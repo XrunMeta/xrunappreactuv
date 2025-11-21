@@ -1,0 +1,115 @@
+# React Native Expo 프로젝트 규칙
+
+## 프로젝트 구조
+- React Native Expo 프로젝트는 TypeScript를 기본으로 사용합니다.
+- 모든 소스 코드는 `src/` 디렉토리 하위에 구성됩니다.
+
+### 폴더 구조
+```
+src/
+├── components/      # 재사용 가능한 컴포넌트
+│   ├── Button.tsx   # 예시 버튼 컴포넌트
+│   └── index.ts     # 컴포넌트 export
+├── screens/         # 화면 컴포넌트
+│   ├── HomeScreen.tsx  # 홈 화면 (첫 페이지)
+│   └── index.ts     # 화면 export
+├── navigation/      # 네비게이션 설정
+│   └── index.tsx    # 네비게이션 구조
+├── services/        # API 서비스 및 외부 통합
+│   └── index.ts
+├── utils/           # 유틸리티 함수
+│   └── index.ts
+├── hooks/           # 커스텀 React 훅
+│   └── index.ts
+├── types/           # TypeScript 타입 정의
+│   └── index.ts
+├── constants/       # 상수 정의 (COLORS, SIZES 등)
+│   └── index.ts
+└── context/         # Context API
+    └── index.tsx
+```
+
+## 주요 규칙
+
+### 1. 첫 화면 설정
+- `App.tsx`는 `HomeScreen`을 첫 페이지로 사용합니다.
+- `HomeScreen`은 화면 중앙에 "안녕하세요 엑스런 어플" 텍스트를 표시합니다.
+
+### 2. 컴포넌트 및 스크린 Export
+- 모든 컴포넌트와 스크린은 각 폴더의 `index.ts` 파일을 통해 export합니다.
+- 예: `src/components/index.ts`에서 모든 컴포넌트를 export
+
+### 3. TypeScript 사용
+- 모든 파일은 TypeScript를 사용합니다.
+- 타입 정의는 `src/types/` 폴더에 저장합니다.
+
+### 4. 스타일링
+- 공통 색상과 크기는 `src/constants/index.ts`에 정의합니다.
+- 각 컴포넌트는 StyleSheet를 사용하여 스타일을 정의합니다.
+
+### 5. 네비게이션
+- 네비게이션을 사용할 경우 `src/navigation/index.tsx`에서 설정합니다.
+- React Navigation 패키지 설치가 필요합니다.
+
+## 파일 구조 예시
+
+### App.tsx
+```typescript
+import React from 'react';
+import { HomeScreen } from './src/screens';
+
+export default function App() {
+  return <HomeScreen />;
+}
+```
+
+### HomeScreen.tsx
+- 화면 중앙에 "안녕하세요 엑스런 어플" 텍스트 표시
+- 재사용 가능한 컴포넌트는 `src/components`에서 import
+
+### Constants
+- COLORS: primary, secondary, background, text, error, success
+- SIZES: small, medium, large, xlarge
+
+## Git 규칙
+
+### 1. 브랜치명 규칙
+형식: `<type>/<scope>-<short-description>`
+
+**Type 목록:**
+- `feature` → 새로운 기능
+- `fix` → 버그 수정
+- `refactor` → 리팩터링
+- `chore` → 환경설정, 빌드 설정
+- `style` → 코드 스타일 변경 (포맷팅 등)
+- `docs` → 문서
+- `hotfix` → 긴급 수정
+- `test` → 테스트 코드 추가
+
+**예시:**
+- `feature/mypage-logout`
+- `fix/login-error`
+- `refactor/api-structure`
+
+### 2. 커밋 메시지 규칙
+형식: `<type>(<scope>): <짧고 명확한 설명>`
+
+**Type 목록:**
+- `feat` → 새로운 기능 추가
+- `fix` → 버그 수정
+- `refactor` → 구조 개선(동작 변화 없음)
+- `style` → 코드 스타일(포맷팅/세미콜론)
+- `chore` → dependency, 빌드 설정
+- `docs` → 문서 수정
+- `test` → 테스트 코드 추가
+- `perf` → 성능 개선
+- `ci` → CI/CD 관련
+- `build` → 빌드 시스템 변경
+
+**예시:**
+- `feat(mypage): 로그아웃 기능 구현`
+- `fix(auth): 로그인 오류 수정`
+- `refactor(api): API 구조 개선`
+
+**참고:** 커밋 시도 시 자동으로 커밋 메시지 형식을 검증합니다.
+
