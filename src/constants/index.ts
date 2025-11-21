@@ -6,6 +6,12 @@ export const COLORS = {
   text: '#000000',
   error: '#FF3B30',
   success: '#34C759',
+
+  buttonPrimary: '#343a5a',
+  buttonSecondary: '#ffdc04',
+
+  headerText: '#10192d',
+  headerIconBg: '#F8FAFC',
 };
 
 export const SIZES = {
