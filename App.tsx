@@ -1,11 +1,28 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_f4f851, v_54d331, v_7c6176 } from './src/screens';
+import {
+  v_f4f851,
+  v_54d331,
+  v_f40fc5,
+  v_7c6176,
+} from './src/screens';
+import { v_00e8f9, v_a0daa8 } from './src/navigation';
+
+const v_c0dbdf = () => {
+  const { currentScreen: v_0f0c7b } = v_a0daa8();
+
+  if (v_0f0c7b === 'login') {
+    return <LoginScreen />;
+  }
+
+  if (v_0f0c7b === 'signup') {
+    return <SignupScreen />;
+  }
+
+  return <LoginSignupScreen />;
+};
 
 export default function v_6540c3() {
   const [v_cd31a8, v_deef62] = v_5ab095(true);
-  const [v_0f0c7b, v_544472] = v_5ab095<'authLanding' | 'login'>(
-    'authLanding',
-  );
 
   v_c4deb2(() => {
 
@@ -20,11 +37,9 @@ export default function v_6540c3() {
     return <SplashScreen />;
   }
 
-  if (v_0f0c7b === 'login') {
-    return <LoginScreen onBackPress={() => v_544472('authLanding')} />;
-  }
-
   return (
-    <LoginSignupScreen onLoginPress={() => v_544472('login')} />
+    <NavigationProvider>
+      <ScreenHost />
+    </NavigationProvider>
   );
 }

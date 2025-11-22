@@ -11,12 +11,10 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
+import { v_a0daa8 } from '../navigation';
 
-interface LoginScreenProps {
-  onBackPress?: () => void;
-}
-
-export const LoginScreen: v_a3453e.FC<LoginScreenProps> = ({ onBackPress: v_f442f6 }) => {
+export const v_f4f851 = () => {
+  const { goBack: v_c7ac57 } = v_a0daa8();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_9fe81c, v_d32265] = v_5ab095(false);
@@ -37,8 +35,8 @@ export const LoginScreen: v_a3453e.FC<LoginScreenProps> = ({ onBackPress: v_f442
       <StatusBar style="dark" />
       <Header
         title="로그인"
-        onBackPress={v_f442f6}
-        showBackButton={Boolean(v_f442f6)}
+        onBackPress={v_c7ac57}
+        showBackButton
       />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}

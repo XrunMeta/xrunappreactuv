@@ -5,8 +5,8 @@ import { v_1bfbd0 } from '../constants';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
-const v_4f9e99 = 'https://www.figma.com/oth-path';
-const v_34a8ff = 'https://www.figma.com/oth-path';
+const v_4f9e99 = require('../../assets/xrun-round-logo.png');
+const v_34a8ff = require('../../assets/xrun-horizontal-logo.png');
 
 export const v_7c6176 = () => {
   return (
@@ -15,7 +15,7 @@ export const v_7c6176 = () => {
       {}
       <View style={v_d81136.centerLogoContainer}>
         <Image
-          source={{ uri: v_4f9e99 }}
+          source={v_4f9e99}
           style={v_d81136.centerLogo}
           resizeMode="contain"
         />
@@ -23,7 +23,7 @@ export const v_7c6176 = () => {
       {}
       <View style={v_d81136.bottomLogoContainer}>
         <Image
-          source={{ uri: v_34a8ff }}
+          source={v_34a8ff}
           style={v_d81136.bottomLogo}
           resizeMode="contain"
         />
