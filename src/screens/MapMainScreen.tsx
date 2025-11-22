@@ -5,9 +5,8 @@ import {
   Platform,
   Alert,
   Dimensions,
-  StatusBar,
-  SafeAreaView,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { BottomNavigationBar } from '../components';
@@ -20,9 +19,53 @@ interface LocationData {
   longitude: number;
 }
 
+let iconWallet: any = null;
+let iconShop: any = null;
+let iconReferral: any = null;
+let iconUser: any = null;
+let iconAdvertise: any = null;
+let iconBell: any = null;
+
+try {
+  iconWallet = require('../../assets/images/icon_wallet.png');
+} catch (e) {
+  console.warn('icon_wallet.png not found');
+}
+
+try {
+  iconShop = require('../../assets/images/icon_shop.png');
+} catch (e) {
+  console.warn('icon_shop.png not found');
+}
+
+try {
+  iconReferral = require('../../assets/images/icon_referral.png');
+} catch (e) {
+  console.warn('icon_referral.png not found');
+}
+
+try {
+  iconUser = require('../../assets/images/icon_user.png');
+} catch (e) {
+  console.warn('icon_user.png not found');
+}
+
+try {
+  iconAdvertise = require('../../assets/images/icon_advertisement.png');
+} catch (e) {
+  console.warn('icon_advertisement.png not found');
+}
+
+try {
+  iconBell = require('../../assets/images/icon_bell.png');
+} catch (e) {
+  console.warn('icon_bell.png not found');
+}
+
 export const MapMainScreen: React.FC = () => {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'Map' | 'Camera'>('Map');
   const [mapRegion, setMapRegion] = useState({
     latitude: 37.5665, 
     longitude: 126.9780,
@@ -74,17 +117,23 @@ export const MapMainScreen: React.FC = () => {
 
   };
 
+  const handleTabChange = (tab: 'Map' | 'Camera') => {
+    setActiveTab(tab);
+    console.log('Tab changed to:', tab);
+
+  };
+
   const bottomNavItems = [
-    { id: 'wallet', label: 'Wallet' },
-    { id: 'advertise', label: 'Advertise' },
+    { id: 'wallet', label: 'Wallet', icon: iconWallet },
+    { id: 'shop', label: 'Shop', icon: iconShop },
     { id: 'map', label: '' }, 
-    { id: 'notify', label: 'Notify' },
-    { id: 'info', label: 'Info' },
+    { id: 'referral', label: 'Referral', icon: iconReferral },
+    { id: 'info', label: 'Info', icon: iconUser },
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <View style={styles.container}>
+      <StatusBar style="dark" />
 
       {}
       <View style={styles.statusBar}>
@@ -130,9 +179,11 @@ export const MapMainScreen: React.FC = () => {
       <BottomNavigationBar
         items={bottomNavItems}
         activeItemId="map"
+        activeTab={activeTab}
         onItemPress={handleNavItemPress}
+        onTabChange={handleTabChange}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

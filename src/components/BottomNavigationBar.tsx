@@ -1,13 +1,42 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS } from '../constants';
 
 const { width } = Dimensions.get('window');
 
+let iconMap: any = null;
+let iconMapWhite: any = null;
+let iconCamera: any = null;
+let iconCameraWhite: any = null;
+
+try {
+  iconMap = require('../../assets/images/icon_map.png');
+} catch (e) {
+  console.warn('icon_map.png not found');
+}
+
+try {
+  iconMapWhite = require('../../assets/images/icon_map_white.png');
+} catch (e) {
+  console.warn('icon_map_white.png not found');
+}
+
+try {
+  iconCamera = require('../../assets/images/icon_camera.png');
+} catch (e) {
+  console.warn('icon_camera.png not found');
+}
+
+try {
+  iconCameraWhite = require('../../assets/images/icon_camera_white.png');
+} catch (e) {
+  console.warn('icon_camera_white.png not found');
+}
+
 interface BottomNavItem {
   id: string;
   label: string;
-  icon?: string;
+  icon?: any;
   isActive?: boolean;
   onPress?: () => void;
 }
@@ -15,13 +44,17 @@ interface BottomNavItem {
 interface BottomNavigationBarProps {
   items: BottomNavItem[];
   activeItemId?: string;
+  activeTab?: 'Map' | 'Camera';
   onItemPress?: (itemId: string) => void;
+  onTabChange?: (tab: 'Map' | 'Camera') => void;
 }
 
 export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   items,
   activeItemId,
+  activeTab = 'Map',
   onItemPress,
+  onTabChange,
 }) => {
 
   const getItemPadding = () => {
@@ -33,33 +66,50 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   const itemPadding = getItemPadding();
 
-  const renderCenterItem = (item: BottomNavItem) => {
-    if (item.id === 'map' || item.id === 'camera') {
-      return (
+  const renderCenterItem = () => {
+
+    return (
+      <View
+        style={styles.centerButtonContainer}>
+        {}
         <TouchableOpacity
-          key={item.id}
-          style={[styles.centerItemContainer, { paddingHorizontal: itemPadding }]}
-          onPress={() => onItemPress?.(item.id)}
-          activeOpacity={0.7}
-        >
-          <View style={styles.centerItemWrapper}>
-            <View style={styles.mapIconContainer}>
-              <View style={styles.mapIconCircle}>
-                {}
-                <View style={styles.mapIcon} />
-              </View>
-            </View>
-            <View style={styles.cameraIconContainer}>
-              <View style={styles.cameraIconCircle}>
-                {}
-                <View style={styles.cameraIcon} />
-              </View>
-            </View>
-          </View>
+          style={[
+            styles.centerButton,
+            activeTab === 'Map' && styles.centerButtonActive,
+          ]}
+          onPress={() => onTabChange?.('Map')}
+          activeOpacity={0.7}>
+          {iconMap && iconMapWhite ? (
+            <Image
+              source={activeTab === 'Map' ? iconMap : iconMapWhite}
+              resizeMode="contain"
+              style={styles.centerIcon}
+            />
+          ) : (
+            <View style={styles.iconPlaceholder} />
+          )}
         </TouchableOpacity>
-      );
-    }
-    return null;
+
+        {}
+        <TouchableOpacity
+          style={[
+            styles.centerButton,
+            activeTab === 'Camera' && styles.centerButtonActive,
+          ]}
+          onPress={() => onTabChange?.('Camera')}
+          activeOpacity={0.7}>
+          {iconCamera && iconCameraWhite ? (
+            <Image
+              source={activeTab === 'Camera' ? iconCamera : iconCameraWhite}
+              resizeMode="contain"
+              style={styles.centerIcon}
+            />
+          ) : (
+            <View style={styles.iconPlaceholder} />
+          )}
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   const renderRegularItem = (item: BottomNavItem) => {
@@ -69,18 +119,31 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
     const isActive = activeItemId === item.id;
 
+    const iconSource = item.icon;
+
     return (
       <TouchableOpacity
         key={item.id}
-        style={[styles.navItem, { paddingHorizontal: itemPadding }]}
+        style={styles.navItem}
         onPress={() => onItemPress?.(item.id)}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <View style={styles.iconContainer}>
-          {}
-          <View style={[styles.iconPlaceholder, isActive && styles.iconPlaceholderActive]} />
+          {iconSource ? (
+            <Image
+              source={iconSource}
+              resizeMode="contain"
+              style={styles.navIcon}
+            />
+          ) : (
+            <View style={[styles.iconPlaceholder, isActive && styles.iconPlaceholderActive]} />
+          )}
         </View>
-        <Text style={[styles.label, isActive && styles.labelActive]}>{item.label}</Text>
+        <Text 
+          style={[styles.label, isActive && styles.labelActive]}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {item.label}
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -92,9 +155,10 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
       {}
       <View style={styles.bottomSection}>
         <View style={styles.content}>
-          {items.map((item) => {
+          {items.map((item, index) => {
             if (item.id === 'map' || item.id === 'camera') {
-              return renderCenterItem(item);
+
+              return <React.Fragment key="center-buttons">{renderCenterItem()}</React.Fragment>;
             }
             return renderRegularItem(item);
           })}
@@ -129,15 +193,22 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     paddingTop: 16,
+    paddingBottom: 12,
     minHeight: 104,
+    width: '100%',
+    paddingHorizontal: 10,
+    gap: 10,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
     minWidth: 60,
+    paddingVertical: 5,
+    flexShrink: 0,
+    paddingHorizontal: 5,
   },
   iconContainer: {
     width: 24,
@@ -145,6 +216,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  navIcon: {
+    width: 20,
+    height: 20,
   },
   iconPlaceholder: {
     width: 20,
@@ -162,53 +237,49 @@ const styles = StyleSheet.create({
     color: '#4C4E55',
     textAlign: 'center',
     letterSpacing: 0.06,
+    maxWidth: '100%',
+    overflow: 'hidden',
   },
   labelActive: {
     color: COLORS.buttonPrimary,
   },
-  centerItemContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  centerItemWrapper: {
+  centerButtonContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapIconContainer: {
-    marginRight: 4,
-  },
-  mapIconCircle: {
-    width: 50,
+    backgroundColor: '#343a59',
+    borderRadius: 50,
     height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.buttonSecondary, 
+    width: 100,
+    marginHorizontal: -5,
+    alignSelf: 'center',
+    flexShrink: 0,
+    ...Platform.select({
+      android: {
+        elevation: 2,
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 3,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
+      },
+    }),
+  },
+  centerButton: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 5,
   },
-  mapIcon: {
-    width: 18,
-    height: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 2,
+  centerButtonActive: {
+    backgroundColor: '#ffdc04',
+    borderRadius: 50,
   },
-  cameraIconContainer: {
-    marginLeft: 4,
-  },
-  cameraIconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#33395B', 
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cameraIcon: {
-    width: 18,
-    height: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 2,
+  centerIcon: {
+    width: 20,
+    height: 20,
   },
   homeIndicator: {
     height: 18,
