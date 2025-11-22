@@ -5,8 +5,8 @@ import { COLORS } from '../constants';
 
 const { width, height } = Dimensions.get('window');
 
-const XRUN_ROUND_LOGO = 'https://www.figma.com/oth-path';
-const XRUN_HORIZONTAL_LOGO = 'https://www.figma.com/oth-path';
+const XRUN_ROUND_LOGO = require('../../assets/xrun-round-logo.png');
+const XRUN_HORIZONTAL_LOGO = require('../../assets/xrun-horizontal-logo.png');
 
 export const SplashScreen = () => {
   return (
@@ -15,7 +15,7 @@ export const SplashScreen = () => {
       {}
       <View style={styles.centerLogoContainer}>
         <Image
-          source={{ uri: XRUN_ROUND_LOGO }}
+          source={XRUN_ROUND_LOGO}
           style={styles.centerLogo}
           resizeMode="contain"
         />
@@ -23,7 +23,7 @@ export const SplashScreen = () => {
       {}
       <View style={styles.bottomLogoContainer}>
         <Image
-          source={{ uri: XRUN_HORIZONTAL_LOGO }}
+          source={XRUN_HORIZONTAL_LOGO}
           style={styles.bottomLogo}
           resizeMode="contain"
         />

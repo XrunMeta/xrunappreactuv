@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { LoginScreen, LoginSignupScreen, SplashScreen } from './src/screens';
+import {
+  LoginScreen,
+  LoginSignupScreen,
+  SignupScreen,
+  SplashScreen,
+} from './src/screens';
+import { NavigationProvider, useAppNavigation } from './src/navigation';
+
+const ScreenHost = () => {
+  const { currentScreen } = useAppNavigation();
+
+  if (currentScreen === 'login') {
+    return <LoginScreen />;
+  }
+
+  if (currentScreen === 'signup') {
+    return <SignupScreen />;
+  }
+
+  return <LoginSignupScreen />;
+};
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentScreen, setCurrentScreen] = useState<'authLanding' | 'login'>(
-    'authLanding',
-  );
 
   useEffect(() => {
 
@@ -20,11 +37,9 @@ export default function App() {
     return <SplashScreen />;
   }
 
-  if (currentScreen === 'login') {
-    return <LoginScreen onBackPress={() => setCurrentScreen('authLanding')} />;
-  }
-
   return (
-    <LoginSignupScreen onLoginPress={() => setCurrentScreen('login')} />
+    <NavigationProvider>
+      <ScreenHost />
+    </NavigationProvider>
   );
 }

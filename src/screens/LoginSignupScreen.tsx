@@ -3,26 +3,17 @@ import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS } from '../constants';
+import { useAppNavigation } from '../navigation';
 
-interface LoginSignupScreenProps {
-  onLoginPress?: () => void;
-}
+export const LoginSignupScreen = () => {
+  const { navigate } = useAppNavigation();
 
-export const LoginSignupScreen: React.FC<LoginSignupScreenProps> = ({
-  onLoginPress,
-}) => {
   const handleLogin = () => {
-    if (onLoginPress) {
-      onLoginPress();
-      return;
-    }
-    console.log('Login pressed');
-
+    navigate('login');
   };
 
   const handleSignUp = () => {
-    console.log('Sign up pressed');
-
+    navigate('signup');
   };
 
   const handleTermsOfService = () => {

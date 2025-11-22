@@ -11,12 +11,10 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
+import { useAppNavigation } from '../navigation';
 
-interface LoginScreenProps {
-  onBackPress?: () => void;
-}
-
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onBackPress }) => {
+export const LoginScreen = () => {
+  const { goBack } = useAppNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberId, setRememberId] = useState(false);
@@ -37,8 +35,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBackPress }) => {
       <StatusBar style="dark" />
       <Header
         title="로그인"
-        onBackPress={onBackPress}
-        showBackButton={Boolean(onBackPress)}
+        onBackPress={goBack}
+        showBackButton
       />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
