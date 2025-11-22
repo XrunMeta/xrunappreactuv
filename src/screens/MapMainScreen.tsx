@@ -11,6 +11,7 @@ import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_f4e704 } from '../components';
 import { v_1bfbd0 } from '../constants';
+import { v_cc3e1f } from './CameraMainScreen';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -120,7 +121,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_42b5ed = (v_11083e) => {
     v_02dd63(v_11083e);
     console.log('Tab changed to:', v_11083e);
-
   };
 
   const v_fce460 = [
@@ -130,6 +130,15 @@ export const MapMainScreen: v_a3453e.FC = () => {
     { id: 'referral', label: 'Referral', icon: v_79011b },
     { id: 'info', label: 'Info', icon: v_b636c9 },
   ];
+
+  if (v_ac1d22 === 'Camera') {
+    return (
+      <CameraMainScreen
+        activeTab={v_ac1d22}
+        onTabChange={v_42b5ed}
+      />
+    );
+  }
 
   return (
     <View style={v_d81136.container}>
