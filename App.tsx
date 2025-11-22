@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HomeScreen, SplashScreen } from './src/screens';
+import { LoginSignupScreen, SplashScreen } from './src/screens';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,5 +17,5 @@ export default function App() {
     return <SplashScreen />;
   }
 
-  return <HomeScreen />;
+  return <LoginSignupScreen />;
 }
