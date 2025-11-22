@@ -20,9 +20,10 @@ export const v_ce4741 = {
   nftHistory: 'nftHistory',
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
+  transactionDetails: 'transactionDetails',
 } as const;
 
-export type ScreenName = keyof typeof v_ce4741 | (string & {});
+export type ScreenName = keyof typeof v_ce4741;
 
 interface NavigationContextValue {
   currentScreen: ScreenName;

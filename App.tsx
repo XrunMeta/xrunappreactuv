@@ -14,6 +14,7 @@ import {
   v_7c7410,
   v_7e9335,
   v_5ea6a6,
+  v_59ff6e,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import {
@@ -73,6 +74,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'adHistory') {
     return <AdWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'transactionDetails') {
+    return <TransactionDetailsScreen />;
   }
 
   return <LoginSignupScreen />;
