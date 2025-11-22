@@ -15,10 +15,16 @@ export const ROUTES = {
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
+  polygonHistory: 'polygonHistory',
+  xrunHistory: 'xrunHistory',
+  nftHistory: 'nftHistory',
+  xrunHistory2: 'xrunHistory2',
+  adHistory: 'adHistory',
+  transactionDetails: 'transactionDetails',
   map: 'map',
 } as const;
 
-export type ScreenName = keyof typeof ROUTES | (string & {});
+export type ScreenName = keyof typeof ROUTES;
 
 interface NavigationContextValue {
   currentScreen: ScreenName;

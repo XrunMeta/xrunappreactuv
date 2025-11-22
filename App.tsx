@@ -9,6 +9,12 @@ import {
   PrivacyPolicyScreen,
   VerificationCodeScreen,
   WalletScreen,
+  PolygonWalletScreen,
+  XrunWalletScreen,
+  NftWalletScreen,
+  XrunWalletScreen2,
+  AdWalletScreen,
+  TransactionDetailsScreen,
   MapMainScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
@@ -49,6 +55,30 @@ const ScreenHost = () => {
 
   if (currentScreen === 'wallet') {
     return <WalletScreen />;
+  }
+
+  if (currentScreen === 'polygonHistory') {
+    return <PolygonWalletScreen />;
+  }
+
+  if (currentScreen === 'xrunHistory') {
+    return <XrunWalletScreen />;
+  }
+
+  if (currentScreen === 'nftHistory') {
+    return <NftWalletScreen />;
+  }
+
+  if (currentScreen === 'xrunHistory2') {
+    return <XrunWalletScreen2 />;
+  }
+
+  if (currentScreen === 'adHistory') {
+    return <AdWalletScreen />;
+  }
+
+  if (currentScreen === 'transactionDetails') {
+    return <TransactionDetailsScreen />;
   }
 
   if (currentScreen === 'map') {
