@@ -4,12 +4,12 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { Header, PrimaryButton } from '../components';
+import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 
@@ -43,50 +43,44 @@ export const LoginScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.formField}>
-          <Text style={styles.label}>이메일</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="이메일을 입력해주세요."
-            placeholderTextColor="#dedede"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </View>
+        <FormField
+          label="이메일"
+          placeholder="이메일을 입력해주세요."
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-        <View style={styles.formField}>
-          <Text style={styles.label}>비밀번호</Text>
-          <View style={styles.passwordWrapper}>
-            <TextInput
-              style={[styles.input, styles.passwordInput]}
-              placeholder="비밀번호를 입력해주세요."
-              placeholderTextColor="#dedede"
-              secureTextEntry={!isPasswordVisible}
-              value={password}
-              onChangeText={setPassword}
-            />
+        <FormField
+          label="비밀번호"
+          placeholder="비밀번호를 입력해주세요."
+          secureTextEntry={!isPasswordVisible}
+          value={password}
+          onChangeText={setPassword}
+          rightAccessory={
             <TouchableOpacity
               style={styles.eyeButton}
               onPress={() => setIsPasswordVisible((prev) => !prev)}
               activeOpacity={0.7}
             >
-              <Text style={styles.eyeText}>{isPasswordVisible ? '숨김' : '보기'}</Text>
+              <Ionicons
+                name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                size={20}
+                color="#666666"
+              />
             </TouchableOpacity>
-          </View>
-        </View>
+          }
+        />
 
-        <TouchableOpacity
-          style={styles.rememberRow}
-          onPress={() => setRememberId((prev) => !prev)}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.checkbox, rememberId && styles.checkboxSelected]}>
-            {rememberId && <View style={styles.checkboxDot} />}
-          </View>
-          <Text style={styles.rememberLabel}>아이디 기억하기</Text>
-        </TouchableOpacity>
+        <View style={styles.checkboxRow}>
+          <FormCheckbox
+            label="아이디 기억하기"
+            checked={rememberId}
+            onToggle={() => setRememberId((prev) => !prev)}
+            variant="circle"
+          />
+        </View>
 
         <View style={styles.loginButtonWrapper}>
           <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
@@ -125,93 +119,28 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
-  formField: {
-    width: '100%',
-    maxWidth: 327,
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
-  },
-  input: {
-    height: 52,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-  },
-  passwordWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  passwordInput: {
-    flex: 1,
-    paddingRight: 46,
-  },
   eyeButton: {
-    position: 'absolute',
-    right: 12,
     height: 24,
     width: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  eyeText: {
-    fontSize: 12,
-    color: '#a0a0a0',
-    fontFamily: 'Roboto-Medium',
-  },
-  rememberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: -8,
+  checkboxRow: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxSelected: {
-    borderColor: COLORS.buttonPrimary,
-  },
-  checkboxDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.buttonPrimary,
-  },
-  rememberLabel: {
-    fontSize: 13,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-    marginLeft: 12,
+    marginTop: -8,
+    marginBottom: 16,
   },
   loginButtonWrapper: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginTop: 48,
   },
   disclaimer: {
     marginTop: 24,
     width: '100%',
-    maxWidth: 327,
     alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,

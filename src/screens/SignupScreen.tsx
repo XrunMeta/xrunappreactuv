@@ -4,14 +4,18 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
-  TouchableOpacity,
   Image,
   Platform,
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Header, PrimaryButton } from '../components';
+import {
+  FormCheckbox,
+  FormField,
+  Header,
+  OptionButton,
+  PrimaryButton,
+} from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 
@@ -63,36 +67,6 @@ export const SignupScreen = () => {
     navigate('login');
   };
 
-  const renderInput = ({
-    label,
-    placeholder,
-    value,
-    onChangeText,
-    keyboardType = 'default',
-    secureTextEntry = false,
-  }: {
-    label: string;
-    placeholder: string;
-    value: string;
-    onChangeText: (text: string) => void;
-    keyboardType?: 'default' | 'email-address' | 'phone-pad';
-    secureTextEntry?: boolean;
-  }) => (
-    <View style={styles.formGroup}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        placeholderTextColor="#dedede"
-        value={value}
-        onChangeText={onChangeText}
-        keyboardType={keyboardType}
-        secureTextEntry={secureTextEntry}
-        autoCapitalize="none"
-      />
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -106,60 +80,67 @@ export const SignupScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {renderInput({
-          label: '성',
-          placeholder: 'Enter your First name',
-          value: familyName,
-          onChangeText: setFamilyName,
-        })}
+        <FormField
+          label="성"
+          placeholder="Enter your First name"
+          value={familyName}
+          onChangeText={setFamilyName}
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
-        {renderInput({
-          label: '이름',
-          placeholder: 'Enter your Last name',
-          value: givenName,
-          onChangeText: setGivenName,
-        })}
+        <FormField
+          label="이름"
+          placeholder="Enter your Last name"
+          value={givenName}
+          onChangeText={setGivenName}
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
-        {renderInput({
-          label: 'Email',
-          placeholder: 'Enter your email address',
-          value: email,
-          onChangeText: setEmail,
-          keyboardType: 'email-address',
-        })}
+        <FormField
+          label="Email"
+          placeholder="Enter your email address"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
-        {renderInput({
-          label: '비밀번호',
-          placeholder: 'Password',
-          value: password,
-          onChangeText: setPassword,
-          secureTextEntry: true,
-        })}
+        <FormField
+          label="비밀번호"
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>전화번호</Text>
-          <View style={styles.phoneRow}>
-            <View style={styles.countryBadge}>
+        <FormField
+          label="전화번호"
+          placeholder="휴대폰 번호를 입력해주세요."
+          keyboardType="phone-pad"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          containerStyle={styles.fieldContainer}
+          leftAccessory={
+            <View style={styles.phonePrefix}>
               <Image source={FLAG_IMAGE} style={styles.flagIcon} />
               <Text style={styles.countryCode}>+82</Text>
             </View>
-            <TextInput
-              style={[styles.input, styles.phoneInput]}
-              placeholder="휴대폰 번호를 입력해주세요."
-              placeholderTextColor="#dedede"
-              keyboardType="phone-pad"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-            />
-          </View>
-        </View>
+          }
+        />
 
-        {renderInput({
-          label: '지역',
-          placeholder: 'Korea',
-          value: region,
-          onChangeText: setRegion,
-        })}
+        <FormField
+          label="지역"
+          placeholder="Korea"
+          value={region}
+          onChangeText={setRegion}
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>성별</Text>
@@ -167,24 +148,12 @@ export const SignupScreen = () => {
             {GENDER_OPTIONS.map((option) => {
               const isActive = gender === option.value;
               return (
-                <TouchableOpacity
+                <OptionButton
                   key={option.value}
-                  style={[
-                    styles.choiceButton,
-                    isActive && styles.choiceButtonActive,
-                  ]}
+                  label={option.label}
+                  selected={isActive}
                   onPress={() => setGender(option.value)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.choiceLabel,
-                      isActive && styles.choiceLabelActive,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
+                />
               );
             })}
           </View>
@@ -192,59 +161,48 @@ export const SignupScreen = () => {
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>나이</Text>
-          <View style={styles.inlineOptions}>
-            {AGE_OPTIONS.map((option) => {
+          <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
+            {AGE_OPTIONS.map((option, index) => {
               const isActive = ageRange === option;
+              const isLast = index === AGE_OPTIONS.length - 1;
               return (
-                <TouchableOpacity
+                <OptionButton
                   key={option}
-                  style={[
-                    styles.choiceButton,
-                    isActive && styles.choiceButtonActive,
-                  ]}
+                  label={option}
+                  selected={isActive}
                   onPress={() => setAgeRange(option)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.choiceLabel,
-                      isActive && styles.choiceLabelActive,
-                    ]}
-                  >
-                    {option}
-                  </Text>
-                </TouchableOpacity>
+                  flex={1}
+                  style={[
+                    styles.ageOptionButton,
+                    !isLast && styles.ageOptionSpacing,
+                  ]}
+                />
               );
             })}
           </View>
         </View>
 
-        {renderInput({
-          label: '추천이메일',
-          placeholder: 'oth-staff@example.invalid',
-          value: referralEmail,
-          onChangeText: setReferralEmail,
-        })}
+        <FormField
+          label="추천이메일"
+          placeholder="oth-staff@example.invalid"
+          value={referralEmail}
+          onChangeText={setReferralEmail}
+          autoCapitalize="none"
+          containerStyle={styles.fieldContainer}
+        />
 
-        <TouchableOpacity
-          style={styles.termsRow}
-          onPress={() => setTermsAccepted((prev) => !prev)}
-          activeOpacity={0.8}
-        >
-          <View
-            style={[
-              styles.checkbox,
-              termsAccepted && styles.checkboxSelected,
-            ]}
-          >
-            {termsAccepted && <View style={styles.checkboxTick} />}
-          </View>
+        <View style={styles.termsRow}>
+          <FormCheckbox
+            checked={termsAccepted}
+            onToggle={() => setTermsAccepted((prev) => !prev)}
+            variant="square"
+          />
           <Text style={styles.termsText}>
             XRUN 서비스 약관 및{' '}
             <Text style={styles.termsHighlight}>개인정보 보호정책</Text>에
             동의합니다.
           </Text>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.buttonWrapper}>
           <PrimaryButton
@@ -275,9 +233,14 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 120,
   },
+  fieldContainer: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+  },
   formGroup: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginBottom: 24,
   },
@@ -288,31 +251,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
   },
-  input: {
-    height: 52,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-  },
-  phoneRow: {
+  phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  countryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#dedede',
-    borderRadius: 10,
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 12,
-    height: 52,
-    marginRight: 12,
+    paddingRight: 12,
+    borderRightWidth: 1,
+    borderRightColor: '#ededed',
   },
   flagIcon: {
     width: 24,
@@ -325,64 +269,32 @@ const styles = StyleSheet.create({
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
-  phoneInput: {
-    flex: 1,
-  },
   inlineOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
-  choiceButton: {
-    height: 40,
-    minWidth: 56,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e3e9ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    marginBottom: 12,
+  ageOptionsRow: {
+    flexWrap: 'nowrap',
+    justifyContent: 'space-between',
   },
-  choiceButtonActive: {
-    backgroundColor: COLORS.buttonPrimary,
-    borderColor: COLORS.buttonPrimary,
+  ageOptionButton: {
+    marginRight: 0,
+    marginBottom: 0,
   },
-  choiceLabel: {
-    fontSize: 13,
-    fontFamily: 'Roboto-Bold',
-    color: '#2a2727',
-  },
-  choiceLabelActive: {
-    color: '#ffffff',
+  ageOptionSpacing: {
+    marginRight: 8,
   },
   termsRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginBottom: 24,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e3e9ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxSelected: {
-    backgroundColor: COLORS.buttonPrimary,
-    borderColor: COLORS.buttonPrimary,
-  },
-  checkboxTick: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#ffffff',
+    gap: 12,
   },
   termsText: {
     flex: 1,
@@ -397,7 +309,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
   },
   homeIndicator: {

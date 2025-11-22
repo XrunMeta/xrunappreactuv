@@ -6,6 +6,13 @@ import {
   SplashScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
+import {
+  useFonts,
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_600SemiBold,
+  Roboto_700Bold,
+} from '@expo-google-fonts/roboto';
 
 const ScreenHost = () => {
   const { currentScreen } = useAppNavigation();
@@ -23,6 +30,12 @@ const ScreenHost = () => {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': Roboto_400Regular,
+    'Roboto-Medium': Roboto_500Medium,
+    'Roboto-SemiBold': Roboto_600SemiBold,
+    'Roboto-Bold': Roboto_700Bold,
+  });
 
   useEffect(() => {
 
@@ -33,7 +46,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
+  if (!fontsLoaded || isLoading) {
     return <SplashScreen />;
   }
 

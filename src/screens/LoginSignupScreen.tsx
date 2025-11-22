@@ -56,7 +56,7 @@ export const LoginSignupScreen = () => {
         {}
         <View style={styles.termsContainer}>
           <Text style={styles.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면{'\n'}
+            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면
             아래의{' '}
             <Text style={styles.linkText} onPress={handleTermsOfService}>
               이용약관
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingBottom: 34,
   },
   adContainer: {
-    width: 327,
+    width: '100%',
     height: 393,
     backgroundColor: '#d9d9d9',
     borderRadius: 10,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
   },
   buttonContainer: {
-    width: 327,
+    width: '100%',
     marginTop: 48, 
     gap: 15,
     alignSelf: 'center',
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   termsContainer: {
-    width: 317,
+    width: '100%',
     marginTop: 97, 
     alignSelf: 'center',
   },
