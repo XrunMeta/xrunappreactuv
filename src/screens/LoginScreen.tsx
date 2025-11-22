@@ -11,23 +11,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginScreen = () => {
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberId, setRememberId] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const emailVerificationRoute: any = ROUTES.emailVerification;
 
   const handleLogin = () => {
     console.log('로그인 시도', { email, rememberId });
-
-  };
-
-  const handleEmailVerification = () => {
-    console.log('이메일 인증 화면으로 이동');
-
+    navigate(ROUTES.wallet);
   };
 
   return (
@@ -50,6 +46,7 @@ export const LoginScreen = () => {
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+          containerStyle={styles.fieldContainer}
         />
 
         <FormField
@@ -58,6 +55,7 @@ export const LoginScreen = () => {
           secureTextEntry={!isPasswordVisible}
           value={password}
           onChangeText={setPassword}
+          containerStyle={styles.fieldContainer}
           rightAccessory={
             <TouchableOpacity
               style={styles.eyeButton}
@@ -92,7 +90,7 @@ export const LoginScreen = () => {
 
         <TouchableOpacity
           style={styles.emailVerification}
-          onPress={handleEmailVerification}
+          onPress={() => navigate(emailVerificationRoute)}
           activeOpacity={0.7}
         >
           <Text style={styles.emailVerificationText}>이메일 인증</Text>
@@ -119,6 +117,11 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
+  fieldContainer: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+  },
   eyeButton: {
     height: 24,
     width: 24,
@@ -141,6 +144,7 @@ const styles = StyleSheet.create({
   disclaimer: {
     marginTop: 24,
     width: '100%',
+    maxWidth: 780,
     alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,
@@ -149,8 +153,10 @@ const styles = StyleSheet.create({
   },
   emailVerification: {
     marginTop: 24,
-    alignSelf: 'flex-start',
-    marginLeft: 24,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    alignItems: 'flex-start',
   },
   emailVerificationText: {
     fontSize: 14,
@@ -173,4 +179,5 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 });
+
 

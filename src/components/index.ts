@@ -6,4 +6,5 @@ export { Header } from './Header';
 export { FormField } from './FormField';
 export { FormCheckbox } from './FormCheckbox';
 export { OptionButton } from './OptionButton';
+export { TokenListItem } from './TokenListItem';
 

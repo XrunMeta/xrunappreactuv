@@ -3,27 +3,25 @@ import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
 
   const handleLogin = () => {
-    navigate('login');
+    navigate(ROUTES.login);
   };
 
   const handleSignUp = () => {
-    navigate('signup');
+    navigate(ROUTES.signup);
   };
 
   const handleTermsOfService = () => {
-
-    console.log('Terms of Service pressed');
+    navigate(ROUTES.terms);
   };
 
   const handlePrivacyPolicy = () => {
-
-    console.log('Privacy Policy pressed');
+    navigate(ROUTES.privacy);
   };
 
   return (

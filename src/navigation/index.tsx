@@ -6,7 +6,18 @@ import React, {
   useState,
 } from 'react';
 
-export type ScreenName = 'authLanding' | 'login' | 'signup';
+export const ROUTES = {
+  authLanding: 'authLanding',
+  login: 'login',
+  signup: 'signup',
+  emailVerification: 'emailVerification',
+  verificationCode: 'verificationCode',
+  terms: 'terms',
+  privacy: 'privacy',
+  wallet: 'wallet',
+} as const;
+
+export type ScreenName = keyof typeof ROUTES | (string & {});
 
 interface NavigationContextValue {
   currentScreen: ScreenName;

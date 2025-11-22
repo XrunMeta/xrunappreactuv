@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
+  EmailVerificationScreen,
   LoginScreen,
   LoginSignupScreen,
   SignupScreen,
   SplashScreen,
+  TermsScreen,
+  PrivacyPolicyScreen,
+  VerificationCodeScreen,
+  WalletScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import {
@@ -23,6 +28,26 @@ const ScreenHost = () => {
 
   if (currentScreen === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (currentScreen === 'emailVerification') {
+    return <EmailVerificationScreen />;
+  }
+
+  if (currentScreen === 'verificationCode') {
+    return <VerificationCodeScreen />;
+  }
+
+  if (currentScreen === 'terms') {
+    return <TermsScreen />;
+  }
+
+  if (currentScreen === 'privacy') {
+    return <PrivacyPolicyScreen />;
+  }
+
+  if (currentScreen === 'wallet') {
+    return <WalletScreen />;
   }
 
   return <LoginSignupScreen />;
