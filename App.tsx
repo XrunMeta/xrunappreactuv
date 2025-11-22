@@ -14,6 +14,7 @@ import {
   NftWalletScreen,
   XrunWalletScreen2,
   AdWalletScreen,
+  TransactionDetailsScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import {
@@ -73,6 +74,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'adHistory') {
     return <AdWalletScreen />;
+  }
+
+  if (currentScreen === 'transactionDetails') {
+    return <TransactionDetailsScreen />;
   }
 
   return <LoginSignupScreen />;

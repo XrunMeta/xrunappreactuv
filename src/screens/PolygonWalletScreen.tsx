@@ -30,7 +30,7 @@ const HISTORY_DATA = [
 ];
 
 export const PolygonWalletScreen = () => {
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const [filterVisible, setFilterVisible] = useState(false);
 
   const handleFilter = () => {
@@ -76,6 +76,7 @@ export const PolygonWalletScreen = () => {
               amount={item.amount}
               suffix={item.suffix}
               iconSource={item.icon}
+              onPress={() => navigate(ROUTES.transactionDetails)}
             />
           ))}
         </View>

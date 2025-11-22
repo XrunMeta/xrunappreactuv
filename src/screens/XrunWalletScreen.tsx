@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
 import { COLORS } from '../constants';
+import { ROUTES, useAppNavigation } from '../navigation';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -38,6 +39,7 @@ const HISTORY_DATA = [
 ];
 
 export const XrunWalletScreen = () => {
+  const { navigate } = useAppNavigation();
   const handleAction = (type: string) => console.log(type);
   const [filterVisible, setFilterVisible] = useState(false);
 
@@ -75,6 +77,7 @@ export const XrunWalletScreen = () => {
               amount={item.amount}
               suffix={item.suffix}
               iconSource={item.icon}
+              onPress={() => navigate(ROUTES.transactionDetails)}
             />
           ))}
         </View>

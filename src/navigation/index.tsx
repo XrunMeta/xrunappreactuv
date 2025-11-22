@@ -20,9 +20,10 @@ export const ROUTES = {
   nftHistory: 'nftHistory',
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
+  transactionDetails: 'transactionDetails',
 } as const;
 
-export type ScreenName = keyof typeof ROUTES | (string & {});
+export type ScreenName = keyof typeof ROUTES;
 
 interface NavigationContextValue {
   currentScreen: ScreenName;
