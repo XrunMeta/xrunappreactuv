@@ -9,6 +9,10 @@ dist/
 web-build/
 expo-env.d.ts
 
+# 시스템 자동추가 파일 (Mac OS)
+._*
+
+
 # Native
 .kotlin/
 *.orig.*

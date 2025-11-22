@@ -2,7 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_cb41de, v_8714fe } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_54d331 = () => {
@@ -87,7 +87,10 @@ const v_d81136 = v_472849.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 58, 
-    paddingBottom: 34,
+    paddingBottom: v_326be8.OS === 'android' 
+      ? 16 + v_9b1a04.medium 
+      : 34,
+    justifyContent: 'space-between',
   },
   adContainer: {
     width: '100%',
@@ -115,9 +118,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 0,
   },
   termsContainer: {
-    width: '100%',
-    marginTop: 97, 
-    alignSelf: 'center',
+    ...v_a61db3.bottomSection,
   },
   termsText: {
     fontSize: 12,

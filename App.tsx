@@ -15,6 +15,7 @@ import {
   v_7e9335,
   v_5ea6a6,
   v_59ff6e,
+  v_20d2c7,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import {
@@ -78,6 +79,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (v_0f0c7b === 'map') {
+    return <MapMainScreen />;
   }
 
   return <LoginSignupScreen />;
