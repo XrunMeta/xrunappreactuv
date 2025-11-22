@@ -11,23 +11,19 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_f4f851 = () => {
-  const { goBack: v_c7ac57 } = v_a0daa8();
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_9fe81c, v_d32265] = v_5ab095(false);
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
+  const v_0d972d = v_ce4741.emailVerification;
 
   const v_ec4736 = () => {
     console.log('로그인 시도', { email: v_e0c7e8, rememberId: v_9fe81c });
-
-  };
-
-  const v_c71e0a = () => {
-    console.log('이메일 인증 화면으로 이동');
-
+    v_9b57fc(v_ce4741.wallet);
   };
 
   return (
@@ -50,6 +46,7 @@ export const v_f4f851 = () => {
           autoCapitalize="none"
           value={v_e0c7e8}
           onChangeText={v_fedf34}
+          containerStyle={v_d81136.fieldContainer}
         />
 
         <FormField
@@ -58,6 +55,7 @@ export const v_f4f851 = () => {
           secureTextEntry={!v_f872c3}
           value={v_adc076}
           onChangeText={v_52b279}
+          containerStyle={v_d81136.fieldContainer}
           rightAccessory={
             <TouchableOpacity
               style={v_d81136.eyeButton}
@@ -92,7 +90,7 @@ export const v_f4f851 = () => {
 
         <TouchableOpacity
           style={v_d81136.emailVerification}
-          onPress={v_c71e0a}
+          onPress={() => v_9b57fc(v_0d972d)}
           activeOpacity={0.7}
         >
           <Text style={v_d81136.emailVerificationText}>이메일 인증</Text>
@@ -119,6 +117,11 @@ const v_d81136 = v_472849.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
+  fieldContainer: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+  },
   eyeButton: {
     height: 24,
     width: 24,
@@ -141,6 +144,7 @@ const v_d81136 = v_472849.create({
   disclaimer: {
     marginTop: 24,
     width: '100%',
+    maxWidth: 780,
     alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,
@@ -149,8 +153,10 @@ const v_d81136 = v_472849.create({
   },
   emailVerification: {
     marginTop: 24,
-    alignSelf: 'flex-start',
-    marginLeft: 24,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    alignItems: 'flex-start',
   },
   emailVerificationText: {
     fontSize: 14,
@@ -173,4 +179,5 @@ const v_d81136 = v_472849.create({
     marginBottom: 9,
   },
 });
+
 

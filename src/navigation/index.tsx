@@ -6,7 +6,18 @@ import v_a3453e, {
   v_5ab095,
 } from 'bapkr';
 
-export type ScreenName = 'authLanding' | 'login' | 'signup';
+export const v_ce4741 = {
+  authLanding: 'authLanding',
+  login: 'login',
+  signup: 'signup',
+  emailVerification: 'emailVerification',
+  verificationCode: 'verificationCode',
+  terms: 'terms',
+  privacy: 'privacy',
+  wallet: 'wallet',
+} as const;
+
+export type ScreenName = keyof typeof v_ce4741 | (string & {});
 
 interface NavigationContextValue {
   currentScreen: ScreenName;

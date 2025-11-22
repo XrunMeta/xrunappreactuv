@@ -1,9 +1,14 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
+  v_a82b55,
   v_f4f851,
   v_54d331,
   v_f40fc5,
   v_7c6176,
+  v_d3f135,
+  v_086cde,
+  v_667a00,
+  v_952e24,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import {
@@ -23,6 +28,26 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (v_0f0c7b === 'emailVerification') {
+    return <EmailVerificationScreen />;
+  }
+
+  if (v_0f0c7b === 'verificationCode') {
+    return <VerificationCodeScreen />;
+  }
+
+  if (v_0f0c7b === 'terms') {
+    return <TermsScreen />;
+  }
+
+  if (v_0f0c7b === 'privacy') {
+    return <PrivacyPolicyScreen />;
+  }
+
+  if (v_0f0c7b === 'wallet') {
+    return <WalletScreen />;
   }
 
   return <LoginSignupScreen />;

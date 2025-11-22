@@ -3,27 +3,25 @@ import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_cb41de, v_8714fe } from '../components';
 import { v_1bfbd0 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_54d331 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
 
   const v_ec4736 = () => {
-    v_9b57fc('login');
+    v_9b57fc(v_ce4741.login);
   };
 
   const v_c5a058 = () => {
-    v_9b57fc('signup');
+    v_9b57fc(v_ce4741.signup);
   };
 
   const v_f4f55f = () => {
-
-    console.log('Terms of Service pressed');
+    v_9b57fc(v_ce4741.terms);
   };
 
   const v_1354b4 = () => {
-
-    console.log('Privacy Policy pressed');
+    v_9b57fc(v_ce4741.privacy);
   };
 
   return (
