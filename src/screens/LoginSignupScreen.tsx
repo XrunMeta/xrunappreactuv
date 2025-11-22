@@ -1,36 +1,27 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS } from '../constants';
+import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginSignupScreen = () => {
-  const handleLogin = () => {
-    console.log('Login pressed');
+  const { navigate } = useAppNavigation();
 
+  const handleLogin = () => {
+    navigate(ROUTES.login);
   };
 
   const handleSignUp = () => {
-    console.log('Sign up pressed');
-
+    navigate(ROUTES.signup);
   };
 
   const handleTermsOfService = () => {
-
-    console.log('Terms of Service pressed');
+    navigate(ROUTES.terms);
   };
 
   const handlePrivacyPolicy = () => {
-
-    console.log('Privacy Policy pressed');
+    navigate(ROUTES.privacy);
   };
 
   return (
@@ -63,7 +54,7 @@ export const LoginSignupScreen = () => {
         {}
         <View style={styles.termsContainer}>
           <Text style={styles.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면{'\n'}
+            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면
             아래의{' '}
             <Text style={styles.linkText} onPress={handleTermsOfService}>
               이용약관
@@ -99,7 +90,7 @@ const styles = StyleSheet.create({
     paddingBottom: 34,
   },
   adContainer: {
-    width: 327,
+    width: '100%',
     height: 393,
     backgroundColor: '#d9d9d9',
     borderRadius: 10,
@@ -115,7 +106,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
   },
   buttonContainer: {
-    width: 327,
+    width: '100%',
     marginTop: 48, 
     gap: 15,
     alignSelf: 'center',
@@ -124,7 +115,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   termsContainer: {
-    width: 317,
+    width: '100%',
     marginTop: 97, 
     alignSelf: 'center',
   },

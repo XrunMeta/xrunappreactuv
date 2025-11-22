@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { COLORS } from '../constants';
+import { useAppNavigation } from '../navigation';
 
 const { width } = Dimensions.get('window');
 
@@ -21,19 +22,32 @@ export const Header: React.FC<HeaderProps> = ({
   onBackPress,
   showBackButton = true,
 }) => {
+  const { goBack, canGoBack } = useAppNavigation();
+  const shouldShowBackButton = showBackButton && canGoBack;
+  const handleBackPress = onBackPress ?? (canGoBack ? goBack : undefined);
+
+  const renderBackArea = () =>
+    shouldShowBackButton ? (
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={handleBackPress}
+        activeOpacity={0.7}
+        disabled={!handleBackPress}
+      >
+        <BackIcon />
+      </TouchableOpacity>
+    ) : (
+      <View style={styles.backButtonPlaceholder} />
+    );
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {showBackButton && (
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={onBackPress}
-            activeOpacity={0.7}
-          >
-            <BackIcon />
-          </TouchableOpacity>
-        )}
-        <Text style={styles.title}>{title}</Text>
+        {renderBackArea()}
+        <View style={styles.titleWrapper} pointerEvents="none">
+          <Text style={styles.title}>{title}</Text>
+        </View>
+        <View style={styles.backButtonPlaceholder} />
       </View>
     </View>
   );
@@ -41,8 +55,9 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 62,
+    height: 92,
     width: width,
+    paddingTop: 30,
     backgroundColor: COLORS.background,
     shadowColor: '#000',
     shadowOffset: {
@@ -59,6 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 25,
     height: '100%',
+    justifyContent: 'space-between',
   },
   backButton: {
     width: 40,
@@ -67,7 +83,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+  },
+  backButtonPlaceholder: {
+    width: 40,
+    height: 40,
   },
   iconContainer: {
     width: 24,
@@ -81,17 +100,17 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     lineHeight: 24,
   },
+  titleWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
   title: {
     fontSize: 20,
     fontWeight: '700',
     lineHeight: 24,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Bold', 
-    flex: 1,
     textAlign: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
   },
 });
 

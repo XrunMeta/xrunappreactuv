@@ -34,7 +34,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: COLORS.buttonSecondary,
     borderRadius: 16,
     alignItems: 'center',

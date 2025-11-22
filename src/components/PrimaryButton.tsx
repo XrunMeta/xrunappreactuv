@@ -34,7 +34,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: COLORS.buttonPrimary,
     borderRadius: 16,
     alignItems: 'center',
