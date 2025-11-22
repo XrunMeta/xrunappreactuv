@@ -9,6 +9,11 @@ import {
   PrivacyPolicyScreen,
   VerificationCodeScreen,
   WalletScreen,
+  PolygonWalletScreen,
+  XrunWalletScreen,
+  NftWalletScreen,
+  XrunWalletScreen2,
+  AdWalletScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import {
@@ -48,6 +53,26 @@ const ScreenHost = () => {
 
   if (currentScreen === 'wallet') {
     return <WalletScreen />;
+  }
+
+  if (currentScreen === 'polygonHistory') {
+    return <PolygonWalletScreen />;
+  }
+
+  if (currentScreen === 'xrunHistory') {
+    return <XrunWalletScreen />;
+  }
+
+  if (currentScreen === 'nftHistory') {
+    return <NftWalletScreen />;
+  }
+
+  if (currentScreen === 'xrunHistory2') {
+    return <XrunWalletScreen2 />;
+  }
+
+  if (currentScreen === 'adHistory') {
+    return <AdWalletScreen />;
   }
 
   return <LoginSignupScreen />;

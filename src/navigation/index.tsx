@@ -15,6 +15,11 @@ export const ROUTES = {
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
+  polygonHistory: 'polygonHistory',
+  xrunHistory: 'xrunHistory',
+  nftHistory: 'nftHistory',
+  xrunHistory2: 'xrunHistory2',
+  adHistory: 'adHistory',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES | (string & {});

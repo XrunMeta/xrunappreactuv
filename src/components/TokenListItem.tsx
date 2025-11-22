@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from 'react-native';
 
-interface TokenListItemProps {
+interface TokenListItemProps extends TouchableOpacityProps {
   title: string;
   subtitle: string;
   amount: string;
@@ -27,9 +35,11 @@ export const TokenListItem: React.FC<TokenListItemProps> = ({
     background: '#EDEDED',
     text: '#343434',
   },
+  onPress,
+  ...touchableProps
 }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} activeOpacity={onPress ? 0.85 : 1} onPress={onPress} {...touchableProps}>
       <View style={styles.left}>
         <View style={[styles.iconWrapper, { backgroundColor: fallbackColors.background }]}>
           {iconSource ? (
@@ -50,7 +60,7 @@ export const TokenListItem: React.FC<TokenListItemProps> = ({
         <Text style={styles.amount}>{amount}</Text>
         {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
