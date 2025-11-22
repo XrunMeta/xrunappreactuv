@@ -4,14 +4,18 @@ import {
   v_19b633,
   v_472849,
   v_122070,
-  v_79c4f2,
-  v_4623af,
   v_cf9c33,
   v_326be8,
   v_03e392,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
-import { v_729608, v_cb41de } from '../components';
+import {
+  v_fa3feb,
+  v_368e80,
+  v_729608,
+  v_89c10a,
+  v_cb41de,
+} from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 
@@ -63,36 +67,6 @@ export const v_f40fc5 = () => {
     v_9b57fc('login');
   };
 
-  const v_d732dc = ({
-    label: v_2869c1,
-    placeholder: v_c6baea,
-    value: v_3b402b,
-    onChangeText: v_271a69,
-    keyboardType: v_130cff = 'default',
-    secureTextEntry: v_458725 = false,
-  }: {
-    label: string;
-    placeholder: string;
-    value: string;
-    onChangeText: (text: string) => void;
-    keyboardType?: 'default' | 'email-address' | 'phone-pad';
-    secureTextEntry?: boolean;
-  }) => (
-    <View style={v_d81136.formGroup}>
-      <Text style={v_d81136.label}>{v_2869c1}</Text>
-      <TextInput
-        style={v_d81136.input}
-        placeholder={v_c6baea}
-        placeholderTextColor="#dedede"
-        value={v_3b402b}
-        onChangeText={v_271a69}
-        keyboardType={v_130cff}
-        secureTextEntry={v_458725}
-        autoCapitalize="none"
-      />
-    </View>
-  );
-
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
@@ -106,60 +80,67 @@ export const v_f40fc5 = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {v_d732dc({
-          label: '성',
-          placeholder: 'Enter your First name',
-          value: v_f142d8,
-          onChangeText: v_6dde2f,
-        })}
+        <FormField
+          label="성"
+          placeholder="Enter your First name"
+          value={v_f142d8}
+          onChangeText={v_6dde2f}
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
-        {v_d732dc({
-          label: '이름',
-          placeholder: 'Enter your Last name',
-          value: v_a7c7b7,
-          onChangeText: v_15ded5,
-        })}
+        <FormField
+          label="이름"
+          placeholder="Enter your Last name"
+          value={v_a7c7b7}
+          onChangeText={v_15ded5}
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
-        {v_d732dc({
-          label: 'Email',
-          placeholder: 'Enter your email address',
-          value: v_e0c7e8,
-          onChangeText: v_fedf34,
-          keyboardType: 'email-address',
-        })}
+        <FormField
+          label="Email"
+          placeholder="Enter your email address"
+          value={v_e0c7e8}
+          onChangeText={v_fedf34}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
-        {v_d732dc({
-          label: '비밀번호',
-          placeholder: 'Password',
-          value: v_adc076,
-          onChangeText: v_52b279,
-          secureTextEntry: true,
-        })}
+        <FormField
+          label="비밀번호"
+          placeholder="Password"
+          value={v_adc076}
+          onChangeText={v_52b279}
+          secureTextEntry
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
-        <View style={v_d81136.formGroup}>
-          <Text style={v_d81136.label}>전화번호</Text>
-          <View style={v_d81136.phoneRow}>
-            <View style={v_d81136.countryBadge}>
+        <FormField
+          label="전화번호"
+          placeholder="휴대폰 번호를 입력해주세요."
+          keyboardType="phone-pad"
+          value={v_3a6ac4}
+          onChangeText={v_f768f9}
+          containerStyle={v_d81136.fieldContainer}
+          leftAccessory={
+            <View style={v_d81136.phonePrefix}>
               <Image source={v_f1883f} style={v_d81136.flagIcon} />
               <Text style={v_d81136.countryCode}>+82</Text>
             </View>
-            <TextInput
-              style={[v_d81136.input, v_d81136.phoneInput]}
-              placeholder="휴대폰 번호를 입력해주세요."
-              placeholderTextColor="#dedede"
-              keyboardType="phone-pad"
-              value={v_3a6ac4}
-              onChangeText={v_f768f9}
-            />
-          </View>
-        </View>
+          }
+        />
 
-        {v_d732dc({
-          label: '지역',
-          placeholder: 'Korea',
-          value: v_a6c30b,
-          onChangeText: v_c030e3,
-        })}
+        <FormField
+          label="지역"
+          placeholder="Korea"
+          value={v_a6c30b}
+          onChangeText={v_c030e3}
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
         <View style={v_d81136.formGroup}>
           <Text style={v_d81136.label}>성별</Text>
@@ -167,24 +148,12 @@ export const v_f40fc5 = () => {
             {v_798085.map((v_0bd920) => {
               const v_26dce6 = v_c3eac4 === v_0bd920.value;
               return (
-                <TouchableOpacity
+                <OptionButton
                   key={v_0bd920.value}
-                  style={[
-                    v_d81136.choiceButton,
-                    v_26dce6 && v_d81136.choiceButtonActive,
-                  ]}
+                  label={v_0bd920.label}
+                  selected={v_26dce6}
                   onPress={() => v_bdc43c(v_0bd920.value)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      v_d81136.choiceLabel,
-                      v_26dce6 && v_d81136.choiceLabelActive,
-                    ]}
-                  >
-                    {v_0bd920.label}
-                  </Text>
-                </TouchableOpacity>
+                />
               );
             })}
           </View>
@@ -192,59 +161,48 @@ export const v_f40fc5 = () => {
 
         <View style={v_d81136.formGroup}>
           <Text style={v_d81136.label}>나이</Text>
-          <View style={v_d81136.inlineOptions}>
-            {v_0c96f7.map((v_0bd920) => {
+          <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
+            {v_0c96f7.map((v_0bd920, v_a56041) => {
               const v_26dce6 = v_f83808 === v_0bd920;
+              const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
               return (
-                <TouchableOpacity
+                <OptionButton
                   key={v_0bd920}
-                  style={[
-                    v_d81136.choiceButton,
-                    v_26dce6 && v_d81136.choiceButtonActive,
-                  ]}
+                  label={v_0bd920}
+                  selected={v_26dce6}
                   onPress={() => v_64a312(v_0bd920)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      v_d81136.choiceLabel,
-                      v_26dce6 && v_d81136.choiceLabelActive,
-                    ]}
-                  >
-                    {v_0bd920}
-                  </Text>
-                </TouchableOpacity>
+                  flex={1}
+                  style={[
+                    v_d81136.ageOptionButton,
+                    !v_0d0d82 && v_d81136.ageOptionSpacing,
+                  ]}
+                />
               );
             })}
           </View>
         </View>
 
-        {v_d732dc({
-          label: '추천이메일',
-          placeholder: 'oth-staff@example.invalid',
-          value: v_9bf12c,
-          onChangeText: v_fb6bbb,
-        })}
+        <FormField
+          label="추천이메일"
+          placeholder="oth-staff@example.invalid"
+          value={v_9bf12c}
+          onChangeText={v_fb6bbb}
+          autoCapitalize="none"
+          containerStyle={v_d81136.fieldContainer}
+        />
 
-        <TouchableOpacity
-          style={v_d81136.termsRow}
-          onPress={() => v_cbfe22((v_ba2215) => !v_ba2215)}
-          activeOpacity={0.8}
-        >
-          <View
-            style={[
-              v_d81136.checkbox,
-              v_91ca05 && v_d81136.checkboxSelected,
-            ]}
-          >
-            {v_91ca05 && <View style={v_d81136.checkboxTick} />}
-          </View>
+        <View style={v_d81136.termsRow}>
+          <FormCheckbox
+            checked={v_91ca05}
+            onToggle={() => v_cbfe22((v_ba2215) => !v_ba2215)}
+            variant="square"
+          />
           <Text style={v_d81136.termsText}>
             XRUN 서비스 약관 및{' '}
             <Text style={v_d81136.termsHighlight}>개인정보 보호정책</Text>에
             동의합니다.
           </Text>
-        </TouchableOpacity>
+        </View>
 
         <View style={v_d81136.buttonWrapper}>
           <PrimaryButton
@@ -275,9 +233,14 @@ const v_d81136 = v_472849.create({
     paddingTop: 24,
     paddingBottom: 120,
   },
+  fieldContainer: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+  },
   formGroup: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginBottom: 24,
   },
@@ -288,31 +251,12 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
   },
-  input: {
-    height: 52,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-  },
-  phoneRow: {
+  phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  countryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#dedede',
-    borderRadius: 10,
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 12,
-    height: 52,
-    marginRight: 12,
+    paddingRight: 12,
+    borderRightWidth: 1,
+    borderRightColor: '#ededed',
   },
   flagIcon: {
     width: 24,
@@ -325,64 +269,32 @@ const v_d81136 = v_472849.create({
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
-  phoneInput: {
-    flex: 1,
-  },
   inlineOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
-  choiceButton: {
-    height: 40,
-    minWidth: 56,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e3e9ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    marginBottom: 12,
+  ageOptionsRow: {
+    flexWrap: 'nowrap',
+    justifyContent: 'space-between',
   },
-  choiceButtonActive: {
-    backgroundColor: v_1bfbd0.buttonPrimary,
-    borderColor: v_1bfbd0.buttonPrimary,
+  ageOptionButton: {
+    marginRight: 0,
+    marginBottom: 0,
   },
-  choiceLabel: {
-    fontSize: 13,
-    fontFamily: 'Roboto-Bold',
-    color: '#2a2727',
-  },
-  choiceLabelActive: {
-    color: '#ffffff',
+  ageOptionSpacing: {
+    marginRight: 8,
   },
   termsRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginBottom: 24,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e3e9ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxSelected: {
-    backgroundColor: v_1bfbd0.buttonPrimary,
-    borderColor: v_1bfbd0.buttonPrimary,
-  },
-  checkboxTick: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#ffffff',
+    gap: 12,
   },
   termsText: {
     flex: 1,
@@ -397,7 +309,7 @@ const v_d81136 = v_472849.create({
   },
   buttonWrapper: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
   },
   homeIndicator: {

@@ -4,12 +4,12 @@ import {
   v_19b633,
   v_472849,
   v_122070,
-  v_79c4f2,
   v_4623af,
   v_326be8,
 } from 'rcmrninabrnb';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b5df25 } from 'ernurodqvmtspux';
-import { v_729608, v_cb41de } from '../components';
+import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 
@@ -43,50 +43,44 @@ export const v_f4f851 = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={v_d81136.formField}>
-          <Text style={v_d81136.label}>이메일</Text>
-          <TextInput
-            style={v_d81136.input}
-            placeholder="이메일을 입력해주세요."
-            placeholderTextColor="#dedede"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={v_e0c7e8}
-            onChangeText={v_fedf34}
-          />
-        </View>
+        <FormField
+          label="이메일"
+          placeholder="이메일을 입력해주세요."
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={v_e0c7e8}
+          onChangeText={v_fedf34}
+        />
 
-        <View style={v_d81136.formField}>
-          <Text style={v_d81136.label}>비밀번호</Text>
-          <View style={v_d81136.passwordWrapper}>
-            <TextInput
-              style={[v_d81136.input, v_d81136.passwordInput]}
-              placeholder="비밀번호를 입력해주세요."
-              placeholderTextColor="#dedede"
-              secureTextEntry={!v_f872c3}
-              value={v_adc076}
-              onChangeText={v_52b279}
-            />
+        <FormField
+          label="비밀번호"
+          placeholder="비밀번호를 입력해주세요."
+          secureTextEntry={!v_f872c3}
+          value={v_adc076}
+          onChangeText={v_52b279}
+          rightAccessory={
             <TouchableOpacity
               style={v_d81136.eyeButton}
               onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.eyeText}>{v_f872c3 ? '숨김' : '보기'}</Text>
+              <Ionicons
+                name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
+                size={20}
+                color="#666666"
+              />
             </TouchableOpacity>
-          </View>
-        </View>
+          }
+        />
 
-        <TouchableOpacity
-          style={v_d81136.rememberRow}
-          onPress={() => v_d32265((v_ba2215) => !v_ba2215)}
-          activeOpacity={0.8}
-        >
-          <View style={[v_d81136.checkbox, v_9fe81c && v_d81136.checkboxSelected]}>
-            {v_9fe81c && <View style={v_d81136.checkboxDot} />}
-          </View>
-          <Text style={v_d81136.rememberLabel}>아이디 기억하기</Text>
-        </TouchableOpacity>
+        <View style={v_d81136.checkboxRow}>
+          <FormCheckbox
+            label="아이디 기억하기"
+            checked={v_9fe81c}
+            onToggle={() => v_d32265((v_ba2215) => !v_ba2215)}
+            variant="circle"
+          />
+        </View>
 
         <View style={v_d81136.loginButtonWrapper}>
           <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
@@ -125,93 +119,28 @@ const v_d81136 = v_472849.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
-  formField: {
-    width: '100%',
-    maxWidth: 327,
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
-  },
-  input: {
-    height: 52,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    backgroundColor: '#fefefe',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-  },
-  passwordWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  passwordInput: {
-    flex: 1,
-    paddingRight: 46,
-  },
   eyeButton: {
-    position: 'absolute',
-    right: 12,
     height: 24,
     width: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  eyeText: {
-    fontSize: 12,
-    color: '#a0a0a0',
-    fontFamily: 'Roboto-Medium',
-  },
-  rememberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: -8,
+  checkboxRow: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#dedede',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxSelected: {
-    borderColor: v_1bfbd0.buttonPrimary,
-  },
-  checkboxDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: v_1bfbd0.buttonPrimary,
-  },
-  rememberLabel: {
-    fontSize: 13,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
-    marginLeft: 12,
+    marginTop: -8,
+    marginBottom: 16,
   },
   loginButtonWrapper: {
     width: '100%',
-    maxWidth: 327,
+    maxWidth: 780,
     alignSelf: 'center',
     marginTop: 48,
   },
   disclaimer: {
     marginTop: 24,
     width: '100%',
-    maxWidth: 327,
     alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,

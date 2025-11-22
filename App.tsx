@@ -6,6 +6,13 @@ import {
   v_7c6176,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
+import {
+  v_c06f2c,
+  v_259807,
+  v_b1350e,
+  v_f2f1ae,
+  v_567640,
+} from 'duafkibkrsnlsywaptcqakgas';
 
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b } = v_a0daa8();
@@ -23,6 +30,12 @@ const v_c0dbdf = () => {
 
 export default function v_6540c3() {
   const [v_cd31a8, v_deef62] = v_5ab095(true);
+  const [v_43f571] = v_c06f2c({
+    'Roboto-Regular': v_259807,
+    'Roboto-Medium': v_b1350e,
+    'Roboto-SemiBold': v_f2f1ae,
+    'Roboto-Bold': v_567640,
+  });
 
   v_c4deb2(() => {
 
@@ -33,7 +46,7 @@ export default function v_6540c3() {
     return () => clearTimeout(v_cb36b1);
   }, []);
 
-  if (v_cd31a8) {
+  if (!v_43f571 || v_cd31a8) {
     return <SplashScreen />;
   }
 
