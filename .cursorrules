@@ -4,6 +4,7 @@
 - React Native Expo 프로젝트는 TypeScript를 기본으로 사용합니다.
 - 모든 소스 코드는 `src/` 디렉토리 하위에 구성됩니다.
 
+cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHRwczovL21jcC5maWdtYS5jb20vbWNwIn0%3D
 ### 폴더 구조
 ```
 src/
