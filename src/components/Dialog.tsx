@@ -1,0 +1,169 @@
+import v_a3453e from 'bapkr';
+import {
+  v_aa7413,
+  v_3094a2,
+  v_19b633,
+  v_4623af,
+  v_472849,
+  v_7e4944,
+} from 'rcmrninabrnb';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
+
+type DialogAction = {
+  label: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary';
+  style?: v_7e4944;
+};
+
+interface DialogProps {
+  visible: boolean;
+  title: string;
+  children?: v_a3453e.ReactNode;
+  actions?: DialogAction[];
+  onClose?: () => void;
+  containerStyle?: v_7e4944;
+}
+
+export const Dialog: v_a3453e.FC<DialogProps> = ({
+  visible: v_cf55be,
+  title: v_9f1622,
+  children: v_21f619,
+  actions: v_dd943a = [],
+  onClose: v_0890f8,
+  containerStyle: v_4affe9,
+}) => {
+  return (
+    <Modal transparent animationType="fade" visible={v_cf55be} onRequestClose={v_0890f8}>
+      <View style={v_d81136.overlay}>
+        <View style={[v_d81136.card, v_4affe9]}>
+          <View style={v_d81136.header}>
+            <Text style={v_d81136.title}>{v_9f1622}</Text>
+            {v_0890f8 ? (
+              <TouchableOpacity onPress={v_0890f8} hitSlop={v_f72698} style={v_d81136.close}>
+                <Ionicons name="close" size={18} color="#747474" />
+              </TouchableOpacity>
+            ) : (
+              <View style={v_d81136.closePlaceholder} />
+            )}
+          </View>
+
+          <View style={v_d81136.divider} />
+
+          <View style={v_d81136.body}>{v_21f619}</View>
+
+          {v_dd943a.length > 0 ? (
+            <View style={v_d81136.actions}>
+              {v_dd943a.map((v_9b064f) => (
+                <TouchableOpacity
+                  key={v_9b064f.label}
+                  style={[
+                    v_d81136.actionButton,
+                    v_9b064f.variant === 'primary' ? v_d81136.primaryButton : v_d81136.secondaryButton,
+                    v_9b064f.style,
+                  ]}
+                  onPress={v_9b064f.onPress}
+                  activeOpacity={0.9}
+                >
+                  <Text
+                    style={[
+                      v_d81136.actionLabel,
+                      v_9b064f.variant === 'primary' ? v_d81136.primaryLabel : v_d81136.secondaryLabel,
+                    ]}
+                  >
+                    {v_9b064f.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : null}
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const v_f72698 = { top: 8, bottom: 8, left: 8, right: 8 };
+
+const v_d81136 = v_472849.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(16, 25, 45, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 360,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 6.5,
+    elevation: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  title: {
+    flex: 1,
+    fontSize: 20,
+    fontFamily: 'Roboto-Bold',
+    color: '#121212',
+    textAlign: 'center',
+  },
+  close: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closePlaceholder: {
+    width: 32,
+    height: 32,
+  },
+  divider: {
+    height: v_472849.hairlineWidth,
+    backgroundColor: '#e4e4e4',
+  },
+  body: {
+    paddingVertical: 20,
+    minHeight: 100,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryButton: {
+    backgroundColor: '#DEDEDE',
+  },
+  primaryButton: {
+    backgroundColor: '#FFDC04',
+  },
+  actionLabel: {
+    fontSize: 16,
+    fontFamily: 'Roboto-SemiBold',
+  },
+  primaryLabel: {
+    color: '#000000',
+  },
+  secondaryLabel: {
+    color: '#000000',
+  },
+});
+
+

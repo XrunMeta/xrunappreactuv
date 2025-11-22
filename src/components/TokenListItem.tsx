@@ -1,7 +1,15 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_cf9c33, v_07a341 } from 'rcmrninabrnb';
+import {
+  v_3094a2,
+  v_19b633,
+  v_472849,
+  v_cf9c33,
+  v_07a341,
+  v_4623af,
+  v_629153,
+} from 'rcmrninabrnb';
 
-interface TokenListItemProps {
+interface TokenListItemProps extends v_629153 {
   title: string;
   subtitle: string;
   amount: string;
@@ -27,9 +35,11 @@ export const TokenListItem: v_a3453e.FC<TokenListItemProps> = ({
     background: '#EDEDED',
     text: '#343434',
   },
+  onPress: v_719eed,
+  ...v_29c333
 }) => {
   return (
-    <View style={v_d81136.container}>
+    <TouchableOpacity style={v_d81136.container} activeOpacity={v_719eed ? 0.85 : 1} onPress={v_719eed} {...v_29c333}>
       <View style={v_d81136.left}>
         <View style={[v_d81136.iconWrapper, { backgroundColor: v_94e1f9.background }]}>
           {v_c1dd95 ? (
@@ -50,7 +60,7 @@ export const TokenListItem: v_a3453e.FC<TokenListItemProps> = ({
         <Text style={v_d81136.amount}>{v_f63e09}</Text>
         {v_ae8e76 ? <Text style={v_d81136.suffix}>{v_ae8e76}</Text> : null}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
