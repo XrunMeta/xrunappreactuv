@@ -15,6 +15,7 @@ export const v_ce4741 = {
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
+  map: 'map',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741 | (string & {});

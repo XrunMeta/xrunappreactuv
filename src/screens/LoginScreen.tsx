@@ -10,7 +10,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_f4f851 = () => {
@@ -80,21 +80,32 @@ export const v_f4f851 = () => {
           />
         </View>
 
-        <View style={v_d81136.loginButtonWrapper}>
-          <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
+        <View style={v_d81136.bottomSection}>
+          <View style={v_d81136.loginButtonWrapper}>
+            <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
+          </View>
+
+          <Text style={v_d81136.disclaimer}>
+            비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
+          </Text>
+
+          <TouchableOpacity
+            style={v_d81136.emailVerification}
+            onPress={() => v_9b57fc(v_0d972d)}
+            activeOpacity={0.7}
+          >
+            <Text style={v_d81136.emailVerificationText}>이메일 인증</Text>
+
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={v_d81136.mapLink}
+            onPress={() => v_9b57fc(v_ce4741.map)}
+            activeOpacity={0.7}
+          >
+            <Text style={v_d81136.mapLinkText}>맵 페이지 (임시 주의)</Text>
+          </TouchableOpacity>
         </View>
-
-        <Text style={v_d81136.disclaimer}>
-          비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
-        </Text>
-
-        <TouchableOpacity
-          style={v_d81136.emailVerification}
-          onPress={() => v_9b57fc(v_0d972d)}
-          activeOpacity={0.7}
-        >
-          <Text style={v_d81136.emailVerificationText}>이메일 인증</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       {v_326be8.OS === 'ios' && (
@@ -115,7 +126,10 @@ const v_d81136 = v_472849.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 40,
+    paddingBottom: v_326be8.OS === 'android' 
+      ? 16 + v_9b1a04.medium 
+      : 40,
+    justifyContent: 'space-between',
   },
   fieldContainer: {
     width: '100%',
@@ -135,17 +149,15 @@ const v_d81136 = v_472849.create({
     marginTop: -8,
     marginBottom: 16,
   },
+  bottomSection: {
+    ...v_a61db3.bottomSection,
+  },
   loginButtonWrapper: {
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginTop: 48,
+    marginBottom: v_9b1a04.medium, 
   },
   disclaimer: {
-    marginTop: 24,
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,
     color: '#4c4e55',
@@ -154,11 +166,20 @@ const v_d81136 = v_472849.create({
   emailVerification: {
     marginTop: 24,
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     alignItems: 'flex-start',
   },
   emailVerificationText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#4c4e55',
+    fontFamily: 'Roboto-Bold',
+  },
+  mapLink: {
+    marginTop: 24,
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+  mapLinkText: {
     fontSize: 14,
     lineHeight: 20,
     color: '#4c4e55',
@@ -179,5 +200,4 @@ const v_d81136 = v_472849.create({
     marginBottom: 9,
   },
 });
-
 

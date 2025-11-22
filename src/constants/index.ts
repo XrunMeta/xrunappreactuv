@@ -21,3 +21,15 @@ export const v_9b1a04 = {
   xlarge: 24,
 };
 
+export const v_a61db3 = {
+
+  bottomSection: {
+    width: '100%' as const,
+    maxWidth: 780,
+    alignSelf: 'center' as const,
+    marginTop: 'auto' as const,
+    paddingTop: v_9b1a04.medium, 
+    marginBottom: v_9b1a04.large, 
+  },
+};
+
