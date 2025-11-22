@@ -5,9 +5,8 @@ import {
   v_326be8,
   v_03e392,
   v_700696,
-  v_b5df25,
-  v_acfdec,
 } from 'rcmrninabrnb';
+import { v_b5df25 } from 'ernurodqvmtspux';
 import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_f4e704 } from '../components';
@@ -20,9 +19,53 @@ interface LocationData {
   longitude: number;
 }
 
+let v_8daafe = null;
+let v_e96568 = null;
+let v_79011b = null;
+let v_b636c9 = null;
+let v_86146a = null;
+let v_800dd2 = null;
+
+try {
+  v_8daafe = require('../../assets/images/icon_wallet.png');
+} catch (v_9e86fd) {
+  console.warn('icon_wallet.png not found');
+}
+
+try {
+  v_e96568 = require('../../assets/images/icon_shop.png');
+} catch (v_9e86fd) {
+  console.warn('icon_shop.png not found');
+}
+
+try {
+  v_79011b = require('../../assets/images/icon_referral.png');
+} catch (v_9e86fd) {
+  console.warn('icon_referral.png not found');
+}
+
+try {
+  v_b636c9 = require('../../assets/images/icon_user.png');
+} catch (v_9e86fd) {
+  console.warn('icon_user.png not found');
+}
+
+try {
+  v_86146a = require('../../assets/images/icon_advertisement.png');
+} catch (v_9e86fd) {
+  console.warn('icon_advertisement.png not found');
+}
+
+try {
+  v_800dd2 = require('../../assets/images/icon_bell.png');
+} catch (v_9e86fd) {
+  console.warn('icon_bell.png not found');
+}
+
 export const MapMainScreen: v_a3453e.FC = () => {
   const [v_a55f0b, v_0326b2] = v_5ab095<LocationData | null>(null);
   const [v_976e82, v_a7e4fc] = v_5ab095<string | null>(null);
+  const [v_ac1d22, v_02dd63] = v_5ab095<'Map' | 'Camera'>('Map');
   const [v_434ce4, v_ed2516] = v_5ab095({
     latitude: 37.5665, 
     longitude: 126.9780,
@@ -74,17 +117,23 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   };
 
+  const v_42b5ed = (v_11083e) => {
+    v_02dd63(v_11083e);
+    console.log('Tab changed to:', v_11083e);
+
+  };
+
   const v_fce460 = [
-    { id: 'wallet', label: 'Wallet' },
-    { id: 'advertise', label: 'Advertise' },
+    { id: 'wallet', label: 'Wallet', icon: v_8daafe },
+    { id: 'shop', label: 'Shop', icon: v_e96568 },
     { id: 'map', label: '' }, 
-    { id: 'notify', label: 'Notify' },
-    { id: 'info', label: 'Info' },
+    { id: 'referral', label: 'Referral', icon: v_79011b },
+    { id: 'info', label: 'Info', icon: v_b636c9 },
   ];
 
   return (
-    <SafeAreaView style={v_d81136.container} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <View style={v_d81136.container}>
+      <StatusBar style="dark" />
 
       {}
       <View style={v_d81136.statusBar}>
@@ -130,9 +179,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
       <BottomNavigationBar
         items={v_fce460}
         activeItemId="map"
+        activeTab={v_ac1d22}
         onItemPress={v_6a213b}
+        onTabChange={v_42b5ed}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
