@@ -1,13 +1,42 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_cf9c33, v_326be8 } from 'rcmrninabrnb';
 import { v_1bfbd0 } from '../constants';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
 
+let v_4eff08 = null;
+let v_f968cc = null;
+let v_88efd0 = null;
+let v_5c635f = null;
+
+try {
+  v_4eff08 = require('../../assets/images/icon_map.png');
+} catch (v_9e86fd) {
+  console.warn('icon_map.png not found');
+}
+
+try {
+  v_f968cc = require('../../assets/images/icon_map_white.png');
+} catch (v_9e86fd) {
+  console.warn('icon_map_white.png not found');
+}
+
+try {
+  v_88efd0 = require('../../assets/images/icon_camera.png');
+} catch (v_9e86fd) {
+  console.warn('icon_camera.png not found');
+}
+
+try {
+  v_5c635f = require('../../assets/images/icon_camera_white.png');
+} catch (v_9e86fd) {
+  console.warn('icon_camera_white.png not found');
+}
+
 interface BottomNavItem {
   id: string;
   label: string;
-  icon?: string;
+  icon?: any;
   isActive?: boolean;
   onPress?: () => void;
 }
@@ -15,13 +44,17 @@ interface BottomNavItem {
 interface BottomNavigationBarProps {
   items: BottomNavItem[];
   activeItemId?: string;
+  activeTab?: 'Map' | 'Camera';
   onItemPress?: (itemId: string) => void;
+  onTabChange?: (tab: 'Map' | 'Camera') => void;
 }
 
 export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   items: v_4622b9,
   activeItemId: v_8ccd46,
+  activeTab: v_ac1d22 = 'Map',
   onItemPress: v_659a80,
+  onTabChange: v_d52709,
 }) => {
 
   const v_6d2a86 = () => {
@@ -33,33 +66,50 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
   const v_397b6d = v_6d2a86();
 
-  const v_eebe9d = (v_8c0b26) => {
-    if (v_8c0b26.id === 'map' || v_8c0b26.id === 'camera') {
-      return (
+  const v_eebe9d = () => {
+
+    return (
+      <View
+        style={v_d81136.centerButtonContainer}>
+        {}
         <TouchableOpacity
-          key={v_8c0b26.id}
-          style={[v_d81136.centerItemContainer, { paddingHorizontal: v_397b6d }]}
-          onPress={() => v_659a80?.(v_8c0b26.id)}
-          activeOpacity={0.7}
-        >
-          <View style={v_d81136.centerItemWrapper}>
-            <View style={v_d81136.mapIconContainer}>
-              <View style={v_d81136.mapIconCircle}>
-                {}
-                <View style={v_d81136.mapIcon} />
-              </View>
-            </View>
-            <View style={v_d81136.cameraIconContainer}>
-              <View style={v_d81136.cameraIconCircle}>
-                {}
-                <View style={v_d81136.cameraIcon} />
-              </View>
-            </View>
-          </View>
+          style={[
+            v_d81136.centerButton,
+            v_ac1d22 === 'Map' && v_d81136.centerButtonActive,
+          ]}
+          onPress={() => v_d52709?.('Map')}
+          activeOpacity={0.7}>
+          {v_4eff08 && v_f968cc ? (
+            <Image
+              source={v_ac1d22 === 'Map' ? v_4eff08 : v_f968cc}
+              resizeMode="contain"
+              style={v_d81136.centerIcon}
+            />
+          ) : (
+            <View style={v_d81136.iconPlaceholder} />
+          )}
         </TouchableOpacity>
-      );
-    }
-    return null;
+
+        {}
+        <TouchableOpacity
+          style={[
+            v_d81136.centerButton,
+            v_ac1d22 === 'Camera' && v_d81136.centerButtonActive,
+          ]}
+          onPress={() => v_d52709?.('Camera')}
+          activeOpacity={0.7}>
+          {v_88efd0 && v_5c635f ? (
+            <Image
+              source={v_ac1d22 === 'Camera' ? v_88efd0 : v_5c635f}
+              resizeMode="contain"
+              style={v_d81136.centerIcon}
+            />
+          ) : (
+            <View style={v_d81136.iconPlaceholder} />
+          )}
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   const v_9eb59f = (v_8c0b26) => {
@@ -69,18 +119,31 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
     const v_26dce6 = v_8ccd46 === v_8c0b26.id;
 
+    const v_c1dd95 = v_8c0b26.icon;
+
     return (
       <TouchableOpacity
         key={v_8c0b26.id}
-        style={[v_d81136.navItem, { paddingHorizontal: v_397b6d }]}
+        style={v_d81136.navItem}
         onPress={() => v_659a80?.(v_8c0b26.id)}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <View style={v_d81136.iconContainer}>
-          {}
-          <View style={[v_d81136.iconPlaceholder, v_26dce6 && v_d81136.iconPlaceholderActive]} />
+          {v_c1dd95 ? (
+            <Image
+              source={v_c1dd95}
+              resizeMode="contain"
+              style={v_d81136.navIcon}
+            />
+          ) : (
+            <View style={[v_d81136.iconPlaceholder, v_26dce6 && v_d81136.iconPlaceholderActive]} />
+          )}
         </View>
-        <Text style={[v_d81136.label, v_26dce6 && v_d81136.labelActive]}>{v_8c0b26.label}</Text>
+        <Text 
+          style={[v_d81136.label, v_26dce6 && v_d81136.labelActive]}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {v_8c0b26.label}
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -92,9 +155,10 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
       {}
       <View style={v_d81136.bottomSection}>
         <View style={v_d81136.content}>
-          {v_4622b9.map((v_8c0b26) => {
+          {v_4622b9.map((v_8c0b26, v_a56041) => {
             if (v_8c0b26.id === 'map' || v_8c0b26.id === 'camera') {
-              return v_eebe9d(v_8c0b26);
+
+              return <React.Fragment key="center-buttons">{v_eebe9d()}</React.Fragment>;
             }
             return v_9eb59f(v_8c0b26);
           })}
@@ -129,15 +193,22 @@ const v_d81136 = v_472849.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     paddingTop: 16,
+    paddingBottom: 12,
     minHeight: 104,
+    width: '100%',
+    paddingHorizontal: 10,
+    gap: 10,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
     minWidth: 60,
+    paddingVertical: 5,
+    flexShrink: 0,
+    paddingHorizontal: 5,
   },
   iconContainer: {
     width: 24,
@@ -145,6 +216,10 @@ const v_d81136 = v_472849.create({
     marginBottom: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  navIcon: {
+    width: 20,
+    height: 20,
   },
   iconPlaceholder: {
     width: 20,
@@ -162,53 +237,49 @@ const v_d81136 = v_472849.create({
     color: '#4C4E55',
     textAlign: 'center',
     letterSpacing: 0.06,
+    maxWidth: '100%',
+    overflow: 'hidden',
   },
   labelActive: {
     color: v_1bfbd0.buttonPrimary,
   },
-  centerItemContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  centerItemWrapper: {
+  centerButtonContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapIconContainer: {
-    marginRight: 4,
-  },
-  mapIconCircle: {
-    width: 50,
+    backgroundColor: '#343a59',
+    borderRadius: 50,
     height: 50,
-    borderRadius: 25,
-    backgroundColor: v_1bfbd0.buttonSecondary, 
+    width: 100,
+    marginHorizontal: -5,
+    alignSelf: 'center',
+    flexShrink: 0,
+    ...v_326be8.select({
+      android: {
+        elevation: 2,
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 3,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
+      },
+    }),
+  },
+  centerButton: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 5,
   },
-  mapIcon: {
-    width: 18,
-    height: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 2,
+  centerButtonActive: {
+    backgroundColor: '#ffdc04',
+    borderRadius: 50,
   },
-  cameraIconContainer: {
-    marginLeft: 4,
-  },
-  cameraIconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#33395B', 
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cameraIcon: {
-    width: 18,
-    height: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 2,
+  centerIcon: {
+    width: 20,
+    height: 20,
   },
   homeIndicator: {
     height: 18,
