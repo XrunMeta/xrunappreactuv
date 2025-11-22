@@ -9,6 +9,12 @@ import {
   v_086cde,
   v_667a00,
   v_952e24,
+  v_94455f,
+  v_ab7114,
+  v_7c7410,
+  v_7e9335,
+  v_5ea6a6,
+  v_59ff6e,
   v_20d2c7,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
@@ -49,6 +55,30 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'wallet') {
     return <WalletScreen />;
+  }
+
+  if (v_0f0c7b === 'polygonHistory') {
+    return <PolygonWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'xrunHistory') {
+    return <XrunWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'nftHistory') {
+    return <NftWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'xrunHistory2') {
+    return <XrunWalletScreen2 />;
+  }
+
+  if (v_0f0c7b === 'adHistory') {
+    return <AdWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'transactionDetails') {
+    return <TransactionDetailsScreen />;
   }
 
   if (v_0f0c7b === 'map') {
