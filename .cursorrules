@@ -50,6 +50,38 @@ src/
 ### 4. 스타일링
 - 공통 색상과 크기는 `src/constants/index.ts`에 정의합니다.
 - 각 컴포넌트는 StyleSheet를 사용하여 스타일을 정의합니다.
+- 공용 스타일은 `src/constants/index.ts`의 `COMMON_STYLES` 객체에 정의합니다.
+
+#### 4.1 공용 스타일 사용 규칙
+**중요**: 화면 하단 정렬이 필요한 경우, 공용 스타일을 먼저 확인하고 재사용해야 합니다.
+
+**COMMON_STYLES.bottomSection** (`src/constants/index.ts`)
+- **용도**: ScrollView 내부에서 화면 하단에 정렬되는 섹션을 위한 공통 스타일
+- **특징**:
+  - `marginTop: 'auto'`를 통해 상단 요소와의 간격을 자동으로 조정
+  - `maxWidth: 780`으로 최대 너비 제한
+  - `paddingTop: SIZES.medium` (16px)로 상단 요소와의 기본 간격
+  - `marginBottom: SIZES.large` (20px)로 하단 여백
+- **사용 예시**:
+  ```typescript
+  import { COMMON_STYLES } from '../constants';
+  
+  const styles = StyleSheet.create({
+    bottomSection: {
+      ...COMMON_STYLES.bottomSection,
+    },
+  });
+  ```
+- **사용 권장 상황**:
+  - ScrollView 내부에서 특정 섹션을 화면 하단에 정렬해야 하는 경우
+  - 버튼, 텍스트, 링크 등이 포함된 하단 섹션이 필요한 경우
+  - 유사한 하단 정렬 레이아웃이 필요한 경우
+
+**공용 스타일 사용 규칙**:
+1. 새로운 화면을 만들 때 하단 정렬이 필요한 경우 `COMMON_STYLES.bottomSection`을 먼저 확인
+2. 유사한 스타일이 필요한 경우 공용 스타일을 우선 사용
+3. 공용 스타일로 해결이 불가능한 경우에만 새로운 스타일 정의
+4. 새로운 공용 스타일 추가 시 `src/constants/index.ts`의 `COMMON_STYLES`에 추가
 
 ### 5. 네비게이션
 - 네비게이션을 사용할 경우 `src/navigation/index.tsx`에서 설정합니다.

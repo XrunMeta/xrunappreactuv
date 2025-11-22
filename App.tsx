@@ -15,6 +15,7 @@ import {
   XrunWalletScreen2,
   AdWalletScreen,
   TransactionDetailsScreen,
+  MapMainScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import {
@@ -78,6 +79,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (currentScreen === 'map') {
+    return <MapMainScreen />;
   }
 
   return <LoginSignupScreen />;

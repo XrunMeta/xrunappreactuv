@@ -21,6 +21,7 @@ export const ROUTES = {
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
   transactionDetails: 'transactionDetails',
+  map: 'map',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
