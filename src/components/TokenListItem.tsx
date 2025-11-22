@@ -1,0 +1,132 @@
+import React from 'react';
+import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+
+interface TokenListItemProps {
+  title: string;
+  subtitle: string;
+  amount: string;
+  suffix?: string;
+  badgeLabel?: string;
+  iconSource?: ImageSourcePropType;
+  fallbackLabel?: string;
+  fallbackColors?: {
+    background: string;
+    text: string;
+  };
+}
+
+export const TokenListItem: React.FC<TokenListItemProps> = ({
+  title,
+  subtitle,
+  amount,
+  suffix,
+  badgeLabel,
+  iconSource,
+  fallbackLabel,
+  fallbackColors = {
+    background: '#EDEDED',
+    text: '#343434',
+  },
+}) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.left}>
+        <View style={[styles.iconWrapper, { backgroundColor: fallbackColors.background }]}>
+          {iconSource ? (
+            <Image source={iconSource} style={styles.iconImage} resizeMode="contain" />
+          ) : (
+            <Text style={[styles.iconText, { color: fallbackColors.text }]}>
+              {fallbackLabel?.slice(0, 2).toUpperCase()}
+            </Text>
+          )}
+        </View>
+        {badgeLabel ? <View style={styles.badge}><Text style={styles.badgeText}>{badgeLabel}</Text></View> : null}
+      </View>
+      <View style={styles.middle}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+      </View>
+      <View style={styles.right}>
+        <Text style={styles.amount}>{amount}</Text>
+        {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    shadowColor: '#3629B7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 15,
+    elevation: 3,
+    marginBottom: 16,
+  },
+  left: {
+    marginRight: 12,
+  },
+  iconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconImage: {
+    width: 40,
+    height: 40,
+  },
+  iconText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+  },
+  badge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#000000',
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgeText: {
+    fontSize: 10,
+    color: '#ffffff',
+    fontFamily: 'Roboto-Bold',
+  },
+  middle: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#343434',
+  },
+  subtitle: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#979797',
+  },
+  right: {
+    alignItems: 'flex-end',
+  },
+  amount: {
+    fontSize: 13,
+    fontFamily: 'Roboto-Bold',
+    color: '#363636',
+  },
+  suffix: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#979797',
+  },
+});
+
+
