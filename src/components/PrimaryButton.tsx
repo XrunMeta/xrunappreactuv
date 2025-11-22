@@ -34,7 +34,7 @@ export const PrimaryButton: v_a3453e.FC<PrimaryButtonProps> = ({
 const v_d81136 = v_472849.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: v_1bfbd0.buttonPrimary,
     borderRadius: 16,
     alignItems: 'center',

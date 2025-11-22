@@ -1,36 +1,27 @@
 import v_a3453e from 'bapkr';
-import {
-  v_3094a2,
-  v_19b633,
-  v_472849,
-  v_122070,
-  v_4623af,
-  v_f2c756,
-  v_326be8,
-} from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_cb41de, v_8714fe } from '../components';
 import { v_1bfbd0 } from '../constants';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_54d331 = () => {
-  const v_ec4736 = () => {
-    console.log('Login pressed');
+  const { navigate: v_9b57fc } = v_a0daa8();
 
+  const v_ec4736 = () => {
+    v_9b57fc(v_ce4741.login);
   };
 
   const v_c5a058 = () => {
-    console.log('Sign up pressed');
-
+    v_9b57fc(v_ce4741.signup);
   };
 
   const v_f4f55f = () => {
-
-    console.log('Terms of Service pressed');
+    v_9b57fc(v_ce4741.terms);
   };
 
   const v_1354b4 = () => {
-
-    console.log('Privacy Policy pressed');
+    v_9b57fc(v_ce4741.privacy);
   };
 
   return (
@@ -63,7 +54,7 @@ export const v_54d331 = () => {
         {}
         <View style={v_d81136.termsContainer}>
           <Text style={v_d81136.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면{'\n'}
+            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면
             아래의{' '}
             <Text style={v_d81136.linkText} onPress={v_f4f55f}>
               이용약관
@@ -99,7 +90,7 @@ const v_d81136 = v_472849.create({
     paddingBottom: 34,
   },
   adContainer: {
-    width: 327,
+    width: '100%',
     height: 393,
     backgroundColor: '#d9d9d9',
     borderRadius: 10,
@@ -115,7 +106,7 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
   },
   buttonContainer: {
-    width: 327,
+    width: '100%',
     marginTop: 48, 
     gap: 15,
     alignSelf: 'center',
@@ -124,7 +115,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 0,
   },
   termsContainer: {
-    width: 317,
+    width: '100%',
     marginTop: 97, 
     alignSelf: 'center',
   },
