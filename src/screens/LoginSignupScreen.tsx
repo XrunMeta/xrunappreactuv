@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginSignupScreen = () => {
@@ -87,7 +87,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 58, 
-    paddingBottom: 34,
+    paddingBottom: Platform.OS === 'android' 
+      ? 16 + SIZES.medium 
+      : 34,
+    justifyContent: 'space-between',
   },
   adContainer: {
     width: '100%',
@@ -115,9 +118,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   termsContainer: {
-    width: '100%',
-    marginTop: 97, 
-    alignSelf: 'center',
+    ...COMMON_STYLES.bottomSection,
   },
   termsText: {
     fontSize: 12,

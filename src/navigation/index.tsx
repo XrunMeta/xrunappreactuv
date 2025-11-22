@@ -15,6 +15,7 @@ export const ROUTES = {
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
+  map: 'map',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES | (string & {});
