@@ -1,19 +1,21 @@
 import v_a3453e from 'bapkr';
-import {
-  v_3094a2,
-  v_19b633,
-  v_472849,
-  v_122070,
-  v_4623af,
-  v_f2c756,
-  v_326be8,
-} from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_cb41de, v_8714fe } from '../components';
 import { v_1bfbd0 } from '../constants';
 
-export const v_54d331 = () => {
+interface LoginSignupScreenProps {
+  onLoginPress?: () => void;
+}
+
+export const LoginSignupScreen: v_a3453e.FC<LoginSignupScreenProps> = ({
+  onLoginPress: v_4e3fc4,
+}) => {
   const v_ec4736 = () => {
+    if (v_4e3fc4) {
+      v_4e3fc4();
+      return;
+    }
     console.log('Login pressed');
 
   };

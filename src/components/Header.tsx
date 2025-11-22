@@ -41,8 +41,9 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
 const v_d81136 = v_472849.create({
   container: {
-    height: 62,
+    height: 92,
     width: v_8e4fb6,
+    paddingTop: 30,
     backgroundColor: v_1bfbd0.background,
     shadowColor: '#000',
     shadowOffset: {
