@@ -11,6 +11,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { BottomNavigationBar } from '../components';
 import { COLORS } from '../constants';
+import { CameraMainScreen } from './CameraMainScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -120,7 +121,6 @@ export const MapMainScreen: React.FC = () => {
   const handleTabChange = (tab: 'Map' | 'Camera') => {
     setActiveTab(tab);
     console.log('Tab changed to:', tab);
-
   };
 
   const bottomNavItems = [
@@ -130,6 +130,15 @@ export const MapMainScreen: React.FC = () => {
     { id: 'referral', label: 'Referral', icon: iconReferral },
     { id: 'info', label: 'Info', icon: iconUser },
   ];
+
+  if (activeTab === 'Camera') {
+    return (
+      <CameraMainScreen
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
