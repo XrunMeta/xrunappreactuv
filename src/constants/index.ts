@@ -21,3 +21,15 @@ export const SIZES = {
   xlarge: 24,
 };
 
+export const COMMON_STYLES = {
+
+  bottomSection: {
+    width: '100%' as const,
+    maxWidth: 780,
+    alignSelf: 'center' as const,
+    marginTop: 'auto' as const,
+    paddingTop: SIZES.medium, 
+    marginBottom: SIZES.large, 
+  },
+};
+

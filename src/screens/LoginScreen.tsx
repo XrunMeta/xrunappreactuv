@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginScreen = () => {
@@ -80,21 +80,32 @@ export const LoginScreen = () => {
           />
         </View>
 
-        <View style={styles.loginButtonWrapper}>
-          <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
+        <View style={styles.bottomSection}>
+          <View style={styles.loginButtonWrapper}>
+            <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
+          </View>
+
+          <Text style={styles.disclaimer}>
+            비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.emailVerification}
+            onPress={() => navigate(emailVerificationRoute)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.emailVerificationText}>이메일 인증</Text>
+
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.mapLink}
+            onPress={() => navigate(ROUTES.map)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.mapLinkText}>맵 페이지 (임시 주의)</Text>
+          </TouchableOpacity>
         </View>
-
-        <Text style={styles.disclaimer}>
-          비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.emailVerification}
-          onPress={() => navigate(emailVerificationRoute)}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.emailVerificationText}>이메일 인증</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       {Platform.OS === 'ios' && (
@@ -115,7 +126,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 40,
+    paddingBottom: Platform.OS === 'android' 
+      ? 16 + SIZES.medium 
+      : 40,
+    justifyContent: 'space-between',
   },
   fieldContainer: {
     width: '100%',
@@ -135,17 +149,15 @@ const styles = StyleSheet.create({
     marginTop: -8,
     marginBottom: 16,
   },
+  bottomSection: {
+    ...COMMON_STYLES.bottomSection,
+  },
   loginButtonWrapper: {
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginTop: 48,
+    marginBottom: SIZES.medium, 
   },
   disclaimer: {
-    marginTop: 24,
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     fontSize: 12,
     lineHeight: 15,
     color: '#4c4e55',
@@ -154,11 +166,20 @@ const styles = StyleSheet.create({
   emailVerification: {
     marginTop: 24,
     width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     alignItems: 'flex-start',
   },
   emailVerificationText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#4c4e55',
+    fontFamily: 'Roboto-Bold',
+  },
+  mapLink: {
+    marginTop: 24,
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+  mapLinkText: {
     fontSize: 14,
     lineHeight: 20,
     color: '#4c4e55',
@@ -179,5 +200,4 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 });
-
 
