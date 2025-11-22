@@ -1,19 +1,21 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS } from '../constants';
 
-export const LoginSignupScreen = () => {
+interface LoginSignupScreenProps {
+  onLoginPress?: () => void;
+}
+
+export const LoginSignupScreen: React.FC<LoginSignupScreenProps> = ({
+  onLoginPress,
+}) => {
   const handleLogin = () => {
+    if (onLoginPress) {
+      onLoginPress();
+      return;
+    }
     console.log('Login pressed');
 
   };

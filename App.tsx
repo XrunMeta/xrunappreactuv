@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LoginSignupScreen, SplashScreen } from './src/screens';
+import { LoginScreen, LoginSignupScreen, SplashScreen } from './src/screens';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [currentScreen, setCurrentScreen] = useState<'authLanding' | 'login'>(
+    'authLanding',
+  );
 
   useEffect(() => {
 
@@ -17,5 +20,11 @@ export default function App() {
     return <SplashScreen />;
   }
 
-  return <LoginSignupScreen />;
+  if (currentScreen === 'login') {
+    return <LoginScreen onBackPress={() => setCurrentScreen('authLanding')} />;
+  }
+
+  return (
+    <LoginSignupScreen onLoginPress={() => setCurrentScreen('login')} />
+  );
 }

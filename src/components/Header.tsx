@@ -41,8 +41,9 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 62,
+    height: 92,
     width: width,
+    paddingTop: 30,
     backgroundColor: COLORS.background,
     shadowColor: '#000',
     shadowOffset: {
