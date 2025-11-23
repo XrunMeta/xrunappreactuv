@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   Platform,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -18,8 +18,7 @@ import {
 } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
-
-const FLAG_IMAGE = require('../../assets/flag-kr.png');
+import { useAppContext } from '../context';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남' },
@@ -33,6 +32,7 @@ type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
   const { goBack, navigate, reset } = useAppNavigation();
+  const { selectedCountryDialCode } = useAppContext();
   const [familyName, setFamilyName] = useState('');
   const [givenName, setGivenName] = useState('');
   const [email, setEmail] = useState('');
@@ -61,6 +61,7 @@ export const SignupScreen = () => {
       gender,
       ageRange,
       termsAccepted,
+      selectedCountryDialCode,
     });
 
     reset('authLanding');
@@ -126,10 +127,14 @@ export const SignupScreen = () => {
           onChangeText={setPhoneNumber}
           containerStyle={styles.fieldContainer}
           leftAccessory={
-            <View style={styles.phonePrefix}>
-              <Image source={FLAG_IMAGE} style={styles.flagIcon} />
-              <Text style={styles.countryCode}>+82</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.phonePrefix}
+              onPress={() => navigate('countryCodeSelect')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
+              <Text style={styles.countryCode}>{selectedCountryDialCode.dialCode}</Text>
+            </TouchableOpacity>
           }
         />
 
@@ -255,13 +260,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 12,
+    paddingVertical: 4,
     borderRightWidth: 1,
     borderRightColor: '#ededed',
   },
-  flagIcon: {
-    width: 24,
-    height: 16,
-    resizeMode: 'contain',
+  flagEmoji: {
+    fontSize: 20,
     marginRight: 6,
   },
   countryCode: {
