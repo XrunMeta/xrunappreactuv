@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, CountryDialCode, ShopItem } from '../types';
+import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo } from '../types';
 import { COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
@@ -18,6 +18,8 @@ type AppContextValue = {
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
+  emergencyStop: EmergencyStopInfo;
+  setEmergencyStop: (info: EmergencyStopInfo) => void;
   selectedCountryDialCode: CountryDialCode;
   setSelectedCountryDialCode: (country: CountryDialCode) => void;
   resetSelectedCountryDialCode: () => void;
@@ -32,6 +34,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ScreenName>(ROUTES.login);
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
+  const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
   const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
 
@@ -50,6 +53,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setSelectedClauseId,
       selectedShopItem,
       setSelectedShopItem,
+      emergencyStop,
+      setEmergencyStop,
       selectedCountryDialCode,
       setSelectedCountryDialCode,
       resetSelectedCountryDialCode: () => setSelectedCountryDialCode(defaultCountry),
@@ -60,6 +65,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationSuccessRoute,
       selectedClauseId,
       selectedShopItem,
+      emergencyStop,
       selectedCountryDialCode,
     ],
   );

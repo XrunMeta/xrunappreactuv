@@ -30,6 +30,21 @@ export interface TokenData {
   campid?: string;
 }
 
+export interface AliveResponse {
+  success: boolean;
+  emergencyStop?: {
+    enabled: boolean;
+    message?: string;
+    link?: string;
+  };
+}
+
+export type EmergencyStopInfo = {
+  enabled: boolean;
+  message?: string;
+  link?: string;
+} | null;
+
 export type CountryDialCode = {
   iso2: string;
   name: string;

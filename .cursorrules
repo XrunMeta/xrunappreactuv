@@ -61,10 +61,169 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
 - 네비게이션을 사용할 경우 `src/navigation/index.tsx`에서 설정합니다.
 - React Navigation 패키지 설치가 필요합니다.
 
-### 6. 하단 패널 동작 규칙 (CameraMainScreen)
+### 6. API 타임아웃 처리 규칙
+**중요**: 프로젝트 전역적으로 API 요청에 대한 타임아웃 처리를 구현해야 합니다.
+
+#### 6.1 타임아웃 설정
+- **타임아웃 시간**: 20초
+- **동작**: API 요청 후 20초 이상 응답이 없으면 자동으로 화면 이동 처리
+
+#### 6.2 타임아웃 시 화면 이동 규칙
+- **로그인 상태 확인**: `AsyncStorage`의 `isLoggedIn` 값을 확인하여 로그인 상태 판단
+- **로그인 되어 있을 때**: `MapMainScreen` (`ROUTES.map`)으로 이동
+- **로그인 되어 있지 않을 때**: `LoginScreen` (`ROUTES.login`)으로 이동
+
+#### 6.3 구현 위치
+- **API 서비스**: `src/services/index.ts`에서 API 클라이언트 설정
+- **타임아웃 처리**: 모든 API 요청에 20초 타임아웃 적용
+- **에러 핸들러**: 타임아웃 발생 시 로그인 상태를 확인하고 적절한 화면으로 이동
+
+#### 6.4 구현 예시
+```typescript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ROUTES } from '../navigation';
+
+const API_TIMEOUT = 20000; // 20초
+
+const handleTimeoutError = async (navigation: any) => {
+  try {
+    const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+    if (isLoggedIn === 'true') {
+      navigation.reset(ROUTES.map);
+    } else {
+      navigation.reset(ROUTES.login);
+    }
+  } catch (error) {
+    console.error('타임아웃 처리 중 오류:', error);
+    navigation.reset(ROUTES.login);
+  }
+};
+
+export const apiRequest = async (
+  url: string,
+  options: RequestInit = {},
+  navigation?: any
+) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      if (navigation) {
+        await handleTimeoutError(navigation);
+      }
+    }
+    throw error;
+  }
+};
+```
+
+#### 6.5 사용 규칙
+1. 모든 API 요청은 `src/services/index.ts`의 API 클라이언트를 통해 수행
+2. 타임아웃은 모든 API 요청에 일관되게 적용
+3. 타임아웃 발생 시 사용자에게 적절한 피드백 제공 (선택사항)
+4. 네비게이션 객체는 API 서비스에서 접근 가능하도록 설정 (Context 또는 Props를 통해 전달)
+
+**주의사항:**
+- 타임아웃 시간은 20초로 고정
+- 로그인 상태는 `AsyncStorage.getItem('isLoggedIn')`으로 확인
+- 화면 이동은 `navigation.reset()`을 사용하여 스택을 초기화하고 이동
+- 타임아웃 발생 시 진행 중인 다른 API 요청도 취소할 수 있도록 고려
+
+### 7. Alive 신호 및 긴급 정지 기능 규칙
+**중요**: 앱은 서버와 지속적으로 연결을 유지하기 위해 Alive 신호를 주기적으로 전송하고, 긴급 정지 신호를 처리해야 합니다.
+
+#### 7.1 Alive 신호 전송 규칙
+- **전송 주기**: 30초마다 자동으로 Alive 신호 전송
+- **API 엔드포인트**: `/oth-path` (RESTful API)
+- **구현 위치**: `src/components/AliveService.tsx`
+- **동작 방식**:
+  - 앱 시작 시 자동으로 첫 Alive 신호 전송
+  - 이후 30초마다 자동으로 전송
+  - 앱이 백그라운드로 가면 일시 중지, 포그라운드로 돌아오면 재개
+  - `AppState` 리스너를 사용하여 앱 상태 모니터링
+
+#### 7.2 실패 처리 규칙
+- **실패 카운트 관리**: 연속 실패 횟수를 추적
+- **실패 처리 기준**: 2번 이상 연속 실패 시 화면 이동 처리
+- **화면 이동 규칙**:
+  - 로그인 상태 확인: `AsyncStorage.getItem('isLoggedIn')`으로 확인
+  - 로그인 되어 있을 때: `MapMainScreen` (`ROUTES.map`)으로 이동
+  - 로그인 되어 있지 않을 때: `LoginScreen` (`ROUTES.login`)으로 이동
+  - 화면 이동 후 실패 카운트 리셋
+- **성공 시 처리**: 실패 카운트를 0으로 리셋
+
+#### 7.3 긴급 정지 신호 처리 규칙
+- **신호 수신**: Alive 신호 응답에서 긴급 정지 신호 확인
+- **응답 형식**:
+  ```typescript
+  interface AliveResponse {
+    success: boolean;
+    emergencyStop?: {
+      enabled: boolean;
+      message?: string;
+      link?: string;
+    };
+  }
+  ```
+- **처리 방식**:
+  - `emergencyStop.enabled`가 `true`이면 긴급 정지 팝업 표시
+  - `EmergencyStopDialog` 컴포넌트를 통해 메시지와 링크 표시
+  - Context를 통해 긴급 정지 상태 관리 (`src/context/index.tsx`)
+
+#### 7.4 긴급 정지 팝업 규칙
+- **컴포넌트**: `src/components/EmergencyStopDialog.tsx`
+- **표시 조건**: `emergencyStop.enabled === true`일 때 자동 표시
+- **기능**:
+  - 긴급 정지 메시지 표시
+  - 링크가 있으면 "자세히 보기" 버튼 표시
+  - 링크 타입에 따라 다르게 처리:
+    - `http://` 또는 `https://`: 외부 브라우저로 열기 (`Linking.openURL`)
+    - 앱 내부 라우트: `useAppNavigation`으로 네비게이션
+- **닫기**: 사용자가 "확인" 버튼을 누르면 팝업 닫기 및 상태 초기화
+
+#### 7.5 구현 위치 및 파일
+- **Alive 서비스**: `src/components/AliveService.tsx`
+- **긴급 정지 팝업**: `src/components/EmergencyStopDialog.tsx`
+- **API 서비스**: `src/services/index.ts`의 `sendAliveSignal()` 함수
+- **타입 정의**: `src/types/index.ts`의 `AliveResponse`, `EmergencyStopInfo`
+- **Context 상태**: `src/context/index.tsx`의 `emergencyStop`, `setEmergencyStop`
+- **통합 위치**: `App.tsx`의 `AppProvider` 내부
+
+#### 7.6 개발 전 단계 처리
+- **현재 상태**: 실제 API 호출은 주석 처리되어 있고, mock 응답 반환
+- **Mock 응답**: 항상 성공 응답 반환 (테스트용으로 `emergencyStop.enabled`를 `true`로 변경 가능)
+- **활성화 방법**: 
+  - `src/services/index.ts`의 `sendAliveSignal()` 함수에서 주석 처리된 실제 API 호출 코드 활성화
+  - Mock 응답 부분 제거
+  - API 베이스 URL 설정 필요
+
+#### 7.7 사용 규칙
+1. `AliveService` 컴포넌트는 `App.tsx`의 최상위에 배치하여 모든 화면에서 동작
+2. Alive 신호는 앱이 실행 중일 때만 전송 (백그라운드에서는 일시 중지)
+3. 실패 처리 로직은 2번 이상 연속 실패 시에만 실행
+4. 긴급 정지 팝업은 전역적으로 표시되며, 모든 화면에서 접근 가능
+5. 링크 처리 시 외부 링크와 앱 내부 라우트를 구분하여 처리
+
+**주의사항:**
+- Alive 신호 전송 주기는 30초로 고정
+- 실패 카운트는 연속 실패 횟수만 추적 (성공 시 자동 리셋)
+- 긴급 정지 상태는 Context를 통해 전역적으로 관리
+- `@react-native-async-storage/async-storage` 패키지 필요
+- 개발 완료 후 실제 API 호출 코드로 교체 필요
+
+### 8. 하단 패널 동작 규칙 (CameraMainScreen)
 **중요**: CameraMainScreen의 하단 패널은 특정한 동작 규칙을 따릅니다.
 
-#### 6.1 하단 패널 기본 동작
+#### 8.1 하단 패널 기본 동작
 - **위치**: 화면 하단, BottomNavigationBar 위에 위치
 - **초기 상태**: 평소에는 BottomNavigationBar 아래에 숨겨져 있음 (`bottom: 20`)
 - **표시 상태**: 토큰 클릭 시 위로 슬라이드되면서 나타남 (`bottom: 90`)
@@ -73,7 +232,7 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
   - 하단 패널: `zIndex: 5` (중간)
   - 하단 네비게이션: `zIndex: 10` (가장 뒤)
 
-#### 6.2 하단 패널 애니메이션
+#### 8.2 하단 패널 애니메이션
 - **애니메이션 라이브러리**: React Native 기본 Animated API 사용
 - **제어 방식**: `bottom` 속성을 직접 애니메이션하여 위치 제어
 - **애니메이션 설정**:
@@ -84,7 +243,7 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
   - 숨김 상태: `bottom: 20` (BottomNavigationBar 아래)
   - 표시 상태: `bottom: 90` (BottomNavigationBar 위)
 
-#### 6.3 하단 패널 터치 동작
+#### 8.3 하단 패널 터치 동작
 - **패널 닫기**: 하단 패널의 배경 영역을 터치하면 패널이 아래로 숨겨짐
 - **구현 방식**: 
   - 하단 패널의 최상위 View를 `Pressable`로 감싸서 배경 터치 감지
@@ -93,7 +252,7 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
   - "View ad" 버튼과 같은 자식 요소는 정상적으로 작동해야 함
   - `pointerEvents: 'box-none'`을 사용하여 자식 요소의 터치 이벤트가 방해받지 않도록 함
 
-#### 6.4 하단 패널 사용 규칙
+#### 8.4 하단 패널 사용 규칙
 1. 하단 패널은 토큰 클릭 시에만 나타나야 함
 2. 하단 패널의 배경을 터치하면 패널이 닫혀야 함
 3. 하단 패널 내부의 버튼이나 클릭 가능한 요소는 정상적으로 작동해야 함
@@ -149,10 +308,10 @@ useEffect(() => {
 </Pressable>
 ```
 
-### 7. 재사용 가능한 컴포넌트 사용 규칙
+### 9. 재사용 가능한 컴포넌트 사용 규칙
 **중요**: 새로운 디자인을 구현하기 전에, 먼저 기존 컴포넌트를 확인하고 재사용 가능한지 검토해야 합니다.
 
-#### 7.1 버튼 컴포넌트
+#### 9.1 버튼 컴포넌트
 
 **PrimaryButton** (`src/components/PrimaryButton.tsx`)
 - **용도**: 주요 액션 버튼 (로그인, 확인, 저장 등)
@@ -204,7 +363,7 @@ useEffect(() => {
 3. 기존 컴포넌트로 해결이 불가능한 경우에만 새로운 버튼 컴포넌트 생성
 4. 새로운 버튼 컴포넌트 생성 시 `src/components/index.ts`에 export 추가
 
-#### 7.2 헤더 컴포넌트
+#### 9.2 헤더 컴포넌트
 
 **Header** (`src/components/Header.tsx`)
 - **용도**: 화면 상단 제목 표시줄
@@ -234,7 +393,7 @@ useEffect(() => {
 2. 유사한 스타일의 헤더가 필요한 경우 기존 Header 컴포넌트를 우선 사용
 3. 기존 컴포넌트로 해결이 불가능한 경우에만 새로운 헤더 컴포넌트 생성
 
-#### 7.3 컴포넌트 재사용 우선순위
+#### 9.3 컴포넌트 재사용 우선순위
 새로운 디자인을 구현할 때 다음 순서로 검토:
 
 1. **1단계: 기존 컴포넌트 확인**
@@ -447,12 +606,12 @@ feat(CameraMainScreen): 하단 패널 동작 규칙 및 토큰 컴포넌트 추�
   - 타임스탬프는 현재 시간을 `YYYYMMDD_HHMMSS` 형식으로 생성
 - 생성된 메시지를 사용자에게 보여주고 필요시 수정 가능하도록 함
 
-### 8. 페이지 및 컴포넌트 목록 참조 규칙
+### 10. 페이지 및 컴포넌트 목록 참조 규칙
 **중요**: 특정 페이지나 컴포넌트를 찾는 요청이 있으면 `listofcontents.md` 파일을 먼저 참조해야 합니다.
 
 **별명**: `listofcontents.md` 파일은 **LOC**라는 별명으로도 참조할 수 있습니다.
 
-#### 8.1 페이지/컴포넌트 검색 프로세스
+#### 10.1 페이지/컴포넌트 검색 프로세스
 1. **listofcontents.md 파일 확인 (LOC 별명 사용 가능)**
    - 프로젝트 최상위 폴더에 있는 `listofcontents.md` 파일을 먼저 확인
    - 이 파일은 **LOC**라는 별명으로도 참조 가능
@@ -472,14 +631,14 @@ feat(CameraMainScreen): 하단 패널 동작 규칙 및 토큰 컴포넌트 추�
    - 화면: `src/screens/<파일명>.tsx`
    - 컴포넌트: `src/components/<파일명>.tsx`
 
-#### 8.2 listofcontents.md (LOC) 파일 구조
+#### 10.2 listofcontents.md (LOC) 파일 구조
 - **프로젝트 폴더 구조**: 전체 폴더 구조 및 각 폴더별 설명
 - **화면 섹션**: 인증, 약관, 메인, 지갑 관련 화면으로 분류
 - **컴포넌트 섹션**: 버튼, 레이아웃, 폼, 리스트, 카드, 컨트롤, 다이얼로그로 분류
 - **파일 경로**: 화면 및 컴포넌트 파일 경로 정보
 - **빠른 검색 가이드**: 카테고리별로 빠르게 찾을 수 있는 가이드 포함
 
-#### 8.3 사용 예시
+#### 10.3 사용 예시
 - 사용자: "로그인 화면 파일 찾아줘"
   - AI: `listofcontents.md` (또는 LOC)를 확인하여 `LoginScreen.tsx` (`src/screens/LoginScreen.tsx`)를 찾아 제공
   
@@ -492,7 +651,7 @@ feat(CameraMainScreen): 하단 패널 동작 규칙 및 토큰 컴포넌트 추�
 - 사용자: "프로젝트 폴더 구조 알려줘" 또는 "@LOC 폴더 구조"
   - AI: `listofcontents.md` (또는 LOC)의 프로젝트 폴더 구조 섹션을 참조하여 전체 폴더 구조 제공
 
-#### 8.4 LOC 별명 사용 규칙
+#### 10.4 LOC 별명 사용 규칙
 - **별명**: `listofcontents.md` 파일은 **LOC**라는 별명으로 참조 가능
 - **사용 방법**:
   - 사용자가 "@LOC" 또는 "LOC 파일"이라고 언급하면 `listofcontents.md` 파일을 참조

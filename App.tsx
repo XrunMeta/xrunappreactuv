@@ -46,7 +46,7 @@ import {
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
-import { AddTokenDialog } from './src/components';
+import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/components';
 import {
   useFonts,
   Roboto_400Regular,
@@ -226,10 +226,22 @@ const ScreenHost = () => {
 };
 
 const GlobalDialogs = () => {
-  const { addTokenDialogVisible, closeAddTokenDialog } = useAppContext();
+  const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop, setEmergencyStop } = useAppContext();
+
+  const handleEmergencyStopClose = () => {
+    setEmergencyStop(null);
+  };
 
   return (
-    <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
+    <>
+      <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
+      <EmergencyStopDialog
+        visible={emergencyStop?.enabled ?? false}
+        message={emergencyStop?.message ?? '긴급 안내가 있습니다.'}
+        link={emergencyStop?.link}
+        onClose={handleEmergencyStopClose}
+      />
+    </>
   );
 };
 
@@ -258,6 +270,7 @@ export default function App() {
   return (
     <AppProvider>
       <NavigationProvider>
+        <AliveService />
         <ScreenHost />
         <GlobalDialogs />
       </NavigationProvider>
