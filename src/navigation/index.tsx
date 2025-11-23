@@ -37,6 +37,11 @@ export const v_ce4741 = {
   myInfoClauseDetail: 'myInfoClauseDetail',
   myInfoNotify: 'myInfoNotify',
   myInfoReferral: 'myInfoReferral',
+  referralMyGroup: 'referralMyGroup',
+  referralSettlement: 'referralSettlement',
+  referralRank: 'referralRank',
+  referralDepthOne: 'referralDepthOne',
+  referralDepthTwo: 'referralDepthTwo',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

@@ -113,6 +113,14 @@ export const v_f4f851 = () => {
           >
             <Text style={v_d81136.mapLinkText}>마이페이지지</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={v_d81136.mapLink}
+            onPress={() => v_9b57fc(v_ce4741.referralMyGroup)}
+            activeOpacity={0.7}
+          >
+            <Text style={v_d81136.mapLinkText}>추천 화면</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 

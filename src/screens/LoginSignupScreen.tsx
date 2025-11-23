@@ -69,9 +69,6 @@ export const v_54d331 = () => {
             </Text>
             을 읽고 동의해주세요.
           </Text>
-          <TouchableOpacity onPress={v_b315f8} activeOpacity={0.7}>
-            <Text style={v_d81136.previewLink}>My Info 미리보기</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 

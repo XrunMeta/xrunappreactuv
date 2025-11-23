@@ -31,6 +31,11 @@ import {
   v_5fdcb2,
   v_386af2,
   v_6086b6,
+  v_58584a,
+  v_08aac3,
+  v_f57686,
+  v_5b4c5a,
+  v_8c15c4,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -160,6 +165,26 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myInfoReferral') {
     return <MyInfoReferralScreen />;
+  }
+
+  if (v_0f0c7b === 'referralMyGroup') {
+    return <ReferralMyGroupScreen />;
+  }
+
+  if (v_0f0c7b === 'referralSettlement') {
+    return <ReferralSettlementScreen />;
+  }
+
+  if (v_0f0c7b === 'referralRank') {
+    return <ReferralRankScreen />;
+  }
+
+  if (v_0f0c7b === 'referralDepthOne') {
+    return <ReferralDepthOneScreen />;
+  }
+
+  if (v_0f0c7b === 'referralDepthTwo') {
+    return <ReferralDepthTwoScreen />;
   }
 
   return <LoginSignupScreen />;
