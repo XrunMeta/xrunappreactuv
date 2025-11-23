@@ -23,7 +23,7 @@ export const v_f4f851 = () => {
 
   const v_ec4736 = () => {
     console.log('로그인 시도', { email: v_e0c7e8, rememberId: v_9fe81c });
-    v_9b57fc(v_ce4741.wallet);
+    v_9b57fc(v_ce4741.map);
   };
 
   return (
@@ -98,37 +98,6 @@ export const v_f4f851 = () => {
 
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={v_d81136.mapLink}
-            onPress={() => v_9b57fc(v_ce4741.map)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.mapLinkText}>맵 페이지 (임시 주의)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={v_d81136.mapLink}
-            onPress={() => v_9b57fc(v_ce4741.myInfo)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.mapLinkText}>마이페이지지</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={v_d81136.mapLink}
-            onPress={() => v_9b57fc(v_ce4741.referralMyGroup)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.mapLinkText}>추천 화면</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={v_d81136.mapLink}
-            onPress={() => v_9b57fc(v_ce4741.shopTicket)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.mapLinkText}>샵 티켓</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 

@@ -44,7 +44,7 @@ import {
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
-import { v_aabda8 } from './src/components';
+import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
 import {
   v_c06f2c,
   v_259807,
@@ -216,10 +216,22 @@ const v_c0dbdf = () => {
 };
 
 const v_d0a391 = () => {
-  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e } = v_700ef9();
+  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca, setEmergencyStop: v_69fcdc } = v_700ef9();
+
+  const v_d419f9 = () => {
+    v_69fcdc(null);
+  };
 
   return (
-    <AddTokenDialog visible={v_750b67} onClose={v_b3106e} />
+    <>
+      <AddTokenDialog visible={v_750b67} onClose={v_b3106e} />
+      <EmergencyStopDialog
+        visible={v_b135ca?.enabled ?? false}
+        message={v_b135ca?.message ?? '긴급 안내가 있습니다.'}
+        link={v_b135ca?.link}
+        onClose={v_d419f9}
+      />
+    </>
   );
 };
 
@@ -248,6 +260,7 @@ export default function v_6540c3() {
   return (
     <AppProvider>
       <NavigationProvider>
+        <AliveService />
         <ScreenHost />
         <GlobalDialogs />
       </NavigationProvider>
