@@ -38,6 +38,7 @@ export const v_ce4741 = {
   myInfoClauseDetail: 'myInfoClauseDetail',
   myInfoNotify: 'myInfoNotify',
   myInfoReferral: 'myInfoReferral',
+  myInfoFaq: 'myInfoFaq',
   referralMyGroup: 'referralMyGroup',
   referralSettlement: 'referralSettlement',
   referralRank: 'referralRank',

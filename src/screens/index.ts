@@ -26,6 +26,7 @@ export { WalletTransactionResultScreen } from './WalletTransactionResultScreen';
 export { WalletReceiveScreen } from './WalletReceiveScreen';
 export { MyInfoScreen } from './MyInfoScreen';
 export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
+export { MyInfoFaqScreen } from './MyInfoFaqScreen';
 export { MyInfoEditScreen } from './MyInfoEditScreen';
 export { MyInfoSettingsScreen } from './MyInfoSettingsScreen';
 export { MyInfoCloseMembershipScreen } from './MyInfoCloseMembershipScreen';
