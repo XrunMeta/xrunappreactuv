@@ -17,6 +17,7 @@ import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_f4e704 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_cc3e1f } from './CameraMainScreen';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -91,6 +92,7 @@ try {
 }
 
 export const MapMainScreen: v_a3453e.FC = () => {
+  const { navigate: v_9b57fc } = v_a0daa8();
   const [v_a55f0b, v_0326b2] = v_5ab095<LocationData | null>(null);
   const [v_976e82, v_a7e4fc] = v_5ab095<string | null>(null);
   const [v_ac1d22, v_02dd63] = v_5ab095<'Map' | 'Camera'>('Map');
@@ -144,15 +146,71 @@ export const MapMainScreen: v_a3453e.FC = () => {
           longitudeDelta: 0.01,
         });
       } catch (v_5e9bfe) {
+        const v_1744b9 = v_5e9bfe instanceof Error ? v_5e9bfe.message : '알 수 없는 오류';
         v_a7e4fc('위치를 가져오는 중 오류가 발생했습니다.');
         console.error('Location error:', v_5e9bfe);
+
+        if (v_1744b9.includes('location services') || v_1744b9.includes('unavailable')) {
+          v_03e392.alert(
+            '위치 서비스 오류',
+            '위치 정보를 가져올 수 없습니다.\n\n다음 사항을 확인해주세요:\n• 기기의 위치 서비스(GPS)가 켜져 있는지\n• 네트워크 위치 서비스가 활성화되어 있는지\n• 실내에서는 GPS 신호가 약할 수 있습니다.',
+            [
+              { text: '기본 위치 사용', onPress: () => {
+
+                const v_3a1065 = {
+                  latitude: 37.5665,
+                  longitude: 126.9780,
+                };
+                v_0326b2(v_3a1065);
+                v_ed2516({
+                  latitude: v_3a1065.latitude,
+                  longitude: v_3a1065.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                });
+              }},
+              { text: '확인', style: 'cancel' }
+            ]
+          );
+        } else {
+
+          const v_3a1065 = {
+            latitude: 37.5665,
+            longitude: 126.9780,
+          };
+          v_0326b2(v_3a1065);
+          v_ed2516({
+            latitude: v_3a1065.latitude,
+            longitude: v_3a1065.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
       }
     })();
   }, []);
 
   const v_6a213b = (v_6e55b1) => {
     console.log('Navigation item pressed:', v_6e55b1);
+    switch (v_6e55b1) {
+      case 'wallet':
+        v_9b57fc(v_ce4741.wallet);
+        break;
+      case 'shop':
+        v_9b57fc(v_ce4741.shopTicket);
+        break;
+      case 'referral':
+        v_9b57fc(v_ce4741.referralMyGroup);
+        break;
+      case 'info':
+        v_9b57fc(v_ce4741.myInfo);
+        break;
+      case 'map':
 
+        break;
+      default:
+        console.log('Unknown navigation item:', v_6e55b1);
+    }
   };
 
   const v_42b5ed = (v_11083e) => {
