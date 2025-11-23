@@ -33,3 +33,5 @@ export const v_a61db3 = {
   },
 };
 
+export { COUNTRY_DIAL_CODES } from './countryDialCodes';
+

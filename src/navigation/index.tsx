@@ -10,6 +10,7 @@ export const v_ce4741 = {
   authLanding: 'authLanding',
   login: 'login',
   signup: 'signup',
+  countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
   verificationCode: 'verificationCode',
   terms: 'terms',

@@ -6,6 +6,7 @@ export { MapMainScreen } from './MapMainScreen';
 export { CameraMainScreen } from './CameraMainScreen';
 export { LoginScreen } from './LoginScreen';
 export { SignupScreen } from './SignupScreen';
+export { CountryCodeSelectScreen } from './CountryCodeSelectScreen';
 export { EmailVerificationScreen } from './EmailVerificationScreen';
 export { VerificationCodeScreen } from './VerificationCodeScreen';
 export { TermsScreen } from './TermsScreen';
