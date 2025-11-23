@@ -14,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, TokenListItem, WalletHeaderCard } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { useAppContext } from '../context';
+import { copyToClipboard } from '../utils';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -78,22 +80,27 @@ const TOKEN_DATA: TokenData[] = [
 
 export const WalletScreen = () => {
   const { goBack, navigate } = useAppNavigation();
+  const { openAddTokenDialog } = useAppContext();
   const tokenList = useMemo(() => TOKEN_DATA, []);
 
   const handleCopyAddress = () => {
-    Alert.alert('주소 복사', '지갑 주소가 복사되었습니다.');
+    copyToClipboard(WALLET_ADDRESS);
   };
 
   const handleAction = (type: 'scan' | 'receive' | 'send') => {
+    if (type === 'send') {
+      navigate(ROUTES.walletSend);
+      return;
+    }
+    if (type === 'receive') {
+      navigate(ROUTES.walletReceive);
+      return;
+    }
     Alert.alert('준비 중', `${type} 기능은 아직 준비 중입니다.`);
   };
 
   const handleAddToken = () => {
-    Alert.alert('추가 예정', '토큰 추가 기능이 곧 제공될 예정입니다.');
-  };
-
-  const handleCardPress = () => {
-    navigate(ROUTES.verificationCode);
+    openAddTokenDialog();
   };
 
   return (
@@ -104,7 +111,6 @@ export const WalletScreen = () => {
         <WalletHeaderCard
           title="My Wallet"
           address={WALLET_ADDRESS}
-          onPress={handleCardPress}
           onCopy={handleCopyAddress}
           actions={[
             {

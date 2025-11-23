@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
@@ -22,6 +22,10 @@ export const LoginSignupScreen = () => {
 
   const handlePrivacyPolicy = () => {
     navigate(ROUTES.privacy);
+  };
+
+  const handleMyInfoPreview = () => {
+    navigate(ROUTES.myInfo);
   };
 
   return (
@@ -135,6 +139,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     letterSpacing: 0.06,
+  },
+  previewLink: {
+    marginTop: 12,
+    fontSize: 13,
+    color: COLORS.buttonPrimary,
+    fontFamily: 'Roboto-SemiBold',
   },
   homeIndicator: {
     height: 34,

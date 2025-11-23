@@ -10,10 +10,12 @@ import { StatusBar } from 'expo-status-bar';
 import { FormField, Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { useAppContext } from '../context';
 
 export const EmailVerificationScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const [email, setEmail] = useState('');
+  const { setVerificationSuccessRoute } = useAppContext();
 
   const handleSend = () => {
     if (!email.trim()) {
@@ -22,6 +24,7 @@ export const EmailVerificationScreen = () => {
     }
 
     console.log('이메일 인증 요청', email);
+    setVerificationSuccessRoute(ROUTES.login);
     navigate(ROUTES.verificationCode);
   };
 

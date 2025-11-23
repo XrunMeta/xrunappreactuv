@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
 }) => {
   const { goBack, canGoBack } = useAppNavigation();
-  const shouldShowBackButton = showBackButton && canGoBack;
+  const shouldShowBackButton = showBackButton && (canGoBack || !!onBackPress);
   const handleBackPress = onBackPress ?? (canGoBack ? goBack : undefined);
 
   const renderBackArea = () =>

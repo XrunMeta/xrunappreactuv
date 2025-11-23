@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { copyToClipboard } from '../utils';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -22,7 +23,13 @@ const HISTORY_DATA = [
 
 export const XrunWalletScreen2 = () => {
   const { navigate } = useAppNavigation();
-  const handleAction = (type: string) => console.log(type);
+  const handleAction = (type: 'scan' | 'receive' | 'send') => {
+    if (type === 'send') {
+      navigate(ROUTES.walletSend);
+      return;
+    }
+    console.log(type);
+  };
   const [filterVisible, setFilterVisible] = useState(false);
 
   return (
@@ -34,10 +41,10 @@ export const XrunWalletScreen2 = () => {
           title="My Balance"
           mainValue="12,200 XRUN"
           address={`${WALLET_ADDRESS.slice(0, 24)}.......`}
-          onCopy={() => console.log('copy xrun 2')}
+          onCopy={() => copyToClipboard(WALLET_ADDRESS)}
           actions={[
             { label: 'PolygonScan', icon: 'scan-outline', onPress: () => handleAction('scan') },
-            { label: 'Receive', icon: 'download-outline', onPress: () => handleAction('receive') },
+            { label: 'Receive', icon: 'download-outline', onPress: () => navigate(ROUTES.walletReceive) },
             { label: 'Send', icon: 'send-outline', onPress: () => handleAction('send') },
           ]}
         />

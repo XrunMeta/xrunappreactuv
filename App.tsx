@@ -16,8 +16,35 @@ import {
   AdWalletScreen,
   TransactionDetailsScreen,
   MapMainScreen,
+  WalletSendScreen,
+  WalletQrScanScreen,
+  WalletEstimateFeeScreen,
+  WalletTransactionProgressScreen,
+  WalletTransactionResultScreen,
+  WalletReceiveScreen,
+  MyInfoScreen,
+  MyInfoEmailAuthScreen,
+  MyInfoEditScreen,
+  MyInfoSettingsScreen,
+  MyInfoCloseMembershipScreen,
+  MyInfoClausesScreen,
+  ClauseDetailScreen,
+  MyInfoNotifyScreen,
+  MyInfoReferralScreen,
+  ReferralMyGroupScreen,
+  ReferralSettlementScreen,
+  ReferralRankScreen,
+  ReferralDepthOneScreen,
+  ReferralDepthTwoScreen,
+  ShopTicketScreen,
+  ShopMyTicketScreen,
+  ShopBuyScreen,
+  ShopSuccessScreen,
+  ShopTicketDetailScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
+import { AppProvider, useAppContext } from './src/context';
+import { AddTokenDialog } from './src/components';
 import {
   useFonts,
   Roboto_400Regular,
@@ -85,7 +112,115 @@ const ScreenHost = () => {
     return <MapMainScreen />;
   }
 
+  if (currentScreen === 'walletSend') {
+    return <WalletSendScreen />;
+  }
+
+  if (currentScreen === 'walletQrScan') {
+    return <WalletQrScanScreen />;
+  }
+
+  if (currentScreen === 'walletEstimate') {
+    return <WalletEstimateFeeScreen />;
+  }
+
+  if (currentScreen === 'walletTransactionProgress') {
+    return <WalletTransactionProgressScreen />;
+  }
+
+  if (currentScreen === 'walletTransactionResult') {
+    return <WalletTransactionResultScreen />;
+  }
+
+  if (currentScreen === 'walletReceive') {
+    return <WalletReceiveScreen />;
+  }
+
+  if (currentScreen === 'myInfo') {
+    return <MyInfoScreen />;
+  }
+
+  if (currentScreen === 'myInfoEmailAuth') {
+    return <MyInfoEmailAuthScreen />;
+  }
+
+  if (currentScreen === 'myInfoEdit') {
+    return <MyInfoEditScreen />;
+  }
+
+  if (currentScreen === 'myInfoSettings') {
+    return <MyInfoSettingsScreen />;
+  }
+
+  if (currentScreen === 'myInfoCloseMembership') {
+    return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (currentScreen === 'myInfoClauses') {
+    return <MyInfoClausesScreen />;
+  }
+
+  if (currentScreen === 'myInfoClauseDetail') {
+    return <ClauseDetailScreen />;
+  }
+
+  if (currentScreen === 'myInfoNotify') {
+    return <MyInfoNotifyScreen />;
+  }
+
+  if (currentScreen === 'myInfoReferral') {
+    return <MyInfoReferralScreen />;
+  }
+
+  if (currentScreen === 'referralMyGroup') {
+    return <ReferralMyGroupScreen />;
+  }
+
+  if (currentScreen === 'referralSettlement') {
+    return <ReferralSettlementScreen />;
+  }
+
+  if (currentScreen === 'referralRank') {
+    return <ReferralRankScreen />;
+  }
+
+  if (currentScreen === 'referralDepthOne') {
+    return <ReferralDepthOneScreen />;
+  }
+
+  if (currentScreen === 'referralDepthTwo') {
+    return <ReferralDepthTwoScreen />;
+  }
+
+  if (currentScreen === 'shopTicket') {
+    return <ShopTicketScreen />;
+  }
+
+  if (currentScreen === 'shopMyTicket') {
+    return <ShopMyTicketScreen />;
+  }
+
+  if (currentScreen === 'shopBuy') {
+    return <ShopBuyScreen />;
+  }
+
+  if (currentScreen === 'shopSuccess') {
+    return <ShopSuccessScreen />;
+  }
+
+  if (currentScreen === 'shopTicketDetail') {
+    return <ShopTicketDetailScreen />;
+  }
+
   return <LoginSignupScreen />;
+};
+
+const GlobalDialogs = () => {
+  const { addTokenDialogVisible, closeAddTokenDialog } = useAppContext();
+
+  return (
+    <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
+  );
 };
 
 export default function App() {
@@ -111,8 +246,11 @@ export default function App() {
   }
 
   return (
-    <NavigationProvider>
-      <ScreenHost />
-    </NavigationProvider>
+    <AppProvider>
+      <NavigationProvider>
+        <ScreenHost />
+        <GlobalDialogs />
+      </NavigationProvider>
+    </AppProvider>
   );
 }
