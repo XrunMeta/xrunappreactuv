@@ -43,7 +43,7 @@ const v_dbfc7f = [
     label: 'FAQ',
     iconName: 'head-question-outline',
     iconLibrary: 'Material',
-    disabled: true,
+    route: 'myInfoFaq',
   },
   {
     id: 'clause',
@@ -72,11 +72,6 @@ export const v_03a231 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
 
   const v_b0f7df = (v_5eae50) => {
-    if (v_5eae50.disabled) {
-      v_03e392.alert('준비 중', 'FAQ 화면은 곧 업데이트될 예정입니다.');
-      return;
-    }
-
     if (v_5eae50.route) {
       v_9b57fc(v_ce4741[v_5eae50.route]);
     }
@@ -155,10 +150,8 @@ export const v_03a231 = () => {
                 key={v_5eae50.id}
                 style={[
                   v_d81136.card,
-                  v_5eae50.disabled && v_d81136.cardDisabled,
                 ]}
                 onPress={() => v_b0f7df(v_5eae50)}
-                disabled={v_5eae50.disabled}
                 activeOpacity={0.85}
               >
                 <View style={v_d81136.cardIcon}>{v_c273da(v_5eae50)}</View>
@@ -257,9 +250,6 @@ const v_d81136 = v_472849.create({
     marginBottom: 18,
     paddingHorizontal: 8,
     gap: 12,
-  },
-  cardDisabled: {
-    opacity: 0.5,
   },
   cardIcon: {
     width: 36,

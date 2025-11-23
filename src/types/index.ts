@@ -45,3 +45,10 @@ export type EmergencyStopInfo = {
   link?: string;
 } | null;
 
+export type CountryDialCode = {
+  iso2: string;
+  name: string;
+  dialCode: string;
+  flagEmoji: string;
+};
+

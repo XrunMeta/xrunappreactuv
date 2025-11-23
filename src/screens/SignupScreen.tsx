@@ -4,9 +4,9 @@ import {
   v_19b633,
   v_472849,
   v_122070,
-  v_cf9c33,
   v_326be8,
   v_03e392,
+  v_4623af,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import {
@@ -18,8 +18,7 @@ import {
 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
-
-const v_f1883f = require('../../assets/flag-kr.png');
+import { v_700ef9 } from '../context';
 
 const v_798085 = [
   { value: 'male', label: '남' },
@@ -33,6 +32,7 @@ type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { selectedCountryDialCode: v_459d5e } = v_700ef9();
   const [v_f142d8, v_6dde2f] = v_5ab095('');
   const [v_a7c7b7, v_15ded5] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
@@ -61,6 +61,7 @@ export const v_f40fc5 = () => {
       gender: v_c3eac4,
       ageRange: v_f83808,
       termsAccepted: v_91ca05,
+      selectedCountryDialCode: v_459d5e,
     });
 
     v_487a25('authLanding');
@@ -126,10 +127,14 @@ export const v_f40fc5 = () => {
           onChangeText={v_f768f9}
           containerStyle={v_d81136.fieldContainer}
           leftAccessory={
-            <View style={v_d81136.phonePrefix}>
-              <Image source={v_f1883f} style={v_d81136.flagIcon} />
-              <Text style={v_d81136.countryCode}>+82</Text>
-            </View>
+            <TouchableOpacity
+              style={v_d81136.phonePrefix}
+              onPress={() => v_9b57fc('countryCodeSelect')}
+              activeOpacity={0.7}
+            >
+              <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
+              <Text style={v_d81136.countryCode}>{v_459d5e.dialCode}</Text>
+            </TouchableOpacity>
           }
         />
 
@@ -255,13 +260,12 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 12,
+    paddingVertical: 4,
     borderRightWidth: 1,
     borderRightColor: '#ededed',
   },
-  flagIcon: {
-    width: 24,
-    height: 16,
-    resizeMode: 'contain',
+  flagEmoji: {
+    fontSize: 20,
     marginRight: 6,
   },
   countryCode: {

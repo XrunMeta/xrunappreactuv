@@ -5,15 +5,13 @@ import {
   v_122070,
   v_19b633,
   v_4623af,
-  v_cf9c33,
   v_03e392,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_729608, v_368e80, v_cb41de, v_89c10a } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-
-const v_0e5a30 = require('../../assets/flag-kr.png');
+import { v_700ef9 } from '../context';
 
 const v_798085 = [
   { value: 'male', label: '남' },
@@ -23,7 +21,8 @@ const v_798085 = [
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
 export const v_cdb169 = () => {
-  const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57 } = v_a0daa8();
+  const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { selectedCountryDialCode: v_459d5e } = v_700ef9();
   const [v_a32a50, v_4944f5] = v_5ab095('XRUN');
   const [v_328bb4, v_b7613d] = v_5ab095('X');
   const [v_e0c7e8, v_fedf34] = v_5ab095('oth-staff@example.invalid');
@@ -92,10 +91,14 @@ export const v_cdb169 = () => {
             keyboardType="phone-pad"
             placeholder="Enter phone number"
             leftAccessory={
-              <View style={v_d81136.phonePrefix}>
-                <Image source={v_0e5a30} style={v_d81136.flagIcon} />
-                <Text style={v_d81136.phonePrefixText}>+82</Text>
-              </View>
+              <TouchableOpacity
+                style={v_d81136.phonePrefix}
+                onPress={() => v_9b57fc('countryCodeSelect')}
+                activeOpacity={0.7}
+              >
+                <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
+                <Text style={v_d81136.phonePrefixText}>{v_459d5e.dialCode}</Text>
+              </TouchableOpacity>
             }
           />
 
@@ -205,15 +208,17 @@ const v_d81136 = v_472849.create({
   phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    paddingRight: 12,
+    paddingVertical: 4,
+    borderRightWidth: 1,
+    borderRightColor: '#ededed',
   },
-  flagIcon: {
-    width: 20,
-    height: 14,
-    borderRadius: 2,
+  flagEmoji: {
+    fontSize: 20,
+    marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
