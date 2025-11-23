@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
+import { ROUTES, ScreenName } from '../navigation';
+import { ClauseId } from '../types';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -8,6 +10,11 @@ type AppContextValue = {
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
+  verificationSuccessRoute: ScreenName;
+  setVerificationSuccessRoute: (route: ScreenName) => void;
+  resetVerificationSuccessRoute: () => void;
+  selectedClauseId: ClauseId;
+  setSelectedClauseId: (clause: ClauseId) => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -15,6 +22,9 @@ const AppContext = createContext<AppContextValue | undefined>(undefined);
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [walletSendAddress, setWalletSendAddress] = useState('');
   const [addTokenDialogVisible, setAddTokenDialogVisible] = useState(false);
+  const [verificationSuccessRoute, setVerificationSuccessRoute] =
+    useState<ScreenName>(ROUTES.login);
+  const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
 
   const value = useMemo(
     () => ({
@@ -24,8 +34,18 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       addTokenDialogVisible,
       openAddTokenDialog: () => setAddTokenDialogVisible(true),
       closeAddTokenDialog: () => setAddTokenDialogVisible(false),
+      verificationSuccessRoute,
+      setVerificationSuccessRoute,
+      resetVerificationSuccessRoute: () => setVerificationSuccessRoute(ROUTES.login),
+      selectedClauseId,
+      setSelectedClauseId,
     }),
-    [walletSendAddress, addTokenDialogVisible],
+    [
+      walletSendAddress,
+      addTokenDialogVisible,
+      verificationSuccessRoute,
+      selectedClauseId,
+    ],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

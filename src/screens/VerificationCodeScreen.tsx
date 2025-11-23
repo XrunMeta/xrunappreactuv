@@ -10,7 +10,8 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
-import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppNavigation } from '../navigation';
+import { useAppContext } from '../context';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
@@ -18,7 +19,8 @@ const RESEND_SECONDS = 300;
 const keypadLayout = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
 
 export const VerificationCodeScreen = () => {
-  const { goBack, navigate } = useAppNavigation();
+  const { goBack, reset } = useAppNavigation();
+  const { verificationSuccessRoute, resetVerificationSuccessRoute } = useAppContext();
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
 
@@ -51,7 +53,8 @@ export const VerificationCodeScreen = () => {
 
   const handleVerify = () => {
     console.log('코드 확인', code);
-    navigate(ROUTES.login);
+    reset(verificationSuccessRoute);
+    resetVerificationSuccessRoute();
   };
 
   const handleResend = () => {

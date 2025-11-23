@@ -22,4 +22,13 @@ export { WalletEstimateFeeScreen } from './WalletEstimateFeeScreen';
 export { WalletTransactionProgressScreen } from './WalletTransactionProgressScreen';
 export { WalletTransactionResultScreen } from './WalletTransactionResultScreen';
 export { WalletReceiveScreen } from './WalletReceiveScreen';
+export { MyInfoScreen } from './MyInfoScreen';
+export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
+export { MyInfoEditScreen } from './MyInfoEditScreen';
+export { MyInfoSettingsScreen } from './MyInfoSettingsScreen';
+export { MyInfoCloseMembershipScreen } from './MyInfoCloseMembershipScreen';
+export { MyInfoClausesScreen } from './MyInfoClausesScreen';
+export { ClauseDetailScreen } from './ClauseDetailScreen';
+export { MyInfoNotifyScreen } from './MyInfoNotifyScreen';
+export { MyInfoReferralScreen } from './MyInfoReferralScreen';
 

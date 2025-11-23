@@ -22,6 +22,15 @@ import {
   WalletTransactionProgressScreen,
   WalletTransactionResultScreen,
   WalletReceiveScreen,
+  MyInfoScreen,
+  MyInfoEmailAuthScreen,
+  MyInfoEditScreen,
+  MyInfoSettingsScreen,
+  MyInfoCloseMembershipScreen,
+  MyInfoClausesScreen,
+  ClauseDetailScreen,
+  MyInfoNotifyScreen,
+  MyInfoReferralScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -115,6 +124,42 @@ const ScreenHost = () => {
 
   if (currentScreen === 'walletReceive') {
     return <WalletReceiveScreen />;
+  }
+
+  if (currentScreen === 'myInfo') {
+    return <MyInfoScreen />;
+  }
+
+  if (currentScreen === 'myInfoEmailAuth') {
+    return <MyInfoEmailAuthScreen />;
+  }
+
+  if (currentScreen === 'myInfoEdit') {
+    return <MyInfoEditScreen />;
+  }
+
+  if (currentScreen === 'myInfoSettings') {
+    return <MyInfoSettingsScreen />;
+  }
+
+  if (currentScreen === 'myInfoCloseMembership') {
+    return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (currentScreen === 'myInfoClauses') {
+    return <MyInfoClausesScreen />;
+  }
+
+  if (currentScreen === 'myInfoClauseDetail') {
+    return <ClauseDetailScreen />;
+  }
+
+  if (currentScreen === 'myInfoNotify') {
+    return <MyInfoNotifyScreen />;
+  }
+
+  if (currentScreen === 'myInfoReferral') {
+    return <MyInfoReferralScreen />;
   }
 
   return <LoginSignupScreen />;
