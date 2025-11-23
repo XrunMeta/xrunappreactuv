@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
   Platform,
   Alert,
   Dimensions,
+  Text,
+  Image,
+  Pressable,
+  Animated,
+  Easing,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { BottomNavigationBar } from '../components';
 import { COLORS } from '../constants';
+import { CameraMainScreen } from './CameraMainScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -62,6 +68,28 @@ try {
   console.warn('icon_bell.png not found');
 }
 
+let iconArrow: any = null;
+let iconXrunLogo: any = null;
+let iconMapPoint: any = null;
+
+try {
+  iconArrow = require('../../assets/images/icon_arrow.png');
+} catch (e) {
+  console.warn('icon_arrow.png not found');
+}
+
+try {
+  iconXrunLogo = require('../../assets/images/logoMain_XRUN.png');
+} catch (e) {
+  console.warn('logoMain_XRUN.png not found');
+}
+
+try {
+  iconMapPoint = require('../../assets/images/icon_mapPoint.png');
+} catch (e) {
+  console.warn('icon_mapPoint.png not found');
+}
+
 export const MapMainScreen: React.FC = () => {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -71,6 +99,16 @@ export const MapMainScreen: React.FC = () => {
     longitude: 126.9780,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
+  });
+
+  const [showBottomPanel, setShowBottomPanel] = useState(true);
+
+  const bottomPanelBottom = useRef(new Animated.Value(90)).current; 
+
+  const [dummySpotData] = useState({
+    distance: 2.53, 
+    direction: 45, 
+    name: 'Earn rewards with XRUN here',
   });
 
   useEffect(() => {
@@ -120,8 +158,25 @@ export const MapMainScreen: React.FC = () => {
   const handleTabChange = (tab: 'Map' | 'Camera') => {
     setActiveTab(tab);
     console.log('Tab changed to:', tab);
-
   };
+
+  useEffect(() => {
+    if (showBottomPanel) {
+      Animated.timing(bottomPanelBottom, {
+        toValue: 80, 
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: false, 
+      }).start();
+    } else {
+      Animated.timing(bottomPanelBottom, {
+        toValue: 20, 
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: false, 
+      }).start();
+    }
+  }, [showBottomPanel]);
 
   const bottomNavItems = [
     { id: 'wallet', label: 'Wallet', icon: iconWallet },
@@ -130,6 +185,15 @@ export const MapMainScreen: React.FC = () => {
     { id: 'referral', label: 'Referral', icon: iconReferral },
     { id: 'info', label: 'Info', icon: iconUser },
   ];
+
+  if (activeTab === 'Camera') {
+    return (
+      <CameraMainScreen
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -170,19 +234,209 @@ export const MapMainScreen: React.FC = () => {
         )}
 
         {}
-        <View style={styles.mapPinButton}>
-          <View style={styles.mapPinIcon} />
-        </View>
+        {iconMapPoint && (
+          <View style={styles.mapPinButton}>
+            <Image
+              source={iconMapPoint}
+              style={styles.mapPinIcon}
+              resizeMode="contain"
+            />
+          </View>
+        )}
       </View>
 
       {}
-      <BottomNavigationBar
-        items={bottomNavItems}
-        activeItemId="map"
-        activeTab={activeTab}
-        onItemPress={handleNavItemPress}
-        onTabChange={handleTabChange}
-      />
+      {
+
+}
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 0,
+          top: 0,
+          left: 0,
+          zIndex: 5, 
+          pointerEvents: 'box-none', 
+        }}>
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              bottom: bottomPanelBottom, 
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              pointerEvents: 'auto', 
+            },
+          ]}>
+          <Pressable
+            onPress={() => {
+              if (showBottomPanel) {
+                console.log('📱 하단 패널 배경 터치 - 패널 닫기');
+                setShowBottomPanel(false);
+              }
+            }}
+            style={[
+              styles.bottomPanel,
+              {
+                minHeight: showBottomPanel ? 100 : 35,
+              },
+            ]}>
+            {}
+            {showBottomPanel && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: 8,
+                  paddingBottom: 4,
+                }}>
+                <View
+                  style={{
+                    width: 40,
+                    height: 4,
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: 2,
+                  }}
+                />
+              </View>
+            )}
+
+            {}
+            {showBottomPanel && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  paddingHorizontal: 20,
+                  paddingTop: 0,
+                  paddingBottom: 12,
+                  pointerEvents: 'box-none', 
+                }}>
+                {}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    flex: 1,
+                  }}>
+                  {}
+                  {iconArrow && (
+                    <View
+                      style={{
+                        width: 33,
+                        height: 33,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 12,
+                        transform: [{ rotate: `${dummySpotData.direction}deg` }],
+                      }}>
+                      <Image
+                        source={iconArrow}
+                        style={{
+                          width: 23,
+                          height: 23,
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
+
+                  {}
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Medium',
+                        fontSize: 16,
+                        color: '#4c4e55',
+                        lineHeight: 24,
+                        marginBottom: 4,
+                      }}>
+                      {dummySpotData.distance.toFixed(2)}m
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 12,
+                        color: '#4c4e55',
+                        lineHeight: 15,
+                        letterSpacing: 0.06,
+                      }}>
+                      {dummySpotData.name}
+                    </Text>
+                  </View>
+                </View>
+
+                {}
+                {iconXrunLogo && (
+                  <View
+                    style={{
+                      width: 44,
+                      height: 44,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginLeft: 12,
+                    }}>
+                    <Image
+                      source={iconXrunLogo}
+                      style={{
+                        width: 44,
+                        height: 44,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+
+                {}
+                <Pressable
+                  onPress={() => {
+                    console.log('📱 하단 패널 닫기 버튼 클릭');
+                    setShowBottomPanel(false);
+                  }}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 12,
+                  }}>
+                  {iconArrow && (
+                    <View
+                      style={{
+                        transform: [{ rotate: '270deg' }],
+                      }}>
+                      <Image
+                        source={iconArrow}
+                        style={{
+                          width: 14,
+                          height: 14,
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
+                </Pressable>
+              </View>
+            )}
+          </Pressable>
+        </Animated.View>
+      </View>
+
+      {}
+      {}
+      <View style={{ zIndex: 10 }}>
+        <BottomNavigationBar
+          items={bottomNavItems}
+          activeItemId="map"
+          activeTab={activeTab}
+          onItemPress={handleNavItemPress}
+          onTabChange={handleTabChange}
+        />
+      </View>
     </View>
   );
 };
@@ -231,8 +485,22 @@ const styles = StyleSheet.create({
   mapPinIcon: {
     width: 25,
     height: 25,
-    backgroundColor: 'transparent',
+  },
 
+  bottomPanel: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    borderTopStartRadius: 33,
+    borderTopEndRadius: 33,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 
