@@ -36,4 +36,9 @@ export { ReferralSettlementScreen } from './ReferralSettlementScreen';
 export { ReferralRankScreen } from './ReferralRankScreen';
 export { ReferralDepthOneScreen } from './ReferralDepthOneScreen';
 export { ReferralDepthTwoScreen } from './ReferralDepthTwoScreen';
+export { ShopTicketScreen } from './ShopTicketScreen';
+export { ShopMyTicketScreen } from './ShopMyTicketScreen';
+export { ShopBuyScreen } from './ShopBuyScreen';
+export { ShopSuccessScreen } from './ShopSuccessScreen';
+export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
 

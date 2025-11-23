@@ -17,4 +17,5 @@ export { ExplorerBadge } from './ExplorerBadge';
 export { AddTokenDialog } from './AddTokenDialog';
 export { ReferralStatsCard } from './ReferralStatsCard';
 export { ReferralMemberRow } from './ReferralMemberRow';
+export { ShopItemCard } from './ShopItemCard';
 

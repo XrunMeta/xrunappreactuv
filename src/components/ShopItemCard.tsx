@@ -1,0 +1,114 @@
+import v_a3453e from 'bapkr';
+import {
+  v_3094a2,
+  v_19b633,
+  v_472849,
+  v_cf9c33,
+  v_4623af,
+  v_07a341,
+  v_7e4944,
+  v_961e77,
+} from 'rcmrninabrnb';
+import { v_1bfbd0 } from '../constants';
+
+export interface ShopItemCardProps {
+  title: string;
+  subtitle?: string;
+  priceLabel: string;
+  imageSource: v_07a341;
+  onPress?: () => void;
+  quantityLabel?: string;
+  containerStyle?: v_961e77<v_7e4944>;
+}
+
+export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
+  title: v_9f1622,
+  subtitle: v_dda473,
+  priceLabel: v_5b0162,
+  imageSource: v_c322f7,
+  onPress: v_719eed,
+  quantityLabel: v_63f02c,
+  containerStyle: v_4affe9,
+}) => {
+  return (
+    <TouchableOpacity
+      style={[v_d81136.card, v_4affe9]}
+      activeOpacity={v_719eed ? 0.85 : 1}
+      onPress={v_719eed}
+      disabled={!v_719eed}
+    >
+      <View style={v_d81136.logoWrapper}>
+        <Image source={v_c322f7} style={v_d81136.logo} resizeMode="contain" />
+      </View>
+      <View style={v_d81136.infoWrapper}>
+        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
+        <Text style={v_d81136.price}>{v_5b0162}</Text>
+      </View>
+      {v_63f02c ? <Text style={v_d81136.quantity}>{v_63f02c}</Text> : null}
+    </TouchableOpacity>
+  );
+};
+
+const v_d81136 = v_472849.create({
+  card: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    borderRadius: 18,
+    backgroundColor: v_1bfbd0.background,
+    flexDirection: 'row',
+    padding: 16,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    shadowColor: '#00000014',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  logoWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+    backgroundColor: '#fff',
+  },
+  logo: {
+    width: 48,
+    height: 32,
+  },
+  infoWrapper: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#10192d',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#747474',
+    marginBottom: 4,
+  },
+  price: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+  },
+  quantity: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+    alignSelf: 'center',
+  },
+});
+
+

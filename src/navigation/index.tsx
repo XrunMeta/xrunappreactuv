@@ -42,6 +42,11 @@ export const v_ce4741 = {
   referralRank: 'referralRank',
   referralDepthOne: 'referralDepthOne',
   referralDepthTwo: 'referralDepthTwo',
+  shopTicket: 'shopTicket',
+  shopMyTicket: 'shopMyTicket',
+  shopBuy: 'shopBuy',
+  shopSuccess: 'shopSuccess',
+  shopTicketDetail: 'shopTicketDetail',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

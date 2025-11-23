@@ -1,7 +1,7 @@
 
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
-import { v_9dd03c } from '../types';
+import { v_9dd03c, v_745d71 } from '../types';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -15,6 +15,8 @@ type AppContextValue = {
   resetVerificationSuccessRoute: () => void;
   selectedClauseId: v_9dd03c;
   setSelectedClauseId: (clause: v_9dd03c) => void;
+  selectedShopItem?: v_745d71;
+  setSelectedShopItem: (item?: v_745d71) => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -25,6 +27,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_e6976c, v_8f89f3] =
     v_5ab095<v_01e0ec>(v_ce4741.login);
   const [v_6e7459, v_48a083] = v_5ab095<v_9dd03c>('service');
+  const [v_dfe883, v_d0fbad] = v_5ab095<v_745d71 | undefined>(undefined);
 
   const v_3b402b = v_df9f57(
     () => ({
@@ -39,12 +42,15 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       resetVerificationSuccessRoute: () => v_8f89f3(v_ce4741.login),
       selectedClauseId: v_6e7459,
       setSelectedClauseId: v_48a083,
+      selectedShopItem: v_dfe883,
+      setSelectedShopItem: v_d0fbad,
     }),
     [
       v_ee27aa,
       v_750b67,
       v_e6976c,
       v_6e7459,
+      v_dfe883,
     ],
   );
 

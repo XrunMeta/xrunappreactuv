@@ -36,6 +36,11 @@ import {
   v_f57686,
   v_5b4c5a,
   v_8c15c4,
+  v_38326c,
+  v_052a8a,
+  v_1a0a02,
+  v_8734da,
+  v_a1c4a5,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -185,6 +190,26 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'referralDepthTwo') {
     return <ReferralDepthTwoScreen />;
+  }
+
+  if (v_0f0c7b === 'shopTicket') {
+    return <ShopTicketScreen />;
+  }
+
+  if (v_0f0c7b === 'shopMyTicket') {
+    return <ShopMyTicketScreen />;
+  }
+
+  if (v_0f0c7b === 'shopBuy') {
+    return <ShopBuyScreen />;
+  }
+
+  if (v_0f0c7b === 'shopSuccess') {
+    return <ShopSuccessScreen />;
+  }
+
+  if (v_0f0c7b === 'shopTicketDetail') {
+    return <ShopTicketDetailScreen />;
   }
 
   return <LoginSignupScreen />;
