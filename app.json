@@ -16,6 +16,9 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY"
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "이 앱은 카메라를 사용하여 AR 기능을 제공합니다."
       }
     },
     "android": {
@@ -32,7 +35,8 @@
       },
       "permissions": [
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
       ]
     },
     "web": {
