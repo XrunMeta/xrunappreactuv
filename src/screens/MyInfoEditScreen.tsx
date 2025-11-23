@@ -5,15 +5,13 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Image,
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Header, FormField, PrimaryButton, OptionButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-
-const flagKr = require('../../assets/flag-kr.png');
+import { useAppContext } from '../context';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남' },
@@ -23,7 +21,8 @@ const GENDER_OPTIONS = [
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 
 export const MyInfoEditScreen = () => {
-  const { reset, canGoBack, goBack } = useAppNavigation();
+  const { reset, canGoBack, goBack, navigate } = useAppNavigation();
+  const { selectedCountryDialCode } = useAppContext();
   const [firstName, setFirstName] = useState('XRUN');
   const [lastName, setLastName] = useState('X');
   const [email, setEmail] = useState('oth-staff@example.invalid');
@@ -92,10 +91,14 @@ export const MyInfoEditScreen = () => {
             keyboardType="phone-pad"
             placeholder="Enter phone number"
             leftAccessory={
-              <View style={styles.phonePrefix}>
-                <Image source={flagKr} style={styles.flagIcon} />
-                <Text style={styles.phonePrefixText}>+82</Text>
-              </View>
+              <TouchableOpacity
+                style={styles.phonePrefix}
+                onPress={() => navigate('countryCodeSelect')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
+                <Text style={styles.phonePrefixText}>{selectedCountryDialCode.dialCode}</Text>
+              </TouchableOpacity>
             }
           />
 
@@ -205,15 +208,17 @@ const styles = StyleSheet.create({
   phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    paddingRight: 12,
+    paddingVertical: 4,
+    borderRightWidth: 1,
+    borderRightColor: '#ededed',
   },
-  flagIcon: {
-    width: 20,
-    height: 14,
-    borderRadius: 2,
+  flagEmoji: {
+    fontSize: 20,
+    marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },

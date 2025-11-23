@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, ShopItem } from '../types';
+import { ClauseId, CountryDialCode, ShopItem } from '../types';
+import { COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -17,6 +18,9 @@ type AppContextValue = {
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
+  selectedCountryDialCode: CountryDialCode;
+  setSelectedCountryDialCode: (country: CountryDialCode) => void;
+  resetSelectedCountryDialCode: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -28,6 +32,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ScreenName>(ROUTES.login);
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
+  const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
+  const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
 
   const value = useMemo(
     () => ({
@@ -44,6 +50,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setSelectedClauseId,
       selectedShopItem,
       setSelectedShopItem,
+      selectedCountryDialCode,
+      setSelectedCountryDialCode,
+      resetSelectedCountryDialCode: () => setSelectedCountryDialCode(defaultCountry),
     }),
     [
       walletSendAddress,
@@ -51,6 +60,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationSuccessRoute,
       selectedClauseId,
       selectedShopItem,
+      selectedCountryDialCode,
     ],
   );
 
