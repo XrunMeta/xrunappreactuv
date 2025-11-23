@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, ShopItem } from '../types';
+import { ClauseId, ShopItem, EmergencyStopInfo } from '../types';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -17,6 +17,8 @@ type AppContextValue = {
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
+  emergencyStop: EmergencyStopInfo;
+  setEmergencyStop: (info: EmergencyStopInfo) => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -28,6 +30,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ScreenName>(ROUTES.login);
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
+  const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
 
   const value = useMemo(
     () => ({
@@ -44,6 +47,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setSelectedClauseId,
       selectedShopItem,
       setSelectedShopItem,
+      emergencyStop,
+      setEmergencyStop,
     }),
     [
       walletSendAddress,
@@ -51,6 +56,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationSuccessRoute,
       selectedClauseId,
       selectedShopItem,
+      emergencyStop,
     ],
   );
 

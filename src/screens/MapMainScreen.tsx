@@ -17,6 +17,7 @@ import * as Location from 'expo-location';
 import { BottomNavigationBar } from '../components';
 import { COLORS } from '../constants';
 import { CameraMainScreen } from './CameraMainScreen';
+import { ROUTES, useAppNavigation } from '../navigation';
 
 const { width, height } = Dimensions.get('window');
 
@@ -91,6 +92,7 @@ try {
 }
 
 export const MapMainScreen: React.FC = () => {
+  const { navigate } = useAppNavigation();
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'Map' | 'Camera'>('Map');
@@ -144,15 +146,71 @@ export const MapMainScreen: React.FC = () => {
           longitudeDelta: 0.01,
         });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
         setErrorMsg('위치를 가져오는 중 오류가 발생했습니다.');
         console.error('Location error:', error);
+
+        if (errorMessage.includes('location services') || errorMessage.includes('unavailable')) {
+          Alert.alert(
+            '위치 서비스 오류',
+            '위치 정보를 가져올 수 없습니다.\n\n다음 사항을 확인해주세요:\n• 기기의 위치 서비스(GPS)가 켜져 있는지\n• 네트워크 위치 서비스가 활성화되어 있는지\n• 실내에서는 GPS 신호가 약할 수 있습니다.',
+            [
+              { text: '기본 위치 사용', onPress: () => {
+
+                const defaultLocation: LocationData = {
+                  latitude: 37.5665,
+                  longitude: 126.9780,
+                };
+                setLocation(defaultLocation);
+                setMapRegion({
+                  latitude: defaultLocation.latitude,
+                  longitude: defaultLocation.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                });
+              }},
+              { text: '확인', style: 'cancel' }
+            ]
+          );
+        } else {
+
+          const defaultLocation: LocationData = {
+            latitude: 37.5665,
+            longitude: 126.9780,
+          };
+          setLocation(defaultLocation);
+          setMapRegion({
+            latitude: defaultLocation.latitude,
+            longitude: defaultLocation.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
       }
     })();
   }, []);
 
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
+    switch (itemId) {
+      case 'wallet':
+        navigate(ROUTES.wallet);
+        break;
+      case 'shop':
+        navigate(ROUTES.shopTicket);
+        break;
+      case 'referral':
+        navigate(ROUTES.referralMyGroup);
+        break;
+      case 'info':
+        navigate(ROUTES.myInfo);
+        break;
+      case 'map':
 
+        break;
+      default:
+        console.log('Unknown navigation item:', itemId);
+    }
   };
 
   const handleTabChange = (tab: 'Map' | 'Camera') => {
