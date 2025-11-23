@@ -28,6 +28,15 @@ export const v_ce4741 = {
   walletTransactionProgress: 'walletTransactionProgress',
   walletTransactionResult: 'walletTransactionResult',
   walletReceive: 'walletReceive',
+  myInfo: 'myInfo',
+  myInfoEmailAuth: 'myInfoEmailAuth',
+  myInfoEdit: 'myInfoEdit',
+  myInfoSettings: 'myInfoSettings',
+  myInfoCloseMembership: 'myInfoCloseMembership',
+  myInfoClauses: 'myInfoClauses',
+  myInfoClauseDetail: 'myInfoClauseDetail',
+  myInfoNotify: 'myInfoNotify',
+  myInfoReferral: 'myInfoReferral',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

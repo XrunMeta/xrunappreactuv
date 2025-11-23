@@ -23,7 +23,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   showBackButton: v_9c4d53 = true,
 }) => {
   const { goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
-  const v_e2510f = v_9c4d53 && v_7e32fb;
+  const v_e2510f = v_9c4d53 && (v_7e32fb || !!v_f442f6);
   const v_648e0d = v_f442f6 ?? (v_7e32fb ? v_c7ac57 : undefined);
 
   const v_91b7e0 = () =>

@@ -1,0 +1,68 @@
+import v_a3453e from 'bapkr';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af } from 'rcmrninabrnb';
+import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_729608 } from '../components';
+import { v_1bfbd0 } from '../constants';
+import { v_a0daa8, v_ce4741 } from '../navigation';
+
+export const v_4a40b2 = () => {
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+
+  return (
+    <View style={v_d81136.container}>
+      <StatusBar style="dark" />
+      <Header title="Setting" onBackPress={v_c7ac57} showBackButton />
+      <ScrollView
+        contentContainerStyle={v_d81136.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={v_d81136.inner}>
+          <TouchableOpacity
+            style={v_d81136.card}
+            activeOpacity={0.85}
+            onPress={() => v_9b57fc(v_ce4741.myInfoCloseMembership)}
+          >
+            <Text style={v_d81136.cardText}>Close Membership</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
+const v_d81136 = v_472849.create({
+  container: {
+    flex: 1,
+    backgroundColor: v_1bfbd0.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 40,
+  },
+  inner: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+  },
+  card: {
+    width: '100%',
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    shadowColor: '#3629b7',
+    shadowOpacity: 0.07,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  cardText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#343434',
+  },
+});
+
+

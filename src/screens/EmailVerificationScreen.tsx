@@ -10,10 +10,12 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_700ef9 } from '../context';
 
 export const v_a82b55 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
+  const { setVerificationSuccessRoute: v_8f89f3 } = v_700ef9();
 
   const v_465869 = () => {
     if (!v_e0c7e8.trim()) {
@@ -22,6 +24,7 @@ export const v_a82b55 = () => {
     }
 
     console.log('이메일 인증 요청', v_e0c7e8);
+    v_8f89f3(v_ce4741.login);
     v_9b57fc(v_ce4741.verificationCode);
   };
 
