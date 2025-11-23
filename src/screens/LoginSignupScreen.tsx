@@ -69,9 +69,6 @@ export const LoginSignupScreen = () => {
             </Text>
             을 읽고 동의해주세요.
           </Text>
-          <TouchableOpacity onPress={handleMyInfoPreview} activeOpacity={0.7}>
-            <Text style={styles.previewLink}>My Info 미리보기</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 

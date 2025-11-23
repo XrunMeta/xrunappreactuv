@@ -31,6 +31,11 @@ import {
   ClauseDetailScreen,
   MyInfoNotifyScreen,
   MyInfoReferralScreen,
+  ReferralMyGroupScreen,
+  ReferralSettlementScreen,
+  ReferralRankScreen,
+  ReferralDepthOneScreen,
+  ReferralDepthTwoScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -160,6 +165,26 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoReferral') {
     return <MyInfoReferralScreen />;
+  }
+
+  if (currentScreen === 'referralMyGroup') {
+    return <ReferralMyGroupScreen />;
+  }
+
+  if (currentScreen === 'referralSettlement') {
+    return <ReferralSettlementScreen />;
+  }
+
+  if (currentScreen === 'referralRank') {
+    return <ReferralRankScreen />;
+  }
+
+  if (currentScreen === 'referralDepthOne') {
+    return <ReferralDepthOneScreen />;
+  }
+
+  if (currentScreen === 'referralDepthTwo') {
+    return <ReferralDepthTwoScreen />;
   }
 
   return <LoginSignupScreen />;

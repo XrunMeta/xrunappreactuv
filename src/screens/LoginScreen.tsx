@@ -113,6 +113,14 @@ export const LoginScreen = () => {
           >
             <Text style={styles.mapLinkText}>마이페이지지</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.mapLink}
+            onPress={() => navigate(ROUTES.referralMyGroup)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.mapLinkText}>추천 화면</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 

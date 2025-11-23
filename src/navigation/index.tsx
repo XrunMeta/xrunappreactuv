@@ -37,6 +37,11 @@ export const ROUTES = {
   myInfoClauseDetail: 'myInfoClauseDetail',
   myInfoNotify: 'myInfoNotify',
   myInfoReferral: 'myInfoReferral',
+  referralMyGroup: 'referralMyGroup',
+  referralSettlement: 'referralSettlement',
+  referralRank: 'referralRank',
+  referralDepthOne: 'referralDepthOne',
+  referralDepthTwo: 'referralDepthTwo',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
