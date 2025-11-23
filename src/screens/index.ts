@@ -16,4 +16,10 @@ export { NftWalletScreen } from './NftWalletScreen';
 export { XrunWalletScreen2 } from './XrunWalletScreen2';
 export { AdWalletScreen } from './AdWalletScreen';
 export { TransactionDetailsScreen } from './TransactionDetailsScreen';
+export { WalletSendScreen } from './WalletSendScreen';
+export { WalletQrScanScreen } from './WalletQrScanScreen';
+export { WalletEstimateFeeScreen } from './WalletEstimateFeeScreen';
+export { WalletTransactionProgressScreen } from './WalletTransactionProgressScreen';
+export { WalletTransactionResultScreen } from './WalletTransactionResultScreen';
+export { WalletReceiveScreen } from './WalletReceiveScreen';
 

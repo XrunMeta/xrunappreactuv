@@ -1,10 +1,10 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
-import { v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_729608 } from '../components';
+import { v_729608, v_660356 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
+import { v_14af53 } from '../constants/tokenMeta';
 
 export interface TransactionDetails {
   id: string;
@@ -29,6 +29,7 @@ interface TransactionDetailsScreenProps {
 export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8 }) => {
   const { goBack: v_c7ac57 } = v_a0daa8();
   const v_5ab5bd = v_9390e8 ?? v_421f30;
+  const v_17af98 = v_14af53(v_5ab5bd.title, v_5ab5bd.subtitle);
 
   return (
     <View style={v_d81136.container}>
@@ -53,10 +54,13 @@ export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps
           <InfoCard label="Block Height" value={v_5ab5bd.blockHeight ?? '-'} />
         </View>
 
-        <TouchableOpacity style={v_d81136.linkRow} activeOpacity={0.8}>
-          <Ionicons name="link-outline" size={16} color="#683AB5" />
-          <Text style={v_d81136.linkText}>polygonscan</Text>
-        </TouchableOpacity>
+        <ExplorerBadge
+          label={v_5ab5bd.title}
+          caption={v_5ab5bd.subtitle}
+          iconSource={v_17af98}
+          style={v_d81136.explorerBadge}
+          labelStyle={v_d81136.explorerLabel}
+        />
       </ScrollView>
 
       {v_326be8.OS === 'ios' && (
@@ -130,16 +134,13 @@ const v_d81136 = v_472849.create({
     color: '#121212',
     marginBottom: 16,
   },
-  linkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  explorerBadge: {
+    alignSelf: 'flex-start',
     marginTop: 8,
   },
-  linkText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Medium',
+  explorerLabel: {
     color: '#683AB5',
+    fontSize: 15,
   },
   homeIndicator: {
     height: 34,

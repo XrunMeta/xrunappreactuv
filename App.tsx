@@ -16,8 +16,16 @@ import {
   v_5ea6a6,
   v_59ff6e,
   v_20d2c7,
+  v_5b640b,
+  v_2ba37d,
+  v_a91257,
+  v_31216c,
+  v_1cd2a2,
+  v_a023f9,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
+import { v_4b64f4, v_700ef9 } from './src/context';
+import { v_aabda8 } from './src/components';
 import {
   v_c06f2c,
   v_259807,
@@ -85,7 +93,39 @@ const v_c0dbdf = () => {
     return <MapMainScreen />;
   }
 
+  if (v_0f0c7b === 'walletSend') {
+    return <WalletSendScreen />;
+  }
+
+  if (v_0f0c7b === 'walletQrScan') {
+    return <WalletQrScanScreen />;
+  }
+
+  if (v_0f0c7b === 'walletEstimate') {
+    return <WalletEstimateFeeScreen />;
+  }
+
+  if (v_0f0c7b === 'walletTransactionProgress') {
+    return <WalletTransactionProgressScreen />;
+  }
+
+  if (v_0f0c7b === 'walletTransactionResult') {
+    return <WalletTransactionResultScreen />;
+  }
+
+  if (v_0f0c7b === 'walletReceive') {
+    return <WalletReceiveScreen />;
+  }
+
   return <LoginSignupScreen />;
+};
+
+const v_d0a391 = () => {
+  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e } = v_700ef9();
+
+  return (
+    <AddTokenDialog visible={v_750b67} onClose={v_b3106e} />
+  );
 };
 
 export default function v_6540c3() {
@@ -111,8 +151,11 @@ export default function v_6540c3() {
   }
 
   return (
-    <NavigationProvider>
-      <ScreenHost />
-    </NavigationProvider>
+    <AppProvider>
+      <NavigationProvider>
+        <ScreenHost />
+        <GlobalDialogs />
+      </NavigationProvider>
+    </AppProvider>
   );
 }
