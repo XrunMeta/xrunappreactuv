@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import { Header } from '../components';
+import { Header, ExplorerBadge } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
+import { getTokenIcon } from '../constants/tokenMeta';
 
 export interface TransactionDetails {
   id: string;
@@ -29,6 +29,7 @@ interface TransactionDetailsScreenProps {
 export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> = ({ data }) => {
   const { goBack } = useAppNavigation();
   const details = data ?? DEFAULT_DETAILS;
+  const tokenIcon = getTokenIcon(details.title, details.subtitle);
 
   return (
     <View style={styles.container}>
@@ -53,10 +54,13 @@ export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> =
           <InfoCard label="Block Height" value={details.blockHeight ?? '-'} />
         </View>
 
-        <TouchableOpacity style={styles.linkRow} activeOpacity={0.8}>
-          <Ionicons name="link-outline" size={16} color="#683AB5" />
-          <Text style={styles.linkText}>polygonscan</Text>
-        </TouchableOpacity>
+        <ExplorerBadge
+          label={details.title}
+          caption={details.subtitle}
+          iconSource={tokenIcon}
+          style={styles.explorerBadge}
+          labelStyle={styles.explorerLabel}
+        />
       </ScrollView>
 
       {Platform.OS === 'ios' && (
@@ -130,16 +134,13 @@ const styles = StyleSheet.create({
     color: '#121212',
     marginBottom: 16,
   },
-  linkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  explorerBadge: {
+    alignSelf: 'flex-start',
     marginTop: 8,
   },
-  linkText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Medium',
+  explorerLabel: {
     color: '#683AB5',
+    fontSize: 15,
   },
   homeIndicator: {
     height: 34,

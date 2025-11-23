@@ -21,8 +21,13 @@ export const ROUTES = {
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
   transactionDetails: 'transactionDetails',
-=======
   map: 'map',
+  walletSend: 'walletSend',
+  walletQrScan: 'walletQrScan',
+  walletEstimate: 'walletEstimate',
+  walletTransactionProgress: 'walletTransactionProgress',
+  walletTransactionResult: 'walletTransactionResult',
+  walletReceive: 'walletReceive',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

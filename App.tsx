@@ -16,8 +16,16 @@ import {
   AdWalletScreen,
   TransactionDetailsScreen,
   MapMainScreen,
+  WalletSendScreen,
+  WalletQrScanScreen,
+  WalletEstimateFeeScreen,
+  WalletTransactionProgressScreen,
+  WalletTransactionResultScreen,
+  WalletReceiveScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
+import { AppProvider, useAppContext } from './src/context';
+import { AddTokenDialog } from './src/components';
 import {
   useFonts,
   Roboto_400Regular,
@@ -85,7 +93,39 @@ const ScreenHost = () => {
     return <MapMainScreen />;
   }
 
+  if (currentScreen === 'walletSend') {
+    return <WalletSendScreen />;
+  }
+
+  if (currentScreen === 'walletQrScan') {
+    return <WalletQrScanScreen />;
+  }
+
+  if (currentScreen === 'walletEstimate') {
+    return <WalletEstimateFeeScreen />;
+  }
+
+  if (currentScreen === 'walletTransactionProgress') {
+    return <WalletTransactionProgressScreen />;
+  }
+
+  if (currentScreen === 'walletTransactionResult') {
+    return <WalletTransactionResultScreen />;
+  }
+
+  if (currentScreen === 'walletReceive') {
+    return <WalletReceiveScreen />;
+  }
+
   return <LoginSignupScreen />;
+};
+
+const GlobalDialogs = () => {
+  const { addTokenDialogVisible, closeAddTokenDialog } = useAppContext();
+
+  return (
+    <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
+  );
 };
 
 export default function App() {
@@ -111,8 +151,11 @@ export default function App() {
   }
 
   return (
-    <NavigationProvider>
-      <ScreenHost />
-    </NavigationProvider>
+    <AppProvider>
+      <NavigationProvider>
+        <ScreenHost />
+        <GlobalDialogs />
+      </NavigationProvider>
+    </AppProvider>
   );
 }

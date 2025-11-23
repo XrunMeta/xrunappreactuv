@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { copyToClipboard } from '../utils';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -46,11 +47,15 @@ export const PolygonWalletScreen = () => {
           title="My Balance"
           mainValue="1,657 POL"
           address={`${WALLET_ADDRESS.slice(0, 24)}.......`}
-          onCopy={() => console.log('copy')}
+          onCopy={() => copyToClipboard(WALLET_ADDRESS)}
           actions={[
             { label: 'PolygonScan', icon: 'scan-outline', onPress: () => console.log('scan') },
-            { label: 'Receive', icon: 'download-outline', onPress: () => console.log('receive') },
-            { label: 'Send', icon: 'send-outline', onPress: () => console.log('send') },
+            { label: 'Receive', icon: 'download-outline', onPress: () => navigate(ROUTES.walletReceive) },
+            {
+              label: 'Send',
+              icon: 'send-outline',
+              onPress: () => navigate(ROUTES.walletSend),
+            },
           ]}
           theme={{
             background: '#683ab5',
