@@ -3,35 +3,9 @@
 ## 프로젝트 구조
 - React Native Expo 프로젝트는 TypeScript를 기본으로 사용합니다.
 - 모든 소스 코드는 `src/` 디렉토리 하위에 구성됩니다.
+- **폴더 구조 상세 정보**: `listofcontents.md` (LOC) 파일의 "프로젝트 폴더 구조" 섹션을 참조하세요.
 
 cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHRwczovL21jcC5maWdtYS5jb20vbWNwIn0%3D
-### 폴더 구조
-```
-src/
-├── components/      # 재사용 가능한 컴포넌트
-│   ├── Button.tsx   # 기본 버튼 컴포넌트
-│   ├── PrimaryButton.tsx   # 주요 액션 버튼 (어두운 파란색)
-│   ├── SecondaryButton.tsx # 보조 액션 버튼 (노란색)
-│   ├── Header.tsx   # 상단 제목 표시줄
-│   └── index.ts     # 컴포넌트 export
-├── screens/         # 화면 컴포넌트
-│   ├── HomeScreen.tsx  # 홈 화면 (첫 페이지)
-│   └── index.ts     # 화면 export
-├── navigation/      # 네비게이션 설정
-│   └── index.tsx    # 네비게이션 구조
-├── services/        # API 서비스 및 외부 통합
-│   └── index.ts
-├── utils/           # 유틸리티 함수
-│   └── index.ts
-├── hooks/           # 커스텀 React 훅
-│   └── index.ts
-├── types/           # TypeScript 타입 정의
-│   └── index.ts
-├── constants/       # 상수 정의 (COLORS, SIZES 등)
-│   └── index.ts
-└── context/         # Context API
-    └── index.tsx
-```
 
 ## 주요 규칙
 
@@ -472,4 +446,68 @@ feat(CameraMainScreen): 하단 패널 동작 규칙 및 토큰 컴포넌트 추�
   - Git 사용자 이름은 `git config user.name` 명령으로 가져옴
   - 타임스탬프는 현재 시간을 `YYYYMMDD_HHMMSS` 형식으로 생성
 - 생성된 메시지를 사용자에게 보여주고 필요시 수정 가능하도록 함
+
+### 8. 페이지 및 컴포넌트 목록 참조 규칙
+**중요**: 특정 페이지나 컴포넌트를 찾는 요청이 있으면 `listofcontents.md` 파일을 먼저 참조해야 합니다.
+
+**별명**: `listofcontents.md` 파일은 **LOC**라는 별명으로도 참조할 수 있습니다.
+
+#### 8.1 페이지/컴포넌트 검색 프로세스
+1. **listofcontents.md 파일 확인 (LOC 별명 사용 가능)**
+   - 프로젝트 최상위 폴더에 있는 `listofcontents.md` 파일을 먼저 확인
+   - 이 파일은 **LOC**라는 별명으로도 참조 가능
+   - 이 파일에는 모든 화면(Screen)과 컴포넌트(Component)의 목록이 정리되어 있음
+   - 파일명과 화면 제목이 모두 포함되어 있어 빠르게 찾을 수 있음
+   - **폴더 구조 정보도 포함**: 프로젝트의 전체 폴더 구조도 이 파일에 포함되어 있음
+
+2. **검색 방법**
+   - 사용자가 특정 페이지나 컴포넌트를 찾는 요청을 하면:
+     - `listofcontents.md` 파일을 읽어서 해당 항목을 찾음
+     - 파일명, 화면 제목, 설명을 모두 확인하여 정확한 파일 경로 제공
+     - 예: "로그인 화면 찾아줘" → `LoginScreen.tsx` (화면 제목: "로그인")
+     - 예: "PrimaryButton 컴포넌트 찾아줘" → `PrimaryButton.tsx` (주요 액션 버튼)
+
+3. **파일 경로 제공**
+   - 찾은 페이지/컴포넌트의 정확한 파일 경로를 제공
+   - 화면: `src/screens/<파일명>.tsx`
+   - 컴포넌트: `src/components/<파일명>.tsx`
+
+#### 8.2 listofcontents.md (LOC) 파일 구조
+- **프로젝트 폴더 구조**: 전체 폴더 구조 및 각 폴더별 설명
+- **화면 섹션**: 인증, 약관, 메인, 지갑 관련 화면으로 분류
+- **컴포넌트 섹션**: 버튼, 레이아웃, 폼, 리스트, 카드, 컨트롤, 다이얼로그로 분류
+- **파일 경로**: 화면 및 컴포넌트 파일 경로 정보
+- **빠른 검색 가이드**: 카테고리별로 빠르게 찾을 수 있는 가이드 포함
+
+#### 8.3 사용 예시
+- 사용자: "로그인 화면 파일 찾아줘"
+  - AI: `listofcontents.md` (또는 LOC)를 확인하여 `LoginScreen.tsx` (`src/screens/LoginScreen.tsx`)를 찾아 제공
+  
+- 사용자: "지갑 관련 화면들 보여줘"
+  - AI: `listofcontents.md` (또는 LOC)의 지갑 관련 화면 섹션을 참조하여 모든 지갑 화면 목록 제공
+
+- 사용자: "버튼 컴포넌트 목록 알려줘"
+  - AI: `listofcontents.md` (또는 LOC)의 버튼 컴포넌트 섹션을 참조하여 모든 버튼 컴포넌트 목록 제공
+
+- 사용자: "프로젝트 폴더 구조 알려줘" 또는 "@LOC 폴더 구조"
+  - AI: `listofcontents.md` (또는 LOC)의 프로젝트 폴더 구조 섹션을 참조하여 전체 폴더 구조 제공
+
+#### 8.4 LOC 별명 사용 규칙
+- **별명**: `listofcontents.md` 파일은 **LOC**라는 별명으로 참조 가능
+- **사용 방법**:
+  - 사용자가 "@LOC" 또는 "LOC 파일"이라고 언급하면 `listofcontents.md` 파일을 참조
+  - 예: "@LOC 폴더 구조 보여줘" → `listofcontents.md`의 폴더 구조 섹션 참조
+  - 예: "@LOC 로그인 화면 찾아줘" → `listofcontents.md`에서 로그인 화면 검색
+- **참조 가능한 정보**:
+  - 프로젝트 폴더 구조
+  - 모든 화면 목록 및 설명
+  - 모든 컴포넌트 목록 및 설명
+  - 파일 경로 정보
+  - 빠른 검색 가이드
+
+**주의사항:**
+- `listofcontents.md` (LOC) 파일은 프로젝트 최상위 폴더에 위치
+- 새로운 페이지나 컴포넌트가 추가되면 `listofcontents.md` (LOC) 파일도 함께 업데이트해야 함
+- 파일명과 화면 제목을 모두 포함하여 검색 가능하도록 유지
+- 폴더 구조가 변경되면 `listofcontents.md` (LOC) 파일의 폴더 구조 섹션도 업데이트해야 함
 
