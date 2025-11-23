@@ -43,3 +43,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# PR messages
+PR_MESSAGE_*.md
+PR_MESSAGE.md
