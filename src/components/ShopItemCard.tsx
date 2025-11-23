@@ -1,0 +1,114 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ImageSourcePropType,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
+import { COLORS } from '../constants';
+
+export interface ShopItemCardProps {
+  title: string;
+  subtitle?: string;
+  priceLabel: string;
+  imageSource: ImageSourcePropType;
+  onPress?: () => void;
+  quantityLabel?: string;
+  containerStyle?: StyleProp<ViewStyle>;
+}
+
+export const ShopItemCard: React.FC<ShopItemCardProps> = ({
+  title,
+  subtitle,
+  priceLabel,
+  imageSource,
+  onPress,
+  quantityLabel,
+  containerStyle,
+}) => {
+  return (
+    <TouchableOpacity
+      style={[styles.card, containerStyle]}
+      activeOpacity={onPress ? 0.85 : 1}
+      onPress={onPress}
+      disabled={!onPress}
+    >
+      <View style={styles.logoWrapper}>
+        <Image source={imageSource} style={styles.logo} resizeMode="contain" />
+      </View>
+      <View style={styles.infoWrapper}>
+        <Text style={styles.title}>{title}</Text>
+        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        <Text style={styles.price}>{priceLabel}</Text>
+      </View>
+      {quantityLabel ? <Text style={styles.quantity}>{quantityLabel}</Text> : null}
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    borderRadius: 18,
+    backgroundColor: COLORS.background,
+    flexDirection: 'row',
+    padding: 16,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    shadowColor: '#00000014',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  logoWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+    backgroundColor: '#fff',
+  },
+  logo: {
+    width: 48,
+    height: 32,
+  },
+  infoWrapper: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#10192d',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#747474',
+    marginBottom: 4,
+  },
+  price: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+  },
+  quantity: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+    alignSelf: 'center',
+  },
+});
+
+

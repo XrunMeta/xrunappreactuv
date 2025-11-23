@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId } from '../types';
+import { ClauseId, ShopItem } from '../types';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -15,6 +15,8 @@ type AppContextValue = {
   resetVerificationSuccessRoute: () => void;
   selectedClauseId: ClauseId;
   setSelectedClauseId: (clause: ClauseId) => void;
+  selectedShopItem?: ShopItem;
+  setSelectedShopItem: (item?: ShopItem) => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -25,6 +27,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [verificationSuccessRoute, setVerificationSuccessRoute] =
     useState<ScreenName>(ROUTES.login);
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
+  const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
 
   const value = useMemo(
     () => ({
@@ -39,12 +42,15 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       resetVerificationSuccessRoute: () => setVerificationSuccessRoute(ROUTES.login),
       selectedClauseId,
       setSelectedClauseId,
+      selectedShopItem,
+      setSelectedShopItem,
     }),
     [
       walletSendAddress,
       addTokenDialogVisible,
       verificationSuccessRoute,
       selectedClauseId,
+      selectedShopItem,
     ],
   );
 

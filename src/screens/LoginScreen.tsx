@@ -121,6 +121,14 @@ export const LoginScreen = () => {
           >
             <Text style={styles.mapLinkText}>추천 화면</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.mapLink}
+            onPress={() => navigate(ROUTES.shopTicket)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.mapLinkText}>샵 티켓</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
