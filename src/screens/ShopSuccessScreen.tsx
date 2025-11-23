@@ -7,10 +7,12 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 
 export const v_8734da = () => {
-  const { reset: v_487a25 } = v_a0daa8();
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
 
   const v_03cae9 = () => {
-    v_487a25(v_ce4741.shopMyTicket);
+    v_c7ac57(); 
+    v_c7ac57(); 
+    v_9b57fc(v_ce4741.shopMyTicket);
   };
 
   return (
@@ -75,5 +77,4 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-SemiBold',
   },
 });
-
 
