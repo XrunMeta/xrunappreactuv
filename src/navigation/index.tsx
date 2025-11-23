@@ -38,6 +38,7 @@ export const ROUTES = {
   myInfoClauseDetail: 'myInfoClauseDetail',
   myInfoNotify: 'myInfoNotify',
   myInfoReferral: 'myInfoReferral',
+  myInfoFaq: 'myInfoFaq',
   referralMyGroup: 'referralMyGroup',
   referralSettlement: 'referralSettlement',
   referralRank: 'referralRank',

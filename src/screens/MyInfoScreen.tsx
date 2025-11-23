@@ -43,7 +43,7 @@ const cardConfigs: CardConfig[] = [
     label: 'FAQ',
     iconName: 'head-question-outline',
     iconLibrary: 'Material',
-    disabled: true,
+    route: 'myInfoFaq',
   },
   {
     id: 'clause',
@@ -72,11 +72,6 @@ export const MyInfoScreen = () => {
   const { navigate } = useAppNavigation();
 
   const handleCardPress = (card: CardConfig) => {
-    if (card.disabled) {
-      Alert.alert('준비 중', 'FAQ 화면은 곧 업데이트될 예정입니다.');
-      return;
-    }
-
     if (card.route) {
       navigate(ROUTES[card.route]);
     }
@@ -155,10 +150,8 @@ export const MyInfoScreen = () => {
                 key={card.id}
                 style={[
                   styles.card,
-                  card.disabled && styles.cardDisabled,
                 ]}
                 onPress={() => handleCardPress(card)}
-                disabled={card.disabled}
                 activeOpacity={0.85}
               >
                 <View style={styles.cardIcon}>{renderIcon(card)}</View>
@@ -257,9 +250,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     paddingHorizontal: 8,
     gap: 12,
-  },
-  cardDisabled: {
-    opacity: 0.5,
   },
   cardIcon: {
     width: 36,

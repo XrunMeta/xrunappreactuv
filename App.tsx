@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  MyInfoFaqScreen,
   CountryCodeSelectScreen,
   EmailVerificationScreen,
   LoginScreen,
@@ -147,6 +148,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoEmailAuth') {
     return <MyInfoEmailAuthScreen />;
+  }
+
+  if (currentScreen === 'myInfoFaq') {
+    return <MyInfoFaqScreen />;
   }
 
   if (currentScreen === 'myInfoEdit') {
