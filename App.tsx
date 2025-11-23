@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
+  v_379bd1,
   v_a82b55,
   v_f4f851,
   v_54d331,
@@ -62,6 +63,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (v_0f0c7b === 'countryCodeSelect') {
+    return <CountryCodeSelectScreen />;
   }
 
   if (v_0f0c7b === 'emailVerification') {
