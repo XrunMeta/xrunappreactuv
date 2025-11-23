@@ -33,3 +33,5 @@ export const COMMON_STYLES = {
   },
 };
 
+export { COUNTRY_DIAL_CODES } from './countryDialCodes';
+

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  CountryCodeSelectScreen,
   EmailVerificationScreen,
   LoginScreen,
   LoginSignupScreen,
@@ -62,6 +63,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (currentScreen === 'countryCodeSelect') {
+    return <CountryCodeSelectScreen />;
   }
 
   if (currentScreen === 'emailVerification') {

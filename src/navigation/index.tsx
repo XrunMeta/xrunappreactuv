@@ -10,6 +10,7 @@ export const ROUTES = {
   authLanding: 'authLanding',
   login: 'login',
   signup: 'signup',
+  countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
   verificationCode: 'verificationCode',
   terms: 'terms',
