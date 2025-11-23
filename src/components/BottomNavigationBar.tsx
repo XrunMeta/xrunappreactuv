@@ -151,8 +151,6 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   return (
     <View style={styles.container}>
       {}
-      <View style={styles.topSection} />
-      {}
       <View style={styles.bottomSection}>
         <View style={styles.content}>
           {items.map((item, index) => {
@@ -179,12 +177,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
-  },
-  topSection: {
-    height: 32,
-    backgroundColor: '#EFF4F5',
-    borderTopLeftRadius: 33,
-    borderTopRightRadius: 33,
   },
   bottomSection: {
     backgroundColor: '#FFFFFF',
