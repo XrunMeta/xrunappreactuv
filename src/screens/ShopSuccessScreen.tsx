@@ -7,10 +7,12 @@ import { useAppNavigation, ROUTES } from '../navigation';
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
 export const ShopSuccessScreen = () => {
-  const { reset } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
 
   const handleConfirm = () => {
-    reset(ROUTES.shopMyTicket);
+    goBack(); 
+    goBack(); 
+    navigate(ROUTES.shopMyTicket);
   };
 
   return (
@@ -75,5 +77,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-SemiBold',
   },
 });
-
 
