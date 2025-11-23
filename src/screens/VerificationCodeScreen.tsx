@@ -10,7 +10,8 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
-import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_a0daa8 } from '../navigation';
+import { v_700ef9 } from '../context';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -18,7 +19,8 @@ const v_ef7132 = 300;
 const v_79c59a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
 
 export const v_667a00 = () => {
-  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { goBack: v_c7ac57, reset: v_487a25 } = v_a0daa8();
+  const { verificationSuccessRoute: v_e6976c, resetVerificationSuccessRoute: v_036f76 } = v_700ef9();
   const [v_c99bd2, v_537cbb] = v_5ab095('');
   const [v_ae68cd, v_83fe8f] = v_5ab095(v_ef7132);
 
@@ -51,7 +53,8 @@ export const v_667a00 = () => {
 
   const v_83b05b = () => {
     console.log('코드 확인', v_c99bd2);
-    v_9b57fc(v_ce4741.login);
+    v_487a25(v_e6976c);
+    v_036f76();
   };
 
   const v_cf9840 = () => {

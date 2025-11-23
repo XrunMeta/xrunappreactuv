@@ -16,8 +16,35 @@ import {
   v_5ea6a6,
   v_59ff6e,
   v_20d2c7,
+  v_5b640b,
+  v_2ba37d,
+  v_a91257,
+  v_31216c,
+  v_1cd2a2,
+  v_a023f9,
+  v_03a231,
+  v_dec378,
+  v_cdb169,
+  v_4a40b2,
+  v_9e06f6,
+  v_41dfd5,
+  v_5fdcb2,
+  v_386af2,
+  v_6086b6,
+  v_58584a,
+  v_08aac3,
+  v_f57686,
+  v_5b4c5a,
+  v_8c15c4,
+  v_38326c,
+  v_052a8a,
+  v_1a0a02,
+  v_8734da,
+  v_a1c4a5,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
+import { v_4b64f4, v_700ef9 } from './src/context';
+import { v_aabda8 } from './src/components';
 import {
   v_c06f2c,
   v_259807,
@@ -85,7 +112,115 @@ const v_c0dbdf = () => {
     return <MapMainScreen />;
   }
 
+  if (v_0f0c7b === 'walletSend') {
+    return <WalletSendScreen />;
+  }
+
+  if (v_0f0c7b === 'walletQrScan') {
+    return <WalletQrScanScreen />;
+  }
+
+  if (v_0f0c7b === 'walletEstimate') {
+    return <WalletEstimateFeeScreen />;
+  }
+
+  if (v_0f0c7b === 'walletTransactionProgress') {
+    return <WalletTransactionProgressScreen />;
+  }
+
+  if (v_0f0c7b === 'walletTransactionResult') {
+    return <WalletTransactionResultScreen />;
+  }
+
+  if (v_0f0c7b === 'walletReceive') {
+    return <WalletReceiveScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfo') {
+    return <MyInfoScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoEmailAuth') {
+    return <MyInfoEmailAuthScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoEdit') {
+    return <MyInfoEditScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoSettings') {
+    return <MyInfoSettingsScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoCloseMembership') {
+    return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoClauses') {
+    return <MyInfoClausesScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoClauseDetail') {
+    return <ClauseDetailScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoNotify') {
+    return <MyInfoNotifyScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoReferral') {
+    return <MyInfoReferralScreen />;
+  }
+
+  if (v_0f0c7b === 'referralMyGroup') {
+    return <ReferralMyGroupScreen />;
+  }
+
+  if (v_0f0c7b === 'referralSettlement') {
+    return <ReferralSettlementScreen />;
+  }
+
+  if (v_0f0c7b === 'referralRank') {
+    return <ReferralRankScreen />;
+  }
+
+  if (v_0f0c7b === 'referralDepthOne') {
+    return <ReferralDepthOneScreen />;
+  }
+
+  if (v_0f0c7b === 'referralDepthTwo') {
+    return <ReferralDepthTwoScreen />;
+  }
+
+  if (v_0f0c7b === 'shopTicket') {
+    return <ShopTicketScreen />;
+  }
+
+  if (v_0f0c7b === 'shopMyTicket') {
+    return <ShopMyTicketScreen />;
+  }
+
+  if (v_0f0c7b === 'shopBuy') {
+    return <ShopBuyScreen />;
+  }
+
+  if (v_0f0c7b === 'shopSuccess') {
+    return <ShopSuccessScreen />;
+  }
+
+  if (v_0f0c7b === 'shopTicketDetail') {
+    return <ShopTicketDetailScreen />;
+  }
+
   return <LoginSignupScreen />;
+};
+
+const v_d0a391 = () => {
+  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e } = v_700ef9();
+
+  return (
+    <AddTokenDialog visible={v_750b67} onClose={v_b3106e} />
+  );
 };
 
 export default function v_6540c3() {
@@ -111,8 +246,11 @@ export default function v_6540c3() {
   }
 
   return (
-    <NavigationProvider>
-      <ScreenHost />
-    </NavigationProvider>
+    <AppProvider>
+      <NavigationProvider>
+        <ScreenHost />
+        <GlobalDialogs />
+      </NavigationProvider>
+    </AppProvider>
   );
 }

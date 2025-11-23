@@ -1,5 +1,5 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_cb41de, v_8714fe } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
@@ -22,6 +22,10 @@ export const v_54d331 = () => {
 
   const v_1354b4 = () => {
     v_9b57fc(v_ce4741.privacy);
+  };
+
+  const v_b315f8 = () => {
+    v_9b57fc(v_ce4741.myInfo);
   };
 
   return (
@@ -135,6 +139,12 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     letterSpacing: 0.06,
+  },
+  previewLink: {
+    marginTop: 12,
+    fontSize: 13,
+    color: v_1bfbd0.buttonPrimary,
+    fontFamily: 'Roboto-SemiBold',
   },
   homeIndicator: {
     height: 34,
