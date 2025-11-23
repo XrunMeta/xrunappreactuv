@@ -151,8 +151,6 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   return (
     <View style={v_d81136.container}>
       {}
-      <View style={v_d81136.topSection} />
-      {}
       <View style={v_d81136.bottomSection}>
         <View style={v_d81136.content}>
           {v_4622b9.map((v_8c0b26, v_a56041) => {
@@ -179,12 +177,6 @@ const v_d81136 = v_472849.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
-  },
-  topSection: {
-    height: 32,
-    backgroundColor: '#EFF4F5',
-    borderTopLeftRadius: 33,
-    borderTopRightRadius: 33,
   },
   bottomSection: {
     backgroundColor: '#FFFFFF',
