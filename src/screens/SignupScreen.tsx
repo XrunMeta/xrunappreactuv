@@ -20,6 +20,7 @@ import {
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { getRegionIdByIso2, getRegionNameById } from '../constants';
 import {
   checkEmailAvailability,
   checkReferralEmail,
@@ -40,7 +41,7 @@ type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
   const { goBack, navigate, reset } = useAppNavigation();
-  const { selectedCountryDialCode } = useAppContext();
+  const { selectedCountryDialCode, selectedRegion, setSelectMode } = useAppContext();
   const [familyName, setFamilyName] = useState('');
   const [givenName, setGivenName] = useState('');
   const [email, setEmail] = useState('');
@@ -80,8 +81,8 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!region.trim()) {
-      Alert.alert('입력 오류', '지역을 입력해주세요.');
+    if (!selectedRegion && !region.trim()) {
+      Alert.alert('입력 오류', '지역을 선택해주세요.');
       return;
     }
 
@@ -137,7 +138,10 @@ export const SignupScreen = () => {
       console.log('[회원가입] 3단계: 회원가입 실행 시작');
       const mobileCode = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
       const countryCode = selectedCountryDialCode.iso2 || 'KR';
-      const regionId = parseInt(region) || 2; 
+
+      const regionId = selectedRegion
+        ? getRegionIdByIso2(selectedRegion.iso2)
+        : parseInt(region) || 2; 
 
       const signupData = {
         email: email.trim(),
@@ -268,14 +272,21 @@ export const SignupScreen = () => {
           }
         />
 
-        <FormField
-          label="지역"
-          placeholder="Korea"
-          value={region}
-          onChangeText={setRegion}
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
+        <TouchableOpacity
+          onPress={() => {
+            setSelectMode('region');
+            navigate('countryCodeSelect');
+          }}
+          style={styles.fieldContainer}
+        >
+          <FormField
+            label="지역"
+            placeholder="지역을 선택하세요"
+            value={selectedRegion ? selectedRegion.name : region || ''}
+            editable={false}
+            containerStyle={styles.fieldContainer}
+          />
+        </TouchableOpacity>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>성별</Text>

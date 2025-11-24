@@ -12,6 +12,7 @@ import { Header, FormField, PrimaryButton, OptionButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { getRegionIdByIso2, getRegionNameById } from '../constants';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남' },
@@ -22,7 +23,7 @@ const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 
 export const MyInfoEditScreen = () => {
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
-  const { selectedCountryDialCode } = useAppContext();
+  const { selectedCountryDialCode, selectedRegion, setSelectMode } = useAppContext();
   const [firstName, setFirstName] = useState('XRUN');
   const [lastName, setLastName] = useState('X');
   const [email, setEmail] = useState('oth-staff@example.invalid');
@@ -102,12 +103,19 @@ export const MyInfoEditScreen = () => {
             }
           />
 
-          <FormField
-            label="Region"
-            value={region}
-            onChangeText={setRegion}
-            placeholder="지역을 입력하세요"
-          />
+          <TouchableOpacity
+            onPress={() => {
+              setSelectMode('region');
+              navigate('countryCodeSelect');
+            }}
+          >
+            <FormField
+              label="Region"
+              value={selectedRegion ? selectedRegion.name : region}
+              editable={false}
+              placeholder="지역을 선택하세요"
+            />
+          </TouchableOpacity>
 
           <View style={styles.formGroup}>
             <Text style={styles.sectionLabel}>성별</Text>
