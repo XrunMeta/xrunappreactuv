@@ -1,4 +1,4 @@
-import v_a3453e from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -7,12 +7,16 @@ import {
   v_4623af,
   v_5f4661,
   v_03e392,
+  v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_a7ab3c, v_d7d5a2 } from '../services';
+import { v_700ef9 } from '../context';
 
 type CardConfig = {
   id: string;
@@ -69,18 +73,65 @@ const v_dbfc7f = [
 ];
 
 export const v_03a231 = () => {
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { setVerificationEmail: v_b572c3 } = v_700ef9();
+  const [v_bb789b, v_a61751] = v_5ab095<{
+    name?: string;
+    email?: string;
+  } | null>(null);
+  const [v_cd31a8, v_deef62] = v_5ab095(true);
+
+  v_c4deb2(() => {
+    const v_ea3fa6 = async () => {
+      try {
+
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          const v_660822 = v_ef7306.member;
+
+          if (v_660822) {
+            const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
+            const v_625c74 = v_3393e3.data[0];
+
+            if (v_625c74) {
+              const v_a32a50 = v_625c74.firstname || '';
+              const v_328bb4 = v_625c74.lastname || '';
+              const v_05b02f = `${v_a32a50} ${v_328bb4}`.trim() || '사용자';
+
+              v_a61751({
+                name: v_05b02f,
+                email: v_625c74.email || '',
+              });
+            }
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[마이페이지] 사용자 정보 로드 실패:', v_5e9bfe);
+      } finally {
+        v_deef62(false);
+      }
+    };
+
+    v_ea3fa6();
+  }, [v_9b57fc]);
 
   const v_b0f7df = (v_5eae50) => {
     if (v_5eae50.route) {
+
+      if (v_5eae50.id === 'edit' && v_bb789b?.email) {
+        v_b572c3(v_bb789b.email);
+      }
       v_9b57fc(v_ce4741[v_5eae50.route]);
     }
   };
 
   const v_22cd2d = async () => {
     try {
+      const v_1833e7 = v_bb789b?.name || '사용자';
+      const v_e0c7e8 = v_bb789b?.email || '';
       await v_5f4661.share({
-        message: 'XRUNBackend • oth-user@example.invalid',
+        message: `${v_1833e7} • ${v_e0c7e8}`,
       });
     } catch (v_5e9bfe) {
       console.warn(v_5e9bfe);
@@ -88,7 +139,65 @@ export const v_03a231 = () => {
   };
 
   const v_06b8a4 = () => {
-    v_03e392.alert('로그아웃', '로그아웃 기능은 추후 연동됩니다.');
+    v_03e392.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '로그아웃',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+
+              const v_f24fd5 = await v_e84827.getItem('userData');
+              if (!v_f24fd5) {
+                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              const v_ef7306 = JSON.parse(v_f24fd5);
+              const v_660822 = v_ef7306.member;
+
+              if (!v_660822) {
+                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              await v_d7d5a2(v_660822, v_9b57fc);
+
+              await v_e84827.removeItem('isLoggedIn');
+              await v_e84827.removeItem('userEmail');
+              await v_e84827.removeItem('userData');
+              await v_e84827.removeItem('rageProgress');
+              await v_e84827.removeItem('userTickets');
+              await v_e84827.removeItem('rageProgressLastUpdate');
+              await v_e84827.removeItem('userSessionToken');
+
+              v_487a25(v_ce4741.login);
+            } catch (v_5e9bfe) {
+              console.error('[로그아웃] 로그아웃 처리 중 오류:', v_5e9bfe);
+
+              try {
+                await v_e84827.removeItem('isLoggedIn');
+                await v_e84827.removeItem('userEmail');
+                await v_e84827.removeItem('userData');
+                await v_e84827.removeItem('rageProgress');
+                await v_e84827.removeItem('userTickets');
+                await v_e84827.removeItem('rageProgressLastUpdate');
+                await v_e84827.removeItem('userSessionToken');
+              } catch (v_df17d5) {
+                console.error('[로그아웃] AsyncStorage 삭제 중 오류:', v_df17d5);
+              }
+              v_487a25(v_ce4741.login);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const v_c273da = (v_5eae50) => {
@@ -119,8 +228,18 @@ export const v_03a231 = () => {
 
           <View style={v_d81136.profileCard}>
             <View>
-              <Text style={v_d81136.profileName}>XRUNBackend</Text>
-              <Text style={v_d81136.profileEmail}>oth-user@example.invalid</Text>
+              {v_cd31a8 ? (
+                <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
+              ) : (
+                <>
+                  <Text style={v_d81136.profileName}>
+                    {v_bb789b?.name || '사용자'}
+                  </Text>
+                  <Text style={v_d81136.profileEmail}>
+                    {v_bb789b?.email || ''}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={v_d81136.profileActions}>
               <TouchableOpacity
@@ -265,5 +384,4 @@ const v_d81136 = v_472849.create({
     color: '#111',
   },
 });
-
 

@@ -11,26 +11,35 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_ecee91 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_1bfbd0, v_202d44 } from '../constants';
+import { v_1bfbd0, v_202d44, v_52495e } from '../constants';
 import { v_da1883 } from '../types';
 
 export const v_379bd1 = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
-  const { selectedCountryDialCode: v_459d5e, setSelectedCountryDialCode: v_f693e7 } = v_700ef9();
+  const {
+    selectedCountryDialCode: v_459d5e,
+    setSelectedCountryDialCode: v_f693e7,
+    selectedRegion: v_2f03bc,
+    setSelectedRegion: v_2f2d51,
+    selectMode: v_479a37,
+  } = v_700ef9();
   const [v_7c5791, v_c57190] = v_5ab095('');
 
-  const v_daa71c = v_df9f57(() => {
+  const v_093bd4 = v_479a37 === 'region' ? v_52495e : v_202d44;
+  const v_c6e76b = v_479a37 === 'region' ? v_2f03bc : v_459d5e;
+
+  const v_973c3e = v_df9f57(() => {
     if (!v_7c5791.trim()) {
-      return v_202d44;
+      return v_093bd4;
     }
 
     const v_470e34 = v_7c5791.trim().toLowerCase();
     const v_5a09fa = v_470e34.replace(/[^0-9]/g, '');
 
-    return v_202d44.filter((v_b9bbbd) => {
-      const v_cd2b74 = v_b9bbbd.name.toLowerCase();
-      const v_73b9dc = v_b9bbbd.iso2.toLowerCase();
-      const v_62656e = v_b9bbbd.dialCode.replace('+', '');
+    return v_093bd4.filter((v_8c0b26) => {
+      const v_cd2b74 = v_8c0b26.name.toLowerCase();
+      const v_73b9dc = v_8c0b26.iso2.toLowerCase();
+      const v_62656e = v_8c0b26.dialCode.replace('+', '');
 
       return (
         v_cd2b74.includes(v_470e34) ||
@@ -38,30 +47,42 @@ export const v_379bd1 = () => {
         (v_5a09fa.length > 0 && v_62656e.startsWith(v_5a09fa))
       );
     });
-  }, [v_7c5791]);
+  }, [v_7c5791, v_093bd4]);
 
-  const v_6121dc = (country: v_da1883) => {
-    v_f693e7(v_b9bbbd);
+  const v_6121dc = (item: v_da1883) => {
+    if (v_479a37 === 'region') {
+      v_2f2d51(v_8c0b26);
+    } else {
+      v_f693e7(v_8c0b26);
+    }
     v_c7ac57();
   };
 
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="국가 선택" showBackButton onBackPress={v_c7ac57} />
+      <Header
+        title={v_479a37 === 'region' ? '지역 선택' : '국가 선택'}
+        showBackButton
+        onBackPress={v_c7ac57}
+      />
       <View style={v_d81136.content}>
-        <View style={v_d81136.currentSection}>
-          <Text style={v_d81136.sectionLabel}>현재 위치</Text>
-          <View style={v_d81136.currentCard}>
-            <View style={v_d81136.flagCircle}>
-              <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
-            </View>
-            <View style={v_d81136.currentInfo}>
-              <Text style={v_d81136.currentCountry}>{v_459d5e.name}</Text>
-              <Text style={v_d81136.currentDial}>{v_459d5e.dialCode}</Text>
+        {v_c6e76b && (
+          <View style={v_d81136.currentSection}>
+            <Text style={v_d81136.sectionLabel}>현재 선택</Text>
+            <View style={v_d81136.currentCard}>
+              <View style={v_d81136.flagCircle}>
+                <Text style={v_d81136.flagEmoji}>{v_c6e76b.flagEmoji}</Text>
+              </View>
+              <View style={v_d81136.currentInfo}>
+                <Text style={v_d81136.currentCountry}>{v_c6e76b.name}</Text>
+                {v_479a37 === 'country' && (
+                  <Text style={v_d81136.currentDial}>{v_c6e76b.dialCode}</Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         <View style={v_d81136.searchBox}>
           <Ionicons name="search" size={18} color="#9ca3af" />
@@ -69,7 +90,7 @@ export const v_379bd1 = () => {
             style={v_d81136.searchInput}
             value={v_7c5791}
             onChangeText={v_c57190}
-            placeholder="국가를 검색하세요"
+            placeholder={v_479a37 === 'region' ? '지역을 검색하세요' : '국가를 검색하세요'}
             placeholderTextColor="#c4c7d1"
             autoCapitalize="none"
             autoCorrect={false}
@@ -77,12 +98,12 @@ export const v_379bd1 = () => {
         </View>
 
         <FlatList
-          data={v_daa71c}
+          data={v_973c3e}
           keyExtractor={(v_8c0b26) => v_8c0b26.iso2}
           renderItem={({ item: v_8c0b26 }) => (
             <CountryCodeListItem
               country={v_8c0b26}
-              isSelected={v_8c0b26.iso2 === v_459d5e.iso2}
+              isSelected={v_8c0b26.iso2 === v_c6e76b?.iso2}
               onPress={v_6121dc}
             />
           )}

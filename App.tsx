@@ -27,8 +27,10 @@ import {
   v_03a231,
   v_dec378,
   v_cdb169,
+  v_e14579,
   v_4a40b2,
   v_9e06f6,
+  v_865e57,
   v_41dfd5,
   v_5fdcb2,
   v_386af2,
@@ -159,12 +161,20 @@ const v_c0dbdf = () => {
     return <MyInfoEditScreen />;
   }
 
+  if (v_0f0c7b === 'myInfoPhoneEdit') {
+    return <PhoneEditScreen />;
+  }
+
   if (v_0f0c7b === 'myInfoSettings') {
     return <MyInfoSettingsScreen />;
   }
 
   if (v_0f0c7b === 'myInfoCloseMembership') {
     return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoCloseMembershipSuccess') {
+    return <MyInfoCloseMembershipSuccessScreen />;
   }
 
   if (v_0f0c7b === 'myInfoClauses') {

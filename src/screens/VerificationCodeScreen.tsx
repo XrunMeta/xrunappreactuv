@@ -6,12 +6,14 @@ import {
   v_122070,
   v_4623af,
   v_326be8,
+  v_03e392,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_8025d1, v_415628 } from '../services';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -19,10 +21,12 @@ const v_ef7132 = 300;
 const v_79c59a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
 
 export const v_667a00 = () => {
-  const { goBack: v_c7ac57, reset: v_487a25 } = v_a0daa8();
-  const { verificationSuccessRoute: v_e6976c, resetVerificationSuccessRoute: v_036f76 } = v_700ef9();
+  const { goBack: v_c7ac57, reset: v_487a25, navigate: v_9b57fc } = v_a0daa8();
+  const { verificationSuccessRoute: v_e6976c, resetVerificationSuccessRoute: v_036f76, verificationEmail: v_fc0b2c } = v_700ef9();
   const [v_c99bd2, v_537cbb] = v_5ab095('');
   const [v_ae68cd, v_83fe8f] = v_5ab095(v_ef7132);
+  const [v_d1dd8f, v_ff0c7a] = v_5ab095(false);
+  const [v_ff9533, v_f30c99] = v_5ab095(false);
 
   v_c4deb2(() => {
     if (v_ae68cd <= 0) {
@@ -51,16 +55,65 @@ export const v_667a00 = () => {
     v_537cbb((v_ba2215) => v_ba2215 + v_3b402b);
   };
 
-  const v_83b05b = () => {
-    console.log('코드 확인', v_c99bd2);
-    v_487a25(v_e6976c);
-    v_036f76();
+  const v_83b05b = async () => {
+    if (!v_fc0b2c) {
+      v_03e392.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    if (v_c99bd2.length !== v_683bb6) {
+      v_03e392.alert('인증 코드 입력', '6자리 인증 코드를 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      v_ff0c7a(true);
+      console.log('[정보수정] 인증 코드 확인 요청:', { email: v_fc0b2c, code: v_c99bd2 });
+
+      const v_593e63 = await v_415628(v_fc0b2c, v_c99bd2, v_9b57fc);
+
+      if (v_593e63) {
+        console.log('[정보수정] 인증 코드 확인 성공');
+        v_487a25(v_e6976c);
+        v_036f76();
+      } else {
+        v_03e392.alert('인증 실패', '인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
+        v_537cbb('');
+      }
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 인증 코드 확인 오류:', v_5e9bfe);
+      v_03e392.alert('인증 실패', '인증 코드 확인 중 오류가 발생했습니다.');
+      v_537cbb('');
+    } finally {
+      v_ff0c7a(false);
+    }
   };
 
-  const v_cf9840 = () => {
-    v_83fe8f(v_ef7132);
-    v_537cbb('');
-    console.log('코드 재전송 요청');
+  const v_cf9840 = async () => {
+    if (!v_fc0b2c) {
+      v_03e392.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      v_f30c99(true);
+      console.log('[정보수정] 인증 코드 재전송 요청:', v_fc0b2c);
+
+      const v_593e63 = await v_8025d1(v_fc0b2c, v_9b57fc);
+
+      if (v_593e63) {
+        v_83fe8f(v_ef7132);
+        v_537cbb('');
+        v_03e392.alert('재전송 완료', '인증 코드를 다시 전송했습니다.');
+      } else {
+        v_03e392.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 인증 코드 재전송 오류:', v_5e9bfe);
+      v_03e392.alert('재전송 실패', '인증 코드 재전송 중 오류가 발생했습니다.');
+    } finally {
+      v_f30c99(false);
+    }
   };
 
   return (
@@ -70,7 +123,7 @@ export const v_667a00 = () => {
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.descriptionWrapper}>
           <Text style={v_d81136.description}>
-            oth-staff@example.invalid 이메일로{'\n'}보내드린 6자리 코드를 입력하세요.
+            {v_fc0b2c || '이메일'}로{'\n'}보내드린 6자리 코드를 입력하세요.
           </Text>
         </View>
 
@@ -87,23 +140,26 @@ export const v_667a00 = () => {
 
         <TouchableOpacity
           style={v_d81136.resendWrapper}
-          onPress={v_ae68cd <= 0 ? v_cf9840 : undefined}
-          activeOpacity={v_ae68cd <= 0 ? 0.7 : 1}
+          onPress={v_ae68cd <= 0 && !v_ff9533 ? v_cf9840 : undefined}
+          activeOpacity={v_ae68cd <= 0 && !v_ff9533 ? 0.7 : 1}
+          disabled={v_ae68cd > 0 || v_ff9533}
         >
           <Text style={v_d81136.resendText}>
-            코드 재전송{' '}
-            <Text style={v_d81136.resendTimer} numberOfLines={1}>
-              {v_8813df}
-            </Text>
+            {v_ff9533 ? '재전송 중...' : '코드 재전송'}{' '}
+            {v_ae68cd > 0 && (
+              <Text style={v_d81136.resendTimer} numberOfLines={1}>
+                {v_8813df}
+              </Text>
+            )}
           </Text>
         </TouchableOpacity>
 
         <View style={v_d81136.buttonWrapper}>
           <PrimaryButton
-            title="Verify"
+            title={v_d1dd8f ? '확인 중...' : 'Verify'}
             onPress={v_83b05b}
             fullWidth
-            disabled={v_c99bd2.length !== v_683bb6}
+            disabled={v_c99bd2.length !== v_683bb6 || v_d1dd8f}
           />
         </View>
 
@@ -246,5 +302,4 @@ const v_d81136 = v_472849.create({
     marginBottom: 9,
   },
 });
-
 
