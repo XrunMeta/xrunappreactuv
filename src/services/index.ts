@@ -35,6 +35,8 @@ import {
   v_0bd014,
   v_bd3e83,
   v_680003,
+  v_4ac02a,
+  v_648048,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -793,6 +795,46 @@ export const v_152d53 = async (
     console.error('[마이페이지] 이름 수정 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_53d723 = async (
+  v_660822,
+  v_49ea09,
+  v_3f1fb1,
+  v_c65f5d,
+): Promise<v_648048> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_4ac02a = {
+      member: v_660822,
+      mobile: v_49ea09,
+      mobilecode: v_3f1fb1,
+    };
+
+    console.log('[전화번호수정] 전화번호 수정 요청:', { member: v_660822, mobile: v_49ea09, mobilecode: v_3f1fb1 });
+
+    const v_3393e3 = await v_9f42a4.post<v_648048>(
+      '/app7153-03',
+      v_576f5a,
+    );
+
+    console.log('[전화번호수정] 전화번호 수정 성공:', v_3393e3.data);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[전화번호수정] 전화번호 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[전화번호수정] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,
