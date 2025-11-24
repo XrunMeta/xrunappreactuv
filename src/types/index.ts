@@ -52,3 +52,57 @@ export type CountryDialCode = {
   flagEmoji: string;
 };
 
+export interface EmailCheckRequest {
+  email: string;
+}
+
+export interface EmailCheckResponse {
+  data: Array<{
+    value: 'OK' | 'NO';
+  }>;
+}
+
+export interface ReferralCheckRequest {
+  email: string;
+}
+
+export interface ReferralCheckResponse {
+  data: Array<{
+    result: boolean;
+    member?: number;
+  }>;
+}
+
+export interface SignupRequest {
+  email: string;
+  pin: string;
+  firstname: string;
+  lastname: string;
+  gender: number; 
+  mobile: string;
+  mobilecode: number;
+  countrycode: string;
+  country: number;
+  region: number;
+  age: number; 
+  recommand: number; 
+  os: number; 
+}
+
+export interface SignupResponse {
+  data: Array<{
+    text: string; 
+  }>;
+}
+
+export interface LoginCheckRequest {
+  email: string;
+  pin: string;
+}
+
+export interface LoginCheckResponse {
+  data: Array<{
+    value: 'OK' | 'NO';
+  }>;
+}
+
