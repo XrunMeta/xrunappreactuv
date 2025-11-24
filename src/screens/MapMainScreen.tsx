@@ -10,11 +10,12 @@ import {
   v_09d0e5,
   v_a2349e,
   v_cdbae1,
+  v_4623af,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
 import * as v_8a44cb from 'zryrlwvgokjhz';
-import { v_f4e704 } from '../components';
+import { v_f4e704, v_3a67b0 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -106,6 +107,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const [v_572bd3, v_6a4dcd] = v_5ab095(true);
 
   const v_8f79f8 = v_e662ae(new v_a2349e.Value(90)).current; 
+
+  const [v_c98d47, v_90fc1b] = v_5ab095(false);
+  const [v_eb5123, v_7413ad] = v_5ab095(false);
 
   const [v_24cc8e] = v_5ab095({
     distance: 2.53, 
@@ -301,6 +305,24 @@ export const MapMainScreen: v_a3453e.FC = () => {
             />
           </View>
         )}
+
+        {}
+        <View style={v_d81136.testButtonContainer}>
+          <TouchableOpacity
+            style={v_d81136.testButton}
+            onPress={() => v_90fc1b(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={v_d81136.testButtonText}>테스트 팝업</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[v_d81136.testButton, v_d81136.testButtonSecondary]}
+            onPress={() => v_7413ad(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={v_d81136.testButtonText}>다단계 팝업</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {}
@@ -495,6 +517,65 @@ export const MapMainScreen: v_a3453e.FC = () => {
           onTabChange={v_42b5ed}
         />
       </View>
+
+      {}
+      <ChoiceDialog
+        visible={v_c98d47}
+        title="테스트 팝업"
+        message="이것은 ChoiceDialog 테스트 팝업입니다. 두 개의 버튼을 테스트할 수 있습니다."
+        button1Label="취소"
+        button1Action={() => {
+          v_03e392.alert('취소', '취소 버튼이 클릭되었습니다.');
+          v_90fc1b(false);
+        }}
+        button2Label="확인"
+        button2Action={async () => {
+          v_03e392.alert('확인', '확인 버튼이 클릭되었습니다.');
+          v_90fc1b(false);
+        }}
+        onClose={() => v_90fc1b(false)}
+      />
+
+      {}
+      <ChoiceDialog
+        visible={v_eb5123}
+        steps={[
+          {
+            title: "1단계",
+            message: "첫 번째 단계입니다. 다음 단계로 진행하시겠습니까?",
+            button1Label: "취소",
+            button1Action: (v_37eab7, v_708a38, v_ef1984) => {
+              v_03e392.alert('취소', '1단계에서 취소되었습니다.');
+              v_ef1984();
+            },
+            button2Label: "다음",
+            button2Action: (v_902c0b) => {
+              v_902c0b();
+            },
+          },
+          {
+            title: "2단계",
+            message: "두 번째 단계입니다. 이전 단계로 돌아가거나 완료할 수 있습니다.",
+            children: (
+              <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8, marginTop: 8 }}>
+                <Text style={{ fontSize: 14, color: '#666' }}>
+                  이것은 children으로 추가된 커스텀 컨텐츠입니다.
+                </Text>
+              </View>
+            ),
+            button1Label: "이전",
+            button1Action: (v_37eab7, v_c54ab6) => {
+              v_c54ab6();
+            },
+            button2Label: "완료",
+            button2Action: async (v_37eab7, v_708a38, v_ef1984) => {
+              v_03e392.alert('완료', '모든 단계가 완료되었습니다!');
+              v_ef1984();
+            },
+          },
+        ]}
+        onClose={() => v_7413ad(false)}
+      />
     </View>
   );
 };
@@ -559,6 +640,33 @@ const v_d81136 = v_472849.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
+  },
+
+  testButtonContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -75 }, { translateY: -25 }],
+    flexDirection: 'row',
+    gap: 12,
+    zIndex: 100,
+  },
+  testButton: {
+    backgroundColor: '#343a5a',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  testButtonSecondary: {
+    backgroundColor: '#ffdc04',
+  },
+  testButtonText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
   },
 });
 
