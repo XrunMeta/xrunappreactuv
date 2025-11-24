@@ -7,13 +7,21 @@ import {
   v_4623af,
   v_326be8,
   v_03e392,
+  v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_8025d1, v_415628 } from '../services';
+import {
+  v_415628,
+  v_a81308,
+  v_a5170b,
+  v_ea3493,
+  v_8025d1,
+} from '../services';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -22,7 +30,11 @@ const v_79c59a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '
 
 export const v_667a00 = () => {
   const { goBack: v_c7ac57, reset: v_487a25, navigate: v_9b57fc } = v_a0daa8();
-  const { verificationSuccessRoute: v_e6976c, resetVerificationSuccessRoute: v_036f76, verificationEmail: v_fc0b2c } = v_700ef9();
+  const {
+    verificationSuccessRoute: v_e6976c,
+    resetVerificationSuccessRoute: v_036f76,
+    verificationEmail: v_fc0b2c,
+  } = v_700ef9();
   const [v_c99bd2, v_537cbb] = v_5ab095('');
   const [v_ae68cd, v_83fe8f] = v_5ab095(v_ef7132);
   const [v_d1dd8f, v_ff0c7a] = v_5ab095(false);
@@ -62,28 +74,71 @@ export const v_667a00 = () => {
     }
 
     if (v_c99bd2.length !== v_683bb6) {
-      v_03e392.alert('인증 코드 입력', '6자리 인증 코드를 모두 입력해주세요.');
+      v_03e392.alert('인증 코드 입력', '6자리 인증 코드를 입력해주세요.');
       return;
     }
 
+    v_ff0c7a(true);
+
     try {
-      v_ff0c7a(true);
-      console.log('[정보수정] 인증 코드 확인 요청:', { email: v_fc0b2c, code: v_c99bd2 });
 
-      const v_593e63 = await v_415628(v_fc0b2c, v_c99bd2, v_9b57fc);
+      console.log('[인증] 이메일 인증 코드 확인 요청:', v_fc0b2c);
+      const v_ac477d = await v_415628(v_fc0b2c, v_c99bd2, v_9b57fc);
 
-      if (v_593e63) {
-        console.log('[정보수정] 인증 코드 확인 성공');
-        v_487a25(v_e6976c);
-        v_036f76();
-      } else {
+      if (!v_ac477d) {
         v_03e392.alert('인증 실패', '인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
-        v_537cbb('');
+        v_ff0c7a(false);
+        return;
+      }
+
+      if (v_e6976c === v_ce4741.login || v_e6976c === v_ce4741.map) {
+
+        console.log('[로그인] 이메일 로그인 요청:', v_fc0b2c);
+        const v_b84499 = await v_a81308(v_fc0b2c, v_9b57fc);
+
+        if (v_b84499.status !== 'success') {
+          v_03e392.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          v_ff0c7a(false);
+          return;
+        }
+
+        const v_ef7306 = v_b84499.data[0];
+        if (!v_ef7306 || !v_ef7306.member) {
+          v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          v_ff0c7a(false);
+          return;
+        }
+
+        const v_9e8d12 = v_ef7306.extrastr;
+        if (v_9e8d12) {
+          const v_06cee6 = v_a5170b(v_9e8d12);
+          const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
+          if (!v_aa0ad8) {
+            console.warn('[로그인] 세션 저장 실패');
+          }
+        }
+
+        await v_e84827.removeItem('userData');
+        await v_e84827.removeItem('userSessionToken');
+        await v_e84827.setItem('userEmail', v_fc0b2c);
+        await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+        const v_00b91e = v_ef7306.extrastr || '';
+        await v_e84827.setItem('userSessionToken', v_00b91e);
+        await v_e84827.setItem('isLoggedIn', 'true');
+
+        console.log('[로그인] 이메일 인증 로그인 성공');
+
+        v_036f76();
+        v_487a25(v_e6976c || v_ce4741.map);
+      } else {
+
+        console.log('[정보수정] 인증 코드 확인 성공');
+        v_036f76();
+        v_487a25(v_e6976c);
       }
     } catch (v_5e9bfe) {
-      console.error('[정보수정] 인증 코드 확인 오류:', v_5e9bfe);
-      v_03e392.alert('인증 실패', '인증 코드 확인 중 오류가 발생했습니다.');
-      v_537cbb('');
+      console.error('[인증] 인증 코드 확인 오류:', v_5e9bfe);
+      v_03e392.alert('오류', '인증 처리 중 오류가 발생했습니다.');
     } finally {
       v_ff0c7a(false);
     }
@@ -95,13 +150,13 @@ export const v_667a00 = () => {
       return;
     }
 
+    v_f30c99(true);
+
     try {
-      v_f30c99(true);
-      console.log('[정보수정] 인증 코드 재전송 요청:', v_fc0b2c);
+      console.log('[인증] 이메일 인증 코드 재전송 요청:', v_fc0b2c);
+      const v_f438c1 = await v_8025d1(v_fc0b2c, v_9b57fc);
 
-      const v_593e63 = await v_8025d1(v_fc0b2c, v_9b57fc);
-
-      if (v_593e63) {
+      if (v_f438c1) {
         v_83fe8f(v_ef7132);
         v_537cbb('');
         v_03e392.alert('재전송 완료', '인증 코드를 다시 전송했습니다.');
@@ -109,8 +164,8 @@ export const v_667a00 = () => {
         v_03e392.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (v_5e9bfe) {
-      console.error('[정보수정] 인증 코드 재전송 오류:', v_5e9bfe);
-      v_03e392.alert('재전송 실패', '인증 코드 재전송 중 오류가 발생했습니다.');
+      console.error('[인증] 인증 코드 재전송 오류:', v_5e9bfe);
+      v_03e392.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
     } finally {
       v_f30c99(false);
     }
@@ -144,23 +199,33 @@ export const v_667a00 = () => {
           activeOpacity={v_ae68cd <= 0 && !v_ff9533 ? 0.7 : 1}
           disabled={v_ae68cd > 0 || v_ff9533}
         >
-          <Text style={v_d81136.resendText}>
-            {v_ff9533 ? '재전송 중...' : '코드 재전송'}{' '}
-            {v_ae68cd > 0 && (
-              <Text style={v_d81136.resendTimer} numberOfLines={1}>
-                {v_8813df}
-              </Text>
-            )}
-          </Text>
+          {v_ff9533 ? (
+            <ActivityIndicator size="small" color="#2873ff" />
+          ) : (
+            <Text style={v_d81136.resendText}>
+              코드 재전송{' '}
+              {v_ae68cd > 0 && (
+                <Text style={v_d81136.resendTimer} numberOfLines={1}>
+                  {v_8813df}
+                </Text>
+              )}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={v_d81136.buttonWrapper}>
-          <PrimaryButton
-            title={v_d1dd8f ? '확인 중...' : 'Verify'}
-            onPress={v_83b05b}
-            fullWidth
-            disabled={v_c99bd2.length !== v_683bb6 || v_d1dd8f}
-          />
+          {v_d1dd8f ? (
+            <View style={v_d81136.loadingContainer}>
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            </View>
+          ) : (
+            <PrimaryButton
+              title="Verify"
+              onPress={v_83b05b}
+              fullWidth
+              disabled={v_c99bd2.length !== v_683bb6 || v_d1dd8f}
+            />
+          )}
         </View>
 
         <View style={v_d81136.keyboardContainer}>
@@ -301,5 +366,10 @@ const v_d81136 = v_472849.create({
     borderRadius: 100,
     marginBottom: 9,
   },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
-

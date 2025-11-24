@@ -41,18 +41,65 @@ type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
-  const { selectedCountryDialCode: v_459d5e, selectedRegion: v_2f03bc, setSelectMode: v_67ab1c } = v_700ef9();
-  const [v_f142d8, v_6dde2f] = v_5ab095('');
-  const [v_a7c7b7, v_15ded5] = v_5ab095('');
-  const [v_e0c7e8, v_fedf34] = v_5ab095('');
-  const [v_adc076, v_52b279] = v_5ab095('');
-  const [v_3a6ac4, v_f768f9] = v_5ab095('');
-  const [v_a6c30b, v_c030e3] = v_5ab095('');
-  const [v_9bf12c, v_fb6bbb] = v_5ab095('');
-  const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>('male');
-  const [v_f83808, v_64a312] = v_5ab095<AgeValue>('10');
-  const [v_91ca05, v_cbfe22] = v_5ab095(true);
+  const {
+    selectedCountryDialCode: v_459d5e,
+    selectedRegion: v_2f03bc,
+    setSelectMode: v_67ab1c,
+    signupFormData: v_8d7bc8,
+    setSignupFormData: v_eee6b0,
+    resetSignupFormData: v_4df356,
+  } = v_700ef9();
+  const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
+  const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);
+  const [v_e0c7e8, v_fedf34] = v_5ab095(v_8d7bc8.email);
+  const [v_adc076, v_52b279] = v_5ab095(v_8d7bc8.password);
+  const [v_3a6ac4, v_f768f9] = v_5ab095(v_8d7bc8.phoneNumber);
+  const [v_a6c30b, v_c030e3] = v_5ab095(v_8d7bc8.region);
+  const [v_9bf12c, v_fb6bbb] = v_5ab095(v_8d7bc8.referralEmail);
+  const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(v_8d7bc8.gender);
+  const [v_f83808, v_64a312] = v_5ab095<AgeValue>(v_8d7bc8.ageRange);
+  const [v_91ca05, v_cbfe22] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
+
+  v_a3453e.useEffect(() => {
+    v_6dde2f(v_8d7bc8.familyName);
+    v_15ded5(v_8d7bc8.givenName);
+    v_fedf34(v_8d7bc8.email);
+    v_52b279(v_8d7bc8.password);
+    v_f768f9(v_8d7bc8.phoneNumber);
+    v_c030e3(v_8d7bc8.region);
+    v_fb6bbb(v_8d7bc8.referralEmail);
+    v_bdc43c(v_8d7bc8.gender);
+    v_64a312(v_8d7bc8.ageRange);
+    v_cbfe22(v_8d7bc8.termsAccepted);
+  }, []); 
+
+  v_a3453e.useEffect(() => {
+    v_eee6b0({
+      familyName: v_f142d8,
+      givenName: v_a7c7b7,
+      email: v_e0c7e8,
+      password: v_adc076,
+      phoneNumber: v_3a6ac4,
+      region: v_a6c30b,
+      referralEmail: v_9bf12c,
+      gender: v_c3eac4,
+      ageRange: v_f83808,
+      termsAccepted: v_91ca05,
+    });
+  }, [
+    v_f142d8,
+    v_a7c7b7,
+    v_e0c7e8,
+    v_adc076,
+    v_3a6ac4,
+    v_a6c30b,
+    v_9bf12c,
+    v_c3eac4,
+    v_f83808,
+    v_91ca05,
+    v_eee6b0,
+  ]);
 
   const v_585b02 = async () => {
 
@@ -185,6 +232,8 @@ export const v_f40fc5 = () => {
         {
           text: '확인',
           onPress: () => {
+
+            v_4df356();
             v_487a25('authLanding');
             v_9b57fc('login');
           },
