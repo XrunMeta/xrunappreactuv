@@ -468,21 +468,21 @@ export const MyInfoEditScreen = () => {
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
           </View>
         ) : (
-          <View style={styles.formWrapper}>
-            <FormField
-              label="First Name"
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder="Enter first name"
+        <View style={styles.formWrapper}>
+          <FormField
+            label="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="Enter first name"
               editable={!isSaving}
-            />
-            <FormField
-              label="Last Name"
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder="Enter last name"
+          />
+          <FormField
+            label="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Enter last name"
               editable={!isSaving}
-            />
+          />
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>Email</Text>
               <View style={styles.disabledInput}>
@@ -511,14 +511,14 @@ export const MyInfoEditScreen = () => {
                   </Text>
                 </View>
                 {}
-                <TouchableOpacity
+              <TouchableOpacity
                   style={styles.phoneValueContainer}
                   onPress={handlePhoneEdit}
-                  activeOpacity={0.7}
+                activeOpacity={0.7}
                   disabled={isSaving}
-                >
+              >
                   <Text style={styles.phoneValue}>{phone}</Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
               </View>
             </View>
 
@@ -550,44 +550,44 @@ export const MyInfoEditScreen = () => {
               </View>
             </View>
 
-            <View style={styles.formGroup}>
-              <Text style={styles.sectionLabel}>성별</Text>
-              <View style={styles.inlineOptions}>
-                {GENDER_OPTIONS.map((option) => (
-                  <OptionButton
-                    key={option.value}
-                    label={option.label}
-                    selected={gender === option.value}
-                    onPress={() => setGender(option.value)}
+          <View style={styles.formGroup}>
+            <Text style={styles.sectionLabel}>성별</Text>
+            <View style={styles.inlineOptions}>
+              {GENDER_OPTIONS.map((option) => (
+                <OptionButton
+                  key={option.value}
+                  label={option.label}
+                  selected={gender === option.value}
+                  onPress={() => setGender(option.value)}
                     disabled={isSaving}
-                  />
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={styles.sectionLabel}>나이</Text>
-              <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
-                {AGE_OPTIONS.map((option, index) => {
-                  const isLast = index === AGE_OPTIONS.length - 1;
-                  return (
-                    <OptionButton
-                      key={option}
-                      label={option}
-                      selected={age === option}
-                      onPress={() => setAge(option)}
-                      flex={1}
-                      disabled={isSaving}
-                      style={[
-                        styles.ageOptionButton,
-                        !isLast && styles.ageOptionSpacing,
-                      ]}
-                    />
-                  );
-                })}
-              </View>
+                />
+              ))}
             </View>
           </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.sectionLabel}>나이</Text>
+            <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
+              {AGE_OPTIONS.map((option, index) => {
+                const isLast = index === AGE_OPTIONS.length - 1;
+                return (
+                  <OptionButton
+                    key={option}
+                    label={option}
+                    selected={age === option}
+                    onPress={() => setAge(option)}
+                    flex={1}
+                      disabled={isSaving}
+                    style={[
+                      styles.ageOptionButton,
+                      !isLast && styles.ageOptionSpacing,
+                    ]}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        </View>
         )}
 
         <View style={styles.bottomSection}>
@@ -596,13 +596,13 @@ export const MyInfoEditScreen = () => {
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             </View>
           ) : (
-            <PrimaryButton
-              title="Save Changes"
-              fullWidth
-              onPress={handleSave}
-              style={styles.primaryButton}
+          <PrimaryButton
+            title="Save Changes"
+            fullWidth
+            onPress={handleSave}
+            style={styles.primaryButton}
               disabled={isLoading}
-            />
+          />
           )}
         </View>
       </ScrollView>

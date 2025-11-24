@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
 import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo } from '../types';
-import { COUNTRY_DIAL_CODES } from '../constants';
+import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -26,6 +26,11 @@ type AppContextValue = {
   selectedCountryDialCode: CountryDialCode;
   setSelectedCountryDialCode: (country: CountryDialCode) => void;
   resetSelectedCountryDialCode: () => void;
+  selectedRegion: CountryDialCode | null;
+  setSelectedRegion: (region: CountryDialCode | null) => void;
+  resetSelectedRegion: () => void;
+  selectMode: 'country' | 'region';
+  setSelectMode: (mode: 'country' | 'region') => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -41,6 +46,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
   const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
+  const [selectedRegion, setSelectedRegion] = useState<CountryDialCode | null>(null);
+  const [selectMode, setSelectMode] = useState<'country' | 'region'>('country');
 
   const value = useMemo(
     () => ({
@@ -65,6 +72,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedCountryDialCode,
       setSelectedCountryDialCode,
       resetSelectedCountryDialCode: () => setSelectedCountryDialCode(defaultCountry),
+      selectedRegion,
+      setSelectedRegion,
+      resetSelectedRegion: () => setSelectedRegion(null),
+      selectMode,
+      setSelectMode,
     }),
     [
       walletSendAddress,
@@ -75,6 +87,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedShopItem,
       emergencyStop,
       selectedCountryDialCode,
+      selectedRegion,
+      selectMode,
     ],
   );
 
