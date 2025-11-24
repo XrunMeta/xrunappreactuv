@@ -1,19 +1,59 @@
-import React, { useMemo } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Share } from 'react-native';
+import React, { useMemo, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
-import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl } from '../components';
+import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { PaginationParams, PaginationResponse } from '../types/pagination';
 
-const members = Array.from({ length: 8 }, (_, index) => ({
-  rank: index + 1,
-  email: 'user1@user.com',
-  date: '2025.05.05',
-}));
+interface MemberData {
+  rank: number;
+  email: string;
+  date: string;
+  highlight?: boolean;
+}
+
+const generateDemoMembers = (page: number, pageSize: number): MemberData[] => {
+  const startIndex = (page - 1) * pageSize;
+  const totalItems = 610; 
+  const items: MemberData[] = [];
+
+  for (let i = 0; i < pageSize && startIndex + i < totalItems; i++) {
+    items.push({
+      rank: startIndex + i + 1,
+      email: `user${startIndex + i + 1}@user.com`,
+      date: '2025.05.05' + i + ' 14:00',
+      highlight: startIndex + i === 0, 
+    });
+  }
+
+  return items;
+};
+
+const fetchReferralMembers = async (
+  params: PaginationParams
+): Promise<PaginationResponse<MemberData>> => {
+
+  return new Promise((resolve) => {
+
+    setTimeout(() => {
+      const data = generateDemoMembers(params.page, params.pageSize);
+      const total = 610;
+      const hasMore = params.page * params.pageSize < total;
+
+      resolve({
+        data,
+        total,
+        hasMore,
+      });
+    }, 500); 
+  });
+};
 
 export const ReferralMyGroupScreen = () => {
   const { navigate } = useAppNavigation();
+  const dataListRef = useRef<DataListRef>(null);
 
   const segmentedOptions = useMemo(
     () => [
@@ -29,6 +69,9 @@ export const ReferralMyGroupScreen = () => {
       navigate(ROUTES.referralSettlement);
     } else if (value === 'rank') {
       navigate(ROUTES.referralRank);
+    } else if (value === 'group') {
+
+      dataListRef.current?.reloadData();
     }
   };
 
@@ -46,7 +89,7 @@ export const ReferralMyGroupScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title="추천" />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         <View style={styles.wrapper}>
           <View style={styles.topRow}>
             <ReferralStatsCard title="내 그룹 맴버" value="610 맴버" helperText=" " />
@@ -61,21 +104,20 @@ export const ReferralMyGroupScreen = () => {
             onChange={handleSegmentChange}
             containerStyle={styles.segmented}
           />
-
-          <View style={styles.list}>
-            {members.map((item) => (
-              <ReferralMemberRow
-                key={`${item.rank}-${item.email}`}
-                rank={item.rank}
-                email={item.email}
-                date={item.date}
-                highlight={item.rank === 1}
-                onPress={() => navigate(ROUTES.referralDepthOne)}
-              />
-            ))}
-          </View>
         </View>
-      </ScrollView>
+
+        <View style={styles.listContainer}>
+          <DataList<MemberData>
+            ref={dataListRef}
+            fetchData={fetchReferralMembers}
+            ItemComponent={ReferralMemberRow}
+            pageSize={20}
+            keyExtractor={(item, index) => `member-${item.rank}-${item.email}-${index}`}
+            onItemPress={() => navigate(ROUTES.referralDepthOne)}
+            contentContainerStyle={styles.listContent}
+          />
+        </View>
+      </View>
     </View>
   );
 };
@@ -85,8 +127,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f7fb',
   },
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    flex: 1,
   },
   wrapper: {
     width: '100%',
@@ -94,6 +136,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',
@@ -112,11 +155,17 @@ const styles = StyleSheet.create({
   },
   segmented: {
     marginTop: 16,
-    marginBottom: 24,
+    marginBottom: 0,
   },
-  list: {
+  listContainer: {
+    flex: 1,
     width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+  },
+  listContent: {
+    paddingBottom: 32,
   },
 });
-
 
