@@ -37,6 +37,17 @@ import {
   v_680003,
   v_4ac02a,
   v_648048,
+  v_52573c,
+  v_2b5bdc,
+  v_32dea4,
+  v_6896c1,
+  v_97a4a7,
+  v_3059f1,
+  v_6d05a4,
+  v_7d842d,
+  v_bf21af,
+  v_9b135d,
+  v_c4dd46,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -807,6 +818,44 @@ export const v_152d53 = async (
   }
 };
 
+export const v_7f8c9e = async (
+  v_660822,
+  v_9517dc,
+  v_c65f5d,
+): Promise<v_2b5bdc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_52573c = {
+      member: v_660822,
+      lastname: v_9517dc,
+    };
+
+    console.log('[마이페이지] 성 수정 요청:', { member: v_660822, lastname: v_9517dc });
+
+    const v_3393e3 = await v_9f42a4.post<v_2b5bdc>(
+      '/app7130-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 성 수정 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 성 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_53d723 = async (
   v_660822,
   v_49ea09,
@@ -835,6 +884,195 @@ export const v_53d723 = async (
     console.error('[전화번호수정] 전화번호 수정 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[전화번호수정] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_71d37e = async (
+  v_660822,
+  v_c3eac4,
+  v_c65f5d,
+): Promise<v_6896c1> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_32dea4 = {
+      member: v_660822,
+      gender: v_c3eac4,
+    };
+
+    console.log('[마이페이지] 성별 수정 요청:', { member: v_660822, gender: v_c3eac4 });
+
+    const v_3393e3 = await v_9f42a4.post<v_6896c1>(
+      '/app7180-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 성별 수정 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 성별 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_07f367 = async (
+  v_660822,
+  v_6e272b,
+  v_c65f5d,
+): Promise<v_3059f1> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_97a4a7 = {
+      member: v_660822,
+      ages: v_6e272b,
+    };
+
+    console.log('[마이페이지] 나이 수정 요청:', { member: v_660822, ages: v_6e272b });
+
+    const v_3393e3 = await v_9f42a4.post<v_3059f1>(
+      '/app7170-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 나이 수정 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 나이 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_60f557 = async (
+  v_c65f5d,
+): Promise<v_c4dd46> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[마이페이지] 국가 목록 조회 요청');
+
+    const v_3393e3 = await v_9f42a4.get<v_c4dd46>('/countries');
+
+    console.log('[마이페이지] 국가 목록 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 국가 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_11e39e = async (
+  v_b9bbbd,
+  v_c65f5d,
+): Promise<v_7d842d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_6d05a4 = {
+      country: v_b9bbbd,
+    };
+
+    console.log('[마이페이지] 지역 목록 조회 요청:', { country: v_b9bbbd });
+
+    const v_3393e3 = await v_9f42a4.post<v_7d842d>(
+      '/app7190-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 지역 목록 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 지역 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4296b8 = async (
+  v_660822,
+  v_b9bbbd,
+  v_a6c30b,
+  v_c65f5d,
+): Promise<v_9b135d> => {
+  try {
+
+    if (v_b9bbbd === undefined || v_b9bbbd === null) {
+      throw new Error('국가 코드가 유효하지 않습니다.');
+    }
+    if (v_a6c30b === undefined || v_a6c30b === null) {
+      throw new Error('지역 코드가 유효하지 않습니다.');
+    }
+
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bf21af = {
+      member: v_660822,
+      country: v_b9bbbd,
+      region: v_a6c30b,
+    };
+
+    console.log('[마이페이지] 지역 수정 요청:', { member: v_660822, country: v_b9bbbd, region: v_a6c30b });
+
+    const v_3393e3 = await v_9f42a4.post<v_9b135d>(
+      '/app7190-02',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 지역 수정 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 지역 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

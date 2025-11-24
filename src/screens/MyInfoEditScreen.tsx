@@ -216,12 +216,20 @@ export const v_cdb169 = () => {
         v_e01f71.push(v_7f8c9e(v_717992, v_328bb4.trim(), v_9b57fc));
       }
 
-      if (v_add96c.cCode && v_167c8b.rCode && v_167c8b.rCode !== 0) {
+      if (v_add96c.cCode !== null && v_add96c.cCode !== undefined && 
+          v_167c8b.rCode !== null && v_167c8b.rCode !== undefined && v_167c8b.rCode !== 0) {
+        console.log('[정보수정] 지역 수정 시도:', {
+          memberId: v_717992,
+          country: v_add96c.cCode,
+          region: v_167c8b.rCode,
+        });
         v_e01f71.push(v_4296b8(v_717992, v_add96c.cCode, v_167c8b.rCode, v_9b57fc));
-      } else if (v_167c8b.rCode === 0) {
-        v_03e392.alert('오류', '지역을 선택해주세요.');
-        v_433822(false);
-        return;
+      } else if (v_add96c.cCode === null || v_add96c.cCode === undefined) {
+
+        console.warn('[정보수정] 국가가 선택되지 않아 지역 수정을 건너뜁니다.');
+      } else if (v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === 0) {
+
+        console.warn('[정보수정] 지역이 선택되지 않아 지역 수정을 건너뜁니다.');
       }
 
       const v_d199d8 = v_a1244c(v_c3eac4);
