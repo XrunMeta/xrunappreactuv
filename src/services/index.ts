@@ -9,6 +9,8 @@ import {
   v_70f41f,
   v_a357d3,
   v_d6bdce,
+  v_8fe320,
+  v_7f7c81,
   v_e71577,
   v_2c1a39,
   v_3edf6c,
@@ -233,6 +235,31 @@ export const v_60e3a5 = async (
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[회원가입 1단계] 이메일 중복 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_f5ecec = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_8fe320 = { email: v_e0c7e8 };
+
+    console.log('[로그인] 이메일 존재 확인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_7f7c81>(
+      '/ap1810-i01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.result === true;
+    console.log('[로그인] 이메일 존재 확인 결과:', v_43c42e ? '등록된 이메일' : '미등록 이메일');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 존재 확인 실패:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
