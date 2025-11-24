@@ -50,6 +50,8 @@ import {
   GetCountriesResponse,
   LogoutRequest,
   LogoutResponse,
+  CloseMembershipRequest,
+  CloseMembershipResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1127,6 +1129,49 @@ export const logout = async (
     if (error instanceof Error && error.message === 'API request timeout') {
 
       throw error;
+    }
+    throw error;
+  }
+};
+
+export const closeMembership = async (
+  member: number,
+  pin: string,
+  reason: string,
+  reasonNum: number,
+  navigation?: any,
+): Promise<boolean> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: CloseMembershipRequest = {
+      pin,
+      reason,
+      reasonNum,
+      member,
+    };
+
+    console.log('[회원 탈퇴] 회원 탈퇴 요청:', { member, reasonNum });
+
+    const response = await axiosInstance.post<CloseMembershipResponse>(
+      '/app8080-01',
+      request,
+    );
+
+    const result = response.data.data?.[0]?.count === 1;
+    console.log('[회원 탈퇴] 회원 탈퇴 결과:', result ? '성공' : '실패');
+
+    return result;
+  } catch (error) {
+    console.error('[회원 탈퇴] 회원 탈퇴 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[회원 탈퇴] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
     }
     throw error;
   }

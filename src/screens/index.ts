@@ -31,6 +31,7 @@ export { MyInfoEditScreen } from './MyInfoEditScreen';
 export { PhoneEditScreen } from './PhoneEditScreen';
 export { MyInfoSettingsScreen } from './MyInfoSettingsScreen';
 export { MyInfoCloseMembershipScreen } from './MyInfoCloseMembershipScreen';
+export { MyInfoCloseMembershipSuccessScreen } from './MyInfoCloseMembershipSuccessScreen';
 export { MyInfoClausesScreen } from './MyInfoClausesScreen';
 export { ClauseDetailScreen } from './ClauseDetailScreen';
 export { MyInfoNotifyScreen } from './MyInfoNotifyScreen';

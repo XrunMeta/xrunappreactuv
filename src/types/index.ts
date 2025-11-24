@@ -356,3 +356,19 @@ export interface LogoutResponse {
   [key: string]: any;
 }
 
+export interface CloseMembershipRequest {
+  pin: string;        
+  reason: string;      
+  reasonNum: number;  
+  member: number;     
+}
+
+export interface CloseMembershipResponse {
+  data?: Array<{
+    count?: number;  
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+

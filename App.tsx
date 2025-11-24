@@ -30,6 +30,7 @@ import {
   PhoneEditScreen,
   MyInfoSettingsScreen,
   MyInfoCloseMembershipScreen,
+  MyInfoCloseMembershipSuccessScreen,
   MyInfoClausesScreen,
   ClauseDetailScreen,
   MyInfoNotifyScreen,
@@ -170,6 +171,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoCloseMembership') {
     return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (currentScreen === 'myInfoCloseMembershipSuccess') {
+    return <MyInfoCloseMembershipSuccessScreen />;
   }
 
   if (currentScreen === 'myInfoClauses') {
