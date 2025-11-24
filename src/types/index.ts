@@ -344,3 +344,15 @@ export interface GetCountriesResponse {
   [key: string]: any;
 }
 
+export interface LogoutRequest {
+  member: number;
+}
+
+export interface LogoutResponse {
+  status?: string;
+  data?: Array<{
+    [key: string]: any;
+  }>;
+  [key: string]: any;
+}
+

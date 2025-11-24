@@ -15,7 +15,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-import { v_a7ab3c } from '../services';
+import { v_a7ab3c, v_d7d5a2 } from '../services';
 import { v_700ef9 } from '../context';
 
 type CardConfig = {
@@ -73,7 +73,7 @@ const v_dbfc7f = [
 ];
 
 export const v_03a231 = () => {
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
@@ -139,7 +139,65 @@ export const v_03a231 = () => {
   };
 
   const v_06b8a4 = () => {
-    v_03e392.alert('로그아웃', '로그아웃 기능은 추후 연동됩니다.');
+    v_03e392.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '로그아웃',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+
+              const v_f24fd5 = await v_e84827.getItem('userData');
+              if (!v_f24fd5) {
+                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              const v_ef7306 = JSON.parse(v_f24fd5);
+              const v_660822 = v_ef7306.member;
+
+              if (!v_660822) {
+                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              await v_d7d5a2(v_660822, v_9b57fc);
+
+              await v_e84827.removeItem('isLoggedIn');
+              await v_e84827.removeItem('userEmail');
+              await v_e84827.removeItem('userData');
+              await v_e84827.removeItem('rageProgress');
+              await v_e84827.removeItem('userTickets');
+              await v_e84827.removeItem('rageProgressLastUpdate');
+              await v_e84827.removeItem('userSessionToken');
+
+              v_487a25(v_ce4741.login);
+            } catch (v_5e9bfe) {
+              console.error('[로그아웃] 로그아웃 처리 중 오류:', v_5e9bfe);
+
+              try {
+                await v_e84827.removeItem('isLoggedIn');
+                await v_e84827.removeItem('userEmail');
+                await v_e84827.removeItem('userData');
+                await v_e84827.removeItem('rageProgress');
+                await v_e84827.removeItem('userTickets');
+                await v_e84827.removeItem('rageProgressLastUpdate');
+                await v_e84827.removeItem('userSessionToken');
+              } catch (v_df17d5) {
+                console.error('[로그아웃] AsyncStorage 삭제 중 오류:', v_df17d5);
+              }
+              v_487a25(v_ce4741.login);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const v_c273da = (v_5eae50) => {

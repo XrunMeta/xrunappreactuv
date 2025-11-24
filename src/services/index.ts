@@ -48,6 +48,8 @@ import {
   v_bf21af,
   v_9b135d,
   v_c4dd46,
+  v_13e1b8,
+  v_6ffbdd,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -1080,6 +1082,51 @@ export const v_4296b8 = async (
         data: v_5e9bfe.response?.data,
         message: v_5e9bfe.message,
       });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_d7d5a2 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_6ffbdd> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_f71b56 = `${v_c01615}/logout-9705`;
+
+    console.log('[로그아웃] 로그아웃 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_12a388(
+      '/logout-9705',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_36dd9e}`,
+        },
+        body: JSON.stringify({
+          member: v_660822,
+        } as v_13e1b8),
+      },
+      v_c65f5d,
+    );
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const data: v_6ffbdd = await v_3393e3.json();
+    console.log('[로그아웃] 로그아웃 성공');
+
+    return v_9390e8;
+  } catch (v_5e9bfe) {
+    console.error('[로그아웃] 로그아웃 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
+
+      throw v_5e9bfe;
     }
     throw v_5e9bfe;
   }
