@@ -14,6 +14,9 @@ type AppContextValue = {
   verificationSuccessRoute: v_01e0ec;
   setVerificationSuccessRoute: (route: v_01e0ec) => void;
   resetVerificationSuccessRoute: () => void;
+  verificationEmail: string;
+  setVerificationEmail: (email: string) => void;
+  resetVerificationEmail: () => void;
   selectedClauseId: v_9dd03c;
   setSelectedClauseId: (clause: v_9dd03c) => void;
   selectedShopItem?: v_745d71;
@@ -52,6 +55,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_750b67, v_2cdd41] = v_5ab095(false);
   const [v_e6976c, v_8f89f3] =
     v_5ab095<v_01e0ec>(v_ce4741.login);
+  const [v_fc0b2c, v_b572c3] = v_5ab095('');
   const [v_6e7459, v_48a083] = v_5ab095<v_9dd03c>('service');
   const [v_dfe883, v_d0fbad] = v_5ab095<v_745d71 | undefined>(undefined);
   const [v_b135ca, v_69fcdc] = v_5ab095<v_ac312b>(null);
@@ -83,6 +87,9 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       verificationSuccessRoute: v_e6976c,
       setVerificationSuccessRoute: v_8f89f3,
       resetVerificationSuccessRoute: () => v_8f89f3(v_ce4741.login),
+      verificationEmail: v_fc0b2c,
+      setVerificationEmail: v_b572c3,
+      resetVerificationEmail: () => v_b572c3(''),
       selectedClauseId: v_6e7459,
       setSelectedClauseId: v_48a083,
       selectedShopItem: v_dfe883,
@@ -120,6 +127,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_ee27aa,
       v_750b67,
       v_e6976c,
+      v_fc0b2c,
       v_6e7459,
       v_dfe883,
       v_b135ca,

@@ -5,27 +5,67 @@ import {
   v_122070,
   v_326be8,
   v_03e392,
+  v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_f5ecec, v_8025d1 } from '../services';
 
 export const v_a82b55 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
-  const { setVerificationSuccessRoute: v_8f89f3 } = v_700ef9();
+  const [v_cd31a8, v_deef62] = v_5ab095(false);
+  const { setVerificationSuccessRoute: v_8f89f3, setVerificationEmail: v_b572c3 } = v_700ef9();
 
-  const v_465869 = () => {
+  const v_465869 = async () => {
     if (!v_e0c7e8.trim()) {
       v_03e392.alert('이메일 입력', '인증 메일을 받을 이메일을 입력해주세요.');
       return;
     }
 
-    console.log('이메일 인증 요청', v_e0c7e8);
-    v_8f89f3(v_ce4741.login);
-    v_9b57fc(v_ce4741.verificationCode);
+    const v_9a3638 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!v_9a3638.test(v_e0c7e8.trim())) {
+      v_03e392.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
+    v_deef62(true);
+
+    try {
+
+      console.log('[로그인] 이메일 존재 확인 요청:', v_e0c7e8.trim());
+      const v_dbae58 = await v_f5ecec(v_e0c7e8.trim(), v_9b57fc);
+
+      if (!v_dbae58) {
+        v_03e392.alert(
+          '이메일 확인',
+          '등록되지 않은 이메일입니다. 회원가입을 진행해주세요.',
+        );
+        v_deef62(false);
+        return;
+      }
+
+      console.log('[로그인] 이메일 인증 코드 전송 요청:', v_e0c7e8.trim());
+      const v_f438c1 = await v_8025d1(v_e0c7e8.trim(), v_9b57fc);
+
+      if (!v_f438c1) {
+        v_03e392.alert('전송 실패', '인증 코드 전송에 실패했습니다. 다시 시도해주세요.');
+        v_deef62(false);
+        return;
+      }
+
+      v_b572c3(v_e0c7e8.trim());
+      v_8f89f3(v_ce4741.map); 
+      v_9b57fc(v_ce4741.verificationCode);
+    } catch (v_5e9bfe) {
+      console.error('[로그인] 이메일 인증 처리 중 오류:', v_5e9bfe);
+      v_03e392.alert('오류', '이메일 인증 처리 중 오류가 발생했습니다.');
+    } finally {
+      v_deef62(false);
+    }
   };
 
   return (
@@ -48,7 +88,12 @@ export const v_a82b55 = () => {
         />
 
         <View style={v_d81136.buttonWrapper}>
-          <PrimaryButton title="Send" fullWidth onPress={v_465869} />
+          <PrimaryButton
+            title={v_cd31a8 ? '처리 중...' : 'Send'}
+            fullWidth
+            onPress={v_465869}
+            disabled={v_cd31a8}
+          />
         </View>
       </ScrollView>
 
@@ -98,5 +143,4 @@ const v_d81136 = v_472849.create({
     marginBottom: 9,
   },
 });
-
 
