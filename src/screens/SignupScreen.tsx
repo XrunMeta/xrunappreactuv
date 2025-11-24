@@ -105,14 +105,31 @@ export const SignupScreen = () => {
         if (referralId !== null) {
           referralMemberId = referralId;
         } else {
-          Alert.alert(
-            '추천인 확인',
-            '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
-            [
-              { text: '취소', style: 'cancel', onPress: () => setIsSubmitting(false) },
-              { text: '계속', onPress: () => {} },
-            ],
-          );
+
+          const shouldContinue = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              '추천인 확인',
+              '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                  onPress: () => {
+                    setIsSubmitting(false);
+                    resolve(false);
+                  },
+                },
+                {
+                  text: '계속',
+                  onPress: () => resolve(true),
+                },
+              ],
+            );
+          });
+
+          if (!shouldContinue) {
+            return;
+          }
 
         }
       }
