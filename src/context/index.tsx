@@ -28,6 +28,21 @@ type AppContextValue = {
   resetSelectedRegion: () => void;
   selectMode: 'country' | 'region';
   setSelectMode: (mode: 'country' | 'region') => void;
+
+  signupFormData: {
+    familyName: string;
+    givenName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    region: string;
+    referralEmail: string;
+    gender: 'male' | 'female';
+    ageRange: '10' | '20' | '30' | '40' | '50+';
+    termsAccepted: boolean;
+  };
+  setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => void;
+  resetSignupFormData: () => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -44,6 +59,18 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_459d5e, v_f693e7] = v_5ab095<v_da1883>(v_d7c38a);
   const [v_2f03bc, v_2f2d51] = v_5ab095<v_da1883 | null>(null);
   const [v_479a37, v_67ab1c] = v_5ab095<'country' | 'region'>('country');
+  const [v_8d7bc8, v_d61c3a] = v_5ab095<AppContextValue['signupFormData']>({
+    familyName: '',
+    givenName: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    region: '',
+    referralEmail: '',
+    gender: 'male',
+    ageRange: '10',
+    termsAccepted: true,
+  });
 
   const v_3b402b = v_df9f57(
     () => ({
@@ -70,6 +97,24 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       resetSelectedRegion: () => v_2f2d51(null),
       selectMode: v_479a37,
       setSelectMode: v_67ab1c,
+      signupFormData: v_8d7bc8,
+      setSignupFormData: (v_9390e8) => {
+        v_d61c3a((v_ba2215) => ({ ...v_ba2215, ...v_9390e8 }));
+      },
+      resetSignupFormData: () => {
+        v_d61c3a({
+          familyName: '',
+          givenName: '',
+          email: '',
+          password: '',
+          phoneNumber: '',
+          region: '',
+          referralEmail: '',
+          gender: 'male',
+          ageRange: '10',
+          termsAccepted: true,
+        });
+      },
     }),
     [
       v_ee27aa,
@@ -81,6 +126,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_459d5e,
       v_2f03bc,
       v_479a37,
+      v_8d7bc8,
     ],
   );
 
