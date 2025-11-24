@@ -11,26 +11,35 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, CountryCodeListItem } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { COLORS, COUNTRY_DIAL_CODES } from '../constants';
+import { COLORS, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 import { CountryDialCode } from '../types';
 
 export const CountryCodeSelectScreen = () => {
   const { goBack } = useAppNavigation();
-  const { selectedCountryDialCode, setSelectedCountryDialCode } = useAppContext();
+  const {
+    selectedCountryDialCode,
+    setSelectedCountryDialCode,
+    selectedRegion,
+    setSelectedRegion,
+    selectMode,
+  } = useAppContext();
   const [query, setQuery] = useState('');
 
-  const filteredCountries = useMemo(() => {
+  const dataSource = selectMode === 'region' ? REGIONS_AS_COUNTRY_DIAL_CODES : COUNTRY_DIAL_CODES;
+  const selectedItem = selectMode === 'region' ? selectedRegion : selectedCountryDialCode;
+
+  const filteredItems = useMemo(() => {
     if (!query.trim()) {
-      return COUNTRY_DIAL_CODES;
+      return dataSource;
     }
 
     const normalizedQuery = query.trim().toLowerCase();
     const numericQuery = normalizedQuery.replace(/[^0-9]/g, '');
 
-    return COUNTRY_DIAL_CODES.filter((country) => {
-      const searchName = country.name.toLowerCase();
-      const searchIso = country.iso2.toLowerCase();
-      const searchDial = country.dialCode.replace('+', '');
+    return dataSource.filter((item) => {
+      const searchName = item.name.toLowerCase();
+      const searchIso = item.iso2.toLowerCase();
+      const searchDial = item.dialCode.replace('+', '');
 
       return (
         searchName.includes(normalizedQuery) ||
@@ -38,30 +47,42 @@ export const CountryCodeSelectScreen = () => {
         (numericQuery.length > 0 && searchDial.startsWith(numericQuery))
       );
     });
-  }, [query]);
+  }, [query, dataSource]);
 
-  const handleSelect = (country: CountryDialCode) => {
-    setSelectedCountryDialCode(country);
+  const handleSelect = (item: CountryDialCode) => {
+    if (selectMode === 'region') {
+      setSelectedRegion(item);
+    } else {
+      setSelectedCountryDialCode(item);
+    }
     goBack();
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="국가 선택" showBackButton onBackPress={goBack} />
+      <Header
+        title={selectMode === 'region' ? '지역 선택' : '국가 선택'}
+        showBackButton
+        onBackPress={goBack}
+      />
       <View style={styles.content}>
-        <View style={styles.currentSection}>
-          <Text style={styles.sectionLabel}>현재 위치</Text>
-          <View style={styles.currentCard}>
-            <View style={styles.flagCircle}>
-              <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
-            </View>
-            <View style={styles.currentInfo}>
-              <Text style={styles.currentCountry}>{selectedCountryDialCode.name}</Text>
-              <Text style={styles.currentDial}>{selectedCountryDialCode.dialCode}</Text>
+        {selectedItem && (
+          <View style={styles.currentSection}>
+            <Text style={styles.sectionLabel}>현재 선택</Text>
+            <View style={styles.currentCard}>
+              <View style={styles.flagCircle}>
+                <Text style={styles.flagEmoji}>{selectedItem.flagEmoji}</Text>
+              </View>
+              <View style={styles.currentInfo}>
+                <Text style={styles.currentCountry}>{selectedItem.name}</Text>
+                {selectMode === 'country' && (
+                  <Text style={styles.currentDial}>{selectedItem.dialCode}</Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.searchBox}>
           <Ionicons name="search" size={18} color="#9ca3af" />
@@ -69,7 +90,7 @@ export const CountryCodeSelectScreen = () => {
             style={styles.searchInput}
             value={query}
             onChangeText={setQuery}
-            placeholder="국가를 검색하세요"
+            placeholder={selectMode === 'region' ? '지역을 검색하세요' : '국가를 검색하세요'}
             placeholderTextColor="#c4c7d1"
             autoCapitalize="none"
             autoCorrect={false}
@@ -77,12 +98,12 @@ export const CountryCodeSelectScreen = () => {
         </View>
 
         <FlatList
-          data={filteredCountries}
+          data={filteredItems}
           keyExtractor={(item) => item.iso2}
           renderItem={({ item }) => (
             <CountryCodeListItem
               country={item}
-              isSelected={item.iso2 === selectedCountryDialCode.iso2}
+              isSelected={item.iso2 === selectedItem?.iso2}
               onPress={handleSelect}
             />
           )}

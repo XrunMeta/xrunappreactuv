@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,20 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import {
+  loginWithEmailPassword,
+  encryptSHA256,
+  saveSession,
+} from '../services';
 
 export const LoginScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -19,11 +27,126 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [rememberId, setRememberId] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const emailVerificationRoute: any = ROUTES.emailVerification;
 
-  const handleLogin = () => {
-    console.log('로그인 시도', { email, rememberId });
-    navigate(ROUTES.map);
+  useEffect(() => {
+    const loadRememberedEmail = async () => {
+      try {
+        const remembered = await AsyncStorage.getItem('rememberMe');
+        if (remembered === 'true') {
+          const savedEmail = await AsyncStorage.getItem('userEmail');
+          if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberId(true);
+            console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
+          }
+        }
+      } catch (error) {
+        console.error('[로그인] 저장된 이메일 불러오기 실패:', error);
+      }
+    };
+    loadRememberedEmail();
+  }, []);
+
+  const handleRememberIdToggle = async () => {
+    const newValue = !rememberId;
+    setRememberId(newValue);
+
+    try {
+      if (newValue && email.trim()) {
+
+        await AsyncStorage.setItem('rememberMe', 'true');
+        await AsyncStorage.setItem('userEmail', email.trim());
+        console.log('[로그인] 아이디 저장 완료:', email.trim());
+      } else {
+
+        await AsyncStorage.removeItem('rememberMe');
+
+        console.log('[로그인] 아이디 저장 해제');
+      }
+    } catch (error) {
+      console.error('[로그인] 아이디 저장/해제 실패:', error);
+    }
+  };
+
+  const handleLogin = async () => {
+
+    if (!email.trim()) {
+      Alert.alert('오류', '이메일을 입력해주세요.');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('오류', '비밀번호를 입력해주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log('[로그인] 로그인 시도:', { email, rememberId });
+
+      const loginResponse = await loginWithEmailPassword(
+        email.trim(),
+        password,
+        navigate,
+      );
+
+      if (loginResponse.status !== 'success') {
+        Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      const userData = loginResponse.data[0];
+      if (!userData) {
+        Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      const extrastr = userData.extrastr;
+      if (extrastr) {
+        const ssidw = encryptSHA256(extrastr);
+
+        const sessionSaved = await saveSession(userData.member, ssidw, navigate);
+        if (!sessionSaved) {
+          console.warn('[로그인] 세션 저장 실패');
+        }
+      }
+
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('userSessionToken');
+
+      await AsyncStorage.setItem('userEmail', email.trim());
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+      const sessionToken = userData.extrastr || '';
+      await AsyncStorage.setItem('userSessionToken', sessionToken);
+
+      if (rememberId) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+
+      } else {
+        await AsyncStorage.removeItem('rememberMe');
+
+      }
+
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+
+      console.log('[로그인] 로그인 성공');
+
+      navigate(ROUTES.map);
+    } catch (error) {
+      console.error('[로그인] 로그인 오류:', error);
+      Alert.alert(
+        '로그인 실패',
+        '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,6 +170,7 @@ export const LoginScreen = () => {
           value={email}
           onChangeText={setEmail}
           containerStyle={styles.fieldContainer}
+          editable={!isLoading}
         />
 
         <FormField
@@ -56,11 +180,13 @@ export const LoginScreen = () => {
           value={password}
           onChangeText={setPassword}
           containerStyle={styles.fieldContainer}
+          editable={!isLoading}
           rightAccessory={
             <TouchableOpacity
               style={styles.eyeButton}
               onPress={() => setIsPasswordVisible((prev) => !prev)}
               activeOpacity={0.7}
+              disabled={isLoading}
             >
               <Ionicons
                 name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
@@ -75,14 +201,21 @@ export const LoginScreen = () => {
           <FormCheckbox
             label="아이디 기억하기"
             checked={rememberId}
-            onToggle={() => setRememberId((prev) => !prev)}
+            onToggle={handleRememberIdToggle}
             variant="circle"
+            disabled={isLoading}
           />
         </View>
 
         <View style={styles.bottomSection}>
           <View style={styles.loginButtonWrapper}>
-            <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+              </View>
+            ) : (
+              <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
+            )}
           </View>
 
           <Text style={styles.disclaimer}>
@@ -93,11 +226,10 @@ export const LoginScreen = () => {
             style={styles.emailVerification}
             onPress={() => navigate(emailVerificationRoute)}
             activeOpacity={0.7}
+            disabled={isLoading}
           >
             <Text style={styles.emailVerificationText}>이메일 인증</Text>
-
           </TouchableOpacity>
-
         </View>
       </ScrollView>
 
@@ -191,6 +323,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#10192d',
     borderRadius: 100,
     marginBottom: 9,
+  },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
