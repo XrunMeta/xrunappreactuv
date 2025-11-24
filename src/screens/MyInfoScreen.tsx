@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,15 @@ import {
   TouchableOpacity,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { getMyPageUserInfo } from '../services';
 
 type CardConfig = {
   id: string;
@@ -70,6 +73,46 @@ const cardConfigs: CardConfig[] = [
 
 export const MyInfoScreen = () => {
   const { navigate } = useAppNavigation();
+  const [userInfo, setUserInfo] = useState<{
+    name?: string;
+    email?: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          const member = userData.member;
+
+          if (member) {
+            const response = await getMyPageUserInfo(member, navigate);
+            const user = response.data[0];
+
+            if (user) {
+              const firstName = user.firstname || '';
+              const lastName = user.lastname || '';
+              const fullName = `${firstName} ${lastName}`.trim() || '사용자';
+
+              setUserInfo({
+                name: fullName,
+                email: user.email || '',
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[마이페이지] 사용자 정보 로드 실패:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserInfo();
+  }, [navigate]);
 
   const handleCardPress = (card: CardConfig) => {
     if (card.route) {
@@ -79,8 +122,10 @@ export const MyInfoScreen = () => {
 
   const handleShare = async () => {
     try {
+      const name = userInfo?.name || '사용자';
+      const email = userInfo?.email || '';
       await Share.share({
-        message: 'XRUNBackend • oth-user@example.invalid',
+        message: `${name} • ${email}`,
       });
     } catch (error) {
       console.warn(error);
@@ -119,8 +164,18 @@ export const MyInfoScreen = () => {
 
           <View style={styles.profileCard}>
             <View>
-              <Text style={styles.profileName}>XRUNBackend</Text>
-              <Text style={styles.profileEmail}>oth-user@example.invalid</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={COLORS.headerText} />
+              ) : (
+                <>
+                  <Text style={styles.profileName}>
+                    {userInfo?.name || '사용자'}
+                  </Text>
+                  <Text style={styles.profileEmail}>
+                    {userInfo?.email || ''}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={styles.profileActions}>
               <TouchableOpacity
@@ -265,5 +320,4 @@ const styles = StyleSheet.create({
     color: '#111',
   },
 });
-
 

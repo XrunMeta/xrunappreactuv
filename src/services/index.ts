@@ -31,6 +31,8 @@ import {
   SaveSessionResponse,
   GetUserInfoRequest,
   GetUserInfoResponse,
+  GetMyPageUserInfoRequest,
+  GetMyPageUserInfoResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -714,6 +716,42 @@ export const getUserInfo = async (
     console.error('[로그인] 사용자 정보 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[로그인] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyPageUserInfo = async (
+  member: number,
+  navigation?: any,
+): Promise<GetMyPageUserInfoResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyPageUserInfoRequest = {
+      member,
+    };
+
+    console.log('[마이페이지] 사용자 정보 조회 요청:', member);
+
+    const response = await axiosInstance.post<GetMyPageUserInfoResponse>(
+      '/app7110-01',
+      request,
+    );
+
+    console.log('[마이페이지] 사용자 정보 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 사용자 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
