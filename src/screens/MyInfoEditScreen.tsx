@@ -67,7 +67,7 @@ const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
 
 export const MyInfoEditScreen = () => {
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
-  const { selectedCountryDialCode, setVerificationEmail, setVerificationSuccessRoute } = useAppContext();
+  const { selectedCountryDialCode, setVerificationEmail, setVerificationSuccessRoute, setSelectMode } = useAppContext();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -88,8 +88,6 @@ export const MyInfoEditScreen = () => {
 
   const [tempCountry, setTempCountry] = useState<{ cDesc: string; cCode: number | null }>({ cDesc: '', cCode: null });
   const [tempRegion, setTempRegion] = useState<{ rDesc: string; rCode: number | null }>({ rDesc: '', rCode: null });
-  const [showCountryDialog, setShowCountryDialog] = useState(false);
-  const [showRegionDialog, setShowRegionDialog] = useState(false);
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -216,22 +214,6 @@ export const MyInfoEditScreen = () => {
         promises.push(updateLastName(memberId, lastName.trim(), navigate));
       }
 
-      if (tempCountry.cCode !== null && tempCountry.cCode !== undefined && 
-          tempRegion.rCode !== null && tempRegion.rCode !== undefined && tempRegion.rCode !== 0) {
-        console.log('[정보수정] 지역 수정 시도:', {
-          memberId,
-          country: tempCountry.cCode,
-          region: tempRegion.rCode,
-        });
-        promises.push(updateRegion(memberId, tempCountry.cCode, tempRegion.rCode, navigate));
-      } else if (tempCountry.cCode === null || tempCountry.cCode === undefined) {
-
-        console.warn('[정보수정] 국가가 선택되지 않아 지역 수정을 건너뜁니다.');
-      } else if (tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === 0) {
-
-        console.warn('[정보수정] 지역이 선택되지 않아 지역 수정을 건너뜁니다.');
-      }
-
       const genderCode = convertGenderToApi(gender);
       if (genderCode !== undefined && genderCode !== null) {
         promises.push(updateGender(memberId, genderCode, navigate));
@@ -316,139 +298,89 @@ export const MyInfoEditScreen = () => {
     }
   };
 
-  const handleCountryDialogOpen = async () => {
+  const handleCountrySelect = async () => {
     try {
 
-      if (countries.length === 0) {
-        const countriesResponse = await getCountries(navigate);
-        const countriesList = countriesResponse.data || [];
-        setCountries(countriesList);
-      }
-      setShowCountryDialog(true);
+      setSelectMode('country');
+      navigate('countryCodeSelect');
     } catch (error) {
-      console.error('[정보수정] 국가 목록 로드 실패:', error);
-      Alert.alert('오류', '국가 목록을 불러오는데 실패했습니다.');
+      console.error('[정보수정] 국가 선택 화면 이동 실패:', error);
     }
   };
 
-  const handleRegionDialogOpen = async () => {
-    try {
-
-      if (!tempCountry.cCode) {
-        Alert.alert('알림', '먼저 국가를 선택해주세요.');
-        handleCountryDialogOpen();
+  useEffect(() => {
+    const updateCountryFromDialCode = async () => {
+      if (!selectedCountryDialCode || isLoadingRegions) {
         return;
       }
 
-      setIsLoadingRegions(true);
-      const regionsResponse = await getRegionsByCountry(tempCountry.cCode, navigate);
-      const regionsList = regionsResponse.data || [];
-      console.log('[정보수정] 지역 목록 로드 성공 (지역 다이얼로그 열기):', {
-        countryCode: tempCountry.cCode,
-        regionsCount: regionsList.length,
-        regions: regionsList.map((r) => ({ description: r.description, subcode: r.subcode, rCode: r.rCode, rName: r.rName })),
-      });
+      try {
 
-      const validRegions = regionsList.filter((r) => {
-        const hasSubcode = r.subcode !== undefined && r.subcode !== null;
-        const hasRCode = r.rCode !== undefined && r.rCode !== null;
-        return hasSubcode || hasRCode;
-      });
-      console.log('[정보수정] 유효한 지역 목록 (다이얼로그):', validRegions.length, validRegions);
-      setRegions(validRegions);
-      setShowRegionDialog(true);
-    } catch (error) {
-      console.error('[정보수정] 지역 목록 로드 실패:', error);
-      Alert.alert('오류', '지역 목록을 불러오는데 실패했습니다.');
-    } finally {
-      setIsLoadingRegions(false);
-    }
-  };
+        const dialCodeNumber = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10);
 
-  const handleCountrySelect = async (country: { country?: string; callnumber?: number; cCode?: number; cName?: string }) => {
+        if (!dialCodeNumber) {
+          return;
+        }
 
-    if (isLoadingRegions) {
-      return;
-    }
+        if (countries.length === 0) {
+          const countriesResponse = await getCountries(navigate);
+          const countriesList = countriesResponse.data || [];
+          setCountries(countriesList);
 
-    try {
-      const countryCode = country.callnumber || country.cCode;
-      const countryName = country.country || country.cName || '';
+          const countryItem = countriesList.find(
+            (c) => (c.callnumber === dialCodeNumber || c.cCode === dialCodeNumber)
+          );
 
-      if (!countryCode) {
-        Alert.alert('오류', '국가 코드를 찾을 수 없습니다.');
-        return;
+          if (countryItem) {
+            const countryCode = countryItem.callnumber || countryItem.cCode;
+            const countryName = countryItem.country || countryItem.cName || selectedCountryDialCode.name;
+
+            setTempCountry({
+              cDesc: countryName,
+              cCode: countryCode || dialCodeNumber,
+            });
+
+          } else {
+
+            setTempCountry({
+              cDesc: selectedCountryDialCode.name,
+              cCode: dialCodeNumber,
+            });
+
+          }
+        } else {
+
+          const countryItem = countries.find(
+            (c) => (c.callnumber === dialCodeNumber || c.cCode === dialCodeNumber)
+          );
+
+          if (countryItem) {
+            const countryCode = countryItem.callnumber || countryItem.cCode;
+            const countryName = countryItem.country || countryItem.cName || selectedCountryDialCode.name;
+
+            setTempCountry({
+              cDesc: countryName,
+              cCode: countryCode || dialCodeNumber,
+            });
+
+          }
+        }
+      } catch (error) {
+        console.error('[정보수정] 국가 정보 업데이트 실패:', error);
+      } finally {
+        setIsLoadingRegions(false);
       }
+    };
 
-      setIsLoadingRegions(true);
+    if (selectedCountryDialCode && !isLoading) {
 
-      setTempCountry({
-        cDesc: countryName,
-        cCode: countryCode,
-      });
+      const timer = setTimeout(() => {
+        updateCountryFromDialCode();
+      }, 100);
 
-      setTempRegion({
-        rDesc: 'Please Select',
-        rCode: 0,
-      });
-
-      setRegions([]);
-
-      const regionsResponse = await getRegionsByCountry(countryCode, navigate);
-      const regionsList = regionsResponse.data || [];
-      console.log('[정보수정] 지역 목록 로드 성공 (국가 선택):', {
-        country: countryName,
-        countryCode: countryCode,
-        regionsCount: regionsList.length,
-        regions: regionsList.map((r) => ({ description: r.description, subcode: r.subcode, rCode: r.rCode, rName: r.rName })),
-        rawResponse: JSON.stringify(regionsResponse),
-      });
-
-      const validRegions = regionsList.filter((r) => {
-        const hasSubcode = r.subcode !== undefined && r.subcode !== null;
-        const hasRCode = r.rCode !== undefined && r.rCode !== null;
-        return hasSubcode || hasRCode;
-      });
-      console.log('[정보수정] 유효한 지역 목록:', validRegions.length, validRegions);
-      setRegions(validRegions);
-
-      if (validRegions.length === 0) {
-        console.warn('[정보수정] 해당 국가의 지역 목록이 없습니다.');
-      }
-
-      setShowCountryDialog(false);
-    } catch (error) {
-      console.error('[정보수정] 지역 목록 로드 실패:', error);
-      Alert.alert('오류', '지역 목록을 불러오는데 실패했습니다.');
-    } finally {
-      setIsLoadingRegions(false);
+      return () => clearTimeout(timer);
     }
-  };
-
-  const handleRegionSelect = (region: { description?: string; subcode?: number; rCode?: number; rName?: string }) => {
-    const regionCode = region.subcode || region.rCode;
-    const regionName = region.description || region.rName || '';
-
-    if (!regionCode) {
-      Alert.alert('오류', '지역 코드를 찾을 수 없습니다.');
-      return;
-    }
-
-    setTempRegion({
-      rDesc: regionName,
-      rCode: regionCode,
-    });
-
-    setShowRegionDialog(false);
-  };
-
-  const handleCountryDialogClose = () => {
-    setShowCountryDialog(false);
-  };
-
-  const handleRegionDialogClose = () => {
-    setShowRegionDialog(false);
-  };
+  }, [selectedCountryDialCode?.iso2, navigate]); 
 
   return (
     <View style={styles.container}>
@@ -523,31 +455,22 @@ export const MyInfoEditScreen = () => {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Region</Text>
-              <View style={styles.regionFieldContainer}>
-                <TouchableOpacity
-                  style={styles.regionField}
-                  onPress={handleCountryDialogOpen}
-                  activeOpacity={0.7}
-                  disabled={isSaving}
-                >
-                  <Text style={[styles.regionValue, !tempCountry.cDesc && styles.regionPlaceholder]}>
-                    {tempCountry.cDesc ? `${tempCountry.cDesc} (+${tempCountry.cCode})` : '국가를 선택하세요'}
-                  </Text>
-                  <Text style={styles.arrow}>›</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.regionField}
-                  onPress={handleRegionDialogOpen}
-                  activeOpacity={0.7}
-                  disabled={isSaving || !tempCountry.cCode}
-                >
-                  <Text style={[styles.regionValue, (!tempRegion.rDesc || tempRegion.rDesc === 'Please Select') && styles.regionPlaceholder]}>
-                    {tempRegion.rDesc && tempRegion.rDesc !== 'Please Select' ? tempRegion.rDesc : '지역을 선택하세요'}
-                  </Text>
-                  <Text style={styles.arrow}>›</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.label}>Country</Text>
+              <TouchableOpacity
+                style={styles.regionField}
+                onPress={handleCountrySelect}
+                activeOpacity={0.7}
+                disabled={isSaving}
+              >
+                <Text style={[styles.regionValue, !tempCountry.cDesc && styles.regionPlaceholder]}>
+                  {tempCountry.cDesc 
+                    ? `${tempCountry.cDesc} (+${tempCountry.cCode})` 
+                    : selectedCountryDialCode 
+                      ? `${selectedCountryDialCode.name} (${selectedCountryDialCode.dialCode})`
+                      : '국가를 선택하세요'}
+                </Text>
+                <Text style={styles.arrow}>›</Text>
+              </TouchableOpacity>
             </View>
 
           <View style={styles.formGroup}>
@@ -607,99 +530,6 @@ export const MyInfoEditScreen = () => {
         </View>
       </ScrollView>
 
-      {}
-      <Dialog
-        visible={showCountryDialog}
-        title="국가 선택"
-        onClose={handleCountryDialogClose}
-        containerStyle={styles.dialogContainer}
-      >
-        <FlatList
-          data={countries}
-          keyExtractor={(item, index) => {
-            const countryCode = item.callnumber || item.cCode;
-            return countryCode ? `country-${countryCode}-${index}` : `country-${index}`;
-          }}
-          renderItem={({ item }) => {
-            const countryCode = item.callnumber || item.cCode;
-            const countryName = item.country || item.cName || '국가명 없음';
-            const isSelected = tempCountry.cCode === countryCode;
-
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.listItem,
-                  isSelected && styles.listItemSelected,
-                  isLoadingRegions && styles.listItemDisabled,
-                ]}
-                onPress={() => handleCountrySelect(item)}
-                activeOpacity={0.7}
-                disabled={isLoadingRegions}
-              >
-                <Text style={styles.listItemText}>{countryName}</Text>
-                {isSelected && (
-                  <Text style={styles.checkmark}>✓</Text>
-                )}
-              </TouchableOpacity>
-            );
-          }}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>국가 목록이 없습니다.</Text>
-            </View>
-          }
-        />
-      </Dialog>
-
-      {}
-      <Dialog
-        visible={showRegionDialog}
-        title="지역 선택"
-        onClose={handleRegionDialogClose}
-        containerStyle={styles.dialogContainer}
-      >
-        <FlatList
-          data={regions}
-          keyExtractor={(item, index) => {
-            const regionCode = item.subcode || item.rCode;
-
-            return regionCode !== undefined && regionCode !== null 
-              ? `region-${tempCountry.cCode}-${regionCode}-${index}` 
-              : `region-${tempCountry.cCode}-${index}`;
-          }}
-          renderItem={({ item }) => {
-            const regionCode = item.subcode !== undefined ? item.subcode : (item.rCode !== undefined ? item.rCode : null);
-            const regionName = item.description || item.rName || '지역명 없음';
-
-            const isSelected = tempRegion.rCode === regionCode && tempRegion.rDesc !== 'Please Select';
-
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.listItem,
-                  isSelected && styles.listItemSelected,
-                ]}
-                onPress={() => handleRegionSelect(item)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.listItemText}>{regionName}</Text>
-                {isSelected && (
-                  <Text style={styles.checkmark}>✓</Text>
-                )}
-              </TouchableOpacity>
-            );
-          }}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>지역 목록이 없습니다.</Text>
-            </View>
-          }
-        />
-      </Dialog>
     </View>
   );
 };
