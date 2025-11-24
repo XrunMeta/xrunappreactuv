@@ -1207,10 +1207,7 @@ export const fetchMapMarkerData = async (
   navigation?: any,
 ): Promise<SpotData[]> => {
   try {
-    const env = getEnv();
-    const baseUrl = env.GATEWAY_NODEJS;
-    const endpoint = 'app2000-01';
-
+    const axiosInstance = createAxiosInstance(navigation);
     const requestBody = {
       member,
       latitude,
@@ -1219,27 +1216,15 @@ export const fetchMapMarkerData = async (
     };
 
     console.log('=== fetchMapMarkerData API 호출 ===');
-    console.log('endpoint:', endpoint);
+    console.log('endpoint: app2000-01');
     console.log('requestBody:', JSON.stringify(requestBody));
 
-    const response = await nodeGatewayRequest(
-      endpoint,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      },
-      navigation,
+    const response = await axiosInstance.post(
+      '/app2000-01',
+      requestBody,
     );
 
-    if (!response.ok) {
-      console.error('API request failed:', response.status);
-      throw new Error(`API request failed: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = response.data;
     console.log('=== fetchMapMarkerData API 응답 ===');
     console.log('data:', data);
     console.log('data.data length:', data?.data?.length);
@@ -1271,6 +1256,7 @@ export const fetchMapMarkerData = async (
           joindesc: item.joindesc || item.description || '',
           brand: item.brand || item.coin || '',
           coins: item.coins || item.coin || '',
+          coin: item.coin || '', 
         };
       });
     }
@@ -1279,6 +1265,16 @@ export const fetchMapMarkerData = async (
     return [];
   } catch (error) {
     console.error('맵 마커 데이터 가져오기 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[맵 마커] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
 
     return [];
   }

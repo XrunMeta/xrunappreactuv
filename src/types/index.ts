@@ -42,6 +42,7 @@ export interface SpotData {
   joindesc?: string;
   brand?: string;
   coins?: string; 
+  coin?: string; 
 }
 
 export interface AliveResponse {

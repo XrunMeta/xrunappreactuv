@@ -75,6 +75,14 @@ try {
   console.warn('icon_mapPoint.png not found');
 }
 
+let logoTempMarker: any = null;
+
+try {
+  logoTempMarker = require('../../assets/logo_tempMarker.png');
+} catch (e) {
+  console.warn('logo_tempMarker.png not found');
+}
+
 export const MapMainScreen: React.FC = () => {
   const { navigate } = useAppNavigation();
   const [location, setLocation] = useState<LocationData | null>(null);
@@ -301,15 +309,27 @@ export const MapMainScreen: React.FC = () => {
             {}
             {markers
               .filter((marker) => marker.latitude && marker.longitude) 
-              .map((marker) => (
-              <Marker
-                key={marker.spotID}
-                coordinate={{
-                  latitude: marker.latitude!,
-                  longitude: marker.longitude!,
-                }}
-                onPress={() => handleMarkerPress(marker)}
-              >
+              .map((marker) => {
+
+                const uniqueKey = marker.coin || `marker-${marker.latitude}-${marker.longitude}`;
+
+                return (
+                <Marker
+                  key={uniqueKey}
+                  coordinate={{
+                    latitude: marker.latitude!,
+                    longitude: marker.longitude!,
+                  }}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  onPress={() => handleMarkerPress(marker)}
+                >
+                  {logoTempMarker && (
+                    <Image
+                      source={logoTempMarker}
+                      style={styles.markerImage}
+                      resizeMode="contain"
+                    />
+                  )}
                 {}
                 <Callout tooltip>
                   <View style={styles.calloutContainer}>
@@ -346,7 +366,8 @@ export const MapMainScreen: React.FC = () => {
                   </View>
                 </Callout>
               </Marker>
-            ))}
+              );
+              })}
           </MapView>
         ) : (
           <View style={styles.mapPlaceholder}>
@@ -481,6 +502,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Roboto-Medium',
     color: 'black',
+  },
+
+  markerImage: {
+    width: 40,
+    height: 40,
   },
 });
 
