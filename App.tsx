@@ -47,6 +47,7 @@ import {
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
 import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/components';
+import { loadEnv } from './src/utils/env';
 import {
   useFonts,
   Roboto_400Regular,
@@ -251,6 +252,17 @@ export default function App() {
   });
 
   useEffect(() => {
+
+    const initializeApp = async () => {
+      try {
+        await loadEnv();
+        console.log('[App] 환경 변수 로드 완료');
+      } catch (error) {
+        console.error('[App] 환경 변수 로드 실패:', error);
+      }
+    };
+
+    initializeApp();
 
     const timer = setTimeout(() => {
       setIsLoading(false);
