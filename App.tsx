@@ -226,11 +226,7 @@ const ScreenHost = () => {
 };
 
 const GlobalDialogs = () => {
-  const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop, setEmergencyStop } = useAppContext();
-
-  const handleEmergencyStopClose = () => {
-    setEmergencyStop(null);
-  };
+  const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
 
   return (
     <>
@@ -239,7 +235,7 @@ const GlobalDialogs = () => {
         visible={emergencyStop?.enabled ?? false}
         message={emergencyStop?.message ?? '긴급 안내가 있습니다.'}
         link={emergencyStop?.link}
-        onClose={handleEmergencyStopClose}
+
       />
     </>
   );
@@ -264,7 +260,14 @@ export default function App() {
   }, []);
 
   if (!fontsLoaded || isLoading) {
-    return <SplashScreen />;
+    return (
+      <AppProvider>
+        <NavigationProvider>
+          <SplashScreen />
+          <GlobalDialogs />
+        </NavigationProvider>
+      </AppProvider>
+    );
   }
 
   return (
