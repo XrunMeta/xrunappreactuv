@@ -1,7 +1,19 @@
 
+import v_b5030f, { v_3333d3 } from 'imsks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_326be8 } from 'rcmrninabrnb';
 import { v_ce4741 } from '../navigation';
-import { v_96ef47 } from '../types';
+import {
+  v_96ef47,
+  v_81dfe9,
+  v_70f41f,
+  v_a357d3,
+  v_d6bdce,
+  v_e71577,
+  v_2c1a39,
+  v_3edf6c,
+  v_d5571c,
+} from '../types';
 import { v_e4a763 } from '../utils/env';
 
 const v_8a74cb = 20000;
@@ -103,5 +115,193 @@ export const v_495832 = async (
     },
   });
 
+};
+
+const v_7488d5 = (v_c65f5d) => {
+  const v_c9c489 = v_e4a763();
+  const v_fed274 = v_c9c489.GATEWAY_NODEJS;
+  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+  const v_0c3a5b = v_b5030f.create({
+    baseURL: v_fed274,
+    timeout: v_8a74cb,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${v_36dd9e}`,
+    },
+  });
+
+  v_0c3a5b.interceptors.request.use(
+    (v_74a79c) => {
+      console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
+      return v_74a79c;
+    },
+    (v_5e9bfe) => {
+      console.error('[API Request Error]', v_5e9bfe);
+      return Promise.reject(v_5e9bfe);
+    },
+  );
+
+  v_0c3a5b.interceptors.response.use(
+    (v_3393e3) => {
+      console.log(`[API Response] ${v_3393e3.config.url}`, v_3393e3.status);
+      return v_3393e3;
+    },
+    async (error: v_3333d3) => {
+
+      if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
+        console.error('[API Timeout]', v_5e9bfe.config?.url);
+        if (v_c65f5d) {
+          await v_e4d665(v_c65f5d);
+        }
+      } else {
+
+        console.error('[API Error]', {
+          url: v_5e9bfe.config?.url,
+          method: v_5e9bfe.config?.method,
+          status: v_5e9bfe.response?.status,
+          statusText: v_5e9bfe.response?.statusText,
+          data: v_5e9bfe.response?.data,
+          message: v_5e9bfe.message,
+        });
+      }
+      return Promise.reject(v_5e9bfe);
+    },
+  );
+
+  return v_0c3a5b;
+};
+
+export const v_60e3a5 = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_81dfe9 = { email: v_e0c7e8 };
+
+    console.log('[회원가입 1단계] 이메일 중복 확인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_70f41f>(
+      '/login-checker-email',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
+    console.log('[회원가입 1단계] 이메일 중복 확인 결과:', v_43c42e ? '사용 가능' : '중복');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 1단계] 이메일 중복 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_01332e = async (
+  v_9bf12c,
+  v_c65f5d,
+): Promise<number | null> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_a357d3 = { email: v_9bf12c };
+
+    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', v_9bf12c);
+
+    const v_3393e3 = await v_9f42a4.post<v_d6bdce>(
+      '/ap1810-i01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0];
+    if (v_43c42e?.result === true && v_43c42e.member) {
+      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', v_43c42e.member);
+      return v_43c42e.member;
+    } else {
+      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
+      return null;
+    }
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_35200c = async (
+  signupData: v_e71577,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[회원가입 3단계] 회원가입 실행 요청:', {
+      email: v_df7dab.email,
+      firstname: v_df7dab.firstname,
+      lastname: v_df7dab.lastname,
+      gender: v_df7dab.gender,
+      age: v_df7dab.age,
+      os: v_df7dab.os,
+    });
+
+    const v_3393e3 = await v_9f42a4.post<v_2c1a39>(
+      '/login-06-joinAndAccount',
+      v_df7dab,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.text === 'ok';
+    console.log('[회원가입 3단계] 회원가입 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 3단계] 회원가입 실행 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_9d2541 = async (
+  v_e0c7e8,
+  v_6bee94,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_3edf6c = { email: v_e0c7e8, pin: v_6bee94 };
+
+    console.log('[회원가입 4단계] 로그인 확인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_d5571c>(
+      '/login-checker',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
+    console.log('[회원가입 4단계] 로그인 확인 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 4단계] 로그인 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_91bb22 = {
+
+  getGenderCode: (v_c3eac4): number => {
+    return v_c3eac4 === 'male' ? 2110 : 2111;
+  },
+
+  getAgeCode: (v_f83808): number => {
+    const v_c3889d = {
+      '10': 2210,
+      '20': 2220,
+      '30': 2230,
+      '40': 2240,
+      '50+': 2250,
+    };
+    return v_c3889d[v_f83808] || 2220;
+  },
+
+  getOSCode: (): number => {
+    return v_326be8.OS === 'android' ? 3112 : 3113;
+  },
 };
 

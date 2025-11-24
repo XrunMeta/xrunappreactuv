@@ -47,6 +47,7 @@ import {
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
 import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
+import { v_a2474a } from './src/utils/env';
 import {
   v_c06f2c,
   v_259807,
@@ -255,6 +256,17 @@ export default function v_6540c3() {
   });
 
   v_c4deb2(() => {
+
+    const v_139fe0 = async () => {
+      try {
+        await v_a2474a();
+        console.log('[App] 환경 변수 로드 완료');
+      } catch (v_5e9bfe) {
+        console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
+      }
+    };
+
+    v_139fe0();
 
     const v_cb36b1 = setTimeout(() => {
       v_deef62(false);
