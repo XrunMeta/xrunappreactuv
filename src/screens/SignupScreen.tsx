@@ -7,6 +7,7 @@ import {
   Platform,
   Alert,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -19,6 +20,13 @@ import {
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import {
+  checkEmailAvailability,
+  checkReferralEmail,
+  signup,
+  checkLogin,
+  SignupHelpers,
+} from '../services';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남' },
@@ -43,29 +51,134 @@ export const SignupScreen = () => {
   const [gender, setGender] = useState<GenderValue>('male');
   const [ageRange, setAgeRange] = useState<AgeValue>('10');
   const [termsAccepted, setTermsAccepted] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+
     if (!termsAccepted) {
       Alert.alert('동의 필요', '약관에 동의해야 가입을 진행할 수 있습니다.');
       return;
     }
 
-    console.log('회원가입 데이터', {
-      familyName,
-      givenName,
-      email,
-      password,
-      phoneNumber,
-      region,
-      referralEmail,
-      gender,
-      ageRange,
-      termsAccepted,
-      selectedCountryDialCode,
-    });
+    if (!familyName.trim() || !givenName.trim()) {
+      Alert.alert('입력 오류', '성과 이름을 입력해주세요.');
+      return;
+    }
 
-    reset('authLanding');
-    navigate('login');
+    if (!email.trim()) {
+      Alert.alert('입력 오류', '이메일을 입력해주세요.');
+      return;
+    }
+
+    if (!password.trim() || password.length < 6) {
+      Alert.alert('입력 오류', '비밀번호는 6자 이상 입력해주세요.');
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      Alert.alert('입력 오류', '전화번호를 입력해주세요.');
+      return;
+    }
+
+    if (!region.trim()) {
+      Alert.alert('입력 오류', '지역을 입력해주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+
+      console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
+      const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
+
+      if (!isEmailAvailable) {
+        Alert.alert('이메일 중복', '이미 사용 중인 이메일입니다.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      let referralMemberId = 0;
+      if (referralEmail.trim()) {
+        console.log('[회원가입] 2단계: 추천인 이메일 확인 시작');
+        const referralId = await checkReferralEmail(referralEmail.trim(), navigate);
+        if (referralId !== null) {
+          referralMemberId = referralId;
+        } else {
+          Alert.alert(
+            '추천인 확인',
+            '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
+            [
+              { text: '취소', style: 'cancel', onPress: () => setIsSubmitting(false) },
+              { text: '계속', onPress: () => {} },
+            ],
+          );
+
+        }
+      }
+
+      console.log('[회원가입] 3단계: 회원가입 실행 시작');
+      const mobileCode = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
+      const countryCode = selectedCountryDialCode.iso2 || 'KR';
+      const regionId = parseInt(region) || 2; 
+
+      const signupData = {
+        email: email.trim(),
+        pin: password,
+        firstname: givenName.trim(),
+        lastname: familyName.trim(),
+        gender: SignupHelpers.getGenderCode(gender),
+        mobile: phoneNumber.trim(),
+        mobilecode: mobileCode,
+        countrycode: countryCode,
+        country: mobileCode,
+        region: regionId,
+        age: SignupHelpers.getAgeCode(ageRange),
+        recommand: referralMemberId,
+        os: SignupHelpers.getOSCode(),
+      };
+
+      const signupSuccess = await signup(signupData, navigate);
+
+      if (!signupSuccess) {
+        Alert.alert('회원가입 실패', '회원가입에 실패했습니다. 다시 시도해주세요.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('[회원가입] 4단계: 로그인 확인 시작');
+      const loginSuccess = await checkLogin(email.trim(), password, navigate);
+
+      if (!loginSuccess) {
+        Alert.alert(
+          '로그인 확인 실패',
+          '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+        );
+        reset('authLanding');
+        navigate('login');
+        setIsSubmitting(false);
+        return;
+      }
+
+      Alert.alert('회원가입 완료', '회원가입이 완료되었습니다.', [
+        {
+          text: '확인',
+          onPress: () => {
+            reset('authLanding');
+            navigate('login');
+          },
+        },
+      ]);
+    } catch (error: any) {
+      console.error('[회원가입] 전체 프로세스 실패:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        '회원가입 중 오류가 발생했습니다.';
+      Alert.alert('오류', errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -211,10 +324,16 @@ export const SignupScreen = () => {
 
         <View style={styles.buttonWrapper}>
           <PrimaryButton
-            title="가입하기"
+            title={isSubmitting ? '처리 중...' : '가입하기'}
             fullWidth
             onPress={handleSubmit}
+            disabled={isSubmitting}
           />
+          {isSubmitting && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -316,6 +435,10 @@ const styles = StyleSheet.create({
     maxWidth: 780,
     alignSelf: 'center',
   },
+  loadingContainer: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
   homeIndicator: {
     position: 'absolute',
     bottom: 0,
@@ -332,5 +455,4 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 });
-
 
