@@ -33,6 +33,8 @@ import {
   v_85f3ff,
   v_72b8c4,
   v_0bd014,
+  v_bd3e83,
+  v_680003,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -552,8 +554,9 @@ export const v_8025d1 = async (
       v_576f5a,
     );
 
-    const v_43c42e = v_3393e3.data.data[0]?.status !== 'false';
-    console.log('[로그인] 이메일 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패');
+    const v_d308b5 = v_3393e3.data.data[0]?.status;
+    const v_43c42e = v_d308b5 === true || v_d308b5 === 'true';
+    console.log('[로그인] 이메일 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패', { status: v_d308b5 });
 
     return v_43c42e;
   } catch (v_5e9bfe) {
@@ -750,6 +753,44 @@ export const v_a7ab3c = async (
     return v_3393e3.data;
   } catch (v_5e9bfe) {
     console.error('[마이페이지] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_152d53 = async (
+  v_660822,
+  v_54d565,
+  v_c65f5d,
+): Promise<v_680003> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bd3e83 = {
+      member: v_660822,
+      firstname: v_54d565,
+    };
+
+    console.log('[마이페이지] 이름 수정 요청:', { member: v_660822, firstname: v_54d565 });
+
+    const v_3393e3 = await v_9f42a4.post<v_680003>(
+      '/app7120-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 이름 수정 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 이름 수정 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,

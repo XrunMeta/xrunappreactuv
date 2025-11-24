@@ -16,6 +16,7 @@ import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c } from '../services';
+import { v_700ef9 } from '../context';
 
 type CardConfig = {
   id: string;
@@ -73,6 +74,7 @@ const v_dbfc7f = [
 
 export const v_03a231 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { setVerificationEmail: v_b572c3 } = v_700ef9();
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
     email?: string;
@@ -116,6 +118,10 @@ export const v_03a231 = () => {
 
   const v_b0f7df = (v_5eae50) => {
     if (v_5eae50.route) {
+
+      if (v_5eae50.id === 'edit' && v_bb789b?.email) {
+        v_b572c3(v_bb789b.email);
+      }
       v_9b57fc(v_ce4741[v_5eae50.route]);
     }
   };
