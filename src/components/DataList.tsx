@@ -45,6 +45,8 @@ const DataListComponent = <T extends Record<string, any>>(
   const prevItemComponentRef = useRef<React.ComponentType<T>>(ItemComponent);
   const prevFetchDataRef = useRef(fetchData);
 
+  const isEndReachedLoadingRef = useRef(false);
+
   useImperativeHandle(ref, () => ({
     reloadData: () => {
       setData([]);
@@ -55,10 +57,10 @@ const DataListComponent = <T extends Record<string, any>>(
     },
   }));
 
-  const loadData = async (page: number, isReload: boolean = false) => {
+  const loadData = async (page: number, isReload: boolean = false): Promise<void> => {
 
     if (isReload ? loading : loadingMore) {
-      return;
+      return Promise.resolve();
     }
 
     try {
@@ -114,9 +116,17 @@ const DataListComponent = <T extends Record<string, any>>(
   }, []);
 
   const handleEndReached = () => {
-    if (!loading && !loadingMore && hasMore) {
-      loadData(currentPage + 1, false);
+
+    if (isEndReachedLoadingRef.current || loading || loadingMore || !hasMore) {
+      return;
     }
+
+    isEndReachedLoadingRef.current = true;
+
+    loadData(currentPage + 1, false).finally(() => {
+
+      isEndReachedLoadingRef.current = false;
+    });
   };
 
   const getKey = (item: T, index: number): string => {
@@ -144,15 +154,15 @@ const DataListComponent = <T extends Record<string, any>>(
       showsVerticalScrollIndicator={false}
       onScroll={({ nativeEvent }) => {
         const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-        const paddingToBottom = 20;
-        if (
-          layoutMeasurement.height + contentOffset.y >=
-          contentSize.height - paddingToBottom
-        ) {
+
+        const threshold = 100; 
+        const distanceFromEnd = contentSize.height - (layoutMeasurement.height + contentOffset.y);
+
+        if (distanceFromEnd <= threshold) {
           handleEndReached();
         }
       }}
-      scrollEventThrottle={400}
+      scrollEventThrottle={16}
     >
       {}
       {loading && (
