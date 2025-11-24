@@ -48,6 +48,8 @@ import {
   UpdateRegionRequest,
   UpdateRegionResponse,
   GetCountriesResponse,
+  LogoutRequest,
+  LogoutResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1080,6 +1082,51 @@ export const updateRegion = async (
         data: error.response?.data,
         message: error.message,
       });
+    }
+    throw error;
+  }
+};
+
+export const logout = async (
+  member: number,
+  navigation?: any,
+): Promise<LogoutResponse> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+    const baseUrl = env.GATEWAY_NODEJS;
+    const url = `${baseUrl}/logout-9705`;
+
+    console.log('[로그아웃] 로그아웃 요청:', { member });
+
+    const response = await nodeGatewayRequest(
+      '/logout-9705',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authCode}`,
+        },
+        body: JSON.stringify({
+          member,
+        } as LogoutRequest),
+      },
+      navigation,
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: LogoutResponse = await response.json();
+    console.log('[로그아웃] 로그아웃 성공');
+
+    return data;
+  } catch (error) {
+    console.error('[로그아웃] 로그아웃 오류:', error);
+    if (error instanceof Error && error.message === 'API request timeout') {
+
+      throw error;
     }
     throw error;
   }

@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { getMyPageUserInfo } from '../services';
+import { getMyPageUserInfo, logout } from '../services';
 import { useAppContext } from '../context';
 
 type CardConfig = {
@@ -73,7 +73,7 @@ const cardConfigs: CardConfig[] = [
 ];
 
 export const MyInfoScreen = () => {
-  const { navigate } = useAppNavigation();
+  const { navigate, reset } = useAppNavigation();
   const { setVerificationEmail } = useAppContext();
   const [userInfo, setUserInfo] = useState<{
     name?: string;
@@ -139,7 +139,65 @@ export const MyInfoScreen = () => {
   };
 
   const handleLogout = () => {
-    Alert.alert('로그아웃', '로그아웃 기능은 추후 연동됩니다.');
+    Alert.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '로그아웃',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+
+              const userDataStr = await AsyncStorage.getItem('userData');
+              if (!userDataStr) {
+                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              const userData = JSON.parse(userDataStr);
+              const member = userData.member;
+
+              if (!member) {
+                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              await logout(member, navigate);
+
+              await AsyncStorage.removeItem('isLoggedIn');
+              await AsyncStorage.removeItem('userEmail');
+              await AsyncStorage.removeItem('userData');
+              await AsyncStorage.removeItem('rageProgress');
+              await AsyncStorage.removeItem('userTickets');
+              await AsyncStorage.removeItem('rageProgressLastUpdate');
+              await AsyncStorage.removeItem('userSessionToken');
+
+              reset(ROUTES.login);
+            } catch (error) {
+              console.error('[로그아웃] 로그아웃 처리 중 오류:', error);
+
+              try {
+                await AsyncStorage.removeItem('isLoggedIn');
+                await AsyncStorage.removeItem('userEmail');
+                await AsyncStorage.removeItem('userData');
+                await AsyncStorage.removeItem('rageProgress');
+                await AsyncStorage.removeItem('userTickets');
+                await AsyncStorage.removeItem('rageProgressLastUpdate');
+                await AsyncStorage.removeItem('userSessionToken');
+              } catch (storageError) {
+                console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
+              }
+              reset(ROUTES.login);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderIcon = (card: CardConfig) => {
