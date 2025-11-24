@@ -31,6 +31,8 @@ import {
   v_60982a,
   v_b8b333,
   v_85f3ff,
+  v_72b8c4,
+  v_0bd014,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -714,6 +716,42 @@ export const v_98a863 = async (
     console.error('[로그인] 사용자 정보 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_a7ab3c = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_0bd014> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_72b8c4 = {
+      member: v_660822,
+    };
+
+    console.log('[마이페이지] 사용자 정보 조회 요청:', v_660822);
+
+    const v_3393e3 = await v_9f42a4.post<v_0bd014>(
+      '/app7110-01',
+      v_576f5a,
+    );
+
+    console.log('[마이페이지] 사용자 정보 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[마이페이지] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

@@ -210,3 +210,23 @@ export interface GetUserInfoResponse {
   }>;
 }
 
+export interface GetMyPageUserInfoRequest {
+  member: number;
+}
+
+export interface GetMyPageUserInfoResponse {
+  data: Array<{
+    email?: string;
+    firstname?: string;
+    lastname?: string;
+    member?: number;
+    gender?: number;
+    extrastr?: string;
+    country?: number;
+    countrycode?: string;
+    region?: number;
+    ages?: number;
+    [key: string]: any;
+  }>;
+}
+
