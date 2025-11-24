@@ -106,3 +106,107 @@ export interface LoginCheckResponse {
   }>;
 }
 
+export interface EmailPasswordLoginRequest {
+  type: 4;
+  email: string;
+  pin: string;
+}
+
+export interface PasswordOnlyLoginRequest {
+  type: 3;
+  pin: string;
+  mobile: string;
+}
+
+export interface MobileLoginRequest {
+  type: 2;
+  mobile: string;
+}
+
+export interface LoginResponse {
+  status: string;
+  data: Array<{
+    member?: number;
+    email?: string;
+    mobile?: string;
+    extrastr?: string;
+    [key: string]: any;
+  }>;
+}
+
+export interface PhoneVerificationRequest {
+  country: string;
+  mobile: string;
+}
+
+export interface PhoneVerificationResponse {
+  data: Array<{
+    status: boolean;
+  }>;
+}
+
+export interface PhoneVerificationCodeRequest {
+  mobile: string;
+  code: string;
+}
+
+export interface PhoneVerificationCodeResponse {
+  data: string; 
+}
+
+export interface EmailVerificationRequest {
+  email: string;
+}
+
+export interface EmailVerificationResponse {
+  data: Array<{
+    status: string | boolean;
+  }>;
+}
+
+export interface EmailVerificationCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface EmailVerificationCodeResponse {
+  status: string;
+}
+
+export interface EmailAuthLoginRequest {
+  email: string;
+}
+
+export interface EmailAuthLoginResponse {
+  status: string;
+  data: Array<{
+    member?: number;
+    email?: string;
+    [key: string]: any;
+  }>;
+}
+
+export interface SaveSessionRequest {
+  member: number;
+  ssidw: string;
+}
+
+export interface SaveSessionResponse {
+  data: Array<{
+    affectedRows: number;
+  }>;
+}
+
+export interface GetUserInfoRequest {
+  member: number;
+}
+
+export interface GetUserInfoResponse {
+  data: Array<{
+    member?: number;
+    email?: string;
+    mobile?: string;
+    [key: string]: any;
+  }>;
+}
+

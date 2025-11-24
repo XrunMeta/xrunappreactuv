@@ -13,7 +13,26 @@ import {
   v_2c1a39,
   v_3edf6c,
   v_d5571c,
+  v_8fc862,
+  v_073611,
+  v_a88df4,
+  v_74e8fc,
+  v_7ec238,
+  v_c5fe19,
+  v_07bb04,
+  v_e7e12a,
+  v_897bd3,
+  v_3eb2f0,
+  v_b2dc50,
+  v_2f87f0,
+  v_5060a1,
+  v_2ff10f,
+  v_d047dc,
+  v_60982a,
+  v_b8b333,
+  v_85f3ff,
 } from '../types';
+import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
 
 const v_8a74cb = 20000;
@@ -303,5 +322,407 @@ export const v_91bb22 = {
   getOSCode: (): number => {
     return v_326be8.OS === 'android' ? 3112 : 3113;
   },
+};
+
+export const v_a5170b = (v_9b6134): string => {
+  return v_a928e1.SHA256(v_9b6134).toString();
+};
+
+export const v_b699a9 = async (
+  v_e0c7e8,
+  v_6bee94,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_8fc862 = {
+      type: 4,
+      email: v_e0c7e8,
+      pin: v_6bee94,
+    };
+
+    console.log('[로그인] 이메일/비밀번호 로그인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
+      '/login-01',
+      v_576f5a,
+    );
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] 이메일/비밀번호 로그인 성공');
+    } else {
+      console.error('[로그인] 이메일/비밀번호 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일/비밀번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_508a17 = async (
+  v_6bee94,
+  v_49ea09,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_073611 = {
+      type: 3,
+      pin: v_6bee94,
+      mobile: v_49ea09,
+    };
+
+    console.log('[로그인] 비밀번호 로그인 요청:', v_49ea09);
+
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
+      '/login-01',
+      v_576f5a,
+    );
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] 비밀번호 로그인 성공');
+    } else {
+      console.error('[로그인] 비밀번호 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 비밀번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_2ecc3f = async (
+  v_b9bbbd,
+  v_49ea09,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_7ec238 = {
+      country: v_b9bbbd,
+      mobile: v_49ea09,
+    };
+
+    console.log('[로그인] 전화번호 인증 코드 발송 요청:', v_49ea09);
+
+    const v_3393e3 = await v_9f42a4.post<v_c5fe19>(
+      '/login-02',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.status === true;
+    console.log('[로그인] 전화번호 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 인증 코드 발송 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_3ca504 = async (
+  v_49ea09,
+  v_c99bd2,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_07bb04 = {
+      mobile: v_49ea09,
+      code: v_c99bd2,
+    };
+
+    console.log('[로그인] 전화번호 인증 코드 확인 요청:', v_49ea09);
+
+    const v_3393e3 = await v_9f42a4.post<v_e7e12a>(
+      '/login-03',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data === 'login';
+    console.log('[로그인] 전화번호 인증 코드 확인 결과:', v_43c42e ? '로그인 가능' : '인증 실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 인증 코드 확인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_7e0a86 = async (
+  v_49ea09,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_a88df4 = {
+      type: 2,
+      mobile: v_49ea09,
+    };
+
+    console.log('[로그인] 전화번호 로그인 요청:', v_49ea09);
+
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
+      '/login-01',
+      v_576f5a,
+    );
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] 전화번호 로그인 성공');
+    } else {
+      console.error('[로그인] 전화번호 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_8025d1 = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_897bd3 = {
+      email: v_e0c7e8,
+    };
+
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_3eb2f0>(
+      '/check-02-email',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.status !== 'false';
+    console.log('[로그인] 이메일 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 코드 발송 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_415628 = async (
+  v_e0c7e8,
+  v_c99bd2,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_b2dc50 = {
+      email: v_e0c7e8,
+      code: v_c99bd2,
+    };
+
+    console.log('[로그인] 이메일 인증 코드 확인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_2f87f0>(
+      '/login-03-email',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.status === 'success';
+    console.log('[로그인] 이메일 인증 코드 확인 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 코드 확인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_a81308 = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_2ff10f> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_5060a1 = {
+      email: v_e0c7e8,
+    };
+
+    console.log('[로그인] 이메일 인증 로그인 요청:', v_e0c7e8);
+
+    const v_3393e3 = await v_9f42a4.post<v_2ff10f>(
+      '/login-04-email',
+      v_576f5a,
+    );
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] 이메일 인증 로그인 성공');
+    } else {
+      console.error('[로그인] 이메일 인증 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_ea3493 = async (
+  v_660822,
+  v_06cee6,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_d047dc = {
+      member: v_660822,
+      ssidw: v_06cee6,
+    };
+
+    console.log('[로그인] 세션 저장 요청:', v_660822);
+
+    const v_3393e3 = await v_9f42a4.post<v_60982a>(
+      '/saveSsidw',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data[0]?.affectedRows === 1;
+    console.log('[로그인] 세션 저장 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 세션 저장 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_98a863 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_85f3ff> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_b8b333 = {
+      member: v_660822,
+    };
+
+    console.log('[로그인] 사용자 정보 조회 요청:', v_660822);
+
+    const v_3393e3 = await v_9f42a4.get<v_85f3ff>(
+      '/app7000-01',
+      {
+        params: v_576f5a,
+      },
+    );
+
+    console.log('[로그인] 사용자 정보 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
 };
 

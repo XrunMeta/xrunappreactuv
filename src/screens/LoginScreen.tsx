@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -6,12 +6,20 @@ import {
   v_122070,
   v_4623af,
   v_326be8,
+  v_03e392,
+  v_39a996,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import {
+  v_b699a9,
+  v_a5170b,
+  v_ea3493,
+} from '../services';
 
 export const v_f4f851 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -19,11 +27,126 @@ export const v_f4f851 = () => {
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_9fe81c, v_d32265] = v_5ab095(false);
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
+  const [v_cd31a8, v_deef62] = v_5ab095(false);
   const v_0d972d = v_ce4741.emailVerification;
 
-  const v_ec4736 = () => {
-    console.log('로그인 시도', { email: v_e0c7e8, rememberId: v_9fe81c });
-    v_9b57fc(v_ce4741.map);
+  v_c4deb2(() => {
+    const v_2a6af5 = async () => {
+      try {
+        const v_05155e = await v_e84827.getItem('rememberMe');
+        if (v_05155e === 'true') {
+          const v_60fc43 = await v_e84827.getItem('userEmail');
+          if (v_60fc43) {
+            v_fedf34(v_60fc43);
+            v_d32265(true);
+            console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[로그인] 저장된 이메일 불러오기 실패:', v_5e9bfe);
+      }
+    };
+    v_2a6af5();
+  }, []);
+
+  const v_709e4f = async () => {
+    const v_ef3163 = !v_9fe81c;
+    v_d32265(v_ef3163);
+
+    try {
+      if (v_ef3163 && v_e0c7e8.trim()) {
+
+        await v_e84827.setItem('rememberMe', 'true');
+        await v_e84827.setItem('userEmail', v_e0c7e8.trim());
+        console.log('[로그인] 아이디 저장 완료:', v_e0c7e8.trim());
+      } else {
+
+        await v_e84827.removeItem('rememberMe');
+
+        console.log('[로그인] 아이디 저장 해제');
+      }
+    } catch (v_5e9bfe) {
+      console.error('[로그인] 아이디 저장/해제 실패:', v_5e9bfe);
+    }
+  };
+
+  const v_ec4736 = async () => {
+
+    if (!v_e0c7e8.trim()) {
+      v_03e392.alert('오류', '이메일을 입력해주세요.');
+      return;
+    }
+
+    if (!v_adc076.trim()) {
+      v_03e392.alert('오류', '비밀번호를 입력해주세요.');
+      return;
+    }
+
+    v_deef62(true);
+
+    try {
+      console.log('[로그인] 로그인 시도:', { email: v_e0c7e8, rememberId: v_9fe81c });
+
+      const v_b84499 = await v_b699a9(
+        v_e0c7e8.trim(),
+        v_adc076,
+        v_9b57fc,
+      );
+
+      if (v_b84499.status !== 'success') {
+        v_03e392.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+        v_deef62(false);
+        return;
+      }
+
+      const v_ef7306 = v_b84499.data[0];
+      if (!v_ef7306) {
+        v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+        v_deef62(false);
+        return;
+      }
+
+      const v_9e8d12 = v_ef7306.extrastr;
+      if (v_9e8d12) {
+        const v_06cee6 = v_a5170b(v_9e8d12);
+
+        const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
+        if (!v_aa0ad8) {
+          console.warn('[로그인] 세션 저장 실패');
+        }
+      }
+
+      await v_e84827.removeItem('userData');
+      await v_e84827.removeItem('userSessionToken');
+
+      await v_e84827.setItem('userEmail', v_e0c7e8.trim());
+      await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+
+      const v_00b91e = v_ef7306.extrastr || '';
+      await v_e84827.setItem('userSessionToken', v_00b91e);
+
+      if (v_9fe81c) {
+        await v_e84827.setItem('rememberMe', 'true');
+
+      } else {
+        await v_e84827.removeItem('rememberMe');
+
+      }
+
+      await v_e84827.setItem('isLoggedIn', 'true');
+
+      console.log('[로그인] 로그인 성공');
+
+      v_9b57fc(v_ce4741.map);
+    } catch (v_5e9bfe) {
+      console.error('[로그인] 로그인 오류:', v_5e9bfe);
+      v_03e392.alert(
+        '로그인 실패',
+        '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+      );
+    } finally {
+      v_deef62(false);
+    }
   };
 
   return (
@@ -47,6 +170,7 @@ export const v_f4f851 = () => {
           value={v_e0c7e8}
           onChangeText={v_fedf34}
           containerStyle={v_d81136.fieldContainer}
+          editable={!v_cd31a8}
         />
 
         <FormField
@@ -56,11 +180,13 @@ export const v_f4f851 = () => {
           value={v_adc076}
           onChangeText={v_52b279}
           containerStyle={v_d81136.fieldContainer}
+          editable={!v_cd31a8}
           rightAccessory={
             <TouchableOpacity
               style={v_d81136.eyeButton}
               onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
               activeOpacity={0.7}
+              disabled={v_cd31a8}
             >
               <Ionicons
                 name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
@@ -75,14 +201,21 @@ export const v_f4f851 = () => {
           <FormCheckbox
             label="아이디 기억하기"
             checked={v_9fe81c}
-            onToggle={() => v_d32265((v_ba2215) => !v_ba2215)}
+            onToggle={v_709e4f}
             variant="circle"
+            disabled={v_cd31a8}
           />
         </View>
 
         <View style={v_d81136.bottomSection}>
           <View style={v_d81136.loginButtonWrapper}>
-            <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
+            {v_cd31a8 ? (
+              <View style={v_d81136.loadingContainer}>
+                <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+              </View>
+            ) : (
+              <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
+            )}
           </View>
 
           <Text style={v_d81136.disclaimer}>
@@ -93,11 +226,10 @@ export const v_f4f851 = () => {
             style={v_d81136.emailVerification}
             onPress={() => v_9b57fc(v_0d972d)}
             activeOpacity={0.7}
+            disabled={v_cd31a8}
           >
             <Text style={v_d81136.emailVerificationText}>이메일 인증</Text>
-
           </TouchableOpacity>
-
         </View>
       </ScrollView>
 
@@ -191,6 +323,12 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#10192d',
     borderRadius: 100,
     marginBottom: 9,
+  },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
