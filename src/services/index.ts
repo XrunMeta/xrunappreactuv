@@ -50,6 +50,8 @@ import {
   v_c4dd46,
   v_13e1b8,
   v_6ffbdd,
+  v_62c808,
+  v_6dba58,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -1127,6 +1129,49 @@ export const v_d7d5a2 = async (
     if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
 
       throw v_5e9bfe;
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_10a69f = async (
+  v_660822,
+  v_6bee94,
+  v_58ca36,
+  v_896cf8,
+  v_c65f5d,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_62c808 = {
+      pin: v_6bee94,
+      reason: v_58ca36,
+      reasonNum: v_896cf8,
+      member: v_660822,
+    };
+
+    console.log('[회원 탈퇴] 회원 탈퇴 요청:', { member: v_660822, reasonNum: v_896cf8 });
+
+    const v_3393e3 = await v_9f42a4.post<v_6dba58>(
+      '/app8080-01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0]?.count === 1;
+    console.log('[회원 탈퇴] 회원 탈퇴 결과:', v_43c42e ? '성공' : '실패');
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원 탈퇴] 회원 탈퇴 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[회원 탈퇴] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
     }
     throw v_5e9bfe;
   }

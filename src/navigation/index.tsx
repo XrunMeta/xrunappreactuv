@@ -35,6 +35,7 @@ export const v_ce4741 = {
   myInfoPhoneEdit: 'myInfoPhoneEdit',
   myInfoSettings: 'myInfoSettings',
   myInfoCloseMembership: 'myInfoCloseMembership',
+  myInfoCloseMembershipSuccess: 'myInfoCloseMembershipSuccess',
   myInfoClauses: 'myInfoClauses',
   myInfoClauseDetail: 'myInfoClauseDetail',
   myInfoNotify: 'myInfoNotify',
