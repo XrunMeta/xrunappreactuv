@@ -12,6 +12,7 @@ import { v_729608, v_368e80, v_cb41de, v_89c10a } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_9553a4, v_6946fd } from '../constants';
 
 const v_798085 = [
   { value: 'male', label: '남' },
@@ -22,7 +23,7 @@ const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
 export const v_cdb169 = () => {
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
-  const { selectedCountryDialCode: v_459d5e } = v_700ef9();
+  const { selectedCountryDialCode: v_459d5e, selectedRegion: v_2f03bc, setSelectMode: v_67ab1c } = v_700ef9();
   const [v_a32a50, v_4944f5] = v_5ab095('XRUN');
   const [v_328bb4, v_b7613d] = v_5ab095('X');
   const [v_e0c7e8, v_fedf34] = v_5ab095('oth-staff@example.invalid');
@@ -102,12 +103,19 @@ export const v_cdb169 = () => {
             }
           />
 
-          <FormField
-            label="Region"
-            value={v_a6c30b}
-            onChangeText={v_c030e3}
-            placeholder="지역을 입력하세요"
-          />
+          <TouchableOpacity
+            onPress={() => {
+              v_67ab1c('region');
+              v_9b57fc('countryCodeSelect');
+            }}
+          >
+            <FormField
+              label="Region"
+              value={v_2f03bc ? v_2f03bc.name : v_a6c30b}
+              editable={false}
+              placeholder="지역을 선택하세요"
+            />
+          </TouchableOpacity>
 
           <View style={v_d81136.formGroup}>
             <Text style={v_d81136.sectionLabel}>성별</Text>
