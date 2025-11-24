@@ -227,11 +227,7 @@ const v_c0dbdf = () => {
 };
 
 const v_d0a391 = () => {
-  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca, setEmergencyStop: v_69fcdc } = v_700ef9();
-
-  const v_d419f9 = () => {
-    v_69fcdc(null);
-  };
+  const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
 
   return (
     <>
@@ -240,7 +236,7 @@ const v_d0a391 = () => {
         visible={v_b135ca?.enabled ?? false}
         message={v_b135ca?.message ?? '긴급 안내가 있습니다.'}
         link={v_b135ca?.link}
-        onClose={v_d419f9}
+
       />
     </>
   );
@@ -276,7 +272,14 @@ export default function v_6540c3() {
   }, []);
 
   if (!v_43f571 || v_cd31a8) {
-    return <SplashScreen />;
+    return (
+      <AppProvider>
+        <NavigationProvider>
+          <SplashScreen />
+          <GlobalDialogs />
+        </NavigationProvider>
+      </AppProvider>
+    );
   }
 
   return (
