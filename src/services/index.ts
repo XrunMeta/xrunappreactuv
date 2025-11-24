@@ -33,6 +33,27 @@ import {
   SaveSessionResponse,
   GetUserInfoRequest,
   GetUserInfoResponse,
+  GetMyPageUserInfoRequest,
+  GetMyPageUserInfoResponse,
+  UpdateNameRequest,
+  UpdateNameResponse,
+  UpdatePhoneRequest,
+  UpdatePhoneResponse,
+  UpdateLastNameRequest,
+  UpdateLastNameResponse,
+  UpdateGenderRequest,
+  UpdateGenderResponse,
+  UpdateAgeRequest,
+  UpdateAgeResponse,
+  GetRegionsByCountryRequest,
+  GetRegionsByCountryResponse,
+  UpdateRegionRequest,
+  UpdateRegionResponse,
+  GetCountriesResponse,
+  LogoutRequest,
+  LogoutResponse,
+  CloseMembershipRequest,
+  CloseMembershipResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -577,8 +598,9 @@ export const sendEmailVerificationCode = async (
       request,
     );
 
-    const result = response.data.data[0]?.status !== 'false';
-    console.log('[로그인] 이메일 인증 코드 발송 결과:', result ? '성공' : '실패');
+    const status = response.data.data[0]?.status;
+    const result = status === true || status === 'true';
+    console.log('[로그인] 이메일 인증 코드 발송 결과:', result ? '성공' : '실패', { status });
 
     return result;
   } catch (error) {
@@ -741,6 +763,435 @@ export const getUserInfo = async (
     console.error('[로그인] 사용자 정보 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[로그인] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyPageUserInfo = async (
+  member: number,
+  navigation?: any,
+): Promise<GetMyPageUserInfoResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyPageUserInfoRequest = {
+      member,
+    };
+
+    console.log('[마이페이지] 사용자 정보 조회 요청:', member);
+
+    const response = await axiosInstance.post<GetMyPageUserInfoResponse>(
+      '/app7110-01',
+      request,
+    );
+
+    console.log('[마이페이지] 사용자 정보 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 사용자 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateName = async (
+  member: number,
+  firstname: string,
+  navigation?: any,
+): Promise<UpdateNameResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateNameRequest = {
+      member,
+      firstname,
+    };
+
+    console.log('[마이페이지] 이름 수정 요청:', { member, firstname });
+
+    const response = await axiosInstance.post<UpdateNameResponse>(
+      '/app7120-01',
+      request,
+    );
+
+    console.log('[마이페이지] 이름 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 이름 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateLastName = async (
+  member: number,
+  lastname: string,
+  navigation?: any,
+): Promise<UpdateLastNameResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateLastNameRequest = {
+      member,
+      lastname,
+    };
+
+    console.log('[마이페이지] 성 수정 요청:', { member, lastname });
+
+    const response = await axiosInstance.post<UpdateLastNameResponse>(
+      '/app7130-01',
+      request,
+    );
+
+    console.log('[마이페이지] 성 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 성 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updatePhone = async (
+  member: number,
+  mobile: string,
+  mobilecode: number,
+  navigation?: any,
+): Promise<UpdatePhoneResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdatePhoneRequest = {
+      member,
+      mobile,
+      mobilecode,
+    };
+
+    console.log('[전화번호수정] 전화번호 수정 요청:', { member, mobile, mobilecode });
+
+    const response = await axiosInstance.post<UpdatePhoneResponse>(
+      '/app7153-03',
+      request,
+    );
+
+    console.log('[전화번호수정] 전화번호 수정 성공:', response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error('[전화번호수정] 전화번호 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[전화번호수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateGender = async (
+  member: number,
+  gender: number,
+  navigation?: any,
+): Promise<UpdateGenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateGenderRequest = {
+      member,
+      gender,
+    };
+
+    console.log('[마이페이지] 성별 수정 요청:', { member, gender });
+
+    const response = await axiosInstance.post<UpdateGenderResponse>(
+      '/app7180-01',
+      request,
+    );
+
+    console.log('[마이페이지] 성별 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 성별 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateAge = async (
+  member: number,
+  ages: number,
+  navigation?: any,
+): Promise<UpdateAgeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateAgeRequest = {
+      member,
+      ages,
+    };
+
+    console.log('[마이페이지] 나이 수정 요청:', { member, ages });
+
+    const response = await axiosInstance.post<UpdateAgeResponse>(
+      '/app7170-01',
+      request,
+    );
+
+    console.log('[마이페이지] 나이 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 나이 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getCountries = async (
+  navigation?: any,
+): Promise<GetCountriesResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[마이페이지] 국가 목록 조회 요청');
+
+    const response = await axiosInstance.get<GetCountriesResponse>('/countries');
+
+    console.log('[마이페이지] 국가 목록 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 국가 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRegionsByCountry = async (
+  country: number,
+  navigation?: any,
+): Promise<GetRegionsByCountryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRegionsByCountryRequest = {
+      country,
+    };
+
+    console.log('[마이페이지] 지역 목록 조회 요청:', { country });
+
+    const response = await axiosInstance.post<GetRegionsByCountryResponse>(
+      '/app7190-01',
+      request,
+    );
+
+    console.log('[마이페이지] 지역 목록 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 지역 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateRegion = async (
+  member: number,
+  country: number,
+  region: number,
+  navigation?: any,
+): Promise<UpdateRegionResponse> => {
+  try {
+
+    if (country === undefined || country === null) {
+      throw new Error('국가 코드가 유효하지 않습니다.');
+    }
+    if (region === undefined || region === null) {
+      throw new Error('지역 코드가 유효하지 않습니다.');
+    }
+
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateRegionRequest = {
+      member,
+      country,
+      region,
+    };
+
+    console.log('[마이페이지] 지역 수정 요청:', { member, country, region });
+
+    const response = await axiosInstance.post<UpdateRegionResponse>(
+      '/app7190-02',
+      request,
+    );
+
+    console.log('[마이페이지] 지역 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 지역 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const logout = async (
+  member: number,
+  navigation?: any,
+): Promise<LogoutResponse> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+    const baseUrl = env.GATEWAY_NODEJS;
+    const url = `${baseUrl}/logout-9705`;
+
+    console.log('[로그아웃] 로그아웃 요청:', { member });
+
+    const response = await nodeGatewayRequest(
+      '/logout-9705',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authCode}`,
+        },
+        body: JSON.stringify({
+          member,
+        } as LogoutRequest),
+      },
+      navigation,
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: LogoutResponse = await response.json();
+    console.log('[로그아웃] 로그아웃 성공');
+
+    return data;
+  } catch (error) {
+    console.error('[로그아웃] 로그아웃 오류:', error);
+    if (error instanceof Error && error.message === 'API request timeout') {
+
+      throw error;
+    }
+    throw error;
+  }
+};
+
+export const closeMembership = async (
+  member: number,
+  pin: string,
+  reason: string,
+  reasonNum: number,
+  navigation?: any,
+): Promise<boolean> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: CloseMembershipRequest = {
+      pin,
+      reason,
+      reasonNum,
+      member,
+    };
+
+    console.log('[회원 탈퇴] 회원 탈퇴 요청:', { member, reasonNum });
+
+    const response = await axiosInstance.post<CloseMembershipResponse>(
+      '/app8080-01',
+      request,
+    );
+
+    const result = response.data.data?.[0]?.count === 1;
+    console.log('[회원 탈퇴] 회원 탈퇴 결과:', result ? '성공' : '실패');
+
+    return result;
+  } catch (error) {
+    console.error('[회원 탈퇴] 회원 탈퇴 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[회원 탈퇴] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

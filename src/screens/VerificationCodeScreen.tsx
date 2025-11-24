@@ -82,7 +82,7 @@ export const VerificationCodeScreen = () => {
 
     try {
 
-      console.log('[로그인] 이메일 인증 코드 확인 요청:', verificationEmail);
+      console.log('[인증] 이메일 인증 코드 확인 요청:', verificationEmail);
       const codeVerified = await verifyEmailCode(verificationEmail, code, navigate);
 
       if (!codeVerified) {
@@ -91,46 +91,54 @@ export const VerificationCodeScreen = () => {
         return;
       }
 
-      console.log('[로그인] 이메일 로그인 요청:', verificationEmail);
-      const loginResponse = await loginWithEmailAuth(verificationEmail, navigate);
+      if (verificationSuccessRoute === ROUTES.login || verificationSuccessRoute === ROUTES.map) {
 
-      if (loginResponse.status !== 'success') {
-        Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
-        setIsVerifying(false);
-        return;
-      }
+        console.log('[로그인] 이메일 로그인 요청:', verificationEmail);
+        const loginResponse = await loginWithEmailAuth(verificationEmail, navigate);
 
-      const userData = loginResponse.data[0];
-      if (!userData || !userData.member) {
-        Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
-        setIsVerifying(false);
-        return;
-      }
-
-      const extrastr = userData.extrastr;
-      if (extrastr) {
-        const ssidw = encryptSHA256(extrastr);
-        const sessionSaved = await saveSession(userData.member, ssidw, navigate);
-        if (!sessionSaved) {
-          console.warn('[로그인] 세션 저장 실패');
+        if (loginResponse.status !== 'success') {
+          Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          setIsVerifying(false);
+          return;
         }
+
+        const userData = loginResponse.data[0];
+        if (!userData || !userData.member) {
+          Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          setIsVerifying(false);
+          return;
+        }
+
+        const extrastr = userData.extrastr;
+        if (extrastr) {
+          const ssidw = encryptSHA256(extrastr);
+          const sessionSaved = await saveSession(userData.member, ssidw, navigate);
+          if (!sessionSaved) {
+            console.warn('[로그인] 세션 저장 실패');
+          }
+        }
+
+        await AsyncStorage.removeItem('userData');
+        await AsyncStorage.removeItem('userSessionToken');
+        await AsyncStorage.setItem('userEmail', verificationEmail);
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        const sessionToken = userData.extrastr || '';
+        await AsyncStorage.setItem('userSessionToken', sessionToken);
+        await AsyncStorage.setItem('isLoggedIn', 'true');
+
+        console.log('[로그인] 이메일 인증 로그인 성공');
+
+        resetVerificationSuccessRoute();
+        reset(verificationSuccessRoute || ROUTES.map);
+      } else {
+
+        console.log('[정보수정] 인증 코드 확인 성공');
+        resetVerificationSuccessRoute();
+        reset(verificationSuccessRoute);
       }
-
-      await AsyncStorage.removeItem('userData');
-      await AsyncStorage.removeItem('userSessionToken');
-      await AsyncStorage.setItem('userEmail', verificationEmail);
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-      const sessionToken = userData.extrastr || '';
-      await AsyncStorage.setItem('userSessionToken', sessionToken);
-      await AsyncStorage.setItem('isLoggedIn', 'true');
-
-      console.log('[로그인] 이메일 인증 로그인 성공');
-
-      resetVerificationSuccessRoute();
-      reset(verificationSuccessRoute || ROUTES.map);
     } catch (error) {
-      console.error('[로그인] 이메일 인증 로그인 오류:', error);
-      Alert.alert('오류', '로그인 처리 중 오류가 발생했습니다.');
+      console.error('[인증] 인증 코드 확인 오류:', error);
+      Alert.alert('오류', '인증 처리 중 오류가 발생했습니다.');
     } finally {
       setIsVerifying(false);
     }
@@ -145,7 +153,7 @@ export const VerificationCodeScreen = () => {
     setIsResending(true);
 
     try {
-      console.log('[로그인] 이메일 인증 코드 재전송 요청:', verificationEmail);
+      console.log('[인증] 이메일 인증 코드 재전송 요청:', verificationEmail);
       const codeSent = await sendEmailVerificationCode(verificationEmail, navigate);
 
       if (codeSent) {
@@ -156,7 +164,7 @@ export const VerificationCodeScreen = () => {
         Alert.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('[로그인] 인증 코드 재전송 오류:', error);
+      console.error('[인증] 인증 코드 재전송 오류:', error);
       Alert.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
     } finally {
       setIsResending(false);
@@ -365,4 +373,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

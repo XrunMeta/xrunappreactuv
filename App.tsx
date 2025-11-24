@@ -27,8 +27,10 @@ import {
   MyInfoScreen,
   MyInfoEmailAuthScreen,
   MyInfoEditScreen,
+  PhoneEditScreen,
   MyInfoSettingsScreen,
   MyInfoCloseMembershipScreen,
+  MyInfoCloseMembershipSuccessScreen,
   MyInfoClausesScreen,
   ClauseDetailScreen,
   MyInfoNotifyScreen,
@@ -159,12 +161,20 @@ const ScreenHost = () => {
     return <MyInfoEditScreen />;
   }
 
+  if (currentScreen === 'myInfoPhoneEdit') {
+    return <PhoneEditScreen />;
+  }
+
   if (currentScreen === 'myInfoSettings') {
     return <MyInfoSettingsScreen />;
   }
 
   if (currentScreen === 'myInfoCloseMembership') {
     return <MyInfoCloseMembershipScreen />;
+  }
+
+  if (currentScreen === 'myInfoCloseMembershipSuccess') {
+    return <MyInfoCloseMembershipSuccessScreen />;
   }
 
   if (currentScreen === 'myInfoClauses') {

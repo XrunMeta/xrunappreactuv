@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,16 @@ import {
   TouchableOpacity,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { getMyPageUserInfo, logout } from '../services';
+import { useAppContext } from '../context';
 
 type CardConfig = {
   id: string;
@@ -69,18 +73,65 @@ const cardConfigs: CardConfig[] = [
 ];
 
 export const MyInfoScreen = () => {
-  const { navigate } = useAppNavigation();
+  const { navigate, reset } = useAppNavigation();
+  const { setVerificationEmail } = useAppContext();
+  const [userInfo, setUserInfo] = useState<{
+    name?: string;
+    email?: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          const member = userData.member;
+
+          if (member) {
+            const response = await getMyPageUserInfo(member, navigate);
+            const user = response.data[0];
+
+            if (user) {
+              const firstName = user.firstname || '';
+              const lastName = user.lastname || '';
+              const fullName = `${firstName} ${lastName}`.trim() || '사용자';
+
+              setUserInfo({
+                name: fullName,
+                email: user.email || '',
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[마이페이지] 사용자 정보 로드 실패:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserInfo();
+  }, [navigate]);
 
   const handleCardPress = (card: CardConfig) => {
     if (card.route) {
+
+      if (card.id === 'edit' && userInfo?.email) {
+        setVerificationEmail(userInfo.email);
+      }
       navigate(ROUTES[card.route]);
     }
   };
 
   const handleShare = async () => {
     try {
+      const name = userInfo?.name || '사용자';
+      const email = userInfo?.email || '';
       await Share.share({
-        message: 'XRUNBackend • oth-user@example.invalid',
+        message: `${name} • ${email}`,
       });
     } catch (error) {
       console.warn(error);
@@ -88,7 +139,65 @@ export const MyInfoScreen = () => {
   };
 
   const handleLogout = () => {
-    Alert.alert('로그아웃', '로그아웃 기능은 추후 연동됩니다.');
+    Alert.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '로그아웃',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+
+              const userDataStr = await AsyncStorage.getItem('userData');
+              if (!userDataStr) {
+                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              const userData = JSON.parse(userDataStr);
+              const member = userData.member;
+
+              if (!member) {
+                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                return;
+              }
+
+              await logout(member, navigate);
+
+              await AsyncStorage.removeItem('isLoggedIn');
+              await AsyncStorage.removeItem('userEmail');
+              await AsyncStorage.removeItem('userData');
+              await AsyncStorage.removeItem('rageProgress');
+              await AsyncStorage.removeItem('userTickets');
+              await AsyncStorage.removeItem('rageProgressLastUpdate');
+              await AsyncStorage.removeItem('userSessionToken');
+
+              reset(ROUTES.login);
+            } catch (error) {
+              console.error('[로그아웃] 로그아웃 처리 중 오류:', error);
+
+              try {
+                await AsyncStorage.removeItem('isLoggedIn');
+                await AsyncStorage.removeItem('userEmail');
+                await AsyncStorage.removeItem('userData');
+                await AsyncStorage.removeItem('rageProgress');
+                await AsyncStorage.removeItem('userTickets');
+                await AsyncStorage.removeItem('rageProgressLastUpdate');
+                await AsyncStorage.removeItem('userSessionToken');
+              } catch (storageError) {
+                console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
+              }
+              reset(ROUTES.login);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderIcon = (card: CardConfig) => {
@@ -119,8 +228,18 @@ export const MyInfoScreen = () => {
 
           <View style={styles.profileCard}>
             <View>
-              <Text style={styles.profileName}>XRUNBackend</Text>
-              <Text style={styles.profileEmail}>oth-user@example.invalid</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={COLORS.headerText} />
+              ) : (
+                <>
+                  <Text style={styles.profileName}>
+                    {userInfo?.name || '사용자'}
+                  </Text>
+                  <Text style={styles.profileEmail}>
+                    {userInfo?.email || ''}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={styles.profileActions}>
               <TouchableOpacity
@@ -265,5 +384,4 @@ const styles = StyleSheet.create({
     color: '#111',
   },
 });
-
 
