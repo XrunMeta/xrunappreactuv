@@ -13,6 +13,7 @@ import {
   v_2c1a39,
   v_3edf6c,
   v_d5571c,
+  v_f71847,
 } from '../types';
 import { v_e4a763 } from '../utils/env';
 
@@ -303,5 +304,111 @@ export const v_91bb22 = {
   getOSCode: (): number => {
     return v_326be8.OS === 'android' ? 3112 : 3113;
   },
+};
+
+const v_b464ed = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+  const v_bef3bf = 6371000; 
+  const v_32a354 = (v_ed3911 - v_34b365) * Math.PI / 180;
+  const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+  const v_779914 =
+    Math.sin(v_32a354 / 2) * Math.sin(v_32a354 / 2) +
+    Math.cos(v_34b365 * Math.PI / 180) * Math.cos(v_ed3911 * Math.PI / 180) *
+    Math.sin(v_84b828 / 2) * Math.sin(v_84b828 / 2);
+  const v_3f4e2e = 2 * Math.atan2(Math.sqrt(v_779914), Math.sqrt(1 - v_779914));
+  return v_bef3bf * v_3f4e2e;
+};
+
+const v_2dc24c = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+  const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+  const v_53e984 = v_34b365 * Math.PI / 180;
+  const v_01952a = v_ed3911 * Math.PI / 180;
+  const v_64877a = Math.sin(v_84b828) * Math.cos(v_01952a);
+  const v_62c214 = Math.cos(v_53e984) * Math.sin(v_01952a) - Math.sin(v_53e984) * Math.cos(v_01952a) * Math.cos(v_84b828);
+  const v_6f4cf9 = Math.atan2(v_64877a, v_62c214) * 180 / Math.PI;
+  return (v_6f4cf9 + 360) % 360;
+};
+
+export const v_f84ef5 = async (
+  v_b5de9c,
+  v_985be2,
+  v_660822,
+  v_c65f5d,
+): Promise<v_f71847[]> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_09dafd = 'app2000-01';
+
+    const v_cd6a57 = {
+      member: v_660822,
+      latitude: v_b5de9c,
+      longitude: v_985be2,
+      limit: 120,
+    };
+
+    console.log('=== fetchMapMarkerData API 호출 ===');
+    console.log('endpoint:', v_09dafd);
+    console.log('requestBody:', JSON.stringify(v_cd6a57));
+
+    const v_3393e3 = await v_12a388(
+      v_09dafd,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(v_cd6a57),
+      },
+      v_c65f5d,
+    );
+
+    if (!v_3393e3.ok) {
+      console.error('API request failed:', v_3393e3.status);
+      throw new Error(`API request failed: ${v_3393e3.status}`);
+    }
+
+    const v_9390e8 = await v_3393e3.json();
+    console.log('=== fetchMapMarkerData API 응답 ===');
+    console.log('data:', v_9390e8);
+    console.log('data.data length:', v_9390e8?.data?.length);
+
+    if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
+      return v_9390e8.data.map((v_8c0b26) => {
+        const v_1906d6 = v_8c0b26.lat || v_8c0b26.latitude;
+        const v_8cd402 = v_8c0b26.lng || v_8c0b26.longitude;
+
+        let v_926d1c = v_8c0b26.distance || 0;
+        if (v_1906d6 && v_8cd402 && (v_926d1c === 0 || !v_8c0b26.distance)) {
+          v_926d1c = v_b464ed(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
+        }
+
+        let v_1fec52 = v_8c0b26.direction || 0;
+        if (v_1906d6 && v_8cd402 && (v_1fec52 === 0 || !v_8c0b26.direction)) {
+          v_1fec52 = v_2dc24c(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
+        }
+
+        return {
+          spotID: v_8c0b26.spotid || v_8c0b26.spotID || v_8c0b26.id || 0,
+          distance: v_926d1c,
+          direction: v_1fec52,
+          name: v_8c0b26.name || v_8c0b26.brand || v_8c0b26.coin || v_8c0b26.title || 'XRUN coin',
+          latitude: v_1906d6,
+          longitude: v_8cd402,
+          xrunPrice: v_8c0b26.xrunprice || v_8c0b26.xrunPrice || v_8c0b26.price || 0,
+          iconurl: v_8c0b26.iconurl || v_8c0b26.brandlogo || v_8c0b26.brandlogo_file || v_8c0b26.adthumbnail2 || v_8c0b26.adthumbnail2_file || '',
+          joindesc: v_8c0b26.joindesc || v_8c0b26.description || '',
+          brand: v_8c0b26.brand || v_8c0b26.coin || '',
+          coins: v_8c0b26.coins || v_8c0b26.coin || '',
+        };
+      });
+    }
+
+    console.log('API 응답에 data.data가 없거나 배열이 아님');
+    return [];
+  } catch (v_5e9bfe) {
+    console.error('맵 마커 데이터 가져오기 오류:', v_5e9bfe);
+
+    return [];
+  }
 };
 

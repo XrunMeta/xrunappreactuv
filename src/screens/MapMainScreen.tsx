@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_e662ae } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
@@ -7,20 +7,17 @@ import {
   v_700696,
   v_19b633,
   v_cf9c33,
-  v_09d0e5,
-  v_a2349e,
-  v_cdbae1,
-  v_4623af,
+  v_6b5698,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
-import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
+import v_2b5678, { v_65a8f9, v_12e0dc, v_b4043e } from 'voblsepvtvpzyatxk';
 import * as v_8a44cb from 'zryrlwvgokjhz';
-import { v_f4e704, v_3a67b0 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_f4e704, v_a77ce6 } from '../components';
 import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-
-const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
+import { v_f71847 } from '../types';
+import { v_f84ef5 } from '../services';
 
 interface LocationData {
   latitude: number;
@@ -70,21 +67,7 @@ try {
   console.warn('icon_bell.png not found');
 }
 
-let v_622407 = null;
-let v_8c4b15 = null;
 let v_16772f = null;
-
-try {
-  v_622407 = require('../../assets/images/icon_arrow.png');
-} catch (v_9e86fd) {
-  console.warn('icon_arrow.png not found');
-}
-
-try {
-  v_8c4b15 = require('../../assets/images/logoMain_XRUN.png');
-} catch (v_9e86fd) {
-  console.warn('logoMain_XRUN.png not found');
-}
 
 try {
   v_16772f = require('../../assets/images/icon_mapPoint.png');
@@ -104,21 +87,23 @@ export const MapMainScreen: v_a3453e.FC = () => {
     longitudeDelta: 0.01,
   });
 
-  const [v_572bd3, v_6a4dcd] = v_5ab095(true);
+  const [v_572bd3, v_6a4dcd] = v_5ab095(false);
+  const [v_27aea1, v_22f943] = v_5ab095<v_f71847 | null>(null);
 
-  const v_8f79f8 = v_e662ae(new v_a2349e.Value(90)).current; 
+  const [v_b4d4c5, v_14dd24] = v_5ab095<v_f71847[]>([]);
+  const [v_818f4d, v_e1bb1a] = v_5ab095(false);
 
-  const [v_c98d47, v_90fc1b] = v_5ab095(false);
-  const [v_eb5123, v_7413ad] = v_5ab095(false);
-
-  const [v_24cc8e] = v_5ab095({
-    distance: 2.53, 
-    direction: 45, 
-    name: 'Earn rewards with XRUN here',
-  });
+  let v_be97ff = null;
+  try {
+    v_be97ff = require('../../assets/images/icon_xrun_black.png');
+  } catch (v_9e86fd) {
+    console.warn('icon_xrun_black.png not found');
+  }
 
   v_c4deb2(() => {
-    (async () => {
+    let v_fd434d = null;
+
+    const v_169317 = async () => {
 
       const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
       if (v_d308b5 !== 'granted') {
@@ -149,6 +134,36 @@ export const MapMainScreen: v_a3453e.FC = () => {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
+
+        await v_e84827.setItem('selfCoordinate', JSON.stringify(v_4a8217));
+
+        const v_ef7306 = await v_e84827.getItem('userData');
+        if (v_ef7306) {
+          try {
+            const v_ff39bc = JSON.parse(v_ef7306);
+            const v_660822 = v_ff39bc?.member;
+            if (v_660822) {
+              v_e1bb1a(true);
+              console.log('=== 맵 마커 데이터 가져오기 시작 ===');
+              const v_003147 = await v_f84ef5(
+                v_4a8217.latitude,
+                v_4a8217.longitude,
+                v_660822,
+                v_9b57fc,
+              );
+              console.log('=== 맵 마커 데이터 가져오기 완료 ===');
+              console.log('마커 개수:', v_003147.length);
+              v_14dd24(v_003147);
+              v_e1bb1a(false);
+            } else {
+              console.log('userData에 member가 없습니다.');
+            }
+          } catch (v_5f9add) {
+            console.error('userData 파싱 오류:', v_5f9add);
+          }
+        } else {
+          console.log('userData가 없습니다. 로그인이 필요할 수 있습니다.');
+        }
       } catch (v_5e9bfe) {
         const v_1744b9 = v_5e9bfe instanceof Error ? v_5e9bfe.message : '알 수 없는 오류';
         v_a7e4fc('위치를 가져오는 중 오류가 발생했습니다.');
@@ -191,8 +206,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
           });
         }
       }
-    })();
-  }, []);
+    };
+
+    v_169317();
+
+    const v_269481 = v_6b5698.addEventListener('change', (v_3b10d8) => {
+      if (v_3b10d8 === 'active') {
+
+        v_169317();
+      }
+    });
+
+    return () => {
+      v_269481?.remove();
+    };
+  }, [v_9b57fc]);
 
   const v_6a213b = (v_6e55b1) => {
     console.log('Navigation item pressed:', v_6e55b1);
@@ -222,23 +250,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
     console.log('Tab changed to:', v_11083e);
   };
 
-  v_c4deb2(() => {
-    if (v_572bd3) {
-      v_a2349e.timing(v_8f79f8, {
-        toValue: 80, 
-        duration: 300,
-        easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
-    } else {
-      v_a2349e.timing(v_8f79f8, {
-        toValue: 20, 
-        duration: 300,
-        easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
+  const v_fc58d0 = (spot: v_f71847) => {
+    v_22f943(v_c5ac8b);
+    if (!v_572bd3) {
+      v_6a4dcd(true);
     }
-  }, [v_572bd3]);
+  };
 
   const v_fce460 = [
     { id: 'wallet', label: 'Wallet', icon: v_8daafe },
@@ -281,13 +298,55 @@ export const MapMainScreen: v_a3453e.FC = () => {
             showsMyLocationButton={false}
             onRegionChangeComplete={v_ed2516}
           >
-            <Marker
-              coordinate={{
-                latitude: v_a55f0b.latitude,
-                longitude: v_a55f0b.longitude,
-              }}
-              title="현재 위치"
-            />
+            {}
+            {v_b4d4c5
+              .filter((v_5e3dbb) => v_5e3dbb.latitude && v_5e3dbb.longitude) 
+              .map((v_5e3dbb) => (
+              <Marker
+                key={v_5e3dbb.spotID}
+                coordinate={{
+                  latitude: v_5e3dbb.latitude!,
+                  longitude: v_5e3dbb.longitude!,
+                }}
+                onPress={() => v_fc58d0(v_5e3dbb)}
+              >
+                {}
+                <Callout tooltip>
+                  <View style={v_d81136.calloutContainer}>
+                    <View style={v_d81136.calloutLeft}>
+                      {}
+                      {v_5e3dbb.iconurl ? (
+                        <Image
+                          source={{ uri: v_5e3dbb.iconurl }}
+                          style={v_d81136.calloutImage}
+                          resizeMode="contain"
+                        />
+                      ) : (
+                        v_be97ff && (
+                          <Image
+                            source={v_be97ff}
+                            style={v_d81136.calloutImage}
+                            resizeMode="contain"
+                          />
+                        )
+                      )}
+                      {}
+                      <Text style={v_d81136.calloutDistance}>
+                        {v_5e3dbb.distance.toFixed(2)}m
+                      </Text>
+                    </View>
+                    <View style={v_d81136.calloutRight}>
+                      <Text style={v_d81136.calloutBrand}>
+                        {v_5e3dbb.brand || v_5e3dbb.name} available
+                      </Text>
+                      <Text style={v_d81136.calloutCoins}>
+                        {v_5e3dbb.coins || '0'} {v_5e3dbb.brand || ''}
+                      </Text>
+                    </View>
+                  </View>
+                </Callout>
+              </Marker>
+            ))}
           </MapView>
         ) : (
           <View style={v_d81136.mapPlaceholder}>
@@ -305,206 +364,17 @@ export const MapMainScreen: v_a3453e.FC = () => {
             />
           </View>
         )}
-
-        {}
-        <View style={v_d81136.testButtonContainer}>
-          <TouchableOpacity
-            style={v_d81136.testButton}
-            onPress={() => v_90fc1b(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.testButtonText}>테스트 팝업</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[v_d81136.testButton, v_d81136.testButtonSecondary]}
-            onPress={() => v_7413ad(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={v_d81136.testButtonText}>다단계 팝업</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       {}
-      {
-
-}
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 0,
-          top: 0,
-          left: 0,
-          zIndex: 5, 
-          pointerEvents: 'box-none', 
-        }}>
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              bottom: v_8f79f8, 
-              left: 0,
-              right: 0,
-              zIndex: 1,
-              pointerEvents: 'auto', 
-            },
-          ]}>
-          <Pressable
-            onPress={() => {
-              if (v_572bd3) {
-                console.log('📱 하단 패널 배경 터치 - 패널 닫기');
-                v_6a4dcd(false);
-              }
-            }}
-            style={[
-              v_d81136.bottomPanel,
-              {
-                minHeight: v_572bd3 ? 100 : 35,
-              },
-            ]}>
-            {}
-            {v_572bd3 && (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingTop: 8,
-                  paddingBottom: 4,
-                }}>
-                <View
-                  style={{
-                    width: 40,
-                    height: 4,
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: 2,
-                  }}
-                />
-              </View>
-            )}
-
-            {}
-            {v_572bd3 && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  paddingHorizontal: 20,
-                  paddingTop: 0,
-                  paddingBottom: 12,
-                  pointerEvents: 'box-none', 
-                }}>
-                {}
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}>
-                  {}
-                  {v_622407 && (
-                    <View
-                      style={{
-                        width: 33,
-                        height: 33,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: 12,
-                        transform: [{ rotate: `${v_24cc8e.direction}deg` }],
-                      }}>
-                      <Image
-                        source={v_622407}
-                        style={{
-                          width: 23,
-                          height: 23,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  )}
-
-                  {}
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 16,
-                        color: '#4c4e55',
-                        lineHeight: 24,
-                        marginBottom: 4,
-                      }}>
-                      {v_24cc8e.distance.toFixed(2)}m
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 12,
-                        color: '#4c4e55',
-                        lineHeight: 15,
-                        letterSpacing: 0.06,
-                      }}>
-                      {v_24cc8e.name}
-                    </Text>
-                  </View>
-                </View>
-
-                {}
-                {v_8c4b15 && (
-                  <View
-                    style={{
-                      width: 44,
-                      height: 44,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginLeft: 12,
-                    }}>
-                    <Image
-                      source={v_8c4b15}
-                      style={{
-                        width: 44,
-                        height: 44,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
-
-                {}
-                <Pressable
-                  onPress={() => {
-                    console.log('📱 하단 패널 닫기 버튼 클릭');
-                    v_6a4dcd(false);
-                  }}
-                  style={{
-                    width: 14,
-                    height: 14,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: 12,
-                  }}>
-                  {v_622407 && (
-                    <View
-                      style={{
-                        transform: [{ rotate: '270deg' }],
-                      }}>
-                      <Image
-                        source={v_622407}
-                        style={{
-                          width: 14,
-                          height: 14,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  )}
-                </Pressable>
-              </View>
-            )}
-          </Pressable>
-        </Animated.View>
-      </View>
+      <MapBottomPanel
+        visible={v_572bd3}
+        spotData={v_27aea1}
+        onClose={() => {
+          v_6a4dcd(false);
+          v_22f943(null);
+        }}
+      />
 
       {}
       {}
@@ -518,64 +388,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         />
       </View>
 
-      {}
-      <ChoiceDialog
-        visible={v_c98d47}
-        title="테스트 팝업"
-        message="이것은 ChoiceDialog 테스트 팝업입니다. 두 개의 버튼을 테스트할 수 있습니다."
-        button1Label="취소"
-        button1Action={() => {
-          v_03e392.alert('취소', '취소 버튼이 클릭되었습니다.');
-          v_90fc1b(false);
-        }}
-        button2Label="확인"
-        button2Action={async () => {
-          v_03e392.alert('확인', '확인 버튼이 클릭되었습니다.');
-          v_90fc1b(false);
-        }}
-        onClose={() => v_90fc1b(false)}
-      />
-
-      {}
-      <ChoiceDialog
-        visible={v_eb5123}
-        steps={[
-          {
-            title: "1단계",
-            message: "첫 번째 단계입니다. 다음 단계로 진행하시겠습니까?",
-            button1Label: "취소",
-            button1Action: (v_37eab7, v_708a38, v_ef1984) => {
-              v_03e392.alert('취소', '1단계에서 취소되었습니다.');
-              v_ef1984();
-            },
-            button2Label: "다음",
-            button2Action: (v_902c0b) => {
-              v_902c0b();
-            },
-          },
-          {
-            title: "2단계",
-            message: "두 번째 단계입니다. 이전 단계로 돌아가거나 완료할 수 있습니다.",
-            children: (
-              <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8, marginTop: 8 }}>
-                <Text style={{ fontSize: 14, color: '#666' }}>
-                  이것은 children으로 추가된 커스텀 컨텐츠입니다.
-                </Text>
-              </View>
-            ),
-            button1Label: "이전",
-            button1Action: (v_37eab7, v_c54ab6) => {
-              v_c54ab6();
-            },
-            button2Label: "완료",
-            button2Action: async (v_37eab7, v_708a38, v_ef1984) => {
-              v_03e392.alert('완료', '모든 단계가 완료되었습니다!');
-              v_ef1984();
-            },
-          },
-        ]}
-        onClose={() => v_7413ad(false)}
-      />
     </View>
   );
 };
@@ -626,47 +438,49 @@ const v_d81136 = v_472849.create({
     height: 25,
   },
 
-  bottomPanel: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    borderTopStartRadius: 33,
-    borderTopEndRadius: 33,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-
-  testButtonContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -75 }, { translateY: -25 }],
+  calloutContainer: {
+    backgroundColor: 'white',
+    borderColor: '#ffdc04',
+    borderWidth: 3,
     flexDirection: 'row',
-    gap: 12,
-    zIndex: 100,
+    width: 270,
+    height: 70,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderRadius: 15,
+    gap: 3,
+    elevation: 4,
+    marginBottom: v_326be8.OS === 'ios' ? -14 : 0,
   },
-  testButton: {
-    backgroundColor: '#343a5a',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minWidth: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
+  calloutLeft: {
+    justifyContent: 'space-between',
+    marginLeft: 10,
   },
-  testButtonSecondary: {
-    backgroundColor: '#ffdc04',
+  calloutImage: {
+    width: 32,
+    height: 32,
   },
-  testButtonText: {
-    color: '#000000',
+  calloutDistance: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  calloutRight: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  calloutBrand: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Medium',
+    color: 'black',
+  },
+  calloutCoins: {
+    marginTop: 5,
     fontSize: 14,
     fontFamily: 'Roboto-Medium',
+    color: 'black',
   },
 });
 
