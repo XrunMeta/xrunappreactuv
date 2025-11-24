@@ -73,6 +73,16 @@ export interface ReferralCheckResponse {
   }>;
 }
 
+export interface EmailExistsRequest {
+  email: string;
+}
+
+export interface EmailExistsResponse {
+  data: Array<{
+    result: boolean; 
+  }>;
+}
+
 export interface SignupRequest {
   email: string;
   pin: string;
