@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,46 @@ export const LoginScreen = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const emailVerificationRoute: any = ROUTES.emailVerification;
+
+  useEffect(() => {
+    const loadRememberedEmail = async () => {
+      try {
+        const remembered = await AsyncStorage.getItem('rememberMe');
+        if (remembered === 'true') {
+          const savedEmail = await AsyncStorage.getItem('userEmail');
+          if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberId(true);
+            console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
+          }
+        }
+      } catch (error) {
+        console.error('[로그인] 저장된 이메일 불러오기 실패:', error);
+      }
+    };
+    loadRememberedEmail();
+  }, []);
+
+  const handleRememberIdToggle = async () => {
+    const newValue = !rememberId;
+    setRememberId(newValue);
+
+    try {
+      if (newValue && email.trim()) {
+
+        await AsyncStorage.setItem('rememberMe', 'true');
+        await AsyncStorage.setItem('userEmail', email.trim());
+        console.log('[로그인] 아이디 저장 완료:', email.trim());
+      } else {
+
+        await AsyncStorage.removeItem('rememberMe');
+
+        console.log('[로그인] 아이디 저장 해제');
+      }
+    } catch (error) {
+      console.error('[로그인] 아이디 저장/해제 실패:', error);
+    }
+  };
 
   const handleLogin = async () => {
 
@@ -76,7 +116,6 @@ export const LoginScreen = () => {
         }
       }
 
-      await AsyncStorage.removeItem('userEmail');
       await AsyncStorage.removeItem('userData');
       await AsyncStorage.removeItem('userSessionToken');
 
@@ -88,8 +127,10 @@ export const LoginScreen = () => {
 
       if (rememberId) {
         await AsyncStorage.setItem('rememberMe', 'true');
+
       } else {
         await AsyncStorage.removeItem('rememberMe');
+
       }
 
       await AsyncStorage.setItem('isLoggedIn', 'true');
@@ -160,7 +201,7 @@ export const LoginScreen = () => {
           <FormCheckbox
             label="아이디 기억하기"
             checked={rememberId}
-            onToggle={() => setRememberId((prev) => !prev)}
+            onToggle={handleRememberIdToggle}
             variant="circle"
             disabled={isLoading}
           />
