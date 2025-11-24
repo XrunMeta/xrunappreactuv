@@ -105,14 +105,31 @@ export const v_f40fc5 = () => {
         if (v_8aae3c !== null) {
           v_65bdb1 = v_8aae3c;
         } else {
-          v_03e392.alert(
-            '추천인 확인',
-            '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
-            [
-              { text: '취소', style: 'cancel', onPress: () => v_e33ec0(false) },
-              { text: '계속', onPress: () => {} },
-            ],
-          );
+
+          const v_411201 = await new Promise<boolean>((v_6f7712) => {
+            v_03e392.alert(
+              '추천인 확인',
+              '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                  onPress: () => {
+                    v_e33ec0(false);
+                    v_6f7712(false);
+                  },
+                },
+                {
+                  text: '계속',
+                  onPress: () => v_6f7712(true),
+                },
+              ],
+            );
+          });
+
+          if (!v_411201) {
+            return;
+          }
 
         }
       }
