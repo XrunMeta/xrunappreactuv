@@ -45,6 +45,8 @@ const v_2219b3 = <T extends Record<string, any>>(
   const v_af7f2d = v_e662ae<v_a3453e.ComponentType<T>>(v_2d6b3c);
   const v_99d34b = v_e662ae(v_4fa913);
 
+  const v_fc9c2f = v_e662ae(false);
+
   v_298205(v_6d4ed3, () => ({
     reloadData: () => {
       v_d57c80([]);
@@ -55,10 +57,10 @@ const v_2219b3 = <T extends Record<string, any>>(
     },
   }));
 
-  const v_5c29ab = async (v_2365e9, v_5b37d7 = false) => {
+  const v_5c29ab = async (v_2365e9, v_5b37d7 = false): Promise<void> => {
 
     if (v_5b37d7 ? v_683210 : v_f34bc3) {
-      return;
+      return Promise.resolve();
     }
 
     try {
@@ -114,9 +116,17 @@ const v_2219b3 = <T extends Record<string, any>>(
   }, []);
 
   const v_98107c = () => {
-    if (!v_683210 && !v_f34bc3 && v_6bbe19) {
-      v_5c29ab(v_7815ff + 1, false);
+
+    if (v_fc9c2f.current || v_683210 || v_f34bc3 || !v_6bbe19) {
+      return;
     }
+
+    v_fc9c2f.current = true;
+
+    v_5c29ab(v_7815ff + 1, false).finally(() => {
+
+      v_fc9c2f.current = false;
+    });
   };
 
   const v_cefe14 = (v_8c0b26, v_a56041): string => {
@@ -144,15 +154,15 @@ const v_2219b3 = <T extends Record<string, any>>(
       showsVerticalScrollIndicator={false}
       onScroll={({ nativeEvent: v_76b943 }) => {
         const { layoutMeasurement: v_6f469f, contentOffset: v_e29918, contentSize: v_d1b3ac } = v_76b943;
-        const v_18f27c = 20;
-        if (
-          v_6f469f.height + v_e29918.y >=
-          v_d1b3ac.height - v_18f27c
-        ) {
+
+        const v_d361d7 = 100; 
+        const v_c5846f = v_d1b3ac.height - (v_6f469f.height + v_e29918.y);
+
+        if (v_c5846f <= v_d361d7) {
           v_98107c();
         }
       }}
-      scrollEventThrottle={400}
+      scrollEventThrottle={16}
     >
       {}
       {v_683210 && (
