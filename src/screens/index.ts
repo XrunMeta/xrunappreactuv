@@ -28,6 +28,7 @@ export { MyInfoScreen } from './MyInfoScreen';
 export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
 export { MyInfoFaqScreen } from './MyInfoFaqScreen';
 export { MyInfoEditScreen } from './MyInfoEditScreen';
+export { PhoneEditScreen } from './PhoneEditScreen';
 export { MyInfoSettingsScreen } from './MyInfoSettingsScreen';
 export { MyInfoCloseMembershipScreen } from './MyInfoCloseMembershipScreen';
 export { MyInfoClausesScreen } from './MyInfoClausesScreen';

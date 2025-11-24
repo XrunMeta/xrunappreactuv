@@ -7,14 +7,26 @@ import {
   v_4623af,
   v_03e392,
   v_39a996,
+  v_9cabcb,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_368e80, v_cb41de, v_89c10a } from '../components';
+import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1 } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_a7ab3c, v_152d53 } from '../services';
+import {
+  v_a7ab3c,
+  v_152d53,
+  v_7f8c9e,
+  v_53d723,
+  v_71d37e,
+  v_07f367,
+  v_60f557,
+  v_11e39e,
+  v_4296b8,
+  v_8025d1,
+} from '../services';
 
 const v_798085 = [
   { value: 'male', label: '남' },
@@ -23,19 +35,61 @@ const v_798085 = [
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
+const v_a1244c = (v_c3eac4): number => {
+  return v_c3eac4 === 'male' ? 2110 : 2111;
+};
+
+const v_d6877d = (v_c3eac4): 'male' | 'female' => {
+  return v_c3eac4 === 2111 ? 'female' : 'male';
+};
+
+const v_e9394b = (v_2694bd): number => {
+  const v_c3889d = {
+    '10': 2210,
+    '20': 2220,
+    '30': 2230,
+    '40': 2240,
+    '50+': 2250,
+  };
+  return v_c3889d[v_2694bd] || 2210;
+};
+
+const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
+  const ageMap: Record<number, (typeof v_0c96f7)[number]> = {
+    2210: '10',
+    2220: '20',
+    2230: '30',
+    2240: '40',
+    2250: '50+',
+  };
+  return v_c3889d[v_2694bd || 2210] || '10';
+};
+
 export const v_cdb169 = () => {
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
-  const { selectedCountryDialCode: v_459d5e } = v_700ef9();
+  const { selectedCountryDialCode: v_459d5e, setVerificationEmail: v_b572c3, setVerificationSuccessRoute: v_8f89f3 } = v_700ef9();
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_d74a81, v_fcce73] = v_5ab095('010 2487 6746');
   const [v_a6c30b, v_c030e3] = v_5ab095('대한민국 서울');
+  const [v_222917, v_b8bf44] = v_5ab095<number | null>(null);
+  const [v_a4d981, v_9b1714] = v_5ab095<number | null>(null);
   const [v_c3eac4, v_bdc43c] = v_5ab095<'male' | 'female'>('male');
   const [v_2694bd, v_6e5c76] = v_5ab095<(typeof v_0c96f7)[number]>('10');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_e495db, v_433822] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
+  const [v_6c7bef, v_7a68da] = v_5ab095<Array<{ country?: string; callnumber?: number; cCode?: number; cName?: string }>>([]);
+  const [v_e94fdf, v_59ad99] = v_5ab095<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
+  const [v_0899ab, v_3400e8] = v_5ab095<number | null>(null);
+  const [v_2f03bc, v_2f2d51] = v_5ab095<number | null>(null);
+  const [v_0908db, v_1c41ce] = v_5ab095(false);
+
+  const [v_add96c, v_85a493] = v_5ab095<{ cDesc: string; cCode: number | null }>({ cDesc: '', cCode: null });
+  const [v_167c8b, v_655be9] = v_5ab095<{ rDesc: string; rCode: number | null }>({ rDesc: '', rCode: null });
+  const [v_ebf41b, v_fb6de4] = v_5ab095(false);
+  const [v_8e8ba2, v_9a2d44] = v_5ab095(false);
 
   v_c4deb2(() => {
     const v_ea3fa6 = async () => {
@@ -55,6 +109,60 @@ export const v_cdb169 = () => {
               v_b7613d(v_625c74.lastname || '');
               v_fedf34(v_625c74.email || '');
 
+              if (v_625c74.mobile) {
+                v_fcce73(v_625c74.mobile.replace(/\s/g, ''));
+              }
+
+              v_bdc43c(v_d6877d(v_625c74.gender));
+
+              v_6e5c76(v_596588(v_625c74.ages));
+
+              if (v_625c74.country) {
+                v_9b1714(v_625c74.country);
+                v_3400e8(v_625c74.country);
+
+                try {
+                  const v_e7edd4 = await v_60f557(v_9b57fc);
+                  const v_3a56f1 = v_e7edd4.data || [];
+                  v_7a68da(v_3a56f1);
+
+                  const v_a54b0c = v_3a56f1.find((v_3f4e2e) => (v_3f4e2e.cCode === v_625c74.country || v_3f4e2e.callnumber === v_625c74.country));
+                  const v_67cb9c = v_a54b0c?.country || v_a54b0c?.cName || '';
+                  const v_a4d981 = v_a54b0c?.callnumber || v_a54b0c?.cCode || v_625c74.country;
+
+                  v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
+
+                  if (v_625c74.region) {
+                    v_b8bf44(v_625c74.region);
+                    v_2f2d51(v_625c74.region);
+
+                    const v_878b8c = await v_11e39e(v_625c74.country, v_9b57fc);
+                    const v_13de92 = v_878b8c.data || [];
+                    v_59ad99(v_13de92);
+
+                    const v_8098b2 = v_13de92.find((v_cb35cb) => (v_cb35cb.subcode === v_625c74.region || v_cb35cb.rCode === v_625c74.region));
+                    const v_638c4d = v_8098b2?.description || v_8098b2?.rName || '';
+                    const v_222917 = v_8098b2?.subcode || v_8098b2?.rCode || v_625c74.region;
+
+                    v_655be9({ rDesc: v_638c4d, rCode: v_222917 });
+
+                    if (v_638c4d) {
+                      v_c030e3(`${v_67cb9c} ${v_638c4d}`);
+                    }
+                  } else {
+
+                    v_655be9({ rDesc: 'Please Select', rCode: 0 });
+                  }
+                } catch (v_5e9bfe) {
+                  console.error('[정보수정] 국가/지역 정보 로드 실패:', v_5e9bfe);
+                }
+              } else if (v_625c74.region) {
+                v_b8bf44(v_625c74.region);
+              } else {
+
+                v_85a493({ cDesc: '', cCode: null });
+                v_655be9({ rDesc: 'Please Select', rCode: 0 });
+              }
             }
           }
         }
@@ -76,6 +184,11 @@ export const v_cdb169 = () => {
       return;
     }
 
+    if (!v_328bb4.trim()) {
+      v_03e392.alert('오류', '성을 입력해주세요.');
+      return;
+    }
+
     if (!v_717992) {
       v_03e392.alert('오류', '사용자 정보를 불러올 수 없습니다.');
       return;
@@ -84,9 +197,48 @@ export const v_cdb169 = () => {
     v_433822(true);
 
     try {
-      console.log('[정보수정] 이름 수정 시도:', { memberId: v_717992, firstname: v_a32a50 });
+      console.log('[정보수정] 정보 수정 시도:', {
+        memberId: v_717992,
+        firstName: v_a32a50.trim(),
+        lastName: v_328bb4.trim(),
+        phone: v_d74a81.replace(/\s/g, ''),
+        gender: v_a1244c(v_c3eac4),
+        age: v_e9394b(v_2694bd),
+      });
 
-      await v_152d53(v_717992, v_a32a50.trim(), v_9b57fc);
+      const v_e01f71 = [];
+
+      if (v_a32a50.trim()) {
+        v_e01f71.push(v_152d53(v_717992, v_a32a50.trim(), v_9b57fc));
+      }
+
+      if (v_328bb4.trim()) {
+        v_e01f71.push(v_7f8c9e(v_717992, v_328bb4.trim(), v_9b57fc));
+      }
+
+      if (v_add96c.cCode && v_167c8b.rCode && v_167c8b.rCode !== 0) {
+        v_e01f71.push(v_4296b8(v_717992, v_add96c.cCode, v_167c8b.rCode, v_9b57fc));
+      } else if (v_167c8b.rCode === 0) {
+        v_03e392.alert('오류', '지역을 선택해주세요.');
+        v_433822(false);
+        return;
+      }
+
+      const v_d199d8 = v_a1244c(v_c3eac4);
+      if (v_d199d8 !== undefined && v_d199d8 !== null) {
+        v_e01f71.push(v_71d37e(v_717992, v_d199d8, v_9b57fc));
+      } else {
+        console.warn('[정보수정] 성별 값이 유효하지 않습니다:', v_c3eac4);
+      }
+
+      const v_2d2cbc = v_e9394b(v_2694bd);
+      if (v_2d2cbc !== undefined && v_2d2cbc !== null) {
+        v_e01f71.push(v_07f367(v_717992, v_2d2cbc, v_9b57fc));
+      } else {
+        console.warn('[정보수정] 나이 값이 유효하지 않습니다:', v_2694bd);
+      }
+
+      await Promise.all(v_e01f71);
 
       v_03e392.alert('저장 완료', '변경 사항이 저장되었습니다.', [
         {
@@ -102,8 +254,8 @@ export const v_cdb169 = () => {
         },
       ]);
     } catch (v_5e9bfe) {
-      console.error('[정보수정] 이름 수정 실패:', v_5e9bfe);
-      v_03e392.alert('저장 실패', '이름 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('[정보수정] 정보 수정 실패:', v_5e9bfe);
+      v_03e392.alert('저장 실패', '정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       v_433822(false);
     }
@@ -111,6 +263,183 @@ export const v_cdb169 = () => {
 
   const v_c09605 = () => {
     v_03e392.alert('비밀번호 변경', '비밀번호 변경 프로세스는 추후 연동됩니다.');
+  };
+
+  const v_801fea = async () => {
+    if (!v_e0c7e8) {
+      v_03e392.alert('오류', '이메일 정보가 없습니다.');
+      return;
+    }
+
+    try {
+
+      const v_b97179 = async () => {
+        try {
+          return await v_8025d1(v_e0c7e8, v_9b57fc);
+        } catch (v_5e9bfe) {
+          console.error('[정보수정] 이메일 인증 코드 발송 오류:', v_5e9bfe);
+          return false;
+        }
+      };
+
+      const v_43c42e = await Promise.race([
+        v_b97179(),
+        new Promise<boolean>((v_6f7712) => setTimeout(() => v_6f7712(false), 5000)),
+      ]);
+
+      if (v_43c42e) {
+
+        v_b572c3(v_e0c7e8);
+        v_8f89f3(v_ce4741.myInfoPhoneEdit); 
+        v_9b57fc(v_ce4741.verificationCode);
+      } else {
+        v_03e392.alert('오류', '이메일 인증 코드 발송에 실패했습니다. 다시 시도해주세요.', [
+          {
+            text: '확인',
+            onPress: () => {
+
+            },
+          },
+        ]);
+      }
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
+      v_03e392.alert('오류', '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const v_6c56d6 = async () => {
+    try {
+
+      if (v_6c7bef.length === 0) {
+        const v_e7edd4 = await v_60f557(v_9b57fc);
+        const v_3a56f1 = v_e7edd4.data || [];
+        v_7a68da(v_3a56f1);
+      }
+      v_fb6de4(true);
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 국가 목록 로드 실패:', v_5e9bfe);
+      v_03e392.alert('오류', '국가 목록을 불러오는데 실패했습니다.');
+    }
+  };
+
+  const v_de4c95 = async () => {
+    try {
+
+      if (!v_add96c.cCode) {
+        v_03e392.alert('알림', '먼저 국가를 선택해주세요.');
+        v_6c56d6();
+        return;
+      }
+
+      v_1c41ce(true);
+      const v_878b8c = await v_11e39e(v_add96c.cCode, v_9b57fc);
+      const v_13de92 = v_878b8c.data || [];
+      console.log('[정보수정] 지역 목록 로드 성공 (지역 다이얼로그 열기):', {
+        countryCode: v_add96c.cCode,
+        regionsCount: v_13de92.length,
+        regions: v_13de92.map((v_cb35cb) => ({ description: v_cb35cb.description, subcode: v_cb35cb.subcode, rCode: v_cb35cb.rCode, rName: v_cb35cb.rName })),
+      });
+
+      const v_d6b2ba = v_13de92.filter((v_cb35cb) => {
+        const v_8ee96c = v_cb35cb.subcode !== undefined && v_cb35cb.subcode !== null;
+        const v_dd5fdb = v_cb35cb.rCode !== undefined && v_cb35cb.rCode !== null;
+        return v_8ee96c || v_dd5fdb;
+      });
+      console.log('[정보수정] 유효한 지역 목록 (다이얼로그):', v_d6b2ba.length, v_d6b2ba);
+      v_59ad99(v_d6b2ba);
+      v_9a2d44(true);
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 지역 목록 로드 실패:', v_5e9bfe);
+      v_03e392.alert('오류', '지역 목록을 불러오는데 실패했습니다.');
+    } finally {
+      v_1c41ce(false);
+    }
+  };
+
+  const v_261e69 = async (v_b9bbbd) => {
+
+    if (v_0908db) {
+      return;
+    }
+
+    try {
+      const v_a4d981 = v_b9bbbd.callnumber || v_b9bbbd.cCode;
+      const v_67cb9c = v_b9bbbd.country || v_b9bbbd.cName || '';
+
+      if (!v_a4d981) {
+        v_03e392.alert('오류', '국가 코드를 찾을 수 없습니다.');
+        return;
+      }
+
+      v_1c41ce(true);
+
+      v_85a493({
+        cDesc: v_67cb9c,
+        cCode: v_a4d981,
+      });
+
+      v_655be9({
+        rDesc: 'Please Select',
+        rCode: 0,
+      });
+
+      v_59ad99([]);
+
+      const v_878b8c = await v_11e39e(v_a4d981, v_9b57fc);
+      const v_13de92 = v_878b8c.data || [];
+      console.log('[정보수정] 지역 목록 로드 성공 (국가 선택):', {
+        country: v_67cb9c,
+        countryCode: v_a4d981,
+        regionsCount: v_13de92.length,
+        regions: v_13de92.map((v_cb35cb) => ({ description: v_cb35cb.description, subcode: v_cb35cb.subcode, rCode: v_cb35cb.rCode, rName: v_cb35cb.rName })),
+        rawResponse: JSON.stringify(v_878b8c),
+      });
+
+      const v_d6b2ba = v_13de92.filter((v_cb35cb) => {
+        const v_8ee96c = v_cb35cb.subcode !== undefined && v_cb35cb.subcode !== null;
+        const v_dd5fdb = v_cb35cb.rCode !== undefined && v_cb35cb.rCode !== null;
+        return v_8ee96c || v_dd5fdb;
+      });
+      console.log('[정보수정] 유효한 지역 목록:', v_d6b2ba.length, v_d6b2ba);
+      v_59ad99(v_d6b2ba);
+
+      if (v_d6b2ba.length === 0) {
+        console.warn('[정보수정] 해당 국가의 지역 목록이 없습니다.');
+      }
+
+      v_fb6de4(false);
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 지역 목록 로드 실패:', v_5e9bfe);
+      v_03e392.alert('오류', '지역 목록을 불러오는데 실패했습니다.');
+    } finally {
+      v_1c41ce(false);
+    }
+  };
+
+  const v_c37f33 = (v_a6c30b) => {
+    const v_222917 = v_a6c30b.subcode || v_a6c30b.rCode;
+    const v_638c4d = v_a6c30b.description || v_a6c30b.rName || '';
+
+    if (!v_222917) {
+      v_03e392.alert('오류', '지역 코드를 찾을 수 없습니다.');
+      return;
+    }
+
+    v_655be9({
+      rDesc: v_638c4d,
+      rCode: v_222917,
+    });
+
+    v_9a2d44(false);
+  };
+
+  const v_627a4f = () => {
+    v_fb6de4(false);
+  };
+
+  const v_d5414b = () => {
+    v_9a2d44(false);
   };
 
   return (
@@ -146,15 +475,12 @@ export const v_cdb169 = () => {
               placeholder="Enter last name"
               editable={!v_e495db}
             />
-            <FormField
-              label="Email"
-              value={v_e0c7e8}
-              onChangeText={v_fedf34}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              placeholder="Enter email address"
-              editable={!v_e495db}
-            />
+            <View style={v_d81136.fieldContainer}>
+              <Text style={v_d81136.label}>Email</Text>
+              <View style={v_d81136.disabledInput}>
+                <Text style={v_d81136.disabledText}>{v_e0c7e8 || 'Enter email address'}</Text>
+              </View>
+            </View>
 
           <View style={v_d81136.inlineLabelRow}>
             <Text style={v_d81136.sectionLabel}>Password</Text>
@@ -166,33 +492,55 @@ export const v_cdb169 = () => {
             <Text style={v_d81136.readonlyText}>최종변경날짜  : 2025.05.02</Text>
           </View>
 
-            <FormField
-              label="Phone Number"
-              value={v_d74a81}
-              onChangeText={v_fcce73}
-              keyboardType="phone-pad"
-              placeholder="Enter phone number"
-              editable={!v_e495db}
-              leftAccessory={
+            <View style={v_d81136.fieldContainer}>
+              <Text style={v_d81136.label}>Phone Number</Text>
+              <View style={v_d81136.phoneFieldContainer}>
+                {}
+                <View style={v_d81136.phonePrefixDisabled}>
+                  <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
+                  <Text style={v_d81136.phonePrefixTextDisabled}>
+                    +{v_459d5e.dialCode.replace('+', '')}
+                  </Text>
+                </View>
+                {}
                 <TouchableOpacity
-                  style={v_d81136.phonePrefix}
-                  onPress={() => v_9b57fc('countryCodeSelect')}
+                  style={v_d81136.phoneValueContainer}
+                  onPress={v_801fea}
                   activeOpacity={0.7}
                   disabled={v_e495db}
                 >
-                  <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
-                  <Text style={v_d81136.phonePrefixText}>{v_459d5e.dialCode}</Text>
+                  <Text style={v_d81136.phoneValue}>{v_d74a81}</Text>
                 </TouchableOpacity>
-              }
-            />
+              </View>
+            </View>
 
-            <FormField
-              label="Region"
-              value={v_a6c30b}
-              onChangeText={v_c030e3}
-              placeholder="지역을 입력하세요"
-              editable={!v_e495db}
-            />
+            <View style={v_d81136.fieldContainer}>
+              <Text style={v_d81136.label}>Region</Text>
+              <View style={v_d81136.regionFieldContainer}>
+                <TouchableOpacity
+                  style={v_d81136.regionField}
+                  onPress={v_6c56d6}
+                  activeOpacity={0.7}
+                  disabled={v_e495db}
+                >
+                  <Text style={[v_d81136.regionValue, !v_add96c.cDesc && v_d81136.regionPlaceholder]}>
+                    {v_add96c.cDesc ? `${v_add96c.cDesc} (+${v_add96c.cCode})` : '국가를 선택하세요'}
+                  </Text>
+                  <Text style={v_d81136.arrow}>›</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={v_d81136.regionField}
+                  onPress={v_de4c95}
+                  activeOpacity={0.7}
+                  disabled={v_e495db || !v_add96c.cCode}
+                >
+                  <Text style={[v_d81136.regionValue, (!v_167c8b.rDesc || v_167c8b.rDesc === 'Please Select') && v_d81136.regionPlaceholder]}>
+                    {v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' ? v_167c8b.rDesc : '지역을 선택하세요'}
+                  </Text>
+                  <Text style={v_d81136.arrow}>›</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <View style={v_d81136.formGroup}>
               <Text style={v_d81136.sectionLabel}>성별</Text>
@@ -250,6 +598,100 @@ export const v_cdb169 = () => {
           )}
         </View>
       </ScrollView>
+
+      {}
+      <Dialog
+        visible={v_ebf41b}
+        title="국가 선택"
+        onClose={v_627a4f}
+        containerStyle={v_d81136.dialogContainer}
+      >
+        <FlatList
+          data={v_6c7bef}
+          keyExtractor={(v_8c0b26, v_a56041) => {
+            const v_a4d981 = v_8c0b26.callnumber || v_8c0b26.cCode;
+            return v_a4d981 ? `country-${v_a4d981}-${v_a56041}` : `country-${v_a56041}`;
+          }}
+          renderItem={({ item: v_8c0b26 }) => {
+            const v_a4d981 = v_8c0b26.callnumber || v_8c0b26.cCode;
+            const v_67cb9c = v_8c0b26.country || v_8c0b26.cName || '국가명 없음';
+            const v_599a41 = v_add96c.cCode === v_a4d981;
+
+            return (
+              <TouchableOpacity
+                style={[
+                  v_d81136.listItem,
+                  v_599a41 && v_d81136.listItemSelected,
+                  v_0908db && v_d81136.listItemDisabled,
+                ]}
+                onPress={() => v_261e69(v_8c0b26)}
+                activeOpacity={0.7}
+                disabled={v_0908db}
+              >
+                <Text style={v_d81136.listItemText}>{v_67cb9c}</Text>
+                {v_599a41 && (
+                  <Text style={v_d81136.checkmark}>✓</Text>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          contentContainerStyle={v_d81136.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={v_d81136.emptyContainer}>
+              <Text style={v_d81136.emptyText}>국가 목록이 없습니다.</Text>
+            </View>
+          }
+        />
+      </Dialog>
+
+      {}
+      <Dialog
+        visible={v_8e8ba2}
+        title="지역 선택"
+        onClose={v_d5414b}
+        containerStyle={v_d81136.dialogContainer}
+      >
+        <FlatList
+          data={v_e94fdf}
+          keyExtractor={(v_8c0b26, v_a56041) => {
+            const v_222917 = v_8c0b26.subcode || v_8c0b26.rCode;
+
+            return v_222917 !== undefined && v_222917 !== null 
+              ? `region-${v_add96c.cCode}-${v_222917}-${v_a56041}` 
+              : `region-${v_add96c.cCode}-${v_a56041}`;
+          }}
+          renderItem={({ item: v_8c0b26 }) => {
+            const v_222917 = v_8c0b26.subcode !== undefined ? v_8c0b26.subcode : (v_8c0b26.rCode !== undefined ? v_8c0b26.rCode : null);
+            const v_638c4d = v_8c0b26.description || v_8c0b26.rName || '지역명 없음';
+
+            const v_599a41 = v_167c8b.rCode === v_222917 && v_167c8b.rDesc !== 'Please Select';
+
+            return (
+              <TouchableOpacity
+                style={[
+                  v_d81136.listItem,
+                  v_599a41 && v_d81136.listItemSelected,
+                ]}
+                onPress={() => v_c37f33(v_8c0b26)}
+                activeOpacity={0.7}
+              >
+                <Text style={v_d81136.listItemText}>{v_638c4d}</Text>
+                {v_599a41 && (
+                  <Text style={v_d81136.checkmark}>✓</Text>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          contentContainerStyle={v_d81136.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={v_d81136.emptyContainer}>
+              <Text style={v_d81136.emptyText}>지역 목록이 없습니다.</Text>
+            </View>
+          }
+        />
+      </Dialog>
     </View>
   );
 };
@@ -300,22 +742,44 @@ const v_d81136 = v_472849.create({
     color: '#1a2e35',
     fontFamily: 'Roboto-Bold',
   },
-  phonePrefix: {
+  phoneFieldContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: 12,
-    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#dedede',
+    borderRadius: 10,
+    backgroundColor: '#fefefe',
+    minHeight: 52,
+    overflow: 'hidden',
+  },
+  phonePrefixDisabled: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderRightWidth: 1,
     borderRightColor: '#ededed',
+    backgroundColor: '#f5f5f5',
   },
   flagEmoji: {
     fontSize: 20,
     marginRight: 6,
   },
-  phonePrefixText: {
+  phonePrefixTextDisabled: {
     fontSize: 16,
     fontFamily: 'Roboto-Medium',
-    color: '#1a2e35',
+    color: '#a8a8a7',
+  },
+  phoneValueContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    justifyContent: 'center',
+  },
+  phoneValue: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#343a59',
   },
   formGroup: {
     marginTop: 24,
@@ -353,6 +817,130 @@ const v_d81136 = v_472849.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fieldContainer: {
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 16,
+    color: '#2a2727',
+    fontFamily: 'Roboto-Medium',
+    marginBottom: 8,
+  },
+  phoneField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#dedede',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    minHeight: 56,
+  },
+  phoneValue: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
+    color: '#1a2e35',
+    marginLeft: 12,
+  },
+  editHint: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#707070',
+    marginLeft: 8,
+  },
+  regionFieldContainer: {
+    gap: 12,
+  },
+  regionField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#dedede',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    minHeight: 56,
+  },
+  regionValue: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
+    color: '#1a2e35',
+  },
+  regionPlaceholder: {
+    color: '#dedede',
+  },
+  arrow: {
+    fontSize: 24,
+    color: '#747474',
+    marginLeft: 8,
+  },
+  dialogContainer: {
+    maxWidth: 400,
+    maxHeight: 600,
+  },
+  listContainer: {
+    paddingVertical: 8,
+    maxHeight: 400,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+  },
+  listItemSelected: {
+    borderColor: v_1bfbd0.buttonPrimary,
+    backgroundColor: '#f5f6fa',
+  },
+  listItemDisabled: {
+    opacity: 0.5,
+  },
+  listItemText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#1a2e35',
+  },
+  checkmark: {
+    fontSize: 18,
+    color: v_1bfbd0.buttonPrimary,
+    fontFamily: 'Roboto-Bold',
+  },
+  disabledInput: {
+    borderWidth: 1,
+    borderColor: '#dedede',
+    borderRadius: 10,
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    minHeight: 56,
+    justifyContent: 'center',
+  },
+  disabledText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
+  },
+  emptyContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
   },
 });
 

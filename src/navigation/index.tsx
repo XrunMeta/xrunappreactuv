@@ -32,6 +32,7 @@ export const v_ce4741 = {
   myInfo: 'myInfo',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoEdit: 'myInfoEdit',
+  myInfoPhoneEdit: 'myInfoPhoneEdit',
   myInfoSettings: 'myInfoSettings',
   myInfoCloseMembership: 'myInfoCloseMembership',
   myInfoClauses: 'myInfoClauses',

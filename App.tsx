@@ -27,6 +27,7 @@ import {
   v_03a231,
   v_dec378,
   v_cdb169,
+  v_e14579,
   v_4a40b2,
   v_9e06f6,
   v_41dfd5,
@@ -157,6 +158,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myInfoEdit') {
     return <MyInfoEditScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoPhoneEdit') {
+    return <PhoneEditScreen />;
   }
 
   if (v_0f0c7b === 'myInfoSettings') {
