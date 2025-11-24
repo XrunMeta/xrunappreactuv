@@ -35,6 +35,8 @@ import {
   GetMyPageUserInfoResponse,
   UpdateNameRequest,
   UpdateNameResponse,
+  UpdatePhoneRequest,
+  UpdatePhoneResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -793,6 +795,46 @@ export const updateName = async (
     console.error('[마이페이지] 이름 수정 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updatePhone = async (
+  member: number,
+  mobile: string,
+  mobilecode: number,
+  navigation?: any,
+): Promise<UpdatePhoneResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdatePhoneRequest = {
+      member,
+      mobile,
+      mobilecode,
+    };
+
+    console.log('[전화번호수정] 전화번호 수정 요청:', { member, mobile, mobilecode });
+
+    const response = await axiosInstance.post<UpdatePhoneResponse>(
+      '/app7153-03',
+      request,
+    );
+
+    console.log('[전화번호수정] 전화번호 수정 성공:', response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error('[전화번호수정] 전화번호 수정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[전화번호수정] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

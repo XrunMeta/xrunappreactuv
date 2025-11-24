@@ -244,3 +244,18 @@ export interface UpdateNameResponse {
   [key: string]: any;
 }
 
+export interface UpdatePhoneRequest {
+  member: number;
+  mobile: string;
+  mobilecode: number;
+}
+
+export interface UpdatePhoneResponse {
+  data?: Array<{
+    count?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
