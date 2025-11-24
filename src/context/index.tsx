@@ -31,6 +31,21 @@ type AppContextValue = {
   resetSelectedRegion: () => void;
   selectMode: 'country' | 'region';
   setSelectMode: (mode: 'country' | 'region') => void;
+
+  signupFormData: {
+    familyName: string;
+    givenName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    region: string;
+    referralEmail: string;
+    gender: 'male' | 'female';
+    ageRange: '10' | '20' | '30' | '40' | '50+';
+    termsAccepted: boolean;
+  };
+  setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => void;
+  resetSignupFormData: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -48,6 +63,18 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
   const [selectedRegion, setSelectedRegion] = useState<CountryDialCode | null>(null);
   const [selectMode, setSelectMode] = useState<'country' | 'region'>('country');
+  const [signupFormData, setSignupFormDataState] = useState<AppContextValue['signupFormData']>({
+    familyName: '',
+    givenName: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    region: '',
+    referralEmail: '',
+    gender: 'male',
+    ageRange: '10',
+    termsAccepted: true,
+  });
 
   const value = useMemo(
     () => ({
@@ -77,6 +104,24 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       resetSelectedRegion: () => setSelectedRegion(null),
       selectMode,
       setSelectMode,
+      signupFormData,
+      setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => {
+        setSignupFormDataState((prev) => ({ ...prev, ...data }));
+      },
+      resetSignupFormData: () => {
+        setSignupFormDataState({
+          familyName: '',
+          givenName: '',
+          email: '',
+          password: '',
+          phoneNumber: '',
+          region: '',
+          referralEmail: '',
+          gender: 'male',
+          ageRange: '10',
+          termsAccepted: true,
+        });
+      },
     }),
     [
       walletSendAddress,
@@ -89,6 +134,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedCountryDialCode,
       selectedRegion,
       selectMode,
+      signupFormData,
     ],
   );
 

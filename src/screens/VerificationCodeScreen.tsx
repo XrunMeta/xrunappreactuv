@@ -7,13 +7,21 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { sendEmailVerificationCode, verifyEmailCode } from '../services';
+import {
+  verifyEmailCode,
+  loginWithEmailAuth,
+  encryptSHA256,
+  saveSession,
+  sendEmailVerificationCode,
+} from '../services';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
@@ -22,7 +30,11 @@ const keypadLayout = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0
 
 export const VerificationCodeScreen = () => {
   const { goBack, reset, navigate } = useAppNavigation();
-  const { verificationSuccessRoute, resetVerificationSuccessRoute, verificationEmail } = useAppContext();
+  const {
+    verificationSuccessRoute,
+    resetVerificationSuccessRoute,
+    verificationEmail,
+  } = useAppContext();
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -62,28 +74,71 @@ export const VerificationCodeScreen = () => {
     }
 
     if (code.length !== CODE_LENGTH) {
-      Alert.alert('인증 코드 입력', '6자리 인증 코드를 모두 입력해주세요.');
+      Alert.alert('인증 코드 입력', '6자리 인증 코드를 입력해주세요.');
       return;
     }
 
+    setIsVerifying(true);
+
     try {
-      setIsVerifying(true);
-      console.log('[정보수정] 인증 코드 확인 요청:', { email: verificationEmail, code });
 
-      const success = await verifyEmailCode(verificationEmail, code, navigate);
+      console.log('[인증] 이메일 인증 코드 확인 요청:', verificationEmail);
+      const codeVerified = await verifyEmailCode(verificationEmail, code, navigate);
 
-      if (success) {
-        console.log('[정보수정] 인증 코드 확인 성공');
-        reset(verificationSuccessRoute);
-        resetVerificationSuccessRoute();
-      } else {
+      if (!codeVerified) {
         Alert.alert('인증 실패', '인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
-        setCode('');
+        setIsVerifying(false);
+        return;
+      }
+
+      if (verificationSuccessRoute === ROUTES.login || verificationSuccessRoute === ROUTES.map) {
+
+        console.log('[로그인] 이메일 로그인 요청:', verificationEmail);
+        const loginResponse = await loginWithEmailAuth(verificationEmail, navigate);
+
+        if (loginResponse.status !== 'success') {
+          Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          setIsVerifying(false);
+          return;
+        }
+
+        const userData = loginResponse.data[0];
+        if (!userData || !userData.member) {
+          Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          setIsVerifying(false);
+          return;
+        }
+
+        const extrastr = userData.extrastr;
+        if (extrastr) {
+          const ssidw = encryptSHA256(extrastr);
+          const sessionSaved = await saveSession(userData.member, ssidw, navigate);
+          if (!sessionSaved) {
+            console.warn('[로그인] 세션 저장 실패');
+          }
+        }
+
+        await AsyncStorage.removeItem('userData');
+        await AsyncStorage.removeItem('userSessionToken');
+        await AsyncStorage.setItem('userEmail', verificationEmail);
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        const sessionToken = userData.extrastr || '';
+        await AsyncStorage.setItem('userSessionToken', sessionToken);
+        await AsyncStorage.setItem('isLoggedIn', 'true');
+
+        console.log('[로그인] 이메일 인증 로그인 성공');
+
+        resetVerificationSuccessRoute();
+        reset(verificationSuccessRoute || ROUTES.map);
+      } else {
+
+        console.log('[정보수정] 인증 코드 확인 성공');
+        resetVerificationSuccessRoute();
+        reset(verificationSuccessRoute);
       }
     } catch (error) {
-      console.error('[정보수정] 인증 코드 확인 오류:', error);
-      Alert.alert('인증 실패', '인증 코드 확인 중 오류가 발생했습니다.');
-      setCode('');
+      console.error('[인증] 인증 코드 확인 오류:', error);
+      Alert.alert('오류', '인증 처리 중 오류가 발생했습니다.');
     } finally {
       setIsVerifying(false);
     }
@@ -95,13 +150,13 @@ export const VerificationCodeScreen = () => {
       return;
     }
 
+    setIsResending(true);
+
     try {
-      setIsResending(true);
-      console.log('[정보수정] 인증 코드 재전송 요청:', verificationEmail);
+      console.log('[인증] 이메일 인증 코드 재전송 요청:', verificationEmail);
+      const codeSent = await sendEmailVerificationCode(verificationEmail, navigate);
 
-      const success = await sendEmailVerificationCode(verificationEmail, navigate);
-
-      if (success) {
+      if (codeSent) {
         setSecondsLeft(RESEND_SECONDS);
         setCode('');
         Alert.alert('재전송 완료', '인증 코드를 다시 전송했습니다.');
@@ -109,8 +164,8 @@ export const VerificationCodeScreen = () => {
         Alert.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      console.error('[정보수정] 인증 코드 재전송 오류:', error);
-      Alert.alert('재전송 실패', '인증 코드 재전송 중 오류가 발생했습니다.');
+      console.error('[인증] 인증 코드 재전송 오류:', error);
+      Alert.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
     } finally {
       setIsResending(false);
     }
@@ -144,23 +199,33 @@ export const VerificationCodeScreen = () => {
           activeOpacity={secondsLeft <= 0 && !isResending ? 0.7 : 1}
           disabled={secondsLeft > 0 || isResending}
         >
-          <Text style={styles.resendText}>
-            {isResending ? '재전송 중...' : '코드 재전송'}{' '}
-            {secondsLeft > 0 && (
-              <Text style={styles.resendTimer} numberOfLines={1}>
-                {formattedTimer}
-              </Text>
-            )}
-          </Text>
+          {isResending ? (
+            <ActivityIndicator size="small" color="#2873ff" />
+          ) : (
+            <Text style={styles.resendText}>
+              코드 재전송{' '}
+              {secondsLeft > 0 && (
+                <Text style={styles.resendTimer} numberOfLines={1}>
+                  {formattedTimer}
+                </Text>
+              )}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.buttonWrapper}>
-          <PrimaryButton
-            title={isVerifying ? '확인 중...' : 'Verify'}
-            onPress={handleVerify}
-            fullWidth
-            disabled={code.length !== CODE_LENGTH || isVerifying}
-          />
+          {isVerifying ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          ) : (
+            <PrimaryButton
+              title="Verify"
+              onPress={handleVerify}
+              fullWidth
+              disabled={code.length !== CODE_LENGTH || isVerifying}
+            />
+          )}
         </View>
 
         <View style={styles.keyboardContainer}>
@@ -301,5 +366,10 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 9,
   },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
-

@@ -41,18 +41,65 @@ type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
   const { goBack, navigate, reset } = useAppNavigation();
-  const { selectedCountryDialCode, selectedRegion, setSelectMode } = useAppContext();
-  const [familyName, setFamilyName] = useState('');
-  const [givenName, setGivenName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [region, setRegion] = useState('');
-  const [referralEmail, setReferralEmail] = useState('');
-  const [gender, setGender] = useState<GenderValue>('male');
-  const [ageRange, setAgeRange] = useState<AgeValue>('10');
-  const [termsAccepted, setTermsAccepted] = useState(true);
+  const {
+    selectedCountryDialCode,
+    selectedRegion,
+    setSelectMode,
+    signupFormData,
+    setSignupFormData,
+    resetSignupFormData,
+  } = useAppContext();
+  const [familyName, setFamilyName] = useState(signupFormData.familyName);
+  const [givenName, setGivenName] = useState(signupFormData.givenName);
+  const [email, setEmail] = useState(signupFormData.email);
+  const [password, setPassword] = useState(signupFormData.password);
+  const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
+  const [region, setRegion] = useState(signupFormData.region);
+  const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
+  const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
+  const [ageRange, setAgeRange] = useState<AgeValue>(signupFormData.ageRange);
+  const [termsAccepted, setTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    setFamilyName(signupFormData.familyName);
+    setGivenName(signupFormData.givenName);
+    setEmail(signupFormData.email);
+    setPassword(signupFormData.password);
+    setPhoneNumber(signupFormData.phoneNumber);
+    setRegion(signupFormData.region);
+    setReferralEmail(signupFormData.referralEmail);
+    setGender(signupFormData.gender);
+    setAgeRange(signupFormData.ageRange);
+    setTermsAccepted(signupFormData.termsAccepted);
+  }, []); 
+
+  React.useEffect(() => {
+    setSignupFormData({
+      familyName,
+      givenName,
+      email,
+      password,
+      phoneNumber,
+      region,
+      referralEmail,
+      gender,
+      ageRange,
+      termsAccepted,
+    });
+  }, [
+    familyName,
+    givenName,
+    email,
+    password,
+    phoneNumber,
+    region,
+    referralEmail,
+    gender,
+    ageRange,
+    termsAccepted,
+    setSignupFormData,
+  ]);
 
   const handleSubmit = async () => {
 
@@ -185,6 +232,8 @@ export const SignupScreen = () => {
         {
           text: '확인',
           onPress: () => {
+
+            resetSignupFormData();
             reset('authLanding');
             navigate('login');
           },
