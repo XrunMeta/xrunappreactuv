@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -29,6 +29,46 @@ export const v_f4f851 = () => {
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
   const v_0d972d = v_ce4741.emailVerification;
+
+  v_c4deb2(() => {
+    const v_2a6af5 = async () => {
+      try {
+        const v_05155e = await v_e84827.getItem('rememberMe');
+        if (v_05155e === 'true') {
+          const v_60fc43 = await v_e84827.getItem('userEmail');
+          if (v_60fc43) {
+            v_fedf34(v_60fc43);
+            v_d32265(true);
+            console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[로그인] 저장된 이메일 불러오기 실패:', v_5e9bfe);
+      }
+    };
+    v_2a6af5();
+  }, []);
+
+  const v_709e4f = async () => {
+    const v_ef3163 = !v_9fe81c;
+    v_d32265(v_ef3163);
+
+    try {
+      if (v_ef3163 && v_e0c7e8.trim()) {
+
+        await v_e84827.setItem('rememberMe', 'true');
+        await v_e84827.setItem('userEmail', v_e0c7e8.trim());
+        console.log('[로그인] 아이디 저장 완료:', v_e0c7e8.trim());
+      } else {
+
+        await v_e84827.removeItem('rememberMe');
+
+        console.log('[로그인] 아이디 저장 해제');
+      }
+    } catch (v_5e9bfe) {
+      console.error('[로그인] 아이디 저장/해제 실패:', v_5e9bfe);
+    }
+  };
 
   const v_ec4736 = async () => {
 
@@ -76,7 +116,6 @@ export const v_f4f851 = () => {
         }
       }
 
-      await v_e84827.removeItem('userEmail');
       await v_e84827.removeItem('userData');
       await v_e84827.removeItem('userSessionToken');
 
@@ -88,8 +127,10 @@ export const v_f4f851 = () => {
 
       if (v_9fe81c) {
         await v_e84827.setItem('rememberMe', 'true');
+
       } else {
         await v_e84827.removeItem('rememberMe');
+
       }
 
       await v_e84827.setItem('isLoggedIn', 'true');
@@ -160,7 +201,7 @@ export const v_f4f851 = () => {
           <FormCheckbox
             label="아이디 기억하기"
             checked={v_9fe81c}
-            onToggle={() => v_d32265((v_ba2215) => !v_ba2215)}
+            onToggle={v_709e4f}
             variant="circle"
             disabled={v_cd31a8}
           />
