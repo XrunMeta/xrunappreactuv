@@ -10,11 +10,12 @@ import {
   Pressable,
   Animated,
   Easing,
+  TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { BottomNavigationBar } from '../components';
+import { BottomNavigationBar, ChoiceDialog } from '../components';
 import { COLORS } from '../constants';
 import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -106,6 +107,9 @@ export const MapMainScreen: React.FC = () => {
   const [showBottomPanel, setShowBottomPanel] = useState(true);
 
   const bottomPanelBottom = useRef(new Animated.Value(90)).current; 
+
+  const [showTestDialog, setShowTestDialog] = useState(false);
+  const [showMultiStepDialog, setShowMultiStepDialog] = useState(false);
 
   const [dummySpotData] = useState({
     distance: 2.53, 
@@ -301,6 +305,24 @@ export const MapMainScreen: React.FC = () => {
             />
           </View>
         )}
+
+        {}
+        <View style={styles.testButtonContainer}>
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => setShowTestDialog(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.testButtonText}>테스트 팝업</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.testButton, styles.testButtonSecondary]}
+            onPress={() => setShowMultiStepDialog(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.testButtonText}>다단계 팝업</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {}
@@ -495,6 +517,65 @@ export const MapMainScreen: React.FC = () => {
           onTabChange={handleTabChange}
         />
       </View>
+
+      {}
+      <ChoiceDialog
+        visible={showTestDialog}
+        title="테스트 팝업"
+        message="이것은 ChoiceDialog 테스트 팝업입니다. 두 개의 버튼을 테스트할 수 있습니다."
+        button1Label="취소"
+        button1Action={() => {
+          Alert.alert('취소', '취소 버튼이 클릭되었습니다.');
+          setShowTestDialog(false);
+        }}
+        button2Label="확인"
+        button2Action={async () => {
+          Alert.alert('확인', '확인 버튼이 클릭되었습니다.');
+          setShowTestDialog(false);
+        }}
+        onClose={() => setShowTestDialog(false)}
+      />
+
+      {}
+      <ChoiceDialog
+        visible={showMultiStepDialog}
+        steps={[
+          {
+            title: "1단계",
+            message: "첫 번째 단계입니다. 다음 단계로 진행하시겠습니까?",
+            button1Label: "취소",
+            button1Action: (_, __, closeDialog) => {
+              Alert.alert('취소', '1단계에서 취소되었습니다.');
+              closeDialog();
+            },
+            button2Label: "다음",
+            button2Action: (goToNextStep) => {
+              goToNextStep();
+            },
+          },
+          {
+            title: "2단계",
+            message: "두 번째 단계입니다. 이전 단계로 돌아가거나 완료할 수 있습니다.",
+            children: (
+              <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8, marginTop: 8 }}>
+                <Text style={{ fontSize: 14, color: '#666' }}>
+                  이것은 children으로 추가된 커스텀 컨텐츠입니다.
+                </Text>
+              </View>
+            ),
+            button1Label: "이전",
+            button1Action: (_, goToPrevStep) => {
+              goToPrevStep();
+            },
+            button2Label: "완료",
+            button2Action: async (_, __, closeDialog) => {
+              Alert.alert('완료', '모든 단계가 완료되었습니다!');
+              closeDialog();
+            },
+          },
+        ]}
+        onClose={() => setShowMultiStepDialog(false)}
+      />
     </View>
   );
 };
@@ -559,6 +640,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
+  },
+
+  testButtonContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -75 }, { translateY: -25 }],
+    flexDirection: 'row',
+    gap: 12,
+    zIndex: 100,
+  },
+  testButton: {
+    backgroundColor: '#343a5a',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  testButtonSecondary: {
+    backgroundColor: '#ffdc04',
+  },
+  testButtonText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
   },
 });
 
