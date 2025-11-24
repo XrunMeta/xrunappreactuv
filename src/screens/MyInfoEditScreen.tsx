@@ -216,12 +216,20 @@ export const MyInfoEditScreen = () => {
         promises.push(updateLastName(memberId, lastName.trim(), navigate));
       }
 
-      if (tempCountry.cCode && tempRegion.rCode && tempRegion.rCode !== 0) {
+      if (tempCountry.cCode !== null && tempCountry.cCode !== undefined && 
+          tempRegion.rCode !== null && tempRegion.rCode !== undefined && tempRegion.rCode !== 0) {
+        console.log('[정보수정] 지역 수정 시도:', {
+          memberId,
+          country: tempCountry.cCode,
+          region: tempRegion.rCode,
+        });
         promises.push(updateRegion(memberId, tempCountry.cCode, tempRegion.rCode, navigate));
-      } else if (tempRegion.rCode === 0) {
-        Alert.alert('오류', '지역을 선택해주세요.');
-        setIsSaving(false);
-        return;
+      } else if (tempCountry.cCode === null || tempCountry.cCode === undefined) {
+
+        console.warn('[정보수정] 국가가 선택되지 않아 지역 수정을 건너뜁니다.');
+      } else if (tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === 0) {
+
+        console.warn('[정보수정] 지역이 선택되지 않아 지역 수정을 건너뜁니다.');
       }
 
       const genderCode = convertGenderToApi(gender);

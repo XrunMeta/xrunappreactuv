@@ -259,3 +259,88 @@ export interface UpdatePhoneResponse {
   [key: string]: any;
 }
 
+export interface UpdateLastNameRequest {
+  member: number;
+  lastname: string;
+}
+
+export interface UpdateLastNameResponse {
+  data?: Array<{
+    affectedRows?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface UpdateGenderRequest {
+  member: number;
+  gender: number; 
+}
+
+export interface UpdateGenderResponse {
+  data?: Array<{
+    affectedRows?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface UpdateAgeRequest {
+  member: number;
+  ages: number; 
+}
+
+export interface UpdateAgeResponse {
+  data?: Array<{
+    affectedRows?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface GetRegionsByCountryRequest {
+  country: number;
+}
+
+export interface GetRegionsByCountryResponse {
+  data?: Array<{
+    country?: string;
+    callnumber?: number;
+    description?: string;
+    subcode?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface UpdateRegionRequest {
+  member: number;
+  country: number;
+  region: number;
+}
+
+export interface UpdateRegionResponse {
+  data?: Array<{
+    affectedRows?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface GetCountriesResponse {
+  data?: Array<{
+    country?: string;
+    callnumber?: number;
+    description?: string;
+    subcode?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+
