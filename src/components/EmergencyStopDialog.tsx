@@ -48,56 +48,32 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
 
   return (
     <Modal
-      transparent
-      animationType="fade"
       visible={visible}
-      onRequestClose={onClose}
+      animationType="slide"
+      onRequestClose={() => {}} 
+      presentationStyle="fullScreen"
     >
-      <View style={styles.overlay}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>긴급 안내</Text>
-            {onClose ? (
-              <TouchableOpacity
-                onPress={onClose}
-                hitSlop={HIT_SLOP}
-                style={styles.close}
-              >
-                <Ionicons name="close" size={18} color="#747474" />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.closePlaceholder} />
-            )}
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>안내</Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.body}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="warning" size={64} color="#FF6B6B" />
           </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.body}>
-            <Text style={styles.message}>{message}</Text>
-            {link && (
-              <TouchableOpacity
-                style={styles.linkButton}
-                onPress={handleLinkPress}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.linkText}>자세히 보기</Text>
-                <Ionicons name="chevron-forward" size={16} color="#4c4e55" />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {onClose && (
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.primaryButton]}
-                onPress={onClose}
-                activeOpacity={0.9}
-              >
-                <Text style={[styles.actionLabel, styles.primaryLabel]}>
-                  확인
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.message}>{message}</Text>
+          {link && (
+            <TouchableOpacity
+              style={styles.linkButton}
+              onPress={handleLinkPress}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.linkText}>자세히 보기</Text>
+              <Ionicons name="chevron-forward" size={20} color="#4c4e55" />
+            </TouchableOpacity>
           )}
         </View>
       </View>
@@ -105,103 +81,64 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
   );
 };
 
-const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
-
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(16, 25, 45, 0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 16,
     backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 6.5,
-    elevation: 8,
+    paddingTop: 60,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 20,
   },
   title: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
   },
-  close: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closePlaceholder: {
-    width: 32,
-    height: 32,
-  },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#e4e4e4',
+    marginBottom: 32,
   },
   body: {
-    paddingVertical: 20,
-    minHeight: 100,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  iconContainer: {
+    marginBottom: 32,
   },
   message: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
-    lineHeight: 24,
-    marginBottom: 16,
+    lineHeight: 28,
+    textAlign: 'center',
+    marginBottom: 32,
   },
   linkButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     backgroundColor: '#F8F8F8',
-    borderRadius: 8,
-    marginTop: 8,
+    borderRadius: 12,
+    width: '100%',
+    maxWidth: 400,
   },
   linkText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Roboto-Medium',
     color: '#4c4e55',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
-  },
-  actionButton: {
-    flex: 1,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#FFDC04',
-  },
-  actionLabel: {
-    fontSize: 16,
-    fontFamily: 'Roboto-SemiBold',
-  },
-  primaryLabel: {
-    color: '#000000',
   },
 });
 
