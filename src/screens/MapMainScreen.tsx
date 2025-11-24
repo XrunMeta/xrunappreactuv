@@ -75,6 +75,14 @@ try {
   console.warn('icon_mapPoint.png not found');
 }
 
+let v_232839 = null;
+
+try {
+  v_232839 = require('../../assets/logo_tempMarker.png');
+} catch (v_9e86fd) {
+  console.warn('logo_tempMarker.png not found');
+}
+
 export const MapMainScreen: v_a3453e.FC = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
   const [v_a55f0b, v_0326b2] = v_5ab095<LocationData | null>(null);
@@ -301,15 +309,27 @@ export const MapMainScreen: v_a3453e.FC = () => {
             {}
             {v_b4d4c5
               .filter((v_5e3dbb) => v_5e3dbb.latitude && v_5e3dbb.longitude) 
-              .map((v_5e3dbb) => (
-              <Marker
-                key={v_5e3dbb.spotID}
-                coordinate={{
-                  latitude: v_5e3dbb.latitude!,
-                  longitude: v_5e3dbb.longitude!,
-                }}
-                onPress={() => v_fc58d0(v_5e3dbb)}
-              >
+              .map((v_5e3dbb) => {
+
+                const v_e149c8 = v_5e3dbb.coin || `marker-${v_5e3dbb.latitude}-${v_5e3dbb.longitude}`;
+
+                return (
+                <Marker
+                  key={v_e149c8}
+                  coordinate={{
+                    latitude: v_5e3dbb.latitude!,
+                    longitude: v_5e3dbb.longitude!,
+                  }}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  onPress={() => v_fc58d0(v_5e3dbb)}
+                >
+                  {v_232839 && (
+                    <Image
+                      source={v_232839}
+                      style={v_d81136.markerImage}
+                      resizeMode="contain"
+                    />
+                  )}
                 {}
                 <Callout tooltip>
                   <View style={v_d81136.calloutContainer}>
@@ -346,7 +366,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
                   </View>
                 </Callout>
               </Marker>
-            ))}
+              );
+              })}
           </MapView>
         ) : (
           <View style={v_d81136.mapPlaceholder}>
@@ -481,6 +502,11 @@ const v_d81136 = v_472849.create({
     fontSize: 14,
     fontFamily: 'Roboto-Medium',
     color: 'black',
+  },
+
+  markerImage: {
+    width: 40,
+    height: 40,
   },
 });
 

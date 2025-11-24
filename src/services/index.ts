@@ -1207,10 +1207,7 @@ export const v_f84ef5 = async (
   v_c65f5d,
 ): Promise<v_f71847[]> => {
   try {
-    const v_c9c489 = v_e4a763();
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
-    const v_09dafd = 'app2000-01';
-
+    const v_9f42a4 = v_7488d5(v_c65f5d);
     const v_cd6a57 = {
       member: v_660822,
       latitude: v_b5de9c,
@@ -1219,27 +1216,15 @@ export const v_f84ef5 = async (
     };
 
     console.log('=== fetchMapMarkerData API 호출 ===');
-    console.log('endpoint:', v_09dafd);
+    console.log('endpoint: app2000-01');
     console.log('requestBody:', JSON.stringify(v_cd6a57));
 
-    const v_3393e3 = await v_12a388(
-      v_09dafd,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(v_cd6a57),
-      },
-      v_c65f5d,
+    const v_3393e3 = await v_9f42a4.post(
+      '/app2000-01',
+      v_cd6a57,
     );
 
-    if (!v_3393e3.ok) {
-      console.error('API request failed:', v_3393e3.status);
-      throw new Error(`API request failed: ${v_3393e3.status}`);
-    }
-
-    const v_9390e8 = await v_3393e3.json();
+    const v_9390e8 = v_3393e3.data;
     console.log('=== fetchMapMarkerData API 응답 ===');
     console.log('data:', v_9390e8);
     console.log('data.data length:', v_9390e8?.data?.length);
@@ -1271,6 +1256,7 @@ export const v_f84ef5 = async (
           joindesc: v_8c0b26.joindesc || v_8c0b26.description || '',
           brand: v_8c0b26.brand || v_8c0b26.coin || '',
           coins: v_8c0b26.coins || v_8c0b26.coin || '',
+          coin: v_8c0b26.coin || '', 
         };
       });
     }
@@ -1279,6 +1265,16 @@ export const v_f84ef5 = async (
     return [];
   } catch (v_5e9bfe) {
     console.error('맵 마커 데이터 가져오기 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[맵 마커] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
 
     return [];
   }
