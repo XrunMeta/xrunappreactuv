@@ -33,6 +33,8 @@ import {
   GetUserInfoResponse,
   GetMyPageUserInfoRequest,
   GetMyPageUserInfoResponse,
+  UpdateNameRequest,
+  UpdateNameResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -552,8 +554,9 @@ export const sendEmailVerificationCode = async (
       request,
     );
 
-    const result = response.data.data[0]?.status !== 'false';
-    console.log('[로그인] 이메일 인증 코드 발송 결과:', result ? '성공' : '실패');
+    const status = response.data.data[0]?.status;
+    const result = status === true || status === 'true';
+    console.log('[로그인] 이메일 인증 코드 발송 결과:', result ? '성공' : '실패', { status });
 
     return result;
   } catch (error) {
@@ -750,6 +753,44 @@ export const getMyPageUserInfo = async (
     return response.data;
   } catch (error) {
     console.error('[마이페이지] 사용자 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[마이페이지] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updateName = async (
+  member: number,
+  firstname: string,
+  navigation?: any,
+): Promise<UpdateNameResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdateNameRequest = {
+      member,
+      firstname,
+    };
+
+    console.log('[마이페이지] 이름 수정 요청:', { member, firstname });
+
+    const response = await axiosInstance.post<UpdateNameResponse>(
+      '/app7120-01',
+      request,
+    );
+
+    console.log('[마이페이지] 이름 수정 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[마이페이지] 이름 수정 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[마이페이지] 상세 오류 정보:', {
         url: error.config?.url,

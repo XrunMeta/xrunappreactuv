@@ -14,6 +14,9 @@ type AppContextValue = {
   verificationSuccessRoute: ScreenName;
   setVerificationSuccessRoute: (route: ScreenName) => void;
   resetVerificationSuccessRoute: () => void;
+  verificationEmail: string;
+  setVerificationEmail: (email: string) => void;
+  resetVerificationEmail: () => void;
   selectedClauseId: ClauseId;
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
@@ -32,6 +35,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [addTokenDialogVisible, setAddTokenDialogVisible] = useState(false);
   const [verificationSuccessRoute, setVerificationSuccessRoute] =
     useState<ScreenName>(ROUTES.login);
+  const [verificationEmail, setVerificationEmail] = useState('');
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
@@ -49,6 +53,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationSuccessRoute,
       setVerificationSuccessRoute,
       resetVerificationSuccessRoute: () => setVerificationSuccessRoute(ROUTES.login),
+      verificationEmail,
+      setVerificationEmail,
+      resetVerificationEmail: () => setVerificationEmail(''),
       selectedClauseId,
       setSelectedClauseId,
       selectedShopItem,
@@ -63,6 +70,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       walletSendAddress,
       addTokenDialogVisible,
       verificationSuccessRoute,
+      verificationEmail,
       selectedClauseId,
       selectedShopItem,
       emergencyStop,

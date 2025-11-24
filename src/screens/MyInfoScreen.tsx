@@ -16,6 +16,7 @@ import { Header } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo } from '../services';
+import { useAppContext } from '../context';
 
 type CardConfig = {
   id: string;
@@ -73,6 +74,7 @@ const cardConfigs: CardConfig[] = [
 
 export const MyInfoScreen = () => {
   const { navigate } = useAppNavigation();
+  const { setVerificationEmail } = useAppContext();
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     email?: string;
@@ -116,6 +118,10 @@ export const MyInfoScreen = () => {
 
   const handleCardPress = (card: CardConfig) => {
     if (card.route) {
+
+      if (card.id === 'edit' && userInfo?.email) {
+        setVerificationEmail(userInfo.email);
+      }
       navigate(ROUTES[card.route]);
     }
   };

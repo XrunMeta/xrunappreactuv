@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,12 +6,15 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, OptionButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { getMyPageUserInfo, updateName } from '../services';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남' },
@@ -23,16 +26,87 @@ const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 export const MyInfoEditScreen = () => {
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
   const { selectedCountryDialCode } = useAppContext();
-  const [firstName, setFirstName] = useState('XRUN');
-  const [lastName, setLastName] = useState('X');
-  const [email, setEmail] = useState('oth-staff@example.invalid');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('010 2487 6746');
   const [region, setRegion] = useState('대한민국 서울');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [age, setAge] = useState<(typeof AGE_OPTIONS)[number]>('10');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [memberId, setMemberId] = useState<number | null>(null);
 
-  const handleSave = () => {
-    Alert.alert('저장 완료', '변경 사항이 저장되었습니다.');
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          const member = userData.member;
+
+          if (member) {
+            setMemberId(member);
+            const response = await getMyPageUserInfo(member, navigate);
+            const user = response.data[0];
+
+            if (user) {
+              setFirstName(user.firstname || '');
+              setLastName(user.lastname || '');
+              setEmail(user.email || '');
+
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[정보수정] 사용자 정보 로드 실패:', error);
+        Alert.alert('오류', '사용자 정보를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserInfo();
+  }, [navigate]);
+
+  const handleSave = async () => {
+
+    if (!firstName.trim()) {
+      Alert.alert('오류', '이름을 입력해주세요.');
+      return;
+    }
+
+    if (!memberId) {
+      Alert.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      console.log('[정보수정] 이름 수정 시도:', { memberId, firstname: firstName });
+
+      await updateName(memberId, firstName.trim(), navigate);
+
+      Alert.alert('저장 완료', '변경 사항이 저장되었습니다.', [
+        {
+          text: '확인',
+          onPress: () => {
+
+            if (canGoBack) {
+              goBack();
+            } else {
+              reset(ROUTES.myInfo);
+            }
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error('[정보수정] 이름 수정 실패:', error);
+      Alert.alert('저장 실패', '이름 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChangePassword = () => {
@@ -52,27 +126,35 @@ export const MyInfoEditScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.formWrapper}>
-          <FormField
-            label="First Name"
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="Enter first name"
-          />
-          <FormField
-            label="Last Name"
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Enter last name"
-          />
-          <FormField
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            placeholder="Enter email address"
-          />
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+          </View>
+        ) : (
+          <View style={styles.formWrapper}>
+            <FormField
+              label="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Enter first name"
+              editable={!isSaving}
+            />
+            <FormField
+              label="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Enter last name"
+              editable={!isSaving}
+            />
+            <FormField
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="Enter email address"
+              editable={!isSaving}
+            />
 
           <View style={styles.inlineLabelRow}>
             <Text style={styles.sectionLabel}>Password</Text>
@@ -84,75 +166,88 @@ export const MyInfoEditScreen = () => {
             <Text style={styles.readonlyText}>최종변경날짜  : 2025.05.02</Text>
           </View>
 
-          <FormField
-            label="Phone Number"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            placeholder="Enter phone number"
-            leftAccessory={
-              <TouchableOpacity
-                style={styles.phonePrefix}
-                onPress={() => navigate('countryCodeSelect')}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
-                <Text style={styles.phonePrefixText}>{selectedCountryDialCode.dialCode}</Text>
-              </TouchableOpacity>
-            }
-          />
+            <FormField
+              label="Phone Number"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              placeholder="Enter phone number"
+              editable={!isSaving}
+              leftAccessory={
+                <TouchableOpacity
+                  style={styles.phonePrefix}
+                  onPress={() => navigate('countryCodeSelect')}
+                  activeOpacity={0.7}
+                  disabled={isSaving}
+                >
+                  <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
+                  <Text style={styles.phonePrefixText}>{selectedCountryDialCode.dialCode}</Text>
+                </TouchableOpacity>
+              }
+            />
 
-          <FormField
-            label="Region"
-            value={region}
-            onChangeText={setRegion}
-            placeholder="지역을 입력하세요"
-          />
+            <FormField
+              label="Region"
+              value={region}
+              onChangeText={setRegion}
+              placeholder="지역을 입력하세요"
+              editable={!isSaving}
+            />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>성별</Text>
-            <View style={styles.inlineOptions}>
-              {GENDER_OPTIONS.map((option) => (
-                <OptionButton
-                  key={option.value}
-                  label={option.label}
-                  selected={gender === option.value}
-                  onPress={() => setGender(option.value)}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>나이</Text>
-            <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
-              {AGE_OPTIONS.map((option, index) => {
-                const isLast = index === AGE_OPTIONS.length - 1;
-                return (
+            <View style={styles.formGroup}>
+              <Text style={styles.sectionLabel}>성별</Text>
+              <View style={styles.inlineOptions}>
+                {GENDER_OPTIONS.map((option) => (
                   <OptionButton
-                    key={option}
-                    label={option}
-                    selected={age === option}
-                    onPress={() => setAge(option)}
-                    flex={1}
-                    style={[
-                      styles.ageOptionButton,
-                      !isLast && styles.ageOptionSpacing,
-                    ]}
+                    key={option.value}
+                    label={option.label}
+                    selected={gender === option.value}
+                    onPress={() => setGender(option.value)}
+                    disabled={isSaving}
                   />
-                );
-              })}
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.sectionLabel}>나이</Text>
+              <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
+                {AGE_OPTIONS.map((option, index) => {
+                  const isLast = index === AGE_OPTIONS.length - 1;
+                  return (
+                    <OptionButton
+                      key={option}
+                      label={option}
+                      selected={age === option}
+                      onPress={() => setAge(option)}
+                      flex={1}
+                      disabled={isSaving}
+                      style={[
+                        styles.ageOptionButton,
+                        !isLast && styles.ageOptionSpacing,
+                      ]}
+                    />
+                  );
+                })}
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.bottomSection}>
-          <PrimaryButton
-            title="Save Changes"
-            fullWidth
-            onPress={handleSave}
-            style={styles.primaryButton}
-          />
+          {isSaving ? (
+            <View style={styles.loadingButtonContainer}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          ) : (
+            <PrimaryButton
+              title="Save Changes"
+              fullWidth
+              onPress={handleSave}
+              style={styles.primaryButton}
+              disabled={isLoading}
+            />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -247,6 +342,17 @@ const styles = StyleSheet.create({
   primaryButton: {
     width: '100%',
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 200,
+  },
+  loadingButtonContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
-
 

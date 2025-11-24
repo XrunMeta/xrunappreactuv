@@ -230,3 +230,17 @@ export interface GetMyPageUserInfoResponse {
   }>;
 }
 
+export interface UpdateNameRequest {
+  member: number;
+  firstname: string;
+}
+
+export interface UpdateNameResponse {
+  data?: Array<{
+    affectedRows?: number;
+    [key: string]: any;
+  }>;
+  status?: string;
+  [key: string]: any;
+}
+

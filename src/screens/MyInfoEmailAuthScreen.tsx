@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,36 +12,105 @@ import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { sendEmailVerificationCode } from '../services';
+
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 export const MyInfoEmailAuthScreen = () => {
   const { goBack, navigate } = useAppNavigation();
-  const { setVerificationSuccessRoute } = useAppContext();
-  const [email, setEmail] = useState('oth-staff@example.invalid');
+  const { setVerificationSuccessRoute, verificationEmail, setVerificationEmail } = useAppContext();
+  const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
+  useEffect(() => {
+    if (verificationEmail) {
+      setEmail(verificationEmail);
+    }
+  }, [verificationEmail]);
+
   const handleSendEmail = async () => {
+
     if (!email.trim()) {
       Alert.alert('이메일 입력', '이메일 주소를 입력해주세요.');
       return;
     }
+
+    if (!isValidEmail(email)) {
+      Alert.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
+    if (verificationEmail && email.trim() !== verificationEmail.trim()) {
+      Alert.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      return;
+    }
+
     try {
       setSending(true);
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      setEmailSent(true);
-      Alert.alert('전송 완료', '입력한 이메일로 인증코드를 전송했어요.');
+      console.log('[정보수정] 이메일 인증 코드 발송 요청:', email.trim());
+
+      const success = await sendEmailVerificationCode(email.trim(), navigate);
+
+      if (success) {
+        setEmailSent(true);
+        Alert.alert('전송 완료', '입력한 이메일로 인증코드를 전송했어요.');
+      } else {
+        Alert.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('[정보수정] 이메일 전송 오류:', error);
+      Alert.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
     } finally {
       setSending(false);
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+
     if (!email.trim()) {
       Alert.alert('이메일 입력', '이메일 주소를 입력해주세요.');
       return;
     }
-    setVerificationSuccessRoute(ROUTES.myInfoEdit);
-    navigate(ROUTES.verificationCode);
+
+    if (!isValidEmail(email)) {
+      Alert.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
+    if (verificationEmail && email.trim() !== verificationEmail.trim()) {
+      Alert.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      return;
+    }
+
+    if (!emailSent) {
+      Alert.alert('인증 코드 미발송', '먼저 이메일 인증 코드를 발송해주세요.');
+      return;
+    }
+
+    try {
+      setSending(true);
+      console.log('[정보수정] 이메일 인증 코드 발송 요청 (확인 버튼):', email.trim());
+
+      const success = await sendEmailVerificationCode(email.trim(), navigate);
+
+      if (success) {
+
+        setVerificationEmail(email.trim());
+        setVerificationSuccessRoute(ROUTES.myInfoEdit);
+        navigate(ROUTES.verificationCode);
+      } else {
+        Alert.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('[정보수정] 이메일 전송 오류:', error);
+      Alert.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -139,5 +208,4 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
-
 
