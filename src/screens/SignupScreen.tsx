@@ -20,6 +20,7 @@ import {
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_9553a4, v_6946fd } from '../constants';
 import {
   v_60e3a5,
   v_01332e,
@@ -40,7 +41,7 @@ type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
-  const { selectedCountryDialCode: v_459d5e } = v_700ef9();
+  const { selectedCountryDialCode: v_459d5e, selectedRegion: v_2f03bc, setSelectMode: v_67ab1c } = v_700ef9();
   const [v_f142d8, v_6dde2f] = v_5ab095('');
   const [v_a7c7b7, v_15ded5] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
@@ -80,8 +81,8 @@ export const v_f40fc5 = () => {
       return;
     }
 
-    if (!v_a6c30b.trim()) {
-      v_03e392.alert('입력 오류', '지역을 입력해주세요.');
+    if (!v_2f03bc && !v_a6c30b.trim()) {
+      v_03e392.alert('입력 오류', '지역을 선택해주세요.');
       return;
     }
 
@@ -137,7 +138,10 @@ export const v_f40fc5 = () => {
       console.log('[회원가입] 3단계: 회원가입 실행 시작');
       const v_6c3a47 = parseInt(v_459d5e.dialCode.replace('+', ''), 10) || 82;
       const v_a4d981 = v_459d5e.iso2 || 'KR';
-      const v_94bdf5 = parseInt(v_a6c30b) || 2; 
+
+      const v_94bdf5 = v_2f03bc
+        ? v_9553a4(v_2f03bc.iso2)
+        : parseInt(v_a6c30b) || 2; 
 
       const v_df7dab = {
         email: v_e0c7e8.trim(),
@@ -268,14 +272,21 @@ export const v_f40fc5 = () => {
           }
         />
 
-        <FormField
-          label="지역"
-          placeholder="Korea"
-          value={v_a6c30b}
-          onChangeText={v_c030e3}
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
+        <TouchableOpacity
+          onPress={() => {
+            v_67ab1c('region');
+            v_9b57fc('countryCodeSelect');
+          }}
+          style={v_d81136.fieldContainer}
+        >
+          <FormField
+            label="지역"
+            placeholder="지역을 선택하세요"
+            value={v_2f03bc ? v_2f03bc.name : v_a6c30b || ''}
+            editable={false}
+            containerStyle={v_d81136.fieldContainer}
+          />
+        </TouchableOpacity>
 
         <View style={v_d81136.formGroup}>
           <Text style={v_d81136.label}>성별</Text>

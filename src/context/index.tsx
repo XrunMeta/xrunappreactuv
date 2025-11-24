@@ -2,7 +2,7 @@
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
 import { v_9dd03c, v_da1883, v_745d71, v_ac312b } from '../types';
-import { v_202d44 } from '../constants';
+import { v_202d44, v_52495e } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -26,6 +26,11 @@ type AppContextValue = {
   selectedCountryDialCode: v_da1883;
   setSelectedCountryDialCode: (country: v_da1883) => void;
   resetSelectedCountryDialCode: () => void;
+  selectedRegion: v_da1883 | null;
+  setSelectedRegion: (region: v_da1883 | null) => void;
+  resetSelectedRegion: () => void;
+  selectMode: 'country' | 'region';
+  setSelectMode: (mode: 'country' | 'region') => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -41,6 +46,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_b135ca, v_69fcdc] = v_5ab095<v_ac312b>(null);
   const v_d7c38a = v_202d44.find((v_b9bbbd) => v_b9bbbd.iso2 === 'kr') ?? v_202d44[0];
   const [v_459d5e, v_f693e7] = v_5ab095<v_da1883>(v_d7c38a);
+  const [v_2f03bc, v_2f2d51] = v_5ab095<v_da1883 | null>(null);
+  const [v_479a37, v_67ab1c] = v_5ab095<'country' | 'region'>('country');
 
   const v_3b402b = v_df9f57(
     () => ({
@@ -65,6 +72,11 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       selectedCountryDialCode: v_459d5e,
       setSelectedCountryDialCode: v_f693e7,
       resetSelectedCountryDialCode: () => v_f693e7(v_d7c38a),
+      selectedRegion: v_2f03bc,
+      setSelectedRegion: v_2f2d51,
+      resetSelectedRegion: () => v_2f2d51(null),
+      selectMode: v_479a37,
+      setSelectMode: v_67ab1c,
     }),
     [
       v_ee27aa,
@@ -75,6 +87,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_dfe883,
       v_b135ca,
       v_459d5e,
+      v_2f03bc,
+      v_479a37,
     ],
   );
 

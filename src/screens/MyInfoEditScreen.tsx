@@ -468,21 +468,21 @@ export const v_cdb169 = () => {
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
           </View>
         ) : (
-          <View style={v_d81136.formWrapper}>
-            <FormField
-              label="First Name"
-              value={v_a32a50}
-              onChangeText={v_4944f5}
-              placeholder="Enter first name"
+        <View style={v_d81136.formWrapper}>
+          <FormField
+            label="First Name"
+            value={v_a32a50}
+            onChangeText={v_4944f5}
+            placeholder="Enter first name"
               editable={!v_e495db}
-            />
-            <FormField
-              label="Last Name"
-              value={v_328bb4}
-              onChangeText={v_b7613d}
-              placeholder="Enter last name"
+          />
+          <FormField
+            label="Last Name"
+            value={v_328bb4}
+            onChangeText={v_b7613d}
+            placeholder="Enter last name"
               editable={!v_e495db}
-            />
+          />
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>Email</Text>
               <View style={v_d81136.disabledInput}>
@@ -511,14 +511,14 @@ export const v_cdb169 = () => {
                   </Text>
                 </View>
                 {}
-                <TouchableOpacity
+              <TouchableOpacity
                   style={v_d81136.phoneValueContainer}
                   onPress={v_801fea}
-                  activeOpacity={0.7}
+                activeOpacity={0.7}
                   disabled={v_e495db}
-                >
+              >
                   <Text style={v_d81136.phoneValue}>{v_d74a81}</Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
               </View>
             </View>
 
@@ -550,44 +550,44 @@ export const v_cdb169 = () => {
               </View>
             </View>
 
-            <View style={v_d81136.formGroup}>
-              <Text style={v_d81136.sectionLabel}>성별</Text>
-              <View style={v_d81136.inlineOptions}>
-                {v_798085.map((v_0bd920) => (
-                  <OptionButton
-                    key={v_0bd920.value}
-                    label={v_0bd920.label}
-                    selected={v_c3eac4 === v_0bd920.value}
-                    onPress={() => v_bdc43c(v_0bd920.value)}
+          <View style={v_d81136.formGroup}>
+            <Text style={v_d81136.sectionLabel}>성별</Text>
+            <View style={v_d81136.inlineOptions}>
+              {v_798085.map((v_0bd920) => (
+                <OptionButton
+                  key={v_0bd920.value}
+                  label={v_0bd920.label}
+                  selected={v_c3eac4 === v_0bd920.value}
+                  onPress={() => v_bdc43c(v_0bd920.value)}
                     disabled={v_e495db}
-                  />
-                ))}
-              </View>
-            </View>
-
-            <View style={v_d81136.formGroup}>
-              <Text style={v_d81136.sectionLabel}>나이</Text>
-              <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
-                {v_0c96f7.map((v_0bd920, v_a56041) => {
-                  const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
-                  return (
-                    <OptionButton
-                      key={v_0bd920}
-                      label={v_0bd920}
-                      selected={v_2694bd === v_0bd920}
-                      onPress={() => v_6e5c76(v_0bd920)}
-                      flex={1}
-                      disabled={v_e495db}
-                      style={[
-                        v_d81136.ageOptionButton,
-                        !v_0d0d82 && v_d81136.ageOptionSpacing,
-                      ]}
-                    />
-                  );
-                })}
-              </View>
+                />
+              ))}
             </View>
           </View>
+
+          <View style={v_d81136.formGroup}>
+            <Text style={v_d81136.sectionLabel}>나이</Text>
+            <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
+              {v_0c96f7.map((v_0bd920, v_a56041) => {
+                const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
+                return (
+                  <OptionButton
+                    key={v_0bd920}
+                    label={v_0bd920}
+                    selected={v_2694bd === v_0bd920}
+                    onPress={() => v_6e5c76(v_0bd920)}
+                    flex={1}
+                      disabled={v_e495db}
+                    style={[
+                      v_d81136.ageOptionButton,
+                      !v_0d0d82 && v_d81136.ageOptionSpacing,
+                    ]}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        </View>
         )}
 
         <View style={v_d81136.bottomSection}>
@@ -596,13 +596,13 @@ export const v_cdb169 = () => {
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             </View>
           ) : (
-            <PrimaryButton
-              title="Save Changes"
-              fullWidth
-              onPress={v_1b8283}
-              style={v_d81136.primaryButton}
+          <PrimaryButton
+            title="Save Changes"
+            fullWidth
+            onPress={v_1b8283}
+            style={v_d81136.primaryButton}
               disabled={v_cd31a8}
-            />
+          />
           )}
         </View>
       </ScrollView>
