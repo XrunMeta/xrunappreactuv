@@ -82,7 +82,7 @@ export const v_667a00 = () => {
 
     try {
 
-      console.log('[로그인] 이메일 인증 코드 확인 요청:', v_fc0b2c);
+      console.log('[인증] 이메일 인증 코드 확인 요청:', v_fc0b2c);
       const v_ac477d = await v_415628(v_fc0b2c, v_c99bd2, v_9b57fc);
 
       if (!v_ac477d) {
@@ -91,46 +91,54 @@ export const v_667a00 = () => {
         return;
       }
 
-      console.log('[로그인] 이메일 로그인 요청:', v_fc0b2c);
-      const v_b84499 = await v_a81308(v_fc0b2c, v_9b57fc);
+      if (v_e6976c === v_ce4741.login || v_e6976c === v_ce4741.map) {
 
-      if (v_b84499.status !== 'success') {
-        v_03e392.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
-        v_ff0c7a(false);
-        return;
-      }
+        console.log('[로그인] 이메일 로그인 요청:', v_fc0b2c);
+        const v_b84499 = await v_a81308(v_fc0b2c, v_9b57fc);
 
-      const v_ef7306 = v_b84499.data[0];
-      if (!v_ef7306 || !v_ef7306.member) {
-        v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
-        v_ff0c7a(false);
-        return;
-      }
-
-      const v_9e8d12 = v_ef7306.extrastr;
-      if (v_9e8d12) {
-        const v_06cee6 = v_a5170b(v_9e8d12);
-        const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
-        if (!v_aa0ad8) {
-          console.warn('[로그인] 세션 저장 실패');
+        if (v_b84499.status !== 'success') {
+          v_03e392.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          v_ff0c7a(false);
+          return;
         }
+
+        const v_ef7306 = v_b84499.data[0];
+        if (!v_ef7306 || !v_ef7306.member) {
+          v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          v_ff0c7a(false);
+          return;
+        }
+
+        const v_9e8d12 = v_ef7306.extrastr;
+        if (v_9e8d12) {
+          const v_06cee6 = v_a5170b(v_9e8d12);
+          const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
+          if (!v_aa0ad8) {
+            console.warn('[로그인] 세션 저장 실패');
+          }
+        }
+
+        await v_e84827.removeItem('userData');
+        await v_e84827.removeItem('userSessionToken');
+        await v_e84827.setItem('userEmail', v_fc0b2c);
+        await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+        const v_00b91e = v_ef7306.extrastr || '';
+        await v_e84827.setItem('userSessionToken', v_00b91e);
+        await v_e84827.setItem('isLoggedIn', 'true');
+
+        console.log('[로그인] 이메일 인증 로그인 성공');
+
+        v_036f76();
+        v_487a25(v_e6976c || v_ce4741.map);
+      } else {
+
+        console.log('[정보수정] 인증 코드 확인 성공');
+        v_036f76();
+        v_487a25(v_e6976c);
       }
-
-      await v_e84827.removeItem('userData');
-      await v_e84827.removeItem('userSessionToken');
-      await v_e84827.setItem('userEmail', v_fc0b2c);
-      await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
-      const v_00b91e = v_ef7306.extrastr || '';
-      await v_e84827.setItem('userSessionToken', v_00b91e);
-      await v_e84827.setItem('isLoggedIn', 'true');
-
-      console.log('[로그인] 이메일 인증 로그인 성공');
-
-      v_036f76();
-      v_487a25(v_e6976c || v_ce4741.map);
     } catch (v_5e9bfe) {
-      console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
-      v_03e392.alert('오류', '로그인 처리 중 오류가 발생했습니다.');
+      console.error('[인증] 인증 코드 확인 오류:', v_5e9bfe);
+      v_03e392.alert('오류', '인증 처리 중 오류가 발생했습니다.');
     } finally {
       v_ff0c7a(false);
     }
@@ -145,7 +153,7 @@ export const v_667a00 = () => {
     v_f30c99(true);
 
     try {
-      console.log('[로그인] 이메일 인증 코드 재전송 요청:', v_fc0b2c);
+      console.log('[인증] 이메일 인증 코드 재전송 요청:', v_fc0b2c);
       const v_f438c1 = await v_8025d1(v_fc0b2c, v_9b57fc);
 
       if (v_f438c1) {
@@ -156,7 +164,7 @@ export const v_667a00 = () => {
         v_03e392.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (v_5e9bfe) {
-      console.error('[로그인] 인증 코드 재전송 오류:', v_5e9bfe);
+      console.error('[인증] 인증 코드 재전송 오류:', v_5e9bfe);
       v_03e392.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
     } finally {
       v_f30c99(false);
@@ -365,4 +373,3 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
 });
-
