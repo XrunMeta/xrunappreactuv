@@ -9,6 +9,8 @@ import {
   EmailCheckResponse,
   ReferralCheckRequest,
   ReferralCheckResponse,
+  EmailExistsRequest,
+  EmailExistsResponse,
   SignupRequest,
   SignupResponse,
   LoginCheckRequest,
@@ -212,6 +214,31 @@ export const checkEmailAvailability = async (
     return result;
   } catch (error) {
     console.error('[회원가입 1단계] 이메일 중복 확인 실패:', error);
+    throw error;
+  }
+};
+
+export const checkEmailExists = async (
+  email: string,
+  navigation?: any,
+): Promise<boolean> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: EmailExistsRequest = { email };
+
+    console.log('[로그인] 이메일 존재 확인 요청:', email);
+
+    const response = await axiosInstance.post<EmailExistsResponse>(
+      '/ap1810-i01',
+      request,
+    );
+
+    const result = response.data.data[0]?.result === true;
+    console.log('[로그인] 이메일 존재 확인 결과:', result ? '등록된 이메일' : '미등록 이메일');
+
+    return result;
+  } catch (error) {
+    console.error('[로그인] 이메일 존재 확인 실패:', error);
     throw error;
   }
 };
