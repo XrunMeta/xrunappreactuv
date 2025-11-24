@@ -27,6 +27,7 @@ import {
   MyInfoScreen,
   MyInfoEmailAuthScreen,
   MyInfoEditScreen,
+  PhoneEditScreen,
   MyInfoSettingsScreen,
   MyInfoCloseMembershipScreen,
   MyInfoClausesScreen,
@@ -157,6 +158,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoEdit') {
     return <MyInfoEditScreen />;
+  }
+
+  if (currentScreen === 'myInfoPhoneEdit') {
+    return <PhoneEditScreen />;
   }
 
   if (currentScreen === 'myInfoSettings') {

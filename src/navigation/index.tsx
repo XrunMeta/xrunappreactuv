@@ -32,6 +32,7 @@ export const ROUTES = {
   myInfo: 'myInfo',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoEdit: 'myInfoEdit',
+  myInfoPhoneEdit: 'myInfoPhoneEdit',
   myInfoSettings: 'myInfoSettings',
   myInfoCloseMembership: 'myInfoCloseMembership',
   myInfoClauses: 'myInfoClauses',
