@@ -30,6 +30,20 @@ export interface TokenData {
   campid?: string;
 }
 
+export interface SpotData {
+  spotID: number;
+  distance: number; 
+  direction: number; 
+  name: string;
+  latitude?: number;
+  longitude?: number;
+  xrunPrice?: number;
+  iconurl?: string;
+  joindesc?: string;
+  brand?: string;
+  coins?: string; 
+}
+
 export interface AliveResponse {
   success: boolean;
   emergencyStop?: {
