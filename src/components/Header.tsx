@@ -9,6 +9,7 @@ interface HeaderProps {
   title: string;
   onBackPress?: () => void;
   showBackButton?: boolean;
+  rightComponent?: v_a3453e.ReactNode;
 }
 
 const v_238728 = () => (
@@ -21,6 +22,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   title: v_9f1622,
   onBackPress: v_f442f6,
   showBackButton: v_9c4d53 = true,
+  rightComponent: v_52c3cc,
 }) => {
   const { goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
   const v_e2510f = v_9c4d53 && (v_7e32fb || !!v_f442f6);
@@ -47,7 +49,11 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
         <View style={v_d81136.titleWrapper} pointerEvents="none">
           <Text style={v_d81136.title}>{v_9f1622}</Text>
         </View>
+        {v_52c3cc ? (
+          <View style={v_d81136.rightComponent}>{v_52c3cc}</View>
+        ) : (
         <View style={v_d81136.backButtonPlaceholder} />
+        )}
       </View>
     </View>
   );
@@ -87,6 +93,12 @@ const v_d81136 = v_472849.create({
   backButtonPlaceholder: {
     width: 40,
     height: 40,
+  },
+  rightComponent: {
+    minWidth: 40,
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   iconContainer: {
     width: 24,
