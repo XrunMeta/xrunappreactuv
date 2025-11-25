@@ -1,163 +1,179 @@
 
-import axios, { AxiosError } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-import { ROUTES } from '../navigation';
+import v_b5030f, { v_3333d3 } from 'imsks';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_326be8 } from 'rcmrninabrnb';
+import { v_ce4741 } from '../navigation';
 import {
-  AliveResponse,
-  EmailCheckRequest,
-  EmailCheckResponse,
-  ReferralCheckRequest,
-  ReferralCheckResponse,
-  EmailExistsRequest,
-  EmailExistsResponse,
-  SignupRequest,
-  SignupResponse,
-  LoginCheckRequest,
-  LoginCheckResponse,
-  EmailPasswordLoginRequest,
-  PasswordOnlyLoginRequest,
-  MobileLoginRequest,
-  LoginResponse,
-  PhoneVerificationRequest,
-  PhoneVerificationResponse,
-  PhoneVerificationCodeRequest,
-  PhoneVerificationCodeResponse,
-  EmailVerificationRequest,
-  EmailVerificationResponse,
-  EmailVerificationCodeRequest,
-  EmailVerificationCodeResponse,
-  EmailAuthLoginRequest,
-  EmailAuthLoginResponse,
-  SaveSessionRequest,
-  SaveSessionResponse,
-  GetUserInfoRequest,
-  GetUserInfoResponse,
-  GetMyPageUserInfoRequest,
-  GetMyPageUserInfoResponse,
-  UpdateNameRequest,
-  UpdateNameResponse,
-  UpdatePhoneRequest,
-  UpdatePhoneResponse,
-  UpdateLastNameRequest,
-  UpdateLastNameResponse,
-  UpdateGenderRequest,
-  UpdateGenderResponse,
-  UpdateAgeRequest,
-  UpdateAgeResponse,
-  GetRegionsByCountryRequest,
-  GetRegionsByCountryResponse,
-  UpdateRegionRequest,
-  UpdateRegionResponse,
-  GetCountriesResponse,
-  LogoutRequest,
-  LogoutResponse,
-  CloseMembershipRequest,
-  CloseMembershipResponse,
-  SpotData,
-  NotificationListRequest,
-  NotificationListResponse,
-  NotificationSendRequest,
-  NotificationSendResponse,
-  NotificationDeleteRequest,
-  NotificationDeleteResponse,
-  NotificationDeleteAllRequest,
-  NotificationDeleteAllResponse,
-  FCMTokenRegisterRequest,
-  FCMTokenRegisterResponse,
+  v_96ef47,
+  v_81dfe9,
+  v_70f41f,
+  v_a357d3,
+  v_d6bdce,
+  v_8fe320,
+  v_7f7c81,
+  v_e71577,
+  v_2c1a39,
+  v_3edf6c,
+  v_d5571c,
+  v_8fc862,
+  v_073611,
+  v_a88df4,
+  v_74e8fc,
+  v_7ec238,
+  v_c5fe19,
+  v_07bb04,
+  v_e7e12a,
+  v_897bd3,
+  v_3eb2f0,
+  v_b2dc50,
+  v_2f87f0,
+  v_5060a1,
+  v_2ff10f,
+  v_d047dc,
+  v_60982a,
+  v_b8b333,
+  v_85f3ff,
+  v_72b8c4,
+  v_0bd014,
+  v_bd3e83,
+  v_680003,
+  v_4ac02a,
+  v_648048,
+  v_52573c,
+  v_2b5bdc,
+  v_32dea4,
+  v_6896c1,
+  v_97a4a7,
+  v_3059f1,
+  v_6d05a4,
+  v_7d842d,
+  v_bf21af,
+  v_9b135d,
+  v_c4dd46,
+  v_13e1b8,
+  v_6ffbdd,
+  v_62c808,
+  v_6dba58,
+  v_f71847,
+  v_d9bc70,
+  v_0a585d,
+  v_7ffbeb,
+  v_2737f8,
+  v_495962,
+  v_ba9bd0,
+  v_368246,
+  v_7092d8,
+  v_294d11,
+  v_0671ef,
+  v_ed2980,
+  v_ba49e9,
+  v_46181d,
+  v_38bdda,
+  v_184dd0,
+  v_b675ff,
+  v_50b98d,
+  v_acff7d,
+  v_baf73b,
+  v_cdd3ce,
+  v_60e215,
+  v_b62495,
+  v_87b54d,
+  v_42f0a8,
+  v_079660,
+  v_3821b8,
 } from '../types';
-import * as CryptoJS from 'crypto-js';
-import { getEnv } from '../utils/env';
+import * as v_a928e1 from 'yvptvjtrs';
+import { v_e4a763 } from '../utils/env';
 
-const API_TIMEOUT = 20000;
+const v_8a74cb = 20000;
 
-const handleTimeoutError = async (navigation?: any) => {
+const v_e4d665 = async (v_c65f5d) => {
   try {
-    const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-    if (navigation) {
-      if (isLoggedIn === 'true') {
+    const v_042a8b = await v_e84827.getItem('isLoggedIn');
+    if (v_c65f5d) {
+      if (v_042a8b === 'true') {
 
-        navigation.reset({
+        v_c65f5d.reset({
           index: 0,
-          routes: [{ name: ROUTES.map }],
+          routes: [{ name: v_ce4741.map }],
         });
       } else {
 
-        navigation.reset({
+        v_c65f5d.reset({
           index: 0,
-          routes: [{ name: ROUTES.login }],
+          routes: [{ name: v_ce4741.login }],
         });
       }
     }
-  } catch (error) {
-    console.error('타임아웃 처리 중 오류:', error);
-    if (navigation) {
+  } catch (v_5e9bfe) {
+    console.error('타임아웃 처리 중 오류:', v_5e9bfe);
+    if (v_c65f5d) {
 
-      navigation.reset({
+      v_c65f5d.reset({
         index: 0,
-        routes: [{ name: ROUTES.login }],
+        routes: [{ name: v_ce4741.login }],
       });
     }
   }
 };
 
-export const apiRequest = async (
-  url: string,
-  options: RequestInit = {},
-  navigation?: any,
+export const v_d61bb8 = async (
+  v_f71b56,
+  v_b36f96 = {},
+  v_c65f5d,
 ): Promise<Response> => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+  const v_4fc7c7 = new AbortController();
+  const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), v_8a74cb);
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
+    const v_3393e3 = await fetch(v_f71b56, {
+      ...v_b36f96,
+      signal: v_4fc7c7.signal,
     });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
+    clearTimeout(v_3894d5);
+    return v_3393e3;
+  } catch (v_5e9bfe) {
+    clearTimeout(v_3894d5);
+    if (v_5e9bfe instanceof Error && v_5e9bfe.name === 'AbortError') {
 
-      if (navigation) {
-        await handleTimeoutError(navigation);
+      if (v_c65f5d) {
+        await v_e4d665(v_c65f5d);
       }
       throw new Error('API request timeout');
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const gatewayRequest = async (
-  endpoint: string,
-  options: RequestInit = {},
-  navigation?: any,
+export const v_0a1127 = async (
+  v_09dafd,
+  v_b36f96 = {},
+  v_c65f5d,
 ): Promise<Response> => {
-  const env = getEnv();
-  const authCode = env.GATEWAY_AUTH_CODE;
-  const gatewayUrl = `${env.GATEWAY}${authCode}&endpoint=${endpoint}`;
+  const v_c9c489 = v_e4a763();
+  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+  const v_7dac96 = `${v_c9c489.GATEWAY}${v_36dd9e}&endpoint=${v_09dafd}`;
 
-  return apiRequest(gatewayUrl, options, navigation);
+  return v_d61bb8(v_7dac96, v_b36f96, v_c65f5d);
 };
 
-export const nodeGatewayRequest = async (
-  endpoint: string,
-  options: RequestInit = {},
-  navigation?: any,
+export const v_12a388 = async (
+  v_09dafd,
+  v_b36f96 = {},
+  v_c65f5d,
 ): Promise<Response> => {
-  const env = getEnv();
-  const baseUrl = env.GATEWAY_NODEJS;
-  const url = endpoint.startsWith('/') 
-    ? `${baseUrl}${endpoint}` 
-    : `${baseUrl}/${endpoint}`;
+  const v_c9c489 = v_e4a763();
+  const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+  const v_f71b56 = v_09dafd.startsWith('/') 
+    ? `${v_c01615}${v_09dafd}` 
+    : `${v_c01615}/${v_09dafd}`;
 
-  return apiRequest(url, options, navigation);
+  return v_d61bb8(v_f71b56, v_b36f96, v_c65f5d);
 };
 
-export const sendAliveSignal = async (
-  navigation?: any,
-): Promise<AliveResponse> => {
+export const v_495832 = async (
+  v_c65f5d,
+): Promise<v_96ef47> => {
 
   return Promise.resolve({
     success: true,
@@ -170,1334 +186,1449 @@ export const sendAliveSignal = async (
 
 };
 
-const createAxiosInstance = (navigation?: any) => {
-  const env = getEnv();
-  const baseURL = env.GATEWAY_NODEJS;
-  const authCode = env.GATEWAY_AUTH_CODE;
+const v_7488d5 = (v_c65f5d) => {
+  const v_c9c489 = v_e4a763();
+  const v_fed274 = v_c9c489.GATEWAY_NODEJS;
+  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
-  const instance = axios.create({
-    baseURL,
-    timeout: API_TIMEOUT,
+  const v_0c3a5b = v_b5030f.create({
+    baseURL: v_fed274,
+    timeout: v_8a74cb,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${authCode}`,
+      Authorization: `Bearer ${v_36dd9e}`,
     },
   });
 
-  instance.interceptors.request.use(
-    (config) => {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
-      return config;
+  v_0c3a5b.interceptors.request.use(
+    (v_74a79c) => {
+      console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
+      return v_74a79c;
     },
-    (error) => {
-      console.error('[API Request Error]', error);
-      return Promise.reject(error);
+    (v_5e9bfe) => {
+      console.error('[API Request Error]', v_5e9bfe);
+      return Promise.reject(v_5e9bfe);
     },
   );
 
-  instance.interceptors.response.use(
-    (response) => {
-      console.log(`[API Response] ${response.config.url}`, response.status);
-      return response;
+  v_0c3a5b.interceptors.response.use(
+    (v_3393e3) => {
+      console.log(`[API Response] ${v_3393e3.config.url}`, v_3393e3.status);
+      return v_3393e3;
     },
-    async (error: AxiosError) => {
+    async (error: v_3333d3) => {
 
-      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        console.error('[API Timeout]', error.config?.url);
-        if (navigation) {
-          await handleTimeoutError(navigation);
+      if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
+        console.error('[API Timeout]', v_5e9bfe.config?.url);
+        if (v_c65f5d) {
+          await v_e4d665(v_c65f5d);
         }
       } else {
 
         console.error('[API Error]', {
-          url: error.config?.url,
-          method: error.config?.method,
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          message: error.message,
+          url: v_5e9bfe.config?.url,
+          method: v_5e9bfe.config?.method,
+          status: v_5e9bfe.response?.status,
+          statusText: v_5e9bfe.response?.statusText,
+          data: v_5e9bfe.response?.data,
+          message: v_5e9bfe.message,
         });
       }
-      return Promise.reject(error);
+      return Promise.reject(v_5e9bfe);
     },
   );
 
-  return instance;
+  return v_0c3a5b;
 };
 
-export const checkEmailAvailability = async (
-  email: string,
-  navigation?: any,
+export const v_60e3a5 = async (
+  v_e0c7e8,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailCheckRequest = { email };
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_81dfe9 = { email: v_e0c7e8 };
 
-    console.log('[회원가입 1단계] 이메일 중복 확인 요청:', email);
+    console.log('[회원가입 1단계] 이메일 중복 확인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<EmailCheckResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_70f41f>(
       '/login-checker-email',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0]?.value === 'OK';
-    console.log('[회원가입 1단계] 이메일 중복 확인 결과:', result ? '사용 가능' : '중복');
+    const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
+    console.log('[회원가입 1단계] 이메일 중복 확인 결과:', v_43c42e ? '사용 가능' : '중복');
 
-    return result;
-  } catch (error) {
-    console.error('[회원가입 1단계] 이메일 중복 확인 실패:', error);
-    throw error;
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 1단계] 이메일 중복 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
   }
 };
 
-export const checkEmailExists = async (
-  email: string,
-  navigation?: any,
+export const v_f5ecec = async (
+  v_e0c7e8,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailExistsRequest = { email };
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_8fe320 = { email: v_e0c7e8 };
 
-    console.log('[로그인] 이메일 존재 확인 요청:', email);
+    console.log('[로그인] 이메일 존재 확인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<EmailExistsResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_7f7c81>(
       '/ap1810-i01',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0]?.result === true;
-    console.log('[로그인] 이메일 존재 확인 결과:', result ? '등록된 이메일' : '미등록 이메일');
+    const v_43c42e = v_3393e3.data.data[0]?.result === true;
+    console.log('[로그인] 이메일 존재 확인 결과:', v_43c42e ? '등록된 이메일' : '미등록 이메일');
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 이메일 존재 확인 실패:', error);
-    throw error;
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 존재 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
   }
 };
 
-export const checkReferralEmail = async (
-  referralEmail: string,
-  navigation?: any,
+export const v_01332e = async (
+  v_9bf12c,
+  v_c65f5d,
 ): Promise<number | null> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: ReferralCheckRequest = { email: referralEmail };
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_a357d3 = { email: v_9bf12c };
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', referralEmail);
+    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', v_9bf12c);
 
-    const response = await axiosInstance.post<ReferralCheckResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_d6bdce>(
       '/ap1810-i01',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0];
-    if (result?.result === true && result.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', result.member);
-      return result.member;
+    const v_43c42e = v_3393e3.data.data[0];
+    if (v_43c42e?.result === true && v_43c42e.member) {
+      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', v_43c42e.member);
+      return v_43c42e.member;
     } else {
       console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
       return null;
     }
-  } catch (error) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', error);
-    throw error;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
   }
 };
 
-export const signup = async (
-  signupData: SignupRequest,
-  navigation?: any,
+export const v_35200c = async (
+  signupData: v_e71577,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const v_9f42a4 = v_7488d5(v_c65f5d);
 
     console.log('[회원가입 3단계] 회원가입 실행 요청:', {
-      email: signupData.email,
-      firstname: signupData.firstname,
-      lastname: signupData.lastname,
-      gender: signupData.gender,
-      age: signupData.age,
-      os: signupData.os,
+      email: v_df7dab.email,
+      firstname: v_df7dab.firstname,
+      lastname: v_df7dab.lastname,
+      gender: v_df7dab.gender,
+      age: v_df7dab.age,
+      os: v_df7dab.os,
     });
 
-    const response = await axiosInstance.post<SignupResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_2c1a39>(
       '/login-06-joinAndAccount',
-      signupData,
+      v_df7dab,
     );
 
-    const result = response.data.data[0]?.text === 'ok';
-    console.log('[회원가입 3단계] 회원가입 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.data[0]?.text === 'ok';
+    console.log('[회원가입 3단계] 회원가입 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[회원가입 3단계] 회원가입 실행 실패:', error);
-    throw error;
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 3단계] 회원가입 실행 실패:', v_5e9bfe);
+    throw v_5e9bfe;
   }
 };
 
-export const checkLogin = async (
-  email: string,
-  pin: string,
-  navigation?: any,
+export const v_9d2541 = async (
+  v_e0c7e8,
+  v_6bee94,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: LoginCheckRequest = { email, pin };
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_3edf6c = { email: v_e0c7e8, pin: v_6bee94 };
 
-    console.log('[회원가입 4단계] 로그인 확인 요청:', email);
+    console.log('[회원가입 4단계] 로그인 확인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<LoginCheckResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_d5571c>(
       '/login-checker',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0]?.value === 'OK';
-    console.log('[회원가입 4단계] 로그인 확인 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
+    console.log('[회원가입 4단계] 로그인 확인 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[회원가입 4단계] 로그인 확인 실패:', error);
-    throw error;
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원가입 4단계] 로그인 확인 실패:', v_5e9bfe);
+    throw v_5e9bfe;
   }
 };
 
-export const SignupHelpers = {
+export const v_91bb22 = {
 
-  getGenderCode: (gender: 'male' | 'female'): number => {
-    return gender === 'male' ? 2110 : 2111;
+  getGenderCode: (v_c3eac4): number => {
+    return v_c3eac4 === 'male' ? 2110 : 2111;
   },
 
-  getAgeCode: (ageRange: '10' | '20' | '30' | '40' | '50+'): number => {
-    const ageMap: Record<string, number> = {
+  getAgeCode: (v_f83808): number => {
+    const v_c3889d = {
       '10': 2210,
       '20': 2220,
       '30': 2230,
       '40': 2240,
       '50+': 2250,
     };
-    return ageMap[ageRange] || 2220;
+    return v_c3889d[v_f83808] || 2220;
   },
 
   getOSCode: (): number => {
-    return Platform.OS === 'android' ? 3112 : 3113;
+    return v_326be8.OS === 'android' ? 3112 : 3113;
   },
 };
 
-export const encryptSHA256 = (text: string): string => {
-  return CryptoJS.SHA256(text).toString();
+export const v_a5170b = (v_9b6134): string => {
+  return v_a928e1.SHA256(v_9b6134).toString();
 };
 
-export const loginWithEmailPassword = async (
-  email: string,
-  pin: string,
-  navigation?: any,
-): Promise<LoginResponse> => {
+export const v_b699a9 = async (
+  v_e0c7e8,
+  v_6bee94,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailPasswordLoginRequest = {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_8fc862 = {
       type: 4,
-      email,
-      pin,
+      email: v_e0c7e8,
+      pin: v_6bee94,
     };
 
-    console.log('[로그인] 이메일/비밀번호 로그인 요청:', email);
+    console.log('[로그인] 이메일/비밀번호 로그인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<LoginResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
       '/login-01',
-      request,
+      v_576f5a,
     );
 
-    if (response.data.status === 'success') {
+    if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일/비밀번호 로그인 성공');
     } else {
-      console.error('[로그인] 이메일/비밀번호 로그인 실패:', response.data);
+      console.error('[로그인] 이메일/비밀번호 로그인 실패:', v_3393e3.data);
     }
 
-    return response.data;
-  } catch (error) {
-    console.error('[로그인] 이메일/비밀번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일/비밀번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const loginWithPassword = async (
-  pin: string,
-  mobile: string,
-  navigation?: any,
-): Promise<LoginResponse> => {
+export const v_508a17 = async (
+  v_6bee94,
+  v_49ea09,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: PasswordOnlyLoginRequest = {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_073611 = {
       type: 3,
-      pin,
-      mobile,
+      pin: v_6bee94,
+      mobile: v_49ea09,
     };
 
-    console.log('[로그인] 비밀번호 로그인 요청:', mobile);
+    console.log('[로그인] 비밀번호 로그인 요청:', v_49ea09);
 
-    const response = await axiosInstance.post<LoginResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
       '/login-01',
-      request,
+      v_576f5a,
     );
 
-    if (response.data.status === 'success') {
+    if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 비밀번호 로그인 성공');
     } else {
-      console.error('[로그인] 비밀번호 로그인 실패:', response.data);
+      console.error('[로그인] 비밀번호 로그인 실패:', v_3393e3.data);
     }
 
-    return response.data;
-  } catch (error) {
-    console.error('[로그인] 비밀번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 비밀번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const sendPhoneVerificationCode = async (
-  country: string,
-  mobile: string,
-  navigation?: any,
+export const v_2ecc3f = async (
+  v_b9bbbd,
+  v_49ea09,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: PhoneVerificationRequest = {
-      country,
-      mobile,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_7ec238 = {
+      country: v_b9bbbd,
+      mobile: v_49ea09,
     };
 
-    console.log('[로그인] 전화번호 인증 코드 발송 요청:', mobile);
+    console.log('[로그인] 전화번호 인증 코드 발송 요청:', v_49ea09);
 
-    const response = await axiosInstance.post<PhoneVerificationResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_c5fe19>(
       '/login-02',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0]?.status === true;
-    console.log('[로그인] 전화번호 인증 코드 발송 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.data[0]?.status === true;
+    console.log('[로그인] 전화번호 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 전화번호 인증 코드 발송 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 인증 코드 발송 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const verifyPhoneCode = async (
-  mobile: string,
-  code: string,
-  navigation?: any,
+export const v_3ca504 = async (
+  v_49ea09,
+  v_c99bd2,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: PhoneVerificationCodeRequest = {
-      mobile,
-      code,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_07bb04 = {
+      mobile: v_49ea09,
+      code: v_c99bd2,
     };
 
-    console.log('[로그인] 전화번호 인증 코드 확인 요청:', mobile);
+    console.log('[로그인] 전화번호 인증 코드 확인 요청:', v_49ea09);
 
-    const response = await axiosInstance.post<PhoneVerificationCodeResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_e7e12a>(
       '/login-03',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data === 'login';
-    console.log('[로그인] 전화번호 인증 코드 확인 결과:', result ? '로그인 가능' : '인증 실패');
+    const v_43c42e = v_3393e3.data.data === 'login';
+    console.log('[로그인] 전화번호 인증 코드 확인 결과:', v_43c42e ? '로그인 가능' : '인증 실패');
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 전화번호 인증 코드 확인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 인증 코드 확인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const loginWithMobile = async (
-  mobile: string,
-  navigation?: any,
-): Promise<LoginResponse> => {
+export const v_7e0a86 = async (
+  v_49ea09,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: MobileLoginRequest = {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_a88df4 = {
       type: 2,
-      mobile,
+      mobile: v_49ea09,
     };
 
-    console.log('[로그인] 전화번호 로그인 요청:', mobile);
+    console.log('[로그인] 전화번호 로그인 요청:', v_49ea09);
 
-    const response = await axiosInstance.post<LoginResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>(
       '/login-01',
-      request,
+      v_576f5a,
     );
 
-    if (response.data.status === 'success') {
+    if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 전화번호 로그인 성공');
     } else {
-      console.error('[로그인] 전화번호 로그인 실패:', response.data);
+      console.error('[로그인] 전화번호 로그인 실패:', v_3393e3.data);
     }
 
-    return response.data;
-  } catch (error) {
-    console.error('[로그인] 전화번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 전화번호 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const sendEmailVerificationCode = async (
-  email: string,
-  navigation?: any,
+export const v_8025d1 = async (
+  v_e0c7e8,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailVerificationRequest = {
-      email,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_897bd3 = {
+      email: v_e0c7e8,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', email);
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<EmailVerificationResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_3eb2f0>(
       '/check-02-email',
-      request,
+      v_576f5a,
     );
 
-    const status = response.data.data[0]?.status;
-    const result = status === true || status === 'true';
-    console.log('[로그인] 이메일 인증 코드 발송 결과:', result ? '성공' : '실패', { status });
+    const v_d308b5 = v_3393e3.data.data[0]?.status;
+    const v_43c42e = v_d308b5 === true || v_d308b5 === 'true';
+    console.log('[로그인] 이메일 인증 코드 발송 결과:', v_43c42e ? '성공' : '실패', { status: v_d308b5 });
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 이메일 인증 코드 발송 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 코드 발송 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const verifyEmailCode = async (
-  email: string,
-  code: string,
-  navigation?: any,
+export const v_415628 = async (
+  v_e0c7e8,
+  v_c99bd2,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailVerificationCodeRequest = {
-      email,
-      code,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_b2dc50 = {
+      email: v_e0c7e8,
+      code: v_c99bd2,
     };
 
-    console.log('[로그인] 이메일 인증 코드 확인 요청:', email);
+    console.log('[로그인] 이메일 인증 코드 확인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<EmailVerificationCodeResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_2f87f0>(
       '/login-03-email',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.status === 'success';
-    console.log('[로그인] 이메일 인증 코드 확인 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.status === 'success';
+    console.log('[로그인] 이메일 인증 코드 확인 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 이메일 인증 코드 확인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 코드 확인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const loginWithEmailAuth = async (
-  email: string,
-  navigation?: any,
-): Promise<EmailAuthLoginResponse> => {
+export const v_a81308 = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_2ff10f> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailAuthLoginRequest = {
-      email,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_5060a1 = {
+      email: v_e0c7e8,
     };
 
-    console.log('[로그인] 이메일 인증 로그인 요청:', email);
+    console.log('[로그인] 이메일 인증 로그인 요청:', v_e0c7e8);
 
-    const response = await axiosInstance.post<EmailAuthLoginResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_2ff10f>(
       '/login-04-email',
-      request,
+      v_576f5a,
     );
 
-    if (response.data.status === 'success') {
+    if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일 인증 로그인 성공');
     } else {
-      console.error('[로그인] 이메일 인증 로그인 실패:', response.data);
+      console.error('[로그인] 이메일 인증 로그인 실패:', v_3393e3.data);
     }
 
-    return response.data;
-  } catch (error) {
-    console.error('[로그인] 이메일 인증 로그인 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const saveSession = async (
-  member: number,
-  ssidw: string,
-  navigation?: any,
+export const v_ea3493 = async (
+  v_660822,
+  v_06cee6,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: SaveSessionRequest = {
-      member,
-      ssidw,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_d047dc = {
+      member: v_660822,
+      ssidw: v_06cee6,
     };
 
-    console.log('[로그인] 세션 저장 요청:', member);
+    console.log('[로그인] 세션 저장 요청:', v_660822);
 
-    const response = await axiosInstance.post<SaveSessionResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_60982a>(
       '/saveSsidw',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data[0]?.affectedRows === 1;
-    console.log('[로그인] 세션 저장 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.data[0]?.affectedRows === 1;
+    console.log('[로그인] 세션 저장 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[로그인] 세션 저장 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 세션 저장 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const getUserInfo = async (
-  member: number,
-  navigation?: any,
-): Promise<GetUserInfoResponse> => {
+export const v_98a863 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_85f3ff> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: GetUserInfoRequest = {
-      member,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_b8b333 = {
+      member: v_660822,
     };
 
-    console.log('[로그인] 사용자 정보 조회 요청:', member);
+    console.log('[로그인] 사용자 정보 조회 요청:', v_660822);
 
-    const response = await axiosInstance.get<GetUserInfoResponse>(
+    const v_3393e3 = await v_9f42a4.get<v_85f3ff>(
       '/app7000-01',
       {
-        params: request,
+        params: v_576f5a,
       },
     );
 
     console.log('[로그인] 사용자 정보 조회 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[로그인] 사용자 정보 조회 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[로그인] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const getMyPageUserInfo = async (
-  member: number,
-  navigation?: any,
-): Promise<GetMyPageUserInfoResponse> => {
+export const v_a7ab3c = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_0bd014> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: GetMyPageUserInfoRequest = {
-      member,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_72b8c4 = {
+      member: v_660822,
     };
 
-    console.log('[마이페이지] 사용자 정보 조회 요청:', member);
+    console.log('[마이페이지] 사용자 정보 조회 요청:', v_660822);
 
-    const response = await axiosInstance.post<GetMyPageUserInfoResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_0bd014>(
       '/app7110-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 사용자 정보 조회 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 사용자 정보 조회 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updateName = async (
-  member: number,
-  firstname: string,
-  navigation?: any,
-): Promise<UpdateNameResponse> => {
+export const v_152d53 = async (
+  v_660822,
+  v_54d565,
+  v_c65f5d,
+): Promise<v_680003> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdateNameRequest = {
-      member,
-      firstname,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bd3e83 = {
+      member: v_660822,
+      firstname: v_54d565,
     };
 
-    console.log('[마이페이지] 이름 수정 요청:', { member, firstname });
+    console.log('[마이페이지] 이름 수정 요청:', { member: v_660822, firstname: v_54d565 });
 
-    const response = await axiosInstance.post<UpdateNameResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_680003>(
       '/app7120-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 이름 수정 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 이름 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 이름 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updateLastName = async (
-  member: number,
-  lastname: string,
-  navigation?: any,
-): Promise<UpdateLastNameResponse> => {
+export const v_7f8c9e = async (
+  v_660822,
+  v_9517dc,
+  v_c65f5d,
+): Promise<v_2b5bdc> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdateLastNameRequest = {
-      member,
-      lastname,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_52573c = {
+      member: v_660822,
+      lastname: v_9517dc,
     };
 
-    console.log('[마이페이지] 성 수정 요청:', { member, lastname });
+    console.log('[마이페이지] 성 수정 요청:', { member: v_660822, lastname: v_9517dc });
 
-    const response = await axiosInstance.post<UpdateLastNameResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_2b5bdc>(
       '/app7130-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 성 수정 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 성 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 성 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updatePhone = async (
-  member: number,
-  mobile: string,
-  mobilecode: number,
-  navigation?: any,
-): Promise<UpdatePhoneResponse> => {
+export const v_53d723 = async (
+  v_660822,
+  v_49ea09,
+  v_3f1fb1,
+  v_c65f5d,
+): Promise<v_648048> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdatePhoneRequest = {
-      member,
-      mobile,
-      mobilecode,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_4ac02a = {
+      member: v_660822,
+      mobile: v_49ea09,
+      mobilecode: v_3f1fb1,
     };
 
-    console.log('[전화번호수정] 전화번호 수정 요청:', { member, mobile, mobilecode });
+    console.log('[전화번호수정] 전화번호 수정 요청:', { member: v_660822, mobile: v_49ea09, mobilecode: v_3f1fb1 });
 
-    const response = await axiosInstance.post<UpdatePhoneResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_648048>(
       '/app7153-03',
-      request,
+      v_576f5a,
     );
 
-    console.log('[전화번호수정] 전화번호 수정 성공:', response.data);
+    console.log('[전화번호수정] 전화번호 수정 성공:', v_3393e3.data);
 
-    return response.data;
-  } catch (error) {
-    console.error('[전화번호수정] 전화번호 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[전화번호수정] 전화번호 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[전화번호수정] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updateGender = async (
-  member: number,
-  gender: number,
-  navigation?: any,
-): Promise<UpdateGenderResponse> => {
+export const v_71d37e = async (
+  v_660822,
+  v_c3eac4,
+  v_c65f5d,
+): Promise<v_6896c1> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdateGenderRequest = {
-      member,
-      gender,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_32dea4 = {
+      member: v_660822,
+      gender: v_c3eac4,
     };
 
-    console.log('[마이페이지] 성별 수정 요청:', { member, gender });
+    console.log('[마이페이지] 성별 수정 요청:', { member: v_660822, gender: v_c3eac4 });
 
-    const response = await axiosInstance.post<UpdateGenderResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_6896c1>(
       '/app7180-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 성별 수정 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 성별 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 성별 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updateAge = async (
-  member: number,
-  ages: number,
-  navigation?: any,
-): Promise<UpdateAgeResponse> => {
+export const v_07f367 = async (
+  v_660822,
+  v_6e272b,
+  v_c65f5d,
+): Promise<v_3059f1> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdateAgeRequest = {
-      member,
-      ages,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_97a4a7 = {
+      member: v_660822,
+      ages: v_6e272b,
     };
 
-    console.log('[마이페이지] 나이 수정 요청:', { member, ages });
+    console.log('[마이페이지] 나이 수정 요청:', { member: v_660822, ages: v_6e272b });
 
-    const response = await axiosInstance.post<UpdateAgeResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_3059f1>(
       '/app7170-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 나이 수정 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 나이 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 나이 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const getCountries = async (
-  navigation?: any,
-): Promise<GetCountriesResponse> => {
+export const v_60f557 = async (
+  v_c65f5d,
+): Promise<v_c4dd46> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const v_9f42a4 = v_7488d5(v_c65f5d);
 
     console.log('[마이페이지] 국가 목록 조회 요청');
 
-    const response = await axiosInstance.get<GetCountriesResponse>('/countries');
+    const v_3393e3 = await v_9f42a4.get<v_c4dd46>('/countries');
 
     console.log('[마이페이지] 국가 목록 조회 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 국가 목록 조회 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 국가 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const getRegionsByCountry = async (
-  country: number,
-  navigation?: any,
-): Promise<GetRegionsByCountryResponse> => {
+export const v_11e39e = async (
+  v_b9bbbd,
+  v_c65f5d,
+): Promise<v_7d842d> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: GetRegionsByCountryRequest = {
-      country,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_6d05a4 = {
+      country: v_b9bbbd,
     };
 
-    console.log('[마이페이지] 지역 목록 조회 요청:', { country });
+    console.log('[마이페이지] 지역 목록 조회 요청:', { country: v_b9bbbd });
 
-    const response = await axiosInstance.post<GetRegionsByCountryResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_7d842d>(
       '/app7190-01',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 지역 목록 조회 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 지역 목록 조회 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 지역 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const updateRegion = async (
-  member: number,
-  country: number,
-  region: number,
-  navigation?: any,
-): Promise<UpdateRegionResponse> => {
+export const v_4296b8 = async (
+  v_660822,
+  v_b9bbbd,
+  v_a6c30b,
+  v_c65f5d,
+): Promise<v_9b135d> => {
   try {
 
-    if (country === undefined || country === null) {
+    if (v_b9bbbd === undefined || v_b9bbbd === null) {
       throw new Error('국가 코드가 유효하지 않습니다.');
     }
-    if (region === undefined || region === null) {
+    if (v_a6c30b === undefined || v_a6c30b === null) {
       throw new Error('지역 코드가 유효하지 않습니다.');
     }
 
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: UpdateRegionRequest = {
-      member,
-      country,
-      region,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bf21af = {
+      member: v_660822,
+      country: v_b9bbbd,
+      region: v_a6c30b,
     };
 
-    console.log('[마이페이지] 지역 수정 요청:', { member, country, region });
+    console.log('[마이페이지] 지역 수정 요청:', { member: v_660822, country: v_b9bbbd, region: v_a6c30b });
 
-    const response = await axiosInstance.post<UpdateRegionResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_9b135d>(
       '/app7190-02',
-      request,
+      v_576f5a,
     );
 
     console.log('[마이페이지] 지역 수정 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[마이페이지] 지역 수정 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[마이페이지] 지역 수정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const logout = async (
-  member: number,
-  navigation?: any,
-): Promise<LogoutResponse> => {
+export const v_d7d5a2 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_6ffbdd> => {
   try {
-    const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = env.GATEWAY_NODEJS;
-    const url = `${baseUrl}/logout-9705`;
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_f71b56 = `${v_c01615}/logout-9705`;
 
-    console.log('[로그아웃] 로그아웃 요청:', { member });
+    console.log('[로그아웃] 로그아웃 요청:', { member: v_660822 });
 
-    const response = await nodeGatewayRequest(
+    const v_3393e3 = await v_12a388(
       '/logout-9705',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${authCode}`,
+          Authorization: `Bearer ${v_36dd9e}`,
         },
         body: JSON.stringify({
-          member,
-        } as LogoutRequest),
+          member: v_660822,
+        } as v_13e1b8),
       },
-      navigation,
+      v_c65f5d,
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     }
 
-    const data: LogoutResponse = await response.json();
+    const data: v_6ffbdd = await v_3393e3.json();
     console.log('[로그아웃] 로그아웃 성공');
 
-    return data;
-  } catch (error) {
-    console.error('[로그아웃] 로그아웃 오류:', error);
-    if (error instanceof Error && error.message === 'API request timeout') {
+    return v_9390e8;
+  } catch (v_5e9bfe) {
+    console.error('[로그아웃] 로그아웃 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
 
-      throw error;
+      throw v_5e9bfe;
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const closeMembership = async (
-  member: number,
-  pin: string,
-  reason: string,
-  reasonNum: number,
-  navigation?: any,
+export const v_10a69f = async (
+  v_660822,
+  v_6bee94,
+  v_58ca36,
+  v_896cf8,
+  v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: CloseMembershipRequest = {
-      pin,
-      reason,
-      reasonNum,
-      member,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_62c808 = {
+      pin: v_6bee94,
+      reason: v_58ca36,
+      reasonNum: v_896cf8,
+      member: v_660822,
     };
 
-    console.log('[회원 탈퇴] 회원 탈퇴 요청:', { member, reasonNum });
+    console.log('[회원 탈퇴] 회원 탈퇴 요청:', { member: v_660822, reasonNum: v_896cf8 });
 
-    const response = await axiosInstance.post<CloseMembershipResponse>(
+    const v_3393e3 = await v_9f42a4.post<v_6dba58>(
       '/app8080-01',
-      request,
+      v_576f5a,
     );
 
-    const result = response.data.data?.[0]?.count === 1;
-    console.log('[회원 탈퇴] 회원 탈퇴 결과:', result ? '성공' : '실패');
+    const v_43c42e = v_3393e3.data.data?.[0]?.count === 1;
+    console.log('[회원 탈퇴] 회원 탈퇴 결과:', v_43c42e ? '성공' : '실패');
 
-    return result;
-  } catch (error) {
-    console.error('[회원 탈퇴] 회원 탈퇴 오류:', error);
-    if (error instanceof AxiosError) {
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[회원 탈퇴] 회원 탈퇴 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[회원 탈퇴] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 6371000; 
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+const v_b464ed = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+  const v_bef3bf = 6371000; 
+  const v_32a354 = (v_ed3911 - v_34b365) * Math.PI / 180;
+  const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+  const v_779914 =
+    Math.sin(v_32a354 / 2) * Math.sin(v_32a354 / 2) +
+    Math.cos(v_34b365 * Math.PI / 180) * Math.cos(v_ed3911 * Math.PI / 180) *
+    Math.sin(v_84b828 / 2) * Math.sin(v_84b828 / 2);
+  const v_3f4e2e = 2 * Math.atan2(Math.sqrt(v_779914), Math.sqrt(1 - v_779914));
+  return v_bef3bf * v_3f4e2e;
 };
 
-const calculateDirection = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const lat1Rad = lat1 * Math.PI / 180;
-  const lat2Rad = lat2 * Math.PI / 180;
-  const y = Math.sin(dLon) * Math.cos(lat2Rad);
-  const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
-  const bearing = Math.atan2(y, x) * 180 / Math.PI;
-  return (bearing + 360) % 360;
+const v_2dc24c = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+  const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+  const v_53e984 = v_34b365 * Math.PI / 180;
+  const v_01952a = v_ed3911 * Math.PI / 180;
+  const v_64877a = Math.sin(v_84b828) * Math.cos(v_01952a);
+  const v_62c214 = Math.cos(v_53e984) * Math.sin(v_01952a) - Math.sin(v_53e984) * Math.cos(v_01952a) * Math.cos(v_84b828);
+  const v_6f4cf9 = Math.atan2(v_64877a, v_62c214) * 180 / Math.PI;
+  return (v_6f4cf9 + 360) % 360;
 };
 
-export const fetchMapMarkerData = async (
-  latitude: number,
-  longitude: number,
-  member: number,
-  navigation?: any,
-): Promise<SpotData[]> => {
+export const v_f84ef5 = async (
+  v_b5de9c,
+  v_985be2,
+  v_660822,
+  v_c65f5d,
+): Promise<v_f71847[]> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const requestBody = {
-      member,
-      latitude,
-      longitude,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      latitude: v_b5de9c,
+      longitude: v_985be2,
       limit: 120,
     };
 
     console.log('=== fetchMapMarkerData API 호출 ===');
     console.log('endpoint: app2000-01');
-    console.log('requestBody:', JSON.stringify(requestBody));
+    console.log('requestBody:', JSON.stringify(v_cd6a57));
 
-    const response = await axiosInstance.post(
+    const v_3393e3 = await v_9f42a4.post(
       '/app2000-01',
-      requestBody,
+      v_cd6a57,
     );
 
-    const data = response.data;
+    const v_9390e8 = v_3393e3.data;
     console.log('=== fetchMapMarkerData API 응답 ===');
 
-    console.log('data.data length:', data?.data?.length);
+    console.log('data.data length:', v_9390e8?.data?.length);
 
-    if (data?.data && Array.isArray(data.data)) {
-      return data.data.map((item: any) => {
-        const markerLat = item.lat || item.latitude;
-        const markerLng = item.lng || item.longitude;
+    if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
+      return v_9390e8.data.map((v_8c0b26) => {
+        const v_1906d6 = v_8c0b26.lat || v_8c0b26.latitude;
+        const v_8cd402 = v_8c0b26.lng || v_8c0b26.longitude;
 
-        let distance = item.distance || 0;
-        if (markerLat && markerLng && (distance === 0 || !item.distance)) {
-          distance = calculateDistance(latitude, longitude, markerLat, markerLng);
+        let v_926d1c = v_8c0b26.distance || 0;
+        if (v_1906d6 && v_8cd402 && (v_926d1c === 0 || !v_8c0b26.distance)) {
+          v_926d1c = v_b464ed(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
         }
 
-        let direction = item.direction || 0;
-        if (markerLat && markerLng && (direction === 0 || !item.direction)) {
-          direction = calculateDirection(latitude, longitude, markerLat, markerLng);
+        let v_1fec52 = v_8c0b26.direction || 0;
+        if (v_1906d6 && v_8cd402 && (v_1fec52 === 0 || !v_8c0b26.direction)) {
+          v_1fec52 = v_2dc24c(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
         }
 
         return {
-          spotID: item.spotid || item.spotID || item.id || 0,
-          distance: distance,
-          direction: direction,
-          name: item.name || item.brand || item.coin || item.title || 'XRUN coin',
-          latitude: markerLat,
-          longitude: markerLng,
-          xrunPrice: item.xrunprice || item.xrunPrice || item.price || 0,
-          iconurl: item.iconurl || item.brandlogo || item.brandlogo_file || item.adthumbnail2 || item.adthumbnail2_file || '',
-          joindesc: item.joindesc || item.description || '',
-          brand: item.brand || item.coin || '',
-          coins: item.coins || item.coin || '',
-          coin: item.coin || '', 
+          spotID: v_8c0b26.spotid || v_8c0b26.spotID || v_8c0b26.id || 0,
+          distance: v_926d1c,
+          direction: v_1fec52,
+          name: v_8c0b26.name || v_8c0b26.brand || v_8c0b26.coin || v_8c0b26.title || 'XRUN coin',
+          latitude: v_1906d6,
+          longitude: v_8cd402,
+          xrunPrice: v_8c0b26.xrunprice || v_8c0b26.xrunPrice || v_8c0b26.price || 0,
+          iconurl: v_8c0b26.iconurl || v_8c0b26.brandlogo || v_8c0b26.brandlogo_file || v_8c0b26.adthumbnail2 || v_8c0b26.adthumbnail2_file || '',
+          joindesc: v_8c0b26.joindesc || v_8c0b26.description || '',
+          brand: v_8c0b26.brand || v_8c0b26.coin || '',
+          coins: v_8c0b26.coins || v_8c0b26.coin || '',
+          coin: v_8c0b26.coin || '', 
         };
       });
     }
 
     console.log('API 응답에 data.data가 없거나 배열이 아님');
     return [];
-  } catch (error) {
-    console.error('맵 마커 데이터 가져오기 오류:', error);
-    if (error instanceof AxiosError) {
+  } catch (v_5e9bfe) {
+    console.error('맵 마커 데이터 가져오기 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
       console.error('[맵 마커] 상세 오류 정보:', {
- * 알림(Notification) API 함수들
- */
-
-export const getNotificationList = async (
-  member: number,
-  start: number = 0,
-  navigation?: any,
-): Promise<NotificationListResponse> => {
-  try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationListRequest = {
-      member,
-      start,
-    };
-
-    console.log('[알림] 알림 목록 조회 요청:', { member, start });
-
-    const response = await axiosInstance.post<NotificationListResponse>(
-      '/ap6000-01',
-      request,
-    );
-
-    console.log('[알림] 알림 목록 조회 성공, 알림 개수:', response.data.data?.length || 0);
-
-    return response.data;
-  } catch (error) {
-    console.error('[알림] 알림 목록 조회 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
 
     return [];
-    throw error;
   }
 };
 
-export const sendNotificationMessage = async (
-  member: number,
-  title: string,
-  isBroadcast: boolean = false,
-  navigation?: any,
-): Promise<NotificationSendResponse> => {
+export const v_4b1d5e = async (
+  v_660822,
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_46181d> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationSendRequest = {
-      isBroadcast,
-      member,
-      title,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_ba49e9 = {
+      member: v_660822,
+      email: v_e0c7e8,
     };
 
-    console.log('[알림] 알림 메시지 전송 요청:', { member, title, isBroadcast });
+    console.log('[추천] 추천인 등록 요청 (이메일):', { member: v_660822, email: v_e0c7e8 });
 
-    const response = await axiosInstance.post<NotificationSendResponse>(
-      '/ap6000-02',
-      request,
+    const v_3393e3 = await v_9f42a4.post<v_46181d>(
+      '/app7410-01',
+      v_576f5a,
     );
 
-    console.log('[알림] 알림 메시지 전송 성공');
+    const v_43c42e = v_3393e3.data.data?.[0]?.data || '';
+    console.log('[추천] 추천인 등록 결과:', v_43c42e);
 
-    return response.data;
-  } catch (error) {
-    console.error('[알림] 알림 메시지 전송 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 등록 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const deleteNotificationMessage = async (
-  member: number,
-  board: number,
-  isBroadcast: boolean = false,
-  navigation?: any,
-): Promise<NotificationDeleteResponse> => {
+export const v_176911 = async (
+  v_c65f5d,
+): Promise<v_38bdda> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationDeleteRequest = {
-      isBroadcast,
-      member,
-      board,
-    };
+    const v_9f42a4 = v_7488d5(v_c65f5d);
 
-    console.log('[알림] 알림 메시지 삭제 요청:', { member, board, isBroadcast });
+    console.log('[추천] 랜덤 추천인 목록 조회 요청');
 
-    const response = await axiosInstance.post<NotificationDeleteResponse>(
-      '/ap6000-03',
-      request,
+    const v_3393e3 = await v_9f42a4.get<v_38bdda>(
+      '/app7420-01',
     );
 
-    console.log('[알림] 알림 메시지 삭제 성공');
+    console.log('[추천] 랜덤 추천인 목록 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
 
-    return response.data;
-  } catch (error) {
-    console.error('[알림] 알림 메시지 삭제 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 랜덤 추천인 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const deleteAllNotifications = async (
-  member: number,
-  navigation?: any,
-): Promise<NotificationDeleteAllResponse> => {
+export const v_2ce9ab = async (
+  v_660822,
+  v_830694,
+  v_c65f5d,
+): Promise<v_b675ff> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationDeleteAllRequest = {
-      member,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_184dd0 = {
+      member: v_660822,
+      posed: v_830694,
     };
 
-    console.log('[알림] 전체 알림 삭제 요청:', { member });
+    console.log('[추천] 랜덤 추천인 등록 요청:', { member: v_660822, posed: v_830694 });
 
-    const response = await axiosInstance.post<NotificationDeleteAllResponse>(
-      '/ap6000-04delete',
-      request,
+    const v_3393e3 = await v_9f42a4.post<v_b675ff>(
+      '/app7420-02',
+      v_576f5a,
     );
 
-    console.log('[알림] 전체 알림 삭제 성공');
+    const v_43c42e = v_3393e3.data.data?.[0]?.data || '';
+    console.log('[추천] 랜덤 추천인 등록 결과:', v_43c42e);
 
-    return response.data;
-  } catch (error) {
-    console.error('[알림] 전체 알림 삭제 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 랜덤 추천인 등록 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
   }
 };
 
-export const registerFCMToken = async (
-  pushkey: string,
-  member: number,
-  navigation?: any,
-): Promise<FCMTokenRegisterResponse> => {
+export const v_e58c11 = async (
+  v_660822,
+  v_a149d6,
+  v_c65f5d,
+): Promise<v_acff7d> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: FCMTokenRegisterRequest = {
-      pushkey,
-      member,
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_50b98d = {
+      member: v_660822,
+      recommand: v_a149d6,
     };
 
-    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+    console.log('[추천] 추천인 저장 요청:', { member: v_660822, recommand: v_a149d6 });
 
-    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
-      '/login-pushkeyreg',
-      request,
+    const v_3393e3 = await v_9f42a4.post<v_acff7d>(
+      '/saveRecommend',
+      v_576f5a,
     );
 
-    console.log('[알림] FCM 토큰 등록 성공');
+    console.log('[추천] 추천인 저장 성공');
 
-    return response.data;
-  } catch (error) {
-    console.error('[알림] FCM 토큰 등록 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 저장 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
       });
     }
-    throw error;
+    throw v_5e9bfe;
+  }
+};
+
+export const v_90af10 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_cdd3ce> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_baf73b = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 추천인 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_cdd3ce>(
+      '/app7420-03',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0];
+    console.log('[추천] 추천인 조회 결과:', {
+      email: v_43c42e?.email,
+      status: v_43c42e?.data,
+    });
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_baf3b8 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_b62495> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_60e215 = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_b62495>(
+      '/getRecommendedToMe',
+      v_576f5a,
+    );
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 내가 추천한 사람 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_bc3c7b = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_42f0a8> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_87b54d = {
+      email: v_e0c7e8,
+    };
+
+    console.log('[추천] 이메일로 회원 조회 요청:', { email: v_e0c7e8 });
+
+    const v_3393e3 = await v_9f42a4.post<v_42f0a8>(
+      '/ap1810-i01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0];
+    console.log('[추천] 이메일로 회원 조회 결과:', {
+      exists: v_43c42e?.result,
+      member: v_43c42e?.member,
+    });
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 이메일로 회원 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_e10c7c = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_3821b8> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_079660 = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 사용자 정보 조회 요청 (app7110-01):', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_3821b8>(
+      '/app7110-01',
+      v_576f5a,
+    );
+
+    console.log('[추천] 사용자 정보 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
   }
 };
 
