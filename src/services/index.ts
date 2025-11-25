@@ -64,6 +64,21 @@ import {
   NotificationDeleteAllResponse,
   FCMTokenRegisterRequest,
   FCMTokenRegisterResponse,
+  RegisterReferralByEmailRequest,
+  RegisterReferralByEmailResponse,
+  GetRandomReferralListResponse,
+  RegisterRandomReferralRequest,
+  RegisterRandomReferralResponse,
+  SaveReferralRequest,
+  SaveReferralResponse,
+  GetMyReferralRequest,
+  GetMyReferralResponse,
+  GetRecommendedToMeRequest,
+  GetRecommendedToMeResponse,
+  GetMemberByEmailRequest,
+  GetMemberByEmailResponse,
+  GetUserInfoForReferralRequest,
+  GetUserInfoForReferralResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1394,6 +1409,305 @@ export const registerFCMToken = async (
     console.error('[알림] FCM 토큰 등록 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const registerReferralByEmail = async (
+  member: number,
+  email: string,
+  navigation?: any,
+): Promise<RegisterReferralByEmailResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: RegisterReferralByEmailRequest = {
+      member,
+      email,
+    };
+
+    console.log('[추천] 추천인 등록 요청 (이메일):', { member, email });
+
+    const response = await axiosInstance.post<RegisterReferralByEmailResponse>(
+      '/app7410-01',
+      request,
+    );
+
+    const result = response.data.data?.[0]?.data || '';
+    console.log('[추천] 추천인 등록 결과:', result);
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 추천인 등록 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRandomReferralList = async (
+  navigation?: any,
+): Promise<GetRandomReferralListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[추천] 랜덤 추천인 목록 조회 요청');
+
+    const response = await axiosInstance.get<GetRandomReferralListResponse>(
+      '/app7420-01',
+    );
+
+    console.log('[추천] 랜덤 추천인 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 랜덤 추천인 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const registerRandomReferral = async (
+  member: number,
+  posed: number,
+  navigation?: any,
+): Promise<RegisterRandomReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: RegisterRandomReferralRequest = {
+      member,
+      posed,
+    };
+
+    console.log('[추천] 랜덤 추천인 등록 요청:', { member, posed });
+
+    const response = await axiosInstance.post<RegisterRandomReferralResponse>(
+      '/app7420-02',
+      request,
+    );
+
+    const result = response.data.data?.[0]?.data || '';
+    console.log('[추천] 랜덤 추천인 등록 결과:', result);
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 랜덤 추천인 등록 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const saveReferral = async (
+  member: number,
+  recommand: number,
+  navigation?: any,
+): Promise<SaveReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SaveReferralRequest = {
+      member,
+      recommand,
+    };
+
+    console.log('[추천] 추천인 저장 요청:', { member, recommand });
+
+    const response = await axiosInstance.post<SaveReferralResponse>(
+      '/saveRecommend',
+      request,
+    );
+
+    console.log('[추천] 추천인 저장 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 추천인 저장 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyReferral = async (
+  member: number,
+  navigation?: any,
+): Promise<GetMyReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyReferralRequest = {
+      member,
+    };
+
+    console.log('[추천] 추천인 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyReferralResponse>(
+      '/app7420-03',
+      request,
+    );
+
+    const result = response.data.data?.[0];
+    console.log('[추천] 추천인 조회 결과:', {
+      email: result?.email,
+      status: result?.data,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 추천인 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRecommendedToMe = async (
+  member: number,
+  navigation?: any,
+): Promise<GetRecommendedToMeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRecommendedToMeRequest = {
+      member,
+    };
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetRecommendedToMeResponse>(
+      '/getRecommendedToMe',
+      request,
+    );
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 내가 추천한 사람 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMemberByEmail = async (
+  email: string,
+  navigation?: any,
+): Promise<GetMemberByEmailResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMemberByEmailRequest = {
+      email,
+    };
+
+    console.log('[추천] 이메일로 회원 조회 요청:', { email });
+
+    const response = await axiosInstance.post<GetMemberByEmailResponse>(
+      '/ap1810-i01',
+      request,
+    );
+
+    const result = response.data.data?.[0];
+    console.log('[추천] 이메일로 회원 조회 결과:', {
+      exists: result?.result,
+      member: result?.member,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 이메일로 회원 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getUserInfoForReferral = async (
+  member: number,
+  navigation?: any,
+): Promise<GetUserInfoForReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetUserInfoForReferralRequest = {
+      member,
+    };
+
+    console.log('[추천] 사용자 정보 조회 요청 (app7110-01):', { member });
+
+    const response = await axiosInstance.post<GetUserInfoForReferralResponse>(
+      '/app7110-01',
+      request,
+    );
+
+    console.log('[추천] 사용자 정보 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 사용자 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
