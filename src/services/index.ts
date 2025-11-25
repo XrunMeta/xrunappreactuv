@@ -1313,7 +1313,9 @@ export const v_f84ef5 = async (
           brand: v_8c0b26.brand || v_8c0b26.coin || '',
           coins: v_8c0b26.coins || v_8c0b26.coin || '',
           coin: v_8c0b26.coin || '', 
-        };
+
+          campid: v_8c0b26.campid || v_8c0b26.campId || v_8c0b26.campaignid || v_8c0b26.campaignId || '',
+        } as v_f71847 & { campid?: string };
       });
     }
 

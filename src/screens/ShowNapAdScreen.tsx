@@ -65,7 +65,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
   const [v_915a6b, v_d2702f] = v_5ab095(false);
   const [v_3aedd0, v_6f8b23] = v_5ab095<CampaignData | null>(null);
   const [v_32428f, v_f775f7] = v_5ab095(0);
-  const [v_54c38a] = v_5ab095(10);
+  const [v_54c38a] = v_5ab095(3);
   const [v_7b73c7, v_ed6932] = v_5ab095(false);
   const [v_5267b5, v_9b0de5] = v_5ab095(false);
   const [v_9c4d53, v_8b3d54] = v_5ab095(false);
@@ -116,11 +116,21 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       v_deef62(true);
 
       const v_e7f87b = await v_f3de6d();
+
+      const v_aa0917 = v_d0b6d4?.campid || '';
+      console.log('=== ShowNapAdScreen API 호출 정보 ===');
+      console.log('member:', v_660822);
+      console.log('adid:', v_e7f87b.adid);
+      console.log('campid:', v_aa0917);
+      console.log('advertisementParams:', JSON.stringify(v_d0b6d4, null, 2));
+      console.log('deviceInfo:', JSON.stringify(v_e7f87b, null, 2));
+      console.log('=== API 호출 정보 끝 ===');
+
       const v_43c42e = await v_1c4683(
         v_660822,
         v_e7f87b.adid,
         v_e7f87b,
-        v_d0b6d4?.campid || '',
+        v_aa0917,
         v_9b57fc,
       );
 
