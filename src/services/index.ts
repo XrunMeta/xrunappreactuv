@@ -1253,7 +1253,7 @@ export const v_f84ef5 = async (
 
     const v_9390e8 = v_3393e3.data;
     console.log('=== fetchMapMarkerData API 응답 ===');
-    console.log('data:', v_9390e8);
+
     console.log('data.data length:', v_9390e8?.data?.length);
 
     if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {

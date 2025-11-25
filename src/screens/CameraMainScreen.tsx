@@ -1,4 +1,4 @@
-import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae, v_de06a3 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
@@ -9,34 +9,207 @@ import {
   v_09d0e5,
   v_a2349e,
   v_cdbae1,
+  v_6b5698,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
+import * as v_8a44cb from 'zryrlwvgokjhz';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f4e704 } from '../components';
-import { v_60c7c3 } from '../types';
+import { v_60c7c3, v_f71847 } from '../types';
+import { v_f84ef5 } from '../services';
+import { v_a0daa8 } from '../navigation';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
+
+const v_4ac6a7 = [
+  { spotID: 1, x: 0, y: 0 },
+  { spotID: 2, x: -100, y: 50 },
+  { spotID: 3, x: 100, y: 50 },
+  { spotID: 4, x: -50, y: 150 },
+];
+
+const v_69ee00 = (v_3b402b, v_4f2c9c): number => {
+  return v_3b402b + (Math.random() * (v_4f2c9c * 2) - v_4f2c9c);
+};
 
 interface TokenComponentProps {
   token: v_60c7c3;
   onPress: () => void;
+  animationRefs: v_a3453e.MutableRefObject<Map<number, v_a3453e.MutableRefObject<v_a2349e.CompositeAnimation | null>>>;
+  appState: string;
 }
 
-const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({ token: v_21cc31, onPress: v_719eed }) => {
+const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({ token: v_21cc31, onPress: v_719eed, animationRefs: v_5b4d76, appState: v_94a194 }) => {
+  const v_4da25a = v_e662ae(new v_a2349e.ValueXY({ x: 0, y: 0 })).current;
   const v_e28e12 = v_e662ae(new v_a2349e.Value(0)).current;
-
-  v_c4deb2(() => {
-
-    v_a2349e.timing(v_e28e12, {
-      toValue: 1,
-      duration: 200,
-      easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
-      useNativeDriver: true,
-    }).start();
-  }, []);
+  const v_f2d721 = v_e662ae(new v_a2349e.Value(1)).current;
+  const v_004f29 = v_e662ae<v_a2349e.CompositeAnimation | null>(null);
+  const v_fd0a18 = v_e662ae(true);
 
   const v_926d1c = v_21cc31.distance || 0;
   const v_ec1ad7 = Math.max(40, Math.min(200, v_926d1c * 4 + 40));
+
+  const v_fef1e8 = v_de06a3(() => {
+    if (!v_fd0a18.current) {
+      return;
+    }
+
+    if (v_004f29.current) {
+      v_004f29.current.stop();
+    }
+
+    const v_62e721 = [
+      v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
+      v_cdbae1.bezier(0.42, 0, 0.58, 1),
+      v_cdbae1.bezier(0.5, 0, 0.75, 0.9),
+      v_cdbae1.bezier(0.15, 0.85, 0.85, 0.15),
+      v_cdbae1.bezier(0.68, -0.55, 0.27, 1.55),
+    ];
+
+    const v_04d9bc = Math.random() * (3000 - 2000) + 2000;
+
+    v_004f29.current = v_a2349e.sequence([
+      v_a2349e.timing(v_4da25a, {
+        toValue: {
+          x: v_69ee00(v_4ac6a7[v_21cc31.spotID - 1]?.x || 0, 70),
+          y: v_69ee00(v_4ac6a7[v_21cc31.spotID - 1]?.y || 0, 200),
+        },
+        duration: 300,
+        easing: v_62e721[0],
+        useNativeDriver: true,
+      }),
+      v_a2349e.delay(v_04d9bc),
+    ]);
+
+    v_004f29.current.start(() => {
+      if (v_fd0a18.current) {
+        v_fef1e8();
+      }
+    });
+  }, [v_21cc31.spotID, v_4da25a]);
+
+  const v_9305dc = v_de06a3(() => {
+    if (!v_fd0a18.current) {
+      return;
+    }
+
+    const v_1fec52 = Math.random() < 0.5 ? -1 : 1;
+    const v_5163df = 400 * v_1fec52;
+    const v_ec9ad9 = v_21cc31.spotID - 1;
+    const v_c5ac8b = v_4ac6a7[v_ec9ad9] || v_4ac6a7[0];
+
+    v_a2349e.parallel([
+      v_a2349e.timing(v_4da25a, {
+        toValue: {
+          x: v_c5ac8b.x + v_5163df,
+          y: v_c5ac8b.y - 200,
+        },
+        duration: 1,
+        easing: v_cdbae1.circle,
+        useNativeDriver: true,
+      }),
+      v_a2349e.timing(v_e28e12, {
+        toValue: 1,
+        duration: 200,
+        easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      if (v_fd0a18.current) {
+        v_fef1e8();
+        setTimeout(() => {
+          if (v_fd0a18.current) {
+            v_941ea0();
+          }
+        }, 300000); 
+      }
+    });
+  }, [v_21cc31.spotID, v_4da25a, v_e28e12, v_fef1e8]);
+
+  const v_941ea0 = v_de06a3(() => {
+    if (!v_fd0a18.current) {
+      return;
+    }
+
+    if (v_004f29.current) {
+      v_004f29.current.stop();
+    }
+
+    const v_1fec52 = Math.random() < 0.5 ? -1 : 1;
+    const v_5163df = 400 * v_1fec52;
+    const v_ec9ad9 = v_21cc31.spotID - 1;
+    const v_c5ac8b = v_4ac6a7[v_ec9ad9] || v_4ac6a7[0];
+
+    v_a2349e.parallel([
+      v_a2349e.timing(v_4da25a, {
+        toValue: {
+          x: v_c5ac8b.x + v_5163df,
+          y: v_c5ac8b.y,
+        },
+        duration: 300,
+        easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => {
+        if (v_fd0a18.current) {
+          v_9305dc();
+        }
+      }, 100);
+    });
+  }, [v_21cc31.spotID, v_4da25a, v_9305dc]);
+
+  v_c4deb2(() => {
+    v_5b4d76.current.set(v_21cc31.spotID, v_004f29);
+    return () => {
+      v_5b4d76.current.delete(v_21cc31.spotID);
+    };
+  }, [v_21cc31.spotID, v_5b4d76]);
+
+  v_c4deb2(() => {
+    if (v_94a194 === 'active') {
+      v_fd0a18.current = true;
+      if (v_004f29.current) {
+        v_fef1e8();
+      }
+    } else if (v_94a194.match(/inactive|background/)) {
+      v_fd0a18.current = false;
+      if (v_004f29.current) {
+        v_004f29.current.stop();
+      }
+    }
+  }, [v_94a194, v_fef1e8]);
+
+  v_c4deb2(() => {
+    v_4da25a.setValue({
+      x: Math.random() * 300 - 150,
+      y: Math.random() * 300 - 150,
+    });
+
+    const v_d620a9 = 300; 
+    v_a2349e.loop(
+      v_a2349e.sequence([
+        v_a2349e.timing(v_f2d721, {
+          toValue: 0,
+          duration: v_d620a9,
+          easing: v_cdbae1.linear,
+          useNativeDriver: true,
+        }),
+        v_a2349e.timing(v_f2d721, {
+          toValue: 1,
+          duration: v_d620a9 * 0.8,
+          easing: v_cdbae1.linear,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    v_9305dc();
+  }, [v_9305dc, v_4da25a, v_f2d721]);
+
+  const v_ec9ad9 = v_21cc31.spotID - 1;
+  const v_c5ac8b = v_4ac6a7[v_ec9ad9] || v_4ac6a7[0];
 
   return (
     <Animated.View
@@ -45,8 +218,18 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({ token: v_21cc31, onP
         {
           opacity: v_e28e12,
           transform: [
-            { translateX: v_21cc31.x },
-            { translateY: v_21cc31.y },
+            {
+              translateX: v_4da25a.x.interpolate({
+                inputRange: [-200, 200],
+                outputRange: [-200, 200],
+              }),
+            },
+            {
+              translateY: v_4da25a.y.interpolate({
+                inputRange: [-200, 200],
+                outputRange: [-200, 200],
+              }),
+            },
           ],
         },
       ]}>
@@ -84,6 +267,18 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({ token: v_21cc31, onP
         style={v_d81136.tokenButtonContainer}
         activeOpacity={0.7}>
         <View style={v_d81136.tokenButton}>
+          {}
+          {parseFloat(String(v_926d1c)) < 20 && v_f0b2c0 && (
+            <Animated.Image
+              source={v_f0b2c0}
+              style={[
+                v_d81136.blinkImage,
+                {
+                  opacity: v_f2d721,
+                },
+              ]}
+            />
+          )}
           {v_ed24ee && (
             <Image
               source={v_ed24ee}
@@ -142,6 +337,7 @@ try {
 
 let v_ed24ee = null;
 let v_5be6d0 = null;
+let v_f0b2c0 = null;
 
 try {
   v_ed24ee = require('../../assets/images/icon_xrun_white.png');
@@ -155,6 +351,12 @@ try {
   console.warn('icon_bottom.png not found');
 }
 
+try {
+  v_f0b2c0 = require('../../assets/images/icon_catch.png');
+} catch (v_9e86fd) {
+  console.warn('icon_catch.png not found');
+}
+
 interface CameraMainScreenProps {
   activeTab?: 'Map' | 'Camera';
   onTabChange?: (tab: 'Map' | 'Camera') => void;
@@ -164,6 +366,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   activeTab: v_ac1d22 = 'Camera',
   onTabChange: v_d52709,
 }) => {
+  const { navigate: v_9b57fc } = v_a0daa8();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
   const [v_572bd3, v_6a4dcd] = v_5ab095(false);
@@ -171,11 +374,192 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_8f79f8 = v_e662ae(new v_a2349e.Value(20)).current;
 
+  const [v_ef86b6, v_8ce112] = v_5ab095<v_60c7c3[]>([]);
+  const [v_683210, v_34a50a] = v_5ab095(true);
+  const v_a96760 = v_e662ae(0);
+  const v_253a77 = 4;
+
+  const v_5b4d76 = v_e662ae<Map<number, v_a3453e.MutableRefObject<v_a2349e.CompositeAnimation | null>>>(new Map());
+
+  const [v_94a194, v_3fff8d] = v_5ab095(v_6b5698.currentState);
+
+  const v_0b2c53 = v_e662ae(false);
+
   v_c4deb2(() => {
     if (v_d1a6bb && !v_d1a6bb.granted) {
       v_1e66f0();
     }
   }, [v_d1a6bb]);
+
+  const v_7c560c = (spotData: v_f71847[], v_6e5804): v_60c7c3[] => {
+    const v_da1995 = Math.min(v_253a77, v_1d0937.length);
+    let nextData: v_f71847[] = [];
+
+    if (v_6e5804 + v_da1995 > v_1d0937.length) {
+      v_2e375c = [
+        ...v_1d0937.slice(v_6e5804),
+        ...v_1d0937.slice(0, (v_6e5804 + v_da1995) % v_1d0937.length),
+      ];
+    } else {
+      v_2e375c = v_1d0937.slice(v_6e5804, v_6e5804 + v_da1995);
+    }
+
+    return v_2e375c.map((v_9390e8, v_a56041) => {
+      const v_c5ac8b = v_4ac6a7[v_a56041 % v_4ac6a7.length];
+      return {
+        spotID: v_c5ac8b.spotID,
+        x: v_c5ac8b.x,
+        y: v_c5ac8b.y,
+        xrunPrice: v_9390e8.xrunPrice || 0,
+        distance: v_9390e8.distance || 0,
+        name: v_9390e8.name || 'XRUN coin',
+        iconurl: v_9390e8.iconurl || '',
+        joindesc: v_9390e8.joindesc || '',
+        brand: v_9390e8.brand || '',
+        advertisement: v_9390e8.coin || '',
+        coin: v_9390e8.coin || '',
+        member: '',
+        campid: '',
+      };
+    });
+  };
+
+  const v_c4c061 = v_de06a3(async (v_9d6a91 = false) => {
+
+    if (v_0b2c53.current && !v_9d6a91) {
+      return;
+    }
+
+    try {
+      v_34a50a(true);
+      console.log('=== CameraMainScreen 데이터 로딩 시작 ===', v_9d6a91 ? '(강제 새로고침)' : '');
+
+      if (!v_9d6a91) {
+        const v_99c46d = await v_e84827.getItem('astorCoinsData');
+
+        if (v_99c46d) {
+          console.log('✅ AsyncStorage에서 astorCoinsData 발견');
+          try {
+            const v_b9ce93 = JSON.parse(v_99c46d);
+
+            if (v_b9ce93 && Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+
+              const spotDataArray: v_f71847[] = v_b9ce93.map((v_51b584) => ({
+                spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
+                distance: v_51b584.distance || 0,
+                direction: v_51b584.direction || 0,
+                name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
+                latitude: v_51b584.latitude || v_51b584.lat,
+                longitude: v_51b584.longitude || v_51b584.lng,
+                xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
+                iconurl: v_51b584.iconurl || '',
+                joindesc: v_51b584.joindesc || '',
+                brand: v_51b584.brand || v_51b584.coin || '',
+                coins: v_51b584.coins || v_51b584.coin || '',
+                coin: v_51b584.coin || '',
+              }));
+
+              if (v_22ecab.length > 0) {
+                const v_f25b07 = v_7c560c(v_22ecab, v_a96760.current);
+                v_8ce112(v_f25b07);
+                v_a96760.current = (v_a96760.current + Math.min(v_253a77, v_22ecab.length)) % v_22ecab.length;
+              } else {
+                v_8ce112([]);
+              }
+
+              v_0b2c53.current = true;
+              v_34a50a(false);
+              return;
+            }
+          } catch (v_5f9add) {
+            console.error('astorCoinsData 파싱 오류:', v_5f9add);
+          }
+        }
+      }
+
+      if (v_9d6a91) {
+        console.log('🔄 서버에서 새 데이터 가져오기');
+      } else {
+        console.log('⚠️ AsyncStorage에 데이터 없음, API 호출');
+      }
+
+      const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
+      if (v_d308b5 !== 'granted') {
+        console.log('위치 권한이 없습니다.');
+        v_34a50a(false);
+        return;
+      }
+
+      const v_7dd198 = await v_8a44cb.getCurrentPositionAsync({
+        accuracy: v_8a44cb.Accuracy.High,
+      });
+
+      const v_ef7306 = await v_e84827.getItem('userData');
+      if (!v_ef7306) {
+        console.log('userData가 없습니다.');
+        v_34a50a(false);
+        return;
+      }
+
+      const v_ff39bc = JSON.parse(v_ef7306);
+      const v_660822 = v_ff39bc?.member;
+      if (!v_660822) {
+        console.log('userData에 member가 없습니다.');
+        v_34a50a(false);
+        return;
+      }
+
+      const v_003147 = await v_f84ef5(
+        v_7dd198.coords.latitude,
+        v_7dd198.coords.longitude,
+        v_660822,
+        v_9b57fc,
+      );
+
+      if (v_003147 && v_003147.length > 0) {
+
+        await v_e84827.setItem('astorCoinsData', JSON.stringify(v_003147));
+
+        const v_f25b07 = v_7c560c(v_003147, v_a96760.current);
+        v_8ce112(v_f25b07);
+        v_a96760.current = (v_a96760.current + Math.min(v_253a77, v_003147.length)) % v_003147.length;
+      } else {
+        v_8ce112([]);
+      }
+
+      v_0b2c53.current = true;
+    } catch (v_5e9bfe) {
+      console.error('데이터 로딩 오류:', v_5e9bfe);
+      v_8ce112([]);
+    } finally {
+      v_34a50a(false);
+    }
+  }, [v_9b57fc]);
+
+  v_c4deb2(() => {
+    if (!v_0b2c53.current) {
+      v_c4c061(false); 
+    }
+  }, []); 
+
+  v_c4deb2(() => {
+    const v_ad1d65 = setInterval(() => {
+      console.log('⏰ 20초 경과 - 서버에서 새 데이터 가져오기');
+      v_c4c061(true); 
+    }, 20000); 
+
+    return () => clearInterval(v_ad1d65);
+  }, []); 
+
+  v_c4deb2(() => {
+    const v_269481 = v_6b5698.addEventListener('change', (v_3b10d8) => {
+      v_3fff8d(v_3b10d8);
+    });
+
+    return () => {
+      v_269481?.remove();
+    };
+  }, []);
 
   const v_6a213b = (v_6e55b1) => {
     console.log('Navigation item pressed:', v_6e55b1);
@@ -224,13 +608,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_6a4dcd(true);
     }
   };
-
-  const initialTokens: v_60c7c3[] = [
-    { spotID: 1, x: 0, y: 0, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 2, x: -100, y: -50, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 3, x: 100, y: -50, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 4, x: -50, y: 100, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-  ];
 
   const v_fce460 = [
     { id: 'wallet', label: 'Wallet', icon: v_8daafe },
@@ -296,15 +673,25 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         {
 
 }
-        <View style={[v_d81136.tokenContainer, { bottom: v_572bd3 && v_04cb77 ? 200 : 110 }]}>
-          {v_3696ca.map((v_21cc31) => (
-            <TokenComponent
-              key={v_21cc31.spotID}
-              token={v_21cc31}
-              onPress={() => v_eed806(v_21cc31)}
-            />
-          ))}
-        </View>
+        {v_683210 ? (
+          <View style={[v_d81136.tokenContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+            <Text style={{ color: 'white' }}>Loading...</Text>
+          </View>
+        ) : (
+          <View style={[v_d81136.tokenContainer, { bottom: v_572bd3 && v_04cb77 ? 200 : 110 }]}>
+            {v_ef86b6
+              .sort((v_779914, v_148ff6) => (v_148ff6.distance || 0) - (v_779914.distance || 0)) 
+              .map((v_21cc31) => (
+                <TokenComponent
+                  key={v_21cc31.spotID}
+                  token={v_21cc31}
+                  onPress={() => v_eed806(v_21cc31)}
+                  animationRefs={v_5b4d76}
+                  appState={v_94a194}
+                />
+              ))}
+          </View>
+        )}
 
         {}
         {
@@ -596,6 +983,14 @@ const v_d81136 = v_472849.create({
     fontSize: 10,
     marginTop: -2,
     textAlign: 'center',
+  },
+
+  blinkImage: {
+    resizeMode: 'contain',
+    height: 100,
+    width: 100,
+    position: 'absolute',
+    top: -80,
   },
 });
 
