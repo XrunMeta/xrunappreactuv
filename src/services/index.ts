@@ -64,6 +64,21 @@ import {
   v_294d11,
   v_0671ef,
   v_ed2980,
+  v_ba49e9,
+  v_46181d,
+  v_38bdda,
+  v_184dd0,
+  v_b675ff,
+  v_50b98d,
+  v_acff7d,
+  v_baf73b,
+  v_cdd3ce,
+  v_60e215,
+  v_b62495,
+  v_87b54d,
+  v_42f0a8,
+  v_079660,
+  v_3821b8,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -1394,6 +1409,305 @@ export const v_903861 = async (
     console.error('[알림] FCM 토큰 등록 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[알림] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4b1d5e = async (
+  v_660822,
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_46181d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_ba49e9 = {
+      member: v_660822,
+      email: v_e0c7e8,
+    };
+
+    console.log('[추천] 추천인 등록 요청 (이메일):', { member: v_660822, email: v_e0c7e8 });
+
+    const v_3393e3 = await v_9f42a4.post<v_46181d>(
+      '/app7410-01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0]?.data || '';
+    console.log('[추천] 추천인 등록 결과:', v_43c42e);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 등록 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_176911 = async (
+  v_c65f5d,
+): Promise<v_38bdda> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[추천] 랜덤 추천인 목록 조회 요청');
+
+    const v_3393e3 = await v_9f42a4.get<v_38bdda>(
+      '/app7420-01',
+    );
+
+    console.log('[추천] 랜덤 추천인 목록 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 랜덤 추천인 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_2ce9ab = async (
+  v_660822,
+  v_830694,
+  v_c65f5d,
+): Promise<v_b675ff> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_184dd0 = {
+      member: v_660822,
+      posed: v_830694,
+    };
+
+    console.log('[추천] 랜덤 추천인 등록 요청:', { member: v_660822, posed: v_830694 });
+
+    const v_3393e3 = await v_9f42a4.post<v_b675ff>(
+      '/app7420-02',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0]?.data || '';
+    console.log('[추천] 랜덤 추천인 등록 결과:', v_43c42e);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 랜덤 추천인 등록 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_e58c11 = async (
+  v_660822,
+  v_a149d6,
+  v_c65f5d,
+): Promise<v_acff7d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_50b98d = {
+      member: v_660822,
+      recommand: v_a149d6,
+    };
+
+    console.log('[추천] 추천인 저장 요청:', { member: v_660822, recommand: v_a149d6 });
+
+    const v_3393e3 = await v_9f42a4.post<v_acff7d>(
+      '/saveRecommend',
+      v_576f5a,
+    );
+
+    console.log('[추천] 추천인 저장 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 저장 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_90af10 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_cdd3ce> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_baf73b = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 추천인 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_cdd3ce>(
+      '/app7420-03',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0];
+    console.log('[추천] 추천인 조회 결과:', {
+      email: v_43c42e?.email,
+      status: v_43c42e?.data,
+    });
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 추천인 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_baf3b8 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_b62495> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_60e215 = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_b62495>(
+      '/getRecommendedToMe',
+      v_576f5a,
+    );
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 내가 추천한 사람 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_bc3c7b = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_42f0a8> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_87b54d = {
+      email: v_e0c7e8,
+    };
+
+    console.log('[추천] 이메일로 회원 조회 요청:', { email: v_e0c7e8 });
+
+    const v_3393e3 = await v_9f42a4.post<v_42f0a8>(
+      '/ap1810-i01',
+      v_576f5a,
+    );
+
+    const v_43c42e = v_3393e3.data.data?.[0];
+    console.log('[추천] 이메일로 회원 조회 결과:', {
+      exists: v_43c42e?.result,
+      member: v_43c42e?.member,
+    });
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 이메일로 회원 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_e10c7c = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_3821b8> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_079660 = {
+      member: v_660822,
+    };
+
+    console.log('[추천] 사용자 정보 조회 요청 (app7110-01):', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_3821b8>(
+      '/app7110-01',
+      v_576f5a,
+    );
+
+    console.log('[추천] 사용자 정보 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[추천] 사용자 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[추천] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

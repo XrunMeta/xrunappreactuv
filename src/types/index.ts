@@ -447,3 +447,95 @@ export interface FCMTokenRegisterResponse {
   message?: string;
 }
 
+export interface RegisterReferralByEmailRequest {
+  member: number; 
+  email: string; 
+}
+
+export interface RegisterReferralByEmailResponse {
+  data: Array<{
+    data: string; 
+  }>;
+}
+
+export interface RandomReferralItem {
+  email: string;
+  member: number;
+  [key: string]: any;
+}
+
+export interface GetRandomReferralListResponse {
+  status: string; 
+  data: RandomReferralItem[];
+}
+
+export interface RegisterRandomReferralRequest {
+  posed: number; 
+  member: number; 
+}
+
+export interface RegisterRandomReferralResponse {
+  data: Array<{
+    data: string; 
+  }>;
+}
+
+export interface SaveReferralRequest {
+  member: number; 
+  recommand: number; 
+}
+
+export interface SaveReferralResponse {
+  success?: boolean;
+  [key: string]: any;
+}
+
+export interface GetMyReferralRequest {
+  member: number; 
+}
+
+export interface GetMyReferralResponse {
+  data: Array<{
+    email: string; 
+    data: string | boolean; 
+  }>;
+}
+
+export interface RecommendedToMeItem {
+  email: string;
+  masked_email: string;
+  [key: string]: any;
+}
+
+export interface GetRecommendedToMeRequest {
+  member: number; 
+}
+
+export interface GetRecommendedToMeResponse {
+  status: string; 
+  data: RecommendedToMeItem[];
+}
+
+export interface GetMemberByEmailRequest {
+  email: string; 
+}
+
+export interface GetMemberByEmailResponse {
+  data: Array<{
+    result: boolean; 
+    member?: number; 
+  }>;
+}
+
+export interface GetUserInfoForReferralRequest {
+  member: number; 
+}
+
+export interface GetUserInfoForReferralResponse {
+  data: Array<{
+    member: number;
+    email: string;
+    [key: string]: any;
+  }>;
+}
+
