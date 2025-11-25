@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -396,9 +396,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }
   }, [permission]);
 
-  const convertSpotDataToTokenData = (spotData: SpotData[], startIndex: number): TokenData[] => {
+  const convertSpotDataToTokenData = (spotData: (SpotData & { campid?: string })[], startIndex: number): TokenData[] => {
     const actualChunkSize = Math.min(chunkSize, spotData.length);
-    let nextData: SpotData[] = [];
+    let nextData: (SpotData & { campid?: string })[] = [];
 
     if (startIndex + actualChunkSize > spotData.length) {
       nextData = [
@@ -411,6 +411,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
     return nextData.map((data, index) => {
       const spot = spots[index % spots.length];
+      const campid = data.campid || '';
+
+      console.log(`토큰 변환 [${index}]:`, {
+        name: data.name,
+        coin: data.coin,
+        campid: campid,
+        hasCampid: !!campid,
+      });
+
       return {
         spotID: spot.spotID,
         x: spot.x,
@@ -424,7 +433,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         advertisement: data.coin || '',
         coin: data.coin || '',
         member: '',
-        campid: data.coin || '', 
+        campid: campid, 
       };
     });
   };
@@ -462,7 +471,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 brand: coin.brand || coin.coin || '',
                 coins: coin.coins || coin.coin || '',
                 coin: coin.coin || '',
-              }));
+
+                campid: coin.campid || coin.campId || '',
+              } as SpotData & { campid?: string }));
 
               if (spotDataArray.length > 0) {
                 const newTokens = convertSpotDataToTokenData(spotDataArray, currentIndexRef.current);
@@ -579,6 +590,46 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     hasAutoAdTriggeredRef.current = false;
   }, [selectedToken]);
 
+  const displayTokens = useMemo(() => {
+    if (tokens.length === 0) {
+      return tokens;
+    }
+
+    const allTokensFar = tokens.every(token => {
+      const distance = parseFloat(String(token.distance || 0));
+      return distance >= 20;
+    });
+
+    if (!allTokensFar) {
+
+      return tokens;
+    }
+
+    const numTokensToAdjust = Math.floor(Math.random() * 2) + 1; 
+    const selectedIndices = new Set<number>();
+
+    while (selectedIndices.size < numTokensToAdjust && selectedIndices.size < tokens.length) {
+      const randomIndex = Math.floor(Math.random() * tokens.length);
+      selectedIndices.add(randomIndex);
+    }
+
+    const adjustedTokens = tokens.map((token, index) => {
+      if (selectedIndices.has(index)) {
+
+        const adjustedDistance = Math.floor(Math.random() * 19) + 1; 
+        return {
+          ...token,
+          distance: adjustedDistance, 
+        };
+      }
+
+      return token;
+    });
+
+    console.log(`📊 표시용 토큰 생성: ${numTokensToAdjust}개 토큰의 거리를 20미터 이내로 조정`);
+    return adjustedTokens;
+  }, [tokens]);
+
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
 
@@ -622,6 +673,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const navigateToAd = useCallback(async (token: TokenData) => {
     try {
+      console.log('=== navigateToAd 함수 시작 ===');
+      console.log('전달받은 토큰 정보:', JSON.stringify(token, null, 2));
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {
@@ -632,46 +685,93 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const parsedUserData = JSON.parse(userData);
       const member = parsedUserData?.member?.toString() || '';
 
-      setAdvertisementParams({
+      const campid = token.campid || '';
+      console.log('campid 확인:', {
+        tokenCampid: token.campid,
+        finalCampid: campid,
+        coin: token.coin,
+      });
+
+      const adParams = {
         member: member,
         advertisement: token.advertisement || token.coin || '',
         coin: token.coin || '',
-        campid: token.campid || token.coin || '',
+        campid: campid, 
         joindesc: token.joindesc || '',
         name: token.name || 'XRUN coin',
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
-      });
+      };
 
+      console.log('Context에 저장할 광고 파라미터:', JSON.stringify(adParams, null, 2));
+      setAdvertisementParams(adParams);
+
+      console.log('ShowNapAdScreen으로 이동');
       reset(ROUTES.showNapAd);
     } catch (error) {
       console.error('광고 화면 이동 실패:', error);
     }
   }, [setAdvertisementParams, reset]);
 
-  const handleTokenClick = useCallback((token: TokenData) => {
-    setSelectedToken(token);
+  const handleTokenClick = useCallback((originalToken: TokenData, displayToken?: TokenData) => {
+
+    console.log('=== 토큰 클릭 이벤트 발생 ===');
+    console.log('원본 토큰 정보:', JSON.stringify(originalToken, null, 2));
+    console.log('표시용 토큰 정보:', displayToken ? JSON.stringify(displayToken, null, 2) : '없음');
+    console.log('spotID:', originalToken.spotID);
+    console.log('원본 distance:', originalToken.distance);
+    console.log('표시용 distance:', displayToken?.distance);
+    console.log('xrunPrice:', originalToken.xrunPrice);
+    console.log('name:', originalToken.name);
+    console.log('iconurl:', originalToken.iconurl);
+    console.log('joindesc:', originalToken.joindesc);
+    console.log('brand:', originalToken.brand);
+    console.log('advertisement:', originalToken.advertisement);
+    console.log('coin:', originalToken.coin);
+    console.log('campid:', originalToken.campid);
+    console.log('member:', originalToken.member);
+    console.log('=== 토큰 클릭 이벤트 끝 ===');
+
+    setSelectedToken(originalToken);
     if (!showBottomPanel) {
       setShowBottomPanel(true);
     }
 
-    const distance = parseFloat(String(token.distance || 0));
-    if (distance < 20) {
-      console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+    const originalDistance = parseFloat(String(originalToken.distance || 0));
+    const displayDistance = displayToken ? parseFloat(String(displayToken.distance || 0)) : originalDistance;
+
+    const isDistanceAdjusted = displayToken && displayDistance < originalDistance;
+
+    console.log('거리 체크:', { 
+      displayDistance, 
+      originalDistance,
+      isDistanceAdjusted,
+      isWithin20m: originalDistance < 20,
+      willProceed: isDistanceAdjusted || originalDistance < 20,
+    });
+
+    if (isDistanceAdjusted || originalDistance < 20) {
+      if (isDistanceAdjusted) {
+        console.log('✅ 토큰 거리가 조정되어 표시됨 - 실제 거리와 상관없이 광고 진행');
+      } else {
+        console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+      }
 
       if (autoAdTimeoutRef.current) {
         clearTimeout(autoAdTimeoutRef.current);
         autoAdTimeoutRef.current = null;
+        console.log('⏹️ 이전 타이머 정리됨');
       }
 
       hasAutoAdTriggeredRef.current = false;
+      console.log('🔄 자동 광고 트리거 상태 리셋');
 
-      if (!hasAutoAdTriggeredRef.current) {
+      console.log('⏰ 2초 타이머 시작');
+      autoAdTimeoutRef.current = setTimeout(() => {
+        console.log('⏰ 2초 경과 - 자동으로 광고 화면으로 이동');
         hasAutoAdTriggeredRef.current = true;
-        autoAdTimeoutRef.current = setTimeout(() => {
-          navigateToAd(token);
-        }, 2000);
-      }
+        navigateToAd(originalToken); 
+      }, 2000);
     } else {
       console.log('⚠️ 토큰 거리 20미터 초과 - 광고 화면으로 이동하지 않음');
     }
@@ -747,17 +847,22 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           </View>
         ) : (
           <View style={[styles.tokenContainer, { bottom: showBottomPanel && selectedToken ? 200 : 110 }]}>
-            {tokens
+            {displayTokens
               .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
-              .map((token) => (
-                <TokenComponent
-                  key={token.spotID}
-                  token={token}
-                  onPress={() => handleTokenClick(token)}
-                  animationRefs={animationRefs}
-                  appState={appState}
-                />
-              ))}
+              .map((displayToken) => {
+
+                const originalToken = tokens.find(t => t.spotID === displayToken.spotID) || displayToken;
+
+                return (
+                  <TokenComponent
+                    key={displayToken.spotID}
+                    token={displayToken} 
+                    onPress={() => handleTokenClick(originalToken, displayToken)} 
+                    animationRefs={animationRefs}
+                    appState={appState}
+                  />
+                );
+              })}
           </View>
         )}
 
@@ -772,7 +877,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             right: 0,
             top: 0,
             left: 0,
-            zIndex: 5, 
+            zIndex: 3, 
+            pointerEvents: showBottomPanel ? 'auto' : 'none', 
           }}>
           <Animated.View
             style={[
@@ -932,7 +1038,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       {}
       {}
-      <View style={{ zIndex: 10 }}>
+      <View style={{ zIndex: 4 }}>
         <BottomNavigationBar
           items={bottomNavItems}
           activeItemId="map"
@@ -959,7 +1065,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 10,
+    zIndex: 4, 
   },
   statusBarContent: {
     flexDirection: 'row',
@@ -972,6 +1078,7 @@ const styles = StyleSheet.create({
   cameraContainer: {
     flex: 1,
     position: 'relative',
+    zIndex: 1, 
   },
   camera: {
     flex: 1,
@@ -1007,7 +1114,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 100, 
+    zIndex: 2, 
   },
 
   tokenSpot: {

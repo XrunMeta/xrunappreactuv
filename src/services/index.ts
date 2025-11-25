@@ -1313,7 +1313,9 @@ export const fetchMapMarkerData = async (
           brand: item.brand || item.coin || '',
           coins: item.coins || item.coin || '',
           coin: item.coin || '', 
-        };
+
+          campid: item.campid || item.campId || item.campaignid || item.campaignId || '',
+        } as SpotData & { campid?: string };
       });
     }
 

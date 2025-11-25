@@ -65,7 +65,7 @@ export const ShowNapAdScreen: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [maxRetries] = useState(10);
+  const [maxRetries] = useState(3);
   const [adCallFailedModalVisible, setAdCallFailedModalVisible] = useState(false);
   const [showAlternativeAdButton, setShowAlternativeAdButton] = useState(false);
   const [showBackButton, setShowBackButton] = useState(false);
@@ -116,11 +116,21 @@ export const ShowNapAdScreen: React.FC = () => {
       setIsLoading(true);
 
       const deviceInfo = await collectDeviceInfo();
+
+      const campid = advertisementParams?.campid || '';
+      console.log('=== ShowNapAdScreen API 호출 정보 ===');
+      console.log('member:', member);
+      console.log('adid:', deviceInfo.adid);
+      console.log('campid:', campid);
+      console.log('advertisementParams:', JSON.stringify(advertisementParams, null, 2));
+      console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
+      console.log('=== API 호출 정보 끝 ===');
+
       const result = await getNasmobAds(
         member,
         deviceInfo.adid,
         deviceInfo,
-        advertisementParams?.campid || '',
+        campid,
         navigate,
       );
 
