@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,34 +9,207 @@ import {
   Pressable,
   Animated,
   Easing,
+  AppState,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BottomNavigationBar } from '../components';
-import { TokenData } from '../types';
+import { TokenData, SpotData } from '../types';
+import { fetchMapMarkerData } from '../services';
+import { useAppNavigation } from '../navigation';
 
 const { width, height } = Dimensions.get('window');
+
+const spots = [
+  { spotID: 1, x: 0, y: 0 },
+  { spotID: 2, x: -100, y: 50 },
+  { spotID: 3, x: 100, y: 50 },
+  { spotID: 4, x: -50, y: 150 },
+];
+
+const getRandomOffset = (value: number, range: number): number => {
+  return value + (Math.random() * (range * 2) - range);
+};
 
 interface TokenComponentProps {
   token: TokenData;
   onPress: () => void;
+  animationRefs: React.MutableRefObject<Map<number, React.MutableRefObject<Animated.CompositeAnimation | null>>>;
+  appState: string;
 }
 
-const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress }) => {
+const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress, animationRefs, appState }) => {
+  const position = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 200,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-      useNativeDriver: true,
-    }).start();
-  }, []);
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  const shakeAnimation = useRef<Animated.CompositeAnimation | null>(null);
+  const isAnimating = useRef(true);
 
   const distance = token.distance || 0;
   const decorationHeight = Math.max(40, Math.min(200, distance * 4 + 40));
+
+  const startShakeAnimation = useCallback(() => {
+    if (!isAnimating.current) {
+      return;
+    }
+
+    if (shakeAnimation.current) {
+      shakeAnimation.current.stop();
+    }
+
+    const bezierCurves = [
+      Easing.bezier(0.25, 0.1, 0.25, 1),
+      Easing.bezier(0.42, 0, 0.58, 1),
+      Easing.bezier(0.5, 0, 0.75, 0.9),
+      Easing.bezier(0.15, 0.85, 0.85, 0.15),
+      Easing.bezier(0.68, -0.55, 0.27, 1.55),
+    ];
+
+    const randomDelay = Math.random() * (3000 - 2000) + 2000;
+
+    shakeAnimation.current = Animated.sequence([
+      Animated.timing(position, {
+        toValue: {
+          x: getRandomOffset(spots[token.spotID - 1]?.x || 0, 70),
+          y: getRandomOffset(spots[token.spotID - 1]?.y || 0, 200),
+        },
+        duration: 300,
+        easing: bezierCurves[0],
+        useNativeDriver: true,
+      }),
+      Animated.delay(randomDelay),
+    ]);
+
+    shakeAnimation.current.start(() => {
+      if (isAnimating.current) {
+        startShakeAnimation();
+      }
+    });
+  }, [token.spotID, position]);
+
+  const animateObject = useCallback(() => {
+    if (!isAnimating.current) {
+      return;
+    }
+
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    const throwDistance = 400 * direction;
+    const spotIndex = token.spotID - 1;
+    const spot = spots[spotIndex] || spots[0];
+
+    Animated.parallel([
+      Animated.timing(position, {
+        toValue: {
+          x: spot.x + throwDistance,
+          y: spot.y - 200,
+        },
+        duration: 1,
+        easing: Easing.circle,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      if (isAnimating.current) {
+        startShakeAnimation();
+        setTimeout(() => {
+          if (isAnimating.current) {
+            stopShakeAndStartExit();
+          }
+        }, 300000); 
+      }
+    });
+  }, [token.spotID, position, fadeAnim, startShakeAnimation]);
+
+  const stopShakeAndStartExit = useCallback(() => {
+    if (!isAnimating.current) {
+      return;
+    }
+
+    if (shakeAnimation.current) {
+      shakeAnimation.current.stop();
+    }
+
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    const throwDistance = 400 * direction;
+    const spotIndex = token.spotID - 1;
+    const spot = spots[spotIndex] || spots[0];
+
+    Animated.parallel([
+      Animated.timing(position, {
+        toValue: {
+          x: spot.x + throwDistance,
+          y: spot.y,
+        },
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => {
+        if (isAnimating.current) {
+          animateObject();
+        }
+      }, 100);
+    });
+  }, [token.spotID, position, animateObject]);
+
+  useEffect(() => {
+    animationRefs.current.set(token.spotID, shakeAnimation);
+    return () => {
+      animationRefs.current.delete(token.spotID);
+    };
+  }, [token.spotID, animationRefs]);
+
+  useEffect(() => {
+    if (appState === 'active') {
+      isAnimating.current = true;
+      if (shakeAnimation.current) {
+        startShakeAnimation();
+      }
+    } else if (appState.match(/inactive|background/)) {
+      isAnimating.current = false;
+      if (shakeAnimation.current) {
+        shakeAnimation.current.stop();
+      }
+    }
+  }, [appState, startShakeAnimation]);
+
+  useEffect(() => {
+    position.setValue({
+      x: Math.random() * 300 - 150,
+      y: Math.random() * 300 - 150,
+    });
+
+    const blinkSpeed = 300; 
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, {
+          toValue: 0,
+          duration: blinkSpeed,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blinkAnim, {
+          toValue: 1,
+          duration: blinkSpeed * 0.8,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    animateObject();
+  }, [animateObject, position, blinkAnim]);
+
+  const spotIndex = token.spotID - 1;
+  const spot = spots[spotIndex] || spots[0];
 
   return (
     <Animated.View
@@ -45,8 +218,18 @@ const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress }) => {
         {
           opacity: fadeAnim,
           transform: [
-            { translateX: token.x },
-            { translateY: token.y },
+            {
+              translateX: position.x.interpolate({
+                inputRange: [-200, 200],
+                outputRange: [-200, 200],
+              }),
+            },
+            {
+              translateY: position.y.interpolate({
+                inputRange: [-200, 200],
+                outputRange: [-200, 200],
+              }),
+            },
           ],
         },
       ]}>
@@ -84,6 +267,18 @@ const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress }) => {
         style={styles.tokenButtonContainer}
         activeOpacity={0.7}>
         <View style={styles.tokenButton}>
+          {}
+          {parseFloat(String(distance)) < 20 && iconCatch && (
+            <Animated.Image
+              source={iconCatch}
+              style={[
+                styles.blinkImage,
+                {
+                  opacity: blinkAnim,
+                },
+              ]}
+            />
+          )}
           {iconXrunWhite && (
             <Image
               source={iconXrunWhite}
@@ -142,6 +337,7 @@ try {
 
 let iconXrunWhite: any = null;
 let iconBottom: any = null;
+let iconCatch: any = null;
 
 try {
   iconXrunWhite = require('../../assets/images/icon_xrun_white.png');
@@ -155,6 +351,12 @@ try {
   console.warn('icon_bottom.png not found');
 }
 
+try {
+  iconCatch = require('../../assets/images/icon_catch.png');
+} catch (e) {
+  console.warn('icon_catch.png not found');
+}
+
 interface CameraMainScreenProps {
   activeTab?: 'Map' | 'Camera';
   onTabChange?: (tab: 'Map' | 'Camera') => void;
@@ -164,6 +366,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   activeTab = 'Camera',
   onTabChange,
 }) => {
+  const { navigate } = useAppNavigation();
   const [permission, requestPermission] = useCameraPermissions();
 
   const [showBottomPanel, setShowBottomPanel] = useState(false);
@@ -171,11 +374,192 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
+  const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const currentIndexRef = useRef(0);
+  const chunkSize = 4;
+
+  const animationRefs = useRef<Map<number, React.MutableRefObject<Animated.CompositeAnimation | null>>>(new Map());
+
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  const hasLoadedDataRef = useRef(false);
+
   useEffect(() => {
     if (permission && !permission.granted) {
       requestPermission();
     }
   }, [permission]);
+
+  const convertSpotDataToTokenData = (spotData: SpotData[], startIndex: number): TokenData[] => {
+    const actualChunkSize = Math.min(chunkSize, spotData.length);
+    let nextData: SpotData[] = [];
+
+    if (startIndex + actualChunkSize > spotData.length) {
+      nextData = [
+        ...spotData.slice(startIndex),
+        ...spotData.slice(0, (startIndex + actualChunkSize) % spotData.length),
+      ];
+    } else {
+      nextData = spotData.slice(startIndex, startIndex + actualChunkSize);
+    }
+
+    return nextData.map((data, index) => {
+      const spot = spots[index % spots.length];
+      return {
+        spotID: spot.spotID,
+        x: spot.x,
+        y: spot.y,
+        xrunPrice: data.xrunPrice || 0,
+        distance: data.distance || 0,
+        name: data.name || 'XRUN coin',
+        iconurl: data.iconurl || '',
+        joindesc: data.joindesc || '',
+        brand: data.brand || '',
+        advertisement: data.coin || '',
+        coin: data.coin || '',
+        member: '',
+        campid: '',
+      };
+    });
+  };
+
+  const loadTokenData = useCallback(async (forceRefresh: boolean = false) => {
+
+    if (hasLoadedDataRef.current && !forceRefresh) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      console.log('=== CameraMainScreen 데이터 로딩 시작 ===', forceRefresh ? '(강제 새로고침)' : '');
+
+      if (!forceRefresh) {
+        const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+
+        if (astorCoinsData) {
+          console.log('✅ AsyncStorage에서 astorCoinsData 발견');
+          try {
+            const coinsData = JSON.parse(astorCoinsData);
+
+            if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
+
+              const spotDataArray: SpotData[] = coinsData.map((coin: any) => ({
+                spotID: coin.spotid || coin.spotID || coin.id || 0,
+                distance: coin.distance || 0,
+                direction: coin.direction || 0,
+                name: coin.name || coin.title || coin.brand || 'XRUN coin',
+                latitude: coin.latitude || coin.lat,
+                longitude: coin.longitude || coin.lng,
+                xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
+                iconurl: coin.iconurl || '',
+                joindesc: coin.joindesc || '',
+                brand: coin.brand || coin.coin || '',
+                coins: coin.coins || coin.coin || '',
+                coin: coin.coin || '',
+              }));
+
+              if (spotDataArray.length > 0) {
+                const newTokens = convertSpotDataToTokenData(spotDataArray, currentIndexRef.current);
+                setTokens(newTokens);
+                currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, spotDataArray.length)) % spotDataArray.length;
+              } else {
+                setTokens([]);
+              }
+
+              hasLoadedDataRef.current = true;
+              setLoading(false);
+              return;
+            }
+          } catch (parseError) {
+            console.error('astorCoinsData 파싱 오류:', parseError);
+          }
+        }
+      }
+
+      if (forceRefresh) {
+        console.log('🔄 서버에서 새 데이터 가져오기');
+      } else {
+        console.log('⚠️ AsyncStorage에 데이터 없음, API 호출');
+      }
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('위치 권한이 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const userData = await AsyncStorage.getItem('userData');
+      if (!userData) {
+        console.log('userData가 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member;
+      if (!member) {
+        console.log('userData에 member가 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const markerData = await fetchMapMarkerData(
+        currentLocation.coords.latitude,
+        currentLocation.coords.longitude,
+        member,
+        navigate,
+      );
+
+      if (markerData && markerData.length > 0) {
+
+        await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
+
+        const newTokens = convertSpotDataToTokenData(markerData, currentIndexRef.current);
+        setTokens(newTokens);
+        currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, markerData.length)) % markerData.length;
+      } else {
+        setTokens([]);
+      }
+
+      hasLoadedDataRef.current = true;
+    } catch (error) {
+      console.error('데이터 로딩 오류:', error);
+      setTokens([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!hasLoadedDataRef.current) {
+      loadTokenData(false); 
+    }
+  }, []); 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('⏰ 20초 경과 - 서버에서 새 데이터 가져오기');
+      loadTokenData(true); 
+    }, 20000); 
+
+    return () => clearInterval(interval);
+  }, []); 
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      setAppState(nextAppState);
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
 
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
@@ -224,13 +608,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       setShowBottomPanel(true);
     }
   };
-
-  const initialTokens: TokenData[] = [
-    { spotID: 1, x: 0, y: 0, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 2, x: -100, y: -50, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 3, x: 100, y: -50, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-    { spotID: 4, x: -50, y: 100, xrunPrice: 0.00, distance: 0.0, name: 'XRUN coin' },
-  ];
 
   const bottomNavItems = [
     { id: 'wallet', label: 'Wallet', icon: iconWallet },
@@ -296,15 +673,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         {
 
 }
-        <View style={[styles.tokenContainer, { bottom: showBottomPanel && selectedToken ? 200 : 110 }]}>
-          {initialTokens.map((token) => (
-            <TokenComponent
-              key={token.spotID}
-              token={token}
-              onPress={() => handleTokenClick(token)}
-            />
-          ))}
-        </View>
+        {loading ? (
+          <View style={[styles.tokenContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+            <Text style={{ color: 'white' }}>Loading...</Text>
+          </View>
+        ) : (
+          <View style={[styles.tokenContainer, { bottom: showBottomPanel && selectedToken ? 200 : 110 }]}>
+            {tokens
+              .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
+              .map((token) => (
+                <TokenComponent
+                  key={token.spotID}
+                  token={token}
+                  onPress={() => handleTokenClick(token)}
+                  animationRefs={animationRefs}
+                  appState={appState}
+                />
+              ))}
+          </View>
+        )}
 
         {}
         {
@@ -596,6 +983,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: -2,
     textAlign: 'center',
+  },
+
+  blinkImage: {
+    resizeMode: 'contain',
+    height: 100,
+    width: 100,
+    position: 'absolute',
+    top: -80,
   },
 });
 

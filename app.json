@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY"
+        "googleMapsApiKey": "oth-google-api-key"
       },
       "infoPlist": {
         "NSCameraUsageDescription": "이 앱은 카메라를 사용하여 AR 기능을 제공합니다."
@@ -30,7 +30,7 @@
       "predictiveBackGestureEnabled": false,
       "config": {
         "googleMaps": {
-          "apiKey": "YOUR_ANDROID_GOOGLE_MAPS_API_KEY"
+          "apiKey": "oth-google-api-key"
         }
       },
       "permissions": [

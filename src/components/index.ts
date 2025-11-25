@@ -26,3 +26,4 @@ export type { DataListProps } from './DataList';
 export type { DataListRef, PaginationParams, PaginationResponse } from '../types/pagination';
 export { ChoiceDialog } from './ChoiceDialog';
 export type { ChoiceDialogRef, ChoiceDialogStep } from './ChoiceDialog';
+export { MapBottomPanel } from './MapBottomPanel';

@@ -54,6 +54,7 @@ import {
   LogoutResponse,
   CloseMembershipRequest,
   CloseMembershipResponse,
+  SpotData,
   NotificationListRequest,
   NotificationListResponse,
   NotificationSendRequest,
@@ -1214,6 +1215,98 @@ export const closeMembership = async (
   }
 };
 
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371000; 
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+const calculateDirection = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const lat1Rad = lat1 * Math.PI / 180;
+  const lat2Rad = lat2 * Math.PI / 180;
+  const y = Math.sin(dLon) * Math.cos(lat2Rad);
+  const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+  const bearing = Math.atan2(y, x) * 180 / Math.PI;
+  return (bearing + 360) % 360;
+};
+
+export const fetchMapMarkerData = async (
+  latitude: number,
+  longitude: number,
+  member: number,
+  navigation?: any,
+): Promise<SpotData[]> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      latitude,
+      longitude,
+      limit: 120,
+    };
+
+    console.log('=== fetchMapMarkerData API 호출 ===');
+    console.log('endpoint: app2000-01');
+    console.log('requestBody:', JSON.stringify(requestBody));
+
+    const response = await axiosInstance.post(
+      '/app2000-01',
+      requestBody,
+    );
+
+    const data = response.data;
+    console.log('=== fetchMapMarkerData API 응답 ===');
+
+    console.log('data.data length:', data?.data?.length);
+
+    if (data?.data && Array.isArray(data.data)) {
+      return data.data.map((item: any) => {
+        const markerLat = item.lat || item.latitude;
+        const markerLng = item.lng || item.longitude;
+
+        let distance = item.distance || 0;
+        if (markerLat && markerLng && (distance === 0 || !item.distance)) {
+          distance = calculateDistance(latitude, longitude, markerLat, markerLng);
+        }
+
+        let direction = item.direction || 0;
+        if (markerLat && markerLng && (direction === 0 || !item.direction)) {
+          direction = calculateDirection(latitude, longitude, markerLat, markerLng);
+        }
+
+        return {
+          spotID: item.spotid || item.spotID || item.id || 0,
+          distance: distance,
+          direction: direction,
+          name: item.name || item.brand || item.coin || item.title || 'XRUN coin',
+          latitude: markerLat,
+          longitude: markerLng,
+          xrunPrice: item.xrunprice || item.xrunPrice || item.price || 0,
+          iconurl: item.iconurl || item.brandlogo || item.brandlogo_file || item.adthumbnail2 || item.adthumbnail2_file || '',
+          joindesc: item.joindesc || item.description || '',
+          brand: item.brand || item.coin || '',
+          coins: item.coins || item.coin || '',
+          coin: item.coin || '', 
+        };
+      });
+    }
+
+    console.log('API 응답에 data.data가 없거나 배열이 아님');
+    return [];
+  } catch (error) {
+    console.error('맵 마커 데이터 가져오기 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[맵 마커] 상세 오류 정보:', {
+ * 알림(Notification) API 함수들
+ */
+
 export const getNotificationList = async (
   member: number,
   start: number = 0,
@@ -1248,6 +1341,8 @@ export const getNotificationList = async (
         message: error.message,
       });
     }
+
+    return [];
     throw error;
   }
 };

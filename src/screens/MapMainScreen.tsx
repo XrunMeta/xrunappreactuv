@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,20 +7,17 @@ import {
   Dimensions,
   Text,
   Image,
-  Pressable,
-  Animated,
-  Easing,
-  TouchableOpacity,
+  AppState,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { BottomNavigationBar, ChoiceDialog } from '../components';
-import { COLORS } from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BottomNavigationBar, MapBottomPanel } from '../components';
 import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
-
-const { width, height } = Dimensions.get('window');
+import { SpotData } from '../types';
+import { fetchMapMarkerData } from '../services';
 
 interface LocationData {
   latitude: number;
@@ -70,26 +67,20 @@ try {
   console.warn('icon_bell.png not found');
 }
 
-let iconArrow: any = null;
-let iconXrunLogo: any = null;
 let iconMapPoint: any = null;
-
-try {
-  iconArrow = require('../../assets/images/icon_arrow.png');
-} catch (e) {
-  console.warn('icon_arrow.png not found');
-}
-
-try {
-  iconXrunLogo = require('../../assets/images/logoMain_XRUN.png');
-} catch (e) {
-  console.warn('logoMain_XRUN.png not found');
-}
 
 try {
   iconMapPoint = require('../../assets/images/icon_mapPoint.png');
 } catch (e) {
   console.warn('icon_mapPoint.png not found');
+}
+
+let logoTempMarker: any = null;
+
+try {
+  logoTempMarker = require('../../assets/logo_tempMarker.png');
+} catch (e) {
+  console.warn('logo_tempMarker.png not found');
 }
 
 export const MapMainScreen: React.FC = () => {
@@ -104,21 +95,210 @@ export const MapMainScreen: React.FC = () => {
     longitudeDelta: 0.01,
   });
 
-  const [showBottomPanel, setShowBottomPanel] = useState(true);
+  const [showBottomPanel, setShowBottomPanel] = useState(false);
+  const [selectedSpot, setSelectedSpot] = useState<SpotData | null>(null);
 
-  const bottomPanelBottom = useRef(new Animated.Value(90)).current; 
+  const [deviceHeading, setDeviceHeading] = useState<number | null>(null);
+  const deviceHeadingRef = useRef<number | null>(null);
 
-  const [showTestDialog, setShowTestDialog] = useState(false);
-  const [showMultiStepDialog, setShowMultiStepDialog] = useState(false);
+  const [markers, setMarkers] = useState<SpotData[]>([]);
+  const [loadingMarkers, setLoadingMarkers] = useState(false);
+  const loadingMarkersRef = useRef(false); 
 
-  const [dummySpotData] = useState({
-    distance: 2.53, 
-    direction: 45, 
-    name: 'Earn rewards with XRUN here',
-  });
+  const [showCalloutPopup, setShowCalloutPopup] = useState(false);
+  const [calloutPosition, setCalloutPosition] = useState({ x: 0, y: 0 });
+  const [calloutData, setCalloutData] = useState<SpotData | null>(null);
+
+  const mapRef = useRef<MapView>(null);
+
+  const [initialLocation, setInitialLocation] = useState<LocationData | null>(null);
+  const [lastFetchedLocation, setLastFetchedLocation] = useState<LocationData | null>(null);
+
+  const lastFetchedLocationRef = useRef<LocationData | null>(null);
+
+  const initialLocationRef = useRef<LocationData | null>(null);
+
+  const dragTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const locationCheckTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const lastLocationChangeTimeRef = useRef<number>(Date.now());
+
+  const mapRegionRef = useRef(mapRegion);
+
+  let iconXrunBlack: any = null;
+  try {
+    iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
+  } catch (e) {
+    console.warn('icon_xrun_black.png not found');
+  }
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371000; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData) => {
+
+    if (loadingMarkersRef.current) {
+      console.log('=== 맵 마커 로딩 중, 중복 호출 방지 ===');
+      return;
+    }
+
+    const userData = await AsyncStorage.getItem('userData');
+    if (!userData) {
+      console.log('userData가 없습니다. 로그인이 필요할 수 있습니다.');
+      return;
+    }
+
+    try {
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member;
+      if (!member) {
+        console.log('userData에 member가 없습니다.');
+        return;
+      }
+
+      loadingMarkersRef.current = true;
+      setLoadingMarkers(true);
+      console.log('=== 맵 마커 데이터 가져오기 시작 ===');
+      console.log('위치:', targetLocation.latitude, targetLocation.longitude);
+      const markerData = await fetchMapMarkerData(
+        targetLocation.latitude,
+        targetLocation.longitude,
+        member,
+        navigate,
+      );
+      console.log('=== 맵 마커 데이터 가져오기 완료 ===');
+      console.log('마커 개수:', markerData.length);
+      setMarkers(markerData);
+      setLastFetchedLocation(targetLocation);
+      lastFetchedLocationRef.current = targetLocation;
+
+      if (markerData.length > 0) {
+        try {
+          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
+          console.log('✅ astorCoinsData AsyncStorage에 저장 완료');
+        } catch (storageError) {
+          console.error('AsyncStorage 저장 오류:', storageError);
+        }
+      }
+    } catch (parseError) {
+      console.error('userData 파싱 오류:', parseError);
+    } finally {
+
+      loadingMarkersRef.current = false;
+      setLoadingMarkers(false);
+    }
+  }, [navigate]);
+
+  const returnToInitialLocation = useCallback(async () => {
+
+    if (loadingMarkersRef.current) {
+      return;
+    }
+
+    const currentInitialLocation = initialLocation;
+    if (!currentInitialLocation) {
+      console.log('초기 위치가 없습니다.');
+      return;
+    }
+
+    console.log('=== 20초 동안 드래그 없음, 초기 위치로 복귀 ===');
+
+    const currentMapRegion = mapRegionRef.current;
+
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: currentInitialLocation.latitude,
+        longitude: currentInitialLocation.longitude,
+        latitudeDelta: currentMapRegion.latitudeDelta,
+        longitudeDelta: currentMapRegion.longitudeDelta,
+      }, 500);
+    }
+
+    const newRegion = {
+      latitude: currentInitialLocation.latitude,
+      longitude: currentInitialLocation.longitude,
+      latitudeDelta: currentMapRegion.latitudeDelta,
+      longitudeDelta: currentMapRegion.longitudeDelta,
+    };
+    setMapRegion(newRegion);
+    mapRegionRef.current = newRegion;
+
+    await loadMarkersForLocation(currentInitialLocation);
+  }, [initialLocation, loadMarkersForLocation]);
+
+  const checkMapLocation = useCallback(async () => {
+
+    if (loadingMarkersRef.current) {
+      return;
+    }
+
+    const currentInitialLocation = initialLocationRef.current;
+    const currentLastFetchedLocation = lastFetchedLocationRef.current;
+
+    if (!currentInitialLocation || !currentLastFetchedLocation) {
+      return;
+    }
+
+    const currentRegion = mapRegionRef.current;
+    const currentLocation: LocationData = {
+      latitude: currentRegion.latitude,
+      longitude: currentRegion.longitude,
+    };
+
+    const distance = calculateDistance(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      currentLastFetchedLocation.latitude,
+      currentLastFetchedLocation.longitude
+    );
+
+    const currentTime = Date.now();
+    const locationChanged = 
+      Math.abs(currentLocation.latitude - currentLastFetchedLocation.latitude) > 0.0001 ||
+      Math.abs(currentLocation.longitude - currentLastFetchedLocation.longitude) > 0.0001;
+
+    if (locationChanged) {
+      lastLocationChangeTimeRef.current = currentTime;
+
+    }
+
+    if (distance >= 500) {
+      console.log('=== 200m 이상 이동, 새로운 위치에서 마커 로드 ===');
+      await loadMarkersForLocation(currentLocation);
+    }
+
+    const timeSinceLastChange = currentTime - lastLocationChangeTimeRef.current;
+    if (timeSinceLastChange >= 20000) {
+
+      const distanceFromInitial = calculateDistance(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        currentInitialLocation.latitude,
+        currentInitialLocation.longitude
+      );
+
+      if (distanceFromInitial > 50) { 
+        console.log('=== 20초 동안 위치 변경 없음, 초기 위치로 복귀 ===');
+        await returnToInitialLocation();
+        lastLocationChangeTimeRef.current = Date.now(); 
+      }
+    }
+  }, [loadMarkersForLocation, returnToInitialLocation]);
 
   useEffect(() => {
-    (async () => {
+    let watchId: number | null = null;
+
+    const startLocationTracking = async () => {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -143,12 +323,31 @@ export const MapMainScreen: React.FC = () => {
         };
 
         setLocation(newLocation);
-        setMapRegion({
+        const newRegion = {
           latitude: newLocation.latitude,
           longitude: newLocation.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
-        });
+        };
+        setMapRegion(newRegion);
+        mapRegionRef.current = newRegion;
+
+        if (!initialLocation) {
+          setInitialLocation(newLocation);
+          setLastFetchedLocation(newLocation);
+          initialLocationRef.current = newLocation;
+          lastFetchedLocationRef.current = newLocation;
+          console.log('=== 초기 위치 저장 ===', newLocation);
+        }
+
+        await AsyncStorage.setItem('selfCoordinate', JSON.stringify(newLocation));
+
+        if (!initialLocation || 
+            (lastFetchedLocation && 
+             lastFetchedLocation.latitude === newLocation.latitude && 
+             lastFetchedLocation.longitude === newLocation.longitude)) {
+          await loadMarkersForLocation(newLocation);
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
         setErrorMsg('위치를 가져오는 중 오류가 발생했습니다.');
@@ -159,19 +358,30 @@ export const MapMainScreen: React.FC = () => {
             '위치 서비스 오류',
             '위치 정보를 가져올 수 없습니다.\n\n다음 사항을 확인해주세요:\n• 기기의 위치 서비스(GPS)가 켜져 있는지\n• 네트워크 위치 서비스가 활성화되어 있는지\n• 실내에서는 GPS 신호가 약할 수 있습니다.',
             [
-              { text: '기본 위치 사용', onPress: () => {
+              { text: '기본 위치 사용', onPress: async () => {
 
                 const defaultLocation: LocationData = {
                   latitude: 37.5665,
                   longitude: 126.9780,
                 };
                 setLocation(defaultLocation);
-                setMapRegion({
+                const newRegion = {
                   latitude: defaultLocation.latitude,
                   longitude: defaultLocation.longitude,
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
-                });
+                };
+                setMapRegion(newRegion);
+                mapRegionRef.current = newRegion;
+
+                if (!initialLocation) {
+                  setInitialLocation(defaultLocation);
+                  setLastFetchedLocation(defaultLocation);
+                  initialLocationRef.current = defaultLocation;
+                  lastFetchedLocationRef.current = defaultLocation;
+                }
+
+                await loadMarkersForLocation(defaultLocation);
               }},
               { text: '확인', style: 'cancel' }
             ]
@@ -183,16 +393,128 @@ export const MapMainScreen: React.FC = () => {
             longitude: 126.9780,
           };
           setLocation(defaultLocation);
-          setMapRegion({
+          const newRegion = {
             latitude: defaultLocation.latitude,
             longitude: defaultLocation.longitude,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
-          });
+          };
+          setMapRegion(newRegion);
+          mapRegionRef.current = newRegion;
+
+          if (!initialLocation) {
+            setInitialLocation(defaultLocation);
+            setLastFetchedLocation(defaultLocation);
+            initialLocationRef.current = defaultLocation;
+            lastFetchedLocationRef.current = defaultLocation;
+          }
+
+          await loadMarkersForLocation(defaultLocation);
         }
       }
-    })();
-  }, []);
+    };
+
+    startLocationTracking();
+
+    const startHeadingTracking = async (): Promise<Location.LocationSubscription | null> => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          return null;
+        }
+
+        const headingSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+
+            timeInterval: 0, 
+            distanceInterval: 0, 
+          },
+          (location) => {
+
+            const heading = location.coords.heading;
+
+            if (heading !== null && heading !== undefined && !isNaN(heading)) {
+              const previousHeading = deviceHeadingRef.current;
+
+              if (previousHeading === null || heading !== previousHeading) {
+
+                setDeviceHeading(heading);
+                deviceHeadingRef.current = heading;
+              }
+            }
+          }
+        );
+
+        return headingSubscription;
+      } catch (error) {
+        console.error('헤딩 추적 오류:', error);
+        return null;
+      }
+    };
+
+    let headingSubscription: Location.LocationSubscription | null = null;
+    startHeadingTracking().then((subscription) => {
+      headingSubscription = subscription;
+    });
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+
+        startLocationTracking();
+
+        startHeadingTracking().then((sub) => {
+          if (headingSubscription) {
+            headingSubscription.remove();
+          }
+          headingSubscription = sub || null;
+        });
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+
+      if (headingSubscription) {
+        headingSubscription.remove();
+      }
+
+      if (dragTimerRef.current) {
+        clearTimeout(dragTimerRef.current);
+        dragTimerRef.current = null;
+      }
+      if (locationCheckTimerRef.current) {
+        clearInterval(locationCheckTimerRef.current);
+        locationCheckTimerRef.current = null;
+      }
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+
+    if (!initialLocation || !lastFetchedLocation) {
+      return;
+    }
+
+    if (locationCheckTimerRef.current) {
+      clearInterval(locationCheckTimerRef.current);
+      locationCheckTimerRef.current = null;
+    }
+
+    locationCheckTimerRef.current = setInterval(() => {
+      checkMapLocation();
+    }, 3000); 
+
+    lastLocationChangeTimeRef.current = Date.now();
+
+    return () => {
+
+      if (locationCheckTimerRef.current) {
+        clearInterval(locationCheckTimerRef.current);
+        locationCheckTimerRef.current = null;
+      }
+    };
+  }, [initialLocation, lastFetchedLocation, checkMapLocation]);
 
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
@@ -222,23 +544,210 @@ export const MapMainScreen: React.FC = () => {
     console.log('Tab changed to:', tab);
   };
 
-  useEffect(() => {
-    if (showBottomPanel) {
-      Animated.timing(bottomPanelBottom, {
-        toValue: 80, 
-        duration: 300,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
-    } else {
-      Animated.timing(bottomPanelBottom, {
-        toValue: 20, 
-        duration: 300,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
+  const handleMarkerPress = (spot: SpotData, index: number) => {
+    console.log('Marker pressed:', spot);
+    setSelectedSpot(spot);
+    if (!showBottomPanel) {
+      setShowBottomPanel(true);
     }
-  }, [showBottomPanel]);
+
+    if (mapRef.current && spot.latitude && spot.longitude) {
+      const currentRegion = mapRegionRef.current;
+      mapRef.current.animateToRegion({
+        latitude: spot.latitude,
+        longitude: spot.longitude,
+        latitudeDelta: currentRegion.latitudeDelta,
+        longitudeDelta: currentRegion.longitudeDelta,
+      }, 500); 
+
+      const newRegion = {
+        latitude: spot.latitude,
+        longitude: spot.longitude,
+        latitudeDelta: currentRegion.latitudeDelta,
+        longitudeDelta: currentRegion.longitudeDelta,
+      };
+      setMapRegion(newRegion);
+      mapRegionRef.current = newRegion;
+      lastLocationChangeTimeRef.current = Date.now();
+
+      setTimeout(() => {
+        if (mapRef.current && spot.latitude && spot.longitude) {
+          mapRef.current.pointForCoordinate({
+            latitude: spot.latitude!,
+            longitude: spot.longitude!,
+          }).then((point) => {
+            if (point) {
+              setCalloutPosition({
+                x: point.x - 110, 
+                y: Math.max(50, point.y - 80), 
+              });
+              setCalloutData(spot);
+              setShowCalloutPopup(true);
+            }
+          }).catch((error) => {
+            console.error('좌표 변환 오류:', error);
+
+            const { width } = Dimensions.get('window');
+            setCalloutPosition({
+              x: (width - 220) / 2, 
+              y: 100, 
+            });
+            setCalloutData(spot);
+            setShowCalloutPopup(true);
+          });
+        }
+      }, 600); 
+    } else {
+
+      const { width } = Dimensions.get('window');
+      setCalloutPosition({
+        x: (width - 220) / 2, 
+        y: 100,
+      });
+      setCalloutData(spot);
+      setShowCalloutPopup(true);
+    }
+  };
+
+  const handleMapPress = (event: any) => {
+
+    const clickedCoordinate = event.nativeEvent.coordinate;
+    if (!clickedCoordinate || !clickedCoordinate.latitude || !clickedCoordinate.longitude) {
+
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+      return;
+    }
+
+    if (markers.length === 0) {
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+      return;
+    }
+
+    let nearestMarker: SpotData | null = null;
+    let minDistance = Infinity;
+
+    markers.forEach((marker) => {
+      if (!marker.latitude || !marker.longitude) {
+        return;
+      }
+
+      const distance = calculateDistance(
+        clickedCoordinate.latitude,
+        clickedCoordinate.longitude,
+        marker.latitude,
+        marker.longitude
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestMarker = marker;
+      }
+    });
+
+    if (nearestMarker === null) {
+
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+      return;
+    }
+
+    const marker: SpotData = nearestMarker;
+    if (!marker.latitude || !marker.longitude) {
+
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+      return;
+    }
+
+    console.log('=== 맵 클릭: 가장 가까운 마커 찾기 ===');
+    console.log('클릭한 위치:', clickedCoordinate.latitude, clickedCoordinate.longitude);
+    console.log('가장 가까운 마커:', marker.name || 'Unknown', '거리:', minDistance.toFixed(2), 'm');
+
+    setSelectedSpot(marker);
+    if (!showBottomPanel) {
+      setShowBottomPanel(true);
+    }
+
+    const currentRegion = mapRegionRef.current;
+    if (mapRef.current && marker.latitude && marker.longitude) {
+      mapRef.current.animateToRegion({
+        latitude: marker.latitude,
+        longitude: marker.longitude,
+        latitudeDelta: currentRegion.latitudeDelta,
+        longitudeDelta: currentRegion.longitudeDelta,
+      }, 500); 
+    }
+
+    const newRegion = {
+      latitude: marker.latitude!,
+      longitude: marker.longitude!,
+      latitudeDelta: currentRegion.latitudeDelta,
+      longitudeDelta: currentRegion.longitudeDelta,
+    };
+    setMapRegion(newRegion);
+    mapRegionRef.current = newRegion;
+    lastLocationChangeTimeRef.current = Date.now();
+
+    setTimeout(() => {
+      if (mapRef.current && marker.latitude && marker.longitude) {
+        mapRef.current.pointForCoordinate({
+          latitude: marker.latitude,
+          longitude: marker.longitude,
+        }).then((point) => {
+          if (point) {
+            setCalloutPosition({
+              x: point.x - 110, 
+              y: Math.max(50, point.y - 80), 
+            });
+            setCalloutData(marker);
+            setShowCalloutPopup(true);
+          }
+        }).catch((error) => {
+          console.error('좌표 변환 오류:', error);
+
+          const { width } = Dimensions.get('window');
+          setCalloutPosition({
+            x: (width - 220) / 2, 
+            y: 100, 
+          });
+          setCalloutData(marker);
+          setShowCalloutPopup(true);
+        });
+      }
+    }, 600); 
+  };
+
+  const updateCalloutPosition = (spot: SpotData) => {
+    if (mapRef.current && spot.latitude && spot.longitude) {
+      mapRef.current.pointForCoordinate({
+        latitude: spot.latitude!,
+        longitude: spot.longitude!,
+      }).then((point) => {
+        if (point) {
+          setCalloutPosition({
+            x: point.x - 135, 
+            y: Math.max(50, point.y - 80), 
+          });
+        }
+      }).catch((error) => {
+        console.error('좌표 변환 오류:', error);
+      });
+    }
+  };
+
+  const handleRegionChange = (region: any) => {
+
+  };
+
+  const handleRegionChangeComplete = (region: any) => {
+
+    setMapRegion(region);
+    mapRegionRef.current = region;
+
+    lastLocationChangeTimeRef.current = Date.now();
+  };
 
   const bottomNavItems = [
     { id: 'wallet', label: 'Wallet', icon: iconWallet },
@@ -274,20 +783,44 @@ export const MapMainScreen: React.FC = () => {
       <View style={styles.mapContainer}>
         {location ? (
           <MapView
+            ref={mapRef}
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             region={mapRegion}
             showsUserLocation={true}
             showsMyLocationButton={false}
-            onRegionChangeComplete={setMapRegion}
+            onRegionChange={handleRegionChange}
+            onRegionChangeComplete={handleRegionChangeComplete}
+            onPress={handleMapPress}
           >
-            <Marker
-              coordinate={{
-                latitude: location.latitude,
-                longitude: location.longitude,
-              }}
-              title="현재 위치"
-            />
+            {}
+            {markers
+              .filter((marker) => marker.latitude && marker.longitude) 
+              .map((marker, index) => {
+
+                const uniqueKey = marker.coin || `marker-${marker.latitude}-${marker.longitude}`;
+
+                return (
+                <Marker
+                  key={uniqueKey}
+                  coordinate={{
+                    latitude: marker.latitude!,
+                    longitude: marker.longitude!,
+                  }}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  onPress={() => handleMarkerPress(marker, index)}
+                >
+                  {}
+                  {logoTempMarker && (
+                    <Image
+                      source={logoTempMarker}
+                      style={styles.markerImage}
+                      resizeMode="contain"
+                    />
+                  )}
+                </Marker>
+              );
+              })}
           </MapView>
         ) : (
           <View style={styles.mapPlaceholder}>
@@ -307,204 +840,63 @@ export const MapMainScreen: React.FC = () => {
         )}
 
         {}
-        <View style={styles.testButtonContainer}>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => setShowTestDialog(true)}
-            activeOpacity={0.7}
+        {showCalloutPopup && calloutData && (
+          <View
+            style={[
+              styles.calloutPopup,
+              {
+                left: calloutPosition.x,
+                top: calloutPosition.y,
+              },
+            ]}
+            pointerEvents="box-none"
           >
-            <Text style={styles.testButtonText}>테스트 팝업</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.testButton, styles.testButtonSecondary]}
-            onPress={() => setShowMultiStepDialog(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.testButtonText}>다단계 팝업</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.calloutContainer}>
+              <View style={styles.calloutLeft}>
+                {}
+                {calloutData.iconurl ? (
+                  <Image
+                    source={{ uri: calloutData.iconurl }}
+                    style={styles.calloutImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  iconXrunBlack && (
+                    <Image
+                      source={iconXrunBlack}
+                      style={styles.calloutImage}
+                      resizeMode="contain"
+                    />
+                  )
+                )}
+                {}
+                <Text style={styles.calloutDistance}>
+                  {calloutData.distance.toFixed(2)}m
+                </Text>
+              </View>
+              <View style={styles.calloutRight}>
+                <Text style={styles.calloutBrand}>
+                  {calloutData.brand || calloutData.name} 획득 가능합니다.
+                </Text>
+                <Text style={styles.calloutCoins}>
+                  {calloutData.distance.toFixed(2)}m {calloutData.coins || '0'} {calloutData.brand || 'XRUN'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
 
       {}
-      {
-
-}
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 0,
-          top: 0,
-          left: 0,
-          zIndex: 5, 
-          pointerEvents: 'box-none', 
-        }}>
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              bottom: bottomPanelBottom, 
-              left: 0,
-              right: 0,
-              zIndex: 1,
-              pointerEvents: 'auto', 
-            },
-          ]}>
-          <Pressable
-            onPress={() => {
-              if (showBottomPanel) {
-                console.log('📱 하단 패널 배경 터치 - 패널 닫기');
-                setShowBottomPanel(false);
-              }
-            }}
-            style={[
-              styles.bottomPanel,
-              {
-                minHeight: showBottomPanel ? 100 : 35,
-              },
-            ]}>
-            {}
-            {showBottomPanel && (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingTop: 8,
-                  paddingBottom: 4,
-                }}>
-                <View
-                  style={{
-                    width: 40,
-                    height: 4,
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: 2,
-                  }}
-                />
-              </View>
-            )}
-
-            {}
-            {showBottomPanel && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  paddingHorizontal: 20,
-                  paddingTop: 0,
-                  paddingBottom: 12,
-                  pointerEvents: 'box-none', 
-                }}>
-                {}
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}>
-                  {}
-                  {iconArrow && (
-                    <View
-                      style={{
-                        width: 33,
-                        height: 33,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: 12,
-                        transform: [{ rotate: `${dummySpotData.direction}deg` }],
-                      }}>
-                      <Image
-                        source={iconArrow}
-                        style={{
-                          width: 23,
-                          height: 23,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  )}
-
-                  {}
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 16,
-                        color: '#4c4e55',
-                        lineHeight: 24,
-                        marginBottom: 4,
-                      }}>
-                      {dummySpotData.distance.toFixed(2)}m
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 12,
-                        color: '#4c4e55',
-                        lineHeight: 15,
-                        letterSpacing: 0.06,
-                      }}>
-                      {dummySpotData.name}
-                    </Text>
-                  </View>
-                </View>
-
-                {}
-                {iconXrunLogo && (
-                  <View
-                    style={{
-                      width: 44,
-                      height: 44,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginLeft: 12,
-                    }}>
-                    <Image
-                      source={iconXrunLogo}
-                      style={{
-                        width: 44,
-                        height: 44,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
-
-                {}
-                <Pressable
-                  onPress={() => {
-                    console.log('📱 하단 패널 닫기 버튼 클릭');
-                    setShowBottomPanel(false);
-                  }}
-                  style={{
-                    width: 14,
-                    height: 14,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: 12,
-                  }}>
-                  {iconArrow && (
-                    <View
-                      style={{
-                        transform: [{ rotate: '270deg' }],
-                      }}>
-                      <Image
-                        source={iconArrow}
-                        style={{
-                          width: 14,
-                          height: 14,
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  )}
-                </Pressable>
-              </View>
-            )}
-          </Pressable>
-        </Animated.View>
-      </View>
+      <MapBottomPanel
+        visible={showBottomPanel}
+        spotData={selectedSpot}
+        deviceHeading={deviceHeading}
+        onClose={() => {
+          setShowBottomPanel(false);
+          setSelectedSpot(null);
+        }}
+      />
 
       {}
       {}
@@ -518,64 +910,6 @@ export const MapMainScreen: React.FC = () => {
         />
       </View>
 
-      {}
-      <ChoiceDialog
-        visible={showTestDialog}
-        title="테스트 팝업"
-        message="이것은 ChoiceDialog 테스트 팝업입니다. 두 개의 버튼을 테스트할 수 있습니다."
-        button1Label="취소"
-        button1Action={() => {
-          Alert.alert('취소', '취소 버튼이 클릭되었습니다.');
-          setShowTestDialog(false);
-        }}
-        button2Label="확인"
-        button2Action={async () => {
-          Alert.alert('확인', '확인 버튼이 클릭되었습니다.');
-          setShowTestDialog(false);
-        }}
-        onClose={() => setShowTestDialog(false)}
-      />
-
-      {}
-      <ChoiceDialog
-        visible={showMultiStepDialog}
-        steps={[
-          {
-            title: "1단계",
-            message: "첫 번째 단계입니다. 다음 단계로 진행하시겠습니까?",
-            button1Label: "취소",
-            button1Action: (_, __, closeDialog) => {
-              Alert.alert('취소', '1단계에서 취소되었습니다.');
-              closeDialog();
-            },
-            button2Label: "다음",
-            button2Action: (goToNextStep) => {
-              goToNextStep();
-            },
-          },
-          {
-            title: "2단계",
-            message: "두 번째 단계입니다. 이전 단계로 돌아가거나 완료할 수 있습니다.",
-            children: (
-              <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8, marginTop: 8 }}>
-                <Text style={{ fontSize: 14, color: '#666' }}>
-                  이것은 children으로 추가된 커스텀 컨텐츠입니다.
-                </Text>
-              </View>
-            ),
-            button1Label: "이전",
-            button1Action: (_, goToPrevStep) => {
-              goToPrevStep();
-            },
-            button2Label: "완료",
-            button2Action: async (_, __, closeDialog) => {
-              Alert.alert('완료', '모든 단계가 완료되었습니다!');
-              closeDialog();
-            },
-          },
-        ]}
-        onClose={() => setShowMultiStepDialog(false)}
-      />
     </View>
   );
 };
@@ -626,47 +960,65 @@ const styles = StyleSheet.create({
     height: 25,
   },
 
-  bottomPanel: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    borderTopStartRadius: 33,
-    borderTopEndRadius: 33,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+  calloutPopup: {
+    position: 'absolute',
+    zIndex: 1000,
+    pointerEvents: 'box-none',
   },
 
-  testButtonContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -75 }, { translateY: -25 }],
+  calloutContainer: {
+    backgroundColor: 'white',
+    borderColor: '#ffdc04',
+    borderWidth: 5,
     flexDirection: 'row',
-    gap: 12,
-    zIndex: 100,
-  },
-  testButton: {
-    backgroundColor: '#343a5a',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minWidth: 120,
+    width: 220,
+    minHeight: 70,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 15,
     alignItems: 'center',
-    justifyContent: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  testButtonSecondary: {
-    backgroundColor: '#ffdc04',
+  calloutLeft: {
+    justifyContent: 'space-between',
+    marginLeft: 0,
   },
-  testButtonText: {
-    color: '#000000',
+  calloutImage: {
+    marginLeft: 8,
+    width: 32,
+    height: 32,
+  },
+  calloutDistance: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: 'black',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  calloutRight: {
+    paddingLeft: 10,
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  calloutBrand: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Medium',
+    color: 'black',
+  },
+  calloutCoins: {
+    marginTop: 5,
     fontSize: 14,
     fontFamily: 'Roboto-Medium',
+    color: 'black',
+  },
+
+  markerImage: {
+    width: 40,
+    height: 40,
   },
 });
 
