@@ -30,6 +30,7 @@ export const LANG = {
     },
     card: {
       income: '총수익',
+      myRank: '내 순위',
     },
   },
   wallet: {

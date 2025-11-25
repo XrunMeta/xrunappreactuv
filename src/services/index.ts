@@ -89,6 +89,10 @@ import {
   GetSettlementListResponse,
   GetSettlementAmountRequest,
   GetSettlementAmountResponse,
+  GetRankRequest,
+  GetRankResponse,
+  GetRankSpesificRequest,
+  GetRankSpesificResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -2029,6 +2033,74 @@ export const getSettlementAmount = async (
     console.error('[정산] 정산 총액 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRank = async (
+  navigation?: any,
+): Promise<GetRankResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRankRequest = {};
+
+    console.log('[Rank] 전체 순위 조회 요청');
+
+    const response = await axiosInstance.post<GetRankResponse>(
+      '/getRank',
+      request,
+    );
+
+    console.log('[Rank] 전체 순위 조회 성공, 개수:', response.data.data?.length || 0);
+    console.log('[Rank] 전체 순위 데이터:', response.data.data);
+
+    return response.data;
+  } catch (error) {
+    console.error('[Rank] 전체 순위 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Rank] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRankSpesific = async (
+  member: number,
+  navigation?: any,
+): Promise<GetRankSpesificResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRankSpesificRequest = { member };
+
+    console.log('[Rank] 사용자 순위 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetRankSpesificResponse>(
+      '/getRankSpesific',
+      request,
+    );
+
+    console.log('[Rank] 사용자 순위 조회 성공:', response.data.data?.[0]?.unique_rank || '-');
+
+    return response.data;
+  } catch (error) {
+    console.error('[Rank] 사용자 순위 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Rank] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
