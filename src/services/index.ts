@@ -1253,7 +1253,7 @@ export const fetchMapMarkerData = async (
 
     const data = response.data;
     console.log('=== fetchMapMarkerData API 응답 ===');
-    console.log('data:', data);
+
     console.log('data.data length:', data?.data?.length);
 
     if (data?.data && Array.isArray(data.data)) {

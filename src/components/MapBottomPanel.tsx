@@ -29,12 +29,14 @@ try {
 interface MapBottomPanelProps {
   visible: boolean;
   spotData: SpotData | null;
+  deviceHeading: number | null; 
   onClose: () => void;
 }
 
 export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
   visible,
   spotData,
+  deviceHeading,
   onClose,
 }) => {
 
@@ -138,26 +140,37 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   flex: 1,
                 }}>
                 {}
-                {iconArrow && (
-                  <View
-                    style={{
-                      width: 33,
-                      height: 33,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: 12,
-                      transform: [{ rotate: `${spotData.direction || 0}deg` }],
-                    }}>
-                    <Image
-                      source={iconArrow}
+                {iconArrow && (() => {
+
+                  let arrowRotation = spotData.direction || 0;
+                  if (deviceHeading !== null && deviceHeading !== undefined) {
+                    arrowRotation = (spotData.direction || 0) - deviceHeading;
+
+                    while (arrowRotation > 180) arrowRotation -= 360;
+                    while (arrowRotation < -180) arrowRotation += 360;
+                  }
+
+                  return (
+                    <View
                       style={{
-                        width: 23,
-                        height: 23,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
+                        width: 33,
+                        height: 33,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 12,
+                        transform: [{ rotate: `${arrowRotation}deg` }],
+                      }}>
+                      <Image
+                        source={iconArrow}
+                        style={{
+                          width: 23,
+                          height: 23,
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  );
+                })()}
 
                 {}
                 <View style={{ flex: 1 }}>
