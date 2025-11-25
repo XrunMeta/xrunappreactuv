@@ -18,7 +18,8 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f4e704 } from '../components';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
-import { v_a0daa8 } from '../navigation';
+import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_700ef9 } from '../context';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -366,7 +367,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   activeTab: v_ac1d22 = 'Camera',
   onTabChange: v_d52709,
 }) => {
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { setAdvertisementParams: v_d48a26 } = v_700ef9();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
   const [v_572bd3, v_6a4dcd] = v_5ab095(false);
@@ -384,6 +386,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_94a194, v_3fff8d] = v_5ab095(v_6b5698.currentState);
 
   const v_0b2c53 = v_e662ae(false);
+
+  const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_6890b1 = v_e662ae(false); 
 
   v_c4deb2(() => {
     if (v_d1a6bb && !v_d1a6bb.granted) {
@@ -419,7 +424,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         advertisement: v_9390e8.coin || '',
         coin: v_9390e8.coin || '',
         member: '',
-        campid: '',
+        campid: v_9390e8.coin || '', 
       };
     });
   };
@@ -502,7 +507,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       }
 
       const v_ff39bc = JSON.parse(v_ef7306);
-      const v_660822 = v_ff39bc?.member;
+      const v_660822 = v_ff39bc?.member?.toString() || '';
       if (!v_660822) {
         console.log('userData에 member가 없습니다.');
         v_34a50a(false);
@@ -561,6 +566,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     };
   }, []);
 
+  v_c4deb2(() => {
+    return () => {
+      if (v_181e3e.current) {
+        clearTimeout(v_181e3e.current);
+        v_181e3e.current = null;
+      }
+    };
+  }, []);
+
+  v_c4deb2(() => {
+    v_6890b1.current = false;
+  }, [v_04cb77]);
+
   const v_6a213b = (v_6e55b1) => {
     console.log('Navigation item pressed:', v_6e55b1);
 
@@ -602,12 +620,62 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     }
   }, [v_572bd3]);
 
-  const v_eed806 = (token: v_60c7c3) => {
+  const v_917f22 = v_de06a3(async (token: v_60c7c3) => {
+    try {
+
+      const v_ef7306 = await v_e84827.getItem('userData');
+      if (!v_ef7306) {
+        console.log('userData가 없습니다.');
+        return;
+      }
+
+      const v_ff39bc = JSON.parse(v_ef7306);
+      const v_660822 = v_ff39bc?.member?.toString() || '';
+
+      v_d48a26({
+        member: v_660822,
+        advertisement: v_21cc31.advertisement || v_21cc31.coin || '',
+        coin: v_21cc31.coin || '',
+        campid: v_21cc31.campid || v_21cc31.coin || '',
+        joindesc: v_21cc31.joindesc || '',
+        name: v_21cc31.name || 'XRUN coin',
+        xrunPrice: v_21cc31.xrunPrice || 0,
+        coinScreen: true,
+      });
+
+      v_487a25(v_ce4741.showNapAd);
+    } catch (v_5e9bfe) {
+      console.error('광고 화면 이동 실패:', v_5e9bfe);
+    }
+  }, [v_d48a26, v_487a25]);
+
+  const v_eed806 = v_de06a3((token: v_60c7c3) => {
     v_96a9ed(v_21cc31);
     if (!v_572bd3) {
       v_6a4dcd(true);
     }
-  };
+
+    const v_926d1c = parseFloat(String(v_21cc31.distance || 0));
+    if (v_926d1c < 20) {
+      console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+
+      if (v_181e3e.current) {
+        clearTimeout(v_181e3e.current);
+        v_181e3e.current = null;
+      }
+
+      v_6890b1.current = false;
+
+      if (!v_6890b1.current) {
+        v_6890b1.current = true;
+        v_181e3e.current = setTimeout(() => {
+          v_917f22(v_21cc31);
+        }, 2000);
+      }
+    } else {
+      console.log('⚠️ 토큰 거리 20미터 초과 - 광고 화면으로 이동하지 않음');
+    }
+  }, [v_572bd3, v_917f22]);
 
   const v_fce460 = [
     { id: 'wallet', label: 'Wallet', icon: v_8daafe },
@@ -828,7 +896,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   <TouchableOpacity
                     onPress={() => {
 
-                      console.log('View ad pressed');
+                      if (v_181e3e.current) {
+                        clearTimeout(v_181e3e.current);
+                        v_181e3e.current = null;
+                      }
+                      v_6890b1.current = true; 
+
+                      if (v_04cb77) {
+                        v_917f22(v_04cb77);
+                      }
                     }}
                     style={{
                       backgroundColor: '#FFDC04',

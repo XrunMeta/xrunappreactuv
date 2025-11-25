@@ -81,6 +81,9 @@ import {
   v_42f0a8,
   v_079660,
   v_3821b8,
+  v_649123,
+  v_cf0182,
+  v_719e34,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -1620,6 +1623,132 @@ export const v_e10c7c = async (
     console.error('[추천] 사용자 정보 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[추천] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_1c4683 = async (
+  v_660822,
+  v_a4f17b,
+  deviceInfo: v_719e34,
+  v_aa0917 = '',
+  v_c65f5d,
+): Promise<v_649123> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
+
+    const v_cd6a57 = {
+      member: v_660822,
+      adid: v_a4f17b || '',
+      osver: v_e7f87b.osVersion || '',
+      ip: v_e7f87b.ipAddress || '',
+      devid: v_e7f87b.deviceId || '',
+      devmodel: v_e7f87b.model || '',
+      devbrand: v_e7f87b.manufacturer || '',
+      mnetwork: v_e7f87b.mnetwork || '4',
+      carrier: v_e7f87b.carrierCode || '1',
+      campid: v_aa0917 || '',
+    };
+
+    console.log('NStation 광고 API 요청:', v_cd6a57);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    const result: v_649123 = await v_3393e3.json();
+    console.log('NStation 광고 API 응답:', v_43c42e);
+
+    if (v_3393e3.ok && v_43c42e.status === 'success' && v_43c42e.code === 200) {
+      return v_43c42e;
+    } else {
+      const v_1744b9 = v_43c42e.message || 'NStation 광고 API 호출 실패';
+      throw new Error(v_1744b9);
+    }
+  } catch (v_5e9bfe) {
+    console.error('NStation 광고 API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_7a6f92 = async (
+  callbackData: v_cf0182,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/callbackNasmob`;
+
+    console.log('NStation 콜백 전송:', v_d8bcf0);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_d8bcf0),
+    });
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('NStation 콜백 응답:', v_43c42e);
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('NStation 콜백 전송 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_c07360 = async (
+  v_5389c3,
+  v_51b584,
+  v_660822,
+  v_be49ae,
+  v_1833e7,
+  v_7be02f,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      advertisement: v_5389c3,
+      coin: v_51b584,
+      member: v_660822,
+      joindesc: v_be49ae,
+      name: v_1833e7,
+      xrunPrice: v_7be02f,
+    };
+
+    console.log('Gateway NodeJS 요청 (app3100-01):', v_cd6a57);
+
+    const v_3393e3 = await v_9f42a4.post('/app3100-01', v_cd6a57);
+
+    console.log('Gateway NodeJS 응답 성공:', v_3393e3.data);
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('Gateway NodeJS 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,
