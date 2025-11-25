@@ -15,3 +15,40 @@ export const v_db97fb = async (
 
 export * from './env';
 
+export const v_35c0e0 = (v_f63e09): string => {
+  const v_0ad8c5 = typeof v_f63e09 === 'string' ? parseFloat(v_f63e09) : v_f63e09;
+  if (isNaN(v_0ad8c5)) return '0';
+  if (v_0ad8c5 === 0) return '0';
+
+  if (v_0ad8c5 > 0 && v_0ad8c5 < 0.000001) {
+    return '< 0.000001';
+  }
+
+  return v_0ad8c5.toFixed(6);
+};
+
+export const v_d7e45e = (v_f63e09): string => {
+  const v_0ad8c5 = parseFloat(String(v_f63e09));
+  if (isNaN(v_0ad8c5) || v_0ad8c5 === 0) return '₩0';
+
+  return (
+    '₩' +
+    v_0ad8c5.toLocaleString('ko-KR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+};
+
+export const v_b9db3d = (v_4c90cc, v_beea9d): number => {
+  const v_844935 = typeof v_4c90cc === 'string' ? parseFloat(v_4c90cc) : v_4c90cc;
+  const v_2d20f9 = typeof v_beea9d === 'string' ? parseFloat(v_beea9d) : v_beea9d;
+
+  if (isNaN(v_844935) || isNaN(v_2d20f9) || v_844935 === 0 || v_2d20f9 === 0) {
+    return 0;
+  }
+
+  const v_43c42e = v_844935 * v_2d20f9;
+  return Math.round(v_43c42e * 100) / 100;
+};
+

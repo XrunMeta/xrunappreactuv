@@ -21,6 +21,24 @@ export const v_9b1a04 = {
   xlarge: 24,
 };
 
+export const v_4922a9 = {
+  referral: {
+    settlement: {
+      list: {
+        desc: '추천 광고 수익 정산',
+      },
+    },
+    card: {
+      income: '총수익',
+    },
+  },
+  wallet: {
+    adxrun: {
+      settlementIn45Days: '45일후 정산완료됨',
+    },
+  },
+} as const;
+
 export const v_a61db3 = {
 
   bottomSection: {
