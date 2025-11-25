@@ -46,4 +46,5 @@ export { ShopMyTicketScreen } from './ShopMyTicketScreen';
 export { ShopBuyScreen } from './ShopBuyScreen';
 export { ShopSuccessScreen } from './ShopSuccessScreen';
 export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
+export { ShowNapAdScreen } from './ShowNapAdScreen';
 

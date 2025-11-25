@@ -51,6 +51,7 @@ export const ROUTES = {
   shopBuy: 'shopBuy',
   shopSuccess: 'shopSuccess',
   shopTicketDetail: 'shopTicketDetail',
+  showNapAd: 'showNapAd',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

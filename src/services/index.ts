@@ -81,6 +81,9 @@ import {
   GetMemberByEmailResponse,
   GetUserInfoForReferralRequest,
   GetUserInfoForReferralResponse,
+  NasmobAdsResponse,
+  NasmobCallbackRequest,
+  DeviceInfo,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1620,6 +1623,132 @@ export const getUserInfoForReferral = async (
     console.error('[추천] 사용자 정보 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getNasmobAds = async (
+  member: string,
+  adid: string,
+  deviceInfo: DeviceInfo,
+  campid: string = '',
+  navigation?: any,
+): Promise<NasmobAdsResponse> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/getNasmobAds`;
+
+    const requestBody = {
+      member: member,
+      adid: adid || '',
+      osver: deviceInfo.osVersion || '',
+      ip: deviceInfo.ipAddress || '',
+      devid: deviceInfo.deviceId || '',
+      devmodel: deviceInfo.model || '',
+      devbrand: deviceInfo.manufacturer || '',
+      mnetwork: deviceInfo.mnetwork || '4',
+      carrier: deviceInfo.carrierCode || '1',
+      campid: campid || '',
+    };
+
+    console.log('NStation 광고 API 요청:', requestBody);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const result: NasmobAdsResponse = await response.json();
+    console.log('NStation 광고 API 응답:', result);
+
+    if (response.ok && result.status === 'success' && result.code === 200) {
+      return result;
+    } else {
+      const errorMessage = result.message || 'NStation 광고 API 호출 실패';
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    console.error('NStation 광고 API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const sendNasmobCallback = async (
+  callbackData: NasmobCallbackRequest,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/callbackNasmob`;
+
+    console.log('NStation 콜백 전송:', callbackData);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(callbackData),
+    });
+
+    const result = await response.json();
+    console.log('NStation 콜백 응답:', result);
+    return result;
+  } catch (error) {
+    console.error('NStation 콜백 전송 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const gatewayNodeJS = async (
+  advertisement: number,
+  coin: string,
+  member: string,
+  joindesc: string,
+  name: string,
+  xrunPrice: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      advertisement: advertisement,
+      coin: coin,
+      member: member,
+      joindesc: joindesc,
+      name: name,
+      xrunPrice: xrunPrice,
+    };
+
+    console.log('Gateway NodeJS 요청 (app3100-01):', requestBody);
+
+    const response = await axiosInstance.post('/app3100-01', requestBody);
+
+    console.log('Gateway NodeJS 응답 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Gateway NodeJS 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

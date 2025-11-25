@@ -18,7 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BottomNavigationBar } from '../components';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppContext } from '../context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -366,7 +367,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   activeTab = 'Camera',
   onTabChange,
 }) => {
-  const { navigate } = useAppNavigation();
+  const { navigate, reset } = useAppNavigation();
+  const { setAdvertisementParams } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
 
   const [showBottomPanel, setShowBottomPanel] = useState(false);
@@ -384,6 +386,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [appState, setAppState] = useState(AppState.currentState);
 
   const hasLoadedDataRef = useRef(false);
+
+  const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasAutoAdTriggeredRef = useRef(false); 
 
   useEffect(() => {
     if (permission && !permission.granted) {
@@ -419,7 +424,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         advertisement: data.coin || '',
         coin: data.coin || '',
         member: '',
-        campid: '',
+        campid: data.coin || '', 
       };
     });
   };
@@ -502,7 +507,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       }
 
       const parsedUserData = JSON.parse(userData);
-      const member = parsedUserData?.member;
+      const member = parsedUserData?.member?.toString() || '';
       if (!member) {
         console.log('userData에 member가 없습니다.');
         setLoading(false);
@@ -561,6 +566,19 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (autoAdTimeoutRef.current) {
+        clearTimeout(autoAdTimeoutRef.current);
+        autoAdTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    hasAutoAdTriggeredRef.current = false;
+  }, [selectedToken]);
+
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
 
@@ -602,12 +620,62 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }
   }, [showBottomPanel]);
 
-  const handleTokenClick = (token: TokenData) => {
+  const navigateToAd = useCallback(async (token: TokenData) => {
+    try {
+
+      const userData = await AsyncStorage.getItem('userData');
+      if (!userData) {
+        console.log('userData가 없습니다.');
+        return;
+      }
+
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member?.toString() || '';
+
+      setAdvertisementParams({
+        member: member,
+        advertisement: token.advertisement || token.coin || '',
+        coin: token.coin || '',
+        campid: token.campid || token.coin || '',
+        joindesc: token.joindesc || '',
+        name: token.name || 'XRUN coin',
+        xrunPrice: token.xrunPrice || 0,
+        coinScreen: true,
+      });
+
+      reset(ROUTES.showNapAd);
+    } catch (error) {
+      console.error('광고 화면 이동 실패:', error);
+    }
+  }, [setAdvertisementParams, reset]);
+
+  const handleTokenClick = useCallback((token: TokenData) => {
     setSelectedToken(token);
     if (!showBottomPanel) {
       setShowBottomPanel(true);
     }
-  };
+
+    const distance = parseFloat(String(token.distance || 0));
+    if (distance < 20) {
+      console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+
+      if (autoAdTimeoutRef.current) {
+        clearTimeout(autoAdTimeoutRef.current);
+        autoAdTimeoutRef.current = null;
+      }
+
+      hasAutoAdTriggeredRef.current = false;
+
+      if (!hasAutoAdTriggeredRef.current) {
+        hasAutoAdTriggeredRef.current = true;
+        autoAdTimeoutRef.current = setTimeout(() => {
+          navigateToAd(token);
+        }, 2000);
+      }
+    } else {
+      console.log('⚠️ 토큰 거리 20미터 초과 - 광고 화면으로 이동하지 않음');
+    }
+  }, [showBottomPanel, navigateToAd]);
 
   const bottomNavItems = [
     { id: 'wallet', label: 'Wallet', icon: iconWallet },
@@ -828,7 +896,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   <TouchableOpacity
                     onPress={() => {
 
-                      console.log('View ad pressed');
+                      if (autoAdTimeoutRef.current) {
+                        clearTimeout(autoAdTimeoutRef.current);
+                        autoAdTimeoutRef.current = null;
+                      }
+                      hasAutoAdTriggeredRef.current = true; 
+
+                      if (selectedToken) {
+                        navigateToAd(selectedToken);
+                      }
                     }}
                     style={{
                       backgroundColor: '#FFDC04',
