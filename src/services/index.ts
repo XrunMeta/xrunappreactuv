@@ -55,6 +55,7 @@ import {
   CloseMembershipRequest,
   CloseMembershipResponse,
   SpotData,
+  NotificationItem,
   NotificationListRequest,
   NotificationListResponse,
   NotificationSendRequest,
@@ -65,6 +66,21 @@ import {
   NotificationDeleteAllResponse,
   FCMTokenRegisterRequest,
   FCMTokenRegisterResponse,
+  RegisterReferralByEmailRequest,
+  RegisterReferralByEmailResponse,
+  GetRandomReferralListResponse,
+  RegisterRandomReferralRequest,
+  RegisterRandomReferralResponse,
+  SaveReferralRequest,
+  SaveReferralResponse,
+  GetMyReferralRequest,
+  GetMyReferralResponse,
+  GetRecommendedToMeRequest,
+  GetRecommendedToMeResponse,
+  GetMemberByEmailRequest,
+  GetMemberByEmailResponse,
+  GetUserInfoForReferralRequest,
+  GetUserInfoForReferralResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1304,35 +1320,6 @@ export const fetchMapMarkerData = async (
     console.error('맵 마커 데이터 가져오기 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[맵 마커] 상세 오류 정보:', {
- * 알림(Notification) API 함수들
- */
-
-export const getNotificationList = async (
-  member: number,
-  start: number = 0,
-  navigation?: any,
-): Promise<NotificationListResponse> => {
-  try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationListRequest = {
-      member,
-      start,
-    };
-
-    console.log('[알림] 알림 목록 조회 요청:', { member, start });
-
-    const response = await axiosInstance.post<NotificationListResponse>(
-      '/ap6000-01',
-      request,
-    );
-
-    console.log('[알림] 알림 목록 조회 성공, 알림 개수:', response.data.data?.length || 0);
-
-    return response.data;
-  } catch (error) {
-    console.error('[알림] 알림 목록 조회 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
@@ -1343,38 +1330,36 @@ export const getNotificationList = async (
     }
 
     return [];
-    throw error;
   }
 };
 
-export const sendNotificationMessage = async (
+export const registerReferralByEmail = async (
   member: number,
-  title: string,
-  isBroadcast: boolean = false,
+  email: string,
   navigation?: any,
-): Promise<NotificationSendResponse> => {
+): Promise<RegisterReferralByEmailResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationSendRequest = {
-      isBroadcast,
+    const request: RegisterReferralByEmailRequest = {
       member,
-      title,
+      email,
     };
 
-    console.log('[알림] 알림 메시지 전송 요청:', { member, title, isBroadcast });
+    console.log('[추천] 추천인 등록 요청 (이메일):', { member, email });
 
-    const response = await axiosInstance.post<NotificationSendResponse>(
-      '/ap6000-02',
+    const response = await axiosInstance.post<RegisterReferralByEmailResponse>(
+      '/app7410-01',
       request,
     );
 
-    console.log('[알림] 알림 메시지 전송 성공');
+    const result = response.data.data?.[0]?.data || '';
+    console.log('[추천] 추천인 등록 결과:', result);
 
     return response.data;
   } catch (error) {
-    console.error('[알림] 알림 메시지 전송 오류:', error);
+    console.error('[추천] 추천인 등록 오류:', error);
     if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
+      console.error('[추천] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
@@ -1387,34 +1372,25 @@ export const sendNotificationMessage = async (
   }
 };
 
-export const deleteNotificationMessage = async (
-  member: number,
-  board: number,
-  isBroadcast: boolean = false,
+export const getRandomReferralList = async (
   navigation?: any,
-): Promise<NotificationDeleteResponse> => {
+): Promise<GetRandomReferralListResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationDeleteRequest = {
-      isBroadcast,
-      member,
-      board,
-    };
 
-    console.log('[알림] 알림 메시지 삭제 요청:', { member, board, isBroadcast });
+    console.log('[추천] 랜덤 추천인 목록 조회 요청');
 
-    const response = await axiosInstance.post<NotificationDeleteResponse>(
-      '/ap6000-03',
-      request,
+    const response = await axiosInstance.get<GetRandomReferralListResponse>(
+      '/app7420-01',
     );
 
-    console.log('[알림] 알림 메시지 삭제 성공');
+    console.log('[추천] 랜덤 추천인 목록 조회 성공, 개수:', response.data.data?.length || 0);
 
     return response.data;
   } catch (error) {
-    console.error('[알림] 알림 메시지 삭제 오류:', error);
+    console.error('[추천] 랜덤 추천인 목록 조회 오류:', error);
     if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
+      console.error('[추천] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
@@ -1427,30 +1403,33 @@ export const deleteNotificationMessage = async (
   }
 };
 
-export const deleteAllNotifications = async (
+export const registerRandomReferral = async (
   member: number,
+  posed: number,
   navigation?: any,
-): Promise<NotificationDeleteAllResponse> => {
+): Promise<RegisterRandomReferralResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: NotificationDeleteAllRequest = {
+    const request: RegisterRandomReferralRequest = {
       member,
+      posed,
     };
 
-    console.log('[알림] 전체 알림 삭제 요청:', { member });
+    console.log('[추천] 랜덤 추천인 등록 요청:', { member, posed });
 
-    const response = await axiosInstance.post<NotificationDeleteAllResponse>(
-      '/ap6000-04delete',
+    const response = await axiosInstance.post<RegisterRandomReferralResponse>(
+      '/app7420-02',
       request,
     );
 
-    console.log('[알림] 전체 알림 삭제 성공');
+    const result = response.data.data?.[0]?.data || '';
+    console.log('[추천] 랜덤 추천인 등록 결과:', result);
 
     return response.data;
   } catch (error) {
-    console.error('[알림] 전체 알림 삭제 오류:', error);
+    console.error('[추천] 랜덤 추천인 등록 오류:', error);
     if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
+      console.error('[추천] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
@@ -1463,32 +1442,184 @@ export const deleteAllNotifications = async (
   }
 };
 
-export const registerFCMToken = async (
-  pushkey: string,
+export const saveReferral = async (
   member: number,
+  recommand: number,
   navigation?: any,
-): Promise<FCMTokenRegisterResponse> => {
+): Promise<SaveReferralResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: FCMTokenRegisterRequest = {
-      pushkey,
+    const request: SaveReferralRequest = {
       member,
+      recommand,
     };
 
-    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+    console.log('[추천] 추천인 저장 요청:', { member, recommand });
 
-    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
-      '/login-pushkeyreg',
+    const response = await axiosInstance.post<SaveReferralResponse>(
+      '/saveRecommend',
       request,
     );
 
-    console.log('[알림] FCM 토큰 등록 성공');
+    console.log('[추천] 추천인 저장 성공');
 
     return response.data;
   } catch (error) {
-    console.error('[알림] FCM 토큰 등록 오류:', error);
+    console.error('[추천] 추천인 저장 오류:', error);
     if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyReferral = async (
+  member: number,
+  navigation?: any,
+): Promise<GetMyReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyReferralRequest = {
+      member,
+    };
+
+    console.log('[추천] 추천인 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyReferralResponse>(
+      '/app7420-03',
+      request,
+    );
+
+    const result = response.data.data?.[0];
+    console.log('[추천] 추천인 조회 결과:', {
+      email: result?.email,
+      status: result?.data,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 추천인 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRecommendedToMe = async (
+  member: number,
+  navigation?: any,
+): Promise<GetRecommendedToMeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRecommendedToMeRequest = {
+      member,
+    };
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetRecommendedToMeResponse>(
+      '/getRecommendedToMe',
+      request,
+    );
+
+    console.log('[추천] 내가 추천한 사람 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 내가 추천한 사람 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMemberByEmail = async (
+  email: string,
+  navigation?: any,
+): Promise<GetMemberByEmailResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMemberByEmailRequest = {
+      email,
+    };
+
+    console.log('[추천] 이메일로 회원 조회 요청:', { email });
+
+    const response = await axiosInstance.post<GetMemberByEmailResponse>(
+      '/ap1810-i01',
+      request,
+    );
+
+    const result = response.data.data?.[0];
+    console.log('[추천] 이메일로 회원 조회 결과:', {
+      exists: result?.result,
+      member: result?.member,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 이메일로 회원 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getUserInfoForReferral = async (
+  member: number,
+  navigation?: any,
+): Promise<GetUserInfoForReferralResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetUserInfoForReferralRequest = {
+      member,
+    };
+
+    console.log('[추천] 사용자 정보 조회 요청 (app7110-01):', { member });
+
+    const response = await axiosInstance.post<GetUserInfoForReferralResponse>(
+      '/app7110-01',
+      request,
+    );
+
+    console.log('[추천] 사용자 정보 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[추천] 사용자 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[추천] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
