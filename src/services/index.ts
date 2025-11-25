@@ -89,6 +89,10 @@ import {
   v_678cf5,
   v_c5ddda,
   v_c8e190,
+  v_caa41f,
+  v_f77e47,
+  v_cde3d3,
+  v_ed4aeb,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -2029,6 +2033,74 @@ export const v_5bb1ab = async (
     console.error('[정산] 정산 총액 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[정산] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4a38fa = async (
+  v_c65f5d,
+): Promise<v_f77e47> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_caa41f = {};
+
+    console.log('[Rank] 전체 순위 조회 요청');
+
+    const v_3393e3 = await v_9f42a4.post<v_f77e47>(
+      '/getRank',
+      v_576f5a,
+    );
+
+    console.log('[Rank] 전체 순위 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+    console.log('[Rank] 전체 순위 데이터:', v_3393e3.data.data);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Rank] 전체 순위 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Rank] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_6a034c = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_ed4aeb> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_cde3d3 = { member: v_660822 };
+
+    console.log('[Rank] 사용자 순위 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_ed4aeb>(
+      '/getRankSpesific',
+      v_576f5a,
+    );
+
+    console.log('[Rank] 사용자 순위 조회 성공:', v_3393e3.data.data?.[0]?.unique_rank || '-');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Rank] 사용자 순위 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Rank] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

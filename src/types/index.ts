@@ -613,3 +613,32 @@ export interface GetSettlementAmountResponse {
   message?: string;
 }
 
+export interface RankItem {
+  referrer_id: number;
+  referrer_email: string;
+  unique_rank: number;
+  referral_count: number;
+}
+
+export interface GetRankRequest {
+
+}
+
+export interface GetRankResponse {
+  status: 'success' | 'error';
+  data: RankItem[];
+  message?: string;
+}
+
+export interface GetRankSpesificRequest {
+  member: number; 
+}
+
+export interface GetRankSpesificResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    unique_rank: number; 
+  }>;
+  message?: string;
+}
+
