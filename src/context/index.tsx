@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo } from '../types';
+import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams } from '../types';
 import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
@@ -46,6 +46,9 @@ type AppContextValue = {
   };
   setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => void;
   resetSignupFormData: () => void;
+  advertisementParams: AdvertisementParams | null;
+  setAdvertisementParams: (params: AdvertisementParams | null) => void;
+  resetAdvertisementParams: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -75,6 +78,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     ageRange: '10',
     termsAccepted: true,
   });
+  const [advertisementParams, setAdvertisementParams] = useState<AdvertisementParams | null>(null);
 
   const value = useMemo(
     () => ({
@@ -122,6 +126,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           termsAccepted: true,
         });
       },
+      advertisementParams,
+      setAdvertisementParams,
+      resetAdvertisementParams: () => setAdvertisementParams(null),
     }),
     [
       walletSendAddress,
@@ -135,6 +142,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedRegion,
       selectMode,
       signupFormData,
+      advertisementParams,
     ],
   );
 
