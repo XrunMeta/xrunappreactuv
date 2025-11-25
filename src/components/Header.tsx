@@ -9,6 +9,7 @@ interface HeaderProps {
   title: string;
   onBackPress?: () => void;
   showBackButton?: boolean;
+  rightComponent?: React.ReactNode;
 }
 
 const BackIcon = () => (
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   onBackPress,
   showBackButton = true,
+  rightComponent,
 }) => {
   const { goBack, canGoBack } = useAppNavigation();
   const shouldShowBackButton = showBackButton && (canGoBack || !!onBackPress);
@@ -47,7 +49,11 @@ export const Header: React.FC<HeaderProps> = ({
         <View style={styles.titleWrapper} pointerEvents="none">
           <Text style={styles.title}>{title}</Text>
         </View>
+        {rightComponent ? (
+          <View style={styles.rightComponent}>{rightComponent}</View>
+        ) : (
         <View style={styles.backButtonPlaceholder} />
+        )}
       </View>
     </View>
   );
@@ -87,6 +93,12 @@ const styles = StyleSheet.create({
   backButtonPlaceholder: {
     width: 40,
     height: 40,
+  },
+  rightComponent: {
+    minWidth: 40,
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   iconContainer: {
     width: 24,
