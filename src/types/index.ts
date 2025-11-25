@@ -397,3 +397,68 @@ export interface CloseMembershipResponse {
   [key: string]: any;
 }
 
+export type NotificationType = 9301 | 9302 | 9303; 
+
+export interface NotificationItem {
+  board: number; 
+  title: string; 
+  contents: string | null; 
+  datetime: string; 
+  type: NotificationType; 
+  image: string | null; 
+  guid: string | null; 
+  datebegin: string | null; 
+  dateends: string | null; 
+}
+
+export interface NotificationListRequest {
+  member: number; 
+  start: number; 
+}
+
+export interface NotificationListResponse {
+  type: string; 
+  data: NotificationItem[];
+}
+
+export interface NotificationSendRequest {
+  isBroadcast: boolean; 
+  member: number; 
+  title: string; 
+}
+
+export interface NotificationSendResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface NotificationDeleteRequest {
+  isBroadcast: boolean; 
+  member: number; 
+  board: number; 
+}
+
+export interface NotificationDeleteResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface NotificationDeleteAllRequest {
+  member: number; 
+}
+
+export interface NotificationDeleteAllResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface FCMTokenRegisterRequest {
+  pushkey: string; 
+  member: number; 
+}
+
+export interface FCMTokenRegisterResponse {
+  success: boolean;
+  message?: string;
+}
+

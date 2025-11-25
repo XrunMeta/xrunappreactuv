@@ -55,6 +55,16 @@ import {
   CloseMembershipRequest,
   CloseMembershipResponse,
   SpotData,
+  NotificationListRequest,
+  NotificationListResponse,
+  NotificationSendRequest,
+  NotificationSendResponse,
+  NotificationDeleteRequest,
+  NotificationDeleteResponse,
+  NotificationDeleteAllRequest,
+  NotificationDeleteAllResponse,
+  FCMTokenRegisterRequest,
+  FCMTokenRegisterResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1294,6 +1304,35 @@ export const fetchMapMarkerData = async (
     console.error('맵 마커 데이터 가져오기 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[맵 마커] 상세 오류 정보:', {
+ * 알림(Notification) API 함수들
+ */
+
+export const getNotificationList = async (
+  member: number,
+  start: number = 0,
+  navigation?: any,
+): Promise<NotificationListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationListRequest = {
+      member,
+      start,
+    };
+
+    console.log('[알림] 알림 목록 조회 요청:', { member, start });
+
+    const response = await axiosInstance.post<NotificationListResponse>(
+      '/ap6000-01',
+      request,
+    );
+
+    console.log('[알림] 알림 목록 조회 성공, 알림 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
@@ -1304,6 +1343,161 @@ export const fetchMapMarkerData = async (
     }
 
     return [];
+    throw error;
+  }
+};
+
+export const sendNotificationMessage = async (
+  member: number,
+  title: string,
+  isBroadcast: boolean = false,
+  navigation?: any,
+): Promise<NotificationSendResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationSendRequest = {
+      isBroadcast,
+      member,
+      title,
+    };
+
+    console.log('[알림] 알림 메시지 전송 요청:', { member, title, isBroadcast });
+
+    const response = await axiosInstance.post<NotificationSendResponse>(
+      '/ap6000-02',
+      request,
+    );
+
+    console.log('[알림] 알림 메시지 전송 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 메시지 전송 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteNotificationMessage = async (
+  member: number,
+  board: number,
+  isBroadcast: boolean = false,
+  navigation?: any,
+): Promise<NotificationDeleteResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationDeleteRequest = {
+      isBroadcast,
+      member,
+      board,
+    };
+
+    console.log('[알림] 알림 메시지 삭제 요청:', { member, board, isBroadcast });
+
+    const response = await axiosInstance.post<NotificationDeleteResponse>(
+      '/ap6000-03',
+      request,
+    );
+
+    console.log('[알림] 알림 메시지 삭제 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 메시지 삭제 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteAllNotifications = async (
+  member: number,
+  navigation?: any,
+): Promise<NotificationDeleteAllResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationDeleteAllRequest = {
+      member,
+    };
+
+    console.log('[알림] 전체 알림 삭제 요청:', { member });
+
+    const response = await axiosInstance.post<NotificationDeleteAllResponse>(
+      '/ap6000-04delete',
+      request,
+    );
+
+    console.log('[알림] 전체 알림 삭제 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 전체 알림 삭제 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const registerFCMToken = async (
+  pushkey: string,
+  member: number,
+  navigation?: any,
+): Promise<FCMTokenRegisterResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: FCMTokenRegisterRequest = {
+      pushkey,
+      member,
+    };
+
+    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+
+    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
+      '/login-pushkeyreg',
+      request,
+    );
+
+    console.log('[알림] FCM 토큰 등록 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] FCM 토큰 등록 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
   }
 };
 

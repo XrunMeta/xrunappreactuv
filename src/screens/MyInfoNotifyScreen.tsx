@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,33 +11,320 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
+import {
+  getNotificationList,
+  sendNotificationMessage,
+  deleteNotificationMessage,
+  deleteAllNotifications,
+} from '../services';
+import { NotificationItem, NotificationType } from '../types';
 
 const eventImage = require('../../assets/thumb_event.png');
 const chatXrun = require('../../assets/chat-xrun.png');
 const chatUser = require('../../assets/chat-user.png');
 
-export const MyInfoNotifyScreen = () => {
-  const { goBack } = useAppNavigation();
-  const [question, setQuestion] = useState('');
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}. ${month}. ${day}`;
+  } catch {
+    return dateString;
+  }
+};
 
-  const handleSend = () => {
+const formatTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${month}-${day} | ${hours}:${minutes}`;
+  } catch {
+    return dateString;
+  }
+};
+
+const groupNotificationsByDate = (notifications: NotificationItem[]) => {
+  const grouped: { [key: string]: NotificationItem[] } = {};
+
+  notifications.forEach((notification) => {
+    const dateKey = formatDate(notification.datetime);
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = [];
+    }
+    grouped[dateKey].push(notification);
+  });
+
+  Object.keys(grouped).forEach((dateKey) => {
+    grouped[dateKey].sort((a, b) => {
+      return new Date(a.datetime).getTime() - new Date(b.datetime).getTime();
+    });
+  });
+
+  return grouped;
+};
+
+export const MyInfoNotifyScreen = () => {
+  const { goBack, navigate } = useAppNavigation();
+  const [question, setQuestion] = useState('');
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [memberId, setMemberId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.member) {
+            setMemberId(userData.member);
+          }
+        }
+      } catch (error) {
+        console.error('[알림] 사용자 정보 로드 실패:', error);
+      }
+    };
+    loadUserData();
+  }, []);
+
+  const loadNotifications = useCallback(async () => {
+    if (!memberId) return;
+
+    try {
+      setLoading(true);
+      const response = await getNotificationList(memberId, 0, navigate);
+
+      if (response && response.data) {
+        setNotifications(response.data);
+      }
+    } catch (error) {
+      console.error('[알림] 알림 목록 조회 실패:', error);
+      Alert.alert('오류', '알림 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [memberId, navigate]);
+
+  useEffect(() => {
+    if (memberId) {
+      loadNotifications();
+    }
+  }, [memberId, loadNotifications]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadNotifications();
+  }, [loadNotifications]);
+
+  const handleSend = async () => {
     if (!question.trim()) {
       Alert.alert('메시지 입력', '보낼 내용을 입력해주세요.');
       return;
     }
-    Alert.alert('전송 완료', '문의가 전송되었습니다.');
-    setQuestion('');
+
+    if (!memberId) {
+      Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      setSending(true);
+      await sendNotificationMessage(memberId, question.trim(), false, navigate);
+      Alert.alert('전송 완료', '문의가 전송되었습니다.');
+      setQuestion('');
+
+      await loadNotifications();
+    } catch (error) {
+      console.error('[알림] 메시지 전송 실패:', error);
+      Alert.alert('오류', '메시지 전송에 실패했습니다.');
+    } finally {
+      setSending(false);
+    }
   };
 
-  const openEventLink = () => {
-    Linking.openURL('https://xrun.run').catch(() => {
-      Alert.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+  const handleDelete = async (board: number) => {
+    if (!memberId) return;
+
+    Alert.alert(
+      '삭제 확인',
+      '이 메시지를 삭제하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteNotificationMessage(memberId, board, false, navigate);
+
+              await loadNotifications();
+            } catch (error) {
+              console.error('[알림] 메시지 삭제 실패:', error);
+              Alert.alert('오류', '메시지 삭제에 실패했습니다.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDeleteAll = () => {
+    if (!memberId) return;
+
+    Alert.alert(
+      '전체 삭제 확인',
+      '모든 메시지를 삭제하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAllNotifications(memberId, navigate);
+
+              await loadNotifications();
+            } catch (error) {
+              console.error('[알림] 전체 삭제 실패:', error);
+              Alert.alert('오류', '전체 삭제에 실패했습니다.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const openLink = (url: string | null) => {
+    if (!url) return;
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      Linking.openURL(url).catch(() => {
+        Alert.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+      });
+    } else {
+
+      console.log('[알림] 앱 내부 라우트:', url);
+    }
+  };
+
+  const renderNotification = (notification: NotificationItem, index: number) => {
+    const isUserMessage = notification.type === 9303;
+    const isEvent = notification.type === 9302;
+    const isNotice = notification.type === 9301;
+
+    const imageUri = notification.image
+      ? `data:image/jpeg;base64,${notification.image}`
+      : null;
+
+    if (isUserMessage) {
+
+      return (
+        <View key={`notification-${notification.board}-${index}`} style={styles.replyWrapper}>
+          <View style={styles.replyRow}>
+            <TouchableOpacity
+              style={styles.replyBubble}
+              onLongPress={() => handleDelete(notification.board)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.replyText}>{notification.title}</Text>
+            </TouchableOpacity>
+            <Image source={chatUser} style={styles.userAvatar} />
+          </View>
+          <Text style={styles.replyTimestamp}>{formatTime(notification.datetime)}</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View key={`notification-${notification.board}-${index}`} style={styles.messageWrapper}>
+        <Image source={chatXrun} style={styles.avatar} />
+        <View style={styles.messageCard}>
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={styles.heroImage} resizeMode="cover" />
+          )}
+          <Text style={styles.badge}>{notification.title}</Text>
+          {}
+          {notification.contents !== null && notification.type !== 9303 && (
+            <View>
+              <Text 
+                style={styles.description}
+                numberOfLines={isNotice ? 3 : undefined}
+                ellipsizeMode="tail"
+              >
+                {notification.contents}
+              </Text>
+              {isEvent && notification.datebegin && notification.dateends && (
+                <Text style={styles.eventDate}>
+                  {formatDate(notification.datebegin)} ~ {formatDate(notification.dateends)}
+                </Text>
+              )}
+              {}
+              {}
+              {isNotice && (
+                <TouchableOpacity
+                  style={[styles.ctaButton, styles.ctaButtonWithMargin]}
+                  onPress={() => {
+                    const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
+                    Linking.openURL(url).catch(() => {
+                      Alert.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+                    });
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.ctaText}>자세히 보기</Text>
+                </TouchableOpacity>
+              )}
+              {}
+              {isEvent && notification.guid !== '' && notification.guid !== null && (
+                <TouchableOpacity
+                  style={styles.ctaButton}
+                  onPress={() => openLink(notification.guid)}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.ctaText}>이벤트로 이동</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+        <Text style={styles.timestamp}>{formatTime(notification.datetime)}</Text>
+      </View>
+    );
+  };
+
+  const renderGroupedNotifications = () => {
+    const grouped = groupNotificationsByDate(notifications);
+    const dates = Object.keys(grouped).sort((a, b) => {
+
+      const dateA = new Date(a.replace(/\. /g, '-').replace(/\./g, ''));
+      const dateB = new Date(b.replace(/\. /g, '-').replace(/\./g, ''));
+      return dateA.getTime() - dateB.getTime();
     });
+
+    return dates.map((date, dateIndex) => (
+      <View key={`date-${date}`}>
+        <View style={styles.dateChip}>
+          <Text style={styles.dateChipText}>{date}</Text>
+        </View>
+        {grouped[date].map((notification, index) => renderNotification(notification, index))}
+      </View>
+    ));
   };
 
   return (
@@ -47,46 +334,45 @@ export const MyInfoNotifyScreen = () => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <View style={styles.container}>
-      <StatusBar style="dark" />
-      <Header title="Notify" onBackPress={goBack} showBackButton />
-      <ScrollView
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.messageWrapper}>
-          <Image source={chatXrun} style={styles.avatar} />
-          <View style={styles.messageCard}>
-            <Image source={eventImage} style={styles.heroImage} />
-            <Text style={styles.badge}>CLUBX EVENT</Text>
-            <Text style={styles.description}>
-              Play Beta version, explore and review, get 5000 XRUN
-            </Text>
-            <TouchableOpacity
-              style={styles.ctaButton}
-              onPress={openEventLink}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.ctaText}>Take Closer Look</Text>
-            </TouchableOpacity>
+        <StatusBar style="dark" />
+        <Header
+          title="Notify"
+          onBackPress={goBack}
+          showBackButton
+          rightComponent={
+            notifications.length > 0 ? (
+              <TouchableOpacity
+                onPress={handleDeleteAll}
+                activeOpacity={0.7}
+                style={styles.deleteAllButton}
+              >
+                <Text style={styles.deleteAllText}>전체 삭제</Text>
+              </TouchableOpacity>
+            ) : undefined
+          }
+        />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
           </View>
-          <Text style={styles.timestamp}>2024-09-27 | 02:16</Text>
-        </View>
-
-        <View style={styles.dateChip}>
-          <Text style={styles.dateChipText}>2024. 09. 28</Text>
-        </View>
-
-        <View style={styles.replyWrapper}>
-          <View style={styles.replyRow}>
-            <View style={styles.replyBubble}>
-              <Text style={styles.replyText}>CLUBX EVENT</Text>
-            </View>
-            <Image source={chatUser} style={styles.userAvatar} />
-          </View>
-          <Text style={styles.replyTimestamp}>2024-09-28 | 02:20</Text>
-        </View>
-      </ScrollView>
+        ) : (
+          <ScrollView
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            {notifications.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>알림이 없습니다.</Text>
+              </View>
+            ) : (
+              renderGroupedNotifications()
+            )}
+          </ScrollView>
+        )}
 
         <View style={styles.inputBar}>
           <View style={styles.inputWrapper}>
@@ -96,10 +382,20 @@ export const MyInfoNotifyScreen = () => {
               placeholderTextColor="#7d7e83"
               value={question}
               onChangeText={setQuestion}
+              editable={!sending}
             />
           </View>
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend} activeOpacity={0.8}>
-            <Text style={styles.sendButtonText}>Send</Text>
+          <TouchableOpacity
+            style={[styles.sendButton, sending && styles.sendButtonDisabled]}
+            onPress={handleSend}
+            activeOpacity={0.8}
+            disabled={sending}
+          >
+            {sending ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.sendButtonText}>Send</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -123,6 +419,22 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 120,
     gap: 24,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: '#7d7e83',
   },
   messageWrapper: {
     position: 'relative',
@@ -158,12 +470,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
   },
+  eventDate: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Regular',
+    color: '#7d7e83',
+    marginTop: 4,
+  },
   ctaButton: {
     backgroundColor: '#33395b',
     borderRadius: 6,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  ctaButtonWithMargin: {
+    marginTop: 12,
   },
   ctaText: {
     color: '#fff',
@@ -183,6 +504,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingHorizontal: 24,
     paddingVertical: 4,
+    marginBottom: 12,
   },
   dateChipText: {
     fontSize: 10,
@@ -248,11 +570,25 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 20,
     paddingVertical: 10,
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    opacity: 0.6,
   },
   sendButtonText: {
     color: '#fff',
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
+  },
+  deleteAllButton: {
+    paddingRight: 16,
+  },
+  deleteAllText: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#ff3b30',
   },
 });
 
