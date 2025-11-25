@@ -15,3 +15,40 @@ export const copyToClipboard = async (
 
 export * from './env';
 
+export const formatXrunAmount = (amount: string | number): string => {
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  if (isNaN(num)) return '0';
+  if (num === 0) return '0';
+
+  if (num > 0 && num < 0.000001) {
+    return '< 0.000001';
+  }
+
+  return num.toFixed(6);
+};
+
+export const formatWonAmount = (amount: number): string => {
+  const num = parseFloat(String(amount));
+  if (isNaN(num) || num === 0) return '₩0';
+
+  return (
+    '₩' +
+    num.toLocaleString('ko-KR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+};
+
+export const calculateWonEquivalent = (xrunAmount: string | number, gopaxPrice: number): number => {
+  const numAmount = typeof xrunAmount === 'string' ? parseFloat(xrunAmount) : xrunAmount;
+  const priceNum = typeof gopaxPrice === 'string' ? parseFloat(gopaxPrice) : gopaxPrice;
+
+  if (isNaN(numAmount) || isNaN(priceNum) || numAmount === 0 || priceNum === 0) {
+    return 0;
+  }
+
+  const result = numAmount * priceNum;
+  return Math.round(result * 100) / 100;
+};
+

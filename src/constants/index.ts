@@ -21,6 +21,24 @@ export const SIZES = {
   xlarge: 24,
 };
 
+export const LANG = {
+  referral: {
+    settlement: {
+      list: {
+        desc: '추천 광고 수익 정산',
+      },
+    },
+    card: {
+      income: '총수익',
+    },
+  },
+  wallet: {
+    adxrun: {
+      settlementIn45Days: '45일후 정산완료됨',
+    },
+  },
+} as const;
+
 export const COMMON_STYLES = {
 
   bottomSection: {

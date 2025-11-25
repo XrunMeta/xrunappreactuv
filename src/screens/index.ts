@@ -17,6 +17,7 @@ export { XrunWalletScreen } from './XrunWalletScreen';
 export { NftWalletScreen } from './NftWalletScreen';
 export { XrunWalletScreen2 } from './XrunWalletScreen2';
 export { AdWalletScreen } from './AdWalletScreen';
+export { AdvertiseScreen } from './AdvertiseScreen';
 export { TransactionDetailsScreen } from './TransactionDetailsScreen';
 export { WalletSendScreen } from './WalletSendScreen';
 export { WalletQrScanScreen } from './WalletQrScanScreen';

@@ -79,6 +79,16 @@ import {
   GetMemberByEmailResponse,
   GetUserInfoForReferralRequest,
   GetUserInfoForReferralResponse,
+  SettlementListRequest,
+  SettlementListResponse,
+  GetCompletedAdsRequest,
+  GetCompletedAdsResponse,
+  GetSavedAdsRequest,
+  GetSavedAdsResponse,
+  GetSettlementListRequest,
+  GetSettlementListResponse,
+  GetSettlementAmountRequest,
+  GetSettlementAmountResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1708,6 +1718,317 @@ export const getUserInfoForReferral = async (
     console.error('[추천] 사용자 정보 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[추천] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTotalHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 총 기록 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-05',
+      request,
+    );
+
+    console.log('[정산] 총 기록 조회 성공, 개수:', response.data.data?.length || 0);
+    console.log('[정산] 총 기록 응답 데이터:', JSON.stringify(response.data, null, 2));
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 총 기록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTransferHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 이체 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-06',
+      request,
+    );
+
+    console.log('[정산] 이체 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 이체 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getReceivedDetails = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 받은 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-01',
+      request,
+    );
+
+    console.log('[정산] 받은 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 받은 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTransitionHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 전송 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-03',
+      request,
+    );
+
+    console.log('[정산] 전송 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 전송 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getCompletedAds = async (
+  member: number,
+  navigation?: any,
+): Promise<GetCompletedAdsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetCompletedAdsRequest = {
+      member,
+    };
+
+    console.log('[광고] 완료된 광고 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetCompletedAdsResponse>(
+      '/app5010-02',
+      request,
+    );
+
+    console.log('[광고] 완료된 광고 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[광고] 완료된 광고 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[광고] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSavedAds = async (
+  member: number,
+  orderField: 'datetime' | 'dateleft' | 'amount' = 'datetime',
+  navigation?: any,
+): Promise<GetSavedAdsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSavedAdsRequest = {
+      member,
+      orderField,
+    };
+
+    console.log('[광고] 저장된 광고 목록 조회 요청:', { member, orderField });
+
+    const response = await axiosInstance.post<GetSavedAdsResponse>(
+      '/app5010-01',
+      request,
+    );
+
+    console.log('[광고] 저장된 광고 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[광고] 저장된 광고 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[광고] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSettlementList = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSettlementListRequest = { member };
+
+    console.log('[정산] 정산 목록 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementListResponse>(
+      '/getSettlementList',
+      request,
+    );
+
+    console.log('[정산] 정산 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 정산 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSettlementAmount = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementAmountResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSettlementAmountRequest = { member };
+
+    console.log('[정산] 정산 총액 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementAmountResponse>(
+      '/getSettlementAmount',
+      request,
+    );
+
+    console.log('[정산] 정산 총액 조회 성공:', response.data.data?.[0]?.amount || '0');
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 정산 총액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

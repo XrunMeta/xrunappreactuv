@@ -539,3 +539,77 @@ export interface GetUserInfoForReferralResponse {
   }>;
 }
 
+export interface SettlementListRequest {
+  member: number; 
+  currency: number; 
+  daysbefore: number; 
+  startwith: number; 
+}
+
+export interface SettlementListResponse {
+  type: string; 
+  data: Array<{
+    [key: string]: any;
+  }>;
+}
+
+export interface GetCompletedAdsRequest {
+  member: number; 
+}
+
+export interface CompletedAdItem {
+  transaction: string;
+  title: string;
+  amount: number;
+  symbol: string;
+  extracode: string;
+  datetime: string;
+}
+
+export interface GetCompletedAdsResponse {
+  data: CompletedAdItem[];
+}
+
+export interface GetSavedAdsRequest {
+  member: number; 
+  orderField?: 'datetime' | 'dateleft' | 'amount'; 
+}
+
+export interface SavedAdItem {
+  [key: string]: any;
+}
+
+export interface GetSavedAdsResponse {
+  data: SavedAdItem[];
+}
+
+export interface GetSettlementListRequest {
+  member: number; 
+}
+
+export interface SettlementListItem {
+  transaction: number;
+  email?: string;
+  amountasxrun: string; 
+  datetime: string;
+  [key: string]: any;
+}
+
+export interface GetSettlementListResponse {
+  status: 'success' | 'error';
+  data: SettlementListItem[];
+  message?: string;
+}
+
+export interface GetSettlementAmountRequest {
+  member: number; 
+}
+
+export interface GetSettlementAmountResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    amount: string; 
+  }>;
+  message?: string;
+}
+
