@@ -67,6 +67,75 @@ export type CountryDialCode = {
   flagEmoji: string;
 };
 
+export interface AdvertisementParams {
+  member: string;
+  advertisement: string;
+  coin: string;
+  campid: string;
+  joindesc: string;
+  name: string;
+  xrunPrice: number;
+  coinScreen: boolean;
+}
+
+export interface NasmobAdsResponse {
+  status: 'success' | 'error';
+  code: number;
+  message?: string;
+  data?: {
+    urlResult: number;
+    urlAD?: string;
+    campid?: string;
+    price?: number;
+    name?: string;
+    rewarddesc?: string;
+    cbparam?: string;
+  };
+}
+
+export interface NasmobCallbackRequest {
+  cbparam: string;
+  mkey: string;
+  mckey: string;
+  nstkey: string | null;
+  subparam: string | null;
+  userid: string;
+  campid: string;
+  adid: string;
+  price: string;
+  total_sales: string;
+  postback_type: null;
+  postback_rewardtype: null;
+  raw_response: any;
+}
+
+export interface DeviceInfo {
+  deviceId: string;
+  adid: string;
+  ipAddress: string;
+  model: string;
+  manufacturer: string;
+  osVersion: string;
+  carrier: string | null;
+  appVersion: string;
+  buildNumber: string;
+  bundleId: string;
+  deviceName: string;
+  userAgent: string;
+  isTablet: boolean;
+  isLocationEnabled: boolean;
+  timestamp: number;
+  networkType?: string;
+  isConnected?: boolean;
+  isInternetReachable?: boolean;
+  cellularGeneration?: string;
+  carrierName?: string | null;
+  ssid?: string | null;
+  bssid?: string | null;
+  mnetwork?: string;
+  carrierCode?: string;
+}
+
 export interface EmailCheckRequest {
   email: string;
 }

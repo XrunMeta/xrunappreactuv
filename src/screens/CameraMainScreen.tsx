@@ -1,4 +1,4 @@
-import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae, v_de06a3, v_df9f57 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
@@ -18,7 +18,8 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f4e704 } from '../components';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
-import { v_a0daa8 } from '../navigation';
+import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_700ef9 } from '../context';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -366,7 +367,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   activeTab: v_ac1d22 = 'Camera',
   onTabChange: v_d52709,
 }) => {
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { setAdvertisementParams: v_d48a26 } = v_700ef9();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
   const [v_572bd3, v_6a4dcd] = v_5ab095(false);
@@ -385,15 +387,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_0b2c53 = v_e662ae(false);
 
+  const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_6890b1 = v_e662ae(false); 
+
   v_c4deb2(() => {
     if (v_d1a6bb && !v_d1a6bb.granted) {
       v_1e66f0();
     }
   }, [v_d1a6bb]);
 
-  const v_7c560c = (spotData: v_f71847[], v_6e5804): v_60c7c3[] => {
+  const v_7c560c = (spotData: (v_f71847 & { campid?: string })[], v_6e5804): v_60c7c3[] => {
     const v_da1995 = Math.min(v_253a77, v_1d0937.length);
-    let nextData: v_f71847[] = [];
+    let nextData: (v_f71847 & { campid?: string })[] = [];
 
     if (v_6e5804 + v_da1995 > v_1d0937.length) {
       v_2e375c = [
@@ -406,6 +411,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
     return v_2e375c.map((v_9390e8, v_a56041) => {
       const v_c5ac8b = v_4ac6a7[v_a56041 % v_4ac6a7.length];
+      const v_aa0917 = v_9390e8.campid || '';
+
+      console.log(`토큰 변환 [${v_a56041}]:`, {
+        name: v_9390e8.name,
+        coin: v_9390e8.coin,
+        campid: v_aa0917,
+        hasCampid: !!v_aa0917,
+      });
+
       return {
         spotID: v_c5ac8b.spotID,
         x: v_c5ac8b.x,
@@ -419,7 +433,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         advertisement: v_9390e8.coin || '',
         coin: v_9390e8.coin || '',
         member: '',
-        campid: '',
+        campid: v_aa0917, 
       };
     });
   };
@@ -457,7 +471,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 brand: v_51b584.brand || v_51b584.coin || '',
                 coins: v_51b584.coins || v_51b584.coin || '',
                 coin: v_51b584.coin || '',
-              }));
+
+                campid: v_51b584.campid || v_51b584.campId || '',
+              } as v_f71847 & { campid?: string }));
 
               if (v_22ecab.length > 0) {
                 const v_f25b07 = v_7c560c(v_22ecab, v_a96760.current);
@@ -502,7 +518,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       }
 
       const v_ff39bc = JSON.parse(v_ef7306);
-      const v_660822 = v_ff39bc?.member;
+      const v_660822 = v_ff39bc?.member?.toString() || '';
       if (!v_660822) {
         console.log('userData에 member가 없습니다.');
         v_34a50a(false);
@@ -561,6 +577,59 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     };
   }, []);
 
+  v_c4deb2(() => {
+    return () => {
+      if (v_181e3e.current) {
+        clearTimeout(v_181e3e.current);
+        v_181e3e.current = null;
+      }
+    };
+  }, []);
+
+  v_c4deb2(() => {
+    v_6890b1.current = false;
+  }, [v_04cb77]);
+
+  const v_c1b041 = v_df9f57(() => {
+    if (v_ef86b6.length === 0) {
+      return v_ef86b6;
+    }
+
+    const v_524a51 = v_ef86b6.every(v_21cc31 => {
+      const v_926d1c = parseFloat(String(v_21cc31.distance || 0));
+      return v_926d1c >= 20;
+    });
+
+    if (!v_524a51) {
+
+      return v_ef86b6;
+    }
+
+    const v_c27036 = Math.floor(Math.random() * 2) + 1; 
+    const v_bbb1fd = new Set<number>();
+
+    while (v_bbb1fd.size < v_c27036 && v_bbb1fd.size < v_ef86b6.length) {
+      const v_668416 = Math.floor(Math.random() * v_ef86b6.length);
+      v_bbb1fd.add(v_668416);
+    }
+
+    const v_2d1be2 = v_ef86b6.map((v_21cc31, v_a56041) => {
+      if (v_bbb1fd.has(v_a56041)) {
+
+        const v_f3c0bc = Math.floor(Math.random() * 19) + 1; 
+        return {
+          ...v_21cc31,
+          distance: v_f3c0bc, 
+        };
+      }
+
+      return v_21cc31;
+    });
+
+    console.log(`📊 표시용 토큰 생성: ${v_c27036}개 토큰의 거리를 20미터 이내로 조정`);
+    return v_2d1be2;
+  }, [v_ef86b6]);
+
   const v_6a213b = (v_6e55b1) => {
     console.log('Navigation item pressed:', v_6e55b1);
 
@@ -602,12 +671,111 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     }
   }, [v_572bd3]);
 
-  const v_eed806 = (token: v_60c7c3) => {
-    v_96a9ed(v_21cc31);
+  const v_917f22 = v_de06a3(async (token: v_60c7c3) => {
+    try {
+      console.log('=== navigateToAd 함수 시작 ===');
+      console.log('전달받은 토큰 정보:', JSON.stringify(v_21cc31, null, 2));
+
+      const v_ef7306 = await v_e84827.getItem('userData');
+      if (!v_ef7306) {
+        console.log('userData가 없습니다.');
+        return;
+      }
+
+      const v_ff39bc = JSON.parse(v_ef7306);
+      const v_660822 = v_ff39bc?.member?.toString() || '';
+
+      const v_aa0917 = v_21cc31.campid || '';
+      console.log('campid 확인:', {
+        tokenCampid: v_21cc31.campid,
+        finalCampid: v_aa0917,
+        coin: v_21cc31.coin,
+      });
+
+      const v_75c344 = {
+        member: v_660822,
+        advertisement: v_21cc31.advertisement || v_21cc31.coin || '',
+        coin: v_21cc31.coin || '',
+        campid: v_aa0917, 
+        joindesc: v_21cc31.joindesc || '',
+        name: v_21cc31.name || 'XRUN coin',
+        xrunPrice: v_21cc31.xrunPrice || 0,
+        coinScreen: true,
+      };
+
+      console.log('Context에 저장할 광고 파라미터:', JSON.stringify(v_75c344, null, 2));
+      v_d48a26(v_75c344);
+
+      console.log('ShowNapAdScreen으로 이동');
+      v_487a25(v_ce4741.showNapAd);
+    } catch (v_5e9bfe) {
+      console.error('광고 화면 이동 실패:', v_5e9bfe);
+    }
+  }, [v_d48a26, v_487a25]);
+
+  const v_eed806 = v_de06a3((originalToken: v_60c7c3, displayToken?: v_60c7c3) => {
+
+    console.log('=== 토큰 클릭 이벤트 발생 ===');
+    console.log('원본 토큰 정보:', JSON.stringify(v_cc8a46, null, 2));
+    console.log('표시용 토큰 정보:', v_33e0b4 ? JSON.stringify(v_33e0b4, null, 2) : '없음');
+    console.log('spotID:', v_cc8a46.spotID);
+    console.log('원본 distance:', v_cc8a46.distance);
+    console.log('표시용 distance:', v_33e0b4?.distance);
+    console.log('xrunPrice:', v_cc8a46.xrunPrice);
+    console.log('name:', v_cc8a46.name);
+    console.log('iconurl:', v_cc8a46.iconurl);
+    console.log('joindesc:', v_cc8a46.joindesc);
+    console.log('brand:', v_cc8a46.brand);
+    console.log('advertisement:', v_cc8a46.advertisement);
+    console.log('coin:', v_cc8a46.coin);
+    console.log('campid:', v_cc8a46.campid);
+    console.log('member:', v_cc8a46.member);
+    console.log('=== 토큰 클릭 이벤트 끝 ===');
+
+    v_96a9ed(v_cc8a46);
     if (!v_572bd3) {
       v_6a4dcd(true);
     }
-  };
+
+    const v_d35959 = parseFloat(String(v_cc8a46.distance || 0));
+    const v_83413d = v_33e0b4 ? parseFloat(String(v_33e0b4.distance || 0)) : v_d35959;
+
+    const v_7c662d = v_33e0b4 && v_83413d < v_d35959;
+
+    console.log('거리 체크:', { 
+      displayDistance: v_83413d, 
+      originalDistance: v_d35959,
+      isDistanceAdjusted: v_7c662d,
+      isWithin20m: v_d35959 < 20,
+      willProceed: v_7c662d || v_d35959 < 20,
+    });
+
+    if (v_7c662d || v_d35959 < 20) {
+      if (v_7c662d) {
+        console.log('✅ 토큰 거리가 조정되어 표시됨 - 실제 거리와 상관없이 광고 진행');
+      } else {
+        console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+      }
+
+      if (v_181e3e.current) {
+        clearTimeout(v_181e3e.current);
+        v_181e3e.current = null;
+        console.log('⏹️ 이전 타이머 정리됨');
+      }
+
+      v_6890b1.current = false;
+      console.log('🔄 자동 광고 트리거 상태 리셋');
+
+      console.log('⏰ 2초 타이머 시작');
+      v_181e3e.current = setTimeout(() => {
+        console.log('⏰ 2초 경과 - 자동으로 광고 화면으로 이동');
+        v_6890b1.current = true;
+        v_917f22(v_cc8a46); 
+      }, 2000);
+    } else {
+      console.log('⚠️ 토큰 거리 20미터 초과 - 광고 화면으로 이동하지 않음');
+    }
+  }, [v_572bd3, v_917f22]);
 
   const v_fce460 = [
     { id: 'wallet', label: 'Wallet', icon: v_8daafe },
@@ -679,17 +847,22 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           </View>
         ) : (
           <View style={[v_d81136.tokenContainer, { bottom: v_572bd3 && v_04cb77 ? 200 : 110 }]}>
-            {v_ef86b6
+            {v_c1b041
               .sort((v_779914, v_148ff6) => (v_148ff6.distance || 0) - (v_779914.distance || 0)) 
-              .map((v_21cc31) => (
-                <TokenComponent
-                  key={v_21cc31.spotID}
-                  token={v_21cc31}
-                  onPress={() => v_eed806(v_21cc31)}
-                  animationRefs={v_5b4d76}
-                  appState={v_94a194}
-                />
-              ))}
+              .map((v_33e0b4) => {
+
+                const v_cc8a46 = v_ef86b6.find(v_8d41d7 => v_8d41d7.spotID === v_33e0b4.spotID) || v_33e0b4;
+
+                return (
+                  <TokenComponent
+                    key={v_33e0b4.spotID}
+                    token={v_33e0b4} 
+                    onPress={() => v_eed806(v_cc8a46, v_33e0b4)} 
+                    animationRefs={v_5b4d76}
+                    appState={v_94a194}
+                  />
+                );
+              })}
           </View>
         )}
 
@@ -704,7 +877,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             right: 0,
             top: 0,
             left: 0,
-            zIndex: 5, 
+            zIndex: 3, 
+            pointerEvents: v_572bd3 ? 'auto' : 'none', 
           }}>
           <Animated.View
             style={[
@@ -828,7 +1002,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   <TouchableOpacity
                     onPress={() => {
 
-                      console.log('View ad pressed');
+                      if (v_181e3e.current) {
+                        clearTimeout(v_181e3e.current);
+                        v_181e3e.current = null;
+                      }
+                      v_6890b1.current = true; 
+
+                      if (v_04cb77) {
+                        v_917f22(v_04cb77);
+                      }
                     }}
                     style={{
                       backgroundColor: '#FFDC04',
@@ -856,7 +1038,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       {}
       {}
-      <View style={{ zIndex: 10 }}>
+      <View style={{ zIndex: 4 }}>
         <BottomNavigationBar
           items={v_fce460}
           activeItemId="map"
@@ -883,7 +1065,7 @@ const v_d81136 = v_472849.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 10,
+    zIndex: 4, 
   },
   statusBarContent: {
     flexDirection: 'row',
@@ -896,6 +1078,7 @@ const v_d81136 = v_472849.create({
   cameraContainer: {
     flex: 1,
     position: 'relative',
+    zIndex: 1, 
   },
   camera: {
     flex: 1,
@@ -931,7 +1114,7 @@ const v_d81136 = v_472849.create({
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 100, 
+    zIndex: 2, 
   },
 
   tokenSpot: {
