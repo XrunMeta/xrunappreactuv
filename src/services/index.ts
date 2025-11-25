@@ -54,6 +54,16 @@ import {
   v_6ffbdd,
   v_62c808,
   v_6dba58,
+  v_0a585d,
+  v_7ffbeb,
+  v_2737f8,
+  v_495962,
+  v_ba9bd0,
+  v_368246,
+  v_7092d8,
+  v_294d11,
+  v_0671ef,
+  v_ed2980,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -1192,6 +1202,198 @@ export const v_10a69f = async (
     console.error('[회원 탈퇴] 회원 탈퇴 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[회원 탈퇴] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_ab08d0 = async (
+  v_660822,
+  v_965edf = 0,
+  v_c65f5d,
+): Promise<v_7ffbeb> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_0a585d = {
+      member: v_660822,
+      start: v_965edf,
+    };
+
+    console.log('[알림] 알림 목록 조회 요청:', { member: v_660822, start: v_965edf });
+
+    const v_3393e3 = await v_9f42a4.post<v_7ffbeb>(
+      '/ap6000-01',
+      v_576f5a,
+    );
+
+    console.log('[알림] 알림 목록 조회 성공, 알림 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[알림] 알림 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_26e528 = async (
+  v_660822,
+  v_9f1622,
+  v_a9d5df = false,
+  v_c65f5d,
+): Promise<v_495962> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_2737f8 = {
+      isBroadcast: v_a9d5df,
+      member: v_660822,
+      title: v_9f1622,
+    };
+
+    console.log('[알림] 알림 메시지 전송 요청:', { member: v_660822, title: v_9f1622, isBroadcast: v_a9d5df });
+
+    const v_3393e3 = await v_9f42a4.post<v_495962>(
+      '/ap6000-02',
+      v_576f5a,
+    );
+
+    console.log('[알림] 알림 메시지 전송 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[알림] 알림 메시지 전송 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_1fc3f6 = async (
+  v_660822,
+  v_10046b,
+  v_a9d5df = false,
+  v_c65f5d,
+): Promise<v_368246> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_ba9bd0 = {
+      isBroadcast: v_a9d5df,
+      member: v_660822,
+      board: v_10046b,
+    };
+
+    console.log('[알림] 알림 메시지 삭제 요청:', { member: v_660822, board: v_10046b, isBroadcast: v_a9d5df });
+
+    const v_3393e3 = await v_9f42a4.post<v_368246>(
+      '/ap6000-03',
+      v_576f5a,
+    );
+
+    console.log('[알림] 알림 메시지 삭제 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[알림] 알림 메시지 삭제 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_3e4cca = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_294d11> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_7092d8 = {
+      member: v_660822,
+    };
+
+    console.log('[알림] 전체 알림 삭제 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_294d11>(
+      '/ap6000-04delete',
+      v_576f5a,
+    );
+
+    console.log('[알림] 전체 알림 삭제 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[알림] 전체 알림 삭제 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_903861 = async (
+  v_4c1edc,
+  v_660822,
+  v_c65f5d,
+): Promise<v_ed2980> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_0671ef = {
+      pushkey: v_4c1edc,
+      member: v_660822,
+    };
+
+    console.log('[알림] FCM 토큰 등록 요청:', { member: v_660822, pushkey: v_4c1edc.substring(0, 20) + '...' });
+
+    const v_3393e3 = await v_9f42a4.post<v_ed2980>(
+      '/login-pushkeyreg',
+      v_576f5a,
+    );
+
+    console.log('[알림] FCM 토큰 등록 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[알림] FCM 토큰 등록 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[알림] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,
