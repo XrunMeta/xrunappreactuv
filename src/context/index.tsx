@@ -8,6 +8,9 @@ type AppContextValue = {
   walletSendAddress: string;
   setWalletSendAddress: (address: string) => void;
   resetWalletSendAddress: () => void;
+  walletReceiveAddress: string;
+  setWalletReceiveAddress: (address: string) => void;
+  resetWalletReceiveAddress: () => void;
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
@@ -57,6 +60,7 @@ const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
 
 export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode }) => {
   const [v_ee27aa, v_134f07] = v_5ab095('');
+  const [v_589fe1, v_f0d0d2] = v_5ab095('');
   const [v_750b67, v_2cdd41] = v_5ab095(false);
   const [v_e6976c, v_8f89f3] =
     v_5ab095<v_01e0ec>(v_ce4741.login);
@@ -88,6 +92,9 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       walletSendAddress: v_ee27aa,
       setWalletSendAddress: v_134f07,
       resetWalletSendAddress: () => v_134f07(''),
+      walletReceiveAddress: v_589fe1,
+      setWalletReceiveAddress: v_f0d0d2,
+      resetWalletReceiveAddress: () => v_f0d0d2(''),
       addTokenDialogVisible: v_750b67,
       openAddTokenDialog: () => v_2cdd41(true),
       closeAddTokenDialog: () => v_2cdd41(false),
@@ -137,6 +144,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     }),
     [
       v_ee27aa,
+      v_589fe1,
       v_750b67,
       v_e6976c,
       v_fc0b2c,
