@@ -332,8 +332,8 @@ export const v_386af2 = () => {
   return (
     <KeyboardAvoidingView
       style={v_d81136.flex}
-      behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={v_326be8.OS === 'ios' ? 90 : 0}
+      behavior={v_326be8.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={v_326be8.OS === 'ios' ? 0 : 0}
     >
       <View style={v_d81136.container}>
         <StatusBar style="dark" />
@@ -362,6 +362,7 @@ export const v_386af2 = () => {
             style={v_d81136.list}
             contentContainerStyle={v_d81136.listContent}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />
             }
@@ -419,8 +420,9 @@ const v_d81136 = v_472849.create({
   listContent: {
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 120,
+    paddingBottom: 0,
     gap: 24,
+    flexGrow: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -561,11 +563,19 @@ const v_d81136 = v_472849.create({
     borderColor: '#edeced',
     backgroundColor: '#fff',
     paddingHorizontal: 12,
+    paddingVertical: 12,
+    minHeight: 48,
+    maxHeight: 48,
+    justifyContent: 'center',
   },
   input: {
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
+    minHeight: 24,
+    maxHeight: 24,
+    padding: 0,
+    margin: 0,
   },
   sendButton: {
     backgroundColor: '#33395b',
