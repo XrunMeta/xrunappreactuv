@@ -1,132 +1,386 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl } from '../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Header, SegmentedControl, DataList } from '../components';
 import { COLORS } from '../constants';
+import { useAppNavigation } from '../navigation';
+import {
+  fetchADXRUNEstimateList,
+  fetchADXRUNResultList,
+  fetchADXRUNTopBanners,
+  fetchADXRUNTopBannersSettled,
+} from '../services';
+import { ADXRUNEstimateItem, ADXRUNResultItem } from '../types';
+import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
 
-type AdEntry = {
-  id: string;
+type TabValue = 'pending' | 'settled';
+
+interface AdEntry {
+  id: string | number;
   status: string;
   date: string;
-  rows: {
-    label: string;
-    amount: string;
-    amountColor?: string;
-  }[];
-};
-
-const getPendingEntries = (t: any): AdEntry[] => [
-  {
-    id: 'pending-1',
-    status: t('screens.adWallet.pending'),
-    date: '2025.05.30 14:00',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+20 XRUN', amountColor: '#707070' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
-    ],
-  },
-  {
-    id: 'pending-2',
-    status: t('screens.adWallet.pending'),
-    date: '2025.05.30 13:58',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
-    ],
-  },
-  {
-    id: 'pending-3',
-    status: t('screens.adWallet.pending'),
-    date: '2025.05.30 13:40',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
-    ],
-  },
-];
-
-const getSettledEntries = (t: any): AdEntry[] => [
-  {
-    id: 'settled-1',
-    status: t('screens.adWallet.settled'),
-    date: '2025.05.30 14:00',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+1500 XRUN', amountColor: '#111111' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '+1500 XRUN', amountColor: '#111111' },
-    ],
-  },
-  {
-    id: 'settled-2',
-    status: t('screens.adWallet.conditionNotMet'),
-    date: '2025.04.20 16:00',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
-    ],
-  },
-  {
-    id: 'settled-3',
-    status: t('screens.adWallet.settled'),
-    date: '2025.04.19 15:00',
-    rows: [
-      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
-      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
-    ],
-  },
-];
-
-type TabValue = (typeof TABS)[number]['value'];
+  expectedAdRevenue: string;
+  adRevenueSettlement: string;
+  expectedAdRevenueColor: string;
+  adRevenueSettlementColor: string;
+}
 
 export const AdWalletScreen = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { goBack } = useAppNavigation();
   const [tab, setTab] = useState<TabValue>('pending');
-  const entries = useMemo(() => (tab === 'pending' ? getPendingEntries(t) : getSettledEntries(t)), [tab, t]);
-  const summaryLabel = tab === 'pending' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount');
-  const tabs = [
-    { label: t('screens.adWallet.pending'), value: 'pending' },
-    { label: t('screens.adWallet.settled'), value: 'settled' },
-  ] as const;
+  const [member, setMember] = useState<number | null>(null);
+  const [topBannersData, setTopBannersData] = useState<{
+    krwamount: string;
+    amountasxrun: string;
+  }>({
+    krwamount: '0 KRW',
+    amountasxrun: '0 XRUN',
+  });
+  const [topBannersLoading, setTopBannersLoading] = useState(false);
+
+  const pendingListRef = useRef<DataListRef>(null);
+  const settledListRef = useRef<DataListRef>(null);
+
+  useEffect(() => {
+    const getMember = async () => {
+      try {
+        const resUserData = await AsyncStorage.getItem('userData');
+        if (!resUserData) {
+          console.log('No userData found in AsyncStorage');
+          return;
+        }
+
+        const parsedUserData = JSON.parse(resUserData);
+        const memberData = parsedUserData.member;
+        setMember(memberData);
+      } catch (err: any) {
+        console.log(`Failed to get member from async storage: ${err}`);
+      }
+    };
+
+    getMember();
+  }, []);
+
+  useEffect(() => {
+    if (!member) return;
+
+    const loadTopBanners = async () => {
+      setTopBannersLoading(true);
+      try {
+        let response;
+        if (tab === 'pending') {
+          response = await fetchADXRUNTopBanners(member);
+        } else {
+          response = await fetchADXRUNTopBannersSettled(member);
+        }
+
+        const responseData = response.data || response;
+
+        if (responseData && responseData.transactions && responseData.transactions.length > 0) {
+          const transaction = responseData.transactions[0];
+
+          const krwAmountValue = parseFloat(transaction.krwamount || '0').toFixed(2);
+          const krwamount = `${krwAmountValue} KRW`;
+
+          const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(4);
+          const amountasxrun = `${amountAsXrunValue} XRUN`;
+
+          setTopBannersData({
+            krwamount,
+            amountasxrun,
+          });
+        } else {
+          setTopBannersData({
+            krwamount: '0 KRW',
+            amountasxrun: '0 XRUN',
+          });
+        }
+      } catch (error: any) {
+        console.error('Failed to fetch top banners:', error);
+        setTopBannersData({
+          krwamount: '0 KRW',
+          amountasxrun: '0 XRUN',
+        });
+      } finally {
+        setTopBannersLoading(false);
+      }
+    };
+
+    loadTopBanners();
+  }, [member, tab]);
+
+  const formatDate = useCallback(
+    (utcString: string | undefined): string => {
+      if (!utcString) {
+        return '-';
+      }
+
+      try {
+
+        let utcDateString = utcString;
+        if (!utcDateString.includes('T')) {
+          utcDateString = utcDateString.replace(' ', 'T') + 'Z';
+        }
+
+        const localDate = new Date(utcDateString);
+
+        if (isNaN(localDate.getTime())) {
+          console.log('❌ 잘못된 날짜 형식:', utcString);
+          return '-';
+        }
+
+        const year = localDate.getFullYear();
+        const month = String(localDate.getMonth() + 1).padStart(2, '0');
+        const day = String(localDate.getDate()).padStart(2, '0');
+        const hours = String(localDate.getHours()).padStart(2, '0');
+        const minutes = String(localDate.getMinutes()).padStart(2, '0');
+
+        const currentLanguage = i18n.language || 'ko';
+        if (currentLanguage === 'ko') {
+
+          return `${year}.${month}.${day} ${hours}:${minutes}`;
+        } else {
+
+          return `${month}/${day}/${year} ${hours}:${minutes}`;
+        }
+      } catch (error) {
+        console.log('❌ 날짜 파싱 오류:', error, '원본 데이터:', utcString);
+        return '-';
+      }
+    },
+    [i18n.language],
+  );
+
+  const convertEstimateToAdEntry = useCallback(
+    (item: ADXRUNEstimateItem): AdEntry => {
+      const status = t('screens.adWallet.pending');
+      const date = formatDate(item.created_at);
+      const expectedAdRevenue = item.priceasXrun ? `${item.priceasXrun} XRUN` : '0 XRUN';
+      const adRevenueSettlement = '- XRUN';
+
+      return {
+        id: item.id,
+        status,
+        date,
+        expectedAdRevenue,
+        adRevenueSettlement,
+        expectedAdRevenueColor: '#707070',
+        adRevenueSettlementColor: '#343434',
+      };
+    },
+    [t, formatDate],
+  );
+
+  const convertResultToAdEntry = useCallback(
+    (item: ADXRUNResultItem): AdEntry => {
+
+      const status =
+        item.action === 3307 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
+      const date = formatDate(item.datetime);
+
+      let expectedAdRevenue = '0 XRUN';
+      if (item.amount && item.extrastr4) {
+        try {
+          const amountValue = parseFloat(item.amount);
+          const extrastr4Value = parseFloat(item.extrastr4);
+
+          if (!isNaN(amountValue) && !isNaN(extrastr4Value) && extrastr4Value !== 0) {
+            const result = (amountValue / extrastr4Value).toFixed(6);
+            expectedAdRevenue = `${result} XRUN`;
+          }
+        } catch (error) {
+          console.log('❌ 광고수익 계산 오류:', error);
+        }
+      }
+
+      let adRevenueSettlement = '0 XRUN';
+      if (item.amountasxrun) {
+        const settlementValue = parseFloat(item.amountasxrun).toFixed(6);
+        adRevenueSettlement = `${settlementValue} XRUN`;
+      }
+
+      const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';
+      const adRevenueSettlementColor =
+        status === t('screens.adWallet.settled') ? '#111111' : '#343434';
+
+      return {
+        id: item.id,
+        status,
+        date,
+        expectedAdRevenue,
+        adRevenueSettlement,
+        expectedAdRevenueColor,
+        adRevenueSettlementColor,
+      };
+    },
+    [t, formatDate],
+  );
+
+  const fetchPendingData = useCallback(
+    async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
+      if (!member) {
+        return { data: [], total: 0, hasMore: false };
+      }
+
+      try {
+        const response = await fetchADXRUNEstimateList(member, params.page);
+
+        const responseData = response.data || response;
+        const items = responseData.items || responseData || [];
+        const pagination = responseData.pagination;
+
+        const adEntries: AdEntry[] = items.map(convertEstimateToAdEntry);
+
+        let hasMore = false;
+        if (pagination) {
+          hasMore = pagination.hasNextPage || false;
+        } else {
+          hasMore = items.length > 0 && items.length >= params.pageSize;
+        }
+
+        return {
+          data: adEntries,
+          total: adEntries.length,
+          hasMore,
+        };
+      } catch (error: any) {
+        console.error('Failed to fetch pending data:', error);
+        return { data: [], total: 0, hasMore: false };
+      }
+    },
+    [member, convertEstimateToAdEntry],
+  );
+
+  const fetchSettledData = useCallback(
+    async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
+      if (!member) {
+        return { data: [], total: 0, hasMore: false };
+      }
+
+      try {
+        const response = await fetchADXRUNResultList(member, params.page);
+
+        const responseData = response.data || response;
+        const items = responseData.items || responseData || [];
+        const pagination = responseData.pagination;
+
+        const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
+
+        let hasMore = false;
+        if (pagination) {
+          hasMore = pagination.hasNextPage || false;
+        } else {
+          hasMore = items.length > 0 && items.length >= params.pageSize;
+        }
+
+        return {
+          data: adEntries,
+          total: adEntries.length,
+          hasMore,
+        };
+      } catch (error: any) {
+        console.error('Failed to fetch settled data:', error);
+        return { data: [], total: 0, hasMore: false };
+      }
+    },
+    [member, convertResultToAdEntry],
+  );
+
+  const handleTabChange = useCallback((value: TabValue) => {
+    setTab(value);
+
+    if (value === 'pending' && pendingListRef.current) {
+      pendingListRef.current.reloadData();
+    } else if (value === 'settled' && settledListRef.current) {
+      settledListRef.current.reloadData();
+    }
+  }, []);
+
+  const summaryLabel = useMemo(
+    () => (tab === 'pending' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
+    [tab, t],
+  );
+
+  const tabs = useMemo(
+    () => [
+      { label: t('screens.adWallet.pending'), value: 'pending' as TabValue },
+      { label: t('screens.adWallet.settled'), value: 'settled' as TabValue },
+    ],
+    [t],
+  );
+
+  const AdEntryItem: React.FC<AdEntry> = (item) => {
+    return (
+      <View style={styles.adCard}>
+        <View style={styles.adCardHeader}>
+          <Text style={styles.adCardStatus}>{item.status}</Text>
+          <Text style={styles.adCardDate}>{item.date}</Text>
+        </View>
+        <View style={styles.adCardRow}>
+          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.expectedAdRevenue')}</Text>
+          <Text style={[styles.adCardRowAmount, { color: item.expectedAdRevenueColor }]}>
+            {item.expectedAdRevenue}
+          </Text>
+        </View>
+        <View style={styles.adCardRow}>
+          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
+          <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+            {item.adRevenueSettlement}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.adWallet.title')} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <Header title={t('screens.adWallet.title')} onBackPress={goBack} showBackButton />
+      <View style={styles.content}>
         <View style={styles.summaryCard}>
           <View style={styles.cardAccentOne} />
           <View style={styles.cardAccentTwo} />
           <Text style={styles.summaryLabel}>{summaryLabel}</Text>
-          <Text style={styles.summaryValue}>3,400.00 xrun</Text>
-          <Text style={styles.summaryExtra}>$5,987</Text>
+          <Text style={styles.summaryValue}>
+            {topBannersLoading ? '...' : topBannersData.amountasxrun}
+          </Text>
+          <Text style={styles.summaryExtra}>
+            {topBannersLoading ? '...' : topBannersData.krwamount}
+          </Text>
         </View>
 
         <SegmentedControl
           options={tabs}
           value={tab}
-          onChange={setTab}
+          onChange={handleTabChange}
           containerStyle={styles.segmentedControl}
         />
 
         <View style={styles.listWrapper}>
-          {entries.map((entry) => (
-            <View key={entry.id} style={styles.adCard}>
-              <View style={styles.adCardHeader}>
-                <Text style={styles.adCardStatus}>{entry.status}</Text>
-                <Text style={styles.adCardDate}>{entry.date}</Text>
-              </View>
-              {entry.rows.map((row, index) => (
-                <View key={`${entry.id}-${index}`} style={styles.adCardRow}>
-                  <Text style={styles.adCardRowLabel}>{row.label}</Text>
-                  <Text style={[styles.adCardRowAmount, { color: row.amountColor ?? '#343434' }]}>
-                    {row.amount}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ))}
+          {tab === 'pending' ? (
+            <DataList
+              ref={pendingListRef}
+              fetchData={fetchPendingData}
+              ItemComponent={AdEntryItem}
+              pageSize={20}
+              contentContainerStyle={styles.dataListContent}
+              keyExtractor={(item, index) => `pending-${item.id}-${index}`}
+            />
+          ) : (
+            <DataList
+              ref={settledListRef}
+              fetchData={fetchSettledData}
+              ItemComponent={AdEntryItem}
+              pageSize={20}
+              contentContainerStyle={styles.dataListContent}
+              keyExtractor={(item, index) => `settled-${item.id}-${index}`}
+            />
+          )}
         </View>
-      </ScrollView>
+      </View>
 
       {Platform.OS === 'ios' && (
         <View style={styles.homeIndicator}>
@@ -142,10 +396,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  scrollContent: {
+  content: {
+    flex: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 40,
   },
   summaryCard: {
     height: 128,
@@ -195,6 +449,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     opacity: 0.8,
+    marginTop: 4,
   },
   segmentedControl: {
     width: '100%',
@@ -203,9 +458,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   listWrapper: {
+    flex: 1,
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
+  },
+  dataListContent: {
+    paddingBottom: 32,
     gap: 12,
   },
   adCard: {
@@ -218,6 +477,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 30,
     elevation: 5,
+    marginBottom: 12,
   },
   adCardHeader: {
     flexDirection: 'row',
@@ -263,5 +523,3 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 });
-
-
