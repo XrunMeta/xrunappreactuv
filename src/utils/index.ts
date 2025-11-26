@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Alert, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
 export const copyToClipboard = async (
@@ -50,5 +50,44 @@ export const calculateWonEquivalent = (xrunAmount: string | number, gopaxPrice: 
 
   const result = numAmount * priceNum;
   return Math.round(result * 100) / 100;
+};
+
+export const shareReferralLink = async (
+  lang: { screen_info?: { button?: { share?: string } } } | null,
+  userDetails: { email: string },
+  navigation?: any,
+): Promise<void> => {
+  try {
+
+    const androidLink = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
+    const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
+
+    const shareText = lang?.screen_info?.button?.share || '공유하기';
+
+    const message = `${shareText}${userDetails.email}\n\n다운로드:\nAndroid: ${androidLink}\niOS: ${iosLink}`;
+
+    const result = await Share.share({
+      message,
+    });
+
+    if (result.action === Share.sharedAction) {
+      if (result.activityType) {
+
+        console.log(`${result.activityType}로 성공적으로 공유됨`);
+      } else {
+
+        console.log('성공적으로 공유됨');
+      }
+    } else if (result.action === Share.dismissedAction) {
+
+      console.log('공유가 취소됨');
+    }
+  } catch (error: any) {
+    Alert.alert('공유 실패', error.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    console.log('Share error:', error);
+    if (navigation) {
+
+    }
+  }
 };
 

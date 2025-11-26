@@ -38,6 +38,11 @@ export const LANG = {
       settlementIn45Days: '45일후 정산완료됨',
     },
   },
+  screen_info: {
+    button: {
+      share: 'XRUN 레퍼럴을 참여하시면 광고수익이 유니레벨방식으로 8단계까지 20%씩 올라와요.\n추천해주세요!\n\n가입후에 아래의 이메일을 추천인으로 반드시 입력하세요. \n\n 👉추천인 이메일: \n',
+    },
+  },
 } as const;
 
 export const COMMON_STYLES = {

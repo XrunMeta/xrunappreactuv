@@ -1,12 +1,13 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, Share, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { shareReferralLink } from '../utils';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { getMyGroup } from '../services';
 import { MyGroupItem } from '../types';
@@ -24,6 +25,7 @@ export const ReferralMyGroupScreen = () => {
   const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
   const [memberId, setMemberId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [allMembers, setAllMembers] = useState<MemberData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,14 +38,17 @@ export const ReferralMyGroupScreen = () => {
       try {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (userDataStr) {
-        const userData = JSON.parse(userDataStr);
-        if (userData.member) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.member) {
 
-          setMemberId(String(userData.member));
+            setMemberId(String(userData.member));
 
             hasLoadedRef.current = false;
             setAllMembers([]);
             setTotalMembers(0);
+          }
+          if (userData.email) {
+            setUserEmail(userData.email);
           }
         }
       } catch (error) {
@@ -160,13 +165,15 @@ export const ReferralMyGroupScreen = () => {
   };
 
   const handleShare = async () => {
-    try {
-      await Share.share({
-        message: 'XRUN referral 링크를 공유해 보세요!',
-      });
-    } catch (error) {
-      console.warn(error);
+    if (!userEmail) {
+      Alert.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      return;
     }
+    await shareReferralLink(
+      LANG,
+      { email: userEmail },
+      navigate,
+    );
   };
 
   return (
