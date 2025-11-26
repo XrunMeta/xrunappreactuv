@@ -100,6 +100,12 @@ import {
   v_ed4aeb,
   v_f7dffa,
   v_8c8b0e,
+  v_bfc1b5,
+  v_ce940a,
+  v_bc5b18,
+  v_14faed,
+  v_0203a2,
+  v_efae6a,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_e4a763 } from '../utils/env';
@@ -2372,6 +2378,136 @@ export const v_fb1936 = async (
     console.error('[내 그룹] 내 그룹 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[내 그룹] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_08316d = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_ce940a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bfc1b5 = { member: v_660822 };
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_ce940a>(
+      '/getMyRecommender',
+      v_576f5a,
+    );
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 성공:', v_3393e3.data.status);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴 수정] 현재 레퍼럴 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_c58856 = async (
+  v_660822,
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_14faed> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_bc5b18 = {
+      member: v_660822,
+      email: v_e0c7e8.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 요청:', { member: v_660822, email: v_e0c7e8.trim() });
+
+    const v_3393e3 = await v_9f42a4.post<v_14faed>(
+      '/checkCanSetRecommender',
+      v_576f5a,
+    );
+
+    const v_f1a123 = v_3393e3.status;
+    const v_f637a4 = v_3393e3.data;
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 응답:', {
+      code: v_f1a123,
+      status: v_f637a4.status,
+      message: v_f637a4.message,
+    });
+
+    return {
+      ...v_f637a4,
+      code: v_f1a123,
+      status_code: v_f1a123,
+    };
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      const v_408297 = v_5e9bfe.response?.status || 500;
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_408297,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+
+      return {
+        status: 'error',
+        code: v_408297,
+        status_code: v_408297,
+        message: v_5e9bfe.response?.data?.message || v_5e9bfe.message,
+        data: v_5e9bfe.response?.data?.data,
+      };
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_794a74 = async (
+  v_660822,
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<v_efae6a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_0203a2 = {
+      member: v_660822,
+      email: v_e0c7e8.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', { member: v_660822, email: v_e0c7e8.trim() });
+
+    const v_3393e3 = await v_9f42a4.post<v_efae6a>(
+      '/setRecommender',
+      v_576f5a,
+    );
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 성공:', v_3393e3.data.status);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

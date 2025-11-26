@@ -741,3 +741,43 @@ export interface GetMyGroupResponse {
   data: MyGroupItem[];
   message?: string;
 }
+
+export interface GetMyRecommenderRequest {
+  member: string; 
+}
+
+export interface GetMyRecommenderResponse {
+  status: 'success' | 'error';
+  data?: {
+    email: string; 
+    masked_email: string; 
+    firstname: string; 
+    lastname: string; 
+  };
+  message?: string;
+}
+
+export interface CheckCanSetRecommenderRequest {
+  member: string; 
+  email: string; 
+}
+
+export interface CheckCanSetRecommenderResponse {
+  status?: 'success' | 'error';
+  code?: number; 
+  status_code?: number; 
+  message?: string; 
+  data?: {
+    canSet?: boolean; 
+  };
+}
+
+export interface SetRecommenderRequest {
+  member: string; 
+  email: string; 
+}
+
+export interface SetRecommenderResponse {
+  status: 'success' | 'error';
+  message?: string;
+}
