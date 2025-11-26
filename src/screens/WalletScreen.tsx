@@ -78,7 +78,7 @@ interface TokenListItemData extends CombinedAsset {
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { openAddTokenDialog, setWalletReceiveAddress } = useAppContext();
+  const { openAddTokenDialog, setWalletReceiveAddress, setSelectedWalletAsset } = useAppContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [publicAddress, setPublicAddress] = useState('');
@@ -582,26 +582,17 @@ export const WalletScreen = () => {
   const handleTokenPress = useCallback(
     (item: TokenListItemData) => {
       const currency = item.currency;
-      const isCustom = item.isCustom;
 
       if (currency === 19) {
 
         navigate(ROUTES.adHistory);
-      } else if (currency === 16) {
-
-        navigate(ROUTES.polygonHistory);
-      } else if (currency === 1) {
-
-        navigate(ROUTES.xrunHistory);
-      } else if (currency === 2) {
-
-        navigate(ROUTES.xrunHistory2);
       } else {
 
-        navigate(ROUTES.polygonHistory);
+        setSelectedWalletAsset(item);
+        navigate(ROUTES.walletDetail);
       }
     },
-    [navigate],
+    [navigate, setSelectedWalletAsset],
   );
 
   const TokenListItemComponent: React.FC<TokenListItemData & { onPress?: () => void }> = (props) => {

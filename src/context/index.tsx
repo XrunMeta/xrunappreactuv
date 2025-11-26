@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams } from '../types';
+import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
 import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
@@ -54,6 +54,9 @@ type AppContextValue = {
   advertisementParams: AdvertisementParams | null;
   setAdvertisementParams: (params: AdvertisementParams | null) => void;
   resetAdvertisementParams: () => void;
+  selectedWalletAsset: CombinedAsset | null;
+  setSelectedWalletAsset: (asset: CombinedAsset | null) => void;
+  resetSelectedWalletAsset: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -86,6 +89,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     termsAccepted: true,
   });
   const [advertisementParams, setAdvertisementParams] = useState<AdvertisementParams | null>(null);
+  const [selectedWalletAsset, setSelectedWalletAsset] = useState<CombinedAsset | null>(null);
 
   const value = useMemo(
     () => ({
@@ -141,6 +145,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       advertisementParams,
       setAdvertisementParams,
       resetAdvertisementParams: () => setAdvertisementParams(null),
+      selectedWalletAsset,
+      setSelectedWalletAsset,
+      resetSelectedWalletAsset: () => setSelectedWalletAsset(null),
     }),
     [
       walletSendAddress,
@@ -157,6 +164,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectMode,
       signupFormData,
       advertisementParams,
+      selectedWalletAsset,
     ],
   );
 

@@ -8,6 +8,7 @@ export { default as terms } from './terms';
 export { default as privacyPolicy } from './privacyPolicy';
 export { default as home } from './home';
 export { default as wallet } from './wallet';
+export { default as walletDetail } from './walletDetail';
 export { default as polygonWallet } from './polygonWallet';
 export { default as xrunWallet } from './xrunWallet';
 export { default as nftWallet } from './nftWallet';

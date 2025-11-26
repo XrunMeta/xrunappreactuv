@@ -1001,3 +1001,88 @@ export interface ERC20TokenCheckResponse {
   };
   [key: string]: any;
 }
+
+export interface TransactionHistoryItem {
+  id?: string | number;
+  transaction?: string;
+  excuteddatetime?: string;
+  date?: string;
+  amount: string;
+  symbol?: string;
+  action: number; 
+  status?: number; 
+  currency?: number;
+  [key: string]: any;
+}
+
+export interface TransactionHistoryResponse {
+  status?: string;
+  data?: TransactionHistoryItem[];
+  [key: string]: any;
+}
+
+export interface ADXRUNEstimateItem {
+  id: string | number;
+  created_at?: string;
+  priceasXrun?: string;
+  [key: string]: any;
+}
+
+export interface ADXRUNEstimateListResponse {
+  status?: string;
+  data?: {
+    items?: ADXRUNEstimateItem[];
+    pagination?: {
+      hasNextPage?: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  items?: ADXRUNEstimateItem[];
+  pagination?: {
+    hasNextPage?: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface ADXRUNResultItem {
+  id: string | number;
+  datetime?: string;
+  amount?: string;
+  extrastr4?: string;
+  amountasxrun?: string;
+  action?: number; 
+  [key: string]: any;
+}
+
+export interface ADXRUNResultListResponse {
+  status?: string;
+  data?: {
+    items?: ADXRUNResultItem[];
+    pagination?: {
+      hasNextPage?: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  items?: ADXRUNResultItem[];
+  pagination?: {
+    hasNextPage?: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface ADXRUNTopBannersSettledResponse {
+  status?: string;
+  data?: {
+    transactions?: Array<{
+      krwamount: string;
+      amountasxrun: string;
+      [key: string]: any;
+    }>;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}

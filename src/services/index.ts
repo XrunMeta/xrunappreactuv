@@ -102,6 +102,11 @@ import {
   WalletDataResponse,
   OtherChainsStatusResponse,
   ADXRUNTopBannersResponse,
+  ADXRUNEstimateListResponse,
+  ADXRUNResultListResponse,
+  ADXRUNTopBannersSettledResponse,
+  TransactionHistoryResponse,
+  TransactionHistoryItem,
   TokenBalanceResponse,
   ERC20TokenCheckResponse,
   GetRankSpesificResponse,
@@ -3073,6 +3078,118 @@ export const fetchTokenBalance = async (
   }
 };
 
+export const fetchADXRUNEstimateList = async (
+  member: number | string,
+  page: number = 1,
+  navigation?: any,
+): Promise<ADXRUNEstimateListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      page,
+    };
+
+    console.log('[AD XRUN] 심사중 리스트 조회 요청:', { member, page });
+
+    const response = await axiosInstance.post<ADXRUNEstimateListResponse>(
+      '/ap4000-adxrun-estimatelist',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 심사중 리스트 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 심사중 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNResultList = async (
+  member: number | string,
+  page: number = 1,
+  navigation?: any,
+): Promise<ADXRUNResultListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      page,
+    };
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 요청:', { member, page });
+
+    const response = await axiosInstance.post<ADXRUNResultListResponse>(
+      '/ap4000-adxrun-resultlist',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 정산완료 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNTopBannersSettled = async (
+  member: number | string,
+  navigation?: any,
+): Promise<ADXRUNTopBannersSettledResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 요청:', { member });
+
+    const response = await axiosInstance.post<ADXRUNTopBannersSettledResponse>(
+      '/ap4000-adxrun-topbannersSattled',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 정산완료 배너 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const checkERC20Token = async (
   contract: string,
   currency: number,
@@ -3099,6 +3216,174 @@ export const checkERC20Token = async (
     console.error('[지갑] ERC20 토큰 검증 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTotalHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전체 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-05',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전체 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전체 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTransferHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전송 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-06',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전송 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전송 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchReceivedDetails = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 수신 상세 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-01',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 수신 상세 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 수신 상세 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTransitionHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전환 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-03',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전환 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전환 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
