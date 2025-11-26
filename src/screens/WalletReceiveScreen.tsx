@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   Platform,
   ScrollView,
   Share,
@@ -15,14 +14,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, PrimaryButton, SecondaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { copyToClipboard } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const WALLET_ADDRESS =
   '0x61cf20b2ebd91caa22782a740f82dcf87ad2b2be7b6401ec3daf2234e7531fbf';
 
 export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const handleCopy = () => {
-    copyToClipboard(WALLET_ADDRESS);
+    copyToClipboard(WALLET_ADDRESS, showAlert);
   };
 
   const handleShare = async () => {
@@ -31,7 +32,7 @@ export const WalletReceiveScreen = () => {
         message: WALLET_ADDRESS,
       });
     } catch (error) {
-      Alert.alert(t('screens.walletReceive.alerts.shareFailed'), t('screens.walletReceive.errors.shareFailed'));
+      await showAlert(t('screens.walletReceive.alerts.shareFailed'), t('screens.walletReceive.errors.shareFailed'));
     }
   };
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShopItemData } from '../types';
 import { getUserBalance, purchaseXrunItem } from '../services';
 import { formatCurrency, formatXrunAmount } from '../utils';
@@ -14,6 +15,7 @@ import { COLORS } from '../constants';
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const { selectedShopItem } = useAppContext();
   const [memberId, setMemberId] = useState<string | null>(null);
   const [userBalance, setUserBalance] = useState<number | null>(null);
@@ -76,7 +78,7 @@ export const ShopBuyScreen = () => {
 
   const handlePurchase = async () => {
     if (!selectedShopItem || !memberId) {
-      Alert.alert('오류', '구매할 수 없습니다.');
+      await showAlert('오류', '구매할 수 없습니다.');
       return;
     }
 
@@ -93,7 +95,7 @@ export const ShopBuyScreen = () => {
 
       if (hasSku) {
 
-        Alert.alert('알림', '인앱 구매 기능은 준비 중입니다.');
+        await showAlert('알림', '인앱 구매 기능은 준비 중입니다.');
         setIsPurchasing(false);
         return;
       }
@@ -109,7 +111,7 @@ export const ShopBuyScreen = () => {
 
       if (currentBalance < totalAmount) {
         console.log('[구매] ❌ 잔액 부족');
-        Alert.alert(
+        await showAlert(
           '잔액 부족',
           `현재 잔액: ${formatXrunAmount(currentBalance)} XRUN\n필요한 금액: ${formatXrunAmount(totalAmount)} XRUN\n잔액을 충전해주세요.`,
           [{ text: '확인' }],
@@ -143,7 +145,7 @@ export const ShopBuyScreen = () => {
     } catch (error: any) {
       console.error('[구매] === 구매 오류 ===');
       console.error('[구매] 구매 오류:', error);
-      Alert.alert(
+      await showAlert(
         '구매 실패',
         error.message || '구매 중 오류가 발생했습니다.',
         [{ text: '확인' }],

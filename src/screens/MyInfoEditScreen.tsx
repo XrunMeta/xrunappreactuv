@@ -5,7 +5,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   FlatList,
 } from 'react-native';
@@ -16,6 +15,7 @@ import { Header, FormField, PrimaryButton, OptionButton, Dialog } from '../compo
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   getMyPageUserInfo,
   updateName,
@@ -64,6 +64,7 @@ const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
 export const MyInfoEditScreen = () => {
   const { t } = useTranslation();
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { selectedCountryDialCode, setVerificationEmail, setVerificationSuccessRoute, setSelectMode } = useAppContext();
 
   const GENDER_OPTIONS = [
@@ -168,7 +169,7 @@ export const MyInfoEditScreen = () => {
         }
       } catch (error) {
         console.error('[정보수정] 사용자 정보 로드 실패:', error);
-        Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.loadFailed'));
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.loadFailed'));
       } finally {
         setIsLoading(false);
       }
@@ -180,17 +181,17 @@ export const MyInfoEditScreen = () => {
   const handleSave = async () => {
 
     if (!firstName.trim()) {
-      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.firstNameRequired'));
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
     if (!lastName.trim()) {
-      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.lastNameRequired'));
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.lastNameRequired'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.userDataNotFound'));
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -232,7 +233,7 @@ export const MyInfoEditScreen = () => {
 
       await Promise.all(promises);
 
-      Alert.alert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'), [
+      await showAlert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'), [
         {
           text: t('screens.myInfoEdit.alerts.confirm'),
           onPress: () => {
@@ -247,19 +248,19 @@ export const MyInfoEditScreen = () => {
       ]);
     } catch (error) {
       console.error('[정보수정] 정보 수정 실패:', error);
-      Alert.alert(t('screens.myInfoEdit.alerts.saveFailed'), t('screens.myInfoEdit.alerts.saveFailedMessage'));
+      await showAlert(t('screens.myInfoEdit.alerts.saveFailed'), t('screens.myInfoEdit.alerts.saveFailedMessage'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleChangePassword = () => {
-    Alert.alert(t('screens.myInfoEdit.alerts.passwordChange'), t('screens.myInfoEdit.alerts.passwordChangeMessage'));
+  const handleChangePassword = async () => {
+    await showAlert(t('screens.myInfoEdit.alerts.passwordChange'), t('screens.myInfoEdit.alerts.passwordChangeMessage'));
   };
 
   const handlePhoneEdit = async () => {
     if (!email) {
-      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
       return;
     }
 
@@ -285,7 +286,7 @@ export const MyInfoEditScreen = () => {
         setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
         navigate(ROUTES.verificationCode);
       } else {
-        Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
           {
             text: t('screens.myInfoEdit.alerts.confirm'),
             onPress: () => {
@@ -296,7 +297,7 @@ export const MyInfoEditScreen = () => {
       }
     } catch (error) {
       console.error('[정보수정] 전화번호 수정 인증 오류:', error);
-      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
     }
   };
 

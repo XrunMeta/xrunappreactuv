@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { getMyGroup } from '../services';
 import { MyGroupItem } from '../types';
@@ -24,6 +25,7 @@ interface MemberData {
 export const ReferralMyGroupScreen = () => {
   const { t } = useTranslation();
   const { navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -168,12 +170,13 @@ export const ReferralMyGroupScreen = () => {
 
   const handleShare = async () => {
     if (!userEmail) {
-      Alert.alert(t('screens.referralMyGroup.shareFailed'), t('screens.referralMyGroup.shareFailedMessage'));
+      await showAlert(t('screens.referralMyGroup.shareFailed'), t('screens.referralMyGroup.shareFailedMessage'));
       return;
     }
     await shareReferralLink(
       LANG,
       { email: userEmail },
+      showAlert,
       navigate,
     );
   };

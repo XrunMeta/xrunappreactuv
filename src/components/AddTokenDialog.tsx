@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   Image,
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { Dialog } from './Dialog';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 type TokenOption = {
   id: string;
@@ -49,6 +49,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
   visible,
   onClose,
 }) => {
+  const { showAlert } = useAlertDialog();
   const [step, setStep] = useState<Step>(0);
   const [selectedToken, setSelectedToken] = useState<TokenOption | null>(null);
   const [contractAddress, setContractAddress] = useState('');
@@ -68,10 +69,10 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
     [step],
   );
 
-  const handlePrimaryAction = () => {
+  const handlePrimaryAction = async () => {
     if (step === 0) {
       if (!selectedToken) {
-        Alert.alert('토큰 선택', '추가할 토큰을 선택해주세요.');
+        await showAlert('토큰 선택', '추가할 토큰을 선택해주세요.');
         return;
       }
       setStep(1);
@@ -81,14 +82,14 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
 
     if (step === 1) {
       if (!contractValue) {
-        Alert.alert('주소 필요', '컨트랙트 주소를 입력해주세요.');
+        await showAlert('주소 필요', '컨트랙트 주소를 입력해주세요.');
         return;
       }
       setStep(2);
       return;
     }
 
-    Alert.alert('토큰 추가', '해당 토큰은 곧 지갑에 추가될 예정입니다.');
+    await showAlert('토큰 추가', '해당 토큰은 곧 지갑에 추가될 예정입니다.');
     onClose();
   };
 

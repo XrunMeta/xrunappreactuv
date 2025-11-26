@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -9,24 +8,27 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { walletSendAddress, setWalletSendAddress } = useAppContext();
 
   const handleScanPress = () => {
     navigate(ROUTES.walletQrScan);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!walletSendAddress) {
-      Alert.alert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
+      await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
       return;
     }
     navigate(ROUTES.walletEstimate);

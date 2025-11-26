@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -14,23 +13,25 @@ import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { checkEmailExists, sendEmailVerificationCode } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const EmailVerificationScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { setVerificationSuccessRoute, setVerificationEmail } = useAppContext();
 
   const handleSend = async () => {
     if (!email.trim()) {
-      Alert.alert(t('screens.emailVerification.alerts.emailInput'), t('screens.emailVerification.errors.emailRequired'));
+      await showAlert(t('screens.emailVerification.alerts.emailInput'), t('screens.emailVerification.errors.emailRequired'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert(t('screens.emailVerification.alerts.emailFormatError'), t('screens.emailVerification.errors.emailInvalid'));
+      await showAlert(t('screens.emailVerification.alerts.emailFormatError'), t('screens.emailVerification.errors.emailInvalid'));
       return;
     }
 
@@ -42,7 +43,7 @@ export const EmailVerificationScreen = () => {
       const emailExists = await checkEmailExists(email.trim(), navigate);
 
       if (!emailExists) {
-        Alert.alert(
+        await showAlert(
           t('screens.emailVerification.alerts.emailCheck'),
           t('screens.emailVerification.errors.emailNotRegistered'),
         );
@@ -54,7 +55,7 @@ export const EmailVerificationScreen = () => {
       const codeSent = await sendEmailVerificationCode(email.trim(), navigate);
 
       if (!codeSent) {
-        Alert.alert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
+        await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
         setIsLoading(false);
         return;
       }
@@ -64,7 +65,7 @@ export const EmailVerificationScreen = () => {
       navigate(ROUTES.verificationCode);
     } catch (error) {
       console.error('[로그인] 이메일 인증 처리 중 오류:', error);
-      Alert.alert(t('screens.emailVerification.alerts.error'), t('screens.emailVerification.errors.error'));
+      await showAlert(t('screens.emailVerification.alerts.error'), t('screens.emailVerification.errors.error'));
     } finally {
       setIsLoading(false);
     }

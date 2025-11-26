@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TextInput, ImageSourcePropType, ActivityIndicator, Alert, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, ImageSourcePropType, ActivityIndicator, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, ShopItemCard, TaboolaBanner } from '../components';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
@@ -118,6 +119,7 @@ const transformShopItem = (
 
 export const ShopTicketScreen = () => {
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const [tab, setTab] = useState<'ticket' | 'myTicket'>('ticket');
   const { navigate } = useAppNavigation();
   const { setSelectedShopItem } = useAppContext();
@@ -277,12 +279,12 @@ export const ShopTicketScreen = () => {
         await loadItemImages(result.data);
       } else {
         console.log('[상점] 상점 아이템 가져오기 실패:', result);
-        Alert.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+        await showAlert('Error', '상점 아이템을 불러오는데 실패했습니다.');
         setShopItems([]);
       }
     } catch (error) {
       console.error('[상점] 상점 아이템 가져오기 오류:', error);
-      Alert.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+      await showAlert('Error', '상점 아이템을 불러오는데 실패했습니다.');
       setShopItems([]);
     } finally {
       setLoading(false);

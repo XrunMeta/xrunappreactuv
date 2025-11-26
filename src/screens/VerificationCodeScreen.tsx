@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +15,7 @@ import { Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   verifyEmailCode,
   loginWithEmailAuth,
@@ -32,6 +32,7 @@ const keypadLayout = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0
 export const VerificationCodeScreen = () => {
   const { t } = useTranslation();
   const { goBack, reset, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const {
     verificationSuccessRoute,
     resetVerificationSuccessRoute,
@@ -71,12 +72,12 @@ export const VerificationCodeScreen = () => {
 
   const handleVerify = async () => {
     if (!verificationEmail) {
-      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
+      await showAlert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
     if (code.length !== CODE_LENGTH) {
-      Alert.alert(t('screens.verificationCode.alerts.codeInput'), t('screens.verificationCode.errors.codeRequired'));
+      await showAlert(t('screens.verificationCode.alerts.codeInput'), t('screens.verificationCode.errors.codeRequired'));
       return;
     }
 
@@ -88,7 +89,7 @@ export const VerificationCodeScreen = () => {
       const codeVerified = await verifyEmailCode(verificationEmail, code, navigate);
 
       if (!codeVerified) {
-        Alert.alert(t('screens.verificationCode.alerts.verificationFailed'), t('screens.verificationCode.errors.verificationFailed'));
+        await showAlert(t('screens.verificationCode.alerts.verificationFailed'), t('screens.verificationCode.errors.verificationFailed'));
         setIsVerifying(false);
         return;
       }
@@ -99,14 +100,14 @@ export const VerificationCodeScreen = () => {
         const loginResponse = await loginWithEmailAuth(verificationEmail, navigate);
 
         if (loginResponse.status !== 'success') {
-          Alert.alert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.loginFailed'));
+          await showAlert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.loginFailed'));
           setIsVerifying(false);
           return;
         }
 
         const userData = loginResponse.data[0];
         if (!userData || !userData.member) {
-          Alert.alert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.userDataNotFound'));
+          await showAlert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.userDataNotFound'));
           setIsVerifying(false);
           return;
         }
@@ -140,7 +141,7 @@ export const VerificationCodeScreen = () => {
       }
     } catch (error) {
       console.error('[인증] 인증 코드 확인 오류:', error);
-      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.error'));
+      await showAlert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.error'));
     } finally {
       setIsVerifying(false);
     }
@@ -148,7 +149,7 @@ export const VerificationCodeScreen = () => {
 
   const handleResend = async () => {
     if (!verificationEmail) {
-      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
+      await showAlert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
@@ -161,13 +162,13 @@ export const VerificationCodeScreen = () => {
       if (codeSent) {
         setSecondsLeft(RESEND_SECONDS);
         setCode('');
-        Alert.alert(t('screens.verificationCode.alerts.resendComplete'), t('screens.verificationCode.success.resendComplete'));
+        await showAlert(t('screens.verificationCode.alerts.resendComplete'), t('screens.verificationCode.success.resendComplete'));
       } else {
-        Alert.alert(t('screens.verificationCode.alerts.resendFailed'), t('screens.verificationCode.errors.resendFailed'));
+        await showAlert(t('screens.verificationCode.alerts.resendFailed'), t('screens.verificationCode.errors.resendFailed'));
       }
     } catch (error) {
       console.error('[인증] 인증 코드 재전송 오류:', error);
-      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.resendError'));
+      await showAlert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.resendError'));
     } finally {
       setIsResending(false);
     }
