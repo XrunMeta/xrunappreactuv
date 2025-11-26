@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Share,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -13,10 +12,11 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout } from '../services';
 import { useAppContext } from '../context';
+import { shareReferralLink } from '../utils';
 
 type CardConfig = {
   id: string;
@@ -127,15 +127,11 @@ export const MyInfoScreen = () => {
   };
 
   const handleShare = async () => {
-    try {
-      const name = userInfo?.name || '사용자';
-      const email = userInfo?.email || '';
-      await Share.share({
-        message: `${name} • ${email}`,
-      });
-    } catch (error) {
-      console.warn(error);
+    if (!userInfo?.email) {
+      Alert.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      return;
     }
+    await shareReferralLink(LANG, { email: userInfo.email }, navigate);
   };
 
   const handleLogout = () => {
