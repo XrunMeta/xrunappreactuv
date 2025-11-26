@@ -5,6 +5,7 @@ import { v_326be8 } from 'rcmrninabrnb';
 import { v_ce4741 } from '../navigation';
 import {
   v_96ef47,
+  v_2fe85a,
   v_81dfe9,
   v_70f41f,
   v_a357d3,
@@ -213,16 +214,55 @@ export const v_12a388 = async (
 export const v_495832 = async (
   v_c65f5d,
 ): Promise<v_96ef47> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
-  return Promise.resolve({
-    success: true,
-    emergencyStop: {
-      enabled: false , 
-      message: '긴급 안내: 시스템 점검 중입니다. 잠시 후 다시 시도해주세요.',
-      link: 'https://example.com/emergency-notice', 
-    },
-  });
+    const v_3393e3 = await v_12a388('/keepalive', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+    }, v_c65f5d);
 
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const serverResponse: v_2fe85a = await v_3393e3.json();
+
+    if (v_2c2f8d.status === 'success') {
+      const result: v_96ef47 = {
+        success: true,
+      };
+
+      if (v_2c2f8d.data.emergency_info) {
+
+        v_43c42e.emergencyStop = {
+          enabled: true,
+          message: v_2c2f8d.data.emergency_info.message,
+          link: v_2c2f8d.data.emergency_info.link,
+        };
+      } else {
+
+        v_43c42e.emergencyStop = {
+          enabled: false,
+        };
+      }
+
+      return v_43c42e;
+    } else {
+
+      throw new Error(`Server error: ${v_2c2f8d.message}`);
+    }
+  } catch (v_5e9bfe) {
+    if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
+
+      throw v_5e9bfe;
+    }
+    throw v_5e9bfe;
+  }
 };
 
 const v_7488d5 = (v_c65f5d) => {

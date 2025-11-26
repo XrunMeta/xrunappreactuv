@@ -879,7 +879,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
                   {v_456f34.brand || v_456f34.name} 획득 가능합니다.
                 </Text>
                 <Text style={v_d81136.calloutCoins}>
-                  {v_456f34.distance.toFixed(2)}m {v_456f34.coins || '0'} {v_456f34.brand || 'XRUN'}
+                  {v_456f34.xrunPrice?.toFixed(2) || '0'} {v_456f34.brand || 'XRUN'}
                 </Text>
               </View>
             </View>

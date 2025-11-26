@@ -76,6 +76,9 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
   const [v_660822, v_06fdbc] = v_5ab095<string>('');
 
   const v_27006e = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_11bce0 = v_e662ae<number>(2);
 
   v_c4deb2(() => {
     if (!v_d0b6d4) {
@@ -177,6 +180,14 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
         clearTimeout(v_27006e.current);
         v_27006e.current = null;
       }
+      if (v_27bab6.current) {
+        clearTimeout(v_27bab6.current);
+        v_27bab6.current = null;
+      }
+      if (v_d35ccb.current) {
+        clearInterval(v_d35ccb.current);
+        v_d35ccb.current = null;
+      }
     };
   }, []);
 
@@ -193,9 +204,12 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
 
       if (v_a42ed3) {
         await v_f2c756.openURL(v_f71b56);
-        console.log('✅ URL 이동 성공');
+        console.log('✅ URL 이동 성공 - Map 화면으로 이동');
         v_3e5456(true);
         v_deef62(false);
+
+        v_e10ff9();
+        v_487a25(v_ce4741.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', v_f71b56);
         throw new Error('지원하지 않는 URL입니다.');
@@ -249,6 +263,15 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       if (v_714642.status === 'success') {
         v_1a68d1(true);
 
+        if (v_27bab6.current) {
+          clearTimeout(v_27bab6.current);
+          v_27bab6.current = null;
+        }
+        if (v_d35ccb.current) {
+          clearInterval(v_d35ccb.current);
+          v_d35ccb.current = null;
+        }
+
         try {
           const v_3393e3 = await v_c07360(
             parseInt(v_d0b6d4?.advertisement || '0'),
@@ -262,33 +285,110 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
 
           if (v_3393e3 && v_3393e3.data) {
             console.log('API response received:', v_3393e3);
-            v_1a68d1(false);
             v_d2702f(false);
 
-            setTimeout(() => {
+            console.log('⏰ Processing your reward... 카운트다운 시작');
+            v_11bce0.current = 2;
+            console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+
+            v_d35ccb.current = setInterval(() => {
+              v_11bce0.current--;
+              if (v_11bce0.current > 0) {
+                console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+              } else {
+                console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+                if (v_d35ccb.current) {
+                  clearInterval(v_d35ccb.current);
+                  v_d35ccb.current = null;
+                }
+              }
+            }, 1000);
+
+            v_27bab6.current = setTimeout(() => {
+              if (v_d35ccb.current) {
+                clearInterval(v_d35ccb.current);
+                v_d35ccb.current = null;
+              }
+              v_1a68d1(false);
               v_e10ff9();
               v_487a25(v_ce4741.map);
-            }, 1000);
+              v_27bab6.current = null;
+            }, 2000);
           }
         } catch (v_5e9bfe) {
           console.error('Error calling API:', v_5e9bfe);
-          v_1a68d1(false);
           v_d2702f(false);
 
-          setTimeout(() => {
+          console.log('⏰ Processing your reward... 카운트다운 시작 (에러 발생)');
+          v_11bce0.current = 2;
+          console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+
+          v_d35ccb.current = setInterval(() => {
+            v_11bce0.current--;
+            if (v_11bce0.current > 0) {
+              console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+            } else {
+              console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+              if (v_d35ccb.current) {
+                clearInterval(v_d35ccb.current);
+                v_d35ccb.current = null;
+              }
+            }
+          }, 1000);
+
+          v_27bab6.current = setTimeout(() => {
+            if (v_d35ccb.current) {
+              clearInterval(v_d35ccb.current);
+              v_d35ccb.current = null;
+            }
+            v_1a68d1(false);
             v_e10ff9();
             v_487a25(v_ce4741.map);
-          }, 1000);
+            v_27bab6.current = null;
+          }, 2000);
         }
       }
     } catch (v_5e9bfe) {
       console.error('Error in ad completion process:', v_5e9bfe);
-      v_1a68d1(false);
+      v_d2702f(false);
 
-      setTimeout(() => {
+      if (v_27bab6.current) {
+        clearTimeout(v_27bab6.current);
+        v_27bab6.current = null;
+      }
+      if (v_d35ccb.current) {
+        clearInterval(v_d35ccb.current);
+        v_d35ccb.current = null;
+      }
+
+      v_1a68d1(true);
+      console.log('⏰ Processing your reward... 카운트다운 시작 (전체 에러)');
+      v_11bce0.current = 2;
+      console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+
+      v_d35ccb.current = setInterval(() => {
+        v_11bce0.current--;
+        if (v_11bce0.current > 0) {
+          console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
+        } else {
+          console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+          if (v_d35ccb.current) {
+            clearInterval(v_d35ccb.current);
+            v_d35ccb.current = null;
+          }
+        }
+      }, 1000);
+
+      v_27bab6.current = setTimeout(() => {
+        if (v_d35ccb.current) {
+          clearInterval(v_d35ccb.current);
+          v_d35ccb.current = null;
+        }
+        v_1a68d1(false);
         v_e10ff9();
         v_487a25(v_ce4741.map);
-      }, 1000);
+        v_27bab6.current = null;
+      }, 2000);
     } finally {
       v_d2702f(false);
     }
