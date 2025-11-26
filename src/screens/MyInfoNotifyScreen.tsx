@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   TextInput,
   Linking,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -18,6 +17,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import {
@@ -80,6 +80,7 @@ const groupNotificationsByDate = (notifications: NotificationItem[]) => {
 export const MyInfoNotifyScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [question, setQuestion] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +117,7 @@ export const MyInfoNotifyScreen = () => {
       }
     } catch (error) {
       console.error('[알림] 알림 목록 조회 실패:', error);
-      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.loadFailed'));
+      await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.loadFailed'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -136,25 +137,25 @@ export const MyInfoNotifyScreen = () => {
 
   const handleSend = async () => {
     if (!question.trim()) {
-      Alert.alert(t('screens.myInfoNotify.alerts.messageInput'), t('screens.myInfoNotify.alerts.messageRequired'));
+      await showAlert(t('screens.myInfoNotify.alerts.messageInput'), t('screens.myInfoNotify.alerts.messageRequired'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.userDataNotFound'));
+      await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.userDataNotFound'));
       return;
     }
 
     try {
       setSending(true);
       await sendNotificationMessage(memberId, question.trim(), false, navigate);
-      Alert.alert(t('screens.myInfoNotify.alerts.sendSuccess'), t('screens.myInfoNotify.alerts.sendSuccessMessage'));
+      await showAlert(t('screens.myInfoNotify.alerts.sendSuccess'), t('screens.myInfoNotify.alerts.sendSuccessMessage'));
       setQuestion('');
 
       await loadNotifications();
     } catch (error) {
       console.error('[알림] 메시지 전송 실패:', error);
-      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.sendFailed'));
+      await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.sendFailed'));
     } finally {
       setSending(false);
     }
@@ -163,7 +164,7 @@ export const MyInfoNotifyScreen = () => {
   const handleDelete = async (board: number) => {
     if (!memberId) return;
 
-    Alert.alert(
+    await showAlert(
       t('screens.myInfoNotify.alerts.deleteConfirm'),
       t('screens.myInfoNotify.alerts.deleteMessage'),
       [
@@ -178,7 +179,7 @@ export const MyInfoNotifyScreen = () => {
               await loadNotifications();
             } catch (error) {
               console.error('[알림] 메시지 삭제 실패:', error);
-              Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteFailed'));
+              await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteFailed'));
             }
           },
         },
@@ -186,10 +187,10 @@ export const MyInfoNotifyScreen = () => {
     );
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (!memberId) return;
 
-    Alert.alert(
+    await showAlert(
       t('screens.myInfoNotify.alerts.deleteAllConfirm'),
       t('screens.myInfoNotify.alerts.deleteAllMessage'),
       [
@@ -204,7 +205,7 @@ export const MyInfoNotifyScreen = () => {
               await loadNotifications();
             } catch (error) {
               console.error('[알림] 전체 삭제 실패:', error);
-              Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteAllFailed'));
+              await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteAllFailed'));
             }
           },
         },
@@ -212,12 +213,12 @@ export const MyInfoNotifyScreen = () => {
     );
   };
 
-  const openLink = (url: string | null) => {
+  const openLink = async (url: string | null) => {
     if (!url) return;
 
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      Linking.openURL(url).catch(() => {
-        Alert.alert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
+      Linking.openURL(url).catch(async () => {
+        await showAlert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
       });
     } else {
 
@@ -281,10 +282,10 @@ export const MyInfoNotifyScreen = () => {
               {isNotice && (
                   <TouchableOpacity
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
-                  onPress={() => {
+                  onPress={async () => {
                     const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
-                    Linking.openURL(url).catch(() => {
-                      Alert.alert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
+                    Linking.openURL(url).catch(async () => {
+                      await showAlert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
                   }}
                   activeOpacity={0.85}

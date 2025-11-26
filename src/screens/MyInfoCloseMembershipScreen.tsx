@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
@@ -8,10 +8,12 @@ import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { closeMembership } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const MyInfoCloseMembershipScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,11 +21,11 @@ export const MyInfoCloseMembershipScreen = () => {
   const handleSubmit = async () => {
 
     if (!password.trim()) {
-      Alert.alert(t('screens.myInfoCloseMembership.alerts.passwordRequired'), t('screens.myInfoCloseMembership.alerts.passwordRequiredMessage'));
+      await showAlert(t('screens.myInfoCloseMembership.alerts.passwordRequired'), t('screens.myInfoCloseMembership.alerts.passwordRequiredMessage'));
       return;
     }
 
-    Alert.alert(
+    await showAlert(
       t('screens.myInfoCloseMembership.alerts.closeMembership'),
       t('screens.myInfoCloseMembership.alerts.closeMembershipMessage'),
       [
@@ -40,7 +42,7 @@ export const MyInfoCloseMembershipScreen = () => {
 
               const userDataStr = await AsyncStorage.getItem('userData');
               if (!userDataStr) {
-                Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
+                await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -49,7 +51,7 @@ export const MyInfoCloseMembershipScreen = () => {
               const member = userData.member;
 
               if (!member) {
-                Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
+                await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -63,7 +65,7 @@ export const MyInfoCloseMembershipScreen = () => {
               );
 
               if (!success) {
-                Alert.alert(t('screens.myInfoCloseMembership.alerts.closeFailed'), t('screens.myInfoCloseMembership.alerts.closeFailedMessage'));
+                await showAlert(t('screens.myInfoCloseMembership.alerts.closeFailed'), t('screens.myInfoCloseMembership.alerts.closeFailedMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -71,7 +73,7 @@ export const MyInfoCloseMembershipScreen = () => {
               navigate(ROUTES.myInfoCloseMembershipSuccess);
             } catch (error) {
               console.error('[회원 탈퇴] 탈퇴 처리 중 오류:', error);
-              Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.closeError'));
+              await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.closeError'));
               setIsSubmitting(false);
             }
           },

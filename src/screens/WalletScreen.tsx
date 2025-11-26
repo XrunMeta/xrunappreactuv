@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ImageSourcePropType,
   Platform,
-  Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,7 @@ import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -82,14 +82,15 @@ const TOKEN_DATA: TokenData[] = [
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { openAddTokenDialog } = useAppContext();
   const tokenList = useMemo(() => TOKEN_DATA, []);
 
   const handleCopyAddress = () => {
-    copyToClipboard(WALLET_ADDRESS);
+    copyToClipboard(WALLET_ADDRESS, showAlert);
   };
 
-  const handleAction = (type: 'scan' | 'receive' | 'send') => {
+  const handleAction = async (type: 'scan' | 'receive' | 'send') => {
     if (type === 'send') {
       navigate(ROUTES.walletSend);
       return;
@@ -98,7 +99,7 @@ export const WalletScreen = () => {
       navigate(ROUTES.walletReceive);
       return;
     }
-    Alert.alert(t('screens.wallet.preparing'), `${type} ${t('screens.wallet.preparingMessage')}`);
+    await showAlert(t('screens.wallet.preparing'), `${type} ${t('screens.wallet.preparingMessage')}`);
   };
 
   const handleAddToken = () => {

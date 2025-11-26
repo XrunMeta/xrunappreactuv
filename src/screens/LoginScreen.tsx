@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,10 +20,12 @@ import {
   encryptSHA256,
   saveSession,
 } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const LoginScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -58,12 +59,12 @@ export const LoginScreen = () => {
   const handleLogin = async () => {
 
     if (!email.trim()) {
-      Alert.alert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
+      await showAlert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
       return;
     }
 
     if (!password.trim()) {
-      Alert.alert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
+      await showAlert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
       return;
     }
 
@@ -79,14 +80,14 @@ export const LoginScreen = () => {
       );
 
       if (loginResponse.status !== 'success') {
-        Alert.alert(t('common.messages.error'), t('screens.login.errors.loginFailed'));
+        await showAlert(t('common.messages.error'), t('screens.login.errors.loginFailed'));
         setIsLoading(false);
         return;
       }
 
       const userData = loginResponse.data[0];
       if (!userData) {
-        Alert.alert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
+        await showAlert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
         setIsLoading(false);
         return;
       }
@@ -125,7 +126,7 @@ export const LoginScreen = () => {
       navigate(ROUTES.map);
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
-      Alert.alert(
+      await showAlert(
         t('common.messages.error'),
         t('screens.login.errors.loginError'),
       );
