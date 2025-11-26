@@ -622,3 +622,122 @@ export interface GetUserInfoForReferralResponse {
     [key: string]: any;
   }>;
 }
+
+export interface SettlementListRequest {
+  member: number; 
+  currency: number; 
+  daysbefore: number; 
+  startwith: number; 
+}
+
+export interface SettlementListResponse {
+  type: string; 
+  data: Array<{
+    [key: string]: any;
+  }>;
+}
+
+export interface GetCompletedAdsRequest {
+  member: number; 
+}
+
+export interface CompletedAdItem {
+  transaction: string;
+  title: string;
+  amount: number;
+  symbol: string;
+  extracode: string;
+  datetime: string;
+}
+
+export interface GetCompletedAdsResponse {
+  data: CompletedAdItem[];
+}
+
+export interface GetSavedAdsRequest {
+  member: number; 
+  orderField?: 'datetime' | 'dateleft' | 'amount'; 
+}
+
+export interface SavedAdItem {
+  [key: string]: any;
+}
+
+export interface GetSavedAdsResponse {
+  data: SavedAdItem[];
+}
+
+export interface GetSettlementListRequest {
+  member: number; 
+}
+
+export interface SettlementListItem {
+  transaction: number;
+  email?: string;
+  amountasxrun: string; 
+  datetime: string;
+  [key: string]: any;
+}
+
+export interface GetSettlementListResponse {
+  status: 'success' | 'error';
+  data: SettlementListItem[];
+  message?: string;
+}
+
+export interface GetSettlementAmountRequest {
+  member: number; 
+}
+
+export interface GetSettlementAmountResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    amount: string; 
+  }>;
+  message?: string;
+}
+
+export interface RankItem {
+  referrer_id: number;
+  referrer_email: string;
+  unique_rank: number;
+  referral_count: number;
+}
+
+export interface GetRankRequest {
+
+}
+
+export interface GetRankResponse {
+  status: 'success' | 'error';
+  data: RankItem[];
+  message?: string;
+}
+
+export interface GetRankSpesificRequest {
+  member: number; 
+}
+
+export interface GetRankSpesificResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    unique_rank: number; 
+  }>;
+  message?: string;
+}
+
+export interface MyGroupItem {
+  member: string; 
+  email: string; 
+  datejoin: string; 
+}
+
+export interface GetMyGroupRequest {
+  member: string; 
+}
+
+export interface GetMyGroupResponse {
+  status: 'success' | 'error';
+  data: MyGroupItem[];
+  message?: string;
+}
