@@ -64,20 +64,27 @@ export const v_f40fc5 = () => {
   const [v_91ca05, v_cbfe22] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
 
-  v_a3453e.useEffect(() => {
-    v_6dde2f(v_8d7bc8.familyName);
-    v_15ded5(v_8d7bc8.givenName);
-    v_fedf34(v_8d7bc8.email);
-    v_52b279(v_8d7bc8.password);
-    v_f768f9(v_8d7bc8.phoneNumber);
-    v_c030e3(v_8d7bc8.region);
-    v_fb6bbb(v_8d7bc8.referralEmail);
-    v_bdc43c(v_8d7bc8.gender);
-    v_64a312(v_8d7bc8.ageRange);
-    v_cbfe22(v_8d7bc8.termsAccepted);
-  }, []); 
+  const v_2ca208 = v_a3453e.useRef(false);
 
   v_a3453e.useEffect(() => {
+    if (!v_2ca208.current) {
+      v_6dde2f(v_8d7bc8.familyName);
+      v_15ded5(v_8d7bc8.givenName);
+      v_fedf34(v_8d7bc8.email);
+      v_52b279(v_8d7bc8.password);
+      v_f768f9(v_8d7bc8.phoneNumber);
+      v_c030e3(v_8d7bc8.region);
+      v_fb6bbb(v_8d7bc8.referralEmail);
+      v_bdc43c(v_8d7bc8.gender);
+      v_64a312(v_8d7bc8.ageRange);
+      v_cbfe22(v_8d7bc8.termsAccepted);
+      v_2ca208.current = true;
+    }
+  }, [v_8d7bc8]);
+
+  v_a3453e.useEffect(() => {
+    if (!v_2ca208.current) return;
+
     v_eee6b0({
       familyName: v_f142d8,
       givenName: v_a7c7b7,
@@ -101,7 +108,7 @@ export const v_f40fc5 = () => {
     v_c3eac4,
     v_f83808,
     v_91ca05,
-    v_eee6b0,
+
   ]);
 
   const v_585b02 = async () => {
