@@ -17,20 +17,21 @@ const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
 
   const v_c322f7 = require('../../assets/images/icon_shop.png');
 
-  const v_63f02c = v_8c0b26.status === 10307 ? v_8d41d7('screens.shopMyTicket.available') : v_8d41d7('screens.shopMyTicket.used');
+  const v_63f02c = v_8c0b26.status === 10306 ? v_8d41d7('screens.shopMyTicket.available') : v_8d41d7('screens.shopMyTicket.used');
 
   const v_6c35f6 = v_8c0b26.txID 
     ? `${v_8c0b26.item}_${v_8c0b26.txID}_${v_a56041}` 
     : `${v_8c0b26.item}_${v_a56041}_${Math.random().toString(36).substr(2, 9)}`;
 
   return {
+
+    ...v_8c0b26,
+
     id: v_6c35f6,
     title: v_8c0b26.title || '',
     priceLabel: '', 
     detailTotal: v_63f02c,
     image: v_c322f7,
-
-    ...v_8c0b26,
   } as v_745d71 & v_029bad;
 };
 
@@ -219,6 +220,9 @@ export const v_052a8a = () => {
                   ? { uri: `data:image/png;base64,${v_63070e}` }
                   : v_8c0b26.image;
 
+                const v_60f39b = (v_8c0b26 as any).status;
+                const v_ca637d = v_60f39b === 10306 ? '#3391D0' : '#707070';
+
                 return (
                   <ShopItemCard
                     key={v_8c0b26.id}
@@ -226,6 +230,7 @@ export const v_052a8a = () => {
                     priceLabel={v_8c0b26.priceLabel}
                     imageSource={v_c322f7}
                     quantityLabel={v_8c0b26.detailTotal}
+                    quantityColor={v_ca637d}
                     onPress={() => v_6121dc(v_8c0b26)}
                   />
                 );

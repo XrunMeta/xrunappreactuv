@@ -63,12 +63,15 @@ export const v_a1c4a5 = () => {
       const v_43c42e = await v_97ad19(v_717992);
 
       if (v_43c42e && v_43c42e.status === 'success' && v_43c42e.data) {
-        const v_791474 = v_43c42e.data.find(v_8c0b26 => v_8c0b26.storage === v_6b1b52);
+
+        const v_791474 = v_43c42e.data.find(v_8c0b26 => String(v_8c0b26.storage) === String(v_6b1b52));
         if (v_791474) {
           v_41f285(v_791474);
           console.log('[티켓 상세] 티켓 데이터 새로고침 완료:', v_791474);
         } else {
           console.log('[티켓 상세] 해당 storageId와 일치하는 아이템을 찾을 수 없습니다:', v_6b1b52);
+          console.log('[티켓 상세] 디버깅 - storageId 타입:', typeof v_6b1b52, '값:', v_6b1b52);
+          console.log('[티켓 상세] 디버깅 - 첫 번째 아이템 storage 타입:', typeof v_43c42e.data[0]?.storage, '값:', v_43c42e.data[0]?.storage);
         }
       }
     } catch (v_5e9bfe) {
@@ -165,7 +168,7 @@ export const v_a1c4a5 = () => {
   const v_1de78e = v_116428();
   const v_2e72da = v_c811e3?.status || (v_dfe883 as any)?.status;
 
-  const v_2911e0 = v_2e72da == 10307 || v_2e72da === 10307;
+  const v_2911e0 = v_2e72da == 10306 || v_2e72da === 10306;
 
   console.log('[티켓 상세] === 상태 확인 ===');
   console.log('[티켓 상세] currentStatus:', v_2e72da);
