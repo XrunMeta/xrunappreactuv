@@ -3,11 +3,14 @@ export default {
   address: 'アドレス',
   copyAddress: 'アドレスをコピー',
   shareAddress: 'アドレスを共有',
+  loadingAddress: 'ウォレットアドレスを読み込み中...',
   errors: {
     shareFailed: 'アドレスの共有に失敗しました',
+    addressNotLoaded: 'ウォレットアドレスが読み込まれていません。',
   },
   alerts: {
     shareFailed: '共有失敗',
+    error: 'エラー',
   },
 };
 

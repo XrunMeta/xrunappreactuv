@@ -8,6 +8,7 @@ export { default as terms } from './terms';
 export { default as privacyPolicy } from './privacyPolicy';
 export { default as home } from './home';
 export { default as wallet } from './wallet';
+export { default as walletDetail } from './walletDetail';
 export { default as polygonWallet } from './polygonWallet';
 export { default as xrunWallet } from './xrunWallet';
 export { default as nftWallet } from './nftWallet';
@@ -45,4 +46,5 @@ export { default as shopSuccess } from './shopSuccess';
 export { default as shopTicketDetail } from './shopTicketDetail';
 export { default as showNapAd } from './showNapAd';
 export { default as advertiseScreen } from './advertiseScreen';
+export { default as addToken } from './addToken';
 

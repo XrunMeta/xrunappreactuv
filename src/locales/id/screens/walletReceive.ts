@@ -3,11 +3,14 @@ export default {
   address: 'Alamat',
   copyAddress: 'Salin Alamat',
   shareAddress: 'Bagikan Alamat',
+  loadingAddress: 'Memuat alamat dompet...',
   errors: {
     shareFailed: 'Gagal membagikan alamat',
+    addressNotLoaded: 'Alamat dompet belum dimuat.',
   },
   alerts: {
     shareFailed: 'Berbagi Gagal',
+    error: 'Kesalahan',
   },
 };
 

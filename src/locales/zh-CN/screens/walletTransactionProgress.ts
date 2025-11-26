@@ -1,4 +1,23 @@
 export default {
-  title: '交易',
+  title: '交易进行中',
+  amount: '发送金额',
+  balance: '余额',
+  from: '发送地址',
+  to: '接收地址',
+  gasPrice: '燃气价格',
+  inProgress: '进行中 . . .',
+  listPage: '列表页面',
+  processing: '处理交易中...',
+  checkingTicket: '检查转账票据中...',
+  executingTransfer: '执行区块链转账中...',
+  transferCompleted: '转账成功完成！',
+  transferFailed: '转账失败',
+  noTxHash: '无交易哈希',
+  loading: '加载中...',
+  calculating: '计算中...',
+  alerts: {
+    transferFailed: '转账失败',
+    transferFailedMessage: '转账失败。请重试。',
+    confirm: '确认',
+  },
 };
-

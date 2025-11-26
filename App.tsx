@@ -11,6 +11,7 @@ import {
   PrivacyPolicyScreen,
   VerificationCodeScreen,
   WalletScreen,
+  WalletDetailScreen,
   PolygonWalletScreen,
   XrunWalletScreen,
   NftWalletScreen,
@@ -116,6 +117,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'adHistory') {
     return <AdWalletScreen />;
+  }
+
+  if (currentScreen === 'walletDetail') {
+    return <WalletDetailScreen />;
   }
 
   if (currentScreen === 'transactionDetails') {

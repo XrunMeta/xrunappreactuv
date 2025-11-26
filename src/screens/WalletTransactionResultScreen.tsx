@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
+import BigNumber from 'bignumber.js';
 import { Header, PrimaryButton, ExplorerBadge } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { useAppContext } from '../context';
 import { getTokenIcon } from '../constants/tokenMeta';
 import { useAlertDialog } from '../context/AlertDialogContext';
-
-const TX_HASH =
-  '0x61cf20b2ebd91caa22782a740f82dcf87ad2b2be7b6401ec3daf2234e7531fbf';
 
 const InfoCard = ({
   label,
@@ -40,8 +39,35 @@ const InfoCard = ({
 export const WalletTransactionResultScreen = () => {
   const { t } = useTranslation();
   const { reset } = useAppNavigation();
-  const { showAlert } = useAlertDialog();
-  const transactionToken = { title: 'POL', subtitle: 'Polygon' };
+  const { transactionResult, resetTransactionResult } = useAppContext();
+  const [txHash, setTxHash] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  const [symbol, setSymbol] = useState<string>('');
+  const [toAddress, setToAddress] = useState<string>('');
+  const [gasPrice, setGasPrice] = useState<string>('');
+  const [network, setNetwork] = useState<string>('');
+
+  useEffect(() => {
+    if (transactionResult) {
+      setTxHash(transactionResult.txHash);
+      setAmount(transactionResult.amount);
+      setSymbol(transactionResult.symbol);
+      setToAddress(transactionResult.toAddress);
+      setGasPrice(transactionResult.gasPrice);
+      setNetwork(transactionResult.network);
+    }
+  }, [transactionResult]);
+
+  useEffect(() => {
+    if (!txHash && !transactionResult) {
+      reset(ROUTES.wallet);
+    }
+  }, [txHash, transactionResult, reset]);
+
+  const transactionToken = { 
+    title: symbol || 'POL', 
+    subtitle: network === 'POL' ? 'Polygon' : 'Ethereum' 
+  };
   const tokenIcon = getTokenIcon(
     transactionToken.title,
     transactionToken.subtitle,
@@ -57,9 +83,30 @@ export const WalletTransactionResultScreen = () => {
   );
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(TX_HASH);
-    await showAlert(t('screens.walletTransactionResult.copySuccess'), t('screens.walletTransactionResult.copySuccessMessage'));
+    if (txHash) {
+      await Clipboard.setStringAsync(txHash);
+      Alert.alert(
+        t('screens.walletTransactionResult.copySuccess'), 
+        t('screens.walletTransactionResult.copySuccessMessage')
+      );
+    }
   };
+
+  const shortenAddress = (address: string, frontChars: number = 6, backChars: number = 4) => {
+    if (!address || address.length <= frontChars + backChars) {
+      return address;
+    }
+    return `${address.substring(0, frontChars)}.....${address.substring(
+      address.length - backChars,
+    )}`;
+  };
+
+  const formattedAmount = amount ? new BigNumber(amount).toFixed() : '0';
+  const formattedGasPrice = gasPrice ? parseFloat(gasPrice).toFixed(6) : '0.000000';
+
+  if (!txHash && !transactionResult) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -73,7 +120,7 @@ export const WalletTransactionResultScreen = () => {
         <View style={styles.contentWidth}>
           <View style={styles.hashRow}>
             <Text style={styles.hashValue} numberOfLines={2}>
-              {TX_HASH}
+              {txHash}
             </Text>
             <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
               <View style={styles.copyIconWrapper}>
@@ -83,16 +130,22 @@ export const WalletTransactionResultScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <InfoCard label={t('screens.walletTransactionResult.amount')} value="1.23 POL" />
-          <InfoCard label={t('screens.walletTransactionResult.networkFree')} value="0.0065 POL" />
+          <InfoCard 
+            label={t('screens.walletTransactionResult.amount')} 
+            value={`${formattedAmount} ${symbol}`} 
+          />
+          <InfoCard 
+            label={t('screens.walletTransactionResult.networkFee')} 
+            value={`${formattedGasPrice} ${network}`} 
+          />
           <InfoCard
-            label={t('screens.walletTransactionResult.networkFee')}
-            value="0xe61C95a80....c40d964aa86"
+            label={t('screens.walletTransactionResult.to')}
+            value={shortenAddress(toAddress)}
             trailing={tokenBadge}
           />
           <InfoCard
             label={t('screens.walletTransactionResult.txHash')}
-            value="0x61cf2.....7531fbf"
+            value={shortenAddress(txHash)}
             trailing={tokenBadge}
           />
 
@@ -103,7 +156,10 @@ export const WalletTransactionResultScreen = () => {
           <PrimaryButton
             title={t('screens.walletTransactionResult.close')}
             fullWidth
-            onPress={() => reset(ROUTES.wallet)}
+            onPress={() => {
+              resetTransactionResult();
+              reset(ROUTES.wallet);
+            }}
           />
         </View>
       </ScrollView>
@@ -197,5 +253,3 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
-
-

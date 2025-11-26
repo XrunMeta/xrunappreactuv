@@ -4,8 +4,13 @@ export default {
   myBalance: '我的余额',
   addToken: '添加代币',
   polygonScan: 'PolygonScan',
+  etherscan: 'Etherscan',
   receive: '收款',
   send: '转账',
   preparing: '准备中',
   preparingMessage: '功能正在准备中',
+  loading: '加载中...',
+  error: '错误',
+  missingInfo: '缺少必需信息。',
+  addressNotLoaded: '钱包地址尚未加载。请稍后再试。',
 };

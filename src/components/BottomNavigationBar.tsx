@@ -6,6 +6,8 @@ import { getIosWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
 
+const TEST_PLATFORM_OS: 'ios' | 'android' | null = null ; 
+
 let iconMap: any = null;
 let iconMapWhite: any = null;
 let iconCamera: any = null;
@@ -59,28 +61,44 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onTabChange,
 }) => {
   const { navigate } = useAppNavigation();
-  const [showWallet, setShowWallet] = useState(Platform.OS === 'android');
+
+  const currentPlatformOS = TEST_PLATFORM_OS || Platform.OS;
+  const [showWallet, setShowWallet] = useState(currentPlatformOS === 'android');
 
   useEffect(() => {
     const abortController = new AbortController();
 
     const getShowWalletStatus = async () => {
-      if (Platform.OS === 'ios') {
+      console.log('[BottomNavigationBar] 현재 플랫폼 OS:', currentPlatformOS, '(실제 Platform.OS:', Platform.OS, ')');
+
+      if (currentPlatformOS === 'ios') {
         try {
+          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 시작');
           const iosOnWallet = await getIosWalletShowStatus(navigate);
+          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 결과:', {
+            iosOnWallet,
+            showWallet: iosOnWallet,
+            timestamp: new Date().toISOString(),
+          });
           setShowWallet(iosOnWallet);
         } catch (error) {
-          console.error('지갑 표시 상태 가져오기 오류:', error);
+          console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', error);
           setShowWallet(false);
         }
       } else {
         setShowWallet(true); 
+        console.log('[BottomNavigationBar] Android 플랫폼 - 지갑 항상 표시');
       }
     };
 
     getShowWalletStatus();
 
+    const interval = setInterval(() => {
+      getShowWalletStatus();
+    }, 30000); 
+
     return () => {
+      clearInterval(interval);
       abortController.abort();
     };
   }, [navigate]);
@@ -110,9 +128,9 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   const handleItemPress = (itemId: string) => {
     if (itemId === 'wallet') {
-      if (Platform.OS === 'android') {
+      if (currentPlatformOS === 'android') {
         navigate(ROUTES.wallet);
-      } else if (Platform.OS === 'ios' && showWallet) {
+      } else if (currentPlatformOS === 'ios' && showWallet) {
         navigate(ROUTES.wallet);
       } else {
 

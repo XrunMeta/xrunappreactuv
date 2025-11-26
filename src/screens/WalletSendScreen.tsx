@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import BigNumber from 'bignumber.js';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -19,39 +21,105 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { showAlert } = useAlertDialog();
-  const { walletSendAddress, setWalletSendAddress } = useAppContext();
+  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
+  const amountInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!selectedWalletAsset) {
+      goBack();
+    }
+  }, [selectedWalletAsset, goBack]);
+
+  const handleBackPress = () => {
+    setSendAmount('0');
+    setWalletSendAmount('0');
+    resetWalletSendAddress();
+    goBack();
+  };
 
   const handleScanPress = () => {
     navigate(ROUTES.walletQrScan);
   };
 
-  const handleConfirm = async () => {
+  const handleAmountFocus = () => {
+    if (sendAmount === '0') {
+      setSendAmount('');
+      setWalletSendAmount('');
+    } else if (sendAmount && amountInputRef.current) {
+
+      setTimeout(() => {
+        amountInputRef.current?.setNativeProps({
+          selection: { start: sendAmount.length, end: sendAmount.length },
+        });
+      }, 0);
+    }
+  };
+
+  const handleAmountBlur = () => {
+
+  };
+
+  const isConfirmEnabled = useMemo(() => {
+    const hasAmount = sendAmount && sendAmount !== '0' && new BigNumber(sendAmount || '0').gt(0);
+    const hasAddress = walletSendAddress && walletSendAddress.trim().length > 0;
+    return hasAmount && hasAddress;
+  }, [sendAmount, walletSendAddress]);
+
+  const handleConfirm = () => {
     if (!walletSendAddress) {
       await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
+      return;
+    }
+    if (!sendAmount || new BigNumber(sendAmount || '0').lte(0)) {
+      Alert.alert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
+      return;
+    }
+
+    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
+    const amount = new BigNumber(sendAmount || '0');
+    if (amount.gt(balance)) {
+      Alert.alert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
       return;
     }
     navigate(ROUTES.walletEstimate);
   };
 
+  if (!selectedWalletAsset) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.walletSend.title')} onBackPress={goBack} showBackButton />
+      <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.contentWidth, styles.mainSection]}>
-          <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>{t('screens.walletSend.balance')}</Text>
-            <Text style={styles.balanceValue}>9,876</Text>
-            <Text style={styles.balanceToken}>POL</Text>
+          <View style={styles.amountSection}>
+            <Text style={styles.amountLabel}>{t('screens.walletSend.amount')}</Text>
+            <TextInput
+              ref={amountInputRef}
+              style={styles.amountInput}
+              value={sendAmount}
+              onChangeText={(text) => {
+                setSendAmount(text);
+                setWalletSendAmount(text);
+              }}
+              onFocus={handleAmountFocus}
+              onBlur={handleAmountBlur}
+              keyboardType="decimal-pad"
+              autoCapitalize="none"
+              autoCorrect={false}
+              textAlign="center"
+            />
           </View>
 
           <View style={styles.tokenBadge}>
-            <Text style={styles.tokenBadgeText}>POL</Text>
+            <Text style={styles.tokenBadgeText}>{selectedWalletAsset.symbol || selectedWalletAsset.name}</Text>
           </View>
 
           <FormField
@@ -75,7 +143,12 @@ export const WalletSendScreen = () => {
         </View>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
-          <PrimaryButton title={t('screens.walletSend.confirm')} fullWidth onPress={handleConfirm} />
+          <PrimaryButton
+            title={t('screens.walletSend.confirm')}
+            fullWidth
+            onPress={handleConfirm}
+            disabled={!isConfirmEnabled}
+          />
         </View>
       </ScrollView>
 
@@ -107,28 +180,26 @@ const styles = StyleSheet.create({
   mainSection: {
     flexGrow: 1,
   },
-  balanceSection: {
+  amountSection: {
     alignItems: 'center',
     marginBottom: 32,
   },
-  balanceLabel: {
+  amountLabel: {
     fontSize: 16,
     lineHeight: 24,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
     marginBottom: 8,
+    textAlign: 'center',
   },
-  balanceValue: {
+  amountInput: {
     fontSize: 32,
     lineHeight: 48,
     fontFamily: 'Roboto-Bold',
-    color: COLORS.headerText,
-  },
-  balanceToken: {
-    fontSize: 14,
-    lineHeight: 24,
-    fontFamily: 'Roboto-Medium',
     color: '#10192d',
+    textAlign: 'center',
+    width: '100%',
+    minHeight: 48,
   },
   tokenBadge: {
     alignSelf: 'center',
@@ -136,8 +207,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 40,
     backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#ebedf5',
     marginBottom: 32,
   },
   tokenBadgeText: {
@@ -175,5 +244,4 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 });
-
 

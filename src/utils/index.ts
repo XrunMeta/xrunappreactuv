@@ -1,5 +1,7 @@
 import { Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as CryptoJS from 'crypto-js';
 
 export const copyToClipboard = async (
   value: string,
@@ -139,5 +141,32 @@ export const shareReferralLink = async (
 
     }
   }
+};
+
+export const generateUserHash = (member: number | string, email: string): string => {
+  const combined = `${member}${email}`;
+  return CryptoJS.SHA256(combined).toString();
+};
+
+export const saveCustomTokens = async (
+  member: number | string,
+  email: string,
+  tokens: any[],
+): Promise<void> => {
+  if (!member) return;
+
+  const hash = generateUserHash(member, email);
+  await AsyncStorage.setItem(`customTokens_${hash}`, JSON.stringify(tokens));
+};
+
+export const loadCustomTokens = async (
+  member: number | string,
+  email: string,
+): Promise<any[]> => {
+  if (!member) return [];
+
+  const hash = generateUserHash(member, email);
+  const tokens = await AsyncStorage.getItem(`customTokens_${hash}`);
+  return tokens ? JSON.parse(tokens) : [];
 };
 

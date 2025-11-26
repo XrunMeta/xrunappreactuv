@@ -104,15 +104,6 @@ export const WalletQrScanScreen = () => {
         </View>
       </View>
 
-      <View style={styles.bottomSheetWrapper}>
-        <View style={styles.bottomSheet}>
-          <View style={styles.handle} />
-          <TouchableOpacity style={styles.captureButton} activeOpacity={0.8}>
-            <Ionicons name="lock-closed-outline" size={28} color="#5f6483" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
       {Platform.OS === 'ios' && (
         <View style={styles.homeIndicator}>
           <View style={styles.homeIndicatorBar} />
@@ -129,9 +120,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingTop: 60,
-    paddingBottom: 200,
   },
   topBar: {
     paddingHorizontal: 24,
@@ -174,42 +164,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.15)',
     margin: 16,
-  },
-  bottomSheetWrapper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-  },
-  bottomSheet: {
-    width: '100%',
-    maxWidth: 780,
-    backgroundColor: COLORS.background,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingVertical: 32,
-    alignItems: 'center',
-  },
-  handle: {
-    width: 48,
-    height: 6,
-    borderRadius: 24,
-    backgroundColor: '#e3e8fc',
-    marginBottom: 24,
-  },
-  captureButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#f1f2f7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
   },
   permissionPlaceholder: {
     backgroundColor: '#0f172a',

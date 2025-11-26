@@ -74,6 +74,7 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 32,
+    zIndex: 10,
   },
   card: {
     borderRadius: 16,
@@ -86,6 +87,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
     overflow: 'hidden',
+    zIndex: 1,
   },
   accentOne: {
     position: 'absolute',
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
     top: -120,
     left: -40,
     transform: [{ rotate: '-20deg' }],
+    zIndex: 0,
   },
   accentTwo: {
     position: 'absolute',
@@ -102,6 +105,7 @@ const styles = StyleSheet.create({
     top: -80,
     right: -30,
     transform: [{ rotate: '-15deg' }],
+    zIndex: 0,
   },
   cardTitle: {
     fontSize: 16,
@@ -143,9 +147,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: 5,
     marginTop: -24,
     marginHorizontal: 16,
+    zIndex: 20,
+    position: 'relative',
   },
   actionButton: {
     flex: 1,

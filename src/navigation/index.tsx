@@ -23,6 +23,7 @@ export const ROUTES = {
   nftHistory: 'nftHistory',
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
+  walletDetail: 'walletDetail',
   transactionDetails: 'transactionDetails',
   map: 'map',
   walletSend: 'walletSend',
@@ -61,6 +62,7 @@ export type ScreenName = keyof typeof ROUTES;
 
 interface NavigationContextValue {
   currentScreen: ScreenName;
+  previousScreen: ScreenName | null;
   navigate: (screen: ScreenName) => void;
   goBack: () => void;
   reset: (screen: ScreenName) => void;
@@ -78,6 +80,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isInitialized, setIsInitialized] = useState(false);
 
   const currentScreen = stack[stack.length - 1];
+  const previousScreen = stack.length > 1 ? stack[stack.length - 2] : null;
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -128,12 +131,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   const value = useMemo(
     () => ({
       currentScreen,
+      previousScreen,
       navigate,
       goBack,
       reset,
       canGoBack: stack.length > 1,
     }),
-    [currentScreen, navigate, goBack, reset, stack.length],
+    [currentScreen, previousScreen, navigate, goBack, reset, stack.length],
   );
 
   return (

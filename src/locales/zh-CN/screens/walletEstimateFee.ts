@@ -1,4 +1,21 @@
 export default {
   title: '估算费用',
+  amount: '发送金额',
+  balance: '余额',
+  from: '发送地址',
+  to: '接收地址',
+  networkFee: '网络费用',
+  speed: '速度',
+  speedNormal: '普通 <15秒',
+  loading: '加载中...',
+  loadingGas: '正在加载燃气数据...',
+  error: '错误',
+  estimation: '更新中',
+  seconds: '秒',
+  confirm: '确认',
+  receiverAddressPlaceholder: '请输入接收地址',
+  alerts: {
+    error: '错误',
+    gasNotReady: '燃气估算尚未准备好。请稍候...',
+  },
 };
-

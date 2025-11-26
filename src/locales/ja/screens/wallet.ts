@@ -4,8 +4,13 @@ export default {
   myBalance: '残高',
   addToken: 'トークンを追加',
   polygonScan: 'PolygonScan',
+  etherscan: 'Etherscan',
   receive: '受取',
   send: '送金',
   preparing: '準備中',
   preparingMessage: 'この機能は準備中です',
+  loading: '読み込み中...',
+  error: 'エラー',
+  missingInfo: '必要な情報が不足しています。',
+  addressNotLoaded: 'ウォレットアドレスがまだ読み込まれていません。しばらく待ってからもう一度お試しください。',
 };

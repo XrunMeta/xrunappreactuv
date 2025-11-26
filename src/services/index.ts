@@ -98,6 +98,17 @@ import {
   GetRankRequest,
   GetRankResponse,
   GetRankSpesificRequest,
+  WalletData,
+  WalletDataResponse,
+  OtherChainsStatusResponse,
+  ADXRUNTopBannersResponse,
+  ADXRUNEstimateListResponse,
+  ADXRUNResultListResponse,
+  ADXRUNTopBannersSettledResponse,
+  TransactionHistoryResponse,
+  TransactionHistoryItem,
+  TokenBalanceResponse,
+  ERC20TokenCheckResponse,
   GetRankSpesificResponse,
   GetMyGroupRequest,
   GetMyGroupResponse,
@@ -2913,6 +2924,580 @@ export const deleteXrunPurchasedItem = async (
         data: error.response?.data,
         message: error.message,
       });
+    }
+    throw error;
+  }
+};
+
+export const fetchWalletData = async (
+  member: number | string,
+  daysbefore: number = 7,
+  navigation?: any,
+): Promise<WalletDataResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      daysbefore,
+    };
+
+    console.log('[지갑] 지갑 데이터 조회 요청:', { member, daysbefore });
+
+    const response = await axiosInstance.post<WalletDataResponse>(
+      '/app4000-01-rev-01',
+      requestBody,
+    );
+
+    console.log('[지갑] 지갑 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 지갑 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchOtherChainsStatus = async (
+  member: number | string,
+  navigation?: any,
+): Promise<OtherChainsStatusResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[지갑] 다른 체인 상태 조회 요청:', { member });
+
+    const response = await axiosInstance.post<OtherChainsStatusResponse>(
+      '/showOtherChains',
+      requestBody,
+    );
+
+    console.log('[지갑] 다른 체인 상태 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 다른 체인 상태 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNTopBanners = async (
+  member: number | string,
+  navigation?: any,
+): Promise<ADXRUNTopBannersResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 요청:', { member });
+
+    const response = await axiosInstance.post<ADXRUNTopBannersResponse>(
+      '/ap4000-adxrun-topbanners',
+      requestBody,
+    );
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] AD XRUN 배너 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTokenBalance = async (
+  address: string,
+  contract: string,
+  currency: number,
+  navigation?: any,
+): Promise<TokenBalanceResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      address,
+      contract,
+      currency,
+    };
+
+    console.log('[지갑] 토큰 잔액 조회 요청:', { address, contract, currency });
+
+    const response = await axiosInstance.post<TokenBalanceResponse>(
+      '/refreshBalancesCommon',
+      requestBody,
+    );
+
+    console.log('[지갑] 토큰 잔액 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 토큰 잔액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNEstimateList = async (
+  member: number | string,
+  page: number = 1,
+  navigation?: any,
+): Promise<ADXRUNEstimateListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      page,
+    };
+
+    console.log('[AD XRUN] 심사중 리스트 조회 요청:', { member, page });
+
+    const response = await axiosInstance.post<ADXRUNEstimateListResponse>(
+      '/ap4000-adxrun-estimatelist',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 심사중 리스트 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 심사중 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNResultList = async (
+  member: number | string,
+  page: number = 1,
+  navigation?: any,
+): Promise<ADXRUNResultListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      page,
+    };
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 요청:', { member, page });
+
+    const response = await axiosInstance.post<ADXRUNResultListResponse>(
+      '/ap4000-adxrun-resultlist',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 정산완료 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNTopBannersSettled = async (
+  member: number | string,
+  navigation?: any,
+): Promise<ADXRUNTopBannersSettledResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 요청:', { member });
+
+    const response = await axiosInstance.post<ADXRUNTopBannersSettledResponse>(
+      '/ap4000-adxrun-topbannersSattled',
+      requestBody,
+    );
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[AD XRUN] 정산완료 배너 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const checkERC20Token = async (
+  contract: string,
+  currency: number,
+  navigation?: any,
+): Promise<ERC20TokenCheckResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      contract,
+      currency,
+    };
+
+    console.log('[지갑] ERC20 토큰 검증 요청:', { contract, currency });
+
+    const response = await axiosInstance.post<ERC20TokenCheckResponse>(
+      '/checkERC20Token',
+      requestBody,
+    );
+
+    console.log('[지갑] ERC20 토큰 검증 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] ERC20 토큰 검증 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTotalHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전체 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-05',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전체 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전체 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTransferHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전송 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-06',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전송 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전송 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchReceivedDetails = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 수신 상세 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-01',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 수신 상세 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 수신 상세 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTransitionHistory = async (
+  member: number | string,
+  currency: number,
+  daysbefore: number = 7,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<TransactionHistoryResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[트랜잭션] 전환 히스토리 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<TransactionHistoryResponse>(
+      '/app4200-03',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] 전환 히스토리 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] 전환 히스토리 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getGasEstimation = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: string,
+  token: string,
+  currency: number,
+  network: string = 'ETH',
+  chainId: number = 1,
+  priorityGasTracker: number = 2,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const body = {
+      from: fromAddress,
+      to: toAddress,
+      amount: amount,
+      token: token,
+      currency: currency,
+      network: network,
+      chainId: chainId,
+      priorityGasTracker: priorityGasTracker,
+    };
+
+    console.log('[가스 수수료 예상] API 요청:', body);
+
+    const response = await nodeGatewayRequest('/gasEstimated', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('[가스 수수료 예상] API 응답:', result);
+
+    return result;
+  } catch (error) {
+    console.error('[가스 수수료 예상] API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const postTransferNew = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: string,
+  member: string,
+  network: string,
+  currency: number,
+  chainId: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const body = {
+      from: fromAddress,
+      to: toAddress,
+      amount: amount,
+      member: member,
+      network: network,
+      currency: currency,
+      chainId: chainId,
+    };
+
+    console.log('[블록체인 전송] API 요청:', body);
+
+    const response = await nodeGatewayRequest('/postTransferNew', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('[블록체인 전송] API 응답:', result);
+
+    return result;
+  } catch (error) {
+    console.error('[블록체인 전송] API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
     }
     throw error;
   }

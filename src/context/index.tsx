@@ -1,13 +1,19 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams } from '../types';
+import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
 import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
   setWalletSendAddress: (address: string) => void;
   resetWalletSendAddress: () => void;
+  walletSendAmount: string;
+  setWalletSendAmount: (amount: string) => void;
+  resetWalletSendAmount: () => void;
+  walletReceiveAddress: string;
+  setWalletReceiveAddress: (address: string) => void;
+  resetWalletReceiveAddress: () => void;
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
@@ -51,12 +57,38 @@ type AppContextValue = {
   advertisementParams: AdvertisementParams | null;
   setAdvertisementParams: (params: AdvertisementParams | null) => void;
   resetAdvertisementParams: () => void;
+  selectedWalletAsset: CombinedAsset | null;
+  setSelectedWalletAsset: (asset: CombinedAsset | null) => void;
+  resetSelectedWalletAsset: () => void;
+  transactionResult: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null;
+  setTransactionResult: (result: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null) => void;
+  resetTransactionResult: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [walletSendAddress, setWalletSendAddress] = useState('');
+  const [walletSendAmount, setWalletSendAmount] = useState('0');
+  const [walletReceiveAddress, setWalletReceiveAddress] = useState('');
   const [addTokenDialogVisible, setAddTokenDialogVisible] = useState(false);
   const [verificationSuccessRoute, setVerificationSuccessRoute] =
     useState<ScreenName>(ROUTES.login);
@@ -82,12 +114,29 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     termsAccepted: true,
   });
   const [advertisementParams, setAdvertisementParams] = useState<AdvertisementParams | null>(null);
+  const [selectedWalletAsset, setSelectedWalletAsset] = useState<CombinedAsset | null>(null);
+  const [transactionResult, setTransactionResult] = useState<{
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null>(null);
 
   const value = useMemo(
     () => ({
       walletSendAddress,
       setWalletSendAddress,
       resetWalletSendAddress: () => setWalletSendAddress(''),
+      walletSendAmount,
+      setWalletSendAmount,
+      resetWalletSendAmount: () => setWalletSendAmount('0'),
+      walletReceiveAddress,
+      setWalletReceiveAddress,
+      resetWalletReceiveAddress: () => setWalletReceiveAddress(''),
       addTokenDialogVisible,
       openAddTokenDialog: () => setAddTokenDialogVisible(true),
       closeAddTokenDialog: () => setAddTokenDialogVisible(false),
@@ -134,9 +183,17 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       advertisementParams,
       setAdvertisementParams,
       resetAdvertisementParams: () => setAdvertisementParams(null),
+      selectedWalletAsset,
+      setSelectedWalletAsset,
+      resetSelectedWalletAsset: () => setSelectedWalletAsset(null),
+      transactionResult,
+      setTransactionResult,
+      resetTransactionResult: () => setTransactionResult(null),
     }),
     [
       walletSendAddress,
+      walletSendAmount,
+      walletReceiveAddress,
       addTokenDialogVisible,
       verificationSuccessRoute,
       verificationEmail,
@@ -149,6 +206,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectMode,
       signupFormData,
       advertisementParams,
+      selectedWalletAsset,
+      transactionResult,
     ],
   );
 

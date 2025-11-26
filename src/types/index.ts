@@ -915,3 +915,174 @@ export interface DeleteXrunPurchasedItemResponse {
   data?: any; 
   message?: string;
 }
+
+export interface WalletData {
+  currency: number; 
+  subcurrency: number; 
+  currencyname: string; 
+  subCurrencyName?: string; 
+  symbol: string; 
+  symbolimg: string; 
+  address: string; 
+  amount: string; 
+  Wamount: string; 
+  [key: string]: any; 
+}
+
+export interface CombinedAsset {
+  id: number | string; 
+  symbol: string; 
+  name: string; 
+  subCurrencyName?: string; 
+  amount: string; 
+  icon: string | any; 
+  currency: number; 
+  isCustom: boolean; 
+  contractAddress?: string; 
+  decimals?: number; 
+  subcurrency?: number; 
+  originalData?: any; 
+}
+
+export interface CustomToken {
+  id: string; 
+  contractAddress: string; 
+  symbol: string; 
+  name: string; 
+  amount: string; 
+  decimals: number; 
+  icon: string; 
+  currency: number; 
+  subcurrency?: number; 
+  address: string; 
+  [key: string]: any; 
+}
+
+export interface WalletDataResponse {
+  status?: string;
+  data?: WalletData[];
+  [key: string]: any;
+}
+
+export interface OtherChainsStatusResponse {
+  status?: string;
+  data?: Array<{
+    status: string; 
+  }>;
+  [key: string]: any;
+}
+
+export interface ADXRUNTopBannersResponse {
+  status?: string;
+  data?: {
+    transactions?: Array<{
+      krwamount: string;
+      amountasxrun: string;
+      [key: string]: any;
+    }>;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface TokenBalanceResponse {
+  status?: string;
+  data?: Array<{
+    balance: string;
+  }>;
+  [key: string]: any;
+}
+
+export interface ERC20TokenCheckResponse {
+  status?: string;
+  data?: {
+    isERC20: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface TransactionHistoryItem {
+  id?: string | number;
+  transaction?: string;
+  excuteddatetime?: string;
+  date?: string;
+  amount: string;
+  symbol?: string;
+  action: number; 
+  status?: number; 
+  currency?: number;
+  [key: string]: any;
+}
+
+export interface TransactionHistoryResponse {
+  status?: string;
+  data?: TransactionHistoryItem[];
+  [key: string]: any;
+}
+
+export interface ADXRUNEstimateItem {
+  id: string | number;
+  created_at?: string;
+  priceasXrun?: string;
+  [key: string]: any;
+}
+
+export interface ADXRUNEstimateListResponse {
+  status?: string;
+  data?: {
+    items?: ADXRUNEstimateItem[];
+    pagination?: {
+      hasNextPage?: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  items?: ADXRUNEstimateItem[];
+  pagination?: {
+    hasNextPage?: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface ADXRUNResultItem {
+  id: string | number;
+  datetime?: string;
+  amount?: string;
+  extrastr4?: string;
+  amountasxrun?: string;
+  action?: number; 
+  [key: string]: any;
+}
+
+export interface ADXRUNResultListResponse {
+  status?: string;
+  data?: {
+    items?: ADXRUNResultItem[];
+    pagination?: {
+      hasNextPage?: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  items?: ADXRUNResultItem[];
+  pagination?: {
+    hasNextPage?: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface ADXRUNTopBannersSettledResponse {
+  status?: string;
+  data?: {
+    transactions?: Array<{
+      krwamount: string;
+      amountasxrun: string;
+      [key: string]: any;
+    }>;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
