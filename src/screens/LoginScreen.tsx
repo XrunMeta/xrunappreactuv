@@ -27,7 +27,7 @@ export const v_f4f851 = () => {
   const { t: v_8d41d7 } = v_772971();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
-  const [v_9fe81c, v_d32265] = v_5ab095(false);
+  const [v_a964a4, v_99916a] = v_5ab095(false);
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
   const v_0d972d = v_ce4741.emailVerification;
@@ -40,7 +40,7 @@ export const v_f4f851 = () => {
           const v_60fc43 = await v_e84827.getItem('userEmail');
           if (v_60fc43) {
             v_fedf34(v_60fc43);
-            v_d32265(true);
+            v_99916a(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
           }
         }
@@ -51,25 +51,8 @@ export const v_f4f851 = () => {
     v_2a6af5();
   }, []);
 
-  const v_709e4f = async () => {
-    const v_ef3163 = !v_9fe81c;
-    v_d32265(v_ef3163);
-
-    try {
-      if (v_ef3163 && v_e0c7e8.trim()) {
-
-        await v_e84827.setItem('rememberMe', 'true');
-        await v_e84827.setItem('userEmail', v_e0c7e8.trim());
-        console.log('[로그인] 아이디 저장 완료:', v_e0c7e8.trim());
-      } else {
-
-        await v_e84827.removeItem('rememberMe');
-
-        console.log('[로그인] 아이디 저장 해제');
-      }
-    } catch (v_5e9bfe) {
-      console.error('[로그인] 아이디 저장/해제 실패:', v_5e9bfe);
-    }
+  const v_8f2c24 = () => {
+    v_99916a(!v_a964a4);
   };
 
   const v_ec4736 = async () => {
@@ -87,7 +70,7 @@ export const v_f4f851 = () => {
     v_deef62(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { email: v_e0c7e8, rememberId: v_9fe81c });
+      console.log('[로그인] 로그인 시도:', { email: v_e0c7e8, rememberMe: v_a964a4 });
 
       const v_b84499 = await v_b699a9(
         v_e0c7e8.trim(),
@@ -109,7 +92,7 @@ export const v_f4f851 = () => {
       }
 
       const v_9e8d12 = v_ef7306.extrastr;
-      if (v_9e8d12) {
+      if (v_9e8d12 && v_ef7306.member) {
         const v_06cee6 = v_a5170b(v_9e8d12);
 
         const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
@@ -127,15 +110,15 @@ export const v_f4f851 = () => {
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
 
-      if (v_9fe81c) {
-        await v_e84827.setItem('rememberMe', 'true');
+      await v_e84827.setItem('isLoggedIn', 'true');
 
+      if (v_a964a4) {
+        await v_e84827.setItem('rememberMe', 'true');
+        console.log('[로그인] 로그인 상태 유지 저장 완료');
       } else {
         await v_e84827.removeItem('rememberMe');
-
+        console.log('[로그인] 로그인 상태 유지 해제');
       }
-
-      await v_e84827.setItem('isLoggedIn', 'true');
 
       console.log('[로그인] 로그인 성공');
 
@@ -200,13 +183,14 @@ export const v_f4f851 = () => {
         />
 
         <View style={v_d81136.checkboxRow}>
-          <FormCheckbox
-            label={v_8d41d7('screens.login.rememberId')}
-            checked={v_9fe81c}
-            onToggle={v_709e4f}
-            variant="circle"
-            disabled={v_cd31a8}
-          />
+          <View style={v_cd31a8 ? v_d81136.checkboxDisabled : undefined}>
+            <FormCheckbox
+              label={v_8d41d7('screens.login.rememberMe')}
+              checked={v_a964a4}
+              onToggle={v_cd31a8 ? () => {} : v_8f2c24}
+              variant="circle"
+            />
+          </View>
         </View>
 
         <View style={v_d81136.bottomSection}>
@@ -331,6 +315,9 @@ const v_d81136 = v_472849.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  checkboxDisabled: {
+    opacity: 0.5,
   },
 });
 
