@@ -4,7 +4,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5, v_2cf4d9 } from '../components';
+import { v_729608, v_b34ce5, v_2cf4d9, v_4c7b5d } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
@@ -353,49 +353,56 @@ export const v_38326c = () => {
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={v_d81136.wrapper}>
-            <SegmentedControl
-              options={v_1c4d31}
-              value={v_11083e}
-              onChange={v_42b5ed}
-              containerStyle={v_d81136.segmented}
-            />
-
-            <View style={v_d81136.searchBar}>
-              <Feather name="search" size={18} color="#bcbec4" />
-              <TextInput
-                style={v_d81136.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
+        <>
+          <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+            <View style={v_d81136.wrapper}>
+              <SegmentedControl
+                options={v_1c4d31}
+                value={v_11083e}
+                onChange={v_42b5ed}
+                containerStyle={v_d81136.segmented}
               />
+
+              <View style={v_d81136.searchBar}>
+                <Feather name="search" size={18} color="#bcbec4" />
+                <TextInput
+                  style={v_d81136.searchInput}
+                  placeholder="Search"
+                  placeholderTextColor="#bcbec4"
+                />
+              </View>
+
+              {v_11083e === 'ticket' && v_b1c029.length > 0
+                ? v_b1c029.map((v_8c0b26) => {
+
+                    const v_63070e = v_f9a2c9[v_8c0b26.id];
+                    const v_c322f7 = v_63070e
+                      ? { uri: `data:image/png;base64,${v_63070e}` }
+                      : v_8c0b26.image;
+
+                    const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+                    const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
+                    const v_e72b09 = v_d6cf14
+                      ? (v_817eee || 'Loading...')
+                      : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
+
+                    return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
+                  })
+                : v_11083e === 'ticket' && v_b1c029.length === 0
+                ? (
+                    <View style={v_d81136.emptyContainer}>
+                      <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                    </View>
+                  )
+                : null}
             </View>
+          </ScrollView>
 
-            {v_11083e === 'ticket' && v_b1c029.length > 0
-              ? v_b1c029.map((v_8c0b26) => {
-
-                  const v_63070e = v_f9a2c9[v_8c0b26.id];
-                  const v_c322f7 = v_63070e
-                    ? { uri: `data:image/png;base64,${v_63070e}` }
-                    : v_8c0b26.image;
-
-                  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
-                  const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                  const v_e72b09 = v_d6cf14
-                    ? (v_817eee || 'Loading...')
-                    : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
-
-                  return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
-                })
-              : v_11083e === 'ticket' && v_b1c029.length === 0
-              ? (
-                  <View style={v_d81136.emptyContainer}>
-                    <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                  </View>
-                )
-              : null}
+          {}
+          <View style={v_d81136.taboolaContainer}>
+            <TaboolaBanner placementType="shop" />
           </View>
-        </ScrollView>
+        </>
       )}
     </View>
   );
@@ -413,6 +420,7 @@ const v_d81136 = v_472849.create({
   },
   scrollContent: {
     paddingBottom: 40,
+    flexGrow: 1,
   },
   wrapper: {
     width: '100%',
@@ -450,5 +458,12 @@ const v_d81136 = v_472849.create({
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
+  },
+  taboolaContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
 });

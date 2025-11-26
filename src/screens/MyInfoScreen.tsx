@@ -12,7 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608 } from '../components';
+import { v_729608, v_4c7b5d } from '../components';
 import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2 } from '../services';
@@ -220,9 +220,8 @@ export const v_03a231 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
-          <View style={v_d81136.adBanner}>
-            <Text style={v_d81136.adText}>AD</Text>
-          </View>
+          {}
+          <TaboolaBanner placementType="myinfo" />
 
           <View style={v_d81136.profileCard}>
             <View>
