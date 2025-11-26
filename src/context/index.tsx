@@ -8,6 +8,9 @@ type AppContextValue = {
   walletSendAddress: string;
   setWalletSendAddress: (address: string) => void;
   resetWalletSendAddress: () => void;
+  walletSendAmount: string;
+  setWalletSendAmount: (amount: string) => void;
+  resetWalletSendAmount: () => void;
   walletReceiveAddress: string;
   setWalletReceiveAddress: (address: string) => void;
   resetWalletReceiveAddress: () => void;
@@ -57,12 +60,34 @@ type AppContextValue = {
   selectedWalletAsset: CombinedAsset | null;
   setSelectedWalletAsset: (asset: CombinedAsset | null) => void;
   resetSelectedWalletAsset: () => void;
+  transactionResult: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null;
+  setTransactionResult: (result: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null) => void;
+  resetTransactionResult: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [walletSendAddress, setWalletSendAddress] = useState('');
+  const [walletSendAmount, setWalletSendAmount] = useState('0');
   const [walletReceiveAddress, setWalletReceiveAddress] = useState('');
   const [addTokenDialogVisible, setAddTokenDialogVisible] = useState(false);
   const [verificationSuccessRoute, setVerificationSuccessRoute] =
@@ -90,12 +115,25 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   });
   const [advertisementParams, setAdvertisementParams] = useState<AdvertisementParams | null>(null);
   const [selectedWalletAsset, setSelectedWalletAsset] = useState<CombinedAsset | null>(null);
+  const [transactionResult, setTransactionResult] = useState<{
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null>(null);
 
   const value = useMemo(
     () => ({
       walletSendAddress,
       setWalletSendAddress,
       resetWalletSendAddress: () => setWalletSendAddress(''),
+      walletSendAmount,
+      setWalletSendAmount,
+      resetWalletSendAmount: () => setWalletSendAmount('0'),
       walletReceiveAddress,
       setWalletReceiveAddress,
       resetWalletReceiveAddress: () => setWalletReceiveAddress(''),
@@ -148,9 +186,13 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedWalletAsset,
       setSelectedWalletAsset,
       resetSelectedWalletAsset: () => setSelectedWalletAsset(null),
+      transactionResult,
+      setTransactionResult,
+      resetTransactionResult: () => setTransactionResult(null),
     }),
     [
       walletSendAddress,
+      walletSendAmount,
       walletReceiveAddress,
       addTokenDialogVisible,
       verificationSuccessRoute,
@@ -165,6 +207,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       signupFormData,
       advertisementParams,
       selectedWalletAsset,
+      transactionResult,
     ],
   );
 

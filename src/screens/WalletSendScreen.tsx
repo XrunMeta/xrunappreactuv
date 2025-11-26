@@ -21,8 +21,8 @@ import { useAppContext } from '../context';
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, selectedWalletAsset } = useAppContext();
-  const [sendAmount, setSendAmount] = useState('0');
+  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
   const amountInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export const WalletSendScreen = () => {
 
   const handleBackPress = () => {
     setSendAmount('0');
+    setWalletSendAmount('0');
     resetWalletSendAddress();
     goBack();
   };
@@ -44,6 +45,7 @@ export const WalletSendScreen = () => {
   const handleAmountFocus = () => {
     if (sendAmount === '0') {
       setSendAmount('');
+      setWalletSendAmount('');
     } else if (sendAmount && amountInputRef.current) {
 
       setTimeout(() => {
@@ -56,9 +58,6 @@ export const WalletSendScreen = () => {
 
   const handleAmountBlur = () => {
 
-    if (!sendAmount || sendAmount.trim() === '') {
-      setSendAmount('0');
-    }
   };
 
   const isConfirmEnabled = useMemo(() => {
@@ -106,7 +105,10 @@ export const WalletSendScreen = () => {
               ref={amountInputRef}
               style={styles.amountInput}
               value={sendAmount}
-              onChangeText={setSendAmount}
+              onChangeText={(text) => {
+                setSendAmount(text);
+                setWalletSendAmount(text);
+              }}
               onFocus={handleAmountFocus}
               onBlur={handleAmountBlur}
               keyboardType="decimal-pad"

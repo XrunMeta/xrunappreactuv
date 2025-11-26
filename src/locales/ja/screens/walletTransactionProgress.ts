@@ -1,4 +1,23 @@
 export default {
-  title: '取引',
+  title: '取引進行中',
+  amount: '送金額',
+  balance: '残高',
+  from: '送信元',
+  to: '送信先',
+  gasPrice: 'ガス価格',
+  inProgress: '進行中 . . .',
+  listPage: 'リストページ',
+  processing: '取引処理中...',
+  checkingTicket: '送金チケット確認中...',
+  executingTransfer: 'ブロックチェーン送金実行中...',
+  transferCompleted: '送金が正常に完了しました！',
+  transferFailed: '送金失敗',
+  noTxHash: 'トランザクションハッシュなし',
+  loading: '読み込み中...',
+  calculating: '計算中...',
+  alerts: {
+    transferFailed: '送金失敗',
+    transferFailedMessage: '送金に失敗しました。もう一度お試しください。',
+    confirm: '確認',
+  },
 };
-

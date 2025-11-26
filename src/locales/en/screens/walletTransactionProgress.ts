@@ -1,4 +1,23 @@
 export default {
-  title: 'Transaction',
+  title: 'Transaction Progress',
+  amount: 'Send Amount',
+  balance: 'Balance',
+  from: 'From',
+  to: 'To',
+  gasPrice: 'Gas Price',
+  inProgress: 'In Progress . . .',
+  listPage: 'List Page',
+  processing: 'Processing transaction...',
+  checkingTicket: 'Checking transfer ticket...',
+  executingTransfer: 'Executing blockchain transfer...',
+  transferCompleted: 'Transfer completed successfully!',
+  transferFailed: 'Transfer failed',
+  noTxHash: 'No transaction hash',
+  loading: 'Loading...',
+  calculating: 'Calculating...',
+  alerts: {
+    transferFailed: 'Transfer Failed',
+    transferFailedMessage: 'Transfer failed. Please try again.',
+    confirm: 'OK',
+  },
 };
-

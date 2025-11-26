@@ -3396,3 +3396,109 @@ export const fetchTransitionHistory = async (
   }
 };
 
+export const getGasEstimation = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: string,
+  token: string,
+  currency: number,
+  network: string = 'ETH',
+  chainId: number = 1,
+  priorityGasTracker: number = 2,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const body = {
+      from: fromAddress,
+      to: toAddress,
+      amount: amount,
+      token: token,
+      currency: currency,
+      network: network,
+      chainId: chainId,
+      priorityGasTracker: priorityGasTracker,
+    };
+
+    console.log('[가스 수수료 예상] API 요청:', body);
+
+    const response = await nodeGatewayRequest('/gasEstimated', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('[가스 수수료 예상] API 응답:', result);
+
+    return result;
+  } catch (error) {
+    console.error('[가스 수수료 예상] API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const postTransferNew = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: string,
+  member: string,
+  network: string,
+  currency: number,
+  chainId: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const body = {
+      from: fromAddress,
+      to: toAddress,
+      amount: amount,
+      member: member,
+      network: network,
+      currency: currency,
+      chainId: chainId,
+    };
+
+    console.log('[블록체인 전송] API 요청:', body);
+
+    const response = await nodeGatewayRequest('/postTransferNew', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('[블록체인 전송] API 응답:', result);
+
+    return result;
+  } catch (error) {
+    console.error('[블록체인 전송] API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
