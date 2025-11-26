@@ -189,13 +189,14 @@ export const v_f57686 = () => {
         ? v_8c0b26.email.substring(0, 12) + '...'
         : v_8c0b26.email;
 
+    const v_06c228 = v_f4fb5e !== '-' && v_8c0b26.email === v_f4fb5e && String(v_8c0b26.rank) === v_ad21d1;
+
     return (
       <ReferralMemberRow
         key={v_8c0b26.id}
         rank={v_8c0b26.rank}
         email={v_b43178}
-        highlight={v_a56041 === 0 && v_8c0b26.rank === 1} 
-        onPress={() => v_9b57fc(v_ce4741.referralDepthOne)}
+        highlight={v_06c228} 
       />
     );
   };

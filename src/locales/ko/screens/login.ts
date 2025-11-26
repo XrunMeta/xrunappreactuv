@@ -4,7 +4,7 @@ export default {
   emailPlaceholder: '이메일을 입력해주세요.',
   passwordLabel: '비밀번호',
   passwordPlaceholder: '비밀번호를 입력해주세요.',
-  rememberId: '아이디 기억하기',
+  rememberMe: '로그인 상태 유지',
   loginButton: '로그인',
   disclaimer: '비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.',
   emailVerification: '이메일 인증',

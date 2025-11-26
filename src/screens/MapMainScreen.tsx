@@ -3,7 +3,6 @@ import {
   v_3094a2,
   v_472849,
   v_326be8,
-  v_03e392,
   v_700696,
   v_19b633,
   v_cf9c33,
@@ -17,6 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_a77ce6 } from '../components';
 import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
 
@@ -87,6 +87,7 @@ try {
 export const MapMainScreen: v_a3453e.FC = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_a55f0b, v_0326b2] = v_5ab095<LocationData | null>(null);
   const [v_976e82, v_a7e4fc] = v_5ab095<string | null>(null);
   const [v_ac1d22, v_02dd63] = v_5ab095<'Map' | 'Camera'>('Map');
@@ -305,7 +306,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
       const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
       if (v_d308b5 !== 'granted') {
         v_a7e4fc('위치 권한이 거부되었습니다.');
-        v_03e392.alert(
+        await v_889fad(
           '위치 권한 필요',
           '지도를 사용하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
           [{ text: '확인' }]
@@ -356,7 +357,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
         console.error('Location error:', v_5e9bfe);
 
         if (v_1744b9.includes('location services') || v_1744b9.includes('unavailable')) {
-          v_03e392.alert(
+          await v_889fad(
             '위치 서비스 오류',
             '위치 정보를 가져올 수 없습니다.\n\n다음 사항을 확인해주세요:\n• 기기의 위치 서비스(GPS)가 켜져 있는지\n• 네트워크 위치 서비스가 활성화되어 있는지\n• 실내에서는 GPS 신호가 약할 수 있습니다.',
             [

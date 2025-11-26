@@ -5,7 +5,6 @@ import {
   v_122070,
   v_19b633,
   v_4623af,
-  v_03e392,
   v_39a996,
   v_9cabcb,
 } from 'rcmrninabrnb';
@@ -16,6 +15,7 @@ import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1 } from '../components'
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import {
   v_a7ab3c,
   v_152d53,
@@ -64,6 +64,7 @@ const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
 export const v_cdb169 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const { selectedCountryDialCode: v_459d5e, setVerificationEmail: v_b572c3, setVerificationSuccessRoute: v_8f89f3, setSelectMode: v_67ab1c } = v_700ef9();
 
   const v_798085 = [
@@ -168,7 +169,7 @@ export const v_cdb169 = () => {
         }
       } catch (v_5e9bfe) {
         console.error('[정보수정] 사용자 정보 로드 실패:', v_5e9bfe);
-        v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.loadFailed'));
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.loadFailed'));
       } finally {
         v_deef62(false);
       }
@@ -180,17 +181,17 @@ export const v_cdb169 = () => {
   const v_1b8283 = async () => {
 
     if (!v_a32a50.trim()) {
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.firstNameRequired'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
     if (!v_328bb4.trim()) {
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.lastNameRequired'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.lastNameRequired'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.userDataNotFound'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -232,7 +233,7 @@ export const v_cdb169 = () => {
 
       await Promise.all(v_e01f71);
 
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'), [
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'), [
         {
           text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
           onPress: () => {
@@ -247,19 +248,19 @@ export const v_cdb169 = () => {
       ]);
     } catch (v_5e9bfe) {
       console.error('[정보수정] 정보 수정 실패:', v_5e9bfe);
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.saveFailed'), v_8d41d7('screens.myInfoEdit.alerts.saveFailedMessage'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveFailed'), v_8d41d7('screens.myInfoEdit.alerts.saveFailedMessage'));
     } finally {
       v_433822(false);
     }
   };
 
-  const v_c09605 = () => {
-    v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.passwordChange'), v_8d41d7('screens.myInfoEdit.alerts.passwordChangeMessage'));
+  const v_c09605 = async () => {
+    await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.passwordChange'), v_8d41d7('screens.myInfoEdit.alerts.passwordChangeMessage'));
   };
 
   const v_801fea = async () => {
     if (!v_e0c7e8) {
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
       return;
     }
 
@@ -285,7 +286,7 @@ export const v_cdb169 = () => {
         v_8f89f3(v_ce4741.myInfoPhoneEdit); 
         v_9b57fc(v_ce4741.verificationCode);
       } else {
-        v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
           {
             text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
             onPress: () => {
@@ -296,7 +297,7 @@ export const v_cdb169 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
-      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
     }
   };
 

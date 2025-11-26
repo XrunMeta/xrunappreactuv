@@ -4,7 +4,7 @@ export default {
   emailPlaceholder: 'Please enter your email',
   passwordLabel: 'Password',
   passwordPlaceholder: 'Please enter your password',
-  rememberId: 'Remember ID',
+  rememberMe: 'Keep me logged in',
   loginButton: 'Login',
   disclaimer: 'If you forgot your password, you can log in using the verification code sent to your email.',
   emailVerification: 'Email Verification',

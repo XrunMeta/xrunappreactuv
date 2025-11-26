@@ -5,19 +5,19 @@ import {
   v_472849,
   v_122070,
   v_4623af,
-  v_03e392,
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608 } from '../components';
+import { v_729608, v_4c7b5d } from '../components';
 import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2 } from '../services';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 type CardConfig = {
   id: string;
@@ -76,6 +76,7 @@ const v_dbfc7f = [
 export const v_03a231 = () => {
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
@@ -130,14 +131,14 @@ export const v_03a231 = () => {
 
   const v_22cd2d = async () => {
     if (!v_bb789b?.email) {
-      v_03e392.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      await v_889fad('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
       return;
     }
-    await v_a3bbf0(v_4922a9, { email: v_bb789b.email }, v_9b57fc);
+    await v_a3bbf0(v_4922a9, { email: v_bb789b.email }, v_889fad, v_9b57fc);
   };
 
-  const v_06b8a4 = () => {
-    v_03e392.alert(
+  const v_06b8a4 = async () => {
+    await v_889fad(
       '로그아웃',
       '로그아웃 하시겠습니까?',
       [
@@ -153,7 +154,7 @@ export const v_03a231 = () => {
 
               const v_f24fd5 = await v_e84827.getItem('userData');
               if (!v_f24fd5) {
-                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await v_889fad('오류', '사용자 정보를 찾을 수 없습니다.');
                 return;
               }
 
@@ -161,7 +162,7 @@ export const v_03a231 = () => {
               const v_660822 = v_ef7306.member;
 
               if (!v_660822) {
-                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await v_889fad('오류', '사용자 정보를 찾을 수 없습니다.');
                 return;
               }
 
@@ -220,9 +221,8 @@ export const v_03a231 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
-          <View style={v_d81136.adBanner}>
-            <Text style={v_d81136.adText}>AD</Text>
-          </View>
+          {}
+          <TaboolaBanner placementType="myinfo" />
 
           <View style={v_d81136.profileCard}>
             <View>

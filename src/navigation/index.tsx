@@ -2,9 +2,11 @@ import v_a3453e, {
   v_af12cb,
   v_de06a3,
   v_76a8a9,
+  v_c4deb2,
   v_df9f57,
   v_5ab095,
 } from 'bapkr';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 export const v_ce4741 = {
   authLanding: 'authLanding',
@@ -75,9 +77,34 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   children: v_21f619,
 }) => {
   const [v_8d490a, v_768005] = v_5ab095<ScreenName[]>(['authLanding']);
+  const [v_2167f0, v_da6fbe] = v_5ab095(false);
 
   const v_0f0c7b = v_8d490a[v_8d490a.length - 1];
   const v_640ccc = v_8d490a.length > 1 ? v_8d490a[v_8d490a.length - 2] : null;
+
+  v_c4deb2(() => {
+    const v_d0a230 = async () => {
+      try {
+        const v_efe339 = await v_e84827.getItem('rememberMe');
+        const v_0fd7ed = await v_e84827.getItem('isLoggedIn');
+
+        if (v_efe339 === 'true' && v_0fd7ed === 'true') {
+
+          console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
+          v_768005([v_ce4741.map]);
+        } else {
+
+          console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+        }
+      } catch (v_5e9bfe) {
+        console.error('[Navigation] 로그인 상태 확인 실패:', v_5e9bfe);
+      } finally {
+        v_da6fbe(true);
+      }
+    };
+
+    v_d0a230();
+  }, []);
 
   const v_9b57fc = v_de06a3((v_53746a) => {
     v_768005((v_ba2215) => {

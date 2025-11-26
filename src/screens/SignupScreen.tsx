@@ -5,7 +5,6 @@ import {
   v_472849,
   v_122070,
   v_326be8,
-  v_03e392,
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
@@ -21,6 +20,7 @@ import {
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_9553a4, v_6946fd } from '../constants';
 import {
   v_60e3a5,
@@ -32,12 +32,13 @@ import {
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
-type GenderValue = (typeof GENDER_OPTIONS)[number]['value'];
+type GenderValue = 'male' | 'female';
 type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const {
     selectedCountryDialCode: v_459d5e,
     selectedRegion: v_2f03bc,
@@ -63,20 +64,27 @@ export const v_f40fc5 = () => {
   const [v_91ca05, v_cbfe22] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
 
-  v_a3453e.useEffect(() => {
-    v_6dde2f(v_8d7bc8.familyName);
-    v_15ded5(v_8d7bc8.givenName);
-    v_fedf34(v_8d7bc8.email);
-    v_52b279(v_8d7bc8.password);
-    v_f768f9(v_8d7bc8.phoneNumber);
-    v_c030e3(v_8d7bc8.region);
-    v_fb6bbb(v_8d7bc8.referralEmail);
-    v_bdc43c(v_8d7bc8.gender);
-    v_64a312(v_8d7bc8.ageRange);
-    v_cbfe22(v_8d7bc8.termsAccepted);
-  }, []); 
+  const v_2ca208 = v_a3453e.useRef(false);
 
   v_a3453e.useEffect(() => {
+    if (!v_2ca208.current) {
+      v_6dde2f(v_8d7bc8.familyName);
+      v_15ded5(v_8d7bc8.givenName);
+      v_fedf34(v_8d7bc8.email);
+      v_52b279(v_8d7bc8.password);
+      v_f768f9(v_8d7bc8.phoneNumber);
+      v_c030e3(v_8d7bc8.region);
+      v_fb6bbb(v_8d7bc8.referralEmail);
+      v_bdc43c(v_8d7bc8.gender);
+      v_64a312(v_8d7bc8.ageRange);
+      v_cbfe22(v_8d7bc8.termsAccepted);
+      v_2ca208.current = true;
+    }
+  }, [v_8d7bc8]);
+
+  v_a3453e.useEffect(() => {
+    if (!v_2ca208.current) return;
+
     v_eee6b0({
       familyName: v_f142d8,
       givenName: v_a7c7b7,
@@ -100,38 +108,38 @@ export const v_f40fc5 = () => {
     v_c3eac4,
     v_f83808,
     v_91ca05,
-    v_eee6b0,
+
   ]);
 
   const v_585b02 = async () => {
 
     if (!v_91ca05) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
       return;
     }
 
     if (!v_f142d8.trim() || !v_a7c7b7.trim()) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
       return;
     }
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.emailRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.emailRequired'));
       return;
     }
 
     if (!v_adc076.trim() || v_adc076.length < 6) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordRequired'));
       return;
     }
 
     if (!v_3a6ac4.trim()) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
       return;
     }
 
     if (!v_2f03bc && !v_a6c30b.trim()) {
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
       return;
     }
 
@@ -143,7 +151,7 @@ export const v_f40fc5 = () => {
       const v_d854e8 = await v_60e3a5(v_e0c7e8.trim(), v_9b57fc);
 
       if (!v_d854e8) {
-        v_03e392.alert(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
+        await v_889fad(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
         v_e33ec0(false);
         return;
       }
@@ -156,28 +164,27 @@ export const v_f40fc5 = () => {
           v_65bdb1 = v_8aae3c;
         } else {
 
-          const v_411201 = await new Promise<boolean>((v_6f7712) => {
-            v_03e392.alert(
-              v_8d41d7('screens.signup.alerts.referralConfirm'),
-              v_8d41d7('screens.signup.errors.referralInvalid'),
-              [
-                {
-                  text: v_8d41d7('screens.signup.alerts.cancel'),
-                  style: 'cancel',
-                  onPress: () => {
-                    v_e33ec0(false);
-                    v_6f7712(false);
-                  },
+          const v_af3e48 = await v_889fad(
+            v_8d41d7('screens.signup.alerts.referralConfirm'),
+            v_8d41d7('screens.signup.errors.referralInvalid'),
+            [
+              {
+                text: v_8d41d7('screens.signup.alerts.cancel'),
+                style: 'cancel',
+                onPress: () => {
+                  v_e33ec0(false);
                 },
-                {
-                  text: v_8d41d7('screens.signup.alerts.continue'),
-                  onPress: () => v_6f7712(true),
-                },
-              ],
-            );
-          });
+              },
+              {
+                text: v_8d41d7('screens.signup.alerts.continue'),
+                onPress: () => {
 
-          if (!v_411201) {
+                },
+              },
+            ],
+          );
+
+          if (v_af3e48 === 0) {
             return;
           }
 
@@ -211,7 +218,7 @@ export const v_f40fc5 = () => {
       const v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
 
       if (!v_d0b446) {
-        v_03e392.alert(v_8d41d7('screens.signup.alerts.signupFailed'), v_8d41d7('screens.signup.errors.signupFailed'));
+        await v_889fad(v_8d41d7('screens.signup.alerts.signupFailed'), v_8d41d7('screens.signup.errors.signupFailed'));
         v_e33ec0(false);
         return;
       }
@@ -220,7 +227,7 @@ export const v_f40fc5 = () => {
       const v_7e280a = await v_9d2541(v_e0c7e8.trim(), v_adc076, v_9b57fc);
 
       if (!v_7e280a) {
-        v_03e392.alert(
+        await v_889fad(
           v_8d41d7('screens.signup.alerts.loginCheckFailed'),
           v_8d41d7('screens.signup.errors.loginCheckFailed'),
         );
@@ -230,7 +237,7 @@ export const v_f40fc5 = () => {
         return;
       }
 
-      v_03e392.alert(v_8d41d7('screens.signup.success.title'), v_8d41d7('screens.signup.success.message'), [
+      await v_889fad(v_8d41d7('screens.signup.success.title'), v_8d41d7('screens.signup.success.message'), [
         {
           text: v_8d41d7('screens.signup.success.confirm'),
           onPress: () => {
@@ -247,7 +254,7 @@ export const v_f40fc5 = () => {
         v_5e9bfe.response?.data?.message ||
         v_5e9bfe.message ||
         v_8d41d7('screens.signup.errors.error');
-      v_03e392.alert(v_8d41d7('screens.signup.alerts.error'), v_1744b9);
+      await v_889fad(v_8d41d7('screens.signup.alerts.error'), v_1744b9);
     } finally {
       v_e33ec0(false);
     }

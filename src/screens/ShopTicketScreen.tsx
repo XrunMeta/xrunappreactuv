@@ -1,10 +1,11 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_03e392, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_19b633 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5, v_2cf4d9 } from '../components';
+import { v_729608, v_b34ce5, v_2cf4d9, v_4c7b5d } from '../components';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
@@ -118,6 +119,7 @@ const v_3e6a6a = (
 
 export const v_38326c = () => {
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_11083e, v_94ee83] = v_5ab095<'ticket' | 'myTicket'>('ticket');
   const { navigate: v_9b57fc } = v_a0daa8();
   const { setSelectedShopItem: v_d0fbad } = v_700ef9();
@@ -277,12 +279,12 @@ export const v_38326c = () => {
         await v_a7da97(v_43c42e.data);
       } else {
         console.log('[상점] 상점 아이템 가져오기 실패:', v_43c42e);
-        v_03e392.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+        await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
         v_9a4b0a([]);
       }
     } catch (v_5e9bfe) {
       console.error('[상점] 상점 아이템 가져오기 오류:', v_5e9bfe);
-      v_03e392.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+      await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
       v_9a4b0a([]);
     } finally {
       v_34a50a(false);
@@ -353,49 +355,56 @@ export const v_38326c = () => {
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={v_d81136.wrapper}>
-            <SegmentedControl
-              options={v_1c4d31}
-              value={v_11083e}
-              onChange={v_42b5ed}
-              containerStyle={v_d81136.segmented}
-            />
-
-            <View style={v_d81136.searchBar}>
-              <Feather name="search" size={18} color="#bcbec4" />
-              <TextInput
-                style={v_d81136.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
+        <>
+          <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+            <View style={v_d81136.wrapper}>
+              <SegmentedControl
+                options={v_1c4d31}
+                value={v_11083e}
+                onChange={v_42b5ed}
+                containerStyle={v_d81136.segmented}
               />
+
+              <View style={v_d81136.searchBar}>
+                <Feather name="search" size={18} color="#bcbec4" />
+                <TextInput
+                  style={v_d81136.searchInput}
+                  placeholder="Search"
+                  placeholderTextColor="#bcbec4"
+                />
+              </View>
+
+              {v_11083e === 'ticket' && v_b1c029.length > 0
+                ? v_b1c029.map((v_8c0b26) => {
+
+                    const v_63070e = v_f9a2c9[v_8c0b26.id];
+                    const v_c322f7 = v_63070e
+                      ? { uri: `data:image/png;base64,${v_63070e}` }
+                      : v_8c0b26.image;
+
+                    const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+                    const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
+                    const v_e72b09 = v_d6cf14
+                      ? (v_817eee || 'Loading...')
+                      : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
+
+                    return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
+                  })
+                : v_11083e === 'ticket' && v_b1c029.length === 0
+                ? (
+                    <View style={v_d81136.emptyContainer}>
+                      <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                    </View>
+                  )
+                : null}
             </View>
+          </ScrollView>
 
-            {v_11083e === 'ticket' && v_b1c029.length > 0
-              ? v_b1c029.map((v_8c0b26) => {
-
-                  const v_63070e = v_f9a2c9[v_8c0b26.id];
-                  const v_c322f7 = v_63070e
-                    ? { uri: `data:image/png;base64,${v_63070e}` }
-                    : v_8c0b26.image;
-
-                  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
-                  const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                  const v_e72b09 = v_d6cf14
-                    ? (v_817eee || 'Loading...')
-                    : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
-
-                  return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
-                })
-              : v_11083e === 'ticket' && v_b1c029.length === 0
-              ? (
-                  <View style={v_d81136.emptyContainer}>
-                    <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                  </View>
-                )
-              : null}
+          {}
+          <View style={v_d81136.taboolaContainer}>
+            <TaboolaBanner placementType="shop" />
           </View>
-        </ScrollView>
+        </>
       )}
     </View>
   );
@@ -413,6 +422,7 @@ const v_d81136 = v_472849.create({
   },
   scrollContent: {
     paddingBottom: 40,
+    flexGrow: 1,
   },
   wrapper: {
     width: '100%',
@@ -450,5 +460,12 @@ const v_d81136 = v_472849.create({
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
+  },
+  taboolaContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
 });

@@ -5,7 +5,6 @@ import {
   v_122070,
   v_19b633,
   v_4623af,
-  v_03e392,
   v_326be8,
   v_39a996,
   v_5f4661,
@@ -18,6 +17,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_029bad } from '../types';
 import { v_97ad19, v_7b3801 } from '../services';
 import { v_e4a763 } from '../utils/env';
@@ -27,6 +27,7 @@ export const v_a1c4a5 = () => {
   const { selectedShopItem: v_dfe883 } = v_700ef9();
   const { navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const v_e74f9a = v_e662ae<any>(null);
 
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
@@ -62,12 +63,15 @@ export const v_a1c4a5 = () => {
       const v_43c42e = await v_97ad19(v_717992);
 
       if (v_43c42e && v_43c42e.status === 'success' && v_43c42e.data) {
-        const v_791474 = v_43c42e.data.find(v_8c0b26 => v_8c0b26.storage === v_6b1b52);
+
+        const v_791474 = v_43c42e.data.find(v_8c0b26 => String(v_8c0b26.storage) === String(v_6b1b52));
         if (v_791474) {
           v_41f285(v_791474);
           console.log('[티켓 상세] 티켓 데이터 새로고침 완료:', v_791474);
         } else {
           console.log('[티켓 상세] 해당 storageId와 일치하는 아이템을 찾을 수 없습니다:', v_6b1b52);
+          console.log('[티켓 상세] 디버깅 - storageId 타입:', typeof v_6b1b52, '값:', v_6b1b52);
+          console.log('[티켓 상세] 디버깅 - 첫 번째 아이템 storage 타입:', typeof v_43c42e.data[0]?.storage, '값:', v_43c42e.data[0]?.storage);
         }
       }
     } catch (v_5e9bfe) {
@@ -164,7 +168,7 @@ export const v_a1c4a5 = () => {
   const v_1de78e = v_116428();
   const v_2e72da = v_c811e3?.status || (v_dfe883 as any)?.status;
 
-  const v_2911e0 = v_2e72da == 10307 || v_2e72da === 10307;
+  const v_2911e0 = v_2e72da == 10306 || v_2e72da === 10306;
 
   console.log('[티켓 상세] === 상태 확인 ===');
   console.log('[티켓 상세] currentStatus:', v_2e72da);
@@ -180,18 +184,18 @@ export const v_a1c4a5 = () => {
     const v_281520 = v_c811e3?.txID || v_c811e3?.txid || v_c811e3?.transaction || v_cd1db8 || v_a94bd8;
 
     if (!v_281520) {
-      v_03e392.alert('오류', '복사할 티켓 번호가 없습니다.');
+      await v_889fad('오류', '복사할 티켓 번호가 없습니다.');
       return;
     }
 
     await v_fba5a0.setStringAsync(v_281520);
-    v_03e392.alert('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
+    await v_889fad('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
   };
 
   const v_434673 = async () => {
     const v_bffa41 = v_1de78e;
     if (!v_bffa41) {
-      v_03e392.alert('오류', '공유할 QR 코드가 없습니다.');
+      await v_889fad('오류', '공유할 QR 코드가 없습니다.');
       return;
     }
 
@@ -216,7 +220,7 @@ export const v_a1c4a5 = () => {
             });
           } catch (v_741f30) {
             console.error('[티켓 상세] QR 공유 대안 실패:', v_741f30);
-            v_03e392.alert('오류', 'QR 코드 공유에 실패했습니다.');
+            await v_889fad('오류', 'QR 코드 공유에 실패했습니다.');
           }
         }
       });
@@ -229,7 +233,7 @@ export const v_a1c4a5 = () => {
           title: '티켓 QR 코드',
         });
       } catch (v_741f30) {
-        v_03e392.alert('오류', 'QR 코드 공유에 실패했습니다.');
+        await v_889fad('오류', 'QR 코드 공유에 실패했습니다.');
       }
     }
   };
@@ -245,11 +249,11 @@ export const v_a1c4a5 = () => {
     console.log('[티켓 상세] ================');
 
     if (!v_717992 || !v_26c75d) {
-      v_03e392.alert('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${v_717992 || '없음'}\nstorageId: ${v_26c75d || '없음'}`);
+      await v_889fad('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${v_717992 || '없음'}\nstorageId: ${v_26c75d || '없음'}`);
       return;
     }
 
-    v_03e392.alert('삭제', '티켓을 삭제하시겠습니까?', [
+    await v_889fad('삭제', '티켓을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       { 
         text: '삭제', 
@@ -268,7 +272,7 @@ export const v_a1c4a5 = () => {
 
             if (v_43c42e.status === 'success') {
               console.log('[티켓 상세] 삭제 성공');
-              v_03e392.alert('삭제 완료', '티켓이 삭제되었습니다.', [
+              await v_889fad('삭제 완료', '티켓이 삭제되었습니다.', [
                 {
                   text: '확인',
                   onPress: () => {
@@ -279,7 +283,7 @@ export const v_a1c4a5 = () => {
               ]);
             } else {
               console.log('[티켓 상세] 삭제 실패:', v_43c42e.message);
-              v_03e392.alert('삭제 실패', v_43c42e.message || '티켓 삭제에 실패했습니다.');
+              await v_889fad('삭제 실패', v_43c42e.message || '티켓 삭제에 실패했습니다.');
             }
           } catch (v_5e9bfe) {
             console.error('[티켓 상세] === 티켓 삭제 오류 ===');
@@ -291,7 +295,7 @@ export const v_a1c4a5 = () => {
               console.error('[티켓 상세] 응답 데이터:', v_5e9bfe.response.data);
             }
             console.error('[티켓 상세] ====================');
-            v_03e392.alert('오류', `티켓 삭제 중 오류가 발생했습니다.\n${v_5e9bfe?.message || '알 수 없는 오류'}`);
+            await v_889fad('오류', `티켓 삭제 중 오류가 발생했습니다.\n${v_5e9bfe?.message || '알 수 없는 오류'}`);
           } finally {
             v_deef62(false);
           }

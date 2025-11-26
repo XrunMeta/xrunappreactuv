@@ -143,7 +143,7 @@ export const v_858bfa = {
       console.log(`[이미지 캐시] === 404 체크 포인트 ===`);
       console.log(`[이미지 캐시] 1. 백엔드 라우트 경로: ${v_09dafd}`);
       console.log(`[이미지 캐시] 2. fileId 존재 여부: ${v_bb51e2 ? '✅ 있음' : '❌ 없음'}`);
-      console.log(`[이미지 캐시] 3. 전체 요청 URL: ${fullUrl}`);
+      console.log(`[이미지 캐시] 3. 전체 요청 URL: ${v_ec0757}`);
 
       const v_9f42a4 = v_b5030f.create({
         baseURL: v_fed274, 
@@ -206,7 +206,7 @@ export const v_858bfa = {
         } else if (v_5e9bfe instanceof v_3333d3 && v_5e9bfe.request) {
 
           console.error(`[이미지 캐시] ❌ 네트워크 오류: 응답을 받지 못했습니다.`);
-          console.error(`[이미지 캐시] 요청 URL: ${fullUrl}`);
+          console.error(`[이미지 캐시] 요청 URL: ${v_ec0757}`);
         } else {
 
           console.error(`[이미지 캐시] ❌ 요청 설정 오류:`, v_5e9bfe.message);
@@ -238,7 +238,7 @@ export const v_858bfa = {
           if (v_7a5fef === 404) {
             console.error(`[이미지 캐시] === 404 에러 분석 (응답 body) ===`);
             console.error(`[이미지 캐시] 체크 포인트 1 - 백엔드 라우트 경로: ${v_09dafd}`);
-            console.error(`[이미지 캐시] 체크 포인트 2 - Postman으로 직접 테스트 필요: ${fullUrl}`);
+            console.error(`[이미지 캐시] 체크 포인트 2 - Postman으로 직접 테스트 필요: ${v_ec0757}`);
             console.error(`[이미지 캐시] 체크 포인트 3 - fileId 존재 여부: ${v_bb51e2 ? '✅ 있음' : '❌ 없음'}`);
             console.error(`[이미지 캐시] 가능한 원인:`);
             console.error(`[이미지 캐시]   - URL 형식이 잘못되었을 수 있습니다.`);
@@ -251,7 +251,7 @@ export const v_858bfa = {
 
       if (!v_43c42e.success || !v_43c42e.data) {
         console.error(`[이미지 캐시] 이미지 다운로드 응답 오류: ${v_bb51e2}`, v_43c42e);
-        console.error(`[이미지 캐시] 요청 URL: ${fullUrl}`);
+        console.error(`[이미지 캐시] 요청 URL: ${v_ec0757}`);
         return false;
       }
 

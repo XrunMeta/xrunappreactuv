@@ -18,6 +18,7 @@ export interface ShopItemCardProps {
   imageSource: v_07a341;
   onPress?: () => void;
   quantityLabel?: string;
+  quantityColor?: string;
   containerStyle?: v_961e77<v_7e4944>;
 }
 
@@ -28,6 +29,7 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
   imageSource: v_c322f7,
   onPress: v_719eed,
   quantityLabel: v_63f02c,
+  quantityColor: v_ca637d,
   containerStyle: v_4affe9,
 }) => {
   const [v_e3c18f, v_e6d26a] = v_5ab095(false);
@@ -65,7 +67,11 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
         {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
         <Text style={v_d81136.price}>{v_5b0162}</Text>
       </View>
-      {v_63f02c ? <Text style={v_d81136.quantity}>{v_63f02c}</Text> : null}
+      {v_63f02c ? (
+        <Text style={[v_d81136.quantity, v_ca637d ? { color: v_ca637d } : null]}>
+          {v_63f02c}
+        </Text>
+      ) : null}
     </TouchableOpacity>
   );
 };

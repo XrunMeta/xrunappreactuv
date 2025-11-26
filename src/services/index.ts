@@ -2846,6 +2846,7 @@ export const v_7b3801 = async (
     console.log('[상점] 구매한 아이템 삭제 요청:', { member: v_660822, storage: v_dbd01d });
 
     const v_f69c4d = [
+      '/deleteXrunItem', 
       '/app4000-04-delete', 
       '/app4000-04delete',   
       '/deleteXrunPurchasedItem', 
