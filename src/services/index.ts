@@ -270,6 +270,31 @@ export const sendAliveSignal = async (
   }
 };
 
+export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const response = await nodeGatewayRequest('/app-config/ios-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data?.data?.iosOnWallet ?? false;
+  } catch (error) {
+    console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
+    return false; 
+  }
+};
+
 const createAxiosInstance = (navigation?: any) => {
   const env = getEnv();
   const baseURL = env.GATEWAY_NODEJS;
