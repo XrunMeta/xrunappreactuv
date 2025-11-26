@@ -1,0 +1,22 @@
+export default {
+  confirmTitle: '토큰 추가 확인',
+  tokenTab: 'Token',
+  contractTab: 'Contract',
+  contractPlaceholder: '컨트랙트 주소를 입력하세요',
+  nextButton: 'Next',
+  contractAddress: '컨트랙트 주소',
+  tokenName: '토큰 이름',
+  tokenSymbol: '토큰 심볼',
+  tokenDecimals: '소수점 자릿수',
+  addButton: '토큰 추가',
+  alreadyOwned: '이미 보유 중',
+  invalidTokenTitle: '유효하지 않은 토큰',
+  invalidTokenDesc: '이 토큰은 유효한 ERC20 토큰이 아닙니다.',
+  existTokenTitle: '이미 존재하는 토큰',
+  existTokenDesc: '이 토큰은 이미 지갑에 추가되어 있습니다.',
+  success: '성공',
+  successMessage: '토큰이 성공적으로 추가되었습니다.',
+  error: '오류',
+  errorMessage: '토큰 추가에 실패했습니다. 다시 시도해주세요.',
+};
+

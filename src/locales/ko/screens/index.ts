@@ -45,4 +45,5 @@ export { default as shopSuccess } from './shopSuccess';
 export { default as shopTicketDetail } from './shopTicketDetail';
 export { default as showNapAd } from './showNapAd';
 export { default as advertiseScreen } from './advertiseScreen';
+export { default as addToken } from './addToken';
 

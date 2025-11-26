@@ -98,6 +98,12 @@ import {
   GetRankRequest,
   GetRankResponse,
   GetRankSpesificRequest,
+  WalletData,
+  WalletDataResponse,
+  OtherChainsStatusResponse,
+  ADXRUNTopBannersResponse,
+  TokenBalanceResponse,
+  ERC20TokenCheckResponse,
   GetRankSpesificResponse,
   GetMyGroupRequest,
   GetMyGroupResponse,
@@ -2905,6 +2911,194 @@ export const deleteXrunPurchasedItem = async (
     console.error('[상점] 구매한 아이템 삭제 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchWalletData = async (
+  member: number | string,
+  daysbefore: number = 7,
+  navigation?: any,
+): Promise<WalletDataResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      daysbefore,
+    };
+
+    console.log('[지갑] 지갑 데이터 조회 요청:', { member, daysbefore });
+
+    const response = await axiosInstance.post<WalletDataResponse>(
+      '/app4000-01-rev-01',
+      requestBody,
+    );
+
+    console.log('[지갑] 지갑 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 지갑 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchOtherChainsStatus = async (
+  member: number | string,
+  navigation?: any,
+): Promise<OtherChainsStatusResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[지갑] 다른 체인 상태 조회 요청:', { member });
+
+    const response = await axiosInstance.post<OtherChainsStatusResponse>(
+      '/showOtherChains',
+      requestBody,
+    );
+
+    console.log('[지갑] 다른 체인 상태 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 다른 체인 상태 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchADXRUNTopBanners = async (
+  member: number | string,
+  navigation?: any,
+): Promise<ADXRUNTopBannersResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+    };
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 요청:', { member });
+
+    const response = await axiosInstance.post<ADXRUNTopBannersResponse>(
+      '/ap4000-adxrun-topbanners',
+      requestBody,
+    );
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] AD XRUN 배너 데이터 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchTokenBalance = async (
+  address: string,
+  contract: string,
+  currency: number,
+  navigation?: any,
+): Promise<TokenBalanceResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      address,
+      contract,
+      currency,
+    };
+
+    console.log('[지갑] 토큰 잔액 조회 요청:', { address, contract, currency });
+
+    const response = await axiosInstance.post<TokenBalanceResponse>(
+      '/refreshBalancesCommon',
+      requestBody,
+    );
+
+    console.log('[지갑] 토큰 잔액 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] 토큰 잔액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const checkERC20Token = async (
+  contract: string,
+  currency: number,
+  navigation?: any,
+): Promise<ERC20TokenCheckResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      contract,
+      currency,
+    };
+
+    console.log('[지갑] ERC20 토큰 검증 요청:', { contract, currency });
+
+    const response = await axiosInstance.post<ERC20TokenCheckResponse>(
+      '/checkERC20Token',
+      requestBody,
+    );
+
+    console.log('[지갑] ERC20 토큰 검증 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[지갑] ERC20 토큰 검증 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[지갑] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

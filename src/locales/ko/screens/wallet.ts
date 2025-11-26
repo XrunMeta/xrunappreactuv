@@ -4,8 +4,13 @@ export default {
   myBalance: 'My Balance',
   addToken: 'add token',
   polygonScan: 'PolygonScan',
+  etherscan: 'Etherscan',
   receive: 'Receive',
   send: 'Send',
   preparing: '준비 중',
   preparingMessage: '기능은 아직 준비 중입니다.',
+  loading: '로딩 중...',
+  error: '오류',
+  missingInfo: '필수 정보가 누락되었습니다.',
+  addressNotLoaded: '지갑 주소가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.',
 };
