@@ -93,6 +93,8 @@ import {
   GetRankResponse,
   GetRankSpesificRequest,
   GetRankSpesificResponse,
+  GetMyGroupRequest,
+  GetMyGroupResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -2101,6 +2103,40 @@ export const getRankSpesific = async (
     console.error('[Rank] 사용자 순위 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[Rank] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyGroup = async (
+  member: string,
+  navigation?: any,
+): Promise<GetMyGroupResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyGroupRequest = { member };
+
+    console.log('[내 그룹] 내 그룹 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyGroupResponse>(
+      '/getMyGroup',
+      request,
+    );
+
+    console.log('[내 그룹] 내 그룹 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[내 그룹] 내 그룹 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[내 그룹] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

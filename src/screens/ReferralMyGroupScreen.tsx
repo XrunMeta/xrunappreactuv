@@ -6,21 +6,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { useAppContext } from '../context';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
-import { getRecommendedToMe } from '../services';
-import { RecommendedToMeItem } from '../types';
+import { getMyGroup } from '../services';
+import { MyGroupItem } from '../types';
 
 interface MemberData {
   rank: number;
   email: string;
   date: string;
+  member: string; 
   highlight?: boolean;
 }
 
 export const ReferralMyGroupScreen = () => {
   const { navigate } = useAppNavigation();
+  const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
-  const [memberId, setMemberId] = useState<number | null>(null);
+  const [memberId, setMemberId] = useState<string | null>(null);
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [allMembers, setAllMembers] = useState<MemberData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,9 +36,10 @@ export const ReferralMyGroupScreen = () => {
       try {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          if (userData.member) {
-            setMemberId(userData.member);
+        const userData = JSON.parse(userDataStr);
+        if (userData.member) {
+
+          setMemberId(String(userData.member));
 
             hasLoadedRef.current = false;
             setAllMembers([]);
@@ -62,16 +66,38 @@ export const ReferralMyGroupScreen = () => {
         isLoadingRef.current = true;
 
         try {
-          const response = await getRecommendedToMe(memberId, navigate);
+          const response = await getMyGroup(memberId, navigate);
 
           if (response.status === 'success' && response.data) {
 
-            const members: MemberData[] = response.data.map((item, index) => ({
-              rank: index + 1,
-              email: item.masked_email || item.email || '',
-              date: '', 
-              highlight: index === 0, 
-            }));
+            const members: MemberData[] = response.data.map((item: MyGroupItem, index: number) => {
+
+              let formattedDate = '';
+              try {
+                const dateString = item.datejoin.replace(' ', 'T');
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                  console.log('[내 그룹] 잘못된 날짜:', item.datejoin);
+                  formattedDate = '';
+                } else {
+                  formattedDate = date
+                    .toISOString()
+                    .split('T')[0]
+                    .replace(/-/g, '.');
+                }
+              } catch (error) {
+                console.log('[내 그룹] 날짜 파싱 오류:', item.datejoin, error);
+                formattedDate = '';
+              }
+
+              return {
+                rank: index + 1,
+                email: item.email || '',
+                date: formattedDate,
+                member: item.member || '',
+                highlight: index === 0, 
+              };
+            });
 
             membersDataRef.current = members;
             setAllMembers(members);
@@ -180,7 +206,10 @@ export const ReferralMyGroupScreen = () => {
               ItemComponent={ReferralMemberRow}
               pageSize={20}
               keyExtractor={(item, index) => `member-${item.rank}-${item.email}-${index}`}
-              onItemPress={() => navigate(ROUTES.referralDepthOne)}
+              onItemPress={(item) => {
+                setSelectedReferralMember({ member: item.member, email: item.email });
+                navigate(ROUTES.referralDepthOne);
+              }}
               contentContainerStyle={styles.listContent}
             />
           )}

@@ -642,3 +642,19 @@ export interface GetRankSpesificResponse {
   message?: string;
 }
 
+export interface MyGroupItem {
+  member: string; 
+  email: string; 
+  datejoin: string; 
+}
+
+export interface GetMyGroupRequest {
+  member: string; 
+}
+
+export interface GetMyGroupResponse {
+  status: 'success' | 'error';
+  data: MyGroupItem[];
+  message?: string;
+}
+
