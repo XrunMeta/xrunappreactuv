@@ -28,7 +28,8 @@ export const AliveService: v_a3453e.FC = () => {
         v_fd5a46(0);
         v_0917d2.current = 0;
 
-        if (v_3393e3.emergencyStop?.enabled) {
+        if (v_3393e3.emergencyStop?.enabled === true) {
+
           v_69fcdc({
             enabled: true,
             message: v_3393e3.emergencyStop.message,
