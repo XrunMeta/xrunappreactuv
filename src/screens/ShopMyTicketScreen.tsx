@@ -19,9 +19,15 @@ const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any):
 
   const quantityLabel = item.status === 10306 ? t('screens.shopMyTicket.available') : t('screens.shopMyTicket.used');
 
-  const uniqueId = item.txID 
-    ? `${item.item}_${item.txID}_${index}` 
-    : `${item.item}_${index}_${Math.random().toString(36).substr(2, 9)}`;
+  const storageStr = item.storage ? String(item.storage) : null;
+  const txIDStr = item.txID ? String(item.txID) : null;
+  const itemStr = String(item.item);
+
+  const uniqueId = storageStr 
+    ? `storage_${storageStr}_idx_${index}` 
+    : txIDStr 
+    ? `txID_${txIDStr}_item_${itemStr}_idx_${index}` 
+    : `item_${itemStr}_idx_${index}`;
 
   return {
 
