@@ -237,7 +237,12 @@ export const sendAliveSignal = async (
         success: true,
       };
 
-      if (serverResponse.data.emergency_info) {
+      if (serverResponse.data.server_status === 'health') {
+
+        result.emergencyStop = {
+          enabled: false,
+        };
+      } else if (serverResponse.data.emergency_info) {
 
         result.emergencyStop = {
           enabled: true,
@@ -262,6 +267,31 @@ export const sendAliveSignal = async (
       throw error;
     }
     throw error;
+  }
+};
+
+export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const response = await nodeGatewayRequest('/app-config/ios-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data?.data?.iosOnWallet ?? false;
+  } catch (error) {
+    console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
+    return false; 
   }
 };
 
