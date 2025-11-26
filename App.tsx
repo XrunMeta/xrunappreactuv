@@ -11,6 +11,7 @@ import {
   v_086cde,
   v_667a00,
   v_952e24,
+  v_f87488,
   v_94455f,
   v_ab7114,
   v_7c7410,
@@ -114,6 +115,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'adHistory') {
     return <AdWalletScreen />;
+  }
+
+  if (v_0f0c7b === 'walletDetail') {
+    return <WalletDetailScreen />;
   }
 
   if (v_0f0c7b === 'transactionDetails') {

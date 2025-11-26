@@ -1,7 +1,7 @@
 
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
-import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302 } from '../types';
+import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
 import { v_202d44, v_52495e } from '../constants';
 
 type AppContextValue = {
@@ -54,6 +54,9 @@ type AppContextValue = {
   advertisementParams: v_fa3302 | null;
   setAdvertisementParams: (params: v_fa3302 | null) => void;
   resetAdvertisementParams: () => void;
+  selectedWalletAsset: v_5681b1 | null;
+  setSelectedWalletAsset: (asset: v_5681b1 | null) => void;
+  resetSelectedWalletAsset: () => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -86,6 +89,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     termsAccepted: true,
   });
   const [v_d0b6d4, v_d48a26] = v_5ab095<v_fa3302 | null>(null);
+  const [v_ea6a7a, v_84bd3c] = v_5ab095<v_5681b1 | null>(null);
 
   const v_3b402b = v_df9f57(
     () => ({
@@ -141,6 +145,9 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       advertisementParams: v_d0b6d4,
       setAdvertisementParams: v_d48a26,
       resetAdvertisementParams: () => v_d48a26(null),
+      selectedWalletAsset: v_ea6a7a,
+      setSelectedWalletAsset: v_84bd3c,
+      resetSelectedWalletAsset: () => v_84bd3c(null),
     }),
     [
       v_ee27aa,
@@ -157,6 +164,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_479a37,
       v_8d7bc8,
       v_d0b6d4,
+      v_ea6a7a,
     ],
   );
 
