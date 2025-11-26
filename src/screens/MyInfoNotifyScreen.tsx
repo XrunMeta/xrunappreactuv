@@ -333,8 +333,8 @@ export const MyInfoNotifyScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <View style={styles.container}>
         <StatusBar style="dark" />
@@ -363,6 +363,7 @@ export const MyInfoNotifyScreen = () => {
             style={styles.list}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -420,8 +421,9 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 120,
+    paddingBottom: 0,
     gap: 24,
+    flexGrow: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -562,11 +564,19 @@ const styles = StyleSheet.create({
     borderColor: '#edeced',
     backgroundColor: '#fff',
     paddingHorizontal: 12,
+    paddingVertical: 12,
+    minHeight: 48,
+    maxHeight: 48,
+    justifyContent: 'center',
   },
   input: {
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
+    minHeight: 24,
+    maxHeight: 24,
+    padding: 0,
+    margin: 0,
   },
   sendButton: {
     backgroundColor: '#33395b',
