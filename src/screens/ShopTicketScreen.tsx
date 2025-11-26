@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl, ShopItemCard } from '../components';
+import { Header, SegmentedControl, ShopItemCard, TaboolaBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
@@ -353,49 +353,56 @@ export const ShopTicketScreen = () => {
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.wrapper}>
-            <SegmentedControl
-              options={segmentedOptions}
-              value={tab}
-              onChange={handleTabChange}
-              containerStyle={styles.segmented}
-            />
-
-            <View style={styles.searchBar}>
-              <Feather name="search" size={18} color="#bcbec4" />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
+        <>
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <View style={styles.wrapper}>
+              <SegmentedControl
+                options={segmentedOptions}
+                value={tab}
+                onChange={handleTabChange}
+                containerStyle={styles.segmented}
               />
+
+              <View style={styles.searchBar}>
+                <Feather name="search" size={18} color="#bcbec4" />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  placeholderTextColor="#bcbec4"
+                />
+              </View>
+
+              {tab === 'ticket' && shopItems.length > 0
+                ? shopItems.map((item) => {
+
+                    const itemImage = itemImages[item.id];
+                    const imageSource = itemImage
+                      ? { uri: `data:image/png;base64,${itemImage}` }
+                      : item.image;
+
+                    const hasSku = item.sku && item.sku.trim() !== '';
+                    const iapPrice = hasSku ? getIapPrice(item.sku) : null;
+                    const displayPrice = hasSku
+                      ? (iapPrice || 'Loading...')
+                      : formatCurrency(item.priceKRW || '0', 'KRW');
+
+                    return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
+                  })
+                : tab === 'ticket' && shopItems.length === 0
+                ? (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                    </View>
+                  )
+                : null}
             </View>
+          </ScrollView>
 
-            {tab === 'ticket' && shopItems.length > 0
-              ? shopItems.map((item) => {
-
-                  const itemImage = itemImages[item.id];
-                  const imageSource = itemImage
-                    ? { uri: `data:image/png;base64,${itemImage}` }
-                    : item.image;
-
-                  const hasSku = item.sku && item.sku.trim() !== '';
-                  const iapPrice = hasSku ? getIapPrice(item.sku) : null;
-                  const displayPrice = hasSku
-                    ? (iapPrice || 'Loading...')
-                    : formatCurrency(item.priceKRW || '0', 'KRW');
-
-                  return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
-                })
-              : tab === 'ticket' && shopItems.length === 0
-              ? (
-                  <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                  </View>
-                )
-              : null}
+          {}
+          <View style={styles.taboolaContainer}>
+            <TaboolaBanner placementType="shop" />
           </View>
-        </ScrollView>
+        </>
       )}
     </View>
   );
@@ -413,6 +420,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 40,
+    flexGrow: 1,
   },
   wrapper: {
     width: '100%',
@@ -450,5 +458,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
+  },
+  taboolaContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
 });

@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header } from '../components';
+import { Header, TaboolaBanner } from '../components';
 import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout } from '../services';
@@ -220,9 +220,8 @@ export const MyInfoScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
-          <View style={styles.adBanner}>
-            <Text style={styles.adText}>AD</Text>
-          </View>
+          {}
+          <TaboolaBanner placementType="myinfo" />
 
           <View style={styles.profileCard}>
             <View>

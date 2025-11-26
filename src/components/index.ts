@@ -28,3 +28,7 @@ export { ChoiceDialog } from './ChoiceDialog';
 export type { ChoiceDialogRef, ChoiceDialogStep } from './ChoiceDialog';
 export { MapBottomPanel } from './MapBottomPanel';
 export { LanguageSelector } from './LanguageSelector';
+export { TaboolaBanner } from './TaboolaBanner';
+export { TaboolaVignette } from './TaboolaVignette';
+export { TaboolaNativeView } from './TaboolaNativeView';
+export { isTaboolaNativeViewAvailable } from './TaboolaNativeView';

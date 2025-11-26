@@ -2,13 +2,27 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { PrimaryButton, SecondaryButton } from '../components';
+import { WebView } from 'react-native-webview';
+import { PrimaryButton, SecondaryButton, TaboolaNativeView, isTaboolaNativeViewAvailable } from '../components';
+import { getTaboolaPlacement, getTaboolaPublisherId, getTaboolaPageUrl, TABOOLA_PLACEMENTS, generateTaboolaHTML } from '../services/taboola';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
+
+  const placement = getTaboolaPlacement('apploading', true);
+  const config = TABOOLA_PLACEMENTS[placement];
+  const pageUrl = getTaboolaPageUrl();
+  const publisherId = getTaboolaPublisherId();
+
+  console.log('[LoginSignupScreen] Taboola 설정:', {
+    placement,
+    publisherId,
+    pageUrl,
+    isNativeAvailable: isTaboolaNativeViewAvailable(),
+  });
 
   const handleLogin = () => {
     navigate(ROUTES.login);
@@ -39,7 +53,63 @@ export const LoginSignupScreen = () => {
       >
         {}
         <View style={styles.adContainer}>
-          <Text style={styles.adText}>{t('screens.loginSignup.adText')}</Text>
+          {isTaboolaNativeViewAvailable() ? (
+            <TaboolaNativeView
+              publisherId={getTaboolaPublisherId()}
+              placement={config.placement}
+              mode={config.mode}
+              pageUrl={pageUrl}
+              pageType={config.pageType}
+              targetType={config.targetType}
+              style={styles.adWebView}
+            />
+          ) : (
+            <WebView
+              source={{
+                html: generateTaboolaHTML(
+                  publisherId,
+                  config.placement,
+                  config.mode,
+                  pageUrl,
+                  config.pageType,
+                  config.targetType,
+                ),
+              }}
+              style={styles.adWebView}
+              scrollEnabled={true}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={false}
+              backgroundColor="#ffffff"
+              allowsInlineMediaPlayback={true}
+              mediaPlaybackRequiresUserAction={false}
+              mixedContentMode="always"
+              originWhitelist={['*']}
+              thirdPartyCookiesEnabled={true}
+              sharedCookiesEnabled={true}
+              userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+              onLoadStart={() => {
+                console.log('[LoginSignupScreen] Taboola WebView 로드 시작');
+              }}
+              onLoadEnd={() => {
+                console.log('[LoginSignupScreen] Taboola WebView 로드 완료');
+              }}
+              onError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.error('[LoginSignupScreen] Taboola WebView 오류:', nativeEvent);
+              }}
+              onMessage={(event) => {
+                try {
+                  const data = JSON.parse(event.nativeEvent.data);
+                  console.log('[LoginSignupScreen] Taboola WebView 메시지:', data);
+                } catch (e) {
+                  console.log('[LoginSignupScreen] Taboola WebView 원시 메시지:', event.nativeEvent.data);
+                }
+              }}
+            />
+          )}
         </View>
 
         {}
@@ -100,18 +170,18 @@ const styles = StyleSheet.create({
   adContainer: {
     width: '100%',
     height: 393,
-    backgroundColor: '#d9d9d9',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 44, 
     alignSelf: 'center',
+    overflow: 'hidden',
   },
-  adText: {
-    fontSize: 30,
-    fontWeight: '500',
-    color: COLORS.text,
-    fontFamily: 'Roboto-Medium',
+  adWebView: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ffffff',
   },
   buttonContainer: {
     width: '100%',
