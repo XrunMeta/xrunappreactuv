@@ -781,3 +781,121 @@ export interface SetRecommenderResponse {
   status: 'success' | 'error';
   message?: string;
 }
+
+export interface GetXRUNGopaxPriceRequest {
+
+}
+
+export interface GetXRUNGopaxPriceResponse {
+  status: 'success' | 'error';
+  data: {
+    gopaxPrice: number; 
+  };
+  message?: string;
+}
+
+export interface GetUserBalanceRequest {
+  member: string; 
+}
+
+export interface GetUserBalanceResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data: {
+    realtimeBalance: {
+      balance: string; 
+      lastUpdated: string;
+      success: boolean;
+    };
+  };
+  message?: string;
+}
+
+export interface GetXrunBuyableItemsRequest {
+  member: string; 
+}
+
+export interface ShopItemData {
+  item: number; 
+  title: string; 
+  description: string; 
+  image: string; 
+  thumbnail: string; 
+  priceKRW: string; 
+  priceXrun: string; 
+  isxrunbuy: number | { data?: number }; 
+  gpkrprice: number | { data?: number }; 
+  gtkrPrice?: number | { data?: number }; 
+  sku: string; 
+  type: string; 
+  unit: string; 
+  total_purchased?: number; 
+  terms?: number; 
+  [key: string]: any; 
+}
+
+export interface GetXrunBuyableItemsResponse {
+  status: 'success' | 'error';
+  data: ShopItemData[];
+  message?: string;
+}
+
+export interface GetXrunPurchasedItemsRequest {
+  member: string; 
+}
+
+export interface PurchasedItemData {
+  item: number; 
+  title: string; 
+  description: string; 
+  storage: string; 
+  status: number; 
+  txID: string; 
+  icon: string; 
+  [key: string]: any; 
+}
+
+export interface GetXrunPurchasedItemsResponse {
+  status: 'success' | 'error';
+  data: PurchasedItemData[];
+  message?: string;
+}
+
+export interface PurchaseXrunItemRequest {
+  member: string; 
+  item: number; 
+  amount: string; 
+}
+
+export interface PurchaseXrunItemResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: any; 
+  message?: string;
+}
+
+export interface SaveInappPurchaseLogRequest {
+  status: string; 
+  member: string; 
+}
+
+export interface SaveInappPurchaseLogResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: Array<{
+    affectedRows?: number; 
+  }>;
+  message?: string;
+}
+
+export interface DeleteXrunPurchasedItemRequest {
+  member: string; 
+  storage: string; 
+}
+
+export interface DeleteXrunPurchasedItemResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: any; 
+  message?: string;
+}

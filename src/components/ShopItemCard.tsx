@@ -1,4 +1,4 @@
-import v_a3453e from 'bapkr';
+import v_a3453e, { v_5ab095 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -30,6 +30,18 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
   quantityLabel: v_63f02c,
   containerStyle: v_4affe9,
 }) => {
+  const [v_e3c18f, v_e6d26a] = v_5ab095(false);
+  const [v_f904ba, v_0cc1b6] = v_5ab095(false);
+
+  v_a3453e.useEffect(() => {
+    if (typeof v_c322f7 === 'object' && 'uri' in v_c322f7) {
+      v_0cc1b6(true);
+    }
+  }, [v_c322f7]);
+
+  const v_ad411c = require('../../assets/xrun-horizontal-logo.png');
+  const v_a4d130 = v_e3c18f ? v_ad411c : v_c322f7;
+
   return (
     <TouchableOpacity
       style={[v_d81136.card, v_4affe9]}
@@ -38,7 +50,15 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
       disabled={!v_719eed}
     >
       <View style={v_d81136.logoWrapper}>
-        <Image source={v_c322f7} style={v_d81136.logo} resizeMode="contain" />
+        <Image
+          source={v_a4d130}
+          style={v_d81136.logo}
+          resizeMode="contain"
+          onError={() => {
+            console.log('[ShopItemCard] 이미지 로딩 실패:', v_f904ba ? (v_c322f7 as { uri: string }).uri : 'local');
+            v_e6d26a(true);
+          }}
+        />
       </View>
       <View style={v_d81136.infoWrapper}>
         <Text style={v_d81136.title}>{v_9f1622}</Text>
@@ -110,5 +130,4 @@ const v_d81136 = v_472849.create({
     alignSelf: 'center',
   },
 });
-
 
