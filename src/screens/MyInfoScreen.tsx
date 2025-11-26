@@ -5,7 +5,6 @@ import {
   v_472849,
   v_122070,
   v_4623af,
-  v_5f4661,
   v_03e392,
   v_39a996,
 } from 'rcmrninabrnb';
@@ -13,10 +12,11 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2 } from '../services';
 import { v_700ef9 } from '../context';
+import { v_a3bbf0 } from '../utils';
 
 type CardConfig = {
   id: string;
@@ -127,15 +127,11 @@ export const v_03a231 = () => {
   };
 
   const v_22cd2d = async () => {
-    try {
-      const v_1833e7 = v_bb789b?.name || '사용자';
-      const v_e0c7e8 = v_bb789b?.email || '';
-      await v_5f4661.share({
-        message: `${v_1833e7} • ${v_e0c7e8}`,
-      });
-    } catch (v_5e9bfe) {
-      console.warn(v_5e9bfe);
+    if (!v_bb789b?.email) {
+      v_03e392.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      return;
     }
+    await v_a3bbf0(v_4922a9, { email: v_bb789b.email }, v_9b57fc);
   };
 
   const v_06b8a4 = () => {
