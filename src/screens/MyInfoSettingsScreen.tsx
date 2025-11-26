@@ -1,12 +1,15 @@
-import v_a3453e from 'bapkr';
+import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
-import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_772971 } from 'jmpfvteuuztnp';
+import { v_729608, v_073f91 } from '../components';
+import { v_1bfbd0, v_731ab4 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
+  const [v_7b4f11, v_7f8510] = v_5ab095(false);
 
   return (
     <View style={v_d81136.container}>
@@ -17,6 +20,15 @@ export const v_4a40b2 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
+          {v_731ab4 && (
+            <TouchableOpacity
+              style={v_d81136.card}
+              activeOpacity={0.85}
+              onPress={() => v_7f8510(true)}
+            >
+              <Text style={v_d81136.cardText}>🌐 언어 선택 (개발 모드)</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
@@ -26,6 +38,12 @@ export const v_4a40b2 = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {v_731ab4 && (
+        <LanguageSelector
+          visible={v_7b4f11}
+          onClose={() => v_7f8510(false)}
+        />
+      )}
     </View>
   );
 };

@@ -7,6 +7,7 @@ import {
   v_3094a2,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_ecee91 } from '../components';
 import { v_a0daa8 } from '../navigation';
@@ -15,6 +16,7 @@ import { v_1bfbd0, v_202d44, v_52495e } from '../constants';
 import { v_da1883 } from '../types';
 
 export const v_379bd1 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const {
     selectedCountryDialCode: v_459d5e,
@@ -62,14 +64,14 @@ export const v_379bd1 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title={v_479a37 === 'region' ? '지역 선택' : '국가 선택'}
+        title={v_479a37 === 'region' ? v_8d41d7('screens.countryCodeSelect.regionSelectTitle') : v_8d41d7('screens.countryCodeSelect.countrySelectTitle')}
         showBackButton
         onBackPress={v_c7ac57}
       />
       <View style={v_d81136.content}>
         {v_c6e76b && (
           <View style={v_d81136.currentSection}>
-            <Text style={v_d81136.sectionLabel}>현재 선택</Text>
+            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.countryCodeSelect.currentSelection')}</Text>
             <View style={v_d81136.currentCard}>
               <View style={v_d81136.flagCircle}>
                 <Text style={v_d81136.flagEmoji}>{v_c6e76b.flagEmoji}</Text>
@@ -90,7 +92,7 @@ export const v_379bd1 = () => {
             style={v_d81136.searchInput}
             value={v_7c5791}
             onChangeText={v_c57190}
-            placeholder={v_479a37 === 'region' ? '지역을 검색하세요' : '국가를 검색하세요'}
+            placeholder={v_479a37 === 'region' ? v_8d41d7('screens.countryCodeSelect.regionSearchPlaceholder') : v_8d41d7('screens.countryCodeSelect.countrySearchPlaceholder')}
             placeholderTextColor="#c4c7d1"
             autoCapitalize="none"
             autoCorrect={false}
@@ -112,7 +114,7 @@ export const v_379bd1 = () => {
           keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View style={v_d81136.emptyState}>
-              <Text style={v_d81136.emptyText}>검색 결과가 없습니다.</Text>
+              <Text style={v_d81136.emptyText}>{v_8d41d7('screens.countryCodeSelect.noResults')}</Text>
             </View>
           }
         />

@@ -27,6 +27,7 @@ interface TransactionDetailsScreenProps {
 }
 
 export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8 }) => {
+  const { t: v_8d41d7 } = useTranslation();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const v_5ab5bd = v_9390e8 ?? v_421f30;
   const v_17af98 = v_14af53(v_5ab5bd.title, v_5ab5bd.subtitle);
@@ -34,24 +35,24 @@ export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Transaction" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.transactionDetails.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.cardGroup}>
-          <InfoCard label="From" value={v_5ab5bd.from} />
-          <InfoCard label="To" value={v_5ab5bd.to} />
-          <InfoCard label="Time" value={v_5ab5bd.timestamp} />
-          <InfoCard label="TX Hash" value={v_5ab5bd.txHash} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.from')} value={v_5ab5bd.from} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.to')} value={v_5ab5bd.to} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.time')} value={v_5ab5bd.timestamp} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.txHash')} value={v_5ab5bd.txHash} />
         </View>
 
-        <Text style={v_d81136.sectionTitle}>Transaction Details</Text>
+        <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.transactionDetails.transactionDetails')}</Text>
 
         <View style={v_d81136.cardGroup}>
-          <InfoCard label="Nonce" value={v_5ab5bd.nonce ?? '-'} />
-          <InfoCard label="Gas Price" value={v_5ab5bd.gasPrice ?? '-'} />
-          <InfoCard label="Used Gas" value={v_5ab5bd.usedGas ?? '-'} />
-          <InfoCard label="Max Gas" value={v_5ab5bd.maxGas ?? '-'} />
-          <InfoCard label="Total Spent" value={v_5ab5bd.totalSpent ?? '-'} />
-          <InfoCard label="Block Height" value={v_5ab5bd.blockHeight ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.nonce')} value={v_5ab5bd.nonce ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.gasPrice')} value={v_5ab5bd.gasPrice ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.usedGas')} value={v_5ab5bd.usedGas ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.maxGas')} value={v_5ab5bd.maxGas ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.totalSpent')} value={v_5ab5bd.totalSpent ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.blockHeight')} value={v_5ab5bd.blockHeight ?? '-'} />
         </View>
 
         <ExplorerBadge

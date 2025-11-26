@@ -3,6 +3,7 @@ import { v_3094a2, v_472849, v_122070, v_79c4f2, v_39a996, v_19b633 } from 'rcmr
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_b34ce5, v_2cf4d9, v_c2fdd1 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -12,11 +13,11 @@ import { v_029bad } from '../types';
 import { v_858bfa } from '../utils/imageCache';
 import { v_1bfbd0 } from '../constants';
 
-const v_c59b9f = (item: v_029bad, v_a56041): v_745d71 => {
+const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
 
   const v_c322f7 = require('../../assets/images/icon_shop.png');
 
-  const v_63f02c = v_8c0b26.status === 10307 ? '사용 가능' : '사용 완료';
+  const v_63f02c = v_8c0b26.status === 10307 ? v_8d41d7('screens.shopMyTicket.available') : v_8d41d7('screens.shopMyTicket.used');
 
   const v_6c35f6 = v_8c0b26.txID 
     ? `${v_8c0b26.item}_${v_8c0b26.txID}_${v_a56041}` 
@@ -35,6 +36,7 @@ const v_c59b9f = (item: v_029bad, v_a56041): v_745d71 => {
 
 export const v_052a8a = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const { setSelectedShopItem: v_d0fbad } = v_700ef9();
   const [v_2aaa7b, v_769e54] = v_5ab095<v_745d71[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
@@ -121,7 +123,7 @@ export const v_052a8a = () => {
       if (v_43c42e && v_43c42e.status === 'success' && v_43c42e.data) {
         console.log('[상점] 구매 아이템 API 응답 성공, 받은 아이템 수:', v_43c42e.data.length);
 
-        const v_1b7132 = v_43c42e.data.map((v_8c0b26, v_a56041) => v_c59b9f(v_8c0b26, v_a56041));
+        const v_1b7132 = v_43c42e.data.map((v_8c0b26, v_a56041) => v_c59b9f(v_8c0b26, v_a56041, v_8d41d7));
 
         v_769e54(v_1b7132);
         console.log('[상점] 변환된 구매 아이템 수:', v_1b7132.length);
@@ -181,7 +183,7 @@ export const v_052a8a = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" />
+      <Header title={v_8d41d7('screens.shop.title')} />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -244,7 +246,7 @@ export const v_052a8a = () => {
         onClose={() => v_0e7cbf({ ...v_be52bc, visible: false })}
         actions={[
           {
-            label: '확인',
+            label: v_8d41d7('screens.shopMyTicket.confirm'),
             onPress: () => v_0e7cbf({ ...v_be52bc, visible: false }),
             variant: 'primary',
           },

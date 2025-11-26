@@ -1,6 +1,7 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -119,12 +120,12 @@ export const v_5b4c5a = () => {
     );
   };
 
-  const v_50edd4 = '1 Depth';
+  const { t: v_8d41d7 } = v_772971();
 
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title={v_50edd4} onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.referralDepthOne.title')} onBackPress={v_c7ac57} showBackButton />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />

@@ -3,6 +3,7 @@ import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_03e392, v
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_b34ce5, v_2cf4d9 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -116,6 +117,7 @@ const v_3e6a6a = (
 };
 
 export const v_38326c = () => {
+  const { t: v_8d41d7 } = v_772971();
   const [v_11083e, v_94ee83] = v_5ab095<'ticket' | 'myTicket'>('ticket');
   const { navigate: v_9b57fc } = v_a0daa8();
   const { setSelectedShopItem: v_d0fbad } = v_700ef9();
@@ -345,7 +347,7 @@ export const v_38326c = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" />
+      <Header title={v_8d41d7('screens.shop.title')} />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />

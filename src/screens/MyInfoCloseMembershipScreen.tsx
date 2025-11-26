@@ -1,6 +1,7 @@
 import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af, v_03e392 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
@@ -9,6 +10,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_10a69f } from '../services';
 
 export const v_9e06f6 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_969f2b, v_bad075] = v_5ab095(true);
@@ -17,20 +19,20 @@ export const v_9e06f6 = () => {
   const v_585b02 = async () => {
 
     if (!v_adc076.trim()) {
-      v_03e392.alert('비밀번호 입력', '회원 탈퇴를 위해 비밀번호를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoCloseMembership.alerts.passwordRequired'), v_8d41d7('screens.myInfoCloseMembership.alerts.passwordRequiredMessage'));
       return;
     }
 
     v_03e392.alert(
-      '회원 탈퇴',
-      '정말 회원 탈퇴를 하시겠습니까? 탈퇴 후에는 복구할 수 없습니다.',
+      v_8d41d7('screens.myInfoCloseMembership.alerts.closeMembership'),
+      v_8d41d7('screens.myInfoCloseMembership.alerts.closeMembershipMessage'),
       [
         {
-          text: '취소',
+          text: v_8d41d7('screens.myInfoCloseMembership.alerts.cancel'),
           style: 'cancel',
         },
         {
-          text: '탈퇴',
+          text: v_8d41d7('screens.myInfoCloseMembership.alerts.confirm'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -38,7 +40,7 @@ export const v_9e06f6 = () => {
 
               const v_f24fd5 = await v_e84827.getItem('userData');
               if (!v_f24fd5) {
-                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                v_03e392.alert(v_8d41d7('screens.myInfoCloseMembership.alerts.error'), v_8d41d7('screens.myInfoCloseMembership.alerts.errorMessage'));
                 v_e33ec0(false);
                 return;
               }
@@ -47,7 +49,7 @@ export const v_9e06f6 = () => {
               const v_660822 = v_ef7306.member;
 
               if (!v_660822) {
-                v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                v_03e392.alert(v_8d41d7('screens.myInfoCloseMembership.alerts.error'), v_8d41d7('screens.myInfoCloseMembership.alerts.errorMessage'));
                 v_e33ec0(false);
                 return;
               }
@@ -61,7 +63,7 @@ export const v_9e06f6 = () => {
               );
 
               if (!v_593e63) {
-                v_03e392.alert('탈퇴 실패', '회원 탈퇴에 실패했습니다. 비밀번호를 확인해주세요.');
+                v_03e392.alert(v_8d41d7('screens.myInfoCloseMembership.alerts.closeFailed'), v_8d41d7('screens.myInfoCloseMembership.alerts.closeFailedMessage'));
                 v_e33ec0(false);
                 return;
               }
@@ -69,7 +71,7 @@ export const v_9e06f6 = () => {
               v_9b57fc(v_ce4741.myInfoCloseMembershipSuccess);
             } catch (v_5e9bfe) {
               console.error('[회원 탈퇴] 탈퇴 처리 중 오류:', v_5e9bfe);
-              v_03e392.alert('오류', '회원 탈퇴 중 오류가 발생했습니다. 다시 시도해주세요.');
+              v_03e392.alert(v_8d41d7('screens.myInfoCloseMembership.alerts.error'), v_8d41d7('screens.myInfoCloseMembership.alerts.closeError'));
               v_e33ec0(false);
             }
           },
@@ -81,7 +83,7 @@ export const v_9e06f6 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Close Membership" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.myInfoCloseMembership.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -89,8 +91,8 @@ export const v_9e06f6 = () => {
       >
         <View style={v_d81136.inner}>
           <FormField
-            label="Password"
-            placeholder="Enter your password"
+            label={v_8d41d7('screens.myInfoCloseMembership.passwordLabel')}
+            placeholder={v_8d41d7('screens.myInfoCloseMembership.passwordPlaceholder')}
             secureTextEntry={v_969f2b}
             value={v_adc076}
             onChangeText={v_52b279}
@@ -101,13 +103,13 @@ export const v_9e06f6 = () => {
             }
           />
           <Text style={v_d81136.helperText}>
-            *For safe account management,{'\n'}you are receiving a password when you leave
+            {v_8d41d7('screens.myInfoCloseMembership.helperText')}
           </Text>
         </View>
 
         <View style={v_d81136.bottomSection}>
           <PrimaryButton
-            title={v_88dca2 ? '처리 중...' : 'Confirm'}
+            title={v_88dca2 ? v_8d41d7('screens.myInfoCloseMembership.processing') : v_8d41d7('screens.myInfoCloseMembership.confirmButton')}
             fullWidth
             onPress={v_585b02}
             style={v_d81136.primaryButton}

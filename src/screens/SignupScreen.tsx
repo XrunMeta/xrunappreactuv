@@ -10,6 +10,7 @@ import {
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import {
   v_fa3feb,
   v_368e80,
@@ -29,17 +30,13 @@ import {
   v_91bb22,
 } from '../services';
 
-const v_798085 = [
-  { value: 'male', label: '남' },
-  { value: 'female', label: '여' },
-] as const;
-
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
-type GenderValue = (typeof v_798085)[number]['value'];
+type GenderValue = (typeof GENDER_OPTIONS)[number]['value'];
 type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const {
     selectedCountryDialCode: v_459d5e,
@@ -49,6 +46,11 @@ export const v_f40fc5 = () => {
     setSignupFormData: v_eee6b0,
     resetSignupFormData: v_4df356,
   } = v_700ef9();
+
+  const v_798085 = [
+    { value: 'male', label: v_8d41d7('screens.signup.genderMale') },
+    { value: 'female', label: v_8d41d7('screens.signup.genderFemale') },
+  ] as const;
   const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
   const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);
   const [v_e0c7e8, v_fedf34] = v_5ab095(v_8d7bc8.email);
@@ -104,32 +106,32 @@ export const v_f40fc5 = () => {
   const v_585b02 = async () => {
 
     if (!v_91ca05) {
-      v_03e392.alert('동의 필요', '약관에 동의해야 가입을 진행할 수 있습니다.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
       return;
     }
 
     if (!v_f142d8.trim() || !v_a7c7b7.trim()) {
-      v_03e392.alert('입력 오류', '성과 이름을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
       return;
     }
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert('입력 오류', '이메일을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.emailRequired'));
       return;
     }
 
     if (!v_adc076.trim() || v_adc076.length < 6) {
-      v_03e392.alert('입력 오류', '비밀번호는 6자 이상 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordRequired'));
       return;
     }
 
     if (!v_3a6ac4.trim()) {
-      v_03e392.alert('입력 오류', '전화번호를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
       return;
     }
 
     if (!v_2f03bc && !v_a6c30b.trim()) {
-      v_03e392.alert('입력 오류', '지역을 선택해주세요.');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
       return;
     }
 
@@ -141,7 +143,7 @@ export const v_f40fc5 = () => {
       const v_d854e8 = await v_60e3a5(v_e0c7e8.trim(), v_9b57fc);
 
       if (!v_d854e8) {
-        v_03e392.alert('이메일 중복', '이미 사용 중인 이메일입니다.');
+        v_03e392.alert(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
         v_e33ec0(false);
         return;
       }
@@ -156,11 +158,11 @@ export const v_f40fc5 = () => {
 
           const v_411201 = await new Promise<boolean>((v_6f7712) => {
             v_03e392.alert(
-              '추천인 확인',
-              '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
+              v_8d41d7('screens.signup.alerts.referralConfirm'),
+              v_8d41d7('screens.signup.errors.referralInvalid'),
               [
                 {
-                  text: '취소',
+                  text: v_8d41d7('screens.signup.alerts.cancel'),
                   style: 'cancel',
                   onPress: () => {
                     v_e33ec0(false);
@@ -168,7 +170,7 @@ export const v_f40fc5 = () => {
                   },
                 },
                 {
-                  text: '계속',
+                  text: v_8d41d7('screens.signup.alerts.continue'),
                   onPress: () => v_6f7712(true),
                 },
               ],
@@ -209,7 +211,7 @@ export const v_f40fc5 = () => {
       const v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
 
       if (!v_d0b446) {
-        v_03e392.alert('회원가입 실패', '회원가입에 실패했습니다. 다시 시도해주세요.');
+        v_03e392.alert(v_8d41d7('screens.signup.alerts.signupFailed'), v_8d41d7('screens.signup.errors.signupFailed'));
         v_e33ec0(false);
         return;
       }
@@ -219,8 +221,8 @@ export const v_f40fc5 = () => {
 
       if (!v_7e280a) {
         v_03e392.alert(
-          '로그인 확인 실패',
-          '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+          v_8d41d7('screens.signup.alerts.loginCheckFailed'),
+          v_8d41d7('screens.signup.errors.loginCheckFailed'),
         );
         v_487a25('authLanding');
         v_9b57fc('login');
@@ -228,9 +230,9 @@ export const v_f40fc5 = () => {
         return;
       }
 
-      v_03e392.alert('회원가입 완료', '회원가입이 완료되었습니다.', [
+      v_03e392.alert(v_8d41d7('screens.signup.success.title'), v_8d41d7('screens.signup.success.message'), [
         {
-          text: '확인',
+          text: v_8d41d7('screens.signup.success.confirm'),
           onPress: () => {
 
             v_4df356();
@@ -244,8 +246,8 @@ export const v_f40fc5 = () => {
       const v_1744b9 =
         v_5e9bfe.response?.data?.message ||
         v_5e9bfe.message ||
-        '회원가입 중 오류가 발생했습니다.';
-      v_03e392.alert('오류', v_1744b9);
+        v_8d41d7('screens.signup.errors.error');
+      v_03e392.alert(v_8d41d7('screens.signup.alerts.error'), v_1744b9);
     } finally {
       v_e33ec0(false);
     }
@@ -329,8 +331,8 @@ export const v_f40fc5 = () => {
           style={v_d81136.fieldContainer}
         >
           <FormField
-            label="지역"
-            placeholder="지역을 선택하세요"
+            label={v_8d41d7('screens.signup.regionLabel')}
+            placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
             value={v_2f03bc ? v_2f03bc.name : v_a6c30b || ''}
             editable={false}
             containerStyle={v_d81136.fieldContainer}
@@ -338,7 +340,7 @@ export const v_f40fc5 = () => {
         </TouchableOpacity>
 
         <View style={v_d81136.formGroup}>
-          <Text style={v_d81136.label}>성별</Text>
+          <Text style={v_d81136.label}>{v_8d41d7('screens.signup.genderLabel')}</Text>
           <View style={v_d81136.inlineOptions}>
             {v_798085.map((v_0bd920) => {
               const v_26dce6 = v_c3eac4 === v_0bd920.value;
@@ -355,7 +357,7 @@ export const v_f40fc5 = () => {
         </View>
 
         <View style={v_d81136.formGroup}>
-          <Text style={v_d81136.label}>나이</Text>
+          <Text style={v_d81136.label}>{v_8d41d7('screens.signup.ageLabel')}</Text>
           <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
             {v_0c96f7.map((v_0bd920, v_a56041) => {
               const v_26dce6 = v_f83808 === v_0bd920;
@@ -378,8 +380,8 @@ export const v_f40fc5 = () => {
         </View>
 
         <FormField
-          label="추천이메일"
-          placeholder="oth-staff@example.invalid"
+          label={v_8d41d7('screens.signup.referralEmailLabel')}
+          placeholder={v_8d41d7('screens.signup.referralEmailPlaceholder')}
           value={v_9bf12c}
           onChangeText={v_fb6bbb}
           autoCapitalize="none"
@@ -393,15 +395,15 @@ export const v_f40fc5 = () => {
             variant="square"
           />
           <Text style={v_d81136.termsText}>
-            XRUN 서비스 약관 및{' '}
-            <Text style={v_d81136.termsHighlight}>개인정보 보호정책</Text>에
-            동의합니다.
+            {v_8d41d7('screens.signup.termsText')}{' '}
+            <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.termsHighlight')}</Text>{' '}
+            {v_8d41d7('screens.signup.termsAgree')}
           </Text>
         </View>
 
         <View style={v_d81136.buttonWrapper}>
           <PrimaryButton
-            title={v_88dca2 ? '처리 중...' : '가입하기'}
+            title={v_88dca2 ? v_8d41d7('screens.signup.submitting') : v_8d41d7('screens.signup.submitButton')}
             fullWidth
             onPress={v_585b02}
             disabled={v_88dca2}

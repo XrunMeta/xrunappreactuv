@@ -15,6 +15,7 @@ import {
   v_6c4f62,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
@@ -77,6 +78,7 @@ const v_23be95 = (notifications: v_d9bc70[]) => {
 };
 
 export const v_386af2 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_180423, v_8f2787] = v_5ab095('');
   const [v_b9c00c, v_0965ee] = v_5ab095<v_d9bc70[]>([]);
@@ -114,12 +116,12 @@ export const v_386af2 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[알림] 알림 목록 조회 실패:', v_5e9bfe);
-      v_03e392.alert('오류', '알림 목록을 불러오는데 실패했습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.loadFailed'));
     } finally {
       v_34a50a(false);
       v_575aad(false);
     }
-  }, [v_717992, v_9b57fc]);
+  }, [v_717992, v_9b57fc, v_8d41d7]);
 
   v_c4deb2(() => {
     if (v_717992) {
@@ -134,25 +136,25 @@ export const v_386af2 = () => {
 
   const v_465869 = async () => {
     if (!v_180423.trim()) {
-      v_03e392.alert('메시지 입력', '보낼 내용을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.messageInput'), v_8d41d7('screens.myInfoNotify.alerts.messageRequired'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.userDataNotFound'));
       return;
     }
 
     try {
       v_10837f(true);
       await v_26e528(v_717992, v_180423.trim(), false, v_9b57fc);
-      v_03e392.alert('전송 완료', '문의가 전송되었습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.sendSuccess'), v_8d41d7('screens.myInfoNotify.alerts.sendSuccessMessage'));
       v_8f2787('');
 
       await v_496106();
     } catch (v_5e9bfe) {
       console.error('[알림] 메시지 전송 실패:', v_5e9bfe);
-      v_03e392.alert('오류', '메시지 전송에 실패했습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.sendFailed'));
     } finally {
       v_10837f(false);
     }
@@ -162,12 +164,12 @@ export const v_386af2 = () => {
     if (!v_717992) return;
 
     v_03e392.alert(
-      '삭제 확인',
-      '이 메시지를 삭제하시겠습니까?',
+      v_8d41d7('screens.myInfoNotify.alerts.deleteConfirm'),
+      v_8d41d7('screens.myInfoNotify.alerts.deleteMessage'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: v_8d41d7('screens.myInfoNotify.alerts.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: v_8d41d7('screens.myInfoNotify.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -176,7 +178,7 @@ export const v_386af2 = () => {
               await v_496106();
             } catch (v_5e9bfe) {
               console.error('[알림] 메시지 삭제 실패:', v_5e9bfe);
-              v_03e392.alert('오류', '메시지 삭제에 실패했습니다.');
+              v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.deleteFailed'));
             }
           },
         },
@@ -188,12 +190,12 @@ export const v_386af2 = () => {
     if (!v_717992) return;
 
     v_03e392.alert(
-      '전체 삭제 확인',
-      '모든 메시지를 삭제하시겠습니까?',
+      v_8d41d7('screens.myInfoNotify.alerts.deleteAllConfirm'),
+      v_8d41d7('screens.myInfoNotify.alerts.deleteAllMessage'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: v_8d41d7('screens.myInfoNotify.alerts.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: v_8d41d7('screens.myInfoNotify.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -202,7 +204,7 @@ export const v_386af2 = () => {
               await v_496106();
             } catch (v_5e9bfe) {
               console.error('[알림] 전체 삭제 실패:', v_5e9bfe);
-              v_03e392.alert('오류', '전체 삭제에 실패했습니다.');
+              v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.deleteAllFailed'));
             }
           },
         },
@@ -215,7 +217,7 @@ export const v_386af2 = () => {
 
     if (v_f71b56.startsWith('http://') || v_f71b56.startsWith('https://')) {
       v_f2c756.openURL(v_f71b56).catch(() => {
-        v_03e392.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+        v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.linkError'), v_8d41d7('screens.myInfoNotify.alerts.linkErrorMessage'));
       });
     } else {
 
@@ -277,17 +279,17 @@ export const v_386af2 = () => {
               {}
               {}
               {v_d37866 && (
-                <TouchableOpacity
+                  <TouchableOpacity
                   style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={() => {
                     const v_f71b56 = `https://oth-path-51a04e.example.invalid/oth-path?id=${v_b9faeb.board}`;
                     v_f2c756.openURL(v_f71b56).catch(() => {
-                      v_03e392.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+                      v_03e392.alert(v_8d41d7('screens.myInfoNotify.alerts.linkError'), v_8d41d7('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
                   }}
                   activeOpacity={0.85}
                 >
-                  <Text style={v_d81136.ctaText}>자세히 보기</Text>
+                  <Text style={v_d81136.ctaText}>{v_8d41d7('screens.myInfoNotify.viewDetails')}</Text>
                 </TouchableOpacity>
               )}
               {}
@@ -297,7 +299,7 @@ export const v_386af2 = () => {
                   onPress={() => v_0a2feb(v_b9faeb.guid)}
                   activeOpacity={0.85}
                 >
-                  <Text style={v_d81136.ctaText}>이벤트로 이동</Text>
+                  <Text style={v_d81136.ctaText}>{v_8d41d7('screens.myInfoNotify.goToEvent')}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -336,7 +338,7 @@ export const v_386af2 = () => {
       <View style={v_d81136.container}>
         <StatusBar style="dark" />
         <Header
-          title="Notify"
+          title={v_8d41d7('screens.myInfoNotify.title')}
           onBackPress={v_c7ac57}
           showBackButton
           rightComponent={
@@ -346,7 +348,7 @@ export const v_386af2 = () => {
                 activeOpacity={0.7}
                 style={v_d81136.deleteAllButton}
               >
-                <Text style={v_d81136.deleteAllText}>전체 삭제</Text>
+                <Text style={v_d81136.deleteAllText}>{v_8d41d7('screens.myInfoNotify.deleteAll')}</Text>
               </TouchableOpacity>
             ) : undefined
           }
@@ -366,7 +368,7 @@ export const v_386af2 = () => {
           >
             {v_b9c00c.length === 0 ? (
               <View style={v_d81136.emptyContainer}>
-                <Text style={v_d81136.emptyText}>알림이 없습니다.</Text>
+                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.myInfoNotify.emptyMessage')}</Text>
               </View>
             ) : (
               v_718f6b()
@@ -378,7 +380,7 @@ export const v_386af2 = () => {
           <View style={v_d81136.inputWrapper}>
             <TextInput
               style={v_d81136.input}
-              placeholder="Type your question..."
+              placeholder={v_8d41d7('screens.myInfoNotify.placeholder')}
               placeholderTextColor="#7d7e83"
               value={v_180423}
               onChangeText={v_8f2787}
@@ -394,7 +396,7 @@ export const v_386af2 = () => {
             {v_5e23ec ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={v_d81136.sendButtonText}>Send</Text>
+              <Text style={v_d81136.sendButtonText}>{v_8d41d7('screens.myInfoNotify.sendButton')}</Text>
             )}
           </TouchableOpacity>
         </View>

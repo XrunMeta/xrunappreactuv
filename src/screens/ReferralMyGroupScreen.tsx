@@ -1,6 +1,7 @@
 import v_a3453e, { v_df9f57, v_e662ae, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_4623af, v_19b633, v_03e392 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581 } from '../components';
@@ -21,6 +22,7 @@ interface MemberData {
 }
 
 export const v_58584a = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { navigate: v_9b57fc } = v_a0daa8();
   const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
@@ -166,7 +168,7 @@ export const v_58584a = () => {
 
   const v_22cd2d = async () => {
     if (!v_f4fb5e) {
-      v_03e392.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.referralMyGroup.shareFailed'), v_8d41d7('screens.referralMyGroup.shareFailedMessage'));
       return;
     }
     await v_a3bbf0(
@@ -179,11 +181,11 @@ export const v_58584a = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={v_8d41d7('screens.referralMyGroup.title')} />
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.topRow}>
-            <ReferralStatsCard title="내 그룹 맴버" value={`${v_03be4c} 맴버`} helperText=" " />
+            <ReferralStatsCard title={v_8d41d7('screens.referralMyGroup.myGroupMembers')} value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`} helperText=" " />
             <TouchableOpacity style={v_d81136.iconButton} onPress={v_22cd2d} activeOpacity={0.7}>
               <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
             </TouchableOpacity>

@@ -51,6 +51,7 @@ import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
 import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
 import { v_a2474a } from './src/utils/env';
+import { v_757c02 } from './src/locales';
 import {
   v_c06f2c,
   v_259807,
@@ -274,6 +275,13 @@ export default function v_6540c3() {
         console.log('[App] 환경 변수 로드 완료');
       } catch (v_5e9bfe) {
         console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
+      }
+
+      try {
+        await v_757c02();
+        console.log('[App] i18n 초기화 완료');
+      } catch (v_5e9bfe) {
+        console.error('[App] i18n 초기화 실패:', v_5e9bfe);
       }
     };
 

@@ -1,6 +1,7 @@
 import v_a3453e, { v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_03e392 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -9,6 +10,7 @@ import { v_d7d5a2 } from '../services';
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 
 export const v_865e57 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { reset: v_487a25 } = v_a0daa8();
 
   const v_03cae9 = async () => {
@@ -60,17 +62,16 @@ export const v_865e57 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Close Membership" showBackButton={false} />
+      <Header title={v_8d41d7('screens.myInfoCloseMembershipSuccess.title')} showBackButton={false} />
       <View style={v_d81136.overlay}>
         <View style={v_d81136.card}>
           <Image source={v_16cea9} style={v_d81136.logo} resizeMode="contain" />
-          <Text style={v_d81136.message}>회원 탈퇴가 완료되었습니다</Text>
+          <Text style={v_d81136.message}>{v_8d41d7('screens.myInfoCloseMembershipSuccess.message')}</Text>
           <Text style={v_d81136.subMessage}>
-            이용해 주셔서 감사합니다.{'\n'}
-            더 나은 서비스로 찾아뵙겠습니다.
+            {v_8d41d7('screens.myInfoCloseMembershipSuccess.subMessage')}
           </Text>
           <TouchableOpacity style={v_d81136.button} onPress={v_03cae9}>
-            <Text style={v_d81136.buttonText}>확인</Text>
+            <Text style={v_d81136.buttonText}>{v_8d41d7('screens.myInfoCloseMembershipSuccess.confirmButton')}</Text>
           </TouchableOpacity>
         </View>
       </View>

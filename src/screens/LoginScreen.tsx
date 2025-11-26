@@ -12,6 +12,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -23,6 +24,7 @@ import {
 
 export const v_f4f851 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_9fe81c, v_d32265] = v_5ab095(false);
@@ -73,12 +75,12 @@ export const v_f4f851 = () => {
   const v_ec4736 = async () => {
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert('오류', '이메일을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.emailRequired'));
       return;
     }
 
     if (!v_adc076.trim()) {
-      v_03e392.alert('오류', '비밀번호를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.passwordRequired'));
       return;
     }
 
@@ -94,14 +96,14 @@ export const v_f4f851 = () => {
       );
 
       if (v_b84499.status !== 'success') {
-        v_03e392.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+        v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.loginFailed'));
         v_deef62(false);
         return;
       }
 
       const v_ef7306 = v_b84499.data[0];
       if (!v_ef7306) {
-        v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+        v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.userDataNotFound'));
         v_deef62(false);
         return;
       }
@@ -141,8 +143,8 @@ export const v_f4f851 = () => {
     } catch (v_5e9bfe) {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
       v_03e392.alert(
-        '로그인 실패',
-        '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+        v_8d41d7('common.messages.error'),
+        v_8d41d7('screens.login.errors.loginError'),
       );
     } finally {
       v_deef62(false);
@@ -153,7 +155,7 @@ export const v_f4f851 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title="로그인"
+        title={v_8d41d7('screens.login.title')}
         onBackPress={v_c7ac57}
         showBackButton
       />
@@ -163,8 +165,8 @@ export const v_f4f851 = () => {
         showsVerticalScrollIndicator={false}
       >
         <FormField
-          label="이메일"
-          placeholder="이메일을 입력해주세요."
+          label={v_8d41d7('screens.login.emailLabel')}
+          placeholder={v_8d41d7('screens.login.emailPlaceholder')}
           keyboardType="email-address"
           autoCapitalize="none"
           value={v_e0c7e8}
@@ -174,8 +176,8 @@ export const v_f4f851 = () => {
         />
 
         <FormField
-          label="비밀번호"
-          placeholder="비밀번호를 입력해주세요."
+          label={v_8d41d7('screens.login.passwordLabel')}
+          placeholder={v_8d41d7('screens.login.passwordPlaceholder')}
           secureTextEntry={!v_f872c3}
           value={v_adc076}
           onChangeText={v_52b279}
@@ -199,7 +201,7 @@ export const v_f4f851 = () => {
 
         <View style={v_d81136.checkboxRow}>
           <FormCheckbox
-            label="아이디 기억하기"
+            label={v_8d41d7('screens.login.rememberId')}
             checked={v_9fe81c}
             onToggle={v_709e4f}
             variant="circle"
@@ -214,12 +216,12 @@ export const v_f4f851 = () => {
                 <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
               </View>
             ) : (
-              <PrimaryButton title="로그인" fullWidth onPress={v_ec4736} />
+              <PrimaryButton title={v_8d41d7('screens.login.loginButton')} fullWidth onPress={v_ec4736} />
             )}
           </View>
 
           <Text style={v_d81136.disclaimer}>
-            비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
+            {v_8d41d7('screens.login.disclaimer')}
           </Text>
 
           <TouchableOpacity
@@ -228,7 +230,7 @@ export const v_f4f851 = () => {
             activeOpacity={0.7}
             disabled={v_cd31a8}
           >
-            <Text style={v_d81136.emailVerificationText}>이메일 인증</Text>
+            <Text style={v_d81136.emailVerificationText}>{v_8d41d7('screens.login.emailVerification')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

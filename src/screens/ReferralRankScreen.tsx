@@ -1,6 +1,7 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_39a996, v_9cabcb } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5 } from '../components';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -40,13 +41,14 @@ export const v_f57686 = () => {
   const [v_ad21d1, v_dadb82] = v_5ab095<string>('-');
   const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('-');
 
+  const { t: v_8d41d7 } = v_772971();
   const v_1c4d31 = v_df9f57(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: 'Rank', value: 'rank' },
+      { label: v_8d41d7('screens.referralRank.group'), value: 'group' },
+      { label: v_8d41d7('screens.referralRank.settlement'), value: 'settlement' },
+      { label: v_8d41d7('screens.referralRank.rank'), value: 'rank' },
     ] as const,
-    [],
+    [v_8d41d7],
   );
 
   v_c4deb2(() => {
@@ -201,10 +203,10 @@ export const v_f57686 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={v_8d41d7('screens.referralRank.title')} />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
-          <ReferralStatsCard title={v_4922a9.referral?.card?.myRank || '내 순위'}>
+          <ReferralStatsCard title={v_4922a9.referral?.card?.myRank || v_8d41d7('screens.referralRank.myRank')}>
             <View style={v_d81136.rankCardContent}>
               <View style={v_d81136.rankLeft}>
                 <Text style={v_d81136.rankEmail}>{v_f4fb5e}</Text>

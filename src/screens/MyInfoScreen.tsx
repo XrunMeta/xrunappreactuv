@@ -11,6 +11,7 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -74,6 +75,7 @@ const v_dbfc7f = [
 
 export const v_03a231 = () => {
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
@@ -212,7 +214,7 @@ export const v_03a231 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="My Info" />
+      <Header title={v_8d41d7('screens.myInfo.title')} />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}

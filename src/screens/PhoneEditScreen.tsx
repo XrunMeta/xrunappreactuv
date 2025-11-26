@@ -9,6 +9,7 @@ import {
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
@@ -17,6 +18,7 @@ import { v_700ef9 } from '../context';
 import { v_53d723 } from '../services';
 
 export const v_e14579 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { selectedCountryDialCode: v_459d5e, setSelectedCountryDialCode: v_f693e7 } = v_700ef9();
   const [v_d74a81, v_fcce73] = v_5ab095('');
@@ -50,18 +52,18 @@ export const v_e14579 = () => {
   const v_1b8283 = async () => {
 
     if (!v_d74a81.trim()) {
-      v_03e392.alert('오류', '전화번호를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneRequired'));
       return;
     }
 
     const v_3a6ac4 = v_d74a81.replace(/\s/g, '').replace(/-/g, '');
     if (!/^\d+$/.test(v_3a6ac4)) {
-      v_03e392.alert('오류', '전화번호는 숫자만 입력 가능합니다.');
+      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneInvalid'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -81,9 +83,9 @@ export const v_e14579 = () => {
         v_9b57fc,
       );
 
-      v_03e392.alert('저장 완료', '전화번호가 변경되었습니다.', [
+      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.saveSuccess'), v_8d41d7('screens.phoneEdit.alerts.saveSuccessMessage'), [
         {
-          text: '확인',
+          text: v_8d41d7('screens.phoneEdit.alerts.confirm'),
           onPress: () => {
 
             v_487a25(v_ce4741.myInfoEdit);
@@ -92,7 +94,7 @@ export const v_e14579 = () => {
       ]);
     } catch (v_5e9bfe) {
       console.error('[전화번호수정] 전화번호 수정 실패:', v_5e9bfe);
-      v_03e392.alert('저장 실패', '전화번호 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.saveFailed'), v_8d41d7('screens.phoneEdit.alerts.saveFailedMessage'));
     } finally {
       v_433822(false);
     }
@@ -106,7 +108,7 @@ export const v_e14579 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title="전화번호 수정"
+        title={v_8d41d7('screens.phoneEdit.title')}
         onBackPress={v_7e32fb ? v_c7ac57 : () => v_487a25(v_ce4741.myInfoEdit)}
         showBackButton
       />
@@ -117,11 +119,11 @@ export const v_e14579 = () => {
       >
         <View style={v_d81136.formWrapper}>
           <FormField
-            label="Phone Number"
+            label={v_8d41d7('screens.phoneEdit.phoneLabel')}
             value={v_d74a81}
             onChangeText={v_fcce73}
             keyboardType="phone-pad"
-            placeholder="Enter phone number"
+            placeholder={v_8d41d7('screens.phoneEdit.phonePlaceholder')}
             editable={!v_e495db}
             leftAccessory={
               <TouchableOpacity
@@ -144,7 +146,7 @@ export const v_e14579 = () => {
             </View>
           ) : (
             <PrimaryButton
-              title="Save Changes"
+              title={v_8d41d7('screens.phoneEdit.saveButton')}
               fullWidth
               onPress={v_1b8283}
               style={v_d81136.primaryButton}
