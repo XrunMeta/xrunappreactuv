@@ -78,7 +78,7 @@ interface TokenListItemData extends CombinedAsset {
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { openAddTokenDialog } = useAppContext();
+  const { openAddTokenDialog, setWalletReceiveAddress } = useAppContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [publicAddress, setPublicAddress] = useState('');
@@ -408,6 +408,7 @@ export const WalletScreen = () => {
       );
       return;
     }
+    setWalletReceiveAddress(publicAddress);
     navigate(ROUTES.walletReceive);
   };
 

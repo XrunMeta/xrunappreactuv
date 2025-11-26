@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -12,33 +12,70 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import QRCode from 'react-native-qrcode-svg';
 import { Header, PrimaryButton, SecondaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { copyToClipboard } from '../utils';
-
-const WALLET_ADDRESS =
-  '0x61cf20b2ebd91caa22782a740f82dcf87ad2b2be7b6401ec3daf2234e7531fbf';
+import { useAppContext } from '../context';
+import { useAppNavigation } from '../navigation';
 
 export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
+  const { goBack } = useAppNavigation();
+  const { walletReceiveAddress, resetWalletReceiveAddress } = useAppContext();
+  const qrCodeRef = useRef<any>(null);
+  const [walletAddress, setWalletAddress] = useState('');
+
+  useEffect(() => {
+
+    if (walletReceiveAddress) {
+      setWalletAddress(walletReceiveAddress);
+    } else {
+
+    }
+
+    return () => {
+      resetWalletReceiveAddress();
+    };
+  }, [walletReceiveAddress, resetWalletReceiveAddress]);
+
   const handleCopy = () => {
-    copyToClipboard(WALLET_ADDRESS);
+    if (walletAddress) {
+      copyToClipboard(walletAddress);
+    } else {
+      Alert.alert(
+        t('screens.walletReceive.alerts.error'),
+        t('screens.walletReceive.errors.addressNotLoaded'),
+      );
+    }
   };
 
   const handleShare = async () => {
+    if (!walletAddress) {
+      Alert.alert(
+        t('screens.walletReceive.alerts.error'),
+        t('screens.walletReceive.errors.addressNotLoaded'),
+      );
+      return;
+    }
+
     try {
       await Share.share({
-        message: WALLET_ADDRESS,
+        message: walletAddress,
       });
     } catch (error) {
-      Alert.alert(t('screens.walletReceive.alerts.shareFailed'), t('screens.walletReceive.errors.shareFailed'));
+      Alert.alert(
+        t('screens.walletReceive.alerts.shareFailed'),
+        t('screens.walletReceive.errors.shareFailed'),
+      );
     }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.walletReceive.title')} showBackButton />
+      <Header title={t('screens.walletReceive.title')} onBackPress={goBack} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -49,7 +86,17 @@ export const WalletReceiveScreen = () => {
             <View style={styles.qrBorder}>
               <View style={styles.qrInnerBorder}>
                 <View style={styles.qrPlaceholder}>
-                  <Ionicons name="qr-code-outline" size={120} color="#10192d" />
+                  {walletAddress ? (
+                    <QRCode
+                      value={walletAddress}
+                      size={200}
+                      color="#000000"
+                      backgroundColor="#FFFFFF"
+                      getRef={(c) => (qrCodeRef.current = c)}
+                    />
+                  ) : (
+                    <Ionicons name="qr-code-outline" size={120} color="#10192d" />
+                  )}
                 </View>
               </View>
             </View>
@@ -58,7 +105,7 @@ export const WalletReceiveScreen = () => {
           <View style={styles.addressSection}>
             <Text style={styles.addressLabel}>{t('screens.walletReceive.address')}</Text>
             <View style={styles.addressBox}>
-              <Text style={styles.addressValue}>{WALLET_ADDRESS}</Text>
+              <Text style={styles.addressValue}>{walletAddress || t('screens.walletReceive.loadingAddress')}</Text>
             </View>
           </View>
         </View>
@@ -184,5 +231,4 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 });
-
 
