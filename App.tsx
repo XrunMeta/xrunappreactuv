@@ -50,6 +50,7 @@ import {
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
+import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
 import { v_a2474a } from './src/utils/env';
 import { v_757c02 } from './src/locales';
@@ -311,8 +312,10 @@ export default function v_6540c3() {
     return (
       <AppProvider>
         <NavigationProvider>
-          <SplashScreen />
-          <GlobalDialogs />
+          <AlertDialogProvider>
+            <SplashScreen />
+            <GlobalDialogs />
+          </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
     );
@@ -321,9 +324,11 @@ export default function v_6540c3() {
   return (
     <AppProvider>
       <NavigationProvider>
-        <AliveService />
-        <ScreenHost />
-        <GlobalDialogs />
+        <AlertDialogProvider>
+          <AliveService />
+          <ScreenHost />
+          <GlobalDialogs />
+        </AlertDialogProvider>
       </NavigationProvider>
     </AppProvider>
   );

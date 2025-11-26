@@ -5,7 +5,6 @@ import {
   v_122070,
   v_19b633,
   v_4623af,
-  v_03e392,
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -16,10 +15,12 @@ import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_53d723 } from '../services';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_e14579 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const { selectedCountryDialCode: v_459d5e, setSelectedCountryDialCode: v_f693e7 } = v_700ef9();
   const [v_d74a81, v_fcce73] = v_5ab095('');
   const [v_e495db, v_433822] = v_5ab095(false);
@@ -52,18 +53,18 @@ export const v_e14579 = () => {
   const v_1b8283 = async () => {
 
     if (!v_d74a81.trim()) {
-      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneRequired'));
+      await v_889fad(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneRequired'));
       return;
     }
 
     const v_3a6ac4 = v_d74a81.replace(/\s/g, '').replace(/-/g, '');
     if (!/^\d+$/.test(v_3a6ac4)) {
-      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneInvalid'));
+      await v_889fad(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.phoneInvalid'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.userDataNotFound'));
+      await v_889fad(v_8d41d7('screens.phoneEdit.alerts.error'), v_8d41d7('screens.phoneEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -83,7 +84,7 @@ export const v_e14579 = () => {
         v_9b57fc,
       );
 
-      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.saveSuccess'), v_8d41d7('screens.phoneEdit.alerts.saveSuccessMessage'), [
+      await v_889fad(v_8d41d7('screens.phoneEdit.alerts.saveSuccess'), v_8d41d7('screens.phoneEdit.alerts.saveSuccessMessage'), [
         {
           text: v_8d41d7('screens.phoneEdit.alerts.confirm'),
           onPress: () => {
@@ -94,7 +95,7 @@ export const v_e14579 = () => {
       ]);
     } catch (v_5e9bfe) {
       console.error('[전화번호수정] 전화번호 수정 실패:', v_5e9bfe);
-      v_03e392.alert(v_8d41d7('screens.phoneEdit.alerts.saveFailed'), v_8d41d7('screens.phoneEdit.alerts.saveFailedMessage'));
+      await v_889fad(v_8d41d7('screens.phoneEdit.alerts.saveFailed'), v_8d41d7('screens.phoneEdit.alerts.saveFailedMessage'));
     } finally {
       v_433822(false);
     }

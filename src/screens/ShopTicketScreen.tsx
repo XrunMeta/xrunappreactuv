@@ -1,10 +1,11 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_03e392, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_19b633 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_b34ce5, v_2cf4d9, v_4c7b5d } from '../components';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
@@ -118,6 +119,7 @@ const v_3e6a6a = (
 
 export const v_38326c = () => {
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_11083e, v_94ee83] = v_5ab095<'ticket' | 'myTicket'>('ticket');
   const { navigate: v_9b57fc } = v_a0daa8();
   const { setSelectedShopItem: v_d0fbad } = v_700ef9();
@@ -277,12 +279,12 @@ export const v_38326c = () => {
         await v_a7da97(v_43c42e.data);
       } else {
         console.log('[상점] 상점 아이템 가져오기 실패:', v_43c42e);
-        v_03e392.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+        await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
         v_9a4b0a([]);
       }
     } catch (v_5e9bfe) {
       console.error('[상점] 상점 아이템 가져오기 오류:', v_5e9bfe);
-      v_03e392.alert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+      await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
       v_9a4b0a([]);
     } finally {
       v_34a50a(false);

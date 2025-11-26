@@ -1,15 +1,16 @@
-import { v_03e392, v_5f4661 } from 'rcmrninabrnb';
+import { v_5f4661 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 
 export const v_db97fb = async (
   v_3b402b,
+  v_889fad,
   v_e5db92 = '지갑 주소가 복사되었습니다.',
 ) => {
   try {
     await v_fba5a0.setStringAsync(v_3b402b);
-    v_03e392.alert('주소 복사', v_e5db92);
+    await v_889fad('주소 복사', v_e5db92);
   } catch (v_5e9bfe) {
-    v_03e392.alert('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
+    await v_889fad('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
   }
 };
 
@@ -103,6 +104,7 @@ export const v_89f939 = (v_f63e09, v_a832b3 = ''): string => {
 export const v_a3bbf0 = async (
   v_5254bf,
   v_412c99,
+  v_889fad,
   v_c65f5d,
 ): Promise<void> => {
   try {
@@ -131,7 +133,7 @@ export const v_a3bbf0 = async (
       console.log('공유가 취소됨');
     }
   } catch (v_5e9bfe) {
-    v_03e392.alert('공유 실패', v_5e9bfe.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    await v_889fad('공유 실패', v_5e9bfe.message || '레퍼럴 링크를 공유하지 못했습니다.');
     console.log('Share error:', v_5e9bfe);
     if (v_c65f5d) {
 

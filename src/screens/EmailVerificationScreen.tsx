@@ -4,7 +4,6 @@ import {
   v_472849,
   v_122070,
   v_326be8,
-  v_03e392,
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -14,23 +13,25 @@ import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_f5ecec, v_8025d1 } from '../services';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_a82b55 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_cd31a8, v_deef62] = v_5ab095(false);
   const { setVerificationSuccessRoute: v_8f89f3, setVerificationEmail: v_b572c3 } = v_700ef9();
 
   const v_465869 = async () => {
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert(v_8d41d7('screens.emailVerification.alerts.emailInput'), v_8d41d7('screens.emailVerification.errors.emailRequired'));
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.emailInput'), v_8d41d7('screens.emailVerification.errors.emailRequired'));
       return;
     }
 
     const v_9a3638 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!v_9a3638.test(v_e0c7e8.trim())) {
-      v_03e392.alert(v_8d41d7('screens.emailVerification.alerts.emailFormatError'), v_8d41d7('screens.emailVerification.errors.emailInvalid'));
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.emailFormatError'), v_8d41d7('screens.emailVerification.errors.emailInvalid'));
       return;
     }
 
@@ -42,7 +43,7 @@ export const v_a82b55 = () => {
       const v_dbae58 = await v_f5ecec(v_e0c7e8.trim(), v_9b57fc);
 
       if (!v_dbae58) {
-        v_03e392.alert(
+        await v_889fad(
           v_8d41d7('screens.emailVerification.alerts.emailCheck'),
           v_8d41d7('screens.emailVerification.errors.emailNotRegistered'),
         );
@@ -54,7 +55,7 @@ export const v_a82b55 = () => {
       const v_f438c1 = await v_8025d1(v_e0c7e8.trim(), v_9b57fc);
 
       if (!v_f438c1) {
-        v_03e392.alert(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
+        await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
         v_deef62(false);
         return;
       }
@@ -64,7 +65,7 @@ export const v_a82b55 = () => {
       v_9b57fc(v_ce4741.verificationCode);
     } catch (v_5e9bfe) {
       console.error('[로그인] 이메일 인증 처리 중 오류:', v_5e9bfe);
-      v_03e392.alert(v_8d41d7('screens.emailVerification.alerts.error'), v_8d41d7('screens.emailVerification.errors.error'));
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.error'), v_8d41d7('screens.emailVerification.errors.error'));
     } finally {
       v_deef62(false);
     }
