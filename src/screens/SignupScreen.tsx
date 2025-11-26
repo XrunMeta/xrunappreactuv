@@ -64,20 +64,27 @@ export const SignupScreen = () => {
   const [termsAccepted, setTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
-    setFamilyName(signupFormData.familyName);
-    setGivenName(signupFormData.givenName);
-    setEmail(signupFormData.email);
-    setPassword(signupFormData.password);
-    setPhoneNumber(signupFormData.phoneNumber);
-    setRegion(signupFormData.region);
-    setReferralEmail(signupFormData.referralEmail);
-    setGender(signupFormData.gender);
-    setAgeRange(signupFormData.ageRange);
-    setTermsAccepted(signupFormData.termsAccepted);
-  }, []); 
+  const isMountedRef = React.useRef(false);
 
   React.useEffect(() => {
+    if (!isMountedRef.current) {
+      setFamilyName(signupFormData.familyName);
+      setGivenName(signupFormData.givenName);
+      setEmail(signupFormData.email);
+      setPassword(signupFormData.password);
+      setPhoneNumber(signupFormData.phoneNumber);
+      setRegion(signupFormData.region);
+      setReferralEmail(signupFormData.referralEmail);
+      setGender(signupFormData.gender);
+      setAgeRange(signupFormData.ageRange);
+      setTermsAccepted(signupFormData.termsAccepted);
+      isMountedRef.current = true;
+    }
+  }, [signupFormData]);
+
+  React.useEffect(() => {
+    if (!isMountedRef.current) return;
+
     setSignupFormData({
       familyName,
       givenName,
@@ -101,7 +108,7 @@ export const SignupScreen = () => {
     gender,
     ageRange,
     termsAccepted,
-    setSignupFormData,
+
   ]);
 
   const handleSubmit = async () => {
