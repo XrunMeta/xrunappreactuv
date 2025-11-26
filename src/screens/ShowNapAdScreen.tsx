@@ -76,6 +76,9 @@ export const ShowNapAdScreen: React.FC = () => {
   const [member, setMember] = useState<string>('');
 
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<number>(2);
 
   useEffect(() => {
     if (!advertisementParams) {
@@ -177,6 +180,14 @@ export const ShowNapAdScreen: React.FC = () => {
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;
       }
+      if (rewardProcessingTimeoutRef.current) {
+        clearTimeout(rewardProcessingTimeoutRef.current);
+        rewardProcessingTimeoutRef.current = null;
+      }
+      if (rewardProcessingIntervalRef.current) {
+        clearInterval(rewardProcessingIntervalRef.current);
+        rewardProcessingIntervalRef.current = null;
+      }
     };
   }, []);
 
@@ -193,9 +204,12 @@ export const ShowNapAdScreen: React.FC = () => {
 
       if (supported) {
         await Linking.openURL(url);
-        console.log('✅ URL 이동 성공');
+        console.log('✅ URL 이동 성공 - Map 화면으로 이동');
         setHasOpenedUrl(true);
         setIsLoading(false);
+
+        resetAdvertisementParams();
+        reset(ROUTES.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', url);
         throw new Error('지원하지 않는 URL입니다.');
@@ -249,6 +263,15 @@ export const ShowNapAdScreen: React.FC = () => {
       if (callbackResponse.status === 'success') {
         setWaitingForWebSocketResponse(true);
 
+        if (rewardProcessingTimeoutRef.current) {
+          clearTimeout(rewardProcessingTimeoutRef.current);
+          rewardProcessingTimeoutRef.current = null;
+        }
+        if (rewardProcessingIntervalRef.current) {
+          clearInterval(rewardProcessingIntervalRef.current);
+          rewardProcessingIntervalRef.current = null;
+        }
+
         try {
           const response = await gatewayNodeJS(
             parseInt(advertisementParams?.advertisement || '0'),
@@ -262,33 +285,110 @@ export const ShowNapAdScreen: React.FC = () => {
 
           if (response && response.data) {
             console.log('API response received:', response);
-            setWaitingForWebSocketResponse(false);
             setIsProcessing(false);
 
-            setTimeout(() => {
+            console.log('⏰ Processing your reward... 카운트다운 시작');
+            countdownRef.current = 2;
+            console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+
+            rewardProcessingIntervalRef.current = setInterval(() => {
+              countdownRef.current--;
+              if (countdownRef.current > 0) {
+                console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+              } else {
+                console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+                if (rewardProcessingIntervalRef.current) {
+                  clearInterval(rewardProcessingIntervalRef.current);
+                  rewardProcessingIntervalRef.current = null;
+                }
+              }
+            }, 1000);
+
+            rewardProcessingTimeoutRef.current = setTimeout(() => {
+              if (rewardProcessingIntervalRef.current) {
+                clearInterval(rewardProcessingIntervalRef.current);
+                rewardProcessingIntervalRef.current = null;
+              }
+              setWaitingForWebSocketResponse(false);
               resetAdvertisementParams();
               reset(ROUTES.map);
-            }, 1000);
+              rewardProcessingTimeoutRef.current = null;
+            }, 2000);
           }
         } catch (error) {
           console.error('Error calling API:', error);
-          setWaitingForWebSocketResponse(false);
           setIsProcessing(false);
 
-          setTimeout(() => {
+          console.log('⏰ Processing your reward... 카운트다운 시작 (에러 발생)');
+          countdownRef.current = 2;
+          console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+
+          rewardProcessingIntervalRef.current = setInterval(() => {
+            countdownRef.current--;
+            if (countdownRef.current > 0) {
+              console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+            } else {
+              console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+              if (rewardProcessingIntervalRef.current) {
+                clearInterval(rewardProcessingIntervalRef.current);
+                rewardProcessingIntervalRef.current = null;
+              }
+            }
+          }, 1000);
+
+          rewardProcessingTimeoutRef.current = setTimeout(() => {
+            if (rewardProcessingIntervalRef.current) {
+              clearInterval(rewardProcessingIntervalRef.current);
+              rewardProcessingIntervalRef.current = null;
+            }
+            setWaitingForWebSocketResponse(false);
             resetAdvertisementParams();
             reset(ROUTES.map);
-          }, 1000);
+            rewardProcessingTimeoutRef.current = null;
+          }, 2000);
         }
       }
     } catch (error) {
       console.error('Error in ad completion process:', error);
-      setWaitingForWebSocketResponse(false);
+      setIsProcessing(false);
 
-      setTimeout(() => {
+      if (rewardProcessingTimeoutRef.current) {
+        clearTimeout(rewardProcessingTimeoutRef.current);
+        rewardProcessingTimeoutRef.current = null;
+      }
+      if (rewardProcessingIntervalRef.current) {
+        clearInterval(rewardProcessingIntervalRef.current);
+        rewardProcessingIntervalRef.current = null;
+      }
+
+      setWaitingForWebSocketResponse(true);
+      console.log('⏰ Processing your reward... 카운트다운 시작 (전체 에러)');
+      countdownRef.current = 2;
+      console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+
+      rewardProcessingIntervalRef.current = setInterval(() => {
+        countdownRef.current--;
+        if (countdownRef.current > 0) {
+          console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
+        } else {
+          console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
+          if (rewardProcessingIntervalRef.current) {
+            clearInterval(rewardProcessingIntervalRef.current);
+            rewardProcessingIntervalRef.current = null;
+          }
+        }
+      }, 1000);
+
+      rewardProcessingTimeoutRef.current = setTimeout(() => {
+        if (rewardProcessingIntervalRef.current) {
+          clearInterval(rewardProcessingIntervalRef.current);
+          rewardProcessingIntervalRef.current = null;
+        }
+        setWaitingForWebSocketResponse(false);
         resetAdvertisementParams();
         reset(ROUTES.map);
-      }, 1000);
+        rewardProcessingTimeoutRef.current = null;
+      }, 2000);
     } finally {
       setIsProcessing(false);
     }

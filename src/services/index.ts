@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { ROUTES } from '../navigation';
 import {
   AliveResponse,
+  KeepAliveServerResponse,
   EmailCheckRequest,
   EmailCheckResponse,
   ReferralCheckRequest,
@@ -213,16 +214,55 @@ export const nodeGatewayRequest = async (
 export const sendAliveSignal = async (
   navigation?: any,
 ): Promise<AliveResponse> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
 
-  return Promise.resolve({
-    success: true,
-    emergencyStop: {
-      enabled: false , 
-      message: '긴급 안내: 시스템 점검 중입니다. 잠시 후 다시 시도해주세요.',
-      link: 'https://example.com/emergency-notice', 
-    },
-  });
+    const response = await nodeGatewayRequest('/keepalive', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const serverResponse: KeepAliveServerResponse = await response.json();
+
+    if (serverResponse.status === 'success') {
+      const result: AliveResponse = {
+        success: true,
+      };
+
+      if (serverResponse.data.emergency_info) {
+
+        result.emergencyStop = {
+          enabled: true,
+          message: serverResponse.data.emergency_info.message,
+          link: serverResponse.data.emergency_info.link,
+        };
+      } else {
+
+        result.emergencyStop = {
+          enabled: false,
+        };
+      }
+
+      return result;
+    } else {
+
+      throw new Error(`Server error: ${serverResponse.message}`);
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === 'API request timeout') {
+
+      throw error;
+    }
+    throw error;
+  }
 };
 
 const createAxiosInstance = (navigation?: any) => {

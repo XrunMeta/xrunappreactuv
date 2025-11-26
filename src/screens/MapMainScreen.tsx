@@ -879,7 +879,7 @@ export const MapMainScreen: React.FC = () => {
                   {calloutData.brand || calloutData.name} 획득 가능합니다.
                 </Text>
                 <Text style={styles.calloutCoins}>
-                  {calloutData.distance.toFixed(2)}m {calloutData.coins || '0'} {calloutData.brand || 'XRUN'}
+                  {calloutData.xrunPrice?.toFixed(2) || '0'} {calloutData.brand || 'XRUN'}
                 </Text>
               </View>
             </View>
