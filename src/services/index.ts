@@ -237,7 +237,12 @@ export const v_495832 = async (
         success: true,
       };
 
-      if (v_2c2f8d.data.emergency_info) {
+      if (v_2c2f8d.data.server_status === 'health') {
+
+        v_43c42e.emergencyStop = {
+          enabled: false,
+        };
+      } else if (v_2c2f8d.data.emergency_info) {
 
         v_43c42e.emergencyStop = {
           enabled: true,
@@ -262,6 +267,31 @@ export const v_495832 = async (
       throw v_5e9bfe;
     }
     throw v_5e9bfe;
+  }
+};
+
+export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_3393e3 = await v_12a388('/app-config/ios-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_9390e8 = await v_3393e3.json();
+    return v_9390e8?.data?.iosOnWallet ?? false;
+  } catch (v_5e9bfe) {
+    console.error('iOS 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
+    return false; 
   }
 };
 
