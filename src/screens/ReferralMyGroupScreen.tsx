@@ -6,21 +6,24 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_700ef9 } from '../context';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
-import { v_baf3b8 } from '../services';
-import { v_7a1a84 } from '../types';
+import { v_fb1936 } from '../services';
+import { v_b0f886 } from '../types';
 
 interface MemberData {
   rank: number;
   email: string;
   date: string;
+  member: string; 
   highlight?: boolean;
 }
 
 export const v_58584a = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
-  const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
+  const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_03be4c, v_e2e8ad] = v_5ab095<number>(0);
   const [v_87203a, v_8d99ff] = v_5ab095<MemberData[]>([]);
   const [v_cd31a8, v_deef62] = v_5ab095<boolean>(true);
@@ -33,9 +36,10 @@ export const v_58584a = () => {
       try {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (v_f24fd5) {
-          const v_ef7306 = JSON.parse(v_f24fd5);
-          if (v_ef7306.member) {
-            v_9d6aeb(v_ef7306.member);
+        const v_ef7306 = JSON.parse(v_f24fd5);
+        if (v_ef7306.member) {
+
+          v_9d6aeb(String(v_ef7306.member));
 
             v_58d2fc.current = false;
             v_8d99ff([]);
@@ -62,16 +66,38 @@ export const v_58584a = () => {
         v_bce118.current = true;
 
         try {
-          const v_3393e3 = await v_baf3b8(v_717992, v_9b57fc);
+          const v_3393e3 = await v_fb1936(v_717992, v_9b57fc);
 
           if (v_3393e3.status === 'success' && v_3393e3.data) {
 
-            const v_8673d6 = v_3393e3.data.map((v_8c0b26, v_a56041) => ({
-              rank: v_a56041 + 1,
-              email: v_8c0b26.masked_email || v_8c0b26.email || '',
-              date: '', 
-              highlight: v_a56041 === 0, 
-            }));
+            const v_8673d6 = v_3393e3.data.map((item: v_b0f886, v_a56041) => {
+
+              let v_14b228 = '';
+              try {
+                const v_a86996 = v_8c0b26.datejoin.replace(' ', 'T');
+                const v_8dffde = new Date(v_a86996);
+                if (isNaN(v_8dffde.getTime())) {
+                  console.log('[내 그룹] 잘못된 날짜:', v_8c0b26.datejoin);
+                  v_14b228 = '';
+                } else {
+                  v_14b228 = v_8dffde
+                    .toISOString()
+                    .split('T')[0]
+                    .replace(/-/g, '.');
+                }
+              } catch (v_5e9bfe) {
+                console.log('[내 그룹] 날짜 파싱 오류:', v_8c0b26.datejoin, v_5e9bfe);
+                v_14b228 = '';
+              }
+
+              return {
+                rank: v_a56041 + 1,
+                email: v_8c0b26.email || '',
+                date: v_14b228,
+                member: v_8c0b26.member || '',
+                highlight: v_a56041 === 0, 
+              };
+            });
 
             v_61b66e.current = v_8673d6;
             v_8d99ff(v_8673d6);
@@ -180,7 +206,10 @@ export const v_58584a = () => {
               ItemComponent={v_814266}
               pageSize={20}
               keyExtractor={(v_8c0b26, v_a56041) => `member-${v_8c0b26.rank}-${v_8c0b26.email}-${v_a56041}`}
-              onItemPress={() => v_9b57fc(v_ce4741.referralDepthOne)}
+              onItemPress={(v_8c0b26) => {
+                v_779227({ member: v_8c0b26.member, email: v_8c0b26.email });
+                v_9b57fc(v_ce4741.referralDepthOne);
+              }}
               contentContainerStyle={v_d81136.listContent}
             />
           )}
