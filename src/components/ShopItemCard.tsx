@@ -18,6 +18,7 @@ export interface ShopItemCardProps {
   imageSource: ImageSourcePropType;
   onPress?: () => void;
   quantityLabel?: string;
+  quantityColor?: string;
   containerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -28,6 +29,7 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
   imageSource,
   onPress,
   quantityLabel,
+  quantityColor,
   containerStyle,
 }) => {
   const [imageError, setImageError] = useState(false);
@@ -65,7 +67,11 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         <Text style={styles.price}>{priceLabel}</Text>
       </View>
-      {quantityLabel ? <Text style={styles.quantity}>{quantityLabel}</Text> : null}
+      {quantityLabel ? (
+        <Text style={[styles.quantity, quantityColor ? { color: quantityColor } : null]}>
+          {quantityLabel}
+        </Text>
+      ) : null}
     </TouchableOpacity>
   );
 };

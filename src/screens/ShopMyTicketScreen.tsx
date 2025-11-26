@@ -17,20 +17,21 @@ const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any):
 
   const imageSource = require('../../assets/images/icon_shop.png');
 
-  const quantityLabel = item.status === 10307 ? t('screens.shopMyTicket.available') : t('screens.shopMyTicket.used');
+  const quantityLabel = item.status === 10306 ? t('screens.shopMyTicket.available') : t('screens.shopMyTicket.used');
 
   const uniqueId = item.txID 
     ? `${item.item}_${item.txID}_${index}` 
     : `${item.item}_${index}_${Math.random().toString(36).substr(2, 9)}`;
 
   return {
+
+    ...item,
+
     id: uniqueId,
     title: item.title || '',
     priceLabel: '', 
     detailTotal: quantityLabel,
     image: imageSource,
-
-    ...item,
   } as ShopItem & PurchasedItemData;
 };
 
@@ -219,6 +220,9 @@ export const ShopMyTicketScreen = () => {
                   ? { uri: `data:image/png;base64,${itemImage}` }
                   : item.image;
 
+                const itemStatus = (item as any).status;
+                const quantityColor = itemStatus === 10306 ? '#3391D0' : '#707070';
+
                 return (
                   <ShopItemCard
                     key={item.id}
@@ -226,6 +230,7 @@ export const ShopMyTicketScreen = () => {
                     priceLabel={item.priceLabel}
                     imageSource={imageSource}
                     quantityLabel={item.detailTotal}
+                    quantityColor={quantityColor}
                     onPress={() => handleSelect(item)}
                   />
                 );

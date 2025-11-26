@@ -63,12 +63,15 @@ export const ShopTicketDetailScreen = () => {
       const result = await getXrunPurchasedItems(memberId);
 
       if (result && result.status === 'success' && result.data) {
-        const targetItem = result.data.find(item => item.storage === storageId);
+
+        const targetItem = result.data.find(item => String(item.storage) === String(storageId));
         if (targetItem) {
           setTicketData(targetItem);
           console.log('[티켓 상세] 티켓 데이터 새로고침 완료:', targetItem);
         } else {
           console.log('[티켓 상세] 해당 storageId와 일치하는 아이템을 찾을 수 없습니다:', storageId);
+          console.log('[티켓 상세] 디버깅 - storageId 타입:', typeof storageId, '값:', storageId);
+          console.log('[티켓 상세] 디버깅 - 첫 번째 아이템 storage 타입:', typeof result.data[0]?.storage, '값:', result.data[0]?.storage);
         }
       }
     } catch (error) {
@@ -165,7 +168,7 @@ export const ShopTicketDetailScreen = () => {
   const qrCodeValue = generateQRCodeValue();
   const currentStatus = ticketData?.status || (selectedShopItem as any)?.status;
 
-  const isAvailable = currentStatus == 10307 || currentStatus === 10307;
+  const isAvailable = currentStatus == 10306 || currentStatus === 10306;
 
   console.log('[티켓 상세] === 상태 확인 ===');
   console.log('[티켓 상세] currentStatus:', currentStatus);
