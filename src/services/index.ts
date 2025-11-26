@@ -100,6 +100,12 @@ import {
   GetRankSpesificResponse,
   GetMyGroupRequest,
   GetMyGroupResponse,
+  GetMyRecommenderRequest,
+  GetMyRecommenderResponse,
+  CheckCanSetRecommenderRequest,
+  CheckCanSetRecommenderResponse,
+  SetRecommenderRequest,
+  SetRecommenderResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -2372,6 +2378,136 @@ export const getMyGroup = async (
     console.error('[내 그룹] 내 그룹 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[내 그룹] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyRecommender = async (
+  member: string,
+  navigation?: any,
+): Promise<GetMyRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyRecommenderRequest = { member };
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyRecommenderResponse>(
+      '/getMyRecommender',
+      request,
+    );
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴 수정] 현재 레퍼럴 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const checkCanSetRecommender = async (
+  member: string,
+  email: string,
+  navigation?: any,
+): Promise<CheckCanSetRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: CheckCanSetRecommenderRequest = {
+      member,
+      email: email.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 요청:', { member, email: email.trim() });
+
+    const response = await axiosInstance.post<CheckCanSetRecommenderResponse>(
+      '/checkCanSetRecommender',
+      request,
+    );
+
+    const responseCode = response.status;
+    const responseData = response.data;
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 응답:', {
+      code: responseCode,
+      status: responseData.status,
+      message: responseData.message,
+    });
+
+    return {
+      ...responseData,
+      code: responseCode,
+      status_code: responseCode,
+    };
+  } catch (error) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 오류:', error);
+    if (error instanceof AxiosError) {
+      const statusCode = error.response?.status || 500;
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: statusCode,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+
+      return {
+        status: 'error',
+        code: statusCode,
+        status_code: statusCode,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data?.data,
+      };
+    }
+    throw error;
+  }
+};
+
+export const setRecommender = async (
+  member: string,
+  email: string,
+  navigation?: any,
+): Promise<SetRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SetRecommenderRequest = {
+      member,
+      email: email.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', { member, email: email.trim() });
+
+    const response = await axiosInstance.post<SetRecommenderResponse>(
+      '/setRecommender',
+      request,
+    );
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
