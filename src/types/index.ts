@@ -638,3 +638,280 @@ export interface GetUserInfoForReferralResponse {
     [key: string]: any;
   }>;
 }
+
+export interface SettlementListRequest {
+  member: number; 
+  currency: number; 
+  daysbefore: number; 
+  startwith: number; 
+}
+
+export interface SettlementListResponse {
+  type: string; 
+  data: Array<{
+    [key: string]: any;
+  }>;
+}
+
+export interface GetCompletedAdsRequest {
+  member: number; 
+}
+
+export interface CompletedAdItem {
+  transaction: string;
+  title: string;
+  amount: number;
+  symbol: string;
+  extracode: string;
+  datetime: string;
+}
+
+export interface GetCompletedAdsResponse {
+  data: CompletedAdItem[];
+}
+
+export interface GetSavedAdsRequest {
+  member: number; 
+  orderField?: 'datetime' | 'dateleft' | 'amount'; 
+}
+
+export interface SavedAdItem {
+  [key: string]: any;
+}
+
+export interface GetSavedAdsResponse {
+  data: SavedAdItem[];
+}
+
+export interface GetSettlementListRequest {
+  member: number; 
+}
+
+export interface SettlementListItem {
+  transaction: number;
+  email?: string;
+  amountasxrun: string; 
+  datetime: string;
+  [key: string]: any;
+}
+
+export interface GetSettlementListResponse {
+  status: 'success' | 'error';
+  data: SettlementListItem[];
+  message?: string;
+}
+
+export interface GetSettlementAmountRequest {
+  member: number; 
+}
+
+export interface GetSettlementAmountResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    amount: string; 
+  }>;
+  message?: string;
+}
+
+export interface RankItem {
+  referrer_id: number;
+  referrer_email: string;
+  unique_rank: number;
+  referral_count: number;
+}
+
+export interface GetRankRequest {
+
+}
+
+export interface GetRankResponse {
+  status: 'success' | 'error';
+  data: RankItem[];
+  message?: string;
+}
+
+export interface GetRankSpesificRequest {
+  member: number; 
+}
+
+export interface GetRankSpesificResponse {
+  status: 'success' | 'error';
+  data: Array<{
+    unique_rank: number; 
+  }>;
+  message?: string;
+}
+
+export interface MyGroupItem {
+  member: string; 
+  email: string; 
+  datejoin: string; 
+}
+
+export interface GetMyGroupRequest {
+  member: string; 
+}
+
+export interface GetMyGroupResponse {
+  status: 'success' | 'error';
+  data: MyGroupItem[];
+  message?: string;
+}
+
+export interface GetMyRecommenderRequest {
+  member: string; 
+}
+
+export interface GetMyRecommenderResponse {
+  status: 'success' | 'error';
+  data?: {
+    email: string; 
+    masked_email: string; 
+    firstname: string; 
+    lastname: string; 
+  };
+  message?: string;
+}
+
+export interface CheckCanSetRecommenderRequest {
+  member: string; 
+  email: string; 
+}
+
+export interface CheckCanSetRecommenderResponse {
+  status?: 'success' | 'error';
+  code?: number; 
+  status_code?: number; 
+  message?: string; 
+  data?: {
+    canSet?: boolean; 
+  };
+}
+
+export interface SetRecommenderRequest {
+  member: string; 
+  email: string; 
+}
+
+export interface SetRecommenderResponse {
+  status: 'success' | 'error';
+  message?: string;
+}
+
+export interface GetXRUNGopaxPriceRequest {
+
+}
+
+export interface GetXRUNGopaxPriceResponse {
+  status: 'success' | 'error';
+  data: {
+    gopaxPrice: number; 
+  };
+  message?: string;
+}
+
+export interface GetUserBalanceRequest {
+  member: string; 
+}
+
+export interface GetUserBalanceResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data: {
+    realtimeBalance: {
+      balance: string; 
+      lastUpdated: string;
+      success: boolean;
+    };
+  };
+  message?: string;
+}
+
+export interface GetXrunBuyableItemsRequest {
+  member: string; 
+}
+
+export interface ShopItemData {
+  item: number; 
+  title: string; 
+  description: string; 
+  image: string; 
+  thumbnail: string; 
+  priceKRW: string; 
+  priceXrun: string; 
+  isxrunbuy: number | { data?: number }; 
+  gpkrprice: number | { data?: number }; 
+  gtkrPrice?: number | { data?: number }; 
+  sku: string; 
+  type: string; 
+  unit: string; 
+  total_purchased?: number; 
+  terms?: number; 
+  [key: string]: any; 
+}
+
+export interface GetXrunBuyableItemsResponse {
+  status: 'success' | 'error';
+  data: ShopItemData[];
+  message?: string;
+}
+
+export interface GetXrunPurchasedItemsRequest {
+  member: string; 
+}
+
+export interface PurchasedItemData {
+  item: number; 
+  title: string; 
+  description: string; 
+  storage: string; 
+  status: number; 
+  txID: string; 
+  icon: string; 
+  [key: string]: any; 
+}
+
+export interface GetXrunPurchasedItemsResponse {
+  status: 'success' | 'error';
+  data: PurchasedItemData[];
+  message?: string;
+}
+
+export interface PurchaseXrunItemRequest {
+  member: string; 
+  item: number; 
+  amount: string; 
+}
+
+export interface PurchaseXrunItemResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: any; 
+  message?: string;
+}
+
+export interface SaveInappPurchaseLogRequest {
+  status: string; 
+  member: string; 
+}
+
+export interface SaveInappPurchaseLogResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: Array<{
+    affectedRows?: number; 
+  }>;
+  message?: string;
+}
+
+export interface DeleteXrunPurchasedItemRequest {
+  member: string; 
+  storage: string; 
+}
+
+export interface DeleteXrunPurchasedItemResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: any; 
+  message?: string;
+}
