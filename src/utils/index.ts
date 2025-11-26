@@ -15,6 +15,8 @@ export const v_db97fb = async (
 
 export * from './env';
 
+export * from './imageCache';
+
 export const v_35c0e0 = (v_f63e09): string => {
   const v_0ad8c5 = typeof v_f63e09 === 'string' ? parseFloat(v_f63e09) : v_f63e09;
   if (isNaN(v_0ad8c5)) return '0';
@@ -50,6 +52,52 @@ export const v_b9db3d = (v_4c90cc, v_beea9d): number => {
 
   const v_43c42e = v_844935 * v_2d20f9;
   return Math.round(v_43c42e * 100) / 100;
+};
+
+export const v_89f939 = (v_f63e09, v_a832b3 = ''): string => {
+
+  if (v_f63e09 === null || v_f63e09 === undefined) return '0';
+
+  if (typeof v_f63e09 === 'object' && v_f63e09 !== null) {
+    console.warn('[formatCurrency] 객체를 받았습니다:', v_f63e09);
+    return '0';
+  }
+
+  let v_e035c6;
+  if (typeof v_f63e09 === 'string') {
+
+    v_e035c6 = parseFloat(v_f63e09.replace(/[^\d.-]/g, ''));
+  } else if (typeof v_f63e09 === 'number') {
+    v_e035c6 = v_f63e09;
+  } else {
+    console.warn('[formatCurrency] 유효하지 않은 타입:', typeof v_f63e09);
+    return '0';
+  }
+
+  if (isNaN(v_e035c6)) {
+    return '0';
+  }
+
+  const v_c9526b = (v_fb558e): string => {
+    const v_468545 = v_fb558e.toString().split('.');
+    v_468545[0] = v_468545[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return v_468545.join('.');
+  };
+
+  if (v_a832b3 === 'KRW') {
+
+    return v_c9526b(v_e035c6) + ' KRW';
+  } else if (v_a832b3 === 'USD') {
+
+    return '$' + v_e035c6.toFixed(2);
+  } else if (v_a832b3 === 'XRUN') {
+
+    return v_c9526b(v_e035c6) + ' XRUN';
+  } else {
+
+    const v_864a3e = v_c9526b(v_e035c6);
+    return v_a832b3 ? `${v_864a3e} ${v_a832b3}` : v_864a3e;
+  }
 };
 
 export const v_a3bbf0 = async (
