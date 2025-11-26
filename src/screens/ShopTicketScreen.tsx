@@ -81,16 +81,16 @@ const transformShopItem = (
 
   return {
     id: String(item.item),
-    title: item.title || '',
     priceLabel: hasSku ? 'Loading...' : priceKRW, 
     detailPrice: `${priceKRW} / ${formatXrunAmount(basePriceXrun)} XRUN`,
     detailFee: `${formatWonAmount(chargeKRW)} / ${formatXrunAmount(chargeXrun)} XRUN`,
     detailTotal: `${formatXrunAmount(totalPriceXrun)} XRUN`,
-    image: imageSource,
 
     ...item,
 
-    priceXrun: basePriceXrun,
+    title: item.title || '',
+    image: imageSource,
+    priceXrun: String(basePriceXrun), 
     isxrunbuy: isxrunbuy,
     gpkrprice: gpkrprice,
     gtkrPrice: gtkrPrice,
@@ -338,7 +338,7 @@ export const ShopTicketScreen = () => {
       priceLabel={price}
       imageSource={imageSource}
       quantityLabel={options?.quantityLabel}
-      onPress={options?.shopItem ? () => handleSelectItem(options.shopItem!) : undefined}
+      onPress={options?.shopItem ? () => handleSelectItem(options.shopItem as ShopItem & ShopItemData) : undefined}
     />
   );
 
