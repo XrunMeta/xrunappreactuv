@@ -81,16 +81,16 @@ const v_3e6a6a = (
 
   return {
     id: String(v_8c0b26.item),
-    title: v_8c0b26.title || '',
     priceLabel: v_d6cf14 ? 'Loading...' : v_1c86a8, 
     detailPrice: `${v_1c86a8} / ${v_35c0e0(v_dab82f)} XRUN`,
     detailFee: `${v_d7e45e(v_63e5c7)} / ${v_35c0e0(v_cd7bfc)} XRUN`,
     detailTotal: `${v_35c0e0(v_216aa2)} XRUN`,
-    image: v_c322f7,
 
     ...v_8c0b26,
 
-    priceXrun: v_dab82f,
+    title: v_8c0b26.title || '',
+    image: v_c322f7,
+    priceXrun: String(v_dab82f), 
     isxrunbuy: v_c73c26,
     gpkrprice: v_4c0bd7,
     gtkrPrice: v_5f1527,
@@ -338,7 +338,7 @@ export const v_38326c = () => {
       priceLabel={v_6bbb57}
       imageSource={v_c322f7}
       quantityLabel={v_b36f96?.quantityLabel}
-      onPress={v_b36f96?.shopItem ? () => v_cac1cc(v_b36f96.shopItem!) : undefined}
+      onPress={v_b36f96?.shopItem ? () => v_cac1cc(v_b36f96.shopItem as v_745d71 & v_20035e) : undefined}
     />
   );
 
