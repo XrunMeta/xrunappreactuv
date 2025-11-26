@@ -237,7 +237,12 @@ export const v_495832 = async (
         success: true,
       };
 
-      if (v_2c2f8d.data.emergency_info) {
+      if (v_2c2f8d.data.server_status === 'health') {
+
+        v_43c42e.emergencyStop = {
+          enabled: false,
+        };
+      } else if (v_2c2f8d.data.emergency_info) {
 
         v_43c42e.emergencyStop = {
           enabled: true,
