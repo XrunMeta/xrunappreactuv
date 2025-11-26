@@ -143,7 +143,7 @@ export const cashingimages = {
       console.log(`[이미지 캐시] === 404 체크 포인트 ===`);
       console.log(`[이미지 캐시] 1. 백엔드 라우트 경로: ${endpoint}`);
       console.log(`[이미지 캐시] 2. fileId 존재 여부: ${fileIdStr ? '✅ 있음' : '❌ 없음'}`);
-      console.log(`[이미지 캐시] 3. 전체 요청 URL: ${fullUrl}`);
+      console.log(`[이미지 캐시] 3. 전체 요청 URL: ${fixedUrl}`);
 
       const axiosInstance = axios.create({
         baseURL: baseURL, 
@@ -206,7 +206,7 @@ export const cashingimages = {
         } else if (error instanceof AxiosError && error.request) {
 
           console.error(`[이미지 캐시] ❌ 네트워크 오류: 응답을 받지 못했습니다.`);
-          console.error(`[이미지 캐시] 요청 URL: ${fullUrl}`);
+          console.error(`[이미지 캐시] 요청 URL: ${fixedUrl}`);
         } else {
 
           console.error(`[이미지 캐시] ❌ 요청 설정 오류:`, error.message);
@@ -238,7 +238,7 @@ export const cashingimages = {
           if (errorCode === 404) {
             console.error(`[이미지 캐시] === 404 에러 분석 (응답 body) ===`);
             console.error(`[이미지 캐시] 체크 포인트 1 - 백엔드 라우트 경로: ${endpoint}`);
-            console.error(`[이미지 캐시] 체크 포인트 2 - Postman으로 직접 테스트 필요: ${fullUrl}`);
+            console.error(`[이미지 캐시] 체크 포인트 2 - Postman으로 직접 테스트 필요: ${fixedUrl}`);
             console.error(`[이미지 캐시] 체크 포인트 3 - fileId 존재 여부: ${fileIdStr ? '✅ 있음' : '❌ 없음'}`);
             console.error(`[이미지 캐시] 가능한 원인:`);
             console.error(`[이미지 캐시]   - URL 형식이 잘못되었을 수 있습니다.`);
@@ -251,7 +251,7 @@ export const cashingimages = {
 
       if (!result.success || !result.data) {
         console.error(`[이미지 캐시] 이미지 다운로드 응답 오류: ${fileIdStr}`, result);
-        console.error(`[이미지 캐시] 요청 URL: ${fullUrl}`);
+        console.error(`[이미지 캐시] 요청 URL: ${fixedUrl}`);
         return false;
       }
 
