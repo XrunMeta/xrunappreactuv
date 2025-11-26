@@ -1,11 +1,12 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af, v_f2c756, v_cf9c33, v_07a341, v_03e392, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af, v_f2c756, v_cf9c33, v_07a341, v_39a996 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_20035e } from '../types';
 import { v_54d016, v_9c9f1b } from '../services';
 import { v_89f939, v_35c0e0 } from '../utils';
@@ -14,6 +15,7 @@ import { v_1bfbd0 } from '../constants';
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const { selectedShopItem: v_dfe883 } = v_700ef9();
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_bc3e72, v_a14a8c] = v_5ab095<number | null>(null);
@@ -76,7 +78,7 @@ export const v_1a0a02 = () => {
 
   const v_dfaad1 = async () => {
     if (!v_dfe883 || !v_717992) {
-      v_03e392.alert('오류', '구매할 수 없습니다.');
+      await v_889fad('오류', '구매할 수 없습니다.');
       return;
     }
 
@@ -93,7 +95,7 @@ export const v_1a0a02 = () => {
 
       if (v_d6cf14) {
 
-        v_03e392.alert('알림', '인앱 구매 기능은 준비 중입니다.');
+        await v_889fad('알림', '인앱 구매 기능은 준비 중입니다.');
         v_72727b(false);
         return;
       }
@@ -109,7 +111,7 @@ export const v_1a0a02 = () => {
 
       if (v_a5e3b7 < v_2c49ad) {
         console.log('[구매] ❌ 잔액 부족');
-        v_03e392.alert(
+        await v_889fad(
           '잔액 부족',
           `현재 잔액: ${v_35c0e0(v_a5e3b7)} XRUN\n필요한 금액: ${v_35c0e0(v_2c49ad)} XRUN\n잔액을 충전해주세요.`,
           [{ text: '확인' }],
@@ -143,7 +145,7 @@ export const v_1a0a02 = () => {
     } catch (v_5e9bfe) {
       console.error('[구매] === 구매 오류 ===');
       console.error('[구매] 구매 오류:', v_5e9bfe);
-      v_03e392.alert(
+      await v_889fad(
         '구매 실패',
         v_5e9bfe.message || '구매 중 오류가 발생했습니다.',
         [{ text: '확인' }],

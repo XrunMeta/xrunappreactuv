@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_03e392, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_39a996 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -7,10 +7,12 @@ import { v_729608, v_368e80, v_cb41de } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_08316d, v_c58856, v_794a74 } from '../services';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_6086b6 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_35edd0, v_a8dd41] = v_5ab095('');
   const [v_c9aa64, v_77b468] = v_5ab095('');
   const [v_5bb914, v_addc15] = v_5ab095('');
@@ -80,17 +82,17 @@ export const v_6086b6 = () => {
   const v_03cae9 = async () => {
 
     if (!v_35edd0 || v_35edd0.trim() === '') {
-      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.emailRequired'));
+      await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.emailRequired'));
       return;
     }
 
     if (v_35edd0 === v_c9aa64) {
-      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.noChange'));
+      await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.noChange'));
       return;
     }
 
     if (!v_660822) {
-      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.error'), v_8d41d7('screens.myInfoReferral.alerts.userDataNotFound'));
+      await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.error'), v_8d41d7('screens.myInfoReferral.alerts.userDataNotFound'));
       return;
     }
 
@@ -104,7 +106,7 @@ export const v_6086b6 = () => {
 
       if (!v_fd95d1) {
 
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
         v_dbca5e(false);
         return;
       }
@@ -124,13 +126,13 @@ export const v_6086b6 = () => {
         (v_fd95d1?.data && v_fd95d1.data.canSet === false && v_f1a123 === 400);
 
       if (v_103d25) {
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.cannotSetSelf'));
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.cannotSetSelf'));
         v_dbca5e(false);
         return;
       }
 
       if (v_f1a123 === 404) {
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.notFound'));
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.notFound'));
         v_dbca5e(false);
         return;
       }
@@ -147,13 +149,13 @@ export const v_6086b6 = () => {
           ? v_8d41d7('screens.myInfoReferral.alerts.alreadyHasRecommender')
           : v_8d41d7('screens.myInfoReferral.alerts.alreadyRegistered');
 
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_a8cd21);
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_a8cd21);
         v_dbca5e(false);
         return;
       }
 
       if (v_f1a123 !== 200) {
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.cannotSet'));
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.cannotSet'));
         v_dbca5e(false);
         return;
       }
@@ -164,7 +166,7 @@ export const v_6086b6 = () => {
       console.log('[레퍼럴 수정] setRecommender 응답:', v_47323f);
 
       if (v_47323f && v_47323f.status === 'success') {
-        v_03e392.alert(
+        await v_889fad(
           v_8d41d7('screens.myInfoReferral.alerts.success'),
           v_8d41d7('screens.myInfoReferral.alerts.successMessage'),
           [
@@ -177,11 +179,11 @@ export const v_6086b6 = () => {
           ],
         );
       } else {
-        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
       }
     } catch (v_5e9bfe) {
       console.error('[레퍼럴 수정] 레퍼럴 수정 오류:', v_5e9bfe);
-      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
+      await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
     } finally {
       v_dbca5e(false);
     }

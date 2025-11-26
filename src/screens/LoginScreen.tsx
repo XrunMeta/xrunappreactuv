@@ -6,7 +6,6 @@ import {
   v_122070,
   v_4623af,
   v_326be8,
-  v_03e392,
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
@@ -21,10 +20,12 @@ import {
   v_a5170b,
   v_ea3493,
 } from '../services';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_f4f851 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
   const [v_a964a4, v_99916a] = v_5ab095(false);
@@ -58,12 +59,12 @@ export const v_f4f851 = () => {
   const v_ec4736 = async () => {
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.emailRequired'));
+      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.emailRequired'));
       return;
     }
 
     if (!v_adc076.trim()) {
-      v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.passwordRequired'));
+      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.passwordRequired'));
       return;
     }
 
@@ -79,14 +80,14 @@ export const v_f4f851 = () => {
       );
 
       if (v_b84499.status !== 'success') {
-        v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.loginFailed'));
+        await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.loginFailed'));
         v_deef62(false);
         return;
       }
 
       const v_ef7306 = v_b84499.data[0];
       if (!v_ef7306) {
-        v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.userDataNotFound'));
+        await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.userDataNotFound'));
         v_deef62(false);
         return;
       }
@@ -125,7 +126,7 @@ export const v_f4f851 = () => {
       v_9b57fc(v_ce4741.map);
     } catch (v_5e9bfe) {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
-      v_03e392.alert(
+      await v_889fad(
         v_8d41d7('common.messages.error'),
         v_8d41d7('screens.login.errors.loginError'),
       );
