@@ -28,3 +28,4 @@ export { ChoiceDialog } from './ChoiceDialog';
 export type { ChoiceDialogRef, ChoiceDialogStep } from './ChoiceDialog';
 export { MapBottomPanel } from './MapBottomPanel';
 export { LanguageSelector } from './LanguageSelector';
+export { AddTokenModal } from './AddTokenModal';

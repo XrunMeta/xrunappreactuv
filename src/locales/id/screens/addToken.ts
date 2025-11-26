@@ -1,0 +1,22 @@
+export default {
+  confirmTitle: 'Konfirmasi Tambah Token',
+  tokenTab: 'Token',
+  contractTab: 'Kontrak',
+  contractPlaceholder: 'Masukkan alamat kontrak',
+  nextButton: 'Selanjutnya',
+  contractAddress: 'Alamat Kontrak',
+  tokenName: 'Nama Token',
+  tokenSymbol: 'Simbol Token',
+  tokenDecimals: 'Desimal',
+  addButton: 'Tambah Token',
+  alreadyOwned: 'Sudah Dimiliki',
+  invalidTokenTitle: 'Token Tidak Valid',
+  invalidTokenDesc: 'Token ini bukan token ERC20 yang valid.',
+  existTokenTitle: 'Token Sudah Ada',
+  existTokenDesc: 'Token ini sudah ditambahkan ke dompet Anda.',
+  success: 'Berhasil',
+  successMessage: 'Token berhasil ditambahkan.',
+  error: 'Kesalahan',
+  errorMessage: 'Gagal menambahkan token. Silakan coba lagi.',
+};
+

@@ -98,6 +98,12 @@ import {
   v_caa41f,
   v_f77e47,
   v_cde3d3,
+  v_533fd3,
+  v_a37f54,
+  v_0c4879,
+  v_2a2e24,
+  v_d86d2d,
+  v_4aa24d,
   v_ed4aeb,
   v_f7dffa,
   v_8c8b0e,
@@ -2905,6 +2911,194 @@ export const v_7b3801 = async (
     console.error('[상점] 구매한 아이템 삭제 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[상점] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4d25ff = async (
+  v_660822,
+  v_ad0715 = 7,
+  v_c65f5d,
+): Promise<v_a37f54> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      daysbefore: v_ad0715,
+    };
+
+    console.log('[지갑] 지갑 데이터 조회 요청:', { member: v_660822, daysbefore: v_ad0715 });
+
+    const v_3393e3 = await v_9f42a4.post<v_a37f54>(
+      '/app4000-01-rev-01',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 지갑 데이터 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 지갑 데이터 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_8ffd12 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_0c4879> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[지갑] 다른 체인 상태 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_0c4879>(
+      '/showOtherChains',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 다른 체인 상태 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 다른 체인 상태 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_dcc367 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_2a2e24> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_2a2e24>(
+      '/ap4000-adxrun-topbanners',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] AD XRUN 배너 데이터 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_a88281 = async (
+  v_157c04,
+  v_1c958d,
+  v_a832b3,
+  v_c65f5d,
+): Promise<v_d86d2d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      address: v_157c04,
+      contract: v_1c958d,
+      currency: v_a832b3,
+    };
+
+    console.log('[지갑] 토큰 잔액 조회 요청:', { address: v_157c04, contract: v_1c958d, currency: v_a832b3 });
+
+    const v_3393e3 = await v_9f42a4.post<v_d86d2d>(
+      '/refreshBalancesCommon',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 토큰 잔액 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 토큰 잔액 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_cf99e2 = async (
+  v_1c958d,
+  v_a832b3,
+  v_c65f5d,
+): Promise<v_4aa24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      contract: v_1c958d,
+      currency: v_a832b3,
+    };
+
+    console.log('[지갑] ERC20 토큰 검증 요청:', { contract: v_1c958d, currency: v_a832b3 });
+
+    const v_3393e3 = await v_9f42a4.post<v_4aa24d>(
+      '/checkERC20Token',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] ERC20 토큰 검증 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] ERC20 토큰 검증 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

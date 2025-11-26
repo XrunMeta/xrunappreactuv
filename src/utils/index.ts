@@ -1,5 +1,7 @@
 import { v_03e392, v_5f4661 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import * as v_a928e1 from 'yvptvjtrs';
 
 export const v_db97fb = async (
   v_3b402b,
@@ -137,5 +139,32 @@ export const v_a3bbf0 = async (
 
     }
   }
+};
+
+export const v_3414e3 = (v_660822, v_e0c7e8): string => {
+  const v_e75c90 = `${v_660822}${v_e0c7e8}`;
+  return v_a928e1.SHA256(v_e75c90).toString();
+};
+
+export const v_989c00 = async (
+  v_660822,
+  v_e0c7e8,
+  v_ef86b6,
+): Promise<void> => {
+  if (!v_660822) return;
+
+  const v_598405 = v_3414e3(v_660822, v_e0c7e8);
+  await v_e84827.setItem(`customTokens_${v_598405}`, JSON.stringify(v_ef86b6));
+};
+
+export const v_506ca9 = async (
+  v_660822,
+  v_e0c7e8,
+): Promise<any[]> => {
+  if (!v_660822) return [];
+
+  const v_598405 = v_3414e3(v_660822, v_e0c7e8);
+  const v_ef86b6 = await v_e84827.getItem(`customTokens_${v_598405}`);
+  return v_ef86b6 ? JSON.parse(v_ef86b6) : [];
 };
 
