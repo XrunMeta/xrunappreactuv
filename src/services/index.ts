@@ -98,6 +98,17 @@ import {
   v_caa41f,
   v_f77e47,
   v_cde3d3,
+  v_533fd3,
+  v_a37f54,
+  v_0c4879,
+  v_2a2e24,
+  v_034a95,
+  v_5c2ee1,
+  v_ca4b36,
+  v_86c24d,
+  v_cc70e1,
+  v_d86d2d,
+  v_4aa24d,
   v_ed4aeb,
   v_f7dffa,
   v_8c8b0e,
@@ -2913,6 +2924,580 @@ export const v_7b3801 = async (
         data: v_5e9bfe.response?.data,
         message: v_5e9bfe.message,
       });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4d25ff = async (
+  v_660822,
+  v_ad0715 = 7,
+  v_c65f5d,
+): Promise<v_a37f54> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      daysbefore: v_ad0715,
+    };
+
+    console.log('[지갑] 지갑 데이터 조회 요청:', { member: v_660822, daysbefore: v_ad0715 });
+
+    const v_3393e3 = await v_9f42a4.post<v_a37f54>(
+      '/app4000-01-rev-01',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 지갑 데이터 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 지갑 데이터 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_8ffd12 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_0c4879> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[지갑] 다른 체인 상태 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_0c4879>(
+      '/showOtherChains',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 다른 체인 상태 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 다른 체인 상태 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_dcc367 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_2a2e24> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_2a2e24>(
+      '/ap4000-adxrun-topbanners',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] AD XRUN 배너 데이터 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] AD XRUN 배너 데이터 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_a88281 = async (
+  v_157c04,
+  v_1c958d,
+  v_a832b3,
+  v_c65f5d,
+): Promise<v_d86d2d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      address: v_157c04,
+      contract: v_1c958d,
+      currency: v_a832b3,
+    };
+
+    console.log('[지갑] 토큰 잔액 조회 요청:', { address: v_157c04, contract: v_1c958d, currency: v_a832b3 });
+
+    const v_3393e3 = await v_9f42a4.post<v_d86d2d>(
+      '/refreshBalancesCommon',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] 토큰 잔액 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 토큰 잔액 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_ce7f8e = async (
+  v_660822,
+  v_2365e9 = 1,
+  v_c65f5d,
+): Promise<v_034a95> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      page: v_2365e9,
+    };
+
+    console.log('[AD XRUN] 심사중 리스트 조회 요청:', { member: v_660822, page: v_2365e9 });
+
+    const v_3393e3 = await v_9f42a4.post<v_034a95>(
+      '/ap4000-adxrun-estimatelist',
+      v_cd6a57,
+    );
+
+    console.log('[AD XRUN] 심사중 리스트 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[AD XRUN] 심사중 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_2e777a = async (
+  v_660822,
+  v_2365e9 = 1,
+  v_c65f5d,
+): Promise<v_5c2ee1> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      page: v_2365e9,
+    };
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 요청:', { member: v_660822, page: v_2365e9 });
+
+    const v_3393e3 = await v_9f42a4.post<v_5c2ee1>(
+      '/ap4000-adxrun-resultlist',
+      v_cd6a57,
+    );
+
+    console.log('[AD XRUN] 정산완료 리스트 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[AD XRUN] 정산완료 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_fe6b99 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_ca4b36> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_ca4b36>(
+      '/ap4000-adxrun-topbannersSattled',
+      v_cd6a57,
+    );
+
+    console.log('[AD XRUN] 정산완료 배너 데이터 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[AD XRUN] 정산완료 배너 데이터 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[AD XRUN] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_cf99e2 = async (
+  v_1c958d,
+  v_a832b3,
+  v_c65f5d,
+): Promise<v_4aa24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      contract: v_1c958d,
+      currency: v_a832b3,
+    };
+
+    console.log('[지갑] ERC20 토큰 검증 요청:', { contract: v_1c958d, currency: v_a832b3 });
+
+    const v_3393e3 = await v_9f42a4.post<v_4aa24d>(
+      '/checkERC20Token',
+      v_cd6a57,
+    );
+
+    console.log('[지갑] ERC20 토큰 검증 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] ERC20 토큰 검증 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[지갑] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_3ff307 = async (
+  v_660822,
+  v_a832b3,
+  v_ad0715 = 7,
+  v_9b860a = 0,
+  v_c65f5d,
+): Promise<v_86c24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      currency: v_a832b3,
+      daysbefore: v_ad0715,
+      startwith: v_9b860a,
+    };
+
+    console.log('[트랜잭션] 전체 히스토리 조회 요청:', { member: v_660822, currency: v_a832b3, daysbefore: v_ad0715, startwith: v_9b860a });
+
+    const v_3393e3 = await v_9f42a4.post<v_86c24d>(
+      '/app4200-05',
+      v_cd6a57,
+    );
+
+    console.log('[트랜잭션] 전체 히스토리 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[트랜잭션] 전체 히스토리 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_c87170 = async (
+  v_660822,
+  v_a832b3,
+  v_ad0715 = 7,
+  v_9b860a = 0,
+  v_c65f5d,
+): Promise<v_86c24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      currency: v_a832b3,
+      daysbefore: v_ad0715,
+      startwith: v_9b860a,
+    };
+
+    console.log('[트랜잭션] 전송 히스토리 조회 요청:', { member: v_660822, currency: v_a832b3, daysbefore: v_ad0715, startwith: v_9b860a });
+
+    const v_3393e3 = await v_9f42a4.post<v_86c24d>(
+      '/app4200-06',
+      v_cd6a57,
+    );
+
+    console.log('[트랜잭션] 전송 히스토리 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[트랜잭션] 전송 히스토리 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_f730b0 = async (
+  v_660822,
+  v_a832b3,
+  v_ad0715 = 7,
+  v_9b860a = 0,
+  v_c65f5d,
+): Promise<v_86c24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      currency: v_a832b3,
+      daysbefore: v_ad0715,
+      startwith: v_9b860a,
+    };
+
+    console.log('[트랜잭션] 수신 상세 조회 요청:', { member: v_660822, currency: v_a832b3, daysbefore: v_ad0715, startwith: v_9b860a });
+
+    const v_3393e3 = await v_9f42a4.post<v_86c24d>(
+      '/app4200-01',
+      v_cd6a57,
+    );
+
+    console.log('[트랜잭션] 수신 상세 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[트랜잭션] 수신 상세 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_629c7b = async (
+  v_660822,
+  v_a832b3,
+  v_ad0715 = 7,
+  v_9b860a = 0,
+  v_c65f5d,
+): Promise<v_86c24d> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      currency: v_a832b3,
+      daysbefore: v_ad0715,
+      startwith: v_9b860a,
+    };
+
+    console.log('[트랜잭션] 전환 히스토리 조회 요청:', { member: v_660822, currency: v_a832b3, daysbefore: v_ad0715, startwith: v_9b860a });
+
+    const v_3393e3 = await v_9f42a4.post<v_86c24d>(
+      '/app4200-03',
+      v_cd6a57,
+    );
+
+    console.log('[트랜잭션] 전환 히스토리 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[트랜잭션] 전환 히스토리 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_927baf = async (
+  v_231c19,
+  v_0d793b,
+  v_f63e09,
+  v_21cc31,
+  v_a832b3,
+  v_74efc1 = 'ETH',
+  v_bcd61d = 1,
+  v_039314 = 2,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_4d33b2 = {
+      from: v_231c19,
+      to: v_0d793b,
+      amount: v_f63e09,
+      token: v_21cc31,
+      currency: v_a832b3,
+      network: v_74efc1,
+      chainId: v_bcd61d,
+      priorityGasTracker: v_039314,
+    };
+
+    console.log('[가스 수수료 예상] API 요청:', v_4d33b2);
+
+    const v_3393e3 = await v_12a388('/gasEstimated', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[가스 수수료 예상] API 응답:', v_43c42e);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[가스 수수료 예상] API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_76d832 = async (
+  v_231c19,
+  v_0d793b,
+  v_f63e09,
+  v_660822,
+  v_74efc1,
+  v_a832b3,
+  v_bcd61d,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_4d33b2 = {
+      from: v_231c19,
+      to: v_0d793b,
+      amount: v_f63e09,
+      member: v_660822,
+      network: v_74efc1,
+      currency: v_a832b3,
+      chainId: v_bcd61d,
+    };
+
+    console.log('[블록체인 전송] API 요청:', v_4d33b2);
+
+    const v_3393e3 = await v_12a388('/postTransferNew', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[블록체인 전송] API 응답:', v_43c42e);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[블록체인 전송] API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
     }
     throw v_5e9bfe;
   }

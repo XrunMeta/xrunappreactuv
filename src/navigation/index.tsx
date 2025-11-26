@@ -23,6 +23,7 @@ export const v_ce4741 = {
   nftHistory: 'nftHistory',
   xrunHistory2: 'xrunHistory2',
   adHistory: 'adHistory',
+  walletDetail: 'walletDetail',
   transactionDetails: 'transactionDetails',
   map: 'map',
   walletSend: 'walletSend',
@@ -61,6 +62,7 @@ export type ScreenName = keyof typeof v_ce4741;
 
 interface NavigationContextValue {
   currentScreen: ScreenName;
+  previousScreen: ScreenName | null;
   navigate: (screen: ScreenName) => void;
   goBack: () => void;
   reset: (screen: ScreenName) => void;
@@ -78,6 +80,7 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   const [v_2167f0, v_da6fbe] = v_5ab095(false);
 
   const v_0f0c7b = v_8d490a[v_8d490a.length - 1];
+  const v_640ccc = v_8d490a.length > 1 ? v_8d490a[v_8d490a.length - 2] : null;
 
   v_c4deb2(() => {
     const v_d0a230 = async () => {
@@ -128,12 +131,13 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   const v_3b402b = v_df9f57(
     () => ({
       currentScreen: v_0f0c7b,
+      previousScreen: v_640ccc,
       navigate: v_9b57fc,
       goBack: v_c7ac57,
       reset: v_487a25,
       canGoBack: v_8d490a.length > 1,
     }),
-    [v_0f0c7b, v_9b57fc, v_c7ac57, v_487a25, v_8d490a.length],
+    [v_0f0c7b, v_640ccc, v_9b57fc, v_c7ac57, v_487a25, v_8d490a.length],
   );
 
   return (

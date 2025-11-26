@@ -12,6 +12,7 @@ export { VerificationCodeScreen } from './VerificationCodeScreen';
 export { TermsScreen } from './TermsScreen';
 export { PrivacyPolicyScreen } from './PrivacyPolicyScreen';
 export { WalletScreen } from './WalletScreen';
+export { WalletDetailScreen } from './WalletDetailScreen';
 export { PolygonWalletScreen } from './PolygonWalletScreen';
 export { XrunWalletScreen } from './XrunWalletScreen';
 export { NftWalletScreen } from './NftWalletScreen';

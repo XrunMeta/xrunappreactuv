@@ -1,13 +1,19 @@
 
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
-import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302 } from '../types';
+import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
 import { v_202d44, v_52495e } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
   setWalletSendAddress: (address: string) => void;
   resetWalletSendAddress: () => void;
+  walletSendAmount: string;
+  setWalletSendAmount: (amount: string) => void;
+  resetWalletSendAmount: () => void;
+  walletReceiveAddress: string;
+  setWalletReceiveAddress: (address: string) => void;
+  resetWalletReceiveAddress: () => void;
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
@@ -51,12 +57,38 @@ type AppContextValue = {
   advertisementParams: v_fa3302 | null;
   setAdvertisementParams: (params: v_fa3302 | null) => void;
   resetAdvertisementParams: () => void;
+  selectedWalletAsset: v_5681b1 | null;
+  setSelectedWalletAsset: (asset: v_5681b1 | null) => void;
+  resetSelectedWalletAsset: () => void;
+  transactionResult: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null;
+  setTransactionResult: (result: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null) => void;
+  resetTransactionResult: () => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
 
 export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode }) => {
   const [v_ee27aa, v_134f07] = v_5ab095('');
+  const [v_e5d0e8, v_8f0018] = v_5ab095('0');
+  const [v_589fe1, v_f0d0d2] = v_5ab095('');
   const [v_750b67, v_2cdd41] = v_5ab095(false);
   const [v_e6976c, v_8f89f3] =
     v_5ab095<v_01e0ec>(v_ce4741.login);
@@ -82,12 +114,29 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     termsAccepted: true,
   });
   const [v_d0b6d4, v_d48a26] = v_5ab095<v_fa3302 | null>(null);
+  const [v_ea6a7a, v_84bd3c] = v_5ab095<v_5681b1 | null>(null);
+  const [v_0fc1c4, v_fcca8e] = v_5ab095<{
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null>(null);
 
   const v_3b402b = v_df9f57(
     () => ({
       walletSendAddress: v_ee27aa,
       setWalletSendAddress: v_134f07,
       resetWalletSendAddress: () => v_134f07(''),
+      walletSendAmount: v_e5d0e8,
+      setWalletSendAmount: v_8f0018,
+      resetWalletSendAmount: () => v_8f0018('0'),
+      walletReceiveAddress: v_589fe1,
+      setWalletReceiveAddress: v_f0d0d2,
+      resetWalletReceiveAddress: () => v_f0d0d2(''),
       addTokenDialogVisible: v_750b67,
       openAddTokenDialog: () => v_2cdd41(true),
       closeAddTokenDialog: () => v_2cdd41(false),
@@ -134,9 +183,17 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       advertisementParams: v_d0b6d4,
       setAdvertisementParams: v_d48a26,
       resetAdvertisementParams: () => v_d48a26(null),
+      selectedWalletAsset: v_ea6a7a,
+      setSelectedWalletAsset: v_84bd3c,
+      resetSelectedWalletAsset: () => v_84bd3c(null),
+      transactionResult: v_0fc1c4,
+      setTransactionResult: v_fcca8e,
+      resetTransactionResult: () => v_fcca8e(null),
     }),
     [
       v_ee27aa,
+      v_e5d0e8,
+      v_589fe1,
       v_750b67,
       v_e6976c,
       v_fc0b2c,
@@ -149,6 +206,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_479a37,
       v_8d7bc8,
       v_d0b6d4,
+      v_ea6a7a,
+      v_0fc1c4,
     ],
   );
 

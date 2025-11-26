@@ -6,6 +6,8 @@ import { v_85f2c8 } from '../services';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
 
+const v_c63bb8 = null ; 
+
 let v_4eff08 = null;
 let v_f968cc = null;
 let v_88efd0 = null;
@@ -59,28 +61,44 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   onTabChange: v_d52709,
 }) => {
   const { navigate: v_9b57fc } = v_a0daa8();
-  const [v_9e28f7, v_603c21] = v_5ab095(v_326be8.OS === 'android');
+
+  const v_39e4a6 = v_c63bb8 || v_326be8.OS;
+  const [v_9e28f7, v_603c21] = v_5ab095(v_39e4a6 === 'android');
 
   v_c4deb2(() => {
     const v_54e447 = new AbortController();
 
     const v_da5e9c = async () => {
-      if (v_326be8.OS === 'ios') {
+      console.log('[BottomNavigationBar] 현재 플랫폼 OS:', v_39e4a6, '(실제 Platform.OS:', v_326be8.OS, ')');
+
+      if (v_39e4a6 === 'ios') {
         try {
+          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 시작');
           const v_5297fb = await v_85f2c8(v_9b57fc);
+          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 결과:', {
+            iosOnWallet: v_5297fb,
+            showWallet: v_5297fb,
+            timestamp: new Date().toISOString(),
+          });
           v_603c21(v_5297fb);
         } catch (v_5e9bfe) {
-          console.error('지갑 표시 상태 가져오기 오류:', v_5e9bfe);
+          console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
           v_603c21(false);
         }
       } else {
         v_603c21(true); 
+        console.log('[BottomNavigationBar] Android 플랫폼 - 지갑 항상 표시');
       }
     };
 
     v_da5e9c();
 
+    const v_ad1d65 = setInterval(() => {
+      v_da5e9c();
+    }, 30000); 
+
     return () => {
+      clearInterval(v_ad1d65);
       v_54e447.abort();
     };
   }, [v_9b57fc]);
@@ -110,9 +128,9 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
   const v_8e442f = (v_6e55b1) => {
     if (v_6e55b1 === 'wallet') {
-      if (v_326be8.OS === 'android') {
+      if (v_39e4a6 === 'android') {
         v_9b57fc(v_ce4741.wallet);
-      } else if (v_326be8.OS === 'ios' && v_9e28f7) {
+      } else if (v_39e4a6 === 'ios' && v_9e28f7) {
         v_9b57fc(v_ce4741.wallet);
       } else {
 
