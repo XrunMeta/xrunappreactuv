@@ -237,7 +237,12 @@ export const sendAliveSignal = async (
         success: true,
       };
 
-      if (serverResponse.data.emergency_info) {
+      if (serverResponse.data.server_status === 'health') {
+
+        result.emergencyStop = {
+          enabled: false,
+        };
+      } else if (serverResponse.data.emergency_info) {
 
         result.emergencyStop = {
           enabled: true,
