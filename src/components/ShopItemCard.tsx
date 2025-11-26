@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,18 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
   quantityLabel,
   containerStyle,
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [isUri, setIsUri] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof imageSource === 'object' && 'uri' in imageSource) {
+      setIsUri(true);
+    }
+  }, [imageSource]);
+
+  const defaultImage = require('../../assets/xrun-horizontal-logo.png');
+  const finalImageSource = imageError ? defaultImage : imageSource;
+
   return (
     <TouchableOpacity
       style={[styles.card, containerStyle]}
@@ -38,7 +50,15 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
       disabled={!onPress}
     >
       <View style={styles.logoWrapper}>
-        <Image source={imageSource} style={styles.logo} resizeMode="contain" />
+        <Image
+          source={finalImageSource}
+          style={styles.logo}
+          resizeMode="contain"
+          onError={() => {
+            console.log('[ShopItemCard] 이미지 로딩 실패:', isUri ? (imageSource as { uri: string }).uri : 'local');
+            setImageError(true);
+          }}
+        />
       </View>
       <View style={styles.infoWrapper}>
         <Text style={styles.title}>{title}</Text>
@@ -110,5 +130,4 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
-
 

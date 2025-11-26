@@ -15,6 +15,8 @@ export const copyToClipboard = async (
 
 export * from './env';
 
+export * from './imageCache';
+
 export const formatXrunAmount = (amount: string | number): string => {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (isNaN(num)) return '0';
@@ -50,6 +52,52 @@ export const calculateWonEquivalent = (xrunAmount: string | number, gopaxPrice: 
 
   const result = numAmount * priceNum;
   return Math.round(result * 100) / 100;
+};
+
+export const formatCurrency = (amount: string | number | object | null | undefined, currency: string = ''): string => {
+
+  if (amount === null || amount === undefined) return '0';
+
+  if (typeof amount === 'object' && amount !== null) {
+    console.warn('[formatCurrency] 객체를 받았습니다:', amount);
+    return '0';
+  }
+
+  let numericValue: number;
+  if (typeof amount === 'string') {
+
+    numericValue = parseFloat(amount.replace(/[^\d.-]/g, ''));
+  } else if (typeof amount === 'number') {
+    numericValue = amount;
+  } else {
+    console.warn('[formatCurrency] 유효하지 않은 타입:', typeof amount);
+    return '0';
+  }
+
+  if (isNaN(numericValue)) {
+    return '0';
+  }
+
+  const addCommas = (number: number): string => {
+    const parts = number.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  };
+
+  if (currency === 'KRW') {
+
+    return addCommas(numericValue) + ' KRW';
+  } else if (currency === 'USD') {
+
+    return '$' + numericValue.toFixed(2);
+  } else if (currency === 'XRUN') {
+
+    return addCommas(numericValue) + ' XRUN';
+  } else {
+
+    const formatted = addCommas(numericValue);
+    return currency ? `${formatted} ${currency}` : formatted;
+  }
 };
 
 export const shareReferralLink = async (
