@@ -21,6 +21,8 @@ export const v_9b1a04 = {
   xlarge: 24,
 };
 
+export const v_731ab4 = __DEV__;
+
 export const v_4922a9 = {
   referral: {
     settlement: {

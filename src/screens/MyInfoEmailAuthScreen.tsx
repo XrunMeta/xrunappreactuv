@@ -8,6 +8,7 @@ import {
   v_03e392,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_368e80, v_cb41de } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -20,6 +21,7 @@ const v_0e461e = (v_e0c7e8): boolean => {
 };
 
 export const v_dec378 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { setVerificationSuccessRoute: v_8f89f3, verificationEmail: v_fc0b2c, setVerificationEmail: v_b572c3 } = v_700ef9();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
@@ -35,17 +37,17 @@ export const v_dec378 = () => {
   const v_d23445 = async () => {
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert('이메일 입력', '이메일 주소를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailInput'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailRequired'));
       return;
     }
 
     if (!v_0e461e(v_e0c7e8)) {
-      v_03e392.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailFormatError'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailFormatInvalid'));
       return;
     }
 
     if (v_fc0b2c && v_e0c7e8.trim() !== v_fc0b2c.trim()) {
-      v_03e392.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailMismatch'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailMismatchMessage'));
       return;
     }
 
@@ -57,13 +59,13 @@ export const v_dec378 = () => {
 
       if (v_593e63) {
         v_e4a300(true);
-        v_03e392.alert('전송 완료', '입력한 이메일로 인증코드를 전송했어요.');
+        v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.sendSuccess'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendSuccessMessage'));
       } else {
-        v_03e392.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+        v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 이메일 전송 오류:', v_5e9bfe);
-      v_03e392.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendError'));
     } finally {
       v_10837f(false);
     }
@@ -72,22 +74,22 @@ export const v_dec378 = () => {
   const v_03cae9 = async () => {
 
     if (!v_e0c7e8.trim()) {
-      v_03e392.alert('이메일 입력', '이메일 주소를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailInput'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailRequired'));
       return;
     }
 
     if (!v_0e461e(v_e0c7e8)) {
-      v_03e392.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailFormatError'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailFormatInvalid'));
       return;
     }
 
     if (v_fc0b2c && v_e0c7e8.trim() !== v_fc0b2c.trim()) {
-      v_03e392.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.emailMismatch'), v_8d41d7('screens.myInfoEmailAuth.alerts.emailMismatchMessage'));
       return;
     }
 
     if (!v_c5c953) {
-      v_03e392.alert('인증 코드 미발송', '먼저 이메일 인증 코드를 발송해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.codeNotSent'), v_8d41d7('screens.myInfoEmailAuth.alerts.codeNotSentMessage'));
       return;
     }
 
@@ -103,11 +105,11 @@ export const v_dec378 = () => {
         v_8f89f3(v_ce4741.myInfoEdit);
         v_9b57fc(v_ce4741.verificationCode);
       } else {
-        v_03e392.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+        v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 이메일 전송 오류:', v_5e9bfe);
-      v_03e392.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendError'));
     } finally {
       v_10837f(false);
     }
@@ -116,7 +118,7 @@ export const v_dec378 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Email Authentification" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.myInfoEmailAuth.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -124,7 +126,7 @@ export const v_dec378 = () => {
       >
         <View style={v_d81136.formWrapper}>
           <FormField
-            label="Email"
+            label={v_8d41d7('screens.myInfoEmailAuth.emailLabel')}
             value={v_e0c7e8}
             onChangeText={(v_9b6134) => {
               v_fedf34(v_9b6134);
@@ -133,7 +135,7 @@ export const v_dec378 = () => {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
-            placeholder="Enter your email address"
+            placeholder={v_8d41d7('screens.myInfoEmailAuth.emailPlaceholder')}
             containerStyle={v_d81136.fieldContainer}
             rightAccessory={
               <TouchableOpacity
@@ -146,7 +148,7 @@ export const v_dec378 = () => {
                 activeOpacity={0.7}
               >
                 <Text style={v_d81136.inlineButtonText}>
-                  {v_c5c953 ? 'Sent' : 'Send Email'}
+                  {v_5e23ec ? v_8d41d7('screens.myInfoEmailAuth.sending') : (v_c5c953 ? v_8d41d7('screens.myInfoEmailAuth.sendButton') : v_8d41d7('screens.myInfoEmailAuth.sendButton'))}
                 </Text>
               </TouchableOpacity>
             }
@@ -155,7 +157,7 @@ export const v_dec378 = () => {
 
         <View style={v_d81136.bottomSection}>
           <PrimaryButton
-            title="Confirm"
+            title={v_8d41d7('screens.myInfoEmailAuth.confirmButton')}
             fullWidth
             onPress={v_03cae9}
             style={v_d81136.primaryButton}

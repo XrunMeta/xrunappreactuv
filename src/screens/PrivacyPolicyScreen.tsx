@@ -1,6 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
@@ -30,12 +31,13 @@ Announcement Date: July 11, 2022 / Effective Date: July 11, 2022
 `;
 
 export const v_086cde = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
 
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="개인정보 처리방침" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.privacyPolicy.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.card}>
           <Text style={v_d81136.contentText}>{v_1afece}</Text>

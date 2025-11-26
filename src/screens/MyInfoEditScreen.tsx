@@ -10,6 +10,7 @@ import {
   v_9cabcb,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1 } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
@@ -27,11 +28,6 @@ import {
   v_4296b8,
   v_8025d1,
 } from '../services';
-
-const v_798085 = [
-  { value: 'male', label: '남' },
-  { value: 'female', label: '여' },
-] as const;
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
 
@@ -66,8 +62,14 @@ const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
 };
 
 export const v_cdb169 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { selectedCountryDialCode: v_459d5e, setVerificationEmail: v_b572c3, setVerificationSuccessRoute: v_8f89f3, setSelectMode: v_67ab1c } = v_700ef9();
+
+  const v_798085 = [
+    { value: 'male' as const, label: v_8d41d7('screens.myInfoEdit.genderMale') },
+    { value: 'female' as const, label: v_8d41d7('screens.myInfoEdit.genderFemale') },
+  ];
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
@@ -166,29 +168,29 @@ export const v_cdb169 = () => {
         }
       } catch (v_5e9bfe) {
         console.error('[정보수정] 사용자 정보 로드 실패:', v_5e9bfe);
-        v_03e392.alert('오류', '사용자 정보를 불러오는데 실패했습니다.');
+        v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.loadFailed'));
       } finally {
         v_deef62(false);
       }
     };
 
     v_ea3fa6();
-  }, [v_9b57fc]);
+  }, [v_9b57fc, v_8d41d7]);
 
   const v_1b8283 = async () => {
 
     if (!v_a32a50.trim()) {
-      v_03e392.alert('오류', '이름을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
     if (!v_328bb4.trim()) {
-      v_03e392.alert('오류', '성을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.lastNameRequired'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -230,9 +232,9 @@ export const v_cdb169 = () => {
 
       await Promise.all(v_e01f71);
 
-      v_03e392.alert('저장 완료', '변경 사항이 저장되었습니다.', [
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'), [
         {
-          text: '확인',
+          text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
           onPress: () => {
 
             if (v_7e32fb) {
@@ -245,19 +247,19 @@ export const v_cdb169 = () => {
       ]);
     } catch (v_5e9bfe) {
       console.error('[정보수정] 정보 수정 실패:', v_5e9bfe);
-      v_03e392.alert('저장 실패', '정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.saveFailed'), v_8d41d7('screens.myInfoEdit.alerts.saveFailedMessage'));
     } finally {
       v_433822(false);
     }
   };
 
   const v_c09605 = () => {
-    v_03e392.alert('비밀번호 변경', '비밀번호 변경 프로세스는 추후 연동됩니다.');
+    v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.passwordChange'), v_8d41d7('screens.myInfoEdit.alerts.passwordChangeMessage'));
   };
 
   const v_801fea = async () => {
     if (!v_e0c7e8) {
-      v_03e392.alert('오류', '이메일 정보가 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
       return;
     }
 
@@ -283,9 +285,9 @@ export const v_cdb169 = () => {
         v_8f89f3(v_ce4741.myInfoPhoneEdit); 
         v_9b57fc(v_ce4741.verificationCode);
       } else {
-        v_03e392.alert('오류', '이메일 인증 코드 발송에 실패했습니다. 다시 시도해주세요.', [
+        v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
           {
-            text: '확인',
+            text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
             onPress: () => {
 
             },
@@ -294,7 +296,7 @@ export const v_cdb169 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
-      v_03e392.alert('오류', '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
     }
   };
 
@@ -386,7 +388,7 @@ export const v_cdb169 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title="Edit My Info"
+        title={v_8d41d7('screens.myInfoEdit.title')}
         onBackPress={v_7e32fb ? v_c7ac57 : () => v_487a25(v_ce4741.myInfo)}
         showBackButton
       />
@@ -402,23 +404,23 @@ export const v_cdb169 = () => {
         ) : (
         <View style={v_d81136.formWrapper}>
           <FormField
-            label="First Name"
+            label={v_8d41d7('screens.myInfoEdit.firstName')}
             value={v_a32a50}
             onChangeText={v_4944f5}
-            placeholder="Enter first name"
+            placeholder={v_8d41d7('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!v_e495db}
           />
           <FormField
-            label="Last Name"
+            label={v_8d41d7('screens.myInfoEdit.lastName')}
             value={v_328bb4}
             onChangeText={v_b7613d}
-            placeholder="Enter last name"
+            placeholder={v_8d41d7('screens.myInfoEdit.lastNamePlaceholder')}
               editable={!v_e495db}
           />
             <View style={v_d81136.fieldContainer}>
-              <Text style={v_d81136.label}>Email</Text>
+              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.email')}</Text>
               <View style={v_d81136.disabledInput}>
-                <Text style={v_d81136.disabledText}>{v_e0c7e8 || 'Enter email address'}</Text>
+                <Text style={v_d81136.disabledText}>{v_e0c7e8 || v_8d41d7('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
 
@@ -433,7 +435,7 @@ export const v_cdb169 = () => {
           </View>
 
             <View style={v_d81136.fieldContainer}>
-              <Text style={v_d81136.label}>Phone Number</Text>
+              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.phone')}</Text>
               <View style={v_d81136.phoneFieldContainer}>
                 {}
                 <View style={v_d81136.phonePrefixDisabled}>
@@ -474,7 +476,7 @@ export const v_cdb169 = () => {
             </View>
 
           <View style={v_d81136.formGroup}>
-            <Text style={v_d81136.sectionLabel}>성별</Text>
+            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.gender')}</Text>
             <View style={v_d81136.inlineOptions}>
               {v_798085.map((v_0bd920) => (
                 <OptionButton
@@ -489,7 +491,7 @@ export const v_cdb169 = () => {
           </View>
 
           <View style={v_d81136.formGroup}>
-            <Text style={v_d81136.sectionLabel}>나이</Text>
+            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.age')}</Text>
             <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
               {v_0c96f7.map((v_0bd920, v_a56041) => {
                 const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
@@ -520,7 +522,7 @@ export const v_cdb169 = () => {
             </View>
           ) : (
           <PrimaryButton
-            title="Save Changes"
+            title={v_8d41d7('screens.myInfoEdit.save')}
             fullWidth
             onPress={v_1b8283}
             style={v_d81136.primaryButton}

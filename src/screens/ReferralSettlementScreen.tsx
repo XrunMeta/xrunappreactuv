@@ -1,6 +1,7 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -87,13 +88,14 @@ export const v_08aac3 = () => {
   const [v_26e26f, v_a80d65] = v_5ab095<string>('₩0');
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0); 
 
+  const { t: v_8d41d7 } = v_772971();
   const v_1c4d31 = v_df9f57(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: 'Rank', value: 'rank' },
+      { label: v_8d41d7('screens.referralSettlement.group'), value: 'group' },
+      { label: v_8d41d7('screens.referralSettlement.settlement'), value: 'settlement' },
+      { label: v_8d41d7('screens.referralSettlement.rank'), value: 'rank' },
     ] as const,
-    [],
+    [v_8d41d7],
   );
 
   v_c4deb2(() => {

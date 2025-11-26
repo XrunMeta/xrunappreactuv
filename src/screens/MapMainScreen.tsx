@@ -13,6 +13,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_a77ce6 } from '../components';
 import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -85,6 +86,7 @@ try {
 
 export const MapMainScreen: v_a3453e.FC = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const [v_a55f0b, v_0326b2] = v_5ab095<LocationData | null>(null);
   const [v_976e82, v_a7e4fc] = v_5ab095<string | null>(null);
   const [v_ac1d22, v_02dd63] = v_5ab095<'Map' | 'Camera'>('Map');
@@ -750,11 +752,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
   };
 
   const v_fce460 = [
-    { id: 'wallet', label: 'Wallet', icon: v_8daafe },
-    { id: 'shop', label: 'Shop', icon: v_e96568 },
+    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: 'Referral', icon: v_79011b },
-    { id: 'info', label: 'Info', icon: v_b636c9 },
+    { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
+    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
   ];
 
   if (v_ac1d22 === 'Camera') {

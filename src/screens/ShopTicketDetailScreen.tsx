@@ -14,6 +14,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_dc0e55 from 'bfgjhdhiuhcmlahuvrfzrfn';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -25,6 +26,7 @@ import { v_1bfbd0 } from '../constants';
 export const v_a1c4a5 = () => {
   const { selectedShopItem: v_dfe883 } = v_700ef9();
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const v_e74f9a = v_e662ae<any>(null);
 
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
@@ -303,7 +305,7 @@ export const v_a1c4a5 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Ticket Detail" showBackButton />
+      <Header title={v_8d41d7('screens.shopTicketDetail.title')} showBackButton />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
           {}

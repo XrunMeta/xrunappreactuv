@@ -1,6 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8 } from '../navigation';
@@ -62,6 +63,7 @@ const clauseMap: Record<
 };
 
 export const v_5fdcb2 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const { selectedClauseId: v_6e7459 } = v_700ef9();
   const v_b43b74 = v_f87e16[v_6e7459];
@@ -82,10 +84,10 @@ export const v_5fdcb2 = () => {
         </View>
         <View style={v_d81136.buttonRow}>
           <TouchableOpacity style={v_d81136.secondaryButton} activeOpacity={0.85} onPress={v_c7ac57}>
-            <Text style={v_d81136.secondaryText}>Declined</Text>
+            <Text style={v_d81136.secondaryText}>{v_8d41d7('screens.clauseDetail.declined')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={v_d81136.primaryButton} activeOpacity={0.85} onPress={v_c7ac57}>
-            <Text style={v_d81136.primaryText}>Accept</Text>
+            <Text style={v_d81136.primaryText}>{v_8d41d7('screens.clauseDetail.accept')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

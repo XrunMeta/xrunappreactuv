@@ -1,6 +1,7 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_122070, v_03e392, v_39a996 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
@@ -8,6 +9,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_08316d, v_c58856, v_794a74 } from '../services';
 
 export const v_6086b6 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const [v_35edd0, v_a8dd41] = v_5ab095('');
   const [v_c9aa64, v_77b468] = v_5ab095('');
@@ -78,17 +80,17 @@ export const v_6086b6 = () => {
   const v_03cae9 = async () => {
 
     if (!v_35edd0 || v_35edd0.trim() === '') {
-      v_03e392.alert('경고', '새 레퍼럴 이메일을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.emailRequired'));
       return;
     }
 
     if (v_35edd0 === v_c9aa64) {
-      v_03e392.alert('경고', '변경사항이 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.noChange'));
       return;
     }
 
     if (!v_660822) {
-      v_03e392.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.error'), v_8d41d7('screens.myInfoReferral.alerts.userDataNotFound'));
       return;
     }
 
@@ -102,7 +104,7 @@ export const v_6086b6 = () => {
 
       if (!v_fd95d1) {
 
-        v_03e392.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
         v_dbca5e(false);
         return;
       }
@@ -122,13 +124,13 @@ export const v_6086b6 = () => {
         (v_fd95d1?.data && v_fd95d1.data.canSet === false && v_f1a123 === 400);
 
       if (v_103d25) {
-        v_03e392.alert('경고', '자기 자신을 레퍼럴로 설정할 수 없습니다.');
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.cannotSetSelf'));
         v_dbca5e(false);
         return;
       }
 
       if (v_f1a123 === 404) {
-        v_03e392.alert('실패', '레퍼럴을 찾을 수 없습니다. 이메일을 확인해주세요.');
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.notFound'));
         v_dbca5e(false);
         return;
       }
@@ -142,16 +144,16 @@ export const v_6086b6 = () => {
           v_c0e79a.includes('추천 기록');
 
         const v_a8cd21 = v_f2f303
-          ? '이미 추천 기록이 있습니다.'
-          : '이미 등록된 레퍼럴입니다. 다른 이메일을 입력해주세요.';
+          ? v_8d41d7('screens.myInfoReferral.alerts.alreadyHasRecommender')
+          : v_8d41d7('screens.myInfoReferral.alerts.alreadyRegistered');
 
-        v_03e392.alert('경고', v_a8cd21);
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_a8cd21);
         v_dbca5e(false);
         return;
       }
 
       if (v_f1a123 !== 200) {
-        v_03e392.alert('실패', '레퍼럴을 설정할 수 없습니다.');
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.cannotSet'));
         v_dbca5e(false);
         return;
       }
@@ -163,11 +165,11 @@ export const v_6086b6 = () => {
 
       if (v_47323f && v_47323f.status === 'success') {
         v_03e392.alert(
-          '성공',
-          '레퍼럴 정보가 성공적으로 수정되었습니다.',
+          v_8d41d7('screens.myInfoReferral.alerts.success'),
+          v_8d41d7('screens.myInfoReferral.alerts.successMessage'),
           [
             {
-              text: 'OK',
+              text: v_8d41d7('screens.myInfoReferral.alerts.ok'),
               onPress: () => {
                 v_9b57fc(v_ce4741.myInfo);
               },
@@ -175,11 +177,11 @@ export const v_6086b6 = () => {
           ],
         );
       } else {
-        v_03e392.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+        v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
       }
     } catch (v_5e9bfe) {
       console.error('[레퍼럴 수정] 레퍼럴 수정 오류:', v_5e9bfe);
-      v_03e392.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.failedMessage'));
     } finally {
       v_dbca5e(false);
     }
@@ -188,7 +190,7 @@ export const v_6086b6 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="레퍼럴 수정" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.myInfoReferral.title')} onBackPress={v_c7ac57} showBackButton />
       {v_cd31a8 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -200,7 +202,7 @@ export const v_6086b6 = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={v_d81136.inner}>
-            <Text style={v_d81136.sectionLabel}>현재 레퍼럴</Text>
+            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoReferral.currentReferral')}</Text>
             {v_c9aa64 || v_5bb914 ? (
               <View style={v_d81136.card}>
                 {v_5bb914 ? <Text style={v_d81136.cardName}>{v_5bb914}</Text> : null}
@@ -208,24 +210,24 @@ export const v_6086b6 = () => {
               </View>
             ) : (
               <View style={v_d81136.card}>
-                <Text style={v_d81136.cardEmail}>레퍼럴이 없습니다</Text>
+                <Text style={v_d81136.cardEmail}>{v_8d41d7('screens.myInfoReferral.noReferral')}</Text>
               </View>
             )}
 
             <FormField
-              label="새 레퍼럴 이메일"
+              label={v_8d41d7('screens.myInfoReferral.newReferralLabel')}
               value={v_35edd0}
               onChangeText={v_a8dd41}
               autoCapitalize="none"
               keyboardType="email-address"
-              placeholder="새 레퍼럴 이메일을 입력해주세요."
+              placeholder={v_8d41d7('screens.myInfoReferral.newReferralPlaceholder')}
               editable={!v_1e6dba}
             />
           </View>
 
           <View style={v_d81136.bottomSection}>
             <PrimaryButton
-              title="Confirm"
+              title={v_1e6dba ? v_8d41d7('screens.myInfoReferral.processing') : v_8d41d7('screens.myInfoReferral.saveButton')}
               fullWidth
               onPress={v_03cae9}
               style={[v_d81136.primaryButton, v_1e6dba && v_d81136.buttonDisabled]}

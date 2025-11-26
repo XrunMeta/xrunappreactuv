@@ -2,6 +2,7 @@ import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af, v_f2c756, v_cf9c33, v_07a341, v_03e392, v_39a996 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -12,6 +13,7 @@ import { v_1bfbd0 } from '../constants';
 
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const { selectedShopItem: v_dfe883 } = v_700ef9();
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_bc3e72, v_a14a8c] = v_5ab095<number | null>(null);
@@ -178,7 +180,7 @@ export const v_1a0a02 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.shop.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.detailCard}>

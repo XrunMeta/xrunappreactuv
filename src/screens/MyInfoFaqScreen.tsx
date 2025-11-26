@@ -10,6 +10,7 @@ import {
   v_3094a2,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
@@ -80,6 +81,7 @@ const v_0e9014 = [
 ];
 
 export const v_083aa7 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const [v_c2c485, v_d24017] = v_5ab095<string[]>([]);
 
   const v_0ab8c5 = (v_389afb) => {
@@ -94,7 +96,7 @@ export const v_083aa7 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="FAQ" showBackButton />
+      <Header title={v_8d41d7('screens.myInfoFaq.title')} showBackButton />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}

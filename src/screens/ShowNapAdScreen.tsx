@@ -12,6 +12,7 @@ import {
   v_326be8,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
@@ -58,6 +59,7 @@ interface CampaignData {
 }
 
 export const ShowNapAdScreen: v_a3453e.FC = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
 
@@ -212,7 +214,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
         v_487a25(v_ce4741.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', v_f71b56);
-        throw new Error('지원하지 않는 URL입니다.');
+        throw new Error(v_8d41d7('screens.showNapAd.unsupportedUrl'));
       }
     } catch (v_5e9bfe) {
       console.error('❌ URL 이동 실패:', v_5e9bfe);
@@ -226,7 +228,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       const v_e7f87b = await v_f3de6d();
 
       if (!v_3aedd0?.urlAD) {
-        throw new Error('광고 URL이 없습니다.');
+        throw new Error(v_8d41d7('screens.showNapAd.noAdUrl'));
       }
 
       const v_7ec08d = v_3aedd0.urlAD;
@@ -467,15 +469,15 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
           <SequentialDots />
           <Text style={v_d81136.loadingText}>
             {v_7a79cf
-              ? 'Processing your reward...'
-              : '광고를 불러오는중입니다. 광고의 리워드는 해당 광고 완료후 진행됩니다. 완료후 약간의 시간 지연이 있습니다'}
+              ? v_8d41d7('screens.showNapAd.processingReward')
+              : v_8d41d7('screens.showNapAd.loading')}
           </Text>
 
           {v_7a79cf && <SequentialDots />}
 
           {v_32428f > 0 && (
             <Text style={v_d81136.retryText}>
-              광고 확인중입니다
+              {v_8d41d7('screens.showNapAd.checkingAd')}
             </Text>
           )}
 
@@ -485,7 +487,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
               onPress={v_812230}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.backButtonText}>뒤로가기</Text>
+              <Text style={v_d81136.backButtonText}>{v_8d41d7('screens.showNapAd.back')}</Text>
             </TouchableOpacity>
           )}
 
@@ -495,7 +497,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
               onPress={v_bde5d3}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.alternativeAdButtonText}>다른 광고 보기</Text>
+              <Text style={v_d81136.alternativeAdButtonText}>{v_8d41d7('screens.showNapAd.alternativeAd')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -505,19 +507,19 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       {!v_cd31a8 && !v_915a6b && !v_7a79cf && v_3aedd0 && (
         <View style={v_d81136.campaignContainer}>
           <Text style={v_d81136.campaignTitle}>
-            {v_3aedd0.name || '캠페인 정보'}
+            {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
           </Text>
           <Text style={v_d81136.campaignReward}>
-            reward : {(v_d0b6d4.xrunPrice || 0).toFixed(2)} XRUN
+            {v_8d41d7('screens.showNapAd.reward')} : {(v_d0b6d4.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={v_d81136.campaignDesc}>
-            {v_3aedd0.rewarddesc || '캠페인 설명'}
+            {v_3aedd0.rewarddesc || v_8d41d7('screens.showNapAd.campaignDesc')}
           </Text>
 
           {}
           {v_d0b6d4.joindesc && v_d0b6d4.joindesc !== '' && (
             <View style={v_d81136.joinDescContainer}>
-              <Text style={v_d81136.joinDescTitle}>참여 방법</Text>
+              <Text style={v_d81136.joinDescTitle}>{v_8d41d7('screens.showNapAd.joinMethod')}</Text>
               <ScrollView 
                 style={v_d81136.joinDescScrollView}
                 showsVerticalScrollIndicator={true}
@@ -542,7 +544,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
               }}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.watchAdButtonText}>광고 보기</Text>
+              <Text style={v_d81136.watchAdButtonText}>{v_8d41d7('screens.showNapAd.watchAd')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -550,7 +552,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
               onPress={v_5ca23e}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.cancelButtonText}>취소</Text>
+              <Text style={v_d81136.cancelButtonText}>{v_8d41d7('screens.showNapAd.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -566,13 +568,13 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
         <View style={v_d81136.modalContainer}>
           <View style={v_d81136.modalContent}>
             <Text style={v_d81136.modalText}>
-              광고 호출에 실패했습니다
+              {v_8d41d7('screens.showNapAd.adCallFailed')}
             </Text>
             <Text style={v_d81136.modalSubText}>
-              여러 번 시도했으나 광고 호출에 실패했습니다. 이전 페이지로 이동합니다.
+              {v_8d41d7('screens.showNapAd.adCallFailedSub')}
             </Text>
             <TouchableOpacity onPress={v_34fafc} style={v_d81136.okButton}>
-              <Text style={v_d81136.okButtonText}>확인</Text>
+              <Text style={v_d81136.okButtonText}>{v_8d41d7('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -15,6 +15,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704 } from '../components';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
@@ -368,6 +369,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   onTabChange: v_d52709,
 }) => {
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
   const { setAdvertisementParams: v_d48a26 } = v_700ef9();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
@@ -778,11 +780,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, [v_572bd3, v_917f22]);
 
   const v_fce460 = [
-    { id: 'wallet', label: 'Wallet', icon: v_8daafe },
-    { id: 'shop', label: 'Shop', icon: v_e96568 },
+    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: 'Referral', icon: v_79011b },
-    { id: 'info', label: 'Info', icon: v_b636c9 },
+    { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
+    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
   ];
 
   if (!v_d1a6bb) {

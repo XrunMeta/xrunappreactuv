@@ -9,6 +9,7 @@ import {
   v_6c4f62,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_1bfbd0 } from '../constants';
@@ -41,6 +42,7 @@ const v_fe0253 = (v_a86996): string => {
 };
 
 export const v_52e916 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_00f110, v_1edbc0] = v_5ab095<CompletedAdData[]>([]);
@@ -79,12 +81,12 @@ export const v_52e916 = () => {
             const v_0e7d84 = v_fe0253(v_ddcfed.datetime);
             return {
               transaction: v_ddcfed.transaction,
-              title: v_ddcfed.title || v_ddcfed.actiontext || v_ddcfed.extratext || '코인 획득',
+              title: v_ddcfed.title || v_ddcfed.actiontext || v_ddcfed.extratext || v_8d41d7('screens.advertiseScreen.coinAcquisition'),
               coin: `${v_ddcfed.amount} ${v_ddcfed.symbol}`,
               extracode: v_ddcfed.extracode,
               datetime: v_0e7d84,
-              statusSuccess: 'Coin acquisition completed',
-              statusPending: 'Waiting for Coin Acquisition',
+              statusSuccess: v_8d41d7('screens.advertiseScreen.statusSuccess'),
+              statusPending: v_8d41d7('screens.advertiseScreen.statusPending'),
             };
           });
 
@@ -155,18 +157,18 @@ export const v_52e916 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="AD" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.advertiseScreen.title')} onBackPress={v_c7ac57} showBackButton />
       <View style={v_d81136.content}>
         {v_683210 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
             <Text style={[v_d81136.normalText, { color: '#7d7e83', marginTop: 12 }]}>
-              로딩 중...
+              {v_8d41d7('screens.advertiseScreen.loading')}
             </Text>
           </View>
         ) : v_00f110.length === 0 ? (
           <View style={v_d81136.emptyContainer}>
-            <Text style={v_d81136.emptyText}>정산 내역이 없습니다.</Text>
+            <Text style={v_d81136.emptyText}>{v_8d41d7('screens.advertiseScreen.emptyMessage')}</Text>
           </View>
         ) : (
           <FlatList

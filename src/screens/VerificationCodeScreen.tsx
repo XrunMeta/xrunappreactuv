@@ -10,6 +10,7 @@ import {
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_cb41de } from '../components';
 import { v_1bfbd0 } from '../constants';
@@ -29,6 +30,7 @@ const v_ef7132 = 300;
 const v_79c59a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
 
 export const v_667a00 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, reset: v_487a25, navigate: v_9b57fc } = v_a0daa8();
   const {
     verificationSuccessRoute: v_e6976c,
@@ -69,12 +71,12 @@ export const v_667a00 = () => {
 
   const v_83b05b = async () => {
     if (!v_fc0b2c) {
-      v_03e392.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.error'), v_8d41d7('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
     if (v_c99bd2.length !== v_683bb6) {
-      v_03e392.alert('인증 코드 입력', '6자리 인증 코드를 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.codeInput'), v_8d41d7('screens.verificationCode.errors.codeRequired'));
       return;
     }
 
@@ -86,7 +88,7 @@ export const v_667a00 = () => {
       const v_ac477d = await v_415628(v_fc0b2c, v_c99bd2, v_9b57fc);
 
       if (!v_ac477d) {
-        v_03e392.alert('인증 실패', '인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
+        v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.verificationFailed'), v_8d41d7('screens.verificationCode.errors.verificationFailed'));
         v_ff0c7a(false);
         return;
       }
@@ -97,14 +99,14 @@ export const v_667a00 = () => {
         const v_b84499 = await v_a81308(v_fc0b2c, v_9b57fc);
 
         if (v_b84499.status !== 'success') {
-          v_03e392.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.loginFailed'), v_8d41d7('screens.verificationCode.errors.loginFailed'));
           v_ff0c7a(false);
           return;
         }
 
         const v_ef7306 = v_b84499.data[0];
         if (!v_ef7306 || !v_ef7306.member) {
-          v_03e392.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.loginFailed'), v_8d41d7('screens.verificationCode.errors.userDataNotFound'));
           v_ff0c7a(false);
           return;
         }
@@ -138,7 +140,7 @@ export const v_667a00 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[인증] 인증 코드 확인 오류:', v_5e9bfe);
-      v_03e392.alert('오류', '인증 처리 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.error'), v_8d41d7('screens.verificationCode.errors.error'));
     } finally {
       v_ff0c7a(false);
     }
@@ -146,7 +148,7 @@ export const v_667a00 = () => {
 
   const v_cf9840 = async () => {
     if (!v_fc0b2c) {
-      v_03e392.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.error'), v_8d41d7('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
@@ -159,13 +161,13 @@ export const v_667a00 = () => {
       if (v_f438c1) {
         v_83fe8f(v_ef7132);
         v_537cbb('');
-        v_03e392.alert('재전송 완료', '인증 코드를 다시 전송했습니다.');
+        v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.resendComplete'), v_8d41d7('screens.verificationCode.success.resendComplete'));
       } else {
-        v_03e392.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
+        v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.resendFailed'), v_8d41d7('screens.verificationCode.errors.resendFailed'));
       }
     } catch (v_5e9bfe) {
       console.error('[인증] 인증 코드 재전송 오류:', v_5e9bfe);
-      v_03e392.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.verificationCode.alerts.error'), v_8d41d7('screens.verificationCode.errors.resendError'));
     } finally {
       v_f30c99(false);
     }
@@ -174,11 +176,11 @@ export const v_667a00 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="인증코드를 입력하세요" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.verificationCode.title')} onBackPress={v_c7ac57} showBackButton />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.descriptionWrapper}>
           <Text style={v_d81136.description}>
-            {v_fc0b2c || '이메일'}로{'\n'}보내드린 6자리 코드를 입력하세요.
+            {v_fc0b2c || '이메일'}{v_8d41d7('screens.verificationCode.description')}
           </Text>
         </View>
 
@@ -203,7 +205,7 @@ export const v_667a00 = () => {
             <ActivityIndicator size="small" color="#2873ff" />
           ) : (
             <Text style={v_d81136.resendText}>
-              코드 재전송{' '}
+              {v_8d41d7('screens.verificationCode.resendCode')}{' '}
               {v_ae68cd > 0 && (
                 <Text style={v_d81136.resendTimer} numberOfLines={1}>
                   {v_8813df}
@@ -220,7 +222,7 @@ export const v_667a00 = () => {
             </View>
           ) : (
             <PrimaryButton
-              title="Verify"
+              title={v_8d41d7('screens.verificationCode.verifyButton')}
               onPress={v_83b05b}
               fullWidth
               disabled={v_c99bd2.length !== v_683bb6 || v_d1dd8f}

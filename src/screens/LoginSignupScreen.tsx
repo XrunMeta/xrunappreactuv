@@ -1,12 +1,14 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_cb41de, v_8714fe } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 
 export const v_54d331 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { t: v_8d41d7 } = v_772971();
 
   const v_ec4736 = () => {
     v_9b57fc(v_ce4741.login);
@@ -37,19 +39,19 @@ export const v_54d331 = () => {
       >
         {}
         <View style={v_d81136.adContainer}>
-          <Text style={v_d81136.adText}>전면 광고</Text>
+          <Text style={v_d81136.adText}>{v_8d41d7('screens.loginSignup.adText')}</Text>
         </View>
 
         {}
         <View style={v_d81136.buttonContainer}>
           <PrimaryButton
-            title="Login"
+            title={v_8d41d7('screens.loginSignup.loginButton')}
             onPress={v_ec4736}
             fullWidth={true}
             style={v_d81136.loginButton}
           />
           <SecondaryButton
-            title="회원가입"
+            title={v_8d41d7('screens.loginSignup.signupButton')}
             onPress={v_c5a058}
             fullWidth={true}
           />
@@ -58,16 +60,15 @@ export const v_54d331 = () => {
         {}
         <View style={v_d81136.termsContainer}>
           <Text style={v_d81136.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면
-            아래의{' '}
+            {v_8d41d7('screens.loginSignup.termsText')}{' '}
             <Text style={v_d81136.linkText} onPress={v_f4f55f}>
-              이용약관
+              {v_8d41d7('screens.loginSignup.termsLink')}
             </Text>
-            {' '}과{' '}
+            {' '}{v_8d41d7('screens.loginSignup.termsAnd')}{' '}
             <Text style={v_d81136.linkText} onPress={v_1354b4}>
-              개인정보 처리방침
+              {v_8d41d7('screens.loginSignup.privacyLink')}
             </Text>
-            을 읽고 동의해주세요.
+            {' '}{v_8d41d7('screens.loginSignup.termsAgree')}
           </Text>
         </View>
       </ScrollView>

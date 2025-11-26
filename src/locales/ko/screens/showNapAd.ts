@@ -1,0 +1,19 @@
+export default {
+  loading: '광고를 불러오는중입니다. 광고의 리워드는 해당 광고 완료후 진행됩니다. 완료후 약간의 시간 지연이 있습니다',
+  processingReward: '리워드 처리 중...',
+  checkingAd: '광고 확인중입니다',
+  back: '뒤로가기',
+  alternativeAd: '다른 광고 보기',
+  campaignInfo: '캠페인 정보',
+  reward: '리워드',
+  campaignDesc: '캠페인 설명',
+  joinMethod: '참여 방법',
+  watchAd: '광고 보기',
+  cancel: '취소',
+  confirm: '확인',
+  adCallFailed: '광고 호출에 실패했습니다',
+  adCallFailedSub: '여러 번 시도했으나 광고 호출에 실패했습니다. 이전 페이지로 이동합니다.',
+  unsupportedUrl: '지원하지 않는 URL입니다.',
+  noAdUrl: '광고 URL이 없습니다.',
+};
+

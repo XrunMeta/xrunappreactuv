@@ -1,0 +1,27 @@
+export default {
+  title: '레퍼럴 수정',
+  currentReferral: '현재 레퍼럴',
+  noReferral: '레퍼럴이 없습니다',
+  newReferralLabel: '새 레퍼럴 이메일',
+  newReferralPlaceholder: '새 레퍼럴 이메일을 입력해주세요.',
+  saveButton: '확인',
+  processing: '처리 중...',
+  alerts: {
+    warning: '경고',
+    emailRequired: '새 레퍼럴 이메일을 입력해주세요.',
+    noChange: '변경사항이 없습니다.',
+    error: '오류',
+    userDataNotFound: '사용자 정보를 찾을 수 없습니다.',
+    failed: '실패',
+    failedMessage: '레퍼럴 수정 중 오류가 발생했습니다.',
+    cannotSetSelf: '자기 자신을 레퍼럴로 설정할 수 없습니다.',
+    notFound: '레퍼럴을 찾을 수 없습니다. 이메일을 확인해주세요.',
+    alreadyHasRecommender: '이미 추천 기록이 있습니다.',
+    alreadyRegistered: '이미 등록된 레퍼럴입니다. 다른 이메일을 입력해주세요.',
+    cannotSet: '레퍼럴을 설정할 수 없습니다.',
+    success: '성공',
+    successMessage: '레퍼럴 정보가 성공적으로 수정되었습니다.',
+    ok: 'OK',
+  },
+};
+
