@@ -21,6 +21,8 @@ type AppContextValue = {
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
+  selectedReferralMember?: { member: string; email: string };
+  setSelectedReferralMember: (member?: { member: string; email: string }) => void;
   emergencyStop: EmergencyStopInfo;
   setEmergencyStop: (info: EmergencyStopInfo) => void;
   selectedCountryDialCode: CountryDialCode;
@@ -61,6 +63,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [verificationEmail, setVerificationEmail] = useState('');
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
+  const [selectedReferralMember, setSelectedReferralMember] = useState<{ member: string; email: string } | undefined>(undefined);
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
   const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
@@ -98,6 +101,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setSelectedClauseId,
       selectedShopItem,
       setSelectedShopItem,
+      selectedReferralMember,
+      setSelectedReferralMember,
       emergencyStop,
       setEmergencyStop,
       selectedCountryDialCode,
@@ -137,6 +142,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationEmail,
       selectedClauseId,
       selectedShopItem,
+      selectedReferralMember,
       emergencyStop,
       selectedCountryDialCode,
       selectedRegion,

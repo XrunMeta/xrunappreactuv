@@ -85,6 +85,42 @@ import {
   NasmobAdsResponse,
   NasmobCallbackRequest,
   DeviceInfo,
+  SettlementListRequest,
+  SettlementListResponse,
+  GetCompletedAdsRequest,
+  GetCompletedAdsResponse,
+  GetSavedAdsRequest,
+  GetSavedAdsResponse,
+  GetSettlementListRequest,
+  GetSettlementListResponse,
+  GetSettlementAmountRequest,
+  GetSettlementAmountResponse,
+  GetRankRequest,
+  GetRankResponse,
+  GetRankSpesificRequest,
+  GetRankSpesificResponse,
+  GetMyGroupRequest,
+  GetMyGroupResponse,
+  GetMyRecommenderRequest,
+  GetMyRecommenderResponse,
+  CheckCanSetRecommenderRequest,
+  CheckCanSetRecommenderResponse,
+  SetRecommenderRequest,
+  SetRecommenderResponse,
+  GetXRUNGopaxPriceRequest,
+  GetXRUNGopaxPriceResponse,
+  GetUserBalanceRequest,
+  GetUserBalanceResponse,
+  GetXrunBuyableItemsRequest,
+  GetXrunBuyableItemsResponse,
+  GetXrunPurchasedItemsRequest,
+  GetXrunPurchasedItemsResponse,
+  PurchaseXrunItemRequest,
+  PurchaseXrunItemResponse,
+  SaveInappPurchaseLogRequest,
+  SaveInappPurchaseLogResponse,
+  DeleteXrunPurchasedItemRequest,
+  DeleteXrunPurchasedItemResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { getEnv } from '../utils/env';
@@ -1274,6 +1310,198 @@ export const closeMembership = async (
   }
 };
 
+export const getNotificationList = async (
+  member: number,
+  start: number = 0,
+  navigation?: any,
+): Promise<NotificationListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationListRequest = {
+      member,
+      start,
+    };
+
+    console.log('[알림] 알림 목록 조회 요청:', { member, start });
+
+    const response = await axiosInstance.post<NotificationListResponse>(
+      '/ap6000-01',
+      request,
+    );
+
+    console.log('[알림] 알림 목록 조회 성공, 알림 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const sendNotificationMessage = async (
+  member: number,
+  title: string,
+  isBroadcast: boolean = false,
+  navigation?: any,
+): Promise<NotificationSendResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationSendRequest = {
+      isBroadcast,
+      member,
+      title,
+    };
+
+    console.log('[알림] 알림 메시지 전송 요청:', { member, title, isBroadcast });
+
+    const response = await axiosInstance.post<NotificationSendResponse>(
+      '/ap6000-02',
+      request,
+    );
+
+    console.log('[알림] 알림 메시지 전송 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 메시지 전송 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteNotificationMessage = async (
+  member: number,
+  board: number,
+  isBroadcast: boolean = false,
+  navigation?: any,
+): Promise<NotificationDeleteResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationDeleteRequest = {
+      isBroadcast,
+      member,
+      board,
+    };
+
+    console.log('[알림] 알림 메시지 삭제 요청:', { member, board, isBroadcast });
+
+    const response = await axiosInstance.post<NotificationDeleteResponse>(
+      '/ap6000-03',
+      request,
+    );
+
+    console.log('[알림] 알림 메시지 삭제 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 알림 메시지 삭제 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteAllNotifications = async (
+  member: number,
+  navigation?: any,
+): Promise<NotificationDeleteAllResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: NotificationDeleteAllRequest = {
+      member,
+    };
+
+    console.log('[알림] 전체 알림 삭제 요청:', { member });
+
+    const response = await axiosInstance.post<NotificationDeleteAllResponse>(
+      '/ap6000-04delete',
+      request,
+    );
+
+    console.log('[알림] 전체 알림 삭제 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] 전체 알림 삭제 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const registerFCMToken = async (
+  pushkey: string,
+  member: number,
+  navigation?: any,
+): Promise<FCMTokenRegisterResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: FCMTokenRegisterRequest = {
+      pushkey,
+      member,
+    };
+
+    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+
+    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
+      '/login-pushkeyreg',
+      request,
+    );
+
+    console.log('[알림] FCM 토큰 등록 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[알림] FCM 토큰 등록 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[알림] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371000; 
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1791,6 +2019,862 @@ export const gatewayNodeJS = async (
     console.error('Gateway NodeJS 오류:', error);
     if (error instanceof AxiosError) {
       console.error('상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTotalHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 총 기록 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-05',
+      request,
+    );
+
+    console.log('[정산] 총 기록 조회 성공, 개수:', response.data.data?.length || 0);
+    console.log('[정산] 총 기록 응답 데이터:', JSON.stringify(response.data, null, 2));
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 총 기록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTransferHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 이체 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-06',
+      request,
+    );
+
+    console.log('[정산] 이체 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 이체 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getReceivedDetails = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 받은 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-01',
+      request,
+    );
+
+    console.log('[정산] 받은 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 받은 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getTransitionHistory = async (
+  member: number,
+  currency: number,
+  daysbefore: number,
+  startwith: number = 0,
+  navigation?: any,
+): Promise<SettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SettlementListRequest = {
+      member,
+      currency,
+      daysbefore,
+      startwith,
+    };
+
+    console.log('[정산] 전송 내역 조회 요청:', { member, currency, daysbefore, startwith });
+
+    const response = await axiosInstance.post<SettlementListResponse>(
+      '/app4200-03',
+      request,
+    );
+
+    console.log('[정산] 전송 내역 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 전송 내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getCompletedAds = async (
+  member: number,
+  navigation?: any,
+): Promise<GetCompletedAdsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetCompletedAdsRequest = {
+      member,
+    };
+
+    console.log('[광고] 완료된 광고 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetCompletedAdsResponse>(
+      '/app5010-02',
+      request,
+    );
+
+    console.log('[광고] 완료된 광고 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[광고] 완료된 광고 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[광고] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSavedAds = async (
+  member: number,
+  orderField: 'datetime' | 'dateleft' | 'amount' = 'datetime',
+  navigation?: any,
+): Promise<GetSavedAdsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSavedAdsRequest = {
+      member,
+      orderField,
+    };
+
+    console.log('[광고] 저장된 광고 목록 조회 요청:', { member, orderField });
+
+    const response = await axiosInstance.post<GetSavedAdsResponse>(
+      '/app5010-01',
+      request,
+    );
+
+    console.log('[광고] 저장된 광고 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[광고] 저장된 광고 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[광고] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSettlementList = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSettlementListRequest = { member };
+
+    console.log('[정산] 정산 목록 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementListResponse>(
+      '/getSettlementList',
+      request,
+    );
+
+    console.log('[정산] 정산 목록 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 정산 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSettlementAmount = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementAmountResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetSettlementAmountRequest = { member };
+
+    console.log('[정산] 정산 총액 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementAmountResponse>(
+      '/getSettlementAmount',
+      request,
+    );
+
+    console.log('[정산] 정산 총액 조회 성공:', response.data.data?.[0]?.amount || '0');
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산] 정산 총액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRank = async (
+  navigation?: any,
+): Promise<GetRankResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRankRequest = {};
+
+    console.log('[Rank] 전체 순위 조회 요청');
+
+    const response = await axiosInstance.post<GetRankResponse>(
+      '/getRank',
+      request,
+    );
+
+    console.log('[Rank] 전체 순위 조회 성공, 개수:', response.data.data?.length || 0);
+    console.log('[Rank] 전체 순위 데이터:', response.data.data);
+
+    return response.data;
+  } catch (error) {
+    console.error('[Rank] 전체 순위 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Rank] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getRankSpesific = async (
+  member: number,
+  navigation?: any,
+): Promise<GetRankSpesificResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetRankSpesificRequest = { member };
+
+    console.log('[Rank] 사용자 순위 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetRankSpesificResponse>(
+      '/getRankSpesific',
+      request,
+    );
+
+    console.log('[Rank] 사용자 순위 조회 성공:', response.data.data?.[0]?.unique_rank || '-');
+
+    return response.data;
+  } catch (error) {
+    console.error('[Rank] 사용자 순위 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Rank] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyGroup = async (
+  member: string,
+  navigation?: any,
+): Promise<GetMyGroupResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyGroupRequest = { member };
+
+    console.log('[내 그룹] 내 그룹 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyGroupResponse>(
+      '/getMyGroup',
+      request,
+    );
+
+    console.log('[내 그룹] 내 그룹 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[내 그룹] 내 그룹 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[내 그룹] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getMyRecommender = async (
+  member: string,
+  navigation?: any,
+): Promise<GetMyRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetMyRecommenderRequest = { member };
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetMyRecommenderResponse>(
+      '/getMyRecommender',
+      request,
+    );
+
+    console.log('[레퍼럴 수정] 현재 레퍼럴 조회 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴 수정] 현재 레퍼럴 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const checkCanSetRecommender = async (
+  member: string,
+  email: string,
+  navigation?: any,
+): Promise<CheckCanSetRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: CheckCanSetRecommenderRequest = {
+      member,
+      email: email.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 요청:', { member, email: email.trim() });
+
+    const response = await axiosInstance.post<CheckCanSetRecommenderResponse>(
+      '/checkCanSetRecommender',
+      request,
+    );
+
+    const responseCode = response.status;
+    const responseData = response.data;
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 응답:', {
+      code: responseCode,
+      status: responseData.status,
+      message: responseData.message,
+    });
+
+    return {
+      ...responseData,
+      code: responseCode,
+      status_code: responseCode,
+    };
+  } catch (error) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 오류:', error);
+    if (error instanceof AxiosError) {
+      const statusCode = error.response?.status || 500;
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: statusCode,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+
+      return {
+        status: 'error',
+        code: statusCode,
+        status_code: statusCode,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data?.data,
+      };
+    }
+    throw error;
+  }
+};
+
+export const setRecommender = async (
+  member: string,
+  email: string,
+  navigation?: any,
+): Promise<SetRecommenderResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SetRecommenderRequest = {
+      member,
+      email: email.trim(),
+    };
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', { member, email: email.trim() });
+
+    const response = await axiosInstance.post<SetRecommenderResponse>(
+      '/setRecommender',
+      request,
+    );
+
+    console.log('[레퍼럴 수정] 레퍼럴 설정 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴 수정] 레퍼럴 설정 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[레퍼럴 수정] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getXRUNGopaxPrice = async (
+  navigation?: any,
+): Promise<GetXRUNGopaxPriceResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetXRUNGopaxPriceRequest = {};
+
+    console.log('[상점] 고팍스 XRUN 가격 조회 요청');
+
+    const response = await axiosInstance.post<GetXRUNGopaxPriceResponse>(
+      '/getXRUNGopaxPrice',
+      request,
+    );
+
+    const price = response.data.data?.gopaxPrice || 0;
+    console.log('[상점] 고팍스 XRUN 가격 조회 성공:', price);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] 고팍스 XRUN 가격 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getUserBalance = async (
+  member: string,
+  navigation?: any,
+): Promise<GetUserBalanceResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetUserBalanceRequest = { member };
+
+    console.log('[상점] 사용자 잔액 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetUserBalanceResponse>(
+      '/app4000-01-rev-01-18only',
+      request,
+    );
+
+    const balance = response.data.data?.realtimeBalance?.balance || '0';
+    console.log('[상점] 사용자 잔액 조회 성공:', balance);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] 사용자 잔액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getXrunBuyableItems = async (
+  member: string,
+  navigation?: any,
+): Promise<GetXrunBuyableItemsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetXrunBuyableItemsRequest = { member };
+
+    console.log('[상점] 구매 가능한 아이템 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetXrunBuyableItemsResponse>(
+      '/getXrunBuyableItems',
+      request,
+    );
+
+    console.log('[상점] 구매 가능한 아이템 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] 구매 가능한 아이템 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getXrunPurchasedItems = async (
+  member: string,
+  navigation?: any,
+): Promise<GetXrunPurchasedItemsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetXrunPurchasedItemsRequest = { member };
+
+    console.log('[상점] 구매한 아이템 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetXrunPurchasedItemsResponse>(
+      '/getXrunPurchasedItems',
+      request,
+    );
+
+    console.log('[상점] 구매한 아이템 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] 구매한 아이템 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const purchaseXrunItem = async (
+  member: string,
+  item: number,
+  amount: string,
+  navigation?: any,
+): Promise<PurchaseXrunItemResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: PurchaseXrunItemRequest = {
+      member,
+      item,
+      amount: amount.toString(),
+    };
+
+    console.log('[상점] XRUN 아이템 구매 요청:', { member, item, amount });
+
+    const response = await axiosInstance.post<PurchaseXrunItemResponse>(
+      '/purchaseXrunItem',
+      request,
+    );
+
+    console.log('[상점] XRUN 아이템 구매 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] XRUN 아이템 구매 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const saveInappPurchaseLog = async (
+  status: string,
+  member: string,
+  navigation?: any,
+): Promise<SaveInappPurchaseLogResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: SaveInappPurchaseLogRequest = {
+      status,
+      member,
+    };
+
+    console.log('[상점] 구매 로그 저장 요청:', { status, member });
+
+    const response = await axiosInstance.post<SaveInappPurchaseLogResponse>(
+      '/saveInappPurchaseLog',
+      request,
+    );
+
+    const affectedRows = response.data.data?.[0]?.affectedRows || 0;
+    console.log('[상점] 구매 로그 저장 성공:', affectedRows === 1 ? 'ok' : 'no');
+
+    return response.data;
+  } catch (error) {
+    console.error('[상점] 구매 로그 저장 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteXrunPurchasedItem = async (
+  member: string,
+  storage: string,
+  navigation?: any,
+): Promise<DeleteXrunPurchasedItemResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: DeleteXrunPurchasedItemRequest = {
+      member,
+      storage,
+    };
+
+    console.log('[상점] 구매한 아이템 삭제 요청:', { member, storage });
+
+    const possibleEndpoints = [
+      '/app4000-04-delete', 
+      '/app4000-04delete',   
+      '/deleteXrunPurchasedItem', 
+      '/app4000-delete',     
+    ];
+
+    let lastError: any = null;
+    for (const endpoint of possibleEndpoints) {
+      try {
+        console.log(`[상점] 삭제 API 엔드포인트 시도: ${endpoint}`);
+        const response = await axiosInstance.post<DeleteXrunPurchasedItemResponse>(
+          endpoint,
+          request,
+        );
+
+        console.log(`[상점] 엔드포인트 ${endpoint} 응답:`, response.data);
+
+        if (response.data.status === 'success') {
+          console.log(`[상점] 삭제 성공 (엔드포인트: ${endpoint}):`, response.data.status);
+          return response.data;
+        }
+
+        if (response.data.status === 'error') {
+
+          if (response.data.code === 404) {
+            console.log(`[상점] 엔드포인트 ${endpoint} 404 에러, 다음 엔드포인트 시도`);
+            lastError = response.data;
+            continue;
+          }
+
+          console.log(`[상점] 삭제 실패 (엔드포인트: ${endpoint}):`, response.data.message);
+          return response.data;
+        }
+
+        lastError = response.data;
+      } catch (error: any) {
+        const errorMessage = error?.response?.data?.message || error?.message || '알 수 없는 오류';
+        const errorCode = error?.response?.data?.code || error?.response?.status;
+        console.log(`[상점] 엔드포인트 ${endpoint} 실패:`, errorMessage);
+
+        if (error?.response?.status && error.response.status !== 404) {
+          lastError = error;
+          break;
+        }
+
+        if (errorCode && errorCode !== 404) {
+          lastError = error;
+          break;
+        }
+
+        lastError = error;
+      }
+    }
+
+    console.error('[상점] 모든 삭제 API 엔드포인트 실패');
+    if (lastError) {
+
+      if (lastError.status || lastError.code) {
+        throw lastError;
+      }
+
+      if (lastError.response) {
+        throw lastError;
+      }
+    }
+    throw new Error('삭제 API 엔드포인트를 찾을 수 없습니다.');
+  } catch (error) {
+    console.error('[상점] 구매한 아이템 삭제 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상점] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,

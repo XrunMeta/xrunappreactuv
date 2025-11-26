@@ -1,58 +1,239 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { ROUTES, useAppNavigation } from '../navigation';
+import { getMyRecommender, checkCanSetRecommender, setRecommender } from '../services';
 
 export const MyInfoReferralScreen = () => {
-  const { goBack } = useAppNavigation();
-  const [email, setEmail] = useState('');
+  const { goBack, navigate } = useAppNavigation();
+  const [newRefEmail, setNewRefEmail] = useState('');
+  const [currentRefEmail, setCurrentRefEmail] = useState('');
+  const [currentRefName, setCurrentRefName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDisable, setIsDisable] = useState(false);
+  const [member, setMember] = useState<string | null>(null);
 
-  const handleConfirm = () => {
-    if (!email.trim()) {
-      Alert.alert('이메일 입력', '새 레퍼럴 이메일을 입력해주세요.');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const AsyncUserData = await AsyncStorage.getItem('userData');
+        if (!AsyncUserData) {
+          setIsLoading(false);
+          return;
+        }
+
+        const data = JSON.parse(AsyncUserData);
+        const memberId = data?.member ? String(data.member) : null;
+        setMember(memberId);
+        setUserEmail(data?.email || '');
+
+        if (!memberId) {
+          setIsLoading(false);
+          return;
+        }
+
+        console.log('[레퍼럴 수정] 현재 레퍼럴 조회 요청, member:', memberId);
+
+        const result = await getMyRecommender(memberId, navigate);
+
+        console.log('[레퍼럴 수정] getMyRecommender 응답:', result);
+
+        if (result && result.status === 'success' && result.data) {
+
+          const recommender = result.data;
+          const displayEmail = recommender.masked_email || recommender.email || '';
+          const displayName =
+            recommender.firstname && recommender.lastname
+              ? `${recommender.firstname}${recommender.lastname}`
+              : '';
+
+          setCurrentRefEmail(displayEmail);
+          setCurrentRefName(displayName);
+        } else if (result && result.status === 'success' && !result.data) {
+
+          setCurrentRefEmail('');
+          setCurrentRefName('');
+        } else {
+
+          console.error('[레퍼럴 수정] 레퍼럴 조회 오류:', result?.message);
+          setCurrentRefEmail('');
+          setCurrentRefName('');
+        }
+      } catch (err) {
+        console.error('[레퍼럴 수정] 데이터 로드 오류:', err);
+        setCurrentRefEmail('');
+        setCurrentRefName('');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
+
+  const handleConfirm = async () => {
+
+    if (!newRefEmail || newRefEmail.trim() === '') {
+      Alert.alert('경고', '새 레퍼럴 이메일을 입력해주세요.');
       return;
     }
-    Alert.alert('신청 완료', '레퍼럴 변경 요청이 전송되었습니다.');
-    setEmail('');
+
+    if (newRefEmail === currentRefEmail) {
+      Alert.alert('경고', '변경사항이 없습니다.');
+      return;
+    }
+
+    if (!member) {
+      Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      setIsDisable(true);
+
+      console.log('[레퍼럴 수정] 레퍼럴 설정 가능 여부 검증 요청:', newRefEmail);
+      const checkResult = await checkCanSetRecommender(member, newRefEmail.trim(), navigate);
+
+      console.log('[레퍼럴 수정] checkCanSetRecommender 응답:', checkResult);
+
+      if (!checkResult) {
+
+        Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+        setIsDisable(false);
+        return;
+      }
+
+      const responseCode = checkResult.code || checkResult.status_code || 500;
+      const responseMessage = (checkResult?.message || '').toLowerCase();
+
+      const isSelfReferral =
+        newRefEmail.trim().toLowerCase() === userEmail.toLowerCase() ||
+        responseCode === 400 ||
+        responseMessage.includes('self') ||
+        responseMessage.includes('yourself') ||
+        responseMessage.includes('own') ||
+        responseMessage.includes('자기 자신') ||
+        responseMessage.includes('본인') ||
+        responseMessage.includes('cannot set yourself') ||
+        (checkResult?.data && checkResult.data.canSet === false && responseCode === 400);
+
+      if (isSelfReferral) {
+        Alert.alert('경고', '자기 자신을 레퍼럴로 설정할 수 없습니다.');
+        setIsDisable(false);
+        return;
+      }
+
+      if (responseCode === 404) {
+        Alert.alert('실패', '레퍼럴을 찾을 수 없습니다. 이메일을 확인해주세요.');
+        setIsDisable(false);
+        return;
+      }
+
+      if (responseCode === 409) {
+
+        const isAlreadyHasRecommender =
+          responseMessage.includes('already has') ||
+          responseMessage.includes('already have') ||
+          responseMessage.includes('이미 추천') ||
+          responseMessage.includes('추천 기록');
+
+        const message = isAlreadyHasRecommender
+          ? '이미 추천 기록이 있습니다.'
+          : '이미 등록된 레퍼럴입니다. 다른 이메일을 입력해주세요.';
+
+        Alert.alert('경고', message);
+        setIsDisable(false);
+        return;
+      }
+
+      if (responseCode !== 200) {
+        Alert.alert('실패', '레퍼럴을 설정할 수 없습니다.');
+        setIsDisable(false);
+        return;
+      }
+
+      console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', newRefEmail);
+      const setResult = await setRecommender(member, newRefEmail.trim(), navigate);
+
+      console.log('[레퍼럴 수정] setRecommender 응답:', setResult);
+
+      if (setResult && setResult.status === 'success') {
+        Alert.alert(
+          '성공',
+          '레퍼럴 정보가 성공적으로 수정되었습니다.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigate(ROUTES.myInfo);
+              },
+            },
+          ],
+        );
+      } else {
+        Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('[레퍼럴 수정] 레퍼럴 수정 오류:', error);
+      Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+    } finally {
+      setIsDisable(false);
+    }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title="레퍼럴 수정" onBackPress={goBack} showBackButton />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.inner}>
-          <Text style={styles.sectionLabel}>현재 레퍼럴</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardName}>WWWWWW</Text>
-            <Text style={styles.cardEmail}>w****w@ww.www</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.inner}>
+            <Text style={styles.sectionLabel}>현재 레퍼럴</Text>
+            {currentRefEmail || currentRefName ? (
+              <View style={styles.card}>
+                {currentRefName ? <Text style={styles.cardName}>{currentRefName}</Text> : null}
+                {currentRefEmail ? <Text style={styles.cardEmail}>{currentRefEmail}</Text> : null}
+              </View>
+            ) : (
+              <View style={styles.card}>
+                <Text style={styles.cardEmail}>레퍼럴이 없습니다</Text>
+              </View>
+            )}
+
+            <FormField
+              label="새 레퍼럴 이메일"
+              value={newRefEmail}
+              onChangeText={setNewRefEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="새 레퍼럴 이메일을 입력해주세요."
+              editable={!isDisable}
+            />
           </View>
 
-          <FormField
-            label="새 레퍼럴 이메일"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            placeholder="새 레퍼럴 이메일을 입력해주세요."
-          />
-        </View>
-
-        <View style={styles.bottomSection}>
-          <PrimaryButton
-            title="Confirm"
-            fullWidth
-            onPress={handleConfirm}
-            style={styles.primaryButton}
-          />
-        </View>
-      </ScrollView>
+          <View style={styles.bottomSection}>
+            <PrimaryButton
+              title="Confirm"
+              fullWidth
+              onPress={handleConfirm}
+              style={[styles.primaryButton, isDisable && styles.buttonDisabled]}
+              disabled={isDisable}
+            />
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -61,6 +242,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f2f2f7',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     flexGrow: 1,
@@ -109,6 +295,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     width: '100%',
   },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
 });
-
-
