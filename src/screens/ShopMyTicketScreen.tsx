@@ -19,9 +19,15 @@ const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
 
   const v_63f02c = v_8c0b26.status === 10306 ? v_8d41d7('screens.shopMyTicket.available') : v_8d41d7('screens.shopMyTicket.used');
 
-  const v_6c35f6 = v_8c0b26.txID 
-    ? `${v_8c0b26.item}_${v_8c0b26.txID}_${v_a56041}` 
-    : `${v_8c0b26.item}_${v_a56041}_${Math.random().toString(36).substr(2, 9)}`;
+  const v_080197 = v_8c0b26.storage ? String(v_8c0b26.storage) : null;
+  const v_2deff5 = v_8c0b26.txID ? String(v_8c0b26.txID) : null;
+  const v_3b701b = String(v_8c0b26.item);
+
+  const v_6c35f6 = v_080197 
+    ? `storage_${v_080197}_idx_${v_a56041}` 
+    : v_2deff5 
+    ? `txID_${v_2deff5}_item_${v_3b701b}_idx_${v_a56041}` 
+    : `item_${v_3b701b}_idx_${v_a56041}`;
 
   return {
 
