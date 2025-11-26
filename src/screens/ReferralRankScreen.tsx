@@ -189,13 +189,14 @@ export const ReferralRankScreen = () => {
         ? item.email.substring(0, 12) + '...'
         : item.email;
 
+    const isCurrentUser = userEmail !== '-' && item.email === userEmail && String(item.rank) === userRank;
+
     return (
       <ReferralMemberRow
         key={item.id}
         rank={item.rank}
         email={displayEmail}
-        highlight={index === 0 && item.rank === 1} 
-        onPress={() => navigate(ROUTES.referralDepthOne)}
+        highlight={isCurrentUser} 
       />
     );
   };
