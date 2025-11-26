@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, TokenListItem, WalletHeaderCard } from '../components';
 import { COLORS } from '../constants';
@@ -79,6 +80,7 @@ const TOKEN_DATA: TokenData[] = [
 ];
 
 export const WalletScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { openAddTokenDialog } = useAppContext();
   const tokenList = useMemo(() => TOKEN_DATA, []);
@@ -96,7 +98,7 @@ export const WalletScreen = () => {
       navigate(ROUTES.walletReceive);
       return;
     }
-    Alert.alert('준비 중', `${type} 기능은 아직 준비 중입니다.`);
+    Alert.alert(t('screens.wallet.preparing'), `${type} ${t('screens.wallet.preparingMessage')}`);
   };
 
   const handleAddToken = () => {
@@ -106,25 +108,25 @@ export const WalletScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Wallet" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.wallet.title')} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <WalletHeaderCard
-          title="My Wallet"
+          title={t('screens.wallet.myWallet')}
           address={WALLET_ADDRESS}
           onCopy={handleCopyAddress}
           actions={[
             {
-              label: 'PolygonScan',
+              label: t('screens.wallet.polygonScan'),
               icon: 'scan-outline',
               onPress: () => handleAction('scan'),
             },
             {
-              label: 'Receive',
+              label: t('screens.wallet.receive'),
               icon: 'download-outline',
               onPress: () => handleAction('receive'),
             },
             {
-              label: 'Send',
+              label: t('screens.wallet.send'),
               icon: 'send-outline',
               onPress: () => handleAction('send'),
             },
@@ -132,9 +134,9 @@ export const WalletScreen = () => {
         />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>My Balance</Text>
+          <Text style={styles.sectionTitle}>{t('screens.wallet.myBalance')}</Text>
           <TouchableOpacity style={styles.addTokenButton} onPress={handleAddToken} activeOpacity={0.7}>
-            <Text style={styles.addTokenText}>add token</Text>
+            <Text style={styles.addTokenText}>{t('screens.wallet.addToken')}</Text>
             <Ionicons name='add-circle-outline' size={18} color='#000' />
           </TouchableOpacity>
         </View>

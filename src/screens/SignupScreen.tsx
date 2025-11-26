@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import {
   FormCheckbox,
   FormField,
@@ -29,17 +30,13 @@ import {
   SignupHelpers,
 } from '../services';
 
-const GENDER_OPTIONS = [
-  { value: 'male', label: '남' },
-  { value: 'female', label: '여' },
-] as const;
-
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 
 type GenderValue = (typeof GENDER_OPTIONS)[number]['value'];
 type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate, reset } = useAppNavigation();
   const {
     selectedCountryDialCode,
@@ -49,6 +46,11 @@ export const SignupScreen = () => {
     setSignupFormData,
     resetSignupFormData,
   } = useAppContext();
+
+  const GENDER_OPTIONS = [
+    { value: 'male', label: t('screens.signup.genderMale') },
+    { value: 'female', label: t('screens.signup.genderFemale') },
+  ] as const;
   const [familyName, setFamilyName] = useState(signupFormData.familyName);
   const [givenName, setGivenName] = useState(signupFormData.givenName);
   const [email, setEmail] = useState(signupFormData.email);
@@ -104,32 +106,32 @@ export const SignupScreen = () => {
   const handleSubmit = async () => {
 
     if (!termsAccepted) {
-      Alert.alert('동의 필요', '약관에 동의해야 가입을 진행할 수 있습니다.');
+      Alert.alert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
       return;
     }
 
     if (!familyName.trim() || !givenName.trim()) {
-      Alert.alert('입력 오류', '성과 이름을 입력해주세요.');
+      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
       return;
     }
 
     if (!email.trim()) {
-      Alert.alert('입력 오류', '이메일을 입력해주세요.');
+      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.emailRequired'));
       return;
     }
 
     if (!password.trim() || password.length < 6) {
-      Alert.alert('입력 오류', '비밀번호는 6자 이상 입력해주세요.');
+      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
       return;
     }
 
     if (!phoneNumber.trim()) {
-      Alert.alert('입력 오류', '전화번호를 입력해주세요.');
+      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
       return;
     }
 
     if (!selectedRegion && !region.trim()) {
-      Alert.alert('입력 오류', '지역을 선택해주세요.');
+      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
       return;
     }
 
@@ -141,7 +143,7 @@ export const SignupScreen = () => {
       const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
 
       if (!isEmailAvailable) {
-        Alert.alert('이메일 중복', '이미 사용 중인 이메일입니다.');
+        Alert.alert(t('screens.signup.alerts.emailDuplicate'), t('screens.signup.errors.emailDuplicate'));
         setIsSubmitting(false);
         return;
       }
@@ -156,11 +158,11 @@ export const SignupScreen = () => {
 
           const shouldContinue = await new Promise<boolean>((resolve) => {
             Alert.alert(
-              '추천인 확인',
-              '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
+              t('screens.signup.alerts.referralConfirm'),
+              t('screens.signup.errors.referralInvalid'),
               [
                 {
-                  text: '취소',
+                  text: t('screens.signup.alerts.cancel'),
                   style: 'cancel',
                   onPress: () => {
                     setIsSubmitting(false);
@@ -168,7 +170,7 @@ export const SignupScreen = () => {
                   },
                 },
                 {
-                  text: '계속',
+                  text: t('screens.signup.alerts.continue'),
                   onPress: () => resolve(true),
                 },
               ],
@@ -209,7 +211,7 @@ export const SignupScreen = () => {
       const signupSuccess = await signup(signupData, navigate);
 
       if (!signupSuccess) {
-        Alert.alert('회원가입 실패', '회원가입에 실패했습니다. 다시 시도해주세요.');
+        Alert.alert(t('screens.signup.alerts.signupFailed'), t('screens.signup.errors.signupFailed'));
         setIsSubmitting(false);
         return;
       }
@@ -219,8 +221,8 @@ export const SignupScreen = () => {
 
       if (!loginSuccess) {
         Alert.alert(
-          '로그인 확인 실패',
-          '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+          t('screens.signup.alerts.loginCheckFailed'),
+          t('screens.signup.errors.loginCheckFailed'),
         );
         reset('authLanding');
         navigate('login');
@@ -228,9 +230,9 @@ export const SignupScreen = () => {
         return;
       }
 
-      Alert.alert('회원가입 완료', '회원가입이 완료되었습니다.', [
+      Alert.alert(t('screens.signup.success.title'), t('screens.signup.success.message'), [
         {
-          text: '확인',
+          text: t('screens.signup.success.confirm'),
           onPress: () => {
 
             resetSignupFormData();
@@ -244,8 +246,8 @@ export const SignupScreen = () => {
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        '회원가입 중 오류가 발생했습니다.';
-      Alert.alert('오류', errorMessage);
+        t('screens.signup.errors.error');
+      Alert.alert(t('screens.signup.alerts.error'), errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -329,8 +331,8 @@ export const SignupScreen = () => {
           style={styles.fieldContainer}
         >
           <FormField
-            label="지역"
-            placeholder="지역을 선택하세요"
+            label={t('screens.signup.regionLabel')}
+            placeholder={t('screens.signup.regionPlaceholder')}
             value={selectedRegion ? selectedRegion.name : region || ''}
             editable={false}
             containerStyle={styles.fieldContainer}
@@ -338,7 +340,7 @@ export const SignupScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>성별</Text>
+          <Text style={styles.label}>{t('screens.signup.genderLabel')}</Text>
           <View style={styles.inlineOptions}>
             {GENDER_OPTIONS.map((option) => {
               const isActive = gender === option.value;
@@ -355,7 +357,7 @@ export const SignupScreen = () => {
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>나이</Text>
+          <Text style={styles.label}>{t('screens.signup.ageLabel')}</Text>
           <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
             {AGE_OPTIONS.map((option, index) => {
               const isActive = ageRange === option;
@@ -378,8 +380,8 @@ export const SignupScreen = () => {
         </View>
 
         <FormField
-          label="추천이메일"
-          placeholder="oth-staff@example.invalid"
+          label={t('screens.signup.referralEmailLabel')}
+          placeholder={t('screens.signup.referralEmailPlaceholder')}
           value={referralEmail}
           onChangeText={setReferralEmail}
           autoCapitalize="none"
@@ -393,15 +395,15 @@ export const SignupScreen = () => {
             variant="square"
           />
           <Text style={styles.termsText}>
-            XRUN 서비스 약관 및{' '}
-            <Text style={styles.termsHighlight}>개인정보 보호정책</Text>에
-            동의합니다.
+            {t('screens.signup.termsText')}{' '}
+            <Text style={styles.termsHighlight}>{t('screens.signup.termsHighlight')}</Text>{' '}
+            {t('screens.signup.termsAgree')}
           </Text>
         </View>
 
         <View style={styles.buttonWrapper}>
           <PrimaryButton
-            title={isSubmitting ? '처리 중...' : '가입하기'}
+            title={isSubmitting ? t('screens.signup.submitting') : t('screens.signup.submitButton')}
             fullWidth
             onPress={handleSubmit}
             disabled={isSubmitting}

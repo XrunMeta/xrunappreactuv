@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Text, ActivityIndicator, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl } from '../components';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -40,13 +41,14 @@ export const ReferralRankScreen = () => {
   const [userRank, setUserRank] = useState<string>('-');
   const [userEmail, setUserEmail] = useState<string>('-');
 
+  const { t } = useTranslation();
   const segmentedOptions = useMemo(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: 'Rank', value: 'rank' },
+      { label: t('screens.referralRank.group'), value: 'group' },
+      { label: t('screens.referralRank.settlement'), value: 'settlement' },
+      { label: t('screens.referralRank.rank'), value: 'rank' },
     ] as const,
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -201,10 +203,10 @@ export const ReferralRankScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={t('screens.referralRank.title')} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
-          <ReferralStatsCard title={LANG.referral?.card?.myRank || '내 순위'}>
+          <ReferralStatsCard title={LANG.referral?.card?.myRank || t('screens.referralRank.myRank')}>
             <View style={styles.rankCardContent}>
               <View style={styles.rankLeft}>
                 <Text style={styles.rankEmail}>{userEmail}</Text>

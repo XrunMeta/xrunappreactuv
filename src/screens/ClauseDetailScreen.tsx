@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -62,6 +63,7 @@ const clauseMap: Record<
 };
 
 export const ClauseDetailScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const { selectedClauseId } = useAppContext();
   const content = clauseMap[selectedClauseId];
@@ -82,10 +84,10 @@ export const ClauseDetailScreen = () => {
         </View>
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.secondaryText}>Declined</Text>
+            <Text style={styles.secondaryText}>{t('screens.clauseDetail.declined')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.primaryText}>Accept</Text>
+            <Text style={styles.primaryText}>{t('screens.clauseDetail.accept')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

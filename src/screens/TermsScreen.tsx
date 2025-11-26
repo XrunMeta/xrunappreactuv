@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Text, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -68,12 +69,13 @@ email: xrun@xrun.com
 `;
 
 export const TermsScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="이용약관" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.terms.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

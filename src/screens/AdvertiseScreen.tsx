@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
@@ -41,6 +42,7 @@ const dateFormatter = (dateString: string): string => {
 };
 
 export const AdvertiseScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [completedAds, setCompletedAds] = useState<CompletedAdData[]>([]);
@@ -79,12 +81,12 @@ export const AdvertiseScreen = () => {
             const localizedDatetime = dateFormatter(ad.datetime);
             return {
               transaction: ad.transaction,
-              title: ad.title || ad.actiontext || ad.extratext || '코인 획득',
+              title: ad.title || ad.actiontext || ad.extratext || t('screens.advertiseScreen.coinAcquisition'),
               coin: `${ad.amount} ${ad.symbol}`,
               extracode: ad.extracode,
               datetime: localizedDatetime,
-              statusSuccess: 'Coin acquisition completed',
-              statusPending: 'Waiting for Coin Acquisition',
+              statusSuccess: t('screens.advertiseScreen.statusSuccess'),
+              statusPending: t('screens.advertiseScreen.statusPending'),
             };
           });
 
@@ -155,18 +157,18 @@ export const AdvertiseScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="AD" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.advertiseScreen.title')} onBackPress={goBack} showBackButton />
       <View style={styles.content}>
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
             <Text style={[styles.normalText, { color: '#7d7e83', marginTop: 12 }]}>
-              로딩 중...
+              {t('screens.advertiseScreen.loading')}
             </Text>
           </View>
         ) : completedAds.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>정산 내역이 없습니다.</Text>
+            <Text style={styles.emptyText}>{t('screens.advertiseScreen.emptyMessage')}</Text>
           </View>
         ) : (
           <FlatList

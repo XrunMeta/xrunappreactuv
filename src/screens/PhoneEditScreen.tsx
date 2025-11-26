@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
@@ -17,6 +18,7 @@ import { useAppContext } from '../context';
 import { updatePhone } from '../services';
 
 export const PhoneEditScreen = () => {
+  const { t } = useTranslation();
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
   const { selectedCountryDialCode, setSelectedCountryDialCode } = useAppContext();
   const [phone, setPhone] = useState('');
@@ -50,18 +52,18 @@ export const PhoneEditScreen = () => {
   const handleSave = async () => {
 
     if (!phone.trim()) {
-      Alert.alert('오류', '전화번호를 입력해주세요.');
+      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneRequired'));
       return;
     }
 
     const phoneNumber = phone.replace(/\s/g, '').replace(/-/g, '');
     if (!/^\d+$/.test(phoneNumber)) {
-      Alert.alert('오류', '전화번호는 숫자만 입력 가능합니다.');
+      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneInvalid'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -81,9 +83,9 @@ export const PhoneEditScreen = () => {
         navigate,
       );
 
-      Alert.alert('저장 완료', '전화번호가 변경되었습니다.', [
+      Alert.alert(t('screens.phoneEdit.alerts.saveSuccess'), t('screens.phoneEdit.alerts.saveSuccessMessage'), [
         {
-          text: '확인',
+          text: t('screens.phoneEdit.alerts.confirm'),
           onPress: () => {
 
             reset(ROUTES.myInfoEdit);
@@ -92,7 +94,7 @@ export const PhoneEditScreen = () => {
       ]);
     } catch (error) {
       console.error('[전화번호수정] 전화번호 수정 실패:', error);
-      Alert.alert('저장 실패', '전화번호 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      Alert.alert(t('screens.phoneEdit.alerts.saveFailed'), t('screens.phoneEdit.alerts.saveFailedMessage'));
     } finally {
       setIsSaving(false);
     }
@@ -106,7 +108,7 @@ export const PhoneEditScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title="전화번호 수정"
+        title={t('screens.phoneEdit.title')}
         onBackPress={canGoBack ? goBack : () => reset(ROUTES.myInfoEdit)}
         showBackButton
       />
@@ -117,11 +119,11 @@ export const PhoneEditScreen = () => {
       >
         <View style={styles.formWrapper}>
           <FormField
-            label="Phone Number"
+            label={t('screens.phoneEdit.phoneLabel')}
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
-            placeholder="Enter phone number"
+            placeholder={t('screens.phoneEdit.phonePlaceholder')}
             editable={!isSaving}
             leftAccessory={
               <TouchableOpacity
@@ -144,7 +146,7 @@ export const PhoneEditScreen = () => {
             </View>
           ) : (
             <PrimaryButton
-              title="Save Changes"
+              title={t('screens.phoneEdit.saveButton')}
               fullWidth
               onPress={handleSave}
               style={styles.primaryButton}

@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, TextInput, ActivityIndicator, Text } from
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, ShopItemCard, Dialog } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -12,11 +13,11 @@ import { PurchasedItemData } from '../types';
 import { cashingimages } from '../utils/imageCache';
 import { COLORS } from '../constants';
 
-const transformPurchasedItem = (item: PurchasedItemData, index: number): ShopItem => {
+const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any): ShopItem => {
 
   const imageSource = require('../../assets/images/icon_shop.png');
 
-  const quantityLabel = item.status === 10307 ? '사용 가능' : '사용 완료';
+  const quantityLabel = item.status === 10307 ? t('screens.shopMyTicket.available') : t('screens.shopMyTicket.used');
 
   const uniqueId = item.txID 
     ? `${item.item}_${item.txID}_${index}` 
@@ -35,6 +36,7 @@ const transformPurchasedItem = (item: PurchasedItemData, index: number): ShopIte
 
 export const ShopMyTicketScreen = () => {
   const { navigate } = useAppNavigation();
+  const { t } = useTranslation();
   const { setSelectedShopItem } = useAppContext();
   const [purchasedItems, setPurchasedItems] = useState<ShopItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +123,7 @@ export const ShopMyTicketScreen = () => {
       if (result && result.status === 'success' && result.data) {
         console.log('[상점] 구매 아이템 API 응답 성공, 받은 아이템 수:', result.data.length);
 
-        const transformedItems = result.data.map((item, index) => transformPurchasedItem(item, index));
+        const transformedItems = result.data.map((item, index) => transformPurchasedItem(item, index, t));
 
         setPurchasedItems(transformedItems);
         console.log('[상점] 변환된 구매 아이템 수:', transformedItems.length);
@@ -181,7 +183,7 @@ export const ShopMyTicketScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" />
+      <Header title={t('screens.shop.title')} />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -244,7 +246,7 @@ export const ShopMyTicketScreen = () => {
         onClose={() => setTransferTicketDialog({ ...transferTicketDialog, visible: false })}
         actions={[
           {
-            label: '확인',
+            label: t('screens.shopMyTicket.confirm'),
             onPress: () => setTransferTicketDialog({ ...transferTicketDialog, visible: false }),
             variant: 'primary',
           },

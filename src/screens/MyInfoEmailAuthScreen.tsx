@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -20,6 +21,7 @@ const isValidEmail = (email: string): boolean => {
 };
 
 export const MyInfoEmailAuthScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { setVerificationSuccessRoute, verificationEmail, setVerificationEmail } = useAppContext();
   const [email, setEmail] = useState('');
@@ -35,17 +37,17 @@ export const MyInfoEmailAuthScreen = () => {
   const handleSendEmail = async () => {
 
     if (!email.trim()) {
-      Alert.alert('이메일 입력', '이메일 주소를 입력해주세요.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailInput'), t('screens.myInfoEmailAuth.alerts.emailRequired'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailFormatError'), t('screens.myInfoEmailAuth.alerts.emailFormatInvalid'));
       return;
     }
 
     if (verificationEmail && email.trim() !== verificationEmail.trim()) {
-      Alert.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailMismatch'), t('screens.myInfoEmailAuth.alerts.emailMismatchMessage'));
       return;
     }
 
@@ -57,13 +59,13 @@ export const MyInfoEmailAuthScreen = () => {
 
       if (success) {
         setEmailSent(true);
-        Alert.alert('전송 완료', '입력한 이메일로 인증코드를 전송했어요.');
+        Alert.alert(t('screens.myInfoEmailAuth.alerts.sendSuccess'), t('screens.myInfoEmailAuth.alerts.sendSuccessMessage'));
       } else {
-        Alert.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+        Alert.alert(t('screens.myInfoEmailAuth.alerts.sendFailed'), t('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
       }
     } catch (error) {
       console.error('[정보수정] 이메일 전송 오류:', error);
-      Alert.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.sendFailed'), t('screens.myInfoEmailAuth.alerts.sendError'));
     } finally {
       setSending(false);
     }
@@ -72,22 +74,22 @@ export const MyInfoEmailAuthScreen = () => {
   const handleConfirm = async () => {
 
     if (!email.trim()) {
-      Alert.alert('이메일 입력', '이메일 주소를 입력해주세요.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailInput'), t('screens.myInfoEmailAuth.alerts.emailRequired'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailFormatError'), t('screens.myInfoEmailAuth.alerts.emailFormatInvalid'));
       return;
     }
 
     if (verificationEmail && email.trim() !== verificationEmail.trim()) {
-      Alert.alert('이메일 불일치', '기존 이메일과 일치하지 않습니다.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.emailMismatch'), t('screens.myInfoEmailAuth.alerts.emailMismatchMessage'));
       return;
     }
 
     if (!emailSent) {
-      Alert.alert('인증 코드 미발송', '먼저 이메일 인증 코드를 발송해주세요.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.codeNotSent'), t('screens.myInfoEmailAuth.alerts.codeNotSentMessage'));
       return;
     }
 
@@ -103,11 +105,11 @@ export const MyInfoEmailAuthScreen = () => {
         setVerificationSuccessRoute(ROUTES.myInfoEdit);
         navigate(ROUTES.verificationCode);
       } else {
-        Alert.alert('전송 실패', '이메일 전송에 실패했습니다. 다시 시도해주세요.');
+        Alert.alert(t('screens.myInfoEmailAuth.alerts.sendFailed'), t('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
       }
     } catch (error) {
       console.error('[정보수정] 이메일 전송 오류:', error);
-      Alert.alert('전송 실패', '이메일 전송 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.myInfoEmailAuth.alerts.sendFailed'), t('screens.myInfoEmailAuth.alerts.sendError'));
     } finally {
       setSending(false);
     }
@@ -116,7 +118,7 @@ export const MyInfoEmailAuthScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Email Authentification" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.myInfoEmailAuth.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -124,7 +126,7 @@ export const MyInfoEmailAuthScreen = () => {
       >
         <View style={styles.formWrapper}>
           <FormField
-            label="Email"
+            label={t('screens.myInfoEmailAuth.emailLabel')}
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -133,7 +135,7 @@ export const MyInfoEmailAuthScreen = () => {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
-            placeholder="Enter your email address"
+            placeholder={t('screens.myInfoEmailAuth.emailPlaceholder')}
             containerStyle={styles.fieldContainer}
             rightAccessory={
               <TouchableOpacity
@@ -146,7 +148,7 @@ export const MyInfoEmailAuthScreen = () => {
                 activeOpacity={0.7}
               >
                 <Text style={styles.inlineButtonText}>
-                  {emailSent ? 'Sent' : 'Send Email'}
+                  {sending ? t('screens.myInfoEmailAuth.sending') : (emailSent ? t('screens.myInfoEmailAuth.sendButton') : t('screens.myInfoEmailAuth.sendButton'))}
                 </Text>
               </TouchableOpacity>
             }
@@ -155,7 +157,7 @@ export const MyInfoEmailAuthScreen = () => {
 
         <View style={styles.bottomSection}>
           <PrimaryButton
-            title="Confirm"
+            title={t('screens.myInfoEmailAuth.confirmButton')}
             fullWidth
             onPress={handleConfirm}
             style={styles.primaryButton}

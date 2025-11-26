@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header, ReferralMemberRow } from '../components';
 
 const rows = Array.from({ length: 7 }, (_, index) => ({
@@ -11,10 +12,11 @@ const rows = Array.from({ length: 7 }, (_, index) => ({
 }));
 
 export const ReferralDepthTwoScreen = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="2 Depth" />
+      <Header title={t('screens.referralDepthTwo.title')} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           {rows.map((row, index) => (

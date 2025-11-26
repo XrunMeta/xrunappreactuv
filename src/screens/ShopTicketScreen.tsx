@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, TextInput, ImageSourcePropType, ActivityI
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, ShopItemCard } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -116,6 +117,7 @@ const transformShopItem = (
 };
 
 export const ShopTicketScreen = () => {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<'ticket' | 'myTicket'>('ticket');
   const { navigate } = useAppNavigation();
   const { setSelectedShopItem } = useAppContext();
@@ -345,7 +347,7 @@ export const ShopTicketScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" />
+      <Header title={t('screens.shop.title')} />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />

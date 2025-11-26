@@ -1,19 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
 
-const clauses: { id: ClauseId; label: string }[] = [
-  { id: 'service', label: 'Service Clause' },
-  { id: 'location', label: 'Clause for Personal location information' },
-  { id: 'personal', label: 'Clause for usage/Collecting Personal Information' },
-];
-
 export const MyInfoClausesScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { setSelectedClauseId } = useAppContext();
 
@@ -22,10 +18,16 @@ export const MyInfoClausesScreen = () => {
     navigate(ROUTES.myInfoClauseDetail);
   };
 
+  const clauses: { id: ClauseId; label: string }[] = [
+    { id: 'service', label: t('screens.myInfoClauses.serviceClause') },
+    { id: 'location', label: t('screens.myInfoClauses.locationClause') },
+    { id: 'personal', label: t('screens.myInfoClauses.personalClause') },
+  ];
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Clause" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.myInfoClauses.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar } from '../components';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
@@ -368,6 +369,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   onTabChange,
 }) => {
   const { navigate, reset } = useAppNavigation();
+  const { t } = useTranslation();
   const { setAdvertisementParams } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -778,11 +780,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, [showBottomPanel, navigateToAd]);
 
   const bottomNavItems = [
-    { id: 'wallet', label: 'Wallet', icon: iconWallet },
-    { id: 'shop', label: 'Shop', icon: iconShop },
+    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+    { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: 'Referral', icon: iconReferral },
-    { id: 'info', label: 'Info', icon: iconUser },
+    { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
+    { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
   ];
 
   if (!permission) {

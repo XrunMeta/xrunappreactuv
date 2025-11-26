@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { FormField, Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -15,6 +16,7 @@ import { useAppContext } from '../context';
 import { checkEmailExists, sendEmailVerificationCode } from '../services';
 
 export const EmailVerificationScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,13 +24,13 @@ export const EmailVerificationScreen = () => {
 
   const handleSend = async () => {
     if (!email.trim()) {
-      Alert.alert('이메일 입력', '인증 메일을 받을 이메일을 입력해주세요.');
+      Alert.alert(t('screens.emailVerification.alerts.emailInput'), t('screens.emailVerification.errors.emailRequired'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert('이메일 형식 오류', '올바른 이메일 형식을 입력해주세요.');
+      Alert.alert(t('screens.emailVerification.alerts.emailFormatError'), t('screens.emailVerification.errors.emailInvalid'));
       return;
     }
 
@@ -41,8 +43,8 @@ export const EmailVerificationScreen = () => {
 
       if (!emailExists) {
         Alert.alert(
-          '이메일 확인',
-          '등록되지 않은 이메일입니다. 회원가입을 진행해주세요.',
+          t('screens.emailVerification.alerts.emailCheck'),
+          t('screens.emailVerification.errors.emailNotRegistered'),
         );
         setIsLoading(false);
         return;
@@ -52,7 +54,7 @@ export const EmailVerificationScreen = () => {
       const codeSent = await sendEmailVerificationCode(email.trim(), navigate);
 
       if (!codeSent) {
-        Alert.alert('전송 실패', '인증 코드 전송에 실패했습니다. 다시 시도해주세요.');
+        Alert.alert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
         setIsLoading(false);
         return;
       }
@@ -62,7 +64,7 @@ export const EmailVerificationScreen = () => {
       navigate(ROUTES.verificationCode);
     } catch (error) {
       console.error('[로그인] 이메일 인증 처리 중 오류:', error);
-      Alert.alert('오류', '이메일 인증 처리 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.emailVerification.alerts.error'), t('screens.emailVerification.errors.error'));
     } finally {
       setIsLoading(false);
     }
@@ -71,15 +73,15 @@ export const EmailVerificationScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="이메일 인증" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.emailVerification.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <FormField
-          label="이메일"
-          placeholder="이메일을 입력해주세요."
+          label={t('screens.emailVerification.emailLabel')}
+          placeholder={t('screens.emailVerification.emailPlaceholder')}
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -89,7 +91,7 @@ export const EmailVerificationScreen = () => {
 
         <View style={styles.buttonWrapper}>
           <PrimaryButton
-            title={isLoading ? '처리 중...' : 'Send'}
+            title={isLoading ? t('screens.emailVerification.processing') : t('screens.emailVerification.sendButton')}
             fullWidth
             onPress={handleSend}
             disabled={isLoading}

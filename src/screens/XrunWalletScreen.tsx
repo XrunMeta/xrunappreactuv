@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
 import { COLORS } from '../constants';
@@ -40,6 +41,7 @@ const HISTORY_DATA = [
 ];
 
 export const XrunWalletScreen = () => {
+  const { t } = useTranslation();
   const { navigate } = useAppNavigation();
   const handleAction = (type: 'scan' | 'receive' | 'send') => {
     if (type === 'send') {
@@ -53,10 +55,10 @@ export const XrunWalletScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="XRUN" showBackButton />
+      <Header title={t('screens.xrunWallet.title')} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <WalletHeaderCard
-          title="My Balance"
+          title={t('screens.xrunWallet.myBalance')}
           mainValue="12,200 XRUN"
           address={`${WALLET_ADDRESS.slice(0, 24)}.......`}
           onCopy={() => copyToClipboard(WALLET_ADDRESS)}
@@ -68,7 +70,7 @@ export const XrunWalletScreen = () => {
         />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>History</Text>
+          <Text style={styles.sectionTitle}>{t('screens.xrunWallet.history')}</Text>
           <TouchableOpacity onPress={() => setFilterVisible(true)} activeOpacity={0.7}>
             <Ionicons name="options-outline" size={20} color="#343434" />
           </TouchableOpacity>

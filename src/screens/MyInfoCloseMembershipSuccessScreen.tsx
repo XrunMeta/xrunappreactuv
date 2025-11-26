@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -9,6 +10,7 @@ import { logout } from '../services';
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
 export const MyInfoCloseMembershipSuccessScreen = () => {
+  const { t } = useTranslation();
   const { reset } = useAppNavigation();
 
   const handleConfirm = async () => {
@@ -60,17 +62,16 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Close Membership" showBackButton={false} />
+      <Header title={t('screens.myInfoCloseMembershipSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.message}>회원 탈퇴가 완료되었습니다</Text>
+          <Text style={styles.message}>{t('screens.myInfoCloseMembershipSuccess.message')}</Text>
           <Text style={styles.subMessage}>
-            이용해 주셔서 감사합니다.{'\n'}
-            더 나은 서비스로 찾아뵙겠습니다.
+            {t('screens.myInfoCloseMembershipSuccess.subMessage')}
           </Text>
           <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-            <Text style={styles.buttonText}>확인</Text>
+            <Text style={styles.buttonText}>{t('screens.myInfoCloseMembershipSuccess.confirmButton')}</Text>
           </TouchableOpacity>
         </View>
       </View>

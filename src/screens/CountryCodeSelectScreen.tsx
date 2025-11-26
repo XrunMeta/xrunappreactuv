@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, CountryCodeListItem } from '../components';
 import { useAppNavigation } from '../navigation';
@@ -15,6 +16,7 @@ import { COLORS, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../co
 import { CountryDialCode } from '../types';
 
 export const CountryCodeSelectScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const {
     selectedCountryDialCode,
@@ -62,14 +64,14 @@ export const CountryCodeSelectScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title={selectMode === 'region' ? '지역 선택' : '국가 선택'}
+        title={selectMode === 'region' ? t('screens.countryCodeSelect.regionSelectTitle') : t('screens.countryCodeSelect.countrySelectTitle')}
         showBackButton
         onBackPress={goBack}
       />
       <View style={styles.content}>
         {selectedItem && (
           <View style={styles.currentSection}>
-            <Text style={styles.sectionLabel}>현재 선택</Text>
+            <Text style={styles.sectionLabel}>{t('screens.countryCodeSelect.currentSelection')}</Text>
             <View style={styles.currentCard}>
               <View style={styles.flagCircle}>
                 <Text style={styles.flagEmoji}>{selectedItem.flagEmoji}</Text>
@@ -90,7 +92,7 @@ export const CountryCodeSelectScreen = () => {
             style={styles.searchInput}
             value={query}
             onChangeText={setQuery}
-            placeholder={selectMode === 'region' ? '지역을 검색하세요' : '국가를 검색하세요'}
+            placeholder={selectMode === 'region' ? t('screens.countryCodeSelect.regionSearchPlaceholder') : t('screens.countryCodeSelect.countrySearchPlaceholder')}
             placeholderTextColor="#c4c7d1"
             autoCapitalize="none"
             autoCorrect={false}
@@ -112,7 +114,7 @@ export const CountryCodeSelectScreen = () => {
           keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>검색 결과가 없습니다.</Text>
+              <Text style={styles.emptyText}>{t('screens.countryCodeSelect.noResults')}</Text>
             </View>
           }
         />

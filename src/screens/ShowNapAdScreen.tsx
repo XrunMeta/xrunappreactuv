@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
@@ -58,6 +59,7 @@ interface CampaignData {
 }
 
 export const ShowNapAdScreen: React.FC = () => {
+  const { t } = useTranslation();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
   const { navigate, reset } = useAppNavigation();
 
@@ -212,7 +214,7 @@ export const ShowNapAdScreen: React.FC = () => {
         reset(ROUTES.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', url);
-        throw new Error('지원하지 않는 URL입니다.');
+        throw new Error(t('screens.showNapAd.unsupportedUrl'));
       }
     } catch (error) {
       console.error('❌ URL 이동 실패:', error);
@@ -226,7 +228,7 @@ export const ShowNapAdScreen: React.FC = () => {
       const deviceInfo = await collectDeviceInfo();
 
       if (!campaignData?.urlAD) {
-        throw new Error('광고 URL이 없습니다.');
+        throw new Error(t('screens.showNapAd.noAdUrl'));
       }
 
       const urlAD = campaignData.urlAD;
@@ -467,15 +469,15 @@ export const ShowNapAdScreen: React.FC = () => {
           <SequentialDots />
           <Text style={styles.loadingText}>
             {waitingForWebSocketResponse
-              ? 'Processing your reward...'
-              : '광고를 불러오는중입니다. 광고의 리워드는 해당 광고 완료후 진행됩니다. 완료후 약간의 시간 지연이 있습니다'}
+              ? t('screens.showNapAd.processingReward')
+              : t('screens.showNapAd.loading')}
           </Text>
 
           {waitingForWebSocketResponse && <SequentialDots />}
 
           {retryCount > 0 && (
             <Text style={styles.retryText}>
-              광고 확인중입니다
+              {t('screens.showNapAd.checkingAd')}
             </Text>
           )}
 
@@ -485,7 +487,7 @@ export const ShowNapAdScreen: React.FC = () => {
               onPress={handleBackButtonPress}
               activeOpacity={0.7}
             >
-              <Text style={styles.backButtonText}>뒤로가기</Text>
+              <Text style={styles.backButtonText}>{t('screens.showNapAd.back')}</Text>
             </TouchableOpacity>
           )}
 
@@ -495,7 +497,7 @@ export const ShowNapAdScreen: React.FC = () => {
               onPress={handleAlternativeAdButton}
               activeOpacity={0.7}
             >
-              <Text style={styles.alternativeAdButtonText}>다른 광고 보기</Text>
+              <Text style={styles.alternativeAdButtonText}>{t('screens.showNapAd.alternativeAd')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -505,19 +507,19 @@ export const ShowNapAdScreen: React.FC = () => {
       {!isLoading && !isProcessing && !waitingForWebSocketResponse && campaignData && (
         <View style={styles.campaignContainer}>
           <Text style={styles.campaignTitle}>
-            {campaignData.name || '캠페인 정보'}
+            {campaignData.name || t('screens.showNapAd.campaignInfo')}
           </Text>
           <Text style={styles.campaignReward}>
-            reward : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
+            {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
-            {campaignData.rewarddesc || '캠페인 설명'}
+            {campaignData.rewarddesc || t('screens.showNapAd.campaignDesc')}
           </Text>
 
           {}
           {advertisementParams.joindesc && advertisementParams.joindesc !== '' && (
             <View style={styles.joinDescContainer}>
-              <Text style={styles.joinDescTitle}>참여 방법</Text>
+              <Text style={styles.joinDescTitle}>{t('screens.showNapAd.joinMethod')}</Text>
               <ScrollView 
                 style={styles.joinDescScrollView}
                 showsVerticalScrollIndicator={true}
@@ -542,7 +544,7 @@ export const ShowNapAdScreen: React.FC = () => {
               }}
               activeOpacity={0.7}
             >
-              <Text style={styles.watchAdButtonText}>광고 보기</Text>
+              <Text style={styles.watchAdButtonText}>{t('screens.showNapAd.watchAd')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -550,7 +552,7 @@ export const ShowNapAdScreen: React.FC = () => {
               onPress={handleCancel}
               activeOpacity={0.7}
             >
-              <Text style={styles.cancelButtonText}>취소</Text>
+              <Text style={styles.cancelButtonText}>{t('screens.showNapAd.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -566,13 +568,13 @@ export const ShowNapAdScreen: React.FC = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              광고 호출에 실패했습니다
+              {t('screens.showNapAd.adCallFailed')}
             </Text>
             <Text style={styles.modalSubText}>
-              여러 번 시도했으나 광고 호출에 실패했습니다. 이전 페이지로 이동합니다.
+              {t('screens.showNapAd.adCallFailedSub')}
             </Text>
             <TouchableOpacity onPress={handleAdCallFailedOK} style={styles.okButton}>
-              <Text style={styles.okButtonText}>확인</Text>
+              <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>

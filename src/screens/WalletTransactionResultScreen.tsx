@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, PrimaryButton, ExplorerBadge } from '../components';
@@ -37,6 +38,7 @@ const InfoCard = ({
 );
 
 export const WalletTransactionResultScreen = () => {
+  const { t } = useTranslation();
   const { reset } = useAppNavigation();
   const transactionToken = { title: 'POL', subtitle: 'Polygon' };
   const tokenIcon = getTokenIcon(
@@ -55,13 +57,13 @@ export const WalletTransactionResultScreen = () => {
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(TX_HASH);
-    Alert.alert('복사 완료', '거래 해시가 클립보드에 복사되었습니다.');
+    Alert.alert(t('screens.walletTransactionResult.copySuccess'), t('screens.walletTransactionResult.copySuccessMessage'));
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Transaction" showBackButton />
+      <Header title={t('screens.walletTransactionResult.title')} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -76,29 +78,29 @@ export const WalletTransactionResultScreen = () => {
               <View style={styles.copyIconWrapper}>
                 <Ionicons name="copy-outline" size={20} color="#747474" />
               </View>
-              <Text style={styles.copyText}>Copy</Text>
+              <Text style={styles.copyText}>{t('screens.walletTransactionResult.copy')}</Text>
             </TouchableOpacity>
           </View>
 
-          <InfoCard label="Amount" value="1.23 POL" />
-          <InfoCard label="Newtwork Free" value="0.0065 POL" />
+          <InfoCard label={t('screens.walletTransactionResult.amount')} value="1.23 POL" />
+          <InfoCard label={t('screens.walletTransactionResult.networkFree')} value="0.0065 POL" />
           <InfoCard
-            label="Network Fee"
+            label={t('screens.walletTransactionResult.networkFee')}
             value="0xe61C95a80....c40d964aa86"
             trailing={tokenBadge}
           />
           <InfoCard
-            label="TX Hash"
+            label={t('screens.walletTransactionResult.txHash')}
             value="0x61cf2.....7531fbf"
             trailing={tokenBadge}
           />
 
-          <Text style={styles.statusText}>Completed</Text>
+          <Text style={styles.statusText}>{t('screens.walletTransactionResult.completed')}</Text>
         </View>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
-            title="Close"
+            title={t('screens.walletTransactionResult.close')}
             fullWidth
             onPress={() => reset(ROUTES.wallet)}
           />
