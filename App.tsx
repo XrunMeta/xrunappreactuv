@@ -46,6 +46,7 @@ import {
   ShopSuccessScreen,
   ShopTicketDetailScreen,
   ShowNapAdScreen,
+  XRUNinfoScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -238,6 +239,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'showNapAd') {
     return <ShowNapAdScreen />;
+  }
+
+  if (currentScreen === 'xrunInfo') {
+    return <XRUNinfoScreen />;
   }
 
   return <LoginSignupScreen />;

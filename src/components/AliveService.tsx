@@ -28,7 +28,8 @@ export const AliveService: React.FC = () => {
         setFailureCount(0);
         failureCountRef.current = 0;
 
-        if (response.emergencyStop?.enabled) {
+        if (response.emergencyStop?.enabled === true) {
+
           setEmergencyStop({
             enabled: true,
             message: response.emergencyStop.message,

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS } from '../constants';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { getIosWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
 
@@ -56,6 +58,71 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onItemPress,
   onTabChange,
 }) => {
+  const { navigate } = useAppNavigation();
+  const [showWallet, setShowWallet] = useState(Platform.OS === 'android');
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    const getShowWalletStatus = async () => {
+      if (Platform.OS === 'ios') {
+        try {
+          const iosOnWallet = await getIosWalletShowStatus(navigate);
+          setShowWallet(iosOnWallet);
+        } catch (error) {
+          console.error('지갑 표시 상태 가져오기 오류:', error);
+          setShowWallet(false);
+        }
+      } else {
+        setShowWallet(true); 
+      }
+    };
+
+    getShowWalletStatus();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [navigate]);
+
+  const processedItems = items.map(item => {
+    if (item.id === 'wallet') {
+
+      let iconXrunBlack: any = null;
+      try {
+        iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
+      } catch (e) {
+        console.warn('icon_xrun_black.png not found');
+      }
+
+      return {
+        ...item,
+        label: showWallet 
+          ? item.label 
+          : 'XRUN',
+        icon: showWallet
+          ? item.icon
+          : iconXrunBlack,
+      };
+    }
+    return item;
+  });
+
+  const handleItemPress = (itemId: string) => {
+    if (itemId === 'wallet') {
+      if (Platform.OS === 'android') {
+        navigate(ROUTES.wallet);
+      } else if (Platform.OS === 'ios' && showWallet) {
+        navigate(ROUTES.wallet);
+      } else {
+
+        navigate(ROUTES.xrunInfo);
+      }
+      return;
+    }
+
+    onItemPress?.(itemId);
+  };
 
   const getItemPadding = () => {
     const basePadding = width * 0.04; 
@@ -125,7 +192,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
       <TouchableOpacity
         key={item.id}
         style={styles.navItem}
-        onPress={() => onItemPress?.(item.id)}
+        onPress={() => handleItemPress(item.id)}
         activeOpacity={0.7}>
         <View style={styles.iconContainer}>
           {iconSource ? (
@@ -153,7 +220,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
       {}
       <View style={styles.bottomSection}>
         <View style={styles.content}>
-          {items.map((item, index) => {
+          {processedItems.map((item, index) => {
             if (item.id === 'map' || item.id === 'camera') {
 
               return <React.Fragment key="center-buttons">{renderCenterItem()}</React.Fragment>;
