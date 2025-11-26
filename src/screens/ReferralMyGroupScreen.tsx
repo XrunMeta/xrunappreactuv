@@ -1,5 +1,5 @@
 import v_a3453e, { v_df9f57, v_e662ae, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_4623af, v_19b633, v_03e392 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_4623af, v_19b633 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -9,6 +9,7 @@ import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
 import { v_fb1936 } from '../services';
 import { v_b0f886 } from '../types';
@@ -24,6 +25,7 @@ interface MemberData {
 export const v_58584a = () => {
   const { t: v_8d41d7 } = v_772971();
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
@@ -168,12 +170,13 @@ export const v_58584a = () => {
 
   const v_22cd2d = async () => {
     if (!v_f4fb5e) {
-      v_03e392.alert(v_8d41d7('screens.referralMyGroup.shareFailed'), v_8d41d7('screens.referralMyGroup.shareFailedMessage'));
+      await v_889fad(v_8d41d7('screens.referralMyGroup.shareFailed'), v_8d41d7('screens.referralMyGroup.shareFailedMessage'));
       return;
     }
     await v_a3bbf0(
       v_4922a9,
       { email: v_f4fb5e },
+      v_889fad,
       v_9b57fc,
     );
   };
