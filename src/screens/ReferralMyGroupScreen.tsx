@@ -1,12 +1,13 @@
 import v_a3453e, { v_df9f57, v_e662ae, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_4623af, v_5f4661, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_4623af, v_19b633, v_03e392 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_a3bbf0 } from '../utils';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
 import { v_fb1936 } from '../services';
 import { v_b0f886 } from '../types';
@@ -24,6 +25,7 @@ export const v_58584a = () => {
   const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
+  const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('');
   const [v_03be4c, v_e2e8ad] = v_5ab095<number>(0);
   const [v_87203a, v_8d99ff] = v_5ab095<MemberData[]>([]);
   const [v_cd31a8, v_deef62] = v_5ab095<boolean>(true);
@@ -36,14 +38,17 @@ export const v_58584a = () => {
       try {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (v_f24fd5) {
-        const v_ef7306 = JSON.parse(v_f24fd5);
-        if (v_ef7306.member) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          if (v_ef7306.member) {
 
-          v_9d6aeb(String(v_ef7306.member));
+            v_9d6aeb(String(v_ef7306.member));
 
             v_58d2fc.current = false;
             v_8d99ff([]);
             v_e2e8ad(0);
+          }
+          if (v_ef7306.email) {
+            v_d9bcc7(v_ef7306.email);
           }
         }
       } catch (v_5e9bfe) {
@@ -160,13 +165,15 @@ export const v_58584a = () => {
   };
 
   const v_22cd2d = async () => {
-    try {
-      await v_5f4661.share({
-        message: 'XRUN referral 링크를 공유해 보세요!',
-      });
-    } catch (v_5e9bfe) {
-      console.warn(v_5e9bfe);
+    if (!v_f4fb5e) {
+      v_03e392.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      return;
     }
+    await v_a3bbf0(
+      v_4922a9,
+      { email: v_f4fb5e },
+      v_9b57fc,
+    );
   };
 
   return (

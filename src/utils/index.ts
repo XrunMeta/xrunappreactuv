@@ -1,4 +1,4 @@
-import { v_03e392 } from 'rcmrninabrnb';
+import { v_03e392, v_5f4661 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 
 export const v_db97fb = async (
@@ -50,5 +50,44 @@ export const v_b9db3d = (v_4c90cc, v_beea9d): number => {
 
   const v_43c42e = v_844935 * v_2d20f9;
   return Math.round(v_43c42e * 100) / 100;
+};
+
+export const v_a3bbf0 = async (
+  v_5254bf,
+  v_412c99,
+  v_c65f5d,
+): Promise<void> => {
+  try {
+
+    const v_17aa0b = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
+    const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
+
+    const v_b657c9 = v_5254bf?.screen_info?.button?.share || '공유하기';
+
+    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n다운로드:\nAndroid: ${v_17aa0b}\niOS: ${v_47d9ba}`;
+
+    const v_43c42e = await v_5f4661.share({
+      message: v_a8cd21,
+    });
+
+    if (v_43c42e.action === v_5f4661.sharedAction) {
+      if (v_43c42e.activityType) {
+
+        console.log(`${v_43c42e.activityType}로 성공적으로 공유됨`);
+      } else {
+
+        console.log('성공적으로 공유됨');
+      }
+    } else if (v_43c42e.action === v_5f4661.dismissedAction) {
+
+      console.log('공유가 취소됨');
+    }
+  } catch (v_5e9bfe) {
+    v_03e392.alert('공유 실패', v_5e9bfe.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    console.log('Share error:', v_5e9bfe);
+    if (v_c65f5d) {
+
+    }
+  }
 };
 
