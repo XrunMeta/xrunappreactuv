@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +14,7 @@ import { Header, PrimaryButton, ExplorerBadge } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getTokenIcon } from '../constants/tokenMeta';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const TX_HASH =
   '0x61cf20b2ebd91caa22782a740f82dcf87ad2b2be7b6401ec3daf2234e7531fbf';
@@ -40,6 +40,7 @@ const InfoCard = ({
 export const WalletTransactionResultScreen = () => {
   const { t } = useTranslation();
   const { reset } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const transactionToken = { title: 'POL', subtitle: 'Polygon' };
   const tokenIcon = getTokenIcon(
     transactionToken.title,
@@ -57,7 +58,7 @@ export const WalletTransactionResultScreen = () => {
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(TX_HASH);
-    Alert.alert(t('screens.walletTransactionResult.copySuccess'), t('screens.walletTransactionResult.copySuccessMessage'));
+    await showAlert(t('screens.walletTransactionResult.copySuccess'), t('screens.walletTransactionResult.copySuccessMessage'));
   };
 
   return (

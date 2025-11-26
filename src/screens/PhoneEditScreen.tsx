@@ -5,7 +5,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -16,10 +15,12 @@ import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { updatePhone } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const PhoneEditScreen = () => {
   const { t } = useTranslation();
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { selectedCountryDialCode, setSelectedCountryDialCode } = useAppContext();
   const [phone, setPhone] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -52,18 +53,18 @@ export const PhoneEditScreen = () => {
   const handleSave = async () => {
 
     if (!phone.trim()) {
-      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneRequired'));
+      await showAlert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneRequired'));
       return;
     }
 
     const phoneNumber = phone.replace(/\s/g, '').replace(/-/g, '');
     if (!/^\d+$/.test(phoneNumber)) {
-      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneInvalid'));
+      await showAlert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.phoneInvalid'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.userDataNotFound'));
+      await showAlert(t('screens.phoneEdit.alerts.error'), t('screens.phoneEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -83,7 +84,7 @@ export const PhoneEditScreen = () => {
         navigate,
       );
 
-      Alert.alert(t('screens.phoneEdit.alerts.saveSuccess'), t('screens.phoneEdit.alerts.saveSuccessMessage'), [
+      await showAlert(t('screens.phoneEdit.alerts.saveSuccess'), t('screens.phoneEdit.alerts.saveSuccessMessage'), [
         {
           text: t('screens.phoneEdit.alerts.confirm'),
           onPress: () => {
@@ -94,7 +95,7 @@ export const PhoneEditScreen = () => {
       ]);
     } catch (error) {
       console.error('[전화번호수정] 전화번호 수정 실패:', error);
-      Alert.alert(t('screens.phoneEdit.alerts.saveFailed'), t('screens.phoneEdit.alerts.saveFailedMessage'));
+      await showAlert(t('screens.phoneEdit.alerts.saveFailed'), t('screens.phoneEdit.alerts.saveFailedMessage'));
     } finally {
       setIsSaving(false);
     }

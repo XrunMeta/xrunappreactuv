@@ -50,6 +50,7 @@ import {
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
+import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/components';
 import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
@@ -311,8 +312,10 @@ export default function App() {
     return (
       <AppProvider>
         <NavigationProvider>
-          <SplashScreen />
-          <GlobalDialogs />
+          <AlertDialogProvider>
+            <SplashScreen />
+            <GlobalDialogs />
+          </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
     );
@@ -321,9 +324,11 @@ export default function App() {
   return (
     <AppProvider>
       <NavigationProvider>
-        <AliveService />
-        <ScreenHost />
-        <GlobalDialogs />
+        <AlertDialogProvider>
+          <AliveService />
+          <ScreenHost />
+          <GlobalDialogs />
+        </AlertDialogProvider>
       </NavigationProvider>
     </AppProvider>
   );

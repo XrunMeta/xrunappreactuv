@@ -5,7 +5,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Alert,
   Platform,
   ActivityIndicator,
   Share,
@@ -18,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { PurchasedItemData } from '../types';
 import { getXrunPurchasedItems, deleteXrunPurchasedItem } from '../services';
 import { getEnv } from '../utils/env';
@@ -27,6 +27,7 @@ export const ShopTicketDetailScreen = () => {
   const { selectedShopItem } = useAppContext();
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const qrCodeRef = useRef<any>(null);
 
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -180,18 +181,18 @@ export const ShopTicketDetailScreen = () => {
     const currentTicketNumber = ticketData?.txID || ticketData?.txid || ticketData?.transaction || txID || ticketNumber;
 
     if (!currentTicketNumber) {
-      Alert.alert('오류', '복사할 티켓 번호가 없습니다.');
+      await showAlert('오류', '복사할 티켓 번호가 없습니다.');
       return;
     }
 
     await Clipboard.setStringAsync(currentTicketNumber);
-    Alert.alert('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
+    await showAlert('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
   };
 
   const handleShareQR = async () => {
     const valueToShare = qrCodeValue;
     if (!valueToShare) {
-      Alert.alert('오류', '공유할 QR 코드가 없습니다.');
+      await showAlert('오류', '공유할 QR 코드가 없습니다.');
       return;
     }
 
@@ -216,7 +217,7 @@ export const ShopTicketDetailScreen = () => {
             });
           } catch (fallbackError) {
             console.error('[티켓 상세] QR 공유 대안 실패:', fallbackError);
-            Alert.alert('오류', 'QR 코드 공유에 실패했습니다.');
+            await showAlert('오류', 'QR 코드 공유에 실패했습니다.');
           }
         }
       });
@@ -229,7 +230,7 @@ export const ShopTicketDetailScreen = () => {
           title: '티켓 QR 코드',
         });
       } catch (fallbackError) {
-        Alert.alert('오류', 'QR 코드 공유에 실패했습니다.');
+        await showAlert('오류', 'QR 코드 공유에 실패했습니다.');
       }
     }
   };
@@ -245,11 +246,11 @@ export const ShopTicketDetailScreen = () => {
     console.log('[티켓 상세] ================');
 
     if (!memberId || !currentStorageId) {
-      Alert.alert('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${memberId || '없음'}\nstorageId: ${currentStorageId || '없음'}`);
+      await showAlert('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${memberId || '없음'}\nstorageId: ${currentStorageId || '없음'}`);
       return;
     }
 
-    Alert.alert('삭제', '티켓을 삭제하시겠습니까?', [
+    await showAlert('삭제', '티켓을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       { 
         text: '삭제', 
@@ -268,7 +269,7 @@ export const ShopTicketDetailScreen = () => {
 
             if (result.status === 'success') {
               console.log('[티켓 상세] 삭제 성공');
-              Alert.alert('삭제 완료', '티켓이 삭제되었습니다.', [
+              await showAlert('삭제 완료', '티켓이 삭제되었습니다.', [
                 {
                   text: '확인',
                   onPress: () => {
@@ -279,7 +280,7 @@ export const ShopTicketDetailScreen = () => {
               ]);
             } else {
               console.log('[티켓 상세] 삭제 실패:', result.message);
-              Alert.alert('삭제 실패', result.message || '티켓 삭제에 실패했습니다.');
+              await showAlert('삭제 실패', result.message || '티켓 삭제에 실패했습니다.');
             }
           } catch (error: any) {
             console.error('[티켓 상세] === 티켓 삭제 오류 ===');
@@ -291,7 +292,7 @@ export const ShopTicketDetailScreen = () => {
               console.error('[티켓 상세] 응답 데이터:', error.response.data);
             }
             console.error('[티켓 상세] ====================');
-            Alert.alert('오류', `티켓 삭제 중 오류가 발생했습니다.\n${error?.message || '알 수 없는 오류'}`);
+            await showAlert('오류', `티켓 삭제 중 오류가 발생했습니다.\n${error?.message || '알 수 없는 오류'}`);
           } finally {
             setIsLoading(false);
           }

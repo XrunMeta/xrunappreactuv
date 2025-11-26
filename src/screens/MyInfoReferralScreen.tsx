@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,10 +7,12 @@ import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyRecommender, checkCanSetRecommender, setRecommender } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const MyInfoReferralScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [newRefEmail, setNewRefEmail] = useState('');
   const [currentRefEmail, setCurrentRefEmail] = useState('');
   const [currentRefName, setCurrentRefName] = useState('');
@@ -80,17 +82,17 @@ export const MyInfoReferralScreen = () => {
   const handleConfirm = async () => {
 
     if (!newRefEmail || newRefEmail.trim() === '') {
-      Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.emailRequired'));
+      await showAlert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.emailRequired'));
       return;
     }
 
     if (newRefEmail === currentRefEmail) {
-      Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.noChange'));
+      await showAlert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.noChange'));
       return;
     }
 
     if (!member) {
-      Alert.alert(t('screens.myInfoReferral.alerts.error'), t('screens.myInfoReferral.alerts.userDataNotFound'));
+      await showAlert(t('screens.myInfoReferral.alerts.error'), t('screens.myInfoReferral.alerts.userDataNotFound'));
       return;
     }
 
@@ -104,7 +106,7 @@ export const MyInfoReferralScreen = () => {
 
       if (!checkResult) {
 
-        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
+        await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
         setIsDisable(false);
         return;
       }
@@ -124,13 +126,13 @@ export const MyInfoReferralScreen = () => {
         (checkResult?.data && checkResult.data.canSet === false && responseCode === 400);
 
       if (isSelfReferral) {
-        Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.cannotSetSelf'));
+        await showAlert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.cannotSetSelf'));
         setIsDisable(false);
         return;
       }
 
       if (responseCode === 404) {
-        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.notFound'));
+        await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.notFound'));
         setIsDisable(false);
         return;
       }
@@ -147,13 +149,13 @@ export const MyInfoReferralScreen = () => {
           ? t('screens.myInfoReferral.alerts.alreadyHasRecommender')
           : t('screens.myInfoReferral.alerts.alreadyRegistered');
 
-        Alert.alert(t('screens.myInfoReferral.alerts.warning'), message);
+        await showAlert(t('screens.myInfoReferral.alerts.warning'), message);
         setIsDisable(false);
         return;
       }
 
       if (responseCode !== 200) {
-        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.cannotSet'));
+        await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.cannotSet'));
         setIsDisable(false);
         return;
       }
@@ -164,7 +166,7 @@ export const MyInfoReferralScreen = () => {
       console.log('[레퍼럴 수정] setRecommender 응답:', setResult);
 
       if (setResult && setResult.status === 'success') {
-        Alert.alert(
+        await showAlert(
           t('screens.myInfoReferral.alerts.success'),
           t('screens.myInfoReferral.alerts.successMessage'),
           [
@@ -177,11 +179,11 @@ export const MyInfoReferralScreen = () => {
           ],
         );
       } else {
-        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
+        await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
       }
     } catch (error) {
       console.error('[레퍼럴 수정] 레퍼럴 수정 오류:', error);
-      Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
+      await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
     } finally {
       setIsDisable(false);
     }
