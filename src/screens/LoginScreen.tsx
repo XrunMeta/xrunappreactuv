@@ -27,7 +27,7 @@ export const LoginScreen = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberId, setRememberId] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const emailVerificationRoute: any = ROUTES.emailVerification;
@@ -40,7 +40,7 @@ export const LoginScreen = () => {
           const savedEmail = await AsyncStorage.getItem('userEmail');
           if (savedEmail) {
             setEmail(savedEmail);
-            setRememberId(true);
+            setRememberMe(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
           }
         }
@@ -51,25 +51,8 @@ export const LoginScreen = () => {
     loadRememberedEmail();
   }, []);
 
-  const handleRememberIdToggle = async () => {
-    const newValue = !rememberId;
-    setRememberId(newValue);
-
-    try {
-      if (newValue && email.trim()) {
-
-        await AsyncStorage.setItem('rememberMe', 'true');
-        await AsyncStorage.setItem('userEmail', email.trim());
-        console.log('[로그인] 아이디 저장 완료:', email.trim());
-      } else {
-
-        await AsyncStorage.removeItem('rememberMe');
-
-        console.log('[로그인] 아이디 저장 해제');
-      }
-    } catch (error) {
-      console.error('[로그인] 아이디 저장/해제 실패:', error);
-    }
+  const toggleRememberMe = () => {
+    setRememberMe(!rememberMe);
   };
 
   const handleLogin = async () => {
@@ -87,7 +70,7 @@ export const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { email, rememberId });
+      console.log('[로그인] 로그인 시도:', { email, rememberMe });
 
       const loginResponse = await loginWithEmailPassword(
         email.trim(),
@@ -109,7 +92,7 @@ export const LoginScreen = () => {
       }
 
       const extrastr = userData.extrastr;
-      if (extrastr) {
+      if (extrastr && userData.member) {
         const ssidw = encryptSHA256(extrastr);
 
         const sessionSaved = await saveSession(userData.member, ssidw, navigate);
@@ -127,15 +110,15 @@ export const LoginScreen = () => {
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
 
-      if (rememberId) {
-        await AsyncStorage.setItem('rememberMe', 'true');
+      await AsyncStorage.setItem('isLoggedIn', 'true');
 
+      if (rememberMe) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+        console.log('[로그인] 로그인 상태 유지 저장 완료');
       } else {
         await AsyncStorage.removeItem('rememberMe');
-
+        console.log('[로그인] 로그인 상태 유지 해제');
       }
-
-      await AsyncStorage.setItem('isLoggedIn', 'true');
 
       console.log('[로그인] 로그인 성공');
 
@@ -200,13 +183,14 @@ export const LoginScreen = () => {
         />
 
         <View style={styles.checkboxRow}>
-          <FormCheckbox
-            label={t('screens.login.rememberId')}
-            checked={rememberId}
-            onToggle={handleRememberIdToggle}
-            variant="circle"
-            disabled={isLoading}
-          />
+          <View style={isLoading ? styles.checkboxDisabled : undefined}>
+            <FormCheckbox
+              label={t('screens.login.rememberMe')}
+              checked={rememberMe}
+              onToggle={isLoading ? () => {} : toggleRememberMe}
+              variant="circle"
+            />
+          </View>
         </View>
 
         <View style={styles.bottomSection}>
@@ -331,6 +315,9 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  checkboxDisabled: {
+    opacity: 0.5,
   },
 });
 

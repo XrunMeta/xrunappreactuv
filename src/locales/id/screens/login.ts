@@ -4,7 +4,7 @@ export default {
   emailPlaceholder: 'Masukkan email Anda',
   passwordLabel: 'Kata Sandi',
   passwordPlaceholder: 'Masukkan kata sandi Anda',
-  rememberId: 'Ingat ID',
+  rememberMe: 'Tetap masuk',
   loginButton: 'Masuk',
   disclaimer: 'Jika Anda lupa kata sandi, Anda dapat masuk menggunakan kode verifikasi yang dikirim ke email Anda.',
   emailVerification: 'Verifikasi Email',
