@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Clipboard from 'expo-clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -25,6 +26,7 @@ import { COLORS } from '../constants';
 export const ShopTicketDetailScreen = () => {
   const { selectedShopItem } = useAppContext();
   const { navigate } = useAppNavigation();
+  const { t } = useTranslation();
   const qrCodeRef = useRef<any>(null);
 
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -303,7 +305,7 @@ export const ShopTicketDetailScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Ticket Detail" showBackButton />
+      <Header title={t('screens.shopTicketDetail.title')} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           {}

@@ -21,6 +21,8 @@ export const SIZES = {
   xlarge: 24,
 };
 
+export const IS_DEV_MODE = __DEV__;
+
 export const LANG = {
   referral: {
     settlement: {

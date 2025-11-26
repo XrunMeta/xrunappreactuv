@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
@@ -9,6 +10,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { closeMembership } from '../services';
 
 export const MyInfoCloseMembershipScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
@@ -17,20 +19,20 @@ export const MyInfoCloseMembershipScreen = () => {
   const handleSubmit = async () => {
 
     if (!password.trim()) {
-      Alert.alert('비밀번호 입력', '회원 탈퇴를 위해 비밀번호를 입력해주세요.');
+      Alert.alert(t('screens.myInfoCloseMembership.alerts.passwordRequired'), t('screens.myInfoCloseMembership.alerts.passwordRequiredMessage'));
       return;
     }
 
     Alert.alert(
-      '회원 탈퇴',
-      '정말 회원 탈퇴를 하시겠습니까? 탈퇴 후에는 복구할 수 없습니다.',
+      t('screens.myInfoCloseMembership.alerts.closeMembership'),
+      t('screens.myInfoCloseMembership.alerts.closeMembershipMessage'),
       [
         {
-          text: '취소',
+          text: t('screens.myInfoCloseMembership.alerts.cancel'),
           style: 'cancel',
         },
         {
-          text: '탈퇴',
+          text: t('screens.myInfoCloseMembership.alerts.confirm'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -38,7 +40,7 @@ export const MyInfoCloseMembershipScreen = () => {
 
               const userDataStr = await AsyncStorage.getItem('userData');
               if (!userDataStr) {
-                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -47,7 +49,7 @@ export const MyInfoCloseMembershipScreen = () => {
               const member = userData.member;
 
               if (!member) {
-                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -61,7 +63,7 @@ export const MyInfoCloseMembershipScreen = () => {
               );
 
               if (!success) {
-                Alert.alert('탈퇴 실패', '회원 탈퇴에 실패했습니다. 비밀번호를 확인해주세요.');
+                Alert.alert(t('screens.myInfoCloseMembership.alerts.closeFailed'), t('screens.myInfoCloseMembership.alerts.closeFailedMessage'));
                 setIsSubmitting(false);
                 return;
               }
@@ -69,7 +71,7 @@ export const MyInfoCloseMembershipScreen = () => {
               navigate(ROUTES.myInfoCloseMembershipSuccess);
             } catch (error) {
               console.error('[회원 탈퇴] 탈퇴 처리 중 오류:', error);
-              Alert.alert('오류', '회원 탈퇴 중 오류가 발생했습니다. 다시 시도해주세요.');
+              Alert.alert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.closeError'));
               setIsSubmitting(false);
             }
           },
@@ -81,7 +83,7 @@ export const MyInfoCloseMembershipScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Close Membership" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.myInfoCloseMembership.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -89,8 +91,8 @@ export const MyInfoCloseMembershipScreen = () => {
       >
         <View style={styles.inner}>
           <FormField
-            label="Password"
-            placeholder="Enter your password"
+            label={t('screens.myInfoCloseMembership.passwordLabel')}
+            placeholder={t('screens.myInfoCloseMembership.passwordPlaceholder')}
             secureTextEntry={secure}
             value={password}
             onChangeText={setPassword}
@@ -101,13 +103,13 @@ export const MyInfoCloseMembershipScreen = () => {
             }
           />
           <Text style={styles.helperText}>
-            *For safe account management,{'\n'}you are receiving a password when you leave
+            {t('screens.myInfoCloseMembership.helperText')}
           </Text>
         </View>
 
         <View style={styles.bottomSection}>
           <PrimaryButton
-            title={isSubmitting ? '처리 중...' : 'Confirm'}
+            title={isSubmitting ? t('screens.myInfoCloseMembership.processing') : t('screens.myInfoCloseMembership.confirmButton')}
             fullWidth
             onPress={handleSubmit}
             style={styles.primaryButton}

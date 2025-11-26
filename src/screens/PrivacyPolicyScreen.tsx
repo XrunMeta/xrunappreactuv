@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Text, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -30,12 +31,13 @@ Announcement Date: July 11, 2022 / Effective Date: July 11, 2022
 `;
 
 export const PrivacyPolicyScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="개인정보 처리방침" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.privacyPolicy.title')} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.contentText}>{PRIVACY_TEXT}</Text>

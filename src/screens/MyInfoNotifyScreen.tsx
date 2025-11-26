@@ -15,6 +15,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { COLORS } from '../constants';
@@ -77,6 +78,7 @@ const groupNotificationsByDate = (notifications: NotificationItem[]) => {
 };
 
 export const MyInfoNotifyScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const [question, setQuestion] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -114,12 +116,12 @@ export const MyInfoNotifyScreen = () => {
       }
     } catch (error) {
       console.error('[알림] 알림 목록 조회 실패:', error);
-      Alert.alert('오류', '알림 목록을 불러오는데 실패했습니다.');
+      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.loadFailed'));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [memberId, navigate]);
+  }, [memberId, navigate, t]);
 
   useEffect(() => {
     if (memberId) {
@@ -134,25 +136,25 @@ export const MyInfoNotifyScreen = () => {
 
   const handleSend = async () => {
     if (!question.trim()) {
-      Alert.alert('메시지 입력', '보낼 내용을 입력해주세요.');
+      Alert.alert(t('screens.myInfoNotify.alerts.messageInput'), t('screens.myInfoNotify.alerts.messageRequired'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.userDataNotFound'));
       return;
     }
 
     try {
       setSending(true);
       await sendNotificationMessage(memberId, question.trim(), false, navigate);
-      Alert.alert('전송 완료', '문의가 전송되었습니다.');
+      Alert.alert(t('screens.myInfoNotify.alerts.sendSuccess'), t('screens.myInfoNotify.alerts.sendSuccessMessage'));
       setQuestion('');
 
       await loadNotifications();
     } catch (error) {
       console.error('[알림] 메시지 전송 실패:', error);
-      Alert.alert('오류', '메시지 전송에 실패했습니다.');
+      Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.sendFailed'));
     } finally {
       setSending(false);
     }
@@ -162,12 +164,12 @@ export const MyInfoNotifyScreen = () => {
     if (!memberId) return;
 
     Alert.alert(
-      '삭제 확인',
-      '이 메시지를 삭제하시겠습니까?',
+      t('screens.myInfoNotify.alerts.deleteConfirm'),
+      t('screens.myInfoNotify.alerts.deleteMessage'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('screens.myInfoNotify.alerts.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: t('screens.myInfoNotify.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -176,7 +178,7 @@ export const MyInfoNotifyScreen = () => {
               await loadNotifications();
             } catch (error) {
               console.error('[알림] 메시지 삭제 실패:', error);
-              Alert.alert('오류', '메시지 삭제에 실패했습니다.');
+              Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteFailed'));
             }
           },
         },
@@ -188,12 +190,12 @@ export const MyInfoNotifyScreen = () => {
     if (!memberId) return;
 
     Alert.alert(
-      '전체 삭제 확인',
-      '모든 메시지를 삭제하시겠습니까?',
+      t('screens.myInfoNotify.alerts.deleteAllConfirm'),
+      t('screens.myInfoNotify.alerts.deleteAllMessage'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('screens.myInfoNotify.alerts.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: t('screens.myInfoNotify.alerts.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -202,7 +204,7 @@ export const MyInfoNotifyScreen = () => {
               await loadNotifications();
             } catch (error) {
               console.error('[알림] 전체 삭제 실패:', error);
-              Alert.alert('오류', '전체 삭제에 실패했습니다.');
+              Alert.alert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteAllFailed'));
             }
           },
         },
@@ -215,7 +217,7 @@ export const MyInfoNotifyScreen = () => {
 
     if (url.startsWith('http://') || url.startsWith('https://')) {
       Linking.openURL(url).catch(() => {
-        Alert.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+        Alert.alert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
       });
     } else {
 
@@ -277,17 +279,17 @@ export const MyInfoNotifyScreen = () => {
               {}
               {}
               {isNotice && (
-                <TouchableOpacity
+                  <TouchableOpacity
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={() => {
                     const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
                     Linking.openURL(url).catch(() => {
-                      Alert.alert('링크 오류', '현재 페이지를 열 수 없어요.');
+                      Alert.alert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
                   }}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.ctaText}>자세히 보기</Text>
+                  <Text style={styles.ctaText}>{t('screens.myInfoNotify.viewDetails')}</Text>
                 </TouchableOpacity>
               )}
               {}
@@ -297,7 +299,7 @@ export const MyInfoNotifyScreen = () => {
                   onPress={() => openLink(notification.guid)}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.ctaText}>이벤트로 이동</Text>
+                  <Text style={styles.ctaText}>{t('screens.myInfoNotify.goToEvent')}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -336,7 +338,7 @@ export const MyInfoNotifyScreen = () => {
       <View style={styles.container}>
         <StatusBar style="dark" />
         <Header
-          title="Notify"
+          title={t('screens.myInfoNotify.title')}
           onBackPress={goBack}
           showBackButton
           rightComponent={
@@ -346,7 +348,7 @@ export const MyInfoNotifyScreen = () => {
                 activeOpacity={0.7}
                 style={styles.deleteAllButton}
               >
-                <Text style={styles.deleteAllText}>전체 삭제</Text>
+                <Text style={styles.deleteAllText}>{t('screens.myInfoNotify.deleteAll')}</Text>
               </TouchableOpacity>
             ) : undefined
           }
@@ -366,7 +368,7 @@ export const MyInfoNotifyScreen = () => {
           >
             {notifications.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>알림이 없습니다.</Text>
+                <Text style={styles.emptyText}>{t('screens.myInfoNotify.emptyMessage')}</Text>
               </View>
             ) : (
               renderGroupedNotifications()
@@ -378,7 +380,7 @@ export const MyInfoNotifyScreen = () => {
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.input}
-              placeholder="Type your question..."
+              placeholder={t('screens.myInfoNotify.placeholder')}
               placeholderTextColor="#7d7e83"
               value={question}
               onChangeText={setQuestion}
@@ -394,7 +396,7 @@ export const MyInfoNotifyScreen = () => {
             {sending ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.sendButtonText}>Send</Text>
+              <Text style={styles.sendButtonText}>{t('screens.myInfoNotify.sendButton')}</Text>
             )}
           </TouchableOpacity>
         </View>

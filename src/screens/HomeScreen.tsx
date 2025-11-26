@@ -1,13 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components';
 
 export const HomeScreen = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>안녕하세요 엑스런 어플</Text>
-      <Button title="Get Started" onPress={() => console.log('Pressed')} />
+      <Text style={styles.title}>{t('screens.home.title')}</Text>
+      <Button title={t('screens.home.getStartedButton')} onPress={() => console.log('Pressed')} />
       <StatusBar style="auto" />
     </View>
   );

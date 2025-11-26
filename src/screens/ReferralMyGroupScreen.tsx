@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef } from '../components';
@@ -21,6 +22,7 @@ interface MemberData {
 }
 
 export const ReferralMyGroupScreen = () => {
+  const { t } = useTranslation();
   const { navigate } = useAppNavigation();
   const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
@@ -166,7 +168,7 @@ export const ReferralMyGroupScreen = () => {
 
   const handleShare = async () => {
     if (!userEmail) {
-      Alert.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      Alert.alert(t('screens.referralMyGroup.shareFailed'), t('screens.referralMyGroup.shareFailedMessage'));
       return;
     }
     await shareReferralLink(
@@ -179,11 +181,11 @@ export const ReferralMyGroupScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={t('screens.referralMyGroup.title')} />
       <View style={styles.content}>
         <View style={styles.wrapper}>
           <View style={styles.topRow}>
-            <ReferralStatsCard title="내 그룹 맴버" value={`${totalMembers} 맴버`} helperText=" " />
+            <ReferralStatsCard title={t('screens.referralMyGroup.myGroupMembers')} value={`${totalMembers} ${t('screens.referralMyGroup.members')}`} helperText=" " />
             <TouchableOpacity style={styles.iconButton} onPress={handleShare} activeOpacity={0.7}>
               <Feather name="share-2" size={18} color={COLORS.headerText} />
             </TouchableOpacity>

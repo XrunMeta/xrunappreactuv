@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
@@ -8,6 +9,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyRecommender, checkCanSetRecommender, setRecommender } from '../services';
 
 export const MyInfoReferralScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const [newRefEmail, setNewRefEmail] = useState('');
   const [currentRefEmail, setCurrentRefEmail] = useState('');
@@ -78,17 +80,17 @@ export const MyInfoReferralScreen = () => {
   const handleConfirm = async () => {
 
     if (!newRefEmail || newRefEmail.trim() === '') {
-      Alert.alert('경고', '새 레퍼럴 이메일을 입력해주세요.');
+      Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.emailRequired'));
       return;
     }
 
     if (newRefEmail === currentRefEmail) {
-      Alert.alert('경고', '변경사항이 없습니다.');
+      Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.noChange'));
       return;
     }
 
     if (!member) {
-      Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+      Alert.alert(t('screens.myInfoReferral.alerts.error'), t('screens.myInfoReferral.alerts.userDataNotFound'));
       return;
     }
 
@@ -102,7 +104,7 @@ export const MyInfoReferralScreen = () => {
 
       if (!checkResult) {
 
-        Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
         setIsDisable(false);
         return;
       }
@@ -122,13 +124,13 @@ export const MyInfoReferralScreen = () => {
         (checkResult?.data && checkResult.data.canSet === false && responseCode === 400);
 
       if (isSelfReferral) {
-        Alert.alert('경고', '자기 자신을 레퍼럴로 설정할 수 없습니다.');
+        Alert.alert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.cannotSetSelf'));
         setIsDisable(false);
         return;
       }
 
       if (responseCode === 404) {
-        Alert.alert('실패', '레퍼럴을 찾을 수 없습니다. 이메일을 확인해주세요.');
+        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.notFound'));
         setIsDisable(false);
         return;
       }
@@ -142,16 +144,16 @@ export const MyInfoReferralScreen = () => {
           responseMessage.includes('추천 기록');
 
         const message = isAlreadyHasRecommender
-          ? '이미 추천 기록이 있습니다.'
-          : '이미 등록된 레퍼럴입니다. 다른 이메일을 입력해주세요.';
+          ? t('screens.myInfoReferral.alerts.alreadyHasRecommender')
+          : t('screens.myInfoReferral.alerts.alreadyRegistered');
 
-        Alert.alert('경고', message);
+        Alert.alert(t('screens.myInfoReferral.alerts.warning'), message);
         setIsDisable(false);
         return;
       }
 
       if (responseCode !== 200) {
-        Alert.alert('실패', '레퍼럴을 설정할 수 없습니다.');
+        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.cannotSet'));
         setIsDisable(false);
         return;
       }
@@ -163,11 +165,11 @@ export const MyInfoReferralScreen = () => {
 
       if (setResult && setResult.status === 'success') {
         Alert.alert(
-          '성공',
-          '레퍼럴 정보가 성공적으로 수정되었습니다.',
+          t('screens.myInfoReferral.alerts.success'),
+          t('screens.myInfoReferral.alerts.successMessage'),
           [
             {
-              text: 'OK',
+              text: t('screens.myInfoReferral.alerts.ok'),
               onPress: () => {
                 navigate(ROUTES.myInfo);
               },
@@ -175,11 +177,11 @@ export const MyInfoReferralScreen = () => {
           ],
         );
       } else {
-        Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+        Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
       }
     } catch (error) {
       console.error('[레퍼럴 수정] 레퍼럴 수정 오류:', error);
-      Alert.alert('실패', '레퍼럴 수정 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.failedMessage'));
     } finally {
       setIsDisable(false);
     }
@@ -188,7 +190,7 @@ export const MyInfoReferralScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="레퍼럴 수정" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.myInfoReferral.title')} onBackPress={goBack} showBackButton />
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -200,7 +202,7 @@ export const MyInfoReferralScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.inner}>
-            <Text style={styles.sectionLabel}>현재 레퍼럴</Text>
+            <Text style={styles.sectionLabel}>{t('screens.myInfoReferral.currentReferral')}</Text>
             {currentRefEmail || currentRefName ? (
               <View style={styles.card}>
                 {currentRefName ? <Text style={styles.cardName}>{currentRefName}</Text> : null}
@@ -208,24 +210,24 @@ export const MyInfoReferralScreen = () => {
               </View>
             ) : (
               <View style={styles.card}>
-                <Text style={styles.cardEmail}>레퍼럴이 없습니다</Text>
+                <Text style={styles.cardEmail}>{t('screens.myInfoReferral.noReferral')}</Text>
               </View>
             )}
 
             <FormField
-              label="새 레퍼럴 이메일"
+              label={t('screens.myInfoReferral.newReferralLabel')}
               value={newRefEmail}
               onChangeText={setNewRefEmail}
               autoCapitalize="none"
               keyboardType="email-address"
-              placeholder="새 레퍼럴 이메일을 입력해주세요."
+              placeholder={t('screens.myInfoReferral.newReferralPlaceholder')}
               editable={!isDisable}
             />
           </View>
 
           <View style={styles.bottomSection}>
             <PrimaryButton
-              title="Confirm"
+              title={isDisable ? t('screens.myInfoReferral.processing') : t('screens.myInfoReferral.saveButton')}
               fullWidth
               onPress={handleConfirm}
               style={[styles.primaryButton, isDisable && styles.buttonDisabled]}

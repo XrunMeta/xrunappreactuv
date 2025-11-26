@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -16,38 +17,39 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
 );
 
 export const WalletEstimateFeeScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { walletSendAddress } = useAppContext();
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Estimate Fee" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.walletEstimateFee.title')} onBackPress={goBack} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.contentWidth}>
           <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>Balance</Text>
+            <Text style={styles.balanceLabel}>{t('screens.walletEstimateFee.balance')}</Text>
             <Text style={styles.balanceValue}>9,876</Text>
             <Text style={styles.balanceToken}>POL</Text>
           </View>
 
-          <InfoCard label="From" value={WALLET_ADDRESS} />
+          <InfoCard label={t('screens.walletEstimateFee.from')} value={WALLET_ADDRESS} />
           <InfoCard
-            label="To"
-            value={walletSendAddress || 'Receiver address를 입력해주세요'}
+            label={t('screens.walletEstimateFee.to')}
+            value={walletSendAddress || t('screens.walletEstimateFee.receiverAddressPlaceholder')}
           />
-          <InfoCard label="Network Fee" value="0.002 POL < US$0.001" />
-          <InfoCard label="Speed" value="Normal <15S" />
+          <InfoCard label={t('screens.walletEstimateFee.networkFee')} value="0.002 POL < US$0.001" />
+          <InfoCard label={t('screens.walletEstimateFee.speed')} value="Normal <15S" />
 
-          <Text style={styles.helperText}>Estimation 10 second</Text>
+          <Text style={styles.helperText}>{t('screens.walletEstimateFee.estimation')} 10 second</Text>
         </View>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
-            title="Confirm"
+            title={t('screens.walletEstimateFee.confirm')}
             fullWidth
             onPress={() => navigate(ROUTES.walletTransactionProgress)}
           />

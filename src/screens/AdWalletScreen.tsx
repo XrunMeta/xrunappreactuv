@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl } from '../components';
 import { COLORS } from '../constants';
 
@@ -15,82 +16,82 @@ type AdEntry = {
   }[];
 };
 
-const PENDING_ENTRIES: AdEntry[] = [
+const getPendingEntries = (t: any): AdEntry[] => [
   {
     id: 'pending-1',
-    status: '심사중',
+    status: t('screens.adWallet.pending'),
     date: '2025.05.30 14:00',
     rows: [
-      { label: '예상광고수익', amount: '+20 XRUN', amountColor: '#707070' },
-      { label: '광고수익정산', amount: '- XRUN', amountColor: '#343434' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+20 XRUN', amountColor: '#707070' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
     ],
   },
   {
     id: 'pending-2',
-    status: '심사중',
+    status: t('screens.adWallet.pending'),
     date: '2025.05.30 13:58',
     rows: [
-      { label: '예상광고수익', amount: '+10 XRUN', amountColor: '#707070' },
-      { label: '광고수익정산', amount: '- XRUN', amountColor: '#343434' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
     ],
   },
   {
     id: 'pending-3',
-    status: '심사중',
+    status: t('screens.adWallet.pending'),
     date: '2025.05.30 13:40',
     rows: [
-      { label: '예상광고수익', amount: '+10 XRUN', amountColor: '#707070' },
-      { label: '광고수익정산', amount: '- XRUN', amountColor: '#343434' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
     ],
   },
 ];
 
-const SETTLED_ENTRIES: AdEntry[] = [
+const getSettledEntries = (t: any): AdEntry[] => [
   {
     id: 'settled-1',
-    status: '정산완료',
+    status: t('screens.adWallet.settled'),
     date: '2025.05.30 14:00',
     rows: [
-      { label: '예상광고수익', amount: '+1500 XRUN', amountColor: '#111111' },
-      { label: '광고수익정산', amount: '+1500 XRUN', amountColor: '#111111' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+1500 XRUN', amountColor: '#111111' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '+1500 XRUN', amountColor: '#111111' },
     ],
   },
   {
     id: 'settled-2',
-    status: '조건 불충족',
+    status: t('screens.adWallet.conditionNotMet'),
     date: '2025.04.20 16:00',
     rows: [
-      { label: '예상광고수익', amount: '+10 XRUN', amountColor: '#707070' },
-      { label: '광고수익정산', amount: '- XRUN', amountColor: '#343434' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
     ],
   },
   {
     id: 'settled-3',
-    status: '정산완료',
+    status: t('screens.adWallet.settled'),
     date: '2025.04.19 15:00',
     rows: [
-      { label: '예상광고수익', amount: '+10 XRUN', amountColor: '#707070' },
-      { label: '광고수익정산', amount: '- XRUN', amountColor: '#343434' },
+      { label: t('screens.adWallet.expectedAdRevenue'), amount: '+10 XRUN', amountColor: '#707070' },
+      { label: t('screens.adWallet.adRevenueSettlement'), amount: '- XRUN', amountColor: '#343434' },
     ],
   },
 ];
 
-const TABS = [
-  { label: '심사중', value: 'pending' },
-  { label: '정산완료', value: 'settled' },
-] as const;
-
 type TabValue = (typeof TABS)[number]['value'];
 
 export const AdWalletScreen = () => {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<TabValue>('pending');
-  const entries = useMemo(() => (tab === 'pending' ? PENDING_ENTRIES : SETTLED_ENTRIES), [tab]);
-  const summaryLabel = tab === 'pending' ? '예상금액' : '확정금액';
+  const entries = useMemo(() => (tab === 'pending' ? getPendingEntries(t) : getSettledEntries(t)), [tab, t]);
+  const summaryLabel = tab === 'pending' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount');
+  const tabs = [
+    { label: t('screens.adWallet.pending'), value: 'pending' },
+    { label: t('screens.adWallet.settled'), value: 'settled' },
+  ] as const;
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="AD" showBackButton />
+      <Header title={t('screens.adWallet.title')} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.summaryCard}>
           <View style={styles.cardAccentOne} />
@@ -101,7 +102,7 @@ export const AdWalletScreen = () => {
         </View>
 
         <SegmentedControl
-          options={TABS}
+          options={tabs}
           value={tab}
           onChange={setTab}
           containerStyle={styles.segmentedControl}

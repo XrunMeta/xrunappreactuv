@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import {
   BarcodeScanningResult,
@@ -19,6 +20,7 @@ import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 
 export const WalletQrScanScreen = () => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const { setWalletSendAddress } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
@@ -47,20 +49,20 @@ export const WalletQrScanScreen = () => {
       return (
         <View style={styles.permissionState}>
           <ActivityIndicator size="large" color="#ffffff" />
-          <Text style={styles.permissionText}>카메라 권한을 확인하고 있어요</Text>
+          <Text style={styles.permissionText}>{t('screens.walletQrScan.checkingPermission')}</Text>
         </View>
       );
     }
 
     return (
       <View style={styles.permissionState}>
-        <Text style={styles.permissionText}>QR 스캔을 위해 카메라 권한이 필요합니다.</Text>
+        <Text style={styles.permissionText}>{t('screens.walletQrScan.permissionRequired')}</Text>
         <TouchableOpacity
           style={styles.permissionButton}
           onPress={requestPermission}
           activeOpacity={0.8}
         >
-          <Text style={styles.permissionButtonText}>권한 허용하기</Text>
+          <Text style={styles.permissionButtonText}>{t('screens.walletQrScan.grantPermission')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -95,7 +97,7 @@ export const WalletQrScanScreen = () => {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title}>Scan QR Code</Text>
+          <Text style={styles.title}>{t('screens.walletQrScan.scanQrCode')}</Text>
           <View style={styles.frameOuter}>
             <View style={styles.frameInner} />
           </View>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -119,12 +120,12 @@ export const ReferralDepthOneScreen = () => {
     );
   };
 
-  const screenTitle = '1 Depth';
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={screenTitle} onBackPress={goBack} showBackButton />
+      <Header title={t('screens.referralDepthOne.title')} onBackPress={goBack} showBackButton />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />

@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components';
 import { COLORS } from '../constants';
@@ -80,6 +81,7 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 export const MyInfoFaqScreen = () => {
+  const { t } = useTranslation();
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   const toggleItem = (id: string) => {
@@ -94,7 +96,7 @@ export const MyInfoFaqScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="FAQ" showBackButton />
+      <Header title={t('screens.myInfoFaq.title')} showBackButton />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

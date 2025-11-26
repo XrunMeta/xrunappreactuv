@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton } from '../components';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
+  const { t } = useTranslation();
 
   const handleLogin = () => {
     navigate(ROUTES.login);
@@ -37,19 +39,19 @@ export const LoginSignupScreen = () => {
       >
         {}
         <View style={styles.adContainer}>
-          <Text style={styles.adText}>전면 광고</Text>
+          <Text style={styles.adText}>{t('screens.loginSignup.adText')}</Text>
         </View>
 
         {}
         <View style={styles.buttonContainer}>
           <PrimaryButton
-            title="Login"
+            title={t('screens.loginSignup.loginButton')}
             onPress={handleLogin}
             fullWidth={true}
             style={styles.loginButton}
           />
           <SecondaryButton
-            title="회원가입"
+            title={t('screens.loginSignup.signupButton')}
             onPress={handleSignUp}
             fullWidth={true}
           />
@@ -58,16 +60,15 @@ export const LoginSignupScreen = () => {
         {}
         <View style={styles.termsContainer}>
           <Text style={styles.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면
-            아래의{' '}
+            {t('screens.loginSignup.termsText')}{' '}
             <Text style={styles.linkText} onPress={handleTermsOfService}>
-              이용약관
+              {t('screens.loginSignup.termsLink')}
             </Text>
-            {' '}과{' '}
+            {' '}{t('screens.loginSignup.termsAnd')}{' '}
             <Text style={styles.linkText} onPress={handlePrivacyPolicy}>
-              개인정보 처리방침
+              {t('screens.loginSignup.privacyLink')}
             </Text>
-            을 읽고 동의해주세요.
+            {' '}{t('screens.loginSignup.termsAgree')}
           </Text>
         </View>
       </ScrollView>

@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, OptionButton, Dialog } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
@@ -27,11 +28,6 @@ import {
   updateRegion,
   sendEmailVerificationCode,
 } from '../services';
-
-const GENDER_OPTIONS = [
-  { value: 'male', label: '남' },
-  { value: 'female', label: '여' },
-] as const;
 
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 
@@ -66,8 +62,14 @@ const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
 };
 
 export const MyInfoEditScreen = () => {
+  const { t } = useTranslation();
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
   const { selectedCountryDialCode, setVerificationEmail, setVerificationSuccessRoute, setSelectMode } = useAppContext();
+
+  const GENDER_OPTIONS = [
+    { value: 'male' as const, label: t('screens.myInfoEdit.genderMale') },
+    { value: 'female' as const, label: t('screens.myInfoEdit.genderFemale') },
+  ];
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -166,29 +168,29 @@ export const MyInfoEditScreen = () => {
         }
       } catch (error) {
         console.error('[정보수정] 사용자 정보 로드 실패:', error);
-        Alert.alert('오류', '사용자 정보를 불러오는데 실패했습니다.');
+        Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.loadFailed'));
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUserInfo();
-  }, [navigate]);
+  }, [navigate, t]);
 
   const handleSave = async () => {
 
     if (!firstName.trim()) {
-      Alert.alert('오류', '이름을 입력해주세요.');
+      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
     if (!lastName.trim()) {
-      Alert.alert('오류', '성을 입력해주세요.');
+      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.lastNameRequired'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
@@ -230,9 +232,9 @@ export const MyInfoEditScreen = () => {
 
       await Promise.all(promises);
 
-      Alert.alert('저장 완료', '변경 사항이 저장되었습니다.', [
+      Alert.alert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'), [
         {
-          text: '확인',
+          text: t('screens.myInfoEdit.alerts.confirm'),
           onPress: () => {
 
             if (canGoBack) {
@@ -245,19 +247,19 @@ export const MyInfoEditScreen = () => {
       ]);
     } catch (error) {
       console.error('[정보수정] 정보 수정 실패:', error);
-      Alert.alert('저장 실패', '정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      Alert.alert(t('screens.myInfoEdit.alerts.saveFailed'), t('screens.myInfoEdit.alerts.saveFailedMessage'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleChangePassword = () => {
-    Alert.alert('비밀번호 변경', '비밀번호 변경 프로세스는 추후 연동됩니다.');
+    Alert.alert(t('screens.myInfoEdit.alerts.passwordChange'), t('screens.myInfoEdit.alerts.passwordChangeMessage'));
   };
 
   const handlePhoneEdit = async () => {
     if (!email) {
-      Alert.alert('오류', '이메일 정보가 없습니다.');
+      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
       return;
     }
 
@@ -283,9 +285,9 @@ export const MyInfoEditScreen = () => {
         setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
         navigate(ROUTES.verificationCode);
       } else {
-        Alert.alert('오류', '이메일 인증 코드 발송에 실패했습니다. 다시 시도해주세요.', [
+        Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
           {
-            text: '확인',
+            text: t('screens.myInfoEdit.alerts.confirm'),
             onPress: () => {
 
             },
@@ -294,7 +296,7 @@ export const MyInfoEditScreen = () => {
       }
     } catch (error) {
       console.error('[정보수정] 전화번호 수정 인증 오류:', error);
-      Alert.alert('오류', '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.');
+      Alert.alert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
     }
   };
 
@@ -386,7 +388,7 @@ export const MyInfoEditScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title="Edit My Info"
+        title={t('screens.myInfoEdit.title')}
         onBackPress={canGoBack ? goBack : () => reset(ROUTES.myInfo)}
         showBackButton
       />
@@ -402,23 +404,23 @@ export const MyInfoEditScreen = () => {
         ) : (
         <View style={styles.formWrapper}>
           <FormField
-            label="First Name"
+            label={t('screens.myInfoEdit.firstName')}
             value={firstName}
             onChangeText={setFirstName}
-            placeholder="Enter first name"
+            placeholder={t('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!isSaving}
           />
           <FormField
-            label="Last Name"
+            label={t('screens.myInfoEdit.lastName')}
             value={lastName}
             onChangeText={setLastName}
-            placeholder="Enter last name"
+            placeholder={t('screens.myInfoEdit.lastNamePlaceholder')}
               editable={!isSaving}
           />
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('screens.myInfoEdit.email')}</Text>
               <View style={styles.disabledInput}>
-                <Text style={styles.disabledText}>{email || 'Enter email address'}</Text>
+                <Text style={styles.disabledText}>{email || t('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
 
@@ -433,7 +435,7 @@ export const MyInfoEditScreen = () => {
           </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>{t('screens.myInfoEdit.phone')}</Text>
               <View style={styles.phoneFieldContainer}>
                 {}
                 <View style={styles.phonePrefixDisabled}>
@@ -474,7 +476,7 @@ export const MyInfoEditScreen = () => {
             </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>성별</Text>
+            <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.gender')}</Text>
             <View style={styles.inlineOptions}>
               {GENDER_OPTIONS.map((option) => (
                 <OptionButton
@@ -489,7 +491,7 @@ export const MyInfoEditScreen = () => {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>나이</Text>
+            <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.age')}</Text>
             <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
               {AGE_OPTIONS.map((option, index) => {
                 const isLast = index === AGE_OPTIONS.length - 1;
@@ -520,7 +522,7 @@ export const MyInfoEditScreen = () => {
             </View>
           ) : (
           <PrimaryButton
-            title="Save Changes"
+            title={t('screens.myInfoEdit.save')}
             fullWidth
             onPress={handleSave}
             style={styles.primaryButton}

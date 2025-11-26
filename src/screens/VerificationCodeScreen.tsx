@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton } from '../components';
 import { COLORS } from '../constants';
@@ -29,6 +30,7 @@ const RESEND_SECONDS = 300;
 const keypadLayout = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
 
 export const VerificationCodeScreen = () => {
+  const { t } = useTranslation();
   const { goBack, reset, navigate } = useAppNavigation();
   const {
     verificationSuccessRoute,
@@ -69,12 +71,12 @@ export const VerificationCodeScreen = () => {
 
   const handleVerify = async () => {
     if (!verificationEmail) {
-      Alert.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
     if (code.length !== CODE_LENGTH) {
-      Alert.alert('인증 코드 입력', '6자리 인증 코드를 입력해주세요.');
+      Alert.alert(t('screens.verificationCode.alerts.codeInput'), t('screens.verificationCode.errors.codeRequired'));
       return;
     }
 
@@ -86,7 +88,7 @@ export const VerificationCodeScreen = () => {
       const codeVerified = await verifyEmailCode(verificationEmail, code, navigate);
 
       if (!codeVerified) {
-        Alert.alert('인증 실패', '인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
+        Alert.alert(t('screens.verificationCode.alerts.verificationFailed'), t('screens.verificationCode.errors.verificationFailed'));
         setIsVerifying(false);
         return;
       }
@@ -97,14 +99,14 @@ export const VerificationCodeScreen = () => {
         const loginResponse = await loginWithEmailAuth(verificationEmail, navigate);
 
         if (loginResponse.status !== 'success') {
-          Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+          Alert.alert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.loginFailed'));
           setIsVerifying(false);
           return;
         }
 
         const userData = loginResponse.data[0];
         if (!userData || !userData.member) {
-          Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+          Alert.alert(t('screens.verificationCode.alerts.loginFailed'), t('screens.verificationCode.errors.userDataNotFound'));
           setIsVerifying(false);
           return;
         }
@@ -138,7 +140,7 @@ export const VerificationCodeScreen = () => {
       }
     } catch (error) {
       console.error('[인증] 인증 코드 확인 오류:', error);
-      Alert.alert('오류', '인증 처리 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.error'));
     } finally {
       setIsVerifying(false);
     }
@@ -146,7 +148,7 @@ export const VerificationCodeScreen = () => {
 
   const handleResend = async () => {
     if (!verificationEmail) {
-      Alert.alert('오류', '이메일 정보를 찾을 수 없습니다.');
+      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.emailNotFound'));
       return;
     }
 
@@ -159,13 +161,13 @@ export const VerificationCodeScreen = () => {
       if (codeSent) {
         setSecondsLeft(RESEND_SECONDS);
         setCode('');
-        Alert.alert('재전송 완료', '인증 코드를 다시 전송했습니다.');
+        Alert.alert(t('screens.verificationCode.alerts.resendComplete'), t('screens.verificationCode.success.resendComplete'));
       } else {
-        Alert.alert('재전송 실패', '인증 코드 재전송에 실패했습니다. 다시 시도해주세요.');
+        Alert.alert(t('screens.verificationCode.alerts.resendFailed'), t('screens.verificationCode.errors.resendFailed'));
       }
     } catch (error) {
       console.error('[인증] 인증 코드 재전송 오류:', error);
-      Alert.alert('오류', '인증 코드 재전송 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.resendError'));
     } finally {
       setIsResending(false);
     }
@@ -174,11 +176,11 @@ export const VerificationCodeScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="인증코드를 입력하세요" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.verificationCode.title')} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.descriptionWrapper}>
           <Text style={styles.description}>
-            {verificationEmail || '이메일'}로{'\n'}보내드린 6자리 코드를 입력하세요.
+            {verificationEmail || '이메일'}{t('screens.verificationCode.description')}
           </Text>
         </View>
 
@@ -203,7 +205,7 @@ export const VerificationCodeScreen = () => {
             <ActivityIndicator size="small" color="#2873ff" />
           ) : (
             <Text style={styles.resendText}>
-              코드 재전송{' '}
+              {t('screens.verificationCode.resendCode')}{' '}
               {secondsLeft > 0 && (
                 <Text style={styles.resendTimer} numberOfLines={1}>
                   {formattedTimer}
@@ -220,7 +222,7 @@ export const VerificationCodeScreen = () => {
             </View>
           ) : (
             <PrimaryButton
-              title="Verify"
+              title={t('screens.verificationCode.verifyButton')}
               onPress={handleVerify}
               fullWidth
               disabled={code.length !== CODE_LENGTH || isVerifying}

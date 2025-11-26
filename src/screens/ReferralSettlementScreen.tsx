@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -87,13 +88,14 @@ export const ReferralSettlementScreen = () => {
   const [totalRevenueWon, setTotalRevenueWon] = useState<string>('₩0');
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
 
+  const { t } = useTranslation();
   const segmentedOptions = useMemo(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: 'Rank', value: 'rank' },
+      { label: t('screens.referralSettlement.group'), value: 'group' },
+      { label: t('screens.referralSettlement.settlement'), value: 'settlement' },
+      { label: t('screens.referralSettlement.rank'), value: 'rank' },
     ] as const,
-    [],
+    [t],
   );
 
   useEffect(() => {

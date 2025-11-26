@@ -27,6 +27,7 @@ interface TransactionDetailsScreenProps {
 }
 
 export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> = ({ data }) => {
+  const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const details = data ?? DEFAULT_DETAILS;
   const tokenIcon = getTokenIcon(details.title, details.subtitle);
@@ -34,24 +35,24 @@ export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> =
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Transaction" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.transactionDetails.title')} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardGroup}>
-          <InfoCard label="From" value={details.from} />
-          <InfoCard label="To" value={details.to} />
-          <InfoCard label="Time" value={details.timestamp} />
-          <InfoCard label="TX Hash" value={details.txHash} />
+          <InfoCard label={t('screens.transactionDetails.from')} value={details.from} />
+          <InfoCard label={t('screens.transactionDetails.to')} value={details.to} />
+          <InfoCard label={t('screens.transactionDetails.time')} value={details.timestamp} />
+          <InfoCard label={t('screens.transactionDetails.txHash')} value={details.txHash} />
         </View>
 
-        <Text style={styles.sectionTitle}>Transaction Details</Text>
+        <Text style={styles.sectionTitle}>{t('screens.transactionDetails.transactionDetails')}</Text>
 
         <View style={styles.cardGroup}>
-          <InfoCard label="Nonce" value={details.nonce ?? '-'} />
-          <InfoCard label="Gas Price" value={details.gasPrice ?? '-'} />
-          <InfoCard label="Used Gas" value={details.usedGas ?? '-'} />
-          <InfoCard label="Max Gas" value={details.maxGas ?? '-'} />
-          <InfoCard label="Total Spent" value={details.totalSpent ?? '-'} />
-          <InfoCard label="Block Height" value={details.blockHeight ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.nonce')} value={details.nonce ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.gasPrice')} value={details.gasPrice ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.usedGas')} value={details.usedGas ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.maxGas')} value={details.maxGas ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.totalSpent')} value={details.totalSpent ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.blockHeight')} value={details.blockHeight ?? '-'} />
         </View>
 
         <ExplorerBadge

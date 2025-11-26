@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, PrimaryButton, SecondaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
@@ -19,6 +20,7 @@ const WALLET_ADDRESS =
   '0x61cf20b2ebd91caa22782a740f82dcf87ad2b2be7b6401ec3daf2234e7531fbf';
 
 export const WalletReceiveScreen = () => {
+  const { t } = useTranslation();
   const handleCopy = () => {
     copyToClipboard(WALLET_ADDRESS);
   };
@@ -29,14 +31,14 @@ export const WalletReceiveScreen = () => {
         message: WALLET_ADDRESS,
       });
     } catch (error) {
-      Alert.alert('공유 실패', '주소를 공유하지 못했습니다.');
+      Alert.alert(t('screens.walletReceive.alerts.shareFailed'), t('screens.walletReceive.errors.shareFailed'));
     }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Share Wallet Address" showBackButton />
+      <Header title={t('screens.walletReceive.title')} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -54,7 +56,7 @@ export const WalletReceiveScreen = () => {
           </View>
 
           <View style={styles.addressSection}>
-            <Text style={styles.addressLabel}>Address</Text>
+            <Text style={styles.addressLabel}>{t('screens.walletReceive.address')}</Text>
             <View style={styles.addressBox}>
               <Text style={styles.addressValue}>{WALLET_ADDRESS}</Text>
             </View>
@@ -63,13 +65,13 @@ export const WalletReceiveScreen = () => {
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
-            title="Copy Address"
+            title={t('screens.walletReceive.copyAddress')}
             fullWidth
             onPress={handleCopy}
             style={styles.primaryButton}
           />
           <SecondaryButton
-            title="Share Address"
+            title={t('screens.walletReceive.shareAddress')}
             fullWidth
             onPress={handleShare}
             style={styles.secondaryButton}

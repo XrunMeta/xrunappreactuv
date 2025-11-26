@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, Alert, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -12,6 +13,7 @@ import { COLORS } from '../constants';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
+  const { t } = useTranslation();
   const { selectedShopItem } = useAppContext();
   const [memberId, setMemberId] = useState<string | null>(null);
   const [userBalance, setUserBalance] = useState<number | null>(null);
@@ -178,7 +180,7 @@ export const ShopBuyScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.shop.title')} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           <View style={styles.detailCard}>

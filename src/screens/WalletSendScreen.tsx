@@ -16,6 +16,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 
 export const WalletSendScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { walletSendAddress, setWalletSendAddress } = useAppContext();
 
@@ -25,7 +26,7 @@ export const WalletSendScreen = () => {
 
   const handleConfirm = () => {
     if (!walletSendAddress) {
-      Alert.alert('주소 필요', '바코드 스캔으로 수신자 주소를 입력해주세요.');
+      Alert.alert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
       return;
     }
     navigate(ROUTES.walletEstimate);
@@ -34,7 +35,7 @@ export const WalletSendScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Sending" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.walletSend.title')} onBackPress={goBack} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -42,7 +43,7 @@ export const WalletSendScreen = () => {
       >
         <View style={[styles.contentWidth, styles.mainSection]}>
           <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>Balance</Text>
+            <Text style={styles.balanceLabel}>{t('screens.walletSend.balance')}</Text>
             <Text style={styles.balanceValue}>9,876</Text>
             <Text style={styles.balanceToken}>POL</Text>
           </View>
@@ -52,8 +53,8 @@ export const WalletSendScreen = () => {
           </View>
 
           <FormField
-            label="Receiver Address"
-            placeholder="지갑 주소를 입력하세요"
+            label={t('screens.walletSend.receiverAddress')}
+            placeholder={t('screens.walletSend.receiverAddressPlaceholder')}
             value={walletSendAddress}
             onChangeText={setWalletSendAddress}
             autoCapitalize="none"
@@ -72,7 +73,7 @@ export const WalletSendScreen = () => {
         </View>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
-          <PrimaryButton title="Confirm" fullWidth onPress={handleConfirm} />
+          <PrimaryButton title={t('screens.walletSend.confirm')} fullWidth onPress={handleConfirm} />
         </View>
       </ScrollView>
 

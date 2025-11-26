@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -23,6 +24,7 @@ import {
 
 export const LoginScreen = () => {
   const { goBack, navigate } = useAppNavigation();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberId, setRememberId] = useState(false);
@@ -73,12 +75,12 @@ export const LoginScreen = () => {
   const handleLogin = async () => {
 
     if (!email.trim()) {
-      Alert.alert('오류', '이메일을 입력해주세요.');
+      Alert.alert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
       return;
     }
 
     if (!password.trim()) {
-      Alert.alert('오류', '비밀번호를 입력해주세요.');
+      Alert.alert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
       return;
     }
 
@@ -94,14 +96,14 @@ export const LoginScreen = () => {
       );
 
       if (loginResponse.status !== 'success') {
-        Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+        Alert.alert(t('common.messages.error'), t('screens.login.errors.loginFailed'));
         setIsLoading(false);
         return;
       }
 
       const userData = loginResponse.data[0];
       if (!userData) {
-        Alert.alert('로그인 실패', '사용자 정보를 가져올 수 없습니다.');
+        Alert.alert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
         setIsLoading(false);
         return;
       }
@@ -141,8 +143,8 @@ export const LoginScreen = () => {
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
       Alert.alert(
-        '로그인 실패',
-        '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+        t('common.messages.error'),
+        t('screens.login.errors.loginError'),
       );
     } finally {
       setIsLoading(false);
@@ -153,7 +155,7 @@ export const LoginScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title="로그인"
+        title={t('screens.login.title')}
         onBackPress={goBack}
         showBackButton
       />
@@ -163,8 +165,8 @@ export const LoginScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <FormField
-          label="이메일"
-          placeholder="이메일을 입력해주세요."
+          label={t('screens.login.emailLabel')}
+          placeholder={t('screens.login.emailPlaceholder')}
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -174,8 +176,8 @@ export const LoginScreen = () => {
         />
 
         <FormField
-          label="비밀번호"
-          placeholder="비밀번호를 입력해주세요."
+          label={t('screens.login.passwordLabel')}
+          placeholder={t('screens.login.passwordPlaceholder')}
           secureTextEntry={!isPasswordVisible}
           value={password}
           onChangeText={setPassword}
@@ -199,7 +201,7 @@ export const LoginScreen = () => {
 
         <View style={styles.checkboxRow}>
           <FormCheckbox
-            label="아이디 기억하기"
+            label={t('screens.login.rememberId')}
             checked={rememberId}
             onToggle={handleRememberIdToggle}
             variant="circle"
@@ -214,12 +216,12 @@ export const LoginScreen = () => {
                 <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
               </View>
             ) : (
-              <PrimaryButton title="로그인" fullWidth onPress={handleLogin} />
+              <PrimaryButton title={t('screens.login.loginButton')} fullWidth onPress={handleLogin} />
             )}
           </View>
 
           <Text style={styles.disclaimer}>
-            비밀번호를 잊으셨다면, 이메일로 받은 인증코드를 사용해 로그인할 수 있습니다.
+            {t('screens.login.disclaimer')}
           </Text>
 
           <TouchableOpacity
@@ -228,7 +230,7 @@ export const LoginScreen = () => {
             activeOpacity={0.7}
             disabled={isLoading}
           >
-            <Text style={styles.emailVerificationText}>이메일 인증</Text>
+            <Text style={styles.emailVerificationText}>{t('screens.login.emailVerification')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

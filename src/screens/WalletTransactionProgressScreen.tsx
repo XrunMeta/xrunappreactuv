@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -16,13 +17,14 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
 );
 
 export const WalletTransactionProgressScreen = () => {
+  const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { walletSendAddress } = useAppContext();
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Transaction" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.walletTransactionProgress.title')} onBackPress={goBack} showBackButton />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -30,24 +32,24 @@ export const WalletTransactionProgressScreen = () => {
       >
         <View style={styles.contentWidth}>
           <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>Balance</Text>
+            <Text style={styles.balanceLabel}>{t('screens.walletTransactionProgress.balance')}</Text>
             <Text style={styles.balanceValue}>9,876</Text>
             <Text style={styles.balanceToken}>POL</Text>
           </View>
 
-          <InfoCard label="From" value={WALLET_ADDRESS} />
-          <InfoCard label="To" value={walletSendAddress || WALLET_ADDRESS} />
-          <InfoCard label="Gas Price" value="1645153" />
+          <InfoCard label={t('screens.walletTransactionProgress.from')} value={WALLET_ADDRESS} />
+          <InfoCard label={t('screens.walletTransactionProgress.to')} value={walletSendAddress || WALLET_ADDRESS} />
+          <InfoCard label={t('screens.walletTransactionProgress.gasPrice')} value="1645153" />
 
           <View style={styles.progressRow}>
             <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-            <Text style={styles.progressText}>In Progress . . .</Text>
+            <Text style={styles.progressText}>{t('screens.walletTransactionProgress.inProgress')}</Text>
           </View>
         </View>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
-            title="List page"
+            title={t('screens.walletTransactionProgress.listPage')}
             fullWidth
             onPress={() => navigate(ROUTES.walletTransactionResult)}
           />

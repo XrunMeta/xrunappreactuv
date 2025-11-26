@@ -11,6 +11,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -74,6 +75,7 @@ const cardConfigs: CardConfig[] = [
 
 export const MyInfoScreen = () => {
   const { navigate, reset } = useAppNavigation();
+  const { t } = useTranslation();
   const { setVerificationEmail } = useAppContext();
   const [userInfo, setUserInfo] = useState<{
     name?: string;
@@ -212,7 +214,7 @@ export const MyInfoScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="My Info" />
+      <Header title={t('screens.myInfo.title')} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

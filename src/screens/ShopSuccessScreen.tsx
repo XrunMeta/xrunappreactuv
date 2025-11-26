@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 
@@ -8,6 +9,7 @@ const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
 export const ShopSuccessScreen = () => {
   const { goBack, navigate } = useAppNavigation();
+  const { t } = useTranslation();
 
   const handleConfirm = () => {
     goBack(); 
@@ -18,13 +20,13 @@ export const ShopSuccessScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="Shop" showBackButton={false} />
+      <Header title={t('screens.shopSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.message}>결제가 완료되었습니다</Text>
+          <Text style={styles.message}>{t('screens.shopSuccess.paymentComplete')}</Text>
           <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-            <Text style={styles.buttonText}>확인</Text>
+            <Text style={styles.buttonText}>{t('screens.shopSuccess.confirm')}</Text>
           </TouchableOpacity>
         </View>
       </View>

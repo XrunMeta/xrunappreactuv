@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, MapBottomPanel } from '../components';
 import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -85,6 +86,7 @@ try {
 
 export const MapMainScreen: React.FC = () => {
   const { navigate } = useAppNavigation();
+  const { t } = useTranslation();
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'Map' | 'Camera'>('Map');
@@ -750,11 +752,11 @@ export const MapMainScreen: React.FC = () => {
   };
 
   const bottomNavItems = [
-    { id: 'wallet', label: 'Wallet', icon: iconWallet },
-    { id: 'shop', label: 'Shop', icon: iconShop },
+    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+    { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: 'Referral', icon: iconReferral },
-    { id: 'info', label: 'Info', icon: iconUser },
+    { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
+    { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
   ];
 
   if (activeTab === 'Camera') {
