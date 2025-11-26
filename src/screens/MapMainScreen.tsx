@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Platform,
-  Alert,
   Dimensions,
   Text,
   Image,
@@ -17,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, MapBottomPanel } from '../components';
 import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
 
@@ -87,6 +87,7 @@ try {
 export const MapMainScreen: React.FC = () => {
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'Map' | 'Camera'>('Map');
@@ -305,7 +306,7 @@ export const MapMainScreen: React.FC = () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('위치 권한이 거부되었습니다.');
-        Alert.alert(
+        await showAlert(
           '위치 권한 필요',
           '지도를 사용하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
           [{ text: '확인' }]
@@ -356,7 +357,7 @@ export const MapMainScreen: React.FC = () => {
         console.error('Location error:', error);
 
         if (errorMessage.includes('location services') || errorMessage.includes('unavailable')) {
-          Alert.alert(
+          await showAlert(
             '위치 서비스 오류',
             '위치 정보를 가져올 수 없습니다.\n\n다음 사항을 확인해주세요:\n• 기기의 위치 서비스(GPS)가 켜져 있는지\n• 네트워크 위치 서비스가 활성화되어 있는지\n• 실내에서는 GPS 신호가 약할 수 있습니다.',
             [

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,7 @@ import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { getTokenIcon } from '../constants/tokenMeta';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const InfoCard = ({
   label,

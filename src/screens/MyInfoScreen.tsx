@@ -5,19 +5,19 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header } from '../components';
+import { Header, TaboolaBanner } from '../components';
 import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout } from '../services';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 type CardConfig = {
   id: string;
@@ -76,6 +76,7 @@ const cardConfigs: CardConfig[] = [
 export const MyInfoScreen = () => {
   const { navigate, reset } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const { setVerificationEmail } = useAppContext();
   const [userInfo, setUserInfo] = useState<{
     name?: string;
@@ -130,14 +131,14 @@ export const MyInfoScreen = () => {
 
   const handleShare = async () => {
     if (!userInfo?.email) {
-      Alert.alert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      await showAlert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
       return;
     }
-    await shareReferralLink(LANG, { email: userInfo.email }, navigate);
+    await shareReferralLink(LANG, { email: userInfo.email }, showAlert, navigate);
   };
 
-  const handleLogout = () => {
-    Alert.alert(
+  const handleLogout = async () => {
+    await showAlert(
       '로그아웃',
       '로그아웃 하시겠습니까?',
       [
@@ -153,7 +154,7 @@ export const MyInfoScreen = () => {
 
               const userDataStr = await AsyncStorage.getItem('userData');
               if (!userDataStr) {
-                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await showAlert('오류', '사용자 정보를 찾을 수 없습니다.');
                 return;
               }
 
@@ -161,7 +162,7 @@ export const MyInfoScreen = () => {
               const member = userData.member;
 
               if (!member) {
-                Alert.alert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await showAlert('오류', '사용자 정보를 찾을 수 없습니다.');
                 return;
               }
 
@@ -220,9 +221,8 @@ export const MyInfoScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
-          <View style={styles.adBanner}>
-            <Text style={styles.adText}>AD</Text>
-          </View>
+          {}
+          <TaboolaBanner placementType="myinfo" />
 
           <View style={styles.profileCard}>
             <View>

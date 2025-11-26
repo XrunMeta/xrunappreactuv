@@ -1,17 +1,18 @@
-import { Alert, Share } from 'react-native';
+import { Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as CryptoJS from 'crypto-js';
 
 export const copyToClipboard = async (
   value: string,
+  showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   successMessage = '지갑 주소가 복사되었습니다.',
 ) => {
   try {
     await Clipboard.setStringAsync(value);
-    Alert.alert('주소 복사', successMessage);
+    await showAlert('주소 복사', successMessage);
   } catch (error) {
-    Alert.alert('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
+    await showAlert('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
   }
 };
 
@@ -105,6 +106,7 @@ export const formatCurrency = (amount: string | number | object | null | undefin
 export const shareReferralLink = async (
   lang: { screen_info?: { button?: { share?: string } } } | null,
   userDetails: { email: string },
+  showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   navigation?: any,
 ): Promise<void> => {
   try {
@@ -133,7 +135,7 @@ export const shareReferralLink = async (
       console.log('공유가 취소됨');
     }
   } catch (error: any) {
-    Alert.alert('공유 실패', error.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    await showAlert('공유 실패', error.message || '레퍼럴 링크를 공유하지 못했습니다.');
     console.log('Share error:', error);
     if (navigation) {
 

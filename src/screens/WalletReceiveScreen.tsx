@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Platform,
   ScrollView,
   Share,
@@ -65,10 +64,7 @@ export const WalletReceiveScreen = () => {
         message: walletAddress,
       });
     } catch (error) {
-      Alert.alert(
-        t('screens.walletReceive.alerts.shareFailed'),
-        t('screens.walletReceive.errors.shareFailed'),
-      );
+      await showAlert(t('screens.walletReceive.alerts.shareFailed'), t('screens.walletReceive.errors.shareFailed'));
     }
   };
 

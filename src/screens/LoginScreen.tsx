@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,13 +20,15 @@ import {
   encryptSHA256,
   saveSession,
 } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const LoginScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberId, setRememberId] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const emailVerificationRoute: any = ROUTES.emailVerification;
@@ -40,7 +41,7 @@ export const LoginScreen = () => {
           const savedEmail = await AsyncStorage.getItem('userEmail');
           if (savedEmail) {
             setEmail(savedEmail);
-            setRememberId(true);
+            setRememberMe(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
           }
         }
@@ -51,43 +52,26 @@ export const LoginScreen = () => {
     loadRememberedEmail();
   }, []);
 
-  const handleRememberIdToggle = async () => {
-    const newValue = !rememberId;
-    setRememberId(newValue);
-
-    try {
-      if (newValue && email.trim()) {
-
-        await AsyncStorage.setItem('rememberMe', 'true');
-        await AsyncStorage.setItem('userEmail', email.trim());
-        console.log('[로그인] 아이디 저장 완료:', email.trim());
-      } else {
-
-        await AsyncStorage.removeItem('rememberMe');
-
-        console.log('[로그인] 아이디 저장 해제');
-      }
-    } catch (error) {
-      console.error('[로그인] 아이디 저장/해제 실패:', error);
-    }
+  const toggleRememberMe = () => {
+    setRememberMe(!rememberMe);
   };
 
   const handleLogin = async () => {
 
     if (!email.trim()) {
-      Alert.alert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
+      await showAlert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
       return;
     }
 
     if (!password.trim()) {
-      Alert.alert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
+      await showAlert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
       return;
     }
 
     setIsLoading(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { email, rememberId });
+      console.log('[로그인] 로그인 시도:', { email, rememberMe });
 
       const loginResponse = await loginWithEmailPassword(
         email.trim(),
@@ -96,20 +80,20 @@ export const LoginScreen = () => {
       );
 
       if (loginResponse.status !== 'success') {
-        Alert.alert(t('common.messages.error'), t('screens.login.errors.loginFailed'));
+        await showAlert(t('common.messages.error'), t('screens.login.errors.loginFailed'));
         setIsLoading(false);
         return;
       }
 
       const userData = loginResponse.data[0];
       if (!userData) {
-        Alert.alert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
+        await showAlert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
         setIsLoading(false);
         return;
       }
 
       const extrastr = userData.extrastr;
-      if (extrastr) {
+      if (extrastr && userData.member) {
         const ssidw = encryptSHA256(extrastr);
 
         const sessionSaved = await saveSession(userData.member, ssidw, navigate);
@@ -127,22 +111,22 @@ export const LoginScreen = () => {
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
 
-      if (rememberId) {
-        await AsyncStorage.setItem('rememberMe', 'true');
+      await AsyncStorage.setItem('isLoggedIn', 'true');
 
+      if (rememberMe) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+        console.log('[로그인] 로그인 상태 유지 저장 완료');
       } else {
         await AsyncStorage.removeItem('rememberMe');
-
+        console.log('[로그인] 로그인 상태 유지 해제');
       }
-
-      await AsyncStorage.setItem('isLoggedIn', 'true');
 
       console.log('[로그인] 로그인 성공');
 
       navigate(ROUTES.map);
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
-      Alert.alert(
+      await showAlert(
         t('common.messages.error'),
         t('screens.login.errors.loginError'),
       );
@@ -200,13 +184,14 @@ export const LoginScreen = () => {
         />
 
         <View style={styles.checkboxRow}>
-          <FormCheckbox
-            label={t('screens.login.rememberId')}
-            checked={rememberId}
-            onToggle={handleRememberIdToggle}
-            variant="circle"
-            disabled={isLoading}
-          />
+          <View style={isLoading ? styles.checkboxDisabled : undefined}>
+            <FormCheckbox
+              label={t('screens.login.rememberMe')}
+              checked={rememberMe}
+              onToggle={isLoading ? () => {} : toggleRememberMe}
+              variant="circle"
+            />
+          </View>
         </View>
 
         <View style={styles.bottomSection}>
@@ -331,6 +316,9 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  checkboxDisabled: {
+    opacity: 0.5,
   },
 });
 

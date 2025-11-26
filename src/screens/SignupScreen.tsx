@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
-  Alert,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
@@ -21,6 +20,7 @@ import {
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { getRegionIdByIso2, getRegionNameById } from '../constants';
 import {
   checkEmailAvailability,
@@ -32,12 +32,13 @@ import {
 
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
 
-type GenderValue = (typeof GENDER_OPTIONS)[number]['value'];
+type GenderValue = 'male' | 'female';
 type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate, reset } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const {
     selectedCountryDialCode,
     selectedRegion,
@@ -63,20 +64,27 @@ export const SignupScreen = () => {
   const [termsAccepted, setTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
-    setFamilyName(signupFormData.familyName);
-    setGivenName(signupFormData.givenName);
-    setEmail(signupFormData.email);
-    setPassword(signupFormData.password);
-    setPhoneNumber(signupFormData.phoneNumber);
-    setRegion(signupFormData.region);
-    setReferralEmail(signupFormData.referralEmail);
-    setGender(signupFormData.gender);
-    setAgeRange(signupFormData.ageRange);
-    setTermsAccepted(signupFormData.termsAccepted);
-  }, []); 
+  const isMountedRef = React.useRef(false);
 
   React.useEffect(() => {
+    if (!isMountedRef.current) {
+      setFamilyName(signupFormData.familyName);
+      setGivenName(signupFormData.givenName);
+      setEmail(signupFormData.email);
+      setPassword(signupFormData.password);
+      setPhoneNumber(signupFormData.phoneNumber);
+      setRegion(signupFormData.region);
+      setReferralEmail(signupFormData.referralEmail);
+      setGender(signupFormData.gender);
+      setAgeRange(signupFormData.ageRange);
+      setTermsAccepted(signupFormData.termsAccepted);
+      isMountedRef.current = true;
+    }
+  }, [signupFormData]);
+
+  React.useEffect(() => {
+    if (!isMountedRef.current) return;
+
     setSignupFormData({
       familyName,
       givenName,
@@ -100,38 +108,38 @@ export const SignupScreen = () => {
     gender,
     ageRange,
     termsAccepted,
-    setSignupFormData,
+
   ]);
 
   const handleSubmit = async () => {
 
     if (!termsAccepted) {
-      Alert.alert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
+      await showAlert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
       return;
     }
 
     if (!familyName.trim() || !givenName.trim()) {
-      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
       return;
     }
 
     if (!email.trim()) {
-      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.emailRequired'));
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.emailRequired'));
       return;
     }
 
     if (!password.trim() || password.length < 6) {
-      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
       return;
     }
 
     if (!phoneNumber.trim()) {
-      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
       return;
     }
 
     if (!selectedRegion && !region.trim()) {
-      Alert.alert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
       return;
     }
 
@@ -143,7 +151,7 @@ export const SignupScreen = () => {
       const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
 
       if (!isEmailAvailable) {
-        Alert.alert(t('screens.signup.alerts.emailDuplicate'), t('screens.signup.errors.emailDuplicate'));
+        await showAlert(t('screens.signup.alerts.emailDuplicate'), t('screens.signup.errors.emailDuplicate'));
         setIsSubmitting(false);
         return;
       }
@@ -156,28 +164,27 @@ export const SignupScreen = () => {
           referralMemberId = referralId;
         } else {
 
-          const shouldContinue = await new Promise<boolean>((resolve) => {
-            Alert.alert(
-              t('screens.signup.alerts.referralConfirm'),
-              t('screens.signup.errors.referralInvalid'),
-              [
-                {
-                  text: t('screens.signup.alerts.cancel'),
-                  style: 'cancel',
-                  onPress: () => {
-                    setIsSubmitting(false);
-                    resolve(false);
-                  },
+          const buttonIndex = await showAlert(
+            t('screens.signup.alerts.referralConfirm'),
+            t('screens.signup.errors.referralInvalid'),
+            [
+              {
+                text: t('screens.signup.alerts.cancel'),
+                style: 'cancel',
+                onPress: () => {
+                  setIsSubmitting(false);
                 },
-                {
-                  text: t('screens.signup.alerts.continue'),
-                  onPress: () => resolve(true),
-                },
-              ],
-            );
-          });
+              },
+              {
+                text: t('screens.signup.alerts.continue'),
+                onPress: () => {
 
-          if (!shouldContinue) {
+                },
+              },
+            ],
+          );
+
+          if (buttonIndex === 0) {
             return;
           }
 
@@ -211,7 +218,7 @@ export const SignupScreen = () => {
       const signupSuccess = await signup(signupData, navigate);
 
       if (!signupSuccess) {
-        Alert.alert(t('screens.signup.alerts.signupFailed'), t('screens.signup.errors.signupFailed'));
+        await showAlert(t('screens.signup.alerts.signupFailed'), t('screens.signup.errors.signupFailed'));
         setIsSubmitting(false);
         return;
       }
@@ -220,7 +227,7 @@ export const SignupScreen = () => {
       const loginSuccess = await checkLogin(email.trim(), password, navigate);
 
       if (!loginSuccess) {
-        Alert.alert(
+        await showAlert(
           t('screens.signup.alerts.loginCheckFailed'),
           t('screens.signup.errors.loginCheckFailed'),
         );
@@ -230,7 +237,7 @@ export const SignupScreen = () => {
         return;
       }
 
-      Alert.alert(t('screens.signup.success.title'), t('screens.signup.success.message'), [
+      await showAlert(t('screens.signup.success.title'), t('screens.signup.success.message'), [
         {
           text: t('screens.signup.success.confirm'),
           onPress: () => {
@@ -247,7 +254,7 @@ export const SignupScreen = () => {
         error.response?.data?.message ||
         error.message ||
         t('screens.signup.errors.error');
-      Alert.alert(t('screens.signup.alerts.error'), errorMessage);
+      await showAlert(t('screens.signup.alerts.error'), errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -17,6 +16,7 @@ import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
@@ -68,7 +68,7 @@ export const WalletSendScreen = () => {
 
   const handleConfirm = () => {
     if (!walletSendAddress) {
-      Alert.alert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
+      await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
       return;
     }
     if (!sendAmount || new BigNumber(sendAmount || '0').lte(0)) {

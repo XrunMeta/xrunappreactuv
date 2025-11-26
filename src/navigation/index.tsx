@@ -2,9 +2,11 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ROUTES = {
   authLanding: 'authLanding',
@@ -75,9 +77,34 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [stack, setStack] = useState<ScreenName[]>(['authLanding']);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const currentScreen = stack[stack.length - 1];
   const previousScreen = stack.length > 1 ? stack[stack.length - 2] : null;
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const remember = await AsyncStorage.getItem('rememberMe');
+        const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+
+        if (remember === 'true' && loggedIn === 'true') {
+
+          console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
+          setStack([ROUTES.map]);
+        } else {
+
+          console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+        }
+      } catch (error) {
+        console.error('[Navigation] 로그인 상태 확인 실패:', error);
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   const navigate = useCallback((screen: ScreenName) => {
     setStack((prev) => {

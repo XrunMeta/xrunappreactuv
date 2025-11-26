@@ -4,7 +4,7 @@ export default {
   emailPlaceholder: '请输入邮箱',
   passwordLabel: '密码',
   passwordPlaceholder: '请输入密码',
-  rememberId: '记住账号',
+  rememberMe: '保持登录状态',
   loginButton: '登录',
   disclaimer: '如果忘记密码，可以使用通过邮箱收到的验证码登录。',
   emailVerification: '邮箱验证',

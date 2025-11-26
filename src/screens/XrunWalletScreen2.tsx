@@ -7,6 +7,7 @@ import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } fro
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -25,6 +26,7 @@ const HISTORY_DATA = [
 export const XrunWalletScreen2 = () => {
   const { t } = useTranslation();
   const { navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const handleAction = (type: 'scan' | 'receive' | 'send') => {
     if (type === 'send') {
       navigate(ROUTES.walletSend);
@@ -43,7 +45,7 @@ export const XrunWalletScreen2 = () => {
           title={t('screens.xrunWallet2.myBalance')}
           mainValue="12,200 XRUN"
           address={`${WALLET_ADDRESS.slice(0, 24)}.......`}
-          onCopy={() => copyToClipboard(WALLET_ADDRESS)}
+          onCopy={() => copyToClipboard(WALLET_ADDRESS, showAlert)}
           actions={[
             { label: 'PolygonScan', icon: 'scan-outline', onPress: () => handleAction('scan') },
             { label: 'Receive', icon: 'download-outline', onPress: () => navigate(ROUTES.walletReceive) },

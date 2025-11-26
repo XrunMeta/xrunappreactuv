@@ -2846,6 +2846,7 @@ export const deleteXrunPurchasedItem = async (
     console.log('[상점] 구매한 아이템 삭제 요청:', { member, storage });
 
     const possibleEndpoints = [
+      '/deleteXrunItem', 
       '/app4000-04-delete', 
       '/app4000-04delete',   
       '/deleteXrunPurchasedItem', 
