@@ -8,6 +8,9 @@ type AppContextValue = {
   walletSendAddress: string;
   setWalletSendAddress: (address: string) => void;
   resetWalletSendAddress: () => void;
+  walletSendAmount: string;
+  setWalletSendAmount: (amount: string) => void;
+  resetWalletSendAmount: () => void;
   walletReceiveAddress: string;
   setWalletReceiveAddress: (address: string) => void;
   resetWalletReceiveAddress: () => void;
@@ -57,12 +60,34 @@ type AppContextValue = {
   selectedWalletAsset: v_5681b1 | null;
   setSelectedWalletAsset: (asset: v_5681b1 | null) => void;
   resetSelectedWalletAsset: () => void;
+  transactionResult: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null;
+  setTransactionResult: (result: {
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null) => void;
+  resetTransactionResult: () => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
 
 export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode }) => {
   const [v_ee27aa, v_134f07] = v_5ab095('');
+  const [v_e5d0e8, v_8f0018] = v_5ab095('0');
   const [v_589fe1, v_f0d0d2] = v_5ab095('');
   const [v_750b67, v_2cdd41] = v_5ab095(false);
   const [v_e6976c, v_8f89f3] =
@@ -90,12 +115,25 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   });
   const [v_d0b6d4, v_d48a26] = v_5ab095<v_fa3302 | null>(null);
   const [v_ea6a7a, v_84bd3c] = v_5ab095<v_5681b1 | null>(null);
+  const [v_0fc1c4, v_fcca8e] = v_5ab095<{
+    txHash: string;
+    amount: string;
+    symbol: string;
+    toAddress: string;
+    gasPrice: string;
+    network: string;
+    currency: number;
+    chainId: number;
+  } | null>(null);
 
   const v_3b402b = v_df9f57(
     () => ({
       walletSendAddress: v_ee27aa,
       setWalletSendAddress: v_134f07,
       resetWalletSendAddress: () => v_134f07(''),
+      walletSendAmount: v_e5d0e8,
+      setWalletSendAmount: v_8f0018,
+      resetWalletSendAmount: () => v_8f0018('0'),
       walletReceiveAddress: v_589fe1,
       setWalletReceiveAddress: v_f0d0d2,
       resetWalletReceiveAddress: () => v_f0d0d2(''),
@@ -148,9 +186,13 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       selectedWalletAsset: v_ea6a7a,
       setSelectedWalletAsset: v_84bd3c,
       resetSelectedWalletAsset: () => v_84bd3c(null),
+      transactionResult: v_0fc1c4,
+      setTransactionResult: v_fcca8e,
+      resetTransactionResult: () => v_fcca8e(null),
     }),
     [
       v_ee27aa,
+      v_e5d0e8,
       v_589fe1,
       v_750b67,
       v_e6976c,
@@ -165,6 +207,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_8d7bc8,
       v_d0b6d4,
       v_ea6a7a,
+      v_0fc1c4,
     ],
   );
 

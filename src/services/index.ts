@@ -3396,3 +3396,109 @@ export const v_629c7b = async (
   }
 };
 
+export const v_927baf = async (
+  v_231c19,
+  v_0d793b,
+  v_f63e09,
+  v_21cc31,
+  v_a832b3,
+  v_74efc1 = 'ETH',
+  v_bcd61d = 1,
+  v_039314 = 2,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_4d33b2 = {
+      from: v_231c19,
+      to: v_0d793b,
+      amount: v_f63e09,
+      token: v_21cc31,
+      currency: v_a832b3,
+      network: v_74efc1,
+      chainId: v_bcd61d,
+      priorityGasTracker: v_039314,
+    };
+
+    console.log('[가스 수수료 예상] API 요청:', v_4d33b2);
+
+    const v_3393e3 = await v_12a388('/gasEstimated', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[가스 수수료 예상] API 응답:', v_43c42e);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[가스 수수료 예상] API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_76d832 = async (
+  v_231c19,
+  v_0d793b,
+  v_f63e09,
+  v_660822,
+  v_74efc1,
+  v_a832b3,
+  v_bcd61d,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_4d33b2 = {
+      from: v_231c19,
+      to: v_0d793b,
+      amount: v_f63e09,
+      member: v_660822,
+      network: v_74efc1,
+      currency: v_a832b3,
+      chainId: v_bcd61d,
+    };
+
+    console.log('[블록체인 전송] API 요청:', v_4d33b2);
+
+    const v_3393e3 = await v_12a388('/postTransferNew', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[블록체인 전송] API 응답:', v_43c42e);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[블록체인 전송] API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
