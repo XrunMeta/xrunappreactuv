@@ -444,6 +444,7 @@ const v_d81136 = v_472849.create({
   messageWrapper: {
     position: 'relative',
     paddingLeft: 34,
+    marginBottom: 16,
   },
   avatar: {
     width: 26,
@@ -519,6 +520,7 @@ const v_d81136 = v_472849.create({
   replyWrapper: {
     alignItems: 'flex-end',
     gap: 6,
+    marginBottom: 16,
   },
   replyRow: {
     flexDirection: 'row',
