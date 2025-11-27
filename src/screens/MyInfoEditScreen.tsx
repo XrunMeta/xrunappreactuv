@@ -390,7 +390,13 @@ export const MyInfoEditScreen = () => {
       <StatusBar style="dark" />
       <Header
         title={t('screens.myInfoEdit.title')}
-        onBackPress={canGoBack ? goBack : () => reset(ROUTES.myInfo)}
+        onBackPress={() => {
+          if (canGoBack) {
+            goBack();
+          } else {
+            reset(ROUTES.myInfo);
+          }
+        }}
         showBackButton
       />
       <ScrollView
@@ -432,7 +438,9 @@ export const MyInfoEditScreen = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.readonlyInput}>
-            <Text style={styles.readonlyText}>최종변경날짜  : 2025.05.02</Text>
+            <Text style={styles.readonlyText}>
+              {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+            </Text>
           </View>
 
             <View style={styles.fieldContainer}>

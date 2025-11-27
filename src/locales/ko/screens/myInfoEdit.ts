@@ -30,5 +30,7 @@ export default {
     emailSendFailed: '이메일 인증 코드 발송에 실패했습니다. 다시 시도해주세요.',
     verificationError: '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.',
   },
+  lastPasswordChangeDate: '최종변경날짜',
+  lastPasswordChangeDateLabel: '최종변경날짜  : {{date}}',
 };
 

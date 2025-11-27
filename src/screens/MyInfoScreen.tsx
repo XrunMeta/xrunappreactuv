@@ -74,7 +74,7 @@ const cardConfigs: CardConfig[] = [
 ];
 
 export const MyInfoScreen = () => {
-  const { navigate, reset } = useAppNavigation();
+  const { navigate, reset, goBack, canGoBack } = useAppNavigation();
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const { setVerificationEmail } = useAppContext();
@@ -215,7 +215,17 @@ export const MyInfoScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.myInfo.title')} />
+      <Header
+        title={t('screens.myInfo.title')}
+        onBackPress={() => {
+          if (canGoBack) {
+            goBack();
+          } else {
+            reset(ROUTES.map);
+          }
+        }}
+        showBackButton
+      />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
