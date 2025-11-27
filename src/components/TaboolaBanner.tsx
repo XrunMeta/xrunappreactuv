@@ -14,6 +14,8 @@ interface TaboolaBannerProps {
   style?: any;
 
   containerStyle?: any;
+
+  onLoadComplete?: () => void;
 }
 
 export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
@@ -21,6 +23,7 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   pageUrl: v_cdfaaa,
   style: v_7fa4e4,
   containerStyle: v_4affe9,
+  onLoadComplete: v_5c5995,
 }) => {
   const { t: v_8d41d7 } = v_772971();
   const [v_4ee138, v_75aef8] = v_5ab095(true);
@@ -45,8 +48,12 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
     if (v_1ea9b3 >= 2) {
       console.log('[TaboolaBanner] Taboola 로딩 완료 (카운터 >= 2)');
       v_75aef8(false);
+
+      if (v_5c5995) {
+        v_5c5995();
+      }
     }
-  }, [v_1ea9b3]);
+  }, [v_1ea9b3, v_5c5995]);
 
   return (
     <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>

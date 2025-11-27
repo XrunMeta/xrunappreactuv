@@ -15,5 +15,6 @@ export default {
   adCallFailedSub: '多次尝试后仍无法加载广告。返回上一页。',
   unsupportedUrl: '不支持的URL。',
   noAdUrl: '没有广告URL。',
+  goToMap: '前往地图',
 };
 
