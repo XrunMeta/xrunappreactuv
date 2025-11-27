@@ -3503,3 +3503,59 @@ export const v_76d832 = async (
   }
 };
 
+export const v_4dba02 = async (
+  v_4898e2,
+  v_05bb19,
+  v_c65f5d,
+): Promise<string> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    let v_8a32c8 = 'app7010-01';
+    if (v_05bb19 === 'id') {
+      v_8a32c8 += '-id';
+    } else if (v_05bb19 === 'ko') {
+      v_8a32c8 += '-kr';
+    } else if (v_05bb19 === 'en') {
+      v_8a32c8 += '-en';
+    } else if (v_05bb19 === 'zh-CN' || v_05bb19 === 'zh') {
+      v_8a32c8 += '-zh';
+    } else {
+
+      v_8a32c8 += '-en';
+    }
+
+    console.log('[약관] 약관 내용 요청:', { clauseType: v_4898e2, language: v_05bb19, apiUrl: v_8a32c8 });
+
+    const v_3393e3 = await v_9f42a4.get<{ data: Array<{ c: string }> }>(v_8a32c8);
+
+    let v_b43b74 = '';
+    if (v_4898e2 === 'service') {
+      v_b43b74 = v_3393e3.data.data?.[0]?.c || '';
+    } else if (v_4898e2 === 'personal') {
+      v_b43b74 = v_3393e3.data.data?.[1]?.c || '';
+    } else if (v_4898e2 === 'location') {
+      v_b43b74 = v_3393e3.data.data?.[2]?.c || '';
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', v_4898e2);
+    return v_b43b74;
+  } catch (v_5e9bfe) {
+    console.error('[약관] 약관 내용 로드 실패:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[약관] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+

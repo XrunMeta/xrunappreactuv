@@ -78,7 +78,7 @@ export const v_1a0a02 = () => {
 
   const v_dfaad1 = async () => {
     if (!v_dfe883 || !v_717992) {
-      await v_889fad('오류', '구매할 수 없습니다.');
+      await v_889fad(v_8d41d7('screens.shopBuy.alerts.error'), v_8d41d7('screens.shopBuy.alerts.cannotPurchase'));
       return;
     }
 
@@ -95,7 +95,7 @@ export const v_1a0a02 = () => {
 
       if (v_d6cf14) {
 
-        await v_889fad('알림', '인앱 구매 기능은 준비 중입니다.');
+        await v_889fad(v_8d41d7('screens.shopBuy.alerts.notification'), v_8d41d7('screens.shopBuy.alerts.inAppPurchaseComingSoon'));
         v_72727b(false);
         return;
       }
@@ -112,9 +112,12 @@ export const v_1a0a02 = () => {
       if (v_a5e3b7 < v_2c49ad) {
         console.log('[구매] ❌ 잔액 부족');
         await v_889fad(
-          '잔액 부족',
-          `현재 잔액: ${v_35c0e0(v_a5e3b7)} XRUN\n필요한 금액: ${v_35c0e0(v_2c49ad)} XRUN\n잔액을 충전해주세요.`,
-          [{ text: '확인' }],
+          v_8d41d7('screens.shopBuy.alerts.insufficientBalanceTitle'),
+          v_8d41d7('screens.shopBuy.alerts.insufficientBalanceMessage', {
+            currentBalance: v_35c0e0(v_a5e3b7),
+            requiredAmount: v_35c0e0(v_2c49ad),
+          }),
+          [{ text: v_8d41d7('screens.shopBuy.confirm') }],
         );
         v_72727b(false);
         return;
@@ -146,9 +149,9 @@ export const v_1a0a02 = () => {
       console.error('[구매] === 구매 오류 ===');
       console.error('[구매] 구매 오류:', v_5e9bfe);
       await v_889fad(
-        '구매 실패',
-        v_5e9bfe.message || '구매 중 오류가 발생했습니다.',
-        [{ text: '확인' }],
+        v_8d41d7('screens.shopBuy.alerts.purchaseFailed'),
+        v_5e9bfe.message || v_8d41d7('screens.shopBuy.alerts.purchaseFailedMessage'),
+        [{ text: v_8d41d7('screens.shopBuy.confirm') }],
       );
     } finally {
       v_72727b(false);
@@ -203,21 +206,21 @@ export const v_1a0a02 = () => {
               {v_d6cf14 ? (
 
                 <View style={v_d81136.row}>
-                  <Text style={v_d81136.label}>가격</Text>
-                  <Text style={v_d81136.value}>인앱 구매 (준비 중)</Text>
+                  <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
+                  <Text style={v_d81136.value}>{v_8d41d7('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
                 </View>
               ) : (
 
                 <>
                   <View style={v_d81136.row}>
-                    <Text style={v_d81136.label}>가격</Text>
+                    <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
                     <Text style={v_d81136.value}>
                       {v_89f939(v_1c86a8, 'KRW')} / {v_35c0e0(v_318e8b)} XRUN
                     </Text>
                   </View>
 
                   <View style={v_d81136.row}>
-                    <Text style={v_d81136.label}>수수료</Text>
+                    <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.fee')}</Text>
                     <Text style={v_d81136.value}>
                       {v_89f939(v_63e5c7, 'KRW')} / {v_35c0e0(v_cd7bfc)} XRUN
                     </Text>
@@ -226,7 +229,7 @@ export const v_1a0a02 = () => {
                   <View style={v_d81136.divider} />
 
                   <View style={v_d81136.row}>
-                    <Text style={[v_d81136.label, v_d81136.totalLabel]}>총액</Text>
+                    <Text style={[v_d81136.label, v_d81136.totalLabel]}>{v_8d41d7('screens.shopBuy.total')}</Text>
                     <Text style={[v_d81136.value, v_d81136.totalValue]}>
                       {v_35c0e0(v_6a3b90)} XRUN
                     </Text>
@@ -234,7 +237,7 @@ export const v_1a0a02 = () => {
 
                   <View style={v_d81136.balanceInfo}>
                     <View style={v_d81136.row}>
-                      <Text style={v_d81136.label}>내 잔액</Text>
+                      <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.myBalance')}</Text>
                       <Text
                         style={[
                           v_d81136.value,
@@ -242,17 +245,17 @@ export const v_1a0a02 = () => {
                         ]}
                       >
                         {v_8dbb06 ? (
-                          '조회 중...'
+                          v_8d41d7('screens.shopBuy.checking')
                         ) : v_bc3e72 !== null ? (
                           v_35c0e0(v_bc3e72) + ' XRUN'
                         ) : (
-                          '조회 실패'
+                          v_8d41d7('screens.shopBuy.checkFailed')
                         )}
                       </Text>
                     </View>
                     {v_1ee1c8 && (
                       <Text style={v_d81136.insufficientBalanceText}>
-                        잔액이 부족합니다. 잔액을 충전해주세요.
+                        {v_8d41d7('screens.shopBuy.insufficientBalance')}
                       </Text>
                     )}
                   </View>
@@ -267,7 +270,7 @@ export const v_1a0a02 = () => {
               onPress={v_c7ac57}
               disabled={v_d4bdc8}
             >
-              <Text style={v_d81136.cancelText}>취소</Text>
+              <Text style={v_d81136.cancelText}>{v_8d41d7('screens.shopBuy.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -281,7 +284,7 @@ export const v_1a0a02 = () => {
               {v_d4bdc8 ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={v_d81136.primaryText}>결제</Text>
+                <Text style={v_d81136.primaryText}>{v_8d41d7('screens.shopBuy.payment')}</Text>
               )}
             </TouchableOpacity>
           </View>

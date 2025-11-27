@@ -177,8 +177,8 @@ export const v_052a8a = () => {
       const v_6856a9 = (v_8c0b26 as any)?.description || '';
       v_0e7cbf({
         visible: true,
-        title: v_8c0b26.title || '전송권',
-        description: v_6856a9 || '티켓 구매시 최소 3회이상의 폴 리곤네트워크 전송(외부지갑) 이 가능하게 됩니다. Withdraw the XRUN network to the Polygon network in your wallet.',
+        title: v_8c0b26.title || v_8d41d7('screens.shopMyTicket.transferTicket'),
+        description: v_6856a9 || v_8d41d7('screens.shopMyTicket.transferTicketDescription'),
       });
     } else {
 
@@ -243,7 +243,7 @@ export const v_052a8a = () => {
               })
             ) : (
               <View style={v_d81136.emptyContainer}>
-                <Text style={v_d81136.emptyText}>구매한 아이템이 없습니다.</Text>
+                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.shopMyTicket.noPurchasedItems')}</Text>
               </View>
             )}
           </View>

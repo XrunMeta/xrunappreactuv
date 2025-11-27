@@ -390,7 +390,13 @@ export const v_cdb169 = () => {
       <StatusBar style="dark" />
       <Header
         title={v_8d41d7('screens.myInfoEdit.title')}
-        onBackPress={v_7e32fb ? v_c7ac57 : () => v_487a25(v_ce4741.myInfo)}
+        onBackPress={() => {
+          if (v_7e32fb) {
+            v_c7ac57();
+          } else {
+            v_487a25(v_ce4741.myInfo);
+          }
+        }}
         showBackButton
       />
       <ScrollView
@@ -432,7 +438,9 @@ export const v_cdb169 = () => {
             </TouchableOpacity>
           </View>
           <View style={v_d81136.readonlyInput}>
-            <Text style={v_d81136.readonlyText}>최종변경날짜  : 2025.05.02</Text>
+            <Text style={v_d81136.readonlyText}>
+              {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+            </Text>
           </View>
 
             <View style={v_d81136.fieldContainer}>

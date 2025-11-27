@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -87,6 +87,8 @@ export const v_386af2 = () => {
   const [v_612e9f, v_575aad] = v_5ab095(false);
   const [v_5e23ec, v_10837f] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
+  const v_e99f51 = v_e662ae<v_122070>(null);
+  const v_d16a0d = v_e662ae(true);
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -126,14 +128,22 @@ export const v_386af2 = () => {
 
   v_c4deb2(() => {
     if (v_717992) {
+      v_d16a0d.current = true; 
       v_496106();
     }
   }, [v_717992, v_496106]);
 
-  const v_d5345f = v_de06a3(() => {
-    v_575aad(true);
-    v_496106();
-  }, [v_496106]);
+  const v_11b765 = v_de06a3(() => {
+    if (v_e99f51.current && v_b9c00c.length > 0 && v_d16a0d.current) {
+      setTimeout(() => {
+        v_e99f51.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [v_b9c00c.length]);
+
+  const v_397f64 = v_de06a3(() => {
+    v_d16a0d.current = false;
+  }, []);
 
   const v_465869 = async () => {
     if (!v_180423.trim()) {
@@ -148,6 +158,7 @@ export const v_386af2 = () => {
 
     try {
       v_10837f(true);
+      v_d16a0d.current = true; 
       await v_26e528(v_717992, v_180423.trim(), false, v_9b57fc);
       await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.sendSuccess'), v_8d41d7('screens.myInfoNotify.alerts.sendSuccessMessage'));
       v_8f2787('');
@@ -160,6 +171,11 @@ export const v_386af2 = () => {
       v_10837f(false);
     }
   };
+
+  const v_d5345f = v_de06a3(() => {
+    v_575aad(true);
+    v_496106();
+  }, [v_496106]);
 
   const v_57fac2 = async (v_10046b) => {
     if (!v_717992) return;
@@ -360,10 +376,13 @@ export const v_386af2 = () => {
           </View>
         ) : (
           <ScrollView
+            ref={v_e99f51}
             style={v_d81136.list}
             contentContainerStyle={v_d81136.listContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            onContentSizeChange={v_11b765}
+            onScrollBeginDrag={v_397f64}
             refreshControl={
               <RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />
             }
@@ -557,6 +576,7 @@ const v_d81136 = v_472849.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingBottom: v_326be8.OS === 'android' ? 24 : 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {
