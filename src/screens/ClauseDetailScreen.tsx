@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
@@ -16,7 +16,7 @@ const clauseTitleMap: Record<ClauseId, string> = {
 };
 
 export const ClauseDetailScreen = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { selectedClauseId } = useAppContext();
   const [content, setContent] = useState<string>('');
@@ -72,14 +72,6 @@ export const ClauseDetailScreen = () => {
             <Text style={styles.contentText}>{content}</Text>
           )}
         </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.secondaryText}>{t('screens.clauseDetail.declined')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.primaryText}>{t('screens.clauseDetail.accept')}</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );
@@ -126,43 +118,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
-    marginBottom: 24,
-  },
-  buttonRow: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 16,
-  },
-  secondaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e4e6ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  primaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#343a5a',
-  },
-  secondaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#10192d',
-  },
-  primaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#fff',
   },
 });
 
