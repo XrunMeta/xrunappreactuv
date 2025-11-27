@@ -3,6 +3,14 @@
 import { Platform } from 'react-native';
 import { getEnvValue } from '../utils/env';
 
+let Taboola: any = null;
+try {
+  Taboola = require('@taboola/react-native-plugin-4x').Taboola;
+} catch (error) {
+
+  console.log('[Taboola] 네이티브 모듈을 로드할 수 없습니다. WebView 방식으로 폴백합니다.');
+}
+
 export type TaboolaPlacement =
   | 'myinfo_aos_395x80' 
   | 'myinfo_ios_395x80' 
@@ -129,8 +137,18 @@ export const convertPlacementForOS = (placementType: TaboolaPlacement): TaboolaP
   return convertedPlacement;
 };
 
+export const isTaboolaNativeModuleAvailable = (): boolean => {
+  return Taboola !== null && typeof Taboola.init === 'function';
+};
+
 export const initializeTaboola = async (): Promise<void> => {
   try {
+
+    if (!isTaboolaNativeModuleAvailable()) {
+      console.log('[Taboola] 네이티브 모듈이 없습니다. WebView 방식으로 폴백합니다.');
+      return;
+    }
+
     const publisherId =
       Platform.OS === 'android'
         ? getEnvValue('TABOOLA_PUBLISHER_ID_ANDROID')
@@ -141,15 +159,18 @@ export const initializeTaboola = async (): Promise<void> => {
       return;
     }
 
-    if (Platform.OS === 'android') {
-
-      console.log('[Taboola] Android 초기화:', publisherId);
-    } else if (Platform.OS === 'ios') {
-
-      console.log('[Taboola] iOS 초기화:', publisherId);
+    if (Taboola && typeof Taboola.init === 'function') {
+      Taboola.init(publisherId);
+      console.log('[Taboola] 초기화 완료:', {
+        publisherId,
+        platform: Platform.OS,
+      });
+    } else {
+      console.log('[Taboola] Taboola 모듈을 사용할 수 없습니다. WebView 방식으로 폴백합니다.');
     }
   } catch (error) {
     console.error('[Taboola] 초기화 실패:', error);
+    console.log('[Taboola] WebView 방식으로 폴백합니다.');
   }
 };
 
