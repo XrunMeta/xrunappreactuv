@@ -637,7 +637,9 @@ export const WalletScreen = () => {
           <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
         </View>
         <View style={styles.tokenItemRight}>
-          <Text style={styles.tokenItemAmount}>{amount}</Text>
+          <Text style={styles.tokenItemAmount} numberOfLines={1} ellipsizeMode="tail">
+            {amount}
+          </Text>
           {suffix ? <Text style={styles.tokenItemSuffix}>{suffix}</Text> : null}
         </View>
       </TouchableOpacity>
@@ -833,9 +835,11 @@ const styles = StyleSheet.create({
   },
   tokenItemRight: {
     alignItems: 'flex-end',
+    flexShrink: 1,
+    maxWidth: '45%',
   },
   tokenItemAmount: {
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
