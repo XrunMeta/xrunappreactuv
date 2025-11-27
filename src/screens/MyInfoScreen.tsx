@@ -83,8 +83,6 @@ export const v_03a231 = () => {
     email?: string;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
-  const [v_4ee138, v_75aef8] = v_5ab095(true);
-  const [v_1ea9b3, v_2ce9d0] = v_5ab095(0);
 
   v_c4deb2(() => {
     const v_ea3fa6 = async () => {
@@ -120,28 +118,6 @@ export const v_03a231 = () => {
 
     v_ea3fa6();
   }, [v_9b57fc]);
-
-  const v_69e114 = (v_cd31a8) => {
-    if (!v_cd31a8) {
-
-      v_2ce9d0((v_ba2215) => {
-        const v_984be3 = v_ba2215 + 1;
-        console.log('[MyInfoScreen] Taboola 로딩 카운터 증가:', v_984be3);
-        return v_984be3;
-      });
-    }
-  };
-
-  v_c4deb2(() => {
-    if (v_1ea9b3 >= 2) {
-      console.log('[MyInfoScreen] Taboola 로딩 완료 (카운터 >= 2)');
-      v_75aef8(false);
-    }
-  }, [v_1ea9b3]);
-
-  v_c4deb2(() => {
-    console.log('[MyInfoScreen] isTaboolaLoading 상태:', v_4ee138);
-  }, [v_4ee138]);
 
   const v_b0f7df = (v_5eae50) => {
     if (v_5eae50.route) {
@@ -246,20 +222,7 @@ export const v_03a231 = () => {
       >
         <View style={v_d81136.inner}>
           {}
-          <View style={v_d81136.taboolaContainer}>
-            <TaboolaBanner
-              placementType="myinfo"
-              onLoadingChange={v_69e114}
-            />
-            {v_4ee138 && (
-              <View style={v_d81136.taboolaLoadingOverlay}>
-                <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
-                <Text style={v_d81136.loadingText}>
-                  {v_8d41d7('common.messages.loading')}
-                </Text>
-              </View>
-            )}
-          </View>
+          <TaboolaBanner placementType="myinfo" />
 
           <View style={v_d81136.profileCard}>
             <View>
@@ -417,28 +380,6 @@ const v_d81136 = v_472849.create({
     fontSize: 16,
     fontFamily: 'Roboto-Medium',
     color: '#111',
-  },
-  taboolaContainer: {
-    position: 'relative',
-    width: '100%',
-  },
-  taboolaLoadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-    gap: 8,
-  },
-  loadingText: {
-    fontSize: 14,
-    fontFamily: 'Roboto-Regular',
-    color: v_1bfbd0.headerText,
-    marginTop: 8,
   },
 });
 

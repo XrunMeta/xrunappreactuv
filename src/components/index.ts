@@ -30,6 +30,7 @@ export { MapBottomPanel } from './MapBottomPanel';
 export { LanguageSelector } from './LanguageSelector';
 export { AddTokenModal } from './AddTokenModal';
 export { TaboolaBanner } from './TaboolaBanner';
+export { TaboolaBannerCore } from './TaboolaBannerCore';
 export { TaboolaVignette } from './TaboolaVignette';
 export { TaboolaNativeView } from './TaboolaNativeView';
 export { isTaboolaNativeViewAvailable } from './TaboolaNativeView';
