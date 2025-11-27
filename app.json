@@ -22,10 +22,10 @@
       }
     },
     "android": {
-      "package": "com.xrun.app",
+      "package": "run.xrun.xrunapp",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 40000,
-      "versionName": "4.0.0",
+      "versionCode": 177,
+      "versionName": "3.2.9",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
