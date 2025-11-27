@@ -1,7 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696 } from 'rcmrninabrnb';
 import { v_1bfbd0 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_a0daa8, v_ce4741 } from '../navigation';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
 
@@ -24,9 +24,12 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   showBackButton: v_9c4d53 = true,
   rightComponent: v_52c3cc,
 }) => {
-  const { goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
-  const v_e2510f = v_9c4d53 && (v_7e32fb || !!v_f442f6);
-  const v_648e0d = v_f442f6 ?? (v_7e32fb ? v_c7ac57 : undefined);
+  const { reset: v_487a25 } = v_a0daa8();
+  const v_e2510f = v_9c4d53;
+
+  const v_648e0d = () => {
+    v_487a25(v_ce4741.map);
+  };
 
   const v_91b7e0 = () =>
     v_e2510f ? (
