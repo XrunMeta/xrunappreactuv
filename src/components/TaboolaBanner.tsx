@@ -1,15 +1,8 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
-import { COLORS, SIZES } from '../constants';
-import {
-  getTaboolaPlacement,
-  getTaboolaPublisherId,
-  getTaboolaPageUrl,
-  TABOOLA_PLACEMENTS,
-  generateTaboolaHTML,
-} from '../services/taboola';
-import { TaboolaNativeView, isTaboolaNativeViewAvailable } from './TaboolaNativeView';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { TaboolaBannerCore } from './TaboolaBannerCore';
+import { COLORS } from '../constants';
 
 interface TaboolaBannerProps {
 
@@ -20,8 +13,6 @@ interface TaboolaBannerProps {
   style?: any;
 
   containerStyle?: any;
-
-  onLoadingChange?: (isLoading: boolean) => void;
 }
 
 export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
@@ -29,131 +20,69 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   pageUrl,
   style,
   containerStyle,
-  onLoadingChange,
 }) => {
+  const { t } = useTranslation();
+  const [isTaboolaLoading, setIsTaboolaLoading] = useState(true);
+  const [taboolaLoadingCount, setTaboolaLoadingCount] = useState(0);
 
-  const placement = getTaboolaPlacement(placementType, false);
-  const config = TABOOLA_PLACEMENTS[placement];
-  const finalPageUrl = pageUrl || getTaboolaPageUrl();
-  const publisherId = getTaboolaPublisherId();
+  const handleTaboolaLoadingChange = (isLoading: boolean) => {
+    if (!isLoading) {
 
-  const isNativeAvailable = isTaboolaNativeViewAvailable();
-
-  console.log('[TaboolaBanner] 렌더링:', {
-    placementType,
-    placement,
-    publisherId,
-    finalPageUrl,
-    isNativeAvailable,
-  });
+      setTaboolaLoadingCount((prev) => {
+        const newCount = prev + 1;
+        console.log('[TaboolaBanner] Taboola 로딩 카운터 증가:', newCount);
+        return newCount;
+      });
+    }
+  };
 
   useEffect(() => {
-    if (isNativeAvailable && onLoadingChange) {
-
-      onLoadingChange(false);
+    if (taboolaLoadingCount >= 2) {
+      console.log('[TaboolaBanner] Taboola 로딩 완료 (카운터 >= 2)');
+      setIsTaboolaLoading(false);
     }
-  }, [isNativeAvailable, onLoadingChange]);
-
-  if (isNativeAvailable) {
-    return (
-      <View style={[styles.container, containerStyle, style]}>
-        <TaboolaNativeView
-          publisherId={getTaboolaPublisherId()}
-          placement={config.placement}
-          mode={config.mode}
-          pageUrl={finalPageUrl}
-          pageType={config.pageType}
-          targetType={config.targetType}
-          style={styles.webView}
-        />
-      </View>
-    );
-  }
-
-  const htmlContent = generateTaboolaHTML(
-    publisherId,
-    config.placement,
-    config.mode,
-    finalPageUrl,
-    config.pageType,
-    config.targetType,
-  );
+  }, [taboolaLoadingCount]);
 
   return (
     <View style={[styles.container, containerStyle, style]}>
-      <WebView
-        source={{ html: htmlContent }}
-        style={styles.webView}
-        scrollEnabled={true}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={false}
-        backgroundColor="#ffffff"
-        allowsInlineMediaPlayback={true}
-        mediaPlaybackRequiresUserAction={false}
-        mixedContentMode="always"
-        originWhitelist={['*']}
-        thirdPartyCookiesEnabled={true}
-        sharedCookiesEnabled={true}
-        userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-        onLoadStart={() => {
-          console.log('[TaboolaBanner] WebView 로드 시작 - onLoadStart 호출됨');
-
-          if (onLoadingChange) {
-            console.log('[TaboolaBanner] onLoadingChange(false) 호출');
-            onLoadingChange(false);
-          } else {
-            console.log('[TaboolaBanner] onLoadingChange가 없습니다');
-          }
-        }}
-        onLoadEnd={() => {
-          console.log('[TaboolaBanner] WebView 로드 완료 - onLoadEnd 호출됨');
-
-        }}
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          console.error('[TaboolaBanner] WebView 오류:', nativeEvent);
-
-          if (onLoadingChange) {
-            onLoadingChange(false);
-          }
-        }}
-        onMessage={(event) => {
-          try {
-            const data = JSON.parse(event.nativeEvent.data);
-            console.log('[TaboolaBanner] WebView 메시지:', data);
-
-            if (data && data.message && typeof data.message === 'string') {
-              const message = data.message;
-              if (message.includes('콘텐츠 감지됨')) {
-                console.log('[TaboolaBanner] 콘텐츠 감지됨 - 로딩 완료 처리');
-                if (onLoadingChange) {
-                  onLoadingChange(false);
-                }
-              }
-            }
-          } catch (e) {
-            console.log('[TaboolaBanner] WebView 원시 메시지:', event.nativeEvent.data);
-          }
-        }}
+      <TaboolaBannerCore
+        placementType={placementType}
+        pageUrl={pageUrl}
+        onLoadingChange={handleTaboolaLoadingChange}
       />
+      {isTaboolaLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="small" color={COLORS.headerText} />
+          <Text style={styles.loadingText}>
+            {t('common.messages.loading')}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     width: '100%',
-    minHeight: 80,
-    backgroundColor: '#F5F5F5',
-    marginVertical: SIZES.small, 
-    marginHorizontal: 0, 
   },
-  webView: {
-    width: '100%',
-    minHeight: 80,
-    backgroundColor: 'transparent',
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.headerText,
+    marginTop: 8,
   },
 });
