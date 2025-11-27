@@ -3,3 +3,4 @@ export default {
   viewDetails: 'View Details',
 };
 
+

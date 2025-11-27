@@ -20,6 +20,7 @@ import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   fetchWalletData,
   fetchOtherChainsStatus,
@@ -35,8 +36,6 @@ import {
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 
 const screenWidth = Dimensions.get('window').width;
-import { copyToClipboard } from '../utils';
-import { useAlertDialog } from '../context/AlertDialogContext';
 
 let front = 6;
 let back = 4;
@@ -81,6 +80,7 @@ export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { openAddTokenDialog, setWalletReceiveAddress, setSelectedWalletAsset } = useAppContext();
+  const { showAlert } = useAlertDialog();
 
   const [isLoading, setIsLoading] = useState(true);
   const [publicAddress, setPublicAddress] = useState('');
@@ -376,7 +376,7 @@ export const WalletScreen = () => {
 
   const handleCopyAddress = () => {
     if (publicAddress) {
-      copyToClipboard(publicAddress);
+      copyToClipboard(publicAddress, showAlert);
     }
   };
 
@@ -386,17 +386,6 @@ export const WalletScreen = () => {
         t('screens.wallet.error'),
         t('screens.wallet.addressNotLoaded'),
       );
-  const { showAlert } = useAlertDialog();
-  const { openAddTokenDialog } = useAppContext();
-  const tokenList = useMemo(() => TOKEN_DATA, []);
-
-  const handleCopyAddress = () => {
-    copyToClipboard(WALLET_ADDRESS, showAlert);
-  };
-
-  const handleAction = async (type: 'scan' | 'receive' | 'send') => {
-    if (type === 'send') {
-      navigate(ROUTES.walletSend);
       return;
     }
     Linking.openURL(`https://polygonscan.com/address/${publicAddress}`);

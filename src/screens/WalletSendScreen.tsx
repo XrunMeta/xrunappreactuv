@@ -22,6 +22,7 @@ export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const { showAlert } = useAlertDialog();
   const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
   const amountInputRef = useRef<TextInput>(null);
 
@@ -66,20 +67,20 @@ export const WalletSendScreen = () => {
     return hasAmount && hasAddress;
   }, [sendAmount, walletSendAddress]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!walletSendAddress) {
       await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
       return;
     }
     if (!sendAmount || new BigNumber(sendAmount || '0').lte(0)) {
-      Alert.alert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
+      await showAlert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
       return;
     }
 
     const balance = new BigNumber(selectedWalletAsset?.amount || '0');
     const amount = new BigNumber(sendAmount || '0');
     if (amount.gt(balance)) {
-      Alert.alert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
+      await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
       return;
     }
     navigate(ROUTES.walletEstimate);

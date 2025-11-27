@@ -12,3 +12,4 @@ export default {
   logoutSuccess: 'Telah keluar',
 };
 
+

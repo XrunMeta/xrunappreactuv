@@ -3,3 +3,4 @@ export default {
   viewDetails: '詳細を見る',
 };
 
+

@@ -7,3 +7,4 @@ export default {
   noResults: 'Tidak ada hasil',
 };
 
+

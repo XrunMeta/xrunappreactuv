@@ -9,7 +9,6 @@ import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionList
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { copyToClipboard } from '../utils';
 import {
   fetchTotalHistory,
   fetchTransferHistory,
@@ -18,6 +17,8 @@ import {
 } from '../services';
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
+import { useAlertDialog } from '../context/AlertDialogContext';
+import { copyToClipboard } from '../utils';
 
 const dateFormatter = (dateString: string): string => {
   try {
@@ -105,6 +106,7 @@ export const WalletDetailScreen = () => {
   const { t } = useTranslation();
   const { navigate, goBack } = useAppNavigation();
   const { selectedWalletAsset, resetSelectedWalletAsset, setSelectedWalletAsset, setWalletReceiveAddress } = useAppContext();
+  const { showAlert } = useAlertDialog();
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'send' | 'receive'>('all');
@@ -329,9 +331,9 @@ export const WalletDetailScreen = () => {
 
   const handleCopyAddress = useCallback(() => {
     if (publicAddress) {
-      copyToClipboard(publicAddress);
+      copyToClipboard(publicAddress, showAlert);
     }
-  }, [publicAddress]);
+  }, [publicAddress, showAlert]);
 
   const formattedBalance = useMemo(() => {
     if (!selectedWalletAsset) return '0';

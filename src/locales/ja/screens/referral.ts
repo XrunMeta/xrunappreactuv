@@ -7,3 +7,4 @@ export default {
   noResults: '検索結果がありません',
 };
 
+

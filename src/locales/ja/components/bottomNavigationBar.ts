@@ -5,3 +5,4 @@ export default {
   info: '情報',
 };
 
+
