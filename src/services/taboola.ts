@@ -3,13 +3,28 @@
 import { v_326be8 } from 'rcmrninabrnb';
 import { v_573fcf } from '../utils/env';
 
+let v_b02f3c = null;
+try {
+  v_b02f3c = require('oxnazmqqjnwuflnfgczxckuhqeiiyoo').Taboola;
+} catch (v_5e9bfe) {
+
+  console.log('[Taboola] 네이티브 모듈을 로드할 수 없습니다. WebView 방식으로 폴백합니다.');
+}
+
 export type TaboolaPlacement =
   | 'myinfo_aos_395x80' 
   | 'myinfo_ios_395x80' 
+  | 'myinfo_OS_395x80' 
   | 'shop_aos_395x80' 
   | 'shop_ios_395x80' 
+  | 'shop_OS_395x80' 
   | 'apploading_aos_vignette' 
-  | 'apploading_ios_vignette'; 
+  | 'apploading_ios_vignette' 
+  | 'apploading_OS_vignette' 
+  | 'reward_aos_395x80' 
+  | 'reward_aos_vignette' 
+  | 'reward_OS_395x80' 
+  | 'reward_OS_vignette'; 
 
 export type TaboolaMode = 'thumbnails-stream-a' | 'thumbnails-textunder-a';
 
@@ -59,10 +74,81 @@ export const v_968eda = {
     pageType: 'article',
     targetType: 'mix',
   },
+  'reward_aos_395x80': {
+    placement: 'reward_aos_395x80',
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_aos_vignette': {
+    placement: 'reward_aos_vignette',
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+
+  'myinfo_OS_395x80': {
+    placement: 'myinfo_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'shop_OS_395x80': {
+    placement: 'shop_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'apploading_OS_vignette': {
+    placement: 'apploading_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_395x80': {
+    placement: 'reward_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_vignette': {
+    placement: 'reward_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+};
+
+export const v_17555f = (v_bb5e8c): TaboolaPlacement => {
+
+  if (!v_bb5e8c.includes('_OS_')) {
+    return v_bb5e8c;
+  }
+
+  const v_c20e12 = v_326be8.OS === 'android' ? '_aos_' : '_ios_';
+  const v_4ea608 = v_bb5e8c.replace('_OS_', v_c20e12) as TaboolaPlacement;
+
+  console.log('[Taboola] 배치 타입 변환:', {
+    original: v_bb5e8c,
+    converted: v_4ea608,
+    platform: v_326be8.OS,
+  });
+
+  return v_4ea608;
+};
+
+export const v_ce593f = (): boolean => {
+  return v_b02f3c !== null && typeof v_b02f3c.init === 'function';
 };
 
 export const v_0b0acf = async (): Promise<void> => {
   try {
+
+    if (!v_ce593f()) {
+      console.log('[Taboola] 네이티브 모듈이 없습니다. WebView 방식으로 폴백합니다.');
+      return;
+    }
+
     const v_26f42c =
       v_326be8.OS === 'android'
         ? v_573fcf('TABOOLA_PUBLISHER_ID_ANDROID')
@@ -73,15 +159,18 @@ export const v_0b0acf = async (): Promise<void> => {
       return;
     }
 
-    if (v_326be8.OS === 'android') {
-
-      console.log('[Taboola] Android 초기화:', v_26f42c);
-    } else if (v_326be8.OS === 'ios') {
-
-      console.log('[Taboola] iOS 초기화:', v_26f42c);
+    if (v_b02f3c && typeof v_b02f3c.init === 'function') {
+      v_b02f3c.init(v_26f42c);
+      console.log('[Taboola] 초기화 완료:', {
+        publisherId: v_26f42c,
+        platform: v_326be8.OS,
+      });
+    } else {
+      console.log('[Taboola] Taboola 모듈을 사용할 수 없습니다. WebView 방식으로 폴백합니다.');
     }
   } catch (v_5e9bfe) {
     console.error('[Taboola] 초기화 실패:', v_5e9bfe);
+    console.log('[Taboola] WebView 방식으로 폴백합니다.');
   }
 };
 

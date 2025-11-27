@@ -1,10 +1,9 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8, v_4623af } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
-import { v_cb41de, v_8714fe, v_c436cb, v_27ace7 } from '../components';
-import { v_dc5d8f, v_995f93, v_33aee4, v_968eda, v_0433f6 } from '../services/taboola';
+import { v_cb41de, v_8714fe, v_eaeabd } from '../components';
+import { v_dc5d8f, v_33aee4, v_ce593f } from '../services/taboola';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 
@@ -13,16 +12,7 @@ export const v_54d331 = () => {
   const { t: v_8d41d7 } = v_772971();
 
   const v_f36218 = v_dc5d8f('apploading', true);
-  const v_74a79c = v_968eda[v_f36218];
   const v_cdfaaa = v_33aee4();
-  const v_26f42c = v_995f93();
-
-  console.log('[LoginSignupScreen] Taboola 설정:', {
-    placement: v_f36218,
-    publisherId: v_26f42c,
-    pageUrl: v_cdfaaa,
-    isNativeAvailable: v_27ace7(),
-  });
 
   const v_ec4736 = () => {
     v_9b57fc(v_ce4741.login);
@@ -53,63 +43,12 @@ export const v_54d331 = () => {
       >
         {}
         <View style={v_d81136.adContainer}>
-          {v_27ace7() ? (
-            <TaboolaNativeView
-              publisherId={v_995f93()}
-              placement={v_74a79c.placement}
-              mode={v_74a79c.mode}
-              pageUrl={v_cdfaaa}
-              pageType={v_74a79c.pageType}
-              targetType={v_74a79c.targetType}
-              style={v_d81136.adWebView}
-            />
-          ) : (
-            <WebView
-              source={{
-                html: v_0433f6(
-                  v_26f42c,
-                  v_74a79c.placement,
-                  v_74a79c.mode,
-                  v_cdfaaa,
-                  v_74a79c.pageType,
-                  v_74a79c.targetType,
-                ),
-              }}
-              style={v_d81136.adWebView}
-              scrollEnabled={true}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-              startInLoadingState={false}
-              backgroundColor="#ffffff"
-              allowsInlineMediaPlayback={true}
-              mediaPlaybackRequiresUserAction={false}
-              mixedContentMode="always"
-              originWhitelist={['*']}
-              thirdPartyCookiesEnabled={true}
-              sharedCookiesEnabled={true}
-              userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-              onLoadStart={() => {
-                console.log('[LoginSignupScreen] Taboola WebView 로드 시작');
-              }}
-              onLoadEnd={() => {
-                console.log('[LoginSignupScreen] Taboola WebView 로드 완료');
-              }}
-              onError={(v_6f3a9d) => {
-                const { nativeEvent: v_76b943 } = v_6f3a9d;
-                console.error('[LoginSignupScreen] Taboola WebView 오류:', v_76b943);
-              }}
-              onMessage={(v_d48baf) => {
-                try {
-                  const v_9390e8 = JSON.parse(v_d48baf.nativeEvent.data);
-                  console.log('[LoginSignupScreen] Taboola WebView 메시지:', v_9390e8);
-                } catch (v_9e86fd) {
-                  console.log('[LoginSignupScreen] Taboola WebView 원시 메시지:', v_d48baf.nativeEvent.data);
-                }
-              }}
-            />
-          )}
+          <TaboolaBannerCore
+            placementType={v_f36218}
+            pageUrl={v_cdfaaa}
+            style={v_d81136.adWebView}
+            containerStyle={v_d81136.adWebView}
+          />
         </View>
 
         {}
@@ -182,6 +121,7 @@ const v_d81136 = v_472849.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#ffffff',
+    borderRadius: 10,
   },
   buttonContainer: {
     width: '100%',

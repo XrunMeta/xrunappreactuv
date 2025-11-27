@@ -15,5 +15,6 @@ export default {
   adCallFailedSub: 'Failed to load advertisement after multiple attempts. Returning to previous page.',
   unsupportedUrl: 'Unsupported URL.',
   noAdUrl: 'No advertisement URL.',
+  goToMap: 'Go to Map',
 };
 

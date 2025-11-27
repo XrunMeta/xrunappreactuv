@@ -19,6 +19,7 @@ import { v_f3de6d } from '../utils/napApiUtils';
 import { v_1c4683, v_7a6f92, v_c07360 } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_4c7b5d } from '../components';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -76,11 +77,11 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
   const [v_b42caf, v_3e5456] = v_5ab095(false);
   const [v_7a79cf, v_1a68d1] = v_5ab095(false);
   const [v_660822, v_06fdbc] = v_5ab095<string>('');
+  const [v_452edc, v_5a7a1a] = v_5ab095(false);
 
   const v_27006e = v_e662ae<NodeJS.Timeout | null>(null);
   const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
   const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
-  const v_11bce0 = v_e662ae<number>(2);
 
   v_c4deb2(() => {
     if (!v_d0b6d4) {
@@ -206,12 +207,12 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
 
       if (v_a42ed3) {
         await v_f2c756.openURL(v_f71b56);
-        console.log('✅ URL 이동 성공 - Map 화면으로 이동');
+        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
         v_3e5456(true);
         v_deef62(false);
+        v_d2702f(true);
+        v_1a68d1(true); 
 
-        v_e10ff9();
-        v_487a25(v_ce4741.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', v_f71b56);
         throw new Error(v_8d41d7('screens.showNapAd.unsupportedUrl'));
@@ -289,65 +290,15 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
             console.log('API response received:', v_3393e3);
             v_d2702f(false);
 
-            console.log('⏰ Processing your reward... 카운트다운 시작');
-            v_11bce0.current = 2;
-            console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-
-            v_d35ccb.current = setInterval(() => {
-              v_11bce0.current--;
-              if (v_11bce0.current > 0) {
-                console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-              } else {
-                console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-                if (v_d35ccb.current) {
-                  clearInterval(v_d35ccb.current);
-                  v_d35ccb.current = null;
-                }
-              }
-            }, 1000);
-
-            v_27bab6.current = setTimeout(() => {
-              if (v_d35ccb.current) {
-                clearInterval(v_d35ccb.current);
-                v_d35ccb.current = null;
-              }
-              v_1a68d1(false);
-              v_e10ff9();
-              v_487a25(v_ce4741.map);
-              v_27bab6.current = null;
-            }, 2000);
+            console.log('✅ 리워드 처리 완료 - 사용자 버튼 클릭 대기');
+            v_1a68d1(true);
           }
         } catch (v_5e9bfe) {
           console.error('Error calling API:', v_5e9bfe);
           v_d2702f(false);
 
-          console.log('⏰ Processing your reward... 카운트다운 시작 (에러 발생)');
-          v_11bce0.current = 2;
-          console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-
-          v_d35ccb.current = setInterval(() => {
-            v_11bce0.current--;
-            if (v_11bce0.current > 0) {
-              console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-            } else {
-              console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-              if (v_d35ccb.current) {
-                clearInterval(v_d35ccb.current);
-                v_d35ccb.current = null;
-              }
-            }
-          }, 1000);
-
-          v_27bab6.current = setTimeout(() => {
-            if (v_d35ccb.current) {
-              clearInterval(v_d35ccb.current);
-              v_d35ccb.current = null;
-            }
-            v_1a68d1(false);
-            v_e10ff9();
-            v_487a25(v_ce4741.map);
-            v_27bab6.current = null;
-          }, 2000);
+          console.log('✅ 리워드 처리 완료 (에러 발생) - 사용자 버튼 클릭 대기');
+          v_1a68d1(true);
         }
       }
     } catch (v_5e9bfe) {
@@ -364,33 +315,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       }
 
       v_1a68d1(true);
-      console.log('⏰ Processing your reward... 카운트다운 시작 (전체 에러)');
-      v_11bce0.current = 2;
-      console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-
-      v_d35ccb.current = setInterval(() => {
-        v_11bce0.current--;
-        if (v_11bce0.current > 0) {
-          console.log(`⏱️ ${v_11bce0.current}초 후 MapMainScreen으로 이동`);
-        } else {
-          console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-          if (v_d35ccb.current) {
-            clearInterval(v_d35ccb.current);
-            v_d35ccb.current = null;
-          }
-        }
-      }, 1000);
-
-      v_27bab6.current = setTimeout(() => {
-        if (v_d35ccb.current) {
-          clearInterval(v_d35ccb.current);
-          v_d35ccb.current = null;
-        }
-        v_1a68d1(false);
-        v_e10ff9();
-        v_487a25(v_ce4741.map);
-        v_27bab6.current = null;
-      }, 2000);
+      console.log('✅ 리워드 처리 완료 (전체 에러) - 사용자 버튼 클릭 대기');
     } finally {
       v_d2702f(false);
     }
@@ -455,6 +380,22 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
     v_487a25(v_ce4741.map);
   };
 
+  const v_ed89ba = () => {
+    console.log('맵으로 이동 버튼 클릭 - MapMainScreen으로 이동');
+
+    if (v_27bab6.current) {
+      clearTimeout(v_27bab6.current);
+      v_27bab6.current = null;
+    }
+    if (v_d35ccb.current) {
+      clearInterval(v_d35ccb.current);
+      v_d35ccb.current = null;
+    }
+    v_1a68d1(false);
+    v_e10ff9();
+    v_487a25(v_ce4741.map);
+  };
+
   if (!v_d0b6d4) {
     return null;
   }
@@ -466,19 +407,41 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
         <View style={v_d81136.loadingContainer}>
-          <SequentialDots />
-          <Text style={v_d81136.loadingText}>
-            {v_7a79cf
-              ? v_8d41d7('screens.showNapAd.processingReward')
-              : v_8d41d7('screens.showNapAd.loading')}
-          </Text>
+          {!v_7a79cf || !v_452edc ? (
+            <>
+              <SequentialDots />
+              <Text style={v_d81136.loadingText}>
+                {v_7a79cf
+                  ? v_8d41d7('screens.showNapAd.processingReward')
+                  : v_8d41d7('screens.showNapAd.loading')}
+              </Text>
 
-          {v_7a79cf && <SequentialDots />}
+              {v_7a79cf && <SequentialDots />}
+            </>
+          ) : null}
 
           {v_32428f > 0 && (
             <Text style={v_d81136.retryText}>
               {v_8d41d7('screens.showNapAd.checkingAd')}
             </Text>
+          )}
+
+          {v_7a79cf && (
+            <TouchableOpacity
+              onPress={v_452edc ? v_ed89ba : undefined}
+              activeOpacity={v_452edc ? 0.7 : 1}
+              disabled={!v_452edc}
+              style={v_d81136.goToMapLinkContainer}
+            >
+              <Text
+                style={[
+                  v_d81136.goToMapLink,
+                  !v_452edc && v_d81136.goToMapLinkDisabled,
+                ]}
+              >
+                {v_8d41d7('screens.showNapAd.goToMap')}
+              </Text>
+            </TouchableOpacity>
           )}
 
           {v_9c4d53 && (
@@ -559,6 +522,19 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
       )}
 
       {}
+      {v_7a79cf && (
+        <View style={v_d81136.bannerContainer}>
+          <TaboolaBanner 
+            placementType="reward_OS_395x80" 
+            onLoadComplete={() => {
+              console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
+              v_5a7a1a(true);
+            }}
+          />
+        </View>
+      )}
+
+      {}
       <Modal
         transparent
         animationType="slide"
@@ -594,6 +570,8 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
     width: '80%',
     alignSelf: 'center',
+    flex: 1,
+    paddingBottom: 100, 
   },
   loadingText: {
     fontFamily: 'Roboto-Regular',
@@ -660,6 +638,29 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
+  },
+  goToMapLinkContainer: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  goToMapLink: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#388Dc8',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  goToMapLinkDisabled: {
+    color: '#999',
+    textDecorationLine: 'none',
+  },
+  bannerContainer: {
+    position: 'absolute',
+    bottom: 65,
+    left: 0,
+    right: 0,
+    width: '100%',
+    zIndex: 10,
   },
   modalContainer: {
     flex: 1,

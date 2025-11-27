@@ -15,5 +15,6 @@ export default {
   adCallFailedSub: 'Gagal memuat iklan setelah beberapa kali percobaan. Kembali ke halaman sebelumnya.',
   unsupportedUrl: 'URL tidak didukung.',
   noAdUrl: 'Tidak ada URL iklan.',
+  goToMap: 'Ke Peta',
 };
 
