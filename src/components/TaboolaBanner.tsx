@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { COLORS, SIZES } from '../constants';
@@ -20,6 +20,8 @@ interface TaboolaBannerProps {
   style?: any;
 
   containerStyle?: any;
+
+  onLoadingChange?: (isLoading: boolean) => void;
 }
 
 export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
@@ -27,6 +29,7 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   pageUrl,
   style,
   containerStyle,
+  onLoadingChange,
 }) => {
 
   const placement = getTaboolaPlacement(placementType, false);
@@ -34,15 +37,24 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   const finalPageUrl = pageUrl || getTaboolaPageUrl();
   const publisherId = getTaboolaPublisherId();
 
+  const isNativeAvailable = isTaboolaNativeViewAvailable();
+
   console.log('[TaboolaBanner] 렌더링:', {
     placementType,
     placement,
     publisherId,
     finalPageUrl,
-    isNativeAvailable: isTaboolaNativeViewAvailable(),
+    isNativeAvailable,
   });
 
-  if (isTaboolaNativeViewAvailable()) {
+  useEffect(() => {
+    if (isNativeAvailable && onLoadingChange) {
+
+      onLoadingChange(false);
+    }
+  }, [isNativeAvailable, onLoadingChange]);
+
+  if (isNativeAvailable) {
     return (
       <View style={[styles.container, containerStyle, style]}>
         <TaboolaNativeView
@@ -87,19 +99,41 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
         sharedCookiesEnabled={true}
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
         onLoadStart={() => {
-          console.log('[TaboolaBanner] WebView 로드 시작');
+          console.log('[TaboolaBanner] WebView 로드 시작 - onLoadStart 호출됨');
+
+          if (onLoadingChange) {
+            console.log('[TaboolaBanner] onLoadingChange(false) 호출');
+            onLoadingChange(false);
+          } else {
+            console.log('[TaboolaBanner] onLoadingChange가 없습니다');
+          }
         }}
         onLoadEnd={() => {
-          console.log('[TaboolaBanner] WebView 로드 완료');
+          console.log('[TaboolaBanner] WebView 로드 완료 - onLoadEnd 호출됨');
+
         }}
         onError={(syntheticEvent) => {
           const { nativeEvent } = syntheticEvent;
           console.error('[TaboolaBanner] WebView 오류:', nativeEvent);
+
+          if (onLoadingChange) {
+            onLoadingChange(false);
+          }
         }}
         onMessage={(event) => {
           try {
             const data = JSON.parse(event.nativeEvent.data);
             console.log('[TaboolaBanner] WebView 메시지:', data);
+
+            if (data && data.message && typeof data.message === 'string') {
+              const message = data.message;
+              if (message.includes('콘텐츠 감지됨')) {
+                console.log('[TaboolaBanner] 콘텐츠 감지됨 - 로딩 완료 처리');
+                if (onLoadingChange) {
+                  onLoadingChange(false);
+                }
+              }
+            }
           } catch (e) {
             console.log('[TaboolaBanner] WebView 원시 메시지:', event.nativeEvent.data);
           }

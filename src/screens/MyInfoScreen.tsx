@@ -83,6 +83,8 @@ export const MyInfoScreen = () => {
     email?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTaboolaLoading, setIsTaboolaLoading] = useState(true);
+  const [taboolaLoadingCount, setTaboolaLoadingCount] = useState(0);
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -118,6 +120,28 @@ export const MyInfoScreen = () => {
 
     loadUserInfo();
   }, [navigate]);
+
+  const handleTaboolaLoadingChange = (isLoading: boolean) => {
+    if (!isLoading) {
+
+      setTaboolaLoadingCount((prev) => {
+        const newCount = prev + 1;
+        console.log('[MyInfoScreen] Taboola 로딩 카운터 증가:', newCount);
+        return newCount;
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (taboolaLoadingCount >= 2) {
+      console.log('[MyInfoScreen] Taboola 로딩 완료 (카운터 >= 2)');
+      setIsTaboolaLoading(false);
+    }
+  }, [taboolaLoadingCount]);
+
+  useEffect(() => {
+    console.log('[MyInfoScreen] isTaboolaLoading 상태:', isTaboolaLoading);
+  }, [isTaboolaLoading]);
 
   const handleCardPress = (card: CardConfig) => {
     if (card.route) {
@@ -222,7 +246,20 @@ export const MyInfoScreen = () => {
       >
         <View style={styles.inner}>
           {}
-          <TaboolaBanner placementType="myinfo" />
+          <View style={styles.taboolaContainer}>
+            <TaboolaBanner
+              placementType="myinfo"
+              onLoadingChange={handleTaboolaLoadingChange}
+            />
+            {isTaboolaLoading && (
+              <View style={styles.taboolaLoadingOverlay}>
+                <ActivityIndicator size="small" color={COLORS.headerText} />
+                <Text style={styles.loadingText}>
+                  {t('common.messages.loading')}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <View style={styles.profileCard}>
             <View>
@@ -380,6 +417,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto-Medium',
     color: '#111',
+  },
+  taboolaContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  taboolaLoadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.headerText,
+    marginTop: 8,
   },
 });
 
