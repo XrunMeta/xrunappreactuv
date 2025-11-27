@@ -15,6 +15,8 @@ export default {
     error: 'エラーが発生しました',
     success: '成功しました',
     networkError: 'ネットワークエラー',
+    locationPermissionRequired: '位置情報の許可が必要',
+    locationPermissionMessage: '地図を使用するには位置情報の許可が必要です。設定で許可してください。',
   },
   validation: {
     required: '必須項目です',

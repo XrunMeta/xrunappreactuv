@@ -15,6 +15,8 @@ export default {
     error: '发生错误',
     success: '成功',
     networkError: '网络错误',
+    locationPermissionRequired: '需要位置权限',
+    locationPermissionMessage: '使用地图需要位置权限。请在设置中允许权限。',
   },
   validation: {
     required: '必填项',
