@@ -177,8 +177,8 @@ export const ShopMyTicketScreen = () => {
       const description = (item as any)?.description || '';
       setTransferTicketDialog({
         visible: true,
-        title: item.title || '전송권',
-        description: description || '티켓 구매시 최소 3회이상의 폴 리곤네트워크 전송(외부지갑) 이 가능하게 됩니다. Withdraw the XRUN network to the Polygon network in your wallet.',
+        title: item.title || t('screens.shopMyTicket.transferTicket'),
+        description: description || t('screens.shopMyTicket.transferTicketDescription'),
       });
     } else {
 
@@ -243,7 +243,7 @@ export const ShopMyTicketScreen = () => {
               })
             ) : (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>구매한 아이템이 없습니다.</Text>
+                <Text style={styles.emptyText}>{t('screens.shopMyTicket.noPurchasedItems')}</Text>
               </View>
             )}
           </View>

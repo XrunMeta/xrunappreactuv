@@ -16,7 +16,7 @@ const clauseTitleMap: Record<ClauseId, string> = {
 };
 
 export const ClauseDetailScreen = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { selectedClauseId } = useAppContext();
   const [content, setContent] = useState<string>('');
@@ -38,11 +38,11 @@ export const ClauseDetailScreen = () => {
         if (clauseText) {
           setContent(clauseText);
         } else {
-          setError('약관 내용을 불러올 수 없습니다.');
+          setError(t('screens.myInfoClauses.loadFailed'));
         }
       } catch (err) {
         console.error('[약관] 약관 내용 로드 오류:', err);
-        setError('약관 내용을 불러오는 중 오류가 발생했습니다.');
+        setError(t('screens.myInfoClauses.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +62,7 @@ export const ClauseDetailScreen = () => {
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-              <Text style={styles.loadingText}>약관 내용을 불러오는 중...</Text>
+              <Text style={styles.loadingText}>{t('screens.myInfoClauses.loading')}</Text>
             </View>
           ) : error ? (
             <View style={styles.errorContainer}>

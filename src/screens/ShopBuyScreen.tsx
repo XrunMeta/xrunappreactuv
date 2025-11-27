@@ -78,7 +78,7 @@ export const ShopBuyScreen = () => {
 
   const handlePurchase = async () => {
     if (!selectedShopItem || !memberId) {
-      await showAlert('오류', '구매할 수 없습니다.');
+      await showAlert(t('screens.shopBuy.alerts.error'), t('screens.shopBuy.alerts.cannotPurchase'));
       return;
     }
 
@@ -95,7 +95,7 @@ export const ShopBuyScreen = () => {
 
       if (hasSku) {
 
-        await showAlert('알림', '인앱 구매 기능은 준비 중입니다.');
+        await showAlert(t('screens.shopBuy.alerts.notification'), t('screens.shopBuy.alerts.inAppPurchaseComingSoon'));
         setIsPurchasing(false);
         return;
       }
@@ -112,9 +112,12 @@ export const ShopBuyScreen = () => {
       if (currentBalance < totalAmount) {
         console.log('[구매] ❌ 잔액 부족');
         await showAlert(
-          '잔액 부족',
-          `현재 잔액: ${formatXrunAmount(currentBalance)} XRUN\n필요한 금액: ${formatXrunAmount(totalAmount)} XRUN\n잔액을 충전해주세요.`,
-          [{ text: '확인' }],
+          t('screens.shopBuy.alerts.insufficientBalanceTitle'),
+          t('screens.shopBuy.alerts.insufficientBalanceMessage', {
+            currentBalance: formatXrunAmount(currentBalance),
+            requiredAmount: formatXrunAmount(totalAmount),
+          }),
+          [{ text: t('screens.shopBuy.confirm') }],
         );
         setIsPurchasing(false);
         return;
@@ -146,9 +149,9 @@ export const ShopBuyScreen = () => {
       console.error('[구매] === 구매 오류 ===');
       console.error('[구매] 구매 오류:', error);
       await showAlert(
-        '구매 실패',
-        error.message || '구매 중 오류가 발생했습니다.',
-        [{ text: '확인' }],
+        t('screens.shopBuy.alerts.purchaseFailed'),
+        error.message || t('screens.shopBuy.alerts.purchaseFailedMessage'),
+        [{ text: t('screens.shopBuy.confirm') }],
       );
     } finally {
       setIsPurchasing(false);
@@ -203,21 +206,21 @@ export const ShopBuyScreen = () => {
               {hasSku ? (
 
                 <View style={styles.row}>
-                  <Text style={styles.label}>가격</Text>
-                  <Text style={styles.value}>인앱 구매 (준비 중)</Text>
+                  <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
+                  <Text style={styles.value}>{t('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
                 </View>
               ) : (
 
                 <>
                   <View style={styles.row}>
-                    <Text style={styles.label}>가격</Text>
+                    <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
                     <Text style={styles.value}>
                       {formatCurrency(priceKRW, 'KRW')} / {formatXrunAmount(priceXrun)} XRUN
                     </Text>
                   </View>
 
                   <View style={styles.row}>
-                    <Text style={styles.label}>수수료</Text>
+                    <Text style={styles.label}>{t('screens.shopBuy.fee')}</Text>
                     <Text style={styles.value}>
                       {formatCurrency(chargeKRW, 'KRW')} / {formatXrunAmount(chargeXrun)} XRUN
                     </Text>
@@ -226,7 +229,7 @@ export const ShopBuyScreen = () => {
                   <View style={styles.divider} />
 
                   <View style={styles.row}>
-                    <Text style={[styles.label, styles.totalLabel]}>총액</Text>
+                    <Text style={[styles.label, styles.totalLabel]}>{t('screens.shopBuy.total')}</Text>
                     <Text style={[styles.value, styles.totalValue]}>
                       {formatXrunAmount(totalGtkrPrice)} XRUN
                     </Text>
@@ -234,7 +237,7 @@ export const ShopBuyScreen = () => {
 
                   <View style={styles.balanceInfo}>
                     <View style={styles.row}>
-                      <Text style={styles.label}>내 잔액</Text>
+                      <Text style={styles.label}>{t('screens.shopBuy.myBalance')}</Text>
                       <Text
                         style={[
                           styles.value,
@@ -242,17 +245,17 @@ export const ShopBuyScreen = () => {
                         ]}
                       >
                         {isLoadingBalance ? (
-                          '조회 중...'
+                          t('screens.shopBuy.checking')
                         ) : userBalance !== null ? (
                           formatXrunAmount(userBalance) + ' XRUN'
                         ) : (
-                          '조회 실패'
+                          t('screens.shopBuy.checkFailed')
                         )}
                       </Text>
                     </View>
                     {isInsufficientBalance && (
                       <Text style={styles.insufficientBalanceText}>
-                        잔액이 부족합니다. 잔액을 충전해주세요.
+                        {t('screens.shopBuy.insufficientBalance')}
                       </Text>
                     )}
                   </View>
@@ -267,7 +270,7 @@ export const ShopBuyScreen = () => {
               onPress={goBack}
               disabled={isPurchasing}
             >
-              <Text style={styles.cancelText}>취소</Text>
+              <Text style={styles.cancelText}>{t('screens.shopBuy.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -281,7 +284,7 @@ export const ShopBuyScreen = () => {
               {isPurchasing ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.primaryText}>결제</Text>
+                <Text style={styles.primaryText}>{t('screens.shopBuy.payment')}</Text>
               )}
             </TouchableOpacity>
           </View>
