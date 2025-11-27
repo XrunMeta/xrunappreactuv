@@ -14,6 +14,8 @@ interface TaboolaBannerProps {
   style?: any;
 
   containerStyle?: any;
+
+  onLoadComplete?: () => void;
 }
 
 export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
@@ -21,6 +23,7 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   pageUrl,
   style,
   containerStyle,
+  onLoadComplete,
 }) => {
   const { t } = useTranslation();
   const [isTaboolaLoading, setIsTaboolaLoading] = useState(true);
@@ -45,8 +48,12 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
     if (taboolaLoadingCount >= 2) {
       console.log('[TaboolaBanner] Taboola 로딩 완료 (카운터 >= 2)');
       setIsTaboolaLoading(false);
+
+      if (onLoadComplete) {
+        onLoadComplete();
+      }
     }
-  }, [taboolaLoadingCount]);
+  }, [taboolaLoadingCount, onLoadComplete]);
 
   return (
     <View style={[styles.container, containerStyle, style]}>
