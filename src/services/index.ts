@@ -3503,3 +3503,59 @@ export const postTransferNew = async (
   }
 };
 
+export const getClauseContent = async (
+  clauseType: 'service' | 'location' | 'personal',
+  language: string,
+  navigation?: any,
+): Promise<string> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    let apiUrl = 'app7010-01';
+    if (language === 'id') {
+      apiUrl += '-id';
+    } else if (language === 'ko') {
+      apiUrl += '-kr';
+    } else if (language === 'en') {
+      apiUrl += '-en';
+    } else if (language === 'zh-CN' || language === 'zh') {
+      apiUrl += '-zh';
+    } else {
+
+      apiUrl += '-en';
+    }
+
+    console.log('[약관] 약관 내용 요청:', { clauseType, language, apiUrl });
+
+    const response = await axiosInstance.get<{ data: Array<{ c: string }> }>(apiUrl);
+
+    let content = '';
+    if (clauseType === 'service') {
+      content = response.data.data?.[0]?.c || '';
+    } else if (clauseType === 'personal') {
+      content = response.data.data?.[1]?.c || '';
+    } else if (clauseType === 'location') {
+      content = response.data.data?.[2]?.c || '';
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', clauseType);
+    return content;
+  } catch (error) {
+    console.error('[약관] 약관 내용 로드 실패:', error);
+    if (error instanceof AxiosError) {
+      console.error('[약관] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+

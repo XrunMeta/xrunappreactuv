@@ -11,6 +11,8 @@ export default {
   age: 'Usia',
   save: 'Simpan',
   cancel: 'Batal',
+  lastPasswordChangeDate: 'Tanggal Perubahan Terakhir',
+  lastPasswordChangeDateLabel: 'Tanggal Perubahan Terakhir  : {{date}}',
 };
 
 

@@ -35,6 +35,7 @@ const formatDateTime = (dateString: string): string => {
 
 const transformSettlementData = (
   apiData: SettlementListItem[],
+  t: (key: string) => string,
 ): TransformedSettlementData[] => {
 
   const seen = new Set<string>();
@@ -50,7 +51,7 @@ const transformSettlementData = (
       }
       seen.add(uniqueKey);
 
-      const description = item.description || item.actiontext || item.extratext || LANG.referral.settlement.list.desc;
+      const description = item.description || item.actiontext || item.extratext || t('screens.referralSettlement.settlementDescription');
 
       let finalId = `settlement_${item.transaction}_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -128,7 +129,7 @@ export const ReferralSettlementScreen = () => {
         resultList.status === 'success' &&
         resultAmount.status === 'success'
       ) {
-        const transformedData = transformSettlementData(resultList.data);
+        const transformedData = transformSettlementData(resultList.data, t);
         setSettlementData(transformedData);
 
         const totalAmount = resultAmount.data[0]?.amount || '0';
@@ -233,12 +234,12 @@ export const ReferralSettlementScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={t('screens.referralSettlement.title')} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           <ReferralStatsCard
-            title={LANG.referral.card.income}
-            subtitle={LANG.wallet.adxrun.settlementIn45Days}
+            title={t('screens.referralSettlement.income')}
+            subtitle={t('screens.referralSettlement.settlementIn45Days')}
             value={totalRevenue}
             helperText={totalRevenueWon}
           />
@@ -256,7 +257,7 @@ export const ReferralSettlementScreen = () => {
             </View>
           ) : currentData.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>정산 내역이 없습니다.</Text>
+              <Text style={styles.emptyText}>{t('screens.referralSettlement.noSettlementHistory')}</Text>
             </View>
           ) : (
             <FlatList

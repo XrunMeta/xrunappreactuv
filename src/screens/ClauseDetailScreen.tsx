@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
@@ -7,88 +7,70 @@ import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
+import { getClauseContent } from '../services';
 
-const clauseMap: Record<
-  ClauseId,
-  { title: string; updatedAt: string; sections: { heading: string; body: string }[] }
-> = {
-  service: {
-    title: 'Terms of Service',
-    updatedAt: 'Last update on August 2021',
-    sections: [
-      {
-        heading: 'Terms',
-        body:
-          'Lorem ipsum dolor sit amet, consectetur adip ielit ut aliquam, purus sit amet luctus venenatis, lectus magna fringilla urna, porttitor rhoncus dolor purus non enim praesent facilisis leo.',
-      },
-      {
-        heading: 'Use License',
-        body:
-          'Adipiscing tempus feugiat viverra iaculis modo quisque dictum quis tellus. Odio et a ac pretium nulla pharetra in. Cursus aenean condimentum volutpat ullamcorper eu, feugiat sed massa.',
-      },
-    ],
-  },
-  location: {
-    title: 'Personal Location Information',
-    updatedAt: 'Last update on August 2021',
-    sections: [
-      {
-        heading: 'Collection',
-        body:
-          'We collect location data to enhance XRUN experiences. Data is stored securely and used only for gameplay features described in this document.',
-      },
-      {
-        heading: 'Usage',
-        body:
-          'Location information is never shared with third parties and can be deleted at any time through account settings.',
-      },
-    ],
-  },
-  personal: {
-    title: 'Personal Information Usage',
-    updatedAt: 'Last update on August 2021',
-    sections: [
-      {
-        heading: 'Scope',
-        body:
-          'We process essential profile details (name, email, wallet) to provide membership and wallet services.',
-      },
-      {
-        heading: 'Retention',
-        body:
-          'Information is retained only while the account is active or as required by local regulations. You may request deletion at any time.',
-      },
-    ],
-  },
+const clauseTitleMap: Record<ClauseId, string> = {
+  service: 'Terms of Service',
+  location: 'Personal Location Information',
+  personal: 'Personal Information Usage',
 };
 
 export const ClauseDetailScreen = () => {
-  const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { i18n, t } = useTranslation();
+  const { goBack, navigate } = useAppNavigation();
   const { selectedClauseId } = useAppContext();
-  const content = clauseMap[selectedClauseId];
+  const [content, setContent] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchClauseContent = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const currentLanguage = i18n.language || 'ko';
+
+        const clauseType = selectedClauseId as 'service' | 'location' | 'personal';
+
+        const clauseText = await getClauseContent(clauseType, currentLanguage, navigate);
+
+        if (clauseText) {
+          setContent(clauseText);
+        } else {
+          setError(t('screens.myInfoClauses.loadFailed'));
+        }
+      } catch (err) {
+        console.error('[약관] 약관 내용 로드 오류:', err);
+        setError(t('screens.myInfoClauses.loadError'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClauseContent();
+  }, [selectedClauseId, i18n.language, navigate]);
+
+  const title = clauseTitleMap[selectedClauseId];
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={content.title} onBackPress={goBack} showBackButton />
+      <Header title={title} onBackPress={goBack} showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.inner}>
-          <Text style={styles.updatedAt}>{content.updatedAt}</Text>
-          {content.sections.map((section) => (
-            <View key={section.heading} style={styles.section}>
-              <Text style={styles.sectionHeading}>{section.heading}</Text>
-              <Text style={styles.sectionBody}>{section.body}</Text>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+              <Text style={styles.loadingText}>{t('screens.myInfoClauses.loading')}</Text>
             </View>
-          ))}
-        </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.secondaryText}>{t('screens.clauseDetail.declined')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={goBack}>
-            <Text style={styles.primaryText}>{t('screens.clauseDetail.accept')}</Text>
-          </TouchableOpacity>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : (
+            <Text style={styles.contentText}>{content}</Text>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -111,63 +93,31 @@ const styles = StyleSheet.create({
     maxWidth: 780,
     alignSelf: 'center',
   },
-  updatedAt: {
-    fontSize: 20,
-    fontFamily: 'Roboto-Bold',
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
-    marginBottom: 24,
   },
-  section: {
-    marginBottom: 24,
+  errorContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
   },
-  sectionHeading: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Medium',
-    color: '#10192d',
-    marginBottom: 12,
+  errorText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: '#ff6b6b',
   },
-  sectionBody: {
+  contentText: {
     fontSize: 14,
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
   },
-  buttonRow: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 16,
-  },
-  secondaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e4e6ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  primaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#343a5a',
-  },
-  secondaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#10192d',
-  },
-  primaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#fff',
-  },
 });
-
 

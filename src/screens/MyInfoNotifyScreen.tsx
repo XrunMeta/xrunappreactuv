@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -87,6 +87,8 @@ export const MyInfoNotifyScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [sending, setSending] = useState(false);
   const [memberId, setMemberId] = useState<number | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const shouldAutoScroll = useRef(true);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -126,14 +128,22 @@ export const MyInfoNotifyScreen = () => {
 
   useEffect(() => {
     if (memberId) {
+      shouldAutoScroll.current = true; 
       loadNotifications();
     }
   }, [memberId, loadNotifications]);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadNotifications();
-  }, [loadNotifications]);
+  const handleContentSizeChange = useCallback(() => {
+    if (scrollViewRef.current && notifications.length > 0 && shouldAutoScroll.current) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [notifications.length]);
+
+  const handleScrollBeginDrag = useCallback(() => {
+    shouldAutoScroll.current = false;
+  }, []);
 
   const handleSend = async () => {
     if (!question.trim()) {
@@ -148,6 +158,7 @@ export const MyInfoNotifyScreen = () => {
 
     try {
       setSending(true);
+      shouldAutoScroll.current = true; 
       await sendNotificationMessage(memberId, question.trim(), false, navigate);
       await showAlert(t('screens.myInfoNotify.alerts.sendSuccess'), t('screens.myInfoNotify.alerts.sendSuccessMessage'));
       setQuestion('');
@@ -160,6 +171,11 @@ export const MyInfoNotifyScreen = () => {
       setSending(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadNotifications();
+  }, [loadNotifications]);
 
   const handleDelete = async (board: number) => {
     if (!memberId) return;
@@ -360,10 +376,13 @@ export const MyInfoNotifyScreen = () => {
           </View>
         ) : (
           <ScrollView
+            ref={scrollViewRef}
             style={styles.list}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            onContentSizeChange={handleContentSizeChange}
+            onScrollBeginDrag={handleScrollBeginDrag}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -557,6 +576,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingBottom: Platform.OS === 'android' ? 24 : 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {

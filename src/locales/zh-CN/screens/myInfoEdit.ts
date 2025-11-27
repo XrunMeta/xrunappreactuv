@@ -11,6 +11,8 @@ export default {
   age: '年龄',
   save: '保存',
   cancel: '取消',
+  lastPasswordChangeDate: '最后修改日期',
+  lastPasswordChangeDateLabel: '最后修改日期  : {{date}}',
 };
 
 
