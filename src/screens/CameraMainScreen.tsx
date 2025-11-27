@@ -21,6 +21,7 @@ import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -371,6 +372,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { setAdvertisementParams: v_d48a26 } = v_700ef9();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
   const [v_572bd3, v_6a4dcd] = v_5ab095(false);
@@ -392,11 +394,42 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
   const v_6890b1 = v_e662ae(false); 
 
+  const v_ac9fa2 = v_e662ae(false);
+
   v_c4deb2(() => {
-    if (v_d1a6bb && !v_d1a6bb.granted) {
-      v_1e66f0();
-    }
-  }, [v_d1a6bb]);
+    const v_35c1b7 = async () => {
+
+      if (v_ac9fa2.current) {
+        return;
+      }
+
+      if (v_d1a6bb === null) {
+        return;
+      }
+
+      if (v_d1a6bb.granted) {
+        console.log('카메라 권한이 이미 허용되어 있습니다.');
+        v_ac9fa2.current = true;
+        return;
+      }
+
+      console.log('카메라 권한 요청 중...');
+      v_ac9fa2.current = true;
+      const v_43c42e = await v_1e66f0();
+      console.log('카메라 권한 요청 결과:', v_43c42e);
+
+      if (!v_43c42e.granted) {
+
+        await v_889fad(
+          '카메라 권한 필요',
+          '카메라를 사용하려면 카메라 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+          [{ text: '확인' }]
+        );
+      }
+    };
+
+    v_35c1b7();
+  }, [v_d1a6bb, v_1e66f0, v_889fad]);
 
   const v_7c560c = (spotData: (v_f71847 & { campid?: string })[], v_6e5804): v_60c7c3[] => {
     const v_da1995 = Math.min(v_253a77, v_1d0937.length);
