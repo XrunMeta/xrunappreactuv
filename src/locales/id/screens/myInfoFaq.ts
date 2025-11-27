@@ -2,3 +2,4 @@ export default {
   title: 'FAQ',
 };
 
+

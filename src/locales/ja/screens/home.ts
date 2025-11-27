@@ -3,3 +3,4 @@ export default {
   getStartedButton: '始める',
 };
 
+

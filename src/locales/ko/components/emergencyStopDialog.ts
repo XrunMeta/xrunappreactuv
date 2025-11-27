@@ -3,3 +3,4 @@ export default {
   viewDetails: '자세히 보기',
 };
 
+
