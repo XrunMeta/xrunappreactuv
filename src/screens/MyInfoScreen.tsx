@@ -222,7 +222,7 @@ export const v_03a231 = () => {
       >
         <View style={v_d81136.inner}>
           {}
-          <TaboolaBanner placementType="myinfo" />
+          <TaboolaBanner placementType="myinfo_aos_395x80" />
 
           <View style={v_d81136.profileCard}>
             <View>

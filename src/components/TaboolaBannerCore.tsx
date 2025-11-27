@@ -3,17 +3,17 @@ import { v_3094a2, v_472849, v_326be8 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_1bfbd0, v_9b1a04 } from '../constants';
 import {
-  v_dc5d8f,
   v_995f93,
   v_33aee4,
   v_968eda,
   v_0433f6,
+  v_80493f,
 } from '../services/taboola';
 import { v_c436cb, v_27ace7 } from './TaboolaNativeView';
 
 interface TaboolaBannerCoreProps {
 
-  placementType: 'myinfo' | 'shop';
+  placementType: v_80493f;
 
   pageUrl?: string;
 
@@ -32,7 +32,7 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
   onLoadingChange: v_c83407,
 }) => {
 
-  const v_f36218 = v_dc5d8f(v_bb5e8c, false);
+  const v_f36218 = v_bb5e8c;
   const v_74a79c = v_968eda[v_f36218];
   const v_40f839 = v_cdfaaa || v_33aee4();
   const v_26f42c = v_995f93();

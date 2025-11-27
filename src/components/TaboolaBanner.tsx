@@ -3,10 +3,11 @@ import { v_3094a2, v_19b633, v_39a996, v_472849 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_eaeabd } from './TaboolaBannerCore';
 import { v_1bfbd0 } from '../constants';
+import { v_80493f } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
-  placementType: 'myinfo' | 'shop';
+  placementType: v_80493f;
 
   pageUrl?: string;
 
