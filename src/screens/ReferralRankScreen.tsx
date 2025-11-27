@@ -207,11 +207,11 @@ export const v_f57686 = () => {
       <Header title={v_8d41d7('screens.referralRank.title')} />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
-          <ReferralStatsCard title={v_4922a9.referral?.card?.myRank || v_8d41d7('screens.referralRank.myRank')}>
+          <ReferralStatsCard title={v_8d41d7('screens.referralRank.myRank')}>
             <View style={v_d81136.rankCardContent}>
               <View style={v_d81136.rankLeft}>
                 <Text style={v_d81136.rankEmail}>{v_f4fb5e}</Text>
-                <Text style={v_d81136.rankHelper}>{v_4922a9.referral?.card?.myRank || '내 순위'}</Text>
+                <Text style={v_d81136.rankHelper}>{v_8d41d7('screens.referralRank.myRank')}</Text>
               </View>
               <View style={v_d81136.rankDivider} />
               <View style={v_d81136.rankRight}>

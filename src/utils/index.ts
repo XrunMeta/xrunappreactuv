@@ -104,7 +104,7 @@ export const v_89f939 = (v_f63e09, v_a832b3 = ''): string => {
 };
 
 export const v_a3bbf0 = async (
-  v_5254bf,
+  v_8d41d7,
   v_412c99,
   v_889fad,
   v_c65f5d,
@@ -114,9 +114,10 @@ export const v_a3bbf0 = async (
     const v_17aa0b = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
-    const v_b657c9 = v_5254bf?.screen_info?.button?.share || '공유하기';
+    const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
+    const v_542b81 = v_8d41d7('screens.referral.share.download');
 
-    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n다운로드:\nAndroid: ${v_17aa0b}\niOS: ${v_47d9ba}`;
+    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n\n${v_542b81}\nAndroid: ${v_17aa0b}\niOS: ${v_47d9ba}`;
 
     const v_43c42e = await v_5f4661.share({
       message: v_a8cd21,
@@ -135,7 +136,7 @@ export const v_a3bbf0 = async (
       console.log('공유가 취소됨');
     }
   } catch (v_5e9bfe) {
-    await v_889fad('공유 실패', v_5e9bfe.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    await v_889fad(v_8d41d7('screens.referral.share.shareFailed'), v_5e9bfe.message || v_8d41d7('screens.referral.share.shareFailedMessage'));
     console.log('Share error:', v_5e9bfe);
     if (v_c65f5d) {
 

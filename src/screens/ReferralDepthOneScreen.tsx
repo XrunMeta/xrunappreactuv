@@ -132,9 +132,9 @@ export const v_5b4c5a = () => {
         </View>
       ) : v_200d98.length === 0 ? (
         <View style={v_d81136.emptyContainer}>
-          <Text style={v_d81136.emptyTitle}>이 멤버는 아직 하위 추천인이 없습니다.</Text>
+          <Text style={v_d81136.emptyTitle}>{v_8d41d7('screens.referralDepthOne.emptyTitle')}</Text>
           <Text style={v_d81136.emptyDescription}>
-            이 사람의 직접 추천인이 추천한 멤버들이 여기에 표시됩니다.
+            {v_8d41d7('screens.referralDepthOne.emptyDescription')}
           </Text>
         </View>
       ) : (

@@ -264,7 +264,7 @@ export const v_f40fc5 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title="회원가입"
+        title={v_8d41d7('screens.signup.title')}
         onBackPress={v_c7ac57}
         showBackButton
       />
@@ -274,8 +274,8 @@ export const v_f40fc5 = () => {
         showsVerticalScrollIndicator={false}
       >
         <FormField
-          label="성"
-          placeholder="Enter your First name"
+          label={v_8d41d7('screens.signup.familyNameLabel')}
+          placeholder={v_8d41d7('screens.signup.familyNamePlaceholder')}
           value={v_f142d8}
           onChangeText={v_6dde2f}
           autoCapitalize="none"
@@ -283,8 +283,8 @@ export const v_f40fc5 = () => {
         />
 
         <FormField
-          label="이름"
-          placeholder="Enter your Last name"
+          label={v_8d41d7('screens.signup.givenNameLabel')}
+          placeholder={v_8d41d7('screens.signup.givenNamePlaceholder')}
           value={v_a7c7b7}
           onChangeText={v_15ded5}
           autoCapitalize="none"
@@ -292,8 +292,8 @@ export const v_f40fc5 = () => {
         />
 
         <FormField
-          label="Email"
-          placeholder="Enter your email address"
+          label={v_8d41d7('screens.signup.emailLabel')}
+          placeholder={v_8d41d7('screens.signup.emailPlaceholder')}
           value={v_e0c7e8}
           onChangeText={v_fedf34}
           keyboardType="email-address"
@@ -302,8 +302,8 @@ export const v_f40fc5 = () => {
         />
 
         <FormField
-          label="비밀번호"
-          placeholder="Password"
+          label={v_8d41d7('screens.signup.passwordLabel')}
+          placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
           value={v_adc076}
           onChangeText={v_52b279}
           secureTextEntry
@@ -312,8 +312,8 @@ export const v_f40fc5 = () => {
         />
 
         <FormField
-          label="전화번호"
-          placeholder="휴대폰 번호를 입력해주세요."
+          label={v_8d41d7('screens.signup.phoneNumberLabel')}
+          placeholder={v_8d41d7('screens.signup.phoneNumberPlaceholder')}
           keyboardType="phone-pad"
           value={v_3a6ac4}
           onChangeText={v_f768f9}

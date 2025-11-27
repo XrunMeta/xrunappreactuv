@@ -1,5 +1,31 @@
 export default {
   title: 'Notifikasi',
+  placeholder: 'Masukkan pertanyaan Anda...',
+  sendButton: 'Kirim',
+  deleteAll: 'Hapus Semua',
+  emptyMessage: 'Tidak ada notifikasi.',
+  viewDetails: 'Lihat Detail',
+  goToEvent: 'Pergi ke Acara',
+  alerts: {
+    messageInput: 'Input Pesan',
+    messageRequired: 'Harap masukkan konten yang akan dikirim.',
+    error: 'Kesalahan',
+    userDataNotFound: 'Informasi pengguna tidak ditemukan.',
+    sendSuccess: 'Kirim Selesai',
+    sendSuccessMessage: 'Pertanyaan Anda telah dikirim.',
+    sendFailed: 'Gagal mengirim pesan.',
+    deleteConfirm: 'Konfirmasi Hapus',
+    deleteMessage: 'Apakah Anda ingin menghapus pesan ini?',
+    cancel: 'Batal',
+    delete: 'Hapus',
+    deleteFailed: 'Gagal menghapus pesan.',
+    deleteAllConfirm: 'Konfirmasi Hapus Semua',
+    deleteAllMessage: 'Apakah Anda ingin menghapus semua pesan?',
+    deleteAllFailed: 'Gagal menghapus semua.',
+    linkError: 'Kesalahan Tautan',
+    linkErrorMessage: 'Tidak dapat membuka halaman saat ini.',
+    loadFailed: 'Gagal memuat daftar notifikasi.',
+  },
 };
 
 

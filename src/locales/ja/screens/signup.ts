@@ -1,9 +1,9 @@
 export default {
   title: '会員登録',
   familyNameLabel: '姓',
-  familyNamePlaceholder: 'Enter your First name',
+  familyNamePlaceholder: '姓を入力してください',
   givenNameLabel: '名',
-  givenNamePlaceholder: 'Enter your Last name',
+  givenNamePlaceholder: '名を入力してください',
   emailLabel: 'メール',
   emailPlaceholder: 'メールアドレスを入力してください',
   passwordLabel: 'パスワード',

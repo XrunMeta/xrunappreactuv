@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_df9f57 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -28,51 +28,6 @@ type CardConfig = {
   disabled?: boolean;
 };
 
-const v_dbfc7f = [
-  {
-    id: 'edit',
-    label: '정보수정',
-    iconName: 'edit-3',
-    iconLibrary: 'Feather',
-    route: 'myInfoEmailAuth',
-  },
-  {
-    id: 'notify',
-    label: '알림',
-    iconName: 'bell',
-    iconLibrary: 'Feather',
-    route: 'myInfoNotify',
-  },
-  {
-    id: 'faq',
-    label: 'FAQ',
-    iconName: 'head-question-outline',
-    iconLibrary: 'Material',
-    route: 'myInfoFaq',
-  },
-  {
-    id: 'clause',
-    label: '이용약관',
-    iconName: 'file-text',
-    iconLibrary: 'Feather',
-    route: 'myInfoClauses',
-  },
-  {
-    id: 'setting',
-    label: '설정',
-    iconName: 'settings',
-    iconLibrary: 'Feather',
-    route: 'myInfoSettings',
-  },
-  {
-    id: 'referral',
-    label: '래퍼럴 수정',
-    iconName: 'refresh-ccw',
-    iconLibrary: 'Feather',
-    route: 'myInfoReferral',
-  },
-];
-
 export const v_03a231 = () => {
   const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
@@ -83,6 +38,54 @@ export const v_03a231 = () => {
     email?: string;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
+
+  const v_dbfc7f = v_df9f57(
+    () => [
+      {
+        id: 'edit',
+        label: v_8d41d7('screens.myInfo.editInfo'),
+        iconName: 'edit-3',
+        iconLibrary: 'Feather',
+        route: 'myInfoEmailAuth',
+      },
+      {
+        id: 'notify',
+        label: v_8d41d7('screens.myInfo.notify'),
+        iconName: 'bell',
+        iconLibrary: 'Feather',
+        route: 'myInfoNotify',
+      },
+      {
+        id: 'faq',
+        label: v_8d41d7('screens.myInfo.faq'),
+        iconName: 'head-question-outline',
+        iconLibrary: 'Material',
+        route: 'myInfoFaq',
+      },
+      {
+        id: 'clause',
+        label: v_8d41d7('screens.myInfo.terms'),
+        iconName: 'file-text',
+        iconLibrary: 'Feather',
+        route: 'myInfoClauses',
+      },
+      {
+        id: 'setting',
+        label: v_8d41d7('screens.myInfo.settings'),
+        iconName: 'settings',
+        iconLibrary: 'Feather',
+        route: 'myInfoSettings',
+      },
+      {
+        id: 'referral',
+        label: v_8d41d7('screens.myInfo.referralEdit'),
+        iconName: 'refresh-ccw',
+        iconLibrary: 'Feather',
+        route: 'myInfoReferral',
+      },
+    ],
+    [v_8d41d7],
+  );
 
   v_c4deb2(() => {
     const v_ea3fa6 = async () => {
@@ -131,30 +134,30 @@ export const v_03a231 = () => {
 
   const v_22cd2d = async () => {
     if (!v_bb789b?.email) {
-      await v_889fad('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      await v_889fad(v_8d41d7('screens.myInfo.alerts.shareFailed'), v_8d41d7('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await v_a3bbf0(v_4922a9, { email: v_bb789b.email }, v_889fad, v_9b57fc);
+    await v_a3bbf0(v_8d41d7, { email: v_bb789b.email }, v_889fad, v_9b57fc);
   };
 
   const v_06b8a4 = async () => {
     await v_889fad(
-      '로그아웃',
-      '로그아웃 하시겠습니까?',
+      v_8d41d7('screens.myInfo.alerts.logout'),
+      v_8d41d7('screens.myInfo.alerts.logoutMessage'),
       [
         {
-          text: '취소',
+          text: v_8d41d7('screens.myInfo.alerts.cancel'),
           style: 'cancel',
         },
         {
-          text: '로그아웃',
+          text: v_8d41d7('screens.myInfo.alerts.logout'),
           style: 'destructive',
           onPress: async () => {
             try {
 
               const v_f24fd5 = await v_e84827.getItem('userData');
               if (!v_f24fd5) {
-                await v_889fad('오류', '사용자 정보를 찾을 수 없습니다.');
+                await v_889fad(v_8d41d7('screens.myInfo.alerts.error'), v_8d41d7('screens.myInfo.alerts.userDataNotFound'));
                 return;
               }
 
@@ -162,7 +165,7 @@ export const v_03a231 = () => {
               const v_660822 = v_ef7306.member;
 
               if (!v_660822) {
-                await v_889fad('오류', '사용자 정보를 찾을 수 없습니다.');
+                await v_889fad(v_8d41d7('screens.myInfo.alerts.error'), v_8d41d7('screens.myInfo.alerts.userDataNotFound'));
                 return;
               }
 

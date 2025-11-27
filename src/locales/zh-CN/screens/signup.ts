@@ -1,9 +1,9 @@
 export default {
   title: '注册',
   familyNameLabel: '姓',
-  familyNamePlaceholder: 'Enter your First name',
+  familyNamePlaceholder: '请输入您的姓',
   givenNameLabel: '名',
-  givenNamePlaceholder: 'Enter your Last name',
+  givenNamePlaceholder: '请输入您的名',
   emailLabel: '邮箱',
   emailPlaceholder: '请输入邮箱地址',
   passwordLabel: '密码',

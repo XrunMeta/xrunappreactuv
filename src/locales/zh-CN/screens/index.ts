@@ -35,6 +35,7 @@ export { default as v_df1cb0 } from './phoneEdit';
 export { default as v_fc7051 } from './referral';
 export { default as v_ca4d8d } from './referralSettlement';
 export { default as v_58246c } from './referralRank';
+export { default as v_431d57 } from './referralMyGroup';
 export { default as v_a78d29 } from './referralDepthOne';
 export { default as v_b072dd } from './referralDepthTwo';
 export { default as v_e3574f } from './shop';
