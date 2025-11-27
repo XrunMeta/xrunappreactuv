@@ -9,7 +9,9 @@ export type TaboolaPlacement =
   | 'shop_aos_395x80' 
   | 'shop_ios_395x80' 
   | 'apploading_aos_vignette' 
-  | 'apploading_ios_vignette'; 
+  | 'apploading_ios_vignette' 
+  | 'reward_aos_395x80' 
+  | 'reward_aos_vignette'; 
 
 export type TaboolaMode = 'thumbnails-stream-a' | 'thumbnails-textunder-a';
 
@@ -55,6 +57,18 @@ export const TABOOLA_PLACEMENTS: Record<TaboolaPlacement, TaboolaPlacementConfig
   },
   'apploading_ios_vignette': {
     placement: 'apploading_ios_vignette',
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_aos_395x80': {
+    placement: 'reward_aos_395x80',
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_aos_vignette': {
+    placement: 'reward_aos_vignette',
     mode: 'thumbnails-textunder-a',
     pageType: 'article',
     targetType: 'mix',

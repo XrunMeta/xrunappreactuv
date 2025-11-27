@@ -3,17 +3,17 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { COLORS, SIZES } from '../constants';
 import {
-  getTaboolaPlacement,
   getTaboolaPublisherId,
   getTaboolaPageUrl,
   TABOOLA_PLACEMENTS,
   generateTaboolaHTML,
+  TaboolaPlacement,
 } from '../services/taboola';
 import { TaboolaNativeView, isTaboolaNativeViewAvailable } from './TaboolaNativeView';
 
 interface TaboolaBannerCoreProps {
 
-  placementType: 'myinfo' | 'shop';
+  placementType: TaboolaPlacement;
 
   pageUrl?: string;
 
@@ -32,7 +32,7 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
   onLoadingChange,
 }) => {
 
-  const placement = getTaboolaPlacement(placementType, false);
+  const placement = placementType;
   const config = TABOOLA_PLACEMENTS[placement];
   const finalPageUrl = pageUrl || getTaboolaPageUrl();
   const publisherId = getTaboolaPublisherId();

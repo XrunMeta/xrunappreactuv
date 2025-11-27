@@ -3,10 +3,11 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TaboolaBannerCore } from './TaboolaBannerCore';
 import { COLORS } from '../constants';
+import { TaboolaPlacement } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
-  placementType: 'myinfo' | 'shop';
+  placementType: TaboolaPlacement;
 
   pageUrl?: string;
 
