@@ -576,6 +576,7 @@ const v_d81136 = v_472849.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingBottom: v_326be8.OS === 'android' ? 24 : 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {
