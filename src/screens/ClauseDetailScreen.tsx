@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_122070, v_39a996 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
@@ -16,7 +16,7 @@ const clauseTitleMap: Record<v_9dd03c, string> = {
 };
 
 export const v_5fdcb2 = () => {
-  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
+  const { i18n: v_9c213b } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { selectedClauseId: v_6e7459 } = v_700ef9();
   const [v_b43b74, v_f435cb] = v_5ab095<string>('');
@@ -72,14 +72,6 @@ export const v_5fdcb2 = () => {
             <Text style={v_d81136.contentText}>{v_b43b74}</Text>
           )}
         </View>
-        <View style={v_d81136.buttonRow}>
-          <TouchableOpacity style={v_d81136.secondaryButton} activeOpacity={0.85} onPress={v_c7ac57}>
-            <Text style={v_d81136.secondaryText}>{v_8d41d7('screens.clauseDetail.declined')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={v_d81136.primaryButton} activeOpacity={0.85} onPress={v_c7ac57}>
-            <Text style={v_d81136.primaryText}>{v_8d41d7('screens.clauseDetail.accept')}</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );
@@ -126,43 +118,6 @@ const v_d81136 = v_472849.create({
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
-    marginBottom: 24,
-  },
-  buttonRow: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 16,
-  },
-  secondaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e4e6ed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  primaryButton: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#343a5a',
-  },
-  secondaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#10192d',
-  },
-  primaryText: {
-    fontSize: 16,
-    fontFamily: 'Roboto-Bold',
-    color: '#fff',
   },
 });
 
