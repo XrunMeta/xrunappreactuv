@@ -15,5 +15,6 @@ export default {
   adCallFailedSub: '複数回試行しましたが、広告の読み込みに失敗しました。前のページに戻ります。',
   unsupportedUrl: 'サポートされていないURLです。',
   noAdUrl: '広告URLがありません。',
+  goToMap: 'マップへ移動',
 };
 

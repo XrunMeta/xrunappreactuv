@@ -15,5 +15,6 @@ export default {
   adCallFailedSub: '여러 번 시도했으나 광고 호출에 실패했습니다. 이전 페이지로 이동합니다.',
   unsupportedUrl: '지원하지 않는 URL입니다.',
   noAdUrl: '광고 URL이 없습니다.',
+  goToMap: '맵으로 이동',
 };
 

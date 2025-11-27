@@ -19,6 +19,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getNasmobAds, sendNasmobCallback, gatewayNodeJS } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TaboolaBanner } from '../components';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -76,11 +77,11 @@ export const ShowNapAdScreen: React.FC = () => {
   const [hasOpenedUrl, setHasOpenedUrl] = useState(false);
   const [waitingForWebSocketResponse, setWaitingForWebSocketResponse] = useState(false);
   const [member, setMember] = useState<string>('');
+  const [isTaboolaLoaded, setIsTaboolaLoaded] = useState(false);
 
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<number>(2);
 
   useEffect(() => {
     if (!advertisementParams) {
@@ -206,12 +207,12 @@ export const ShowNapAdScreen: React.FC = () => {
 
       if (supported) {
         await Linking.openURL(url);
-        console.log('✅ URL 이동 성공 - Map 화면으로 이동');
+        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
         setHasOpenedUrl(true);
         setIsLoading(false);
+        setIsProcessing(true);
+        setWaitingForWebSocketResponse(true); 
 
-        resetAdvertisementParams();
-        reset(ROUTES.map);
       } else {
         console.error('❌ 지원하지 않는 URL:', url);
         throw new Error(t('screens.showNapAd.unsupportedUrl'));
@@ -289,65 +290,15 @@ export const ShowNapAdScreen: React.FC = () => {
             console.log('API response received:', response);
             setIsProcessing(false);
 
-            console.log('⏰ Processing your reward... 카운트다운 시작');
-            countdownRef.current = 2;
-            console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-
-            rewardProcessingIntervalRef.current = setInterval(() => {
-              countdownRef.current--;
-              if (countdownRef.current > 0) {
-                console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-              } else {
-                console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-                if (rewardProcessingIntervalRef.current) {
-                  clearInterval(rewardProcessingIntervalRef.current);
-                  rewardProcessingIntervalRef.current = null;
-                }
-              }
-            }, 1000);
-
-            rewardProcessingTimeoutRef.current = setTimeout(() => {
-              if (rewardProcessingIntervalRef.current) {
-                clearInterval(rewardProcessingIntervalRef.current);
-                rewardProcessingIntervalRef.current = null;
-              }
-              setWaitingForWebSocketResponse(false);
-              resetAdvertisementParams();
-              reset(ROUTES.map);
-              rewardProcessingTimeoutRef.current = null;
-            }, 2000);
+            console.log('✅ 리워드 처리 완료 - 사용자 버튼 클릭 대기');
+            setWaitingForWebSocketResponse(true);
           }
         } catch (error) {
           console.error('Error calling API:', error);
           setIsProcessing(false);
 
-          console.log('⏰ Processing your reward... 카운트다운 시작 (에러 발생)');
-          countdownRef.current = 2;
-          console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-
-          rewardProcessingIntervalRef.current = setInterval(() => {
-            countdownRef.current--;
-            if (countdownRef.current > 0) {
-              console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-            } else {
-              console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-              if (rewardProcessingIntervalRef.current) {
-                clearInterval(rewardProcessingIntervalRef.current);
-                rewardProcessingIntervalRef.current = null;
-              }
-            }
-          }, 1000);
-
-          rewardProcessingTimeoutRef.current = setTimeout(() => {
-            if (rewardProcessingIntervalRef.current) {
-              clearInterval(rewardProcessingIntervalRef.current);
-              rewardProcessingIntervalRef.current = null;
-            }
-            setWaitingForWebSocketResponse(false);
-            resetAdvertisementParams();
-            reset(ROUTES.map);
-            rewardProcessingTimeoutRef.current = null;
-          }, 2000);
+          console.log('✅ 리워드 처리 완료 (에러 발생) - 사용자 버튼 클릭 대기');
+          setWaitingForWebSocketResponse(true);
         }
       }
     } catch (error) {
@@ -364,33 +315,7 @@ export const ShowNapAdScreen: React.FC = () => {
       }
 
       setWaitingForWebSocketResponse(true);
-      console.log('⏰ Processing your reward... 카운트다운 시작 (전체 에러)');
-      countdownRef.current = 2;
-      console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-
-      rewardProcessingIntervalRef.current = setInterval(() => {
-        countdownRef.current--;
-        if (countdownRef.current > 0) {
-          console.log(`⏱️ ${countdownRef.current}초 후 MapMainScreen으로 이동`);
-        } else {
-          console.log('✅ 카운트다운 완료 - MapMainScreen으로 이동');
-          if (rewardProcessingIntervalRef.current) {
-            clearInterval(rewardProcessingIntervalRef.current);
-            rewardProcessingIntervalRef.current = null;
-          }
-        }
-      }, 1000);
-
-      rewardProcessingTimeoutRef.current = setTimeout(() => {
-        if (rewardProcessingIntervalRef.current) {
-          clearInterval(rewardProcessingIntervalRef.current);
-          rewardProcessingIntervalRef.current = null;
-        }
-        setWaitingForWebSocketResponse(false);
-        resetAdvertisementParams();
-        reset(ROUTES.map);
-        rewardProcessingTimeoutRef.current = null;
-      }, 2000);
+      console.log('✅ 리워드 처리 완료 (전체 에러) - 사용자 버튼 클릭 대기');
     } finally {
       setIsProcessing(false);
     }
@@ -455,6 +380,22 @@ export const ShowNapAdScreen: React.FC = () => {
     reset(ROUTES.map);
   };
 
+  const handleGoToMap = () => {
+    console.log('맵으로 이동 버튼 클릭 - MapMainScreen으로 이동');
+
+    if (rewardProcessingTimeoutRef.current) {
+      clearTimeout(rewardProcessingTimeoutRef.current);
+      rewardProcessingTimeoutRef.current = null;
+    }
+    if (rewardProcessingIntervalRef.current) {
+      clearInterval(rewardProcessingIntervalRef.current);
+      rewardProcessingIntervalRef.current = null;
+    }
+    setWaitingForWebSocketResponse(false);
+    resetAdvertisementParams();
+    reset(ROUTES.map);
+  };
+
   if (!advertisementParams) {
     return null;
   }
@@ -466,19 +407,41 @@ export const ShowNapAdScreen: React.FC = () => {
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
         <View style={styles.loadingContainer}>
-          <SequentialDots />
-          <Text style={styles.loadingText}>
-            {waitingForWebSocketResponse
-              ? t('screens.showNapAd.processingReward')
-              : t('screens.showNapAd.loading')}
-          </Text>
+          {!waitingForWebSocketResponse || !isTaboolaLoaded ? (
+            <>
+              <SequentialDots />
+              <Text style={styles.loadingText}>
+                {waitingForWebSocketResponse
+                  ? t('screens.showNapAd.processingReward')
+                  : t('screens.showNapAd.loading')}
+              </Text>
 
-          {waitingForWebSocketResponse && <SequentialDots />}
+              {waitingForWebSocketResponse && <SequentialDots />}
+            </>
+          ) : null}
 
           {retryCount > 0 && (
             <Text style={styles.retryText}>
               {t('screens.showNapAd.checkingAd')}
             </Text>
+          )}
+
+          {waitingForWebSocketResponse && (
+            <TouchableOpacity
+              onPress={isTaboolaLoaded ? handleGoToMap : undefined}
+              activeOpacity={isTaboolaLoaded ? 0.7 : 1}
+              disabled={!isTaboolaLoaded}
+              style={styles.goToMapLinkContainer}
+            >
+              <Text
+                style={[
+                  styles.goToMapLink,
+                  !isTaboolaLoaded && styles.goToMapLinkDisabled,
+                ]}
+              >
+                {t('screens.showNapAd.goToMap')}
+              </Text>
+            </TouchableOpacity>
           )}
 
           {showBackButton && (
@@ -559,6 +522,19 @@ export const ShowNapAdScreen: React.FC = () => {
       )}
 
       {}
+      {waitingForWebSocketResponse && (
+        <View style={styles.bannerContainer}>
+          <TaboolaBanner 
+            placementType="reward_OS_395x80" 
+            onLoadComplete={() => {
+              console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
+              setIsTaboolaLoaded(true);
+            }}
+          />
+        </View>
+      )}
+
+      {}
       <Modal
         transparent
         animationType="slide"
@@ -594,6 +570,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '80%',
     alignSelf: 'center',
+    flex: 1,
+    paddingBottom: 100, 
   },
   loadingText: {
     fontFamily: 'Roboto-Regular',
@@ -660,6 +638,29 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
+  },
+  goToMapLinkContainer: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  goToMapLink: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#388Dc8',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  goToMapLinkDisabled: {
+    color: '#999',
+    textDecorationLine: 'none',
+  },
+  bannerContainer: {
+    position: 'absolute',
+    bottom: 65,
+    left: 0,
+    right: 0,
+    width: '100%',
+    zIndex: 10,
   },
   modalContainer: {
     flex: 1,
