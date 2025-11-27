@@ -305,11 +305,11 @@ export const MapMainScreen: React.FC = () => {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('위치 권한이 거부되었습니다.');
+        setErrorMsg(t('common.messages.locationPermissionMessage'));
         await showAlert(
-          '위치 권한 필요',
-          '지도를 사용하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-          [{ text: '확인' }]
+          t('common.messages.locationPermissionRequired'),
+          t('common.messages.locationPermissionMessage'),
+          [{ text: t('common.buttons.confirm') }]
         );
         return;
       }

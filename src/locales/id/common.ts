@@ -15,6 +15,8 @@ export default {
     error: 'Terjadi kesalahan',
     success: 'Berhasil',
     networkError: 'Kesalahan jaringan',
+    locationPermissionRequired: 'Izin Lokasi Diperlukan',
+    locationPermissionMessage: 'Izin lokasi diperlukan untuk menggunakan peta. Harap izinkan izin di pengaturan.',
   },
   validation: {
     required: 'Field ini wajib diisi',

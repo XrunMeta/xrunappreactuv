@@ -15,6 +15,8 @@ export default {
     error: '오류가 발생했습니다',
     success: '성공했습니다',
     networkError: '네트워크 오류가 발생했습니다',
+    locationPermissionRequired: '위치 권한 필요',
+    locationPermissionMessage: '지도를 사용하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
   },
   validation: {
     required: '필수 입력 항목입니다',
