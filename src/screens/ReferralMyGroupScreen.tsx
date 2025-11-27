@@ -219,7 +219,8 @@ export const ReferralMyGroupScreen = () => {
               pageSize={20}
               keyExtractor={(item, index) => `member-${item.rank}-${item.email}-${index}`}
               onItemPress={(item) => {
-                setSelectedReferralMember({ member: item.member, email: item.email });
+
+                setSelectedReferralMember({ member: item.member, email: item.email, depth: 2 });
                 navigate(ROUTES.referralDepthOne);
               }}
               contentContainerStyle={styles.listContent}
