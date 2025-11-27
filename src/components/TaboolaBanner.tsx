@@ -1,9 +1,9 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_df9f57 } from 'bapkr';
 import { v_3094a2, v_19b633, v_39a996, v_472849 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_eaeabd } from './TaboolaBannerCore';
 import { v_1bfbd0 } from '../constants';
-import { v_80493f } from '../services/taboola';
+import { v_80493f, v_17555f } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
@@ -26,6 +26,10 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   const [v_4ee138, v_75aef8] = v_5ab095(true);
   const [v_1ea9b3, v_2ce9d0] = v_5ab095(0);
 
+  const v_193481 = v_df9f57(() => {
+    return v_17555f(v_bb5e8c);
+  }, [v_bb5e8c]);
+
   const v_69e114 = (v_cd31a8) => {
     if (!v_cd31a8) {
 
@@ -47,7 +51,7 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   return (
     <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>
       <TaboolaBannerCore
-        placementType={v_bb5e8c}
+        placementType={v_193481}
         pageUrl={v_cdfaaa}
         onLoadingChange={v_69e114}
       />

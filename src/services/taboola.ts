@@ -6,12 +6,17 @@ import { v_573fcf } from '../utils/env';
 export type TaboolaPlacement =
   | 'myinfo_aos_395x80' 
   | 'myinfo_ios_395x80' 
+  | 'myinfo_OS_395x80' 
   | 'shop_aos_395x80' 
   | 'shop_ios_395x80' 
+  | 'shop_OS_395x80' 
   | 'apploading_aos_vignette' 
   | 'apploading_ios_vignette' 
+  | 'apploading_OS_vignette' 
   | 'reward_aos_395x80' 
-  | 'reward_aos_vignette'; 
+  | 'reward_aos_vignette' 
+  | 'reward_OS_395x80' 
+  | 'reward_OS_vignette'; 
 
 export type TaboolaMode = 'thumbnails-stream-a' | 'thumbnails-textunder-a';
 
@@ -73,6 +78,55 @@ export const v_968eda = {
     pageType: 'article',
     targetType: 'mix',
   },
+
+  'myinfo_OS_395x80': {
+    placement: 'myinfo_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'shop_OS_395x80': {
+    placement: 'shop_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'apploading_OS_vignette': {
+    placement: 'apploading_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_395x80': {
+    placement: 'reward_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_vignette': {
+    placement: 'reward_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+};
+
+export const v_17555f = (v_bb5e8c): TaboolaPlacement => {
+
+  if (!v_bb5e8c.includes('_OS_')) {
+    return v_bb5e8c;
+  }
+
+  const v_c20e12 = v_326be8.OS === 'android' ? '_aos_' : '_ios_';
+  const v_4ea608 = v_bb5e8c.replace('_OS_', v_c20e12) as TaboolaPlacement;
+
+  console.log('[Taboola] 배치 타입 변환:', {
+    original: v_bb5e8c,
+    converted: v_4ea608,
+    platform: v_326be8.OS,
+  });
+
+  return v_4ea608;
 };
 
 export const v_0b0acf = async (): Promise<void> => {
