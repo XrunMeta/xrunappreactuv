@@ -576,6 +576,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingBottom: Platform.OS === 'android' ? 24 : 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {
