@@ -74,7 +74,7 @@ const v_dbfc7f = [
 ];
 
 export const v_03a231 = () => {
-  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
@@ -215,7 +215,17 @@ export const v_03a231 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title={v_8d41d7('screens.myInfo.title')} />
+      <Header
+        title={v_8d41d7('screens.myInfo.title')}
+        onBackPress={() => {
+          if (v_7e32fb) {
+            v_c7ac57();
+          } else {
+            v_487a25(v_ce4741.map);
+          }
+        }}
+        showBackButton
+      />
       <ScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
