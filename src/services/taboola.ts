@@ -6,12 +6,17 @@ import { getEnvValue } from '../utils/env';
 export type TaboolaPlacement =
   | 'myinfo_aos_395x80' 
   | 'myinfo_ios_395x80' 
+  | 'myinfo_OS_395x80' 
   | 'shop_aos_395x80' 
   | 'shop_ios_395x80' 
+  | 'shop_OS_395x80' 
   | 'apploading_aos_vignette' 
   | 'apploading_ios_vignette' 
+  | 'apploading_OS_vignette' 
   | 'reward_aos_395x80' 
-  | 'reward_aos_vignette'; 
+  | 'reward_aos_vignette' 
+  | 'reward_OS_395x80' 
+  | 'reward_OS_vignette'; 
 
 export type TaboolaMode = 'thumbnails-stream-a' | 'thumbnails-textunder-a';
 
@@ -73,6 +78,55 @@ export const TABOOLA_PLACEMENTS: Record<TaboolaPlacement, TaboolaPlacementConfig
     pageType: 'article',
     targetType: 'mix',
   },
+
+  'myinfo_OS_395x80': {
+    placement: 'myinfo_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'shop_OS_395x80': {
+    placement: 'shop_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'apploading_OS_vignette': {
+    placement: 'apploading_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_395x80': {
+    placement: 'reward_OS_395x80', 
+    mode: 'thumbnails-stream-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+  'reward_OS_vignette': {
+    placement: 'reward_OS_vignette', 
+    mode: 'thumbnails-textunder-a',
+    pageType: 'article',
+    targetType: 'mix',
+  },
+};
+
+export const convertPlacementForOS = (placementType: TaboolaPlacement): TaboolaPlacement => {
+
+  if (!placementType.includes('_OS_')) {
+    return placementType;
+  }
+
+  const osSuffix = Platform.OS === 'android' ? '_aos_' : '_ios_';
+  const convertedPlacement = placementType.replace('_OS_', osSuffix) as TaboolaPlacement;
+
+  console.log('[Taboola] 배치 타입 변환:', {
+    original: placementType,
+    converted: convertedPlacement,
+    platform: Platform.OS,
+  });
+
+  return convertedPlacement;
 };
 
 export const initializeTaboola = async (): Promise<void> => {

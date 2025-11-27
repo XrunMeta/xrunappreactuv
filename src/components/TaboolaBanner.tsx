@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TaboolaBannerCore } from './TaboolaBannerCore';
 import { COLORS } from '../constants';
-import { TaboolaPlacement } from '../services/taboola';
+import { TaboolaPlacement, convertPlacementForOS } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
@@ -26,6 +26,10 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   const [isTaboolaLoading, setIsTaboolaLoading] = useState(true);
   const [taboolaLoadingCount, setTaboolaLoadingCount] = useState(0);
 
+  const convertedPlacementType = useMemo(() => {
+    return convertPlacementForOS(placementType);
+  }, [placementType]);
+
   const handleTaboolaLoadingChange = (isLoading: boolean) => {
     if (!isLoading) {
 
@@ -47,7 +51,7 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   return (
     <View style={[styles.container, containerStyle, style]}>
       <TaboolaBannerCore
-        placementType={placementType}
+        placementType={convertedPlacementType}
         pageUrl={pageUrl}
         onLoadingChange={handleTaboolaLoadingChange}
       />

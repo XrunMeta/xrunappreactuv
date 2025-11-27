@@ -222,7 +222,7 @@ export const MyInfoScreen = () => {
       >
         <View style={styles.inner}>
           {}
-          <TaboolaBanner placementType="myinfo_aos_395x80" />
+          <TaboolaBanner placementType="myinfo_OS_395x80" />
 
           <View style={styles.profileCard}>
             <View>
