@@ -3,6 +3,14 @@
 import { v_326be8 } from 'rcmrninabrnb';
 import { v_573fcf } from '../utils/env';
 
+let v_b02f3c = null;
+try {
+  v_b02f3c = require('oxnazmqqjnwuflnfgczxckuhqeiiyoo').Taboola;
+} catch (v_5e9bfe) {
+
+  console.log('[Taboola] 네이티브 모듈을 로드할 수 없습니다. WebView 방식으로 폴백합니다.');
+}
+
 export type TaboolaPlacement =
   | 'myinfo_aos_395x80' 
   | 'myinfo_ios_395x80' 
@@ -129,8 +137,18 @@ export const v_17555f = (v_bb5e8c): TaboolaPlacement => {
   return v_4ea608;
 };
 
+export const v_ce593f = (): boolean => {
+  return v_b02f3c !== null && typeof v_b02f3c.init === 'function';
+};
+
 export const v_0b0acf = async (): Promise<void> => {
   try {
+
+    if (!v_ce593f()) {
+      console.log('[Taboola] 네이티브 모듈이 없습니다. WebView 방식으로 폴백합니다.');
+      return;
+    }
+
     const v_26f42c =
       v_326be8.OS === 'android'
         ? v_573fcf('TABOOLA_PUBLISHER_ID_ANDROID')
@@ -141,15 +159,18 @@ export const v_0b0acf = async (): Promise<void> => {
       return;
     }
 
-    if (v_326be8.OS === 'android') {
-
-      console.log('[Taboola] Android 초기화:', v_26f42c);
-    } else if (v_326be8.OS === 'ios') {
-
-      console.log('[Taboola] iOS 초기화:', v_26f42c);
+    if (v_b02f3c && typeof v_b02f3c.init === 'function') {
+      v_b02f3c.init(v_26f42c);
+      console.log('[Taboola] 초기화 완료:', {
+        publisherId: v_26f42c,
+        platform: v_326be8.OS,
+      });
+    } else {
+      console.log('[Taboola] Taboola 모듈을 사용할 수 없습니다. WebView 방식으로 폴백합니다.');
     }
   } catch (v_5e9bfe) {
     console.error('[Taboola] 초기화 실패:', v_5e9bfe);
+    console.log('[Taboola] WebView 방식으로 폴백합니다.');
   }
 };
 
