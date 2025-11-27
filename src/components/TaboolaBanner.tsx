@@ -1,4 +1,4 @@
-import v_a3453e from 'bapkr';
+import v_a3453e, { v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_472849, v_326be8 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_1bfbd0, v_9b1a04 } from '../constants';
@@ -20,6 +20,8 @@ interface TaboolaBannerProps {
   style?: any;
 
   containerStyle?: any;
+
+  onLoadingChange?: (isLoading: boolean) => void;
 }
 
 export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
@@ -27,6 +29,7 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   pageUrl: v_cdfaaa,
   style: v_7fa4e4,
   containerStyle: v_4affe9,
+  onLoadingChange: v_c83407,
 }) => {
 
   const v_f36218 = v_dc5d8f(v_bb5e8c, false);
@@ -34,15 +37,24 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   const v_40f839 = v_cdfaaa || v_33aee4();
   const v_26f42c = v_995f93();
 
+  const v_d2b80a = v_27ace7();
+
   console.log('[TaboolaBanner] 렌더링:', {
     placementType: v_bb5e8c,
     placement: v_f36218,
     publisherId: v_26f42c,
     finalPageUrl: v_40f839,
-    isNativeAvailable: v_27ace7(),
+    isNativeAvailable: v_d2b80a,
   });
 
-  if (v_27ace7()) {
+  v_c4deb2(() => {
+    if (v_d2b80a && v_c83407) {
+
+      v_c83407(false);
+    }
+  }, [v_d2b80a, v_c83407]);
+
+  if (v_d2b80a) {
     return (
       <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>
         <TaboolaNativeView
@@ -87,19 +99,41 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
         sharedCookiesEnabled={true}
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
         onLoadStart={() => {
-          console.log('[TaboolaBanner] WebView 로드 시작');
+          console.log('[TaboolaBanner] WebView 로드 시작 - onLoadStart 호출됨');
+
+          if (v_c83407) {
+            console.log('[TaboolaBanner] onLoadingChange(false) 호출');
+            v_c83407(false);
+          } else {
+            console.log('[TaboolaBanner] onLoadingChange가 없습니다');
+          }
         }}
         onLoadEnd={() => {
-          console.log('[TaboolaBanner] WebView 로드 완료');
+          console.log('[TaboolaBanner] WebView 로드 완료 - onLoadEnd 호출됨');
+
         }}
         onError={(v_6f3a9d) => {
           const { nativeEvent: v_76b943 } = v_6f3a9d;
           console.error('[TaboolaBanner] WebView 오류:', v_76b943);
+
+          if (v_c83407) {
+            v_c83407(false);
+          }
         }}
         onMessage={(v_d48baf) => {
           try {
             const v_9390e8 = JSON.parse(v_d48baf.nativeEvent.data);
             console.log('[TaboolaBanner] WebView 메시지:', v_9390e8);
+
+            if (v_9390e8 && v_9390e8.message && typeof v_9390e8.message === 'string') {
+              const v_a8cd21 = v_9390e8.message;
+              if (v_a8cd21.includes('콘텐츠 감지됨')) {
+                console.log('[TaboolaBanner] 콘텐츠 감지됨 - 로딩 완료 처리');
+                if (v_c83407) {
+                  v_c83407(false);
+                }
+              }
+            }
           } catch (v_9e86fd) {
             console.log('[TaboolaBanner] WebView 원시 메시지:', v_d48baf.nativeEvent.data);
           }
