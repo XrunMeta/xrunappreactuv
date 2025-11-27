@@ -35,6 +35,7 @@ const v_16897e = (v_a86996): string => {
 
 const v_325ac3 = (
   apiData: v_5f9ea4[],
+  v_8d41d7,
 ): TransformedSettlementData[] => {
 
   const v_110a8b = new Set<string>();
@@ -50,7 +51,7 @@ const v_325ac3 = (
       }
       v_110a8b.add(v_e149c8);
 
-      const v_6856a9 = v_8c0b26.description || v_8c0b26.actiontext || v_8c0b26.extratext || v_4922a9.referral.settlement.list.desc;
+      const v_6856a9 = v_8c0b26.description || v_8c0b26.actiontext || v_8c0b26.extratext || v_8d41d7('screens.referralSettlement.settlementDescription');
 
       let v_224318 = `settlement_${v_8c0b26.transaction}_${v_a56041}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -128,7 +129,7 @@ export const v_08aac3 = () => {
         v_79d0f6.status === 'success' &&
         v_0b09a2.status === 'success'
       ) {
-        const v_2a6164 = v_325ac3(v_79d0f6.data);
+        const v_2a6164 = v_325ac3(v_79d0f6.data, v_8d41d7);
         v_2f9613(v_2a6164);
 
         const v_2c49ad = v_0b09a2.data[0]?.amount || '0';
@@ -233,12 +234,12 @@ export const v_08aac3 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title="추천" />
+      <Header title={v_8d41d7('screens.referralSettlement.title')} />
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
           <ReferralStatsCard
-            title={v_4922a9.referral.card.income}
-            subtitle={v_4922a9.wallet.adxrun.settlementIn45Days}
+            title={v_8d41d7('screens.referralSettlement.income')}
+            subtitle={v_8d41d7('screens.referralSettlement.settlementIn45Days')}
             value={v_13f115}
             helperText={v_26e26f}
           />
@@ -256,7 +257,7 @@ export const v_08aac3 = () => {
             </View>
           ) : v_def2d0.length === 0 ? (
             <View style={v_d81136.emptyContainer}>
-              <Text style={v_d81136.emptyText}>정산 내역이 없습니다.</Text>
+              <Text style={v_d81136.emptyText}>{v_8d41d7('screens.referralSettlement.noSettlementHistory')}</Text>
             </View>
           ) : (
             <FlatList

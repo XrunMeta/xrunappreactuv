@@ -16,7 +16,7 @@ const clauseTitleMap: Record<v_9dd03c, string> = {
 };
 
 export const v_5fdcb2 = () => {
-  const { i18n: v_9c213b } = v_772971();
+  const { i18n: v_9c213b, t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { selectedClauseId: v_6e7459 } = v_700ef9();
   const [v_b43b74, v_f435cb] = v_5ab095<string>('');
@@ -38,11 +38,11 @@ export const v_5fdcb2 = () => {
         if (v_75fec9) {
           v_f435cb(v_75fec9);
         } else {
-          v_3a7d09('약관 내용을 불러올 수 없습니다.');
+          v_3a7d09(v_8d41d7('screens.myInfoClauses.loadFailed'));
         }
       } catch (v_49263d) {
         console.error('[약관] 약관 내용 로드 오류:', v_49263d);
-        v_3a7d09('약관 내용을 불러오는 중 오류가 발생했습니다.');
+        v_3a7d09(v_8d41d7('screens.myInfoClauses.loadError'));
       } finally {
         v_deef62(false);
       }
@@ -62,7 +62,7 @@ export const v_5fdcb2 = () => {
           {v_cd31a8 ? (
             <View style={v_d81136.loadingContainer}>
               <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-              <Text style={v_d81136.loadingText}>약관 내용을 불러오는 중...</Text>
+              <Text style={v_d81136.loadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
             </View>
           ) : v_5e9bfe ? (
             <View style={v_d81136.errorContainer}>
