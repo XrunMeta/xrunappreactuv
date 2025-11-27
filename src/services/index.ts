@@ -245,7 +245,7 @@ export const sendAliveSignal = async (
 
     if (serverResponse.status === 'success') {
       const result: AliveResponse = {
-        success: true,
+    success: true,
       };
 
       if (serverResponse.data.server_status === 'health') {
@@ -1278,9 +1278,9 @@ export const logout = async (
     const response = await nodeGatewayRequest(
       '/logout-9705',
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
           Authorization: `Bearer ${authCode}`,
         },
         body: JSON.stringify({

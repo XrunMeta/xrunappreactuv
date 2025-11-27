@@ -146,11 +146,11 @@ export const ReferralMyGroupScreen = () => {
 
   const segmentedOptions = useMemo(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: '순위', value: 'rank' },
+      { label: t('screens.referralRank.group'), value: 'group' },
+      { label: t('screens.referralRank.settlement'), value: 'settlement' },
+      { label: t('screens.referralRank.rank'), value: 'rank' },
     ] as const,
-    [],
+    [t],
   );
 
   const handleSegmentChange = (value: typeof segmentedOptions[number]['value']) => {
@@ -174,7 +174,7 @@ export const ReferralMyGroupScreen = () => {
       return;
     }
     await shareReferralLink(
-      LANG,
+      t,
       { email: userEmail },
       showAlert,
       navigate,

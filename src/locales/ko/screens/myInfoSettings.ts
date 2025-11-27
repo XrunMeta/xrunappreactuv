@@ -1,5 +1,5 @@
 export default {
-  title: 'Setting',
+  title: '설정',
 
 };
 

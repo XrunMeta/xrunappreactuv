@@ -195,7 +195,7 @@ export const ShopTicketDetailScreen = () => {
   const handleShareQR = async () => {
     const valueToShare = qrCodeValue;
     if (!valueToShare) {
-      await showAlert('오류', '공유할 QR 코드가 없습니다.');
+      await showAlert(t('common.messages.error'), t('screens.shopTicketDetail.share.noQrCode'));
       return;
     }
 
@@ -204,23 +204,23 @@ export const ShopTicketDetailScreen = () => {
       qrCodeRef.current?.toDataURL(async (dataURL: string) => {
         try {
 
-          const shareMessage = `티켓 번호: ${ticketNumber}\nQR 코드 URL: ${valueToShare}`;
+          const shareMessage = `${t('screens.shopTicketDetail.share.ticketNumber')} ${ticketNumber}\n${t('screens.shopTicketDetail.share.qrCodeUrl')} ${valueToShare}`;
 
           await Share.share({
             message: shareMessage,
-            title: '티켓 QR 코드',
+            title: t('screens.shopTicketDetail.share.qrCodeTitle'),
           });
         } catch (shareError) {
           console.error('[티켓 상세] QR 공유 오류:', shareError);
 
           try {
             await Share.share({
-              message: `티켓 QR 코드: ${valueToShare}`,
-              title: '티켓 QR 코드',
+              message: `${t('screens.shopTicketDetail.share.qrCodeTitle')}: ${valueToShare}`,
+              title: t('screens.shopTicketDetail.share.qrCodeTitle'),
             });
           } catch (fallbackError) {
             console.error('[티켓 상세] QR 공유 대안 실패:', fallbackError);
-            await showAlert('오류', 'QR 코드 공유에 실패했습니다.');
+            await showAlert(t('common.messages.error'), t('screens.shopTicketDetail.share.shareFailed'));
           }
         }
       });
@@ -229,11 +229,11 @@ export const ShopTicketDetailScreen = () => {
 
       try {
         await Share.share({
-          message: `티켓 QR 코드: ${qrCodeValue}`,
-          title: '티켓 QR 코드',
+          message: `${t('screens.shopTicketDetail.share.qrCodeTitle')}: ${qrCodeValue}`,
+          title: t('screens.shopTicketDetail.share.qrCodeTitle'),
         });
       } catch (fallbackError) {
-        await showAlert('오류', 'QR 코드 공유에 실패했습니다.');
+        await showAlert(t('common.messages.error'), t('screens.shopTicketDetail.share.shareFailed'));
       }
     }
   };
@@ -375,20 +375,20 @@ export const ShopTicketDetailScreen = () => {
               style={[styles.actionButton, styles.copyButton]}
               onPress={handleCopyTicketNumber}
               disabled={!qrCodeValue}>
-              <Text style={styles.actionButtonText}>Copy Ticket Number</Text>
+              <Text style={styles.actionButtonText}>{t('screens.shopTicketDetail.share.copyTicketNumber')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, styles.shareButton]}
               onPress={handleShareQR}
               disabled={!qrCodeValue}>
-              <Text style={styles.shareButtonText}>Share QR Image</Text>
+              <Text style={styles.shareButtonText}>{t('screens.shopTicketDetail.share.shareQrImage')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             onPress={confirmDelete}>
-            <Text style={styles.actionButtonText}>Delete</Text>
+            <Text style={styles.actionButtonText}>{t('screens.shopTicketDetail.share.delete')}</Text>
           </TouchableOpacity>
         )}
       </View>

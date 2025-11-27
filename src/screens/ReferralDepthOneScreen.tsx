@@ -132,9 +132,9 @@ export const ReferralDepthOneScreen = () => {
         </View>
       ) : depthMembers.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>이 멤버는 아직 하위 추천인이 없습니다.</Text>
+          <Text style={styles.emptyTitle}>{t('screens.referralDepthOne.emptyTitle')}</Text>
           <Text style={styles.emptyDescription}>
-            이 사람의 직접 추천인이 추천한 멤버들이 여기에 표시됩니다.
+            {t('screens.referralDepthOne.emptyDescription')}
           </Text>
         </View>
       ) : (

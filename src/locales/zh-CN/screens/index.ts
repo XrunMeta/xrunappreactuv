@@ -35,6 +35,7 @@ export { default as phoneEdit } from './phoneEdit';
 export { default as referral } from './referral';
 export { default as referralSettlement } from './referralSettlement';
 export { default as referralRank } from './referralRank';
+export { default as referralMyGroup } from './referralMyGroup';
 export { default as referralDepthOne } from './referralDepthOne';
 export { default as referralDepthTwo } from './referralDepthTwo';
 export { default as shop } from './shop';
