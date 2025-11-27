@@ -21,6 +21,7 @@ import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -371,6 +372,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const { navigate, reset } = useAppNavigation();
   const { t } = useTranslation();
   const { setAdvertisementParams } = useAppContext();
+  const { showAlert } = useAlertDialog();
   const [permission, requestPermission] = useCameraPermissions();
 
   const [showBottomPanel, setShowBottomPanel] = useState(false);
@@ -392,11 +394,42 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasAutoAdTriggeredRef = useRef(false); 
 
+  const hasRequestedPermissionRef = useRef(false);
+
   useEffect(() => {
-    if (permission && !permission.granted) {
-      requestPermission();
-    }
-  }, [permission]);
+    const requestCameraPermission = async () => {
+
+      if (hasRequestedPermissionRef.current) {
+        return;
+      }
+
+      if (permission === null) {
+        return;
+      }
+
+      if (permission.granted) {
+        console.log('카메라 권한이 이미 허용되어 있습니다.');
+        hasRequestedPermissionRef.current = true;
+        return;
+      }
+
+      console.log('카메라 권한 요청 중...');
+      hasRequestedPermissionRef.current = true;
+      const result = await requestPermission();
+      console.log('카메라 권한 요청 결과:', result);
+
+      if (!result.granted) {
+
+        await showAlert(
+          '카메라 권한 필요',
+          '카메라를 사용하려면 카메라 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+          [{ text: '확인' }]
+        );
+      }
+    };
+
+    requestCameraPermission();
+  }, [permission, requestPermission, showAlert]);
 
   const convertSpotDataToTokenData = (spotData: (SpotData & { campid?: string })[], startIndex: number): TokenData[] => {
     const actualChunkSize = Math.min(chunkSize, spotData.length);
