@@ -219,7 +219,8 @@ export const v_58584a = () => {
               pageSize={20}
               keyExtractor={(v_8c0b26, v_a56041) => `member-${v_8c0b26.rank}-${v_8c0b26.email}-${v_a56041}`}
               onItemPress={(v_8c0b26) => {
-                v_779227({ member: v_8c0b26.member, email: v_8c0b26.email });
+
+                v_779227({ member: v_8c0b26.member, email: v_8c0b26.email, depth: 2 });
                 v_9b57fc(v_ce4741.referralDepthOne);
               }}
               contentContainerStyle={v_d81136.listContent}

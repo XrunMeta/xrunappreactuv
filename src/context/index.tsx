@@ -27,8 +27,8 @@ type AppContextValue = {
   setSelectedClauseId: (clause: v_9dd03c) => void;
   selectedShopItem?: v_745d71;
   setSelectedShopItem: (item?: v_745d71) => void;
-  selectedReferralMember?: { member: string; email: string };
-  setSelectedReferralMember: (member?: { member: string; email: string }) => void;
+  selectedReferralMember?: { member: string; email: string; depth?: number };
+  setSelectedReferralMember: (member?: { member: string; email: string; depth?: number }) => void;
   emergencyStop: v_ac312b;
   setEmergencyStop: (info: v_ac312b) => void;
   selectedCountryDialCode: v_da1883;
