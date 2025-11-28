@@ -1,9 +1,9 @@
 export default {
   title: 'Daftar',
   familyNameLabel: 'Nama Belakang',
-  familyNamePlaceholder: 'Enter your First name',
+  familyNamePlaceholder: 'Masukkan nama belakang Anda',
   givenNameLabel: 'Nama Depan',
-  givenNamePlaceholder: 'Enter your Last name',
+  givenNamePlaceholder: 'Masukkan nama depan Anda',
   emailLabel: 'Email',
   emailPlaceholder: 'Masukkan alamat email Anda',
   passwordLabel: 'Kata Sandi',

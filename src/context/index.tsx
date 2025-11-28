@@ -27,8 +27,8 @@ type AppContextValue = {
   setSelectedClauseId: (clause: ClauseId) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
-  selectedReferralMember?: { member: string; email: string };
-  setSelectedReferralMember: (member?: { member: string; email: string }) => void;
+  selectedReferralMember?: { member: string; email: string; depth?: number };
+  setSelectedReferralMember: (member?: { member: string; email: string; depth?: number }) => void;
   emergencyStop: EmergencyStopInfo;
   setEmergencyStop: (info: EmergencyStopInfo) => void;
   selectedCountryDialCode: CountryDialCode;

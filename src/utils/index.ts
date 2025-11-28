@@ -104,7 +104,7 @@ export const formatCurrency = (amount: string | number | object | null | undefin
 };
 
 export const shareReferralLink = async (
-  lang: { screen_info?: { button?: { share?: string } } } | null,
+  t: (key: string) => string,
   userDetails: { email: string },
   showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   navigation?: any,
@@ -114,9 +114,10 @@ export const shareReferralLink = async (
     const androidLink = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
-    const shareText = lang?.screen_info?.button?.share || '공유하기';
+    const shareText = t('screens.referral.share.shareText');
+    const downloadLabel = t('screens.referral.share.download');
 
-    const message = `${shareText}${userDetails.email}\n\n다운로드:\nAndroid: ${androidLink}\niOS: ${iosLink}`;
+    const message = `${shareText}${userDetails.email}\n\n\n${downloadLabel}\nAndroid: ${androidLink}\niOS: ${iosLink}`;
 
     const result = await Share.share({
       message,
@@ -135,7 +136,7 @@ export const shareReferralLink = async (
       console.log('공유가 취소됨');
     }
   } catch (error: any) {
-    await showAlert('공유 실패', error.message || '레퍼럴 링크를 공유하지 못했습니다.');
+    await showAlert(t('screens.referral.share.shareFailed'), error.message || t('screens.referral.share.shareFailedMessage'));
     console.log('Share error:', error);
     if (navigation) {
 

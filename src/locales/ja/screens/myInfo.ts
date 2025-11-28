@@ -10,6 +10,15 @@ export default {
   shareReferral: '紹介リンクを共有',
   logoutConfirm: 'ログアウトしますか？',
   logoutSuccess: 'ログアウトしました',
+  alerts: {
+    logout: 'ログアウト',
+    logoutMessage: 'ログアウトしますか？',
+    cancel: 'キャンセル',
+    error: 'エラー',
+    userDataNotFound: 'ユーザー情報が見つかりません。',
+    shareFailed: '共有失敗',
+    shareFailedMessage: 'ユーザーのメール情報が見つかりません。',
+  },
 };
 
 

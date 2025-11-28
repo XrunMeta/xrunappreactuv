@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { COLORS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 
 const { width } = Dimensions.get('window');
 
@@ -24,9 +24,12 @@ export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   rightComponent,
 }) => {
-  const { goBack, canGoBack } = useAppNavigation();
-  const shouldShowBackButton = showBackButton && (canGoBack || !!onBackPress);
-  const handleBackPress = onBackPress ?? (canGoBack ? goBack : undefined);
+  const { reset } = useAppNavigation();
+  const shouldShowBackButton = showBackButton;
+
+  const handleBackPress = () => {
+    reset(ROUTES.map);
+  };
 
   const renderBackArea = () =>
     shouldShowBackButton ? (

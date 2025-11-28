@@ -15,6 +15,8 @@ export default {
     error: 'An error occurred',
     success: 'Success',
     networkError: 'Network error',
+    locationPermissionRequired: 'Location Permission Required',
+    locationPermissionMessage: 'Location permission is required to use the map. Please allow the permission in settings.',
   },
   validation: {
     required: 'This field is required',

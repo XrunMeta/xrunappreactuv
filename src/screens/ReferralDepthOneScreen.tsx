@@ -53,10 +53,11 @@ const transformDepthData = (apiData: MyGroupItem[]): MemberData[] => {
 
 export const ReferralDepthOneScreen = () => {
   const { navigate, goBack } = useAppNavigation();
-  const { selectedReferralMember } = useAppContext();
+  const { selectedReferralMember, setSelectedReferralMember } = useAppContext();
   const [memberId, setMemberId] = useState<string | null>(null);
   const [depthMembers, setDepthMembers] = useState<MemberData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [depthLevel, setDepthLevel] = useState<number>(2); 
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -97,9 +98,13 @@ export const ReferralDepthOneScreen = () => {
 
   useEffect(() => {
     if (selectedReferralMember?.member) {
+
+      const currentDepth = selectedReferralMember.depth || 2;
+      setDepthLevel(currentDepth);
       fetchDepthData(selectedReferralMember.member);
     } else if (memberId) {
 
+      setDepthLevel(2);
       fetchDepthData(memberId);
     }
   }, [selectedReferralMember, memberId, fetchDepthData]);
@@ -114,7 +119,12 @@ export const ReferralDepthOneScreen = () => {
         highlight={item.highlight}
         onPress={() => {
 
-          navigate(ROUTES.referralDepthTwo);
+          setSelectedReferralMember({
+            member: item.member,
+            email: item.email,
+            depth: depthLevel + 1,
+          });
+          navigate(ROUTES.referralDepthOne);
         }}
       />
     );
@@ -125,16 +135,20 @@ export const ReferralDepthOneScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.referralDepthOne.title')} onBackPress={goBack} showBackButton />
+      <Header 
+        title={`${t('screens.referralDepthOne.title')} ${depthLevel}`} 
+        onBackPress={goBack} 
+        showBackButton 
+      />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
       ) : depthMembers.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>이 멤버는 아직 하위 추천인이 없습니다.</Text>
+          <Text style={styles.emptyTitle}>{t('screens.referralDepthOne.emptyTitle')}</Text>
           <Text style={styles.emptyDescription}>
-            이 사람의 직접 추천인이 추천한 멤버들이 여기에 표시됩니다.
+            {t('screens.referralDepthOne.emptyDescription')}
           </Text>
         </View>
       ) : (

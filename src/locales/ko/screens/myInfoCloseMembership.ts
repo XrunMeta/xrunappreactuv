@@ -2,7 +2,7 @@ export default {
   title: '회원 탈퇴',
   passwordLabel: '비밀번호',
   passwordPlaceholder: '비밀번호를 입력해주세요',
-  helperText: '*안전한 계정 관리를 위해\n탈퇴 시 비밀번호를 받고 있습니다',
+  helperText: '*안전한 계정 관리를 위해 탈퇴 시 비밀번호를 받고 있습니다.',
   confirmButton: '확인',
   processing: '처리 중...',
   alerts: {

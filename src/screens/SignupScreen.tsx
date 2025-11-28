@@ -264,7 +264,7 @@ export const SignupScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title="회원가입"
+        title={t('screens.signup.title')}
         onBackPress={goBack}
         showBackButton
       />
@@ -274,8 +274,8 @@ export const SignupScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <FormField
-          label="성"
-          placeholder="Enter your First name"
+          label={t('screens.signup.familyNameLabel')}
+          placeholder={t('screens.signup.familyNamePlaceholder')}
           value={familyName}
           onChangeText={setFamilyName}
           autoCapitalize="none"
@@ -283,8 +283,8 @@ export const SignupScreen = () => {
         />
 
         <FormField
-          label="이름"
-          placeholder="Enter your Last name"
+          label={t('screens.signup.givenNameLabel')}
+          placeholder={t('screens.signup.givenNamePlaceholder')}
           value={givenName}
           onChangeText={setGivenName}
           autoCapitalize="none"
@@ -292,8 +292,8 @@ export const SignupScreen = () => {
         />
 
         <FormField
-          label="Email"
-          placeholder="Enter your email address"
+          label={t('screens.signup.emailLabel')}
+          placeholder={t('screens.signup.emailPlaceholder')}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -302,8 +302,8 @@ export const SignupScreen = () => {
         />
 
         <FormField
-          label="비밀번호"
-          placeholder="Password"
+          label={t('screens.signup.passwordLabel')}
+          placeholder={t('screens.signup.passwordPlaceholder')}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -312,8 +312,8 @@ export const SignupScreen = () => {
         />
 
         <FormField
-          label="전화번호"
-          placeholder="휴대폰 번호를 입력해주세요."
+          label={t('screens.signup.phoneNumberLabel')}
+          placeholder={t('screens.signup.phoneNumberPlaceholder')}
           keyboardType="phone-pad"
           value={phoneNumber}
           onChangeText={setPhoneNumber}

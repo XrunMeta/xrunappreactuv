@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -28,51 +28,6 @@ type CardConfig = {
   disabled?: boolean;
 };
 
-const cardConfigs: CardConfig[] = [
-  {
-    id: 'edit',
-    label: '정보수정',
-    iconName: 'edit-3',
-    iconLibrary: 'Feather',
-    route: 'myInfoEmailAuth',
-  },
-  {
-    id: 'notify',
-    label: '알림',
-    iconName: 'bell',
-    iconLibrary: 'Feather',
-    route: 'myInfoNotify',
-  },
-  {
-    id: 'faq',
-    label: 'FAQ',
-    iconName: 'head-question-outline',
-    iconLibrary: 'Material',
-    route: 'myInfoFaq',
-  },
-  {
-    id: 'clause',
-    label: '이용약관',
-    iconName: 'file-text',
-    iconLibrary: 'Feather',
-    route: 'myInfoClauses',
-  },
-  {
-    id: 'setting',
-    label: '설정',
-    iconName: 'settings',
-    iconLibrary: 'Feather',
-    route: 'myInfoSettings',
-  },
-  {
-    id: 'referral',
-    label: '래퍼럴 수정',
-    iconName: 'refresh-ccw',
-    iconLibrary: 'Feather',
-    route: 'myInfoReferral',
-  },
-];
-
 export const MyInfoScreen = () => {
   const { navigate, reset, goBack, canGoBack } = useAppNavigation();
   const { t } = useTranslation();
@@ -83,6 +38,54 @@ export const MyInfoScreen = () => {
     email?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const cardConfigs: CardConfig[] = useMemo(
+    () => [
+      {
+        id: 'edit',
+        label: t('screens.myInfo.editInfo'),
+        iconName: 'edit-3',
+        iconLibrary: 'Feather',
+        route: 'myInfoEmailAuth',
+      },
+      {
+        id: 'notify',
+        label: t('screens.myInfo.notify'),
+        iconName: 'bell',
+        iconLibrary: 'Feather',
+        route: 'myInfoNotify',
+      },
+      {
+        id: 'faq',
+        label: t('screens.myInfo.faq'),
+        iconName: 'head-question-outline',
+        iconLibrary: 'Material',
+        route: 'myInfoFaq',
+      },
+      {
+        id: 'clause',
+        label: t('screens.myInfo.terms'),
+        iconName: 'file-text',
+        iconLibrary: 'Feather',
+        route: 'myInfoClauses',
+      },
+      {
+        id: 'setting',
+        label: t('screens.myInfo.settings'),
+        iconName: 'settings',
+        iconLibrary: 'Feather',
+        route: 'myInfoSettings',
+      },
+      {
+        id: 'referral',
+        label: t('screens.myInfo.referralEdit'),
+        iconName: 'refresh-ccw',
+        iconLibrary: 'Feather',
+        route: 'myInfoReferral',
+      },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -131,30 +134,30 @@ export const MyInfoScreen = () => {
 
   const handleShare = async () => {
     if (!userInfo?.email) {
-      await showAlert('공유 실패', '사용자 이메일 정보를 찾을 수 없습니다.');
+      await showAlert(t('screens.myInfo.alerts.shareFailed'), t('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await shareReferralLink(LANG, { email: userInfo.email }, showAlert, navigate);
+    await shareReferralLink(t, { email: userInfo.email }, showAlert, navigate);
   };
 
   const handleLogout = async () => {
     await showAlert(
-      '로그아웃',
-      '로그아웃 하시겠습니까?',
+      t('screens.myInfo.alerts.logout'),
+      t('screens.myInfo.alerts.logoutMessage'),
       [
         {
-          text: '취소',
+          text: t('screens.myInfo.alerts.cancel'),
           style: 'cancel',
         },
         {
-          text: '로그아웃',
+          text: t('screens.myInfo.alerts.logout'),
           style: 'destructive',
           onPress: async () => {
             try {
 
               const userDataStr = await AsyncStorage.getItem('userData');
               if (!userDataStr) {
-                await showAlert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await showAlert(t('screens.myInfo.alerts.error'), t('screens.myInfo.alerts.userDataNotFound'));
                 return;
               }
 
@@ -162,7 +165,7 @@ export const MyInfoScreen = () => {
               const member = userData.member;
 
               if (!member) {
-                await showAlert('오류', '사용자 정보를 찾을 수 없습니다.');
+                await showAlert(t('screens.myInfo.alerts.error'), t('screens.myInfo.alerts.userDataNotFound'));
                 return;
               }
 

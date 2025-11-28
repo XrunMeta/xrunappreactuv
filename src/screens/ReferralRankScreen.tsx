@@ -207,11 +207,11 @@ export const ReferralRankScreen = () => {
       <Header title={t('screens.referralRank.title')} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
-          <ReferralStatsCard title={LANG.referral?.card?.myRank || t('screens.referralRank.myRank')}>
+          <ReferralStatsCard title={t('screens.referralRank.myRank')}>
             <View style={styles.rankCardContent}>
               <View style={styles.rankLeft}>
                 <Text style={styles.rankEmail}>{userEmail}</Text>
-                <Text style={styles.rankHelper}>{LANG.referral?.card?.myRank || '내 순위'}</Text>
+                <Text style={styles.rankHelper}>{t('screens.referralRank.myRank')}</Text>
               </View>
               <View style={styles.rankDivider} />
               <View style={styles.rankRight}>
