@@ -305,11 +305,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
       if (v_d308b5 !== 'granted') {
-        v_a7e4fc('위치 권한이 거부되었습니다.');
+        v_a7e4fc(v_8d41d7('common.messages.locationPermissionMessage'));
         await v_889fad(
-          '위치 권한 필요',
-          '지도를 사용하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-          [{ text: '확인' }]
+          v_8d41d7('common.messages.locationPermissionRequired'),
+          v_8d41d7('common.messages.locationPermissionMessage'),
+          [{ text: v_8d41d7('common.buttons.confirm') }]
         );
         return;
       }

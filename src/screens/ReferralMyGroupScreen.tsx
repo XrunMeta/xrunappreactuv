@@ -146,11 +146,11 @@ export const v_58584a = () => {
 
   const v_1c4d31 = v_df9f57(
     () => [
-      { label: '내 그룹', value: 'group' },
-      { label: '정산목록', value: 'settlement' },
-      { label: '순위', value: 'rank' },
+      { label: v_8d41d7('screens.referralRank.group'), value: 'group' },
+      { label: v_8d41d7('screens.referralRank.settlement'), value: 'settlement' },
+      { label: v_8d41d7('screens.referralRank.rank'), value: 'rank' },
     ] as const,
-    [],
+    [v_8d41d7],
   );
 
   const v_c411e0 = (value: typeof v_1c4d31[number]['value']) => {
@@ -174,7 +174,7 @@ export const v_58584a = () => {
       return;
     }
     await v_a3bbf0(
-      v_4922a9,
+      v_8d41d7,
       { email: v_f4fb5e },
       v_889fad,
       v_9b57fc,
@@ -219,7 +219,8 @@ export const v_58584a = () => {
               pageSize={20}
               keyExtractor={(v_8c0b26, v_a56041) => `member-${v_8c0b26.rank}-${v_8c0b26.email}-${v_a56041}`}
               onItemPress={(v_8c0b26) => {
-                v_779227({ member: v_8c0b26.member, email: v_8c0b26.email });
+
+                v_779227({ member: v_8c0b26.member, email: v_8c0b26.email, depth: 2 });
                 v_9b57fc(v_ce4741.referralDepthOne);
               }}
               contentContainerStyle={v_d81136.listContent}

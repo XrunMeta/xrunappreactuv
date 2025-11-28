@@ -195,7 +195,7 @@ export const v_a1c4a5 = () => {
   const v_434673 = async () => {
     const v_bffa41 = v_1de78e;
     if (!v_bffa41) {
-      await v_889fad('오류', '공유할 QR 코드가 없습니다.');
+      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.shopTicketDetail.share.noQrCode'));
       return;
     }
 
@@ -204,23 +204,23 @@ export const v_a1c4a5 = () => {
       v_e74f9a.current?.toDataURL(async (v_91b89e) => {
         try {
 
-          const v_6a425b = `티켓 번호: ${v_a94bd8}\nQR 코드 URL: ${v_bffa41}`;
+          const v_6a425b = `${v_8d41d7('screens.shopTicketDetail.share.ticketNumber')} ${v_a94bd8}\n${v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl')} ${v_bffa41}`;
 
           await v_5f4661.share({
             message: v_6a425b,
-            title: '티켓 QR 코드',
+            title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
           });
         } catch (v_8c89c1) {
           console.error('[티켓 상세] QR 공유 오류:', v_8c89c1);
 
           try {
             await v_5f4661.share({
-              message: `티켓 QR 코드: ${v_bffa41}`,
-              title: '티켓 QR 코드',
+              message: `${v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle')}: ${v_bffa41}`,
+              title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
             });
           } catch (v_741f30) {
             console.error('[티켓 상세] QR 공유 대안 실패:', v_741f30);
-            await v_889fad('오류', 'QR 코드 공유에 실패했습니다.');
+            await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.shopTicketDetail.share.shareFailed'));
           }
         }
       });
@@ -229,11 +229,11 @@ export const v_a1c4a5 = () => {
 
       try {
         await v_5f4661.share({
-          message: `티켓 QR 코드: ${v_1de78e}`,
-          title: '티켓 QR 코드',
+          message: `${v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle')}: ${v_1de78e}`,
+          title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
         });
       } catch (v_741f30) {
-        await v_889fad('오류', 'QR 코드 공유에 실패했습니다.');
+        await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.shopTicketDetail.share.shareFailed'));
       }
     }
   };
@@ -375,20 +375,20 @@ export const v_a1c4a5 = () => {
               style={[v_d81136.actionButton, v_d81136.copyButton]}
               onPress={v_a155a6}
               disabled={!v_1de78e}>
-              <Text style={v_d81136.actionButtonText}>Copy Ticket Number</Text>
+              <Text style={v_d81136.actionButtonText}>{v_8d41d7('screens.shopTicketDetail.share.copyTicketNumber')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[v_d81136.actionButton, v_d81136.shareButton]}
               onPress={v_434673}
               disabled={!v_1de78e}>
-              <Text style={v_d81136.shareButtonText}>Share QR Image</Text>
+              <Text style={v_d81136.shareButtonText}>{v_8d41d7('screens.shopTicketDetail.share.shareQrImage')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity
             style={[v_d81136.actionButton, v_d81136.deleteButton]}
             onPress={v_6ff8af}>
-            <Text style={v_d81136.actionButtonText}>Delete</Text>
+            <Text style={v_d81136.actionButtonText}>{v_8d41d7('screens.shopTicketDetail.share.delete')}</Text>
           </TouchableOpacity>
         )}
       </View>

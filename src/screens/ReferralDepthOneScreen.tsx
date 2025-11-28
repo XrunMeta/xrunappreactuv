@@ -53,10 +53,11 @@ const v_f181d8 = (apiData: v_b0f886[]): MemberData[] => {
 
 export const v_5b4c5a = () => {
   const { navigate: v_9b57fc, goBack: v_c7ac57 } = v_a0daa8();
-  const { selectedReferralMember: v_f87030 } = v_700ef9();
+  const { selectedReferralMember: v_f87030, setSelectedReferralMember: v_779227 } = v_700ef9();
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_200d98, v_284862] = v_5ab095<MemberData[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
+  const [v_c09f1f, v_0d08b9] = v_5ab095<number>(2); 
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -97,9 +98,13 @@ export const v_5b4c5a = () => {
 
   v_c4deb2(() => {
     if (v_f87030?.member) {
+
+      const v_98c1d0 = v_f87030.depth || 2;
+      v_0d08b9(v_98c1d0);
       v_ee33d3(v_f87030.member);
     } else if (v_717992) {
 
+      v_0d08b9(2);
       v_ee33d3(v_717992);
     }
   }, [v_f87030, v_717992, v_ee33d3]);
@@ -114,7 +119,12 @@ export const v_5b4c5a = () => {
         highlight={v_8c0b26.highlight}
         onPress={() => {
 
-          v_9b57fc(v_ce4741.referralDepthTwo);
+          v_779227({
+            member: v_8c0b26.member,
+            email: v_8c0b26.email,
+            depth: v_c09f1f + 1,
+          });
+          v_9b57fc(v_ce4741.referralDepthOne);
         }}
       />
     );
@@ -125,16 +135,20 @@ export const v_5b4c5a = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title={v_8d41d7('screens.referralDepthOne.title')} onBackPress={v_c7ac57} showBackButton />
+      <Header 
+        title={`${v_8d41d7('screens.referralDepthOne.title')} ${v_c09f1f}`} 
+        onBackPress={v_c7ac57} 
+        showBackButton 
+      />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : v_200d98.length === 0 ? (
         <View style={v_d81136.emptyContainer}>
-          <Text style={v_d81136.emptyTitle}>이 멤버는 아직 하위 추천인이 없습니다.</Text>
+          <Text style={v_d81136.emptyTitle}>{v_8d41d7('screens.referralDepthOne.emptyTitle')}</Text>
           <Text style={v_d81136.emptyDescription}>
-            이 사람의 직접 추천인이 추천한 멤버들이 여기에 표시됩니다.
+            {v_8d41d7('screens.referralDepthOne.emptyDescription')}
           </Text>
         </View>
       ) : (

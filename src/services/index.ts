@@ -245,7 +245,7 @@ export const v_495832 = async (
 
     if (v_2c2f8d.status === 'success') {
       const result: v_96ef47 = {
-        success: true,
+    success: true,
       };
 
       if (v_2c2f8d.data.server_status === 'health') {
@@ -1278,9 +1278,9 @@ export const v_d7d5a2 = async (
     const v_3393e3 = await v_12a388(
       '/logout-9705',
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
           Authorization: `Bearer ${v_36dd9e}`,
         },
         body: JSON.stringify({

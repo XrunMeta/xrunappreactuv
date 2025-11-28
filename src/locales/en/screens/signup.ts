@@ -1,9 +1,9 @@
 export default {
   title: 'Sign Up',
   familyNameLabel: 'Family Name',
-  familyNamePlaceholder: 'Enter your First name',
+  familyNamePlaceholder: 'Please enter your family name',
   givenNameLabel: 'Given Name',
-  givenNamePlaceholder: 'Enter your Last name',
+  givenNamePlaceholder: 'Please enter your given name',
   emailLabel: 'Email',
   emailPlaceholder: 'Enter your email address',
   passwordLabel: 'Password',
