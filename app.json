@@ -18,9 +18,12 @@
         "googleMapsApiKey": "oth-google-api-key"
       },
       "infoPlist": {
-        "NSCameraUsageDescription": "카메라 권한이 필요합니다",
-        "NSLocationWhenInUseUsageDescription": "위치 권한이 필요합니다"
-      }
+        "NSCameraUsageDescription": "앱의 주요 기능에 카메라 권한이 필요합니다",
+        "NSPhotoLibraryUsageDescription": "원활한 사용을 위해서 사진 권한이 필요합니다",
+        "NSLocationWhenInUseUsageDescription": "앱의 주요 기능에 위치 권한이 필요합니다",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "run.xrun.xrunapps"
     },
     "android": {
       "package": "run.xrun.xrunapp",
@@ -41,7 +44,11 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "CAMERA"
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -51,6 +58,11 @@
       "expo-font",
       "expo-camera",
       "expo-location"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "98780521-4749-4507-8e3a-62a2b3a80783"
+      }
+    }
   }
 }
