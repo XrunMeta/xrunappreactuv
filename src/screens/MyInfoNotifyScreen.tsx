@@ -12,7 +12,9 @@ import {
   v_326be8,
   v_39a996,
   v_6c4f62,
+  v_0e1f26,
 } from 'rcmrninabrnb';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -81,6 +83,7 @@ export const v_386af2 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
+  const v_033e14 = v_e0068c();
   const [v_180423, v_8f2787] = v_5ab095('');
   const [v_b9c00c, v_0965ee] = v_5ab095<v_d9bc70[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
@@ -89,6 +92,9 @@ export const v_386af2 = () => {
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const v_e99f51 = v_e662ae<v_122070>(null);
   const v_d16a0d = v_e662ae(true);
+  const [v_ac3ab7, v_028502] = v_5ab095(false);
+  const v_eb358e = v_e662ae(v_033e14.bottom || 0);
+  const v_a87c3a = v_033e14.bottom || 0;
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -346,11 +352,38 @@ export const v_386af2 = () => {
     ));
   };
 
+  v_c4deb2(() => {
+    const v_53f5d7 = v_0e1f26.addListener('keyboardDidShow', () => v_028502(true));
+    const v_52528b = v_0e1f26.addListener('keyboardDidHide', () => v_028502(false));
+
+    return () => {
+      v_53f5d7.remove();
+      v_52528b.remove();
+    };
+  }, []);
+
+  v_c4deb2(() => {
+    if (v_326be8.OS !== 'android') {
+      return;
+    }
+    if (!v_ac3ab7 && v_a87c3a >= 0 && v_a87c3a <= 80) {
+      v_eb358e.current = Math.min(v_a87c3a, 56);
+    }
+  }, [v_a87c3a, v_ac3ab7]);
+
+  const v_5dedb1 =
+    v_326be8.OS === 'android'
+      ? v_ac3ab7
+        ? 16
+        : Math.max(v_eb358e.current, 24)
+      : 16;
+
   return (
     <KeyboardAvoidingView
       style={v_d81136.flex}
-      behavior={v_326be8.OS === 'ios' ? 'padding' : undefined}
+      behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={v_326be8.OS === 'ios' ? 0 : 0}
+      enabled={v_326be8.OS === 'ios' ? true : v_ac3ab7}
     >
       <View style={v_d81136.container}>
         <StatusBar style="dark" />
@@ -397,7 +430,14 @@ export const v_386af2 = () => {
           </ScrollView>
         )}
 
-        <View style={v_d81136.inputBar}>
+        <View
+          style={[
+            v_d81136.inputBar,
+            {
+              paddingBottom: v_5dedb1,
+            },
+          ]}
+        >
           <View style={v_d81136.inputWrapper}>
             <TextInput
               style={v_d81136.input}
@@ -576,7 +616,7 @@ const v_d81136 = v_472849.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
-    paddingBottom: v_326be8.OS === 'android' ? 24 : 16,
+    paddingBottom: 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {
@@ -606,6 +646,7 @@ const v_d81136 = v_472849.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     minWidth: 60,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },

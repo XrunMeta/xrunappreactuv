@@ -24,10 +24,20 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   showBackButton: v_9c4d53 = true,
   rightComponent: v_52c3cc,
 }) => {
-  const { reset: v_487a25 } = v_a0daa8();
+  const { goBack: v_c7ac57, reset: v_487a25, canGoBack: v_7e32fb } = v_a0daa8();
   const v_e2510f = v_9c4d53;
 
   const v_648e0d = () => {
+    if (v_f442f6) {
+      v_f442f6();
+      return;
+    }
+
+    if (v_7e32fb) {
+      v_c7ac57();
+      return;
+    }
+
     v_487a25(v_ce4741.map);
   };
 
@@ -37,7 +47,6 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
         style={v_d81136.backButton}
         onPress={v_648e0d}
         activeOpacity={0.7}
-        disabled={!v_648e0d}
       >
         <BackIcon />
       </TouchableOpacity>

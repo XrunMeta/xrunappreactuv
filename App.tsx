@@ -63,6 +63,7 @@ import {
   v_f2f1ae,
   v_567640,
 } from 'duafkibkrsnlsywaptcqakgas';
+import { v_b2c639 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b } = v_a0daa8();
@@ -315,26 +316,30 @@ export default function v_6540c3() {
 
   if (!v_43f571 || v_cd31a8) {
     return (
-      <AppProvider>
-        <NavigationProvider>
-          <AlertDialogProvider>
-            <SplashScreen />
-            <GlobalDialogs />
-          </AlertDialogProvider>
-        </NavigationProvider>
-      </AppProvider>
+      <SafeAreaProvider>
+        <AppProvider>
+          <NavigationProvider>
+            <AlertDialogProvider>
+              <SplashScreen />
+              <GlobalDialogs />
+            </AlertDialogProvider>
+          </NavigationProvider>
+        </AppProvider>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <AppProvider>
-      <NavigationProvider>
-        <AlertDialogProvider>
-          <AliveService />
-          <ScreenHost />
-          <GlobalDialogs />
-        </AlertDialogProvider>
-      </NavigationProvider>
-    </AppProvider>
+    <SafeAreaProvider>
+      <AppProvider>
+        <NavigationProvider>
+          <AlertDialogProvider>
+            <AliveService />
+            <ScreenHost />
+            <GlobalDialogs />
+          </AlertDialogProvider>
+        </NavigationProvider>
+      </AppProvider>
+    </SafeAreaProvider>
   );
 }
