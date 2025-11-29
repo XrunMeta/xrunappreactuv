@@ -12,7 +12,9 @@ import {
   Platform,
   ActivityIndicator,
   RefreshControl,
+  Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,6 +83,7 @@ export const MyInfoNotifyScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
+  const insets = useSafeAreaInsets();
   const [question, setQuestion] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +92,9 @@ export const MyInfoNotifyScreen = () => {
   const [memberId, setMemberId] = useState<number | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const shouldAutoScroll = useRef(true);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const baselineAndroidInset = useRef(insets.bottom || 0);
+  const safeInsetBottom = insets.bottom || 0;
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -346,11 +352,38 @@ export const MyInfoNotifyScreen = () => {
     ));
   };
 
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+    if (!isKeyboardVisible && safeInsetBottom >= 0 && safeInsetBottom <= 80) {
+      baselineAndroidInset.current = Math.min(safeInsetBottom, 56);
+    }
+  }, [safeInsetBottom, isKeyboardVisible]);
+
+  const androidPadding =
+    Platform.OS === 'android'
+      ? isKeyboardVisible
+        ? 16
+        : Math.max(baselineAndroidInset.current, 24)
+      : 16;
+
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      enabled={Platform.OS === 'ios' ? true : isKeyboardVisible}
     >
       <View style={styles.container}>
         <StatusBar style="dark" />
@@ -397,7 +430,14 @@ export const MyInfoNotifyScreen = () => {
           </ScrollView>
         )}
 
-        <View style={styles.inputBar}>
+        <View
+          style={[
+            styles.inputBar,
+            {
+              paddingBottom: androidPadding,
+            },
+          ]}
+        >
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.input}
@@ -576,7 +616,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 16,
-    paddingBottom: Platform.OS === 'android' ? 24 : 16,
+    paddingBottom: 16,
     backgroundColor: '#fff',
   },
   inputWrapper: {
@@ -606,6 +646,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     minWidth: 60,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },

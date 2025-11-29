@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   balanceValue: {
-    fontSize: 28,
+    fontSize: 24,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

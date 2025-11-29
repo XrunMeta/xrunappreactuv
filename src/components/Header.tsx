@@ -24,10 +24,20 @@ export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   rightComponent,
 }) => {
-  const { reset } = useAppNavigation();
+  const { goBack, reset, canGoBack } = useAppNavigation();
   const shouldShowBackButton = showBackButton;
 
   const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+      return;
+    }
+
+    if (canGoBack) {
+      goBack();
+      return;
+    }
+
     reset(ROUTES.map);
   };
 
@@ -37,7 +47,6 @@ export const Header: React.FC<HeaderProps> = ({
         style={styles.backButton}
         onPress={handleBackPress}
         activeOpacity={0.7}
-        disabled={!handleBackPress}
       >
         <BackIcon />
       </TouchableOpacity>

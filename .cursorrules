@@ -920,3 +920,17 @@ interface DataListProps<T> {
 - **값**: `__DEV__` (React Native의 개발 모드 플래그)
 - **용도**: 개발 환경에서만 언어 선택 기능을 표시하기 위한 플래그
 
+### 13. 안드로이드 하단 입력 바 트러블슈팅 프롬프트
+
+안드로이드에서 `MyInfoNotifyScreen` 하단 입력 바가 키패드 또는 소프트키와 다시 겹치는 문제가 발생하면 아래 프롬프트를 사용하여 동일한 절차로 문제를 점검합니다.
+
+```
+안드로이드에서 MyInfoNotifyScreen 하단 입력 바가 키패드(또는 내비게이션 바)와 다시 겹치는 문제가 발생했습니다. 현재 구조는 KeyboardAvoidingView + SafeAreaInsets 기반 padding을 사용하고 있고, 키보드 표시 여부에 따라 paddingBottom을 다르게 적용합니다. 
+1) 키보드 열리고 닫힌 뒤 하단 여백 변화가 정상인지 확인
+2) KeyboardAvoidingView 설정(behavior, enabled, keyboardVerticalOffset) 점검
+3) paddingBottom 계산 로직에서 SafeAreaInsets가 키보드 높이를 포함하는지 여부 확인
+4) 필요 시 baseline inset을 재측정하거나 KeyboardAvoidingView 대신 다른 방식(KeyboardAwareScrollView, Animated)으로 수정
+
+위 단계를 순서대로 점검해서 겹침 문제를 해결해 주세요.
+```
+

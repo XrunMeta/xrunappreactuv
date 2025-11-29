@@ -63,6 +63,7 @@ import {
   Roboto_600SemiBold,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const ScreenHost = () => {
   const { currentScreen } = useAppNavigation();
@@ -315,26 +316,30 @@ export default function App() {
 
   if (!fontsLoaded || isLoading) {
     return (
-      <AppProvider>
-        <NavigationProvider>
-          <AlertDialogProvider>
-            <SplashScreen />
-            <GlobalDialogs />
-          </AlertDialogProvider>
-        </NavigationProvider>
-      </AppProvider>
+      <SafeAreaProvider>
+        <AppProvider>
+          <NavigationProvider>
+            <AlertDialogProvider>
+              <SplashScreen />
+              <GlobalDialogs />
+            </AlertDialogProvider>
+          </NavigationProvider>
+        </AppProvider>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <AppProvider>
-      <NavigationProvider>
-        <AlertDialogProvider>
-          <AliveService />
-          <ScreenHost />
-          <GlobalDialogs />
-        </AlertDialogProvider>
-      </NavigationProvider>
-    </AppProvider>
+    <SafeAreaProvider>
+      <AppProvider>
+        <NavigationProvider>
+          <AlertDialogProvider>
+            <AliveService />
+            <ScreenHost />
+            <GlobalDialogs />
+          </AlertDialogProvider>
+        </NavigationProvider>
+      </AppProvider>
+    </SafeAreaProvider>
   );
 }

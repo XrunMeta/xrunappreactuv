@@ -746,7 +746,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   headerCardWrapper: {
-    marginBottom: 32,
+    marginBottom: 0,
     zIndex: 10,
   },
   sectionHeader: {
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: 0,
   },
   sectionTitle: {
     fontSize: 16,
@@ -767,6 +767,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    display: 'none',
   },
   addTokenText: {
     fontSize: 13,
@@ -839,7 +840,7 @@ const styles = StyleSheet.create({
     maxWidth: '45%',
   },
   tokenItemAmount: {
-    fontSize: 11,
+    fontSize: 16,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
