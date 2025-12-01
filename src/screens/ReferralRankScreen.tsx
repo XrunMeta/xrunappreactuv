@@ -191,10 +191,14 @@ export const ReferralRankScreen = () => {
 
     const isCurrentUser = userEmail !== '-' && item.email === userEmail && String(item.rank) === userRank;
 
+    const formattedRank = typeof item.rank === 'number'
+      ? Number(item.rank.toFixed(2))
+      : item.rank;
+
     return (
       <ReferralMemberRow
         key={item.id}
-        rank={item.rank}
+        rank={formattedRank}
         email={displayEmail}
         highlight={isCurrentUser} 
       />
@@ -205,28 +209,42 @@ export const ReferralRankScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.referralRank.title')} />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         <View style={styles.wrapper}>
-          <ReferralStatsCard title={t('screens.referralRank.myRank')}>
-            <View style={styles.rankCardContent}>
-              <View style={styles.rankLeft}>
-                <Text style={styles.rankEmail}>{userEmail}</Text>
-                <Text style={styles.rankHelper}>{t('screens.referralRank.myRank')}</Text>
+          <View style={styles.topRow}>
+            <ReferralStatsCard title="">
+              <View style={styles.rankCardContent}>
+                <View style={styles.rankLeft}>
+                  <Text style={styles.rankHelper}>My Rank</Text>
+                  <Text style={styles.rankEmail} numberOfLines={1} ellipsizeMode="tail">
+                    {userEmail}
+                  </Text>
+                </View>
+                <View style={styles.rankDivider} />
+                <View style={styles.rankRight}>
+                  <Text style={styles.rankValue}>
+                    {userRank !== '-' 
+                      ? Number(userRank).toLocaleString('ko-KR', { 
+                          minimumFractionDigits: 0, 
+                          maximumFractionDigits: 2 
+                        })
+                      : userRank}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.rankDivider} />
-              <View style={styles.rankRight}>
-                <Text style={styles.rankValue}>#{userRank}</Text>
-              </View>
-            </View>
-          </ReferralStatsCard>
+            </ReferralStatsCard>
+          </View>
 
           <SegmentedControl
             options={segmentedOptions}
             value="rank"
             onChange={handleSegmentChange}
             containerStyle={styles.segmented}
+            hideIndicator={true}
           />
+        </View>
 
+        <View style={styles.listContainer}>
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -249,11 +267,12 @@ export const ReferralRankScreen = () => {
                   </View>
                 ) : null
               }
-              scrollEnabled={false}
+              scrollEnabled={true}
+              contentContainerStyle={styles.listContent}
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -263,8 +282,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f7fb',
   },
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    flex: 1,
   },
   wrapper: {
     width: '100%',
@@ -272,10 +291,26 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
+  },
+  topRow: {
+    position: 'relative',
+    marginBottom: 16,
   },
   segmented: {
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  listContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
+  },
+  listContent: {
+    paddingBottom: 32,
   },
   loadingContainer: {
     flex: 1,
@@ -300,21 +335,28 @@ const styles = StyleSheet.create({
   rankCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 0,
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 0,
   },
   rankLeft: {
     flex: 1,
-  },
-  rankEmail: {
-    fontSize: 20,
-    fontFamily: 'Roboto-Bold',
-    color: '#ffffff',
+    justifyContent: 'center',
+    minHeight: 20,
   },
   rankHelper: {
-    marginTop: 4,
-    fontSize: 14,
+    fontSize: 16,
     color: '#d2edf4',
-    fontFamily: 'Roboto-Regular',
+    fontFamily: 'Roboto-Bold',
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  rankEmail: {
+    fontSize: 18,
+    fontFamily: 'Roboto-Bold',
+    color: '#ffffff',
+    lineHeight: 22,
   },
   rankDivider: {
     width: 1,
@@ -324,9 +366,10 @@ const styles = StyleSheet.create({
   },
   rankRight: {
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   rankValue: {
-    fontSize: 18,
+    fontSize: 32,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

@@ -20,6 +20,7 @@ interface MemberData {
   date: string;
   member: string; 
   highlight?: boolean;
+  hideHighlightBorder?: boolean;
 }
 
 export const ReferralMyGroupScreen = () => {
@@ -105,6 +106,7 @@ export const ReferralMyGroupScreen = () => {
                 date: formattedDate,
                 member: item.member || '',
                 highlight: index === 0, 
+                hideHighlightBorder: true, 
               };
             });
 
@@ -148,7 +150,7 @@ export const ReferralMyGroupScreen = () => {
     () => [
       { label: t('screens.referralRank.group'), value: 'group' },
       { label: t('screens.referralRank.settlement'), value: 'settlement' },
-      { label: t('screens.referralRank.rank'), value: 'rank' },
+      { label: '순위', value: 'rank' }, 
     ] as const,
     [t],
   );
@@ -188,7 +190,11 @@ export const ReferralMyGroupScreen = () => {
       <View style={styles.content}>
         <View style={styles.wrapper}>
           <View style={styles.topRow}>
-            <ReferralStatsCard title={t('screens.referralMyGroup.myGroupMembers')} value={`${totalMembers} ${t('screens.referralMyGroup.members')}`} helperText=" " />
+            <ReferralStatsCard 
+              title={t('screens.referralMyGroup.myGroupMembers')} 
+              value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
+              containerStyle={styles.statsCardCenter}
+            />
             <TouchableOpacity style={styles.iconButton} onPress={handleShare} activeOpacity={0.7}>
               <Feather name="share-2" size={18} color={COLORS.headerText} />
             </TouchableOpacity>
@@ -199,6 +205,7 @@ export const ReferralMyGroupScreen = () => {
             value="group"
             onChange={handleSegmentChange}
             containerStyle={styles.segmented}
+            hideIndicator={true}
           />
         </View>
 
@@ -223,7 +230,7 @@ export const ReferralMyGroupScreen = () => {
                 setSelectedReferralMember({ member: item.member, email: item.email, depth: 2 });
                 navigate(ROUTES.referralDepthOne);
               }}
-              contentContainerStyle={styles.listContent}
+              contentContainerStyle={{ ...styles.listContent, paddingVertical: 0, paddingBottom: 32 }}
             />
           )}
         </View>
@@ -250,7 +257,10 @@ const styles = StyleSheet.create({
   },
   topRow: {
     position: 'relative',
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  statsCardCenter: {
+    justifyContent: 'center',
   },
   iconButton: {
     position: 'absolute',
@@ -264,7 +274,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   segmented: {
-    marginTop: 16,
+    marginTop: 0,
     marginBottom: 0,
   },
   listContainer: {
@@ -273,8 +283,10 @@ const styles = StyleSheet.create({
     maxWidth: 780,
     alignSelf: 'center',
     paddingHorizontal: 24,
+    paddingTop: 0,
   },
   listContent: {
+    paddingTop: 0,
     paddingBottom: 32,
   },
   emptyContainer: {

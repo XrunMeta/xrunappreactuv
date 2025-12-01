@@ -15,6 +15,7 @@ interface ReferralMemberRowProps {
   description?: string;
   valueText?: string;
   highlight?: boolean;
+  hideHighlightBorder?: boolean;
   onPress?: (event: GestureResponderEvent) => void;
 }
 
@@ -25,11 +26,15 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
   description,
   valueText,
   highlight,
+  hideHighlightBorder = false,
   onPress,
 }) => {
+
+  const shouldShowHighlight = highlight === true && hideHighlightBorder !== true;
+
   return (
     <TouchableOpacity
-      style={[styles.container, highlight && styles.highlight]}
+      style={[styles.container, shouldShowHighlight && styles.highlight]}
       activeOpacity={onPress ? 0.8 : 1}
       onPress={onPress}
       disabled={!onPress}
@@ -113,5 +118,4 @@ const styles = StyleSheet.create({
     color: '#1f6880',
   },
 });
-
 

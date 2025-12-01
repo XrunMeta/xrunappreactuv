@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 
@@ -12,12 +13,6 @@ interface HeaderProps {
   rightComponent?: React.ReactNode;
 }
 
-const BackIcon = () => (
-  <View style={styles.iconContainer}>
-    <Text style={styles.iconText}>‹</Text>
-  </View>
-);
-
 export const Header: React.FC<HeaderProps> = ({
   title,
   onBackPress,
@@ -28,15 +23,6 @@ export const Header: React.FC<HeaderProps> = ({
   const shouldShowBackButton = showBackButton;
 
   const handleBackPress = () => {
-    if (onBackPress) {
-      onBackPress();
-      return;
-    }
-
-    if (canGoBack) {
-      goBack();
-      return;
-    }
 
     reset(ROUTES.map);
   };
@@ -48,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
         onPress={handleBackPress}
         activeOpacity={0.7}
       >
-        <BackIcon />
+        <Feather name="arrow-left" size={20} color={COLORS.headerText} />
       </TouchableOpacity>
     ) : (
       <View style={styles.backButtonPlaceholder} />
@@ -97,8 +83,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    backgroundColor: COLORS.headerIconBg,
-    borderRadius: 16,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -111,18 +97,6 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'flex-end',
     justifyContent: 'center',
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: {
-    fontSize: 32,
-    color: COLORS.headerText,
-    fontWeight: '300',
-    lineHeight: 24,
   },
   titleWrapper: {
     flex: 1,

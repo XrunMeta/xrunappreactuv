@@ -11,6 +11,7 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   containerStyle?: ViewStyle;
+  hideIndicator?: boolean;
 }
 
 export const SegmentedControl = <T extends string>({
@@ -18,6 +19,7 @@ export const SegmentedControl = <T extends string>({
   value,
   onChange,
   containerStyle,
+  hideIndicator = false,
 }: SegmentedControlProps<T>) => {
   return (
     <View style={[styles.container, containerStyle]}>
@@ -26,7 +28,11 @@ export const SegmentedControl = <T extends string>({
         return (
           <TouchableOpacity
             key={option.value}
-            style={[styles.optionWrapper, isActive && styles.optionActive]}
+            style={[
+              styles.optionWrapper,
+              isActive && styles.optionActive,
+              isActive && !hideIndicator && styles.optionActiveWithIndicator,
+            ]}
             activeOpacity={0.85}
             onPress={() => onChange(option.value)}
           >
@@ -62,6 +68,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 2,
+  },
+  optionActiveWithIndicator: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#ffdc04',
   },
   optionLabel: {
     fontSize: 16,

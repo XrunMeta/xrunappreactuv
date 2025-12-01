@@ -94,7 +94,7 @@ export const ReferralSettlementScreen = () => {
     () => [
       { label: t('screens.referralSettlement.group'), value: 'group' },
       { label: t('screens.referralSettlement.settlement'), value: 'settlement' },
-      { label: t('screens.referralSettlement.rank'), value: 'rank' },
+      { label: 'Rank', value: 'rank' }, 
     ] as const,
     [t],
   );
@@ -133,12 +133,11 @@ export const ReferralSettlementScreen = () => {
         setSettlementData(transformedData);
 
         const totalAmount = resultAmount.data[0]?.amount || '0';
-        const formattedAmount = formatXrunAmount(totalAmount);
+        const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
+        const formattedAmount = isNaN(totalAmountNum) ? '0' : totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
         const price = gopaxPrice > 0 ? gopaxPrice : 176; 
-
-        const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
         console.log('[정산] 원화 계산:', { totalAmount, totalAmountNum, price });
 
         const wonEquivalent = calculateWonEquivalent(totalAmountNum, price);
@@ -235,22 +234,27 @@ export const ReferralSettlementScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.referralSettlement.title')} />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         <View style={styles.wrapper}>
-          <ReferralStatsCard
-            title={t('screens.referralSettlement.income')}
-            subtitle={t('screens.referralSettlement.settlementIn45Days')}
-            value={totalRevenue}
-            helperText={totalRevenueWon}
-          />
+          <View style={styles.topRow}>
+            <ReferralStatsCard
+              title={t('screens.referralSettlement.income')}
+              subtitle={t('screens.referralSettlement.settlementIn45Days')}
+              value={totalRevenue}
+              helperText={totalRevenueWon}
+            />
+          </View>
 
           <SegmentedControl
             options={segmentedOptions}
             value="settlement"
             onChange={handleSegmentChange}
             containerStyle={styles.segmented}
+            hideIndicator={true}
           />
+        </View>
 
+        <View style={styles.listContainer}>
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -273,11 +277,12 @@ export const ReferralSettlementScreen = () => {
                   </View>
                 ) : null
               }
-              scrollEnabled={false}
+              scrollEnabled={true}
+              contentContainerStyle={styles.listContent}
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -287,8 +292,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f7f7fb',
   },
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    flex: 1,
   },
   wrapper: {
     width: '100%',
@@ -296,10 +301,26 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
+  },
+  topRow: {
+    position: 'relative',
+    marginBottom: 16,
   },
   segmented: {
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  listContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
+  },
+  listContent: {
+    paddingBottom: 32,
   },
   loadingContainer: {
     flex: 1,

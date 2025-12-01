@@ -21,16 +21,18 @@ export const ReferralStatsCard: React.FC<ReferralStatsCardProps> = ({
 }) => {
   return (
     <View style={[styles.card, containerStyle]}>
-      <View style={styles.titleRow}>
-        <Text style={styles.title}>{title}</Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-      </View>
+      {(title && title.trim()) || subtitle ? (
+        <View style={styles.titleRow}>
+          {title && title.trim() ? <Text style={styles.title}>{title}</Text> : null}
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        </View>
+      ) : null}
       {children ? (
         children
       ) : (
         <>
           {value ? <Text style={styles.value}>{value}</Text> : null}
-          {helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
+          {helperText && helperText.trim() ? <Text style={styles.helper}>{helperText}</Text> : null}
         </>
       )}
     </View>
@@ -50,6 +52,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 16,
     elevation: 6,
+    height: 120,
   },
   titleRow: {
     flexDirection: 'row',
