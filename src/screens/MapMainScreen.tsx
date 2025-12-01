@@ -129,6 +129,12 @@ export const MapMainScreen: React.FC = () => {
 
   const mapRegionRef = useRef(mapRegion);
 
+  const isProgrammaticMoveRef = useRef(false);
+
+  const isUserTouchRef = useRef(false);
+
+  const lastUpdatedRegionRef = useRef<{ latitude: number; longitude: number } | null>(null);
+
   let iconXrunBlack: any = null;
   try {
     iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
@@ -218,6 +224,11 @@ export const MapMainScreen: React.FC = () => {
 
     const currentMapRegion = mapRegionRef.current;
 
+    isProgrammaticMoveRef.current = true;
+    console.log('📍 [프로그램 이동] 초기 위치로 복귀 시작');
+    console.log('  현재 위치:', currentMapRegion.latitude.toFixed(6), currentMapRegion.longitude.toFixed(6));
+    console.log('  목표 위치:', currentInitialLocation.latitude.toFixed(6), currentInitialLocation.longitude.toFixed(6));
+
     if (mapRef.current) {
       mapRef.current.animateToRegion({
         latitude: currentInitialLocation.latitude,
@@ -225,6 +236,11 @@ export const MapMainScreen: React.FC = () => {
         latitudeDelta: currentMapRegion.latitudeDelta,
         longitudeDelta: currentMapRegion.longitudeDelta,
       }, 500);
+
+      setTimeout(() => {
+        isProgrammaticMoveRef.current = false;
+        console.log('📍 [프로그램 이동] 플래그 리셋 완료');
+      }, 600);
     }
 
     const newRegion = {
@@ -272,7 +288,11 @@ export const MapMainScreen: React.FC = () => {
 
     if (locationChanged) {
       lastLocationChangeTimeRef.current = currentTime;
-
+      console.log('=== [3초마다 위치 확인] 맵 위치 변경 감지 ===');
+      console.log('  현재 위치:', currentLocation.latitude.toFixed(6), currentLocation.longitude.toFixed(6));
+      console.log('  마지막 마커 로드 위치:', currentLastFetchedLocation.latitude.toFixed(6), currentLastFetchedLocation.longitude.toFixed(6));
+      console.log('  거리:', distance.toFixed(2), 'm');
+      console.log('  프로그램 이동 플래그:', isProgrammaticMoveRef.current);
     }
 
     if (distance >= 500) {
@@ -340,6 +360,11 @@ export const MapMainScreen: React.FC = () => {
           setLastFetchedLocation(newLocation);
           initialLocationRef.current = newLocation;
           lastFetchedLocationRef.current = newLocation;
+
+          lastUpdatedRegionRef.current = {
+            latitude: newLocation.latitude,
+            longitude: newLocation.longitude,
+          };
           console.log('=== 초기 위치 저장 ===', newLocation);
         }
 
@@ -382,6 +407,11 @@ export const MapMainScreen: React.FC = () => {
                   setLastFetchedLocation(defaultLocation);
                   initialLocationRef.current = defaultLocation;
                   lastFetchedLocationRef.current = defaultLocation;
+
+                  lastUpdatedRegionRef.current = {
+                    latitude: defaultLocation.latitude,
+                    longitude: defaultLocation.longitude,
+                  };
                 }
 
                 await loadMarkersForLocation(defaultLocation);
@@ -410,6 +440,11 @@ export const MapMainScreen: React.FC = () => {
             setLastFetchedLocation(defaultLocation);
             initialLocationRef.current = defaultLocation;
             lastFetchedLocationRef.current = defaultLocation;
+
+            lastUpdatedRegionRef.current = {
+              latitude: defaultLocation.latitude,
+              longitude: defaultLocation.longitude,
+            };
           }
 
           await loadMarkersForLocation(defaultLocation);
@@ -556,6 +591,12 @@ export const MapMainScreen: React.FC = () => {
 
     if (mapRef.current && spot.latitude && spot.longitude) {
       const currentRegion = mapRegionRef.current;
+
+      isProgrammaticMoveRef.current = true;
+      console.log('📍 [프로그램 이동] 마커 클릭으로 맵 이동 시작');
+      console.log('  현재 위치:', currentRegion.latitude.toFixed(6), currentRegion.longitude.toFixed(6));
+      console.log('  목표 위치:', spot.latitude.toFixed(6), spot.longitude.toFixed(6));
+
       mapRef.current.animateToRegion({
         latitude: spot.latitude,
         longitude: spot.longitude,
@@ -572,6 +613,11 @@ export const MapMainScreen: React.FC = () => {
       setMapRegion(newRegion);
       mapRegionRef.current = newRegion;
       lastLocationChangeTimeRef.current = Date.now();
+
+      setTimeout(() => {
+        isProgrammaticMoveRef.current = false;
+        console.log('📍 [프로그램 이동] 마커 클릭 이동 플래그 리셋 완료');
+      }, 600);
 
       setTimeout(() => {
         if (mapRef.current && spot.latitude && spot.longitude) {
@@ -675,12 +721,23 @@ export const MapMainScreen: React.FC = () => {
 
     const currentRegion = mapRegionRef.current;
     if (mapRef.current && marker.latitude && marker.longitude) {
+
+      isProgrammaticMoveRef.current = true;
+      console.log('📍 [프로그램 이동] 맵 클릭으로 맵 이동 시작');
+      console.log('  현재 위치:', currentRegion.latitude.toFixed(6), currentRegion.longitude.toFixed(6));
+      console.log('  목표 위치:', marker.latitude.toFixed(6), marker.longitude.toFixed(6));
+
       mapRef.current.animateToRegion({
         latitude: marker.latitude,
         longitude: marker.longitude,
         latitudeDelta: currentRegion.latitudeDelta,
         longitudeDelta: currentRegion.longitudeDelta,
       }, 500); 
+
+      setTimeout(() => {
+        isProgrammaticMoveRef.current = false;
+        console.log('📍 [프로그램 이동] 맵 클릭 이동 플래그 리셋 완료');
+      }, 600);
     }
 
     const newRegion = {
@@ -744,12 +801,92 @@ export const MapMainScreen: React.FC = () => {
 
   };
 
+  const handlePanDrag = () => {
+    if (Platform.OS === 'ios') {
+      console.log('👆 [iOS] 사용자 드래그 시작 감지');
+      isUserTouchRef.current = true;
+    }
+  };
+
   const handleRegionChangeComplete = (region: any) => {
+    const isProgrammatic = isProgrammaticMoveRef.current;
+    const platform = Platform.OS;
+    const lastUpdated = lastUpdatedRegionRef.current;
+
+    console.log('=== [맵 이동 완료 이벤트] ===');
+    console.log('플랫폼:', platform);
+    console.log('프로그램 이동 플래그:', isProgrammatic);
+    console.log('사용자 터치 플래그:', isUserTouchRef.current);
+    console.log('새로운 위치:', region.latitude.toFixed(6), region.longitude.toFixed(6));
+    console.log('현재 mapRegionRef 위치:', mapRegionRef.current.latitude.toFixed(6), mapRegionRef.current.longitude.toFixed(6));
+
+    if (Platform.OS === 'ios' && isProgrammaticMoveRef.current) {
+      console.log('⚠️ [iOS] 프로그램 이동 감지 - mapRegionRef 업데이트 건너뛰기');
+
+      setMapRegion(region);
+
+      isProgrammaticMoveRef.current = false;
+      return;
+    }
+
+    if (Platform.OS === 'ios' && !isUserTouchRef.current) {
+      console.log('⚠️ [iOS] 사용자 터치 없음 - mapRegionRef 업데이트 건너뛰기 및 지도 위치 복귀');
+
+      if (mapRef.current) {
+        const currentRegion = mapRegionRef.current;
+        mapRef.current.animateToRegion({
+          latitude: currentRegion.latitude,
+          longitude: currentRegion.longitude,
+          latitudeDelta: currentRegion.latitudeDelta,
+          longitudeDelta: currentRegion.longitudeDelta,
+        }, 100); 
+      }
+
+      return;
+    }
+
+    if (Platform.OS === 'ios' && lastUpdated) {
+      const latDiff = Math.abs(region.latitude - lastUpdated.latitude);
+      const lonDiff = Math.abs(region.longitude - lastUpdated.longitude);
+      const minChange = 0.0001; 
+
+      console.log('  위치 변경 차이:', 'latDiff:', latDiff.toFixed(6), 'lonDiff:', lonDiff.toFixed(6));
+
+      if (latDiff < minChange && lonDiff < minChange) {
+        console.log('⚠️ [iOS] 위치 변경이 너무 작음 - 무시 및 지도 위치 복귀');
+
+        if (mapRef.current && lastUpdated) {
+          mapRef.current.animateToRegion({
+            latitude: lastUpdated.latitude,
+            longitude: lastUpdated.longitude,
+            latitudeDelta: mapRegionRef.current.latitudeDelta,
+            longitudeDelta: mapRegionRef.current.longitudeDelta,
+          }, 100); 
+        }
+
+        return;
+      }
+    } else if (Platform.OS === 'ios' && !lastUpdated) {
+
+      console.log('  [iOS] 첫 위치 업데이트 (lastUpdated가 null)');
+    }
+
+    if (Platform.OS === 'ios') {
+      console.log('✅ [iOS] 사용자 터치 + 위치 변경 확인 - mapRegionRef 업데이트');
+    } else {
+      console.log('✅ [Android] 사용자 드래그 감지 - mapRegionRef 업데이트');
+    }
 
     setMapRegion(region);
     mapRegionRef.current = region;
+    lastUpdatedRegionRef.current = {
+      latitude: region.latitude,
+      longitude: region.longitude,
+    };
 
     lastLocationChangeTimeRef.current = Date.now();
+
+    isUserTouchRef.current = false;
   };
 
   const bottomNavItems = [
@@ -794,6 +931,7 @@ export const MapMainScreen: React.FC = () => {
             showsMyLocationButton={false}
             onRegionChange={handleRegionChange}
             onRegionChangeComplete={handleRegionChangeComplete}
+            onPanDrag={handlePanDrag}
             onPress={handleMapPress}
           >
             {}
