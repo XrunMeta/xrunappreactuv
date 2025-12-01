@@ -29,7 +29,13 @@ export const ClauseDetailScreen = () => {
         setIsLoading(true);
         setError(null);
 
-        const currentLanguage = i18n.language || 'ko';
+        let currentLanguage = i18n.language || 'ko';
+
+        if (currentLanguage === 'zh' || currentLanguage === 'zhCN' || currentLanguage === 'zh-CN') {
+          currentLanguage = 'zh-CN';
+        }
+
+        console.log('[약관] 현재 언어 코드:', currentLanguage, 'i18n.language:', i18n.language);
 
         const clauseType = selectedClauseId as 'service' | 'location' | 'personal';
 

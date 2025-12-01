@@ -186,7 +186,14 @@ export const ReferralMyGroupScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <Header title={t('screens.referralMyGroup.title')} />
+      <Header 
+        title={t('screens.referralMyGroup.title')} 
+        rightComponent={
+          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+            <Feather name="share-2" size={18} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
+      />
       <View style={styles.content}>
         <View style={styles.wrapper}>
           <View style={styles.topRow}>
@@ -195,9 +202,6 @@ export const ReferralMyGroupScreen = () => {
               value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
               containerStyle={styles.statsCardCenter}
             />
-            <TouchableOpacity style={styles.iconButton} onPress={handleShare} activeOpacity={0.7}>
-              <Feather name="share-2" size={18} color={COLORS.headerText} />
-            </TouchableOpacity>
           </View>
 
           <SegmentedControl
@@ -262,14 +266,11 @@ const styles = StyleSheet.create({
   statsCardCenter: {
     justifyContent: 'center',
   },
-  iconButton: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
+  headerShareButton: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },

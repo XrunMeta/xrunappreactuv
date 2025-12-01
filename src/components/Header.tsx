@@ -19,12 +19,29 @@ export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   rightComponent,
 }) => {
-  const { goBack, reset, canGoBack } = useAppNavigation();
+  const { goBack, reset, canGoBack, currentScreen } = useAppNavigation();
   const shouldShowBackButton = showBackButton;
 
   const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+      return;
+    }
 
-    reset(ROUTES.map);
+    const isMyInfoScreen = currentScreen?.startsWith('myInfo');
+
+    if (isMyInfoScreen) {
+
+      if (canGoBack) {
+        goBack();
+      } else {
+
+        reset(ROUTES.map);
+      }
+    } else {
+
+      reset(ROUTES.map);
+    }
   };
 
   const renderBackArea = () =>
@@ -61,7 +78,8 @@ const styles = StyleSheet.create({
   container: {
     height: 92,
     width: width,
-    paddingTop: 30,
+    marginTop:10,
+    paddingTop: 40,
     backgroundColor: COLORS.background,
     shadowColor: '#000',
     shadowOffset: {

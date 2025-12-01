@@ -3529,6 +3529,12 @@ export const getClauseContent = async (
 
     const response = await axiosInstance.get<{ data: Array<{ c: string }> }>(apiUrl);
 
+    console.log('[약관] API 응답 데이터:', {
+      language,
+      dataLength: response.data.data?.length,
+      data: response.data.data,
+    });
+
     let content = '';
     if (clauseType === 'service') {
       content = response.data.data?.[0]?.c || '';
@@ -3538,7 +3544,40 @@ export const getClauseContent = async (
       content = response.data.data?.[2]?.c || '';
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', clauseType);
+    if ((language === 'zh-CN' || language === 'zh') && !content) {
+      console.warn('[약관] 중국어 약관 내용이 비어있습니다. 전체 응답 확인:', response.data);
+
+      if (response.data.data && response.data.data.length > 0) {
+
+        for (let i = 0; i < response.data.data.length; i++) {
+          const item = response.data.data[i];
+          if (item && item.c && item.c.trim()) {
+
+            if (clauseType === 'service' && i === 0) {
+              content = item.c;
+              break;
+            } else if (clauseType === 'personal' && i === 1) {
+              content = item.c;
+              break;
+            } else if (clauseType === 'location' && i === 2) {
+              content = item.c;
+              break;
+            }
+          }
+        }
+
+        if (!content && response.data.data.length > 0) {
+          const firstNonEmpty = response.data.data.find(item => item && item.c && item.c.trim());
+          if (firstNonEmpty) {
+            content = firstNonEmpty.c;
+            console.log('[약관] Fallback으로 첫 번째 비어있지 않은 항목 사용');
+          }
+        }
+      }
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', { clauseType, language, contentLength: content.length });
+
     return content;
   } catch (error) {
     console.error('[약관] 약관 내용 로드 실패:', error);
