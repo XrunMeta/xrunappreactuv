@@ -129,6 +129,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_de148f = v_e662ae(v_434ce4);
 
+  const v_ca338a = v_e662ae(false);
+
+  const v_43de51 = v_e662ae(false);
+
+  const v_c675cc = v_e662ae<{ latitude: number; longitude: number } | null>(null);
+
   let v_be97ff = null;
   try {
     v_be97ff = require('../../assets/images/icon_xrun_black.png');
@@ -218,6 +224,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     const v_dfcc93 = v_de148f.current;
 
+    v_ca338a.current = true;
+    console.log('📍 [프로그램 이동] 초기 위치로 복귀 시작');
+    console.log('  현재 위치:', v_dfcc93.latitude.toFixed(6), v_dfcc93.longitude.toFixed(6));
+    console.log('  목표 위치:', v_0ff02b.latitude.toFixed(6), v_0ff02b.longitude.toFixed(6));
+
     if (v_3ec640.current) {
       v_3ec640.current.animateToRegion({
         latitude: v_0ff02b.latitude,
@@ -225,6 +236,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
         latitudeDelta: v_dfcc93.latitudeDelta,
         longitudeDelta: v_dfcc93.longitudeDelta,
       }, 500);
+
+      setTimeout(() => {
+        v_ca338a.current = false;
+        console.log('📍 [프로그램 이동] 플래그 리셋 완료');
+      }, 600);
     }
 
     const v_6ffbdc = {
@@ -272,7 +288,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     if (v_f69ae0) {
       v_a11b30.current = v_dcebe9;
-
+      console.log('=== [3초마다 위치 확인] 맵 위치 변경 감지 ===');
+      console.log('  현재 위치:', v_7dd198.latitude.toFixed(6), v_7dd198.longitude.toFixed(6));
+      console.log('  마지막 마커 로드 위치:', v_5a477d.latitude.toFixed(6), v_5a477d.longitude.toFixed(6));
+      console.log('  거리:', v_926d1c.toFixed(2), 'm');
+      console.log('  프로그램 이동 플래그:', v_ca338a.current);
     }
 
     if (v_926d1c >= 500) {
@@ -340,6 +360,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
           v_c84980(v_4a8217);
           v_c38114.current = v_4a8217;
           v_a2b40c.current = v_4a8217;
+
+          v_c675cc.current = {
+            latitude: v_4a8217.latitude,
+            longitude: v_4a8217.longitude,
+          };
           console.log('=== 초기 위치 저장 ===', v_4a8217);
         }
 
@@ -382,6 +407,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
                   v_c84980(v_3a1065);
                   v_c38114.current = v_3a1065;
                   v_a2b40c.current = v_3a1065;
+
+                  v_c675cc.current = {
+                    latitude: v_3a1065.latitude,
+                    longitude: v_3a1065.longitude,
+                  };
                 }
 
                 await v_524200(v_3a1065);
@@ -410,6 +440,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
             v_c84980(v_3a1065);
             v_c38114.current = v_3a1065;
             v_a2b40c.current = v_3a1065;
+
+            v_c675cc.current = {
+              latitude: v_3a1065.latitude,
+              longitude: v_3a1065.longitude,
+            };
           }
 
           await v_524200(v_3a1065);
@@ -556,6 +591,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     if (v_3ec640.current && v_c5ac8b.latitude && v_c5ac8b.longitude) {
       const v_340e3c = v_de148f.current;
+
+      v_ca338a.current = true;
+      console.log('📍 [프로그램 이동] 마커 클릭으로 맵 이동 시작');
+      console.log('  현재 위치:', v_340e3c.latitude.toFixed(6), v_340e3c.longitude.toFixed(6));
+      console.log('  목표 위치:', v_c5ac8b.latitude.toFixed(6), v_c5ac8b.longitude.toFixed(6));
+
       v_3ec640.current.animateToRegion({
         latitude: v_c5ac8b.latitude,
         longitude: v_c5ac8b.longitude,
@@ -572,6 +613,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_ed2516(v_6ffbdc);
       v_de148f.current = v_6ffbdc;
       v_a11b30.current = Date.now();
+
+      setTimeout(() => {
+        v_ca338a.current = false;
+        console.log('📍 [프로그램 이동] 마커 클릭 이동 플래그 리셋 완료');
+      }, 600);
 
       setTimeout(() => {
         if (v_3ec640.current && v_c5ac8b.latitude && v_c5ac8b.longitude) {
@@ -675,12 +721,23 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     const v_340e3c = v_de148f.current;
     if (v_3ec640.current && v_5e3dbb.latitude && v_5e3dbb.longitude) {
+
+      v_ca338a.current = true;
+      console.log('📍 [프로그램 이동] 맵 클릭으로 맵 이동 시작');
+      console.log('  현재 위치:', v_340e3c.latitude.toFixed(6), v_340e3c.longitude.toFixed(6));
+      console.log('  목표 위치:', v_5e3dbb.latitude.toFixed(6), v_5e3dbb.longitude.toFixed(6));
+
       v_3ec640.current.animateToRegion({
         latitude: v_5e3dbb.latitude,
         longitude: v_5e3dbb.longitude,
         latitudeDelta: v_340e3c.latitudeDelta,
         longitudeDelta: v_340e3c.longitudeDelta,
       }, 500); 
+
+      setTimeout(() => {
+        v_ca338a.current = false;
+        console.log('📍 [프로그램 이동] 맵 클릭 이동 플래그 리셋 완료');
+      }, 600);
     }
 
     const v_6ffbdc = {
@@ -744,12 +801,92 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   };
 
+  const v_f127bf = () => {
+    if (v_326be8.OS === 'ios') {
+      console.log('👆 [iOS] 사용자 드래그 시작 감지');
+      v_43de51.current = true;
+    }
+  };
+
   const v_6b4469 = (v_a6c30b) => {
+    const v_355a57 = v_ca338a.current;
+    const v_81a27a = v_326be8.OS;
+    const v_46e4e9 = v_c675cc.current;
+
+    console.log('=== [맵 이동 완료 이벤트] ===');
+    console.log('플랫폼:', v_81a27a);
+    console.log('프로그램 이동 플래그:', v_355a57);
+    console.log('사용자 터치 플래그:', v_43de51.current);
+    console.log('새로운 위치:', v_a6c30b.latitude.toFixed(6), v_a6c30b.longitude.toFixed(6));
+    console.log('현재 mapRegionRef 위치:', v_de148f.current.latitude.toFixed(6), v_de148f.current.longitude.toFixed(6));
+
+    if (v_326be8.OS === 'ios' && v_ca338a.current) {
+      console.log('⚠️ [iOS] 프로그램 이동 감지 - mapRegionRef 업데이트 건너뛰기');
+
+      v_ed2516(v_a6c30b);
+
+      v_ca338a.current = false;
+      return;
+    }
+
+    if (v_326be8.OS === 'ios' && !v_43de51.current) {
+      console.log('⚠️ [iOS] 사용자 터치 없음 - mapRegionRef 업데이트 건너뛰기 및 지도 위치 복귀');
+
+      if (v_3ec640.current) {
+        const v_340e3c = v_de148f.current;
+        v_3ec640.current.animateToRegion({
+          latitude: v_340e3c.latitude,
+          longitude: v_340e3c.longitude,
+          latitudeDelta: v_340e3c.latitudeDelta,
+          longitudeDelta: v_340e3c.longitudeDelta,
+        }, 100); 
+      }
+
+      return;
+    }
+
+    if (v_326be8.OS === 'ios' && v_46e4e9) {
+      const v_7358c4 = Math.abs(v_a6c30b.latitude - v_46e4e9.latitude);
+      const v_85decc = Math.abs(v_a6c30b.longitude - v_46e4e9.longitude);
+      const v_8cc066 = 0.0001; 
+
+      console.log('  위치 변경 차이:', 'latDiff:', v_7358c4.toFixed(6), 'lonDiff:', v_85decc.toFixed(6));
+
+      if (v_7358c4 < v_8cc066 && v_85decc < v_8cc066) {
+        console.log('⚠️ [iOS] 위치 변경이 너무 작음 - 무시 및 지도 위치 복귀');
+
+        if (v_3ec640.current && v_46e4e9) {
+          v_3ec640.current.animateToRegion({
+            latitude: v_46e4e9.latitude,
+            longitude: v_46e4e9.longitude,
+            latitudeDelta: v_de148f.current.latitudeDelta,
+            longitudeDelta: v_de148f.current.longitudeDelta,
+          }, 100); 
+        }
+
+        return;
+      }
+    } else if (v_326be8.OS === 'ios' && !v_46e4e9) {
+
+      console.log('  [iOS] 첫 위치 업데이트 (lastUpdated가 null)');
+    }
+
+    if (v_326be8.OS === 'ios') {
+      console.log('✅ [iOS] 사용자 터치 + 위치 변경 확인 - mapRegionRef 업데이트');
+    } else {
+      console.log('✅ [Android] 사용자 드래그 감지 - mapRegionRef 업데이트');
+    }
 
     v_ed2516(v_a6c30b);
     v_de148f.current = v_a6c30b;
+    v_c675cc.current = {
+      latitude: v_a6c30b.latitude,
+      longitude: v_a6c30b.longitude,
+    };
 
     v_a11b30.current = Date.now();
+
+    v_43de51.current = false;
   };
 
   const v_fce460 = [
@@ -794,6 +931,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
             showsMyLocationButton={false}
             onRegionChange={v_0424a1}
             onRegionChangeComplete={v_6b4469}
+            onPanDrag={v_f127bf}
             onPress={v_4e890f}
           >
             {}
