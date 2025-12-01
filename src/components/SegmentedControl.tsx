@@ -11,6 +11,7 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   containerStyle?: v_7e4944;
+  hideIndicator?: boolean;
 }
 
 export const v_b34ce5 = <T extends string>({
@@ -18,6 +19,7 @@ export const v_b34ce5 = <T extends string>({
   value: v_3b402b,
   onChange: v_b187d9,
   containerStyle: v_4affe9,
+  hideIndicator: v_175661 = false,
 }: SegmentedControlProps<T>) => {
   return (
     <View style={[v_d81136.container, v_4affe9]}>
@@ -26,7 +28,11 @@ export const v_b34ce5 = <T extends string>({
         return (
           <TouchableOpacity
             key={v_0bd920.value}
-            style={[v_d81136.optionWrapper, v_26dce6 && v_d81136.optionActive]}
+            style={[
+              v_d81136.optionWrapper,
+              v_26dce6 && v_d81136.optionActive,
+              v_26dce6 && !v_175661 && v_d81136.optionActiveWithIndicator,
+            ]}
             activeOpacity={0.85}
             onPress={() => v_b187d9(v_0bd920.value)}
           >
@@ -62,6 +68,10 @@ const v_d81136 = v_472849.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 2,
+  },
+  optionActiveWithIndicator: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#ffdc04',
   },
   optionLabel: {
     fontSize: 16,

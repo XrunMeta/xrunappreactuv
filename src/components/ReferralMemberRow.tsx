@@ -15,6 +15,7 @@ interface ReferralMemberRowProps {
   description?: string;
   valueText?: string;
   highlight?: boolean;
+  hideHighlightBorder?: boolean;
   onPress?: (event: v_fee73b) => void;
 }
 
@@ -25,11 +26,15 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
   description: v_6856a9,
   valueText: v_870d58,
   highlight: v_70cffa,
+  hideHighlightBorder: v_f909d6 = false,
   onPress: v_719eed,
 }) => {
+
+  const v_f5df09 = v_70cffa === true && v_f909d6 !== true;
+
   return (
     <TouchableOpacity
-      style={[v_d81136.container, v_70cffa && v_d81136.highlight]}
+      style={[v_d81136.container, v_f5df09 && v_d81136.highlight]}
       activeOpacity={v_719eed ? 0.8 : 1}
       onPress={v_719eed}
       disabled={!v_719eed}
@@ -113,5 +118,4 @@ const v_d81136 = v_472849.create({
     color: '#1f6880',
   },
 });
-
 

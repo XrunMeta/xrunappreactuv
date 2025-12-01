@@ -20,6 +20,7 @@ interface MemberData {
   date: string;
   member: string; 
   highlight?: boolean;
+  hideHighlightBorder?: boolean;
 }
 
 export const v_58584a = () => {
@@ -105,6 +106,7 @@ export const v_58584a = () => {
                 date: v_14b228,
                 member: v_8c0b26.member || '',
                 highlight: v_a56041 === 0, 
+                hideHighlightBorder: true, 
               };
             });
 
@@ -148,7 +150,7 @@ export const v_58584a = () => {
     () => [
       { label: v_8d41d7('screens.referralRank.group'), value: 'group' },
       { label: v_8d41d7('screens.referralRank.settlement'), value: 'settlement' },
-      { label: v_8d41d7('screens.referralRank.rank'), value: 'rank' },
+      { label: '순위', value: 'rank' }, 
     ] as const,
     [v_8d41d7],
   );
@@ -188,7 +190,11 @@ export const v_58584a = () => {
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.topRow}>
-            <ReferralStatsCard title={v_8d41d7('screens.referralMyGroup.myGroupMembers')} value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`} helperText=" " />
+            <ReferralStatsCard 
+              title={v_8d41d7('screens.referralMyGroup.myGroupMembers')} 
+              value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
+              containerStyle={v_d81136.statsCardCenter}
+            />
             <TouchableOpacity style={v_d81136.iconButton} onPress={v_22cd2d} activeOpacity={0.7}>
               <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
             </TouchableOpacity>
@@ -199,6 +205,7 @@ export const v_58584a = () => {
             value="group"
             onChange={v_c411e0}
             containerStyle={v_d81136.segmented}
+            hideIndicator={true}
           />
         </View>
 
@@ -223,7 +230,7 @@ export const v_58584a = () => {
                 v_779227({ member: v_8c0b26.member, email: v_8c0b26.email, depth: 2 });
                 v_9b57fc(v_ce4741.referralDepthOne);
               }}
-              contentContainerStyle={v_d81136.listContent}
+              contentContainerStyle={{ ...v_d81136.listContent, paddingVertical: 0, paddingBottom: 32 }}
             />
           )}
         </View>
@@ -250,7 +257,10 @@ const v_d81136 = v_472849.create({
   },
   topRow: {
     position: 'relative',
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  statsCardCenter: {
+    justifyContent: 'center',
   },
   iconButton: {
     position: 'absolute',
@@ -264,7 +274,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   segmented: {
-    marginTop: 16,
+    marginTop: 0,
     marginBottom: 0,
   },
   listContainer: {
@@ -273,8 +283,10 @@ const v_d81136 = v_472849.create({
     maxWidth: 780,
     alignSelf: 'center',
     paddingHorizontal: 24,
+    paddingTop: 0,
   },
   listContent: {
+    paddingTop: 0,
     paddingBottom: 32,
   },
   emptyContainer: {

@@ -94,7 +94,7 @@ export const v_08aac3 = () => {
     () => [
       { label: v_8d41d7('screens.referralSettlement.group'), value: 'group' },
       { label: v_8d41d7('screens.referralSettlement.settlement'), value: 'settlement' },
-      { label: v_8d41d7('screens.referralSettlement.rank'), value: 'rank' },
+      { label: 'Rank', value: 'rank' }, 
     ] as const,
     [v_8d41d7],
   );
@@ -133,12 +133,11 @@ export const v_08aac3 = () => {
         v_2f9613(v_2a6164);
 
         const v_2c49ad = v_0b09a2.data[0]?.amount || '0';
-        const v_e0fe28 = v_35c0e0(v_2c49ad);
+        const v_a35cbd = typeof v_2c49ad === 'string' ? parseFloat(v_2c49ad) : v_2c49ad;
+        const v_e0fe28 = isNaN(v_a35cbd) ? '0' : v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
         const v_6bbb57 = v_beea9d > 0 ? v_beea9d : 176; 
-
-        const v_a35cbd = typeof v_2c49ad === 'string' ? parseFloat(v_2c49ad) : v_2c49ad;
         console.log('[정산] 원화 계산:', { totalAmount: v_2c49ad, totalAmountNum: v_a35cbd, price: v_6bbb57 });
 
         const v_f02564 = v_b9db3d(v_a35cbd, v_6bbb57);
@@ -235,22 +234,27 @@ export const v_08aac3 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.referralSettlement.title')} />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
-          <ReferralStatsCard
-            title={v_8d41d7('screens.referralSettlement.income')}
-            subtitle={v_8d41d7('screens.referralSettlement.settlementIn45Days')}
-            value={v_13f115}
-            helperText={v_26e26f}
-          />
+          <View style={v_d81136.topRow}>
+            <ReferralStatsCard
+              title={v_8d41d7('screens.referralSettlement.income')}
+              subtitle={v_8d41d7('screens.referralSettlement.settlementIn45Days')}
+              value={v_13f115}
+              helperText={v_26e26f}
+            />
+          </View>
 
           <SegmentedControl
             options={v_1c4d31}
             value="settlement"
             onChange={v_c411e0}
             containerStyle={v_d81136.segmented}
+            hideIndicator={true}
           />
+        </View>
 
+        <View style={v_d81136.listContainer}>
           {v_683210 ? (
             <View style={v_d81136.loadingContainer}>
               <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -273,11 +277,12 @@ export const v_08aac3 = () => {
                   </View>
                 ) : null
               }
-              scrollEnabled={false}
+              scrollEnabled={true}
+              contentContainerStyle={v_d81136.listContent}
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -287,8 +292,8 @@ const v_d81136 = v_472849.create({
     flex: 1,
     backgroundColor: '#f7f7fb',
   },
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    flex: 1,
   },
   wrapper: {
     width: '100%',
@@ -296,10 +301,26 @@ const v_d81136 = v_472849.create({
     alignSelf: 'center',
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
+  },
+  topRow: {
+    position: 'relative',
+    marginBottom: 16,
   },
   segmented: {
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  listContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
+  },
+  listContent: {
+    paddingBottom: 32,
   },
   loadingContainer: {
     flex: 1,

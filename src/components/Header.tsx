@@ -1,5 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696 } from 'rcmrninabrnb';
+import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 
@@ -12,12 +13,6 @@ interface HeaderProps {
   rightComponent?: v_a3453e.ReactNode;
 }
 
-const v_238728 = () => (
-  <View style={v_d81136.iconContainer}>
-    <Text style={v_d81136.iconText}>‹</Text>
-  </View>
-);
-
 export const Header: v_a3453e.FC<HeaderProps> = ({
   title: v_9f1622,
   onBackPress: v_f442f6,
@@ -28,15 +23,6 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   const v_e2510f = v_9c4d53;
 
   const v_648e0d = () => {
-    if (v_f442f6) {
-      v_f442f6();
-      return;
-    }
-
-    if (v_7e32fb) {
-      v_c7ac57();
-      return;
-    }
 
     v_487a25(v_ce4741.map);
   };
@@ -48,7 +34,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
         onPress={v_648e0d}
         activeOpacity={0.7}
       >
-        <BackIcon />
+        <Feather name="arrow-left" size={20} color={v_1bfbd0.headerText} />
       </TouchableOpacity>
     ) : (
       <View style={v_d81136.backButtonPlaceholder} />
@@ -97,8 +83,8 @@ const v_d81136 = v_472849.create({
   backButton: {
     width: 40,
     height: 40,
-    backgroundColor: v_1bfbd0.headerIconBg,
-    borderRadius: 16,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -111,18 +97,6 @@ const v_d81136 = v_472849.create({
     height: 40,
     alignItems: 'flex-end',
     justifyContent: 'center',
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: {
-    fontSize: 32,
-    color: v_1bfbd0.headerText,
-    fontWeight: '300',
-    lineHeight: 24,
   },
   titleWrapper: {
     flex: 1,

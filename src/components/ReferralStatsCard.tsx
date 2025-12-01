@@ -21,16 +21,18 @@ export const ReferralStatsCard: v_a3453e.FC<ReferralStatsCardProps> = ({
 }) => {
   return (
     <View style={[v_d81136.card, v_4affe9]}>
-      <View style={v_d81136.titleRow}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
-        {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
-      </View>
+      {(v_9f1622 && v_9f1622.trim()) || v_dda473 ? (
+        <View style={v_d81136.titleRow}>
+          {v_9f1622 && v_9f1622.trim() ? <Text style={v_d81136.title}>{v_9f1622}</Text> : null}
+          {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
+        </View>
+      ) : null}
       {v_21f619 ? (
         v_21f619
       ) : (
         <>
           {v_3b402b ? <Text style={v_d81136.value}>{v_3b402b}</Text> : null}
-          {v_43fb35 ? <Text style={v_d81136.helper}>{v_43fb35}</Text> : null}
+          {v_43fb35 && v_43fb35.trim() ? <Text style={v_d81136.helper}>{v_43fb35}</Text> : null}
         </>
       )}
     </View>
@@ -50,6 +52,7 @@ const v_d81136 = v_472849.create({
     shadowOpacity: 0.2,
     shadowRadius: 16,
     elevation: 6,
+    height: 120,
   },
   titleRow: {
     flexDirection: 'row',

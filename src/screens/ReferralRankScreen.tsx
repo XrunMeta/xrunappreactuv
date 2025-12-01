@@ -191,10 +191,14 @@ export const v_f57686 = () => {
 
     const v_06c228 = v_f4fb5e !== '-' && v_8c0b26.email === v_f4fb5e && String(v_8c0b26.rank) === v_ad21d1;
 
+    const v_2f2afb = typeof v_8c0b26.rank === 'number'
+      ? Number(v_8c0b26.rank.toFixed(2))
+      : v_8c0b26.rank;
+
     return (
       <ReferralMemberRow
         key={v_8c0b26.id}
-        rank={v_8c0b26.rank}
+        rank={v_2f2afb}
         email={v_b43178}
         highlight={v_06c228} 
       />
@@ -205,28 +209,42 @@ export const v_f57686 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.referralRank.title')} />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
-          <ReferralStatsCard title={v_8d41d7('screens.referralRank.myRank')}>
-            <View style={v_d81136.rankCardContent}>
-              <View style={v_d81136.rankLeft}>
-                <Text style={v_d81136.rankEmail}>{v_f4fb5e}</Text>
-                <Text style={v_d81136.rankHelper}>{v_8d41d7('screens.referralRank.myRank')}</Text>
+          <View style={v_d81136.topRow}>
+            <ReferralStatsCard title="">
+              <View style={v_d81136.rankCardContent}>
+                <View style={v_d81136.rankLeft}>
+                  <Text style={v_d81136.rankHelper}>My Rank</Text>
+                  <Text style={v_d81136.rankEmail} numberOfLines={1} ellipsizeMode="tail">
+                    {v_f4fb5e}
+                  </Text>
+                </View>
+                <View style={v_d81136.rankDivider} />
+                <View style={v_d81136.rankRight}>
+                  <Text style={v_d81136.rankValue}>
+                    {v_ad21d1 !== '-' 
+                      ? Number(v_ad21d1).toLocaleString('ko-KR', { 
+                          minimumFractionDigits: 0, 
+                          maximumFractionDigits: 2 
+                        })
+                      : v_ad21d1}
+                  </Text>
+                </View>
               </View>
-              <View style={v_d81136.rankDivider} />
-              <View style={v_d81136.rankRight}>
-                <Text style={v_d81136.rankValue}>#{v_ad21d1}</Text>
-              </View>
-            </View>
-          </ReferralStatsCard>
+            </ReferralStatsCard>
+          </View>
 
           <SegmentedControl
             options={v_1c4d31}
             value="rank"
             onChange={v_c411e0}
             containerStyle={v_d81136.segmented}
+            hideIndicator={true}
           />
+        </View>
 
+        <View style={v_d81136.listContainer}>
           {v_683210 ? (
             <View style={v_d81136.loadingContainer}>
               <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -249,11 +267,12 @@ export const v_f57686 = () => {
                   </View>
                 ) : null
               }
-              scrollEnabled={false}
+              scrollEnabled={true}
+              contentContainerStyle={v_d81136.listContent}
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -263,8 +282,8 @@ const v_d81136 = v_472849.create({
     flex: 1,
     backgroundColor: '#f7f7fb',
   },
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    flex: 1,
   },
   wrapper: {
     width: '100%',
@@ -272,10 +291,26 @@ const v_d81136 = v_472849.create({
     alignSelf: 'center',
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
+  },
+  topRow: {
+    position: 'relative',
+    marginBottom: 16,
   },
   segmented: {
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  listContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
+  },
+  listContent: {
+    paddingBottom: 32,
   },
   loadingContainer: {
     flex: 1,
@@ -300,21 +335,28 @@ const v_d81136 = v_472849.create({
   rankCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 0,
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 0,
   },
   rankLeft: {
     flex: 1,
-  },
-  rankEmail: {
-    fontSize: 20,
-    fontFamily: 'Roboto-Bold',
-    color: '#ffffff',
+    justifyContent: 'center',
+    minHeight: 20,
   },
   rankHelper: {
-    marginTop: 4,
-    fontSize: 14,
+    fontSize: 16,
     color: '#d2edf4',
-    fontFamily: 'Roboto-Regular',
+    fontFamily: 'Roboto-Bold',
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  rankEmail: {
+    fontSize: 18,
+    fontFamily: 'Roboto-Bold',
+    color: '#ffffff',
+    lineHeight: 22,
   },
   rankDivider: {
     width: 1,
@@ -324,9 +366,10 @@ const v_d81136 = v_472849.create({
   },
   rankRight: {
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   rankValue: {
-    fontSize: 18,
+    fontSize: 32,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
