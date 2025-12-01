@@ -85,7 +85,7 @@ export const AdWalletScreen = () => {
           const krwAmountValue = parseFloat(transaction.krwamount || '0').toFixed(2);
           const krwamount = `${krwAmountValue} KRW`;
 
-          const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(4);
+          const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(2);
           const amountasxrun = `${amountAsXrunValue} XRUN`;
 
           setTopBannersData({
@@ -158,7 +158,9 @@ export const AdWalletScreen = () => {
     (item: ADXRUNEstimateItem): AdEntry => {
       const status = t('screens.adWallet.pending');
       const date = formatDate(item.created_at);
-      const expectedAdRevenue = item.priceasXrun ? `${item.priceasXrun} XRUN` : '0 XRUN';
+      const expectedAdRevenue = item.priceasXrun 
+        ? `${parseFloat(item.priceasXrun || '0').toFixed(2)} XRUN` 
+        : '0.00 XRUN';
       const adRevenueSettlement = '- XRUN';
 
       return {
@@ -188,7 +190,7 @@ export const AdWalletScreen = () => {
           const extrastr4Value = parseFloat(item.extrastr4);
 
           if (!isNaN(amountValue) && !isNaN(extrastr4Value) && extrastr4Value !== 0) {
-            const result = (amountValue / extrastr4Value).toFixed(6);
+            const result = (amountValue / extrastr4Value).toFixed(2);
             expectedAdRevenue = `${result} XRUN`;
           }
         } catch (error) {
@@ -196,9 +198,9 @@ export const AdWalletScreen = () => {
         }
       }
 
-      let adRevenueSettlement = '0 XRUN';
+      let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
-        const settlementValue = parseFloat(item.amountasxrun).toFixed(6);
+        const settlementValue = parseFloat(item.amountasxrun).toFixed(2);
         adRevenueSettlement = `${settlementValue} XRUN`;
       }
 
@@ -357,6 +359,7 @@ export const AdWalletScreen = () => {
           value={tab}
           onChange={handleTabChange}
           containerStyle={styles.segmentedControl}
+          hideIndicator={true}
         />
 
         <View style={styles.listWrapper}>

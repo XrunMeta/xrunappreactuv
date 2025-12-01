@@ -43,7 +43,7 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
         <View style={[styles.accentOne, { backgroundColor: theme.accentOne }]} />
         <View style={[styles.accentTwo, { backgroundColor: theme.accentTwo }]} />
 
-        <View>
+        <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>{title}</Text>
           {mainValue ? (
             <>
@@ -51,7 +51,11 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
               <Text style={styles.balanceValue}>{mainValue}</Text>
             </>
           ) : null}
-          {address ? <Text style={styles.cardAddress}>{address}</Text> : null}
+          {address ? (
+            <Text style={styles.cardAddress} numberOfLines={2} ellipsizeMode="middle">
+              {address}
+            </Text>
+          ) : null}
         </View>
 
         <TouchableOpacity style={styles.copyButton} onPress={onCopy} activeOpacity={0.7}>
@@ -107,6 +111,10 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-15deg' }],
     zIndex: 0,
   },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   cardTitle: {
     fontSize: 16,
     color: '#ffffff',
@@ -117,6 +125,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#f0f3ff',
     fontFamily: 'Roboto-Regular',
+    marginTop: 4,
+    textAlign: 'left',
   },
   balanceLabel: {
     fontSize: 14,

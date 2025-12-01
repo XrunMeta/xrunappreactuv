@@ -154,7 +154,7 @@ export const WalletScreen = () => {
           symbol: item.symbol,
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
-          amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(),
+          amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
           icon:
             item.currency === 1
               ? require('../../assets/xrun-round-logo.png')
@@ -178,7 +178,7 @@ export const WalletScreen = () => {
             id: token.currency,
             symbol: token.symbol,
             name: token.name,
-            amount: new BigNumber(token.amount || '0').toFixed(),
+            amount: new BigNumber(token.amount || '0').toFixed(2),
             icon: matchingWalletData
               ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(
                   /(\r\n|\n|\r)/gm,
@@ -201,7 +201,7 @@ export const WalletScreen = () => {
         id: 19,
         symbol: 'XRUN',
         name: 'AD XRUN',
-        amount: new BigNumber(adXrunAmount || '0').toFixed(),
+        amount: new BigNumber(adXrunAmount || '0').toFixed(2),
         icon: require('../../assets/ad-round-logo.png'),
         currency: 19,
         isCustom: false,
@@ -557,6 +557,7 @@ export const WalletScreen = () => {
           decimalSeparator: '.',
           groupSeparator: ',',
           groupSize: 3,
+          decimalPlaces: 2,
         }),
         suffix: asset.symbol,
         iconSource,
@@ -637,10 +638,9 @@ export const WalletScreen = () => {
           <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
         </View>
         <View style={styles.tokenItemRight}>
-          <Text style={styles.tokenItemAmount} numberOfLines={1} ellipsizeMode="tail">
-            {amount}
+          <Text style={styles.tokenItemAmount} numberOfLines={2} ellipsizeMode="tail">
+            {amount} {suffix || ''}
           </Text>
-          {suffix ? <Text style={styles.tokenItemSuffix}>{suffix}</Text> : null}
         </View>
       </TouchableOpacity>
     );
@@ -654,7 +654,7 @@ export const WalletScreen = () => {
         <View style={styles.headerCardWrapper}>
           <WalletHeaderCard
             title={t('screens.wallet.myWallet')}
-            address={publicAddress ? shortenAddress(publicAddress, front, back) : ''}
+            address={publicAddress || ''}
             onCopy={handleCopyAddress}
             actions={[
               {
@@ -836,18 +836,13 @@ const styles = StyleSheet.create({
   },
   tokenItemRight: {
     alignItems: 'flex-end',
-    flexShrink: 1,
-    maxWidth: '45%',
+    flexShrink: 0,
+    minWidth: 0,
   },
   tokenItemAmount: {
     fontSize: 16,
     fontFamily: 'Roboto-Bold',
-    color: '#363636',
-  },
-  tokenItemSuffix: {
-    fontSize: 12,
-    fontFamily: 'Roboto-Regular',
-    color: '#979797',
+    color: '#000000',
   },
   homeIndicator: {
     height: 34,

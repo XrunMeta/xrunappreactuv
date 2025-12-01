@@ -342,9 +342,7 @@ export const WalletDetailScreen = () => {
   }, [selectedWalletAsset]);
 
   const shortenedAddress = useMemo(() => {
-    if (!publicAddress) return '';
-    if (publicAddress.length <= 24) return publicAddress;
-    return `${publicAddress.slice(0, 24)}.......`;
+    return publicAddress || '';
   }, [publicAddress]);
 
   const explorerLabel = useMemo(() => {
