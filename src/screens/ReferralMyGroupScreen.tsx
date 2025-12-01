@@ -186,7 +186,14 @@ export const v_58584a = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <Header title={v_8d41d7('screens.referralMyGroup.title')} />
+      <Header 
+        title={v_8d41d7('screens.referralMyGroup.title')} 
+        rightComponent={
+          <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
+            <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
+          </TouchableOpacity>
+        }
+      />
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.topRow}>
@@ -195,9 +202,6 @@ export const v_58584a = () => {
               value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
               containerStyle={v_d81136.statsCardCenter}
             />
-            <TouchableOpacity style={v_d81136.iconButton} onPress={v_22cd2d} activeOpacity={0.7}>
-              <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
-            </TouchableOpacity>
           </View>
 
           <SegmentedControl
@@ -262,14 +266,11 @@ const v_d81136 = v_472849.create({
   statsCardCenter: {
     justifyContent: 'center',
   },
-  iconButton: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
+  headerShareButton: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },

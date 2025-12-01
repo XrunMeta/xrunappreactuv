@@ -29,7 +29,13 @@ export const v_5fdcb2 = () => {
         v_deef62(true);
         v_3a7d09(null);
 
-        const v_7c5e9b = v_9c213b.language || 'ko';
+        let v_7c5e9b = v_9c213b.language || 'ko';
+
+        if (v_7c5e9b === 'zh' || v_7c5e9b === 'zhCN' || v_7c5e9b === 'zh-CN') {
+          v_7c5e9b = 'zh-CN';
+        }
+
+        console.log('[약관] 현재 언어 코드:', v_7c5e9b, 'i18n.language:', v_9c213b.language);
 
         const v_4898e2 = v_6e7459 as 'service' | 'location' | 'personal';
 

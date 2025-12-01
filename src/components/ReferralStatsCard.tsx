@@ -60,7 +60,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Roboto-Medium',
     color: '#EBF6FF',
   },

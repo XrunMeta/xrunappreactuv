@@ -19,12 +19,29 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   showBackButton: v_9c4d53 = true,
   rightComponent: v_52c3cc,
 }) => {
-  const { goBack: v_c7ac57, reset: v_487a25, canGoBack: v_7e32fb } = v_a0daa8();
+  const { goBack: v_c7ac57, reset: v_487a25, canGoBack: v_7e32fb, currentScreen: v_0f0c7b } = v_a0daa8();
   const v_e2510f = v_9c4d53;
 
   const v_648e0d = () => {
+    if (v_f442f6) {
+      v_f442f6();
+      return;
+    }
 
-    v_487a25(v_ce4741.map);
+    const v_439a85 = v_0f0c7b?.startsWith('myInfo');
+
+    if (v_439a85) {
+
+      if (v_7e32fb) {
+        v_c7ac57();
+      } else {
+
+        v_487a25(v_ce4741.map);
+      }
+    } else {
+
+      v_487a25(v_ce4741.map);
+    }
   };
 
   const v_91b7e0 = () =>
@@ -61,7 +78,8 @@ const v_d81136 = v_472849.create({
   container: {
     height: 92,
     width: v_8e4fb6,
-    paddingTop: 30,
+    marginTop:10,
+    paddingTop: 40,
     backgroundColor: v_1bfbd0.background,
     shadowColor: '#000',
     shadowOffset: {

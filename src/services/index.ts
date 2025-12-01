@@ -3529,6 +3529,12 @@ export const v_4dba02 = async (
 
     const v_3393e3 = await v_9f42a4.get<{ data: Array<{ c: string }> }>(v_8a32c8);
 
+    console.log('[약관] API 응답 데이터:', {
+      language: v_05bb19,
+      dataLength: v_3393e3.data.data?.length,
+      data: v_3393e3.data.data,
+    });
+
     let v_b43b74 = '';
     if (v_4898e2 === 'service') {
       v_b43b74 = v_3393e3.data.data?.[0]?.c || '';
@@ -3538,7 +3544,40 @@ export const v_4dba02 = async (
       v_b43b74 = v_3393e3.data.data?.[2]?.c || '';
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', v_4898e2);
+    if ((v_05bb19 === 'zh-CN' || v_05bb19 === 'zh') && !v_b43b74) {
+      console.warn('[약관] 중국어 약관 내용이 비어있습니다. 전체 응답 확인:', v_3393e3.data);
+
+      if (v_3393e3.data.data && v_3393e3.data.data.length > 0) {
+
+        for (let v_ebec57 = 0; v_ebec57 < v_3393e3.data.data.length; v_ebec57++) {
+          const v_8c0b26 = v_3393e3.data.data[v_ebec57];
+          if (v_8c0b26 && v_8c0b26.c && v_8c0b26.c.trim()) {
+
+            if (v_4898e2 === 'service' && v_ebec57 === 0) {
+              v_b43b74 = v_8c0b26.c;
+              break;
+            } else if (v_4898e2 === 'personal' && v_ebec57 === 1) {
+              v_b43b74 = v_8c0b26.c;
+              break;
+            } else if (v_4898e2 === 'location' && v_ebec57 === 2) {
+              v_b43b74 = v_8c0b26.c;
+              break;
+            }
+          }
+        }
+
+        if (!v_b43b74 && v_3393e3.data.data.length > 0) {
+          const v_08588b = v_3393e3.data.data.find(v_8c0b26 => v_8c0b26 && v_8c0b26.c && v_8c0b26.c.trim());
+          if (v_08588b) {
+            v_b43b74 = v_08588b.c;
+            console.log('[약관] Fallback으로 첫 번째 비어있지 않은 항목 사용');
+          }
+        }
+      }
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', { clauseType: v_4898e2, language: v_05bb19, contentLength: v_b43b74.length });
+
     return v_b43b74;
   } catch (v_5e9bfe) {
     console.error('[약관] 약관 내용 로드 실패:', v_5e9bfe);
