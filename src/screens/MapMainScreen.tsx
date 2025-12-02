@@ -19,6 +19,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
+import { preloadTaboolaHTML } from '../services/taboola';
 
 interface LocationData {
   latitude: number;
@@ -154,7 +155,7 @@ export const MapMainScreen: React.FC = () => {
     return R * c;
   };
 
-  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData) => {
+  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData, forceRefresh: boolean = false) => {
 
     if (loadingMarkersRef.current) {
       console.log('=== 맵 마커 로딩 중, 중복 호출 방지 ===');
@@ -173,6 +174,53 @@ export const MapMainScreen: React.FC = () => {
       if (!member) {
         console.log('userData에 member가 없습니다.');
         return;
+      }
+
+      if (!forceRefresh) {
+        const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+
+        if (astorCoinsData) {
+          console.log('✅ [MapMainScreen] AsyncStorage에서 astorCoinsData 발견');
+          try {
+            const coinsData = JSON.parse(astorCoinsData);
+
+            if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
+
+              const spotDataArray: SpotData[] = coinsData.map((coin: any) => ({
+                spotID: coin.spotid || coin.spotID || coin.id || 0,
+                distance: coin.distance || 0,
+                direction: coin.direction || 0,
+                name: coin.name || coin.title || coin.brand || 'XRUN coin',
+                latitude: coin.latitude || coin.lat,
+                longitude: coin.longitude || coin.lng,
+                xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
+                iconurl: coin.iconurl || '',
+                joindesc: coin.joindesc || '',
+                brand: coin.brand || coin.coin || '',
+                coins: coin.coins || coin.coin || '',
+                coin: coin.coin || '',
+                campid: coin.campid || coin.campId || '',
+              } as SpotData & { campid?: string }));
+
+              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', spotDataArray.length, ')');
+              setMarkers(spotDataArray);
+              setLastFetchedLocation(targetLocation);
+              lastFetchedLocationRef.current = targetLocation;
+
+              loadingMarkersRef.current = false;
+              setLoadingMarkers(false);
+              return;
+            }
+          } catch (parseError) {
+            console.error('[MapMainScreen] astorCoinsData 파싱 오류:', parseError);
+          }
+        }
+      }
+
+      if (forceRefresh) {
+        console.log('🔄 [MapMainScreen] 서버에서 새 데이터 가져오기');
+      } else {
+        console.log('⚠️ [MapMainScreen] AsyncStorage에 데이터 없음, API 호출');
       }
 
       loadingMarkersRef.current = true;
@@ -317,6 +365,21 @@ export const MapMainScreen: React.FC = () => {
       }
     }
   }, [loadMarkersForLocation, returnToInitialLocation]);
+
+  useEffect(() => {
+    const preloadTaboola = async () => {
+      try {
+        console.log('[MapMainScreen] Taboola HTML 프리로드 시작');
+        await preloadTaboolaHTML();
+        console.log('[MapMainScreen] Taboola HTML 프리로드 완료');
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+      } catch (error) {
+        console.error('[MapMainScreen] Taboola HTML 프리로드 실패:', error);
+      }
+    };
+
+    preloadTaboola();
+  }, []); 
 
   useEffect(() => {
     let watchId: number | null = null;
@@ -921,53 +984,47 @@ export const MapMainScreen: React.FC = () => {
 
       {}
       <View style={styles.mapContainer}>
-        {location ? (
-          <MapView
-            ref={mapRef}
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            region={mapRegion}
-            showsUserLocation={true}
-            showsMyLocationButton={false}
-            onRegionChange={handleRegionChange}
-            onRegionChangeComplete={handleRegionChangeComplete}
-            onPanDrag={handlePanDrag}
-            onPress={handleMapPress}
-          >
-            {}
-            {markers
-              .filter((marker) => marker.latitude && marker.longitude) 
-              .map((marker, index) => {
+        <MapView
+          ref={mapRef}
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          region={mapRegion}
+          showsUserLocation={!!location} 
+          showsMyLocationButton={false}
+          onRegionChange={handleRegionChange}
+          onRegionChangeComplete={handleRegionChangeComplete}
+          onPanDrag={handlePanDrag}
+          onPress={handleMapPress}
+        >
+          {}
+          {markers
+            .filter((marker) => marker.latitude && marker.longitude) 
+            .map((marker, index) => {
 
-                const uniqueKey = marker.coin || `marker-${marker.latitude}-${marker.longitude}`;
+              const uniqueKey = marker.coin || `marker-${marker.latitude}-${marker.longitude}`;
 
-                return (
-                <Marker
-                  key={uniqueKey}
-                  coordinate={{
-                    latitude: marker.latitude!,
-                    longitude: marker.longitude!,
-                  }}
-                  anchor={{ x: 0.5, y: 0.5 }}
-                  onPress={() => handleMarkerPress(marker, index)}
-                >
-                  {}
-                  {logoTempMarker && (
-                    <Image
-                      source={logoTempMarker}
-                      style={styles.markerImage}
-                      resizeMode="contain"
-                    />
-                  )}
-                </Marker>
-              );
-              })}
-          </MapView>
-        ) : (
-          <View style={styles.mapPlaceholder}>
-            {}
-          </View>
-        )}
+              return (
+              <Marker
+                key={uniqueKey}
+                coordinate={{
+                  latitude: marker.latitude!,
+                  longitude: marker.longitude!,
+                }}
+                anchor={{ x: 0.5, y: 0.5 }}
+                onPress={() => handleMarkerPress(marker, index)}
+              >
+                {}
+                {logoTempMarker && (
+                  <Image
+                    source={logoTempMarker}
+                    style={styles.markerImage}
+                    resizeMode="contain"
+                  />
+                )}
+              </Marker>
+            );
+            })}
+        </MapView>
 
         {}
         {iconMapPoint && (
