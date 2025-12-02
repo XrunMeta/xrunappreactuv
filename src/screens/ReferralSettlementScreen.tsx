@@ -360,12 +360,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   refTypeText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     color: '#343434',
   },
   amountText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },
