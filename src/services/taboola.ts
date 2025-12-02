@@ -307,7 +307,7 @@ export const v_0433f6 = (
             logToRN('[Taboola WebView] 방법 1: 스크립트 로드 실패: ' + (err ? err.toString() : 'unknown error'), 'error');
             tryMethod2();
           };
-          f.parentNode.insertBefore(e, f);
+          (document.head || document.getElementsByTagName('head')[0] || f.parentNode).appendChild(e);
         } else {
           logToRN('[Taboola WebView] 방법 1: 스크립트가 이미 로드됨');
           checkTaboolaAPI();
@@ -334,7 +334,7 @@ export const v_0433f6 = (
             };
             document.head.appendChild(webScript);
           }
-        }, 3000);
+        }, 1000); // 3000ms에서 1000ms로 단축 (더 빠른 폴백)
       }
 
       function checkTaboolaAPI() {
@@ -375,7 +375,7 @@ export const v_0433f6 = (
             logToRN('[Taboola WebView] Taboola API를 찾을 수 없습니다. 스크립트가 제대로 로드되지 않았을 수 있습니다.', 'error');
             tryMethod2();
           }
-        }, 1500);
+        }, 50); // 100ms에서 50ms로 단축 (최대한 빠른 감지)
       }
 
       setTimeout(function() {
@@ -390,7 +390,7 @@ export const v_0433f6 = (
             }
           }
         }
-      }, 2000);
+      }, 100); // 200ms에서 100ms로 단축 (최대한 빠른 감지)
 
       var checkInterval = setInterval(function() {
         var container = document.getElementById('taboola-container');
@@ -403,12 +403,12 @@ export const v_0433f6 = (
             hasTaboolaElements: container.querySelectorAll('[class*="taboola"], [id*="taboola"]').length > 0
           };
 
-          if (status.hasContent || status.hasTaboolaElements) {
+          if (status.hasContent || status.hasTaboolaElements || status.innerHTMLLength > 50) {
             logToRN('[Taboola WebView] 콘텐츠 감지됨: ' + JSON.stringify(status));
             clearInterval(checkInterval);
           }
         }
-      }, 1000);
+      }, 50); // 100ms에서 50ms로 단축 (최대한 빠른 감지)
 
       setTimeout(function() {
         clearInterval(checkInterval);
@@ -433,4 +433,46 @@ export const v_0433f6 = (
 </body>
 </html>
   `.trim();
+};
+
+export const v_295e39 = async (): Promise<void> => {
+  try {
+    const v_26f42c = v_995f93();
+    const v_cdfaaa = v_33aee4();
+
+    const v_ab9b34 = [
+      v_dc5d8f('myinfo', false),
+      v_dc5d8f('shop', false),
+    ];
+
+    console.log('[Taboola] HTML 프리로드 시작:', v_ab9b34);
+
+    for (const v_f36218 of v_ab9b34) {
+      try {
+        const v_74a79c = v_968eda[v_f36218];
+        if (!v_74a79c) {
+          console.warn(`[Taboola] 프리로드: ${v_f36218}에 대한 config가 없습니다.`);
+          continue;
+        }
+
+        const v_d91d98 = v_0433f6(
+          v_26f42c,
+          v_74a79c.placement,
+          v_74a79c.mode,
+          v_cdfaaa,
+          v_74a79c.pageType,
+          v_74a79c.targetType,
+        );
+
+        console.log(`[Taboola] 프리로드 완료: ${v_f36218} (HTML 생성됨)`);
+      } catch (v_5e9bfe) {
+        console.error(`[Taboola] 프리로드 실패 (${v_f36218}):`, v_5e9bfe);
+      }
+    }
+
+    console.log('[Taboola] HTML 프리로드 완료');
+  } catch (v_5e9bfe) {
+    console.error('[Taboola] HTML 프리로드 중 오류:', v_5e9bfe);
+
+  }
 };

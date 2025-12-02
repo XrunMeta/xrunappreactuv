@@ -3,7 +3,6 @@ import {
   v_3094a2,
   v_19b633,
   v_472849,
-  v_122070,
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
@@ -229,10 +228,7 @@ export const v_03a231 = () => {
         }}
         showBackButton
       />
-      <ScrollView
-        contentContainerStyle={v_d81136.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={v_d81136.scrollContent}>
         <View style={v_d81136.inner}>
           {}
           <TaboolaBanner placementType="myinfo_OS_395x80" />
@@ -290,7 +286,7 @@ export const v_03a231 = () => {
             ))}
           </View>
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };

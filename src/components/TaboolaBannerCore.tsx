@@ -107,12 +107,6 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
         onLoadStart={() => {
           console.log('[TaboolaBannerCore] WebView 로드 시작 - onLoadStart 호출됨');
 
-          if (v_c83407) {
-            console.log('[TaboolaBannerCore] onLoadingChange(false) 호출');
-            v_c83407(false);
-          } else {
-            console.log('[TaboolaBannerCore] onLoadingChange가 없습니다');
-          }
         }}
         onLoadEnd={() => {
           console.log('[TaboolaBannerCore] WebView 로드 완료 - onLoadEnd 호출됨');
@@ -134,9 +128,33 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
             if (v_9390e8 && v_9390e8.message && typeof v_9390e8.message === 'string') {
               const v_a8cd21 = v_9390e8.message;
               if (v_a8cd21.includes('콘텐츠 감지됨')) {
-                console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리');
-                if (v_c83407) {
-                  v_c83407(false);
+                try {
+
+                  const v_6e21ec = v_a8cd21.match(/콘텐츠 감지됨:\s*({.*})/);
+                  if (v_6e21ec) {
+                    const v_8469e9 = JSON.parse(v_6e21ec[1]);
+
+                    if (v_8469e9 && (v_8469e9.hasTaboolaElements === true || (v_8469e9.innerHTMLLength && v_8469e9.innerHTMLLength > 50))) {
+                      console.log('[TaboolaBannerCore] Taboola 광고 콘텐츠 감지됨 - 로딩 완료 처리', v_8469e9);
+                      if (v_c83407) {
+                        v_c83407(false);
+                      }
+                    } else {
+                      console.log('[TaboolaBannerCore] 콘텐츠는 있지만 Taboola 요소 없음, 대기 중...', v_8469e9);
+                    }
+                  } else {
+
+                    console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리 (JSON 파싱 실패)');
+                    if (v_c83407) {
+                      v_c83407(false);
+                    }
+                  }
+                } catch (v_9e86fd) {
+
+                  console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리 (파싱 에러)', v_9e86fd);
+                  if (v_c83407) {
+                    v_c83407(false);
+                  }
                 }
               }
             }
@@ -153,7 +171,7 @@ const v_d81136 = v_472849.create({
   container: {
     width: '100%',
     minHeight: 80,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent', 
     marginVertical: v_9b1a04.small, 
     marginHorizontal: 0, 
   },
