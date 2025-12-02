@@ -19,6 +19,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
+import { v_295e39 } from '../services/taboola';
 
 interface LocationData {
   latitude: number;
@@ -154,7 +155,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
     return v_bef3bf * v_3f4e2e;
   };
 
-  const v_524200 = v_de06a3(async (v_f18a9c) => {
+  const v_524200 = v_de06a3(async (v_f18a9c, v_9d6a91 = false) => {
 
     if (v_5db874.current) {
       console.log('=== 맵 마커 로딩 중, 중복 호출 방지 ===');
@@ -173,6 +174,53 @@ export const MapMainScreen: v_a3453e.FC = () => {
       if (!v_660822) {
         console.log('userData에 member가 없습니다.');
         return;
+      }
+
+      if (!v_9d6a91) {
+        const v_99c46d = await v_e84827.getItem('astorCoinsData');
+
+        if (v_99c46d) {
+          console.log('✅ [MapMainScreen] AsyncStorage에서 astorCoinsData 발견');
+          try {
+            const v_b9ce93 = JSON.parse(v_99c46d);
+
+            if (v_b9ce93 && Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+
+              const spotDataArray: v_f71847[] = v_b9ce93.map((v_51b584) => ({
+                spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
+                distance: v_51b584.distance || 0,
+                direction: v_51b584.direction || 0,
+                name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
+                latitude: v_51b584.latitude || v_51b584.lat,
+                longitude: v_51b584.longitude || v_51b584.lng,
+                xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
+                iconurl: v_51b584.iconurl || '',
+                joindesc: v_51b584.joindesc || '',
+                brand: v_51b584.brand || v_51b584.coin || '',
+                coins: v_51b584.coins || v_51b584.coin || '',
+                coin: v_51b584.coin || '',
+                campid: v_51b584.campid || v_51b584.campId || '',
+              } as v_f71847 & { campid?: string }));
+
+              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', v_22ecab.length, ')');
+              v_14dd24(v_22ecab);
+              v_c84980(v_f18a9c);
+              v_a2b40c.current = v_f18a9c;
+
+              v_5db874.current = false;
+              v_e1bb1a(false);
+              return;
+            }
+          } catch (v_5f9add) {
+            console.error('[MapMainScreen] astorCoinsData 파싱 오류:', v_5f9add);
+          }
+        }
+      }
+
+      if (v_9d6a91) {
+        console.log('🔄 [MapMainScreen] 서버에서 새 데이터 가져오기');
+      } else {
+        console.log('⚠️ [MapMainScreen] AsyncStorage에 데이터 없음, API 호출');
       }
 
       v_5db874.current = true;
@@ -317,6 +365,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
       }
     }
   }, [v_524200, v_668889]);
+
+  v_c4deb2(() => {
+    const v_f2c805 = async () => {
+      try {
+        console.log('[MapMainScreen] Taboola HTML 프리로드 시작');
+        await v_295e39();
+        console.log('[MapMainScreen] Taboola HTML 프리로드 완료');
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+      } catch (v_5e9bfe) {
+        console.error('[MapMainScreen] Taboola HTML 프리로드 실패:', v_5e9bfe);
+      }
+    };
+
+    v_f2c805();
+  }, []); 
 
   v_c4deb2(() => {
     let v_fd434d = null;
@@ -921,53 +984,47 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       {}
       <View style={v_d81136.mapContainer}>
-        {v_a55f0b ? (
-          <MapView
-            ref={v_3ec640}
-            provider={v_b4043e}
-            style={v_d81136.map}
-            region={v_434ce4}
-            showsUserLocation={true}
-            showsMyLocationButton={false}
-            onRegionChange={v_0424a1}
-            onRegionChangeComplete={v_6b4469}
-            onPanDrag={v_f127bf}
-            onPress={v_4e890f}
-          >
-            {}
-            {v_b4d4c5
-              .filter((v_5e3dbb) => v_5e3dbb.latitude && v_5e3dbb.longitude) 
-              .map((v_5e3dbb, v_a56041) => {
+        <MapView
+          ref={v_3ec640}
+          provider={v_b4043e}
+          style={v_d81136.map}
+          region={v_434ce4}
+          showsUserLocation={!!v_a55f0b} 
+          showsMyLocationButton={false}
+          onRegionChange={v_0424a1}
+          onRegionChangeComplete={v_6b4469}
+          onPanDrag={v_f127bf}
+          onPress={v_4e890f}
+        >
+          {}
+          {v_b4d4c5
+            .filter((v_5e3dbb) => v_5e3dbb.latitude && v_5e3dbb.longitude) 
+            .map((v_5e3dbb, v_a56041) => {
 
-                const v_e149c8 = v_5e3dbb.coin || `marker-${v_5e3dbb.latitude}-${v_5e3dbb.longitude}`;
+              const v_e149c8 = v_5e3dbb.coin || `marker-${v_5e3dbb.latitude}-${v_5e3dbb.longitude}`;
 
-                return (
-                <Marker
-                  key={v_e149c8}
-                  coordinate={{
-                    latitude: v_5e3dbb.latitude!,
-                    longitude: v_5e3dbb.longitude!,
-                  }}
-                  anchor={{ x: 0.5, y: 0.5 }}
-                  onPress={() => v_fc58d0(v_5e3dbb, v_a56041)}
-                >
-                  {}
-                  {v_232839 && (
-                    <Image
-                      source={v_232839}
-                      style={v_d81136.markerImage}
-                      resizeMode="contain"
-                    />
-                  )}
-                </Marker>
-              );
-              })}
-          </MapView>
-        ) : (
-          <View style={v_d81136.mapPlaceholder}>
-            {}
-          </View>
-        )}
+              return (
+              <Marker
+                key={v_e149c8}
+                coordinate={{
+                  latitude: v_5e3dbb.latitude!,
+                  longitude: v_5e3dbb.longitude!,
+                }}
+                anchor={{ x: 0.5, y: 0.5 }}
+                onPress={() => v_fc58d0(v_5e3dbb, v_a56041)}
+              >
+                {}
+                {v_232839 && (
+                  <Image
+                    source={v_232839}
+                    style={v_d81136.markerImage}
+                    resizeMode="contain"
+                  />
+                )}
+              </Marker>
+            );
+            })}
+        </MapView>
 
         {}
         {v_16772f && (
