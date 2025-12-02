@@ -35,6 +35,11 @@ export const TaboolaVignette: React.FC<TaboolaVignetteProps> = ({
     return null;
   }
 
+  if (!config) {
+    console.error('[TaboolaVignette] config가 없습니다:', placement);
+    return null;
+  }
+
   return (
     <Modal
       visible={visible}

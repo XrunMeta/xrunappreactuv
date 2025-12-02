@@ -206,6 +206,7 @@ export const ShopMyTicketScreen = () => {
               value="myTicket"
               onChange={handleSegmentChange}
               containerStyle={styles.segmented}
+              hideIndicator={true}
             />
 
             <View style={styles.searchBar}>

@@ -3,11 +3,11 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TaboolaBannerCore } from './TaboolaBannerCore';
 import { COLORS } from '../constants';
-import { TaboolaPlacement, convertPlacementForOS } from '../services/taboola';
+import { TaboolaPlacement, convertPlacementForOS, getTaboolaPlacement } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
-  placementType: TaboolaPlacement;
+  placementType: TaboolaPlacement | 'myinfo' | 'shop' | 'apploading';
 
   pageUrl?: string;
 
@@ -30,6 +30,11 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   const [taboolaLoadingCount, setTaboolaLoadingCount] = useState(0);
 
   const convertedPlacementType = useMemo(() => {
+
+    if (placementType === 'myinfo' || placementType === 'shop' || placementType === 'apploading') {
+      return getTaboolaPlacement(placementType, false);
+    }
+
     return convertPlacementForOS(placementType);
   }, [placementType]);
 

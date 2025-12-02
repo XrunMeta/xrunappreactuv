@@ -45,7 +45,13 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
     publisherId,
     finalPageUrl,
     isNativeAvailable,
+    configExists: !!config,
   });
+
+  if (!config) {
+    console.error('[TaboolaBannerCore] config가 없습니다:', placement);
+    return null;
+  }
 
   useEffect(() => {
     if (isNativeAvailable && onLoadingChange) {

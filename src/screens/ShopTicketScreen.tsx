@@ -363,6 +363,7 @@ export const ShopTicketScreen = () => {
                 value={tab}
                 onChange={handleTabChange}
                 containerStyle={styles.segmented}
+                hideIndicator={true}
               />
 
               <View style={styles.searchBar}>
