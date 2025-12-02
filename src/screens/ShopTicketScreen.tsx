@@ -363,6 +363,7 @@ export const v_38326c = () => {
                 value={v_11083e}
                 onChange={v_42b5ed}
                 containerStyle={v_d81136.segmented}
+                hideIndicator={true}
               />
 
               <View style={v_d81136.searchBar}>

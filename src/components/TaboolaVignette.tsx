@@ -35,6 +35,11 @@ export const TaboolaVignette: v_a3453e.FC<TaboolaVignetteProps> = ({
     return null;
   }
 
+  if (!v_74a79c) {
+    console.error('[TaboolaVignette] config가 없습니다:', v_f36218);
+    return null;
+  }
+
   return (
     <Modal
       visible={v_cf55be}

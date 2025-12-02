@@ -206,6 +206,7 @@ export const v_052a8a = () => {
               value="myTicket"
               onChange={v_c411e0}
               containerStyle={v_d81136.segmented}
+              hideIndicator={true}
             />
 
             <View style={v_d81136.searchBar}>

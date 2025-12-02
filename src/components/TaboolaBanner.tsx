@@ -3,11 +3,11 @@ import { v_3094a2, v_19b633, v_39a996, v_472849 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_eaeabd } from './TaboolaBannerCore';
 import { v_1bfbd0 } from '../constants';
-import { v_80493f, v_17555f } from '../services/taboola';
+import { v_80493f, v_17555f, v_dc5d8f } from '../services/taboola';
 
 interface TaboolaBannerProps {
 
-  placementType: v_80493f;
+  placementType: v_80493f | 'myinfo' | 'shop' | 'apploading';
 
   pageUrl?: string;
 
@@ -30,6 +30,11 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   const [v_1ea9b3, v_2ce9d0] = v_5ab095(0);
 
   const v_193481 = v_df9f57(() => {
+
+    if (v_bb5e8c === 'myinfo' || v_bb5e8c === 'shop' || v_bb5e8c === 'apploading') {
+      return v_dc5d8f(v_bb5e8c, false);
+    }
+
     return v_17555f(v_bb5e8c);
   }, [v_bb5e8c]);
 

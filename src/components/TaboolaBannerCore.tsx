@@ -45,7 +45,13 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
     publisherId: v_26f42c,
     finalPageUrl: v_40f839,
     isNativeAvailable: v_d2b80a,
+    configExists: !!v_74a79c,
   });
+
+  if (!v_74a79c) {
+    console.error('[TaboolaBannerCore] config가 없습니다:', v_f36218);
+    return null;
+  }
 
   v_c4deb2(() => {
     if (v_d2b80a && v_c83407) {
