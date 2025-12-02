@@ -107,12 +107,6 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
         onLoadStart={() => {
           console.log('[TaboolaBannerCore] WebView 로드 시작 - onLoadStart 호출됨');
 
-          if (onLoadingChange) {
-            console.log('[TaboolaBannerCore] onLoadingChange(false) 호출');
-            onLoadingChange(false);
-          } else {
-            console.log('[TaboolaBannerCore] onLoadingChange가 없습니다');
-          }
         }}
         onLoadEnd={() => {
           console.log('[TaboolaBannerCore] WebView 로드 완료 - onLoadEnd 호출됨');
@@ -134,9 +128,33 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
             if (data && data.message && typeof data.message === 'string') {
               const message = data.message;
               if (message.includes('콘텐츠 감지됨')) {
-                console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리');
-                if (onLoadingChange) {
-                  onLoadingChange(false);
+                try {
+
+                  const jsonMatch = message.match(/콘텐츠 감지됨:\s*({.*})/);
+                  if (jsonMatch) {
+                    const contentData = JSON.parse(jsonMatch[1]);
+
+                    if (contentData && (contentData.hasTaboolaElements === true || (contentData.innerHTMLLength && contentData.innerHTMLLength > 50))) {
+                      console.log('[TaboolaBannerCore] Taboola 광고 콘텐츠 감지됨 - 로딩 완료 처리', contentData);
+                      if (onLoadingChange) {
+                        onLoadingChange(false);
+                      }
+                    } else {
+                      console.log('[TaboolaBannerCore] 콘텐츠는 있지만 Taboola 요소 없음, 대기 중...', contentData);
+                    }
+                  } else {
+
+                    console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리 (JSON 파싱 실패)');
+                    if (onLoadingChange) {
+                      onLoadingChange(false);
+                    }
+                  }
+                } catch (e) {
+
+                  console.log('[TaboolaBannerCore] 콘텐츠 감지됨 - 로딩 완료 처리 (파싱 에러)', e);
+                  if (onLoadingChange) {
+                    onLoadingChange(false);
+                  }
                 }
               }
             }
@@ -153,7 +171,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     minHeight: 80,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent', 
     marginVertical: SIZES.small, 
     marginHorizontal: 0, 
   },

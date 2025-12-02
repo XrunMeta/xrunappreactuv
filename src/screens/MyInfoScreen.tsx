@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
@@ -229,10 +228,7 @@ export const MyInfoScreen = () => {
         }}
         showBackButton
       />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.scrollContent}>
         <View style={styles.inner}>
           {}
           <TaboolaBanner placementType="myinfo_OS_395x80" />
@@ -290,7 +286,7 @@ export const MyInfoScreen = () => {
             ))}
           </View>
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
