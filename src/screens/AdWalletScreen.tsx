@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SegmentedControl, DataList } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
+import { formatCurrency } from '../utils';
 import {
   fetchADXRUNEstimateList,
   fetchADXRUNResultList,
@@ -82,8 +83,8 @@ export const AdWalletScreen = () => {
         if (responseData && responseData.transactions && responseData.transactions.length > 0) {
           const transaction = responseData.transactions[0];
 
-          const krwAmountValue = parseFloat(transaction.krwamount || '0').toFixed(2);
-          const krwamount = `${krwAmountValue} KRW`;
+          const krwAmountValue = parseFloat(transaction.krwamount || '0');
+          const krwamount = formatCurrency(krwAmountValue, 'KRW');
 
           const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(2);
           const amountasxrun = `${amountAsXrunValue} XRUN`;
