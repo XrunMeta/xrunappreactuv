@@ -76,10 +76,10 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
 const v_d81136 = v_472849.create({
   container: {
-    height: 92,
+    height: 96,
     width: v_8e4fb6,
     marginTop:10,
-    paddingTop: 40,
+    paddingTop: 44,
     backgroundColor: v_1bfbd0.background,
     shadowColor: '#000',
     shadowOffset: {
@@ -121,9 +121,9 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    lineHeight: 24,
+    lineHeight: 22,
     color: v_1bfbd0.headerText,
     fontFamily: 'Roboto-Bold', 
     textAlign: 'center',
