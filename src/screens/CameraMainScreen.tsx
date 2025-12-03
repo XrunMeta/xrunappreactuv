@@ -381,6 +381,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
   const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [coinsData, setCoinsData] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const currentIndexRef = useRef(0);
   const chunkSize = 4;
@@ -431,47 +432,86 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     requestCameraPermission();
   }, [permission, requestPermission, showAlert]);
 
-  const convertSpotDataToTokenData = (spotData: (SpotData & { campid?: string })[], startIndex: number): TokenData[] => {
-    const actualChunkSize = Math.min(chunkSize, spotData.length);
-    let nextData: (SpotData & { campid?: string })[] = [];
+  const organizeData = useCallback((oCoinData: any[]) => {
+    console.log('🔧 organizeData 호출됨:', {
+      oCoinDataLength: oCoinData.length,
+      currentIndex: currentIndexRef.current,
+      chunkSize: chunkSize,
+    });
 
-    if (startIndex + actualChunkSize > spotData.length) {
-      nextData = [
-        ...spotData.slice(startIndex),
-        ...spotData.slice(0, (startIndex + actualChunkSize) % spotData.length),
-      ];
-    } else {
-      nextData = spotData.slice(startIndex, startIndex + actualChunkSize);
+    if (oCoinData.length === 0) {
+      console.log('❌ oCoinData가 비어있음');
+      setTokens([]);
+      return;
     }
 
-    return nextData.map((data, index) => {
-      const spot = spots[index % spots.length];
-      const campid = data.campid || '';
+    let nextData: any[] = [];
+    let actualChunkSize = Math.min(chunkSize, oCoinData.length);
+    const startIndex = currentIndexRef.current; 
 
-      console.log(`토큰 변환 [${index}]:`, {
+    if (currentIndexRef.current + actualChunkSize > oCoinData.length) {
+
+      nextData = [
+        ...oCoinData.slice(currentIndexRef.current),
+        ...oCoinData.slice(0, (currentIndexRef.current + actualChunkSize) % oCoinData.length),
+      ];
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    } else {
+
+      nextData = oCoinData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    }
+
+    console.log('📊 nextData 정보:', {
+      nextDataLength: nextData.length,
+      startIndex: startIndex,
+      currentIndex: currentIndexRef.current,
+      actualChunkSize: actualChunkSize,
+    });
+
+    nextData.forEach((data, idx) => {
+      console.log(`📋 nextData[${idx}] 원본 데이터:`, {
         name: data.name,
         coin: data.coin,
-        campid: campid,
-        hasCampid: !!campid,
+        advertisement: data.advertisement,
+        campid: data.campid,
+        xrunPrice: data.xrunPrice || data.xrunprice,
+        xrunprice: data.xrunprice,
+        distance: data.distance,
+        iconurl: data.iconurl,
+        joindesc: data.joindesc,
+        brand: data.brand,
+
+        allKeys: Object.keys(data),
+      });
+    });
+
+    const newOrganizedData = nextData.map((data, index) => {
+
+      const mergedData = {
+        ...spots[index % spots.length], 
+        ...data, 
+      };
+
+      console.log(`🎯 토큰 [${index}] 데이터 합치기:`, {
+        spotID: mergedData.spotID,
+        name: mergedData.name,
+        coin: mergedData.coin,
+        advertisement: mergedData.advertisement,
+        xrunPrice: mergedData.xrunPrice || mergedData.xrunprice,
+        campid: mergedData.campid,
+        distance: mergedData.distance,
+        iconurl: mergedData.iconurl,
+        joindesc: mergedData.joindesc,
+        brand: mergedData.brand,
       });
 
-      return {
-        spotID: spot.spotID,
-        x: spot.x,
-        y: spot.y,
-        xrunPrice: data.xrunPrice || 0,
-        distance: data.distance || 0,
-        name: data.name || 'XRUN coin',
-        iconurl: data.iconurl || '',
-        joindesc: data.joindesc || '',
-        brand: data.brand || '',
-        advertisement: data.coin || '',
-        coin: data.coin || '',
-        member: '',
-        campid: campid, 
-      };
+      return mergedData as TokenData;
     });
-  };
+
+    console.log('✅ organizedData 상태 업데이트 완료:', newOrganizedData.length, '개');
+    setTokens(newOrganizedData);
+  }, []);
 
   const loadTokenData = useCallback(async (forceRefresh: boolean = false) => {
 
@@ -493,30 +533,34 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
 
-              const spotDataArray: SpotData[] = coinsData.map((coin: any) => ({
-                spotID: coin.spotid || coin.spotID || coin.id || 0,
-                distance: coin.distance || 0,
-                direction: coin.direction || 0,
-                name: coin.name || coin.title || coin.brand || 'XRUN coin',
-                latitude: coin.latitude || coin.lat,
-                longitude: coin.longitude || coin.lng,
-                xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
-                iconurl: coin.iconurl || '',
+              const validatedCoinsData = coinsData.map((coin: any) => ({
+                ...coin, 
+                iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
                 joindesc: coin.joindesc || '',
-                brand: coin.brand || coin.coin || '',
-                coins: coin.coins || coin.coin || '',
-                coin: coin.coin || '',
-
+                name: coin.name || coin.title || coin.brand || 'Unknown coin',
+                xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || '',
+                xrunPrice: coin.xrunPrice || coin.xrunprice || coin.price || 0, 
                 campid: coin.campid || coin.campId || '',
-              } as SpotData & { campid?: string }));
 
-              if (spotDataArray.length > 0) {
-                const newTokens = convertSpotDataToTokenData(spotDataArray, currentIndexRef.current);
-                setTokens(newTokens);
-                currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, spotDataArray.length)) % spotDataArray.length;
-              } else {
-                setTokens([]);
-              }
+                advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+              }));
+
+              console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
+
+              validatedCoinsData.slice(0, 4).forEach((coin: any, idx: number) => {
+                console.log(`📋 validatedCoinsData[${idx}]:`, {
+                  name: coin.name,
+                  advertisement: coin.advertisement,
+                  campid: coin.campid,
+                  xrunPrice: coin.xrunPrice,
+                  coin: coin.coin,
+                  brand: coin.brand,
+                });
+              });
+
+              setCoinsData(validatedCoinsData);
+
+              organizeData(validatedCoinsData);
 
               hasLoadedDataRef.current = true;
               setLoading(false);
@@ -571,10 +615,23 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
         await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
 
-        const newTokens = convertSpotDataToTokenData(markerData, currentIndexRef.current);
-        setTokens(newTokens);
-        currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, markerData.length)) % markerData.length;
+        const validatedCoinsData = markerData.map((coin: any) => ({
+          ...coin, 
+          iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+          joindesc: coin.joindesc || '',
+          name: coin.name || coin.title || coin.brand || 'Unknown coin',
+          xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || '',
+          xrunPrice: coin.xrunPrice || coin.xrunprice || coin.price || 0, 
+          campid: coin.campid || coin.campId || '',
+
+          advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+        }));
+
+        setCoinsData(validatedCoinsData);
+
+        organizeData(validatedCoinsData);
       } else {
+        setCoinsData([]);
         setTokens([]);
       }
 
@@ -594,13 +651,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, []); 
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('⏰ 20초 경과 - 서버에서 새 데이터 가져오기');
-      loadTokenData(true); 
-    }, 20000); 
 
-    return () => clearInterval(interval);
-  }, []); 
+    const interval = setInterval(() => {
+      console.log('⏰ 3분 경과 - 다른 코인들로 교체');
+      if (coinsData.length > 0) {
+        organizeData(coinsData);
+      }
+    }, 180000); 
+
+    return () => clearInterval(interval); 
+  }, [coinsData, organizeData]); 
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {

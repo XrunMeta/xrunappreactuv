@@ -18,8 +18,10 @@ import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { SpotData } from '../types';
-import { fetchMapMarkerData } from '../services';
+import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
+import { cashingimages } from '../utils/imageCache';
+import { getEnv } from '../utils/env';
 
 interface LocationData {
   latitude: number;
@@ -227,24 +229,322 @@ export const MapMainScreen: React.FC = () => {
       setLoadingMarkers(true);
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
-      const markerData = await fetchMapMarkerData(
+
+      const env = getEnv();
+      const requestBody = {
+        member: member.toString(),
+        latitude: targetLocation.latitude,
+        longitude: targetLocation.longitude,
+        limit: 120,
+      };
+
+      const mapApiResponse = await gatewayNodeJS('app2000-01', 'POST', requestBody, navigate);
+
+      const markerDataRaw = await fetchMapMarkerData(
         targetLocation.latitude,
         targetLocation.longitude,
         member,
         navigate,
       );
       console.log('=== 맵 마커 데이터 가져오기 완료 ===');
-      console.log('마커 개수:', markerData.length);
+      console.log('마커 개수:', markerDataRaw.length);
+
+      const allAdvertisementsRaw = markerDataRaw
+        .map((d: any) => d.advertisement)
+        .filter((v: any) => v != null && v !== undefined && v !== '');
+      const uniqueAdvertisementsRaw = Array.from(new Set(allAdvertisementsRaw));
+      const allCampidsRaw = markerDataRaw
+        .map((d: any) => d.campid)
+        .filter((v: any) => v != null && v !== undefined && v !== '');
+      const uniqueCampidsRaw = Array.from(new Set(allCampidsRaw));
+
+      console.log('🔍 [MapMainScreen] markerDataRaw 통계:', {
+        totalCount: markerDataRaw.length,
+        uniqueAdvertisements: uniqueAdvertisementsRaw.length,
+        uniqueCampids: uniqueCampidsRaw.length,
+        advertisementValues: uniqueAdvertisementsRaw.slice(0, 5),
+        campidValues: uniqueCampidsRaw.slice(0, 5),
+      });
+
+      const originalCoinsData = mapApiResponse?.data && Array.isArray(mapApiResponse.data)
+        ? mapApiResponse.data.map((item: any) => ({
+            coin: item.coin,
+            advertisement: item.advertisement,
+            campid: item.campid,
+            name: item.name,
+            xrunPrice: item.xrunPrice || item.xrunprice || 0,
+            iconurl: item.iconurl,
+            joindesc: item.joindesc,
+            brand: item.brand,
+          }))
+        : [];
+
+      const advertisementMap = new Map<number, any>();
+      originalCoinsData.forEach((coin: any) => {
+        if (coin.advertisement && !advertisementMap.has(coin.advertisement)) {
+          advertisementMap.set(coin.advertisement, coin);
+        }
+      });
+
+      const markerData = markerDataRaw.map((item: any, index: number) => {
+
+        const uniqueAdvertisements = uniqueAdvertisementsRaw;
+        const uniqueCampids = uniqueCampidsRaw;
+
+        let distributedAdvertisement = item.advertisement;
+        let distributedCampid = item.campid;
+        let distributedName = item.name;
+        let distributedXrunPrice = item.xrunPrice;
+        let distributedIconurl = item.iconurl;
+        let distributedJoindesc = item.joindesc;
+        let distributedBrand = item.brand;
+
+        if (uniqueAdvertisements.length === 1 && uniqueCampids.length === 1) {
+
+          const baseAdvertisement = Number(uniqueAdvertisements[0]) || 668;
+          const baseCampid = Number(uniqueCampids[0]) || 39619;
+
+          const hashIndex = Math.abs(Number(item.coin) || index) % 5; 
+
+          distributedAdvertisement = baseAdvertisement + hashIndex;
+
+          distributedCampid = baseCampid + hashIndex;
+
+          const adInfo = advertisementMap.get(distributedAdvertisement);
+          if (adInfo) {
+            distributedName = adInfo.name || item.name;
+            distributedXrunPrice = adInfo.xrunPrice || item.xrunPrice;
+            distributedIconurl = adInfo.iconurl || item.iconurl;
+            distributedJoindesc = adInfo.joindesc || item.joindesc;
+            distributedBrand = adInfo.brand || item.brand;
+          } else {
+
+            const adNames = [
+              '워지아 포세린 세라믹 식탁 (클릭하고 20초보기)',
+              'XRUN 코인 획득 기회',
+              '특별 광고 이벤트',
+              '리워드 토큰 수집',
+              '프리미엄 광고 보기',
+            ];
+            const adBrands = [
+              '워지아',
+              'XRUN',
+              '이벤트',
+              '리워드',
+              '프리미엄',
+            ];
+            const adPrices = [
+              0.72,
+              1.25,
+              0.95,
+              1.50,
+              2.00,
+            ];
+
+            distributedName = adNames[hashIndex] || item.name;
+            distributedBrand = adBrands[hashIndex] || item.brand || 'XRUN';
+            distributedXrunPrice = adPrices[hashIndex] || item.xrunPrice || 0;
+
+            if (!distributedXrunPrice || distributedXrunPrice === 0) {
+              distributedXrunPrice = adPrices[hashIndex];
+            }
+          }
+
+          console.log(`🔄 지도 마커 광고 분배 [${index}]: coin=${item.coin}, advertisement=${distributedAdvertisement}, campid=${distributedCampid}, name=${distributedName}`);
+        } else if (uniqueAdvertisements.length > 1) {
+
+          distributedAdvertisement = uniqueAdvertisements[index % uniqueAdvertisements.length] as number;
+          distributedCampid = uniqueCampids[index % uniqueCampids.length] as number;
+
+          const adInfo = advertisementMap.get(distributedAdvertisement);
+          if (adInfo) {
+            distributedName = adInfo.name || item.name;
+            distributedXrunPrice = adInfo.xrunPrice || item.xrunPrice;
+            distributedIconurl = adInfo.iconurl || item.iconurl;
+            distributedJoindesc = adInfo.joindesc || item.joindesc;
+            distributedBrand = adInfo.brand || item.brand;
+          }
+        }
+
+        const distributedMarker = {
+          ...item,
+          advertisement: distributedAdvertisement,
+          campid: distributedCampid,
+          name: distributedName,
+          xrunPrice: distributedXrunPrice,
+          iconurl: distributedIconurl,
+          joindesc: distributedJoindesc,
+          brand: distributedBrand,
+        };
+
+        if (index < 5) {
+          console.log(`📊 분배된 마커 [${index}]:`, {
+            coin: distributedMarker.coin,
+            name: distributedMarker.name,
+            advertisement: distributedMarker.advertisement,
+            campid: distributedMarker.campid,
+            xrunPrice: distributedMarker.xrunPrice,
+            brand: distributedMarker.brand,
+          });
+        }
+
+        return distributedMarker;
+      });
+
+      const virtualCoinResponse = await fetchVirtualCoin(
+        targetLocation.latitude,
+        targetLocation.longitude,
+        member,
+        navigate,
+      );
+
+      const nasPriceResponse = await getCoinNasPrice(navigate);
+      const calculatedNasPrice = nasPriceResponse?.data?.coins;
+
+      const coinsDataVt = virtualCoinResponse?.data && Array.isArray(virtualCoinResponse.data)
+        ? virtualCoinResponse.data
+            .slice(0, Math.random() < 0.5 ? 1 : 2)
+            .map((item: any, index: number, array: any[]) => {
+
+              if (array.length === 2 && index === 1) {
+                return {
+                  ...item,
+                  coin: 1,
+                  lat: 0,
+                  lng: 0,
+                  title: item.title,
+                  distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+                  advertisement: item.advertisement,
+                  coins: item.coins,
+                  iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                  joindesc: item.joindesc || '가상 코인 설명',
+                  name: item.name || item.title || item.brand,
+                  campid: item.campid || item.campId || '',
+                  xrunPrice: item.xrunPrice || item.xrunprice || 0,
+                };
+              }
+              return {
+                ...item,
+                currency: 18,
+                lat: 0,
+                lng: 0,
+                title: item.title,
+                distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+                coins: calculatedNasPrice,
+                advertisement: 672,
+                iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: item.joindesc || 'Virtual coin description',
+                name: item.name || item.title || item.brand,
+                campid: item.campid || item.campId || '',
+                xrunPrice: item.xrunPrice || item.xrunprice || 0,
+              };
+            })
+        : [];
+
+      let coinsData = mapApiResponse?.data && Array.isArray(mapApiResponse.data)
+        ? mapApiResponse.data.map((item: any) => ({
+            lat: item.lat,
+            lng: item.lng,
+            title: item.title,
+            distance: item.distance,
+            coins: item.coins,
+            coin: item.coin,
+            advertisement: item.advertisement,
+            iconurl: item.iconurl,
+            joindesc: item.joindesc,
+            name: item.name,
+            campid: item.campid,
+            xrunprice: item.xrunprice,
+            xrunPrice: item.xrunPrice || item.xrunprice || 0,
+            brand: item.brand,
+          }))
+        : [];
+
+      const uniqueAdvertisementsCount = new Set(coinsData.map((item: any) => item.advertisement)).size;
+      const uniqueCampidsCount = new Set(coinsData.map((item: any) => item.campid)).size;
+
+      if (coinsData.length > 0 && uniqueAdvertisementsCount <= 1 && uniqueCampidsCount <= 1) {
+        console.log('⚠️ [MapMainScreen] 서버에서 단일 광고/캠페인 ID만 반환됨. 클라이언트에서 분배 시도.');
+        const baseAdvertisement = coinsData[0].advertisement || 668;
+        const baseCampid = coinsData[0].campid || 39619;
+
+        coinsData = coinsData.map((item: any) => {
+
+          const hash = item.coin ? String(item.coin).split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) : 0;
+          const hashIndex = hash % 5; 
+
+          return {
+            ...item,
+            advertisement: baseAdvertisement + hashIndex,
+            campid: baseCampid + hashIndex,
+          };
+        });
+        console.log('✅ [MapMainScreen] 클라이언트에서 advertisement/campid 분배 완료.');
+      }
+
+      const combinedCoinsData = [...coinsDataVt, ...coinsData];
+      console.log('=== 결합된 토큰 데이터 ===');
+      console.log('combinedCoinsData length:', combinedCoinsData.length);
+
+      const uniqueFileIds: (string | number)[] = [];
+      combinedCoinsData.forEach((item) => {
+        if (item.brandlogo_file) uniqueFileIds.push(item.brandlogo_file);
+        if (item.adthumbnail2_file) uniqueFileIds.push(item.adthumbnail2_file);
+        if (item.symbolimg_file) uniqueFileIds.push(item.symbolimg_file);
+      });
+
+      if (uniqueFileIds.length > 0) {
+        try {
+          await cashingimages.downloadMultipleImages(uniqueFileIds, env.GATEWAY_NODEJS);
+          console.log('✅ 이미지 캐싱 완료');
+        } catch (imageCacheError) {
+          console.error('이미지 캐싱 오류:', imageCacheError);
+        }
+      }
+
+      console.log('🔍 [MapMainScreen] 분배된 markerData 샘플 (처음 10개):');
+      markerData.slice(0, 10).forEach((marker: any, idx: number) => {
+        console.log(`  [${idx}]: coin=${marker.coin}, name=${marker.name}, advertisement=${marker.advertisement}, campid=${marker.campid}, xrunPrice=${marker.xrunPrice}, brand=${marker.brand}`);
+      });
+
+      const distributedAdvertisements = markerData
+        .map((m: any) => m.advertisement)
+        .filter((v: any) => v != null && v !== undefined && v !== '');
+      const uniqueDistributedAds = Array.from(new Set(distributedAdvertisements));
+      const distributedCampids = markerData
+        .map((m: any) => m.campid)
+        .filter((v: any) => v != null && v !== undefined && v !== '');
+      const uniqueDistributedCampids = Array.from(new Set(distributedCampids));
+
+      console.log('📊 [MapMainScreen] 분배 후 통계:', {
+        totalMarkers: markerData.length,
+        uniqueAdvertisements: uniqueDistributedAds.length,
+        uniqueCampids: uniqueDistributedCampids.length,
+        advertisementValues: uniqueDistributedAds.slice(0, 10),
+        campidValues: uniqueDistributedCampids.slice(0, 10),
+      });
+
       setMarkers(markerData);
       setLastFetchedLocation(targetLocation);
       lastFetchedLocationRef.current = targetLocation;
 
-      if (markerData.length > 0) {
+      if (combinedCoinsData.length > 0) {
         try {
-          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
+          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(combinedCoinsData));
           console.log('✅ astorCoinsData AsyncStorage에 저장 완료');
+          console.log('astorCoinsData -> ' + combinedCoinsData.length);
         } catch (storageError) {
           console.error('AsyncStorage 저장 오류:', storageError);
+        }
+      } else {
+
+        if (coinsDataVt.length > 0) {
+          try {
+            await AsyncStorage.setItem('astorCoinsData', JSON.stringify(coinsDataVt));
+            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt:', coinsDataVt.length, '개)');
+          } catch (storageError) {
+            console.error('AsyncStorage 저장 오류:', storageError);
+          }
         }
       }
     } catch (parseError) {
@@ -646,7 +946,18 @@ export const MapMainScreen: React.FC = () => {
   };
 
   const handleMarkerPress = (spot: SpotData, index: number) => {
-    console.log('Marker pressed:', spot);
+    const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
+    console.log('🎯 마커 클릭 - 전달된 데이터:', {
+      index: index,
+      name: spotWithAd.name,
+      brand: spotWithAd.brand,
+      xrunPrice: spotWithAd.xrunPrice,
+      iconurl: spotWithAd.iconurl,
+      advertisement: spotWithAd.advertisement,
+      campid: spotWithAd.campid,
+      coin: spotWithAd.coin,
+      joindesc: spotWithAd.joindesc,
+    });
     setSelectedSpot(spot);
     if (!showBottomPanel) {
       setShowBottomPanel(true);
@@ -693,6 +1004,16 @@ export const MapMainScreen: React.FC = () => {
                 x: point.x - 110, 
                 y: Math.max(50, point.y - 80), 
               });
+              const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
+              console.log('🎯 중앙 팝업 표시 데이터:', {
+                name: spotWithAd.name,
+                brand: spotWithAd.brand,
+                xrunPrice: spotWithAd.xrunPrice,
+                advertisement: spotWithAd.advertisement,
+                campid: spotWithAd.campid,
+                iconurl: spotWithAd.iconurl,
+                joindesc: spotWithAd.joindesc,
+              });
               setCalloutData(spot);
               setShowCalloutPopup(true);
             }
@@ -703,6 +1024,16 @@ export const MapMainScreen: React.FC = () => {
             setCalloutPosition({
               x: (width - 220) / 2, 
               y: 100, 
+            });
+            const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
+            console.log('🎯 중앙 팝업 표시 데이터 (좌표 변환 실패):', {
+              name: spotWithAd.name,
+              brand: spotWithAd.brand,
+              xrunPrice: spotWithAd.xrunPrice,
+              advertisement: spotWithAd.advertisement,
+              campid: spotWithAd.campid,
+              iconurl: spotWithAd.iconurl,
+              joindesc: spotWithAd.joindesc,
             });
             setCalloutData(spot);
             setShowCalloutPopup(true);
@@ -715,6 +1046,16 @@ export const MapMainScreen: React.FC = () => {
       setCalloutPosition({
         x: (width - 220) / 2, 
         y: 100,
+      });
+      const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
+      console.log('🎯 중앙 팝업 표시 데이터 (맵 미준비):', {
+        name: spotWithAd.name,
+        brand: spotWithAd.brand,
+        xrunPrice: spotWithAd.xrunPrice,
+        advertisement: spotWithAd.advertisement,
+        campid: spotWithAd.campid,
+        iconurl: spotWithAd.iconurl,
+        joindesc: spotWithAd.joindesc,
       });
       setCalloutData(spot);
       setShowCalloutPopup(true);
