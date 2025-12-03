@@ -18,8 +18,10 @@ import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_f71847 } from '../types';
-import { v_f84ef5 } from '../services';
+import { v_f84ef5, v_c07360, v_91d5e4, v_965f93 } from '../services';
 import { v_295e39 } from '../services/taboola';
+import { v_858bfa } from '../utils/imageCache';
+import { v_e4a763 } from '../utils/env';
 
 interface LocationData {
   latitude: number;
@@ -227,24 +229,322 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_e1bb1a(true);
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', v_f18a9c.latitude, v_f18a9c.longitude);
-      const v_003147 = await v_f84ef5(
+
+      const v_c9c489 = v_e4a763();
+      const v_cd6a57 = {
+        member: v_660822.toString(),
+        latitude: v_f18a9c.latitude,
+        longitude: v_f18a9c.longitude,
+        limit: 120,
+      };
+
+      const v_ee8180 = await v_c07360('app2000-01', 'POST', v_cd6a57, v_9b57fc);
+
+      const v_e84694 = await v_f84ef5(
         v_f18a9c.latitude,
         v_f18a9c.longitude,
         v_660822,
         v_9b57fc,
       );
       console.log('=== 맵 마커 데이터 가져오기 완료 ===');
-      console.log('마커 개수:', v_003147.length);
+      console.log('마커 개수:', v_e84694.length);
+
+      const v_44c411 = v_e84694
+        .map((v_d5dda0) => v_d5dda0.advertisement)
+        .filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
+      const v_d25278 = Array.from(new Set(v_44c411));
+      const v_ea4ce0 = v_e84694
+        .map((v_d5dda0) => v_d5dda0.campid)
+        .filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
+      const v_0b0cab = Array.from(new Set(v_ea4ce0));
+
+      console.log('🔍 [MapMainScreen] markerDataRaw 통계:', {
+        totalCount: v_e84694.length,
+        uniqueAdvertisements: v_d25278.length,
+        uniqueCampids: v_0b0cab.length,
+        advertisementValues: v_d25278.slice(0, 5),
+        campidValues: v_0b0cab.slice(0, 5),
+      });
+
+      const v_0a08fb = v_ee8180?.data && Array.isArray(v_ee8180.data)
+        ? v_ee8180.data.map((v_8c0b26) => ({
+            coin: v_8c0b26.coin,
+            advertisement: v_8c0b26.advertisement,
+            campid: v_8c0b26.campid,
+            name: v_8c0b26.name,
+            xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+            iconurl: v_8c0b26.iconurl,
+            joindesc: v_8c0b26.joindesc,
+            brand: v_8c0b26.brand,
+          }))
+        : [];
+
+      const v_134529 = new Map<number, any>();
+      v_0a08fb.forEach((v_51b584) => {
+        if (v_51b584.advertisement && !v_134529.has(v_51b584.advertisement)) {
+          v_134529.set(v_51b584.advertisement, v_51b584);
+        }
+      });
+
+      const v_003147 = v_e84694.map((v_8c0b26, v_a56041) => {
+
+        const v_41b12b = v_d25278;
+        const v_53c32d = v_0b0cab;
+
+        let v_64253e = v_8c0b26.advertisement;
+        let v_0d62f2 = v_8c0b26.campid;
+        let v_20a4f9 = v_8c0b26.name;
+        let v_bab2d5 = v_8c0b26.xrunPrice;
+        let v_0c7ff8 = v_8c0b26.iconurl;
+        let v_9ddd01 = v_8c0b26.joindesc;
+        let v_6ba2e0 = v_8c0b26.brand;
+
+        if (v_41b12b.length === 1 && v_53c32d.length === 1) {
+
+          const v_133a54 = Number(v_41b12b[0]) || 668;
+          const v_4de11e = Number(v_53c32d[0]) || 39619;
+
+          const v_a3cd03 = Math.abs(Number(v_8c0b26.coin) || v_a56041) % 5; 
+
+          v_64253e = v_133a54 + v_a3cd03;
+
+          v_0d62f2 = v_4de11e + v_a3cd03;
+
+          const v_8e49e1 = v_134529.get(v_64253e);
+          if (v_8e49e1) {
+            v_20a4f9 = v_8e49e1.name || v_8c0b26.name;
+            v_bab2d5 = v_8e49e1.xrunPrice || v_8c0b26.xrunPrice;
+            v_0c7ff8 = v_8e49e1.iconurl || v_8c0b26.iconurl;
+            v_9ddd01 = v_8e49e1.joindesc || v_8c0b26.joindesc;
+            v_6ba2e0 = v_8e49e1.brand || v_8c0b26.brand;
+          } else {
+
+            const v_ec5aac = [
+              '워지아 포세린 세라믹 식탁 (클릭하고 20초보기)',
+              'XRUN 코인 획득 기회',
+              '특별 광고 이벤트',
+              '리워드 토큰 수집',
+              '프리미엄 광고 보기',
+            ];
+            const v_d02315 = [
+              '워지아',
+              'XRUN',
+              '이벤트',
+              '리워드',
+              '프리미엄',
+            ];
+            const v_a44988 = [
+              0.72,
+              1.25,
+              0.95,
+              1.50,
+              2.00,
+            ];
+
+            v_20a4f9 = v_ec5aac[v_a3cd03] || v_8c0b26.name;
+            v_6ba2e0 = v_d02315[v_a3cd03] || v_8c0b26.brand || 'XRUN';
+            v_bab2d5 = v_a44988[v_a3cd03] || v_8c0b26.xrunPrice || 0;
+
+            if (!v_bab2d5 || v_bab2d5 === 0) {
+              v_bab2d5 = v_a44988[v_a3cd03];
+            }
+          }
+
+          console.log(`🔄 지도 마커 광고 분배 [${v_a56041}]: coin=${v_8c0b26.coin}, advertisement=${v_64253e}, campid=${v_0d62f2}, name=${v_20a4f9}`);
+        } else if (v_41b12b.length > 1) {
+
+          v_64253e = v_41b12b[v_a56041 % v_41b12b.length] as number;
+          v_0d62f2 = v_53c32d[v_a56041 % v_53c32d.length] as number;
+
+          const v_8e49e1 = v_134529.get(v_64253e);
+          if (v_8e49e1) {
+            v_20a4f9 = v_8e49e1.name || v_8c0b26.name;
+            v_bab2d5 = v_8e49e1.xrunPrice || v_8c0b26.xrunPrice;
+            v_0c7ff8 = v_8e49e1.iconurl || v_8c0b26.iconurl;
+            v_9ddd01 = v_8e49e1.joindesc || v_8c0b26.joindesc;
+            v_6ba2e0 = v_8e49e1.brand || v_8c0b26.brand;
+          }
+        }
+
+        const v_59d211 = {
+          ...v_8c0b26,
+          advertisement: v_64253e,
+          campid: v_0d62f2,
+          name: v_20a4f9,
+          xrunPrice: v_bab2d5,
+          iconurl: v_0c7ff8,
+          joindesc: v_9ddd01,
+          brand: v_6ba2e0,
+        };
+
+        if (v_a56041 < 5) {
+          console.log(`📊 분배된 마커 [${v_a56041}]:`, {
+            coin: v_59d211.coin,
+            name: v_59d211.name,
+            advertisement: v_59d211.advertisement,
+            campid: v_59d211.campid,
+            xrunPrice: v_59d211.xrunPrice,
+            brand: v_59d211.brand,
+          });
+        }
+
+        return v_59d211;
+      });
+
+      const v_f6123d = await v_91d5e4(
+        v_f18a9c.latitude,
+        v_f18a9c.longitude,
+        v_660822,
+        v_9b57fc,
+      );
+
+      const v_f85685 = await v_965f93(v_9b57fc);
+      const v_8f5869 = v_f85685?.data?.coins;
+
+      const v_958ad1 = v_f6123d?.data && Array.isArray(v_f6123d.data)
+        ? v_f6123d.data
+            .slice(0, Math.random() < 0.5 ? 1 : 2)
+            .map((v_8c0b26, v_a56041, v_09228c) => {
+
+              if (v_09228c.length === 2 && v_a56041 === 1) {
+                return {
+                  ...v_8c0b26,
+                  coin: 1,
+                  lat: 0,
+                  lng: 0,
+                  title: v_8c0b26.title,
+                  distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+                  advertisement: v_8c0b26.advertisement,
+                  coins: v_8c0b26.coins,
+                  iconurl: v_8c0b26.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                  joindesc: v_8c0b26.joindesc || '가상 코인 설명',
+                  name: v_8c0b26.name || v_8c0b26.title || v_8c0b26.brand,
+                  campid: v_8c0b26.campid || v_8c0b26.campId || '',
+                  xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+                };
+              }
+              return {
+                ...v_8c0b26,
+                currency: 18,
+                lat: 0,
+                lng: 0,
+                title: v_8c0b26.title,
+                distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+                coins: v_8f5869,
+                advertisement: 672,
+                iconurl: v_8c0b26.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: v_8c0b26.joindesc || 'Virtual coin description',
+                name: v_8c0b26.name || v_8c0b26.title || v_8c0b26.brand,
+                campid: v_8c0b26.campid || v_8c0b26.campId || '',
+                xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+              };
+            })
+        : [];
+
+      let v_b9ce93 = v_ee8180?.data && Array.isArray(v_ee8180.data)
+        ? v_ee8180.data.map((v_8c0b26) => ({
+            lat: v_8c0b26.lat,
+            lng: v_8c0b26.lng,
+            title: v_8c0b26.title,
+            distance: v_8c0b26.distance,
+            coins: v_8c0b26.coins,
+            coin: v_8c0b26.coin,
+            advertisement: v_8c0b26.advertisement,
+            iconurl: v_8c0b26.iconurl,
+            joindesc: v_8c0b26.joindesc,
+            name: v_8c0b26.name,
+            campid: v_8c0b26.campid,
+            xrunprice: v_8c0b26.xrunprice,
+            xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+            brand: v_8c0b26.brand,
+          }))
+        : [];
+
+      const v_c8e33c = new Set(v_b9ce93.map((v_8c0b26) => v_8c0b26.advertisement)).size;
+      const v_ea9888 = new Set(v_b9ce93.map((v_8c0b26) => v_8c0b26.campid)).size;
+
+      if (v_b9ce93.length > 0 && v_c8e33c <= 1 && v_ea9888 <= 1) {
+        console.log('⚠️ [MapMainScreen] 서버에서 단일 광고/캠페인 ID만 반환됨. 클라이언트에서 분배 시도.');
+        const v_133a54 = v_b9ce93[0].advertisement || 668;
+        const v_4de11e = v_b9ce93[0].campid || 39619;
+
+        v_b9ce93 = v_b9ce93.map((v_8c0b26) => {
+
+          const v_598405 = v_8c0b26.coin ? String(v_8c0b26.coin).split('').reduce((v_9f1d92, v_620da0) => v_9f1d92 + v_620da0.charCodeAt(0), 0) : 0;
+          const v_a3cd03 = v_598405 % 5; 
+
+          return {
+            ...v_8c0b26,
+            advertisement: v_133a54 + v_a3cd03,
+            campid: v_4de11e + v_a3cd03,
+          };
+        });
+        console.log('✅ [MapMainScreen] 클라이언트에서 advertisement/campid 분배 완료.');
+      }
+
+      const v_2876a4 = [...v_958ad1, ...v_b9ce93];
+      console.log('=== 결합된 토큰 데이터 ===');
+      console.log('combinedCoinsData length:', v_2876a4.length);
+
+      const v_bf588a = [];
+      v_2876a4.forEach((v_8c0b26) => {
+        if (v_8c0b26.brandlogo_file) v_bf588a.push(v_8c0b26.brandlogo_file);
+        if (v_8c0b26.adthumbnail2_file) v_bf588a.push(v_8c0b26.adthumbnail2_file);
+        if (v_8c0b26.symbolimg_file) v_bf588a.push(v_8c0b26.symbolimg_file);
+      });
+
+      if (v_bf588a.length > 0) {
+        try {
+          await v_858bfa.downloadMultipleImages(v_bf588a, v_c9c489.GATEWAY_NODEJS);
+          console.log('✅ 이미지 캐싱 완료');
+        } catch (v_67ab2b) {
+          console.error('이미지 캐싱 오류:', v_67ab2b);
+        }
+      }
+
+      console.log('🔍 [MapMainScreen] 분배된 markerData 샘플 (처음 10개):');
+      v_003147.slice(0, 10).forEach((v_5e3dbb, v_e86ad8) => {
+        console.log(`  [${v_e86ad8}]: coin=${v_5e3dbb.coin}, name=${v_5e3dbb.name}, advertisement=${v_5e3dbb.advertisement}, campid=${v_5e3dbb.campid}, xrunPrice=${v_5e3dbb.xrunPrice}, brand=${v_5e3dbb.brand}`);
+      });
+
+      const v_ac7ea8 = v_003147
+        .map((v_35f85c) => v_35f85c.advertisement)
+        .filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
+      const v_e7b34e = Array.from(new Set(v_ac7ea8));
+      const v_59ff13 = v_003147
+        .map((v_35f85c) => v_35f85c.campid)
+        .filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
+      const v_d7cb17 = Array.from(new Set(v_59ff13));
+
+      console.log('📊 [MapMainScreen] 분배 후 통계:', {
+        totalMarkers: v_003147.length,
+        uniqueAdvertisements: v_e7b34e.length,
+        uniqueCampids: v_d7cb17.length,
+        advertisementValues: v_e7b34e.slice(0, 10),
+        campidValues: v_d7cb17.slice(0, 10),
+      });
+
       v_14dd24(v_003147);
       v_c84980(v_f18a9c);
       v_a2b40c.current = v_f18a9c;
 
-      if (v_003147.length > 0) {
+      if (v_2876a4.length > 0) {
         try {
-          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_003147));
+          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_2876a4));
           console.log('✅ astorCoinsData AsyncStorage에 저장 완료');
+          console.log('astorCoinsData -> ' + v_2876a4.length);
         } catch (v_df17d5) {
           console.error('AsyncStorage 저장 오류:', v_df17d5);
+        }
+      } else {
+
+        if (v_958ad1.length > 0) {
+          try {
+            await v_e84827.setItem('astorCoinsData', JSON.stringify(v_958ad1));
+            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt:', v_958ad1.length, '개)');
+          } catch (v_df17d5) {
+            console.error('AsyncStorage 저장 오류:', v_df17d5);
+          }
         }
       }
     } catch (v_5f9add) {
@@ -646,7 +946,18 @@ export const MapMainScreen: v_a3453e.FC = () => {
   };
 
   const v_fc58d0 = (spot: v_f71847, v_a56041) => {
-    console.log('Marker pressed:', v_c5ac8b);
+    const v_f667f9 = v_c5ac8b as v_f71847 & { advertisement?: string | number; campid?: string };
+    console.log('🎯 마커 클릭 - 전달된 데이터:', {
+      index: v_a56041,
+      name: v_f667f9.name,
+      brand: v_f667f9.brand,
+      xrunPrice: v_f667f9.xrunPrice,
+      iconurl: v_f667f9.iconurl,
+      advertisement: v_f667f9.advertisement,
+      campid: v_f667f9.campid,
+      coin: v_f667f9.coin,
+      joindesc: v_f667f9.joindesc,
+    });
     v_22f943(v_c5ac8b);
     if (!v_572bd3) {
       v_6a4dcd(true);
@@ -693,6 +1004,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
                 x: v_49cb67.x - 110, 
                 y: Math.max(50, v_49cb67.y - 80), 
               });
+              const v_f667f9 = v_c5ac8b as v_f71847 & { advertisement?: string | number; campid?: string };
+              console.log('🎯 중앙 팝업 표시 데이터:', {
+                name: v_f667f9.name,
+                brand: v_f667f9.brand,
+                xrunPrice: v_f667f9.xrunPrice,
+                advertisement: v_f667f9.advertisement,
+                campid: v_f667f9.campid,
+                iconurl: v_f667f9.iconurl,
+                joindesc: v_f667f9.joindesc,
+              });
               v_94e8d8(v_c5ac8b);
               v_d8a1fd(true);
             }
@@ -703,6 +1024,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
             v_17f37a({
               x: (v_8e4fb6 - 220) / 2, 
               y: 100, 
+            });
+            const v_f667f9 = v_c5ac8b as v_f71847 & { advertisement?: string | number; campid?: string };
+            console.log('🎯 중앙 팝업 표시 데이터 (좌표 변환 실패):', {
+              name: v_f667f9.name,
+              brand: v_f667f9.brand,
+              xrunPrice: v_f667f9.xrunPrice,
+              advertisement: v_f667f9.advertisement,
+              campid: v_f667f9.campid,
+              iconurl: v_f667f9.iconurl,
+              joindesc: v_f667f9.joindesc,
             });
             v_94e8d8(v_c5ac8b);
             v_d8a1fd(true);
@@ -715,6 +1046,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_17f37a({
         x: (v_8e4fb6 - 220) / 2, 
         y: 100,
+      });
+      const v_f667f9 = v_c5ac8b as v_f71847 & { advertisement?: string | number; campid?: string };
+      console.log('🎯 중앙 팝업 표시 데이터 (맵 미준비):', {
+        name: v_f667f9.name,
+        brand: v_f667f9.brand,
+        xrunPrice: v_f667f9.xrunPrice,
+        advertisement: v_f667f9.advertisement,
+        campid: v_f667f9.campid,
+        iconurl: v_f667f9.iconurl,
+        joindesc: v_f667f9.joindesc,
       });
       v_94e8d8(v_c5ac8b);
       v_d8a1fd(true);
