@@ -140,30 +140,39 @@ const v_8a74cb = 20000;
 
 const v_e4d665 = async (v_c65f5d) => {
   try {
-    const v_042a8b = await v_e84827.getItem('isLoggedIn');
-    if (v_c65f5d) {
-      if (v_042a8b === 'true') {
 
-        v_c65f5d.reset({
-          index: 0,
-          routes: [{ name: v_ce4741.map }],
-        });
-      } else {
-
-        v_c65f5d.reset({
-          index: 0,
-          routes: [{ name: v_ce4741.login }],
-        });
-      }
+    if (!v_c65f5d || typeof v_c65f5d.reset !== 'function') {
+      console.log('타임아웃 처리 스킵: navigation 또는 reset 함수가 없음');
+      return;
     }
-  } catch (v_5e9bfe) {
-    console.error('타임아웃 처리 중 오류:', v_5e9bfe);
-    if (v_c65f5d) {
+
+    const v_042a8b = await v_e84827.getItem('isLoggedIn');
+    if (v_042a8b === 'true') {
+
+      v_c65f5d.reset({
+        index: 0,
+        routes: [{ name: v_ce4741.map }],
+      });
+    } else {
 
       v_c65f5d.reset({
         index: 0,
         routes: [{ name: v_ce4741.login }],
       });
+    }
+  } catch (v_5e9bfe) {
+    console.error('타임아웃 처리 중 오류:', v_5e9bfe);
+
+    if (v_c65f5d && typeof v_c65f5d.reset === 'function') {
+      try {
+
+        v_c65f5d.reset({
+          index: 0,
+          routes: [{ name: v_ce4741.login }],
+        });
+      } catch (v_16229f) {
+        console.error('navigation.reset 호출 실패:', v_16229f);
+      }
     }
   }
 };
@@ -2122,13 +2131,28 @@ export const v_1c4683 = async (
     if (v_3393e3.ok && v_43c42e.status === 'success' && v_43c42e.code === 200) {
       return v_43c42e;
     } else {
+
       const v_1744b9 = v_43c42e.message || 'NStation 광고 API 호출 실패';
-      throw new Error(v_1744b9);
+      const v_5e9bfe = new Error(v_1744b9);
+
+      (v_5e9bfe as any).is404 = v_43c42e.code === 404;
+      throw v_5e9bfe;
     }
   } catch (v_5e9bfe) {
     console.error('NStation 광고 API 호출 실패:', v_5e9bfe);
-    if (v_c65f5d) {
-      await v_e4d665(v_c65f5d);
+
+    if (v_5e9bfe.is404) {
+      console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
+      throw v_5e9bfe;
+    }
+
+    if (v_c65f5d && typeof v_c65f5d.reset === 'function') {
+      try {
+        await v_e4d665(v_c65f5d);
+      } catch (v_2d075f) {
+        console.error('타임아웃 처리 중 오류:', v_2d075f);
+
+      }
     }
     throw v_5e9bfe;
   }

@@ -201,7 +201,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         v_e7f87b.adid,
         v_e7f87b,
         v_aa0917,
-        v_9b57fc,
+        v_0890f8 ? undefined : v_9b57fc, 
       );
 
       if (v_43c42e.data && v_43c42e.data.urlResult === 200 && v_43c42e.data.urlAD) {

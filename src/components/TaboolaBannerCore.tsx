@@ -1,5 +1,5 @@
 import v_a3453e, { v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_472849, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_326be8, v_f2c756 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_1bfbd0, v_9b1a04 } from '../constants';
 import {
@@ -85,6 +85,100 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
     v_74a79c.targetType,
   );
 
+  const v_24913e = `
+    (function() {
+      function interceptLinkClicks() {
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          while (target && target !== document.body) {
+            if (target.tagName === 'A' && target.href) {
+              var url = target.href;
+
+              if (url.startsWith('http://') || url.startsWith('https://')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'linkClick',
+                    url: url
+                  }));
+                }
+
+                return false;
+              }
+            }
+
+            if (target.onclick || target.getAttribute('onclick')) {
+              var linkUrl = target.href || target.getAttribute('href') || target.getAttribute('data-url');
+              if (linkUrl && (linkUrl.startsWith('http://') || linkUrl.startsWith('https://'))) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'linkClick',
+                    url: linkUrl
+                  }));
+                }
+
+                return false;
+              }
+            }
+
+            target = target.parentElement;
+          }
+        }, true); // capture phase에서 이벤트 가로채기
+
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType === 1) { // Element node
+                var links = node.querySelectorAll ? node.querySelectorAll('a[href]') : [];
+                links.forEach(function(link) {
+                  if (link.href && (link.href.startsWith('http://') || link.href.startsWith('https://'))) {
+                    link.addEventListener('click', function(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+
+                      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'linkClick',
+                          url: link.href
+                        }));
+                      }
+
+                      return false;
+                    }, true);
+                  }
+                });
+              }
+            });
+          });
+        });
+
+        var container = document.getElementById('taboola-container');
+        if (container) {
+          observer.observe(container, {
+            childList: true,
+            subtree: true
+          });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', interceptLinkClicks);
+      } else {
+        interceptLinkClicks();
+      }
+
+      setTimeout(interceptLinkClicks, 1000);
+      setTimeout(interceptLinkClicks, 3000);
+    })();
+    true; // injected JavaScript는 반드시 true를 반환해야 함
+  `;
+
   return (
     <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>
       <WebView
@@ -104,6 +198,32 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
         thirdPartyCookiesEnabled={true}
         sharedCookiesEnabled={true}
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+        injectedJavaScript={v_24913e}
+        onShouldStartLoadWithRequest={(v_576f5a) => {
+          const { url: v_f71b56 } = v_576f5a;
+          console.log('[TaboolaBannerCore] 네비게이션 요청:', v_f71b56);
+
+          if (v_f71b56 === 'about:blank' || v_f71b56.startsWith('data:')) {
+            return true;
+          }
+
+          if (v_f71b56.startsWith('http://') || v_f71b56.startsWith('https://')) {
+            v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+              console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', v_49263d);
+            });
+            return false; 
+          }
+
+          return false;
+        }}
+        onNavigationStateChange={(v_b8df7f) => {
+          console.log('[TaboolaBannerCore] 네비게이션 상태 변경:', {
+            url: v_b8df7f.url,
+            loading: v_b8df7f.loading,
+            canGoBack: v_b8df7f.canGoBack,
+            canGoForward: v_b8df7f.canGoForward,
+          });
+        }}
         onLoadStart={() => {
           console.log('[TaboolaBannerCore] WebView 로드 시작 - onLoadStart 호출됨');
 
@@ -124,6 +244,14 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
           try {
             const v_9390e8 = JSON.parse(v_d48baf.nativeEvent.data);
             console.log('[TaboolaBannerCore] WebView 메시지:', v_9390e8);
+
+            if (v_9390e8 && v_9390e8.type === 'linkClick' && v_9390e8.url) {
+              console.log('[TaboolaBannerCore] 링크 클릭 감지:', v_9390e8.url);
+              v_f2c756.openURL(v_9390e8.url).catch((v_49263d) => {
+                console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', v_49263d);
+              });
+              return;
+            }
 
             if (v_9390e8 && v_9390e8.message && typeof v_9390e8.message === 'string') {
               const v_a8cd21 = v_9390e8.message;
