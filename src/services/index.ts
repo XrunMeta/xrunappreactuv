@@ -140,30 +140,39 @@ const API_TIMEOUT = 20000;
 
 const handleTimeoutError = async (navigation?: any) => {
   try {
-    const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-    if (navigation) {
-      if (isLoggedIn === 'true') {
 
-        navigation.reset({
-          index: 0,
-          routes: [{ name: ROUTES.map }],
-        });
-      } else {
-
-        navigation.reset({
-          index: 0,
-          routes: [{ name: ROUTES.login }],
-        });
-      }
+    if (!navigation || typeof navigation.reset !== 'function') {
+      console.log('타임아웃 처리 스킵: navigation 또는 reset 함수가 없음');
+      return;
     }
-  } catch (error) {
-    console.error('타임아웃 처리 중 오류:', error);
-    if (navigation) {
+
+    const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+    if (isLoggedIn === 'true') {
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: ROUTES.map }],
+      });
+    } else {
 
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.login }],
       });
+    }
+  } catch (error) {
+    console.error('타임아웃 처리 중 오류:', error);
+
+    if (navigation && typeof navigation.reset === 'function') {
+      try {
+
+        navigation.reset({
+          index: 0,
+          routes: [{ name: ROUTES.login }],
+        });
+      } catch (resetError) {
+        console.error('navigation.reset 호출 실패:', resetError);
+      }
     }
   }
 };
@@ -2122,13 +2131,28 @@ export const getNasmobAds = async (
     if (response.ok && result.status === 'success' && result.code === 200) {
       return result;
     } else {
+
       const errorMessage = result.message || 'NStation 광고 API 호출 실패';
-      throw new Error(errorMessage);
+      const error = new Error(errorMessage);
+
+      (error as any).is404 = result.code === 404;
+      throw error;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('NStation 광고 API 호출 실패:', error);
-    if (navigation) {
-      await handleTimeoutError(navigation);
+
+    if (error.is404) {
+      console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
+      throw error;
+    }
+
+    if (navigation && typeof navigation.reset === 'function') {
+      try {
+        await handleTimeoutError(navigation);
+      } catch (timeoutError) {
+        console.error('타임아웃 처리 중 오류:', timeoutError);
+
+      }
     }
     throw error;
   }

@@ -201,7 +201,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         deviceInfo.adid,
         deviceInfo,
         campid,
-        navigate,
+        onClose ? undefined : navigate, 
       );
 
       if (result.data && result.data.urlResult === 200 && result.data.urlAD) {

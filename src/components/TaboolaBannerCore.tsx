@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { COLORS, SIZES } from '../constants';
 import {
@@ -85,6 +85,100 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
     config.targetType,
   );
 
+  const injectedJavaScript = `
+    (function() {
+      function interceptLinkClicks() {
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          while (target && target !== document.body) {
+            if (target.tagName === 'A' && target.href) {
+              var url = target.href;
+
+              if (url.startsWith('http://') || url.startsWith('https://')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'linkClick',
+                    url: url
+                  }));
+                }
+
+                return false;
+              }
+            }
+
+            if (target.onclick || target.getAttribute('onclick')) {
+              var linkUrl = target.href || target.getAttribute('href') || target.getAttribute('data-url');
+              if (linkUrl && (linkUrl.startsWith('http://') || linkUrl.startsWith('https://'))) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'linkClick',
+                    url: linkUrl
+                  }));
+                }
+
+                return false;
+              }
+            }
+
+            target = target.parentElement;
+          }
+        }, true); // capture phase에서 이벤트 가로채기
+
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType === 1) { // Element node
+                var links = node.querySelectorAll ? node.querySelectorAll('a[href]') : [];
+                links.forEach(function(link) {
+                  if (link.href && (link.href.startsWith('http://') || link.href.startsWith('https://'))) {
+                    link.addEventListener('click', function(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+
+                      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'linkClick',
+                          url: link.href
+                        }));
+                      }
+
+                      return false;
+                    }, true);
+                  }
+                });
+              }
+            });
+          });
+        });
+
+        var container = document.getElementById('taboola-container');
+        if (container) {
+          observer.observe(container, {
+            childList: true,
+            subtree: true
+          });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', interceptLinkClicks);
+      } else {
+        interceptLinkClicks();
+      }
+
+      setTimeout(interceptLinkClicks, 1000);
+      setTimeout(interceptLinkClicks, 3000);
+    })();
+    true; // injected JavaScript는 반드시 true를 반환해야 함
+  `;
+
   return (
     <View style={[styles.container, containerStyle, style]}>
       <WebView
@@ -104,6 +198,32 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
         thirdPartyCookiesEnabled={true}
         sharedCookiesEnabled={true}
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+        injectedJavaScript={injectedJavaScript}
+        onShouldStartLoadWithRequest={(request) => {
+          const { url } = request;
+          console.log('[TaboolaBannerCore] 네비게이션 요청:', url);
+
+          if (url === 'about:blank' || url.startsWith('data:')) {
+            return true;
+          }
+
+          if (url.startsWith('http://') || url.startsWith('https://')) {
+            Linking.openURL(url).catch((err) => {
+              console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', err);
+            });
+            return false; 
+          }
+
+          return false;
+        }}
+        onNavigationStateChange={(navState) => {
+          console.log('[TaboolaBannerCore] 네비게이션 상태 변경:', {
+            url: navState.url,
+            loading: navState.loading,
+            canGoBack: navState.canGoBack,
+            canGoForward: navState.canGoForward,
+          });
+        }}
         onLoadStart={() => {
           console.log('[TaboolaBannerCore] WebView 로드 시작 - onLoadStart 호출됨');
 
@@ -124,6 +244,14 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
           try {
             const data = JSON.parse(event.nativeEvent.data);
             console.log('[TaboolaBannerCore] WebView 메시지:', data);
+
+            if (data && data.type === 'linkClick' && data.url) {
+              console.log('[TaboolaBannerCore] 링크 클릭 감지:', data.url);
+              Linking.openURL(data.url).catch((err) => {
+                console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', err);
+              });
+              return;
+            }
 
             if (data && data.message && typeof data.message === 'string') {
               const message = data.message;
