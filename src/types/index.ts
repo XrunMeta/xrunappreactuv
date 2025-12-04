@@ -19,6 +19,7 @@ export interface TokenData {
   x: number;
   y: number;
   xrunPrice?: number;
+  xrunprice?: number | string; 
   distance?: number;
   name?: string;
   iconurl?: string;
@@ -43,6 +44,8 @@ export interface SpotData {
   brand?: string;
   coins?: string; 
   coin?: string; 
+  advertisement?: string | number; 
+  campid?: string | number; 
 }
 
 export interface EmergencyInfo {
