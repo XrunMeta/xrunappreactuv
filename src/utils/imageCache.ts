@@ -292,4 +292,60 @@ export const v_858bfa = {
       return false;
     }
   },
+
+  downloadMultipleImages: async (
+    v_a750e4,
+    v_feeeb6,
+  ): Promise<boolean[]> => {
+    console.log(`[이미지 캐시] === 여러 이미지 다운로드 시작: ${v_a750e4.length}개 ===`);
+    const v_fb7a65 = Date.now();
+
+    const v_bf588a = Array.from(new Set(v_a750e4.map(v_389afb => String(v_389afb))));
+    console.log(`[이미지 캐시] 중복 제거 후: ${v_bf588a.length}개`);
+
+    const v_0f892a = [];
+    for (const v_433c46 of v_bf588a) {
+      const v_49774a = await v_858bfa.isCached(v_433c46);
+      if (!v_49774a) {
+        v_0f892a.push(v_433c46);
+      }
+    }
+
+    console.log(`[이미지 캐시] 캐시되지 않은 이미지: ${v_0f892a.length}개`);
+
+    if (v_0f892a.length === 0) {
+      console.log(`[이미지 캐시] 모든 이미지가 이미 캐시되어 있습니다.`);
+      return v_bf588a.map(() => true);
+    }
+
+    const v_5f1221 = 5;
+    const v_a7f568 = new Array(v_bf588a.length).fill(false);
+
+    for (let v_ebec57 = 0; v_ebec57 < v_0f892a.length; v_ebec57 += v_5f1221) {
+      const v_36e01f = v_0f892a.slice(v_ebec57, v_ebec57 + v_5f1221);
+      console.log(`[이미지 캐시] 배치 ${Math.floor(v_ebec57 / v_5f1221) + 1} 다운로드 시작: ${v_36e01f.length}개`);
+
+      const v_8067e8 = await Promise.all(
+        v_36e01f.map(async (v_433c46) => {
+          return await v_858bfa.downloadAndCacheImage(v_433c46, v_feeeb6);
+        }),
+      );
+
+      v_36e01f.forEach((v_433c46, v_51d7da) => {
+        const v_3effb4 = v_bf588a.indexOf(v_433c46);
+        if (v_3effb4 !== -1) {
+          v_a7f568[v_3effb4] = v_8067e8[v_51d7da];
+        }
+      });
+    }
+
+    const v_39bc0e = Date.now();
+    const v_a712cf = v_39bc0e - v_fb7a65;
+    const v_0d7889 = v_a7f568.filter(v_cb35cb => v_cb35cb).length;
+    console.log(`[이미지 캐시] === 여러 이미지 다운로드 완료 ===`);
+    console.log(`[이미지 캐시] 성공: ${v_0d7889}/${v_bf588a.length}개`);
+    console.log(`[이미지 캐시] 소요 시간: ${v_a712cf}ms`);
+
+    return v_a7f568;
+  },
 };
