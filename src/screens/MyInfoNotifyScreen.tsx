@@ -136,6 +136,11 @@ export const MyInfoNotifyScreen = () => {
     if (memberId) {
       shouldAutoScroll.current = true; 
       loadNotifications();
+
+      AsyncStorage.setItem('lastNotificationCheckTime', new Date().toISOString())
+        .catch((error) => {
+          console.error('[알림] 마지막 확인 시간 저장 실패:', error);
+        });
     }
   }, [memberId, loadNotifications]);
 

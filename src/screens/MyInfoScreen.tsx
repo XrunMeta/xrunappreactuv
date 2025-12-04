@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, TaboolaBanner } from '../components';
 import { COLORS, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { getMyPageUserInfo, logout } from '../services';
+import { getMyPageUserInfo, logout, getNotificationList } from '../services';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -28,7 +28,7 @@ type CardConfig = {
 };
 
 export const MyInfoScreen = () => {
-  const { navigate, reset, goBack, canGoBack } = useAppNavigation();
+  const { navigate, reset, goBack, canGoBack, currentScreen } = useAppNavigation();
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const { setVerificationEmail } = useAppContext();
@@ -37,6 +37,7 @@ export const MyInfoScreen = () => {
     email?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
   const cardConfigs: CardConfig[] = useMemo(
     () => [
@@ -120,6 +121,51 @@ export const MyInfoScreen = () => {
 
     loadUserInfo();
   }, [navigate]);
+
+  useEffect(() => {
+
+    if (currentScreen !== 'myInfo') {
+      return;
+    }
+
+    const checkNotifications = async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          const member = userData.member;
+
+          if (member) {
+            const response = await getNotificationList(member, 0, navigate);
+            if (response?.data && response.data.length > 0) {
+
+              const lastCheckedTime = await AsyncStorage.getItem('lastNotificationCheckTime');
+              const lastChecked = lastCheckedTime ? new Date(lastCheckedTime).getTime() : 0;
+
+              const hasNewNotifications = response.data.some((notification) => {
+                const notificationTime = new Date(notification.datetime).getTime();
+                return notificationTime > lastChecked;
+              });
+
+              setHasUnreadNotifications(hasNewNotifications);
+            } else {
+              setHasUnreadNotifications(false);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[마이페이지] 알림 확인 실패:', error);
+
+        setHasUnreadNotifications(false);
+      }
+    };
+
+    checkNotifications();
+
+    const interval = setInterval(checkNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [navigate, currentScreen]);
 
   const handleCardPress = (card: CardConfig) => {
     if (card.route) {
@@ -280,7 +326,12 @@ export const MyInfoScreen = () => {
                 onPress={() => handleCardPress(card)}
                 activeOpacity={0.85}
               >
-                <View style={styles.cardIcon}>{renderIcon(card)}</View>
+                <View style={styles.cardIconContainer}>
+                  <View style={styles.cardIcon}>{renderIcon(card)}</View>
+                  {card.id === 'notify' && hasUnreadNotifications && (
+                    <View style={styles.notificationBadge} />
+                  )}
+                </View>
                 <Text style={styles.cardLabel}>{card.label}</Text>
               </TouchableOpacity>
             ))}
@@ -377,6 +428,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 12,
   },
+  cardIconContainer: {
+    position: 'relative',
+    width: 36,
+    height: 36,
+  },
   cardIcon: {
     width: 36,
     height: 36,
@@ -384,6 +440,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#343a5a',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FF6B6B',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   cardLabel: {
     fontSize: 16,

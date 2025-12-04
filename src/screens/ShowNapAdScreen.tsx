@@ -111,8 +111,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     });
 
     if (!advertisementParams) {
-      console.error('❌ [ShowNapAdScreen] 광고 파라미터가 없습니다. 이전 화면으로 이동');
-      handleClose();
+      console.log('⚠️ [ShowNapAdScreen] 광고 파라미터가 없습니다. 화면을 렌더링하지 않습니다.');
       return;
     }
 
@@ -123,7 +122,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       name: advertisementParams.name,
       xrunPrice: advertisementParams.xrunPrice,
     });
-  }, [advertisementParams, reset]);
+  }, [advertisementParams]);
 
   useEffect(() => {
     const getUserData = async () => {
