@@ -111,8 +111,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     });
 
     if (!v_d0b6d4) {
-      console.error('❌ [ShowNapAdScreen] 광고 파라미터가 없습니다. 이전 화면으로 이동');
-      v_7f2e65();
+      console.log('⚠️ [ShowNapAdScreen] 광고 파라미터가 없습니다. 화면을 렌더링하지 않습니다.');
       return;
     }
 
@@ -123,7 +122,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       name: v_d0b6d4.name,
       xrunPrice: v_d0b6d4.xrunPrice,
     });
-  }, [v_d0b6d4, v_487a25]);
+  }, [v_d0b6d4]);
 
   v_c4deb2(() => {
     const v_b2bcc9 = async () => {

@@ -136,6 +136,11 @@ export const v_386af2 = () => {
     if (v_717992) {
       v_d16a0d.current = true; 
       v_496106();
+
+      v_e84827.setItem('lastNotificationCheckTime', new Date().toISOString())
+        .catch((v_5e9bfe) => {
+          console.error('[알림] 마지막 확인 시간 저장 실패:', v_5e9bfe);
+        });
     }
   }, [v_717992, v_496106]);
 

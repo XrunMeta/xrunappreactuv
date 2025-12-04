@@ -13,7 +13,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_4c7b5d } from '../components';
 import { v_1bfbd0, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-import { v_a7ab3c, v_d7d5a2 } from '../services';
+import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -28,7 +28,7 @@ type CardConfig = {
 };
 
 export const v_03a231 = () => {
-  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57, canGoBack: v_7e32fb } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57, canGoBack: v_7e32fb, currentScreen: v_0f0c7b } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
@@ -37,6 +37,7 @@ export const v_03a231 = () => {
     email?: string;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
+  const [v_79b081, v_0dfa96] = v_5ab095(false);
 
   const v_dbfc7f = v_df9f57(
     () => [
@@ -120,6 +121,51 @@ export const v_03a231 = () => {
 
     v_ea3fa6();
   }, [v_9b57fc]);
+
+  v_c4deb2(() => {
+
+    if (v_0f0c7b !== 'myInfo') {
+      return;
+    }
+
+    const v_5e556c = async () => {
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          const v_660822 = v_ef7306.member;
+
+          if (v_660822) {
+            const v_3393e3 = await v_ab08d0(v_660822, 0, v_9b57fc);
+            if (v_3393e3?.data && v_3393e3.data.length > 0) {
+
+              const v_90af29 = await v_e84827.getItem('lastNotificationCheckTime');
+              const v_910d40 = v_90af29 ? new Date(v_90af29).getTime() : 0;
+
+              const v_f66810 = v_3393e3.data.some((v_b9faeb) => {
+                const v_85f156 = new Date(v_b9faeb.datetime).getTime();
+                return v_85f156 > v_910d40;
+              });
+
+              v_0dfa96(v_f66810);
+            } else {
+              v_0dfa96(false);
+            }
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[마이페이지] 알림 확인 실패:', v_5e9bfe);
+
+        v_0dfa96(false);
+      }
+    };
+
+    v_5e556c();
+
+    const v_ad1d65 = setInterval(v_5e556c, 30000);
+
+    return () => clearInterval(v_ad1d65);
+  }, [v_9b57fc, v_0f0c7b]);
 
   const v_b0f7df = (v_5eae50) => {
     if (v_5eae50.route) {
@@ -280,7 +326,12 @@ export const v_03a231 = () => {
                 onPress={() => v_b0f7df(v_5eae50)}
                 activeOpacity={0.85}
               >
-                <View style={v_d81136.cardIcon}>{v_c273da(v_5eae50)}</View>
+                <View style={v_d81136.cardIconContainer}>
+                  <View style={v_d81136.cardIcon}>{v_c273da(v_5eae50)}</View>
+                  {v_5eae50.id === 'notify' && v_79b081 && (
+                    <View style={v_d81136.notificationBadge} />
+                  )}
+                </View>
                 <Text style={v_d81136.cardLabel}>{v_5eae50.label}</Text>
               </TouchableOpacity>
             ))}
@@ -377,6 +428,11 @@ const v_d81136 = v_472849.create({
     paddingHorizontal: 8,
     gap: 12,
   },
+  cardIconContainer: {
+    position: 'relative',
+    width: 36,
+    height: 36,
+  },
   cardIcon: {
     width: 36,
     height: 36,
@@ -384,6 +440,17 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#343a5a',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FF6B6B',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   cardLabel: {
     fontSize: 16,
