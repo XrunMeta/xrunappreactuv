@@ -113,7 +113,19 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     ageRange: '10',
     termsAccepted: true,
   });
-  const [v_d0b6d4, v_d48a26] = v_5ab095<v_fa3302 | null>(null);
+  const [v_d0b6d4, v_50d169] = v_5ab095<v_fa3302 | null>(null);
+
+  const v_d48a26 = (params: v_fa3302 | null) => {
+    console.log('🔄 [Context] setAdvertisementParams 호출:', {
+      advertisement: v_24baff?.advertisement,
+      campid: v_24baff?.campid,
+      coin: v_24baff?.coin,
+      name: v_24baff?.name,
+      fullParams: JSON.stringify(v_24baff, null, 2),
+    });
+    v_50d169(v_24baff);
+    console.log('✅ [Context] setAdvertisementParams 완료');
+  };
   const [v_ea6a7a, v_84bd3c] = v_5ab095<v_5681b1 | null>(null);
   const [v_0fc1c4, v_fcca8e] = v_5ab095<{
     txHash: string;
@@ -182,7 +194,10 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       },
       advertisementParams: v_d0b6d4,
       setAdvertisementParams: v_d48a26,
-      resetAdvertisementParams: () => v_d48a26(null),
+      resetAdvertisementParams: () => {
+        console.log('🔄 [Context] resetAdvertisementParams 호출');
+        v_d48a26(null);
+      },
       selectedWalletAsset: v_ea6a7a,
       setSelectedWalletAsset: v_84bd3c,
       resetSelectedWalletAsset: () => v_84bd3c(null),

@@ -1565,6 +1565,51 @@ const v_2dc24c = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
   return (v_6f4cf9 + 360) % 360;
 };
 
+export const v_c615aa = async (
+  v_b5de9c,
+  v_985be2,
+  v_660822,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: v_660822,
+      latitude: v_b5de9c,
+      longitude: v_985be2,
+      limit: 120,
+    };
+
+    console.log('=== fetchMapMarkerDataRaw API 호출 ===');
+    console.log('endpoint: app2000-01');
+    console.log('requestBody:', JSON.stringify(v_cd6a57));
+
+    const v_3393e3 = await v_9f42a4.post(
+      '/app2000-01',
+      v_cd6a57,
+    );
+
+    const v_9390e8 = v_3393e3.data;
+    console.log('=== fetchMapMarkerDataRaw API 응답 ===');
+    console.log('data.data length:', v_9390e8?.data?.length);
+
+    return v_9390e8;
+  } catch (v_5e9bfe) {
+    console.error('맵 마커 원본 데이터 가져오기 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[맵 마커 원본] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_f84ef5 = async (
   v_b5de9c,
   v_985be2,
@@ -1580,19 +1625,25 @@ export const v_f84ef5 = async (
       limit: 120,
     };
 
-    console.log('=== fetchMapMarkerData API 호출 ===');
-    console.log('endpoint: app2000-01');
-    console.log('requestBody:', JSON.stringify(v_cd6a57));
+    console.log('🌐 [app2000-01] fetchMapMarkerData API 호출 시작');
+    console.log('🌐 [app2000-01] endpoint: app2000-01');
+    console.log('🌐 [app2000-01] requestBody:', JSON.stringify(v_cd6a57, null, 2));
+    console.log('🌐 [app2000-01] axiosInstance.post 호출 전');
 
     const v_3393e3 = await v_9f42a4.post(
       '/app2000-01',
       v_cd6a57,
     );
 
+    console.log('✅ [app2000-01] axiosInstance.post 응답 받음');
     const v_9390e8 = v_3393e3.data;
-    console.log('=== fetchMapMarkerData API 응답 ===');
-
-    console.log('data.data length:', v_9390e8?.data?.length);
+    console.log('✅ [app2000-01] fetchMapMarkerData API 응답 완료');
+    console.log('✅ [app2000-01] data.data length:', v_9390e8?.data?.length);
+    console.log('✅ [app2000-01] 전체 응답 구조:', {
+      success: v_9390e8?.success,
+      dataLength: v_9390e8?.data?.length,
+      hasData: !!v_9390e8?.data,
+    });
 
     if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
       return v_9390e8.data.map((v_8c0b26) => {
@@ -1624,7 +1675,9 @@ export const v_f84ef5 = async (
           coin: v_8c0b26.coin || '', 
 
           campid: v_8c0b26.campid || v_8c0b26.campId || v_8c0b26.campaignid || v_8c0b26.campaignId || '',
-        } as v_f71847 & { campid?: string };
+
+          advertisement: v_8c0b26.advertisement || v_8c0b26.adid || v_8c0b26.ad || v_8c0b26.coin || '',
+        } as v_f71847 & { campid?: string; advertisement?: string | number };
       });
     }
 
@@ -1644,6 +1697,88 @@ export const v_f84ef5 = async (
     }
 
     return [];
+  }
+};
+
+export const v_91d5e4 = async (
+  v_660822,
+  v_b5de9c,
+  v_985be2,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/virtualCoin`;
+
+    const v_cd6a57 = {
+      member: v_660822,
+      latitude: v_b5de9c,
+      longitude: v_985be2,
+    };
+
+    console.log('=== virtualCoin API 호출 ===');
+    console.log('requestBody:', JSON.stringify(v_cd6a57));
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('=== virtualCoin API 응답 ===');
+    console.log('response.data length:', v_43c42e?.data?.length);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('virtualCoin API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_965f93 = async (
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getCoinNasPrice`;
+
+    console.log('=== getCoinNasPrice API 호출 ===');
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('=== getCoinNasPrice API 응답 ===');
+    console.log('calculatedNasPrice:', v_43c42e?.data?.coins);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('getCoinNasPrice API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
   }
 };
 
@@ -2031,6 +2166,58 @@ export const v_7a6f92 = async (
 };
 
 export const v_c07360 = async (
+  v_09dafd,
+  v_bfe9b9 = 'POST',
+  v_cd6a57 = {},
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
+
+    console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
+    console.log(`🌐 [gatewayNodeJS] endpoint: ${v_09dafd}`);
+    console.log(`🌐 [gatewayNodeJS] method: ${v_bfe9b9}`);
+    console.log(`🌐 [gatewayNodeJS] url: ${v_f71b56}`);
+    console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(v_cd6a57, null, 2));
+    console.log(`🌐 [gatewayNodeJS] fetch 호출 전`);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: v_bfe9b9,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    console.log(`✅ [gatewayNodeJS] fetch 응답 받음, status: ${v_3393e3.status}`);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log(`✅ [gatewayNodeJS] API 응답 성공`);
+    console.log(`✅ [gatewayNodeJS] endpoint: ${v_09dafd}`);
+    console.log(`✅ [gatewayNodeJS] result.data length:`, v_43c42e?.data?.length || 'N/A');
+    console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+      success: v_43c42e?.success,
+      dataLength: v_43c42e?.data?.length,
+      hasData: !!v_43c42e?.data,
+    });
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error(`Gateway NodeJS 오류 (${v_09dafd}):`, v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_ad146c = async (
   v_5389c3,
   v_51b584,
   v_660822,

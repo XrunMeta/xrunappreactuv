@@ -16,7 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_1c4683, v_7a6f92, v_c07360 } from '../services';
+import { v_1c4683, v_7a6f92, v_ad146c } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d } from '../components';
@@ -59,10 +59,24 @@ interface CampaignData {
   cbparam?: string;
 }
 
-export const ShowNapAdScreen: v_a3453e.FC = () => {
+interface ShowNapAdScreenProps {
+  onClose?: () => void; 
+}
+
+export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8 }) => {
   const { t: v_8d41d7 } = v_772971();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+
+  const v_7f2e65 = () => {
+    if (v_0890f8) {
+      v_e10ff9();
+      v_0890f8();
+    } else if (v_487a25) {
+      v_e10ff9();
+      v_487a25(v_ce4741.map);
+    }
+  };
 
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_915a6b, v_d2702f] = v_5ab095(false);
@@ -84,11 +98,31 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
   const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
 
   v_c4deb2(() => {
+    console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
+    console.log('advertisementParams:', v_d0b6d4 ? '있음' : '없음');
+    console.log('advertisementParams 상세:', JSON.stringify(v_d0b6d4, null, 2));
+    console.log('🔍 [ShowNapAdScreen] advertisementParams 값 검증:', {
+      advertisement: v_d0b6d4?.advertisement,
+      campid: v_d0b6d4?.campid,
+      coin: v_d0b6d4?.coin,
+      name: v_d0b6d4?.name,
+      xrunPrice: v_d0b6d4?.xrunPrice,
+      member: v_d0b6d4?.member,
+    });
+
     if (!v_d0b6d4) {
-      console.log('광고 파라미터가 없습니다. 이전 화면으로 이동');
-      v_487a25(v_ce4741.map);
+      console.error('❌ [ShowNapAdScreen] 광고 파라미터가 없습니다. 이전 화면으로 이동');
+      v_7f2e65();
       return;
     }
+
+    console.log('✅ [ShowNapAdScreen] 광고 파라미터 확인 완료:', {
+      advertisement: v_d0b6d4.advertisement,
+      campid: v_d0b6d4.campid,
+      coin: v_d0b6d4.coin,
+      name: v_d0b6d4.name,
+      xrunPrice: v_d0b6d4.xrunPrice,
+    });
   }, [v_d0b6d4, v_487a25]);
 
   v_c4deb2(() => {
@@ -116,20 +150,50 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
     v_b2bcc9();
   }, [v_d0b6d4]);
 
-  const v_07cef7 = async (v_a6848f = 0) => {
+  const v_07cef7 = async (v_a6848f = 0, params?: typeof v_d0b6d4) => {
     try {
+
+      const v_766d99 = v_24baff || v_d0b6d4;
+
       console.log('Starting NStation advertisement initialization');
       v_deef62(true);
 
+      console.log('=== ShowNapAdScreen 진입 advertisementParams ===');
+      console.log('advertisement:', v_766d99?.advertisement);
+      console.log('coin:', v_766d99?.coin);
+      console.log('campid:', v_766d99?.campid);
+      console.log('name:', v_766d99?.name);
+      console.log('xrunPrice:', v_766d99?.xrunPrice);
+      console.log('joindesc:', v_766d99?.joindesc);
+      console.log('전체 advertisementParams:', JSON.stringify(v_766d99, null, 2));
+      console.log('=== ShowNapAdScreen 진입 advertisementParams 끝 ===');
+
+      if (!v_766d99 || !v_766d99.campid || v_766d99.campid === '') {
+        console.error('❌ [ShowNapAdScreen] campid가 유효하지 않습니다:', {
+          campid: v_766d99?.campid,
+          advertisement: v_766d99?.advertisement,
+          fullParams: JSON.stringify(v_766d99, null, 2),
+        });
+        v_deef62(false);
+        v_7f2e65();
+        return;
+      }
+
       const v_e7f87b = await v_f3de6d();
 
-      const v_aa0917 = v_d0b6d4?.campid || '';
+      const v_aa0917 = v_766d99.campid || '';
       console.log('=== ShowNapAdScreen API 호출 정보 ===');
       console.log('member:', v_660822);
       console.log('adid:', v_e7f87b.adid);
       console.log('campid:', v_aa0917);
-      console.log('advertisementParams:', JSON.stringify(v_d0b6d4, null, 2));
+      console.log('advertisementParams (currentParams):', JSON.stringify(v_766d99, null, 2));
       console.log('deviceInfo:', JSON.stringify(v_e7f87b, null, 2));
+      console.log('🔍 [ShowNapAdScreen] 최종 API 호출 campid 검증:', {
+        campid: v_aa0917,
+        advertisement: v_766d99?.advertisement,
+        coin: v_766d99?.coin,
+        name: v_766d99?.name,
+      });
       console.log('=== API 호출 정보 끝 ===');
 
       const v_43c42e = await v_1c4683(
@@ -159,8 +223,9 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
           v_9b0de5(true);
         }
 
+        const v_0a9026 = v_24baff || v_d0b6d4;
         v_27006e.current = setTimeout(() => {
-          v_07cef7(v_a6848f + 1);
+          v_07cef7(v_a6848f + 1, v_0a9026);
         }, 2000);
         return;
       }
@@ -171,9 +236,84 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
     }
   };
 
+  const v_57519b = v_e662ae<{ advertisement?: string; campid?: string } | null>(null);
+
   v_c4deb2(() => {
+    if (v_d0b6d4) {
+      const v_c84c22 = `${v_d0b6d4.advertisement}-${v_d0b6d4.campid}`;
+      const v_28b331 = v_57519b.current 
+        ? `${v_57519b.current.advertisement}-${v_57519b.current.campid}`
+        : null;
+
+      if (v_28b331 && v_c84c22 !== v_28b331) {
+        console.log('🔄 [ShowNapAdScreen] advertisementParams 변경 감지 - 상태 초기화');
+        console.log('🔍 이전 파라미터:', v_57519b.current);
+        console.log('🔍 새로운 파라미터:', {
+          advertisement: v_d0b6d4.advertisement,
+          campid: v_d0b6d4.campid,
+          coin: v_d0b6d4.coin,
+          name: v_d0b6d4.name,
+        });
+
+        v_6f8b23(null);
+        v_deef62(true);
+        v_d2702f(false);
+        v_f775f7(0);
+        v_a62e23(false);
+        v_ed6932(false);
+        v_9b0de5(false);
+        v_8b3d54(false);
+        v_3e5456(false);
+        v_1a68d1(false);
+
+        if (v_27006e.current) {
+          clearTimeout(v_27006e.current);
+          v_27006e.current = null;
+        }
+        if (v_27bab6.current) {
+          clearTimeout(v_27bab6.current);
+          v_27bab6.current = null;
+        }
+        if (v_d35ccb.current) {
+          clearInterval(v_d35ccb.current);
+          v_d35ccb.current = null;
+        }
+
+        console.log('✅ [ShowNapAdScreen] 상태 초기화 완료');
+      }
+
+      v_57519b.current = {
+        advertisement: v_d0b6d4.advertisement,
+        campid: v_d0b6d4.campid,
+      };
+    }
+  }, [v_d0b6d4?.advertisement, v_d0b6d4?.campid]);
+
+  v_c4deb2(() => {
+    console.log('=== ShowNapAdScreen 광고 초기화 체크 ===');
+    console.log('member:', v_660822 ? `있음 (${v_660822})` : '없음');
+    console.log('advertisementParams:', v_d0b6d4 ? '있음' : '없음');
+    console.log('🔍 [ShowNapAdScreen] advertisementParams 상세:', {
+      advertisement: v_d0b6d4?.advertisement,
+      campid: v_d0b6d4?.campid,
+      coin: v_d0b6d4?.coin,
+      name: v_d0b6d4?.name,
+      xrunPrice: v_d0b6d4?.xrunPrice,
+    });
+
     if (v_660822 && v_d0b6d4) {
-      v_07cef7();
+      console.log('✅ member와 advertisementParams 모두 있음 - initNStationAd 호출');
+      console.log('🔍 [ShowNapAdScreen] initNStationAd에 전달할 campid:', v_d0b6d4.campid);
+
+      v_07cef7(0, v_d0b6d4);
+    } else {
+      console.log('⏳ member 또는 advertisementParams 대기 중...');
+      if (!v_660822) {
+        console.log('  - member가 아직 설정되지 않음');
+      }
+      if (!v_d0b6d4) {
+        console.log('  - advertisementParams가 아직 설정되지 않음');
+      }
     }
   }, [v_660822, v_d0b6d4]);
 
@@ -276,8 +416,50 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
         }
 
         try {
-          const v_3393e3 = await v_c07360(
-            parseInt(v_d0b6d4?.advertisement || '0'),
+
+          const v_871fbe = v_d0b6d4?.advertisement;
+
+          if (!v_871fbe) {
+            console.error('[ShowNapAdScreen] ❌ advertisement가 비어있습니다. 이 상태로는 올바른 리워드를 줄 수 없습니다.', {
+              advertisementParams: v_d0b6d4,
+              advertisement: v_d0b6d4?.advertisement,
+              coin: v_d0b6d4?.coin,
+              campid: v_d0b6d4?.campid,
+              name: v_d0b6d4?.name,
+            });
+
+            v_e10ff9();
+            v_7f2e65();
+            v_d2702f(false);
+            v_1a68d1(false);
+            return;
+          }
+
+          const v_36e78d = parseInt(String(v_871fbe), 10);
+
+          if (isNaN(v_36e78d) || v_36e78d === 0) {
+            console.error('[ShowNapAdScreen] ❌ advertisement가 유효하지 않은 값입니다.', {
+              adIdRaw: v_871fbe,
+              adId: v_36e78d,
+              advertisementParams: v_d0b6d4,
+            });
+
+            v_e10ff9();
+            v_7f2e65();
+            v_d2702f(false);
+            v_1a68d1(false);
+            return;
+          }
+
+          console.log('[ShowNapAdScreen] ✅ advertisement 검증 통과:', {
+            adIdRaw: v_871fbe,
+            adId: v_36e78d,
+            coin: v_d0b6d4?.coin || '0',
+            member: v_660822,
+          });
+
+          const v_3393e3 = await v_ad146c(
+            v_36e78d,
             v_d0b6d4?.coin || '0',
             v_660822,
             v_d0b6d4?.joindesc || '',
@@ -358,26 +540,26 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
     }
 
     v_e10ff9();
-    v_487a25(v_ce4741.map);
+    v_7f2e65();
   };
 
   const v_34fafc = () => {
     console.log('광고 호출 실패 확인 버튼 클릭 - CameraMainScreen으로 이동');
     v_ed6932(false);
     v_e10ff9();
-    v_487a25(v_ce4741.map);
+    v_7f2e65();
   };
 
   const v_bde5d3 = () => {
     console.log('다른 광고 보기 버튼 클릭 - CameraMainScreen으로 이동');
     v_e10ff9();
-    v_487a25(v_ce4741.map);
+    v_7f2e65();
   };
 
   const v_5ca23e = () => {
     console.log('취소 버튼 클릭 - CameraMainScreen으로 이동');
     v_e10ff9();
-    v_487a25(v_ce4741.map);
+    v_7f2e65();
   };
 
   const v_ed89ba = () => {
@@ -393,7 +575,7 @@ export const ShowNapAdScreen: v_a3453e.FC = () => {
     }
     v_1a68d1(false);
     v_e10ff9();
-    v_487a25(v_ce4741.map);
+    v_7f2e65();
   };
 
   if (!v_d0b6d4) {
