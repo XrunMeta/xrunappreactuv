@@ -192,7 +192,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                       lineHeight: 15,
                       letterSpacing: 0.06,
                     }}>
-                    {spotData.name}
+                    XRun으로 리워드를 획득하세요
                   </Text>
                 </View>
               </View>
