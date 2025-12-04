@@ -192,7 +192,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                       lineHeight: 15,
                       letterSpacing: 0.06,
                     }}>
-                    {v_1d0937.name}
+                    XRun으로 리워드를 획득하세요
                   </Text>
                 </View>
               </View>
