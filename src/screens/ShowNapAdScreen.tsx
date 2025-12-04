@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, gatewayNodeJS } from '../services';
+import { getNasmobAds, sendNasmobCallback, gatewayNodeJSApp3100 } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner } from '../components';
@@ -59,10 +59,24 @@ interface CampaignData {
   cbparam?: string;
 }
 
-export const ShowNapAdScreen: React.FC = () => {
+interface ShowNapAdScreenProps {
+  onClose?: () => void; 
+}
+
+export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
   const { navigate, reset } = useAppNavigation();
+
+  const handleClose = () => {
+    if (onClose) {
+      resetAdvertisementParams();
+      onClose();
+    } else if (reset) {
+      resetAdvertisementParams();
+      reset(ROUTES.map);
+    }
+  };
 
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -84,11 +98,31 @@ export const ShowNapAdScreen: React.FC = () => {
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
+    console.log('advertisementParams:', advertisementParams ? '있음' : '없음');
+    console.log('advertisementParams 상세:', JSON.stringify(advertisementParams, null, 2));
+    console.log('🔍 [ShowNapAdScreen] advertisementParams 값 검증:', {
+      advertisement: advertisementParams?.advertisement,
+      campid: advertisementParams?.campid,
+      coin: advertisementParams?.coin,
+      name: advertisementParams?.name,
+      xrunPrice: advertisementParams?.xrunPrice,
+      member: advertisementParams?.member,
+    });
+
     if (!advertisementParams) {
-      console.log('광고 파라미터가 없습니다. 이전 화면으로 이동');
-      reset(ROUTES.map);
+      console.error('❌ [ShowNapAdScreen] 광고 파라미터가 없습니다. 이전 화면으로 이동');
+      handleClose();
       return;
     }
+
+    console.log('✅ [ShowNapAdScreen] 광고 파라미터 확인 완료:', {
+      advertisement: advertisementParams.advertisement,
+      campid: advertisementParams.campid,
+      coin: advertisementParams.coin,
+      name: advertisementParams.name,
+      xrunPrice: advertisementParams.xrunPrice,
+    });
   }, [advertisementParams, reset]);
 
   useEffect(() => {
@@ -116,20 +150,50 @@ export const ShowNapAdScreen: React.FC = () => {
     getUserData();
   }, [advertisementParams]);
 
-  const initNStationAd = async (currentRetryCount: number = 0) => {
+  const initNStationAd = async (currentRetryCount: number = 0, params?: typeof advertisementParams) => {
     try {
+
+      const currentParams = params || advertisementParams;
+
       console.log('Starting NStation advertisement initialization');
       setIsLoading(true);
 
+      console.log('=== ShowNapAdScreen 진입 advertisementParams ===');
+      console.log('advertisement:', currentParams?.advertisement);
+      console.log('coin:', currentParams?.coin);
+      console.log('campid:', currentParams?.campid);
+      console.log('name:', currentParams?.name);
+      console.log('xrunPrice:', currentParams?.xrunPrice);
+      console.log('joindesc:', currentParams?.joindesc);
+      console.log('전체 advertisementParams:', JSON.stringify(currentParams, null, 2));
+      console.log('=== ShowNapAdScreen 진입 advertisementParams 끝 ===');
+
+      if (!currentParams || !currentParams.campid || currentParams.campid === '') {
+        console.error('❌ [ShowNapAdScreen] campid가 유효하지 않습니다:', {
+          campid: currentParams?.campid,
+          advertisement: currentParams?.advertisement,
+          fullParams: JSON.stringify(currentParams, null, 2),
+        });
+        setIsLoading(false);
+        handleClose();
+        return;
+      }
+
       const deviceInfo = await collectDeviceInfo();
 
-      const campid = advertisementParams?.campid || '';
+      const campid = currentParams.campid || '';
       console.log('=== ShowNapAdScreen API 호출 정보 ===');
       console.log('member:', member);
       console.log('adid:', deviceInfo.adid);
       console.log('campid:', campid);
-      console.log('advertisementParams:', JSON.stringify(advertisementParams, null, 2));
+      console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
       console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
+      console.log('🔍 [ShowNapAdScreen] 최종 API 호출 campid 검증:', {
+        campid,
+        advertisement: currentParams?.advertisement,
+        coin: currentParams?.coin,
+        name: currentParams?.name,
+      });
       console.log('=== API 호출 정보 끝 ===');
 
       const result = await getNasmobAds(
@@ -159,8 +223,9 @@ export const ShowNapAdScreen: React.FC = () => {
           setShowAlternativeAdButton(true);
         }
 
+        const retryParams = params || advertisementParams;
         retryTimeoutRef.current = setTimeout(() => {
-          initNStationAd(currentRetryCount + 1);
+          initNStationAd(currentRetryCount + 1, retryParams);
         }, 2000);
         return;
       }
@@ -171,9 +236,84 @@ export const ShowNapAdScreen: React.FC = () => {
     }
   };
 
+  const previousParamsRef = useRef<{ advertisement?: string; campid?: string } | null>(null);
+
   useEffect(() => {
+    if (advertisementParams) {
+      const currentKey = `${advertisementParams.advertisement}-${advertisementParams.campid}`;
+      const previousKey = previousParamsRef.current 
+        ? `${previousParamsRef.current.advertisement}-${previousParamsRef.current.campid}`
+        : null;
+
+      if (previousKey && currentKey !== previousKey) {
+        console.log('🔄 [ShowNapAdScreen] advertisementParams 변경 감지 - 상태 초기화');
+        console.log('🔍 이전 파라미터:', previousParamsRef.current);
+        console.log('🔍 새로운 파라미터:', {
+          advertisement: advertisementParams.advertisement,
+          campid: advertisementParams.campid,
+          coin: advertisementParams.coin,
+          name: advertisementParams.name,
+        });
+
+        setCampaignData(null);
+        setIsLoading(true);
+        setIsProcessing(false);
+        setRetryCount(0);
+        setIsRetrying(false);
+        setAdCallFailedModalVisible(false);
+        setShowAlternativeAdButton(false);
+        setShowBackButton(false);
+        setHasOpenedUrl(false);
+        setWaitingForWebSocketResponse(false);
+
+        if (retryTimeoutRef.current) {
+          clearTimeout(retryTimeoutRef.current);
+          retryTimeoutRef.current = null;
+        }
+        if (rewardProcessingTimeoutRef.current) {
+          clearTimeout(rewardProcessingTimeoutRef.current);
+          rewardProcessingTimeoutRef.current = null;
+        }
+        if (rewardProcessingIntervalRef.current) {
+          clearInterval(rewardProcessingIntervalRef.current);
+          rewardProcessingIntervalRef.current = null;
+        }
+
+        console.log('✅ [ShowNapAdScreen] 상태 초기화 완료');
+      }
+
+      previousParamsRef.current = {
+        advertisement: advertisementParams.advertisement,
+        campid: advertisementParams.campid,
+      };
+    }
+  }, [advertisementParams?.advertisement, advertisementParams?.campid]);
+
+  useEffect(() => {
+    console.log('=== ShowNapAdScreen 광고 초기화 체크 ===');
+    console.log('member:', member ? `있음 (${member})` : '없음');
+    console.log('advertisementParams:', advertisementParams ? '있음' : '없음');
+    console.log('🔍 [ShowNapAdScreen] advertisementParams 상세:', {
+      advertisement: advertisementParams?.advertisement,
+      campid: advertisementParams?.campid,
+      coin: advertisementParams?.coin,
+      name: advertisementParams?.name,
+      xrunPrice: advertisementParams?.xrunPrice,
+    });
+
     if (member && advertisementParams) {
-      initNStationAd();
+      console.log('✅ member와 advertisementParams 모두 있음 - initNStationAd 호출');
+      console.log('🔍 [ShowNapAdScreen] initNStationAd에 전달할 campid:', advertisementParams.campid);
+
+      initNStationAd(0, advertisementParams);
+    } else {
+      console.log('⏳ member 또는 advertisementParams 대기 중...');
+      if (!member) {
+        console.log('  - member가 아직 설정되지 않음');
+      }
+      if (!advertisementParams) {
+        console.log('  - advertisementParams가 아직 설정되지 않음');
+      }
     }
   }, [member, advertisementParams]);
 
@@ -276,8 +416,50 @@ export const ShowNapAdScreen: React.FC = () => {
         }
 
         try {
-          const response = await gatewayNodeJS(
-            parseInt(advertisementParams?.advertisement || '0'),
+
+          const adIdRaw = advertisementParams?.advertisement;
+
+          if (!adIdRaw) {
+            console.error('[ShowNapAdScreen] ❌ advertisement가 비어있습니다. 이 상태로는 올바른 리워드를 줄 수 없습니다.', {
+              advertisementParams,
+              advertisement: advertisementParams?.advertisement,
+              coin: advertisementParams?.coin,
+              campid: advertisementParams?.campid,
+              name: advertisementParams?.name,
+            });
+
+            resetAdvertisementParams();
+            handleClose();
+            setIsProcessing(false);
+            setWaitingForWebSocketResponse(false);
+            return;
+          }
+
+          const adId = parseInt(String(adIdRaw), 10);
+
+          if (isNaN(adId) || adId === 0) {
+            console.error('[ShowNapAdScreen] ❌ advertisement가 유효하지 않은 값입니다.', {
+              adIdRaw,
+              adId,
+              advertisementParams,
+            });
+
+            resetAdvertisementParams();
+            handleClose();
+            setIsProcessing(false);
+            setWaitingForWebSocketResponse(false);
+            return;
+          }
+
+          console.log('[ShowNapAdScreen] ✅ advertisement 검증 통과:', {
+            adIdRaw,
+            adId,
+            coin: advertisementParams?.coin || '0',
+            member,
+          });
+
+          const response = await gatewayNodeJSApp3100(
+            adId,
             advertisementParams?.coin || '0',
             member,
             advertisementParams?.joindesc || '',
@@ -358,26 +540,26 @@ export const ShowNapAdScreen: React.FC = () => {
     }
 
     resetAdvertisementParams();
-    reset(ROUTES.map);
+    handleClose();
   };
 
   const handleAdCallFailedOK = () => {
     console.log('광고 호출 실패 확인 버튼 클릭 - CameraMainScreen으로 이동');
     setAdCallFailedModalVisible(false);
     resetAdvertisementParams();
-    reset(ROUTES.map);
+    handleClose();
   };
 
   const handleAlternativeAdButton = () => {
     console.log('다른 광고 보기 버튼 클릭 - CameraMainScreen으로 이동');
     resetAdvertisementParams();
-    reset(ROUTES.map);
+    handleClose();
   };
 
   const handleCancel = () => {
     console.log('취소 버튼 클릭 - CameraMainScreen으로 이동');
     resetAdvertisementParams();
-    reset(ROUTES.map);
+    handleClose();
   };
 
   const handleGoToMap = () => {
@@ -393,7 +575,7 @@ export const ShowNapAdScreen: React.FC = () => {
     }
     setWaitingForWebSocketResponse(false);
     resetAdvertisementParams();
-    reset(ROUTES.map);
+    handleClose();
   };
 
   if (!advertisementParams) {

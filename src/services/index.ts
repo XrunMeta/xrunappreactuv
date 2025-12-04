@@ -1565,6 +1565,51 @@ const calculateDirection = (lat1: number, lon1: number, lat2: number, lon2: numb
   return (bearing + 360) % 360;
 };
 
+export const fetchMapMarkerDataRaw = async (
+  latitude: number,
+  longitude: number,
+  member: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member,
+      latitude,
+      longitude,
+      limit: 120,
+    };
+
+    console.log('=== fetchMapMarkerDataRaw API 호출 ===');
+    console.log('endpoint: app2000-01');
+    console.log('requestBody:', JSON.stringify(requestBody));
+
+    const response = await axiosInstance.post(
+      '/app2000-01',
+      requestBody,
+    );
+
+    const data = response.data;
+    console.log('=== fetchMapMarkerDataRaw API 응답 ===');
+    console.log('data.data length:', data?.data?.length);
+
+    return data;
+  } catch (error) {
+    console.error('맵 마커 원본 데이터 가져오기 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[맵 마커 원본] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const fetchMapMarkerData = async (
   latitude: number,
   longitude: number,
@@ -1580,19 +1625,25 @@ export const fetchMapMarkerData = async (
       limit: 120,
     };
 
-    console.log('=== fetchMapMarkerData API 호출 ===');
-    console.log('endpoint: app2000-01');
-    console.log('requestBody:', JSON.stringify(requestBody));
+    console.log('🌐 [app2000-01] fetchMapMarkerData API 호출 시작');
+    console.log('🌐 [app2000-01] endpoint: app2000-01');
+    console.log('🌐 [app2000-01] requestBody:', JSON.stringify(requestBody, null, 2));
+    console.log('🌐 [app2000-01] axiosInstance.post 호출 전');
 
     const response = await axiosInstance.post(
       '/app2000-01',
       requestBody,
     );
 
+    console.log('✅ [app2000-01] axiosInstance.post 응답 받음');
     const data = response.data;
-    console.log('=== fetchMapMarkerData API 응답 ===');
-
-    console.log('data.data length:', data?.data?.length);
+    console.log('✅ [app2000-01] fetchMapMarkerData API 응답 완료');
+    console.log('✅ [app2000-01] data.data length:', data?.data?.length);
+    console.log('✅ [app2000-01] 전체 응답 구조:', {
+      success: data?.success,
+      dataLength: data?.data?.length,
+      hasData: !!data?.data,
+    });
 
     if (data?.data && Array.isArray(data.data)) {
       return data.data.map((item: any) => {
@@ -1624,7 +1675,9 @@ export const fetchMapMarkerData = async (
           coin: item.coin || '', 
 
           campid: item.campid || item.campId || item.campaignid || item.campaignId || '',
-        } as SpotData & { campid?: string };
+
+          advertisement: item.advertisement || item.adid || item.ad || item.coin || '',
+        } as SpotData & { campid?: string; advertisement?: string | number };
       });
     }
 
@@ -1644,6 +1697,88 @@ export const fetchMapMarkerData = async (
     }
 
     return [];
+  }
+};
+
+export const fetchVirtualCoin = async (
+  member: number | string,
+  latitude: number,
+  longitude: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
+
+    const requestBody = {
+      member: member,
+      latitude: latitude,
+      longitude: longitude,
+    };
+
+    console.log('=== virtualCoin API 호출 ===');
+    console.log('requestBody:', JSON.stringify(requestBody));
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('=== virtualCoin API 응답 ===');
+    console.log('response.data length:', result?.data?.length);
+
+    return result;
+  } catch (error) {
+    console.error('virtualCoin API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const getCoinNasPrice = async (
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
+
+    console.log('=== getCoinNasPrice API 호출 ===');
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('=== getCoinNasPrice API 응답 ===');
+    console.log('calculatedNasPrice:', result?.data?.coins);
+
+    return result;
+  } catch (error) {
+    console.error('getCoinNasPrice API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
   }
 };
 
@@ -2031,6 +2166,58 @@ export const sendNasmobCallback = async (
 };
 
 export const gatewayNodeJS = async (
+  endpoint: string,
+  method: string = 'POST',
+  requestBody: any = {},
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
+
+    console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
+    console.log(`🌐 [gatewayNodeJS] endpoint: ${endpoint}`);
+    console.log(`🌐 [gatewayNodeJS] method: ${method}`);
+    console.log(`🌐 [gatewayNodeJS] url: ${url}`);
+    console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(requestBody, null, 2));
+    console.log(`🌐 [gatewayNodeJS] fetch 호출 전`);
+
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    console.log(`✅ [gatewayNodeJS] fetch 응답 받음, status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log(`✅ [gatewayNodeJS] API 응답 성공`);
+    console.log(`✅ [gatewayNodeJS] endpoint: ${endpoint}`);
+    console.log(`✅ [gatewayNodeJS] result.data length:`, result?.data?.length || 'N/A');
+    console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+      success: result?.success,
+      dataLength: result?.data?.length,
+      hasData: !!result?.data,
+    });
+
+    return result;
+  } catch (error) {
+    console.error(`Gateway NodeJS 오류 (${endpoint}):`, error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const gatewayNodeJSApp3100 = async (
   advertisement: number,
   coin: string,
   member: string,

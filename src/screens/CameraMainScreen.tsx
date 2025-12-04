@@ -10,6 +10,7 @@ import {
   Animated,
   Easing,
   AppState,
+  Modal,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -22,6 +23,7 @@ import { fetchMapMarkerData } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { ShowNapAdScreen } from './ShowNapAdScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,12 +40,25 @@ const getRandomOffset = (value: number, range: number): number => {
 
 interface TokenComponentProps {
   token: TokenData;
-  onPress: () => void;
+  onPress: () => void; 
   animationRefs: React.MutableRefObject<Map<number, React.MutableRefObject<Animated.CompositeAnimation | null>>>;
   appState: string;
+  rageProgress: number;
+  isRageMode: boolean;
+  rageColor: string;
+  calculateScaleBasedOnDistance: (distance: number) => number;
 }
 
-const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress, animationRefs, appState }) => {
+const TokenComponent: React.FC<TokenComponentProps> = ({ 
+  token, 
+  onPress, 
+  animationRefs, 
+  appState,
+  rageProgress,
+  isRageMode,
+  rageColor,
+  calculateScaleBasedOnDistance,
+}) => {
   const position = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const blinkAnim = useRef(new Animated.Value(1)).current;
@@ -190,11 +205,11 @@ const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress, animati
       y: Math.random() * 300 - 150,
     });
 
-    const blinkSpeed = 300; 
+    const blinkSpeed = Math.max(100, 300 - rageProgress * 2);
     Animated.loop(
       Animated.sequence([
         Animated.timing(blinkAnim, {
-          toValue: 0,
+          toValue: isRageMode ? 0.2 : 0,
           duration: blinkSpeed,
           easing: Easing.linear,
           useNativeDriver: true,
@@ -209,7 +224,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress, animati
     ).start();
 
     animateObject();
-  }, [animateObject, position, blinkAnim]);
+  }, [animateObject, position, blinkAnim, rageProgress, isRageMode]);
 
   const spotIndex = token.spotID - 1;
   const spot = spots[spotIndex] || spots[0];
@@ -267,30 +282,66 @@ const TokenComponent: React.FC<TokenComponentProps> = ({ token, onPress, animati
 
       <TouchableOpacity
         onPress={onPress}
-        style={styles.tokenButtonContainer}
+        style={[
+          styles.tokenButtonContainer,
+          {
+            transform: [
+              { scale: calculateScaleBasedOnDistance(distance) },
+            ],
+          },
+        ]}
         activeOpacity={0.7}>
-        <View style={styles.tokenButton}>
+        <View
+          style={[
+            styles.tokenButton,
+            {
+              backgroundColor: isRageMode ? '#1E40AF' : '#161d2d',
+              borderColor: '#E5E5E5',
+              shadowColor: isRageMode ? '#3B82F6' : '#FCD34D',
+              shadowOpacity: isRageMode ? 0.8 : 0.5,
+              shadowRadius: isRageMode ? 10 : 5,
+              elevation: isRageMode ? 15 : 8,
+            },
+          ]}>
           {}
-          {parseFloat(String(distance)) < 20 && iconCatch && (
+          {parseFloat(String(distance)) < 30 && (
             <Animated.Image
-              source={iconCatch}
+              source={
+                isRageMode
+                  ? require('../../assets/images/icon_catch_rage.png')
+                  : require('../../assets/images/icon_catch.png')
+              }
               style={[
                 styles.blinkImage,
                 {
                   opacity: blinkAnim,
                 },
+                isRageMode && { top: -90 },
               ]}
             />
           )}
           {iconXrunWhite && (
             <Image
               source={iconXrunWhite}
-              style={[styles.tokenIcon, { marginTop: 3 }]}
+              style={[
+                styles.tokenIcon,
+                { marginTop: 3 },
+                isRageMode && { tintColor: rageColor },
+              ]}
             />
           )}
           <View style={{ alignItems: 'center', marginTop: -4 }}>
             <Text style={styles.tokenPriceText}>
-              {token?.xrunPrice ? parseFloat(String(token.xrunPrice)).toFixed(2) : '0.00'}
+              {(() => {
+
+                const price = token?.xrunPrice || 0;
+                const priceValue = parseFloat(String(price));
+                console.log(`💰 [TokenComponent] 토큰 spotID=${token.spotID} 가격:`, {
+                  xrunPrice: token?.xrunPrice,
+                  priceValue,
+                });
+                return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
+              })()}
             </Text>
             <Text style={styles.tokenDistanceText}>
               {token?.distance ? parseFloat(String(token.distance)).toFixed(1) + 'm' : '0.0m'}
@@ -339,19 +390,12 @@ try {
 }
 
 let iconXrunWhite: any = null;
-let iconBottom: any = null;
 let iconCatch: any = null;
 
 try {
   iconXrunWhite = require('../../assets/images/icon_xrun_white.png');
 } catch (e) {
   console.warn('icon_xrun_white.png not found');
-}
-
-try {
-  iconBottom = require('../../assets/images/icon_bottom.png');
-} catch (e) {
-  console.warn('icon_bottom.png not found');
 }
 
 try {
@@ -380,10 +424,140 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
+  const [showAdModal, setShowAdModal] = useState(false);
+
   const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [coinsData, setCoinsData] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const currentIndexRef = useRef(0);
   const chunkSize = 4;
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const [rageProgress, setRageProgress] = useState(0);
+  const [isRageMode, setIsRageMode] = useState(false);
+  const rageColor = '#60A5FA'; 
+
+  const loadRageProgress = useCallback(async () => {
+    try {
+      const savedProgress = await AsyncStorage.getItem('rageProgress');
+      const lastUpdateTime = await AsyncStorage.getItem('rageProgressLastUpdate');
+
+      if (savedProgress !== null && lastUpdateTime !== null) {
+        const currentTime = Date.now();
+        const lastUpdate = parseInt(lastUpdateTime);
+        const timeDifference = currentTime - lastUpdate;
+        const oneDayInMs = 24 * 60 * 60 * 1000; 
+
+        if (timeDifference > oneDayInMs) {
+          console.log('More than 1 day passed, resetting rage progress');
+          await resetRageProgress();
+        } else {
+          const progress = parseFloat(savedProgress);
+          setRageProgress(progress);
+          setIsRageMode(progress >= 100);
+          console.log(
+            `Loaded rage progress: ${progress}% (last updated: ${new Date(
+              lastUpdate,
+            ).toLocaleString()})`,
+          );
+        }
+      } else {
+
+        await resetRageProgress();
+      }
+    } catch (error) {
+      console.log('Error loading rage progress:', error);
+      await resetRageProgress();
+    }
+  }, []);
+
+  const saveRageProgress = useCallback(async (progress: number) => {
+    try {
+      const currentTime = Date.now();
+      await AsyncStorage.setItem('rageProgress', progress.toString());
+      await AsyncStorage.setItem(
+        'rageProgressLastUpdate',
+        currentTime.toString(),
+      );
+      console.log(
+        `Saved rage progress: ${progress}% at ${new Date(
+          currentTime,
+        ).toLocaleString()}`,
+      );
+    } catch (error) {
+      console.log('Error saving rage progress:', error);
+    }
+  }, []);
+
+  const resetRageProgress = useCallback(async () => {
+    try {
+      const currentTime = Date.now();
+      await AsyncStorage.setItem('rageProgress', '0');
+      await AsyncStorage.setItem(
+        'rageProgressLastUpdate',
+        currentTime.toString(),
+      );
+      setRageProgress(0);
+      setIsRageMode(false);
+      console.log('Rage progress reset to 0');
+    } catch (error) {
+      console.log('Error resetting rage progress:', error);
+    }
+  }, []);
+
+  const resetRageProgressOnLogout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem('rageProgress');
+      await AsyncStorage.removeItem('rageProgressLastUpdate');
+      setRageProgress(0);
+      setIsRageMode(false);
+      console.log('Rage progress cleared on logout');
+    } catch (error) {
+      console.log('Error clearing rage progress on logout:', error);
+    }
+  }, []);
+
+  const checkUserLoginStatus = useCallback(async () => {
+    try {
+      const currentUser = await AsyncStorage.getItem('userData');
+
+      if (currentUser) {
+        await loadRageProgress();
+      } else {
+
+        await resetRageProgressOnLogout();
+      }
+    } catch (error) {
+      console.log('Error checking user login status:', error);
+      await resetRageProgress();
+    }
+  }, [loadRageProgress, resetRageProgress, resetRageProgressOnLogout]);
+
+  const updateRageProgress = useCallback(async (increment: number) => {
+    const newProgress = Math.min(100, Math.max(0, rageProgress + increment));
+    setRageProgress(newProgress);
+
+    await saveRageProgress(newProgress);
+
+    setIsRageMode(newProgress >= 100);
+
+    console.log(
+      `Rage progress updated: ${newProgress}% (${Math.floor(
+        newProgress / 2,
+      )}/50 ads)`,
+    );
+  }, [rageProgress, saveRageProgress]);
+
+  const handleRageModeActivated = useCallback(() => {
+    console.log('🔥 RAGE MODE ACTIVATED! Double rewards enabled!');
+    setIsRageMode(true);
+  }, []);
+
+  const handleRageModeDeactivated = useCallback(() => {
+    console.log('Rage mode deactivated');
+    setIsRageMode(false);
+  }, []);
 
   const animationRefs = useRef<Map<number, React.MutableRefObject<Animated.CompositeAnimation | null>>>(new Map());
 
@@ -431,47 +605,34 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     requestCameraPermission();
   }, [permission, requestPermission, showAlert]);
 
-  const convertSpotDataToTokenData = (spotData: (SpotData & { campid?: string })[], startIndex: number): TokenData[] => {
-    const actualChunkSize = Math.min(chunkSize, spotData.length);
-    let nextData: (SpotData & { campid?: string })[] = [];
-
-    if (startIndex + actualChunkSize > spotData.length) {
-      nextData = [
-        ...spotData.slice(startIndex),
-        ...spotData.slice(0, (startIndex + actualChunkSize) % spotData.length),
-      ];
-    } else {
-      nextData = spotData.slice(startIndex, startIndex + actualChunkSize);
+  const organizeData = useCallback((oCoinData: any[]) => {
+    if (oCoinData.length === 0) {
+      setTokens([]);
+      return;
     }
 
-    return nextData.map((data, index) => {
-      const spot = spots[index % spots.length];
-      const campid = data.campid || '';
+    let nextData: any[] = [];
+    let actualChunkSize = Math.min(chunkSize, oCoinData.length);
 
-      console.log(`토큰 변환 [${index}]:`, {
-        name: data.name,
-        coin: data.coin,
-        campid: campid,
-        hasCampid: !!campid,
-      });
+    if (currentIndexRef.current + actualChunkSize > oCoinData.length) {
 
-      return {
-        spotID: spot.spotID,
-        x: spot.x,
-        y: spot.y,
-        xrunPrice: data.xrunPrice || 0,
-        distance: data.distance || 0,
-        name: data.name || 'XRUN coin',
-        iconurl: data.iconurl || '',
-        joindesc: data.joindesc || '',
-        brand: data.brand || '',
-        advertisement: data.coin || '',
-        coin: data.coin || '',
-        member: '',
-        campid: campid, 
-      };
+      nextData = [
+        ...oCoinData.slice(currentIndexRef.current),
+        ...oCoinData.slice(0, (currentIndexRef.current + actualChunkSize) % oCoinData.length),
+      ];
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    } else {
+
+      nextData = oCoinData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    }
+
+    const newOrganizedData = nextData.map((data, index) => {
+      return { ...spots[index % spots.length], ...data };
     });
-  };
+
+    setTokens(newOrganizedData);
+  }, []);
 
   const loadTokenData = useCallback(async (forceRefresh: boolean = false) => {
 
@@ -483,6 +644,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       setLoading(true);
       console.log('=== CameraMainScreen 데이터 로딩 시작 ===', forceRefresh ? '(강제 새로고침)' : '');
 
+      await checkUserLoginStatus();
+
       if (!forceRefresh) {
         const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
 
@@ -493,30 +656,62 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
 
-              const spotDataArray: SpotData[] = coinsData.map((coin: any) => ({
-                spotID: coin.spotid || coin.spotID || coin.id || 0,
-                distance: coin.distance || 0,
-                direction: coin.direction || 0,
-                name: coin.name || coin.title || coin.brand || 'XRUN coin',
-                latitude: coin.latitude || coin.lat,
-                longitude: coin.longitude || coin.lng,
-                xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
-                iconurl: coin.iconurl || '',
-                joindesc: coin.joindesc || '',
-                brand: coin.brand || coin.coin || '',
-                coins: coin.coins || coin.coin || '',
-                coin: coin.coin || '',
+              const validatedCoinsData = coinsData.map((coin: any) => {
 
-                campid: coin.campid || coin.campId || '',
-              } as SpotData & { campid?: string }));
+                const originalXrunPrice = coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0;
 
-              if (spotDataArray.length > 0) {
-                const newTokens = convertSpotDataToTokenData(spotDataArray, currentIndexRef.current);
-                setTokens(newTokens);
-                currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, spotDataArray.length)) % spotDataArray.length;
-              } else {
-                setTokens([]);
-              }
+                console.log(`🔍 [loadTokenData] 코인 원본 데이터 확인:`, {
+                  coin: coin.coin,
+                  advertisement: coin.advertisement,
+                  xrunPrice: coin.xrunPrice,
+                  xrunprice: coin.xrunprice,
+                  price: coin.price,
+                  coins: coin.coins,
+                  originalXrunPrice,
+                });
+
+                return {
+                  ...coin, 
+                  iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                  joindesc: coin.joindesc || '',
+                  name: coin.name || coin.title || coin.brand || 'Unknown coin',
+                  xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                  xrunPrice: originalXrunPrice, 
+                  campid: coin.campid || coin.campId || '',
+
+                  advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                };
+              });
+
+              console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
+
+              console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
+              validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
+                console.log(`📋 validatedCoinsData[${idx}]:`, {
+                  name: coin.name,
+                  advertisement: coin.advertisement,
+                  campid: coin.campid,
+                  xrunPrice: coin.xrunPrice,
+                  coin: coin.coin,
+                  brand: coin.brand,
+                });
+              });
+
+              const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
+              const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
+              const uniqueAllAds = Array.from(new Set(allAdvertisements));
+              const uniqueAllCampids = Array.from(new Set(allCampids));
+              console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
+                total: validatedCoinsData.length,
+                uniqueAdvertisements: uniqueAllAds.length,
+                uniqueCampids: uniqueAllCampids.length,
+                advertisementValues: uniqueAllAds.slice(0, 10),
+                campidValues: uniqueAllCampids.slice(0, 10),
+              });
+
+              setCoinsData(validatedCoinsData);
+
+              organizeData(validatedCoinsData);
 
               hasLoadedDataRef.current = true;
               setLoading(false);
@@ -571,10 +766,38 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
         await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
 
-        const newTokens = convertSpotDataToTokenData(markerData, currentIndexRef.current);
-        setTokens(newTokens);
-        currentIndexRef.current = (currentIndexRef.current + Math.min(chunkSize, markerData.length)) % markerData.length;
+        const validatedCoinsData = markerData.map((coin: any) => {
+
+          const originalXrunPrice = coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0;
+
+          console.log(`🔍 [loadTokenData API] 코인 원본 데이터 확인:`, {
+            coin: coin.coin,
+            advertisement: coin.advertisement,
+            xrunPrice: coin.xrunPrice,
+            xrunprice: coin.xrunprice,
+            price: coin.price,
+            coins: coin.coins,
+            originalXrunPrice,
+          });
+
+          return {
+            ...coin, 
+            iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+            joindesc: coin.joindesc || '',
+            name: coin.name || coin.title || coin.brand || 'Unknown coin',
+            xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+            xrunPrice: originalXrunPrice, 
+            campid: coin.campid || coin.campId || '',
+
+            advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+          };
+        });
+
+        setCoinsData(validatedCoinsData);
+
+        organizeData(validatedCoinsData);
       } else {
+        setCoinsData([]);
         setTokens([]);
       }
 
@@ -587,29 +810,92 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }
   }, [navigate]);
 
-  useEffect(() => {
-    if (!hasLoadedDataRef.current) {
-      loadTokenData(false); 
-    }
-  }, []); 
+  const calculateScaleBasedOnDistance = useCallback((distance: number): number => {
+    const dist = parseFloat(String(distance));
+    const minScale = 0.9; 
+    const maxScale = 1.0; 
+    const maxDistance = 30; 
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('⏰ 20초 경과 - 서버에서 새 데이터 가져오기');
-      loadTokenData(true); 
-    }, 20000); 
+    if (dist <= 0) return maxScale;
+    if (dist >= maxDistance) return minScale;
 
-    return () => clearInterval(interval);
-  }, []); 
+    return maxScale - (maxScale - minScale) * (dist / maxDistance);
+  }, []);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      setAppState(nextAppState);
+  const pauseAllAnimations = useCallback(() => {
+    animationRefs.current.forEach((animationRef, spotID) => {
+      if (animationRef && animationRef.current) {
+        animationRef.current.stop();
+        console.log(`⏸️ 토큰 ${spotID} 애니메이션 일시정지`);
+      }
     });
+  }, []);
+
+  const resumeAllAnimations = useCallback(() => {
+    animationRefs.current.forEach((animationRef, spotID) => {
+      if (animationRef && animationRef.current) {
+
+        console.log(`🔄 토큰 ${spotID} 애니메이션 재시작 준비`);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const initializeData = async () => {
+
+      await checkUserLoginStatus();
+
+      if (!hasLoadedDataRef.current) {
+        loadTokenData(false); 
+      }
+    };
+
+    initializeData();
+  }, []); 
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+      console.log('⏰ 3분 경과 - 다른 코인들로 교체');
+      if (coinsData.length > 0) {
+        organizeData(coinsData);
+      }
+    }, 180000); 
+
+    return () => clearInterval(interval); 
+  }, [coinsData, organizeData]); 
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: typeof appState) => {
+      console.log('📱 AppState 변경:', appState, '->', nextAppState);
+
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+
+        console.log('🔄 앱 활성화 - 토큰 애니메이션 재시작');
+        resumeAllAnimations();
+      } else if (appState === 'active' && nextAppState.match(/inactive|background/)) {
+
+        console.log('⏸️ 앱 비활성화 - 토큰 애니메이션 일시정지');
+        pauseAllAnimations();
+      }
+
+      setAppState(nextAppState);
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
 
     return () => {
       subscription?.remove();
     };
+  }, [appState, pauseAllAnimations, resumeAllAnimations]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRefreshKey(prevKey => prevKey + 1);
+      console.log('🔄 [CameraMainScreen] 3분 경과 - 컴포넌트 리프레시 (refreshKey 증가)');
+    }, 180000); 
+
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -622,94 +908,83 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, []);
 
   useEffect(() => {
+    console.log('🔄 selectedToken 변경 감지:', {
+      spotID: selectedToken?.spotID,
+      advertisement: selectedToken?.advertisement,
+      campid: selectedToken?.campid,
+      coin: selectedToken?.coin,
+      xrunPrice: selectedToken?.xrunPrice,
+      name: selectedToken?.name,
+    });
     hasAutoAdTriggeredRef.current = false;
   }, [selectedToken]);
 
-  const displayTokens = useMemo(() => {
-    if (tokens.length === 0) {
-      return tokens;
-    }
+  useEffect(() => {
+    console.log('📱 CameraMainScreen 포커스 받음');
 
-    const allTokensFar = tokens.every(token => {
-      const distance = parseFloat(String(token.distance || 0));
-      return distance >= 20;
-    });
+    return () => {
+      console.log('📱 CameraMainScreen 포커스 잃음 - 광고 초기화 중단');
 
-    if (!allTokensFar) {
-
-      return tokens;
-    }
-
-    const numTokensToAdjust = Math.floor(Math.random() * 2) + 1; 
-    const selectedIndices = new Set<number>();
-
-    while (selectedIndices.size < numTokensToAdjust && selectedIndices.size < tokens.length) {
-      const randomIndex = Math.floor(Math.random() * tokens.length);
-      selectedIndices.add(randomIndex);
-    }
-
-    const adjustedTokens = tokens.map((token, index) => {
-      if (selectedIndices.has(index)) {
-
-        const adjustedDistance = Math.floor(Math.random() * 19) + 1; 
-        return {
-          ...token,
-          distance: adjustedDistance, 
-        };
+      if (autoAdTimeoutRef.current) {
+        clearTimeout(autoAdTimeoutRef.current);
+        autoAdTimeoutRef.current = null;
+        console.log('⏹️ 자동 광고 이동 타이머 정리됨');
       }
 
-      return token;
-    });
+      hasAutoAdTriggeredRef.current = false;
+      console.log('🔄 자동 광고 트리거 상태 리셋됨');
+    };
+  }, []); 
 
-    console.log(`📊 표시용 토큰 생성: ${numTokensToAdjust}개 토큰의 거리를 20미터 이내로 조정`);
-    return adjustedTokens;
-  }, [tokens]);
+  useEffect(() => {
+    if (showBottomPanel && selectedToken) {
+
+      Animated.timing(bottomPanelBottom, {
+        toValue: 140, 
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: false,
+      }).start();
+    } else {
+
+      Animated.timing(bottomPanelBottom, {
+        toValue: 20, 
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [showBottomPanel, selectedToken, bottomPanelBottom]);
 
   const handleNavItemPress = (itemId: string) => {
     console.log('Navigation item pressed:', itemId);
 
+    switch (itemId) {
+      case 'wallet':
+        navigate(ROUTES.wallet);
+        break;
+      case 'shop':
+        navigate(ROUTES.shopTicket);
+        break;
+      case 'referral':
+        navigate(ROUTES.referralSettlement);
+        break;
+      case 'info':
+        navigate(ROUTES.myInfo);
+        break;
+      default:
+        console.log('Unknown navigation item:', itemId);
+    }
   };
 
   const handleTabChange = (tab: 'Map' | 'Camera') => {
     onTabChange?.(tab);
   };
 
-  const handleToggleBottomPanel = () => {
-    if (showBottomPanel) {
-
-      setShowBottomPanel(false);
-    } else {
-
-      if (!selectedToken) {
-        console.log('selectedToken이 없어서 하단 패널을 열 수 없습니다.');
-        return;
-      }
-      setShowBottomPanel(true);
-    }
-  };
-
-  useEffect(() => {
-    if (showBottomPanel) {
-      Animated.timing(bottomPanelBottom, {
-        toValue: 90, 
-        duration: 300,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
-    } else {
-      Animated.timing(bottomPanelBottom, {
-        toValue: 20, 
-        duration: 300,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: false, 
-      }).start();
-    }
-  }, [showBottomPanel]);
-
-  const navigateToAd = useCallback(async (token: TokenData) => {
+  const showAdInModal = useCallback(async (token: TokenData) => {
     try {
-      console.log('=== navigateToAd 함수 시작 ===');
-      console.log('전달받은 토큰 정보:', JSON.stringify(token, null, 2));
+      console.log('=== showAdInModal 함수 시작 ===');
+      console.log('📥 전달받은 토큰 원본:', JSON.stringify(token, null, 2));
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {
@@ -720,97 +995,263 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const parsedUserData = JSON.parse(userData);
       const member = parsedUserData?.member?.toString() || '';
 
-      const campid = token.campid || '';
-      console.log('campid 확인:', {
-        tokenCampid: token.campid,
-        finalCampid: campid,
-        coin: token.coin,
-      });
+      if (!member) {
+        console.log('userData에 member가 없습니다.');
+        return;
+      }
+
+      const advertisement = token.advertisement 
+        ? String(token.advertisement) 
+        : (token.coin ? String(token.coin) : '');
+      const campid = token.campid ? String(token.campid) : '';
+
+      if (!advertisement || advertisement === '' || advertisement === 'undefined') {
+        console.error('❌ advertisement가 유효하지 않습니다');
+        return;
+      }
+
+      if (!campid || campid === '' || campid === 'undefined') {
+        console.error('❌ campid가 유효하지 않습니다');
+        return;
+      }
 
       const adParams = {
         member: member,
-        advertisement: token.advertisement || token.coin || '',
-        coin: token.coin || '',
-        campid: campid, 
+        advertisement: advertisement,
+        coin: token.coin ? String(token.coin) : '',
+        campid: campid,
         joindesc: token.joindesc || '',
         name: token.name || 'XRUN coin',
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
       };
 
-      console.log('Context에 저장할 광고 파라미터:', JSON.stringify(adParams, null, 2));
+      console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
+
       setAdvertisementParams(adParams);
 
-      console.log('ShowNapAdScreen으로 이동');
-      reset(ROUTES.showNapAd);
+      setTimeout(() => {
+        console.log('🔄 Context 업데이트 완료 - 모달 표시');
+        setShowAdModal(true);
+      }, 100);
     } catch (error) {
-      console.error('광고 화면 이동 실패:', error);
+      console.error('❌ showAdInModal 오류:', error);
     }
-  }, [setAdvertisementParams, reset]);
+  }, [setAdvertisementParams]);
 
-  const handleTokenClick = useCallback((originalToken: TokenData, displayToken?: TokenData) => {
+  const navigateToAd = useCallback(async (token: TokenData) => {
+    try {
+      console.log('=== navigateToAd 함수 시작 ===');
+      console.log('📥 전달받은 토큰 원본:', JSON.stringify(token, null, 2));
+      console.log('🔍 navigateToAd 토큰 상세:', {
+        spotID: token.spotID,
+        advertisement: token.advertisement,
+        campid: token.campid,
+        coin: token.coin,
+        xrunPrice: token.xrunPrice,
+        name: token.name,
+        brand: token.brand,
+      });
 
-    console.log('=== 토큰 클릭 이벤트 발생 ===');
-    console.log('원본 토큰 정보:', JSON.stringify(originalToken, null, 2));
-    console.log('표시용 토큰 정보:', displayToken ? JSON.stringify(displayToken, null, 2) : '없음');
-    console.log('spotID:', originalToken.spotID);
-    console.log('원본 distance:', originalToken.distance);
-    console.log('표시용 distance:', displayToken?.distance);
-    console.log('xrunPrice:', originalToken.xrunPrice);
-    console.log('name:', originalToken.name);
-    console.log('iconurl:', originalToken.iconurl);
-    console.log('joindesc:', originalToken.joindesc);
-    console.log('brand:', originalToken.brand);
-    console.log('advertisement:', originalToken.advertisement);
-    console.log('coin:', originalToken.coin);
-    console.log('campid:', originalToken.campid);
-    console.log('member:', originalToken.member);
-    console.log('=== 토큰 클릭 이벤트 끝 ===');
-
-    setSelectedToken(originalToken);
-    if (!showBottomPanel) {
-      setShowBottomPanel(true);
-    }
-
-    const originalDistance = parseFloat(String(originalToken.distance || 0));
-    const displayDistance = displayToken ? parseFloat(String(displayToken.distance || 0)) : originalDistance;
-
-    const isDistanceAdjusted = displayToken && displayDistance < originalDistance;
-
-    console.log('거리 체크:', { 
-      displayDistance, 
-      originalDistance,
-      isDistanceAdjusted,
-      isWithin20m: originalDistance < 20,
-      willProceed: isDistanceAdjusted || originalDistance < 20,
-    });
-
-    if (isDistanceAdjusted || originalDistance < 20) {
-      if (isDistanceAdjusted) {
-        console.log('✅ 토큰 거리가 조정되어 표시됨 - 실제 거리와 상관없이 광고 진행');
-      } else {
-        console.log('✅ 토큰 거리 20미터 이내 - 2초 후 광고 화면으로 이동');
+      const userData = await AsyncStorage.getItem('userData');
+      if (!userData) {
+        console.log('userData가 없습니다.');
+        return;
       }
 
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member?.toString() || '';
+
+      if (!member) {
+        console.log('userData에 member가 없습니다.');
+        return;
+      }
+
+      const advertisement = token.advertisement 
+        ? String(token.advertisement) 
+        : (token.coin ? String(token.coin) : '');
+      const campid = token.campid ? String(token.campid) : '';
+
+      console.log('🔍 navigateToAd - advertisement/campid 추출:', {
+        tokenAdvertisement: token.advertisement,
+        tokenCampid: token.campid,
+        extractedAdvertisement: advertisement,
+        extractedCampid: campid,
+        tokenSpotID: token.spotID,
+        tokenCoin: token.coin,
+      });
+
+      if (!advertisement || advertisement === '' || advertisement === 'undefined') {
+        console.error('❌ advertisement가 유효하지 않습니다:', {
+          advertisement,
+          tokenAdvertisement: token.advertisement,
+          tokenCoin: token.coin,
+        });
+        return;
+      }
+
+      if (!campid || campid === '' || campid === 'undefined') {
+        console.error('❌ campid가 유효하지 않습니다:', {
+          campid,
+          tokenCampid: token.campid,
+          tokenSpotID: token.spotID,
+        });
+        return;
+      }
+
+      const adParams = {
+        member: member,
+        advertisement: advertisement,
+        coin: token.coin ? String(token.coin) : '',
+        campid: campid,
+        joindesc: token.joindesc || '',
+        name: token.name || 'XRUN coin',
+        xrunPrice: token.xrunPrice || 0,
+        coinScreen: true,
+      };
+
+      console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(adParams, null, 2));
+      console.log('🔍 파라미터 상세:', {
+        member,
+        advertisement,
+        campid,
+        coin: token.coin,
+        name: token.name,
+        xrunPrice: token.xrunPrice,
+        joindesc: token.joindesc,
+      });
+
+      console.log('🔄 Context에 광고 파라미터 설정 전:', {
+        advertisement: adParams.advertisement,
+        campid: adParams.campid,
+        coin: adParams.coin,
+        name: adParams.name,
+      });
+      setAdvertisementParams(adParams);
+      console.log('✅ Context에 광고 파라미터 설정 완료:', {
+        advertisement: adParams.advertisement,
+        campid: adParams.campid,
+        coin: adParams.coin,
+        name: adParams.name,
+      });
+
+      console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
+      console.log('🔍 이동 시 전달할 파라미터:', {
+        advertisement: adParams.advertisement,
+        campid: adParams.campid,
+        coin: adParams.coin,
+        name: adParams.name,
+      });
+      reset(ROUTES.showNapAd);
+      console.log('✅ ShowNapAd 화면으로 이동 완료');
+    } catch (error) {
+      console.error('❌ navigateToAd 오류:', error);
+    }
+  }, [navigate, reset, setAdvertisementParams]);
+
+  useEffect(() => {
+    if (showBottomPanel && selectedToken && !hasAutoAdTriggeredRef.current) {
+
+      const currentToken: TokenData = {
+        ...selectedToken,
+        advertisement: selectedToken.advertisement,
+        campid: selectedToken.campid,
+        coin: selectedToken.coin,
+        xrunPrice: selectedToken.xrunPrice,
+        name: selectedToken.name,
+        iconurl: selectedToken.iconurl,
+        joindesc: selectedToken.joindesc,
+        brand: selectedToken.brand,
+      };
+
+      console.log('📱 하단 패널 열림 - 20초 후 자동 광고 이동 타이머 설정');
+      console.log('🔍 자동 광고 이동 대상 토큰 (현재 selectedToken):', {
+        advertisement: currentToken.advertisement,
+        campid: currentToken.campid,
+        coin: currentToken.coin,
+        name: currentToken.name,
+        spotID: currentToken.spotID,
+      });
+      hasAutoAdTriggeredRef.current = true;
+      autoAdTimeoutRef.current = setTimeout(() => {
+        console.log('⏰ 20초 경과 - 자동으로 광고 화면으로 이동');
+        console.log('🔍 자동 이동 시 토큰 정보 (저장된 currentToken):', {
+          advertisement: currentToken.advertisement,
+          campid: currentToken.campid,
+          coin: currentToken.coin,
+          name: currentToken.name,
+          spotID: currentToken.spotID,
+        });
+        navigateToAd(currentToken);
+      }, 20000); 
+    } else {
+
+      if (autoAdTimeoutRef.current) {
+        console.log('📱 하단 패널 닫힘 또는 토큰 변경 - 자동 광고 이동 타이머 정리');
+        clearTimeout(autoAdTimeoutRef.current);
+        autoAdTimeoutRef.current = null;
+      }
+    }
+
+    return () => {
       if (autoAdTimeoutRef.current) {
         clearTimeout(autoAdTimeoutRef.current);
         autoAdTimeoutRef.current = null;
-        console.log('⏹️ 이전 타이머 정리됨');
       }
+    };
+  }, [showBottomPanel, selectedToken, navigateToAd]);
 
-      hasAutoAdTriggeredRef.current = false;
-      console.log('🔄 자동 광고 트리거 상태 리셋');
+  const handleTokenClick = useCallback((token: TokenData) => {
+    console.log('=== 토큰 클릭 이벤트 발생 ===');
+    console.log('클릭된 토큰 정보:', JSON.stringify(token, null, 2));
+    console.log('🔍 클릭된 토큰 상세:', {
+      spotID: token.spotID,
+      advertisement: token.advertisement,
+      campid: token.campid,
+      coin: token.coin,
+      xrunPrice: token.xrunPrice,
+      name: token.name,
+    });
 
-      console.log('⏰ 2초 타이머 시작');
-      autoAdTimeoutRef.current = setTimeout(() => {
-        console.log('⏰ 2초 경과 - 자동으로 광고 화면으로 이동');
-        hasAutoAdTriggeredRef.current = true;
-        navigateToAd(originalToken); 
-      }, 2000);
-    } else {
-      console.log('⚠️ 토큰 거리 20미터 초과 - 광고 화면으로 이동하지 않음');
+    if (autoAdTimeoutRef.current) {
+      console.log('🔄 다른 토큰 클릭 - 이전 자동 광고 이동 타이머 정리');
+      clearTimeout(autoAdTimeoutRef.current);
+      autoAdTimeoutRef.current = null;
     }
-  }, [showBottomPanel, navigateToAd]);
+    hasAutoAdTriggeredRef.current = false; 
+
+    const tokenCopy: TokenData = {
+      ...token,
+      advertisement: token.advertisement,
+      campid: token.campid,
+      coin: token.coin,
+      xrunPrice: token.xrunPrice,
+      name: token.name,
+      iconurl: token.iconurl,
+      joindesc: token.joindesc,
+      brand: token.brand,
+    };
+
+    console.log('✅ 저장할 토큰 복사본:', JSON.stringify(tokenCopy, null, 2));
+    console.log('🔍 tokenCopy 상세 검증:', {
+      spotID: tokenCopy.spotID,
+      advertisement: tokenCopy.advertisement,
+      campid: tokenCopy.campid,
+      coin: tokenCopy.coin,
+      name: tokenCopy.name,
+    });
+
+    setSelectedToken(tokenCopy);
+    setShowBottomPanel(true); 
+
+    setTimeout(() => {
+      console.log('⏱️ selectedToken 업데이트 확인 (100ms 후):', {
+        advertisement: tokenCopy.advertisement,
+        campid: tokenCopy.campid,
+        coin: tokenCopy.coin,
+      });
+    }, 100);
+  }, []);
 
   const bottomNavItems = [
     { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
@@ -842,7 +1283,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View key={refreshKey} style={styles.container}>
       <StatusBar style="light" />
 
       {}
@@ -882,22 +1323,50 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           </View>
         ) : (
           <View style={[styles.tokenContainer, { bottom: showBottomPanel && selectedToken ? 200 : 110 }]}>
-            {displayTokens
-              .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
-              .map((displayToken) => {
+            {(() => {
 
-                const originalToken = tokens.find(t => t.spotID === displayToken.spotID) || displayToken;
+              console.log('🔍 [렌더링 전] 토큰 정보 검증:');
+              tokens.forEach((t) => {
+                console.log('토큰:', {
+                  spotID: t.spotID,
+                  advertisement: t.advertisement,
+                  campid: t.campid,
+                  coin: t.coin,
+                  xrunPrice: t.xrunPrice,
+                  distance: t.distance,
+                });
+              });
+
+              return tokens
+                .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
+                .map((token) => {
+
+                const handleClick = () => {
+                  console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
+                    spotID: token.spotID,
+                    advertisement: token.advertisement,
+                    campid: token.campid,
+                    coin: token.coin,
+                    name: token.name,
+                  });
+                  handleTokenClick(token);
+                };
 
                 return (
                   <TokenComponent
-                    key={displayToken.spotID}
-                    token={displayToken} 
-                    onPress={() => handleTokenClick(originalToken, displayToken)} 
+                    key={token.spotID}
+                    token={token}
+                    onPress={handleClick} 
                     animationRefs={animationRefs}
                     appState={appState}
+                    rageProgress={rageProgress}
+                    isRageMode={isRageMode}
+                    rageColor={rageColor}
+                    calculateScaleBasedOnDistance={calculateScaleBasedOnDistance}
                   />
-                );
-              })}
+                  );
+                });
+            })()}
           </View>
         )}
 
@@ -905,137 +1374,151 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         {
 
 }
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 20,
-            right: 0,
-            top: 0,
-            left: 0,
-            zIndex: 3, 
-            pointerEvents: showBottomPanel ? 'auto' : 'none', 
-          }}>
-          <Animated.View
+        {}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              bottom: bottomPanelBottom, 
+              left: 0,
+              right: 0,
+              zIndex: 3, 
+              pointerEvents: showBottomPanel ? 'box-none' : 'none', 
+            },
+          ]}>
+          <Pressable
+            onPress={() => {
+              if (showBottomPanel) {
+                console.log('📱 하단 패널 배경 터치 - 패널 닫기');
+                setShowBottomPanel(false);
+              }
+            }}
             style={[
               {
-                position: 'absolute',
-                bottom: bottomPanelBottom, 
-                left: 0,
-                right: 0,
-                zIndex: 1,
+                backgroundColor: '#FFFFFF',
+                paddingHorizontal: 0,
+                paddingVertical: 0,
+                borderTopStartRadius: 33,
+                borderTopEndRadius: 33,
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: -2,
+                },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 5,
+                minHeight: showBottomPanel && selectedToken ? 100 : 35,
               },
             ]}>
-            <Pressable
-              onPress={() => {
-                if (showBottomPanel) {
-                  console.log('📱 하단 패널 배경 터치 - 패널 닫기');
-                  setShowBottomPanel(false);
-                }
-              }}
-              style={{
-                backgroundColor: showBottomPanel && selectedToken ? '#EFF4F5' : '#adadad',
-                paddingHorizontal: 20,
-                paddingVertical: 15,
-                borderTopStartRadius: 30,
-                borderTopEndRadius: 30,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: showBottomPanel && selectedToken ? 150 : 35,
-                paddingBottom: showBottomPanel && selectedToken ? 40 : 15,
-                zIndex: 1,
-                position: 'relative',
-              }}>
+              {}
+              {showBottomPanel && (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingTop: 8,
+                    paddingBottom: 0, 
+                  }}>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 4,
+                      backgroundColor: '#D9D9D9',
+                      borderRadius: 2,
+                    }}
+                  />
+                </View>
+              )}
               {}
               {showBottomPanel && selectedToken && (
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    flex: 1,
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    paddingHorizontal: 20,
                     paddingTop: 0,
-                    gap: 10,
-                    zIndex: 1,
+                    paddingBottom: 12,
                     pointerEvents: 'box-none', 
                   }}>
                   {}
-                  {!selectedToken?.iconurl ||
-                  selectedToken?.iconurl.toString().trim() === '' ||
-                  typeof selectedToken?.iconurl !== 'string' ? (
-                    iconXrunWhite && (
-                      <Image
-                        source={iconXrunWhite}
-                        resizeMode="contain"
-                        style={{
-                          marginLeft: 10,
-                          height: 65,
-                          width: 65,
-                          borderRadius: 10,
-                          backgroundColor: '#161d2d',
-                          padding: 10,
-                        }}
-                      />
-                    )
-                  ) : (
-                    <Image
-                      source={{ uri: selectedToken?.iconurl }}
-                      resizeMode="contain"
-                      style={{
-                        marginLeft: 10,
-                        height: 65,
-                        width: 65,
-                        borderRadius: 10,
-                      }}
-                    />
-                  )}
-
                   <View
                     style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       flex: 1,
                     }}>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 20,
-                        color: '#343a59',
-                        marginBottom: -9,
-                        marginTop: -3,
-                      }}
-                      numberOfLines={1}
-                      ellipsizeMode="tail">
-                      {!selectedToken?.name ||
-                      selectedToken?.name.toString().trim() === ''
-                        ? 'XRUN coin'
-                        : selectedToken?.name}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 16,
-                        color: '#343a59',
-                        marginTop: 10,
-                      }}
-                      numberOfLines={1}
-                      ellipsizeMode="tail">
-                      {!selectedToken?.joindesc ||
-                      selectedToken?.joindesc.toString().trim() === ''
-                        ? 'XRUN coin'
-                        : selectedToken?.joindesc}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 12,
-                        color: '#666',
-                        marginTop: 5,
-                      }}>
-                      {(selectedToken?.xrunPrice || 0).toFixed(2)} {selectedToken?.brand || ''}
-                    </Text>
+                    {}
+                    {!selectedToken?.iconurl ||
+                    selectedToken?.iconurl.toString().trim() === '' ||
+                    typeof selectedToken?.iconurl !== 'string' ? (
+                      iconXrunWhite && (
+                        <Image
+                          source={iconXrunWhite}
+                          resizeMode="contain"
+                          style={{
+                            width: 44,
+                            height: 44,
+                            marginRight: 12,
+                          }}
+                        />
+                      )
+                    ) : (
+                      <Image
+                        source={{ uri: selectedToken?.iconurl }}
+                        resizeMode="contain"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          marginRight: 12,
+                          borderRadius: 8,
+                        }}
+                      />
+                    )}
+
+                    {}
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          fontFamily: 'Roboto-Medium',
+                          fontSize: 16,
+                          color: '#4c4e55',
+                          lineHeight: 24,
+                          marginTop:20,
+                          marginBottom: 4,
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail">
+                        {!selectedToken?.name ||
+                        selectedToken?.name.toString().trim() === ''
+                          ? 'XRUN coin'
+                          : selectedToken?.name}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: 'Roboto-Regular',
+                          fontSize: 12,
+                          color: '#4c4e55',
+                          lineHeight: 15,
+                          letterSpacing: 0.06,
+                        }}
+                        numberOfLines={2}
+                        ellipsizeMode="tail">
+                        {!selectedToken?.joindesc ||
+                        selectedToken?.joindesc.toString().trim() === ''
+                          ? 'XRUN으로 리워드를 획득하세요'
+                          : selectedToken?.joindesc}
+                      </Text>
+                    </View>
                   </View>
 
+                  {}
                   <TouchableOpacity
-                    onPress={() => {
+                    onPress={async () => {
+                      console.log('=== View ad 버튼 클릭 ===');
+                      console.log('현재 selectedToken:', JSON.stringify(selectedToken, null, 2));
 
                       if (autoAdTimeoutRef.current) {
                         clearTimeout(autoAdTimeoutRef.current);
@@ -1044,22 +1527,23 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       hasAutoAdTriggeredRef.current = true; 
 
                       if (selectedToken) {
-                        navigateToAd(selectedToken);
+                        await showAdInModal(selectedToken);
+                      } else {
+                        console.error('❌ View ad 버튼 - selectedToken이 없습니다!');
                       }
                     }}
                     style={{
                       backgroundColor: '#FFDC04',
                       paddingHorizontal: 15,
                       paddingVertical: 8,
-                      borderColor: '#D9D9D9',
-                      borderWidth: 1,
-                      alignSelf: 'flex-end',
+                      borderRadius: 8,
+                      marginLeft: 12,
                     }}>
                     <Text
                       style={{
-                        fontSize: 16,
+                        fontSize: 14,
                         fontFamily: 'Roboto-Bold',
-                        color: 'black',
+                        color: '#000000',
                       }}>
                       View ad
                     </Text>
@@ -1068,7 +1552,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               )}
             </Pressable>
           </Animated.View>
-        </View>
       </View>
 
       {}
@@ -1082,6 +1565,42 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           onTabChange={handleTabChange}
         />
       </View>
+
+      {}
+      <Modal
+        visible={showAdModal}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => {
+          console.log('모달 닫기 요청');
+          setShowAdModal(false);
+        }}>
+        <ShowNapAdScreen 
+          onClose={() => {
+            console.log('ShowNapAdScreen 모달 닫기');
+            setShowAdModal(false);
+          }}
+        />
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: 50,
+            right: 20,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: 20,
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onPress={() => {
+            console.log('모달 닫기 버튼 클릭');
+            setShowAdModal(false);
+          }}>
+          <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>×</Text>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };

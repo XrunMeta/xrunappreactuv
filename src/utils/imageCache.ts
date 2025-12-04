@@ -292,4 +292,60 @@ export const cashingimages = {
       return false;
     }
   },
+
+  downloadMultipleImages: async (
+    fileIds: (string | number)[],
+    gatewayApiAddress?: string,
+  ): Promise<boolean[]> => {
+    console.log(`[이미지 캐시] === 여러 이미지 다운로드 시작: ${fileIds.length}개 ===`);
+    const startTime = Date.now();
+
+    const uniqueFileIds = Array.from(new Set(fileIds.map(id => String(id))));
+    console.log(`[이미지 캐시] 중복 제거 후: ${uniqueFileIds.length}개`);
+
+    const uncachedFileIds: string[] = [];
+    for (const fileId of uniqueFileIds) {
+      const isCached = await cashingimages.isCached(fileId);
+      if (!isCached) {
+        uncachedFileIds.push(fileId);
+      }
+    }
+
+    console.log(`[이미지 캐시] 캐시되지 않은 이미지: ${uncachedFileIds.length}개`);
+
+    if (uncachedFileIds.length === 0) {
+      console.log(`[이미지 캐시] 모든 이미지가 이미 캐시되어 있습니다.`);
+      return uniqueFileIds.map(() => true);
+    }
+
+    const batchSize = 5;
+    const results: boolean[] = new Array(uniqueFileIds.length).fill(false);
+
+    for (let i = 0; i < uncachedFileIds.length; i += batchSize) {
+      const batch = uncachedFileIds.slice(i, i + batchSize);
+      console.log(`[이미지 캐시] 배치 ${Math.floor(i / batchSize) + 1} 다운로드 시작: ${batch.length}개`);
+
+      const batchResults = await Promise.all(
+        batch.map(async (fileId) => {
+          return await cashingimages.downloadAndCacheImage(fileId, gatewayApiAddress);
+        }),
+      );
+
+      batch.forEach((fileId, batchIndex) => {
+        const originalIndex = uniqueFileIds.indexOf(fileId);
+        if (originalIndex !== -1) {
+          results[originalIndex] = batchResults[batchIndex];
+        }
+      });
+    }
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    const successCount = results.filter(r => r).length;
+    console.log(`[이미지 캐시] === 여러 이미지 다운로드 완료 ===`);
+    console.log(`[이미지 캐시] 성공: ${successCount}/${uniqueFileIds.length}개`);
+    console.log(`[이미지 캐시] 소요 시간: ${duration}ms`);
+
+    return results;
+  },
 };
