@@ -1,4 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import * as v_f2c756 from 'rddjsfilumpz';
 import {
   v_083aa7,
   v_379bd1,
@@ -66,7 +67,81 @@ import {
 import { v_b2c639 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 const v_c0dbdf = () => {
-  const { currentScreen: v_0f0c7b } = v_a0daa8();
+  const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
+  const { setReferralCode: v_276c22 } = v_700ef9();
+
+  v_c4deb2(() => {
+    let v_915a6b = false; 
+
+    const v_90a7e8 = (v_f71b56) => {
+
+      if (v_915a6b) {
+        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기:', v_f71b56);
+        return;
+      }
+
+      try {
+        v_915a6b = true;
+        console.log('[딥링크] URL 처리 시작:', v_f71b56);
+
+        const v_8decf8 = v_f2c756.parse(v_f71b56);
+        console.log('[딥링크] 파싱된 URL:', v_8decf8);
+
+        const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
+
+        if (v_fc7051) {
+          console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
+
+          v_276c22(v_fc7051);
+
+          if (v_0f0c7b !== 'signup') {
+            console.log('[딥링크] 회원가입 화면으로 이동');
+            v_9b57fc('signup');
+          }
+        } else {
+          console.log('[딥링크] referral 파라미터가 없습니다.');
+        }
+      } catch (v_5e9bfe) {
+        console.error('[딥링크] URL 처리 실패:', v_5e9bfe);
+      } finally {
+
+        setTimeout(() => {
+          v_915a6b = false;
+        }, 1000);
+      }
+    };
+
+    const v_442744 = async () => {
+      try {
+        const v_7b9c4e = await v_f2c756.getInitialURL();
+        if (v_7b9c4e) {
+          console.log('[딥링크] 앱 시작 시 딥링크 감지:', v_7b9c4e);
+          v_90a7e8(v_7b9c4e);
+        } else {
+          console.log('[딥링크] 앱 시작 시 딥링크 없음');
+        }
+      } catch (v_5e9bfe) {
+        console.error('[딥링크] 초기 URL 가져오기 실패:', v_5e9bfe);
+      }
+    };
+
+    const v_269481 = v_f2c756.addEventListener('url', (v_d48baf) => {
+      console.log('[딥링크] 딥링크 이벤트 감지:', v_d48baf.url);
+      v_90a7e8(v_d48baf.url);
+    });
+
+    v_442744();
+
+    const v_599769 = setTimeout(() => {
+      console.log('[딥링크] 스플래시 종료 후 딥링크 재확인');
+      v_442744();
+    }, 2500); 
+
+    return () => {
+      v_269481.remove();
+      clearTimeout(v_599769);
+    };
+  }, [v_276c22, v_9b57fc, v_0f0c7b]);
 
   if (v_0f0c7b === 'login') {
     return <LoginScreen />;
