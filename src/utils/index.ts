@@ -114,10 +114,13 @@ export const shareReferralLink = async (
     const androidLink = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
+    const encodedEmail = encodeURIComponent(userDetails.email);
+    const deepLinkUrl = `xrun://signup?referral=${encodedEmail}`;
+
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
 
-    const message = `${shareText}${userDetails.email}\n\n\n${downloadLabel}\nAndroid: ${androidLink}\niOS: ${iosLink}`;
+    const message = `${shareText}${userDetails.email}\n\n${deepLinkUrl}\n\n${downloadLabel}\nAndroid: ${androidLink}\niOS: ${iosLink}`;
 
     const result = await Share.share({
       message,

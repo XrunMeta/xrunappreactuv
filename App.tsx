@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import * as Linking from 'expo-linking';
 import {
   MyInfoFaqScreen,
   CountryCodeSelectScreen,
@@ -66,7 +67,81 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const ScreenHost = () => {
-  const { currentScreen } = useAppNavigation();
+  const { currentScreen, navigate } = useAppNavigation();
+  const { setReferralCode } = useAppContext();
+
+  useEffect(() => {
+    let isProcessing = false; 
+
+    const handleDeepLink = (url: string) => {
+
+      if (isProcessing) {
+        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기:', url);
+        return;
+      }
+
+      try {
+        isProcessing = true;
+        console.log('[딥링크] URL 처리 시작:', url);
+
+        const parsed = Linking.parse(url);
+        console.log('[딥링크] 파싱된 URL:', parsed);
+
+        const referral = parsed.queryParams?.referral as string | undefined;
+
+        if (referral) {
+          console.log('[딥링크] 레퍼럴 코드 추출:', referral);
+
+          setReferralCode(referral);
+
+          if (currentScreen !== 'signup') {
+            console.log('[딥링크] 회원가입 화면으로 이동');
+            navigate('signup');
+          }
+        } else {
+          console.log('[딥링크] referral 파라미터가 없습니다.');
+        }
+      } catch (error) {
+        console.error('[딥링크] URL 처리 실패:', error);
+      } finally {
+
+        setTimeout(() => {
+          isProcessing = false;
+        }, 1000);
+      }
+    };
+
+    const getInitialURL = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+        if (initialUrl) {
+          console.log('[딥링크] 앱 시작 시 딥링크 감지:', initialUrl);
+          handleDeepLink(initialUrl);
+        } else {
+          console.log('[딥링크] 앱 시작 시 딥링크 없음');
+        }
+      } catch (error) {
+        console.error('[딥링크] 초기 URL 가져오기 실패:', error);
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', (event) => {
+      console.log('[딥링크] 딥링크 이벤트 감지:', event.url);
+      handleDeepLink(event.url);
+    });
+
+    getInitialURL();
+
+    const recheckTimer = setTimeout(() => {
+      console.log('[딥링크] 스플래시 종료 후 딥링크 재확인');
+      getInitialURL();
+    }, 2500); 
+
+    return () => {
+      subscription.remove();
+      clearTimeout(recheckTimer);
+    };
+  }, [setReferralCode, navigate, currentScreen]);
 
   if (currentScreen === 'login') {
     return <LoginScreen />;
