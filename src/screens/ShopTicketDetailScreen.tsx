@@ -2,26 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   Text,
   TouchableOpacity,
   Platform,
   ActivityIndicator,
   Share,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import * as Clipboard from 'expo-clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header } from '../components';
+import { Header, SafeScrollView, SafeView } from '../components';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { PurchasedItemData } from '../types';
 import { getXrunPurchasedItems, deleteXrunPurchasedItem } from '../services';
 import { getEnv } from '../utils/env';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES } from '../constants';
 
 export const ShopTicketDetailScreen = () => {
   const { selectedShopItem } = useAppContext();
@@ -255,9 +253,9 @@ export const ShopTicketDetailScreen = () => {
 
     await showAlert('삭제', '티켓을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
-      { 
-        text: '삭제', 
-        style: 'destructive', 
+      {
+        text: '삭제',
+        style: 'destructive',
         onPress: async () => {
           try {
             setIsLoading(true);
@@ -307,65 +305,65 @@ export const ShopTicketDetailScreen = () => {
   const currentTicketNumber = ticketData?.txID || ticketData?.txid || ticketData?.transaction || txID || ticketNumber;
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.shopTicketDetail.title')} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.wrapper}>
-          {}
-          <View style={styles.qrWrapper}>
-            <View
+      <SafeScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        showBottomBackground={false}>
+        {}
+        <View style={styles.qrWrapper}>
+          <View
+            style={[
+              styles.qrBorder,
+              {
+                opacity: isAvailable ? 1 : 0.3,
+                borderColor: '#DEDEDE',
+              },
+            ]}>
+            {qrCodeValue ? (
+              <QRCode
+                value={String(qrCodeValue)}
+                size={150}
+                color={isAvailable ? '#000' : '#999999'}
+                backgroundColor="#FFFFFF"
+                getRef={(c) => (qrCodeRef.current = c)}
+              />
+            ) : (
+              <Text style={styles.errorText}>QR 코드를 생성할 수 없습니다</Text>
+            )}
+          </View>
+        </View>
+
+        <Text style={styles.itemTitle}>{selectedShopItem?.title ?? '티켓'}</Text>
+
+        {}
+        <View style={styles.ticketFieldContainer}>
+          <View style={styles.ticketFieldHeader}>
+            <Text style={styles.ticketFieldLabel}>
+              Ticket Number
+            </Text>
+            <Text
               style={[
-                styles.qrBorder,
+                styles.ticketFieldStatus,
                 {
-                  opacity: isAvailable ? 1 : 0.3,
-                  borderColor: '#DEDEDE',
+                  color: isAvailable ? '#3391D0' : '#707070',
                 },
               ]}>
-              {qrCodeValue ? (
-                <QRCode
-                  value={String(qrCodeValue)}
-                  size={150}
-                  color={isAvailable ? '#000' : '#999999'}
-                  backgroundColor="#FFFFFF"
-                  getRef={(c) => (qrCodeRef.current = c)}
-                />
-              ) : (
-                <Text style={styles.errorText}>QR 코드를 생성할 수 없습니다</Text>
-              )}
-            </View>
+              {isAvailable ? 'Available' : 'Redeemed'}
+            </Text>
           </View>
-
-          <Text style={styles.itemTitle}>{selectedShopItem?.title ?? '티켓'}</Text>
-
-          {}
-          <View style={styles.ticketFieldContainer}>
-            <View style={styles.ticketFieldHeader}>
-              <Text style={styles.ticketFieldLabel}>
-                Ticket Number
-              </Text>
-              <Text
-                style={[
-                  styles.ticketFieldStatus,
-                  {
-                    color: isAvailable ? '#3391D0' : '#707070',
-                  },
-                ]}>
-                {isAvailable ? 'Available' : 'Redeemed'}
-              </Text>
-            </View>
-            <View style={styles.ticketFieldBox}>
-              <Text style={styles.ticketFieldNumber}>
-                {currentTicketNumber || 'No Ticket Available'}
-              </Text>
-            </View>
+          <View style={styles.ticketFieldBox}>
+            <Text style={styles.ticketFieldNumber}>
+              {currentTicketNumber || 'No Ticket Available'}
+            </Text>
           </View>
-
-          {isLoading && (
-            <ActivityIndicator size="small" color={COLORS.buttonPrimary} style={{ marginBottom: 16 }} />
-          )}
         </View>
-      </ScrollView>
+
+        {isLoading && (
+          <ActivityIndicator size="small" color={COLORS.buttonPrimary} style={{ marginBottom: 16 }} />
+        )}
+      </SafeScrollView>
 
       {}
       <View style={styles.actionButtonsContainer}>
@@ -392,24 +390,17 @@ export const ShopTicketDetailScreen = () => {
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 120, 
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    ...COMMON_STYLES.scrollContent,
+    flexGrow: 1,
   },
   qrWrapper: {
     alignItems: 'center',
@@ -473,11 +464,9 @@ const styles = StyleSheet.create({
   },
 
   actionButtonsContainer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
+    ...COMMON_STYLES.bottomButtonContainer,
+    paddingHorizontal: SIZES.large,
+
   },
   actionButton: {
     borderRadius: 16,

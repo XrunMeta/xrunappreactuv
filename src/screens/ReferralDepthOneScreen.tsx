@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { getMyGroup } from '../services';
 import { MyGroupItem } from '../types';
+import { SafeView } from '../components';
 
 interface MemberData {
   id: string;
@@ -133,12 +133,11 @@ export const ReferralDepthOneScreen = () => {
   const { t } = useTranslation();
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-      <Header 
-        title={`${t('screens.referralDepthOne.title')} ${depthLevel}`} 
-        onBackPress={goBack} 
-        showBackButton 
+    <SafeView style={styles.container}>
+      <Header
+        title={`${t('screens.referralDepthOne.title')} ${depthLevel}`}
+        onBackPress={goBack}
+        showBackButton
       />
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -160,20 +159,17 @@ export const ReferralDepthOneScreen = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
+    ...COMMON_STYLES.scrollContent,
   },
   emptyContainer: {
     flex: 1,

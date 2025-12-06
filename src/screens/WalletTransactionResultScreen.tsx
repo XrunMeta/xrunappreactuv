@@ -3,15 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
+import { Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
-import { Header, PrimaryButton, ExplorerBadge } from '../components';
+import { Header, PrimaryButton, ExplorerBadge, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -64,9 +63,9 @@ export const WalletTransactionResultScreen = () => {
     }
   }, [txHash, transactionResult, reset]);
 
-  const transactionToken = { 
-    title: symbol || 'POL', 
-    subtitle: network === 'POL' ? 'Polygon' : 'Ethereum' 
+  const transactionToken = {
+    title: symbol || 'POL',
+    subtitle: network === 'POL' ? 'Polygon' : 'Ethereum'
   };
   const tokenIcon = getTokenIcon(
     transactionToken.title,
@@ -86,7 +85,7 @@ export const WalletTransactionResultScreen = () => {
     if (txHash) {
       await Clipboard.setStringAsync(txHash);
       Alert.alert(
-        t('screens.walletTransactionResult.copySuccess'), 
+        t('screens.walletTransactionResult.copySuccess'),
         t('screens.walletTransactionResult.copySuccessMessage')
       );
     }
@@ -110,47 +109,44 @@ export const WalletTransactionResultScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.walletTransactionResult.title')} showBackButton />
 
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.contentWidth}>
-          <View style={styles.hashRow}>
-            <Text style={styles.hashValue} numberOfLines={2}>
-              {txHash}
-            </Text>
-            <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
-              <View style={styles.copyIconWrapper}>
-                <Ionicons name="copy-outline" size={20} color="#747474" />
-              </View>
-              <Text style={styles.copyText}>{t('screens.walletTransactionResult.copy')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <InfoCard 
-            label={t('screens.walletTransactionResult.amount')} 
-            value={`${formattedAmount} ${symbol}`} 
-          />
-          <InfoCard 
-            label={t('screens.walletTransactionResult.networkFee')} 
-            value={`${formattedGasPrice} ${network}`} 
-          />
-          <InfoCard
-            label={t('screens.walletTransactionResult.to')}
-            value={shortenAddress(toAddress)}
-            trailing={tokenBadge}
-          />
-          <InfoCard
-            label={t('screens.walletTransactionResult.txHash')}
-            value={shortenAddress(txHash)}
-            trailing={tokenBadge}
-          />
-
-          <Text style={styles.statusText}>{t('screens.walletTransactionResult.completed')}</Text>
+        <View style={styles.hashRow}>
+          <Text style={styles.hashValue} numberOfLines={2}>
+            {txHash}
+          </Text>
+          <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
+            <View style={styles.copyIconWrapper}>
+              <Ionicons name="copy-outline" size={20} color="#747474" />
+            </View>
+            <Text style={styles.copyText}>{t('screens.walletTransactionResult.copy')}</Text>
+          </TouchableOpacity>
         </View>
+
+        <InfoCard
+          label={t('screens.walletTransactionResult.amount')}
+          value={`${formattedAmount} ${symbol}`}
+        />
+        <InfoCard
+          label={t('screens.walletTransactionResult.networkFee')}
+          value={`${formattedGasPrice} ${network}`}
+        />
+        <InfoCard
+          label={t('screens.walletTransactionResult.to')}
+          value={shortenAddress(toAddress)}
+          trailing={tokenBadge}
+        />
+        <InfoCard
+          label={t('screens.walletTransactionResult.txHash')}
+          value={shortenAddress(txHash)}
+          trailing={tokenBadge}
+        />
+
+        <Text style={styles.statusText}>{t('screens.walletTransactionResult.completed')}</Text>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
@@ -162,7 +158,7 @@ export const WalletTransactionResultScreen = () => {
             }}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -170,19 +166,12 @@ export const WalletTransactionResultScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    paddingTop: 24,
+    ...COMMON_STYLES.scrollContent,
   },
-  contentWidth: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   hashRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -250,6 +239,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   bottomSection: {
-    width: '100%',
+    ...COMMON_STYLES.bottomButtonContainer,
   },
 });

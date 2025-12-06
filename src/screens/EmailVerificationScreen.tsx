@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { FormField, Header, PrimaryButton } from '../components';
+import { FormField, Header, PrimaryButton, SafeScrollView } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -73,9 +71,8 @@ export const EmailVerificationScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.emailVerification.title')} onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -98,7 +95,7 @@ export const EmailVerificationScreen = () => {
             disabled={isLoading}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
       {Platform.OS === 'ios' && (
         <View style={styles.homeIndicator}>

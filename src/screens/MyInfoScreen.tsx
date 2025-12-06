@@ -6,17 +6,17 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header, TaboolaBanner } from '../components';
-import { COLORS, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { SafeView } from '../components';
 
 type CardConfig = {
   id: string;
@@ -261,8 +261,7 @@ export const MyInfoScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header
         title={t('screens.myInfo.title')}
         onBackPress={() => {
@@ -338,24 +337,18 @@ export const MyInfoScreen = () => {
           </View>
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
     gap: 24,
   },
   adBanner: {

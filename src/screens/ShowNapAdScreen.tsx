@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  ScrollView,
   Linking,
   AppState,
   Modal,
@@ -19,7 +18,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getNasmobAds, sendNasmobCallback, gatewayNodeJSApp3100 } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TaboolaBanner } from '../components';
+import { TaboolaBanner, SafeScrollView } from '../components';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -240,7 +239,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   useEffect(() => {
     if (advertisementParams) {
       const currentKey = `${advertisementParams.advertisement}-${advertisementParams.campid}`;
-      const previousKey = previousParamsRef.current 
+      const previousKey = previousParamsRef.current
         ? `${previousParamsRef.current.advertisement}-${previousParamsRef.current.campid}`
         : null;
 
@@ -664,7 +663,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           {advertisementParams.joindesc && advertisementParams.joindesc !== '' && (
             <View style={styles.joinDescContainer}>
               <Text style={styles.joinDescTitle}>{t('screens.showNapAd.joinMethod')}</Text>
-              <ScrollView 
+              <SafeScrollView
                 style={styles.joinDescScrollView}
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
@@ -673,7 +672,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
                 <Text style={styles.joinDescText}>
                   {advertisementParams.joindesc}
                 </Text>
-              </ScrollView>
+              </SafeScrollView>
             </View>
           )}
 
@@ -705,8 +704,8 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       {}
       {waitingForWebSocketResponse && (
         <View style={styles.bannerContainer}>
-          <TaboolaBanner 
-            placementType="reward_OS_395x80" 
+          <TaboolaBanner
+            placementType="reward_OS_395x80"
             onLoadComplete={() => {
               console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
               setIsTaboolaLoaded(true);

@@ -1,18 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
-import { Header, FormField, PrimaryButton } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -92,14 +90,14 @@ export const WalletSendScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
-        <View style={[styles.contentWidth, styles.mainSection]}>
+        <View style={[styles.mainSection]}>
           <View style={styles.amountSection}>
             <Text style={styles.amountLabel}>{t('screens.walletSend.amount')}</Text>
             <TextInput
@@ -151,13 +149,8 @@ export const WalletSendScreen = () => {
             disabled={!isConfirmEnabled}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
@@ -165,19 +158,12 @@ export const WalletSendScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
-  contentWidth: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   mainSection: {
     flexGrow: 1,
   },
@@ -228,21 +214,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   bottomSection: {
-    width: '100%',
+    ...COMMON_STYLES.bottomButtonContainer,
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 

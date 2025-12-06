@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import {
   LayoutAnimation,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,8 +11,8 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Header } from '../components';
-import { COLORS } from '../constants';
+import { Header, SafeScrollView } from '../components';
+import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES } from '../constants';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -91,7 +90,7 @@ export const MyInfoFaqScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.myInfoFaq.title')} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -121,7 +120,7 @@ export const MyInfoFaqScreen = () => {
             );
           })}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -129,18 +128,12 @@ export const MyInfoFaqScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   list: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    gap: 12,
+    ...LIST_STYLES.small,
   },
   card: {
     borderRadius: 16,
@@ -169,6 +162,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 16,
     backgroundColor: '#f9fafc',
+    marginBottom: SIZES.small,
   },
   answer: {
     fontSize: 14,

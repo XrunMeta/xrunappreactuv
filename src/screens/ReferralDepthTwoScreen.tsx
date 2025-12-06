@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Header, ReferralMemberRow } from '../components';
+import { COMMON_STYLES, SIZES } from '../constants';
 
 const rows = Array.from({ length: 7 }, (_, index) => ({
   rank: index === 0 ? 2 : 1,
@@ -17,7 +19,7 @@ export const ReferralDepthTwoScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.referralDepthTwo.title')} />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           {rows.map((row, index) => (
             <ReferralMemberRow
@@ -29,7 +31,7 @@ export const ReferralDepthTwoScreen = () => {
             />
           ))}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -37,17 +39,12 @@ export const ReferralDepthTwoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
   wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingVertical: SIZES.small,
   },
 });
 

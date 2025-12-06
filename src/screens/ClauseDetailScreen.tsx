@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
@@ -61,24 +61,21 @@ export const ClauseDetailScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={title} onBackPress={goBack} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.inner}>
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-              <Text style={styles.loadingText}>{t('screens.myInfoClauses.loading')}</Text>
-            </View>
-          ) : error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : (
-            <Text style={styles.contentText}>{content}</Text>
-          )}
-        </View>
-      </ScrollView>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+            <Text style={styles.loadingText}>{t('screens.myInfoClauses.loading')}</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : (
+          <Text style={styles.contentText}>{content}</Text>
+        )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -86,19 +83,12 @@ export const ClauseDetailScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
-  inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',

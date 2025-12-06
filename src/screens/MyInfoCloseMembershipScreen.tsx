@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { closeMembership } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -84,12 +84,12 @@ export const MyInfoCloseMembershipScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.myInfoCloseMembership.title')} onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         <View style={styles.inner}>
           <FormField
@@ -118,7 +118,7 @@ export const MyInfoCloseMembershipScreen = () => {
             disabled={isSubmitting}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -126,18 +126,13 @@ export const MyInfoCloseMembershipScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...LIST_STYLES.small,
   },
   helperText: {
     marginTop: 8,
@@ -147,7 +142,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
   },
   bottomSection: {
-    ...COMMON_STYLES.bottomSection,
+    ...COMMON_STYLES.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

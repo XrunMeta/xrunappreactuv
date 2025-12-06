@@ -181,9 +181,9 @@ export const WalletScreen = () => {
             amount: new BigNumber(token.amount || '0').toFixed(2),
             icon: matchingWalletData
               ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(
-                  /(\r\n|\n|\r)/gm,
-                  '',
-                ) || ''}`
+                /(\r\n|\n|\r)/gm,
+                '',
+              ) || ''}`
               : 'https://via.placeholder.com/24',
             currency: token.currency,
             subCurrencyName: token.subCurrencyName,
@@ -553,11 +553,10 @@ export const WalletScreen = () => {
         ...asset,
         title: asset.symbol,
         subtitle: asset.subCurrencyName || asset.name,
-        amount: new BigNumber(asset.amount || '0').toFormat({
+        amount: new BigNumber(asset.amount || '0').toFormat(2, {
           decimalSeparator: '.',
           groupSeparator: ',',
           groupSize: 3,
-          decimalPlaces: 2,
         }),
         suffix: asset.symbol,
         iconSource,

@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   Text,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeScrollView } from '../components';
 import { Header, FormField, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -107,16 +106,16 @@ export const PhoneEditScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header
         title={t('screens.phoneEdit.title')}
         onBackPress={canGoBack ? goBack : () => reset(ROUTES.myInfoEdit)}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         <View style={styles.formWrapper}>
           <FormField
@@ -154,7 +153,7 @@ export const PhoneEditScreen = () => {
             />
           )}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };

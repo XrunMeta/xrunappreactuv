@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Text, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, Text, Platform } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS } from '../constants';
@@ -36,19 +36,13 @@ export const PrivacyPolicyScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.privacyPolicy.title')} onBackPress={goBack} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.contentText}>{PRIVACY_TEXT}</Text>
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
@@ -73,6 +67,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
+    marginBottom: 10,
   },
   contentText: {
     fontSize: 12,
@@ -80,20 +75,7 @@ const styles = StyleSheet.create({
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 
 

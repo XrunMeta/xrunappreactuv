@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { PrimaryButton, SecondaryButton, TaboolaBannerCore } from '../components';
+import { PrimaryButton, SecondaryButton, TaboolaBannerCore, SafeScrollView } from '../components';
 import { getTaboolaPlacement, getTaboolaPageUrl, isTaboolaNativeModuleAvailable } from '../services/taboola';
-import { COLORS, SIZES, COMMON_STYLES } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
+import { CameraMainScreen } from './CameraMainScreen';
 
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
@@ -34,10 +35,14 @@ export const LoginSignupScreen = () => {
     navigate(ROUTES.myInfo);
   };
 
+  const quickLinks = [
+
+  ];
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -80,7 +85,25 @@ export const LoginSignupScreen = () => {
             {' '}{t('screens.loginSignup.termsAgree')}
           </Text>
         </View>
-      </ScrollView>
+
+        {}
+        {IS_DEV_MODE && (
+          <View style={styles.devLinksContainer}>
+            <Text style={styles.devLinksTitle}>🔗 개발 모드: 빠른 링크</Text>
+            <View style={styles.devLinksGrid}>
+              {quickLinks.map((link) => (
+                <TouchableOpacity
+                  key={link.route}
+                  style={styles.devLinkButton}
+                  onPress={() => navigate(link.route)}
+                >
+                  <Text style={styles.devLinkText}>{link.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+      </SafeScrollView>
 
       {}
       {Platform.OS === 'ios' && (
@@ -101,7 +124,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 58, 
-    paddingBottom: Platform.OS === 'android' 
+    paddingBottom: Platform.OS === 'android'
       ? 16 + SIZES.medium 
       : 34,
     justifyContent: 'space-between',
@@ -170,6 +193,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#10192d',
     borderRadius: 100,
     marginBottom: 9,
+  },
+  devLinksContainer: {
+    marginTop: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  devLinksTitle: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
+    fontWeight: 'bold',
+    color: '#10192d',
+    marginBottom: 12,
+  },
+  devLinksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  devLinkButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  devLinkText: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.buttonPrimary,
   },
 });
 

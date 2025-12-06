@@ -65,6 +65,7 @@ import {
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
 const ScreenHost = () => {
   const { currentScreen, navigate } = useAppNavigation();
@@ -392,6 +393,7 @@ export default function App() {
   if (!fontsLoaded || isLoading) {
     return (
       <SafeAreaProvider>
+        <StatusBar style="dark" />
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
@@ -406,6 +408,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <StatusBar style="dark" />
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>

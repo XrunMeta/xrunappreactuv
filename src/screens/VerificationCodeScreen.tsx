@@ -1,17 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, PrimaryButton } from '../components';
+import { Header, PrimaryButton, SafeScrollView } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -27,8 +27,6 @@ import {
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
 
-const keypadLayout = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
-
 export const VerificationCodeScreen = () => {
   const { t } = useTranslation();
   const { goBack, reset, navigate } = useAppNavigation();
@@ -42,6 +40,7 @@ export const VerificationCodeScreen = () => {
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const hiddenInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -58,17 +57,6 @@ export const VerificationCodeScreen = () => {
     const seconds = (secondsLeft % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
   }, [secondsLeft]);
-
-  const handleKeyPress = (value: string) => {
-    if (value === '⌫') {
-      setCode((prev) => prev.slice(0, -1));
-      return;
-    }
-    if (value === '' || code.length >= CODE_LENGTH) {
-      return;
-    }
-    setCode((prev) => prev + value);
-  };
 
   const handleVerify = async () => {
     if (!verificationEmail) {
@@ -176,9 +164,8 @@ export const VerificationCodeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.verificationCode.title')} onBackPress={goBack} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.descriptionWrapper}>
           <Text style={styles.description}>
             {verificationEmail || '이메일'}{t('screens.verificationCode.description')}
@@ -189,12 +176,31 @@ export const VerificationCodeScreen = () => {
           {Array.from({ length: CODE_LENGTH }).map((_, index) => {
             const digit = code[index] ?? '';
             return (
-              <View key={index} style={styles.codeBox}>
+              <TouchableOpacity
+                key={index}
+                style={styles.codeBox}
+                onPress={() => {
+
+                  hiddenInputRef.current?.focus();
+                }}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.codeText}>{digit}</Text>
-              </View>
+              </TouchableOpacity>
             );
           })}
         </View>
+
+        {}
+        <TextInput
+          ref={hiddenInputRef}
+          value={code}
+          onChangeText={setCode}
+          keyboardType="number-pad"
+          maxLength={CODE_LENGTH}
+          style={styles.hiddenInput}
+          autoFocus={false}
+        />
 
         <TouchableOpacity
           style={styles.resendWrapper}
@@ -231,29 +237,7 @@ export const VerificationCodeScreen = () => {
           )}
         </View>
 
-        <View style={styles.keyboardContainer}>
-          {keypadLayout.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.keyboardRow}>
-              {row.map((value, colIndex) => (
-                <TouchableOpacity
-                  key={colIndex}
-                  style={[styles.keyButton, value === '' && styles.keyButtonPlaceholder]}
-                  activeOpacity={value ? 0.6 : 1}
-                  onPress={() => value && handleKeyPress(value)}
-                >
-                  {value !== '' && <Text style={styles.keyText}>{value}</Text>}
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -323,56 +307,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 32,
   },
-  keyboardContainer: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 16,
-  },
-  keyboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  keyButton: {
-    flex: 1,
-    marginHorizontal: 4,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#f2f2f2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  keyButtonPlaceholder: {
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-  },
-  keyText: {
-    fontSize: 24,
-    fontFamily: 'Roboto-Bold',
-    color: '#10192d',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
   loadingContainer: {
     height: 56,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    opacity: 0,
   },
 });

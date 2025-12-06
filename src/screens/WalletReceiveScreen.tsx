@@ -1,27 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Platform,
-  ScrollView,
   Share,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
-import { Header, PrimaryButton, SecondaryButton } from '../components';
+import { Header, PrimaryButton, SecondaryButton, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { copyToClipboard } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
 import { useAppNavigation } from '../navigation';
 
 export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const { walletReceiveAddress, resetWalletReceiveAddress } = useAppContext();
   const qrCodeRef = useRef<any>(null);
   const [walletAddress, setWalletAddress] = useState('');
@@ -39,11 +40,11 @@ export const WalletReceiveScreen = () => {
     };
   }, [walletReceiveAddress, resetWalletReceiveAddress]);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (walletAddress) {
-      copyToClipboard(walletAddress);
+      await copyToClipboard(walletAddress, showAlert);
     } else {
-      Alert.alert(
+      await showAlert(
         t('screens.walletReceive.alerts.error'),
         t('screens.walletReceive.errors.addressNotLoaded'),
       );
@@ -70,14 +71,13 @@ export const WalletReceiveScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.walletReceive.title')} onBackPress={goBack} showBackButton />
 
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.contentWidth, styles.content]}>
+        <View style={[styles.content]}>
           <View style={styles.qrWrapper}>
             <View style={styles.qrBorder}>
               <View style={styles.qrInnerBorder}>
@@ -120,13 +120,8 @@ export const WalletReceiveScreen = () => {
             style={styles.secondaryButton}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
@@ -134,18 +129,10 @@ export const WalletReceiveScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
-  },
-  contentWidth: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...COMMON_STYLES.scrollContent,
   },
   content: {
     alignItems: 'center',
@@ -212,19 +199,6 @@ const styles = StyleSheet.create({
   secondaryButton: {
     borderRadius: 16,
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 

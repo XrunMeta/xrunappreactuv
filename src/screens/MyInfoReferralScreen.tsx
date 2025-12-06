@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyRecommender, checkCanSetRecommender, setRecommender } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -191,30 +191,33 @@ export const MyInfoReferralScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.myInfoReferral.title')} onBackPress={goBack} showBackButton />
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView
+        <SafeScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          autoAdjustKeyboardPadding={true}
         >
           <View style={styles.inner}>
-            <Text style={styles.sectionLabel}>{t('screens.myInfoReferral.currentReferral')}</Text>
-            {currentRefEmail || currentRefName ? (
-              <View style={styles.card}>
-                {currentRefName ? <Text style={styles.cardName}>{currentRefName}</Text> : null}
-                {currentRefEmail ? <Text style={styles.cardEmail}>{currentRefEmail}</Text> : null}
-              </View>
-            ) : (
-              <View style={styles.card}>
-                <Text style={styles.cardEmail}>{t('screens.myInfoReferral.noReferral')}</Text>
-              </View>
-            )}
+            {
+
+}
+            <FormField
+              label={t('screens.myInfoReferral.currentReferral')}
+              value={
+                currentRefEmail || currentRefName
+                  ? currentRefName && currentRefEmail
+                    ? `${currentRefName} (${currentRefEmail})`
+                    : currentRefEmail || currentRefName || ''
+                  : t('screens.myInfoReferral.noReferral')
+              }
+              editable={false}
+            />
 
             <FormField
               label={t('screens.myInfoReferral.newReferralLabel')}
@@ -236,7 +239,7 @@ export const MyInfoReferralScreen = () => {
               disabled={isDisable}
             />
           </View>
-        </ScrollView>
+        </SafeScrollView>
       )}
     </View>
   );
@@ -245,7 +248,6 @@ export const MyInfoReferralScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f7',
   },
   loadingContainer: {
     flex: 1,
@@ -254,20 +256,17 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...LIST_STYLES.large,
   },
   sectionLabel: {
     fontSize: 16,
-    fontFamily: 'Roboto-Medium',
+    lineHeight: 24,
     color: '#2a2727',
-    marginBottom: 12,
+    fontFamily: 'Roboto-Medium',
+    marginBottom: 8,
   },
   card: {
     width: '100%',
@@ -275,7 +274,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 18,
-    marginBottom: 32,
     shadowColor: '#3629b7',
     shadowOpacity: 0.07,
     shadowRadius: 15,
@@ -286,7 +284,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
-    marginBottom: 6,
   },
   cardEmail: {
     fontSize: 12,
@@ -294,7 +291,7 @@ const styles = StyleSheet.create({
     color: '#bababa',
   },
   bottomSection: {
-    ...COMMON_STYLES.bottomSection,
+    ...COMMON_STYLES.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

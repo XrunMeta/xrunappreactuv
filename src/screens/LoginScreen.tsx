@@ -3,16 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Platform,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { FormCheckbox, FormField, Header, PrimaryButton } from '../components';
+import { FormCheckbox, FormField, Header, PrimaryButton, SafeScrollView } from '../components';
 import { COLORS, SIZES, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import {
@@ -23,7 +21,7 @@ import {
 import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const LoginScreen = () => {
-  const { goBack, navigate } = useAppNavigation();
+  const { navigate } = useAppNavigation();
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
@@ -32,6 +30,10 @@ export const LoginScreen = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const emailVerificationRoute: any = ROUTES.emailVerification;
+
+  const handleBackPress = () => {
+    navigate(ROUTES.authLanding);
+  };
 
   useEffect(() => {
     const loadRememberedEmail = async () => {
@@ -137,13 +139,12 @@ export const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header
         title={t('screens.login.title')}
-        onBackPress={goBack}
+        onBackPress={handleBackPress}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -188,8 +189,8 @@ export const LoginScreen = () => {
             <FormCheckbox
               label={t('screens.login.rememberMe')}
               checked={rememberMe}
-              onToggle={isLoading ? () => {} : toggleRememberMe}
-              variant="circle"
+              onToggle={isLoading ? () => { } : toggleRememberMe}
+              variant="square"
             />
           </View>
         </View>
@@ -218,7 +219,7 @@ export const LoginScreen = () => {
             <Text style={styles.emailVerificationText}>{t('screens.login.emailVerification')}</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
       {Platform.OS === 'ios' && (
         <View style={styles.homeIndicator}>
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: Platform.OS === 'android' 
+    paddingBottom: Platform.OS === 'android'
       ? 16 + SIZES.medium 
       : 40,
     justifyContent: 'space-between',
@@ -247,6 +248,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
+    marginBottom: SIZES.large,
   },
   eyeButton: {
     height: 24,
@@ -258,7 +260,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    marginTop: -8,
     marginBottom: 16,
   },
   bottomSection: {

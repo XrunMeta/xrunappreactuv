@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, ActivityIndicator } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, ActivityIndicator } from 'react-native';
+import { SafeScrollView } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
@@ -10,7 +10,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShopItemData } from '../types';
 import { getUserBalance, purchaseXrunItem } from '../services';
 import { formatCurrency, formatXrunAmount } from '../utils';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -90,7 +90,7 @@ export const ShopBuyScreen = () => {
     setIsPurchasing(true);
 
     try {
-      const item = selectedShopItem as ShopItemData & { totalPrice?: { coin?: number } };
+      const item = (selectedShopItem as unknown) as ShopItemData & { totalPrice?: { coin?: number } };
       const hasSku = item.sku && item.sku.trim() !== '';
 
       if (hasSku) {
@@ -162,7 +162,7 @@ export const ShopBuyScreen = () => {
     return null;
   }
 
-  const item = selectedShopItem as ShopItemData & {
+  const item = (selectedShopItem as unknown) as ShopItemData & {
     totalPrice?: { coin?: number; gtkrPrice?: number };
     price?: { won?: string; coin?: number };
     charge?: { won?: number; coin?: number };
@@ -184,112 +184,109 @@ export const ShopBuyScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.shop.title')} onBackPress={goBack} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.wrapper}>
-          <View style={styles.detailCard}>
-            <Image source={imageSource} style={styles.itemImage} resizeMode="contain" />
-            <Text style={styles.itemTitle}>{item.title || ''}</Text>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.detailCard}>
+          <Image source={imageSource} style={styles.itemImage} resizeMode="contain" />
+          <Text style={styles.itemTitle}>{item.title || ''}</Text>
 
-            {item.description && (
-              <Text style={styles.description}>{item.description}</Text>
-            )}
+          {item.description && (
+            <Text style={styles.description}>{item.description}</Text>
+          )}
 
-            {item.website && (
-              <TouchableOpacity onPress={() => Linking.openURL(item.website).catch(() => {})}>
-                <Text style={styles.link}>{item.website}</Text>
-              </TouchableOpacity>
-            )}
+          {item.website && (
+            <TouchableOpacity onPress={() => Linking.openURL(item.website).catch(() => { })}>
+              <Text style={styles.link}>{item.website}</Text>
+            </TouchableOpacity>
+          )}
 
-            <View style={styles.priceContainer}>
-              {hasSku ? (
+          <View style={styles.priceContainer}>
+            {hasSku ? (
 
+              <View style={styles.row}>
+                <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
+                <Text style={styles.value}>{t('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
+              </View>
+            ) : (
+
+              <>
                 <View style={styles.row}>
                   <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
-                  <Text style={styles.value}>{t('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
+                  <Text style={styles.value}>
+                    {formatCurrency(priceKRW, 'KRW')} / {formatXrunAmount(priceXrun)} XRUN
+                  </Text>
                 </View>
-              ) : (
 
-                <>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{t('screens.shopBuy.fee')}</Text>
+                  <Text style={styles.value}>
+                    {formatCurrency(chargeKRW, 'KRW')} / {formatXrunAmount(chargeXrun)} XRUN
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.row}>
+                  <Text style={[styles.label, styles.totalLabel]}>{t('screens.shopBuy.total')}</Text>
+                  <Text style={[styles.value, styles.totalValue]}>
+                    {formatXrunAmount(totalGtkrPrice)} XRUN
+                  </Text>
+                </View>
+
+                <View style={styles.balanceInfo}>
                   <View style={styles.row}>
-                    <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
-                    <Text style={styles.value}>
-                      {formatCurrency(priceKRW, 'KRW')} / {formatXrunAmount(priceXrun)} XRUN
+                    <Text style={styles.label}>{t('screens.shopBuy.myBalance')}</Text>
+                    <Text
+                      style={[
+                        styles.value,
+                        isInsufficientBalance ? styles.insufficientBalance : styles.sufficientBalance,
+                      ]}
+                    >
+                      {isLoadingBalance ? (
+                        t('screens.shopBuy.checking')
+                      ) : userBalance !== null ? (
+                        formatXrunAmount(userBalance) + ' XRUN'
+                      ) : (
+                        t('screens.shopBuy.checkFailed')
+                      )}
                     </Text>
                   </View>
-
-                  <View style={styles.row}>
-                    <Text style={styles.label}>{t('screens.shopBuy.fee')}</Text>
-                    <Text style={styles.value}>
-                      {formatCurrency(chargeKRW, 'KRW')} / {formatXrunAmount(chargeXrun)} XRUN
+                  {isInsufficientBalance && (
+                    <Text style={styles.insufficientBalanceText}>
+                      {t('screens.shopBuy.insufficientBalance')}
                     </Text>
-                  </View>
-
-                  <View style={styles.divider} />
-
-                  <View style={styles.row}>
-                    <Text style={[styles.label, styles.totalLabel]}>{t('screens.shopBuy.total')}</Text>
-                    <Text style={[styles.value, styles.totalValue]}>
-                      {formatXrunAmount(totalGtkrPrice)} XRUN
-                    </Text>
-                  </View>
-
-                  <View style={styles.balanceInfo}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>{t('screens.shopBuy.myBalance')}</Text>
-                      <Text
-                        style={[
-                          styles.value,
-                          isInsufficientBalance ? styles.insufficientBalance : styles.sufficientBalance,
-                        ]}
-                      >
-                        {isLoadingBalance ? (
-                          t('screens.shopBuy.checking')
-                        ) : userBalance !== null ? (
-                          formatXrunAmount(userBalance) + ' XRUN'
-                        ) : (
-                          t('screens.shopBuy.checkFailed')
-                        )}
-                      </Text>
-                    </View>
-                    {isInsufficientBalance && (
-                      <Text style={styles.insufficientBalanceText}>
-                        {t('screens.shopBuy.insufficientBalance')}
-                      </Text>
-                    )}
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={goBack}
-              disabled={isPurchasing}
-            >
-              <Text style={styles.cancelText}>{t('screens.shopBuy.cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                styles.primaryButton,
-                (isPurchasing || isInsufficientBalance) && styles.disabledButton,
-              ]}
-              onPress={handlePurchase}
-              disabled={isPurchasing || isInsufficientBalance}
-            >
-              {isPurchasing ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.primaryText}>{t('screens.shopBuy.payment')}</Text>
-              )}
-            </TouchableOpacity>
+                  )}
+                </View>
+              </>
+            )}
           </View>
         </View>
-      </ScrollView>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={goBack}
+            disabled={isPurchasing}
+          >
+            <Text style={styles.cancelText}>{t('screens.shopBuy.cancel')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.primaryButton,
+              (isPurchasing || isInsufficientBalance) && styles.disabledButton,
+            ]}
+            onPress={handlePurchase}
+            disabled={isPurchasing || isInsufficientBalance}
+          >
+            {isPurchasing ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.primaryText}>{t('screens.shopBuy.payment')}</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </SafeScrollView>
     </View>
   );
 };
@@ -297,18 +294,11 @@ export const ShopBuyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
+
   detailCard: {
     borderRadius: 20,
     borderWidth: 1,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
+import { useHeaderDimensions } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
 
 const { width } = Dimensions.get('window');
@@ -21,6 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { goBack, reset, canGoBack, currentScreen } = useAppNavigation();
   const shouldShowBackButton = showBackButton;
+
+  const { topPadding, headerHeight } = useHeaderDimensions();
 
   const handleBackPress = () => {
     if (onBackPress) {
@@ -58,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
     );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: headerHeight + 10, paddingTop: topPadding }]}>
       <View style={styles.content}>
         {renderBackArea()}
         <View style={styles.titleWrapper} pointerEvents="none">
@@ -67,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
         {rightComponent ? (
           <View style={styles.rightComponent}>{rightComponent}</View>
         ) : (
-        <View style={styles.backButtonPlaceholder} />
+          <View style={styles.backButtonPlaceholder} />
         )}
       </View>
     </View>
@@ -76,20 +79,19 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 96,
     width: width,
-    marginTop:10,
-    paddingTop: 44,
+
     backgroundColor: COLORS.background,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 2,
     },
-    shadowOpacity: 0.09,
-    shadowRadius: 3,
-    elevation: 3, 
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5, 
     justifyContent: 'center',
+    zIndex: 10, 
   },
   content: {
     flexDirection: 'row',
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.headerIconBg,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

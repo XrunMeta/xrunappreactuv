@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,9 +20,9 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
 export const WalletTransactionProgressScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { 
-    walletSendAddress, 
-    walletSendAmount, 
+  const {
+    walletSendAddress,
+    walletSendAmount,
     selectedWalletAsset,
     setTransactionResult,
   } = useAppContext();
@@ -169,37 +169,34 @@ export const WalletTransactionProgressScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.walletTransactionProgress.title')} onBackPress={goBack} showBackButton />
 
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.contentWidth}>
-          <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>{t('screens.walletTransactionProgress.amount') || t('screens.walletTransactionProgress.balance')}</Text>
-            <Text style={styles.balanceValue}>{formattedSendAmount}</Text>
-            <Text style={styles.balanceToken}>{sendToken}</Text>
-          </View>
+        <View style={styles.balanceSection}>
+          <Text style={styles.balanceLabel}>{t('screens.walletTransactionProgress.amount') || t('screens.walletTransactionProgress.balance')}</Text>
+          <Text style={styles.balanceValue}>{formattedSendAmount}</Text>
+          <Text style={styles.balanceToken}>{sendToken}</Text>
+        </View>
 
-          <InfoCard 
-            label={t('screens.walletTransactionProgress.from')} 
-            value={userAddress || t('screens.walletTransactionProgress.loading') || 'Loading...'} 
-          />
-          <InfoCard 
-            label={t('screens.walletTransactionProgress.to')} 
-            value={walletSendAddress || t('screens.walletTransactionProgress.loading') || 'Loading...'} 
-          />
-          <InfoCard 
-            label={t('screens.walletTransactionProgress.gasPrice')} 
-            value={t('screens.walletTransactionProgress.calculating') || 'Calculating...'} 
-          />
+        <InfoCard
+          label={t('screens.walletTransactionProgress.from')}
+          value={userAddress || t('screens.walletTransactionProgress.loading') || 'Loading...'}
+        />
+        <InfoCard
+          label={t('screens.walletTransactionProgress.to')}
+          value={walletSendAddress || t('screens.walletTransactionProgress.loading') || 'Loading...'}
+        />
+        <InfoCard
+          label={t('screens.walletTransactionProgress.gasPrice')}
+          value={t('screens.walletTransactionProgress.calculating') || 'Calculating...'}
+        />
 
-          <View style={styles.progressRow}>
-            {isProcessing && <ActivityIndicator size="small" color={COLORS.buttonPrimary} />}
-            <Text style={styles.progressText}>{statusMessage}</Text>
-          </View>
+        <View style={styles.progressRow}>
+          {isProcessing && <ActivityIndicator size="small" color={COLORS.buttonPrimary} />}
+          <Text style={styles.progressText}>{statusMessage}</Text>
         </View>
 
         {!isProcessing && isSuccess && (
@@ -211,7 +208,7 @@ export const WalletTransactionProgressScreen = () => {
             />
           </View>
         )}
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -219,19 +216,12 @@ export const WalletTransactionProgressScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
+    ...COMMON_STYLES.scrollContent,
   },
-  contentWidth: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   balanceSection: {
     alignItems: 'center',
     marginBottom: 32,
@@ -287,6 +277,6 @@ const styles = StyleSheet.create({
     color: '#707070',
   },
   bottomSection: {
-    width: '100%',
+    ...COMMON_STYLES.bottomButtonContainer,
   },
 });

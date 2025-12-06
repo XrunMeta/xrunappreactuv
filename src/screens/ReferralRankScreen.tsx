@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Text, ActivityIndicator, FlatList } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl } from '../components';
+import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { COLORS, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG } from '../constants';
 import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
 
@@ -206,8 +205,7 @@ export const ReferralRankScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.referralRank.title')} />
       <View style={styles.content}>
         <View style={styles.wrapper}>
@@ -223,11 +221,11 @@ export const ReferralRankScreen = () => {
                 <View style={styles.rankDivider} />
                 <View style={styles.rankRight}>
                   <Text style={styles.rankValue}>
-                    {userRank !== '-' 
-                      ? Number(userRank).toLocaleString('ko-KR', { 
-                          minimumFractionDigits: 0, 
-                          maximumFractionDigits: 2 
-                        })
+                    {userRank !== '-'
+                      ? Number(userRank).toLocaleString('ko-KR', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                      })
                       : userRank}
                   </Text>
                 </View>
@@ -273,25 +271,22 @@ export const ReferralRankScreen = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   content: {
     flex: 1,
+    ...COMMON_STYLES.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',

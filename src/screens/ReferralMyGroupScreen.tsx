@@ -4,8 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef } from '../components';
-import { COLORS, LANG } from '../constants';
+import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef, SafeScrollView, SafeView } from '../components';
+import { COLORS, COMMON_STYLES, LANG } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
@@ -184,10 +184,9 @@ export const ReferralMyGroupScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-      <Header 
-        title={t('screens.referralMyGroup.title')} 
+    <SafeView style={styles.container}>
+      <Header
+        title={t('screens.referralMyGroup.title')}
         rightComponent={
           <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={COLORS.headerText} />
@@ -197,8 +196,8 @@ export const ReferralMyGroupScreen = () => {
       <View style={styles.content}>
         <View style={styles.wrapper}>
           <View style={styles.topRow}>
-            <ReferralStatsCard 
-              title={t('screens.referralMyGroup.myGroupMembers')} 
+            <ReferralStatsCard
+              title={t('screens.referralMyGroup.myGroupMembers')}
               value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
               containerStyle={styles.statsCardCenter}
             />
@@ -239,7 +238,7 @@ export const ReferralMyGroupScreen = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
@@ -249,15 +248,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7fb',
   },
   content: {
-    flex: 1,
+    ...COMMON_STYLES.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',

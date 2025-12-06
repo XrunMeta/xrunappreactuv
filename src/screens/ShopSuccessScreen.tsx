@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { Header } from '../components';
+import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
@@ -18,8 +17,7 @@ export const ShopSuccessScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.shopSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
         <View style={styles.card}>
@@ -30,7 +28,7 @@ export const ShopSuccessScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 

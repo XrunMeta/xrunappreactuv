@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -38,9 +38,8 @@ export const XrunWalletScreen2 = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.xrunWallet2.title')} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <WalletHeaderCard
           title={t('screens.xrunWallet2.myBalance')}
           mainValue="12,200 XRUN"
@@ -60,27 +59,19 @@ export const XrunWalletScreen2 = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.listWrapper}>
-          {HISTORY_DATA.map((item) => (
-            <TransactionListItem
-              key={item.id}
-              title={item.title}
-              subtitle={item.subtitle}
-              timestamp={item.timestamp}
-              amount={item.amount}
-              suffix={item.suffix}
-              iconSource={item.icon}
-              onPress={() => navigate(ROUTES.transactionDetails)}
-            />
-          ))}
-        </View>
-      </ScrollView>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
+        {HISTORY_DATA.map((item) => (
+          <TransactionListItem
+            key={item.id}
+            title={item.title}
+            subtitle={item.subtitle}
+            timestamp={item.timestamp}
+            amount={item.amount}
+            suffix={item.suffix}
+            iconSource={item.icon}
+            onPress={() => navigate(ROUTES.transactionDetails)}
+          />
+        ))}
+      </SafeScrollView>
 
       <WalletFilterDialog
         visible={filterVisible}
@@ -94,12 +85,9 @@ export const XrunWalletScreen2 = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-    paddingTop: 16,
+    ...COMMON_STYLES.scrollContent,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -115,25 +103,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
-  listWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 
 

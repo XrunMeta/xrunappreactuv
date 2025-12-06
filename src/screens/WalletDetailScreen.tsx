@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
-import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionListItem } from '../components';
+import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionListItem, SafeView } from '../components';
 import { COLORS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -361,8 +360,7 @@ export const WalletDetailScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton />
       <View style={styles.content}>
         <WalletHeaderCard
@@ -412,7 +410,7 @@ export const WalletDetailScreen = () => {
         defaultType={selectedType}
         defaultRange={selectedRange}
       />
-    </View>
+    </SafeView>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TextInput, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, TextInput, ActivityIndicator, Text } from 'react-native';
+import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -196,7 +197,7 @@ export const ShopMyTicketScreen = () => {
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.wrapper}>
             <SegmentedControl
               options={[
@@ -248,7 +249,7 @@ export const ShopMyTicketScreen = () => {
               </View>
             )}
           </View>
-        </ScrollView>
+        </SafeScrollView>
       )}
 
       {}

@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
@@ -26,9 +26,8 @@ export const MyInfoClausesScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.myInfoClauses.title')} onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -44,7 +43,7 @@ export const MyInfoClausesScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -55,16 +54,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    gap: 16,
+    ...LIST_STYLES.small,
   },
   card: {
     width: '100%',

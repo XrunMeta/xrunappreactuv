@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { SafeScrollView } from '../components';
 import { Header } from '../components';
+import { COMMON_STYLES } from '../constants';
 
 let xrunRoundLogo: any = null;
 try {
@@ -13,11 +14,11 @@ try {
 export const XRUNinfoScreen = () => {
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title="XRUN" />
-      <ScrollView 
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         {}
         {xrunRoundLogo && (
           <View style={styles.logoContainer}>
@@ -43,7 +44,7 @@ export const XRUNinfoScreen = () => {
             리워드를 받는 보상형 광고 플랫폼입니다.
           </Text>
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -51,11 +52,10 @@ export const XRUNinfoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   logoContainer: {
     alignItems: 'center',
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   descriptionContainer: {
-    paddingHorizontal: 37,
     width: '100%',
   },
   description: {

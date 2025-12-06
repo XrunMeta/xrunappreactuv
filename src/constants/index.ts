@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 
 export const COLORS = {
   primary: '#007AFF',
@@ -57,7 +58,71 @@ export const COMMON_STYLES = {
     paddingTop: SIZES.medium, 
     marginBottom: SIZES.large, 
   },
+  bottomButtonContainer: {
+    paddingTop: SIZES.large, 
+    marginBottom: SIZES.large,
+    width: '100%' as const,
+    marginTop: 'auto' as const,
+  },
+  listSamllTermsContainer: {
+    width: '100%',
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    justifyContent: 'flex-start' as const,
+    gap: SIZES.small,
+  },
+  getScreenStyle: () => ({
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 50, 
+  }),
+  scrollContent: {
+    paddingHorizontal: SIZES.xlarge,
+    paddingVertical: SIZES.xlarge,
+  },
 };
+
+export const LIST_STYLES = {
+  width: '100%',
+  display: 'flex' as const,
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start' as const,
+  justifyContent: 'flex-start' as const,
+  gap: SIZES.small,
+  small: {
+    gap: SIZES.small,   
+  },
+  medium: {
+    gap: SIZES.medium,
+  },
+  large: {
+    gap: SIZES.large,
+  },
+  xlarge: {
+    gap: SIZES.xlarge,
+  },
+};
+
+export const FORM_STYLES = {
+  fieldContainer: {
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    gap: SIZES.large,
+  },
+}  as const;
+
+export const SAFE_AREA = {
+  background: '#ffffff',
+  bottomBackground: '#fafafa',
+};
+
+export const HEADER = {
+
+  contentHeight: 52,
+
+  minHeight: 52,
+} as const;
 
 export { COUNTRY_DIAL_CODES } from './countryDialCodes';
 export {

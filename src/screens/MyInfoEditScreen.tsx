@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   Text,
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, OptionButton, Dialog } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { Header, FormField, PrimaryButton, OptionButton, Dialog, SafeScrollView } from '../components';
+import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -387,7 +385,6 @@ export const MyInfoEditScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header
         title={t('screens.myInfoEdit.title')}
         onBackPress={() => {
@@ -399,31 +396,37 @@ export const MyInfoEditScreen = () => {
         }}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
           </View>
         ) : (
-        <View style={styles.formWrapper}>
-          <FormField
-            label={t('screens.myInfoEdit.firstName')}
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder={t('screens.myInfoEdit.firstNamePlaceholder')}
+          <View style={styles.formFieldContainer}>
+
+            <FormField
+              label={t('screens.myInfoEdit.firstName')}
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder={t('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!isSaving}
-          />
-          <FormField
-            label={t('screens.myInfoEdit.lastName')}
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder={t('screens.myInfoEdit.lastNamePlaceholder')}
+              containerStyle={styles.fieldContainer}
+            />
+
+            <FormField
+              label={t('screens.myInfoEdit.lastName')}
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder={t('screens.myInfoEdit.lastNamePlaceholder')}
               editable={!isSaving}
-          />
+              containerStyle={styles.fieldContainer}
+            />
+
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.email')}</Text>
               <View style={styles.disabledInput}>
@@ -431,19 +434,21 @@ export const MyInfoEditScreen = () => {
               </View>
             </View>
 
-          <View style={styles.inlineLabelRow}>
-            <Text style={styles.sectionLabel}>Password</Text>
-            <TouchableOpacity onPress={handleChangePassword}>
-              <Text style={styles.linkText}>Change Password</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.readonlyInput}>
-            <Text style={styles.readonlyText}>
-              {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
-            </Text>
-          </View>
-
             <View style={styles.fieldContainer}>
+              <View style={styles.inlineLabelRow}>
+                <Text style={styles.sectionLabel}>Password</Text>
+                <TouchableOpacity onPress={handleChangePassword}>
+                  <Text style={styles.linkText}>Change Password</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.readonlyInput}>
+                <Text style={styles.readonlyText}>
+                  {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.fieldContainer} >
               <Text style={styles.label}>{t('screens.myInfoEdit.phone')}</Text>
               <View style={styles.phoneFieldContainer}>
                 {}
@@ -454,14 +459,14 @@ export const MyInfoEditScreen = () => {
                   </Text>
                 </View>
                 {}
-              <TouchableOpacity
+                <TouchableOpacity
                   style={styles.phoneValueContainer}
                   onPress={handlePhoneEdit}
-                activeOpacity={0.7}
+                  activeOpacity={0.7}
                   disabled={isSaving}
-              >
+                >
                   <Text style={styles.phoneValue}>{phone}</Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -474,9 +479,9 @@ export const MyInfoEditScreen = () => {
                 disabled={isSaving}
               >
                 <Text style={[styles.regionValue, !tempCountry.cDesc && styles.regionPlaceholder]}>
-                  {tempCountry.cDesc 
-                    ? `${tempCountry.cDesc} (+${tempCountry.cCode})` 
-                    : selectedCountryDialCode 
+                  {tempCountry.cDesc
+                    ? `${tempCountry.cDesc} (+${tempCountry.cCode})`
+                    : selectedCountryDialCode
                       ? `${selectedCountryDialCode.name} (${selectedCountryDialCode.dialCode})`
                       : '국가를 선택하세요'}
                 </Text>
@@ -484,44 +489,39 @@ export const MyInfoEditScreen = () => {
               </TouchableOpacity>
             </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.gender')}</Text>
-            <View style={styles.inlineOptions}>
-              {GENDER_OPTIONS.map((option) => (
-                <OptionButton
-                  key={option.value}
-                  label={option.label}
-                  selected={gender === option.value}
-                  onPress={() => setGender(option.value)}
-                    disabled={isSaving}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.age')}</Text>
-            <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
-              {AGE_OPTIONS.map((option, index) => {
-                const isLast = index === AGE_OPTIONS.length - 1;
-                return (
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>{t('screens.myInfoEdit.gender')}</Text>
+              <View style={styles.inlineOptions}>
+                {GENDER_OPTIONS.map((option) => (
                   <OptionButton
-                    key={option}
-                    label={option}
-                    selected={age === option}
-                    onPress={() => setAge(option)}
-                    flex={1}
-                      disabled={isSaving}
-                    style={[
-                      styles.ageOptionButton,
-                      !isLast && styles.ageOptionSpacing,
-                    ]}
+                    key={option.value}
+                    label={option.label}
+                    selected={gender === option.value}
+                    onPress={() => setGender(option.value)}
+                    disabled={isSaving}
                   />
-                );
-              })}
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>{t('screens.myInfoEdit.age')}</Text>
+              <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
+                {AGE_OPTIONS.map((option, index) => {
+                  return (
+                    <OptionButton
+                      key={option}
+                      label={option}
+                      selected={age === option}
+                      onPress={() => setAge(option)}
+                      flex={1}
+                      disabled={isSaving}
+                    />
+                  );
+                })}
+              </View>
             </View>
           </View>
-        </View>
         )}
 
         <View style={styles.bottomSection}>
@@ -530,16 +530,16 @@ export const MyInfoEditScreen = () => {
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             </View>
           ) : (
-          <PrimaryButton
-            title={t('screens.myInfoEdit.save')}
-            fullWidth
-            onPress={handleSave}
-            style={styles.primaryButton}
+            <PrimaryButton
+              title={t('screens.myInfoEdit.save')}
+              fullWidth
+              onPress={handleSave}
+              style={styles.primaryButton}
               disabled={isLoading}
-          />
+            />
           )}
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
     </View>
   );
@@ -556,10 +556,8 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  formFieldContainer: {
+    ...FORM_STYLES.fieldContainer,
   },
   inlineLabelRow: {
     flexDirection: 'row',
@@ -583,8 +581,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fefefe',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 24,
+    minHeight: 52, 
+    justifyContent: 'center',
   },
   readonlyText: {
     fontSize: 13,
@@ -598,14 +596,15 @@ const styles = StyleSheet.create({
     borderColor: '#dedede',
     borderRadius: 10,
     backgroundColor: '#fefefe',
-    minHeight: 52,
+    minHeight: 52, 
     overflow: 'hidden',
   },
   phonePrefixDisabled: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    minHeight: 52, 
+    justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#ededed',
     backgroundColor: '#f5f5f5',
@@ -622,7 +621,7 @@ const styles = StyleSheet.create({
   phoneValueContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    minHeight: 52, 
     justifyContent: 'center',
   },
   phoneValue: {
@@ -630,13 +629,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
-  formGroup: {
-    marginTop: 24,
-  },
   inlineOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
+    flexWrap: 'nowrap',
+    justifyContent: 'flex-start',
+    gap: 8,
+    width: '100%',
   },
   ageOptionsRow: {
     flexWrap: 'nowrap',
@@ -650,7 +648,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   bottomSection: {
-    ...COMMON_STYLES.bottomSection,
+    ...COMMON_STYLES.bottomButtonContainer,
+    marginTop: SIZES.large,
   },
   primaryButton: {
     width: '100%',
@@ -668,7 +667,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fieldContainer: {
-    marginBottom: 24,
+    borderWidth: 0,
   },
   label: {
     fontSize: 16,
@@ -687,7 +686,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     minHeight: 56,
   },
-  phoneValue: {
+  phoneValueText: {
     flex: 1,
     fontSize: 16,
     fontFamily: 'Roboto-Regular',
@@ -712,8 +711,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    minHeight: 56,
+    minHeight: 52, 
   },
   regionValue: {
     flex: 1,
@@ -772,8 +770,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#f5f5f5',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    minHeight: 56,
+    minHeight: 52, 
     justifyContent: 'center',
   },
   disabledText: {

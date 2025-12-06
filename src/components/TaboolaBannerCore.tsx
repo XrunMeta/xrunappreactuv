@@ -76,13 +76,47 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
     );
   }
 
-  const htmlContent = generateTaboolaHTML(
+  let htmlContent = generateTaboolaHTML(
     publisherId,
     config.placement,
     config.mode,
     finalPageUrl,
     config.pageType,
     config.targetType,
+  );
+
+  htmlContent = htmlContent.replace(
+    /#taboola-container\s*\{[^}]*\}/,
+    `#taboola-container {
+      width: 100%;
+      height: 80px;
+      min-height: 80px;
+      max-height: 80px;
+      overflow: hidden;
+    }`
+  );
+
+  htmlContent = htmlContent.replace(
+    /body\s*\{[^}]*\}/,
+    `body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 80px;
+    }`
+  );
+
+  htmlContent = htmlContent.replace(
+    /<style>/,
+    `<style>
+    html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 80px;
+    }`
   );
 
   const injectedJavaScript = `
@@ -184,7 +218,7 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
       <WebView
         source={{ html: htmlContent }}
         style={styles.webView}
-        scrollEnabled={true}
+        scrollEnabled={false}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         javaScriptEnabled={true}
@@ -298,15 +332,13 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    minHeight: 80,
-    backgroundColor: 'transparent', 
-    marginVertical: SIZES.small, 
+    height: 80,
     marginHorizontal: 0, 
   },
   webView: {
     width: '100%',
-    minHeight: 80,
-    backgroundColor: 'transparent',
+    height: 80,
+    backgroundColor: '#ffffff',
   },
 });
 

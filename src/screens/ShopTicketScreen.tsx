@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TextInput, ImageSourcePropType, ActivityIndicator, Text } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, TextInput, ImageSourcePropType, ActivityIndicator, Text } from 'react-native';
+import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import { getXRUNGopaxPrice, getXrunBuyableItems } from '../services';
 import { ShopItemData } from '../types';
 import { formatXrunAmount, formatWonAmount, formatCurrency } from '../utils';
 import { cashingimages } from '../utils/imageCache';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 
 const transformShopItem = (
   item: ShopItemData,
@@ -347,8 +347,7 @@ export const ShopTicketScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.shop.title')} />
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -356,50 +355,53 @@ export const ShopTicketScreen = () => {
         </View>
       ) : (
         <>
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            <View style={styles.wrapper}>
-              <SegmentedControl
-                options={segmentedOptions}
-                value={tab}
-                onChange={handleTabChange}
-                containerStyle={styles.segmented}
-                hideIndicator={true}
+          <SafeScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            showBottomBackground={false}
+          >
+
+            <SegmentedControl
+              options={segmentedOptions}
+              value={tab}
+              onChange={handleTabChange}
+              containerStyle={styles.segmented}
+              hideIndicator={true}
+            />
+
+            <View style={styles.searchBar}>
+              <Feather name="search" size={18} color="#bcbec4" />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search"
+                placeholderTextColor="#bcbec4"
               />
-
-              <View style={styles.searchBar}>
-                <Feather name="search" size={18} color="#bcbec4" />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search"
-                  placeholderTextColor="#bcbec4"
-                />
-              </View>
-
-              {tab === 'ticket' && shopItems.length > 0
-                ? shopItems.map((item) => {
-
-                    const itemImage = itemImages[item.id];
-                    const imageSource = itemImage
-                      ? { uri: `data:image/png;base64,${itemImage}` }
-                      : item.image;
-
-                    const hasSku = item.sku && item.sku.trim() !== '';
-                    const iapPrice = hasSku ? getIapPrice(item.sku) : null;
-                    const displayPrice = hasSku
-                      ? (iapPrice || 'Loading...')
-                      : formatCurrency(item.priceKRW || '0', 'KRW');
-
-                    return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
-                  })
-                : tab === 'ticket' && shopItems.length === 0
-                ? (
-                    <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                    </View>
-                  )
-                : null}
             </View>
-          </ScrollView>
+
+            {tab === 'ticket' && shopItems.length > 0
+              ? shopItems.map((item) => {
+
+                const itemImage = itemImages[item.id];
+                const imageSource = itemImage
+                  ? { uri: `data:image/png;base64,${itemImage}` }
+                  : item.image;
+
+                const hasSku = item.sku && item.sku.trim() !== '';
+                const iapPrice = hasSku ? getIapPrice(item.sku) : null;
+                const displayPrice = hasSku
+                  ? (iapPrice || 'Loading...')
+                  : formatCurrency(item.priceKRW || '0', 'KRW');
+
+                return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
+              })
+              : tab === 'ticket' && shopItems.length === 0
+                ? (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                  </View>
+                )
+                : null}
+          </SafeScrollView>
 
           {}
           <View style={styles.taboolaContainer}>
@@ -407,14 +409,13 @@ export const ShopTicketScreen = () => {
           </View>
         </>
       )}
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   loadingContainer: {
     flex: 1,
@@ -422,16 +423,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingBottom: 40,
     flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
+
   segmented: {
     marginBottom: 20,
   },
@@ -463,10 +458,8 @@ const styles = StyleSheet.create({
     color: '#7d7e83',
   },
   taboolaContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#d5dde0',
+    marginTop: 10,
   },
 });

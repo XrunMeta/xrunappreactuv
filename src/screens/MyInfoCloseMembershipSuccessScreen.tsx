@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header } from '../components';
+import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { logout } from '../services';
 
@@ -60,7 +60,7 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.myInfoCloseMembershipSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
@@ -75,7 +75,7 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 

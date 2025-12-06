@@ -6,7 +6,7 @@ import { getIosWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
 
-const TEST_PLATFORM_OS: 'ios' | 'android' | null = null ; 
+const TEST_PLATFORM_OS: 'ios' | 'android' | null = null; 
 
 let iconMap: any = null;
 let iconMapWhite: any = null;
@@ -115,8 +115,8 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
       return {
         ...item,
-        label: showWallet 
-          ? item.label 
+        label: showWallet
+          ? item.label
           : 'XRUN',
         icon: showWallet
           ? item.icon
@@ -149,13 +149,36 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     return Math.max(minPadding, Math.min(maxPadding, basePadding));
   };
 
+  const getHorizontalPadding = () => {
+    if (width < 360) {
+
+      return 4;
+    } else if (width < 400) {
+
+      return 8;
+    } else {
+
+      return 10;
+    }
+  };
+
+  const getCenterButtonWidth = () => {
+    if (width < 360) {
+      return 90; 
+    } else if (width < 400) {
+      return 95;
+    } else {
+      return 100;
+    }
+  };
+
   const itemPadding = getItemPadding();
+  const horizontalPadding = getHorizontalPadding();
+  const centerButtonWidth = getCenterButtonWidth();
 
   const renderCenterItem = () => {
-
     return (
-      <View
-        style={styles.centerButtonContainer}>
+      <>
         {}
         <TouchableOpacity
           style={[
@@ -193,7 +216,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
             <View style={styles.iconPlaceholder} />
           )}
         </TouchableOpacity>
-      </View>
+      </>
     );
   };
 
@@ -209,7 +232,10 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     return (
       <TouchableOpacity
         key={item.id}
-        style={styles.navItem}
+        style={[
+          styles.navItem,
+          { minWidth: width < 360 ? 50 : 55 }
+        ]}
         onPress={() => handleItemPress(item.id)}
         activeOpacity={0.7}>
         <View style={styles.iconContainer}>
@@ -223,8 +249,12 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
             <View style={[styles.iconPlaceholder, isActive && styles.iconPlaceholderActive]} />
           )}
         </View>
-        <Text 
-          style={[styles.label, isActive && styles.labelActive]}
+        <Text
+          style={[
+            styles.label,
+            isActive && styles.labelActive,
+            { fontSize: width < 360 ? 12 : 14 }
+          ]}
           numberOfLines={1}
           ellipsizeMode="tail">
           {item.label}
@@ -237,11 +267,29 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     <View style={styles.container}>
       {}
       <View style={styles.bottomSection}>
-        <View style={styles.content}>
+        <View style={[
+          styles.content,
+          {
+            paddingHorizontal: horizontalPadding,
+            gap: width < 360 ? 4 : width < 400 ? 6 : 8,
+          }
+        ]}>
           {processedItems.map((item, index) => {
             if (item.id === 'map' || item.id === 'camera') {
 
-              return <React.Fragment key="center-buttons">{renderCenterItem()}</React.Fragment>;
+              return (
+                <React.Fragment key="center-buttons">
+                  <View style={[
+                    styles.centerButtonContainer,
+                    {
+                      width: centerButtonWidth,
+                      marginHorizontal: width < 360 ? -2 : -3,
+                    }
+                  ]}>
+                    {renderCenterItem()}
+                  </View>
+                </React.Fragment>
+              );
             }
             return renderRegularItem(item);
           })}
@@ -275,17 +323,14 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     minHeight: 104,
     width: '100%',
-    paddingHorizontal: 10,
-    gap: 10,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    minWidth: 60,
     paddingVertical: 5,
-    flexShrink: 0,
-    paddingHorizontal: 5,
+    flexShrink: 1,
+    paddingHorizontal: 2,
   },
   iconContainer: {
     width: 24,
@@ -325,10 +370,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#343a59',
     borderRadius: 50,
     height: 50,
-    width: 100,
-    marginHorizontal: -5,
     alignSelf: 'center',
-    flexShrink: 0,
+    flexShrink: 1,
     ...Platform.select({
       android: {
         elevation: 2,

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Text,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { Header, FormField } from '../components';
+import { Header, FormField, SafeScrollView } from '../components';
 import { COLORS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -77,7 +76,7 @@ export const MyInfoEmailAuthScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.myInfoEmailAuth.title')} onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -107,7 +106,7 @@ export const MyInfoEmailAuthScreen = () => {
           />
         </View>
 
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };

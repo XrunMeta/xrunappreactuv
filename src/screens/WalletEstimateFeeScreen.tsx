@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Modal, Alert } from 'react-native';
+import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
@@ -183,7 +184,6 @@ export const WalletEstimateFeeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.walletEstimateFee.title')} onBackPress={goBack} showBackButton />
 
       {isLoading && (
@@ -199,40 +199,38 @@ export const WalletEstimateFeeScreen = () => {
         </Modal>
       )}
 
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.contentWidth}>
-          <View style={styles.balanceSection}>
-            <Text style={styles.balanceLabel}>{t('screens.walletEstimateFee.amount')}</Text>
-            <Text style={styles.balanceValue}>{formattedSendAmount}</Text>
-            <Text style={styles.balanceToken}>{sendToken}</Text>
-          </View>
-
-          <InfoCard 
-            label={t('screens.walletEstimateFee.from')} 
-            value={userAddress || t('screens.walletEstimateFee.loading')} 
-          />
-          <InfoCard
-            label={t('screens.walletEstimateFee.to')}
-            value={walletSendAddress || t('screens.walletEstimateFee.receiverAddressPlaceholder')}
-          />
-          <InfoCard 
-            label={t('screens.walletEstimateFee.networkFee')} 
-            value={formatGasFee()} 
-          />
-          <InfoCard 
-            label={t('screens.walletEstimateFee.speed')} 
-            value={formatSpeed()} 
-          />
-
-          <Text style={styles.helperText}>
-            {t('screens.walletEstimateFee.estimation')} {countdown}{' '}
-            {t('screens.walletEstimateFee.seconds')}
-            {countdown !== 1 && (t('screens.walletEstimateFee.seconds') === 'second' || t('screens.walletEstimateFee.seconds') === 'detik') ? 's' : ''}
-          </Text>
+        <View style={styles.balanceSection}>
+          <Text style={styles.balanceLabel}>{t('screens.walletEstimateFee.amount')}</Text>
+          <Text style={styles.balanceValue}>{formattedSendAmount}</Text>
+          <Text style={styles.balanceToken}>{sendToken}</Text>
         </View>
+
+        <InfoCard
+          label={t('screens.walletEstimateFee.from')}
+          value={userAddress || t('screens.walletEstimateFee.loading')}
+        />
+        <InfoCard
+          label={t('screens.walletEstimateFee.to')}
+          value={walletSendAddress || t('screens.walletEstimateFee.receiverAddressPlaceholder')}
+        />
+        <InfoCard
+          label={t('screens.walletEstimateFee.networkFee')}
+          value={formatGasFee()}
+        />
+        <InfoCard
+          label={t('screens.walletEstimateFee.speed')}
+          value={formatSpeed()}
+        />
+
+        <Text style={styles.helperText}>
+          {t('screens.walletEstimateFee.estimation')} {countdown}{' '}
+          {t('screens.walletEstimateFee.seconds')}
+          {countdown !== 1 && (t('screens.walletEstimateFee.seconds') === 'second' || t('screens.walletEstimateFee.seconds') === 'detik') ? 's' : ''}
+        </Text>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton
@@ -242,7 +240,7 @@ export const WalletEstimateFeeScreen = () => {
             disabled={isLoading || (gasPrice === null && gasPrice !== 0)}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -250,19 +248,12 @@ export const WalletEstimateFeeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    paddingTop: 24,
+    ...COMMON_STYLES.scrollContent,
   },
-  contentWidth: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   balanceSection: {
     alignItems: 'center',
     marginBottom: 32,

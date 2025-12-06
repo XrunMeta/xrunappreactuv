@@ -3,25 +3,25 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Platform,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import {
   FormCheckbox,
   FormField,
+  SafeScrollView,
   Header,
   OptionButton,
   PrimaryButton,
 } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { getRegionIdByIso2, getRegionNameById } from '../constants';
+import { getRegionIdByIso2, getRegionNameById, COMMON_STYLES, FORM_STYLES } from '../constants';
+
 import {
   checkEmailAvailability,
   checkReferralEmail,
@@ -262,172 +262,163 @@ export const SignupScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header
         title={t('screens.signup.title')}
         onBackPress={goBack}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
-        <FormField
-          label={t('screens.signup.familyNameLabel')}
-          placeholder={t('screens.signup.familyNamePlaceholder')}
-          value={familyName}
-          onChangeText={setFamilyName}
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
-
-        <FormField
-          label={t('screens.signup.givenNameLabel')}
-          placeholder={t('screens.signup.givenNamePlaceholder')}
-          value={givenName}
-          onChangeText={setGivenName}
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
-
-        <FormField
-          label={t('screens.signup.emailLabel')}
-          placeholder={t('screens.signup.emailPlaceholder')}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
-
-        <FormField
-          label={t('screens.signup.passwordLabel')}
-          placeholder={t('screens.signup.passwordPlaceholder')}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
-
-        <FormField
-          label={t('screens.signup.phoneNumberLabel')}
-          placeholder={t('screens.signup.phoneNumberPlaceholder')}
-          keyboardType="phone-pad"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          containerStyle={styles.fieldContainer}
-          leftAccessory={
-            <TouchableOpacity
-              style={styles.phonePrefix}
-              onPress={() => navigate('countryCodeSelect')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
-              <Text style={styles.countryCode}>{selectedCountryDialCode.dialCode}</Text>
-            </TouchableOpacity>
-          }
-        />
-
-        <TouchableOpacity
-          onPress={() => {
-            setSelectMode('region');
-            navigate('countryCodeSelect');
-          }}
-          style={styles.fieldContainer}
-        >
+        <View style={styles.formFieldContainer}>
           <FormField
-            label={t('screens.signup.regionLabel')}
-            placeholder={t('screens.signup.regionPlaceholder')}
-            value={selectedRegion ? selectedRegion.name : region || ''}
-            editable={false}
+            label={t('screens.signup.familyNameLabel')}
+            placeholder={t('screens.signup.familyNamePlaceholder')}
+            value={familyName}
+            onChangeText={setFamilyName}
+            autoCapitalize="none"
             containerStyle={styles.fieldContainer}
           />
-        </TouchableOpacity>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{t('screens.signup.genderLabel')}</Text>
-          <View style={styles.inlineOptions}>
-            {GENDER_OPTIONS.map((option) => {
-              const isActive = gender === option.value;
-              return (
-                <OptionButton
-                  key={option.value}
-                  label={option.label}
-                  selected={isActive}
-                  onPress={() => setGender(option.value)}
-                />
-              );
-            })}
-          </View>
-        </View>
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{t('screens.signup.ageLabel')}</Text>
-          <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
-            {AGE_OPTIONS.map((option, index) => {
-              const isActive = ageRange === option;
-              const isLast = index === AGE_OPTIONS.length - 1;
-              return (
-                <OptionButton
-                  key={option}
-                  label={option}
-                  selected={isActive}
-                  onPress={() => setAgeRange(option)}
-                  flex={1}
-                  style={[
-                    styles.ageOptionButton,
-                    !isLast && styles.ageOptionSpacing,
-                  ]}
-                />
-              );
-            })}
-          </View>
-        </View>
-
-        <FormField
-          label={t('screens.signup.referralEmailLabel')}
-          placeholder={t('screens.signup.referralEmailPlaceholder')}
-          value={referralEmail}
-          onChangeText={setReferralEmail}
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-        />
-
-        <View style={styles.termsRow}>
-          <FormCheckbox
-            checked={termsAccepted}
-            onToggle={() => setTermsAccepted((prev) => !prev)}
-            variant="square"
+          <FormField
+            label={t('screens.signup.givenNameLabel')}
+            placeholder={t('screens.signup.givenNamePlaceholder')}
+            value={givenName}
+            onChangeText={setGivenName}
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
           />
-          <Text style={styles.termsText}>
-            {t('screens.signup.termsText')}{' '}
-            <Text style={styles.termsHighlight}>{t('screens.signup.termsHighlight')}</Text>{' '}
-            {t('screens.signup.termsAgree')}
-          </Text>
-        </View>
 
-        <View style={styles.buttonWrapper}>
-          <PrimaryButton
-            title={isSubmitting ? t('screens.signup.submitting') : t('screens.signup.submitButton')}
-            fullWidth
-            onPress={handleSubmit}
-            disabled={isSubmitting}
+          <FormField
+            label={t('screens.signup.emailLabel')}
+            placeholder={t('screens.signup.emailPlaceholder')}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
           />
-          {isSubmitting && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+
+          <FormField
+            label={t('screens.signup.passwordLabel')}
+            placeholder={t('screens.signup.passwordPlaceholder')}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
+          />
+
+          <FormField
+            containerStyle={styles.fieldContainer}
+            label={t('screens.signup.phoneNumberLabel')}
+            placeholder={t('screens.signup.phoneNumberPlaceholder')}
+            keyboardType="phone-pad"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            leftAccessory={
+              <TouchableOpacity
+                style={styles.phonePrefix}
+                onPress={() => navigate('countryCodeSelect')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
+                <Text style={styles.countryCode}>{selectedCountryDialCode.dialCode}</Text>
+              </TouchableOpacity>
+            }
+          />
+
+          <TouchableOpacity
+            style={styles.fieldContainer}
+            onPress={() => {
+              setSelectMode('region');
+              navigate('countryCodeSelect');
+            }}
+          >
+            <FormField
+              label={t('screens.signup.regionLabel')}
+              placeholder={t('screens.signup.regionPlaceholder')}
+              value={selectedRegion ? selectedRegion.name : region || ''}
+              editable={false}
+            />
+          </TouchableOpacity>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>{t('screens.signup.genderLabel')}</Text>
+            <View style={[styles.inlineOptions]}>
+              {GENDER_OPTIONS.map((option) => {
+                const isActive = gender === option.value;
+                return (
+                  <OptionButton
+                    key={option.value}
+                    label={option.label}
+                    selected={isActive}
+                    onPress={() => setGender(option.value)}
+                  />
+                );
+              })}
             </View>
-          )}
-        </View>
-      </ScrollView>
+          </View>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>{t('screens.signup.ageLabel')}</Text>
+            <View style={[styles.inlineOptions]}>
+              {AGE_OPTIONS.map((option, index) => {
+                const isActive = ageRange === option;
+                const isLast = index === AGE_OPTIONS.length - 1;
+                return (
+                  <OptionButton
+                    key={option}
+                    label={option}
+                    selected={isActive}
+                    onPress={() => setAgeRange(option)}
+                    flex={1}
+                  />
+                );
+              })}
+            </View>
+          </View>
+
+          <FormField
+            label={t('screens.signup.referralEmailLabel')}
+            placeholder={t('screens.signup.referralEmailPlaceholder')}
+            value={referralEmail}
+            onChangeText={setReferralEmail}
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
+          />
+
+          <View style={styles.termsRow}>
+            <FormCheckbox
+              checked={termsAccepted}
+              onToggle={() => setTermsAccepted((prev) => !prev)}
+              variant="square"
+            />
+            <Text style={styles.termsText}>
+              {t('screens.signup.termsText')}{' '}
+              <Text style={styles.termsHighlight}>{t('screens.signup.termsHighlight')}</Text>{' '}
+              {t('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          <View style={styles.buttonWrapper}>
+            <PrimaryButton
+              title={isSubmitting ? t('screens.signup.submitting') : t('screens.signup.submitButton')}
+              fullWidth
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            />
+            {isSubmitting && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+              </View>
+            )}
+          </View>
         </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -435,24 +426,16 @@ export const SignupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 120,
+
+    ...COMMON_STYLES.scrollContent,
+  },
+  formFieldContainer: {
+    ...FORM_STYLES.fieldContainer,
   },
   fieldContainer: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  formGroup: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginBottom: 24,
+    borderWidth: 0,
   },
   label: {
     fontSize: 16,
@@ -480,21 +463,10 @@ const styles = StyleSheet.create({
   },
   inlineOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  ageOptionsRow: {
     flexWrap: 'nowrap',
-    justifyContent: 'space-between',
-  },
-  ageOptionButton: {
-    marginRight: 0,
-    marginBottom: 0,
-  },
-  ageOptionSpacing: {
-    marginRight: 8,
+    justifyContent: 'flex-start',
+    gap: 8,
+    width: '100%',
   },
   termsRow: {
     flexDirection: 'row',
@@ -502,7 +474,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    marginBottom: 24,
     gap: 12,
   },
   termsText: {
@@ -517,28 +488,12 @@ const styles = StyleSheet.create({
     color: '#8e9bae',
   },
   buttonWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...COMMON_STYLES.bottomButtonContainer,
   },
   loadingContainer: {
     marginTop: 12,
     alignItems: 'center',
   },
-  homeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-  },
+
 });
 

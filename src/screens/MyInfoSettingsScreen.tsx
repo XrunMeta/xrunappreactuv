@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
-import { COLORS, IS_DEV_MODE } from '../constants';
+import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 
 export const MyInfoSettingsScreen = () => {
@@ -13,9 +13,8 @@ export const MyInfoSettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title="Setting" onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -37,7 +36,7 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>Close Membership</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </SafeScrollView>
       {IS_DEV_MODE && (
         <LanguageSelector
           visible={languageSelectorVisible}
@@ -51,18 +50,12 @@ export const MyInfoSettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...LIST_STYLES.small,
   },
   card: {
     width: '100%',

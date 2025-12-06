@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Text, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, Text, Platform } from 'react-native';
+import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS } from '../constants';
 import { useAppNavigation } from '../navigation';
+import { COMMON_STYLES } from '../constants';
 
 const TERMS_TEXT = `
 XRUN Location-Based Service Terms and Conditions
@@ -74,22 +74,16 @@ export const TermsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.terms.title')} onBackPress={goBack} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
           <Text style={styles.contentText}>{TERMS_TEXT}</Text>
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
@@ -97,12 +91,9 @@ export const TermsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 60,
+    ...COMMON_STYLES.scrollContent,
   },
   card: {
     backgroundColor: '#ffffff',
@@ -114,26 +105,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
+    marginBottom: 10,
   },
   contentText: {
     fontSize: 12,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
   },
 });
 

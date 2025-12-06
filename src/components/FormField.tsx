@@ -8,6 +8,8 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
+import { useKeyboardScroll } from '../context/KeyboardScrollContext';
+import { SIZES } from '../constants';
 
 interface FormFieldProps extends TextInputProps {
   label: string;
@@ -23,8 +25,22 @@ export const FormField: React.FC<FormFieldProps> = ({
   leftAccessory,
   style,
   placeholderTextColor = '#dedede',
+  onFocus,
   ...inputProps
 }) => {
+  const keyboardScroll = useKeyboardScroll();
+
+  const handleFocus = (event: any) => {
+
+    if (keyboardScroll) {
+      keyboardScroll.scrollToFocusedInput(event);
+    }
+
+    if (onFocus) {
+      onFocus(event);
+    }
+  };
+
   return (
     <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{label}</Text>
@@ -33,6 +49,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         <TextInput
           style={[styles.input, style]}
           placeholderTextColor={placeholderTextColor}
+          onFocus={handleFocus}
           {...inputProps}
         />
         {rightAccessory ? (
@@ -46,7 +63,7 @@ export const FormField: React.FC<FormFieldProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 24,
+
   },
   label: {
     fontSize: 16,
@@ -83,5 +100,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
 

@@ -41,20 +41,11 @@ export const TaboolaBanner: React.FC<TaboolaBannerProps> = ({
   };
 
   return (
-    <View style={[styles.container, containerStyle, style]}>
-      <TaboolaBannerCore
-        placementType={convertedPlacementType}
-        pageUrl={pageUrl}
-        onLoadingChange={handleTaboolaLoadingChange}
-      />
-      {}
-    </View>
+    <TaboolaBannerCore
+      placementType={convertedPlacementType}
+      pageUrl={pageUrl}
+      onLoadingChange={handleTaboolaLoadingChange}
+    />
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    width: '100%',
-  },
-});

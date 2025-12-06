@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Image,
   TouchableOpacity,
   TextInput,
@@ -13,14 +12,15 @@ import {
   ActivityIndicator,
   RefreshControl,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header } from '../components';
+import { Header, SafeScrollView } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { COLORS } from '../constants';
+import { COLORS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import {
   getNotificationList,
@@ -274,7 +274,7 @@ export const MyInfoNotifyScreen = () => {
             >
               <Text style={styles.replyText}>{notification.title}</Text>
             </TouchableOpacity>
-            <Image source={chatUser} style={styles.userAvatar} />
+            {}
           </View>
           <Text style={styles.replyTimestamp}>{formatTime(notification.datetime)}</Text>
         </View>
@@ -292,7 +292,7 @@ export const MyInfoNotifyScreen = () => {
           {}
           {notification.contents !== null && notification.type !== 9303 && (
             <View>
-              <Text 
+              <Text
                 style={styles.description}
                 numberOfLines={isNotice ? 3 : undefined}
                 ellipsizeMode="tail"
@@ -307,7 +307,7 @@ export const MyInfoNotifyScreen = () => {
               {}
               {}
               {isNotice && (
-                  <TouchableOpacity
+                <TouchableOpacity
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={async () => {
                     const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
@@ -413,17 +413,17 @@ export const MyInfoNotifyScreen = () => {
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
           </View>
         ) : (
-          <ScrollView
+          <SafeScrollView
             ref={scrollViewRef}
             style={styles.list}
+            backgroundColor={'#f2f2f7'}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={handleContentSizeChange}
             onScrollBeginDrag={handleScrollBeginDrag}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            showBottomBackground={false}
           >
             {notifications.length === 0 ? (
               <View style={styles.emptyContainer}>
@@ -432,7 +432,7 @@ export const MyInfoNotifyScreen = () => {
             ) : (
               renderGroupedNotifications()
             )}
-          </ScrollView>
+          </SafeScrollView>
         )}
 
         <View
@@ -467,7 +467,7 @@ export const MyInfoNotifyScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 };
 
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: SIZES.small,
     paddingTop: 24,
     paddingBottom: 0,
     gap: 24,
@@ -582,9 +582,10 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   replyWrapper: {
-    alignItems: 'flex-end',
+    alignSelf: 'flex-end',
     gap: 6,
     marginBottom: 16,
+    maxWidth: '95%',
   },
   replyRow: {
     flexDirection: 'row',
@@ -603,17 +604,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
-  userAvatar: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignSelf: 'center',
-  },
+
   replyTimestamp: {
     fontSize: 10,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
-    paddingRight: 34,
+    paddingRight: 0,
+    alignSelf: 'flex-end',
   },
   inputBar: {
     flexDirection: 'row',

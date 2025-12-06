@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { SafeScrollView } from '../components';
 import { Header, ExplorerBadge } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { getTokenIcon } from '../constants/tokenMeta';
+import { useTranslation } from 'react-i18next';
 
 export interface TransactionDetails {
   id: string;
@@ -34,9 +35,8 @@ export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> =
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <Header title={t('screens.transactionDetails.title')} onBackPress={goBack} showBackButton />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardGroup}>
           <InfoCard label={t('screens.transactionDetails.from')} value={details.from} />
           <InfoCard label={t('screens.transactionDetails.to')} value={details.to} />
@@ -62,13 +62,7 @@ export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> =
           style={styles.explorerBadge}
           labelStyle={styles.explorerLabel}
         />
-      </ScrollView>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -99,12 +93,9 @@ const DEFAULT_DETAILS: TransactionDetails = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   cardGroup: {
     gap: 12,
@@ -143,20 +134,7 @@ const styles = StyleSheet.create({
     color: '#683AB5',
     fontSize: 15,
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 
 

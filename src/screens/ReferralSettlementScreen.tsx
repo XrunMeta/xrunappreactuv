@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, ReferralStatsCard, SegmentedControl } from '../components';
+import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { COLORS, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG } from '../constants';
 import { getSettlementList, getSettlementAmount } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent } from '../utils';
@@ -211,7 +210,7 @@ export const ReferralSettlementScreen = () => {
 
   const renderSettlementItem = ({ item }: { item: TransformedSettlementData }) => {
     return (
-      <View style={styles.listItem}>
+      <SafeView style={styles.listItem}>
         <View style={styles.listItemRow}>
           <Text style={styles.refTypeText}>{item.type}</Text>
           <Text style={styles.dateText}>{item.date}</Text>
@@ -226,13 +225,12 @@ export const ReferralSettlementScreen = () => {
           </Text>
           <Text style={styles.amountText}>{item.amount}</Text>
         </View>
-      </View>
+      </SafeView>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.referralSettlement.title')} />
       <View style={styles.content}>
         <View style={styles.wrapper}>
@@ -283,7 +281,7 @@ export const ReferralSettlementScreen = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
@@ -294,14 +292,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    ...COMMON_STYLES.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',
