@@ -24,11 +24,11 @@ const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
   const v_2deff5 = v_8c0b26.txID ? String(v_8c0b26.txID) : null;
   const v_3b701b = String(v_8c0b26.item);
 
-  const v_6c35f6 = v_080197 
-    ? `storage_${v_080197}_idx_${v_a56041}` 
-    : v_2deff5 
-    ? `txID_${v_2deff5}_item_${v_3b701b}_idx_${v_a56041}` 
-    : `item_${v_3b701b}_idx_${v_a56041}`;
+  const v_6c35f6 = v_080197
+    ? `storage_${v_080197}_idx_${v_a56041}`
+    : v_2deff5
+      ? `txID_${v_2deff5}_item_${v_3b701b}_idx_${v_a56041}`
+      : `item_${v_3b701b}_idx_${v_a56041}`;
 
   return {
 
@@ -165,8 +165,8 @@ export const v_052a8a = () => {
     const v_6e55b1 = (v_8c0b26 as any)?.item;
     const v_9f1622 = v_8c0b26.title || '';
 
-    return v_6e55b1 === 1 || 
-      v_9f1622.includes('전송권') || 
+    return v_6e55b1 === 1 ||
+      v_9f1622.includes('전송권') ||
       v_9f1622.includes('Transfer ticket') ||
       v_9f1622.toLowerCase().includes('transfer');
   };
