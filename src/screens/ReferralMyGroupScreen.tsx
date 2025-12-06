@@ -5,7 +5,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581, v_570c34, v_556baf } from '../components';
-import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
@@ -194,23 +194,18 @@ export const v_58584a = () => {
         }
       />
       <View style={v_d81136.content}>
-        <View style={v_d81136.wrapper}>
-          <View style={v_d81136.topRow}>
-            <ReferralStatsCard
-              title={v_8d41d7('screens.referralMyGroup.myGroupMembers')}
-              value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
-              containerStyle={v_d81136.statsCardCenter}
-            />
-          </View>
+        <ReferralStatsCard
+          title={v_8d41d7('screens.referralMyGroup.myGroupMembers')}
+          value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
+        />
 
-          <SegmentedControl
-            options={v_1c4d31}
-            value="group"
-            onChange={v_c411e0}
-            containerStyle={v_d81136.segmented}
-            hideIndicator={true}
-          />
-        </View>
+        <SegmentedControl
+          options={v_1c4d31}
+          value="group"
+          onChange={v_c411e0}
+          containerStyle={v_d81136.segmented}
+          hideIndicator={true}
+        />
 
         <View style={v_d81136.listContainer}>
           {!v_cd31a8 && v_03be4c === 0 ? (
@@ -233,7 +228,7 @@ export const v_58584a = () => {
                 v_779227({ member: v_8c0b26.member, email: v_8c0b26.email, depth: 2 });
                 v_9b57fc(v_ce4741.referralDepthOne);
               }}
-              contentContainerStyle={{ ...v_d81136.listContent, paddingVertical: 0, paddingBottom: 32 }}
+              contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
             />
           )}
         </View>
@@ -245,22 +240,17 @@ export const v_58584a = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   content: {
+    flex: 1,
     ...v_a61db3.scrollContent,
+    paddingBottom: 0,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  segmented: {
+    marginVertical: v_9b1a04.large,
   },
-  topRow: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  statsCardCenter: {
-    justifyContent: 'center',
+  listContainer: {
+    flex: 1,
   },
   headerShareButton: {
     width: 36,
@@ -270,28 +260,14 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  segmented: {
-    marginTop: 0,
-    marginBottom: 0,
-  },
-  listContainer: {
+
+  loadingContainer: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0,
-  },
-  listContent: {
-    paddingTop: 0,
-    paddingBottom: 32,
+    justifyContent: 'center',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 60,
   },
   emptyTitle: {
     fontSize: 18,

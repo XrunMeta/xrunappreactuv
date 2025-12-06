@@ -1,10 +1,11 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_39a996, v_9cabcb } from 'rcmrninabrnb';
+import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04 } from '../constants';
 import { v_4a38fa, v_6a034c } from '../services';
 import { v_1cc79a } from '../types';
 
@@ -205,42 +206,40 @@ export const v_f57686 = () => {
   };
 
   return (
-    <SafeView style={v_d81136.container}>
+    <SafeView style={v_d81136.container}
+      showBottomBackground={true}
+      backgroundColor={"#f7f7fb"}>
       <Header title={v_8d41d7('screens.referralRank.title')} />
       <View style={v_d81136.content}>
-        <View style={v_d81136.wrapper}>
-          <View style={v_d81136.topRow}>
-            <ReferralStatsCard title="">
-              <View style={v_d81136.rankCardContent}>
-                <View style={v_d81136.rankLeft}>
-                  <Text style={v_d81136.rankHelper}>My Rank</Text>
-                  <Text style={v_d81136.rankEmail} numberOfLines={1} ellipsizeMode="tail">
-                    {v_f4fb5e}
-                  </Text>
-                </View>
-                <View style={v_d81136.rankDivider} />
-                <View style={v_d81136.rankRight}>
-                  <Text style={v_d81136.rankValue}>
-                    {v_ad21d1 !== '-'
-                      ? Number(v_ad21d1).toLocaleString('ko-KR', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                      })
-                      : v_ad21d1}
-                  </Text>
-                </View>
-              </View>
-            </ReferralStatsCard>
+        <ReferralStatsCard title="">
+          <View style={v_d81136.rankCardContent}>
+            <View style={v_d81136.rankLeft}>
+              <Text style={v_d81136.rankHelper}>My Rank</Text>
+              <Text style={v_d81136.rankEmail} numberOfLines={1} ellipsizeMode="tail">
+                {v_f4fb5e}
+              </Text>
+            </View>
+            <View style={v_d81136.rankDivider} />
+            <View style={v_d81136.rankRight}>
+              <Text style={v_d81136.rankValue}>
+                {v_ad21d1 !== '-'
+                  ? Number(v_ad21d1).toLocaleString('ko-KR', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                  })
+                  : v_ad21d1}
+              </Text>
+            </View>
           </View>
+        </ReferralStatsCard>
 
-          <SegmentedControl
-            options={v_1c4d31}
-            value="rank"
-            onChange={v_c411e0}
-            containerStyle={v_d81136.segmented}
-            hideIndicator={true}
-          />
-        </View>
+        <SegmentedControl
+          options={v_1c4d31}
+          value="rank"
+          onChange={v_c411e0}
+          containerStyle={v_d81136.segmented}
+          hideIndicator={true}
+        />
 
         <View style={v_d81136.listContainer}>
           {v_683210 ? (
@@ -266,7 +265,6 @@ export const v_f57686 = () => {
                 ) : null
               }
               scrollEnabled={true}
-              contentContainerStyle={v_d81136.listContent}
             />
           )}
         </View>
@@ -278,46 +276,27 @@ export const v_f57686 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f7fb',
   },
   content: {
     flex: 1,
     ...v_a61db3.scrollContent,
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  topRow: {
-    position: 'relative',
-    marginBottom: 16,
+    paddingBottom: 0,
   },
   segmented: {
-    marginTop: 0,
-    marginBottom: 0,
+    marginVertical: v_9b1a04.large,
   },
   listContainer: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0,
   },
-  listContent: {
-    paddingBottom: 32,
-  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
   },
   emptyText: {
     fontSize: 14,

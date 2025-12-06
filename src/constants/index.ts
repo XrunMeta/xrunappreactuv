@@ -81,6 +81,10 @@ export const v_a61db3 = {
     paddingHorizontal: v_9b1a04.xlarge,
     paddingVertical: v_9b1a04.xlarge,
   },
+  contentContainer: {
+    paddingHorizontal: v_9b1a04.xlarge,
+    paddingVertical: v_9b1a04.xlarge,
+  },
 };
 
 export const v_704d15 = {
