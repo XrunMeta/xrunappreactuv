@@ -148,6 +148,7 @@ export const v_f4f851 = () => {
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         <FormField
           label={v_8d41d7('screens.login.emailLabel')}
