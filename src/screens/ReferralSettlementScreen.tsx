@@ -1,10 +1,11 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { COLORS, COMMON_STYLES, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
 import { getSettlementList, getSettlementAmount } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent } from '../utils';
@@ -210,7 +211,7 @@ export const ReferralSettlementScreen = () => {
 
   const renderSettlementItem = ({ item }: { item: TransformedSettlementData }) => {
     return (
-      <SafeView style={styles.listItem}>
+      <View style={styles.listItem}>
         <View style={styles.listItemRow}>
           <Text style={styles.refTypeText}>{item.type}</Text>
           <Text style={styles.dateText}>{item.date}</Text>
@@ -225,32 +226,29 @@ export const ReferralSettlementScreen = () => {
           </Text>
           <Text style={styles.amountText}>{item.amount}</Text>
         </View>
-      </SafeView>
+      </View>
     );
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
+      <StatusBar style="dark" />
       <Header title={t('screens.referralSettlement.title')} />
       <View style={styles.content}>
-        <View style={styles.wrapper}>
-          <View style={styles.topRow}>
-            <ReferralStatsCard
-              title={t('screens.referralSettlement.income')}
-              subtitle={t('screens.referralSettlement.settlementIn45Days')}
-              value={totalRevenue}
-              helperText={totalRevenueWon}
-            />
-          </View>
+        <ReferralStatsCard
+          title={t('screens.referralSettlement.income')}
+          subtitle={t('screens.referralSettlement.settlementIn45Days')}
+          value={totalRevenue}
+          helperText={totalRevenueWon}
+        />
 
-          <SegmentedControl
-            options={segmentedOptions}
-            value="settlement"
-            onChange={handleSegmentChange}
-            containerStyle={styles.segmented}
-            hideIndicator={true}
-          />
-        </View>
+        <SegmentedControl
+          options={segmentedOptions}
+          value="settlement"
+          onChange={handleSegmentChange}
+          containerStyle={styles.segmented}
+          hideIndicator={true}
+        />
 
         <View style={styles.listContainer}>
           {loading ? (
@@ -276,7 +274,6 @@ export const ReferralSettlementScreen = () => {
                 ) : null
               }
               scrollEnabled={true}
-              contentContainerStyle={styles.listContent}
             />
           )}
         </View>
@@ -288,35 +285,17 @@ export const ReferralSettlementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  topRow: {
-    position: 'relative',
-    marginBottom: 16,
+    paddingBottom: 0,
   },
   segmented: {
-    marginTop: 0,
-    marginBottom: 0,
+    marginVertical: SIZES.large,
   },
   listContainer: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0,
-  },
-  listContent: {
-    paddingBottom: 32,
   },
   loadingContainer: {
     flex: 1,

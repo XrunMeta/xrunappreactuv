@@ -81,6 +81,10 @@ export const COMMON_STYLES = {
     paddingHorizontal: SIZES.xlarge,
     paddingVertical: SIZES.xlarge,
   },
+  contentContainer: {
+    paddingHorizontal: SIZES.xlarge,
+    paddingVertical: SIZES.xlarge,
+  },
 };
 
 export const LIST_STYLES = {

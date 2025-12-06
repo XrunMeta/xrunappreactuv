@@ -1,10 +1,11 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Text, ActivityIndicator, FlatList } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { COLORS, COMMON_STYLES, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
 import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
 
@@ -205,42 +206,40 @@ export const ReferralRankScreen = () => {
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container}
+      showBottomBackground={true}
+      backgroundColor={"#f7f7fb"}>
       <Header title={t('screens.referralRank.title')} />
       <View style={styles.content}>
-        <View style={styles.wrapper}>
-          <View style={styles.topRow}>
-            <ReferralStatsCard title="">
-              <View style={styles.rankCardContent}>
-                <View style={styles.rankLeft}>
-                  <Text style={styles.rankHelper}>My Rank</Text>
-                  <Text style={styles.rankEmail} numberOfLines={1} ellipsizeMode="tail">
-                    {userEmail}
-                  </Text>
-                </View>
-                <View style={styles.rankDivider} />
-                <View style={styles.rankRight}>
-                  <Text style={styles.rankValue}>
-                    {userRank !== '-'
-                      ? Number(userRank).toLocaleString('ko-KR', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                      })
-                      : userRank}
-                  </Text>
-                </View>
-              </View>
-            </ReferralStatsCard>
+        <ReferralStatsCard title="">
+          <View style={styles.rankCardContent}>
+            <View style={styles.rankLeft}>
+              <Text style={styles.rankHelper}>My Rank</Text>
+              <Text style={styles.rankEmail} numberOfLines={1} ellipsizeMode="tail">
+                {userEmail}
+              </Text>
+            </View>
+            <View style={styles.rankDivider} />
+            <View style={styles.rankRight}>
+              <Text style={styles.rankValue}>
+                {userRank !== '-'
+                  ? Number(userRank).toLocaleString('ko-KR', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                  })
+                  : userRank}
+              </Text>
+            </View>
           </View>
+        </ReferralStatsCard>
 
-          <SegmentedControl
-            options={segmentedOptions}
-            value="rank"
-            onChange={handleSegmentChange}
-            containerStyle={styles.segmented}
-            hideIndicator={true}
-          />
-        </View>
+        <SegmentedControl
+          options={segmentedOptions}
+          value="rank"
+          onChange={handleSegmentChange}
+          containerStyle={styles.segmented}
+          hideIndicator={true}
+        />
 
         <View style={styles.listContainer}>
           {loading ? (
@@ -266,7 +265,6 @@ export const ReferralRankScreen = () => {
                 ) : null
               }
               scrollEnabled={true}
-              contentContainerStyle={styles.listContent}
             />
           )}
         </View>
@@ -278,46 +276,27 @@ export const ReferralRankScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f7f7fb',
   },
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  topRow: {
-    position: 'relative',
-    marginBottom: 16,
+    paddingBottom: 0,
   },
   segmented: {
-    marginTop: 0,
-    marginBottom: 0,
+    marginVertical: SIZES.large,
   },
   listContainer: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0,
   },
-  listContent: {
-    paddingBottom: 32,
-  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
   },
   emptyText: {
     fontSize: 14,

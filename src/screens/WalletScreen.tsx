@@ -10,13 +10,12 @@ import {
   Image,
   Linking,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
-import { Header, WalletHeaderCard, DataList, AddTokenModal } from '../components';
-import { COLORS } from '../constants';
+import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView } from '../components';
+import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
@@ -646,8 +645,7 @@ export const WalletScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container}>
       <Header title={t('screens.wallet.title')} onBackPress={goBack} showBackButton />
       <View style={styles.content}>
         <View style={styles.headerCardWrapper}>
@@ -701,12 +699,6 @@ export const WalletScreen = () => {
         </View>
       </View>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
-
       <AddTokenModal
         modalVisible={modalVisible}
         closeModal={closeModal}
@@ -730,19 +722,17 @@ export const WalletScreen = () => {
         walletTokens={cardsData}
         customTokens={customTokens}
       />
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    ...COMMON_STYLES.scrollContent,
   },
   headerCardWrapper: {
     marginBottom: 0,
@@ -775,9 +765,6 @@ const styles = StyleSheet.create({
   },
   listWrapper: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
   },
   dataListContent: {
     paddingBottom: 32,
@@ -842,19 +829,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
   },
 });

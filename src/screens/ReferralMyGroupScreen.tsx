@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef, SafeScrollView, SafeView } from '../components';
-import { COLORS, COMMON_STYLES, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
@@ -194,23 +194,18 @@ export const ReferralMyGroupScreen = () => {
         }
       />
       <View style={styles.content}>
-        <View style={styles.wrapper}>
-          <View style={styles.topRow}>
-            <ReferralStatsCard
-              title={t('screens.referralMyGroup.myGroupMembers')}
-              value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
-              containerStyle={styles.statsCardCenter}
-            />
-          </View>
+        <ReferralStatsCard
+          title={t('screens.referralMyGroup.myGroupMembers')}
+          value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
+        />
 
-          <SegmentedControl
-            options={segmentedOptions}
-            value="group"
-            onChange={handleSegmentChange}
-            containerStyle={styles.segmented}
-            hideIndicator={true}
-          />
-        </View>
+        <SegmentedControl
+          options={segmentedOptions}
+          value="group"
+          onChange={handleSegmentChange}
+          containerStyle={styles.segmented}
+          hideIndicator={true}
+        />
 
         <View style={styles.listContainer}>
           {!isLoading && totalMembers === 0 ? (
@@ -233,7 +228,7 @@ export const ReferralMyGroupScreen = () => {
                 setSelectedReferralMember({ member: item.member, email: item.email, depth: 2 });
                 navigate(ROUTES.referralDepthOne);
               }}
-              contentContainerStyle={{ ...styles.listContent, paddingVertical: 0, paddingBottom: 32 }}
+              contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
             />
           )}
         </View>
@@ -245,22 +240,17 @@ export const ReferralMyGroupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   content: {
+    flex: 1,
     ...COMMON_STYLES.scrollContent,
+    paddingBottom: 0,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  segmented: {
+    marginVertical: SIZES.large,
   },
-  topRow: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  statsCardCenter: {
-    justifyContent: 'center',
+  listContainer: {
+    flex: 1,
   },
   headerShareButton: {
     width: 36,
@@ -270,28 +260,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  segmented: {
-    marginTop: 0,
-    marginBottom: 0,
-  },
-  listContainer: {
+
+  loadingContainer: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0,
-  },
-  listContent: {
-    paddingTop: 0,
-    paddingBottom: 32,
+    justifyContent: 'center',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 60,
   },
   emptyTitle: {
     fontSize: 18,
