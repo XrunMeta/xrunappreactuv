@@ -87,22 +87,9 @@ export const LoginSignupScreen = () => {
         </View>
 
         {}
-        {IS_DEV_MODE && (
-          <View style={styles.devLinksContainer}>
-            <Text style={styles.devLinksTitle}>🔗 개발 모드: 빠른 링크</Text>
-            <View style={styles.devLinksGrid}>
-              {quickLinks.map((link) => (
-                <TouchableOpacity
-                  key={link.route}
-                  style={styles.devLinkButton}
-                  onPress={() => navigate(link.route)}
-                >
-                  <Text style={styles.devLinkText}>{link.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
+        {
+
+}
       </SafeScrollView>
 
       {}
