@@ -24,11 +24,11 @@ const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any):
   const txIDStr = item.txID ? String(item.txID) : null;
   const itemStr = String(item.item);
 
-  const uniqueId = storageStr 
-    ? `storage_${storageStr}_idx_${index}` 
-    : txIDStr 
-    ? `txID_${txIDStr}_item_${itemStr}_idx_${index}` 
-    : `item_${itemStr}_idx_${index}`;
+  const uniqueId = storageStr
+    ? `storage_${storageStr}_idx_${index}`
+    : txIDStr
+      ? `txID_${txIDStr}_item_${itemStr}_idx_${index}`
+      : `item_${itemStr}_idx_${index}`;
 
   return {
 
@@ -165,8 +165,8 @@ export const ShopMyTicketScreen = () => {
     const itemId = (item as any)?.item;
     const title = item.title || '';
 
-    return itemId === 1 || 
-      title.includes('전송권') || 
+    return itemId === 1 ||
+      title.includes('전송권') ||
       title.includes('Transfer ticket') ||
       title.toLowerCase().includes('transfer');
   };
