@@ -1,11 +1,11 @@
 import v_a3453e, { v_5ab095 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_472849, v_19b633, v_4623af } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_10a69f } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -84,12 +84,12 @@ export const v_9e06f6 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoCloseMembership.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.inner}>
           <FormField
@@ -118,7 +118,7 @@ export const v_9e06f6 = () => {
             disabled={v_88dca2}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -126,18 +126,13 @@ export const v_9e06f6 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...v_704d15.small,
   },
   helperText: {
     marginTop: 8,
@@ -147,7 +142,7 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Regular',
   },
   bottomSection: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

@@ -1,11 +1,10 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_f16775, v_b34ce5 } from '../components';
+import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_1bfbd0, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
 import { v_b7594c, v_5bb1ab } from '../services';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d } from '../utils';
@@ -211,7 +210,7 @@ export const v_08aac3 = () => {
 
   const v_d24ee8 = ({ item: v_8c0b26 }: { item: TransformedSettlementData }) => {
     return (
-      <View style={v_d81136.listItem}>
+      <SafeView style={v_d81136.listItem}>
         <View style={v_d81136.listItemRow}>
           <Text style={v_d81136.refTypeText}>{v_8c0b26.type}</Text>
           <Text style={v_d81136.dateText}>{v_8c0b26.date}</Text>
@@ -226,13 +225,12 @@ export const v_08aac3 = () => {
           </Text>
           <Text style={v_d81136.amountText}>{v_8c0b26.amount}</Text>
         </View>
-      </View>
+      </SafeView>
     );
   };
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header title={v_8d41d7('screens.referralSettlement.title')} />
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
@@ -283,7 +281,7 @@ export const v_08aac3 = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
@@ -294,14 +292,12 @@ const v_d81136 = v_472849.create({
   },
   content: {
     flex: 1,
+    ...v_a61db3.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',

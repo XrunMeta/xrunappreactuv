@@ -34,3 +34,6 @@ export { TaboolaBannerCore } from './TaboolaBannerCore';
 export { TaboolaVignette } from './TaboolaVignette';
 export { TaboolaNativeView } from './TaboolaNativeView';
 export { isTaboolaNativeViewAvailable } from './TaboolaNativeView';
+export { default as SafeView } from './SafeView';
+export { default as SafeScrollView } from './SafeScrollView';
+export type { SafeScrollViewProps } from './SafeScrollView';

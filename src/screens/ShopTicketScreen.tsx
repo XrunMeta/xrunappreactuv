@@ -1,6 +1,6 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_79c4f2, v_07a341, v_39a996, v_19b633 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_472849, v_79c4f2, v_07a341, v_39a996, v_19b633 } from 'rcmrninabrnb';
+import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -13,7 +13,7 @@ import { v_dd87bc, v_81c40d } from '../services';
 import { v_20035e } from '../types';
 import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 
 const v_3e6a6a = (
   item: v_20035e,
@@ -347,8 +347,7 @@ export const v_38326c = () => {
   );
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header title={v_8d41d7('screens.shop.title')} />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
@@ -356,50 +355,53 @@ export const v_38326c = () => {
         </View>
       ) : (
         <>
-          <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-            <View style={v_d81136.wrapper}>
-              <SegmentedControl
-                options={v_1c4d31}
-                value={v_11083e}
-                onChange={v_42b5ed}
-                containerStyle={v_d81136.segmented}
-                hideIndicator={true}
+          <SafeScrollView
+            contentContainerStyle={v_d81136.scrollContent}
+            showsVerticalScrollIndicator={false}
+            showBottomBackground={false}
+          >
+
+            <SegmentedControl
+              options={v_1c4d31}
+              value={v_11083e}
+              onChange={v_42b5ed}
+              containerStyle={v_d81136.segmented}
+              hideIndicator={true}
+            />
+
+            <View style={v_d81136.searchBar}>
+              <Feather name="search" size={18} color="#bcbec4" />
+              <TextInput
+                style={v_d81136.searchInput}
+                placeholder="Search"
+                placeholderTextColor="#bcbec4"
               />
-
-              <View style={v_d81136.searchBar}>
-                <Feather name="search" size={18} color="#bcbec4" />
-                <TextInput
-                  style={v_d81136.searchInput}
-                  placeholder="Search"
-                  placeholderTextColor="#bcbec4"
-                />
-              </View>
-
-              {v_11083e === 'ticket' && v_b1c029.length > 0
-                ? v_b1c029.map((v_8c0b26) => {
-
-                    const v_63070e = v_f9a2c9[v_8c0b26.id];
-                    const v_c322f7 = v_63070e
-                      ? { uri: `data:image/png;base64,${v_63070e}` }
-                      : v_8c0b26.image;
-
-                    const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
-                    const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                    const v_e72b09 = v_d6cf14
-                      ? (v_817eee || 'Loading...')
-                      : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
-
-                    return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
-                  })
-                : v_11083e === 'ticket' && v_b1c029.length === 0
-                ? (
-                    <View style={v_d81136.emptyContainer}>
-                      <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                    </View>
-                  )
-                : null}
             </View>
-          </ScrollView>
+
+            {v_11083e === 'ticket' && v_b1c029.length > 0
+              ? v_b1c029.map((v_8c0b26) => {
+
+                const v_63070e = v_f9a2c9[v_8c0b26.id];
+                const v_c322f7 = v_63070e
+                  ? { uri: `data:image/png;base64,${v_63070e}` }
+                  : v_8c0b26.image;
+
+                const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+                const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
+                const v_e72b09 = v_d6cf14
+                  ? (v_817eee || 'Loading...')
+                  : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
+
+                return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
+              })
+              : v_11083e === 'ticket' && v_b1c029.length === 0
+                ? (
+                  <View style={v_d81136.emptyContainer}>
+                    <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                  </View>
+                )
+                : null}
+          </SafeScrollView>
 
           {}
           <View style={v_d81136.taboolaContainer}>
@@ -407,14 +409,13 @@ export const v_38326c = () => {
           </View>
         </>
       )}
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   loadingContainer: {
     flex: 1,
@@ -422,16 +423,10 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingBottom: 40,
     flexGrow: 1,
+    ...v_a61db3.scrollContent,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
+
   segmented: {
     marginBottom: 20,
   },
@@ -463,10 +458,8 @@ const v_d81136 = v_472849.create({
     color: '#7d7e83',
   },
   taboolaContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#d5dde0',
+    marginTop: 10,
   },
 });

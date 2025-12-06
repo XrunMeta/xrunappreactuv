@@ -2,17 +2,15 @@ import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
-  v_122070,
   v_19b633,
   v_4623af,
   v_39a996,
   v_9cabcb,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1 } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1, v_570c34 } from '../components';
+import { v_1bfbd0, v_a61db3, v_9b1a04, v_bae512 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -387,7 +385,6 @@ export const v_cdb169 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header
         title={v_8d41d7('screens.myInfoEdit.title')}
         onBackPress={() => {
@@ -399,31 +396,37 @@ export const v_cdb169 = () => {
         }}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         {v_cd31a8 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
           </View>
         ) : (
-        <View style={v_d81136.formWrapper}>
-          <FormField
-            label={v_8d41d7('screens.myInfoEdit.firstName')}
-            value={v_a32a50}
-            onChangeText={v_4944f5}
-            placeholder={v_8d41d7('screens.myInfoEdit.firstNamePlaceholder')}
+          <View style={v_d81136.formFieldContainer}>
+
+            <FormField
+              label={v_8d41d7('screens.myInfoEdit.firstName')}
+              value={v_a32a50}
+              onChangeText={v_4944f5}
+              placeholder={v_8d41d7('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!v_e495db}
-          />
-          <FormField
-            label={v_8d41d7('screens.myInfoEdit.lastName')}
-            value={v_328bb4}
-            onChangeText={v_b7613d}
-            placeholder={v_8d41d7('screens.myInfoEdit.lastNamePlaceholder')}
+              containerStyle={v_d81136.fieldContainer}
+            />
+
+            <FormField
+              label={v_8d41d7('screens.myInfoEdit.lastName')}
+              value={v_328bb4}
+              onChangeText={v_b7613d}
+              placeholder={v_8d41d7('screens.myInfoEdit.lastNamePlaceholder')}
               editable={!v_e495db}
-          />
+              containerStyle={v_d81136.fieldContainer}
+            />
+
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.email')}</Text>
               <View style={v_d81136.disabledInput}>
@@ -431,19 +434,21 @@ export const v_cdb169 = () => {
               </View>
             </View>
 
-          <View style={v_d81136.inlineLabelRow}>
-            <Text style={v_d81136.sectionLabel}>Password</Text>
-            <TouchableOpacity onPress={v_c09605}>
-              <Text style={v_d81136.linkText}>Change Password</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={v_d81136.readonlyInput}>
-            <Text style={v_d81136.readonlyText}>
-              {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
-            </Text>
-          </View>
-
             <View style={v_d81136.fieldContainer}>
+              <View style={v_d81136.inlineLabelRow}>
+                <Text style={v_d81136.sectionLabel}>Password</Text>
+                <TouchableOpacity onPress={v_c09605}>
+                  <Text style={v_d81136.linkText}>Change Password</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={v_d81136.readonlyInput}>
+                <Text style={v_d81136.readonlyText}>
+                  {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+                </Text>
+              </View>
+            </View>
+
+            <View style={v_d81136.fieldContainer} >
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.phone')}</Text>
               <View style={v_d81136.phoneFieldContainer}>
                 {}
@@ -454,14 +459,14 @@ export const v_cdb169 = () => {
                   </Text>
                 </View>
                 {}
-              <TouchableOpacity
+                <TouchableOpacity
                   style={v_d81136.phoneValueContainer}
                   onPress={v_801fea}
-                activeOpacity={0.7}
+                  activeOpacity={0.7}
                   disabled={v_e495db}
-              >
+                >
                   <Text style={v_d81136.phoneValue}>{v_d74a81}</Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -474,9 +479,9 @@ export const v_cdb169 = () => {
                 disabled={v_e495db}
               >
                 <Text style={[v_d81136.regionValue, !v_add96c.cDesc && v_d81136.regionPlaceholder]}>
-                  {v_add96c.cDesc 
-                    ? `${v_add96c.cDesc} (+${v_add96c.cCode})` 
-                    : v_459d5e 
+                  {v_add96c.cDesc
+                    ? `${v_add96c.cDesc} (+${v_add96c.cCode})`
+                    : v_459d5e
                       ? `${v_459d5e.name} (${v_459d5e.dialCode})`
                       : '국가를 선택하세요'}
                 </Text>
@@ -484,44 +489,39 @@ export const v_cdb169 = () => {
               </TouchableOpacity>
             </View>
 
-          <View style={v_d81136.formGroup}>
-            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.gender')}</Text>
-            <View style={v_d81136.inlineOptions}>
-              {v_798085.map((v_0bd920) => (
-                <OptionButton
-                  key={v_0bd920.value}
-                  label={v_0bd920.label}
-                  selected={v_c3eac4 === v_0bd920.value}
-                  onPress={() => v_bdc43c(v_0bd920.value)}
-                    disabled={v_e495db}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View style={v_d81136.formGroup}>
-            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.age')}</Text>
-            <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
-              {v_0c96f7.map((v_0bd920, v_a56041) => {
-                const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
-                return (
+            <View style={v_d81136.fieldContainer}>
+              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.gender')}</Text>
+              <View style={v_d81136.inlineOptions}>
+                {v_798085.map((v_0bd920) => (
                   <OptionButton
-                    key={v_0bd920}
-                    label={v_0bd920}
-                    selected={v_2694bd === v_0bd920}
-                    onPress={() => v_6e5c76(v_0bd920)}
-                    flex={1}
-                      disabled={v_e495db}
-                    style={[
-                      v_d81136.ageOptionButton,
-                      !v_0d0d82 && v_d81136.ageOptionSpacing,
-                    ]}
+                    key={v_0bd920.value}
+                    label={v_0bd920.label}
+                    selected={v_c3eac4 === v_0bd920.value}
+                    onPress={() => v_bdc43c(v_0bd920.value)}
+                    disabled={v_e495db}
                   />
-                );
-              })}
+                ))}
+              </View>
+            </View>
+
+            <View style={v_d81136.fieldContainer}>
+              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.age')}</Text>
+              <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
+                {v_0c96f7.map((v_0bd920, v_a56041) => {
+                  return (
+                    <OptionButton
+                      key={v_0bd920}
+                      label={v_0bd920}
+                      selected={v_2694bd === v_0bd920}
+                      onPress={() => v_6e5c76(v_0bd920)}
+                      flex={1}
+                      disabled={v_e495db}
+                    />
+                  );
+                })}
+              </View>
             </View>
           </View>
-        </View>
         )}
 
         <View style={v_d81136.bottomSection}>
@@ -530,16 +530,16 @@ export const v_cdb169 = () => {
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             </View>
           ) : (
-          <PrimaryButton
-            title={v_8d41d7('screens.myInfoEdit.save')}
-            fullWidth
-            onPress={v_1b8283}
-            style={v_d81136.primaryButton}
+            <PrimaryButton
+              title={v_8d41d7('screens.myInfoEdit.save')}
+              fullWidth
+              onPress={v_1b8283}
+              style={v_d81136.primaryButton}
               disabled={v_cd31a8}
-          />
+            />
           )}
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
     </View>
   );
@@ -556,10 +556,8 @@ const v_d81136 = v_472849.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  formFieldContainer: {
+    ...v_bae512.fieldContainer,
   },
   inlineLabelRow: {
     flexDirection: 'row',
@@ -583,8 +581,8 @@ const v_d81136 = v_472849.create({
     borderRadius: 10,
     backgroundColor: '#fefefe',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 24,
+    minHeight: 52, 
+    justifyContent: 'center',
   },
   readonlyText: {
     fontSize: 13,
@@ -598,14 +596,15 @@ const v_d81136 = v_472849.create({
     borderColor: '#dedede',
     borderRadius: 10,
     backgroundColor: '#fefefe',
-    minHeight: 52,
+    minHeight: 52, 
     overflow: 'hidden',
   },
   phonePrefixDisabled: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    minHeight: 52, 
+    justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#ededed',
     backgroundColor: '#f5f5f5',
@@ -622,7 +621,7 @@ const v_d81136 = v_472849.create({
   phoneValueContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    minHeight: 52, 
     justifyContent: 'center',
   },
   phoneValue: {
@@ -630,13 +629,12 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
-  formGroup: {
-    marginTop: 24,
-  },
   inlineOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
+    flexWrap: 'nowrap',
+    justifyContent: 'flex-start',
+    gap: 8,
+    width: '100%',
   },
   ageOptionsRow: {
     flexWrap: 'nowrap',
@@ -650,7 +648,8 @@ const v_d81136 = v_472849.create({
     marginRight: 8,
   },
   bottomSection: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
+    marginTop: v_9b1a04.large,
   },
   primaryButton: {
     width: '100%',
@@ -668,7 +667,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   fieldContainer: {
-    marginBottom: 24,
+    borderWidth: 0,
   },
   label: {
     fontSize: 16,
@@ -687,7 +686,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 16,
     minHeight: 56,
   },
-  phoneValue: {
+  phoneValueText: {
     flex: 1,
     fontSize: 16,
     fontFamily: 'Roboto-Regular',
@@ -712,8 +711,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    minHeight: 56,
+    minHeight: 52, 
   },
   regionValue: {
     flex: 1,
@@ -772,8 +770,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 10,
     backgroundColor: '#f5f5f5',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    minHeight: 56,
+    minHeight: 52, 
     justifyContent: 'center',
   },
   disabledText: {

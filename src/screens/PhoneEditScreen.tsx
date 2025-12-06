@@ -2,14 +2,13 @@ import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
-  v_122070,
   v_19b633,
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_570c34 } from '../components';
 import { v_729608, v_368e80, v_cb41de } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -107,16 +106,16 @@ export const v_e14579 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header
         title={v_8d41d7('screens.phoneEdit.title')}
         onBackPress={v_7e32fb ? v_c7ac57 : () => v_487a25(v_ce4741.myInfoEdit)}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.formWrapper}>
           <FormField
@@ -154,7 +153,7 @@ export const v_e14579 = () => {
             />
           )}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };

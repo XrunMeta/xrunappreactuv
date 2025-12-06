@@ -2,6 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696 } from 'rcmrninabrnb';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
+import { v_ee0c5a } from '../hooks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
@@ -21,6 +22,8 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 }) => {
   const { goBack: v_c7ac57, reset: v_487a25, canGoBack: v_7e32fb, currentScreen: v_0f0c7b } = v_a0daa8();
   const v_e2510f = v_9c4d53;
+
+  const { topPadding: v_a3707d, headerHeight: v_1e0e1c } = v_ee0c5a();
 
   const v_648e0d = () => {
     if (v_f442f6) {
@@ -58,7 +61,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
     );
 
   return (
-    <View style={v_d81136.container}>
+    <View style={[v_d81136.container, { height: v_1e0e1c + 10, paddingTop: v_a3707d }]}>
       <View style={v_d81136.content}>
         {v_91b7e0()}
         <View style={v_d81136.titleWrapper} pointerEvents="none">
@@ -67,7 +70,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
         {v_52c3cc ? (
           <View style={v_d81136.rightComponent}>{v_52c3cc}</View>
         ) : (
-        <View style={v_d81136.backButtonPlaceholder} />
+          <View style={v_d81136.backButtonPlaceholder} />
         )}
       </View>
     </View>
@@ -76,20 +79,19 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
 const v_d81136 = v_472849.create({
   container: {
-    height: 96,
     width: v_8e4fb6,
-    marginTop:10,
-    paddingTop: 44,
+
     backgroundColor: v_1bfbd0.background,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 2,
     },
-    shadowOpacity: 0.09,
-    shadowRadius: 3,
-    elevation: 3, 
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5, 
     justifyContent: 'center',
+    zIndex: 10, 
   },
   content: {
     flexDirection: 'row',
@@ -101,7 +103,7 @@ const v_d81136 = v_472849.create({
   backButton: {
     width: 40,
     height: 40,
-    backgroundColor: 'transparent',
+    backgroundColor: v_1bfbd0.headerIconBg,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,14 +1,14 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_fb1936 } from '../services';
 import { v_b0f886 } from '../types';
+import { v_556baf } from '../components';
 
 interface MemberData {
   id: string;
@@ -133,12 +133,11 @@ export const v_5b4c5a = () => {
   const { t: v_8d41d7 } = v_772971();
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
-      <Header 
-        title={`${v_8d41d7('screens.referralDepthOne.title')} ${v_c09f1f}`} 
-        onBackPress={v_c7ac57} 
-        showBackButton 
+    <SafeView style={v_d81136.container}>
+      <Header
+        title={`${v_8d41d7('screens.referralDepthOne.title')} ${v_c09f1f}`}
+        onBackPress={v_c7ac57}
+        showBackButton
       />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
@@ -160,20 +159,17 @@ export const v_5b4c5a = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
+    ...v_a61db3.scrollContent,
   },
   emptyContainer: {
     flex: 1,

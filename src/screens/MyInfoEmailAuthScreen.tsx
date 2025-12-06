@@ -2,13 +2,12 @@ import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
-  v_122070,
   v_4623af,
   v_19b633,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_368e80 } from '../components';
+import { v_729608, v_368e80, v_570c34 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -77,7 +76,7 @@ export const v_dec378 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoEmailAuth.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -107,7 +106,7 @@ export const v_dec378 = () => {
           />
         </View>
 
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };

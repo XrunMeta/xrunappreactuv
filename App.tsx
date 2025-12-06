@@ -65,6 +65,7 @@ import {
   v_567640,
 } from 'duafkibkrsnlsywaptcqakgas';
 import { v_b2c639 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
+import { v_b5df25 } from 'ernurodqvmtspux';
 
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
@@ -392,6 +393,7 @@ export default function v_6540c3() {
   if (!v_43f571 || v_cd31a8) {
     return (
       <SafeAreaProvider>
+        <StatusBar style="dark" />
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
@@ -406,6 +408,7 @@ export default function v_6540c3() {
 
   return (
     <SafeAreaProvider>
+      <StatusBar style="dark" />
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>

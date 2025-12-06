@@ -76,13 +76,47 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
     );
   }
 
-  const v_6d4549 = v_0433f6(
+  let v_6d4549 = v_0433f6(
     v_26f42c,
     v_74a79c.placement,
     v_74a79c.mode,
     v_40f839,
     v_74a79c.pageType,
     v_74a79c.targetType,
+  );
+
+  v_6d4549 = v_6d4549.replace(
+    /#taboola-container\s*\{[^}]*\}/,
+    `#taboola-container {
+      width: 100%;
+      height: 80px;
+      min-height: 80px;
+      max-height: 80px;
+      overflow: hidden;
+    }`
+  );
+
+  v_6d4549 = v_6d4549.replace(
+    /body\s*\{[^}]*\}/,
+    `body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 80px;
+    }`
+  );
+
+  v_6d4549 = v_6d4549.replace(
+    /<style>/,
+    `<style>
+    html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 80px;
+    }`
   );
 
   const v_24913e = `
@@ -184,7 +218,7 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
       <WebView
         source={{ html: v_6d4549 }}
         style={v_d81136.webView}
-        scrollEnabled={true}
+        scrollEnabled={false}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         javaScriptEnabled={true}
@@ -298,15 +332,13 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
 const v_d81136 = v_472849.create({
   container: {
     width: '100%',
-    minHeight: 80,
-    backgroundColor: 'transparent', 
-    marginVertical: v_9b1a04.small, 
+    height: 80,
     marginHorizontal: 0, 
   },
   webView: {
     width: '100%',
-    minHeight: 80,
-    backgroundColor: 'transparent',
+    height: 80,
+    backgroundColor: '#ffffff',
   },
 });
 

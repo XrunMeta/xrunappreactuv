@@ -1,8 +1,10 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_472849, v_122070 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_814266 } from '../components';
+import { v_a61db3, v_9b1a04 } from '../constants';
 
 const v_18b8bf = Array.from({ length: 7 }, (v_37eab7, v_a56041) => ({
   rank: v_a56041 === 0 ? 2 : 1,
@@ -17,7 +19,7 @@ export const v_8c15c4 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.referralDepthTwo.title')} />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
           {v_18b8bf.map((v_3ac7e7, v_a56041) => (
             <ReferralMemberRow
@@ -29,7 +31,7 @@ export const v_8c15c4 = () => {
             />
           ))}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -37,17 +39,12 @@ export const v_8c15c4 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...v_a61db3.scrollContent,
   },
   wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingVertical: v_9b1a04.small,
   },
 });
 

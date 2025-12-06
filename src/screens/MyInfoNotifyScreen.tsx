@@ -3,7 +3,6 @@ import {
   v_3094a2,
   v_19b633,
   v_472849,
-  v_122070,
   v_cf9c33,
   v_4623af,
   v_79c4f2,
@@ -13,14 +12,15 @@ import {
   v_39a996,
   v_6c4f62,
   v_0e1f26,
+  v_122070,
 } from 'rcmrninabrnb';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608 } from '../components';
+import { v_729608, v_570c34 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import {
   v_ab08d0,
@@ -274,7 +274,7 @@ export const v_386af2 = () => {
             >
               <Text style={v_d81136.replyText}>{v_b9faeb.title}</Text>
             </TouchableOpacity>
-            <Image source={v_01b6c9} style={v_d81136.userAvatar} />
+            {}
           </View>
           <Text style={v_d81136.replyTimestamp}>{v_9f6fdd(v_b9faeb.datetime)}</Text>
         </View>
@@ -292,7 +292,7 @@ export const v_386af2 = () => {
           {}
           {v_b9faeb.contents !== null && v_b9faeb.type !== 9303 && (
             <View>
-              <Text 
+              <Text
                 style={v_d81136.description}
                 numberOfLines={v_d37866 ? 3 : undefined}
                 ellipsizeMode="tail"
@@ -307,7 +307,7 @@ export const v_386af2 = () => {
               {}
               {}
               {v_d37866 && (
-                  <TouchableOpacity
+                <TouchableOpacity
                   style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={async () => {
                     const v_f71b56 = `https://oth-path-51a04e.example.invalid/oth-path?id=${v_b9faeb.board}`;
@@ -413,17 +413,17 @@ export const v_386af2 = () => {
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
           </View>
         ) : (
-          <ScrollView
+          <SafeScrollView
             ref={v_e99f51}
             style={v_d81136.list}
+            backgroundColor={'#f2f2f7'}
             contentContainerStyle={v_d81136.listContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={v_11b765}
             onScrollBeginDrag={v_397f64}
-            refreshControl={
-              <RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />
-            }
+            refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
+            showBottomBackground={false}
           >
             {v_b9c00c.length === 0 ? (
               <View style={v_d81136.emptyContainer}>
@@ -432,7 +432,7 @@ export const v_386af2 = () => {
             ) : (
               v_718f6b()
             )}
-          </ScrollView>
+          </SafeScrollView>
         )}
 
         <View
@@ -467,7 +467,7 @@ export const v_386af2 = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 };
 
@@ -483,7 +483,7 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: v_9b1a04.small,
     paddingTop: 24,
     paddingBottom: 0,
     gap: 24,
@@ -582,9 +582,10 @@ const v_d81136 = v_472849.create({
     color: '#000',
   },
   replyWrapper: {
-    alignItems: 'flex-end',
+    alignSelf: 'flex-end',
     gap: 6,
     marginBottom: 16,
+    maxWidth: '95%',
   },
   replyRow: {
     flexDirection: 'row',
@@ -603,17 +604,13 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
-  userAvatar: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignSelf: 'center',
-  },
+
   replyTimestamp: {
     fontSize: 10,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
-    paddingRight: 34,
+    paddingRight: 0,
+    alignSelf: 'flex-end',
   },
   inputBar: {
     flexDirection: 'row',

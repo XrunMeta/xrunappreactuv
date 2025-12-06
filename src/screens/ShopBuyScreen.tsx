@@ -1,6 +1,6 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_19b633, v_4623af, v_f2c756, v_cf9c33, v_07a341, v_39a996 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_f2c756, v_cf9c33, v_07a341, v_39a996 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
@@ -10,7 +10,7 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_20035e } from '../types';
 import { v_54d016, v_9c9f1b } from '../services';
 import { v_89f939, v_35c0e0 } from '../utils';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -90,7 +90,7 @@ export const v_1a0a02 = () => {
     v_72727b(true);
 
     try {
-      const v_8c0b26 = v_dfe883 as v_20035e & { totalPrice?: { coin?: number } };
+      const v_8c0b26 = (v_dfe883 as unknown) as v_20035e & { totalPrice?: { coin?: number } };
       const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
 
       if (v_d6cf14) {
@@ -162,7 +162,7 @@ export const v_1a0a02 = () => {
     return null;
   }
 
-  const v_8c0b26 = v_dfe883 as v_20035e & {
+  const v_8c0b26 = (v_dfe883 as unknown) as v_20035e & {
     totalPrice?: { coin?: number; gtkrPrice?: number };
     price?: { won?: string; coin?: number };
     charge?: { won?: number; coin?: number };
@@ -184,112 +184,109 @@ export const v_1a0a02 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.shop.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={v_d81136.wrapper}>
-          <View style={v_d81136.detailCard}>
-            <Image source={v_c322f7} style={v_d81136.itemImage} resizeMode="contain" />
-            <Text style={v_d81136.itemTitle}>{v_8c0b26.title || ''}</Text>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={v_d81136.detailCard}>
+          <Image source={v_c322f7} style={v_d81136.itemImage} resizeMode="contain" />
+          <Text style={v_d81136.itemTitle}>{v_8c0b26.title || ''}</Text>
 
-            {v_8c0b26.description && (
-              <Text style={v_d81136.description}>{v_8c0b26.description}</Text>
-            )}
+          {v_8c0b26.description && (
+            <Text style={v_d81136.description}>{v_8c0b26.description}</Text>
+          )}
 
-            {v_8c0b26.website && (
-              <TouchableOpacity onPress={() => v_f2c756.openURL(v_8c0b26.website).catch(() => {})}>
-                <Text style={v_d81136.link}>{v_8c0b26.website}</Text>
-              </TouchableOpacity>
-            )}
+          {v_8c0b26.website && (
+            <TouchableOpacity onPress={() => v_f2c756.openURL(v_8c0b26.website).catch(() => { })}>
+              <Text style={v_d81136.link}>{v_8c0b26.website}</Text>
+            </TouchableOpacity>
+          )}
 
-            <View style={v_d81136.priceContainer}>
-              {v_d6cf14 ? (
+          <View style={v_d81136.priceContainer}>
+            {v_d6cf14 ? (
 
+              <View style={v_d81136.row}>
+                <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
+                <Text style={v_d81136.value}>{v_8d41d7('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
+              </View>
+            ) : (
+
+              <>
                 <View style={v_d81136.row}>
                   <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
-                  <Text style={v_d81136.value}>{v_8d41d7('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
+                  <Text style={v_d81136.value}>
+                    {v_89f939(v_1c86a8, 'KRW')} / {v_35c0e0(v_318e8b)} XRUN
+                  </Text>
                 </View>
-              ) : (
 
-                <>
+                <View style={v_d81136.row}>
+                  <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.fee')}</Text>
+                  <Text style={v_d81136.value}>
+                    {v_89f939(v_63e5c7, 'KRW')} / {v_35c0e0(v_cd7bfc)} XRUN
+                  </Text>
+                </View>
+
+                <View style={v_d81136.divider} />
+
+                <View style={v_d81136.row}>
+                  <Text style={[v_d81136.label, v_d81136.totalLabel]}>{v_8d41d7('screens.shopBuy.total')}</Text>
+                  <Text style={[v_d81136.value, v_d81136.totalValue]}>
+                    {v_35c0e0(v_6a3b90)} XRUN
+                  </Text>
+                </View>
+
+                <View style={v_d81136.balanceInfo}>
                   <View style={v_d81136.row}>
-                    <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
-                    <Text style={v_d81136.value}>
-                      {v_89f939(v_1c86a8, 'KRW')} / {v_35c0e0(v_318e8b)} XRUN
+                    <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.myBalance')}</Text>
+                    <Text
+                      style={[
+                        v_d81136.value,
+                        v_1ee1c8 ? v_d81136.insufficientBalance : v_d81136.sufficientBalance,
+                      ]}
+                    >
+                      {v_8dbb06 ? (
+                        v_8d41d7('screens.shopBuy.checking')
+                      ) : v_bc3e72 !== null ? (
+                        v_35c0e0(v_bc3e72) + ' XRUN'
+                      ) : (
+                        v_8d41d7('screens.shopBuy.checkFailed')
+                      )}
                     </Text>
                   </View>
-
-                  <View style={v_d81136.row}>
-                    <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.fee')}</Text>
-                    <Text style={v_d81136.value}>
-                      {v_89f939(v_63e5c7, 'KRW')} / {v_35c0e0(v_cd7bfc)} XRUN
+                  {v_1ee1c8 && (
+                    <Text style={v_d81136.insufficientBalanceText}>
+                      {v_8d41d7('screens.shopBuy.insufficientBalance')}
                     </Text>
-                  </View>
-
-                  <View style={v_d81136.divider} />
-
-                  <View style={v_d81136.row}>
-                    <Text style={[v_d81136.label, v_d81136.totalLabel]}>{v_8d41d7('screens.shopBuy.total')}</Text>
-                    <Text style={[v_d81136.value, v_d81136.totalValue]}>
-                      {v_35c0e0(v_6a3b90)} XRUN
-                    </Text>
-                  </View>
-
-                  <View style={v_d81136.balanceInfo}>
-                    <View style={v_d81136.row}>
-                      <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.myBalance')}</Text>
-                      <Text
-                        style={[
-                          v_d81136.value,
-                          v_1ee1c8 ? v_d81136.insufficientBalance : v_d81136.sufficientBalance,
-                        ]}
-                      >
-                        {v_8dbb06 ? (
-                          v_8d41d7('screens.shopBuy.checking')
-                        ) : v_bc3e72 !== null ? (
-                          v_35c0e0(v_bc3e72) + ' XRUN'
-                        ) : (
-                          v_8d41d7('screens.shopBuy.checkFailed')
-                        )}
-                      </Text>
-                    </View>
-                    {v_1ee1c8 && (
-                      <Text style={v_d81136.insufficientBalanceText}>
-                        {v_8d41d7('screens.shopBuy.insufficientBalance')}
-                      </Text>
-                    )}
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-
-          <View style={v_d81136.actions}>
-            <TouchableOpacity
-              style={[v_d81136.button, v_d81136.cancelButton]}
-              onPress={v_c7ac57}
-              disabled={v_d4bdc8}
-            >
-              <Text style={v_d81136.cancelText}>{v_8d41d7('screens.shopBuy.cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                v_d81136.button,
-                v_d81136.primaryButton,
-                (v_d4bdc8 || v_1ee1c8) && v_d81136.disabledButton,
-              ]}
-              onPress={v_dfaad1}
-              disabled={v_d4bdc8 || v_1ee1c8}
-            >
-              {v_d4bdc8 ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={v_d81136.primaryText}>{v_8d41d7('screens.shopBuy.payment')}</Text>
-              )}
-            </TouchableOpacity>
+                  )}
+                </View>
+              </>
+            )}
           </View>
         </View>
-      </ScrollView>
+
+        <View style={v_d81136.actions}>
+          <TouchableOpacity
+            style={[v_d81136.button, v_d81136.cancelButton]}
+            onPress={v_c7ac57}
+            disabled={v_d4bdc8}
+          >
+            <Text style={v_d81136.cancelText}>{v_8d41d7('screens.shopBuy.cancel')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              v_d81136.button,
+              v_d81136.primaryButton,
+              (v_d4bdc8 || v_1ee1c8) && v_d81136.disabledButton,
+            ]}
+            onPress={v_dfaad1}
+            disabled={v_d4bdc8 || v_1ee1c8}
+          >
+            {v_d4bdc8 ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={v_d81136.primaryText}>{v_8d41d7('screens.shopBuy.payment')}</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </SafeScrollView>
     </View>
   );
 };
@@ -297,18 +294,11 @@ export const v_1a0a02 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...v_a61db3.scrollContent,
   },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
+
   detailCard: {
     borderRadius: 20,
     borderWidth: 1,

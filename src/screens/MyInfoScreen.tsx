@@ -6,17 +6,17 @@ import {
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_4c7b5d } from '../components';
-import { v_1bfbd0, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_556baf } from '../components';
 
 type CardConfig = {
   id: string;
@@ -261,8 +261,7 @@ export const v_03a231 = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header
         title={v_8d41d7('screens.myInfo.title')}
         onBackPress={() => {
@@ -338,24 +337,18 @@ export const v_03a231 = () => {
           </View>
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
-    paddingBottom: 32,
+    ...v_a61db3.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
     gap: 24,
   },
   adBanner: {

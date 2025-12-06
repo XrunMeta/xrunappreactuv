@@ -3,25 +3,25 @@ import {
   v_3094a2,
   v_19b633,
   v_472849,
-  v_122070,
   v_326be8,
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import {
   v_fa3feb,
   v_368e80,
+  v_570c34,
   v_729608,
   v_89c10a,
   v_cb41de,
 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_9553a4, v_6946fd } from '../constants';
+import { v_9553a4, v_6946fd, v_a61db3, v_bae512 } from '../constants';
+
 import {
   v_60e3a5,
   v_01332e,
@@ -262,172 +262,163 @@ export const v_f40fc5 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header
         title={v_8d41d7('screens.signup.title')}
         onBackPress={v_c7ac57}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
       >
-        <FormField
-          label={v_8d41d7('screens.signup.familyNameLabel')}
-          placeholder={v_8d41d7('screens.signup.familyNamePlaceholder')}
-          value={v_f142d8}
-          onChangeText={v_6dde2f}
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
-
-        <FormField
-          label={v_8d41d7('screens.signup.givenNameLabel')}
-          placeholder={v_8d41d7('screens.signup.givenNamePlaceholder')}
-          value={v_a7c7b7}
-          onChangeText={v_15ded5}
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
-
-        <FormField
-          label={v_8d41d7('screens.signup.emailLabel')}
-          placeholder={v_8d41d7('screens.signup.emailPlaceholder')}
-          value={v_e0c7e8}
-          onChangeText={v_fedf34}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
-
-        <FormField
-          label={v_8d41d7('screens.signup.passwordLabel')}
-          placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
-          value={v_adc076}
-          onChangeText={v_52b279}
-          secureTextEntry
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
-
-        <FormField
-          label={v_8d41d7('screens.signup.phoneNumberLabel')}
-          placeholder={v_8d41d7('screens.signup.phoneNumberPlaceholder')}
-          keyboardType="phone-pad"
-          value={v_3a6ac4}
-          onChangeText={v_f768f9}
-          containerStyle={v_d81136.fieldContainer}
-          leftAccessory={
-            <TouchableOpacity
-              style={v_d81136.phonePrefix}
-              onPress={() => v_9b57fc('countryCodeSelect')}
-              activeOpacity={0.7}
-            >
-              <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
-              <Text style={v_d81136.countryCode}>{v_459d5e.dialCode}</Text>
-            </TouchableOpacity>
-          }
-        />
-
-        <TouchableOpacity
-          onPress={() => {
-            v_67ab1c('region');
-            v_9b57fc('countryCodeSelect');
-          }}
-          style={v_d81136.fieldContainer}
-        >
+        <View style={v_d81136.formFieldContainer}>
           <FormField
-            label={v_8d41d7('screens.signup.regionLabel')}
-            placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
-            value={v_2f03bc ? v_2f03bc.name : v_a6c30b || ''}
-            editable={false}
+            label={v_8d41d7('screens.signup.familyNameLabel')}
+            placeholder={v_8d41d7('screens.signup.familyNamePlaceholder')}
+            value={v_f142d8}
+            onChangeText={v_6dde2f}
+            autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
           />
-        </TouchableOpacity>
 
-        <View style={v_d81136.formGroup}>
-          <Text style={v_d81136.label}>{v_8d41d7('screens.signup.genderLabel')}</Text>
-          <View style={v_d81136.inlineOptions}>
-            {v_798085.map((v_0bd920) => {
-              const v_26dce6 = v_c3eac4 === v_0bd920.value;
-              return (
-                <OptionButton
-                  key={v_0bd920.value}
-                  label={v_0bd920.label}
-                  selected={v_26dce6}
-                  onPress={() => v_bdc43c(v_0bd920.value)}
-                />
-              );
-            })}
-          </View>
-        </View>
-
-        <View style={v_d81136.formGroup}>
-          <Text style={v_d81136.label}>{v_8d41d7('screens.signup.ageLabel')}</Text>
-          <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
-            {v_0c96f7.map((v_0bd920, v_a56041) => {
-              const v_26dce6 = v_f83808 === v_0bd920;
-              const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
-              return (
-                <OptionButton
-                  key={v_0bd920}
-                  label={v_0bd920}
-                  selected={v_26dce6}
-                  onPress={() => v_64a312(v_0bd920)}
-                  flex={1}
-                  style={[
-                    v_d81136.ageOptionButton,
-                    !v_0d0d82 && v_d81136.ageOptionSpacing,
-                  ]}
-                />
-              );
-            })}
-          </View>
-        </View>
-
-        <FormField
-          label={v_8d41d7('screens.signup.referralEmailLabel')}
-          placeholder={v_8d41d7('screens.signup.referralEmailPlaceholder')}
-          value={v_9bf12c}
-          onChangeText={v_fb6bbb}
-          autoCapitalize="none"
-          containerStyle={v_d81136.fieldContainer}
-        />
-
-        <View style={v_d81136.termsRow}>
-          <FormCheckbox
-            checked={v_91ca05}
-            onToggle={() => v_cbfe22((v_ba2215) => !v_ba2215)}
-            variant="square"
+          <FormField
+            label={v_8d41d7('screens.signup.givenNameLabel')}
+            placeholder={v_8d41d7('screens.signup.givenNamePlaceholder')}
+            value={v_a7c7b7}
+            onChangeText={v_15ded5}
+            autoCapitalize="none"
+            containerStyle={v_d81136.fieldContainer}
           />
-          <Text style={v_d81136.termsText}>
-            {v_8d41d7('screens.signup.termsText')}{' '}
-            <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.termsHighlight')}</Text>{' '}
-            {v_8d41d7('screens.signup.termsAgree')}
-          </Text>
-        </View>
 
-        <View style={v_d81136.buttonWrapper}>
-          <PrimaryButton
-            title={v_88dca2 ? v_8d41d7('screens.signup.submitting') : v_8d41d7('screens.signup.submitButton')}
-            fullWidth
-            onPress={v_585b02}
-            disabled={v_88dca2}
+          <FormField
+            label={v_8d41d7('screens.signup.emailLabel')}
+            placeholder={v_8d41d7('screens.signup.emailPlaceholder')}
+            value={v_e0c7e8}
+            onChangeText={v_fedf34}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            containerStyle={v_d81136.fieldContainer}
           />
-          {v_88dca2 && (
-            <View style={v_d81136.loadingContainer}>
-              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+
+          <FormField
+            label={v_8d41d7('screens.signup.passwordLabel')}
+            placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
+            value={v_adc076}
+            onChangeText={v_52b279}
+            secureTextEntry
+            autoCapitalize="none"
+            containerStyle={v_d81136.fieldContainer}
+          />
+
+          <FormField
+            containerStyle={v_d81136.fieldContainer}
+            label={v_8d41d7('screens.signup.phoneNumberLabel')}
+            placeholder={v_8d41d7('screens.signup.phoneNumberPlaceholder')}
+            keyboardType="phone-pad"
+            value={v_3a6ac4}
+            onChangeText={v_f768f9}
+            leftAccessory={
+              <TouchableOpacity
+                style={v_d81136.phonePrefix}
+                onPress={() => v_9b57fc('countryCodeSelect')}
+                activeOpacity={0.7}
+              >
+                <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
+                <Text style={v_d81136.countryCode}>{v_459d5e.dialCode}</Text>
+              </TouchableOpacity>
+            }
+          />
+
+          <TouchableOpacity
+            style={v_d81136.fieldContainer}
+            onPress={() => {
+              v_67ab1c('region');
+              v_9b57fc('countryCodeSelect');
+            }}
+          >
+            <FormField
+              label={v_8d41d7('screens.signup.regionLabel')}
+              placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
+              value={v_2f03bc ? v_2f03bc.name : v_a6c30b || ''}
+              editable={false}
+            />
+          </TouchableOpacity>
+
+          <View style={v_d81136.fieldContainer}>
+            <Text style={v_d81136.label}>{v_8d41d7('screens.signup.genderLabel')}</Text>
+            <View style={[v_d81136.inlineOptions]}>
+              {v_798085.map((v_0bd920) => {
+                const v_26dce6 = v_c3eac4 === v_0bd920.value;
+                return (
+                  <OptionButton
+                    key={v_0bd920.value}
+                    label={v_0bd920.label}
+                    selected={v_26dce6}
+                    onPress={() => v_bdc43c(v_0bd920.value)}
+                  />
+                );
+              })}
             </View>
-          )}
-        </View>
-      </ScrollView>
+          </View>
 
-      {v_326be8.OS === 'ios' && (
-        <View style={v_d81136.homeIndicator}>
-          <View style={v_d81136.homeIndicatorBar} />
+          <View style={v_d81136.fieldContainer}>
+            <Text style={v_d81136.label}>{v_8d41d7('screens.signup.ageLabel')}</Text>
+            <View style={[v_d81136.inlineOptions]}>
+              {v_0c96f7.map((v_0bd920, v_a56041) => {
+                const v_26dce6 = v_f83808 === v_0bd920;
+                const v_0d0d82 = v_a56041 === v_0c96f7.length - 1;
+                return (
+                  <OptionButton
+                    key={v_0bd920}
+                    label={v_0bd920}
+                    selected={v_26dce6}
+                    onPress={() => v_64a312(v_0bd920)}
+                    flex={1}
+                  />
+                );
+              })}
+            </View>
+          </View>
+
+          <FormField
+            label={v_8d41d7('screens.signup.referralEmailLabel')}
+            placeholder={v_8d41d7('screens.signup.referralEmailPlaceholder')}
+            value={v_9bf12c}
+            onChangeText={v_fb6bbb}
+            autoCapitalize="none"
+            containerStyle={v_d81136.fieldContainer}
+          />
+
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_91ca05}
+              onToggle={() => v_cbfe22((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              {v_8d41d7('screens.signup.termsText')}{' '}
+              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.termsHighlight')}</Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          <View style={v_d81136.buttonWrapper}>
+            <PrimaryButton
+              title={v_88dca2 ? v_8d41d7('screens.signup.submitting') : v_8d41d7('screens.signup.submitButton')}
+              fullWidth
+              onPress={v_585b02}
+              disabled={v_88dca2}
+            />
+            {v_88dca2 && (
+              <View style={v_d81136.loadingContainer}>
+                <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+              </View>
+            )}
+          </View>
         </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -435,24 +426,16 @@ export const v_f40fc5 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 120,
+
+    ...v_a61db3.scrollContent,
+  },
+  formFieldContainer: {
+    ...v_bae512.fieldContainer,
   },
   fieldContainer: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  formGroup: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginBottom: 24,
+    borderWidth: 0,
   },
   label: {
     fontSize: 16,
@@ -480,21 +463,10 @@ const v_d81136 = v_472849.create({
   },
   inlineOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  ageOptionsRow: {
     flexWrap: 'nowrap',
-    justifyContent: 'space-between',
-  },
-  ageOptionButton: {
-    marginRight: 0,
-    marginBottom: 0,
-  },
-  ageOptionSpacing: {
-    marginRight: 8,
+    justifyContent: 'flex-start',
+    gap: 8,
+    width: '100%',
   },
   termsRow: {
     flexDirection: 'row',
@@ -502,7 +474,6 @@ const v_d81136 = v_472849.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    marginBottom: 24,
     gap: 12,
   },
   termsText: {
@@ -517,28 +488,12 @@ const v_d81136 = v_472849.create({
     color: '#8e9bae',
   },
   buttonWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...v_a61db3.bottomButtonContainer,
   },
   loadingContainer: {
     marginTop: 12,
     alignItems: 'center',
   },
-  homeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-  },
+
 });
 

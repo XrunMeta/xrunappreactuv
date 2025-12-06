@@ -3,16 +3,14 @@ import {
   v_3094a2,
   v_19b633,
   v_472849,
-  v_122070,
   v_4623af,
   v_326be8,
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_fa3feb, v_368e80, v_729608, v_cb41de } from '../components';
+import { v_fa3feb, v_368e80, v_729608, v_cb41de, v_570c34 } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import {
@@ -23,7 +21,7 @@ import {
 import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_f4f851 = () => {
-  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
@@ -32,6 +30,10 @@ export const v_f4f851 = () => {
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
   const v_0d972d = v_ce4741.emailVerification;
+
+  const v_648e0d = () => {
+    v_9b57fc(v_ce4741.authLanding);
+  };
 
   v_c4deb2(() => {
     const v_2a6af5 = async () => {
@@ -137,13 +139,12 @@ export const v_f4f851 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header
         title={v_8d41d7('screens.login.title')}
-        onBackPress={v_c7ac57}
+        onBackPress={v_648e0d}
         showBackButton
       />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -188,8 +189,8 @@ export const v_f4f851 = () => {
             <FormCheckbox
               label={v_8d41d7('screens.login.rememberMe')}
               checked={v_a964a4}
-              onToggle={v_cd31a8 ? () => {} : v_8f2c24}
-              variant="circle"
+              onToggle={v_cd31a8 ? () => { } : v_8f2c24}
+              variant="square"
             />
           </View>
         </View>
@@ -218,7 +219,7 @@ export const v_f4f851 = () => {
             <Text style={v_d81136.emailVerificationText}>{v_8d41d7('screens.login.emailVerification')}</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
       {v_326be8.OS === 'ios' && (
         <View style={v_d81136.homeIndicator}>
@@ -238,7 +239,7 @@ const v_d81136 = v_472849.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: v_326be8.OS === 'android' 
+    paddingBottom: v_326be8.OS === 'android'
       ? 16 + v_9b1a04.medium 
       : 40,
     justifyContent: 'space-between',
@@ -247,6 +248,7 @@ const v_d81136 = v_472849.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
+    marginBottom: v_9b1a04.large,
   },
   eyeButton: {
     height: 24,
@@ -258,7 +260,6 @@ const v_d81136 = v_472849.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    marginTop: -8,
     marginBottom: 16,
   },
   bottomSection: {

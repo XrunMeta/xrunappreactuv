@@ -4,8 +4,8 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581 } from '../components';
-import { v_1bfbd0, v_4922a9 } from '../constants';
+import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581, v_570c34, v_556baf } from '../components';
+import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
@@ -184,10 +184,9 @@ export const v_58584a = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
-      <Header 
-        title={v_8d41d7('screens.referralMyGroup.title')} 
+    <SafeView style={v_d81136.container}>
+      <Header
+        title={v_8d41d7('screens.referralMyGroup.title')}
         rightComponent={
           <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
@@ -197,8 +196,8 @@ export const v_58584a = () => {
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.topRow}>
-            <ReferralStatsCard 
-              title={v_8d41d7('screens.referralMyGroup.myGroupMembers')} 
+            <ReferralStatsCard
+              title={v_8d41d7('screens.referralMyGroup.myGroupMembers')}
               value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
               containerStyle={v_d81136.statsCardCenter}
             />
@@ -239,7 +238,7 @@ export const v_58584a = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
@@ -249,15 +248,12 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#f7f7fb',
   },
   content: {
-    flex: 1,
+    ...v_a61db3.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',

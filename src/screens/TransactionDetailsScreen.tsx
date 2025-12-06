@@ -1,10 +1,11 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_19b633, v_472849, v_326be8 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_729608, v_660356 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_14af53 } from '../constants/tokenMeta';
+import { v_772971 } from 'jmpfvteuuztnp';
 
 export interface TransactionDetails {
   id: string;
@@ -27,16 +28,15 @@ interface TransactionDetailsScreenProps {
 }
 
 export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8 }) => {
-  const { t: v_8d41d7 } = useTranslation();
+  const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const v_5ab5bd = v_9390e8 ?? v_421f30;
   const v_17af98 = v_14af53(v_5ab5bd.title, v_5ab5bd.subtitle);
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.transactionDetails.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.cardGroup}>
           <InfoCard label={v_8d41d7('screens.transactionDetails.from')} value={v_5ab5bd.from} />
           <InfoCard label={v_8d41d7('screens.transactionDetails.to')} value={v_5ab5bd.to} />
@@ -62,13 +62,7 @@ export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps
           style={v_d81136.explorerBadge}
           labelStyle={v_d81136.explorerLabel}
         />
-      </ScrollView>
-
-      {v_326be8.OS === 'ios' && (
-        <View style={v_d81136.homeIndicator}>
-          <View style={v_d81136.homeIndicatorBar} />
-        </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -99,12 +93,9 @@ const v_421f30 = {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   cardGroup: {
     gap: 12,
@@ -143,20 +134,7 @@ const v_d81136 = v_472849.create({
     color: '#683AB5',
     fontSize: 15,
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
 });
 
 

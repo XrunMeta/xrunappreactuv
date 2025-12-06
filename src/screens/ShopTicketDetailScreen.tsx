@@ -2,26 +2,24 @@ import v_a3453e, { v_5ab095, v_c4deb2, v_e662ae } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
-  v_122070,
   v_19b633,
   v_4623af,
   v_326be8,
   v_39a996,
   v_5f4661,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_dc0e55 from 'bfgjhdhiuhcmlahuvrfzrfn';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608 } from '../components';
+import { v_729608, v_570c34, v_556baf } from '../components';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_029bad } from '../types';
 import { v_97ad19, v_7b3801 } from '../services';
 import { v_e4a763 } from '../utils/env';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04 } from '../constants';
 
 export const v_a1c4a5 = () => {
   const { selectedShopItem: v_dfe883 } = v_700ef9();
@@ -255,9 +253,9 @@ export const v_a1c4a5 = () => {
 
     await v_889fad('삭제', '티켓을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
-      { 
-        text: '삭제', 
-        style: 'destructive', 
+      {
+        text: '삭제',
+        style: 'destructive',
         onPress: async () => {
           try {
             v_deef62(true);
@@ -307,65 +305,65 @@ export const v_a1c4a5 = () => {
   const v_281520 = v_c811e3?.txID || v_c811e3?.txid || v_c811e3?.transaction || v_cd1db8 || v_a94bd8;
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header title={v_8d41d7('screens.shopTicketDetail.title')} showBackButton />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={v_d81136.wrapper}>
-          {}
-          <View style={v_d81136.qrWrapper}>
-            <View
+      <SafeScrollView
+        contentContainerStyle={v_d81136.scrollContent}
+        showsVerticalScrollIndicator={false}
+        showBottomBackground={false}>
+        {}
+        <View style={v_d81136.qrWrapper}>
+          <View
+            style={[
+              v_d81136.qrBorder,
+              {
+                opacity: v_2911e0 ? 1 : 0.3,
+                borderColor: '#DEDEDE',
+              },
+            ]}>
+            {v_1de78e ? (
+              <QRCode
+                value={String(v_1de78e)}
+                size={150}
+                color={v_2911e0 ? '#000' : '#999999'}
+                backgroundColor="#FFFFFF"
+                getRef={(v_3f4e2e) => (v_e74f9a.current = v_3f4e2e)}
+              />
+            ) : (
+              <Text style={v_d81136.errorText}>QR 코드를 생성할 수 없습니다</Text>
+            )}
+          </View>
+        </View>
+
+        <Text style={v_d81136.itemTitle}>{v_dfe883?.title ?? '티켓'}</Text>
+
+        {}
+        <View style={v_d81136.ticketFieldContainer}>
+          <View style={v_d81136.ticketFieldHeader}>
+            <Text style={v_d81136.ticketFieldLabel}>
+              Ticket Number
+            </Text>
+            <Text
               style={[
-                v_d81136.qrBorder,
+                v_d81136.ticketFieldStatus,
                 {
-                  opacity: v_2911e0 ? 1 : 0.3,
-                  borderColor: '#DEDEDE',
+                  color: v_2911e0 ? '#3391D0' : '#707070',
                 },
               ]}>
-              {v_1de78e ? (
-                <QRCode
-                  value={String(v_1de78e)}
-                  size={150}
-                  color={v_2911e0 ? '#000' : '#999999'}
-                  backgroundColor="#FFFFFF"
-                  getRef={(v_3f4e2e) => (v_e74f9a.current = v_3f4e2e)}
-                />
-              ) : (
-                <Text style={v_d81136.errorText}>QR 코드를 생성할 수 없습니다</Text>
-              )}
-            </View>
+              {v_2911e0 ? 'Available' : 'Redeemed'}
+            </Text>
           </View>
-
-          <Text style={v_d81136.itemTitle}>{v_dfe883?.title ?? '티켓'}</Text>
-
-          {}
-          <View style={v_d81136.ticketFieldContainer}>
-            <View style={v_d81136.ticketFieldHeader}>
-              <Text style={v_d81136.ticketFieldLabel}>
-                Ticket Number
-              </Text>
-              <Text
-                style={[
-                  v_d81136.ticketFieldStatus,
-                  {
-                    color: v_2911e0 ? '#3391D0' : '#707070',
-                  },
-                ]}>
-                {v_2911e0 ? 'Available' : 'Redeemed'}
-              </Text>
-            </View>
-            <View style={v_d81136.ticketFieldBox}>
-              <Text style={v_d81136.ticketFieldNumber}>
-                {v_281520 || 'No Ticket Available'}
-              </Text>
-            </View>
+          <View style={v_d81136.ticketFieldBox}>
+            <Text style={v_d81136.ticketFieldNumber}>
+              {v_281520 || 'No Ticket Available'}
+            </Text>
           </View>
-
-          {v_cd31a8 && (
-            <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} style={{ marginBottom: 16 }} />
-          )}
         </View>
-      </ScrollView>
+
+        {v_cd31a8 && (
+          <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} style={{ marginBottom: 16 }} />
+        )}
+      </SafeScrollView>
 
       {}
       <View style={v_d81136.actionButtonsContainer}>
@@ -392,24 +390,17 @@ export const v_a1c4a5 = () => {
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    paddingBottom: 120, 
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    ...v_a61db3.scrollContent,
+    flexGrow: 1,
   },
   qrWrapper: {
     alignItems: 'center',
@@ -473,11 +464,9 @@ const v_d81136 = v_472849.create({
   },
 
   actionButtonsContainer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
+    ...v_a61db3.bottomButtonContainer,
+    paddingHorizontal: v_9b1a04.large,
+
   },
   actionButton: {
     borderRadius: 16,

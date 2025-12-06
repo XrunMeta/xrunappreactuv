@@ -5,7 +5,6 @@ import {
   v_472849,
   v_4623af,
   v_39a996,
-  v_122070,
   v_f2c756,
   v_6b5698,
   v_aa7413,
@@ -19,7 +18,7 @@ import { v_f3de6d } from '../utils/napApiUtils';
 import { v_1c4683, v_7a6f92, v_ad146c } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_4c7b5d } from '../components';
+import { v_4c7b5d, v_570c34 } from '../components';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -240,7 +239,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   v_c4deb2(() => {
     if (v_d0b6d4) {
       const v_c84c22 = `${v_d0b6d4.advertisement}-${v_d0b6d4.campid}`;
-      const v_28b331 = v_57519b.current 
+      const v_28b331 = v_57519b.current
         ? `${v_57519b.current.advertisement}-${v_57519b.current.campid}`
         : null;
 
@@ -664,7 +663,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           {v_d0b6d4.joindesc && v_d0b6d4.joindesc !== '' && (
             <View style={v_d81136.joinDescContainer}>
               <Text style={v_d81136.joinDescTitle}>{v_8d41d7('screens.showNapAd.joinMethod')}</Text>
-              <ScrollView 
+              <SafeScrollView
                 style={v_d81136.joinDescScrollView}
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
@@ -673,7 +672,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                 <Text style={v_d81136.joinDescText}>
                   {v_d0b6d4.joindesc}
                 </Text>
-              </ScrollView>
+              </SafeScrollView>
             </View>
           )}
 
@@ -705,8 +704,8 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       {}
       {v_7a79cf && (
         <View style={v_d81136.bannerContainer}>
-          <TaboolaBanner 
-            placementType="reward_OS_395x80" 
+          <TaboolaBanner
+            placementType="reward_OS_395x80"
             onLoadComplete={() => {
               console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
               v_5a7a1a(true);

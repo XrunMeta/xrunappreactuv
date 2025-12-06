@@ -41,20 +41,11 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   };
 
   return (
-    <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>
-      <TaboolaBannerCore
-        placementType={v_193481}
-        pageUrl={v_cdfaaa}
-        onLoadingChange={v_69e114}
-      />
-      {}
-    </View>
+    <TaboolaBannerCore
+      placementType={v_193481}
+      pageUrl={v_cdfaaa}
+      onLoadingChange={v_69e114}
+    />
   );
 };
 
-const v_d81136 = v_472849.create({
-  container: {
-    position: 'relative',
-    width: '100%',
-  },
-});

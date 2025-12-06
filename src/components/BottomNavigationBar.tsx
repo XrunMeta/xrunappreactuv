@@ -6,7 +6,7 @@ import { v_85f2c8 } from '../services';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
 
-const v_c63bb8 = null ; 
+const v_c63bb8 = null; 
 
 let v_4eff08 = null;
 let v_f968cc = null;
@@ -115,8 +115,8 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
       return {
         ...v_8c0b26,
-        label: v_9e28f7 
-          ? v_8c0b26.label 
+        label: v_9e28f7
+          ? v_8c0b26.label
           : 'XRUN',
         icon: v_9e28f7
           ? v_8c0b26.icon
@@ -149,13 +149,36 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     return Math.max(v_46d0e7, Math.min(v_382137, v_2e3fba));
   };
 
+  const v_6a3c24 = () => {
+    if (v_8e4fb6 < 360) {
+
+      return 4;
+    } else if (v_8e4fb6 < 400) {
+
+      return 8;
+    } else {
+
+      return 10;
+    }
+  };
+
+  const v_e5df55 = () => {
+    if (v_8e4fb6 < 360) {
+      return 90; 
+    } else if (v_8e4fb6 < 400) {
+      return 95;
+    } else {
+      return 100;
+    }
+  };
+
   const v_397b6d = v_6d2a86();
+  const v_30e711 = v_6a3c24();
+  const v_f4f953 = v_e5df55();
 
   const v_eebe9d = () => {
-
     return (
-      <View
-        style={v_d81136.centerButtonContainer}>
+      <>
         {}
         <TouchableOpacity
           style={[
@@ -193,7 +216,7 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
             <View style={v_d81136.iconPlaceholder} />
           )}
         </TouchableOpacity>
-      </View>
+      </>
     );
   };
 
@@ -209,7 +232,10 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     return (
       <TouchableOpacity
         key={v_8c0b26.id}
-        style={v_d81136.navItem}
+        style={[
+          v_d81136.navItem,
+          { minWidth: v_8e4fb6 < 360 ? 50 : 55 }
+        ]}
         onPress={() => v_8e442f(v_8c0b26.id)}
         activeOpacity={0.7}>
         <View style={v_d81136.iconContainer}>
@@ -223,8 +249,12 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
             <View style={[v_d81136.iconPlaceholder, v_26dce6 && v_d81136.iconPlaceholderActive]} />
           )}
         </View>
-        <Text 
-          style={[v_d81136.label, v_26dce6 && v_d81136.labelActive]}
+        <Text
+          style={[
+            v_d81136.label,
+            v_26dce6 && v_d81136.labelActive,
+            { fontSize: v_8e4fb6 < 360 ? 12 : 14 }
+          ]}
           numberOfLines={1}
           ellipsizeMode="tail">
           {v_8c0b26.label}
@@ -237,11 +267,29 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     <View style={v_d81136.container}>
       {}
       <View style={v_d81136.bottomSection}>
-        <View style={v_d81136.content}>
+        <View style={[
+          v_d81136.content,
+          {
+            paddingHorizontal: v_30e711,
+            gap: v_8e4fb6 < 360 ? 4 : v_8e4fb6 < 400 ? 6 : 8,
+          }
+        ]}>
           {v_79cf3d.map((v_8c0b26, v_a56041) => {
             if (v_8c0b26.id === 'map' || v_8c0b26.id === 'camera') {
 
-              return <React.Fragment key="center-buttons">{v_eebe9d()}</React.Fragment>;
+              return (
+                <React.Fragment key="center-buttons">
+                  <View style={[
+                    v_d81136.centerButtonContainer,
+                    {
+                      width: v_f4f953,
+                      marginHorizontal: v_8e4fb6 < 360 ? -2 : -3,
+                    }
+                  ]}>
+                    {v_eebe9d()}
+                  </View>
+                </React.Fragment>
+              );
             }
             return v_9eb59f(v_8c0b26);
           })}
@@ -275,17 +323,14 @@ const v_d81136 = v_472849.create({
     paddingBottom: 12,
     minHeight: 104,
     width: '100%',
-    paddingHorizontal: 10,
-    gap: 10,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    minWidth: 60,
     paddingVertical: 5,
-    flexShrink: 0,
-    paddingHorizontal: 5,
+    flexShrink: 1,
+    paddingHorizontal: 2,
   },
   iconContainer: {
     width: 24,
@@ -325,10 +370,8 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#343a59',
     borderRadius: 50,
     height: 50,
-    width: 100,
-    marginHorizontal: -5,
     alignSelf: 'center',
-    flexShrink: 0,
+    flexShrink: 1,
     ...v_326be8.select({
       android: {
         elevation: 2,

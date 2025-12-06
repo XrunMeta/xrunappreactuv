@@ -1,10 +1,10 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_39a996 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_08316d, v_c58856, v_794a74 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -191,30 +191,33 @@ export const v_6086b6 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoReferral.title')} onBackPress={v_c7ac57} showBackButton />
       {v_cd31a8 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView
+        <SafeScrollView
           contentContainerStyle={v_d81136.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          autoAdjustKeyboardPadding={true}
         >
           <View style={v_d81136.inner}>
-            <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoReferral.currentReferral')}</Text>
-            {v_c9aa64 || v_5bb914 ? (
-              <View style={v_d81136.card}>
-                {v_5bb914 ? <Text style={v_d81136.cardName}>{v_5bb914}</Text> : null}
-                {v_c9aa64 ? <Text style={v_d81136.cardEmail}>{v_c9aa64}</Text> : null}
-              </View>
-            ) : (
-              <View style={v_d81136.card}>
-                <Text style={v_d81136.cardEmail}>{v_8d41d7('screens.myInfoReferral.noReferral')}</Text>
-              </View>
-            )}
+            {
+
+}
+            <FormField
+              label={v_8d41d7('screens.myInfoReferral.currentReferral')}
+              value={
+                v_c9aa64 || v_5bb914
+                  ? v_5bb914 && v_c9aa64
+                    ? `${v_5bb914} (${v_c9aa64})`
+                    : v_c9aa64 || v_5bb914 || ''
+                  : v_8d41d7('screens.myInfoReferral.noReferral')
+              }
+              editable={false}
+            />
 
             <FormField
               label={v_8d41d7('screens.myInfoReferral.newReferralLabel')}
@@ -236,7 +239,7 @@ export const v_6086b6 = () => {
               disabled={v_1e6dba}
             />
           </View>
-        </ScrollView>
+        </SafeScrollView>
       )}
     </View>
   );
@@ -245,7 +248,6 @@ export const v_6086b6 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f7',
   },
   loadingContainer: {
     flex: 1,
@@ -254,20 +256,17 @@ const v_d81136 = v_472849.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...v_704d15.large,
   },
   sectionLabel: {
     fontSize: 16,
-    fontFamily: 'Roboto-Medium',
+    lineHeight: 24,
     color: '#2a2727',
-    marginBottom: 12,
+    fontFamily: 'Roboto-Medium',
+    marginBottom: 8,
   },
   card: {
     width: '100%',
@@ -275,7 +274,6 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 18,
-    marginBottom: 32,
     shadowColor: '#3629b7',
     shadowOpacity: 0.07,
     shadowRadius: 15,
@@ -286,7 +284,6 @@ const v_d81136 = v_472849.create({
     fontSize: 18,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
-    marginBottom: 6,
   },
   cardEmail: {
     fontSize: 12,
@@ -294,7 +291,7 @@ const v_d81136 = v_472849.create({
     color: '#bababa',
   },
   bottomSection: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

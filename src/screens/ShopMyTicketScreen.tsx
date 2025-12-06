@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_79c4f2, v_39a996, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_79c4f2, v_39a996, v_19b633 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -196,7 +197,7 @@ export const v_052a8a = () => {
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+        <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={v_d81136.wrapper}>
             <SegmentedControl
               options={[
@@ -248,7 +249,7 @@ export const v_052a8a = () => {
               </View>
             )}
           </View>
-        </ScrollView>
+        </SafeScrollView>
       )}
 
       {}

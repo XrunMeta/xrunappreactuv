@@ -1,11 +1,12 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_326be8, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_cb41de, v_8714fe, v_eaeabd } from '../components';
+import { v_cb41de, v_8714fe, v_eaeabd, v_570c34 } from '../components';
 import { v_dc5d8f, v_33aee4, v_ce593f } from '../services/taboola';
-import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_cc3e1f } from './CameraMainScreen';
 
 export const v_54d331 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
@@ -34,10 +35,14 @@ export const v_54d331 = () => {
     v_9b57fc(v_ce4741.myInfo);
   };
 
+  const v_3b9f13 = [
+
+  ];
+
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -80,7 +85,25 @@ export const v_54d331 = () => {
             {' '}{v_8d41d7('screens.loginSignup.termsAgree')}
           </Text>
         </View>
-      </ScrollView>
+
+        {}
+        {v_731ab4 && (
+          <View style={v_d81136.devLinksContainer}>
+            <Text style={v_d81136.devLinksTitle}>🔗 개발 모드: 빠른 링크</Text>
+            <View style={v_d81136.devLinksGrid}>
+              {v_3b9f13.map((v_8dbe00) => (
+                <TouchableOpacity
+                  key={v_8dbe00.route}
+                  style={v_d81136.devLinkButton}
+                  onPress={() => v_9b57fc(v_8dbe00.route)}
+                >
+                  <Text style={v_d81136.devLinkText}>{v_8dbe00.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+      </SafeScrollView>
 
       {}
       {v_326be8.OS === 'ios' && (
@@ -101,7 +124,7 @@ const v_d81136 = v_472849.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 58, 
-    paddingBottom: v_326be8.OS === 'android' 
+    paddingBottom: v_326be8.OS === 'android'
       ? 16 + v_9b1a04.medium 
       : 34,
     justifyContent: 'space-between',
@@ -170,6 +193,37 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#10192d',
     borderRadius: 100,
     marginBottom: 9,
+  },
+  devLinksContainer: {
+    marginTop: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  devLinksTitle: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Bold',
+    fontWeight: 'bold',
+    color: '#10192d',
+    marginBottom: 12,
+  },
+  devLinksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  devLinkButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  devLinkText: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Regular',
+    color: v_1bfbd0.buttonPrimary,
   },
 });
 

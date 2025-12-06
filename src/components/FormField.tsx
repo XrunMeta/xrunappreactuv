@@ -8,6 +8,8 @@ import {
   v_7e4944,
   v_961e77,
 } from 'rcmrninabrnb';
+import { v_f3168c } from '../context/KeyboardScrollContext';
+import { v_9b1a04 } from '../constants';
 
 interface FormFieldProps extends v_b60ea2 {
   label: string;
@@ -23,8 +25,22 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
   leftAccessory: v_bea0eb,
   style: v_7fa4e4,
   placeholderTextColor: v_46ec3b = '#dedede',
+  onFocus: v_cd3cee,
   ...v_3a2a5d
 }) => {
+  const v_73e70b = v_f3168c();
+
+  const v_086489 = (v_d48baf) => {
+
+    if (v_73e70b) {
+      v_73e70b.scrollToFocusedInput(v_d48baf);
+    }
+
+    if (v_cd3cee) {
+      v_cd3cee(v_d48baf);
+    }
+  };
+
   return (
     <View style={[v_d81136.container, v_4affe9]}>
       <Text style={v_d81136.label}>{v_2869c1}</Text>
@@ -33,6 +49,7 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
         <TextInput
           style={[v_d81136.input, v_7fa4e4]}
           placeholderTextColor={v_46ec3b}
+          onFocus={v_086489}
           {...v_3a2a5d}
         />
         {v_de8f73 ? (
@@ -46,7 +63,7 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
 const v_d81136 = v_472849.create({
   container: {
     width: '100%',
-    marginBottom: 24,
+
   },
   label: {
     fontSize: 16,
@@ -83,5 +100,4 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
 });
-
 

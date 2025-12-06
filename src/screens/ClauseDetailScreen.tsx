@@ -1,9 +1,9 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_39a996 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
@@ -61,24 +61,21 @@ export const v_5fdcb2 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_9f1622} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={v_d81136.inner}>
-          {v_cd31a8 ? (
-            <View style={v_d81136.loadingContainer}>
-              <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-              <Text style={v_d81136.loadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
-            </View>
-          ) : v_5e9bfe ? (
-            <View style={v_d81136.errorContainer}>
-              <Text style={v_d81136.errorText}>{v_5e9bfe}</Text>
-            </View>
-          ) : (
-            <Text style={v_d81136.contentText}>{v_b43b74}</Text>
-          )}
-        </View>
-      </ScrollView>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+        {v_cd31a8 ? (
+          <View style={v_d81136.loadingContainer}>
+            <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
+          </View>
+        ) : v_5e9bfe ? (
+          <View style={v_d81136.errorContainer}>
+            <Text style={v_d81136.errorText}>{v_5e9bfe}</Text>
+          </View>
+        ) : (
+          <Text style={v_d81136.contentText}>{v_b43b74}</Text>
+        )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -86,19 +83,12 @@ export const v_5fdcb2 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
+    ...v_a61db3.scrollContent,
   },
-  inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
+
   loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',

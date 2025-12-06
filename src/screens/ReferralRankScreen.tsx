@@ -1,11 +1,10 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_19b633, v_39a996, v_9cabcb } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_814266, v_f16775, v_b34ce5 } from '../components';
+import { v_729608, v_814266, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-import { v_1bfbd0, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
 import { v_4a38fa, v_6a034c } from '../services';
 import { v_1cc79a } from '../types';
 
@@ -206,8 +205,7 @@ export const v_f57686 = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header title={v_8d41d7('screens.referralRank.title')} />
       <View style={v_d81136.content}>
         <View style={v_d81136.wrapper}>
@@ -223,11 +221,11 @@ export const v_f57686 = () => {
                 <View style={v_d81136.rankDivider} />
                 <View style={v_d81136.rankRight}>
                   <Text style={v_d81136.rankValue}>
-                    {v_ad21d1 !== '-' 
-                      ? Number(v_ad21d1).toLocaleString('ko-KR', { 
-                          minimumFractionDigits: 0, 
-                          maximumFractionDigits: 2 
-                        })
+                    {v_ad21d1 !== '-'
+                      ? Number(v_ad21d1).toLocaleString('ko-KR', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                      })
                       : v_ad21d1}
                   </Text>
                 </View>
@@ -273,25 +271,22 @@ export const v_f57686 = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
   },
   content: {
     flex: 1,
+    ...v_a61db3.scrollContent,
   },
   wrapper: {
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
   },
   topRow: {
     position: 'relative',

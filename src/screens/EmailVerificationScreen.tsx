@@ -2,13 +2,11 @@ import v_a3453e, { v_5ab095 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
-  v_122070,
   v_326be8,
   v_39a996,
 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_368e80, v_729608, v_cb41de } from '../components';
+import { v_368e80, v_729608, v_cb41de, v_570c34 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -73,9 +71,8 @@ export const v_a82b55 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.emailVerification.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -98,7 +95,7 @@ export const v_a82b55 = () => {
             disabled={v_cd31a8}
           />
         </View>
-      </ScrollView>
+      </SafeScrollView>
 
       {v_326be8.OS === 'ios' && (
         <View style={v_d81136.homeIndicator}>

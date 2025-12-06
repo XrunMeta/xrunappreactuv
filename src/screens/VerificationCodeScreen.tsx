@@ -1,17 +1,17 @@
-import v_a3453e, { v_c4deb2, v_df9f57, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_df9f57, v_5ab095, v_e662ae } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
   v_472849,
-  v_122070,
   v_4623af,
   v_326be8,
   v_39a996,
+  v_79c4f2,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_cb41de } from '../components';
+import { v_729608, v_cb41de, v_570c34 } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -27,8 +27,6 @@ import {
 const v_683bb6 = 6;
 const v_ef7132 = 300;
 
-const v_79c59a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', '⌫']];
-
 export const v_667a00 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, reset: v_487a25, navigate: v_9b57fc } = v_a0daa8();
@@ -42,6 +40,7 @@ export const v_667a00 = () => {
   const [v_ae68cd, v_83fe8f] = v_5ab095(v_ef7132);
   const [v_d1dd8f, v_ff0c7a] = v_5ab095(false);
   const [v_ff9533, v_f30c99] = v_5ab095(false);
+  const v_56c646 = v_e662ae<v_79c4f2>(null);
 
   v_c4deb2(() => {
     if (v_ae68cd <= 0) {
@@ -58,17 +57,6 @@ export const v_667a00 = () => {
     const v_ec1a55 = (v_ae68cd % 60).toString().padStart(2, '0');
     return `${v_ef3543}:${v_ec1a55}`;
   }, [v_ae68cd]);
-
-  const v_fceada = (v_3b402b) => {
-    if (v_3b402b === '⌫') {
-      v_537cbb((v_ba2215) => v_ba2215.slice(0, -1));
-      return;
-    }
-    if (v_3b402b === '' || v_c99bd2.length >= v_683bb6) {
-      return;
-    }
-    v_537cbb((v_ba2215) => v_ba2215 + v_3b402b);
-  };
 
   const v_83b05b = async () => {
     if (!v_fc0b2c) {
@@ -176,9 +164,8 @@ export const v_667a00 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.verificationCode.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.descriptionWrapper}>
           <Text style={v_d81136.description}>
             {v_fc0b2c || '이메일'}{v_8d41d7('screens.verificationCode.description')}
@@ -189,12 +176,31 @@ export const v_667a00 = () => {
           {Array.from({ length: v_683bb6 }).map((v_37eab7, v_a56041) => {
             const v_5f701e = v_c99bd2[v_a56041] ?? '';
             return (
-              <View key={v_a56041} style={v_d81136.codeBox}>
+              <TouchableOpacity
+                key={v_a56041}
+                style={v_d81136.codeBox}
+                onPress={() => {
+
+                  v_56c646.current?.focus();
+                }}
+                activeOpacity={0.7}
+              >
                 <Text style={v_d81136.codeText}>{v_5f701e}</Text>
-              </View>
+              </TouchableOpacity>
             );
           })}
         </View>
+
+        {}
+        <TextInput
+          ref={v_56c646}
+          value={v_c99bd2}
+          onChangeText={v_537cbb}
+          keyboardType="number-pad"
+          maxLength={v_683bb6}
+          style={v_d81136.hiddenInput}
+          autoFocus={false}
+        />
 
         <TouchableOpacity
           style={v_d81136.resendWrapper}
@@ -231,29 +237,7 @@ export const v_667a00 = () => {
           )}
         </View>
 
-        <View style={v_d81136.keyboardContainer}>
-          {v_79c59a.map((v_3ac7e7, v_554071) => (
-            <View key={v_554071} style={v_d81136.keyboardRow}>
-              {v_3ac7e7.map((v_3b402b, v_a667ee) => (
-                <TouchableOpacity
-                  key={v_a667ee}
-                  style={[v_d81136.keyButton, v_3b402b === '' && v_d81136.keyButtonPlaceholder]}
-                  activeOpacity={v_3b402b ? 0.6 : 1}
-                  onPress={() => v_3b402b && v_fceada(v_3b402b)}
-                >
-                  {v_3b402b !== '' && <Text style={v_d81136.keyText}>{v_3b402b}</Text>}
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-
-      {v_326be8.OS === 'ios' && (
-        <View style={v_d81136.homeIndicator}>
-          <View style={v_d81136.homeIndicatorBar} />
-        </View>
-      )}
+      </SafeScrollView>
     </View>
   );
 };
@@ -323,56 +307,17 @@ const v_d81136 = v_472849.create({
     alignSelf: 'center',
     marginBottom: 32,
   },
-  keyboardContainer: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 16,
-  },
-  keyboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  keyButton: {
-    flex: 1,
-    marginHorizontal: 4,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#f2f2f2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  keyButtonPlaceholder: {
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-  },
-  keyText: {
-    fontSize: 24,
-    fontFamily: 'Roboto-Bold',
-    color: '#10192d',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
   loadingContainer: {
     height: 56,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    opacity: 0,
   },
 });

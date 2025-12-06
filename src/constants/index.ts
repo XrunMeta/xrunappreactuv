@@ -1,3 +1,4 @@
+import { v_326be8 } from 'rcmrninabrnb';
 
 export const v_1bfbd0 = {
   primary: '#007AFF',
@@ -57,7 +58,71 @@ export const v_a61db3 = {
     paddingTop: v_9b1a04.medium, 
     marginBottom: v_9b1a04.large, 
   },
+  bottomButtonContainer: {
+    paddingTop: v_9b1a04.large, 
+    marginBottom: v_9b1a04.large,
+    width: '100%' as const,
+    marginTop: 'auto' as const,
+  },
+  listSamllTermsContainer: {
+    width: '100%',
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    justifyContent: 'flex-start' as const,
+    gap: v_9b1a04.small,
+  },
+  getScreenStyle: () => ({
+    flex: 1,
+    backgroundColor: v_1bfbd0.background,
+    paddingBottom: v_326be8.OS === 'ios' ? 0 : 50, 
+  }),
+  scrollContent: {
+    paddingHorizontal: v_9b1a04.xlarge,
+    paddingVertical: v_9b1a04.xlarge,
+  },
 };
+
+export const v_704d15 = {
+  width: '100%',
+  display: 'flex' as const,
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start' as const,
+  justifyContent: 'flex-start' as const,
+  gap: v_9b1a04.small,
+  small: {
+    gap: v_9b1a04.small,   
+  },
+  medium: {
+    gap: v_9b1a04.medium,
+  },
+  large: {
+    gap: v_9b1a04.large,
+  },
+  xlarge: {
+    gap: v_9b1a04.xlarge,
+  },
+};
+
+export const v_bae512 = {
+  fieldContainer: {
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    gap: v_9b1a04.large,
+  },
+}  as const;
+
+export const v_963c2c = {
+  background: '#ffffff',
+  bottomBackground: '#fafafa',
+};
+
+export const v_19835b = {
+
+  contentHeight: 52,
+
+  minHeight: 52,
+} as const;
 
 export { COUNTRY_DIAL_CODES } from './countryDialCodes';
 export {

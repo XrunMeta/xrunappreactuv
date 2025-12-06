@@ -1,9 +1,9 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_122070, v_4623af } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_19b633, v_472849, v_4623af } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
@@ -26,9 +26,8 @@ export const v_41dfd5 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoClauses.title')} onBackPress={v_c7ac57} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -44,7 +43,7 @@ export const v_41dfd5 = () => {
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -55,16 +54,10 @@ const v_d81136 = v_472849.create({
     backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    gap: 16,
+    ...v_704d15.small,
   },
   card: {
     width: '100%',

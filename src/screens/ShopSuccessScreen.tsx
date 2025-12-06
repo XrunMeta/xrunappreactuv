@@ -1,8 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608 } from '../components';
+import { v_729608, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
@@ -18,8 +17,7 @@ export const v_8734da = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
-      <StatusBar style="dark" />
+    <SafeView style={v_d81136.container}>
       <Header title={v_8d41d7('screens.shopSuccess.title')} showBackButton={false} />
       <View style={v_d81136.overlay}>
         <View style={v_d81136.card}>
@@ -30,7 +28,7 @@ export const v_8734da = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeView>
   );
 };
 

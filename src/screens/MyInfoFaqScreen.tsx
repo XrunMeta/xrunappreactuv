@@ -2,7 +2,6 @@ import v_a3453e, { v_df9f57, v_5ab095 } from 'bapkr';
 import {
   v_94c965,
   v_326be8,
-  v_122070,
   v_472849,
   v_19b633,
   v_4623af,
@@ -12,8 +11,8 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_729608, v_570c34 } from '../components';
+import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04 } from '../constants';
 
 if (v_326be8.OS === 'android' && v_bfa1d6.setLayoutAnimationEnabledExperimental) {
   v_bfa1d6.setLayoutAnimationEnabledExperimental(true);
@@ -91,7 +90,7 @@ export const v_083aa7 = () => {
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoFaq.title')} showBackButton />
-      <ScrollView
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -121,7 +120,7 @@ export const v_083aa7 = () => {
             );
           })}
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -129,18 +128,12 @@ export const v_083aa7 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   list: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    gap: 12,
+    ...v_704d15.small,
   },
   card: {
     borderRadius: 16,
@@ -169,6 +162,7 @@ const v_d81136 = v_472849.create({
     paddingHorizontal: 18,
     paddingVertical: 16,
     backgroundColor: '#f9fafc',
+    marginBottom: v_9b1a04.small,
   },
   answer: {
     fontSize: 14,

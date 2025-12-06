@@ -1,7 +1,8 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_cf9c33, v_122070 } from 'rcmrninabrnb';
-import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_3094a2, v_19b633, v_472849, v_cf9c33 } from 'rcmrninabrnb';
+import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
+import { v_a61db3 } from '../constants';
 
 let v_33c40c = null;
 try {
@@ -13,11 +14,11 @@ try {
 export const v_f7bdb9 = () => {
   return (
     <View style={v_d81136.container}>
-      <StatusBar style="dark" />
       <Header title="XRUN" />
-      <ScrollView 
+      <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         {}
         {v_33c40c && (
           <View style={v_d81136.logoContainer}>
@@ -43,7 +44,7 @@ export const v_f7bdb9 = () => {
             리워드를 받는 보상형 광고 플랫폼입니다.
           </Text>
         </View>
-      </ScrollView>
+      </SafeScrollView>
     </View>
   );
 };
@@ -51,11 +52,10 @@ export const v_f7bdb9 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   logoContainer: {
     alignItems: 'center',
@@ -77,7 +77,6 @@ const v_d81136 = v_472849.create({
     marginBottom: 20,
   },
   descriptionContainer: {
-    paddingHorizontal: 37,
     width: '100%',
   },
   description: {
