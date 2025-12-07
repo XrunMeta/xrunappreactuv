@@ -455,8 +455,8 @@ const styles = StyleSheet.create({
     color: '#7d7e83',
   },
   taboolaContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#d5dde0',
+    borderWidth: 2,
+    borderColor: '#ededed',
     marginTop: 10,
   },
 });

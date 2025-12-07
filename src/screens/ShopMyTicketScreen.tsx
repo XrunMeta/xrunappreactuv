@@ -325,8 +325,8 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   taboolaContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#d5dde0',
+    borderWidth: 2,
+    borderColor: '#ededed',
     marginTop: 10,
   },
 });

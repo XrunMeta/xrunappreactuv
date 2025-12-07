@@ -244,6 +244,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
+    paddingBottom: 0,
   },
   segmented: {
     marginVertical: SIZES.large,
