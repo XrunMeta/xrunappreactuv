@@ -150,7 +150,7 @@ export const FORM_STYLES = {
 
 export const SAFE_AREA = {
   background: '#ffffff',
-  bottomBackground: '#cccccc',
+  bottomBackground: '#fafafa',
 };
 
 export const HEADER = {

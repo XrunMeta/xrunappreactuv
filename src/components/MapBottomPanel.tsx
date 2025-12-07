@@ -41,6 +41,12 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
   onClose,
 }) => {
 
+  const [iconLoadError, setIconLoadError] = React.useState(false);
+
+  React.useEffect(() => {
+    setIconLoadError(false);
+  }, [spotData?.iconurl]);
+
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
   useEffect(() => {
@@ -199,15 +205,29 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
               </View>
 
               {}
-              {iconXrunLogo && (
-                <View
-                  style={{
-                    width: 44,
-                    height: 44,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: 12,
-                  }}>
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                }}>
+                {spotData.iconurl && !iconLoadError ? (
+                  <Image
+                    source={{ uri: spotData.iconurl }}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 8,
+                    }}
+                    resizeMode="cover"
+                    onError={() => {
+                      console.warn('[MapBottomPanel] 아이콘 이미지 로드 실패:', spotData.iconurl);
+                      setIconLoadError(true);
+                    }}
+                  />
+                ) : iconXrunLogo ? (
                   <Image
                     source={iconXrunLogo}
                     style={{
@@ -216,8 +236,8 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                     }}
                     resizeMode="contain"
                   />
-                </View>
-              )}
+                ) : null}
+              </View>
 
               {}
               <Pressable
