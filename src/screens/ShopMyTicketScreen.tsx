@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_df9f57 } from 'bapkr';
 import { v_3094a2, v_472849, v_79c4f2, v_39a996, v_19b633 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -50,6 +50,7 @@ export const v_052a8a = () => {
   const [v_683210, v_34a50a] = v_5ab095(true);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_f9a2c9, v_01b387] = v_5ab095<Record<string, string>>({}); 
+  const [v_5d756f, v_a563de] = v_5ab095<string>(''); 
   const [v_be52bc, v_0e7cbf] = v_5ab095<{
     visible: boolean;
     title: string;
@@ -188,6 +189,20 @@ export const v_052a8a = () => {
     }
   };
 
+  const v_973c3e = v_df9f57(() => {
+    if (!v_5d756f.trim()) {
+      return v_2aaa7b;
+    }
+
+    const v_7c5791 = v_5d756f.toLowerCase().trim();
+    return v_2aaa7b.filter((v_8c0b26) => {
+      const v_9f1622 = (v_8c0b26.title || '').toLowerCase();
+      const v_6856a9 = ((v_8c0b26 as any)?.description || '').toLowerCase();
+
+      return v_9f1622.includes(v_7c5791) || v_6856a9.includes(v_7c5791);
+    });
+  }, [v_2aaa7b, v_5d756f]);
+
   return (
     <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
@@ -215,11 +230,13 @@ export const v_052a8a = () => {
               placeholder="Search"
               placeholderTextColor="#bcbec4"
               style={v_d81136.searchInput}
+              value={v_5d756f}
+              onChangeText={v_a563de}
             />
           </View>
           <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-            {v_2aaa7b.length > 0 ? (
-              v_2aaa7b.map((v_8c0b26) => {
+            {v_973c3e.length > 0 ? (
+              v_973c3e.map((v_8c0b26) => {
 
                 const v_28895b = `${(v_8c0b26 as any).item}_${(v_8c0b26 as any).txID || 'no-tx'}`;
                 const v_63070e = v_f9a2c9[v_28895b];
@@ -244,7 +261,12 @@ export const v_052a8a = () => {
               })
             ) : (
               <View style={v_d81136.emptyContainer}>
-                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.shopMyTicket.noPurchasedItems')}</Text>
+                <Text style={v_d81136.emptyText}>
+                  {v_5d756f.trim()
+                    ? 'No search results'
+                    : v_8d41d7('screens.shopMyTicket.noPurchasedItems')
+                  }
+                </Text>
               </View>
             )}
           </SafeScrollView>

@@ -128,6 +128,7 @@ export const v_38326c = () => {
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_f9a2c9, v_01b387] = v_5ab095<Record<string, string>>({}); 
+  const [v_5d756f, v_a563de] = v_5ab095<string>(''); 
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -330,6 +331,20 @@ export const v_38326c = () => {
     v_9b57fc(v_ce4741.shopBuy);
   };
 
+  const v_973c3e = v_df9f57(() => {
+    if (!v_5d756f.trim()) {
+      return v_b1c029;
+    }
+
+    const v_7c5791 = v_5d756f.toLowerCase().trim();
+    return v_b1c029.filter((v_8c0b26) => {
+      const v_9f1622 = (v_8c0b26.title || '').toLowerCase();
+      const v_6856a9 = ((v_8c0b26 as any)?.description || '').toLowerCase();
+
+      return v_9f1622.includes(v_7c5791) || v_6856a9.includes(v_7c5791);
+    });
+  }, [v_b1c029, v_5d756f]);
+
   const v_719647 = (
     v_9f1622,
     v_6bbb57,
@@ -371,11 +386,13 @@ export const v_38326c = () => {
                 style={v_d81136.searchInput}
                 placeholder="Search"
                 placeholderTextColor="#bcbec4"
+                value={v_5d756f}
+                onChangeText={v_a563de}
               />
             </View>
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-              {v_11083e === 'ticket' && v_b1c029.length > 0
-                ? v_b1c029.map((v_8c0b26) => {
+              {v_11083e === 'ticket' && v_973c3e.length > 0
+                ? v_973c3e.map((v_8c0b26) => {
 
                   const v_63070e = v_f9a2c9[v_8c0b26.id];
                   const v_c322f7 = v_63070e
@@ -390,10 +407,15 @@ export const v_38326c = () => {
 
                   return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
                 })
-                : v_11083e === 'ticket' && v_b1c029.length === 0
+                : v_11083e === 'ticket' && v_973c3e.length === 0
                   ? (
                     <View style={v_d81136.emptyContainer}>
-                      <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                      <Text style={v_d81136.emptyText}>
+                        {v_5d756f.trim()
+                          ? 'No search results'
+                          : '구매 가능한 아이템이 없습니다.'
+                        }
+                      </Text>
                     </View>
                   )
                   : null}
