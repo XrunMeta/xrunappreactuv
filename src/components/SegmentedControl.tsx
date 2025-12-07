@@ -1,6 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_4623af, v_19b633, v_472849, v_7e4944 } from 'rcmrninabrnb';
-import { v_843035 } from '../constants';
+import { v_843035, v_9b1a04 } from '../constants';
 
 interface SegmentedControlOption<T extends string> {
   label: string;
@@ -53,14 +53,14 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#ebeff5',
     borderWidth: 1,
     borderColor: '#dfe3eb',
-    borderRadius: 8,
+    borderRadius: v_9b1a04.small,
     padding: 4,
     gap: 8,
   },
   optionWrapper: {
     flex: 1,
     height: 40,
-    borderRadius: 8,
+    borderRadius: v_9b1a04.small,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -69,7 +69,7 @@ const v_d81136 = v_472849.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowRadius: v_9b1a04.small,
     elevation: 2,
   },
   optionActiveWithIndicator: {

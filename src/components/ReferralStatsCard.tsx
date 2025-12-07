@@ -2,7 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_7e4944, v_961e77 } from 'rcmrninabrnb';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_1bfbd0, v_843035 } from '../constants';
+import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -71,9 +71,7 @@ export const ReferralStatsCard: v_a3453e.FC<ReferralStatsCardProps> = ({
 
 const v_d81136 = v_472849.create({
   card: {
-    width: '100%',
-    maxWidth: 780,
-    borderRadius: 28,
+    borderRadius: v_9b1a04.medium,
     shadowColor: '#6366F1',
     shadowOffset: { width: 0, height: 16 },
     shadowOpacity: 0.25,
@@ -84,7 +82,7 @@ const v_d81136 = v_472849.create({
   },
   gradient: {
     flex: 1,
-    borderRadius: 28,
+    borderRadius: v_9b1a04.medium,
     position: 'relative',
   },
   backgroundIcon: {
