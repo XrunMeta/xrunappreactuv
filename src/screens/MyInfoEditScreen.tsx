@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_df9f57 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
@@ -6,6 +6,8 @@ import {
   v_4623af,
   v_39a996,
   v_9cabcb,
+  v_aa7413,
+  v_122070,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -81,98 +83,186 @@ export const v_cdb169 = () => {
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_e495db, v_433822] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
-  const [v_6c7bef, v_7a68da] = v_5ab095<Array<{ country?: string; callnumber?: number; cCode?: number; cName?: string }>>([]);
   const [v_e94fdf, v_59ad99] = v_5ab095<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
-  const [v_0899ab, v_3400e8] = v_5ab095<number | null>(null);
-  const [v_2f03bc, v_2f2d51] = v_5ab095<number | null>(null);
   const [v_0908db, v_1c41ce] = v_5ab095(false);
 
   const [v_add96c, v_85a493] = v_5ab095<{ cDesc: string; cCode: number | null }>({ cDesc: '', cCode: null });
   const [v_167c8b, v_655be9] = v_5ab095<{ rDesc: string; rCode: number | null }>({ rDesc: '', rCode: null });
 
-  v_c4deb2(() => {
-    const v_ea3fa6 = async () => {
-      try {
-        const v_f24fd5 = await v_e84827.getItem('userData');
-        if (v_f24fd5) {
-          const v_ef7306 = JSON.parse(v_f24fd5);
-          const v_660822 = v_ef7306.member;
+  const [v_3a64df, v_c73419] = v_5ab095(false);
+  const [v_db24c7, v_a0f6fa] = v_5ab095<string | null>(null);
 
-          if (v_660822) {
-            v_9d6aeb(v_660822);
-            const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
-            const v_625c74 = v_3393e3.data[0];
+  const [v_9d09f1, v_d0e79e] = v_5ab095('');
+  const [v_b6daf3, v_c94311] = v_5ab095('');
+  const [v_318eac, v_edd340] = v_5ab095<'male' | 'female'>('male');
+  const [v_30922c, v_27ff98] = v_5ab095<(typeof v_0c96f7)[number]>('10');
+  const [v_b6505c, v_4a9b82] = v_5ab095<number | null>(null);
+  const [v_6e1588, v_8656e3] = v_5ab095<number | null>(null);
 
-            if (v_625c74) {
-              v_4944f5(v_625c74.firstname || '');
-              v_b7613d(v_625c74.lastname || '');
-              v_fedf34(v_625c74.email || '');
+  const v_ea3fa6 = async (v_587901 = true) => {
+    try {
+      if (v_587901) {
+        v_deef62(true);
+      }
+      const v_f24fd5 = await v_e84827.getItem('userData');
+      if (v_f24fd5) {
+        const v_ef7306 = JSON.parse(v_f24fd5);
+        const v_660822 = v_ef7306.member;
 
-              if (v_625c74.mobile) {
-                v_fcce73(v_625c74.mobile.replace(/\s/g, ''));
-              }
+        if (v_660822) {
+          v_9d6aeb(v_660822);
+          const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
+          const v_625c74 = v_3393e3.data[0];
 
-              v_bdc43c(v_d6877d(v_625c74.gender));
+          if (v_625c74) {
+            const v_898d5f = v_625c74.firstname || '';
+            const v_8e4db1 = v_625c74.lastname || '';
+            const v_df7343 = v_d6877d(v_625c74.gender);
+            const v_9c69cf = v_596588(v_625c74.ages);
 
-              v_6e5c76(v_596588(v_625c74.ages));
+            v_4944f5(v_898d5f);
+            v_b7613d(v_8e4db1);
+            v_fedf34(v_625c74.email || '');
 
-              if (v_625c74.country) {
-                v_9b1714(v_625c74.country);
-                v_3400e8(v_625c74.country);
+            v_d0e79e(v_898d5f);
+            v_c94311(v_8e4db1);
+            v_edd340(v_df7343);
+            v_27ff98(v_9c69cf);
 
-                try {
-                  const v_e7edd4 = await v_60f557(v_9b57fc);
-                  const v_3a56f1 = v_e7edd4.data || [];
-                  v_7a68da(v_3a56f1);
+            if (v_625c74.mobile) {
+              v_fcce73(v_625c74.mobile.replace(/\s/g, ''));
+            }
 
-                  const v_a54b0c = v_3a56f1.find((v_3f4e2e) => (v_3f4e2e.cCode === v_625c74.country || v_3f4e2e.callnumber === v_625c74.country));
-                  const v_67cb9c = v_a54b0c?.country || v_a54b0c?.cName || '';
-                  const v_a4d981 = v_a54b0c?.callnumber || v_a54b0c?.cCode || v_625c74.country;
+            v_bdc43c(v_df7343);
 
-                  v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
+            v_6e5c76(v_9c69cf);
 
-                  if (v_625c74.region) {
-                    v_b8bf44(v_625c74.region);
-                    v_2f2d51(v_625c74.region);
+            console.log('[정보수정] 사용자 국가/지역 정보 (원본):', { country: v_625c74.country, region: v_625c74.region, countryType: typeof v_625c74.country, regionType: typeof v_625c74.region });
 
-                    const v_878b8c = await v_11e39e(v_625c74.country, v_9b57fc);
-                    const v_13de92 = v_878b8c.data || [];
-                    v_59ad99(v_13de92);
+            const v_851a40 = typeof v_625c74.country === 'string' ? parseInt(v_625c74.country, 10) : v_625c74.country;
+            const v_23b15e = typeof v_625c74.region === 'string' ? parseInt(v_625c74.region, 10) : v_625c74.region;
 
-                    const v_8098b2 = v_13de92.find((v_cb35cb) => (v_cb35cb.subcode === v_625c74.region || v_cb35cb.rCode === v_625c74.region));
-                    const v_638c4d = v_8098b2?.description || v_8098b2?.rName || '';
-                    const v_222917 = v_8098b2?.subcode || v_8098b2?.rCode || v_625c74.region;
+            console.log('[정보수정] 변환된 국가/지역 정보:', { country: v_851a40, region: v_23b15e, countryType: typeof v_851a40, regionType: typeof v_23b15e });
 
-                    v_655be9({ rDesc: v_638c4d, rCode: v_222917 });
+            if (v_851a40 && !isNaN(v_851a40)) {
+              v_9b1714(v_851a40);
+              v_4a9b82(v_851a40);
 
-                    if (v_638c4d) {
-                      v_c030e3(`${v_67cb9c} ${v_638c4d}`);
-                    }
+              try {
+                const v_e7edd4 = await v_60f557(v_9b57fc);
+                const v_3a56f1 = v_e7edd4.data || [];
+
+                const v_a54b0c = v_3a56f1.find((v_3f4e2e) => {
+                  const v_d50b6d = typeof v_3f4e2e.cCode === 'string' ? parseInt(v_3f4e2e.cCode, 10) : v_3f4e2e.cCode;
+                  const v_2ce1e2 = typeof v_3f4e2e.callnumber === 'string' ? parseInt(v_3f4e2e.callnumber, 10) : v_3f4e2e.callnumber;
+                  return v_d50b6d === v_851a40 || v_2ce1e2 === v_851a40;
+                });
+
+                const v_67cb9c = v_a54b0c?.country || v_a54b0c?.cName || '';
+                const v_a4d981 = v_a54b0c?.callnumber || v_a54b0c?.cCode || v_851a40;
+
+                console.log('[정보수정] 국가 매칭 결과:', {
+                  userCountry: v_851a40,
+                  countryItem: v_a54b0c,
+                  countryName: v_67cb9c,
+                  countryCode: v_a4d981,
+                });
+
+                v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
+                console.log('[정보수정] tempCountry 설정됨:', { cDesc: v_67cb9c, cCode: v_a4d981 });
+
+                if (v_23b15e !== undefined && v_23b15e !== null && !isNaN(v_23b15e)) {
+                  const v_5cf162 = typeof v_23b15e === 'string' ? parseInt(v_23b15e, 10) : v_23b15e;
+                  v_b8bf44(v_5cf162);
+                  v_8656e3(v_5cf162);
+
+                  console.log('[정보수정] 지역 정보 설정:', { regionNum: v_5cf162, regionType: typeof v_5cf162 });
+
+                  if (v_5cf162 === 0) {
+                    const v_dbcc10 = v_8d41d7('screens.myInfoEdit.allRegions');
+                    v_655be9({ rDesc: v_dbcc10, rCode: 0 });
+                    v_a0f6fa(v_dbcc10);
+                    console.log('[정보수정] 전체지역 설정됨 (region: 0)');
                   } else {
 
-                    v_655be9({ rDesc: 'Please Select', rCode: 0 });
+                    try {
+                      v_1c41ce(true);
+                      const v_878b8c = await v_11e39e(v_a4d981, v_9b57fc);
+                      const v_13de92 = v_878b8c.data || [];
+                      v_59ad99(v_13de92);
+
+                      const v_8098b2 = v_13de92.find((v_cb35cb) => {
+                        const v_781183 = typeof v_cb35cb.subcode === 'string' ? parseInt(v_cb35cb.subcode, 10) : v_cb35cb.subcode;
+                        const v_34b52f = typeof v_cb35cb.rCode === 'string' ? parseInt(v_cb35cb.rCode, 10) : v_cb35cb.rCode;
+                        return v_781183 === v_5cf162 || v_34b52f === v_5cf162;
+                      });
+
+                      const v_638c4d = v_8098b2?.description || v_8098b2?.rName || '';
+
+                      if (v_638c4d) {
+                        v_655be9({ rDesc: v_638c4d, rCode: v_5cf162 });
+                        v_a0f6fa(v_638c4d);
+                        console.log('[정보수정] 초기 로드 - 지역 이름 찾음:', { rDesc: v_638c4d, rCode: v_5cf162 });
+                      } else {
+                        v_655be9({ rDesc: 'Please Select', rCode: v_5cf162 });
+                        v_a0f6fa(null);
+                        console.log('[정보수정] 초기 로드 - 지역 이름 없음:', { rCode: v_5cf162 });
+                      }
+                      v_1c41ce(false);
+                    } catch (v_5e9bfe) {
+                      console.error('[정보수정] 초기 로드 - 지역 목록 로드 실패:', v_5e9bfe);
+                      v_655be9({ rDesc: 'Please Select', rCode: v_5cf162 });
+                      v_a0f6fa(null);
+                      v_1c41ce(false);
+                    }
                   }
-                } catch (v_5e9bfe) {
-                  console.error('[정보수정] 국가/지역 정보 로드 실패:', v_5e9bfe);
+                } else {
+
+                  v_655be9({ rDesc: 'Please Select', rCode: 0 });
+                  v_a0f6fa(null);
+                  console.log('[정보수정] 지역 정보 없음 - 초기화');
                 }
-              } else if (v_625c74.region) {
-                v_b8bf44(v_625c74.region);
+              } catch (v_5e9bfe) {
+                console.error('[정보수정] 국가/지역 정보 로드 실패:', v_5e9bfe);
+              }
+            } else {
+
+              if (v_23b15e !== undefined && v_23b15e !== null && !isNaN(v_23b15e)) {
+                const v_5cf162 = typeof v_23b15e === 'string' ? parseInt(v_23b15e, 10) : v_23b15e;
+                v_b8bf44(v_5cf162);
+                v_8656e3(v_5cf162);
+
+                if (v_5cf162 === 0) {
+                  const v_dbcc10 = v_8d41d7('screens.myInfoEdit.allRegions');
+                  v_655be9({ rDesc: v_dbcc10, rCode: 0 });
+                  v_a0f6fa(v_dbcc10);
+                  console.log('[정보수정] 전체지역 설정됨 (region: 0, country 없음)');
+                } else {
+                  v_655be9({ rDesc: 'Please Select', rCode: v_5cf162 });
+                  v_a0f6fa(null);
+                }
               } else {
 
                 v_85a493({ cDesc: '', cCode: null });
                 v_655be9({ rDesc: 'Please Select', rCode: 0 });
+                v_a0f6fa(null);
+                console.log('[정보수정] 국가와 지역 모두 없음 - 초기화');
               }
             }
           }
         }
-      } catch (v_5e9bfe) {
-        console.error('[정보수정] 사용자 정보 로드 실패:', v_5e9bfe);
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.loadFailed'));
-      } finally {
+      }
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 사용자 정보 로드 실패:', v_5e9bfe);
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.loadFailed'));
+    } finally {
+      if (v_587901) {
         v_deef62(false);
       }
-    };
+    }
+  };
 
+  v_c4deb2(() => {
     v_ea3fa6();
   }, [v_9b57fc, v_8d41d7]);
 
@@ -207,43 +297,53 @@ export const v_cdb169 = () => {
 
       const v_e01f71 = [];
 
-      if (v_a32a50.trim()) {
+      if (v_a32a50.trim() !== v_9d09f1.trim()) {
+        console.log('[정보수정] 이름 변경 감지:', { original: v_9d09f1, new: v_a32a50.trim() });
         v_e01f71.push(v_152d53(v_717992, v_a32a50.trim(), v_9b57fc));
       }
 
-      if (v_328bb4.trim()) {
+      if (v_328bb4.trim() !== v_b6daf3.trim()) {
+        console.log('[정보수정] 성 변경 감지:', { original: v_b6daf3, new: v_328bb4.trim() });
         v_e01f71.push(v_7f8c9e(v_717992, v_328bb4.trim(), v_9b57fc));
       }
 
       const v_d199d8 = v_a1244c(v_c3eac4);
-      if (v_d199d8 !== undefined && v_d199d8 !== null) {
+      const v_9f4b02 = v_a1244c(v_318eac);
+      if (v_d199d8 !== undefined && v_d199d8 !== null && v_d199d8 !== v_9f4b02) {
+        console.log('[정보수정] 성별 변경 감지:', { original: v_9f4b02, new: v_d199d8 });
         v_e01f71.push(v_71d37e(v_717992, v_d199d8, v_9b57fc));
-      } else {
-        console.warn('[정보수정] 성별 값이 유효하지 않습니다:', v_c3eac4);
       }
 
       const v_2d2cbc = v_e9394b(v_2694bd);
-      if (v_2d2cbc !== undefined && v_2d2cbc !== null) {
+      const v_08fe20 = v_e9394b(v_30922c);
+      if (v_2d2cbc !== undefined && v_2d2cbc !== null && v_2d2cbc !== v_08fe20) {
+        console.log('[정보수정] 나이 변경 감지:', { original: v_08fe20, new: v_2d2cbc });
         v_e01f71.push(v_07f367(v_717992, v_2d2cbc, v_9b57fc));
-      } else {
-        console.warn('[정보수정] 나이 값이 유효하지 않습니다:', v_2694bd);
       }
 
-      await Promise.all(v_e01f71);
+      if (v_add96c.cCode !== null && v_167c8b.rCode !== null && v_167c8b.rCode !== 0 && v_167c8b.rCode !== -1) {
+        const v_ca520f = v_add96c.cCode;
+        const v_c61e4f = v_167c8b.rCode;
+        if (v_ca520f !== v_b6505c || v_c61e4f !== v_6e1588) {
+          console.log('[정보수정] 국가/지역 변경 감지:', {
+            original: { country: v_b6505c, region: v_6e1588 },
+            new: { country: v_ca520f, region: v_c61e4f },
+          });
+          v_e01f71.push(v_4296b8(v_717992, v_ca520f, v_c61e4f, v_9b57fc));
+        }
+      }
 
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'), [
-        {
-          text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
-          onPress: () => {
+      if (v_e01f71.length > 0) {
 
-            if (v_7e32fb) {
-              v_c7ac57();
-            } else {
-              v_487a25(v_ce4741.myInfo);
-            }
-          },
-        },
-      ]);
+        await Promise.all(v_e01f71);
+
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'));
+
+        await v_ea3fa6(false);
+      } else {
+
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.noChanges'));
+      }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 정보 수정 실패:', v_5e9bfe);
       await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveFailed'), v_8d41d7('screens.myInfoEdit.alerts.saveFailedMessage'));
@@ -254,6 +354,16 @@ export const v_cdb169 = () => {
 
   const v_c09605 = async () => {
     v_9b57fc(v_ce4741.myInfoChangePassword);
+  };
+
+  const v_261e69 = async () => {
+    try {
+
+      v_67ab1c('country');
+      v_9b57fc('countryCodeSelect');
+    } catch (v_5e9bfe) {
+      console.error('[정보수정] 국가 선택 화면 이동 실패:', v_5e9bfe);
+    }
   };
 
   const v_801fea = async () => {
@@ -299,89 +409,165 @@ export const v_cdb169 = () => {
     }
   };
 
-  const v_261e69 = async () => {
+  const v_bec697 = (v_146092): number | null => {
+
     try {
 
-      v_67ab1c('country');
-      v_9b57fc('countryCodeSelect');
+      const v_277926 = parseInt(v_146092.replace('+', ''), 10);
+      return v_277926 || null;
     } catch (v_5e9bfe) {
-      console.error('[정보수정] 국가 선택 화면 이동 실패:', v_5e9bfe);
+      console.error('[정보수정] 국가 코드 추출 실패:', v_5e9bfe);
+      return null;
     }
   };
 
-  v_c4deb2(() => {
-    const v_545028 = async () => {
-      if (!v_459d5e || v_0908db) {
-        return;
+  const v_477add = (v_2f03bc) => {
+    const v_222917 = v_2f03bc.subcode || v_2f03bc.rCode || 0;
+    const v_5a7a4f = v_2f03bc.description || v_2f03bc.rName || '';
+
+    console.log('[정보수정] 지역 선택:', { regionCode: v_222917, regionDesc: v_5a7a4f, selectedRegion: v_2f03bc });
+
+    if (!v_5a7a4f) {
+      console.warn('[정보수정] 지역 설명이 없습니다:', v_2f03bc);
+
+      const v_2d5696 = 'Unknown';
+      v_655be9({
+        rDesc: v_2d5696,
+        rCode: v_222917,
+      });
+      v_a0f6fa(v_2d5696);
+    } else {
+
+      if (v_222917 === -1) {
+        v_655be9({
+          rDesc: v_5a7a4f,
+          rCode: -1, 
+        });
+        console.log('[정보수정] 전체 지역 선택됨:', v_5a7a4f);
+      } else {
+        v_655be9({
+          rDesc: v_5a7a4f,
+          rCode: v_222917,
+        });
+        console.log('[정보수정] 지역 선택됨:', { rDesc: v_5a7a4f, rCode: v_222917 });
       }
 
+      v_a0f6fa(v_5a7a4f);
+    }
+
+    v_c73419(false);
+
+    setTimeout(() => {
+      console.log('[정보수정] 지역 선택 후 상태 확인:', {
+        tempCountry: v_add96c,
+        tempRegion: { rDesc: v_5a7a4f || 'Unknown', rCode: v_222917 },
+        selectedRegionId: v_5a7a4f || 'Unknown',
+      });
+    }, 100);
+  };
+
+  const v_c0d2d4 = async () => {
+    console.log('handleOpenRegionModal');
+
+    if (!v_459d5e || !v_459d5e.dialCode) {
+      await v_889fad(
+        v_8d41d7('screens.myInfoEdit.alerts.error'),
+        v_8d41d7('screens.myInfoEdit.alerts.selectCountryFirst')
+      );
+
+      v_261e69();
+      return;
+    }
+
+    const v_a4d981 = v_bec697(v_459d5e.dialCode); 
+    if (!v_a4d981) {
+      await v_889fad(
+        v_8d41d7('screens.myInfoEdit.alerts.error'),
+        v_8d41d7('screens.myInfoEdit.alerts.invalidCountryCode')
+      );
+      return;
+    }
+
+    const v_ca520f = v_add96c.cCode;
+    if (v_e94fdf.length === 0 || v_ca520f !== v_a4d981) {
+      v_1c41ce(true);
       try {
+        console.log('[정보수정] 지역 목록 조회:', { countryCode: v_a4d981, dialCode: v_459d5e.dialCode });
 
-        const v_277926 = parseInt(v_459d5e.dialCode.replace('+', ''), 10);
+        const v_878b8c = await v_11e39e(v_a4d981, v_9b57fc);
+        const v_13de92 = v_878b8c.data || [];
+        v_59ad99(v_13de92);
 
-        if (!v_277926) {
-          return;
-        }
+        v_85a493({
+          cDesc: v_459d5e.name,
+          cCode: v_a4d981,
+        });
 
-        if (v_6c7bef.length === 0) {
-          const v_e7edd4 = await v_60f557(v_9b57fc);
-          const v_3a56f1 = v_e7edd4.data || [];
-          v_7a68da(v_3a56f1);
-
-          const v_a54b0c = v_3a56f1.find(
-            (v_3f4e2e) => (v_3f4e2e.callnumber === v_277926 || v_3f4e2e.cCode === v_277926)
-          );
-
-          if (v_a54b0c) {
-            const v_a4d981 = v_a54b0c.callnumber || v_a54b0c.cCode;
-            const v_67cb9c = v_a54b0c.country || v_a54b0c.cName || v_459d5e.name;
-
-            v_85a493({
-              cDesc: v_67cb9c,
-              cCode: v_a4d981 || v_277926,
-            });
-
-          } else {
-
-            v_85a493({
-              cDesc: v_459d5e.name,
-              cCode: v_277926,
-            });
-
-          }
-        } else {
-
-          const v_a54b0c = v_6c7bef.find(
-            (v_3f4e2e) => (v_3f4e2e.callnumber === v_277926 || v_3f4e2e.cCode === v_277926)
-          );
-
-          if (v_a54b0c) {
-            const v_a4d981 = v_a54b0c.callnumber || v_a54b0c.cCode;
-            const v_67cb9c = v_a54b0c.country || v_a54b0c.cName || v_459d5e.name;
-
-            v_85a493({
-              cDesc: v_67cb9c,
-              cCode: v_a4d981 || v_277926,
-            });
-
-          }
+        if (v_13de92.length === 0) {
+          console.log('[정보수정] 지역 목록이 없습니다. 전체 지역을 선택할 수 있습니다.');
+          v_59ad99([{
+            description: v_8d41d7('screens.myInfoEdit.allRegions'),
+            subcode: -1,
+            rCode: -1,
+            rName: v_8d41d7('screens.myInfoEdit.allRegions'),
+          }]);
         }
       } catch (v_5e9bfe) {
-        console.error('[정보수정] 국가 정보 업데이트 실패:', v_5e9bfe);
+        console.error('[정보수정] 지역 목록 로드 실패:', v_5e9bfe);
+
+        v_59ad99([{
+          description: v_8d41d7('screens.myInfoEdit.allRegions'),
+          subcode: -1,
+          rCode: -1,
+          rName: v_8d41d7('screens.myInfoEdit.allRegions'),
+        }]);
       } finally {
         v_1c41ce(false);
       }
-    };
+    }
+
+    v_c73419(true);
+  };
+
+  v_c4deb2(() => {
+    console.log('[정보수정] useEffect 트리거됨 - selectedCountryDialCode 변경 감지:', {
+      selectedCountryDialCode: v_459d5e,
+      iso2: v_459d5e?.iso2,
+      isLoading: v_cd31a8,
+      조건체크: v_459d5e && !v_cd31a8,
+    });
 
     if (v_459d5e && !v_cd31a8) {
+      console.log('[정보수정] 전화번호 국가 선택됨 (CountryCodeSelectScreen에서):', {
+        iso2: v_459d5e.iso2,
+        name: v_459d5e.name,
+        dialCode: v_459d5e.dialCode,
+        flagEmoji: v_459d5e.flagEmoji,
+      });
 
-      const v_cb36b1 = setTimeout(() => {
-        v_545028();
-      }, 100);
+      const v_a4d981 = v_bec697(v_459d5e.dialCode);
+      console.log('[정보수정] 추출된 국가 코드:', { dialCode: v_459d5e.dialCode, countryCode: v_a4d981 });
 
-      return () => clearTimeout(v_cb36b1);
+      if (v_a4d981) {
+
+        v_85a493({
+          cDesc: v_459d5e.name,
+          cCode: v_a4d981,
+        });
+        console.log('[정보수정] tempCountry 업데이트 완료:', {
+          cDesc: v_459d5e.name,
+          cCode: v_a4d981,
+        });
+
+        v_59ad99([]);
+
+        if (v_167c8b.rCode !== null && v_167c8b.rCode !== 0) {
+          v_655be9({ rDesc: 'Please Select', rCode: 0 });
+          v_a0f6fa(null);
+        }
+      }
     }
-  }, [v_459d5e?.iso2, v_9b57fc]); 
+  }, [v_459d5e?.iso2]);
 
   return (
     <View style={v_d81136.container}>
@@ -450,12 +636,17 @@ export const v_cdb169 = () => {
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.phone')}</Text>
               <View style={v_d81136.phoneFieldContainer}>
                 {}
-                <View style={v_d81136.phonePrefixDisabled}>
+                <TouchableOpacity
+                  style={v_d81136.phonePrefix}
+                  onPress={v_261e69}
+                  activeOpacity={0.7}
+                  disabled={v_e495db}
+                >
                   <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
-                  <Text style={v_d81136.phonePrefixTextDisabled}>
-                    +{v_459d5e.dialCode.replace('+', '')}
+                  <Text style={v_d81136.phonePrefixText}>
+                    {v_459d5e.dialCode}
                   </Text>
-                </View>
+                </TouchableOpacity>
                 {}
                 <TouchableOpacity
                   style={v_d81136.phoneValueContainer}
@@ -468,20 +659,21 @@ export const v_cdb169 = () => {
               </View>
             </View>
 
+            {}
             <View style={v_d81136.fieldContainer}>
-              <Text style={v_d81136.label}>Country</Text>
+              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.region')}</Text>
               <TouchableOpacity
                 style={v_d81136.regionField}
-                onPress={v_261e69}
+                onPress={v_c0d2d4}
                 activeOpacity={0.7}
-                disabled={v_e495db}
+                disabled={v_e495db || v_0908db}
               >
-                <Text style={[v_d81136.regionValue, !v_add96c.cDesc && v_d81136.regionPlaceholder]}>
-                  {v_add96c.cDesc
-                    ? `${v_add96c.cDesc} (+${v_add96c.cCode})`
-                    : v_459d5e
-                      ? `${v_459d5e.name} (${v_459d5e.dialCode})`
-                      : '국가를 선택하세요'}
+                <Text style={[v_d81136.regionValue, (!v_add96c.cDesc || !v_167c8b.rDesc || v_167c8b.rCode === 0 || v_167c8b.rCode === null || v_167c8b.rCode === -1) && v_d81136.regionPlaceholder]}>
+                  {v_add96c.cDesc && v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' && v_167c8b.rCode !== null && v_167c8b.rCode !== 0 && v_167c8b.rCode !== -1
+                    ? `${v_add96c.cDesc}, ${v_167c8b.rDesc}`
+                    : v_add96c.cDesc
+                      ? `${v_add96c.cDesc}, ${v_8d41d7('screens.myInfoEdit.pleaseSelect')}`
+                      : v_8d41d7('screens.myInfoEdit.selectCountryAndRegion')}
                 </Text>
                 <Text style={v_d81136.arrow}>›</Text>
               </TouchableOpacity>
@@ -539,6 +731,64 @@ export const v_cdb169 = () => {
         </View>
       </SafeScrollView>
 
+      {}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={v_3a64df}
+        onRequestClose={() => v_c73419(false)}
+      >
+        <View style={v_d81136.modalOverlay}>
+          <TouchableOpacity
+            style={v_d81136.modalBackdrop}
+            activeOpacity={1}
+            onPress={() => v_c73419(false)}
+          />
+          <View style={v_d81136.modalContent}>
+            <View style={v_d81136.modalHeader}>
+              <Text style={v_d81136.modalTitle}>
+                {v_add96c.cDesc ? `${v_8d41d7('screens.myInfoEdit.selectRegion')} - ${v_add96c.cDesc}` : v_8d41d7('screens.myInfoEdit.selectRegion')}
+              </Text>
+              <TouchableOpacity onPress={() => v_c73419(false)}>
+                <Text style={v_d81136.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {v_0908db ? (
+              <View style={v_d81136.modalLoadingContainer}>
+                <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+              </View>
+            ) : (
+              <ScrollView style={v_d81136.modalScrollView}>
+                {v_e94fdf.length > 0 ? (
+                  v_e94fdf.map((v_a6c30b) => (
+                    <TouchableOpacity
+                      key={v_a6c30b.subcode || v_a6c30b.rCode || v_a6c30b.description}
+                      style={[
+                        v_d81136.modalItem,
+                        v_db24c7 === (v_a6c30b.description || v_a6c30b.rName) && v_d81136.modalItemSelected,
+                      ]}
+                      onPress={() => v_477add(v_a6c30b)}
+                    >
+                      <Text style={v_d81136.modalItemText}>
+                        {v_a6c30b.description || v_a6c30b.rName || 'Unknown'}
+                      </Text>
+                      {v_db24c7 === (v_a6c30b.description || v_a6c30b.rName) && (
+                        <Text style={v_d81136.checkmark}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <View style={v_d81136.emptyContainer}>
+                    <Text style={v_d81136.emptyText}>{v_8d41d7('screens.myInfoEdit.noRegions')}</Text>
+                    <Text style={v_d81136.emptyTextSub}>{v_8d41d7('screens.myInfoEdit.selectAllRegions')}</Text>
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -594,7 +844,7 @@ const v_d81136 = v_472849.create({
     minHeight: 52, 
     overflow: 'hidden',
   },
-  phonePrefixDisabled: {
+  phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -602,16 +852,16 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#ededed',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fefefe',
   },
   flagEmoji: {
     fontSize: v_843035.size.large,
     marginRight: 6,
   },
-  phonePrefixTextDisabled: {
+  phonePrefixText: {
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
-    color: '#a8a8a7',
+    color: '#343a59',
   },
   phoneValueContainer: {
     flex: 1,
@@ -782,6 +1032,85 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
+  },
+  emptyTextSub: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
+    marginTop: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '90%',
+    maxWidth: 400,
+    maxHeight: '80%',
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ededed',
+  },
+  modalTitle: {
+    fontSize: v_843035.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+    flex: 1,
+  },
+  modalCloseButton: {
+    fontSize: v_843035.size.xlarge,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
+    padding: 4,
+  },
+  modalScrollView: {
+    maxHeight: 400,
+  },
+  modalLoadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+    marginHorizontal: 16,
+  },
+  modalItemSelected: {
+    borderColor: v_1bfbd0.buttonPrimary,
+    backgroundColor: '#f5f6fa',
+  },
+  modalItemText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#1a2e35',
+    flex: 1,
   },
 });
 
