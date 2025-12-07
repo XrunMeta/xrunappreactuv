@@ -82,7 +82,7 @@ const v_d81136 = v_472849.create({
   },
   rank: {
     width: 28,
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
@@ -93,13 +93,13 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   email: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   description: {
     marginTop: 4,
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -107,13 +107,13 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   date: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#707070',
   },
   value: {
     marginTop: 4,
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

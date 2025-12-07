@@ -97,21 +97,21 @@ const v_d81136 = v_472849.create({
     height: 18,
   },
   label: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   caption: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#5f6478',
   },
   compactLabel: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     color: '#1f6880',
   },
   compactCaption: {
-    fontSize: v_843035.fontSize.xsmall,
+    fontSize: v_843035.size.xsmall,
   },
   textColumn: {
     justifyContent: 'center',

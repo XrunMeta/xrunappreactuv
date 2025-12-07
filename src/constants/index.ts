@@ -30,7 +30,7 @@ export const v_843035 = {
     bold: 'Roboto-Bold',
     black: 'Roboto-Black',
   },
-  fontSize: {
+  size: {
     xxsmall: 10,   
     xsmall: 11,   
     small: 12,

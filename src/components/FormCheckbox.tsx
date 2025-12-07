@@ -96,7 +96,7 @@ const v_d81136 = v_472849.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
   },

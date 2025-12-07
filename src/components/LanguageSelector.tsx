@@ -87,7 +87,7 @@ const v_d81136 = v_472849.create({
     maxHeight: '70%',
   },
   title: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.headerText,
     marginBottom: 20,
@@ -110,7 +110,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: v_1bfbd0.buttonPrimary,
   },
   optionText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: v_1bfbd0.text,
   },
@@ -119,7 +119,7 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
   },
   checkmark: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     color: '#fff',
     fontFamily: 'Roboto-Bold',
   },
@@ -131,7 +131,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   closeButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.text,
   },

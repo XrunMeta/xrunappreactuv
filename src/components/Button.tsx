@@ -1,17 +1,17 @@
 import v_a3453e from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_629153 } from 'rcmrninabrnb';
-import { v_1bfbd0, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
 
 interface ButtonProps extends v_629153 {
   title: string;
   variant?: 'primary' | 'secondary';
 }
 
-export const Button: v_a3453e.FC<ButtonProps> = ({ 
-  title: v_9f1622, 
-  variant: v_46e192 = 'primary', 
-  style: v_7fa4e4, 
-  ...v_b1927c 
+export const Button: v_a3453e.FC<ButtonProps> = ({
+  title: v_9f1622,
+  variant: v_46e192 = 'primary',
+  style: v_7fa4e4,
+  ...v_b1927c
 }) => {
   return (
     <TouchableOpacity
@@ -43,7 +43,7 @@ const v_d81136 = v_472849.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: v_9b1a04.medium,
+    fontSize: v_843035.size.medium,
     fontWeight: '600',
   },
 });

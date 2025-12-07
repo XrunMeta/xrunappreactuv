@@ -313,20 +313,20 @@ const v_d81136 = v_472849.create({
     marginBottom: 20,
   },
   itemTitle: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#111111',
     marginBottom: 6,
   },
   description: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     marginBottom: 12,
     lineHeight: 20,
   },
   link: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#007aff',
     marginBottom: 30,
@@ -340,12 +340,12 @@ const v_d81136 = v_472849.create({
     marginBottom: 12,
   },
   label: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#78828a',
   },
   value: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111111',
   },
@@ -360,7 +360,7 @@ const v_d81136 = v_472849.create({
   },
   totalValue: {
     fontFamily: 'Roboto-Bold',
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
   },
   balanceInfo: {
     borderTopWidth: 1,
@@ -375,7 +375,7 @@ const v_d81136 = v_472849.create({
     color: '#dc3545',
   },
   insufficientBalanceText: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#dc3545',
     textAlign: 'center',
@@ -405,12 +405,12 @@ const v_d81136 = v_472849.create({
   },
   cancelText: {
     color: '#fff',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryText: {
     color: '#fff',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

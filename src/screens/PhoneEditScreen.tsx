@@ -183,11 +183,11 @@ const v_d81136 = v_472849.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },

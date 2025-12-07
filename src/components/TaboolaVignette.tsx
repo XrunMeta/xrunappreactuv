@@ -1,6 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_472849, v_39a996, v_19b633, v_aa7413, v_326be8, v_4623af } from 'rcmrninabrnb';
-import { v_1bfbd0, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
 import {
   v_dc5d8f,
   v_995f93,
@@ -106,7 +106,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#E0E0E0',
   },
   placeholderText: {
-    fontSize: v_9b1a04.medium,
+    fontSize: v_843035.size.medium,
     color: v_1bfbd0.text,
     opacity: 0.5,
     marginTop: v_9b1a04.medium,
@@ -122,7 +122,7 @@ const v_d81136 = v_472849.create({
     zIndex: 1000,
   },
   closeButtonText: {
-    fontSize: v_9b1a04.medium,
+    fontSize: v_843035.size.medium,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },

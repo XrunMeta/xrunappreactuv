@@ -178,7 +178,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Medium',
-                      fontSize: v_843035.fontSize.medium,
+                      fontSize: v_843035.size.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
                       marginBottom: 4,
@@ -188,7 +188,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Regular',
-                      fontSize: v_843035.fontSize.small,
+                      fontSize: v_843035.size.small,
                       color: '#4c4e55',
                       lineHeight: 15,
                       letterSpacing: 0.06,

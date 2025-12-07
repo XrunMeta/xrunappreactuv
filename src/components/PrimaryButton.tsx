@@ -48,7 +48,7 @@ const v_d81136 = v_472849.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontWeight: '500',
     lineHeight: 24,
     fontFamily: 'Roboto-Medium', 

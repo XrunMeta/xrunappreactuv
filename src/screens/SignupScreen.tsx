@@ -437,7 +437,7 @@ const v_d81136 = v_472849.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -452,11 +452,11 @@ const v_d81136 = v_472849.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     marginRight: 6,
   },
   countryCode: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
@@ -477,7 +477,7 @@ const v_d81136 = v_472849.create({
   },
   termsText: {
     flex: 1,
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',

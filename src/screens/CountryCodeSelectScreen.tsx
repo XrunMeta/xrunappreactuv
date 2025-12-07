@@ -135,7 +135,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 16,
   },
   sectionLabel: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#9ca3af',
     marginBottom: 8,
     fontFamily: 'Roboto-Medium',
@@ -157,7 +157,7 @@ const v_d81136 = v_472849.create({
     marginRight: 12,
   },
   flagEmoji: {
-    fontSize: v_843035.fontSize.xlarge,
+    fontSize: v_843035.size.xlarge,
   },
   currentInfo: {
     flexDirection: 'row',
@@ -166,12 +166,12 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   currentCountry: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.headerText,
   },
   currentDial: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.buttonPrimary,
   },
@@ -187,7 +187,7 @@ const v_d81136 = v_472849.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: v_843035.fontSize.lsmall,
+    fontSize: v_843035.size.lsmall,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.headerText,
   },
@@ -199,7 +199,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: v_843035.fontSize.lsmall,
+    fontSize: v_843035.size.lsmall,
     color: '#9ca3af',
     fontFamily: 'Roboto-Regular',
   },

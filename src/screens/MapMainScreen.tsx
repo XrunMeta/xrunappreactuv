@@ -2210,7 +2210,7 @@ const v_d81136 = v_472849.create({
 
   calloutDistance: {
 
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
 
     fontFamily: 'Roboto-Regular',
 
@@ -2234,7 +2234,7 @@ const v_d81136 = v_472849.create({
 
   calloutBrand: {
 
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
 
     fontFamily: 'Roboto-Medium',
 

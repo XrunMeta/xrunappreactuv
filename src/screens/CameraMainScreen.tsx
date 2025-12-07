@@ -1484,7 +1484,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     <Text
                       style={{
                         fontFamily: 'Roboto-Medium',
-                        fontSize: v_843035.fontSize.medium,
+                        fontSize: v_843035.size.medium,
                         color: '#4c4e55',
                         lineHeight: 24,
                         marginTop: 20,
@@ -1500,7 +1500,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     <Text
                       style={{
                         fontFamily: 'Roboto-Regular',
-                        fontSize: v_843035.fontSize.small,
+                        fontSize: v_843035.size.small,
                         color: '#4c4e55',
                         lineHeight: 15,
                         letterSpacing: 0.06,
@@ -1542,7 +1542,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   }}>
                   <Text
                     style={{
-                      fontSize: v_843035.fontSize.msmall,
+                      fontSize: v_843035.size.msmall,
                       fontFamily: 'Roboto-Bold',
                       color: '#000000',
                     }}>
@@ -1599,7 +1599,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.log('모달 닫기 버튼 클릭');
             v_219124(false);
           }}>
-          <Text style={{ color: '#FFFFFF', fontSize: v_843035.fontSize.xlarge, fontWeight: 'bold' }}>×</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: v_843035.size.xlarge, fontWeight: 'bold' }}>×</Text>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -1711,14 +1711,14 @@ const v_d81136 = v_472849.create({
 
   tokenPriceText: {
     color: 'white',
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontWeight: 'bold',
     textAlign: 'center',
   },
 
   tokenDistanceText: {
     color: '#CCCCCC',
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     marginTop: -2,
     textAlign: 'center',
   },

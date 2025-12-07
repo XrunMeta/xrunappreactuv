@@ -151,7 +151,7 @@ const v_d81136 = v_472849.create({
   },
   question: {
     flex: 1,
-    fontSize: v_843035.fontSize.lsmall,
+    fontSize: v_843035.size.lsmall,
     fontFamily: 'Roboto-Medium',
     color: '#111827',
     marginRight: 12,
@@ -165,7 +165,7 @@ const v_d81136 = v_472849.create({
     marginBottom: v_9b1a04.small,
   },
   answer: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     lineHeight: 20,
     color: '#4b5563',
     fontFamily: 'Roboto-Regular',

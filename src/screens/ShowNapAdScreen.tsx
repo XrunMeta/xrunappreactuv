@@ -756,7 +756,7 @@ const v_d81136 = v_472849.create({
   },
   loadingText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: 'grey',
     textAlign: 'center',
     marginTop: 10,
@@ -765,7 +765,7 @@ const v_d81136 = v_472849.create({
   },
   retryText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#388Dc8',
     textAlign: 'center',
     marginTop: 10,
@@ -791,7 +791,7 @@ const v_d81136 = v_472849.create({
     shadowRadius: 3.84,
   },
   alternativeAdButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -815,7 +815,7 @@ const v_d81136 = v_472849.create({
     shadowRadius: 3.84,
   },
   backButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -825,7 +825,7 @@ const v_d81136 = v_472849.create({
     alignSelf: 'center',
   },
   goToMapLink: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#388Dc8',
     textAlign: 'center',
@@ -859,14 +859,14 @@ const v_d81136 = v_472849.create({
     marginHorizontal: 'auto',
   },
   modalText: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Regular',
     marginBottom: 10,
     color: 'black',
     textAlign: 'center',
   },
   modalSubText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     marginBottom: 20,
     color: '#666',
@@ -891,7 +891,7 @@ const v_d81136 = v_472849.create({
     shadowRadius: 2,
   },
   okButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -915,21 +915,21 @@ const v_d81136 = v_472849.create({
     justifyContent: 'flex-start',
   },
   campaignTitle: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
   },
   campaignReward: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     marginBottom: 10,
     color: '#388Dc8',
     textAlign: 'center',
   },
   campaignDesc: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     textAlign: 'center',
@@ -960,7 +960,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   watchAdButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -982,7 +982,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#666',
     textAlign: 'center',
@@ -994,7 +994,7 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   joinDescTitle: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -1011,7 +1011,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 20,
   },
   joinDescText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#495057',
     lineHeight: 18,

@@ -25,7 +25,7 @@ const v_d81136 = v_472849.create({
     padding: 20,
   },
   title: {
-    fontSize: v_843035.fontSize.xlarge,
+    fontSize: v_843035.size.xlarge,
     fontWeight: 'bold',
     marginBottom: 20,
   },

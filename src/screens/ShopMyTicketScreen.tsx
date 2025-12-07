@@ -305,7 +305,7 @@ const v_d81136 = v_472849.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -314,12 +314,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
   dialogText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#121212',
     lineHeight: 24,
     textAlign: 'left',

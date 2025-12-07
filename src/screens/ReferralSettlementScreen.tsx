@@ -309,7 +309,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -334,22 +334,22 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
   },
   refTypeText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   dateText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
   descriptionText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
   },
   amountText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

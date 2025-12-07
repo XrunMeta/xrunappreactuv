@@ -95,7 +95,7 @@ const v_d81136 = v_472849.create({
     height: 40,
   },
   iconText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
   },
   badge: {
@@ -108,7 +108,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 2,
   },
   badgeText: {
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
@@ -116,12 +116,12 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   title: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   subtitle: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -129,12 +129,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
   suffix: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },

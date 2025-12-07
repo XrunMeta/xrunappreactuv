@@ -136,7 +136,7 @@ const v_d81136 = v_472849.create({
   },
   helperText: {
     marginTop: 8,
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#747474',
     fontFamily: 'Roboto-Regular',

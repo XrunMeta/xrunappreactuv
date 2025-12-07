@@ -116,7 +116,7 @@ const v_d81136 = v_472849.create({
   },
   title: {
     flex: 1,
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -157,7 +157,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#FFDC04',
   },
   actionLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryLabel: {

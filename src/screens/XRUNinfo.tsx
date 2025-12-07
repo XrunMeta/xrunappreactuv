@@ -68,7 +68,7 @@ const v_d81136 = v_472849.create({
     height: 115,
   },
   title: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     fontWeight: '500',
     lineHeight: 24,
@@ -80,7 +80,7 @@ const v_d81136 = v_472849.create({
     width: '100%',
   },
   description: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     lineHeight: 24,

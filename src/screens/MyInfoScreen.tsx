@@ -360,7 +360,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   adText: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontWeight: '700',
     color: '#000',
   },
@@ -380,12 +380,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   profileName: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
   },
   profileEmail: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     marginTop: 4,
@@ -446,7 +446,7 @@ const v_d81136 = v_472849.create({
     borderColor: '#fff',
   },
   cardLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111',
   },

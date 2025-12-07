@@ -262,7 +262,7 @@ const v_d81136 = v_472849.create({
     ...v_704d15.large,
   },
   sectionLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -281,12 +281,12 @@ const v_d81136 = v_472849.create({
     elevation: 4,
   },
   cardName: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
   },
   cardEmail: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#bababa',
   },

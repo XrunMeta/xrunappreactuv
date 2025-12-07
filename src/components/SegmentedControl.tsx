@@ -75,7 +75,7 @@ const v_d81136 = v_472849.create({
     borderBottomColor: '#ffdc04',
   },
   optionLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   optionLabelActive: {

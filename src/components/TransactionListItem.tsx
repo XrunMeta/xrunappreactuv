@@ -102,19 +102,19 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   fallbackLabel: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     fontFamily: 'Roboto-Bold',
   },
   middle: {
     flex: 1,
   },
   title: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#343434',
     fontFamily: 'Roboto-Medium',
   },
   subtitle: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     color: '#979797',
     fontFamily: 'Roboto-Regular',
   },
@@ -122,13 +122,13 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   timestamp: {
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     color: '#aeaeae',
     fontFamily: 'Roboto-Medium',
     marginBottom: 6,
   },
   amount: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     color: '#363636',
     fontFamily: 'Roboto-Bold',
   },

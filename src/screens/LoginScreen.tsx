@@ -261,7 +261,7 @@ const v_d81136 = v_472849.create({
   },
   disclaimer: {
     width: '100%',
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -272,7 +272,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-start',
   },
   emailVerificationText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -283,7 +283,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-start',
   },
   mapLinkText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',

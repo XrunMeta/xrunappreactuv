@@ -98,7 +98,7 @@ const v_d81136 = v_472849.create({
   },
   title: {
     flex: 1,
-    fontSize: v_843035.fontSize.xlarge,
+    fontSize: v_843035.size.xlarge,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -118,7 +118,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 32,
   },
   message: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     lineHeight: 28,
@@ -137,7 +137,7 @@ const v_d81136 = v_472849.create({
     maxWidth: 400,
   },
   linkText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#4c4e55',
   },

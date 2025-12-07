@@ -58,7 +58,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 16,
   },
   message: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
     marginBottom: 24,
@@ -73,7 +73,7 @@ const v_d81136 = v_472849.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

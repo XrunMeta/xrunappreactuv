@@ -66,7 +66,7 @@ const v_d81136 = v_472849.create({
     opacity: 0.5,
   },
   label: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#2a2727',
   },

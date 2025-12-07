@@ -68,12 +68,12 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   regionName: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: v_1bfbd0.headerText,
     fontFamily: 'Roboto-Medium',
   },
   regionNameEn: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 2,

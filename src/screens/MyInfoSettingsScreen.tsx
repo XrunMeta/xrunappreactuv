@@ -70,7 +70,7 @@ const v_d81136 = v_472849.create({
     elevation: 4,
   },
   cardText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },

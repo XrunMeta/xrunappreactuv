@@ -123,7 +123,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontWeight: '700',
     lineHeight: 22,
     color: v_1bfbd0.headerText,

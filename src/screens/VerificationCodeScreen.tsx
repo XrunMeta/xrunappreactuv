@@ -257,7 +257,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 24,
   },
   description: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     lineHeight: 24,
     color: '#747474',
     fontFamily: 'Roboto-Regular',
@@ -281,7 +281,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#fff',
   },
   codeText: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.headerText,
   },
@@ -290,7 +290,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 24,
   },
   resendText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     lineHeight: 24,
     color: v_1bfbd0.headerText,
     fontFamily: 'Roboto-Medium',

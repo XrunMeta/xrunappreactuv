@@ -234,7 +234,7 @@ const v_d81136 = v_472849.create({
   tabLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -292,7 +292,7 @@ const v_d81136 = v_472849.create({
     resizeMode: 'contain',
   },
   tokenLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -304,7 +304,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 12,
     backgroundColor: '#f8f8f8',
     paddingHorizontal: 16,
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -315,12 +315,12 @@ const v_d81136 = v_472849.create({
     gap: 4,
   },
   summaryLabel: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#b8b8b8',
   },
   summaryValue: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

@@ -1,6 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_7e4944, v_961e77 } from 'rcmrninabrnb';
-import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -60,24 +60,24 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#EBF6FF',
   },
   subtitle: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     color: '#D6E6EE',
     fontFamily: 'Roboto-Medium',
   },
   value: {
     marginTop: 4,
-    fontSize: v_843035.fontSize.xxxlarge,
+    fontSize: v_843035.size.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.background,
   },
   helper: {
     marginTop: 4,
-    fontSize: v_9b1a04.small,
+    fontSize: v_843035.size.small,
     color: '#D6E6EE',
     fontFamily: 'Roboto-Regular',
   },

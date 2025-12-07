@@ -501,7 +501,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -531,17 +531,17 @@ const v_d81136 = v_472849.create({
     marginBottom: 4,
   },
   badge: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#000',
   },
   description: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
   },
   eventDate: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     marginTop: 4,
@@ -558,12 +558,12 @@ const v_d81136 = v_472849.create({
   },
   ctaText: {
     color: '#fff',
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Bold',
   },
   timestamp: {
     marginTop: 8,
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     color: '#7d7e83',
     fontFamily: 'Roboto-Regular',
     textAlign: 'left',
@@ -577,7 +577,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 12,
   },
   dateChipText: {
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#000',
   },
@@ -600,13 +600,13 @@ const v_d81136 = v_472849.create({
     alignSelf: 'flex-end',
   },
   replyText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#10192d',
   },
 
   replyTimestamp: {
-    fontSize: v_843035.fontSize.xxsmall,
+    fontSize: v_843035.size.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     paddingRight: 0,
@@ -634,7 +634,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   input: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
     minHeight: 24,
@@ -657,14 +657,14 @@ const v_d81136 = v_472849.create({
   },
   sendButtonText: {
     color: '#fff',
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
   },
   deleteAllButton: {
     paddingRight: 16,
   },
   deleteAllText: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#ff3b30',
   },

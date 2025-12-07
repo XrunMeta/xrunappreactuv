@@ -414,12 +414,12 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#FFFFFF',
   },
   errorText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#999',
     textAlign: 'center',
   },
   itemTitle: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#111',
     marginBottom: 12,
@@ -438,13 +438,13 @@ const v_d81136 = v_472849.create({
     marginBottom: 5, 
   },
   ticketFieldLabel: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#000',
     marginBottom: 0, 
     fontWeight: '500',
   },
   ticketFieldStatus: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontWeight: '500',
   },
   ticketFieldBox: {
@@ -458,7 +458,7 @@ const v_d81136 = v_472849.create({
     marginTop: 0, 
   },
   ticketFieldNumber: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#000',
     fontWeight: '600',
   },
@@ -486,11 +486,11 @@ const v_d81136 = v_472849.create({
   actionButtonText: {
     color: '#FFF',
     fontWeight: '600',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
   },
   shareButtonText: {
     color: '#000',
     fontWeight: '600',
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
   },
 });

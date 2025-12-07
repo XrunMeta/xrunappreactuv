@@ -96,7 +96,7 @@ const v_d81136 = v_472849.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
   },
@@ -105,12 +105,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   errorText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',

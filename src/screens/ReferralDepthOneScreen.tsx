@@ -179,14 +179,14 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyTitle: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#2a2727',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',

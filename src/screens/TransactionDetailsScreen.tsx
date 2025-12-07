@@ -110,18 +110,18 @@ const v_d81136 = v_472849.create({
     paddingVertical: 12,
   },
   infoLabel: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#B8B8B8',
   },
   infoValue: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
     marginTop: 4,
   },
   sectionTitle: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     marginBottom: 16,
@@ -132,7 +132,7 @@ const v_d81136 = v_472849.create({
   },
   explorerLabel: {
     color: '#683AB5',
-    fontSize: v_843035.fontSize.lsmall,
+    fontSize: v_843035.size.lsmall,
   },
 
 });

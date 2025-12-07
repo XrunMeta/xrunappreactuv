@@ -159,7 +159,7 @@ const v_d81136 = v_472849.create({
     ...v_a61db3.bottomButtonContainer,
   },
   termsText: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -167,7 +167,7 @@ const v_d81136 = v_472849.create({
     letterSpacing: 0.06,
   },
   linkText: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -201,7 +201,7 @@ const v_d81136 = v_472849.create({
     borderTopColor: '#e0e0e0',
   },
   devLinksTitle: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     color: '#10192d',
@@ -221,7 +221,7 @@ const v_d81136 = v_472849.create({
     borderColor: '#e0e0e0',
   },
   devLinkText: {
-    fontSize: v_843035.fontSize.xsmall,
+    fontSize: v_843035.size.xsmall,
     fontFamily: 'Roboto-Regular',
     color: v_1bfbd0.buttonPrimary,
   },

@@ -163,7 +163,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

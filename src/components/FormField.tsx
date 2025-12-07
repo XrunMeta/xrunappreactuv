@@ -66,7 +66,7 @@ const v_d81136 = v_472849.create({
 
   },
   label: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -84,7 +84,7 @@ const v_d81136 = v_472849.create({
   },
   input: {
     flex: 1,
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
     paddingVertical: 0,

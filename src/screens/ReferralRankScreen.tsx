@@ -296,7 +296,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: v_843035.fontSize.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -317,14 +317,14 @@ const v_d81136 = v_472849.create({
     minHeight: 20,
   },
   rankHelper: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#d2edf4',
     fontFamily: 'Roboto-Bold',
     marginBottom: 4,
     lineHeight: 20,
   },
   rankEmail: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
     lineHeight: 22,
@@ -340,7 +340,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   rankValue: {
-    fontSize: v_843035.fontSize.xxxlarge,
+    fontSize: v_843035.size.xxxlarge,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

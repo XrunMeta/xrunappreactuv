@@ -563,12 +563,12 @@ const v_d81136 = v_472849.create({
     marginBottom: 8,
   },
   sectionLabel: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
   linkText: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     color: '#707070',
     fontFamily: 'Roboto-SemiBold',
   },
@@ -582,7 +582,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   readonlyText: {
-    fontSize: v_843035.fontSize.ssmall,
+    fontSize: v_843035.size.ssmall,
     color: '#1a2e35',
     fontFamily: 'Roboto-Bold',
   },
@@ -607,11 +607,11 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#f5f5f5',
   },
   flagEmoji: {
-    fontSize: v_843035.fontSize.large,
+    fontSize: v_843035.size.large,
     marginRight: 6,
   },
   phonePrefixTextDisabled: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#a8a8a7',
   },
@@ -622,7 +622,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   phoneValue: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
@@ -667,7 +667,7 @@ const v_d81136 = v_472849.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
@@ -685,13 +685,13 @@ const v_d81136 = v_472849.create({
   },
   phoneValueText: {
     flex: 1,
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
     marginLeft: 12,
   },
   editHint: {
-    fontSize: v_843035.fontSize.small,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
     marginLeft: 8,
@@ -712,7 +712,7 @@ const v_d81136 = v_472849.create({
   },
   regionValue: {
     flex: 1,
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -720,7 +720,7 @@ const v_d81136 = v_472849.create({
     color: '#dedede',
   },
   arrow: {
-    fontSize: v_843035.fontSize.xlarge,
+    fontSize: v_843035.size.xlarge,
     color: '#747474',
     marginLeft: 8,
   },
@@ -752,12 +752,12 @@ const v_d81136 = v_472849.create({
     opacity: 0.5,
   },
   listItemText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   checkmark: {
-    fontSize: v_843035.fontSize.mmedium,
+    fontSize: v_843035.size.mmedium,
     color: v_1bfbd0.buttonPrimary,
     fontFamily: 'Roboto-Bold',
   },
@@ -771,7 +771,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   disabledText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },
@@ -781,7 +781,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: v_843035.fontSize.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },
