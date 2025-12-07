@@ -50,7 +50,9 @@ export const v_b34ce5 = <T extends string>({
 const v_d81136 = v_472849.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#e1e7ed',
+    backgroundColor: '#ebeff5',
+    borderWidth: 1,
+    borderColor: '#dfe3eb',
     borderRadius: 8,
     padding: 4,
     gap: 8,
@@ -82,7 +84,7 @@ const v_d81136 = v_472849.create({
     color: '#111111',
   },
   optionLabelInactive: {
-    color: '#566a7d',
+    color: '#6c88ad',
   },
 });
 
