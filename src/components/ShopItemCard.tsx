@@ -119,6 +119,7 @@ const v_d81136 = v_472849.create({
     height: 32,
   },
   infoWrapper: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -128,6 +129,8 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   subtitle: {
     fontSize: v_843035.size.small,
