@@ -83,7 +83,7 @@ const v_d81136 = v_472849.create({
     elevation: 0,
   },
   rank: {
-    width: 28,
+    minWidth: 28,
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.white,
