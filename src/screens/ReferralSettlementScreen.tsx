@@ -213,18 +213,18 @@ export const ReferralSettlementScreen = () => {
     return (
       <View style={styles.listItem}>
         <View style={styles.listItemRow}>
-          <Text style={styles.refTypeText}>{item.type}</Text>
-          <Text style={styles.dateText}>{item.date}</Text>
-        </View>
-        <View style={styles.listItemRow}>
-          <Text
+          {item.type ? <Text style={styles.refTypeText}>{item.type}</Text> : <Text style={styles.refTypeText}>TYPE</Text>}
+          {item.description ? <Text
             style={[styles.descriptionText, { flex: 1, marginRight: 10 }]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {item.description}
-          </Text>
-          <Text style={styles.amountText}>{item.amount}</Text>
+          </Text> : null}
+        </View>
+        <View style={styles.listItemRow2}>
+          {item.date ? <Text style={styles.dateText}>{item.date}</Text> : null}
+          {item.amount ? <Text style={styles.amountText}>{item.amount}</Text> : null}
         </View>
       </View>
     );
@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+
   },
   loadingContainer: {
     flex: 1,
@@ -315,32 +316,43 @@ const styles = StyleSheet.create({
     color: '#7d7e83',
   },
   listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.medium,
+    paddingVertical: SIZES.large,
+    borderRadius: 4,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 14,
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    flexDirection: 'column',
-    gap: 20,
+    borderWidth: 1,
+    borderColor: '#ededed',
+    marginBottom: SIZES.xsmall,
   },
   listItemRow: {
     flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
+    flexDirection: 'column',
+  },
+  listItemRow2: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
   refTypeText: {
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-SemiBold',
-    color: '#343434',
+    color: COLORS.white,
+    width: 'auto',
+    backgroundColor: COLORS.info,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 4,
   },
   dateText: {
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
@@ -350,12 +362,11 @@ const styles = StyleSheet.create({
     color: '#343434',
   },
   amountText: {
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
-    color: '#1f6880',
+    color: COLORS.buttonPrimary,
   },
   loadingMoreContainer: {
     paddingVertical: 16,
-    alignItems: 'center',
   },
 });

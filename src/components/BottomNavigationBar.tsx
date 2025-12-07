@@ -354,8 +354,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.buttonPrimary,
   },
   label: {
-    fontSize: FONTS.size.msmall,
-    fontWeight: '600',
+    fontSize: FONTS.size.small,
+    fontWeight: '500',
     color: '#4C4E55',
     textAlign: 'center',
     letterSpacing: 0.06,

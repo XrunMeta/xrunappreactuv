@@ -347,7 +347,7 @@ export const ShopTicketScreen = () => {
   );
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor='#F8FAFC'>
       <Header title={t('screens.shop.title')} />
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -373,7 +373,7 @@ export const ShopTicketScreen = () => {
                 placeholderTextColor="#bcbec4"
               />
             </View>
-            <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
+            <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
               {tab === 'ticket' && shopItems.length > 0
                 ? shopItems.map((item) => {
 
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
-    backgroundColor: '#f7f8f9',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 20,

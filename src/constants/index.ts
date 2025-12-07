@@ -1,12 +1,15 @@
 import { Platform } from 'react-native';
+import { withSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const COLORS = {
   primary: '#007AFF',
   secondary: '#5856D6',
   background: '#FFFFFF',
+  white: '#FFFFFF',
   text: '#000000',
   error: '#FF3B30',
   success: '#34C759',
+  info: '#7243d1',
 
   buttonPrimary: '#343a5a',
   buttonSecondary: '#ffdc04',
@@ -16,6 +19,7 @@ export const COLORS = {
 };
 
 export const SIZES = {
+  xsmall: 8,
   small: 12,
   medium: 16,
   large: 20,
@@ -32,17 +36,18 @@ export const FONTS = {
   },
   size: {
     xxsmall: 10,   
-    xsmall: 11,   
+    xsmall: 12,   
     small: 12,
-    ssmall: 13,
+    ssmall: 14,
     msmall: 14,
-    lsmall: 15,
+    lsmall: 16,
     medium: 16,
     mmedium: 18,
     large: 20,
     xlarge: 24,
     xxlarge: 28,
     xxxlarge: 32,
+
   },
 };    
 

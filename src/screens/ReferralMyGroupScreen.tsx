@@ -184,7 +184,7 @@ export const ReferralMyGroupScreen = () => {
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor='#F8FAFC'>
       <Header
         title={t('screens.referralMyGroup.title')}
         rightComponent={

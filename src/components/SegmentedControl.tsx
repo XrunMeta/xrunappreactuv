@@ -50,15 +50,15 @@ export const SegmentedControl = <T extends string>({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
-    borderRadius: 16,
+    backgroundColor: '#e1e7ed',
+    borderRadius: 8,
     padding: 4,
     gap: 8,
   },
   optionWrapper: {
     flex: 1,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     color: '#111111',
   },
   optionLabelInactive: {
-    color: '#747474',
+    color: '#566a7d',
   },
 });
 

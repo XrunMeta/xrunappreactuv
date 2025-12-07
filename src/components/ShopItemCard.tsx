@@ -8,8 +8,9 @@ import {
   ImageSourcePropType,
   ViewStyle,
   StyleProp,
+  ActivityIndicator,
 } from 'react-native';
-import { COLORS, FONTS } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 
 export interface ShopItemCardProps {
   title: string;
@@ -34,10 +35,12 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   const [isUri, setIsUri] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
     if (typeof imageSource === 'object' && 'uri' in imageSource) {
       setIsUri(true);
+      setIsLoading(true);
     }
   }, [imageSource]);
 
@@ -52,39 +55,46 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
       disabled={!onPress}
     >
       <View style={styles.logoWrapper}>
-        <Image
-          source={finalImageSource}
-          style={styles.logo}
-          resizeMode="contain"
-          onError={() => {
-            console.log('[ShopItemCard] 이미지 로딩 실패:', isUri ? (imageSource as { uri: string }).uri : 'local');
-            setImageError(true);
-          }}
-        />
+        {isLoading && !imageError && isUri ? (
+          <ActivityIndicator size="small" color={COLORS.primary} />
+        ) : (
+          <Image
+            source={finalImageSource}
+            style={styles.logo}
+            resizeMode="contain"
+            onError={() => {
+              console.log('[ShopItemCard] 이미지 로딩 실패:', isUri ? (imageSource as { uri: string }).uri : 'local');
+              setImageError(true);
+              setIsLoading(false);
+            }}
+            onLoad={() => {
+              setIsLoading(false);
+            }}
+          />
+        )}
       </View>
+
       <View style={styles.infoWrapper}>
         <Text style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-        <Text style={styles.price}>{priceLabel}</Text>
+        {priceLabel ? <Text style={styles.price}>{priceLabel}</Text> : null}
+        {quantityLabel ? (
+          <Text style={[styles.quantity, quantityColor ? { color: quantityColor } : null]}>
+            {quantityLabel}
+          </Text>
+        ) : null}
       </View>
-      {quantityLabel ? (
-        <Text style={[styles.quantity, quantityColor ? { color: quantityColor } : null]}>
-          {quantityLabel}
-        </Text>
-      ) : null}
+
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     borderRadius: 18,
     backgroundColor: COLORS.background,
     flexDirection: 'row',
-    padding: 16,
+    padding: SIZES.medium,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
     shadowColor: '#00000014',
@@ -92,11 +102,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    marginBottom: 16,
+    marginBottom: SIZES.small,
   },
   logoWrapper: {
     width: 64,
-    height: 64,
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
@@ -110,30 +119,31 @@ const styles = StyleSheet.create({
     height: 32,
   },
   infoWrapper: {
-    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 4,
   },
   title: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
-    marginBottom: 4,
   },
   price: {
     fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
+    height: 'auto',
   },
   quantity: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-Bold',
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
-    alignSelf: 'center',
   },
 });
 

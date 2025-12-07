@@ -1,4 +1,5 @@
 import React from 'react';
+import { SIZES } from '../constants';
 import {
   View,
   Text,
@@ -60,20 +61,21 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 16,
+    paddingHorizontal: SIZES.medium,
+    paddingVertical: SIZES.large,
+    borderRadius: 8,
     backgroundColor: '#FFFFFF',
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#ededed',
+    marginBottom: SIZES.xsmall,
+    gap: SIZES.small,
   },
+
   highlight: {
     borderWidth: 1,
     borderColor: '#ffdc04',
@@ -82,9 +84,15 @@ const styles = StyleSheet.create({
   },
   rank: {
     width: 28,
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
-    color: '#10192d',
+    color: COLORS.white,
+    backgroundColor: COLORS.info,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
   rankPlaceholder: {
     width: 28,
@@ -94,13 +102,13 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
+    fontFamily: 'Roboto-medium',
     color: '#343434',
   },
   description: {
     marginTop: 4,
     fontSize: FONTS.size.small,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: 'Roboto-medium',
     color: '#979797',
   },
   metaColumn: {
@@ -108,7 +116,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: FONTS.size.small,
-    fontFamily: 'Roboto-SemiBold',
+    fontFamily: 'Roboto-medium',
     color: '#707070',
   },
   value: {

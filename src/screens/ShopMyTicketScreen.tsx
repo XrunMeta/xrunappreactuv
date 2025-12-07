@@ -189,7 +189,7 @@ export const ShopMyTicketScreen = () => {
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
       <Header title={t('screens.shop.title')} />
       {loading ? (
@@ -217,7 +217,7 @@ export const ShopMyTicketScreen = () => {
               style={styles.searchInput}
             />
           </View>
-          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
+          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
             {purchasedItems.length > 0 ? (
               purchasedItems.map((item) => {
 
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
-    backgroundColor: '#f7f8f9',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 20,
