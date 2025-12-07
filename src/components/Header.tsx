@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ViewStyle, StyleProp } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { useHeaderDimensions } from '../hooks';
@@ -12,6 +12,7 @@ interface HeaderProps {
   onBackPress?: () => void;
   showBackButton?: boolean;
   rightComponent?: React.ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onBackPress,
   showBackButton = true,
   rightComponent,
+  containerStyle,
 }) => {
   const { goBack, reset, canGoBack, currentScreen } = useAppNavigation();
   const shouldShowBackButton = showBackButton;
@@ -61,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
     );
 
   return (
-    <View style={[styles.container, { height: headerHeight + 10, paddingTop: topPadding }]}>
+    <View style={[styles.container, { height: headerHeight + 10, paddingTop: topPadding }, containerStyle]}>
       <View style={styles.content}>
         {renderBackArea()}
         <View style={styles.titleWrapper} pointerEvents="none">

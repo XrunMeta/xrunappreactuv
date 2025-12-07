@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
@@ -78,7 +78,7 @@ interface TokenListItemData extends CombinedAsset {
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { openAddTokenDialog, setWalletReceiveAddress, setSelectedWalletAsset } = useAppContext();
+  const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -409,7 +409,9 @@ export const WalletScreen = () => {
       );
       return;
     }
+    console.log('[WalletScreen] receive 버튼 클릭 - currency: 1 (XRUN)');
     setWalletReceiveAddress(publicAddress);
+    setWalletReceiveCurrency(1); 
     navigate(ROUTES.walletReceive);
   };
 
@@ -779,15 +781,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderRadius: 15,
-    paddingHorizontal: 16,
+    borderRadius: SIZES.small,
     paddingVertical: 14,
-    shadowColor: '#3629B7',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07,
-    shadowRadius: 15,
-    elevation: 3,
-    marginBottom: 16,
+    paddingHorizontal: SIZES.medium,
+    marginHorizontal: 4,
+    shadowColor: '#999999',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: SIZES.medium,
+    elevation: 6,
+    marginBottom: SIZES.small,
+    borderWidth: 1,
+    borderColor: '#ededed',
   },
   tokenItemLeft: {
     marginRight: 12,
