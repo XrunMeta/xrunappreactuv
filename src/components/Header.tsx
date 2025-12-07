@@ -1,11 +1,10 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_7e4944, v_961e77 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_4623af, v_472849, v_7e4944, v_961e77 } from 'rcmrninabrnb';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
 import { v_ee0c5a } from '../hooks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_843035 } from '../constants';
-const { width: v_8e4fb6 } = v_700696.get('window');
 
 interface HeaderProps {
   title: string;
@@ -81,7 +80,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
 const v_d81136 = v_472849.create({
   container: {
-    width: v_8e4fb6,
+    width: '100%',
 
     backgroundColor: v_1bfbd0.background,
     shadowColor: '#000',
