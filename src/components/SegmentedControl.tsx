@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     color: '#111111',
   },
   optionLabelInactive: {
-    color: '#6c88ad',
+    color: '#a3adc2',
   },
 });
 
