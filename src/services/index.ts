@@ -134,6 +134,8 @@ import {
   SaveInappPurchaseLogResponse,
   DeleteXrunPurchasedItemRequest,
   DeleteXrunPurchasedItemResponse,
+  InAppPurchaseRequest,
+  InAppPurchaseResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 
@@ -3885,6 +3887,64 @@ export const getStoredTopAd5 = async (): Promise<any | null> => {
   } catch (error) {
     console.error('[getStoredTopAd5] AsyncStorage 읽기 실패:', error);
     return null;
+  }
+};
+
+export const sendInAppPurchase = async (
+  request: InAppPurchaseRequest,
+  navigation?: any,
+): Promise<InAppPurchaseResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('========================================');
+    console.log('[인앱구매 API] 구매 데이터 전송 시작');
+    console.log('========================================');
+    console.log('[인앱구매 API] 요청 데이터:');
+    console.log(JSON.stringify(request, null, 2));
+    console.log('----------------------------------------');
+
+    const response = await axiosInstance.post<InAppPurchaseResponse>(
+      '/inapp/purchase',
+      request,
+    );
+
+    console.log('========================================');
+    console.log('[인앱구매 API] ✅ 전송 성공');
+    console.log('========================================');
+    console.log('[인앱구매 API] 응답 데이터:');
+    console.log(JSON.stringify(response.data, null, 2));
+    console.log('----------------------------------------');
+    console.log('[인앱구매 API] 상태:', response.data?.status);
+    console.log('[인앱구매 API] 메시지:', response.data?.message);
+    if (response.data?.data?.savedCount !== undefined) {
+      console.log('[인앱구매 API] 저장된 수:', response.data.data.savedCount);
+    }
+    console.log('========================================');
+
+    return response.data;
+  } catch (error) {
+    console.log('========================================');
+    console.error('[인앱구매 API] ❌ 전송 실패');
+    console.log('========================================');
+    if (error instanceof AxiosError) {
+      console.error('[인앱구매 API] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    } else {
+      console.error('[인앱구매 API] 오류:', error);
+    }
+    console.log('========================================');
+
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
   }
 };
 

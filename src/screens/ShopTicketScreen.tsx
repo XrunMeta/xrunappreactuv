@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TextInput, ImageSourcePropType, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, TextInput, ImageSourcePropType, ActivityIndicator, Text, Platform } from 'react-native';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,11 +9,12 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
-import { getXRUNGopaxPrice, getXrunBuyableItems } from '../services';
+import { getXRUNGopaxPrice, getXrunBuyableItems, sendInAppPurchase } from '../services';
 import { ShopItemData } from '../types';
 import { formatXrunAmount, formatWonAmount, formatCurrency } from '../utils';
 import { cashingimages } from '../utils/imageCache';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import * as IAP from 'expo-iap';
 
 const transformShopItem = (
   item: ShopItemData,
@@ -130,7 +131,21 @@ export const ShopTicketScreen = () => {
   const [itemImages, setItemImages] = useState<Record<string, string>>({}); 
   const [searchQuery, setSearchQuery] = useState<string>(''); 
 
+  const [iapProducts, setIapProducts] = useState<Record<string, any>>({});
+  const [iapLoading, setIapLoading] = useState(false);
+
   useEffect(() => {
+
+    const initIAP = async () => {
+      try {
+        await IAP.initConnection();
+        console.log('[상점] IAP 연결 초기화 성공');
+      } catch (error) {
+        console.error('[상점] IAP 연결 초기화 실패:', error);
+      }
+    };
+    initIAP();
+
     const loadUserData = async () => {
       try {
         const userDataStr = await AsyncStorage.getItem('userData');
@@ -233,6 +248,46 @@ export const ShopTicketScreen = () => {
     return skus;
   }, []);
 
+  const fetchIapProducts = useCallback(async (skus: string[]) => {
+    try {
+      if (!skus || skus.length === 0) {
+        console.log('[상점] IAP SKU가 없습니다.');
+        return;
+      }
+
+      setIapLoading(true);
+      console.log('[상점] IAP 제품 정보 가져오기 시작:', skus);
+
+      const fetchedProducts = await IAP.fetchProducts({
+        skus: skus,
+        type: 'in-app',
+      });
+
+      console.log('[상점] IAP 제품 정보 응답:', JSON.stringify(fetchedProducts, null, 2));
+
+      if (fetchedProducts && fetchedProducts.length > 0) {
+
+        const productMap: Record<string, any> = {};
+        fetchedProducts.forEach((product: any) => {
+          const productId = product.productId || product.id;
+          if (productId) {
+            productMap[productId] = product;
+            console.log(`[상점] IAP 제품 추가: ${productId}`, {
+              price: product.price || product.localizedPrice,
+              title: product.title || product.name,
+            });
+          }
+        });
+        setIapProducts(productMap);
+        console.log('[상점] IAP 제품 맵 설정 완료:', Object.keys(productMap));
+      }
+    } catch (error) {
+      console.error('[상점] IAP 제품 정보 가져오기 오류:', error);
+    } finally {
+      setIapLoading(false);
+    }
+  }, []);
+
   const fetchShopItems = useCallback(async (currentGopaxPrice?: number) => {
     if (!memberId) return;
 
@@ -272,7 +327,7 @@ export const ShopTicketScreen = () => {
         const dynamicSkus = extractSkusFromItems(result.data);
         if (dynamicSkus.length > 0) {
           console.log('[상점] SKU에 대한 IAP 제품 가져오기:', dynamicSkus);
-
+          await fetchIapProducts(dynamicSkus);
         } else {
           console.log('[상점] 상점 아이템에서 IAP SKU를 찾을 수 없음');
         }
@@ -290,7 +345,7 @@ export const ShopTicketScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [memberId, gopaxPrice, navigate, fetchGopaxPrice, loadItemImages, extractSkusFromItems]);
+  }, [memberId, gopaxPrice, navigate, fetchGopaxPrice, loadItemImages, extractSkusFromItems, fetchIapProducts]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -322,9 +377,17 @@ export const ShopTicketScreen = () => {
   };
 
   const getIapPrice = useCallback((sku: string): string | null => {
+    const product = iapProducts[sku];
+    if (product) {
 
+      return product.localizedPrice || product.price || null;
+    }
     return null;
-  }, []);
+  }, [iapProducts]);
+
+  const hasIapProduct = useCallback((sku: string): boolean => {
+    return !!iapProducts[sku];
+  }, [iapProducts]);
 
   const handleSelectItem = (item: ShopItem & ShopItemData) => {
     setSelectedShopItem(item);
@@ -401,9 +464,20 @@ export const ShopTicketScreen = () => {
 
                   const hasSku = item.sku && item.sku.trim() !== '';
                   const iapPrice = hasSku ? getIapPrice(item.sku) : null;
-                  const displayPrice = hasSku
-                    ? (iapPrice || 'Loading...')
-                    : formatCurrency(item.priceKRW || '0', 'KRW');
+                  const isIapReady = hasSku && hasIapProduct(item.sku);
+
+                  let displayPrice: string;
+                  if (hasSku) {
+                    if (isIapReady && iapPrice) {
+                      displayPrice = iapPrice; 
+                    } else if (iapLoading) {
+                      displayPrice = 'Loading...'; 
+                    } else {
+                      displayPrice = formatCurrency(item.priceKRW || '0', 'KRW'); 
+                    }
+                  } else {
+                    displayPrice = formatCurrency(item.priceKRW || '0', 'KRW');
+                  }
 
                   return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
                 })
