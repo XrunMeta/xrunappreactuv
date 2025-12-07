@@ -919,6 +919,25 @@ export interface DeleteXrunPurchasedItemResponse {
   message?: string;
 }
 
+export interface InAppPurchaseRequest {
+  memberId: string; 
+  productId: string; 
+  platform: 'android' | 'ios'; 
+  purchaseData: any[]; 
+  purchaseTime: string; 
+}
+
+export interface InAppPurchaseResponse {
+  status: 'success' | 'error';
+  code?: number; 
+  data?: {
+    savedCount?: number; 
+    saved?: boolean; 
+    reason?: string; 
+  };
+  message?: string;
+}
+
 export interface WalletData {
   currency: number; 
   subcurrency: number; 
