@@ -46,7 +46,26 @@ export const cashingimages = {
 
       if (cachedData) {
         const imageData = JSON.parse(cachedData);
-        return imageData.filecontents || null;
+        const filecontents = imageData.filecontents;
+        const filesize = imageData.filesize;
+
+        if (!filesize || filesize === 0) {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${fileId}의 파일 크기가 0이거나 없음. 캐시 무효화.`);
+          return null;
+        }
+
+        if (!filecontents || typeof filecontents !== 'string' || filecontents.trim() === '') {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${fileId}의 파일 내용이 없거나 비어있음. 캐시 무효화.`);
+          return null;
+        }
+
+        if (filecontents.length < 100) {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${fileId}의 파일 내용이 너무 짧음 (${filecontents.length}자). 캐시 무효화.`);
+          return null;
+        }
+
+        console.log(`[이미지 캐시] ✅ 이미지 ${fileId} 캐시 유효성 검증 통과 (크기: ${filesize} bytes, 내용 길이: ${filecontents.length}자)`);
+        return filecontents;
       }
       return null;
     } catch (error) {
