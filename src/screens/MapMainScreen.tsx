@@ -30,6 +30,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useTranslation } from 'react-i18next';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { BottomNavigationBar, MapBottomPanel, SafeView } from '../components';
 
 import { CameraMainScreen } from './CameraMainScreen';
@@ -173,11 +175,22 @@ try {
   }
 }
 
+let logoHorizontal: any = null;
+
+try {
+  logoHorizontal = require('../../assets/xrun-horizontal-logo.png');
+  console.log('✅ [MapMainScreen] 상단 로고 이미지 로드 성공');
+} catch (e) {
+  console.warn('❌ [MapMainScreen] xrun-horizontal-logo.png not found:', e);
+}
+
 export const MapMainScreen: React.FC = () => {
 
   const { navigate, previousScreen } = useAppNavigation();
 
   const { t } = useTranslation();
+
+  const insets = useSafeAreaInsets();
 
   const prevScreenRef = useRef<string | null>(null);
 
@@ -2794,6 +2807,11 @@ export const MapMainScreen: React.FC = () => {
       </View>
 
       {}
+      {
+
+}
+
+      {}
 
       <View style={styles.mapContainer}>
 
@@ -3113,6 +3131,15 @@ const styles = StyleSheet.create({
     width: 25,
 
     height: 25,
+
+  },
+
+  topLogo: {
+
+    position: 'absolute',
+    left: 16,
+    width: Dimensions.get('window').width / 4,
+    zIndex: 10, 
 
   },
 
