@@ -30,6 +30,8 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 import { v_772971 } from 'jmpfvteuuztnp';
 
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
+
 import { v_f4e704, v_a77ce6, v_556baf } from '../components';
 
 import { v_cc3e1f } from './CameraMainScreen';
@@ -173,11 +175,22 @@ try {
   }
 }
 
+let v_5dede3 = null;
+
+try {
+  v_5dede3 = require('../../assets/xrun-horizontal-logo.png');
+  console.log('✅ [MapMainScreen] 상단 로고 이미지 로드 성공');
+} catch (v_9e86fd) {
+  console.warn('❌ [MapMainScreen] xrun-horizontal-logo.png not found:', v_9e86fd);
+}
+
 export const MapMainScreen: v_a3453e.FC = () => {
 
   const { navigate: v_9b57fc, previousScreen: v_640ccc } = v_a0daa8();
 
   const { t: v_8d41d7 } = v_772971();
+
+  const v_033e14 = v_e0068c();
 
   const v_4166d2 = v_e662ae<string | null>(null);
 
@@ -2794,6 +2807,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
       </View>
 
       {}
+      {
+
+}
+
+      {}
 
       <View style={v_d81136.mapContainer}>
 
@@ -3113,6 +3131,15 @@ const v_d81136 = v_472849.create({
     width: 25,
 
     height: 25,
+
+  },
+
+  topLogo: {
+
+    position: 'absolute',
+    left: 16,
+    width: v_700696.get('window').width / 4,
+    zIndex: 10, 
 
   },
 
