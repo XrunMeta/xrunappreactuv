@@ -197,10 +197,16 @@ export const v_38326c = () => {
 
           const v_415a10 = await v_858bfa.getCachedImage(v_bb51e2);
           if (v_415a10) {
-            console.log(`[상점] ✅ 이미지 ${v_bb51e2}가 캐시에서 발견됨`);
+            console.log(`[상점] ✅ 이미지 ${v_bb51e2}가 캐시에서 발견됨 (유효성 검증 통과)`);
             v_e49fc7[String(v_8c0b26.item)] = v_415a10;
           } else {
-            console.log(`[상점] ❌ 이미지 ${v_bb51e2}가 캐시에 없음, 다운로드 시도...`);
+
+            console.log(`[상점] ⚠️ 이미지 ${v_bb51e2}가 캐시에 없거나 유효하지 않음, 다운로드 시도...`);
+
+            const v_49774a = await v_858bfa.isCached(v_bb51e2);
+            if (v_49774a) {
+              console.log(`[상점] 🔄 유효하지 않은 캐시 감지, 재다운로드 진행...`);
+            }
 
             const v_65903b = await v_858bfa.downloadAndCacheImage(
               v_bb51e2,
@@ -213,7 +219,7 @@ export const v_38326c = () => {
                 console.log(`[상점] ✅ 이미지 ${v_bb51e2}가 다운로드 후 성공적으로 가져옴`);
                 v_e49fc7[String(v_8c0b26.item)] = v_132a3d;
               } else {
-                console.log(`[상점] ❌ 다운로드 후 이미지 ${v_bb51e2} 가져오기 실패`);
+                console.log(`[상점] ❌ 다운로드 후 이미지 ${v_bb51e2} 가져오기 실패 (유효성 검증 실패)`);
               }
             } else {
               console.log(`[상점] ❌ ${v_bb51e2} 다운로드 실패`);
@@ -231,6 +237,12 @@ export const v_38326c = () => {
     console.log('[상점] 처리된 총 아이템 수:', v_4622b9.length);
     console.log('[상점] 성공적으로 캐시된 이미지 수:', Object.keys(v_e49fc7).length);
     console.log('[상점] 캐시된 아이템들:', Object.keys(v_e49fc7));
+
+    Object.keys(v_e49fc7).forEach((v_6e55b1) => {
+      const v_14a7eb = v_e49fc7[v_6e55b1];
+      console.log(`[상점] 아이템 ${v_6e55b1} 이미지 데이터 길이: ${v_14a7eb?.length || 0}자`);
+    });
+
     console.log('[상점] === loadItemImages 끝 ===');
 
     v_01b387(v_e49fc7);
@@ -458,9 +470,21 @@ export const v_38326c = () => {
                 ? v_973c3e.map((v_8c0b26) => {
 
                   const v_63070e = v_f9a2c9[v_8c0b26.id];
-                  const v_c322f7 = v_63070e
-                    ? { uri: `data:image/png;base64,${v_63070e}` }
-                    : v_8c0b26.image;
+                  let imageSource: v_07a341;
+
+                  if (v_63070e) {
+
+                    if (v_63070e && v_63070e.length > 100) {
+                      v_c322f7 = { uri: `data:image/png;base64,${v_63070e}` };
+                      console.log(`[상점] 아이템 ${v_8c0b26.id} base64 이미지 사용 (길이: ${v_63070e.length})`);
+                    } else {
+                      console.warn(`[상점] ⚠️ 아이템 ${v_8c0b26.id}의 base64 데이터가 유효하지 않음 (길이: ${v_63070e?.length || 0}), 기본 이미지 사용`);
+                      v_c322f7 = v_8c0b26.image;
+                    }
+                  } else {
+                    console.log(`[상점] 아이템 ${v_8c0b26.id} 캐시된 이미지 없음, 기본 이미지 사용`);
+                    v_c322f7 = v_8c0b26.image;
+                  }
 
                   const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
                   const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;

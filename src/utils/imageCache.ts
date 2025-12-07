@@ -46,7 +46,26 @@ export const v_858bfa = {
 
       if (v_dd2dca) {
         const v_14a7eb = JSON.parse(v_dd2dca);
-        return v_14a7eb.filecontents || null;
+        const v_01513a = v_14a7eb.filecontents;
+        const v_fe09e6 = v_14a7eb.filesize;
+
+        if (!v_fe09e6 || v_fe09e6 === 0) {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${v_433c46}의 파일 크기가 0이거나 없음. 캐시 무효화.`);
+          return null;
+        }
+
+        if (!v_01513a || typeof v_01513a !== 'string' || v_01513a.trim() === '') {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${v_433c46}의 파일 내용이 없거나 비어있음. 캐시 무효화.`);
+          return null;
+        }
+
+        if (v_01513a.length < 100) {
+          console.log(`[이미지 캐시] ⚠️ 이미지 ${v_433c46}의 파일 내용이 너무 짧음 (${v_01513a.length}자). 캐시 무효화.`);
+          return null;
+        }
+
+        console.log(`[이미지 캐시] ✅ 이미지 ${v_433c46} 캐시 유효성 검증 통과 (크기: ${v_fe09e6} bytes, 내용 길이: ${v_01513a.length}자)`);
+        return v_01513a;
       }
       return null;
     } catch (v_5e9bfe) {

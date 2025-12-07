@@ -40,7 +40,36 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
   v_a3453e.useEffect(() => {
     if (typeof v_c322f7 === 'object' && 'uri' in v_c322f7) {
       v_0cc1b6(true);
-      v_deef62(true);
+      v_e6d26a(false); 
+
+      const v_cd1446 = (v_c322f7 as { uri: string }).uri;
+      if (v_cd1446.startsWith('data:image')) {
+        console.log('[ShopItemCard] base64 이미지 감지, URI 길이:', v_cd1446.length);
+
+        const v_41e0ce = v_cd1446.split(',')[1];
+        if (!v_41e0ce || v_41e0ce.length < 100) {
+          console.warn('[ShopItemCard] ⚠️ base64 데이터가 너무 짧거나 없음');
+          v_deef62(false); 
+        } else {
+
+          v_deef62(false);
+        }
+      } else {
+
+        v_deef62(true);
+
+        const v_3894d5 = setTimeout(() => {
+          console.warn('[ShopItemCard] ⚠️ 이미지 로딩 타임아웃, 로딩 상태 해제');
+          v_deef62(false);
+        }, 5000);
+
+        return () => {
+          clearTimeout(v_3894d5);
+        };
+      }
+    } else {
+      v_0cc1b6(false);
+      v_deef62(false);
     }
   }, [v_c322f7]);
 
@@ -62,13 +91,29 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
             source={v_a4d130}
             style={v_d81136.logo}
             resizeMode="contain"
-            onError={() => {
-              console.log('[ShopItemCard] 이미지 로딩 실패:', v_f904ba ? (v_c322f7 as { uri: string }).uri : 'local');
+            onError={(v_5e9bfe) => {
+              const v_cd1446 = v_f904ba ? (v_c322f7 as { uri: string }).uri : 'local';
+              console.error('[ShopItemCard] ❌ 이미지 로딩 실패:', {
+                uri: v_cd1446.substring(0, 100) + (v_cd1446.length > 100 ? '...' : ''),
+                uriLength: v_cd1446.length,
+                isBase64: v_cd1446.startsWith('data:image'),
+                error: v_5e9bfe.nativeEvent?.error || 'Unknown error',
+              });
               v_e6d26a(true);
               v_deef62(false);
             }}
             onLoad={() => {
+              console.log('[ShopItemCard] ✅ 이미지 로딩 성공');
               v_deef62(false);
+              v_e6d26a(false);
+            }}
+            onLoadStart={() => {
+              console.log('[ShopItemCard] 이미지 로딩 시작');
+
+              const v_cd1446 = v_f904ba ? (v_c322f7 as { uri: string }).uri : '';
+              if (!v_cd1446.startsWith('data:image')) {
+                v_deef62(true);
+              }
             }}
           />
         )}
