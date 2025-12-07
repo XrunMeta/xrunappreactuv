@@ -296,7 +296,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-
   },
   loadingContainer: {
     flex: 1,
@@ -334,10 +333,12 @@ const styles = StyleSheet.create({
   listItemRow: {
     flex: 1,
     flexDirection: 'column',
+    gap: 4,
   },
   listItemRow2: {
     flex: 1,
     flexDirection: 'column',
+    gap: 4,
     alignItems: 'flex-end',
   },
   refTypeText: {
@@ -360,6 +361,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
+    letterSpacing: -1,
   },
   amountText: {
     fontSize: FONTS.size.medium,
