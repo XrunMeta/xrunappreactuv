@@ -3809,3 +3809,56 @@ export const v_4dba02 = async (
   }
 };
 
+const v_332c06 = 'topAd5Data';
+
+export const v_563153 = async (v_c65f5d): Promise<any> => {
+  try {
+    const v_e16099 = v_326be8.OS === 'ios' ? 'ios' : 'android';
+
+    let v_660822 = '';
+    try {
+      const v_ef7306 = await v_e84827.getItem('userData');
+      if (v_ef7306) {
+        const v_ff39bc = JSON.parse(v_ef7306);
+        v_660822 = v_ff39bc?.member || '';
+      }
+    } catch (v_7f5774) {
+      console.log('[getTopAd5] userData 가져오기 실패:', v_7f5774);
+    }
+
+    const v_cd6a57 = { os: v_e16099, member: v_660822 };
+
+    console.log('[getTopAd5] API 호출 시작');
+    console.log('[getTopAd5] OS:', v_e16099);
+    console.log('[getTopAd5] member:', v_660822);
+
+    const v_3393e3 = await v_c07360('getTopAd5', 'POST', v_cd6a57, v_c65f5d);
+
+    console.log('[getTopAd5] API 응답 갯수:');
+    console.log(v_3393e3.length);
+
+    if (v_3393e3) {
+      await v_e84827.setItem(v_332c06, JSON.stringify(v_3393e3));
+      console.log('[getTopAd5] AsyncStorage에 저장 완료');
+    }
+
+    return v_3393e3;
+  } catch (v_5e9bfe) {
+    console.error('[getTopAd5] API 호출 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_5d7ca4 = async (): Promise<any | null> => {
+  try {
+    const v_fe7102 = await v_e84827.getItem(v_332c06);
+    if (v_fe7102) {
+      return JSON.parse(v_fe7102);
+    }
+    return null;
+  } catch (v_5e9bfe) {
+    console.error('[getStoredTopAd5] AsyncStorage 읽기 실패:', v_5e9bfe);
+    return null;
+  }
+};
+
