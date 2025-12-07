@@ -197,10 +197,16 @@ export const ShopTicketScreen = () => {
 
           const cachedImage = await cashingimages.getCachedImage(fileIdStr);
           if (cachedImage) {
-            console.log(`[상점] ✅ 이미지 ${fileIdStr}가 캐시에서 발견됨`);
+            console.log(`[상점] ✅ 이미지 ${fileIdStr}가 캐시에서 발견됨 (유효성 검증 통과)`);
             imageCache[String(item.item)] = cachedImage;
           } else {
-            console.log(`[상점] ❌ 이미지 ${fileIdStr}가 캐시에 없음, 다운로드 시도...`);
+
+            console.log(`[상점] ⚠️ 이미지 ${fileIdStr}가 캐시에 없거나 유효하지 않음, 다운로드 시도...`);
+
+            const isCached = await cashingimages.isCached(fileIdStr);
+            if (isCached) {
+              console.log(`[상점] 🔄 유효하지 않은 캐시 감지, 재다운로드 진행...`);
+            }
 
             const downloadSuccess = await cashingimages.downloadAndCacheImage(
               fileIdStr,
@@ -213,7 +219,7 @@ export const ShopTicketScreen = () => {
                 console.log(`[상점] ✅ 이미지 ${fileIdStr}가 다운로드 후 성공적으로 가져옴`);
                 imageCache[String(item.item)] = newCachedImage;
               } else {
-                console.log(`[상점] ❌ 다운로드 후 이미지 ${fileIdStr} 가져오기 실패`);
+                console.log(`[상점] ❌ 다운로드 후 이미지 ${fileIdStr} 가져오기 실패 (유효성 검증 실패)`);
               }
             } else {
               console.log(`[상점] ❌ ${fileIdStr} 다운로드 실패`);
@@ -231,6 +237,12 @@ export const ShopTicketScreen = () => {
     console.log('[상점] 처리된 총 아이템 수:', items.length);
     console.log('[상점] 성공적으로 캐시된 이미지 수:', Object.keys(imageCache).length);
     console.log('[상점] 캐시된 아이템들:', Object.keys(imageCache));
+
+    Object.keys(imageCache).forEach((itemId) => {
+      const imageData = imageCache[itemId];
+      console.log(`[상점] 아이템 ${itemId} 이미지 데이터 길이: ${imageData?.length || 0}자`);
+    });
+
     console.log('[상점] === loadItemImages 끝 ===');
 
     setItemImages(imageCache);
@@ -458,9 +470,21 @@ export const ShopTicketScreen = () => {
                 ? filteredItems.map((item) => {
 
                   const itemImage = itemImages[item.id];
-                  const imageSource = itemImage
-                    ? { uri: `data:image/png;base64,${itemImage}` }
-                    : item.image;
+                  let imageSource: ImageSourcePropType;
+
+                  if (itemImage) {
+
+                    if (itemImage && itemImage.length > 100) {
+                      imageSource = { uri: `data:image/png;base64,${itemImage}` };
+                      console.log(`[상점] 아이템 ${item.id} base64 이미지 사용 (길이: ${itemImage.length})`);
+                    } else {
+                      console.warn(`[상점] ⚠️ 아이템 ${item.id}의 base64 데이터가 유효하지 않음 (길이: ${itemImage?.length || 0}), 기본 이미지 사용`);
+                      imageSource = item.image;
+                    }
+                  } else {
+                    console.log(`[상점] 아이템 ${item.id} 캐시된 이미지 없음, 기본 이미지 사용`);
+                    imageSource = item.image;
+                  }
 
                   const hasSku = item.sku && item.sku.trim() !== '';
                   const iapPrice = hasSku ? getIapPrice(item.sku) : null;

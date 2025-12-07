@@ -40,7 +40,36 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
   React.useEffect(() => {
     if (typeof imageSource === 'object' && 'uri' in imageSource) {
       setIsUri(true);
-      setIsLoading(true);
+      setImageError(false); 
+
+      const uri = (imageSource as { uri: string }).uri;
+      if (uri.startsWith('data:image')) {
+        console.log('[ShopItemCard] base64 이미지 감지, URI 길이:', uri.length);
+
+        const base64Data = uri.split(',')[1];
+        if (!base64Data || base64Data.length < 100) {
+          console.warn('[ShopItemCard] ⚠️ base64 데이터가 너무 짧거나 없음');
+          setIsLoading(false); 
+        } else {
+
+          setIsLoading(false);
+        }
+      } else {
+
+        setIsLoading(true);
+
+        const timeoutId = setTimeout(() => {
+          console.warn('[ShopItemCard] ⚠️ 이미지 로딩 타임아웃, 로딩 상태 해제');
+          setIsLoading(false);
+        }, 5000);
+
+        return () => {
+          clearTimeout(timeoutId);
+        };
+      }
+    } else {
+      setIsUri(false);
+      setIsLoading(false);
     }
   }, [imageSource]);
 
@@ -62,13 +91,29 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
             source={finalImageSource}
             style={styles.logo}
             resizeMode="contain"
-            onError={() => {
-              console.log('[ShopItemCard] 이미지 로딩 실패:', isUri ? (imageSource as { uri: string }).uri : 'local');
+            onError={(error) => {
+              const uri = isUri ? (imageSource as { uri: string }).uri : 'local';
+              console.error('[ShopItemCard] ❌ 이미지 로딩 실패:', {
+                uri: uri.substring(0, 100) + (uri.length > 100 ? '...' : ''),
+                uriLength: uri.length,
+                isBase64: uri.startsWith('data:image'),
+                error: error.nativeEvent?.error || 'Unknown error',
+              });
               setImageError(true);
               setIsLoading(false);
             }}
             onLoad={() => {
+              console.log('[ShopItemCard] ✅ 이미지 로딩 성공');
               setIsLoading(false);
+              setImageError(false);
+            }}
+            onLoadStart={() => {
+              console.log('[ShopItemCard] 이미지 로딩 시작');
+
+              const uri = isUri ? (imageSource as { uri: string }).uri : '';
+              if (!uri.startsWith('data:image')) {
+                setIsLoading(true);
+              }
             }}
           />
         )}
