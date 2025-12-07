@@ -338,7 +338,6 @@ const v_d81136 = v_472849.create({
     marginBottom: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
   },
   navIcon: {
     width: 20,
