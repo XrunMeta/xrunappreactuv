@@ -271,8 +271,6 @@ export const MapMainScreen: React.FC = () => {
 
   const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
 
-  const LAST_MAP_REGION_KEY = 'lastMapRegion';
-
   const hasLoadedLastGpsLocationRef = useRef(false);
 
   const hasCompletedInitialLoadRef = useRef(false);
@@ -1020,54 +1018,22 @@ export const MapMainScreen: React.FC = () => {
     }
 
     let targetLocation: LocationData | null = null;
-    let targetRegion: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number } | null = null;
     let locationSource = '';
 
     try {
 
       try {
-        const storedMapRegion = await AsyncStorage.getItem(LAST_MAP_REGION_KEY);
-        if (storedMapRegion) {
-          const lastMapRegion = JSON.parse(storedMapRegion);
-          if (lastMapRegion.latitude && lastMapRegion.longitude && 
-              lastMapRegion.latitudeDelta && lastMapRegion.longitudeDelta) {
-            targetRegion = {
-              latitude: lastMapRegion.latitude,
-              longitude: lastMapRegion.longitude,
-              latitudeDelta: lastMapRegion.latitudeDelta,
-              longitudeDelta: lastMapRegion.longitudeDelta,
-            };
-            targetLocation = {
-              latitude: lastMapRegion.latitude,
-              longitude: lastMapRegion.longitude,
-            };
-            locationSource = '캐시된 맵 영역 정보';
-            console.log('✅ [handleMapReady] 캐시된 맵 영역 정보 발견:', {
-              latitude: targetRegion.latitude.toFixed(6),
-              longitude: targetRegion.longitude.toFixed(6),
-              latitudeDelta: targetRegion.latitudeDelta.toFixed(6),
-              longitudeDelta: targetRegion.longitudeDelta.toFixed(6),
-            });
+        const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
+        if (storedLocation) {
+          const lastGpsLocation: LocationData = JSON.parse(storedLocation);
+          if (lastGpsLocation.latitude && lastGpsLocation.longitude) {
+            targetLocation = lastGpsLocation;
+            locationSource = 'AsyncStorage 마지막 위치';
+            console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', lastGpsLocation);
           }
         }
-      } catch (mapRegionError) {
-        console.error('❌ [handleMapReady] 맵 영역 정보 읽기 실패:', mapRegionError);
-      }
-
-      if (!targetLocation) {
-        try {
-          const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
-          if (storedLocation) {
-            const lastGpsLocation: LocationData = JSON.parse(storedLocation);
-            if (lastGpsLocation.latitude && lastGpsLocation.longitude) {
-              targetLocation = lastGpsLocation;
-              locationSource = 'AsyncStorage 마지막 위치';
-              console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', lastGpsLocation);
-            }
-          }
-        } catch (storageError) {
-          console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', storageError);
-        }
+      } catch (storageError) {
+        console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', storageError);
       }
 
       if (!targetLocation) {
@@ -1134,16 +1100,19 @@ export const MapMainScreen: React.FC = () => {
 
         isProgrammaticMoveRef.current = true;
 
-        const regionToUse = targetRegion || {
+        mapRef.current.animateToRegion({
+          latitude: targetLocation.latitude,
+          longitude: targetLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+
+        mapRegionRef.current = {
           latitude: targetLocation.latitude,
           longitude: targetLocation.longitude,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         };
-
-        mapRef.current.animateToRegion(regionToUse, 500);
-
-        mapRegionRef.current = regionToUse;
 
         setLocation(targetLocation);
 
@@ -1156,20 +1125,6 @@ export const MapMainScreen: React.FC = () => {
             latitude: targetLocation.latitude,
             longitude: targetLocation.longitude,
           };
-        }
-
-        if (!targetRegion) {
-          try {
-            await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(regionToUse));
-            console.log('💾 [handleMapReady] 맵 영역 정보 저장:', {
-              latitude: regionToUse.latitude.toFixed(6),
-              longitude: regionToUse.longitude.toFixed(6),
-              latitudeDelta: regionToUse.latitudeDelta.toFixed(6),
-              longitudeDelta: regionToUse.longitudeDelta.toFixed(6),
-            });
-          } catch (cacheError) {
-            console.error('❌ [handleMapReady] 맵 영역 정보 저장 실패:', cacheError);
-          }
         }
 
         console.log('🔄 [handleMapReady] 마커 로드 시작');
@@ -1194,18 +1149,21 @@ export const MapMainScreen: React.FC = () => {
         longitude: 126.9780,
       };
 
-      const defaultRegion = {
-        latitude: defaultLocation.latitude,
-        longitude: defaultLocation.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      };
-
       if (mapRef.current) {
         isProgrammaticMoveRef.current = true;
-        mapRef.current.animateToRegion(defaultRegion, 500);
+        mapRef.current.animateToRegion({
+          latitude: defaultLocation.latitude,
+          longitude: defaultLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
 
-        mapRegionRef.current = defaultRegion;
+        mapRegionRef.current = {
+          latitude: defaultLocation.latitude,
+          longitude: defaultLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
 
         setLocation(defaultLocation);
 
@@ -1214,13 +1172,6 @@ export const MapMainScreen: React.FC = () => {
           setLastFetchedLocation(defaultLocation);
           initialLocationRef.current = defaultLocation;
           lastFetchedLocationRef.current = defaultLocation;
-        }
-
-        try {
-          await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(defaultRegion));
-          console.log('💾 [handleMapReady] 기본 위치 맵 영역 정보 저장');
-        } catch (cacheError) {
-          console.error('❌ [handleMapReady] 기본 위치 맵 영역 정보 저장 실패:', cacheError);
         }
 
         await loadMarkersForLocation(defaultLocation, false);
@@ -1297,8 +1248,6 @@ export const MapMainScreen: React.FC = () => {
       console.log('  마지막 마커 로드 위치:', currentLastFetchedLocation.latitude.toFixed(6), currentLastFetchedLocation.longitude.toFixed(6));
       console.log('  거리:', distance.toFixed(2), 'm');
 
-      setMarkers([]);
-
       await loadMarkersForLocation(currentLocation, true);
 
       hasMovedToGpsAfterInitialLoadRef.current = true;
@@ -1309,8 +1258,6 @@ export const MapMainScreen: React.FC = () => {
     if (distance >= 500) {
 
       console.log('=== 200m 이상 이동, 새로운 위치에서 마커 로드 ===');
-
-      setMarkers([]);
 
       await loadMarkersForLocation(currentLocation, true);
 
@@ -1945,17 +1892,7 @@ export const MapMainScreen: React.FC = () => {
       mapping.set(uniqueKey, mappedAd);
 
       if (index < 10) {
-        console.log(`[MapMainScreen] 마커 ${index + 1} 매핑:`, {
-          uniqueKey,
-          markerKey,
-          spotID: marker.spotID,
-          coin: marker.coin,
-          latitude: marker.latitude,
-          longitude: marker.longitude,
-          adIndex,
-          adName: mappedAd?.name || '없음',
-          adCompany: mappedAd?.ad_company || '없음',
-        });
+
       }
     });
     console.log('[MapMainScreen] 마커-광고 매핑 완료:', mapping.size, '개 마커, TopAd5 개수:', topAd5Data.length);
@@ -2357,14 +2294,13 @@ export const MapMainScreen: React.FC = () => {
 
     });
 
-    if (nearestMarker === null) {
+    if (nearestMarker === null || minDistance > 100) {
 
       setShowCalloutPopup(false);
-
       setCalloutData(null);
-
+      console.log('=== 맵 클릭: 100미터 이내 마커 없음 ===');
+      console.log('가장 가까운 마커 거리:', minDistance === Infinity ? '없음' : `${minDistance.toFixed(2)}m`);
       return;
-
     }
 
     const marker: SpotData = nearestMarker;
@@ -2372,11 +2308,8 @@ export const MapMainScreen: React.FC = () => {
     if (!marker.latitude || !marker.longitude) {
 
       setShowCalloutPopup(false);
-
       setCalloutData(null);
-
       return;
-
     }
 
     const markerKey = getMarkerKey(marker);
@@ -2647,26 +2580,6 @@ export const MapMainScreen: React.FC = () => {
     lastLocationChangeTimeRef.current = Date.now();
 
     isUserTouchRef.current = false;
-
-    if (!isProgrammatic) {
-      try {
-        const mapRegionData = {
-          latitude: region.latitude,
-          longitude: region.longitude,
-          latitudeDelta: region.latitudeDelta,
-          longitudeDelta: region.longitudeDelta,
-        };
-        await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(mapRegionData));
-        console.log('💾 [맵 캐싱] 맵 영역 정보 저장:', {
-          latitude: mapRegionData.latitude.toFixed(6),
-          longitude: mapRegionData.longitude.toFixed(6),
-          latitudeDelta: mapRegionData.latitudeDelta.toFixed(6),
-          longitudeDelta: mapRegionData.longitudeDelta.toFixed(6),
-        });
-      } catch (cacheError) {
-        console.error('❌ [맵 캐싱] 저장 실패:', cacheError);
-      }
-    }
 
   };
 
