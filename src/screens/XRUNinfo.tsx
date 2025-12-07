@@ -2,7 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_cf9c33 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
-import { v_a61db3 } from '../constants';
+import { v_a61db3, v_843035 } from '../constants';
 
 let v_33c40c = null;
 try {
@@ -68,7 +68,7 @@ const v_d81136 = v_472849.create({
     height: 115,
   },
   title: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     fontWeight: '500',
     lineHeight: 24,
@@ -80,7 +80,7 @@ const v_d81136 = v_472849.create({
     width: '100%',
   },
   description: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     lineHeight: 24,

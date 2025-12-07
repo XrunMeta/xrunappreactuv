@@ -1,6 +1,6 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_cf9c33, v_326be8 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_85f2c8 } from '../services';
 
@@ -354,7 +354,7 @@ const v_d81136 = v_472849.create({
     borderColor: v_1bfbd0.buttonPrimary,
   },
   label: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontWeight: '600',
     color: '#4C4E55',
     textAlign: 'center',

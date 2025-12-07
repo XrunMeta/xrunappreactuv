@@ -9,6 +9,7 @@ import {
 } from 'rcmrninabrnb';
 import { v_c2fdd1 } from './Dialog';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_843035 } from '../constants';
 
 type TokenOption = {
   id: string;
@@ -233,7 +234,7 @@ const v_d81136 = v_472849.create({
   tabLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -291,7 +292,7 @@ const v_d81136 = v_472849.create({
     resizeMode: 'contain',
   },
   tokenLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -303,7 +304,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 12,
     backgroundColor: '#f8f8f8',
     paddingHorizontal: 16,
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -314,12 +315,12 @@ const v_d81136 = v_472849.create({
     gap: 4,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#b8b8b8',
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

@@ -8,6 +8,7 @@ import {
   v_961e77,
 } from 'rcmrninabrnb';
 import { v_1bfbd0 } from '../constants';
+import { v_843035 } from '../constants';
 
 type CheckboxVariant = 'square' | 'circle';
 
@@ -95,7 +96,7 @@ const v_d81136 = v_472849.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
   },

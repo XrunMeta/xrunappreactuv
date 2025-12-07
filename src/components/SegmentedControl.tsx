@@ -1,5 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_4623af, v_19b633, v_472849, v_7e4944 } from 'rcmrninabrnb';
+import { v_843035 } from '../constants';
 
 interface SegmentedControlOption<T extends string> {
   label: string;
@@ -74,7 +75,7 @@ const v_d81136 = v_472849.create({
     borderBottomColor: '#ffdc04',
   },
   optionLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   optionLabelActive: {

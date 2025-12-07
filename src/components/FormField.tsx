@@ -9,7 +9,7 @@ import {
   v_961e77,
 } from 'rcmrninabrnb';
 import { v_f3168c } from '../context/KeyboardScrollContext';
-import { v_9b1a04 } from '../constants';
+import { v_843035 } from '../constants';
 
 interface FormFieldProps extends v_b60ea2 {
   label: string;
@@ -66,7 +66,7 @@ const v_d81136 = v_472849.create({
 
   },
   label: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -84,7 +84,7 @@ const v_d81136 = v_472849.create({
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
     paddingVertical: 0,

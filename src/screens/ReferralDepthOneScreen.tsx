@@ -5,7 +5,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_fb1936 } from '../services';
 import { v_b0f886 } from '../types';
 import { v_556baf } from '../components';
@@ -179,14 +179,14 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#2a2727',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',

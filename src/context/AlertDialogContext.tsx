@@ -2,6 +2,7 @@ import v_a3453e, { v_af12cb, v_76a8a9, v_e662ae, v_4a8ba2, v_5ab095 } from 'bapk
 import { v_3a67b0, v_eaf177 } from '../components/ChoiceDialog';
 import { v_c2fdd1 } from '../components/Dialog';
 import { v_19b633, v_3094a2, v_472849 } from 'rcmrninabrnb';
+import { v_843035 } from '../constants';
 
 interface AlertDialogContextValue {
   showAlert: (
@@ -162,7 +163,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

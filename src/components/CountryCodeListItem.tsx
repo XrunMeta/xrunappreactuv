@@ -1,7 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_09d0e5, v_472849, v_19b633, v_3094a2 } from 'rcmrninabrnb';
 import { v_da1883 } from '../types';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 type Props = {
   country: v_da1883;
@@ -69,18 +69,18 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   countryName: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: v_1bfbd0.headerText,
     fontFamily: 'Roboto-Medium',
   },
   isoText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     color: '#8e9bae',
     textTransform: 'uppercase',
     fontFamily: 'Roboto-Regular',
   },
   dialCode: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#1f2933',
     fontFamily: 'Roboto-Bold',
   },

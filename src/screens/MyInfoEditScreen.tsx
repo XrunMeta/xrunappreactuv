@@ -10,7 +10,7 @@ import {
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de, v_89c10a, v_c2fdd1, v_570c34 } from '../components';
-import { v_1bfbd0, v_a61db3, v_9b1a04, v_bae512 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04, v_bae512, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -563,12 +563,12 @@ const v_d81136 = v_472849.create({
     marginBottom: 8,
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
   linkText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     color: '#707070',
     fontFamily: 'Roboto-SemiBold',
   },
@@ -582,7 +582,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   readonlyText: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     color: '#1a2e35',
     fontFamily: 'Roboto-Bold',
   },
@@ -607,11 +607,11 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#f5f5f5',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     marginRight: 6,
   },
   phonePrefixTextDisabled: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#a8a8a7',
   },
@@ -622,7 +622,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   phoneValue: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
@@ -667,7 +667,7 @@ const v_d81136 = v_472849.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
@@ -685,13 +685,13 @@ const v_d81136 = v_472849.create({
   },
   phoneValueText: {
     flex: 1,
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
     marginLeft: 12,
   },
   editHint: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
     marginLeft: 8,
@@ -712,7 +712,7 @@ const v_d81136 = v_472849.create({
   },
   regionValue: {
     flex: 1,
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -720,7 +720,7 @@ const v_d81136 = v_472849.create({
     color: '#dedede',
   },
   arrow: {
-    fontSize: 24,
+    fontSize: v_843035.fontSize.xlarge,
     color: '#747474',
     marginLeft: 8,
   },
@@ -752,12 +752,12 @@ const v_d81136 = v_472849.create({
     opacity: 0.5,
   },
   listItemText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   checkmark: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     color: v_1bfbd0.buttonPrimary,
     fontFamily: 'Roboto-Bold',
   },
@@ -771,7 +771,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   disabledText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },
@@ -781,7 +781,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },

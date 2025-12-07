@@ -2,7 +2,7 @@ import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_4623af, v_aa7413, v_122070 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_e1e9c4, v_076c45, v_0e4a4f } from '../locales';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 interface LanguageSelectorProps {
   visible: boolean;
@@ -87,7 +87,7 @@ const v_d81136 = v_472849.create({
     maxHeight: '70%',
   },
   title: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.headerText,
     marginBottom: 20,
@@ -110,7 +110,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: v_1bfbd0.buttonPrimary,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: v_1bfbd0.text,
   },
@@ -119,7 +119,7 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
   },
   checkmark: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     color: '#fff',
     fontFamily: 'Roboto-Bold',
   },
@@ -131,7 +131,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.text,
   },

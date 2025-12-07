@@ -12,7 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_f4cc2d, v_010f9a } from '../services';
 import { v_574252 } from '../types';
@@ -206,7 +206,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -233,17 +233,17 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   mediumText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   smallText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
   normalText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
   },

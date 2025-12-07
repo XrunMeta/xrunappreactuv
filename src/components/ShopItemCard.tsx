@@ -9,7 +9,7 @@ import {
   v_7e4944,
   v_961e77,
 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 export interface ShopItemCardProps {
   title: string;
@@ -113,24 +113,24 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 4,
   },
   price: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
   },
   quantity: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
     alignSelf: 'center',

@@ -12,6 +12,7 @@ import {
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_533fd3, v_c03e7f } from '../types';
+import { v_843035 } from '../constants';
 
 interface PredefinedToken {
   symbol: string;
@@ -333,7 +334,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontWeight: 'bold',
     color: 'black',
     flex: 1,
@@ -357,7 +358,7 @@ const v_d81136 = v_472849.create({
     borderBottomColor: '#FFDC04',
   },
   tabText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#B8B8B8',
     fontFamily: 'Roboto-Regular',
   },
@@ -384,7 +385,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#F5F5FF',
   },
   tokenSymbol: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: 'black',
     fontFamily: 'Roboto-Medium',
   },
@@ -394,7 +395,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     backgroundColor: '#FAFAFA',
   },
@@ -410,7 +411,7 @@ const v_d81136 = v_472849.create({
   nextButtonText: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
   },
   confirmRow: {
@@ -419,12 +420,12 @@ const v_d81136 = v_472849.create({
     marginTop: 15,
   },
   confirmLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#B8B8B8',
     fontFamily: 'Roboto-Regular',
   },
   confirmValue: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: 'black',
     fontWeight: 'bold',
     fontFamily: 'Roboto-Bold',
@@ -432,7 +433,7 @@ const v_d81136 = v_472849.create({
   },
   addButtonText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
   },
@@ -451,7 +452,7 @@ const v_d81136 = v_472849.create({
   },
   ownedText: {
     marginLeft: 'auto',
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     color: '#B8B8B8',
     marginTop: 3,
     fontFamily: 'Roboto-Regular',

@@ -12,7 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_570c34 } from '../components';
-import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04, v_843035 } from '../constants';
 
 if (v_326be8.OS === 'android' && v_bfa1d6.setLayoutAnimationEnabledExperimental) {
   v_bfa1d6.setLayoutAnimationEnabledExperimental(true);
@@ -151,7 +151,7 @@ const v_d81136 = v_472849.create({
   },
   question: {
     flex: 1,
-    fontSize: 15,
+    fontSize: v_843035.fontSize.lsmall,
     fontFamily: 'Roboto-Medium',
     color: '#111827',
     marginRight: 12,
@@ -165,7 +165,7 @@ const v_d81136 = v_472849.create({
     marginBottom: v_9b1a04.small,
   },
   answer: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     lineHeight: 20,
     color: '#4b5563',
     fontFamily: 'Roboto-Regular',

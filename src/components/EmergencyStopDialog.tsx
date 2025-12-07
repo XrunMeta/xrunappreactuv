@@ -10,6 +10,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
+import { v_843035 } from '../constants';
 
 interface EmergencyStopDialogProps {
   visible: boolean;
@@ -50,7 +51,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
     <Modal
       visible={v_cf55be}
       animationType="slide"
-      onRequestClose={() => {}} 
+      onRequestClose={() => { }} 
       presentationStyle="fullScreen"
     >
       <View style={v_d81136.container}>
@@ -97,7 +98,7 @@ const v_d81136 = v_472849.create({
   },
   title: {
     flex: 1,
-    fontSize: 24,
+    fontSize: v_843035.fontSize.xlarge,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -117,7 +118,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 32,
   },
   message: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     lineHeight: 28,
@@ -136,7 +137,7 @@ const v_d81136 = v_472849.create({
     maxWidth: 400,
   },
   linkText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#4c4e55',
   },

@@ -43,7 +43,7 @@ import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
-import { v_a61db3 } from '../constants';
+import { v_a61db3, v_843035 } from '../constants';
 
 interface LocationData {
 
@@ -2210,7 +2210,7 @@ const v_d81136 = v_472849.create({
 
   calloutDistance: {
 
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
 
     fontFamily: 'Roboto-Regular',
 
@@ -2234,7 +2234,7 @@ const v_d81136 = v_472849.create({
 
   calloutBrand: {
 
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
 
     fontFamily: 'Roboto-Medium',
 

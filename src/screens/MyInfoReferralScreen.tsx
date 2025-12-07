@@ -4,7 +4,7 @@ import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de } from '../components';
-import { v_1bfbd0, v_a61db3, v_704d15 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_08316d, v_c58856, v_794a74 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -262,7 +262,7 @@ const v_d81136 = v_472849.create({
     ...v_704d15.large,
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -281,12 +281,12 @@ const v_d81136 = v_472849.create({
     elevation: 4,
   },
   cardName: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
   },
   cardEmail: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#bababa',
   },

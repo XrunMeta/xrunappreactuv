@@ -2,7 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_326be8 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_729608, v_660356 } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_14af53 } from '../constants/tokenMeta';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -110,18 +110,18 @@ const v_d81136 = v_472849.create({
     paddingVertical: 12,
   },
   infoLabel: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#B8B8B8',
   },
   infoValue: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
     marginTop: 4,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     marginBottom: 16,
@@ -132,7 +132,7 @@ const v_d81136 = v_472849.create({
   },
   explorerLabel: {
     color: '#683AB5',
-    fontSize: 15,
+    fontSize: v_843035.fontSize.lsmall,
   },
 
 });

@@ -5,7 +5,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_60b263, v_029581, v_570c34, v_556baf } from '../components';
-import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
@@ -269,14 +269,14 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#2a2727',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',

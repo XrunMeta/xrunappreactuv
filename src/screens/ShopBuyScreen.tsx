@@ -10,7 +10,7 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_20035e } from '../types';
 import { v_54d016, v_9c9f1b } from '../services';
 import { v_89f939, v_35c0e0 } from '../utils';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -313,20 +313,20 @@ const v_d81136 = v_472849.create({
     marginBottom: 20,
   },
   itemTitle: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#111111',
     marginBottom: 6,
   },
   description: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     marginBottom: 12,
     lineHeight: 20,
   },
   link: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#007aff',
     marginBottom: 30,
@@ -340,12 +340,12 @@ const v_d81136 = v_472849.create({
     marginBottom: 12,
   },
   label: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#78828a',
   },
   value: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111111',
   },
@@ -360,7 +360,7 @@ const v_d81136 = v_472849.create({
   },
   totalValue: {
     fontFamily: 'Roboto-Bold',
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
   },
   balanceInfo: {
     borderTopWidth: 1,
@@ -375,7 +375,7 @@ const v_d81136 = v_472849.create({
     color: '#dc3545',
   },
   insufficientBalanceText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#dc3545',
     textAlign: 'center',
@@ -405,12 +405,12 @@ const v_d81136 = v_472849.create({
   },
   cancelText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

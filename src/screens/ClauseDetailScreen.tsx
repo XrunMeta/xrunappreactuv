@@ -3,7 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
@@ -96,7 +96,7 @@ const v_d81136 = v_472849.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
   },
@@ -105,12 +105,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   errorText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',

@@ -10,7 +10,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34 } from '../components';
 import { v_729608, v_368e80, v_cb41de } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_53d723 } from '../services';
@@ -183,11 +183,11 @@ const v_d81136 = v_472849.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },

@@ -8,7 +8,7 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_368e80, v_570c34 } from '../components';
-import { v_a61db3 } from '../constants';
+import { v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_8025d1 } from '../services';
@@ -130,7 +130,7 @@ const v_d81136 = v_472849.create({
   },
   inlineButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
   },
 });

@@ -5,7 +5,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_814266, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_ce4741, v_a0daa8 } from '../navigation';
-import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_4a38fa, v_6a034c } from '../services';
 import { v_1cc79a } from '../types';
 
@@ -296,7 +296,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -317,14 +317,14 @@ const v_d81136 = v_472849.create({
     minHeight: 20,
   },
   rankHelper: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#d2edf4',
     fontFamily: 'Roboto-Bold',
     marginBottom: 4,
     lineHeight: 20,
   },
   rankEmail: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
     lineHeight: 22,
@@ -340,7 +340,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   rankValue: {
-    fontSize: 32,
+    fontSize: v_843035.fontSize.xxxlarge,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

@@ -4,7 +4,7 @@ import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
 import { v_ee0c5a } from '../hooks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-
+import { v_843035 } from '../constants';
 const { width: v_8e4fb6 } = v_700696.get('window');
 
 interface HeaderProps {
@@ -123,7 +123,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontWeight: '700',
     lineHeight: 22,
     color: v_1bfbd0.headerText,

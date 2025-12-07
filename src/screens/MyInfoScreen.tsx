@@ -10,7 +10,7 @@ import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_4c7b5d } from '../components';
-import { v_1bfbd0, v_a61db3, v_4922a9 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
 import { v_700ef9 } from '../context';
@@ -360,7 +360,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   adText: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontWeight: '700',
     color: '#000',
   },
@@ -380,12 +380,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   profileName: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
   },
   profileEmail: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     marginTop: 4,
@@ -446,7 +446,7 @@ const v_d81136 = v_472849.create({
     borderColor: '#fff',
   },
   cardLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111',
   },

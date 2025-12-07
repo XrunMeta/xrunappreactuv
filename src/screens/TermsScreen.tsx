@@ -4,7 +4,7 @@ import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
-import { v_a61db3 } from '../constants';
+import { v_a61db3, v_843035 } from '../constants';
 
 const v_b0b4d0 = `
 XRUN Location-Based Service Terms and Conditions
@@ -108,7 +108,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',

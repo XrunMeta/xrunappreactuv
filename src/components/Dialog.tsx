@@ -6,8 +6,10 @@ import {
   v_4623af,
   v_472849,
   v_7e4944,
+  v_961e77,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_843035 } from '../constants';
 
 type DialogAction = {
   label: string;
@@ -22,7 +24,7 @@ interface DialogProps {
   children?: v_a3453e.ReactNode;
   actions?: DialogAction[];
   onClose?: () => void;
-  containerStyle?: v_7e4944;
+  containerStyle?: v_961e77<v_7e4944>;
 }
 
 export const Dialog: v_a3453e.FC<DialogProps> = ({
@@ -114,7 +116,7 @@ const v_d81136 = v_472849.create({
   },
   title: {
     flex: 1,
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -155,7 +157,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#FFDC04',
   },
   actionLabel: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryLabel: {

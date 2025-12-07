@@ -10,6 +10,7 @@ import {
   v_326be8,
 } from 'rcmrninabrnb';
 import { v_f71847 } from '../types';
+import { v_843035 } from '../constants';
 
 let v_622407 = null;
 let v_8c4b15 = null;
@@ -177,7 +178,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Medium',
-                      fontSize: 16,
+                      fontSize: v_843035.fontSize.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
                       marginBottom: 4,
@@ -187,7 +188,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Regular',
-                      fontSize: 12,
+                      fontSize: v_843035.fontSize.small,
                       color: '#4c4e55',
                       lineHeight: 15,
                       letterSpacing: 0.06,

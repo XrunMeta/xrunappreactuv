@@ -4,7 +4,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_cb41de, v_8714fe, v_eaeabd, v_570c34 } from '../components';
 import { v_dc5d8f, v_33aee4, v_ce593f } from '../services/taboola';
-import { v_1bfbd0, v_9b1a04, v_a61db3, v_731ab4 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3, v_731ab4, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -159,7 +159,7 @@ const v_d81136 = v_472849.create({
     ...v_a61db3.bottomButtonContainer,
   },
   termsText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -167,7 +167,7 @@ const v_d81136 = v_472849.create({
     letterSpacing: 0.06,
   },
   linkText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -176,7 +176,7 @@ const v_d81136 = v_472849.create({
   },
   previewLink: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: 14,
     color: v_1bfbd0.buttonPrimary,
     fontFamily: 'Roboto-SemiBold',
   },
@@ -201,7 +201,7 @@ const v_d81136 = v_472849.create({
     borderTopColor: '#e0e0e0',
   },
   devLinksTitle: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     color: '#10192d',
@@ -221,7 +221,7 @@ const v_d81136 = v_472849.create({
     borderColor: '#e0e0e0',
   },
   devLinkText: {
-    fontSize: 11,
+    fontSize: v_843035.fontSize.xsmall,
     fontFamily: 'Roboto-Regular',
     color: v_1bfbd0.buttonPrimary,
   },

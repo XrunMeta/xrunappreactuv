@@ -11,7 +11,7 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_fa3feb, v_368e80, v_729608, v_cb41de, v_570c34 } from '../components';
-import { v_1bfbd0, v_9b1a04, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import {
   v_b699a9,
@@ -261,7 +261,7 @@ const v_d81136 = v_472849.create({
   },
   disclaimer: {
     width: '100%',
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -272,7 +272,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-start',
   },
   emailVerificationText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -283,7 +283,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-start',
   },
   mapLinkText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',

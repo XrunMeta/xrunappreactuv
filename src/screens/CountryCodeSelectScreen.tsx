@@ -12,7 +12,7 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_ecee91, v_570c34, v_556baf } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_1bfbd0, v_a61db3, v_202d44, v_52495e } from '../constants';
+import { v_1bfbd0, v_a61db3, v_202d44, v_52495e, v_843035 } from '../constants';
 import { v_da1883 } from '../types';
 
 export const v_379bd1 = () => {
@@ -135,7 +135,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 16,
   },
   sectionLabel: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     color: '#9ca3af',
     marginBottom: 8,
     fontFamily: 'Roboto-Medium',
@@ -157,7 +157,7 @@ const v_d81136 = v_472849.create({
     marginRight: 12,
   },
   flagEmoji: {
-    fontSize: 24,
+    fontSize: v_843035.fontSize.xlarge,
   },
   currentInfo: {
     flexDirection: 'row',
@@ -166,12 +166,12 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   currentCountry: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.headerText,
   },
   currentDial: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.buttonPrimary,
   },
@@ -187,7 +187,7 @@ const v_d81136 = v_472849.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: 15,
+    fontSize: v_843035.fontSize.lsmall,
     fontFamily: 'Roboto-Medium',
     color: v_1bfbd0.headerText,
   },
@@ -199,7 +199,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 15,
+    fontSize: v_843035.fontSize.lsmall,
     color: '#9ca3af',
     fontFamily: 'Roboto-Regular',
   },

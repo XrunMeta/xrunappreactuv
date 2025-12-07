@@ -20,7 +20,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_570c34 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_1bfbd0, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import {
   v_ab08d0,
@@ -501,7 +501,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -531,17 +531,17 @@ const v_d81136 = v_472849.create({
     marginBottom: 4,
   },
   badge: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#000',
   },
   description: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.ssmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
   },
   eventDate: {
-    fontSize: 11,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     marginTop: 4,
@@ -558,12 +558,12 @@ const v_d81136 = v_472849.create({
   },
   ctaText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Bold',
   },
   timestamp: {
     marginTop: 8,
-    fontSize: 10,
+    fontSize: v_843035.fontSize.xxsmall,
     color: '#7d7e83',
     fontFamily: 'Roboto-Regular',
     textAlign: 'left',
@@ -577,7 +577,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 12,
   },
   dateChipText: {
-    fontSize: 10,
+    fontSize: v_843035.fontSize.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#000',
   },
@@ -600,13 +600,13 @@ const v_d81136 = v_472849.create({
     alignSelf: 'flex-end',
   },
   replyText: {
-    fontSize: 12,
-    fontFamily: 'Roboto-Bold',
+    fontSize: v_843035.fontSize.msmall,
+    fontFamily: 'Roboto-Regular',
     color: '#10192d',
   },
 
   replyTimestamp: {
-    fontSize: 10,
+    fontSize: v_843035.fontSize.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     paddingRight: 0,
@@ -634,7 +634,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   input: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
     minHeight: 24,
@@ -657,14 +657,14 @@ const v_d81136 = v_472849.create({
   },
   sendButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
   },
   deleteAllButton: {
     paddingRight: 16,
   },
   deleteAllText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#ff3b30',
   },

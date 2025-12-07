@@ -12,7 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_cb41de, v_570c34 } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -257,7 +257,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 24,
   },
   description: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     lineHeight: 24,
     color: '#747474',
     fontFamily: 'Roboto-Regular',
@@ -281,7 +281,7 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#fff',
   },
   codeText: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: v_1bfbd0.headerText,
   },
@@ -290,7 +290,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 24,
   },
   resendText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     lineHeight: 24,
     color: v_1bfbd0.headerText,
     fontFamily: 'Roboto-Medium',

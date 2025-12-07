@@ -6,7 +6,7 @@ import {
   v_4623af,
   v_fee73b,
 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 interface ReferralMemberRowProps {
   rank?: number | string;
@@ -82,7 +82,7 @@ const v_d81136 = v_472849.create({
   },
   rank: {
     width: 28,
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
@@ -93,13 +93,13 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   email: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   description: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -107,13 +107,13 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   date: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#707070',
   },
   value: {
     marginTop: 4,
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

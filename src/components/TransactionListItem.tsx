@@ -8,6 +8,7 @@ import {
   v_4623af,
   v_629153,
 } from 'rcmrninabrnb';
+import { v_843035 } from '../constants';
 
 interface TransactionListItemProps extends v_629153 {
   title: string;
@@ -101,19 +102,19 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   fallbackLabel: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
   },
   middle: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#343434',
     fontFamily: 'Roboto-Medium',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     color: '#979797',
     fontFamily: 'Roboto-Regular',
   },
@@ -121,13 +122,13 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   timestamp: {
-    fontSize: 9,
+    fontSize: v_843035.fontSize.xxsmall,
     color: '#aeaeae',
     fontFamily: 'Roboto-Medium',
     marginBottom: 6,
   },
   amount: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     color: '#363636',
     fontFamily: 'Roboto-Bold',
   },

@@ -3,7 +3,7 @@ import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_a61db3 } from '../constants';
+import { v_a61db3, v_843035 } from '../constants';
 
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 
@@ -58,7 +58,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 16,
   },
   message: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
     marginBottom: 24,
@@ -73,7 +73,7 @@ const v_d81136 = v_472849.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

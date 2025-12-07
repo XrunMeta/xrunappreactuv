@@ -6,7 +6,8 @@ import {
   v_961e77,
   v_7e4944,
 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
+
 
 interface OptionButtonProps {
   label: string;
@@ -65,7 +66,7 @@ const v_d81136 = v_472849.create({
     opacity: 0.5,
   },
   label: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#2a2727',
   },

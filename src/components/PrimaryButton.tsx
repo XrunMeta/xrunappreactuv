@@ -1,6 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_629153, v_7e4944, v_5e8657 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 interface PrimaryButtonProps extends v_629153 {
   title: string;
@@ -48,7 +48,7 @@ const v_d81136 = v_472849.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontWeight: '500',
     lineHeight: 24,
     fontFamily: 'Roboto-Medium', 

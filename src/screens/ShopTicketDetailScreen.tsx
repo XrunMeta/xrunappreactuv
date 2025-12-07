@@ -19,7 +19,7 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_029bad } from '../types';
 import { v_97ad19, v_7b3801 } from '../services';
 import { v_e4a763 } from '../utils/env';
-import { v_1bfbd0, v_a61db3, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 
 export const v_a1c4a5 = () => {
   const { selectedShopItem: v_dfe883 } = v_700ef9();
@@ -414,12 +414,12 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#FFFFFF',
   },
   errorText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     color: '#999',
     textAlign: 'center',
   },
   itemTitle: {
-    fontSize: 18,
+    fontSize: v_843035.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#111',
     marginBottom: 12,
@@ -438,13 +438,13 @@ const v_d81136 = v_472849.create({
     marginBottom: 5, 
   },
   ticketFieldLabel: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     color: '#000',
     marginBottom: 0, 
     fontWeight: '500',
   },
   ticketFieldStatus: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontWeight: '500',
   },
   ticketFieldBox: {
@@ -458,7 +458,7 @@ const v_d81136 = v_472849.create({
     marginTop: 0, 
   },
   ticketFieldNumber: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#000',
     fontWeight: '600',
   },
@@ -486,11 +486,11 @@ const v_d81136 = v_472849.create({
   actionButtonText: {
     color: '#FFF',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
   },
   shareButtonText: {
     color: '#000',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
   },
 });

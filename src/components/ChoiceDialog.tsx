@@ -1,7 +1,8 @@
 import v_a3453e, { v_c4deb2, v_5ab095, v_298205, v_680bcc } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_7e4944 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_7e4944, v_961e77 } from 'rcmrninabrnb';
 import { v_c2fdd1 } from './Dialog';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_843035 } from '../constants';
 
 export interface ChoiceDialogStep {
   title: string;
@@ -46,7 +47,7 @@ interface ChoiceDialogProps {
   initialStep?: number; 
   onClose?: () => void;
   fullScreen?: boolean; 
-  containerStyle?: v_7e4944;
+  containerStyle?: v_961e77<v_7e4944>;
   contentContainerStyle?: v_7e4944; 
 }
 
@@ -246,7 +247,7 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
         actions={v_dd943a}
         containerStyle={[
           v_4affe9,
-          v_4e91ee && v_d81136.fullScreenContainer,
+          v_4e91ee ? v_d81136.fullScreenContainer : undefined,
         ]}
       >
         {v_a1ac21()}
@@ -262,7 +263,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

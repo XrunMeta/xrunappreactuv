@@ -13,7 +13,7 @@ import { v_dd87bc, v_81c40d } from '../services';
 import { v_20035e } from '../types';
 import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
-import { v_1bfbd0, v_a61db3, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 
 const v_3e6a6a = (
   item: v_20035e,
@@ -441,7 +441,7 @@ const v_d81136 = v_472849.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -450,7 +450,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },

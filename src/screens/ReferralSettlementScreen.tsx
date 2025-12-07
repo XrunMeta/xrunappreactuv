@@ -5,7 +5,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_b7594c, v_5bb1ab } from '../services';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d } from '../utils';
@@ -309,7 +309,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -334,22 +334,22 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
   },
   refTypeText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   dateText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
   descriptionText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
   },
   amountText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

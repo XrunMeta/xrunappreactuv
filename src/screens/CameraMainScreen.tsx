@@ -18,6 +18,7 @@ import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704 } from '../components';
+import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -49,10 +50,10 @@ interface TokenComponentProps {
   calculateScaleBasedOnDistance: (distance: number) => number;
 }
 
-const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({ 
-  token: v_21cc31, 
-  onPress: v_719eed, 
-  animationRefs: v_5b4d76, 
+const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
+  token: v_21cc31,
+  onPress: v_719eed,
+  animationRefs: v_5b4d76,
   appState: v_94a194,
   rageProgress: v_95eb72,
   isRageMode: v_a5ed76,
@@ -1000,8 +1001,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const v_5389c3 = v_21cc31.advertisement 
-        ? String(v_21cc31.advertisement) 
+      const v_5389c3 = v_21cc31.advertisement
+        ? String(v_21cc31.advertisement)
         : (v_21cc31.coin ? String(v_21cc31.coin) : '');
       const v_aa0917 = v_21cc31.campid ? String(v_21cc31.campid) : '';
 
@@ -1067,8 +1068,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const v_5389c3 = v_21cc31.advertisement 
-        ? String(v_21cc31.advertisement) 
+      const v_5389c3 = v_21cc31.advertisement
+        ? String(v_21cc31.advertisement)
         : (v_21cc31.coin ? String(v_21cc31.coin) : '');
       const v_aa0917 = v_21cc31.campid ? String(v_21cc31.campid) : '';
 
@@ -1341,29 +1342,29 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 .sort((v_779914, v_148ff6) => (v_148ff6.distance || 0) - (v_779914.distance || 0)) 
                 .map((v_21cc31) => {
 
-                const v_d0be5e = () => {
-                  console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
-                    spotID: v_21cc31.spotID,
-                    advertisement: v_21cc31.advertisement,
-                    campid: v_21cc31.campid,
-                    coin: v_21cc31.coin,
-                    name: v_21cc31.name,
-                  });
-                  v_eed806(v_21cc31);
-                };
+                  const v_d0be5e = () => {
+                    console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
+                      spotID: v_21cc31.spotID,
+                      advertisement: v_21cc31.advertisement,
+                      campid: v_21cc31.campid,
+                      coin: v_21cc31.coin,
+                      name: v_21cc31.name,
+                    });
+                    v_eed806(v_21cc31);
+                  };
 
-                return (
-                  <TokenComponent
-                    key={v_21cc31.spotID}
-                    token={v_21cc31}
-                    onPress={v_d0be5e} 
-                    animationRefs={v_5b4d76}
-                    appState={v_94a194}
-                    rageProgress={v_95eb72}
-                    isRageMode={v_a5ed76}
-                    rageColor={v_269c04}
-                    calculateScaleBasedOnDistance={v_c4aeea}
-                  />
+                  return (
+                    <TokenComponent
+                      key={v_21cc31.spotID}
+                      token={v_21cc31}
+                      onPress={v_d0be5e} 
+                      animationRefs={v_5b4d76}
+                      appState={v_94a194}
+                      rageProgress={v_95eb72}
+                      isRageMode={v_a5ed76}
+                      rageColor={v_269c04}
+                      calculateScaleBasedOnDistance={v_c4aeea}
+                    />
                   );
                 });
             })()}
@@ -1411,147 +1412,147 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 minHeight: v_572bd3 && v_04cb77 ? 100 : 35,
               },
             ]}>
-              {}
-              {v_572bd3 && (
+            {}
+            {v_572bd3 && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: 8,
+                  paddingBottom: 0, 
+                }}>
                 <View
                   style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingTop: 8,
-                    paddingBottom: 0, 
-                  }}>
-                  <View
-                    style={{
-                      width: 40,
-                      height: 4,
-                      backgroundColor: '#D9D9D9',
-                      borderRadius: 2,
-                    }}
-                  />
-                </View>
-              )}
-              {}
-              {v_572bd3 && v_04cb77 && (
+                    width: 40,
+                    height: 4,
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: 2,
+                  }}
+                />
+              </View>
+            )}
+            {}
+            {v_572bd3 && v_04cb77 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  paddingHorizontal: 20,
+                  paddingTop: 0,
+                  paddingBottom: 12,
+                  pointerEvents: 'box-none', 
+                }}>
+                {}
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingHorizontal: 20,
-                    paddingTop: 0,
-                    paddingBottom: 12,
-                    pointerEvents: 'box-none', 
+                    flex: 1,
                   }}>
                   {}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}>
-                    {}
-                    {!v_04cb77?.iconurl ||
+                  {!v_04cb77?.iconurl ||
                     v_04cb77?.iconurl.toString().trim() === '' ||
                     typeof v_04cb77?.iconurl !== 'string' ? (
-                      v_ed24ee && (
-                        <Image
-                          source={v_ed24ee}
-                          resizeMode="contain"
-                          style={{
-                            width: 44,
-                            height: 44,
-                            marginRight: 12,
-                          }}
-                        />
-                      )
-                    ) : (
+                    v_ed24ee && (
                       <Image
-                        source={{ uri: v_04cb77?.iconurl }}
+                        source={v_ed24ee}
                         resizeMode="contain"
                         style={{
                           width: 44,
                           height: 44,
                           marginRight: 12,
-                          borderRadius: 8,
                         }}
                       />
-                    )}
-
-                    {}
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: 'Roboto-Medium',
-                          fontSize: 16,
-                          color: '#4c4e55',
-                          lineHeight: 24,
-                          marginTop:20,
-                          marginBottom: 4,
-                        }}
-                        numberOfLines={1}
-                        ellipsizeMode="tail">
-                        {!v_04cb77?.name ||
-                        v_04cb77?.name.toString().trim() === ''
-                          ? 'XRUN coin'
-                          : v_04cb77?.name}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: 'Roboto-Regular',
-                          fontSize: 12,
-                          color: '#4c4e55',
-                          lineHeight: 15,
-                          letterSpacing: 0.06,
-                        }}
-                        numberOfLines={2}
-                        ellipsizeMode="tail">
-                        {!v_04cb77?.joindesc ||
-                        v_04cb77?.joindesc.toString().trim() === ''
-                          ? 'XRUN으로 리워드를 획득하세요'
-                          : v_04cb77?.joindesc}
-                      </Text>
-                    </View>
-                  </View>
+                    )
+                  ) : (
+                    <Image
+                      source={{ uri: v_04cb77?.iconurl }}
+                      resizeMode="contain"
+                      style={{
+                        width: 44,
+                        height: 44,
+                        marginRight: 12,
+                        borderRadius: 8,
+                      }}
+                    />
+                  )}
 
                   {}
-                  <TouchableOpacity
-                    onPress={async () => {
-                      console.log('=== View ad 버튼 클릭 ===');
-                      console.log('현재 selectedToken:', JSON.stringify(v_04cb77, null, 2));
-
-                      if (v_181e3e.current) {
-                        clearTimeout(v_181e3e.current);
-                        v_181e3e.current = null;
-                      }
-                      v_6890b1.current = true; 
-
-                      if (v_04cb77) {
-                        await v_794bb0(v_04cb77);
-                      } else {
-                        console.error('❌ View ad 버튼 - selectedToken이 없습니다!');
-                      }
-                    }}
-                    style={{
-                      backgroundColor: '#FFDC04',
-                      paddingHorizontal: 15,
-                      paddingVertical: 8,
-                      borderRadius: 8,
-                      marginLeft: 12,
-                    }}>
+                  <View style={{ flex: 1 }}>
                     <Text
                       style={{
-                        fontSize: 14,
-                        fontFamily: 'Roboto-Bold',
-                        color: '#000000',
-                      }}>
-                      View ad
+                        fontFamily: 'Roboto-Medium',
+                        fontSize: v_843035.fontSize.medium,
+                        color: '#4c4e55',
+                        lineHeight: 24,
+                        marginTop: 20,
+                        marginBottom: 4,
+                      }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail">
+                      {!v_04cb77?.name ||
+                        v_04cb77?.name.toString().trim() === ''
+                        ? 'XRUN coin'
+                        : v_04cb77?.name}
                     </Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: v_843035.fontSize.small,
+                        color: '#4c4e55',
+                        lineHeight: 15,
+                        letterSpacing: 0.06,
+                      }}
+                      numberOfLines={2}
+                      ellipsizeMode="tail">
+                      {!v_04cb77?.joindesc ||
+                        v_04cb77?.joindesc.toString().trim() === ''
+                        ? 'XRUN으로 리워드를 획득하세요'
+                        : v_04cb77?.joindesc}
+                    </Text>
+                  </View>
                 </View>
-              )}
-            </Pressable>
-          </Animated.View>
+
+                {}
+                <TouchableOpacity
+                  onPress={async () => {
+                    console.log('=== View ad 버튼 클릭 ===');
+                    console.log('현재 selectedToken:', JSON.stringify(v_04cb77, null, 2));
+
+                    if (v_181e3e.current) {
+                      clearTimeout(v_181e3e.current);
+                      v_181e3e.current = null;
+                    }
+                    v_6890b1.current = true; 
+
+                    if (v_04cb77) {
+                      await v_794bb0(v_04cb77);
+                    } else {
+                      console.error('❌ View ad 버튼 - selectedToken이 없습니다!');
+                    }
+                  }}
+                  style={{
+                    backgroundColor: '#FFDC04',
+                    paddingHorizontal: 15,
+                    paddingVertical: 8,
+                    borderRadius: 8,
+                    marginLeft: 12,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: v_843035.fontSize.msmall,
+                      fontFamily: 'Roboto-Bold',
+                      color: '#000000',
+                    }}>
+                    View ad
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Pressable>
+        </Animated.View>
       </View>
 
       {}
@@ -1575,7 +1576,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           console.log('모달 닫기 요청');
           v_219124(false);
         }}>
-        <ShowNapAdScreen 
+        <ShowNapAdScreen
           onClose={() => {
             console.log('ShowNapAdScreen 모달 닫기');
             v_219124(false);
@@ -1598,7 +1599,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.log('모달 닫기 버튼 클릭');
             v_219124(false);
           }}>
-          <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>×</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: v_843035.fontSize.xlarge, fontWeight: 'bold' }}>×</Text>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -1710,14 +1711,14 @@ const v_d81136 = v_472849.create({
 
   tokenPriceText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontWeight: 'bold',
     textAlign: 'center',
   },
 
   tokenDistanceText: {
     color: '#CCCCCC',
-    fontSize: 10,
+    fontSize: v_843035.fontSize.xxsmall,
     marginTop: -2,
     textAlign: 'center',
   },

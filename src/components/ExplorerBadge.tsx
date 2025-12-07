@@ -11,6 +11,7 @@ import {
   v_3094a2,
   v_7e4944,
 } from 'rcmrninabrnb';
+import { v_843035 } from '../constants';
 
 interface ExplorerBadgeProps {
   label: string;
@@ -96,21 +97,21 @@ const v_d81136 = v_472849.create({
     height: 18,
   },
   label: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   caption: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#5f6478',
   },
   compactLabel: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     color: '#1f6880',
   },
   compactCaption: {
-    fontSize: 11,
+    fontSize: v_843035.fontSize.xsmall,
   },
   textColumn: {
     justifyContent: 'center',

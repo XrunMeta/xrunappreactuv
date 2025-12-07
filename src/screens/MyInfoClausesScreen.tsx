@@ -3,7 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_4623af } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0, v_a61db3, v_704d15 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_704d15, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
@@ -71,7 +71,7 @@ const v_d81136 = v_472849.create({
     elevation: 4,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: v_843035.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },

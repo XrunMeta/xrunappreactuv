@@ -16,7 +16,7 @@ import {
   v_89c10a,
   v_cb41de,
 } from '../components';
-import { v_1bfbd0, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -437,7 +437,7 @@ const v_d81136 = v_472849.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -452,11 +452,11 @@ const v_d81136 = v_472849.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: v_843035.fontSize.large,
     marginRight: 6,
   },
   countryCode: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
@@ -477,7 +477,7 @@ const v_d81136 = v_472849.create({
   },
   termsText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',

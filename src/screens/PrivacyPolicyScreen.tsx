@@ -3,7 +3,7 @@ import { v_3094a2, v_472849, v_19b633, v_326be8 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 
 const v_1afece = `
@@ -67,7 +67,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',

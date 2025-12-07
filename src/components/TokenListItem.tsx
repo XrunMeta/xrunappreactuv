@@ -8,6 +8,7 @@ import {
   v_4623af,
   v_629153,
 } from 'rcmrninabrnb';
+import { v_843035 } from '../constants';
 
 interface TokenListItemProps extends v_629153 {
   title: string;
@@ -94,7 +95,7 @@ const v_d81136 = v_472849.create({
     height: 40,
   },
   iconText: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Bold',
   },
   badge: {
@@ -107,7 +108,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 2,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: v_843035.fontSize.xxsmall,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
@@ -115,12 +116,12 @@ const v_d81136 = v_472849.create({
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: v_843035.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -128,12 +129,12 @@ const v_d81136 = v_472849.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: 13,
+    fontSize: v_843035.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
   suffix: {
-    fontSize: 12,
+    fontSize: v_843035.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
