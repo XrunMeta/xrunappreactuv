@@ -81,19 +81,15 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [maxRetries] = useState(3);
   const [adCallFailedModalVisible, setAdCallFailedModalVisible] = useState(false);
   const [showAlternativeAdButton, setShowAlternativeAdButton] = useState(false);
   const [showBackButton, setShowBackButton] = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
   const [hasOpenedUrl, setHasOpenedUrl] = useState(false);
   const [waitingForWebSocketResponse, setWaitingForWebSocketResponse] = useState(false);
   const [member, setMember] = useState<string>('');
   const [isTaboolaLoaded, setIsTaboolaLoaded] = useState(false);
 
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -149,7 +145,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     getUserData();
   }, [advertisementParams]);
 
-  const initNStationAd = async (currentRetryCount: number = 0, params?: typeof advertisementParams) => {
+  const initNStationAd = async (params?: typeof advertisementParams) => {
     try {
 
       const currentParams = params || advertisementParams;
@@ -211,25 +207,9 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         throw new Error(`URL 결과 실패: ${result.data?.urlResult}`);
       }
     } catch (error: any) {
-      console.error(`NStation 광고 초기화 실패 (${currentRetryCount + 1}번째 시도):`, error);
+      console.error('NStation 광고 초기화 실패:', error);
 
-      if (currentRetryCount < maxRetries) {
-        console.log(`🔄 재시도 ${currentRetryCount + 1}/${maxRetries} - 에러: ${error.message}`);
-        setRetryCount(currentRetryCount + 1);
-        setIsRetrying(true);
-
-        if (currentRetryCount > 15) {
-          setShowAlternativeAdButton(true);
-        }
-
-        const retryParams = params || advertisementParams;
-        retryTimeoutRef.current = setTimeout(() => {
-          initNStationAd(currentRetryCount + 1, retryParams);
-        }, 2000);
-        return;
-      }
-
-      console.log(`❌ 최대 재시도 횟수(${maxRetries}) 초과 - 총 ${currentRetryCount}번 시도`);
+      console.log('❌ 광고 초기화 실패 - 팝업 표시');
       setIsLoading(false);
       setAdCallFailedModalVisible(true);
     }
@@ -257,18 +237,12 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         setCampaignData(null);
         setIsLoading(true);
         setIsProcessing(false);
-        setRetryCount(0);
-        setIsRetrying(false);
         setAdCallFailedModalVisible(false);
         setShowAlternativeAdButton(false);
         setShowBackButton(false);
         setHasOpenedUrl(false);
         setWaitingForWebSocketResponse(false);
 
-        if (retryTimeoutRef.current) {
-          clearTimeout(retryTimeoutRef.current);
-          retryTimeoutRef.current = null;
-        }
         if (rewardProcessingTimeoutRef.current) {
           clearTimeout(rewardProcessingTimeoutRef.current);
           rewardProcessingTimeoutRef.current = null;
@@ -304,7 +278,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       console.log('✅ member와 advertisementParams 모두 있음 - initNStationAd 호출');
       console.log('🔍 [ShowNapAdScreen] initNStationAd에 전달할 campid:', advertisementParams.campid);
 
-      initNStationAd(0, advertisementParams);
+      initNStationAd(advertisementParams);
     } else {
       console.log('⏳ member 또는 advertisementParams 대기 중...');
       if (!member) {
@@ -318,10 +292,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
   useEffect(() => {
     return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
-      }
       if (rewardProcessingTimeoutRef.current) {
         clearTimeout(rewardProcessingTimeoutRef.current);
         rewardProcessingTimeoutRef.current = null;
@@ -361,6 +331,64 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       throw error;
     }
   };
+
+    const callAdApi = async () => {
+      try {
+        const adCompany = advertisementParams?.ad_company || 'nas';
+        const deviceInfo = await collectDeviceInfo();
+
+        console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${adCompany}`);
+
+        if (adCompany === 'nas') {
+
+          const campid = advertisementParams?.campid || '';
+          console.log(`[callAdApi] getNasmobAds 호출 - campid: ${campid}`);
+
+          const result = await getNasmobAds(
+            member,
+            deviceInfo.adid,
+            deviceInfo,
+            campid,
+            onClose ? undefined : navigate,
+          );
+          console.log('[callAdApi] getNasmobAds 응답:', result);
+          return result;
+
+        } else if (adCompany === 'pointclick') {
+
+          const ad_key = advertisementParams?.campid || ''; 
+          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${ad_key}`);
+
+          const result = await getPointClickAds(
+            member,
+            deviceInfo.adid,
+            deviceInfo,
+            ad_key,
+            onClose ? undefined : navigate,
+          );
+          console.log('[callAdApi] getPointClickAds 응답:', result);
+          return result;
+
+        } else {
+
+          console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
+          const campid = advertisementParams?.campid || '';
+
+          const result = await getNasmobAds(
+            member,
+            deviceInfo.adid,
+            deviceInfo,
+            campid,
+            onClose ? undefined : navigate,
+          );
+          console.log('[callAdApi] getNasmobAds 응답:', result);
+          return result;
+        }
+      } catch (error) {
+        console.error('[callAdApi] 광고 API 호출 실패:', error);
+        throw error;
+      }
+    };
 
   const handleAdCompletion = async () => {
     try {
@@ -530,14 +558,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
   const handleBackButtonPress = () => {
     console.log('뒤로가기 버튼 클릭 - CameraMainScreen으로 이동');
-    setIsRetrying(false);
     setShowBackButton(false);
-
-    if (retryTimeoutRef.current) {
-      clearTimeout(retryTimeoutRef.current);
-      retryTimeoutRef.current = null;
-    }
-
     resetAdvertisementParams();
     handleClose();
   };
@@ -600,12 +621,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
               {waitingForWebSocketResponse && <SequentialDots />}
             </>
           ) : null}
-
-          {retryCount > 0 && (
-            <Text style={styles.retryText}>
-              {t('screens.showNapAd.checkingAd')}
-            </Text>
-          )}
 
           {waitingForWebSocketResponse && (
             <TouchableOpacity
@@ -678,12 +693,26 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           )}
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
+          <TouchableOpacity
               style={styles.watchAdButton}
-              onPress={() => {
+              onPress={async () => {
                 console.log('광고 보기 버튼 클릭');
-                if (campaignData.urlAD) {
-                  openUrlAD(campaignData.urlAD);
+                console.log(`[광고보기] ad_company: ${advertisementParams?.ad_company}`);
+
+                try {
+
+                  await callAdApi();
+                  console.log('[광고보기] 광고 API 호출 완료');
+
+                  if (campaignData.urlAD) {
+                    openUrlAD(campaignData.urlAD);
+                  }
+                } catch (error) {
+                  console.error('[광고보기] 광고 API 호출 실패:', error);
+
+                  if (campaignData.urlAD) {
+                    openUrlAD(campaignData.urlAD);
+                  }
                 }
               }}
               activeOpacity={0.7}
