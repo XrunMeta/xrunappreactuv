@@ -271,8 +271,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_f3d3c8 = 'lastGpsLocationForMapMove';
 
-  const v_f18c4f = 'lastMapRegion';
-
   const v_5f2e8e = v_e662ae(false);
 
   const v_9bf134 = v_e662ae(false);
@@ -1020,54 +1018,22 @@ export const MapMainScreen: v_a3453e.FC = () => {
     }
 
     let v_f18a9c = null;
-    let v_fb2a0d = null;
     let v_439b17 = '';
 
     try {
 
       try {
-        const v_d353f0 = await v_e84827.getItem(v_f18c4f);
-        if (v_d353f0) {
-          const v_19f861 = JSON.parse(v_d353f0);
-          if (v_19f861.latitude && v_19f861.longitude && 
-              v_19f861.latitudeDelta && v_19f861.longitudeDelta) {
-            v_fb2a0d = {
-              latitude: v_19f861.latitude,
-              longitude: v_19f861.longitude,
-              latitudeDelta: v_19f861.latitudeDelta,
-              longitudeDelta: v_19f861.longitudeDelta,
-            };
-            v_f18a9c = {
-              latitude: v_19f861.latitude,
-              longitude: v_19f861.longitude,
-            };
-            v_439b17 = '캐시된 맵 영역 정보';
-            console.log('✅ [handleMapReady] 캐시된 맵 영역 정보 발견:', {
-              latitude: v_fb2a0d.latitude.toFixed(6),
-              longitude: v_fb2a0d.longitude.toFixed(6),
-              latitudeDelta: v_fb2a0d.latitudeDelta.toFixed(6),
-              longitudeDelta: v_fb2a0d.longitudeDelta.toFixed(6),
-            });
+        const v_05f29b = await v_e84827.getItem(v_f3d3c8);
+        if (v_05f29b) {
+          const v_3a14d6 = JSON.parse(v_05f29b);
+          if (v_3a14d6.latitude && v_3a14d6.longitude) {
+            v_f18a9c = v_3a14d6;
+            v_439b17 = 'AsyncStorage 마지막 위치';
+            console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', v_3a14d6);
           }
         }
-      } catch (v_74d34c) {
-        console.error('❌ [handleMapReady] 맵 영역 정보 읽기 실패:', v_74d34c);
-      }
-
-      if (!v_f18a9c) {
-        try {
-          const v_05f29b = await v_e84827.getItem(v_f3d3c8);
-          if (v_05f29b) {
-            const v_3a14d6 = JSON.parse(v_05f29b);
-            if (v_3a14d6.latitude && v_3a14d6.longitude) {
-              v_f18a9c = v_3a14d6;
-              v_439b17 = 'AsyncStorage 마지막 위치';
-              console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', v_3a14d6);
-            }
-          }
-        } catch (v_df17d5) {
-          console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', v_df17d5);
-        }
+      } catch (v_df17d5) {
+        console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', v_df17d5);
       }
 
       if (!v_f18a9c) {
@@ -1134,16 +1100,19 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         v_ca338a.current = true;
 
-        const v_d99c20 = v_fb2a0d || {
+        v_3ec640.current.animateToRegion({
+          latitude: v_f18a9c.latitude,
+          longitude: v_f18a9c.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+
+        v_de148f.current = {
           latitude: v_f18a9c.latitude,
           longitude: v_f18a9c.longitude,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         };
-
-        v_3ec640.current.animateToRegion(v_d99c20, 500);
-
-        v_de148f.current = v_d99c20;
 
         v_0326b2(v_f18a9c);
 
@@ -1156,20 +1125,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
             latitude: v_f18a9c.latitude,
             longitude: v_f18a9c.longitude,
           };
-        }
-
-        if (!v_fb2a0d) {
-          try {
-            await v_e84827.setItem(v_f18c4f, JSON.stringify(v_d99c20));
-            console.log('💾 [handleMapReady] 맵 영역 정보 저장:', {
-              latitude: v_d99c20.latitude.toFixed(6),
-              longitude: v_d99c20.longitude.toFixed(6),
-              latitudeDelta: v_d99c20.latitudeDelta.toFixed(6),
-              longitudeDelta: v_d99c20.longitudeDelta.toFixed(6),
-            });
-          } catch (v_2bf859) {
-            console.error('❌ [handleMapReady] 맵 영역 정보 저장 실패:', v_2bf859);
-          }
         }
 
         console.log('🔄 [handleMapReady] 마커 로드 시작');
@@ -1194,18 +1149,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
         longitude: 126.9780,
       };
 
-      const v_4e4859 = {
-        latitude: v_3a1065.latitude,
-        longitude: v_3a1065.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      };
-
       if (v_3ec640.current) {
         v_ca338a.current = true;
-        v_3ec640.current.animateToRegion(v_4e4859, 500);
+        v_3ec640.current.animateToRegion({
+          latitude: v_3a1065.latitude,
+          longitude: v_3a1065.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
 
-        v_de148f.current = v_4e4859;
+        v_de148f.current = {
+          latitude: v_3a1065.latitude,
+          longitude: v_3a1065.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
 
         v_0326b2(v_3a1065);
 
@@ -1214,13 +1172,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
           v_c84980(v_3a1065);
           v_c38114.current = v_3a1065;
           v_a2b40c.current = v_3a1065;
-        }
-
-        try {
-          await v_e84827.setItem(v_f18c4f, JSON.stringify(v_4e4859));
-          console.log('💾 [handleMapReady] 기본 위치 맵 영역 정보 저장');
-        } catch (v_2bf859) {
-          console.error('❌ [handleMapReady] 기본 위치 맵 영역 정보 저장 실패:', v_2bf859);
         }
 
         await v_524200(v_3a1065, false);
@@ -1297,8 +1248,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('  마지막 마커 로드 위치:', v_5a477d.latitude.toFixed(6), v_5a477d.longitude.toFixed(6));
       console.log('  거리:', v_926d1c.toFixed(2), 'm');
 
-      v_14dd24([]);
-
       await v_524200(v_7dd198, true);
 
       v_772369.current = true;
@@ -1309,8 +1258,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
     if (v_926d1c >= 500) {
 
       console.log('=== 200m 이상 이동, 새로운 위치에서 마커 로드 ===');
-
-      v_14dd24([]);
 
       await v_524200(v_7dd198, true);
 
@@ -1945,17 +1892,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_b3439a.set(v_e149c8, v_127b33);
 
       if (v_a56041 < 10) {
-        console.log(`[MapMainScreen] 마커 ${v_a56041 + 1} 매핑:`, {
-          uniqueKey: v_e149c8,
-          markerKey: v_f81bc9,
-          spotID: v_5e3dbb.spotID,
-          coin: v_5e3dbb.coin,
-          latitude: v_5e3dbb.latitude,
-          longitude: v_5e3dbb.longitude,
-          adIndex: v_ba7922,
-          adName: v_127b33?.name || '없음',
-          adCompany: v_127b33?.ad_company || '없음',
-        });
+
       }
     });
     console.log('[MapMainScreen] 마커-광고 매핑 완료:', v_b3439a.size, '개 마커, TopAd5 개수:', v_4cf0ad.length);
@@ -2357,14 +2294,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     });
 
-    if (v_386fb7 === null) {
+    if (v_386fb7 === null || v_2540f0 > 100) {
 
       v_d8a1fd(false);
-
       v_94e8d8(null);
-
+      console.log('=== 맵 클릭: 100미터 이내 마커 없음 ===');
+      console.log('가장 가까운 마커 거리:', v_2540f0 === Infinity ? '없음' : `${v_2540f0.toFixed(2)}m`);
       return;
-
     }
 
     const marker: v_f71847 = v_386fb7;
@@ -2372,11 +2308,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
     if (!v_5e3dbb.latitude || !v_5e3dbb.longitude) {
 
       v_d8a1fd(false);
-
       v_94e8d8(null);
-
       return;
-
     }
 
     const v_f81bc9 = v_3d837b(v_5e3dbb);
@@ -2647,26 +2580,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
     v_a11b30.current = Date.now();
 
     v_43de51.current = false;
-
-    if (!v_355a57) {
-      try {
-        const v_46d20d = {
-          latitude: v_a6c30b.latitude,
-          longitude: v_a6c30b.longitude,
-          latitudeDelta: v_a6c30b.latitudeDelta,
-          longitudeDelta: v_a6c30b.longitudeDelta,
-        };
-        await v_e84827.setItem(v_f18c4f, JSON.stringify(v_46d20d));
-        console.log('💾 [맵 캐싱] 맵 영역 정보 저장:', {
-          latitude: v_46d20d.latitude.toFixed(6),
-          longitude: v_46d20d.longitude.toFixed(6),
-          latitudeDelta: v_46d20d.latitudeDelta.toFixed(6),
-          longitudeDelta: v_46d20d.longitudeDelta.toFixed(6),
-        });
-      } catch (v_2bf859) {
-        console.error('❌ [맵 캐싱] 저장 실패:', v_2bf859);
-      }
-    }
 
   };
 
