@@ -2321,6 +2321,8 @@ export const MapMainScreen: React.FC = () => {
       setShowCalloutPopup(false);
 
       setCalloutData(null);
+      setShowBottomPanel(false);
+      setSelectedSpot(null);
 
       return;
 
@@ -2331,6 +2333,8 @@ export const MapMainScreen: React.FC = () => {
       setShowCalloutPopup(false);
 
       setCalloutData(null);
+      setShowBottomPanel(false);
+      setSelectedSpot(null);
 
       return;
 
@@ -2374,7 +2378,9 @@ export const MapMainScreen: React.FC = () => {
 
       setShowCalloutPopup(false);
       setCalloutData(null);
-      console.log('=== 맵 클릭: 100미터 이내 마커 없음 ===');
+      setShowBottomPanel(false);
+      setSelectedSpot(null);
+      console.log('=== 맵 클릭: 100미터 이내 마커 없음 - 콜아웃 및 하단 패널 닫기 ===');
       console.log('가장 가까운 마커 거리:', minDistance === Infinity ? '없음' : `${minDistance.toFixed(2)}m`);
       return;
     }
@@ -2385,6 +2391,8 @@ export const MapMainScreen: React.FC = () => {
 
       setShowCalloutPopup(false);
       setCalloutData(null);
+      setShowBottomPanel(false);
+      setSelectedSpot(null);
       return;
     }
 
