@@ -1233,7 +1233,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       brand: v_21cc31.brand,
     };
 
-    console.log('✅ 저장할 토큰 복사본:', JSON.stringify(v_021ef9, null, 2));
     console.log('🔍 tokenCopy 상세 검증:', {
       spotID: v_021ef9.spotID,
       advertisement: v_021ef9.advertisement,

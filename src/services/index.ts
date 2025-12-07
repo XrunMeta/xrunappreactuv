@@ -3,6 +3,8 @@ import v_b5030f, { v_3333d3 } from 'imsks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_326be8 } from 'rcmrninabrnb';
 import { v_ce4741 } from '../navigation';
+import { v_858bfa } from '../utils/imageCache';
+import { v_e4a763 } from '../utils/env';
 import {
   v_96ef47,
   v_2fe85a,
@@ -134,7 +136,6 @@ import {
   v_dfd755,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
-import { v_e4a763 } from '../utils/env';
 
 const v_8a74cb = 20000;
 
@@ -3840,6 +3841,98 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
     if (v_3393e3) {
       await v_e84827.setItem(v_332c06, JSON.stringify(v_3393e3));
       console.log('[getTopAd5] AsyncStorage에 저장 완료');
+    }
+
+    if (v_3393e3 && Array.isArray(v_3393e3)) {
+      try {
+        console.log('[getTopAd5] 이미지 캐싱 시작');
+        const v_bd2479 = [];
+
+        v_3393e3.forEach((v_ddcfed) => {
+
+          const v_b55406 = [
+            v_ddcfed?.brandlogo,
+            v_ddcfed?.adthumbnail2,
+            v_ddcfed?.symbolimg,
+            v_ddcfed?.thumbnail,
+            v_ddcfed?.iconurl,
+          ];
+
+          v_b55406.forEach((v_70c705) => {
+
+            if (v_70c705 && (typeof v_70c705 === 'number' || (typeof v_70c705 === 'string' && !v_70c705.startsWith('http') && !v_70c705.startsWith('data:')))) {
+              const v_433c46 = typeof v_70c705 === 'string' ? v_70c705.trim() : v_70c705;
+              if (v_433c46 && !v_bd2479.includes(v_433c46)) {
+                v_bd2479.push(v_433c46);
+              }
+            }
+          });
+        });
+
+        console.log('[getTopAd5] 추출된 이미지 파일 ID 개수:', v_bd2479.length);
+
+        if (v_bd2479.length > 0) {
+
+          const v_c9c489 = v_e4a763();
+          const v_feeeb6 = v_c9c489.GATEWAY_NODEJS;
+
+          await v_858bfa.downloadMultipleImages(v_bd2479, v_feeeb6);
+          console.log('[getTopAd5] 이미지 캐싱 완료');
+        } else {
+          console.log('[getTopAd5] 캐싱할 이미지가 없습니다.');
+        }
+      } catch (v_67ab2b) {
+        console.error('[getTopAd5] 이미지 캐싱 오류:', v_67ab2b);
+
+      }
+    }
+
+    try {
+      const v_99c46d = await v_e84827.getItem('astorCoinsData');
+      if (v_99c46d && v_3393e3 && Array.isArray(v_3393e3) && v_3393e3.length > 0) {
+        console.log('[getTopAd5] 마커 데이터 발견 - 광고 매핑 시작');
+
+        const v_b9ce93 = JSON.parse(v_99c46d);
+        if (Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+
+          const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
+
+            const v_ba7922 = v_a56041 % v_3393e3.length;
+            const v_127b33 = v_3393e3[v_ba7922];
+
+            return {
+              ...v_5e3dbb,
+
+              name: v_127b33?.name || v_5e3dbb.name,
+              iconurl: v_127b33?.iconurl || v_5e3dbb.iconurl,
+              joindesc: v_127b33?.joindesc || v_5e3dbb.joindesc,
+              xrunPrice: v_127b33?.xrunPrice || v_5e3dbb.xrunPrice || v_5e3dbb.xrunprice || 0,
+              campid: v_127b33?.campid || v_5e3dbb.campid || v_5e3dbb.campId || '',
+
+              thumbnail: v_127b33?.thumbnail || v_5e3dbb.thumbnail,
+              ad_company: v_127b33?.ad_company || v_5e3dbb.ad_company,
+              coins: v_127b33?.coins?.toString() || v_5e3dbb.coins,
+              brandlogo: v_127b33?.brandlogo || v_5e3dbb.brandlogo,
+              adthumbnail2: v_127b33?.adthumbnail2 || v_5e3dbb.adthumbnail2,
+              symbolimg: v_127b33?.symbolimg || v_5e3dbb.symbolimg,
+            };
+          });
+
+          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_8ceeaa));
+          console.log('[getTopAd5] 마커-광고 매핑 완료:', v_8ceeaa.length, '개 마커에 광고 매핑');
+        } else {
+          console.log('[getTopAd5] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
+        }
+      } else {
+        if (!v_99c46d) {
+          console.log('[getTopAd5] 마커 데이터 없음 - 매핑 건너뛰기');
+        } else if (!v_3393e3 || !Array.isArray(v_3393e3) || v_3393e3.length === 0) {
+          console.log('[getTopAd5] 광고 데이터 없음 - 매핑 건너뛰기');
+        }
+      }
+    } catch (v_aa40f4) {
+      console.error('[getTopAd5] 마커-광고 매핑 오류:', v_aa40f4);
+
     }
 
     return v_3393e3;

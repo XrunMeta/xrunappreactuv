@@ -271,6 +271,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_f3d3c8 = 'lastGpsLocationForMapMove';
 
+  const v_f18c4f = 'lastMapRegion';
+
   const v_5f2e8e = v_e662ae(false);
 
   const v_9bf134 = v_e662ae(false);
@@ -278,6 +280,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_772369 = v_e662ae(false);
 
   const v_9d72cd = v_e662ae(false);
+
+  const v_1b0a7f = v_e662ae(false);
 
   let v_be97ff = null;
   let v_8c4b15 = null;
@@ -328,11 +332,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
     console.log('🚀 [loadMarkersForLocation] 시작:', { targetLocation: v_f18a9c, forceRefresh: v_9d6a91, hasCurrentGpsLocation: !!v_e8ec67 });
 
     if (v_5db874.current) {
-
       console.log('=== 맵 마커 로딩 중, 중복 호출 방지 ===');
-
       return;
-
     }
 
     const v_ef7306 = await v_e84827.getItem('userData');
@@ -346,60 +347,74 @@ export const MapMainScreen: v_a3453e.FC = () => {
     try {
 
       const v_ff39bc = JSON.parse(v_ef7306);
-
       const v_660822 = v_ff39bc?.member;
-
       if (!v_660822) {
-
         console.log('userData에 member가 없습니다.');
-
         return;
-
       }
 
       if (!v_9d6a91) {
-
         const v_99c46d = await v_e84827.getItem('astorCoinsData');
-
         if (v_99c46d) {
 
           try {
-
             const v_b9ce93 = JSON.parse(v_99c46d);
-
             if (v_b9ce93 && Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
 
-              const spotDataArray: v_f71847[] = v_b9ce93.map((v_51b584) => ({
+              const v_beddf3 = v_b9ce93
+                .map((v_51b584) => {
+                  const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
+                  const v_c87b30 = v_51b584.longitude || v_51b584.lng;
+
+                  if (v_e1b1cf && v_c87b30) {
+                    const v_926d1c = v_b464ed(
+                      v_f18a9c.latitude,
+                      v_f18a9c.longitude,
+                      v_e1b1cf,
+                      v_c87b30
+                    );
+                    return {
+                      ...v_51b584,
+                      distance: v_926d1c, 
+                    };
+                  } else {
+
+                    return {
+                      ...v_51b584,
+                      distance: v_51b584.distance || Infinity,
+                    };
+                  }
+                })
+                .sort((v_779914, v_148ff6) => {
+
+                  return (v_779914.distance || Infinity) - (v_148ff6.distance || Infinity);
+                });
+
+              try {
+                await v_e84827.setItem('astorCoinsData', JSON.stringify(v_beddf3));
+                console.log('✅ [MapMainScreen] 캐시 데이터 거리순 정렬 후 저장 완료');
+              } catch (v_090638) {
+                console.error('[MapMainScreen] 캐시 데이터 정렬 후 저장 오류:', v_090638);
+              }
+
+              const spotDataArray: v_f71847[] = v_beddf3.map((v_51b584) => ({
 
                 spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
-
                 distance: v_51b584.distance || 0,
-
                 direction: v_51b584.direction || 0,
-
                 name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
-
                 latitude: v_51b584.latitude || v_51b584.lat,
-
                 longitude: v_51b584.longitude || v_51b584.lng,
-
                 xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
-
                 iconurl: v_51b584.iconurl || '',
-
                 joindesc: v_51b584.joindesc || '',
-
                 brand: v_51b584.brand || v_51b584.coin || '',
-
                 coins: v_51b584.coins || v_51b584.coin || '',
-
                 coin: v_51b584.coin || '',
-
                 campid: v_51b584.campid || v_51b584.campId || '',
-
               } as v_f71847 & { campid?: string }));
 
-              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', v_22ecab.length, ')');
+              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', v_22ecab.length, ', 거리순 정렬됨)');
               console.log('📌 [MapMainScreen] setMarkers 호출 (캐시 데이터):', v_22ecab.length, '개');
               v_14dd24(v_22ecab);
               v_c84980(v_f18a9c);
@@ -744,10 +759,38 @@ export const MapMainScreen: v_a3453e.FC = () => {
       if (v_2876a4.length > 0) {
         try {
 
-          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_2876a4));
-          console.log('✅ astorCoinsData AsyncStorage에 저장 완료');
+          const v_beddf3 = v_2876a4
+            .map((v_51b584) => {
+              const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
+              const v_c87b30 = v_51b584.longitude || v_51b584.lng;
 
-          console.log('astorCoinsData -> ' + v_2876a4.length);
+              if (v_e1b1cf && v_c87b30) {
+                const v_926d1c = v_b464ed(
+                  v_f18a9c.latitude,
+                  v_f18a9c.longitude,
+                  v_e1b1cf,
+                  v_c87b30
+                );
+                return {
+                  ...v_51b584,
+                  distance: v_926d1c, 
+                };
+              } else {
+
+                return {
+                  ...v_51b584,
+                  distance: v_51b584.distance || Infinity,
+                };
+              }
+            })
+            .sort((v_779914, v_148ff6) => {
+
+              return (v_779914.distance || Infinity) - (v_148ff6.distance || Infinity);
+            });
+
+          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_beddf3));
+          console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (거리순 정렬됨)');
+          console.log('astorCoinsData -> ' + v_beddf3.length);
         } catch (v_df17d5) {
 
           console.error('AsyncStorage 저장 오류:', v_df17d5);
@@ -758,8 +801,36 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         if (v_958ad1.length > 0) {
           try {
-            await v_e84827.setItem('astorCoinsData', JSON.stringify(v_958ad1));
-            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt:', v_958ad1.length, '개)');
+
+            const v_5ef6fa = v_958ad1
+              .map((v_51b584) => {
+                const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
+                const v_c87b30 = v_51b584.longitude || v_51b584.lng;
+
+                if (v_e1b1cf && v_c87b30) {
+                  const v_926d1c = v_b464ed(
+                    v_f18a9c.latitude,
+                    v_f18a9c.longitude,
+                    v_e1b1cf,
+                    v_c87b30
+                  );
+                  return {
+                    ...v_51b584,
+                    distance: v_926d1c,
+                  };
+                } else {
+                  return {
+                    ...v_51b584,
+                    distance: v_51b584.distance || Infinity,
+                  };
+                }
+              })
+              .sort((v_779914, v_148ff6) => {
+                return (v_779914.distance || Infinity) - (v_148ff6.distance || Infinity);
+              });
+
+            await v_e84827.setItem('astorCoinsData', JSON.stringify(v_5ef6fa));
+            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt 거리순 정렬됨:', v_5ef6fa.length, '개)');
           } catch (v_df17d5) {
             console.error('AsyncStorage 저장 오류:', v_df17d5);
           }
@@ -937,6 +1008,229 @@ export const MapMainScreen: v_a3453e.FC = () => {
       }
     }
   }, [v_a55f0b, v_30b908]);
+
+  const v_64543d = v_de06a3(async () => {
+
+    v_1b0a7f.current = true;
+    console.log('📍 [handleMapReady] 지도 로드 완료 - 최초 위치 이동 시작');
+
+    if (!v_3ec640.current) {
+      console.error('❌ [handleMapReady] mapRef가 없습니다.');
+      return;
+    }
+
+    let v_f18a9c = null;
+    let v_fb2a0d = null;
+    let v_439b17 = '';
+
+    try {
+
+      try {
+        const v_d353f0 = await v_e84827.getItem(v_f18c4f);
+        if (v_d353f0) {
+          const v_19f861 = JSON.parse(v_d353f0);
+          if (v_19f861.latitude && v_19f861.longitude && 
+              v_19f861.latitudeDelta && v_19f861.longitudeDelta) {
+            v_fb2a0d = {
+              latitude: v_19f861.latitude,
+              longitude: v_19f861.longitude,
+              latitudeDelta: v_19f861.latitudeDelta,
+              longitudeDelta: v_19f861.longitudeDelta,
+            };
+            v_f18a9c = {
+              latitude: v_19f861.latitude,
+              longitude: v_19f861.longitude,
+            };
+            v_439b17 = '캐시된 맵 영역 정보';
+            console.log('✅ [handleMapReady] 캐시된 맵 영역 정보 발견:', {
+              latitude: v_fb2a0d.latitude.toFixed(6),
+              longitude: v_fb2a0d.longitude.toFixed(6),
+              latitudeDelta: v_fb2a0d.latitudeDelta.toFixed(6),
+              longitudeDelta: v_fb2a0d.longitudeDelta.toFixed(6),
+            });
+          }
+        }
+      } catch (v_74d34c) {
+        console.error('❌ [handleMapReady] 맵 영역 정보 읽기 실패:', v_74d34c);
+      }
+
+      if (!v_f18a9c) {
+        try {
+          const v_05f29b = await v_e84827.getItem(v_f3d3c8);
+          if (v_05f29b) {
+            const v_3a14d6 = JSON.parse(v_05f29b);
+            if (v_3a14d6.latitude && v_3a14d6.longitude) {
+              v_f18a9c = v_3a14d6;
+              v_439b17 = 'AsyncStorage 마지막 위치';
+              console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', v_3a14d6);
+            }
+          }
+        } catch (v_df17d5) {
+          console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', v_df17d5);
+        }
+      }
+
+      if (!v_f18a9c) {
+        try {
+
+          const { status: v_d308b5 } = await v_8a44cb.getForegroundPermissionsAsync();
+          if (v_d308b5 === 'granted') {
+            const v_e8ec67 = await v_8a44cb.getCurrentPositionAsync({
+              accuracy: v_8a44cb.Accuracy.High,
+            });
+            v_f18a9c = {
+              latitude: v_e8ec67.coords.latitude,
+              longitude: v_e8ec67.coords.longitude,
+            };
+            v_439b17 = '현재 GPS 위치';
+            console.log('✅ [handleMapReady] 현재 GPS 위치 가져오기 성공:', v_f18a9c);
+
+            await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_f18a9c));
+          } else {
+            console.log('⚠️ [handleMapReady] 위치 권한 없음 - 다음 우선순위로');
+          }
+        } catch (v_3acd44) {
+          console.error('❌ [handleMapReady] GPS 위치 가져오기 실패:', v_3acd44);
+        }
+      }
+
+      if (!v_f18a9c) {
+        try {
+          const v_99c46d = await v_e84827.getItem('astorCoinsData');
+          if (v_99c46d) {
+            const v_b9ce93 = JSON.parse(v_99c46d);
+            if (Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+
+              const v_97e2bc = v_b9ce93.find((v_51b584) => 
+                (v_51b584.latitude || v_51b584.lat) && (v_51b584.longitude || v_51b584.lng)
+              );
+
+              if (v_97e2bc) {
+                v_f18a9c = {
+                  latitude: v_97e2bc.latitude || v_97e2bc.lat,
+                  longitude: v_97e2bc.longitude || v_97e2bc.lng,
+                };
+                v_439b17 = '저장된 마커 중 첫 번째 마커';
+                console.log('✅ [handleMapReady] 저장된 마커에서 첫 번째 마커 위치 발견:', v_f18a9c);
+              }
+            }
+          }
+        } catch (v_a8e7ca) {
+          console.error('❌ [handleMapReady] 저장된 마커 읽기 실패:', v_a8e7ca);
+        }
+      }
+
+      if (!v_f18a9c) {
+        v_f18a9c = {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        };
+        v_439b17 = '기본 위치(서울)';
+        console.log('✅ [handleMapReady] 기본 위치(서울) 사용:', v_f18a9c);
+      }
+
+      if (v_f18a9c) {
+        console.log(`📍 [handleMapReady] ${v_439b17}로 이동:`, v_f18a9c);
+
+        v_ca338a.current = true;
+
+        const v_d99c20 = v_fb2a0d || {
+          latitude: v_f18a9c.latitude,
+          longitude: v_f18a9c.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+
+        v_3ec640.current.animateToRegion(v_d99c20, 500);
+
+        v_de148f.current = v_d99c20;
+
+        v_0326b2(v_f18a9c);
+
+        if (!v_c38114.current) {
+          v_b6ebe9(v_f18a9c);
+          v_c84980(v_f18a9c);
+          v_c38114.current = v_f18a9c;
+          v_a2b40c.current = v_f18a9c;
+          v_c675cc.current = {
+            latitude: v_f18a9c.latitude,
+            longitude: v_f18a9c.longitude,
+          };
+        }
+
+        if (!v_fb2a0d) {
+          try {
+            await v_e84827.setItem(v_f18c4f, JSON.stringify(v_d99c20));
+            console.log('💾 [handleMapReady] 맵 영역 정보 저장:', {
+              latitude: v_d99c20.latitude.toFixed(6),
+              longitude: v_d99c20.longitude.toFixed(6),
+              latitudeDelta: v_d99c20.latitudeDelta.toFixed(6),
+              longitudeDelta: v_d99c20.longitudeDelta.toFixed(6),
+            });
+          } catch (v_2bf859) {
+            console.error('❌ [handleMapReady] 맵 영역 정보 저장 실패:', v_2bf859);
+          }
+        }
+
+        console.log('🔄 [handleMapReady] 마커 로드 시작');
+        v_9183ca.current = Date.now();
+        await v_524200(v_f18a9c, false);
+        console.log('✅ [handleMapReady] 마커 로드 완료');
+
+        v_9bf134.current = true;
+
+        setTimeout(() => {
+          v_ca338a.current = false;
+          console.log('✅ [handleMapReady] 지도 이동 완료');
+        }, 600);
+      } else {
+        console.error('❌ [handleMapReady] 이동할 위치를 찾을 수 없습니다.');
+      }
+    } catch (v_5e9bfe) {
+      console.error('❌ [handleMapReady] 오류 발생:', v_5e9bfe);
+
+      const v_3a1065 = {
+        latitude: 37.5665,
+        longitude: 126.9780,
+      };
+
+      const v_4e4859 = {
+        latitude: v_3a1065.latitude,
+        longitude: v_3a1065.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      };
+
+      if (v_3ec640.current) {
+        v_ca338a.current = true;
+        v_3ec640.current.animateToRegion(v_4e4859, 500);
+
+        v_de148f.current = v_4e4859;
+
+        v_0326b2(v_3a1065);
+
+        if (!v_c38114.current) {
+          v_b6ebe9(v_3a1065);
+          v_c84980(v_3a1065);
+          v_c38114.current = v_3a1065;
+          v_a2b40c.current = v_3a1065;
+        }
+
+        try {
+          await v_e84827.setItem(v_f18c4f, JSON.stringify(v_4e4859));
+          console.log('💾 [handleMapReady] 기본 위치 맵 영역 정보 저장');
+        } catch (v_2bf859) {
+          console.error('❌ [handleMapReady] 기본 위치 맵 영역 정보 저장 실패:', v_2bf859);
+        }
+
+        await v_524200(v_3a1065, false);
+
+        setTimeout(() => {
+          v_ca338a.current = false;
+        }, 600);
+      }
+    }
+  }, [v_524200]);
 
   const v_acecf6 = v_de06a3(async () => {
 
@@ -2267,7 +2561,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   };
 
-  const v_6b4469 = (v_a6c30b) => {
+  const v_6b4469 = async (v_a6c30b) => {
 
     const v_355a57 = v_ca338a.current;
     const v_81a27a = v_326be8.OS;
@@ -2353,6 +2647,26 @@ export const MapMainScreen: v_a3453e.FC = () => {
     v_a11b30.current = Date.now();
 
     v_43de51.current = false;
+
+    if (!v_355a57) {
+      try {
+        const v_46d20d = {
+          latitude: v_a6c30b.latitude,
+          longitude: v_a6c30b.longitude,
+          latitudeDelta: v_a6c30b.latitudeDelta,
+          longitudeDelta: v_a6c30b.longitudeDelta,
+        };
+        await v_e84827.setItem(v_f18c4f, JSON.stringify(v_46d20d));
+        console.log('💾 [맵 캐싱] 맵 영역 정보 저장:', {
+          latitude: v_46d20d.latitude.toFixed(6),
+          longitude: v_46d20d.longitude.toFixed(6),
+          latitudeDelta: v_46d20d.latitudeDelta.toFixed(6),
+          longitudeDelta: v_46d20d.longitudeDelta.toFixed(6),
+        });
+      } catch (v_2bf859) {
+        console.error('❌ [맵 캐싱] 저장 실패:', v_2bf859);
+      }
+    }
 
   };
 
@@ -2499,6 +2813,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
           showsUserLocation={v_15f7cd}
 
           showsMyLocationButton={false}
+
+          onMapReady={v_64543d}
 
           onRegionChange={v_0424a1}
 
