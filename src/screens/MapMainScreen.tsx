@@ -1319,34 +1319,110 @@ export const MapMainScreen: React.FC = () => {
   }, []); 
 
   useEffect(() => {
-    const refreshTopAd5 = async () => {
-      try {
-        console.log('[MapMainScreen] TopAd5 데이터 새로고침 시작');
-        await getTopAd5();
 
-        const storedData = await getStoredTopAd5();
-        if (storedData?.data?.ads && Array.isArray(storedData.data.ads)) {
-          setTopAd5Data(storedData.data.ads);
-          console.log('[MapMainScreen] TopAd5 데이터 상태 저장 완료:', storedData.data.ads.length, '개 광고');
+    if (activeTab !== 'Map') {
+      return;
+    }
+
+    const refreshTopAd5AndMapMarkers = async () => {
+      try {
+
+        console.log('[MapMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
+        const topAd5Response = await getTopAd5();
+
+        if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+          console.warn('[MapMainScreen] TopAd5 데이터가 없습니다. 저장된 데이터 사용 시도');
+
+          const storedData = await getStoredTopAd5();
+          if (storedData && Array.isArray(storedData) && storedData.length > 0) {
+            setTopAd5Data(storedData);
+            console.log('[MapMainScreen] 저장된 TopAd5 데이터 사용:', storedData.length, '개 광고');
+          }
+          return;
         }
 
-        console.log('[MapMainScreen] TopAd5 데이터 새로고침 완료');
+        console.log('[MapMainScreen] 2단계: TopAd5 데이터 상태 저장:', topAd5Response.length, '개 광고');
+        setTopAd5Data(topAd5Response);
+
+        console.log('[MapMainScreen] 3단계: 마커 데이터 가져오기 시작');
+        const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+
+        if (!astorCoinsData) {
+          console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
+          return;
+        }
+
+        const coinsData = JSON.parse(astorCoinsData);
+        if (!Array.isArray(coinsData) || coinsData.length === 0) {
+          console.log('[MapMainScreen] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
+          return;
+        }
+
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개)');
+        const mappedCoinsData = coinsData.map((marker: any, index: number) => {
+
+          const adIndex = index % topAd5Response.length;
+          const mappedAd = topAd5Response[adIndex];
+
+          return {
+            ...marker,
+
+            name: mappedAd?.name || marker.name,
+            iconurl: mappedAd?.iconurl || marker.iconurl,
+            joindesc: mappedAd?.joindesc || marker.joindesc,
+            xrunPrice: mappedAd?.xrunPrice || marker.xrunPrice || marker.xrunprice || 0,
+            campid: mappedAd?.campid || marker.campid || marker.campId || '',
+
+            thumbnail: mappedAd?.thumbnail || marker.thumbnail,
+            ad_company: mappedAd?.ad_company || marker.ad_company,
+            coins: mappedAd?.coins?.toString() || marker.coins,
+            brandlogo: mappedAd?.brandlogo || marker.brandlogo,
+            adthumbnail2: mappedAd?.adthumbnail2 || marker.adthumbnail2,
+            symbolimg: mappedAd?.symbolimg || marker.symbolimg,
+          };
+        });
+
+        console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
+        await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
+        console.log('[MapMainScreen] 마커-광고 매핑 완료:', mappedCoinsData.length, '개 마커에 광고 매핑');
+
+        console.log('[MapMainScreen] 6단계: 화면에 마커 표시 시작');
+        const spotDataArray: SpotData[] = mappedCoinsData.map((coin: any) => ({
+          spotID: coin.spotid || coin.spotID || coin.id || 0,
+          distance: coin.distance || 0,
+          direction: coin.direction || 0,
+          name: coin.name || coin.title || coin.brand || 'XRUN coin',
+          latitude: coin.latitude || coin.lat,
+          longitude: coin.longitude || coin.lng,
+          xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
+          iconurl: coin.iconurl || '',
+          joindesc: coin.joindesc || '',
+          brand: coin.brand || coin.coin || '',
+          coins: coin.coins || coin.coin || '',
+          coin: coin.coin || '',
+          campid: coin.campid || coin.campId || '',
+        } as SpotData & { campid?: string }));
+
+        setMarkers(spotDataArray);
+        console.log('[MapMainScreen] 화면에 마커 표시 완료:', spotDataArray.length, '개 마커');
+
+        console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
       } catch (error) {
         console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', error);
 
         try {
           const storedData = await getStoredTopAd5();
-          if (storedData?.data?.ads && Array.isArray(storedData.data.ads)) {
-            setTopAd5Data(storedData.data.ads);
-            console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용');
+          if (storedData && Array.isArray(storedData) && storedData.length > 0) {
+            setTopAd5Data(storedData);
+            console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', storedData.length, '개 광고');
           }
         } catch (fallbackError) {
           console.error('[MapMainScreen] Fall over 실패:', fallbackError);
         }
       }
     };
-    refreshTopAd5();
-  }, []); 
+    refreshTopAd5AndMapMarkers();
+  }, [activeTab]); 
 
   useEffect(() => {
     if (!location) return;

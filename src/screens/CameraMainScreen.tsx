@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5 } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -612,6 +612,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       return;
     }
 
+    console.log('🔄 [organizeData] 호출:', {
+      currentIndex: currentIndexRef.current,
+      totalDataLength: oCoinData.length,
+      chunkSize: chunkSize,
+    });
+
     let nextData: any[] = [];
     let actualChunkSize = Math.min(chunkSize, oCoinData.length);
 
@@ -628,9 +634,27 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
     }
 
+    console.log('📋 [organizeData] 선택된 데이터 (처음 4개):', nextData.slice(0, 4).map((d, idx) => ({
+      index: idx,
+      distance: d.distance,
+      advertisement: d.advertisement,
+      campid: d.campid,
+      name: d.name,
+      xrunPrice: d.xrunPrice,
+    })));
+
     const newOrganizedData = nextData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
     });
+
+    console.log('✅ [organizeData] 최종 토큰 데이터:', newOrganizedData.map((t, idx) => ({
+      spotID: t.spotID,
+      distance: t.distance,
+      advertisement: t.advertisement,
+      campid: t.campid,
+      name: t.name,
+      xrunPrice: t.xrunPrice,
+    })));
 
     setTokens(newOrganizedData);
   }, []);
@@ -661,16 +685,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                 const originalXrunPrice = coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0;
 
-                console.log(`🔍 [loadTokenData] 코인 원본 데이터 확인:`, {
-                  coin: coin.coin,
-                  advertisement: coin.advertisement,
-                  xrunPrice: coin.xrunPrice,
-                  xrunprice: coin.xrunprice,
-                  price: coin.price,
-                  coins: coin.coins,
-                  originalXrunPrice,
-                });
-
                 return {
                   ...coin, 
                   iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
@@ -686,33 +700,156 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
               console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
 
-              console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
-              validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
-                console.log(`📋 validatedCoinsData[${idx}]:`, {
-                  name: coin.name,
-                  advertisement: coin.advertisement,
-                  campid: coin.campid,
-                  xrunPrice: coin.xrunPrice,
-                  coin: coin.coin,
-                  brand: coin.brand,
+              try {
+                const topAd5Response = await getStoredTopAd5();
+                if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+                  console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', topAd5Response.length, '개');
+
+                  console.log('🔍 [CameraMainScreen] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
+                    keys: Object.keys(topAd5Response[0] || {}),
+                    firstItem: topAd5Response[0],
+                  });
+
+                  const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+                    const distanceA = parseFloat(String(a.distance || 0));
+                    const distanceB = parseFloat(String(b.distance || 0));
+                    return distanceA - distanceB; 
+                  });
+
+                  console.log('📊 [CameraMainScreen] 거리 순 정렬 완료 (가까운 순서)');
+
+                  const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+                    const adIndex = index % topAd5Response.length;
+                    const mappedAd = topAd5Response[adIndex];
+
+                    console.log(`🔗 [CameraMainScreen] 토큰 ${index} 매핑:`, {
+                      distance: coin.distance,
+                      adIndex,
+                      adName: mappedAd?.name || '없음',
+                      adCompany: mappedAd?.ad_company || '없음',
+                      originalAdvertisement: coin.advertisement,
+                      originalCampid: coin.campid,
+                      mappedAdvertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || mappedAd?.coin,
+                      mappedCampid: mappedAd?.campid,
+                    });
+
+                    return {
+                      ...coin,
+
+                      name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                      iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                      joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                      xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                      xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                      campid: mappedAd?.campid || coin.campid || coin.campId || '',
+
+                      advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+
+                      thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                      ad_company: mappedAd?.ad_company || coin.ad_company,
+                      coins: mappedAd?.coins?.toString() || coin.coins,
+                      brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                      adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                      symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                    };
+                  });
+
+                  console.log('✅ [CameraMainScreen] TopAd5 매핑 완료:', mappedCoinsData.length, '개 토큰');
+
+                  console.log('🔍 [loadTokenData] mappedCoinsData 고유 데이터 확인 (처음 10개):');
+                  mappedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
+                    console.log(`📋 mappedCoinsData[${idx}]:`, {
+                      name: coin.name,
+                      advertisement: coin.advertisement,
+                      campid: coin.campid,
+                      xrunPrice: coin.xrunPrice,
+                      distance: coin.distance,
+                      coin: coin.coin,
+                      brand: coin.brand,
+                    });
+                  });
+
+                  const allAdvertisements = mappedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
+                  const allCampids = mappedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
+                  const uniqueAllAds = Array.from(new Set(allAdvertisements));
+                  const uniqueAllCampids = Array.from(new Set(allCampids));
+                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
+                    total: mappedCoinsData.length,
+                    uniqueAdvertisements: uniqueAllAds.length,
+                    uniqueCampids: uniqueAllCampids.length,
+                    advertisementValues: uniqueAllAds.slice(0, 10),
+                    campidValues: uniqueAllCampids.slice(0, 10),
+                  });
+
+                  setCoinsData(mappedCoinsData);
+
+                  currentIndexRef.current = 0;
+                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+
+                  organizeData(mappedCoinsData);
+                } else {
+                  console.log('⚠️ [CameraMainScreen] TopAd5 데이터 없음, 기존 데이터 사용');
+
+                  console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
+                  validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
+                    console.log(`📋 validatedCoinsData[${idx}]:`, {
+                      name: coin.name,
+                      advertisement: coin.advertisement,
+                      campid: coin.campid,
+                      xrunPrice: coin.xrunPrice,
+                      coin: coin.coin,
+                      brand: coin.brand,
+                    });
+                  });
+
+                  const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
+                  const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
+                  const uniqueAllAds = Array.from(new Set(allAdvertisements));
+                  const uniqueAllCampids = Array.from(new Set(allCampids));
+                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
+                    total: validatedCoinsData.length,
+                    uniqueAdvertisements: uniqueAllAds.length,
+                    uniqueCampids: uniqueAllCampids.length,
+                    advertisementValues: uniqueAllAds.slice(0, 10),
+                    campidValues: uniqueAllCampids.slice(0, 10),
+                  });
+
+                  setCoinsData(validatedCoinsData);
+
+                  organizeData(validatedCoinsData);
+                }
+              } catch (topAd5Error) {
+                console.error('❌ [CameraMainScreen] TopAd5 데이터 가져오기 실패:', topAd5Error);
+                console.log('⚠️ 기존 데이터 사용');
+
+                console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
+                validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
+                  console.log(`📋 validatedCoinsData[${idx}]:`, {
+                    name: coin.name,
+                    advertisement: coin.advertisement,
+                    campid: coin.campid,
+                    xrunPrice: coin.xrunPrice,
+                    coin: coin.coin,
+                    brand: coin.brand,
+                  });
                 });
-              });
 
-              const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
-              const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
-              const uniqueAllAds = Array.from(new Set(allAdvertisements));
-              const uniqueAllCampids = Array.from(new Set(allCampids));
-              console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                total: validatedCoinsData.length,
-                uniqueAdvertisements: uniqueAllAds.length,
-                uniqueCampids: uniqueAllCampids.length,
-                advertisementValues: uniqueAllAds.slice(0, 10),
-                campidValues: uniqueAllCampids.slice(0, 10),
-              });
+                const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
+                const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
+                const uniqueAllAds = Array.from(new Set(allAdvertisements));
+                const uniqueAllCampids = Array.from(new Set(allCampids));
+                console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
+                  total: validatedCoinsData.length,
+                  uniqueAdvertisements: uniqueAllAds.length,
+                  uniqueCampids: uniqueAllCampids.length,
+                  advertisementValues: uniqueAllAds.slice(0, 10),
+                  campidValues: uniqueAllCampids.slice(0, 10),
+                });
 
-              setCoinsData(validatedCoinsData);
+                setCoinsData(validatedCoinsData);
 
-              organizeData(validatedCoinsData);
+                organizeData(validatedCoinsData);
+              }
 
               hasLoadedDataRef.current = true;
               setLoading(false);
@@ -794,9 +931,83 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           };
         });
 
-        setCoinsData(validatedCoinsData);
+        try {
+          const topAd5Response = await getStoredTopAd5();
+          if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+            console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', topAd5Response.length, '개');
 
-        organizeData(validatedCoinsData);
+            console.log('🔍 [CameraMainScreen API] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
+              keys: Object.keys(topAd5Response[0] || {}),
+              firstItem: topAd5Response[0],
+            });
+
+            const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+              const distanceA = parseFloat(String(a.distance || 0));
+              const distanceB = parseFloat(String(b.distance || 0));
+              return distanceA - distanceB; 
+            });
+
+            console.log('📊 [CameraMainScreen API] 거리 순 정렬 완료 (가까운 순서)');
+
+            const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+              const adIndex = index % topAd5Response.length;
+              const mappedAd = topAd5Response[adIndex];
+
+              console.log(`🔗 [CameraMainScreen API] 토큰 ${index} 매핑:`, {
+                distance: coin.distance,
+                adIndex,
+                adName: mappedAd?.name || '없음',
+                adCompany: mappedAd?.ad_company || '없음',
+                originalAdvertisement: coin.advertisement,
+                originalCampid: coin.campid,
+                mappedAdvertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || mappedAd?.coin,
+                mappedCampid: mappedAd?.campid,
+              });
+
+              return {
+                ...coin,
+
+                name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                campid: mappedAd?.campid || coin.campid || coin.campId || '',
+
+                advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+
+                thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                ad_company: mappedAd?.ad_company || coin.ad_company,
+                coins: mappedAd?.coins?.toString() || coin.coins,
+                brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+              };
+            });
+
+            console.log('✅ [CameraMainScreen API] TopAd5 매핑 완료:', mappedCoinsData.length, '개 토큰');
+
+            setCoinsData(mappedCoinsData);
+
+            currentIndexRef.current = 0;
+            console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+
+            organizeData(mappedCoinsData);
+          } else {
+            console.log('⚠️ [CameraMainScreen API] TopAd5 데이터 없음, 기존 데이터 사용');
+
+            setCoinsData(validatedCoinsData);
+
+            organizeData(validatedCoinsData);
+          }
+        } catch (topAd5Error) {
+          console.error('❌ [CameraMainScreen API] TopAd5 데이터 가져오기 실패:', topAd5Error);
+          console.log('⚠️ 기존 데이터 사용');
+
+          setCoinsData(validatedCoinsData);
+
+          organizeData(validatedCoinsData);
+        }
       } else {
         setCoinsData([]);
         setTokens([]);
