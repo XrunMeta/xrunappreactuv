@@ -134,6 +134,8 @@ import {
   v_caf66a,
   v_036174,
   v_dfd755,
+  v_c2fe02,
+  v_574952,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 
@@ -3885,6 +3887,64 @@ export const v_5d7ca4 = async (): Promise<any | null> => {
   } catch (v_5e9bfe) {
     console.error('[getStoredTopAd5] AsyncStorage 읽기 실패:', v_5e9bfe);
     return null;
+  }
+};
+
+export const v_d751d6 = async (
+  request: v_c2fe02,
+  v_c65f5d,
+): Promise<v_574952> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('========================================');
+    console.log('[인앱구매 API] 구매 데이터 전송 시작');
+    console.log('========================================');
+    console.log('[인앱구매 API] 요청 데이터:');
+    console.log(JSON.stringify(v_576f5a, null, 2));
+    console.log('----------------------------------------');
+
+    const v_3393e3 = await v_9f42a4.post<v_574952>(
+      '/inapp/purchase',
+      v_576f5a,
+    );
+
+    console.log('========================================');
+    console.log('[인앱구매 API] ✅ 전송 성공');
+    console.log('========================================');
+    console.log('[인앱구매 API] 응답 데이터:');
+    console.log(JSON.stringify(v_3393e3.data, null, 2));
+    console.log('----------------------------------------');
+    console.log('[인앱구매 API] 상태:', v_3393e3.data?.status);
+    console.log('[인앱구매 API] 메시지:', v_3393e3.data?.message);
+    if (v_3393e3.data?.data?.savedCount !== undefined) {
+      console.log('[인앱구매 API] 저장된 수:', v_3393e3.data.data.savedCount);
+    }
+    console.log('========================================');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.log('========================================');
+    console.error('[인앱구매 API] ❌ 전송 실패');
+    console.log('========================================');
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[인앱구매 API] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    } else {
+      console.error('[인앱구매 API] 오류:', v_5e9bfe);
+    }
+    console.log('========================================');
+
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
   }
 };
 

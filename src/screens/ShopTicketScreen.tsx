@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_79c4f2, v_07a341, v_39a996, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_79c4f2, v_07a341, v_39a996, v_19b633, v_326be8 } from 'rcmrninabrnb';
 import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -9,11 +9,12 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
-import { v_dd87bc, v_81c40d } from '../services';
+import { v_dd87bc, v_81c40d, v_d751d6 } from '../services';
 import { v_20035e } from '../types';
 import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
+import * as v_759f4d from 'ssuyxdbb';
 
 const v_3e6a6a = (
   item: v_20035e,
@@ -130,7 +131,21 @@ export const v_38326c = () => {
   const [v_f9a2c9, v_01b387] = v_5ab095<Record<string, string>>({}); 
   const [v_5d756f, v_a563de] = v_5ab095<string>(''); 
 
+  const [v_6cb0a1, v_019be3] = v_5ab095<Record<string, any>>({});
+  const [v_c1f1a5, v_1c3217] = v_5ab095(false);
+
   v_c4deb2(() => {
+
+    const v_dede3e = async () => {
+      try {
+        await v_759f4d.initConnection();
+        console.log('[상점] IAP 연결 초기화 성공');
+      } catch (v_5e9bfe) {
+        console.error('[상점] IAP 연결 초기화 실패:', v_5e9bfe);
+      }
+    };
+    v_dede3e();
+
     const v_0e1f49 = async () => {
       try {
         const v_f24fd5 = await v_e84827.getItem('userData');
@@ -233,6 +248,46 @@ export const v_38326c = () => {
     return v_72edf9;
   }, []);
 
+  const v_8305f6 = v_de06a3(async (v_72edf9) => {
+    try {
+      if (!v_72edf9 || v_72edf9.length === 0) {
+        console.log('[상점] IAP SKU가 없습니다.');
+        return;
+      }
+
+      v_1c3217(true);
+      console.log('[상점] IAP 제품 정보 가져오기 시작:', v_72edf9);
+
+      const v_74a563 = await v_759f4d.fetchProducts({
+        skus: v_72edf9,
+        type: 'in-app',
+      });
+
+      console.log('[상점] IAP 제품 정보 응답:', JSON.stringify(v_74a563, null, 2));
+
+      if (v_74a563 && v_74a563.length > 0) {
+
+        const v_e3bbd8 = {};
+        v_74a563.forEach((v_01bee9) => {
+          const v_9af408 = v_01bee9.productId || v_01bee9.id;
+          if (v_9af408) {
+            v_e3bbd8[v_9af408] = v_01bee9;
+            console.log(`[상점] IAP 제품 추가: ${v_9af408}`, {
+              price: v_01bee9.price || v_01bee9.localizedPrice,
+              title: v_01bee9.title || v_01bee9.name,
+            });
+          }
+        });
+        v_019be3(v_e3bbd8);
+        console.log('[상점] IAP 제품 맵 설정 완료:', Object.keys(v_e3bbd8));
+      }
+    } catch (v_5e9bfe) {
+      console.error('[상점] IAP 제품 정보 가져오기 오류:', v_5e9bfe);
+    } finally {
+      v_1c3217(false);
+    }
+  }, []);
+
   const v_977746 = v_de06a3(async (v_5c15b4) => {
     if (!v_717992) return;
 
@@ -272,7 +327,7 @@ export const v_38326c = () => {
         const v_c32bfd = v_2cfb06(v_43c42e.data);
         if (v_c32bfd.length > 0) {
           console.log('[상점] SKU에 대한 IAP 제품 가져오기:', v_c32bfd);
-
+          await v_8305f6(v_c32bfd);
         } else {
           console.log('[상점] 상점 아이템에서 IAP SKU를 찾을 수 없음');
         }
@@ -290,7 +345,7 @@ export const v_38326c = () => {
     } finally {
       v_34a50a(false);
     }
-  }, [v_717992, v_beea9d, v_9b57fc, v_faf1cb, v_a7da97, v_2cfb06]);
+  }, [v_717992, v_beea9d, v_9b57fc, v_faf1cb, v_a7da97, v_2cfb06, v_8305f6]);
 
   v_c4deb2(() => {
     const v_5c29ab = async () => {
@@ -322,9 +377,17 @@ export const v_38326c = () => {
   };
 
   const v_c0e000 = v_de06a3((v_399dbd): string | null => {
+    const v_01bee9 = v_6cb0a1[v_399dbd];
+    if (v_01bee9) {
 
+      return v_01bee9.localizedPrice || v_01bee9.price || null;
+    }
     return null;
-  }, []);
+  }, [v_6cb0a1]);
+
+  const v_8051fd = v_de06a3((v_399dbd): boolean => {
+    return !!v_6cb0a1[v_399dbd];
+  }, [v_6cb0a1]);
 
   const v_cac1cc = (item: v_745d71 & v_20035e) => {
     v_d0fbad(v_8c0b26);
@@ -401,9 +464,20 @@ export const v_38326c = () => {
 
                   const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
                   const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                  const v_e72b09 = v_d6cf14
-                    ? (v_817eee || 'Loading...')
-                    : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
+                  const v_e48882 = v_d6cf14 && v_8051fd(v_8c0b26.sku);
+
+                  let v_e72b09;
+                  if (v_d6cf14) {
+                    if (v_e48882 && v_817eee) {
+                      v_e72b09 = v_817eee; 
+                    } else if (v_c1f1a5) {
+                      v_e72b09 = 'Loading...'; 
+                    } else {
+                      v_e72b09 = v_89f939(v_8c0b26.priceKRW || '0', 'KRW'); 
+                    }
+                  } else {
+                    v_e72b09 = v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
+                  }
 
                   return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
                 })
