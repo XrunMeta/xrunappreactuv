@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import {
 
@@ -15,6 +15,8 @@ import {
   Image,
 
   AppState,
+
+  Pressable,
 
 } from 'react-native';
 
@@ -38,7 +40,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 
 import { SpotData } from '../types';
 
-import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice } from '../services';
+import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5 } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -51,6 +53,22 @@ interface LocationData {
 
   longitude: number;
 
+}
+
+interface TopAd5Item {
+  brandlogo: string;
+  adthumbnail2: string;
+  symbolimg: string;
+  thumbnail: string;
+  coins: number;
+  nasPrice: number;
+  campid: string;
+  xrunPrice: number;
+  gopaxPrice: number;
+  iconurl: string;
+  joindesc: string;
+  name: string;
+  ad_company: string;
 }
 
 let iconWallet: any = null;
@@ -142,18 +160,34 @@ let logoTempMarker: any = null;
 try {
 
   logoTempMarker = require('../../assets/logo_tempMarker.png');
-
+  console.log('✅ [MapMainScreen] 마커 이미지 로드 성공:', logoTempMarker);
 } catch (e) {
 
-  console.warn('logo_tempMarker.png not found');
+  console.warn('❌ [MapMainScreen] logo_tempMarker.png not found:', e);
 
+  try {
+    logoTempMarker = require('../../assets/icon_xrun_round_logo.png');
+    console.log('✅ [MapMainScreen] 대체 마커 이미지 로드 성공');
+  } catch (e2) {
+    console.warn('❌ [MapMainScreen] 대체 마커 이미지도 없음:', e2);
+  }
 }
 
 export const MapMainScreen: React.FC = () => {
 
-  const { navigate } = useAppNavigation();
+  const { navigate, previousScreen } = useAppNavigation();
 
   const { t } = useTranslation();
+
+  const prevScreenRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (logoTempMarker) {
+      console.log('✅ [MapMainScreen] 마커 이미지 사용 가능');
+    } else {
+      console.warn('⚠️ [MapMainScreen] 마커 이미지 없음 - 기본 마커 사용');
+    }
+  }, []);
 
   const { showAlert } = useAlertDialog();
 
@@ -162,18 +196,6 @@ export const MapMainScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'Map' | 'Camera'>('Map');
-
-  const [mapRegion, setMapRegion] = useState({
-
-    latitude: 37.5665, 
-
-    longitude: 126.9780,
-
-    latitudeDelta: 0.01,
-
-    longitudeDelta: 0.01,
-
-  });
 
   const [showBottomPanel, setShowBottomPanel] = useState(false);
 
@@ -188,6 +210,8 @@ export const MapMainScreen: React.FC = () => {
   const [loadingMarkers, setLoadingMarkers] = useState(false);
 
   const loadingMarkersRef = useRef(false); 
+
+  const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
 
@@ -211,13 +235,49 @@ export const MapMainScreen: React.FC = () => {
 
   const lastLocationChangeTimeRef = useRef<number>(Date.now());
 
-  const mapRegionRef = useRef(mapRegion);
+  const lastMarkerRefreshTimeRef = useRef<number>(0);
+
+  const mapRegionRef = useRef({
+    latitude: 37.5665,
+    longitude: 126.9780,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  });
 
   const isProgrammaticMoveRef = useRef(false);
 
   const isUserTouchRef = useRef(false);
 
   const lastUpdatedRegionRef = useRef<{ latitude: number; longitude: number } | null>(null);
+
+  const [mappingLocation, setMappingLocation] = useState<LocationData | null>(null);
+
+  const lastMappingLocationRef = useRef<LocationData | null>(null);
+
+  const lastMappingTimeRef = useRef<number>(0);
+
+  const MAPPING_MIN_DISTANCE = 500;
+
+  const MAPPING_MIN_INTERVAL = 10000; 
+
+  const DEFAULT_LATITUDE_DELTA = 0.005;
+  const DEFAULT_LONGITUDE_DELTA = 0.005;
+
+  const hasMovedToCurrentLocationRef = useRef(false);
+
+  const hasRequestedLocationPermissionRef = useRef(false);
+
+  const headingSubscriptionRef = useRef<Location.LocationSubscription | null>(null);
+
+  const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
+
+  const hasLoadedLastGpsLocationRef = useRef(false);
+
+  const hasCompletedInitialLoadRef = useRef(false);
+
+  const hasMovedToGpsAfterInitialLoadRef = useRef(false);
+
+  const hasMovedToFirstMarkerOnInitialLoadRef = useRef(false);
 
   let iconXrunBlack: any = null;
   let iconXrunLogo: any = null;
@@ -264,7 +324,8 @@ export const MapMainScreen: React.FC = () => {
 
   };
 
-  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData, forceRefresh: boolean = false) => {
+  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData, forceRefresh: boolean = false, currentGpsLocation?: LocationData | null) => {
+    console.log('🚀 [loadMarkersForLocation] 시작:', { targetLocation, forceRefresh, hasCurrentGpsLocation: !!currentGpsLocation });
 
     if (loadingMarkersRef.current) {
 
@@ -275,14 +336,12 @@ export const MapMainScreen: React.FC = () => {
     }
 
     const userData = await AsyncStorage.getItem('userData');
-
     if (!userData) {
-
-      console.log('userData가 없습니다. 로그인이 필요할 수 있습니다.');
-
+      console.log('❌ [loadMarkersForLocation] userData가 없습니다. 로그인이 필요할 수 있습니다.');
       return;
-
     }
+
+    console.log('✅ [loadMarkersForLocation] userData 확인 완료');
 
     try {
 
@@ -303,8 +362,6 @@ export const MapMainScreen: React.FC = () => {
         const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
 
         if (astorCoinsData) {
-
-          console.log('✅ [MapMainScreen] AsyncStorage에서 astorCoinsData 발견');
 
           try {
 
@@ -343,12 +400,84 @@ export const MapMainScreen: React.FC = () => {
               } as SpotData & { campid?: string }));
 
               console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', spotDataArray.length, ')');
-
+              console.log('📌 [MapMainScreen] setMarkers 호출 (캐시 데이터):', spotDataArray.length, '개');
               setMarkers(spotDataArray);
-
               setLastFetchedLocation(targetLocation);
-
               lastFetchedLocationRef.current = targetLocation;
+              lastMarkerRefreshTimeRef.current = Date.now(); 
+
+              const firstMarker = spotDataArray.find(marker => marker.latitude && marker.longitude);
+              if (firstMarker && firstMarker.latitude && firstMarker.longitude) {
+                if (!mapRef.current) return;
+                console.log('📍 [MapMainScreen] 캐시 데이터 사용 시 첫 번째 마커 위치로 맵 이동:', firstMarker.latitude, firstMarker.longitude);
+
+                isProgrammaticMoveRef.current = true;
+                mapRef.current.animateToRegion({
+                  latitude: firstMarker.latitude,
+                  longitude: firstMarker.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }, 500);
+
+                mapRegionRef.current = {
+                  latitude: firstMarker.latitude,
+                  longitude: firstMarker.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                };
+
+                setTimeout(() => {
+                  isProgrammaticMoveRef.current = false;
+                }, 600);
+
+                if (currentGpsLocation) {
+                  setTimeout(async () => {
+                    console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
+
+                    console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
+                    await loadMarkersForLocation(currentGpsLocation, true);
+                    console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
+
+                    if (!mapRef.current) return;
+                    isProgrammaticMoveRef.current = true;
+
+                    mapRef.current.animateToRegion({
+                      latitude: currentGpsLocation.latitude,
+                      longitude: currentGpsLocation.longitude,
+                      latitudeDelta: 0.005,
+                      longitudeDelta: 0.005,
+                    }, 500);
+                    mapRegionRef.current = {
+                      latitude: currentGpsLocation.latitude,
+                      longitude: currentGpsLocation.longitude,
+                      latitudeDelta: 0.005,
+                      longitudeDelta: 0.005,
+                    };
+                    setTimeout(() => {
+                      isProgrammaticMoveRef.current = false;
+                    }, 600);
+                  }, 1000); 
+                }
+              } else if (!firstMarker && currentGpsLocation && mapRef.current) {
+
+                console.log('📍 [MapMainScreen] 캐시 데이터에 마커 없음 - 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
+                isProgrammaticMoveRef.current = true;
+                mapRef.current.animateToRegion({
+                  latitude: currentGpsLocation.latitude,
+                  longitude: currentGpsLocation.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }, 500);
+                mapRegionRef.current = {
+                  latitude: currentGpsLocation.latitude,
+                  longitude: currentGpsLocation.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                };
+                setTimeout(() => {
+                  isProgrammaticMoveRef.current = false;
+                }, 600);
+              }
 
               loadingMarkersRef.current = false;
 
@@ -369,12 +498,8 @@ export const MapMainScreen: React.FC = () => {
       }
 
       if (forceRefresh) {
-
         console.log('🔄 [MapMainScreen] 서버에서 새 데이터 가져오기');
-
       } else {
-
-        console.log('⚠️ [MapMainScreen] AsyncStorage에 데이터 없음, API 호출');
 
       }
 
@@ -382,8 +507,9 @@ export const MapMainScreen: React.FC = () => {
 
       setLoadingMarkers(true);
 
+      loadingMarkersRef.current = true;
+      setLoadingMarkers(true);
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
-
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
 
       const env = getEnv();
@@ -536,11 +662,84 @@ export const MapMainScreen: React.FC = () => {
         });
       });
 
+      console.log('📌 [MapMainScreen] setMarkers 호출 (서버 데이터):', uniqueMarkers.length, '개');
       setMarkers(uniqueMarkers);
-
       setLastFetchedLocation(targetLocation);
-
       lastFetchedLocationRef.current = targetLocation;
+      lastMarkerRefreshTimeRef.current = Date.now(); 
+      console.log('✅ [MapMainScreen] 마커 설정 완료');
+
+      const firstMarker = uniqueMarkers.find(marker => marker.latitude && marker.longitude);
+      if (firstMarker && firstMarker.latitude && firstMarker.longitude) {
+        if (!mapRef.current) return;
+        console.log('📍 [MapMainScreen] 서버 데이터 로드 후 첫 번째 마커 위치로 맵 이동:', firstMarker.latitude, firstMarker.longitude);
+
+        isProgrammaticMoveRef.current = true;
+        mapRef.current.animateToRegion({
+          latitude: firstMarker.latitude,
+          longitude: firstMarker.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+
+        mapRegionRef.current = {
+          latitude: firstMarker.latitude,
+          longitude: firstMarker.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+
+        setTimeout(() => {
+          isProgrammaticMoveRef.current = false;
+        }, 600);
+
+        if (currentGpsLocation) {
+          setTimeout(async () => {
+            console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
+
+            console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
+            await loadMarkersForLocation(currentGpsLocation, true);
+            console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
+
+            if (!mapRef.current) return;
+            isProgrammaticMoveRef.current = true;
+            mapRef.current.animateToRegion({
+              latitude: currentGpsLocation.latitude,
+              longitude: currentGpsLocation.longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            }, 500);
+            mapRegionRef.current = {
+              latitude: currentGpsLocation.latitude,
+              longitude: currentGpsLocation.longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            };
+            setTimeout(() => {
+              isProgrammaticMoveRef.current = false;
+            }, 600);
+          }, 1000); 
+        }
+      } else if (!firstMarker && currentGpsLocation && mapRef.current) {
+
+        console.log('📍 [MapMainScreen] 서버 데이터에 마커 없음 - 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
+        isProgrammaticMoveRef.current = true;
+        mapRef.current.animateToRegion({
+          latitude: currentGpsLocation.latitude,
+          longitude: currentGpsLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+        mapRegionRef.current = {
+          latitude: currentGpsLocation.latitude,
+          longitude: currentGpsLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+        setTimeout(() => {
+          isProgrammaticMoveRef.current = false;
+        }, 600);
+      }
 
       if (combinedCoinsData.length > 0) {
         try {
@@ -567,18 +766,18 @@ export const MapMainScreen: React.FC = () => {
         }
       }
 
-    } catch (parseError) {
+    } catch (error) {
+      console.error('❌ [loadMarkersForLocation] 에러 발생:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('❌ [loadMarkersForLocation] 에러 상세:', errorMessage);
 
-      console.error('userData 파싱 오류:', parseError);
-
+      setMarkers([]);
     } finally {
 
+      console.log('✅ [loadMarkersForLocation] 완료 (로딩 상태 해제)');
       loadingMarkersRef.current = false;
-
       setLoadingMarkers(false);
-
     }
-
   }, [navigate]);
 
   const returnToInitialLocation = useCallback(async () => {
@@ -647,13 +846,97 @@ export const MapMainScreen: React.FC = () => {
 
     };
 
-    setMapRegion(newRegion);
-
     mapRegionRef.current = newRegion;
 
     await loadMarkersForLocation(currentInitialLocation);
 
   }, [initialLocation, loadMarkersForLocation]);
+
+  const goToCurrentLocation = useCallback(() => {
+    if (!location) {
+      console.log('📍 현재 위치가 없습니다.');
+      return;
+    }
+
+    if (!mapRef.current) {
+      console.log('📍 맵 ref가 없습니다.');
+      return;
+    }
+
+    console.log('📍 현재 위치로 이동:', location.latitude, location.longitude);
+
+    isProgrammaticMoveRef.current = true;
+    mapRef.current.animateToRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    }, 500);
+
+    mapRegionRef.current = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    };
+
+    setTimeout(() => {
+      isProgrammaticMoveRef.current = false;
+      console.log('📍 현재 위치 이동 완료');
+    }, 600);
+  }, [location]);
+
+  const goToGpsLocation = useCallback(async () => {
+    try {
+      console.log('📍 [GPS 위치 가져오기] 최신 GPS 위치 요청');
+      const currentGpsLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const gpsLocation: LocationData = {
+        latitude: currentGpsLocation.coords.latitude,
+        longitude: currentGpsLocation.coords.longitude,
+      };
+
+      console.log('📍 [GPS 위치 가져오기] GPS 위치:', gpsLocation);
+
+      if (!mapRef.current) {
+        console.log('📍 맵 ref가 없습니다.');
+        return;
+      }
+
+      isProgrammaticMoveRef.current = true;
+
+      mapRef.current.animateToRegion({
+        latitude: gpsLocation.latitude,
+        longitude: gpsLocation.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }, 500);
+
+      mapRegionRef.current = {
+        latitude: gpsLocation.latitude,
+        longitude: gpsLocation.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      };
+
+      setLocation(gpsLocation);
+
+      await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(gpsLocation));
+
+      setTimeout(() => {
+        isProgrammaticMoveRef.current = false;
+        console.log('📍 GPS 위치로 이동 완료');
+      }, 600);
+    } catch (error) {
+      console.error('📍 [GPS 위치 가져오기] 실패:', error);
+
+      if (location) {
+        goToCurrentLocation();
+      }
+    }
+  }, [location, goToCurrentLocation]);
 
   const checkMapLocation = useCallback(async () => {
 
@@ -707,23 +990,35 @@ export const MapMainScreen: React.FC = () => {
 
       lastLocationChangeTimeRef.current = currentTime;
 
-      console.log('=== [3초마다 위치 확인] 맵 위치 변경 감지 ===');
+    }
 
+    if (
+      hasCompletedInitialLoadRef.current &&
+      !hasMovedToGpsAfterInitialLoadRef.current &&
+      isProgrammaticMoveRef.current &&
+      locationChanged
+    ) {
+      console.log('=== [초기 로드 후 첫 GPS 위치 이동] 거리 상관없이 마커 로드 ===');
       console.log('  현재 위치:', currentLocation.latitude.toFixed(6), currentLocation.longitude.toFixed(6));
-
       console.log('  마지막 마커 로드 위치:', currentLastFetchedLocation.latitude.toFixed(6), currentLastFetchedLocation.longitude.toFixed(6));
-
       console.log('  거리:', distance.toFixed(2), 'm');
 
-      console.log('  프로그램 이동 플래그:', isProgrammaticMoveRef.current);
+      setMarkers([]);
 
+      await loadMarkersForLocation(currentLocation, true);
+
+      hasMovedToGpsAfterInitialLoadRef.current = true;
+      console.log('✅ [초기 로드 후 첫 GPS 위치 이동] 마커 로드 완료');
+      return; 
     }
 
     if (distance >= 500) {
 
       console.log('=== 200m 이상 이동, 새로운 위치에서 마커 로드 ===');
 
-      await loadMarkersForLocation(currentLocation);
+      setMarkers([]);
+
+      await loadMarkersForLocation(currentLocation, true);
 
     }
 
@@ -780,8 +1075,71 @@ export const MapMainScreen: React.FC = () => {
     };
 
     preloadTaboola();
-
   }, []); 
+
+  useEffect(() => {
+    const refreshTopAd5 = async () => {
+      try {
+        console.log('[MapMainScreen] TopAd5 데이터 새로고침 시작');
+        await getTopAd5();
+
+        const storedData = await getStoredTopAd5();
+        if (storedData?.data?.ads && Array.isArray(storedData.data.ads)) {
+          setTopAd5Data(storedData.data.ads);
+          console.log('[MapMainScreen] TopAd5 데이터 상태 저장 완료:', storedData.data.ads.length, '개 광고');
+        }
+
+        console.log('[MapMainScreen] TopAd5 데이터 새로고침 완료');
+      } catch (error) {
+        console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', error);
+
+        try {
+          const storedData = await getStoredTopAd5();
+          if (storedData?.data?.ads && Array.isArray(storedData.data.ads)) {
+            setTopAd5Data(storedData.data.ads);
+            console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용');
+          }
+        } catch (fallbackError) {
+          console.error('[MapMainScreen] Fall over 실패:', fallbackError);
+        }
+      }
+    };
+    refreshTopAd5();
+  }, []); 
+
+  useEffect(() => {
+    if (!location) return;
+    const now = Date.now();
+    const lastLocation = lastMappingLocationRef.current;
+    const lastTime = lastMappingTimeRef.current;
+
+    if (!lastLocation) {
+      console.log('[MapMainScreen] 매핑 위치 초기 설정');
+      setMappingLocation(location);
+      lastMappingLocationRef.current = location;
+      lastMappingTimeRef.current = now;
+      return;
+    }
+
+    const timeSinceLastMapping = now - lastTime;
+    if (timeSinceLastMapping < MAPPING_MIN_INTERVAL) {
+
+      return;
+    }
+
+    const distance = calculateDistance(
+      lastLocation.latitude,
+      lastLocation.longitude,
+      location.latitude,
+      location.longitude
+    );
+    if (distance >= MAPPING_MIN_DISTANCE) {
+      console.log(`[MapMainScreen] 매핑 위치 업데이트: ${distance.toFixed(0)}m 이동, ${(timeSinceLastMapping / 1000).toFixed(1)}초 경과`);
+      setMappingLocation(location);
+      lastMappingLocationRef.current = location;
+      lastMappingTimeRef.current = now;
+    }
+  }, [location]);
 
   useEffect(() => {
 
@@ -791,20 +1149,49 @@ export const MapMainScreen: React.FC = () => {
 
       const { status } = await Location.requestForegroundPermissionsAsync();
 
+      if (status === 'granted') {
+        hasRequestedLocationPermissionRef.current = true;
+      }
+
       if (status !== 'granted') {
 
         setErrorMsg(t('common.messages.locationPermissionMessage'));
-
         await showAlert(
-
           t('common.messages.locationPermissionRequired'),
-
           t('common.messages.locationPermissionMessage'),
-
           [{ text: t('common.buttons.confirm') }]
-
         );
 
+        console.log('📍 위치 권한 거부 - 기본 위치(서울)로 마커 로드');
+        const defaultLocation: LocationData = {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        };
+        setLocation(defaultLocation);
+
+        const newRegion = {
+          latitude: defaultLocation.latitude,
+          longitude: defaultLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+        mapRegionRef.current = newRegion;
+
+        if (!initialLocationRef.current) {
+          setInitialLocation(defaultLocation);
+          setLastFetchedLocation(defaultLocation);
+          initialLocationRef.current = defaultLocation;
+          lastFetchedLocationRef.current = defaultLocation;
+          lastUpdatedRegionRef.current = {
+            latitude: defaultLocation.latitude,
+            longitude: defaultLocation.longitude,
+          };
+        }
+
+        console.log('📍 [MapMainScreen] 권한 거부 - 기본 위치로 마커 로드 시작');
+        lastMarkerRefreshTimeRef.current = Date.now();
+        await loadMarkersForLocation(defaultLocation);
+        console.log('✅ [MapMainScreen] 권한 거부 - 기본 위치로 마커 로드 완료');
         return;
 
       }
@@ -825,58 +1212,81 @@ export const MapMainScreen: React.FC = () => {
 
         };
 
+        const isInitialLoad = !initialLocationRef.current;
+        let initialLocationToUse: LocationData | null = null;
+
+        if (isInitialLoad) {
+
+          try {
+            const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
+            if (storedLocation) {
+              const lastGpsLocation: LocationData = JSON.parse(storedLocation);
+              initialLocationToUse = lastGpsLocation;
+              console.log('📍 [초기 위치] AsyncStorage에서 마지막 위치 사용:', lastGpsLocation);
+            }
+          } catch (storageError) {
+            console.error('📍 [초기 위치] AsyncStorage에서 위치 가져오기 실패:', storageError);
+          }
+
+          if (!initialLocationToUse) {
+            initialLocationToUse = newLocation;
+            console.log('📍 [초기 위치] 현재 GPS 위치 사용:', initialLocationToUse);
+          }
+
+          setInitialLocation(initialLocationToUse);
+          setLastFetchedLocation(initialLocationToUse);
+          initialLocationRef.current = initialLocationToUse;
+          lastFetchedLocationRef.current = initialLocationToUse;
+
+          lastUpdatedRegionRef.current = {
+            latitude: initialLocationToUse.latitude,
+            longitude: initialLocationToUse.longitude,
+          };
+          console.log('=== 초기 위치 저장 ===', initialLocationToUse);
+        }
+
         setLocation(newLocation);
 
+        const locationForMap = isInitialLoad && initialLocationToUse ? initialLocationToUse : newLocation;
         const newRegion = {
-
-          latitude: newLocation.latitude,
-
-          longitude: newLocation.longitude,
-
-          latitudeDelta: 0.01,
-
-          longitudeDelta: 0.01,
-
+          latitude: locationForMap.latitude,
+          longitude: locationForMap.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
         };
-
-        setMapRegion(newRegion);
 
         mapRegionRef.current = newRegion;
 
-        if (!initialLocation) {
-
-          setInitialLocation(newLocation);
-
-          setLastFetchedLocation(newLocation);
-
-          initialLocationRef.current = newLocation;
-
-          lastFetchedLocationRef.current = newLocation;
-
-          lastUpdatedRegionRef.current = {
-
-            latitude: newLocation.latitude,
-
-            longitude: newLocation.longitude,
-
-          };
-
-          console.log('=== 초기 위치 저장 ===', newLocation);
-
-        }
-
         await AsyncStorage.setItem('selfCoordinate', JSON.stringify(newLocation));
 
-        if (!initialLocation ||
+        const timeSinceLastRefresh = Date.now() - lastMarkerRefreshTimeRef.current;
+        const shouldLoadMarkers = isInitialLoad || (timeSinceLastRefresh >= 30000 && lastMarkerRefreshTimeRef.current > 0);
+        console.log('🔍 [MapMainScreen] 마커 로드 조건 확인:', {
+          isInitialLoad,
+          timeSinceLastRefresh,
+          lastMarkerRefreshTime: lastMarkerRefreshTimeRef.current,
+          shouldLoadMarkers,
+        });
 
-          (lastFetchedLocation &&
+        if (isInitialLoad && initialLocationToUse) {
+          console.log('🔄 [MapMainScreen] 초기 로드 - 마커 로드 시작 (초기 위치 사용)');
+          lastMarkerRefreshTimeRef.current = Date.now();
+          await loadMarkersForLocation(initialLocationToUse, false, newLocation);
 
-            lastFetchedLocation.latitude === newLocation.latitude &&
+          hasCompletedInitialLoadRef.current = true;
+          console.log('✅ [MapMainScreen] 초기 로드 완료 플래그 설정');
+        } else if (timeSinceLastRefresh >= 30000 && lastMarkerRefreshTimeRef.current > 0) {
 
-            lastFetchedLocation.longitude === newLocation.longitude)) {
-
+          console.log('🔄 [MapMainScreen] 시간 경과 후 갱신 - 마커 로드 시작');
+          lastMarkerRefreshTimeRef.current = Date.now();
           await loadMarkersForLocation(newLocation);
-
+        } else {
+          console.log('⚠️ [MapMainScreen] 마커 로드 건너뜀:', {
+            isInitialLoad,
+            timeSinceLastRefresh,
+            lastMarkerRefreshTime: lastMarkerRefreshTimeRef.current,
+            reason: isInitialLoad ? 'none' : (timeSinceLastRefresh < 30000 ? '시간 미경과' : '이전 로드 기록 없음'),
+          });
         }
 
       } catch (error) {
@@ -909,44 +1319,33 @@ export const MapMainScreen: React.FC = () => {
                   };
 
                   setLocation(defaultLocation);
-
                   const newRegion = {
-
                     latitude: defaultLocation.latitude,
-
                     longitude: defaultLocation.longitude,
-
-                    latitudeDelta: 0.01,
-
-                    longitudeDelta: 0.01,
-
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
                   };
-
-                  setMapRegion(newRegion);
 
                   mapRegionRef.current = newRegion;
 
-                  if (!initialLocation) {
-
+                  const isInitialLoadFallback = !initialLocationRef.current;
+                  if (isInitialLoadFallback) {
                     setInitialLocation(defaultLocation);
-
                     setLastFetchedLocation(defaultLocation);
-
                     initialLocationRef.current = defaultLocation;
-
                     lastFetchedLocationRef.current = defaultLocation;
 
                     lastUpdatedRegionRef.current = {
-
                       latitude: defaultLocation.latitude,
-
                       longitude: defaultLocation.longitude,
-
                     };
-
                   }
 
-                  await loadMarkersForLocation(defaultLocation);
+                  const timeSinceLastRefreshFallback = Date.now() - lastMarkerRefreshTimeRef.current;
+                  if (isInitialLoadFallback || (timeSinceLastRefreshFallback >= 30000 && lastMarkerRefreshTimeRef.current > 0)) {
+                    lastMarkerRefreshTimeRef.current = Date.now();
+                    await loadMarkersForLocation(defaultLocation);
+                  }
 
                 }
               },
@@ -968,44 +1367,33 @@ export const MapMainScreen: React.FC = () => {
           };
 
           setLocation(defaultLocation);
-
           const newRegion = {
-
             latitude: defaultLocation.latitude,
-
             longitude: defaultLocation.longitude,
-
-            latitudeDelta: 0.01,
-
-            longitudeDelta: 0.01,
-
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
           };
-
-          setMapRegion(newRegion);
 
           mapRegionRef.current = newRegion;
 
-          if (!initialLocation) {
-
+          const isInitialLoadError = !initialLocationRef.current;
+          if (isInitialLoadError) {
             setInitialLocation(defaultLocation);
-
             setLastFetchedLocation(defaultLocation);
-
             initialLocationRef.current = defaultLocation;
-
             lastFetchedLocationRef.current = defaultLocation;
 
             lastUpdatedRegionRef.current = {
-
               latitude: defaultLocation.latitude,
-
               longitude: defaultLocation.longitude,
-
             };
-
           }
 
-          await loadMarkersForLocation(defaultLocation);
+          const timeSinceLastRefreshError = Date.now() - lastMarkerRefreshTimeRef.current;
+          if (isInitialLoadError || (timeSinceLastRefreshError >= 30000 && lastMarkerRefreshTimeRef.current > 0)) {
+            lastMarkerRefreshTimeRef.current = Date.now();
+            await loadMarkersForLocation(defaultLocation);
+          }
 
         }
 
@@ -1016,122 +1404,139 @@ export const MapMainScreen: React.FC = () => {
     startLocationTracking();
 
     const startHeadingTracking = async (): Promise<Location.LocationSubscription | null> => {
-
       try {
 
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (headingSubscriptionRef.current) {
+          headingSubscriptionRef.current.remove();
+          headingSubscriptionRef.current = null;
+        }
 
-        if (status !== 'granted') {
-
+        const permission = await Location.getForegroundPermissionsAsync();
+        if (!permission.granted) {
           return null;
-
         }
 
         const headingSubscription = await Location.watchPositionAsync(
-
           {
+            accuracy: Location.Accuracy.Low, 
 
-            accuracy: Location.Accuracy.High,
+            timeInterval: 2000, 
 
-            timeInterval: 0, 
-
-            distanceInterval: 0, 
-
+            distanceInterval: 10, 
           },
-
           (location) => {
 
             const heading = location.coords.heading;
 
             if (heading !== null && heading !== undefined && !isNaN(heading)) {
-
               const previousHeading = deviceHeadingRef.current;
 
-              if (previousHeading === null || heading !== previousHeading) {
-
-                setDeviceHeading(heading);
+              const MIN_HEADING_CHANGE = 5;
+              const headingDiff = previousHeading === null 
+                ? MIN_HEADING_CHANGE + 1 
+                : Math.abs(heading - previousHeading);
+              if (headingDiff >= MIN_HEADING_CHANGE) {
 
                 deviceHeadingRef.current = heading;
 
+                setDeviceHeading(heading);
               }
-
             }
-
           }
-
         );
-
+        headingSubscriptionRef.current = headingSubscription;
         return headingSubscription;
-
       } catch (error) {
-
         console.error('헤딩 추적 오류:', error);
-
         return null;
-
       }
-
     };
 
-    let headingSubscription: Location.LocationSubscription | null = null;
+    startHeadingTracking();
 
-    startHeadingTracking().then((subscription) => {
-
-      headingSubscription = subscription;
-
-    });
+    let prevAppState = AppState.currentState;
 
     const subscription = AppState.addEventListener('change', (nextAppState) => {
 
-      if (nextAppState === 'active') {
-
-        startLocationTracking();
-
-        startHeadingTracking().then((sub) => {
-
-          if (headingSubscription) {
-
-            headingSubscription.remove();
-
-          }
-
-          headingSubscription = sub || null;
-
-        });
-
+      if (prevAppState === nextAppState) {
+        return;
       }
 
+      if (prevAppState.match(/inactive|background/) && nextAppState === 'active') {
+
+        Location.getForegroundPermissionsAsync().then((permission) => {
+          if (permission.granted) {
+
+            Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+            }).then((currentLocation) => {
+              const newLocation: LocationData = {
+                latitude: currentLocation.coords.latitude,
+                longitude: currentLocation.coords.longitude,
+              };
+              setLocation(newLocation);
+              mapRegionRef.current = {
+                latitude: newLocation.latitude,
+                longitude: newLocation.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              };
+            }).catch((error) => {
+
+              console.log('포그라운드 복귀 시 위치 가져오기 실패 (무시):', error.message);
+            });
+
+            startHeadingTracking();
+          } else {
+
+            console.log('📍 포그라운드 복귀 시 권한 없음 - 권한 재요청');
+            hasRequestedLocationPermissionRef.current = false;
+            startLocationTracking();
+          }
+        }).catch(() => {
+
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          }).then((currentLocation) => {
+            const newLocation: LocationData = {
+              latitude: currentLocation.coords.latitude,
+              longitude: currentLocation.coords.longitude,
+            };
+            setLocation(newLocation);
+            mapRegionRef.current = {
+              latitude: newLocation.latitude,
+              longitude: newLocation.longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            };
+          }).catch(() => {
+
+          });
+        });
+      }
+
+      prevAppState = nextAppState;
     });
 
     return () => {
-
       subscription?.remove();
 
-      if (headingSubscription) {
-
-        headingSubscription.remove();
-
+      if (headingSubscriptionRef.current) {
+        headingSubscriptionRef.current.remove();
+        headingSubscriptionRef.current = null;
       }
 
       if (dragTimerRef.current) {
-
         clearTimeout(dragTimerRef.current);
-
         dragTimerRef.current = null;
-
       }
 
       if (locationCheckTimerRef.current) {
-
         clearInterval(locationCheckTimerRef.current);
-
         locationCheckTimerRef.current = null;
-
       }
-
     };
-
-  }, [navigate]);
+  }, []); 
 
   useEffect(() => {
 
@@ -1153,7 +1558,7 @@ export const MapMainScreen: React.FC = () => {
 
       checkMapLocation();
 
-    }, 3000); 
+    }, 5000); 
 
     lastLocationChangeTimeRef.current = Date.now();
 
@@ -1170,6 +1575,123 @@ export const MapMainScreen: React.FC = () => {
     };
 
   }, [initialLocation, lastFetchedLocation, checkMapLocation]);
+
+  useEffect(() => {
+
+    if (
+      previousScreen && 
+      previousScreen !== 'map' && 
+      prevScreenRef.current !== previousScreen
+    ) {
+      console.log('[MapMainScreen] 화면 이동 감지:', previousScreen, '→ map');
+
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+
+      goToGpsLocation();
+    }
+
+    prevScreenRef.current = previousScreen;
+  }, [previousScreen, goToGpsLocation]);
+
+  const markerAdMapping = useMemo(() => {
+
+    if (!mappingLocation || markers.length === 0) {
+      return new Map<string, TopAd5Item | null>();
+    }
+
+    if (topAd5Data.length === 0) {
+      console.log('[MapMainScreen] TopAd5 광고 없음, 기존 마커 데이터 사용');
+      return new Map<string, TopAd5Item | null>();
+    }
+
+    console.log('[MapMainScreen] TopAd5 데이터 확인:', {
+      totalAds: topAd5Data.length,
+      adNames: topAd5Data.map(ad => ad.name || '이름 없음'),
+      adCompanies: topAd5Data.map(ad => ad.ad_company || '없음'),
+    });
+
+    const sortedMarkers = [...markers]
+      .filter(marker => marker.latitude && marker.longitude)
+      .map(marker => ({
+        marker,
+        distance: calculateDistance(
+          mappingLocation.latitude,
+          mappingLocation.longitude,
+          marker.latitude!,
+          marker.longitude!
+        ),
+      }))
+      .sort((a, b) => a.distance - b.distance);
+
+    console.log('[MapMainScreen] 정렬된 마커 개수:', sortedMarkers.length);
+
+    const mapping = new Map<string, TopAd5Item | null>();
+    sortedMarkers.forEach(({ marker }, index) => {
+
+      let markerKey: string;
+      if (marker.spotID !== undefined && marker.spotID !== null && marker.spotID !== 0) {
+
+        markerKey = `spot-${marker.spotID}`;
+      } else if (marker.coin !== undefined && marker.coin !== null) {
+
+        markerKey = `coin-${marker.coin}`;
+      } else {
+
+        const lat = marker.latitude?.toFixed(6) ?? '0';
+        const lng = marker.longitude?.toFixed(6) ?? '0';
+        markerKey = `marker-${lat}-${lng}`;
+      }
+
+      const uniqueKey = `${markerKey}-${index}`;
+
+      const adIndex = index % topAd5Data.length;
+      const mappedAd = topAd5Data[adIndex];
+
+      mapping.set(uniqueKey, mappedAd);
+
+      if (index < 10) {
+        console.log(`[MapMainScreen] 마커 ${index + 1} 매핑:`, {
+          uniqueKey,
+          markerKey,
+          spotID: marker.spotID,
+          coin: marker.coin,
+          latitude: marker.latitude,
+          longitude: marker.longitude,
+          adIndex,
+          adName: mappedAd?.name || '없음',
+          adCompany: mappedAd?.ad_company || '없음',
+        });
+      }
+    });
+    console.log('[MapMainScreen] 마커-광고 매핑 완료:', mapping.size, '개 마커, TopAd5 개수:', topAd5Data.length);
+    return mapping;
+  }, [mappingLocation, markers, topAd5Data]);
+
+  const getMarkerKey = useCallback((marker: SpotData): string => {
+
+    if (marker.spotID !== undefined && marker.spotID !== null && marker.spotID !== 0) {
+      return `spot-${marker.spotID}`;
+    } else if (marker.coin !== undefined && marker.coin !== null) {
+      return `coin-${marker.coin}`;
+    } else {
+
+      const lat = marker.latitude?.toFixed(6) ?? '0';
+      const lng = marker.longitude?.toFixed(6) ?? '0';
+      return `marker-${lat}-${lng}`;
+    }
+  }, []);
+
+  const getMappedAd = useCallback((marker: SpotData): TopAd5Item | null | undefined => {
+    const baseKey = getMarkerKey(marker);
+
+    for (const [key, ad] of markerAdMapping.entries()) {
+      if (key.startsWith(baseKey + '-')) {
+        return ad;
+      }
+    }
+    return undefined;
+  }, [markerAdMapping, getMarkerKey]);
 
   const handleNavItemPress = (itemId: string) => {
 
@@ -1203,6 +1725,20 @@ export const MapMainScreen: React.FC = () => {
 
       case 'map':
 
+        console.log('📍 [하단 메뉴] 맵 클릭 - GPS 위치로 이동 및 콜아웃 숨기기');
+
+        setShowCalloutPopup(false);
+        setCalloutData(null);
+
+        if (activeTab === 'Map') {
+          goToGpsLocation();
+        } else {
+
+          setActiveTab('Map');
+          setTimeout(() => {
+            goToGpsLocation();
+          }, 100);
+        }
         break;
 
       default:
@@ -1214,28 +1750,105 @@ export const MapMainScreen: React.FC = () => {
   };
 
   const handleTabChange = (tab: 'Map' | 'Camera') => {
-
     setActiveTab(tab);
-
     console.log('Tab changed to:', tab);
 
+    if (tab === 'Map') {
+
+      setShowCalloutPopup(false);
+      setCalloutData(null);
+
+      setTimeout(() => {
+        goToGpsLocation();
+      }, 100);
+    }
   };
 
-  const handleMarkerPress = (spot: SpotData, index: number) => {
+  const handleMarkerPress = (spot: SpotData) => {
 
-    const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
-    console.log('🎯 마커 클릭 - 전달된 데이터:', {
-      index: index,
-      name: spotWithAd.name,
-      brand: spotWithAd.brand,
-      xrunPrice: spotWithAd.xrunPrice,
-      iconurl: spotWithAd.iconurl,
-      advertisement: spotWithAd.advertisement,
-      campid: spotWithAd.campid,
-      coin: spotWithAd.coin,
-      joindesc: spotWithAd.joindesc,
+    const markerKey = getMarkerKey(spot);
+    const mappedAd = getMappedAd(spot);
+
+    console.log('🎯 마커 클릭 - 매핑 확인:', {
+      markerKey,
+      spotID: spot.spotID,
+      coin: spot.coin,
+      latitude: spot.latitude,
+      longitude: spot.longitude,
+      hasMappedAd: !!mappedAd,
+      mappedAdName: mappedAd?.name || '없음',
+      mappedAdCompany: mappedAd?.ad_company || '없음',
+      mappingSize: markerAdMapping.size,
     });
-    setSelectedSpot(spot);
+
+    if (spot.latitude && spot.longitude) {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('📍 [임시 작업] 현재 마커와 주변 5개 마커 광고명');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+      const currentAdName = mappedAd?.name || spot.name || '광고 없음';
+      console.log(`[현재 마커] ${currentAdName} (거리: 0m)`);
+
+      const nearbyMarkers = markers
+        .filter(marker => 
+          marker.latitude && 
+          marker.longitude &&
+          !(marker.spotID === spot.spotID && marker.latitude === spot.latitude && marker.longitude === spot.longitude) 
+        )
+        .map(marker => {
+          const distance = calculateDistance(
+            spot.latitude!,
+            spot.longitude!,
+            marker.latitude!,
+            marker.longitude!
+          );
+          const ad = getMappedAd(marker);
+          return {
+            marker,
+            distance,
+            adName: ad?.name || marker.name || '광고 없음',
+            adCompany: ad?.ad_company || '없음',
+          };
+        })
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 5); 
+
+      nearbyMarkers.forEach((item, index) => {
+        console.log(`[주변 ${index + 1}] ${item.adName} (거리: ${item.distance.toFixed(2)}m, 회사: ${item.adCompany})`);
+      });
+
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    }
+
+    const spotWithMappedAd = mappedAd ? {
+      ...spot,
+      name: mappedAd.name || spot.name,
+      iconurl: mappedAd.iconurl || spot.iconurl,
+      joindesc: mappedAd.joindesc || spot.joindesc,
+      xrunPrice: mappedAd.xrunPrice || spot.xrunPrice,
+      brand: spot.brand, 
+
+      advertisement: spot.advertisement,
+      campid: mappedAd.campid || spot.campid,
+
+      thumbnail: mappedAd.thumbnail,
+      ad_company: mappedAd.ad_company,
+      coins: mappedAd.coins?.toString() || spot.coins,
+    } as SpotData & { thumbnail?: string; ad_company?: string } : spot;
+    console.log('🎯 마커 클릭 - 전달된 데이터:', {
+      markerKey: markerKey,
+      hasMappedAd: !!mappedAd,
+      name: spotWithMappedAd.name,
+      brand: spotWithMappedAd.brand,
+      xrunPrice: spotWithMappedAd.xrunPrice,
+      iconurl: spotWithMappedAd.iconurl,
+      advertisement: spotWithMappedAd.advertisement,
+      campid: (spotWithMappedAd as any).campid,
+      coin: spotWithMappedAd.coin,
+      joindesc: spotWithMappedAd.joindesc,
+      ad_company: (spotWithMappedAd as any).ad_company,
+    });
+    setSelectedSpot(spotWithMappedAd);
 
     if (!showBottomPanel) {
 
@@ -1278,9 +1891,6 @@ export const MapMainScreen: React.FC = () => {
         longitudeDelta: currentRegion.longitudeDelta,
 
       };
-
-      setMapRegion(newRegion);
-
       mapRegionRef.current = newRegion;
 
       lastLocationChangeTimeRef.current = Date.now();
@@ -1315,17 +1925,17 @@ export const MapMainScreen: React.FC = () => {
 
               });
 
-              const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
               console.log('🎯 중앙 팝업 표시 데이터:', {
-                name: spotWithAd.name,
-                brand: spotWithAd.brand,
-                xrunPrice: spotWithAd.xrunPrice,
-                advertisement: spotWithAd.advertisement,
-                campid: spotWithAd.campid,
-                iconurl: spotWithAd.iconurl,
-                joindesc: spotWithAd.joindesc,
+                name: spotWithMappedAd.name,
+
+                xrunPrice: spotWithMappedAd.xrunPrice,
+                advertisement: spotWithMappedAd.advertisement,
+                campid: (spotWithMappedAd as any).campid,
+                iconurl: spotWithMappedAd.iconurl,
+
+                ad_company: (spotWithMappedAd as any).ad_company,
               });
-              setCalloutData(spot);
+              setCalloutData(spotWithMappedAd);
 
               setShowCalloutPopup(true);
 
@@ -1345,17 +1955,17 @@ export const MapMainScreen: React.FC = () => {
 
             });
 
-            const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
             console.log('🎯 중앙 팝업 표시 데이터 (좌표 변환 실패):', {
-              name: spotWithAd.name,
-              brand: spotWithAd.brand,
-              xrunPrice: spotWithAd.xrunPrice,
-              advertisement: spotWithAd.advertisement,
-              campid: spotWithAd.campid,
-              iconurl: spotWithAd.iconurl,
-              joindesc: spotWithAd.joindesc,
+              name: spotWithMappedAd.name,
+              brand: spotWithMappedAd.brand,
+              xrunPrice: spotWithMappedAd.xrunPrice,
+              advertisement: spotWithMappedAd.advertisement,
+              campid: (spotWithMappedAd as any).campid,
+              iconurl: spotWithMappedAd.iconurl,
+              joindesc: spotWithMappedAd.joindesc,
+              ad_company: (spotWithMappedAd as any).ad_company,
             });
-            setCalloutData(spot);
+            setCalloutData(spotWithMappedAd);
 
             setShowCalloutPopup(true);
 
@@ -1377,17 +1987,17 @@ export const MapMainScreen: React.FC = () => {
 
       });
 
-      const spotWithAd = spot as SpotData & { advertisement?: string | number; campid?: string };
       console.log('🎯 중앙 팝업 표시 데이터 (맵 미준비):', {
-        name: spotWithAd.name,
-        brand: spotWithAd.brand,
-        xrunPrice: spotWithAd.xrunPrice,
-        advertisement: spotWithAd.advertisement,
-        campid: spotWithAd.campid,
-        iconurl: spotWithAd.iconurl,
-        joindesc: spotWithAd.joindesc,
+        name: spotWithMappedAd.name,
+        brand: spotWithMappedAd.brand,
+        xrunPrice: spotWithMappedAd.xrunPrice,
+        advertisement: spotWithMappedAd.advertisement,
+        campid: (spotWithMappedAd as any).campid,
+        iconurl: spotWithMappedAd.iconurl,
+        joindesc: spotWithMappedAd.joindesc,
+        ad_company: (spotWithMappedAd as any).ad_company,
       });
-      setCalloutData(spot);
+      setCalloutData(spotWithMappedAd);
 
       setShowCalloutPopup(true);
 
@@ -1475,13 +2085,28 @@ export const MapMainScreen: React.FC = () => {
 
     }
 
+    const markerKey = getMarkerKey(marker);
+    const mappedAd = getMappedAd(marker);
+
+    const markerWithMappedAd = mappedAd ? {
+      ...marker,
+      name: mappedAd.name || marker.name,
+      iconurl: mappedAd.iconurl || marker.iconurl,
+      joindesc: mappedAd.joindesc || marker.joindesc,
+      xrunPrice: mappedAd.xrunPrice || marker.xrunPrice,
+      brand: marker.brand,
+      advertisement: marker.advertisement,
+      campid: mappedAd.campid || marker.campid,
+      thumbnail: mappedAd.thumbnail,
+      ad_company: mappedAd.ad_company,
+      coins: mappedAd.coins?.toString() || marker.coins,
+    } as SpotData & { thumbnail?: string; ad_company?: string } : marker;
     console.log('=== 맵 클릭: 가장 가까운 마커 찾기 ===');
-
     console.log('클릭한 위치:', clickedCoordinate.latitude, clickedCoordinate.longitude);
+    console.log('가장 가까운 마커:', markerWithMappedAd.name || 'Unknown', '거리:', minDistance.toFixed(2), 'm');
+    console.log('매핑된 광고 여부:', !!mappedAd, 'ad_company:', (markerWithMappedAd as any).ad_company);
 
-    console.log('가장 가까운 마커:', marker.name || 'Unknown', '거리:', minDistance.toFixed(2), 'm');
-
-    setSelectedSpot(marker);
+    setSelectedSpot(markerWithMappedAd);
 
     if (!showBottomPanel) {
 
@@ -1534,9 +2159,6 @@ export const MapMainScreen: React.FC = () => {
       longitudeDelta: currentRegion.longitudeDelta,
 
     };
-
-    setMapRegion(newRegion);
-
     mapRegionRef.current = newRegion;
 
     lastLocationChangeTimeRef.current = Date.now();
@@ -1563,7 +2185,7 @@ export const MapMainScreen: React.FC = () => {
 
             });
 
-            setCalloutData(marker);
+            setCalloutData(markerWithMappedAd);
 
             setShowCalloutPopup(true);
 
@@ -1648,59 +2270,32 @@ export const MapMainScreen: React.FC = () => {
   const handleRegionChangeComplete = (region: any) => {
 
     const isProgrammatic = isProgrammaticMoveRef.current;
-
     const platform = Platform.OS;
-
     const lastUpdated = lastUpdatedRegionRef.current;
 
-    console.log('=== [맵 이동 완료 이벤트] ===');
-
-    console.log('플랫폼:', platform);
-
-    console.log('프로그램 이동 플래그:', isProgrammatic);
-
-    console.log('사용자 터치 플래그:', isUserTouchRef.current);
-
-    console.log('새로운 위치:', region.latitude.toFixed(6), region.longitude.toFixed(6));
-
-    console.log('현재 mapRegionRef 위치:', mapRegionRef.current.latitude.toFixed(6), mapRegionRef.current.longitude.toFixed(6));
-
     if (Platform.OS === 'ios' && isProgrammaticMoveRef.current) {
-
       console.log('⚠️ [iOS] 프로그램 이동 감지 - mapRegionRef 업데이트 건너뛰기');
 
-      setMapRegion(region);
+      mapRegionRef.current = region;
 
       isProgrammaticMoveRef.current = false;
-
       return;
-
     }
 
     if (Platform.OS === 'ios' && !isUserTouchRef.current) {
-
       console.log('⚠️ [iOS] 사용자 터치 없음 - mapRegionRef 업데이트 건너뛰기 및 지도 위치 복귀');
 
       if (mapRef.current) {
-
         const currentRegion = mapRegionRef.current;
-
         mapRef.current.animateToRegion({
-
           latitude: currentRegion.latitude,
-
           longitude: currentRegion.longitude,
-
           latitudeDelta: currentRegion.latitudeDelta,
-
           longitudeDelta: currentRegion.longitudeDelta,
-
         }, 100); 
-
       }
 
       return;
-
     }
 
     if (Platform.OS === 'ios' && lastUpdated) {
@@ -1710,8 +2305,6 @@ export const MapMainScreen: React.FC = () => {
       const lonDiff = Math.abs(region.longitude - lastUpdated.longitude);
 
       const minChange = 0.0001; 
-
-      console.log('  위치 변경 차이:', 'latDiff:', latDiff.toFixed(6), 'lonDiff:', lonDiff.toFixed(6));
 
       if (latDiff < minChange && lonDiff < minChange) {
 
@@ -1739,21 +2332,13 @@ export const MapMainScreen: React.FC = () => {
 
     } else if (Platform.OS === 'ios' && !lastUpdated) {
 
-      console.log('  [iOS] 첫 위치 업데이트 (lastUpdated가 null)');
-
     }
 
     if (Platform.OS === 'ios') {
 
-      console.log('✅ [iOS] 사용자 터치 + 위치 변경 확인 - mapRegionRef 업데이트');
-
     } else {
 
-      console.log('✅ [Android] 사용자 드래그 감지 - mapRegionRef 업데이트');
-
     }
-
-    setMapRegion(region);
 
     mapRegionRef.current = region;
 
@@ -1770,6 +2355,80 @@ export const MapMainScreen: React.FC = () => {
     isUserTouchRef.current = false;
 
   };
+
+  const stableInitialRegion = useMemo(() => {
+    return mapRegionRef.current;
+  }, []); 
+
+  const stableShowsUserLocation = useMemo(() => {
+    return !!location;
+  }, [location]);
+
+  const memoizedMarkers = useMemo(() => {
+    console.log('🔄 [memoizedMarkers] 재계산 시작, markers 개수:', markers.length);
+    const filtered = markers.filter((marker) => marker.latitude && marker.longitude); 
+    console.log('✅ [memoizedMarkers] 필터링 후 개수:', filtered.length);
+    const mapped = filtered.map((marker) => {
+
+        const campId = marker.campid ?? '';
+        const coinValue = marker.coin ?? '';
+        const spotId = marker.spotID ?? '';
+        const lat = marker.latitude!.toFixed(6);
+        const lng = marker.longitude!.toFixed(6);
+        const uniqueKey = `marker-${campId}-${coinValue}-${spotId}-${lat}-${lng}`;
+        return {
+          ...marker,
+          uniqueKey,
+        };
+      });
+    console.log('✅ [memoizedMarkers] 최종 마커 개수:', mapped.length);
+    return mapped;
+  }, [markers]);
+
+  useEffect(() => {
+    console.log('📊 [markers 상태 변경] markers 개수:', markers.length);
+    if (markers.length > 0) {
+      console.log('✅ [markers 상태 변경] 마커 데이터 있음, 첫 번째 마커:', {
+        coin: markers[0].coin,
+        name: markers[0].name,
+        latitude: markers[0].latitude,
+        longitude: markers[0].longitude,
+      });
+
+      if (
+        hasCompletedInitialLoadRef.current &&
+        !hasMovedToFirstMarkerOnInitialLoadRef.current &&
+        markers[0].latitude &&
+        markers[0].longitude &&
+        mapRef.current
+      ) {
+        console.log('📍 [초기 로드] 첫 번째 마커 위치로 맵 이동:', markers[0].latitude, markers[0].longitude);
+
+        isProgrammaticMoveRef.current = true;
+        mapRef.current.animateToRegion({
+          latitude: markers[0].latitude,
+          longitude: markers[0].longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+
+        mapRegionRef.current = {
+          latitude: markers[0].latitude,
+          longitude: markers[0].longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+
+        hasMovedToFirstMarkerOnInitialLoadRef.current = true;
+
+        setTimeout(() => {
+          isProgrammaticMoveRef.current = false;
+        }, 600);
+      }
+    } else {
+      console.log('⚠️ [markers 상태 변경] 마커 데이터 없음 (빈 배열)');
+    }
+  }, [markers]);
 
   const bottomNavItems = [
 
@@ -1835,9 +2494,9 @@ export const MapMainScreen: React.FC = () => {
 
           style={styles.map}
 
-          region={mapRegion}
+          initialRegion={stableInitialRegion}
 
-          showsUserLocation={!!location} 
+          showsUserLocation={stableShowsUserLocation}
 
           showsMyLocationButton={false}
 
@@ -1853,38 +2512,32 @@ export const MapMainScreen: React.FC = () => {
 
           {}
 
-          {markers
-
-            .filter((marker) => marker.latitude && marker.longitude) 
-
-            .map((marker, index) => {
-
-              const uniqueKey = marker.coin || `marker-${marker.latitude}-${marker.longitude}`;
-
+          {memoizedMarkers.map((marker) => {
               return (
+              <Marker
 
-                <Marker
+                key={marker.uniqueKey}
 
-                  key={uniqueKey}
+                coordinate={{
 
-                  coordinate={{
+                  latitude: marker.latitude!,
 
-                    latitude: marker.latitude!,
+                  longitude: marker.longitude!,
 
-                    longitude: marker.longitude!,
+                }}
 
-                  }}
+                anchor={{ x: 0.5, y: 0.5 }}
 
-                  anchor={{ x: 0.5, y: 0.5 }}
+                onPress={() => handleMarkerPress(marker)}
 
-                  onPress={() => handleMarkerPress(marker, index)}
+                tracksViewChanges={true}
 
-                >
+              >
 
-                  {}
+                {}
 
-                  {logoTempMarker && (
-
+                {logoTempMarker ? (
+                  <View style={styles.markerImageContainer}>
                     <Image
 
                       source={logoTempMarker}
@@ -1894,13 +2547,14 @@ export const MapMainScreen: React.FC = () => {
                       resizeMode="contain"
 
                     />
+                  </View>
+                ) : (
 
-                  )}
+                  <View style={styles.defaultMarker} />
+                )}
 
-                </Marker>
-
-              );
-
+              </Marker>
+            );
             })}
 
         </MapView>
@@ -1909,19 +2563,18 @@ export const MapMainScreen: React.FC = () => {
 
         {iconMapPoint && (
 
-          <View style={styles.mapPinButton}>
+          <Pressable 
+            style={styles.mapPinButton}
+            onPress={goToCurrentLocation}
+          >
 
             <Image
-
               source={iconMapPoint}
-
               style={styles.mapPinIcon}
-
               resizeMode="contain"
-
             />
 
-          </View>
+          </Pressable>
 
         )}
 
@@ -1955,8 +2608,17 @@ export const MapMainScreen: React.FC = () => {
 
                 {}
 
-                {iconXrunLogo ? (
+                {calloutData.iconurl ? (
+                  <Image
 
+                    source={{ uri: calloutData.iconurl }}
+
+                    style={[styles.calloutImage, { borderRadius: 6 }]}
+
+                    resizeMode="cover"
+
+                  />
+                ) : iconXrunLogo ? (
                   <Image
 
                     source={iconXrunLogo}
@@ -1966,11 +2628,8 @@ export const MapMainScreen: React.FC = () => {
                     resizeMode="contain"
 
                   />
-
                 ) : (
-
                   iconXrunBlack && (
-
                     <Image
 
                       source={iconXrunBlack}
@@ -1980,9 +2639,7 @@ export const MapMainScreen: React.FC = () => {
                       resizeMode="contain"
 
                     />
-
                   )
-
                 )}
 
                 {}
@@ -1997,9 +2654,9 @@ export const MapMainScreen: React.FC = () => {
 
               <View style={styles.calloutRight}>
 
-                <Text style={styles.calloutBrand}>
+                <Text style={styles.calloutBrand} numberOfLines={2}>
 
-                  {calloutData.brand || calloutData.name} 획득 가능합니다.
+                  {calloutData.name || calloutData.brand || 'XRUN'} 획득 가능합니다.
 
                 </Text>
 
@@ -2200,7 +2857,7 @@ const styles = StyleSheet.create({
 
   calloutImage: {
 
-    marginLeft: 8,
+    marginLeft: 4,
 
     width: 32,
 
@@ -2242,12 +2899,25 @@ const styles = StyleSheet.create({
 
   },
 
-  markerImage: {
-
+  markerImageContainer: {
     width: 40,
-
     height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
+  markerImage: {
+    width: 40,
+    height: 40,
+  },
+
+  defaultMarker: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#ff0000',
+    borderWidth: 2,
+    borderColor: '#ffffff',
   },
 
 });

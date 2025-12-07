@@ -3809,3 +3809,56 @@ export const getClauseContent = async (
   }
 };
 
+const TOP_AD5_STORAGE_KEY = 'topAd5Data';
+
+export const getTopAd5 = async (navigation?: any): Promise<any> => {
+  try {
+    const os = Platform.OS === 'ios' ? 'ios' : 'android';
+
+    let member: number | string = '';
+    try {
+      const userData = await AsyncStorage.getItem('userData');
+      if (userData) {
+        const parsedUserData = JSON.parse(userData);
+        member = parsedUserData?.member || '';
+      }
+    } catch (userDataError) {
+      console.log('[getTopAd5] userData 가져오기 실패:', userDataError);
+    }
+
+    const requestBody = { os, member };
+
+    console.log('[getTopAd5] API 호출 시작');
+    console.log('[getTopAd5] OS:', os);
+    console.log('[getTopAd5] member:', member);
+
+    const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
+
+    console.log('[getTopAd5] API 응답 갯수:');
+    console.log(response.length);
+
+    if (response) {
+      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(response));
+      console.log('[getTopAd5] AsyncStorage에 저장 완료');
+    }
+
+    return response;
+  } catch (error) {
+    console.error('[getTopAd5] API 호출 실패:', error);
+    throw error;
+  }
+};
+
+export const getStoredTopAd5 = async (): Promise<any | null> => {
+  try {
+    const storedData = await AsyncStorage.getItem(TOP_AD5_STORAGE_KEY);
+    if (storedData) {
+      return JSON.parse(storedData);
+    }
+    return null;
+  } catch (error) {
+    console.error('[getStoredTopAd5] AsyncStorage 읽기 실패:', error);
+    return null;
+  }
+};
+
