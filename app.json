@@ -28,8 +28,7 @@
     "android": {
       "package": "run.xrun.xrunapp",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 177,
-      "versionName": "3.2.9",
+      "versionCode": 177, 
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
