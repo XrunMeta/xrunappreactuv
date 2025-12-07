@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, StyleSheet, TextInput, ActivityIndicator, Text } from 'react-native';
 import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
@@ -50,6 +50,7 @@ export const ShopMyTicketScreen = () => {
   const [loading, setLoading] = useState(true);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [itemImages, setItemImages] = useState<Record<string, string>>({}); 
+  const [searchQuery, setSearchQuery] = useState<string>(''); 
   const [transferTicketDialog, setTransferTicketDialog] = useState<{
     visible: boolean;
     title: string;
@@ -188,6 +189,20 @@ export const ShopMyTicketScreen = () => {
     }
   };
 
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return purchasedItems;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return purchasedItems.filter((item) => {
+      const title = (item.title || '').toLowerCase();
+      const description = ((item as any)?.description || '').toLowerCase();
+
+      return title.includes(query) || description.includes(query);
+    });
+  }, [purchasedItems, searchQuery]);
+
   return (
     <SafeView style={styles.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
@@ -215,11 +230,13 @@ export const ShopMyTicketScreen = () => {
               placeholder="Search"
               placeholderTextColor="#bcbec4"
               style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
             />
           </View>
           <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-            {purchasedItems.length > 0 ? (
-              purchasedItems.map((item) => {
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => {
 
                 const itemKey = `${(item as any).item}_${(item as any).txID || 'no-tx'}`;
                 const itemImage = itemImages[itemKey];
@@ -244,7 +261,12 @@ export const ShopMyTicketScreen = () => {
               })
             ) : (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>{t('screens.shopMyTicket.noPurchasedItems')}</Text>
+                <Text style={styles.emptyText}>
+                  {searchQuery.trim()
+                    ? 'No search results'
+                    : t('screens.shopMyTicket.noPurchasedItems')
+                  }
+                </Text>
               </View>
             )}
           </SafeScrollView>
