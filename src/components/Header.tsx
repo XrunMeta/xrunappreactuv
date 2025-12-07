@@ -1,5 +1,5 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_7e4944, v_961e77 } from 'rcmrninabrnb';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
 import { v_ee0c5a } from '../hooks';
@@ -12,6 +12,7 @@ interface HeaderProps {
   onBackPress?: () => void;
   showBackButton?: boolean;
   rightComponent?: v_a3453e.ReactNode;
+  containerStyle?: v_961e77<v_7e4944>;
 }
 
 export const Header: v_a3453e.FC<HeaderProps> = ({
@@ -19,6 +20,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
   onBackPress: v_f442f6,
   showBackButton: v_9c4d53 = true,
   rightComponent: v_52c3cc,
+  containerStyle: v_4affe9,
 }) => {
   const { goBack: v_c7ac57, reset: v_487a25, canGoBack: v_7e32fb, currentScreen: v_0f0c7b } = v_a0daa8();
   const v_e2510f = v_9c4d53;
@@ -61,7 +63,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
     );
 
   return (
-    <View style={[v_d81136.container, { height: v_1e0e1c + 10, paddingTop: v_a3707d }]}>
+    <View style={[v_d81136.container, { height: v_1e0e1c + 10, paddingTop: v_a3707d }, v_4affe9]}>
       <View style={v_d81136.content}>
         {v_91b7e0()}
         <View style={v_d81136.titleWrapper} pointerEvents="none">

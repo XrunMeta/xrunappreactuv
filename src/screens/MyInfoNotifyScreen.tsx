@@ -612,7 +612,7 @@ const v_d81136 = v_472849.create({
   inputWrapper: {
     flex: 1,
     borderRadius: 6,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: '#edeced',
     backgroundColor: '#fff',
     paddingHorizontal: 12,

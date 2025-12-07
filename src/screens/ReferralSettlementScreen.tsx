@@ -232,7 +232,6 @@ export const v_08aac3 = () => {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor={"#f7f7fb"}>
-      <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.referralSettlement.title')} />
       <View style={v_d81136.content}>
         <ReferralStatsCard
@@ -319,12 +318,12 @@ const v_d81136 = v_472849.create({
     justifyContent: 'space-between',
     paddingHorizontal: v_9b1a04.medium,
     paddingVertical: v_9b1a04.large,
-    borderRadius: 4,
+    borderRadius: v_9b1a04.small,
     backgroundColor: '#FFFFFF',
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: v_9b1a04.small,
     elevation: 2,
     borderWidth: 1,
     borderColor: '#ededed',
