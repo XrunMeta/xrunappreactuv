@@ -210,7 +210,7 @@ export const ShopMyTicketScreen = () => {
           />
 
           <View style={styles.searchBar}>
-            <Feather name="search" size={18} color="#bcbec4" />
+            <Feather name="search" size={18} color="#0296f2" />
             <TextInput
               placeholder="Search"
               placeholderTextColor="#bcbec4"
@@ -289,18 +289,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   segmented: {
-    marginBottom: SIZES.large,
+    marginBottom: SIZES.medium,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 14,
-    borderWidth: 0.5,
-    borderColor: '#d5dde0',
+    borderWidth: 1,
+    borderColor: '#ededed',
     backgroundColor: '#ffffff',
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 6,
     marginBottom: 20,
+    shadowColor: '#182b78',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   searchInput: {
     flex: 1,
