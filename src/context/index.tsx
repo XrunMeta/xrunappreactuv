@@ -14,6 +14,9 @@ type AppContextValue = {
   walletReceiveAddress: string;
   setWalletReceiveAddress: (address: string) => void;
   resetWalletReceiveAddress: () => void;
+  walletReceiveCurrency: number;
+  setWalletReceiveCurrency: (currency: number) => void;
+  resetWalletReceiveCurrency: () => void;
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
@@ -89,6 +92,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_ee27aa, v_134f07] = v_5ab095('');
   const [v_e5d0e8, v_8f0018] = v_5ab095('0');
   const [v_589fe1, v_f0d0d2] = v_5ab095('');
+  const [v_4efba4, v_00796a] = v_5ab095<number>(1);
   const [v_750b67, v_2cdd41] = v_5ab095(false);
   const [v_e6976c, v_8f89f3] =
     v_5ab095<v_01e0ec>(v_ce4741.login);
@@ -149,6 +153,9 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       walletReceiveAddress: v_589fe1,
       setWalletReceiveAddress: v_f0d0d2,
       resetWalletReceiveAddress: () => v_f0d0d2(''),
+      walletReceiveCurrency: v_4efba4,
+      setWalletReceiveCurrency: v_00796a,
+      resetWalletReceiveCurrency: () => v_00796a(1),
       addTokenDialogVisible: v_750b67,
       openAddTokenDialog: () => v_2cdd41(true),
       closeAddTokenDialog: () => v_2cdd41(false),
@@ -209,6 +216,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_ee27aa,
       v_e5d0e8,
       v_589fe1,
+      v_4efba4,
       v_750b67,
       v_e6976c,
       v_fc0b2c,

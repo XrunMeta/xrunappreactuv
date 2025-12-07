@@ -6,23 +6,25 @@ import {
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
-import { v_dec439, v_f832ec } from 'zvyjokvuouwvifyzks';
+import { v_dec439, v_f832ec, v_25515d } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_4c7b5d } from '../components';
-import { v_1bfbd0, v_a61db3, v_4922a9, v_843035 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_556baf } from '../components';
+import { v_570c34, v_556baf } from '../components';
 
-type CardConfig = {
+type MenuConfig = {
   id: string;
   label: string;
+  subtitle: string;
   iconName: string;
-  iconLibrary: 'Feather' | 'Material';
+  iconLibrary: 'Feather' | 'Material' | 'Ionicons';
+  iconColor: string;
   route?: keyof typeof v_ce4741;
   disabled?: boolean;
 };
@@ -37,50 +39,63 @@ export const v_03a231 = () => {
     email?: string;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
-  const [v_79b081, v_0dfa96] = v_5ab095(false);
 
-  const v_dbfc7f = v_df9f57(
+  const [v_79b081, v_0dfa96] = v_5ab095(v_731ab4 ? true : false);
+
+  const v_e47202 = v_df9f57(
     () => [
       {
         id: 'edit',
         label: v_8d41d7('screens.myInfo.editInfo'),
-        iconName: 'edit-3',
-        iconLibrary: 'Feather',
+        subtitle: '이메일, 비밀번호 변경',
+        iconName: 'person-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
       {
         id: 'notify',
         label: v_8d41d7('screens.myInfo.notify'),
-        iconName: 'bell',
-        iconLibrary: 'Feather',
+        subtitle: '알림 설정, 알림 내역',
+        iconName: 'notifications-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#10B981',
         route: 'myInfoNotify',
       },
       {
         id: 'faq',
         label: v_8d41d7('screens.myInfo.faq'),
-        iconName: 'head-question-outline',
-        iconLibrary: 'Material',
+        subtitle: '자주 묻는 질문',
+        iconName: 'help-circle-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#F59E0B',
         route: 'myInfoFaq',
       },
       {
         id: 'clause',
         label: v_8d41d7('screens.myInfo.terms'),
-        iconName: 'file-text',
-        iconLibrary: 'Feather',
+        subtitle: '이용약관, 개인정보처리방침',
+        iconName: 'document-text-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#3B82F6',
         route: 'myInfoClauses',
       },
       {
         id: 'setting',
         label: v_8d41d7('screens.myInfo.settings'),
-        iconName: 'settings',
-        iconLibrary: 'Feather',
+        subtitle: '앱 설정, 언어 설정',
+        iconName: 'settings-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#8B5CF6',
         route: 'myInfoSettings',
       },
       {
         id: 'referral',
         label: v_8d41d7('screens.myInfo.referralEdit'),
-        iconName: 'refresh-ccw',
-        iconLibrary: 'Feather',
+        subtitle: '추천인 관리, 정산 내역',
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#EC4899',
         route: 'myInfoReferral',
       },
     ],
@@ -167,13 +182,13 @@ export const v_03a231 = () => {
     return () => clearInterval(v_ad1d65);
   }, [v_9b57fc, v_0f0c7b]);
 
-  const v_b0f7df = (v_5eae50) => {
-    if (v_5eae50.route) {
+  const v_18219f = (v_714568) => {
+    if (v_714568.route) {
 
-      if (v_5eae50.id === 'edit' && v_bb789b?.email) {
+      if (v_714568.id === 'edit' && v_bb789b?.email) {
         v_b572c3(v_bb789b.email);
       }
-      v_9b57fc(v_ce4741[v_5eae50.route]);
+      v_9b57fc(v_ce4741[v_714568.route]);
     }
   };
 
@@ -247,21 +262,25 @@ export const v_03a231 = () => {
     );
   };
 
-  const v_c273da = (v_5eae50) => {
-    if (v_5eae50.iconLibrary === 'Material') {
+  const v_03ce49 = (v_714568) => {
+    const v_6fb2d1 = 24;
+    if (v_714568.iconLibrary === 'Ionicons') {
+      return <Ionicons name={v_714568.iconName as any} size={v_6fb2d1} color={v_714568.iconColor} />;
+    }
+    if (v_714568.iconLibrary === 'Material') {
       return (
         <MaterialCommunityIcons
-          name={v_5eae50.iconName as any}
-          size={18}
-          color="#fff"
+          name={v_714568.iconName as any}
+          size={v_6fb2d1}
+          color={v_714568.iconColor}
         />
       );
     }
-    return <Feather name={v_5eae50.iconName as any} size={18} color="#fff" />;
+    return <Feather name={v_714568.iconName as any} size={v_6fb2d1} color={v_714568.iconColor} />;
   };
 
   return (
-    <SafeView style={v_d81136.container}>
+    <SafeView style={v_d81136.container} backgroundColor={"#f7f7fb"}>
       <Header
         title={v_8d41d7('screens.myInfo.title')}
         onBackPress={() => {
@@ -273,71 +292,79 @@ export const v_03a231 = () => {
         }}
         showBackButton
       />
+      {}
+      <View style={v_d81136.adBanner}>
+        < TaboolaBanner placementType="myinfo_OS_395x80" />
+      </View>
+
       <View style={v_d81136.scrollContent}>
-        <View style={v_d81136.inner}>
-          {}
-          <TaboolaBanner placementType="myinfo_OS_395x80" />
-
-          <View style={v_d81136.profileCard}>
-            <View>
-              {v_cd31a8 ? (
-                <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
-              ) : (
-                <>
-                  <Text style={v_d81136.profileName}>
-                    {v_bb789b?.name || '사용자'}
-                  </Text>
-                  <Text style={v_d81136.profileEmail}>
-                    {v_bb789b?.email || ''}
-                  </Text>
-                </>
-              )}
-            </View>
-            <View style={v_d81136.profileActions}>
-              <TouchableOpacity
-                onPress={v_22cd2d}
-                style={v_d81136.actionButton}
-                activeOpacity={0.7}
-              >
-                <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={v_06b8a4}
-                style={v_d81136.actionButton}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons
-                  name="logout"
-                  size={18}
-                  color={v_1bfbd0.headerText}
-                />
-              </TouchableOpacity>
-            </View>
+        <View style={v_d81136.profileCard}>
+          <View style={v_d81136.profileIconContainer}>
+            <Ionicons name="person-outline" size={32} color="#666666" />
           </View>
-
-          <View style={v_d81136.grid}>
-            {v_dbfc7f.map((v_5eae50) => (
-              <TouchableOpacity
-                key={v_5eae50.id}
-                style={[
-                  v_d81136.card,
-                ]}
-                onPress={() => v_b0f7df(v_5eae50)}
-                activeOpacity={0.85}
-              >
-                <View style={v_d81136.cardIconContainer}>
-                  <View style={v_d81136.cardIcon}>{v_c273da(v_5eae50)}</View>
-                  {v_5eae50.id === 'notify' && v_79b081 && (
-                    <View style={v_d81136.notificationBadge} />
-                  )}
-                </View>
-                <Text style={v_d81136.cardLabel}>{v_5eae50.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={v_d81136.profileInfo}>
+            {v_cd31a8 ? (
+              <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
+            ) : (
+              <>
+                <Text style={v_d81136.profileName}>
+                  {v_bb789b?.name || '사용자'}
+                </Text>
+                <Text style={v_d81136.profileEmail}>
+                  {v_bb789b?.email || ''}
+                </Text>
+              </>
+            )}
+          </View>
+          <View style={v_d81136.profileActions}>
+            <TouchableOpacity
+              onPress={v_22cd2d}
+              style={v_d81136.actionButton}
+              activeOpacity={0.7}
+            >
+              <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={v_06b8a4}
+              style={v_d81136.actionButton}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons
+                name="logout"
+                size={18}
+                color={v_1bfbd0.headerText}
+              />
+            </TouchableOpacity>
           </View>
         </View>
+        <SafeScrollView style={v_d81136.menuListContainer} showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
+          {}
+          <View style={v_d81136.menuList}>
+            {v_e47202.map((v_714568, v_a56041) => (
+              <React.Fragment key={v_714568.id}>
+                <TouchableOpacity
+                  style={v_d81136.menuItem}
+                  onPress={() => v_18219f(v_714568)}
+                  activeOpacity={0.7}
+                >
+                  <View style={v_d81136.menuIconContainer}>
+                    {v_03ce49(v_714568)}
+                    {v_714568.id === 'notify' && v_79b081 && (
+                      <View style={v_d81136.notificationBadge} />
+                    )}
+                  </View>
+                  <View style={v_d81136.menuTextContainer}>
+                    <Text style={v_d81136.menuLabel}>{v_714568.label}</Text>
+                    <Text style={v_d81136.menuSubtitle}>{v_714568.subtitle}</Text>
+                  </View>
+                </TouchableOpacity>
+                {v_a56041 < v_e47202.length - 1 && <View style={v_d81136.menuDivider} />}
+              </React.Fragment>
+            ))}
+          </View>
+        </SafeScrollView>
       </View>
-    </SafeView>
+    </SafeView >
   );
 };
 
@@ -346,18 +373,22 @@ const v_d81136 = v_472849.create({
     ...v_a61db3.container,
   },
   scrollContent: {
-    ...v_a61db3.scrollContent,
+
+    marginHorizontal: v_9b1a04.large,
+    gap: v_9b1a04.small,
+    paddingTop: v_9b1a04.small,
+    flex: 1,
   },
-  inner: {
-    gap: 24,
+
+  menuListContainer: {
+    flex: 1,
   },
   adBanner: {
     width: '100%',
-    height: 97,
-    borderRadius: 8,
-    backgroundColor: '#d9d9d9',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 84,
+    borderWidth: 1,
+    overflow: 'hidden',
+    borderColor: '#ededed',
   },
   adText: {
     fontSize: v_843035.size.large,
@@ -376,8 +407,21 @@ const v_d81136 = v_472849.create({
     shadowRadius: 8,
     elevation: 3,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 16,
+  },
+  profileIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 30,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#ededed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileInfo: {
+    flex: 1,
   },
   profileName: {
     fontSize: v_843035.size.medium,
@@ -392,63 +436,70 @@ const v_d81136 = v_472849.create({
   },
   profileActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
     width: 36,
     height: 36,
-    borderRadius: 12,
+    borderRadius: v_9b1a04.small,
     backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    width: '31%',
-    minWidth: 100,
-    height: 110,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e3e7ec',
+  menuList: {
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
-    paddingHorizontal: 8,
-    gap: 12,
+    borderRadius: v_9b1a04.medium,
+    overflow: 'hidden',
+    shadowColor: '#00000014',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  cardIconContainer: {
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: v_9b1a04.large,
+    paddingVertical: v_9b1a04.medium,
+    gap: 16,
+  },
+  menuIconContainer: {
     position: 'relative',
-    width: 36,
-    height: 36,
-  },
-  cardIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#343a5a',
+    width: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  menuTextContainer: {
+    flex: 1,
+  },
+  menuLabel: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#10192d',
+    marginBottom: 2,
+  },
+  menuSubtitle: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#6B7280',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#EEF0F5',
+    marginLeft: 60, 
   },
   notificationBadge: {
     position: 'absolute',
     top: -2,
     right: -2,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#FF6B6B',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#fff',
   },
-  cardLabel: {
-    fontSize: v_843035.size.medium,
-    fontFamily: 'Roboto-Medium',
-    color: '#111',
-  },
+
 });
 
