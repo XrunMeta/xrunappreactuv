@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },

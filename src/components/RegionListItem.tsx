@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   regionName: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',
   },
   regionNameEn: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 2,

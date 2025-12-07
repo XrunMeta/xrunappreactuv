@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 
   },
   label: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
     paddingVertical: 0,

@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   iconText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
   },
   badge: {
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   badgeText: {
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
@@ -116,12 +116,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   subtitle: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -129,12 +129,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
   suffix: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

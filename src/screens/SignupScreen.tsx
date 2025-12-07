@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -452,11 +452,11 @@ const styles = StyleSheet.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     marginRight: 6,
   },
   countryCode: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   termsText: {
     flex: 1,
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',

@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFDC04',
   },
   actionLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryLabel: {

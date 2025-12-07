@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     ...LIST_STYLES.large,
   },
   sectionLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardName: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
   },
   cardEmail: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#bababa',
   },

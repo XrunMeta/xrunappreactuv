@@ -97,21 +97,21 @@ const styles = StyleSheet.create({
     height: 18,
   },
   label: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   caption: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#5f6478',
   },
   compactLabel: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     color: '#1f6880',
   },
   compactCaption: {
-    fontSize: FONTS.fontSize.xsmall,
+    fontSize: FONTS.size.xsmall,
   },
   textColumn: {
     justifyContent: 'center',

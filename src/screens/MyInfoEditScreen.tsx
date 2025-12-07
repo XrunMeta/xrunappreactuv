@@ -563,12 +563,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
   linkText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     color: '#707070',
     fontFamily: 'Roboto-SemiBold',
   },
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   readonlyText: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     color: '#1a2e35',
     fontFamily: 'Roboto-Bold',
   },
@@ -607,11 +607,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   flagEmoji: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     marginRight: 6,
   },
   phonePrefixTextDisabled: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#a8a8a7',
   },
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   phoneValue: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
@@ -685,13 +685,13 @@ const styles = StyleSheet.create({
   },
   phoneValueText: {
     flex: 1,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
     marginLeft: 12,
   },
   editHint: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
     marginLeft: 8,
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   },
   regionValue: {
     flex: 1,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     color: '#dedede',
   },
   arrow: {
-    fontSize: FONTS.fontSize.xlarge,
+    fontSize: FONTS.size.xlarge,
     color: '#747474',
     marginLeft: 8,
   },
@@ -752,12 +752,12 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   listItemText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   checkmark: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     color: COLORS.buttonPrimary,
     fontFamily: 'Roboto-Bold',
   },
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   disabledText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },
@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },

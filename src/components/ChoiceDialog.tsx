@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

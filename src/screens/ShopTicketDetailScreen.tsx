@@ -414,12 +414,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   errorText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     color: '#999',
     textAlign: 'center',
   },
   itemTitle: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#111',
     marginBottom: 12,
@@ -438,13 +438,13 @@ const styles = StyleSheet.create({
     marginBottom: 5, 
   },
   ticketFieldLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     color: '#000',
     marginBottom: 0, 
     fontWeight: '500',
   },
   ticketFieldStatus: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontWeight: '500',
   },
   ticketFieldBox: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     marginTop: 0, 
   },
   ticketFieldNumber: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#000',
     fontWeight: '600',
   },
@@ -486,11 +486,11 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: '#FFF',
     fontWeight: '600',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
   },
   shareButtonText: {
     color: '#000',
     fontWeight: '600',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
   },
 });

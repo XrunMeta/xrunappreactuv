@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     maxHeight: '70%',
   },
   title: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
     marginBottom: 20,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.buttonPrimary,
   },
   optionText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: COLORS.text,
   },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
   },
   checkmark: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     color: '#fff',
     fontFamily: 'Roboto-Bold',
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: COLORS.text,
   },

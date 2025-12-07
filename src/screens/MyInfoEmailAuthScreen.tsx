@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   inlineButtonText: {
     color: '#fff',
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-SemiBold',
   },
 });

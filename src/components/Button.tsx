@@ -1,17 +1,17 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps } from 'react-native';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
   variant?: 'primary' | 'secondary';
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-  title, 
-  variant = 'primary', 
-  style, 
-  ...props 
+export const Button: React.FC<ButtonProps> = ({
+  title,
+  variant = 'primary',
+  style,
+  ...props
 }) => {
   return (
     <TouchableOpacity
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: SIZES.medium,
+    fontSize: FONTS.size.medium,
     fontWeight: '600',
   },
 });

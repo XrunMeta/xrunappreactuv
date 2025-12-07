@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   hashValue: {
     flex: 1,
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   copyText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#747474',
     marginTop: 4,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 6,
@@ -226,14 +226,14 @@ const styles = StyleSheet.create({
   },
   cardValue: {
     flex: 1,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     lineHeight: 22,
   },
   statusText: {
     textAlign: 'center',
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1f6880',
     marginTop: 16,

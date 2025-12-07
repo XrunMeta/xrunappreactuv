@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     width: '100%',
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   emailVerificationText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   mapLinkText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',

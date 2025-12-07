@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   amountLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   amountInput: {
-    fontSize: FONTS.fontSize.xxxlarge,
+    fontSize: FONTS.size.xxxlarge,
     lineHeight: 48,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   tokenBadgeText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     fontFamily: 'Roboto-SemiBold',
     color: COLORS.headerText,

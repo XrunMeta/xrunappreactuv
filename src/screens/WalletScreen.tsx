@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   sectionTitle: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   addTokenText: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
   },
@@ -804,19 +804,19 @@ const styles = StyleSheet.create({
     height: 40,
   },
   tokenIconText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
   },
   tokenItemMiddle: {
     flex: 1,
   },
   tokenItemTitle: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   tokenItemSubtitle: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   tokenItemAmount: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
   },

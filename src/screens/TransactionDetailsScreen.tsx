@@ -110,18 +110,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   infoLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#B8B8B8',
   },
   infoValue: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
     marginTop: 4,
   },
   sectionTitle: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     marginBottom: 16,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   explorerLabel: {
     color: '#683AB5',
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
   },
 
 });

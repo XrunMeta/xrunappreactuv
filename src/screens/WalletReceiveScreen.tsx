@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   addressLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1a2e35',
     marginBottom: 8,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   addressValue: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     fontFamily: 'Roboto-Regular',
     color: '#121212',

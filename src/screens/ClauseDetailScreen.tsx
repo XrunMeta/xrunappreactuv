@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
   },
@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',

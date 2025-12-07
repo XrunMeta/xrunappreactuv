@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontWeight: 'bold',
     color: 'black',
     flex: 1,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FFDC04',
   },
   tabText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#B8B8B8',
     fontFamily: 'Roboto-Regular',
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5FF',
   },
   tokenSymbol: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: 'black',
     fontFamily: 'Roboto-Medium',
   },
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     backgroundColor: '#FAFAFA',
   },
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
   },
   confirmRow: {
@@ -420,12 +420,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   confirmLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#B8B8B8',
     fontFamily: 'Roboto-Regular',
   },
   confirmValue: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: 'black',
     fontWeight: 'bold',
     fontFamily: 'Roboto-Bold',
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: 'black',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
   },
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   },
   ownedText: {
     marginLeft: 'auto',
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     color: '#B8B8B8',
     marginTop: 3,
     fontFamily: 'Roboto-Regular',

@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   message: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
     marginBottom: 24,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

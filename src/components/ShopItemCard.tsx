@@ -113,24 +113,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 4,
   },
   price: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
   },
   quantity: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
     alignSelf: 'center',

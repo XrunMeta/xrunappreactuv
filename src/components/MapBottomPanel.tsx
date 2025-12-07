@@ -178,7 +178,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Medium',
-                      fontSize: FONTS.fontSize.medium,
+                      fontSize: FONTS.size.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
                       marginBottom: 4,
@@ -188,7 +188,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Regular',
-                      fontSize: FONTS.fontSize.small,
+                      fontSize: FONTS.size.small,
                       color: '#4c4e55',
                       lineHeight: 15,
                       letterSpacing: 0.06,

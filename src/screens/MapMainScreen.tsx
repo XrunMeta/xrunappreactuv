@@ -2210,7 +2210,7 @@ const styles = StyleSheet.create({
 
   calloutDistance: {
 
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
 
     fontFamily: 'Roboto-Regular',
 
@@ -2234,7 +2234,7 @@ const styles = StyleSheet.create({
 
   calloutBrand: {
 
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
 
     fontFamily: 'Roboto-Medium',
 

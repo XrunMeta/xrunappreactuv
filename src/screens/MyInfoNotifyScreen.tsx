@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -531,17 +531,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   badge: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#000',
   },
   description: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
   },
   eventDate: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     marginTop: 4,
@@ -558,12 +558,12 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     color: '#fff',
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Bold',
   },
   timestamp: {
     marginTop: 8,
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     color: '#7d7e83',
     fontFamily: 'Roboto-Regular',
     textAlign: 'left',
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   dateChipText: {
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#000',
   },
@@ -600,13 +600,13 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   replyText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#10192d',
   },
 
   replyTimestamp: {
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     paddingRight: 0,
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
     minHeight: 24,
@@ -657,14 +657,14 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: '#fff',
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
   },
   deleteAllButton: {
     paddingRight: 16,
   },
   deleteAllText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#ff3b30',
   },

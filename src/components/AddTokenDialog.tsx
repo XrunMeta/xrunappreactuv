@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   tabLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   tokenLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#f8f8f8',
     paddingHorizontal: 16,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   summaryLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#b8b8b8',
   },
   summaryValue: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: FONTS.fontSize.xlarge,
+    fontSize: FONTS.size.xlarge,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   message: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     lineHeight: 28,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   linkText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#4c4e55',
   },

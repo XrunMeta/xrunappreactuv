@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -317,14 +317,14 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   rankHelper: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#d2edf4',
     fontFamily: 'Roboto-Bold',
     marginBottom: 4,
     lineHeight: 20,
   },
   rankEmail: {
-    fontSize: FONTS.fontSize.mmedium,
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
     lineHeight: 22,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rankValue: {
-    fontSize: FONTS.fontSize.xxxlarge,
+    fontSize: FONTS.size.xxxlarge,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

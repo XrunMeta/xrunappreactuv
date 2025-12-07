@@ -102,19 +102,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fallbackLabel: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     fontFamily: 'Roboto-Bold',
   },
   middle: {
     flex: 1,
   },
   title: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#343434',
     fontFamily: 'Roboto-Medium',
   },
   subtitle: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     color: '#979797',
     fontFamily: 'Roboto-Regular',
   },
@@ -122,13 +122,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   timestamp: {
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     color: '#aeaeae',
     fontFamily: 'Roboto-Medium',
     marginBottom: 6,
   },
   amount: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     color: '#363636',
     fontFamily: 'Roboto-Bold',
   },

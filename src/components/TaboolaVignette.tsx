@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ActivityIndicator, Text, Modal, Platform, TouchableOpacity } from 'react-native';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 import {
   getTaboolaPlacement,
   getTaboolaPublisherId,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   placeholderText: {
-    fontSize: SIZES.medium,
+    fontSize: FONTS.size.medium,
     color: COLORS.text,
     opacity: 0.5,
     marginTop: SIZES.medium,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   closeButtonText: {
-    fontSize: SIZES.medium,
+    fontSize: FONTS.size.medium,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },

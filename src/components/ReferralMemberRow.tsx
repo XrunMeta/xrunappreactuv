@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   rank: {
     width: 28,
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   email: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   description: {
     marginTop: 4,
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -107,13 +107,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   date: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#707070',
   },
   value: {
     marginTop: 4,
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

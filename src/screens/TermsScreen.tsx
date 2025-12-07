@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',

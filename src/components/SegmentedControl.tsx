@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ffdc04',
   },
   optionLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   optionLabelActive: {

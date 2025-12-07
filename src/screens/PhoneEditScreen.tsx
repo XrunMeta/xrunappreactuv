@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },

@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   adText: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontWeight: '700',
     color: '#000',
   },
@@ -380,12 +380,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileName: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
   },
   profileEmail: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     marginTop: 4,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
   },
   cardLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111',
   },

@@ -69,18 +69,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   countryName: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',
   },
   isoText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     color: '#8e9bae',
     textTransform: 'uppercase',
     fontFamily: 'Roboto-Regular',
   },
   dialCode: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#1f2933',
     fontFamily: 'Roboto-Bold',
   },

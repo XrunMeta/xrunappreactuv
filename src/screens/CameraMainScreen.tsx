@@ -1484,7 +1484,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     <Text
                       style={{
                         fontFamily: 'Roboto-Medium',
-                        fontSize: FONTS.fontSize.medium,
+                        fontSize: FONTS.size.medium,
                         color: '#4c4e55',
                         lineHeight: 24,
                         marginTop: 20,
@@ -1500,7 +1500,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     <Text
                       style={{
                         fontFamily: 'Roboto-Regular',
-                        fontSize: FONTS.fontSize.small,
+                        fontSize: FONTS.size.small,
                         color: '#4c4e55',
                         lineHeight: 15,
                         letterSpacing: 0.06,
@@ -1542,7 +1542,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   }}>
                   <Text
                     style={{
-                      fontSize: FONTS.fontSize.msmall,
+                      fontSize: FONTS.size.msmall,
                       fontFamily: 'Roboto-Bold',
                       color: '#000000',
                     }}>
@@ -1599,7 +1599,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.log('모달 닫기 버튼 클릭');
             setShowAdModal(false);
           }}>
-          <Text style={{ color: '#FFFFFF', fontSize: FONTS.fontSize.xlarge, fontWeight: 'bold' }}>×</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: FONTS.size.xlarge, fontWeight: 'bold' }}>×</Text>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -1711,14 +1711,14 @@ const styles = StyleSheet.create({
 
   tokenPriceText: {
     color: 'white',
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontWeight: 'bold',
     textAlign: 'center',
   },
 
   tokenDistanceText: {
     color: '#CCCCCC',
-    fontSize: FONTS.fontSize.xxsmall,
+    fontSize: FONTS.size.xxsmall,
     marginTop: -2,
     textAlign: 'center',
   },

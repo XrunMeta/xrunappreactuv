@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderWidth: 5,
   },
   title: {
-    fontSize: FONTS.fontSize.xlarge,
+    fontSize: FONTS.size.xlarge,
     lineHeight: 28,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   permissionText: {
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
     lineHeight: 22,
     color: '#ffffff',
     textAlign: 'center',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   permissionButtonText: {
     color: '#ffffff',
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
     fontFamily: 'Roboto-Medium',
   },
 

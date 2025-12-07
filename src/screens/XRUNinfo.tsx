@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     height: 115,
   },
   title: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     fontWeight: '500',
     lineHeight: 24,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   description: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     lineHeight: 24,

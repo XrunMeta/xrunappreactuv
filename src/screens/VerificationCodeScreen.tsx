@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   description: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     lineHeight: 24,
     color: '#747474',
     fontFamily: 'Roboto-Regular',
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   codeText: {
-    fontSize: FONTS.fontSize.large,
+    fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   resendText: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     lineHeight: 24,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',

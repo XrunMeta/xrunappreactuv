@@ -439,18 +439,18 @@ const styles = StyleSheet.create({
     borderRadius: 70,
   },
   summaryLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#E6E6E6',
     fontFamily: 'Roboto-SemiBold',
   },
   summaryValue: {
-    fontSize: FONTS.fontSize.xxxlarge,
+    fontSize: FONTS.size.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: '#FFFFFF',
     marginTop: 8,
   },
   summaryExtra: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     color: '#FFFFFF',
     opacity: 0.8,
     marginTop: 4,
@@ -489,12 +489,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   adCardStatus: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   adCardDate: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
@@ -504,12 +504,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   adCardRowLabel: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
   adCardRowAmount: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     fontFamily: 'Roboto-SemiBold',
   },
   homeIndicator: {

@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     color: '#9ca3af',
     marginBottom: 8,
     fontFamily: 'Roboto-Medium',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   flagEmoji: {
-    fontSize: FONTS.fontSize.xlarge,
+    fontSize: FONTS.size.xlarge,
   },
   currentInfo: {
     flexDirection: 'row',
@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   currentCountry: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: COLORS.headerText,
   },
   currentDial: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: COLORS.buttonPrimary,
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
     fontFamily: 'Roboto-Medium',
     color: COLORS.headerText,
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
     color: '#9ca3af',
     fontFamily: 'Roboto-Regular',
   },

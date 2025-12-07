@@ -227,19 +227,19 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   balanceLabel: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
     marginBottom: 8,
   },
   balanceValue: {
-    fontSize: FONTS.fontSize.xxxlarge,
+    fontSize: FONTS.size.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
     lineHeight: 48,
   },
   balanceToken: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#10192d',
   },
@@ -253,13 +253,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardLabel: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 6,
   },
   cardValue: {
-    fontSize: FONTS.fontSize.medium,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     lineHeight: 22,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   progressText: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },

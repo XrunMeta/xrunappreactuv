@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     ...COMMON_STYLES.bottomButtonContainer,
   },
   termsText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.06,
   },
   linkText: {
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
   },
   devLinksTitle: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     color: '#10192d',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   devLinkText: {
-    fontSize: FONTS.fontSize.xsmall,
+    fontSize: FONTS.size.xsmall,
     fontFamily: 'Roboto-Regular',
     color: COLORS.buttonPrimary,
   },

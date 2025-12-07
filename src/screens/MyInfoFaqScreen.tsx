@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   question: {
     flex: 1,
-    fontSize: FONTS.fontSize.lsmall,
+    fontSize: FONTS.size.lsmall,
     fontFamily: 'Roboto-Medium',
     color: '#111827',
     marginRight: 12,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.small,
   },
   answer: {
-    fontSize: FONTS.fontSize.msmall,
+    fontSize: FONTS.size.msmall,
     lineHeight: 20,
     color: '#4b5563',
     fontFamily: 'Roboto-Regular',

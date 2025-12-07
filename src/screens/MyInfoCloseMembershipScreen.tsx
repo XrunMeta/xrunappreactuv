@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   helperText: {
     marginTop: 8,
-    fontSize: FONTS.fontSize.small,
+    fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#747474',
     fontFamily: 'Roboto-Regular',

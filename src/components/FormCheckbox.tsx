@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: FONTS.fontSize.ssmall,
+    fontSize: FONTS.size.ssmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
   },
