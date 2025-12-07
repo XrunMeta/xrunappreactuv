@@ -232,7 +232,6 @@ export const ReferralSettlementScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
-      <StatusBar style="dark" />
       <Header title={t('screens.referralSettlement.title')} />
       <View style={styles.content}>
         <ReferralStatsCard
@@ -319,12 +318,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SIZES.medium,
     paddingVertical: SIZES.large,
-    borderRadius: 4,
+    borderRadius: SIZES.small,
     backgroundColor: '#FFFFFF',
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: SIZES.small,
     elevation: 2,
     borderWidth: 1,
     borderColor: '#ededed',

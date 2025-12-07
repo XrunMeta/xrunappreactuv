@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, FONTS } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -71,9 +71,7 @@ export const ReferralStatsCard: React.FC<ReferralStatsCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    width: '100%',
-    maxWidth: 780,
-    borderRadius: 28,
+    borderRadius: SIZES.medium,
     shadowColor: '#6366F1',
     shadowOffset: { width: 0, height: 16 },
     shadowOpacity: 0.25,
@@ -84,7 +82,7 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    borderRadius: 28,
+    borderRadius: SIZES.medium,
     position: 'relative',
   },
   backgroundIcon: {

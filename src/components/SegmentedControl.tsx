@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { FONTS } from '../constants';
+import { FONTS, SIZES } from '../constants';
 
 interface SegmentedControlOption<T extends string> {
   label: string;
@@ -53,14 +53,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#ebeff5',
     borderWidth: 1,
     borderColor: '#dfe3eb',
-    borderRadius: 8,
+    borderRadius: SIZES.small,
     padding: 4,
     gap: 8,
   },
   optionWrapper: {
     flex: 1,
     height: 40,
-    borderRadius: 8,
+    borderRadius: SIZES.small,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowRadius: SIZES.small,
     elevation: 2,
   },
   optionActiveWithIndicator: {
