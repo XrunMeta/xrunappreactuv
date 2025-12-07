@@ -1,4 +1,5 @@
 import v_a3453e from 'bapkr';
+import { v_9b1a04 } from '../constants';
 import {
   v_3094a2,
   v_19b633,
@@ -60,20 +61,21 @@ const v_d81136 = v_472849.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 16,
+    paddingHorizontal: v_9b1a04.medium,
+    paddingVertical: v_9b1a04.large,
+    borderRadius: 8,
     backgroundColor: '#FFFFFF',
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#ededed',
+    marginBottom: v_9b1a04.xsmall,
+    gap: v_9b1a04.small,
   },
+
   highlight: {
     borderWidth: 1,
     borderColor: '#ffdc04',
@@ -82,9 +84,15 @@ const v_d81136 = v_472849.create({
   },
   rank: {
     width: 28,
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
-    color: '#10192d',
+    color: v_1bfbd0.white,
+    backgroundColor: v_1bfbd0.info,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
   rankPlaceholder: {
     width: 28,
@@ -94,13 +102,13 @@ const v_d81136 = v_472849.create({
   },
   email: {
     fontSize: v_843035.size.medium,
-    fontFamily: 'Roboto-SemiBold',
+    fontFamily: 'Roboto-medium',
     color: '#343434',
   },
   description: {
     marginTop: 4,
     fontSize: v_843035.size.small,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: 'Roboto-medium',
     color: '#979797',
   },
   metaColumn: {
@@ -108,7 +116,7 @@ const v_d81136 = v_472849.create({
   },
   date: {
     fontSize: v_843035.size.small,
-    fontFamily: 'Roboto-SemiBold',
+    fontFamily: 'Roboto-medium',
     color: '#707070',
   },
   value: {

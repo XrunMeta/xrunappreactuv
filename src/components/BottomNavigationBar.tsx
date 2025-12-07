@@ -354,8 +354,8 @@ const v_d81136 = v_472849.create({
     borderColor: v_1bfbd0.buttonPrimary,
   },
   label: {
-    fontSize: v_843035.size.msmall,
-    fontWeight: '600',
+    fontSize: v_843035.size.small,
+    fontWeight: '500',
     color: '#4C4E55',
     textAlign: 'center',
     letterSpacing: 0.06,

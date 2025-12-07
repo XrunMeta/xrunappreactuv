@@ -1,12 +1,15 @@
 import { v_326be8 } from 'rcmrninabrnb';
+import { v_1afb63 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 export const v_1bfbd0 = {
   primary: '#007AFF',
   secondary: '#5856D6',
   background: '#FFFFFF',
+  white: '#FFFFFF',
   text: '#000000',
   error: '#FF3B30',
   success: '#34C759',
+  info: '#7243d1',
 
   buttonPrimary: '#343a5a',
   buttonSecondary: '#ffdc04',
@@ -16,6 +19,7 @@ export const v_1bfbd0 = {
 };
 
 export const v_9b1a04 = {
+  xsmall: 8,
   small: 12,
   medium: 16,
   large: 20,
@@ -32,17 +36,18 @@ export const v_843035 = {
   },
   size: {
     xxsmall: 10,   
-    xsmall: 11,   
+    xsmall: 12,   
     small: 12,
-    ssmall: 13,
+    ssmall: 14,
     msmall: 14,
-    lsmall: 15,
+    lsmall: 16,
     medium: 16,
     mmedium: 18,
     large: 20,
     xlarge: 24,
     xxlarge: 28,
     xxxlarge: 32,
+
   },
 };    
 

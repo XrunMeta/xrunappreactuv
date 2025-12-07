@@ -184,7 +184,7 @@ export const v_58584a = () => {
   };
 
   return (
-    <SafeView style={v_d81136.container}>
+    <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
       <Header
         title={v_8d41d7('screens.referralMyGroup.title')}
         rightComponent={

@@ -8,8 +8,9 @@ import {
   v_07a341,
   v_7e4944,
   v_961e77,
+  v_39a996,
 } from 'rcmrninabrnb';
-import { v_1bfbd0, v_843035 } from '../constants';
+import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
 
 export interface ShopItemCardProps {
   title: string;
@@ -34,10 +35,12 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
 }) => {
   const [v_e3c18f, v_e6d26a] = v_5ab095(false);
   const [v_f904ba, v_0cc1b6] = v_5ab095(false);
+  const [v_cd31a8, v_deef62] = v_5ab095(false);
 
   v_a3453e.useEffect(() => {
     if (typeof v_c322f7 === 'object' && 'uri' in v_c322f7) {
       v_0cc1b6(true);
+      v_deef62(true);
     }
   }, [v_c322f7]);
 
@@ -52,39 +55,46 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
       disabled={!v_719eed}
     >
       <View style={v_d81136.logoWrapper}>
-        <Image
-          source={v_a4d130}
-          style={v_d81136.logo}
-          resizeMode="contain"
-          onError={() => {
-            console.log('[ShopItemCard] 이미지 로딩 실패:', v_f904ba ? (v_c322f7 as { uri: string }).uri : 'local');
-            v_e6d26a(true);
-          }}
-        />
+        {v_cd31a8 && !v_e3c18f && v_f904ba ? (
+          <ActivityIndicator size="small" color={v_1bfbd0.primary} />
+        ) : (
+          <Image
+            source={v_a4d130}
+            style={v_d81136.logo}
+            resizeMode="contain"
+            onError={() => {
+              console.log('[ShopItemCard] 이미지 로딩 실패:', v_f904ba ? (v_c322f7 as { uri: string }).uri : 'local');
+              v_e6d26a(true);
+              v_deef62(false);
+            }}
+            onLoad={() => {
+              v_deef62(false);
+            }}
+          />
+        )}
       </View>
+
       <View style={v_d81136.infoWrapper}>
         <Text style={v_d81136.title}>{v_9f1622}</Text>
         {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
-        <Text style={v_d81136.price}>{v_5b0162}</Text>
+        {v_5b0162 ? <Text style={v_d81136.price}>{v_5b0162}</Text> : null}
+        {v_63f02c ? (
+          <Text style={[v_d81136.quantity, v_ca637d ? { color: v_ca637d } : null]}>
+            {v_63f02c}
+          </Text>
+        ) : null}
       </View>
-      {v_63f02c ? (
-        <Text style={[v_d81136.quantity, v_ca637d ? { color: v_ca637d } : null]}>
-          {v_63f02c}
-        </Text>
-      ) : null}
+
     </TouchableOpacity>
   );
 };
 
 const v_d81136 = v_472849.create({
   card: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
     borderRadius: 18,
     backgroundColor: v_1bfbd0.background,
     flexDirection: 'row',
-    padding: 16,
+    padding: v_9b1a04.medium,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
     shadowColor: '#00000014',
@@ -92,11 +102,10 @@ const v_d81136 = v_472849.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    marginBottom: 16,
+    marginBottom: v_9b1a04.small,
   },
   logoWrapper: {
     width: 64,
-    height: 64,
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
@@ -110,30 +119,31 @@ const v_d81136 = v_472849.create({
     height: 32,
   },
   infoWrapper: {
-    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 4,
   },
   title: {
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
-    marginBottom: 4,
   },
   price: {
     fontSize: v_843035.size.medium,
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
+    height: 'auto',
   },
   quantity: {
-    fontSize: v_843035.size.medium,
-    fontFamily: 'Roboto-Bold',
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
-    alignSelf: 'center',
   },
 });
 

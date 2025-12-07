@@ -189,7 +189,7 @@ export const v_052a8a = () => {
   };
 
   return (
-    <SafeView style={v_d81136.container}>
+    <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.shop.title')} />
       {v_683210 ? (
@@ -217,7 +217,7 @@ export const v_052a8a = () => {
               style={v_d81136.searchInput}
             />
           </View>
-          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
+          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
             {v_2aaa7b.length > 0 ? (
               v_2aaa7b.map((v_8c0b26) => {
 
@@ -297,7 +297,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 14,
     borderWidth: 0.5,
     borderColor: '#d5dde0',
-    backgroundColor: '#f7f8f9',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 20,

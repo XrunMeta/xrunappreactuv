@@ -213,18 +213,18 @@ export const v_08aac3 = () => {
     return (
       <View style={v_d81136.listItem}>
         <View style={v_d81136.listItemRow}>
-          <Text style={v_d81136.refTypeText}>{v_8c0b26.type}</Text>
-          <Text style={v_d81136.dateText}>{v_8c0b26.date}</Text>
-        </View>
-        <View style={v_d81136.listItemRow}>
-          <Text
+          {v_8c0b26.type ? <Text style={v_d81136.refTypeText}>{v_8c0b26.type}</Text> : <Text style={v_d81136.refTypeText}>TYPE</Text>}
+          {v_8c0b26.description ? <Text
             style={[v_d81136.descriptionText, { flex: 1, marginRight: 10 }]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {v_8c0b26.description}
-          </Text>
-          <Text style={v_d81136.amountText}>{v_8c0b26.amount}</Text>
+          </Text> : null}
+        </View>
+        <View style={v_d81136.listItemRow2}>
+          {v_8c0b26.date ? <Text style={v_d81136.dateText}>{v_8c0b26.date}</Text> : null}
+          {v_8c0b26.amount ? <Text style={v_d81136.amountText}>{v_8c0b26.amount}</Text> : null}
         </View>
       </View>
     );
@@ -296,6 +296,7 @@ const v_d81136 = v_472849.create({
   },
   listContainer: {
     flex: 1,
+
   },
   loadingContainer: {
     flex: 1,
@@ -315,32 +316,43 @@ const v_d81136 = v_472849.create({
     color: '#7d7e83',
   },
   listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: v_9b1a04.medium,
+    paddingVertical: v_9b1a04.large,
+    borderRadius: 4,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 14,
     shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
-    flexDirection: 'column',
-    gap: 20,
+    borderWidth: 1,
+    borderColor: '#ededed',
+    marginBottom: v_9b1a04.xsmall,
   },
   listItemRow: {
     flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
+    flexDirection: 'column',
+  },
+  listItemRow2: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
   refTypeText: {
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-SemiBold',
-    color: '#343434',
+    color: v_1bfbd0.white,
+    width: 'auto',
+    backgroundColor: v_1bfbd0.info,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 4,
   },
   dateText: {
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
@@ -350,12 +362,11 @@ const v_d81136 = v_472849.create({
     color: '#343434',
   },
   amountText: {
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
-    color: '#1f6880',
+    color: v_1bfbd0.buttonPrimary,
   },
   loadingMoreContainer: {
     paddingVertical: 16,
-    alignItems: 'center',
   },
 });
