@@ -23,6 +23,7 @@ export { default as transactionDetails } from './transactionDetails';
 export { default as myInfo } from './myInfo';
 export { default as myInfoEdit } from './myInfoEdit';
 export { default as myInfoEmailAuth } from './myInfoEmailAuth';
+export { default as changePassword } from './changePassword';
 export { default as myInfoSettings } from './myInfoSettings';
 export { default as myInfoNotify } from './myInfoNotify';
 export { default as myInfoClauses } from './myInfoClauses';
