@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ViewStyle, StyleProp } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { useHeaderDimensions } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { FONTS } from '../constants';
-const { width } = Dimensions.get('window');
 
 interface HeaderProps {
   title: string;
@@ -81,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: width,
+    width: '100%',
 
     backgroundColor: COLORS.background,
     shadowColor: '#000',

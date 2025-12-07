@@ -114,6 +114,7 @@ export const WalletReceiveScreen = () => {
         contentContainerStyle={styles.scrollContent}
         backgroundColor="transparent"
         showsVerticalScrollIndicator={false}
+        showBottomBackground={false}
       >
         {}
         <View style={styles.topSection}>

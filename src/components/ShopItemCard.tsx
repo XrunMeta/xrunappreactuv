@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     height: 32,
   },
   infoWrapper: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -128,6 +129,8 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   subtitle: {
     fontSize: FONTS.size.small,
