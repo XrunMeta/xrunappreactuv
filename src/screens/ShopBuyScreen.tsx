@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, ActivityIndicator } from 'react-native';
-import { SafeScrollView } from '../components';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Linking, Image, ImageSourcePropType, ActivityIndicator, Platform } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
@@ -8,9 +8,10 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShopItemData } from '../types';
-import { getUserBalance, purchaseXrunItem } from '../services';
+import { getUserBalance, purchaseXrunItem, sendInAppPurchase } from '../services';
 import { formatCurrency, formatXrunAmount } from '../utils';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
+import * as IAP from 'expo-iap';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -21,6 +22,10 @@ export const ShopBuyScreen = () => {
   const [userBalance, setUserBalance] = useState<number | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+
+  const [iapProduct, setIapProduct] = useState<any>(null);
+  const [isLoadingIap, setIsLoadingIap] = useState(false);
+  const [iapError, setIapError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -69,6 +74,59 @@ export const ShopBuyScreen = () => {
     }
   }, [memberId, checkUserBalance]);
 
+  const fetchIapProduct = useCallback(async (sku: string) => {
+    if (!sku || sku.trim() === '') {
+      setIapProduct(null);
+      return;
+    }
+
+    try {
+      setIsLoadingIap(true);
+      setIapError(null);
+      console.log('[구매] IAP 제품 정보 가져오기:', sku);
+
+      try {
+        await IAP.initConnection();
+        console.log('[구매] IAP 연결 성공');
+      } catch (connectionError: any) {
+        console.error('[구매] IAP 연결 실패:', connectionError);
+        setIapError('인앱 구매 서비스에 연결할 수 없습니다.');
+        setIapProduct(null);
+        return;
+      }
+
+      const products = await IAP.fetchProducts({
+        skus: [sku],
+        type: 'in-app',
+      });
+
+      console.log('[구매] IAP 제품 정보 응답:', JSON.stringify(products, null, 2));
+
+      if (products && products.length > 0) {
+        setIapProduct(products[0]);
+        setIapError(null);
+        console.log('[구매] IAP 제품 설정 완료:', products[0]);
+      } else {
+        console.log('[구매] IAP 제품을 찾을 수 없음:', sku);
+        setIapProduct(null);
+        setIapError('이 상품은 현재 구매할 수 없습니다.');
+      }
+    } catch (error: any) {
+      console.error('[구매] IAP 제품 정보 가져오기 오류:', error);
+      setIapProduct(null);
+      setIapError(error?.message || '상품 정보를 가져올 수 없습니다.');
+    } finally {
+      setIsLoadingIap(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const item = selectedShopItem as unknown as ShopItemData;
+    if (item?.sku && item.sku.trim() !== '') {
+      fetchIapProduct(item.sku);
+    }
+  }, [selectedShopItem, fetchIapProduct]);
+
   useEffect(() => {
     if (!selectedShopItem) {
       console.log('[구매] 선택된 아이템이 없습니다.');
@@ -95,7 +153,91 @@ export const ShopBuyScreen = () => {
 
       if (hasSku) {
 
-        await showAlert(t('screens.shopBuy.alerts.notification'), t('screens.shopBuy.alerts.inAppPurchaseComingSoon'));
+        console.log('========================================');
+        console.log('[구매] === IAP 인앱 구매 시작 ===');
+        console.log('========================================');
+        console.log('[구매] 상품 ID:', item.sku);
+        console.log('[구매] 사용자 번호:', memberId);
+        console.log('[구매] 플랫폼:', Platform.OS);
+
+        if (!iapProduct) {
+          console.log('[구매] IAP 제품 정보가 없습니다. 다시 가져오기...');
+          await fetchIapProduct(item.sku);
+
+          if (!iapProduct) {
+            await showAlert(
+              t('screens.shopBuy.alerts.error'),
+              '인앱 구매 상품 정보를 가져올 수 없습니다.',
+            );
+            setIsPurchasing(false);
+            return;
+          }
+        }
+
+        console.log('[구매] IAP 제품 정보:', JSON.stringify(iapProduct, null, 2));
+
+        console.log('[구매] IAP 구매 요청 중...');
+        const purchase = await IAP.requestPurchase({
+          request: {
+            ios: { sku: item.sku },
+            android: { skus: [item.sku] },
+          },
+          type: 'in-app',
+        });
+
+        console.log('========================================');
+        console.log('[구매] ✅ IAP 구매 완료!');
+        console.log('========================================');
+        console.log('[구매] 구매 응답:', JSON.stringify(purchase, null, 2));
+
+        const purchaseDataArray = Array.isArray(purchase) ? purchase : [purchase];
+
+        const apiPayload = {
+          memberId: memberId,
+          productId: item.sku,
+          platform: Platform.OS as 'android' | 'ios',
+          purchaseData: purchaseDataArray,
+          purchaseTime: new Date().toISOString(),
+          item: item.item?.toString() || '', 
+        };
+
+        console.log('[구매] 서버로 구매 데이터 전송 중...');
+        console.log('[구매] API 페이로드:', JSON.stringify(apiPayload, null, 2));
+
+        const apiResponse = await sendInAppPurchase(apiPayload, navigate);
+
+        console.log('[구매] API 응답:', JSON.stringify(apiResponse, null, 2));
+
+        if (apiResponse.status === 'success') {
+
+          const savedCount = apiResponse.data?.savedCount ?? 0;
+          const responseData = apiResponse.data as { savedCount?: number; saved?: boolean; reason?: string } | undefined;
+          const isSaved = responseData?.saved !== false; 
+
+          if (savedCount > 0 || isSaved) {
+
+            console.log('[구매] ✅ 구매 완료 및 서버 저장 성공');
+            navigate(ROUTES.shopSuccess);
+          } else {
+
+            console.log('[구매] ⚠️ 구매 데이터가 저장되지 않음:', apiResponse.data?.reason);
+            await showAlert(
+              '구매 확인 필요',
+              '결제가 완료되지 않았습니다. 다시 시도해주세요.',
+              [{ text: '확인' }],
+            );
+
+          }
+        } else {
+          console.log('[구매] ⚠️ 서버 전송 실패:', apiResponse.message);
+          await showAlert(
+            '서버 오류',
+            apiResponse.message || '서버 전송 중 오류가 발생했습니다.',
+            [{ text: '확인' }],
+          );
+
+        }
+
         setIsPurchasing(false);
         return;
       }
@@ -148,11 +290,19 @@ export const ShopBuyScreen = () => {
     } catch (error: any) {
       console.error('[구매] === 구매 오류 ===');
       console.error('[구매] 구매 오류:', error);
-      await showAlert(
-        t('screens.shopBuy.alerts.purchaseFailed'),
-        error.message || t('screens.shopBuy.alerts.purchaseFailedMessage'),
-        [{ text: t('screens.shopBuy.confirm') }],
-      );
+      console.error('[구매] 오류 메시지:', error?.message);
+      console.error('[구매] 오류 코드:', error?.code);
+
+      if (error?.code === 'E_USER_CANCELLED' || error?.message?.includes('cancel')) {
+        console.log('[구매] 사용자가 구매를 취소했습니다.');
+
+      } else {
+        await showAlert(
+          t('screens.shopBuy.alerts.purchaseFailed'),
+          error.message || t('screens.shopBuy.alerts.purchaseFailedMessage'),
+          [{ text: t('screens.shopBuy.confirm') }],
+        );
+      }
     } finally {
       setIsPurchasing(false);
     }
@@ -180,13 +330,17 @@ export const ShopBuyScreen = () => {
   const totalXrun = item.totalPrice?.coin || 0;
   const totalGtkrPrice = item.totalPrice?.gtkrPrice || totalXrun;
 
-  const isInsufficientBalance = userBalance !== null && userBalance < totalXrun;
+  const isInsufficientBalance = !hasSku && userBalance !== null && userBalance < totalXrun;
+
+  const isIapNotReady = hasSku && (isLoadingIap || !iapProduct || !!iapError);
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
       <Header title={t('screens.shop.title')} onBackPress={goBack} showBackButton />
-      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.detailCard}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.wrapper}>
+          <View style={styles.detailCard}>
           <Image source={imageSource} style={styles.itemImage} resizeMode="contain" />
           <Text style={styles.itemTitle}>{item.title || ''}</Text>
 
@@ -203,10 +357,36 @@ export const ShopBuyScreen = () => {
           <View style={styles.priceContainer}>
             {hasSku ? (
 
-              <View style={styles.row}>
-                <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
-                <Text style={styles.value}>{t('screens.shopBuy.inAppPurchaseComingSoon')}</Text>
-              </View>
+              <>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
+                  <Text style={[styles.value, iapError && styles.errorValue]}>
+                    {isLoadingIap ? (
+                      'Loading...'
+                    ) : iapProduct ? (
+                      iapProduct.localizedPrice || iapProduct.price || formatCurrency(priceKRW, 'KRW')
+                    ) : iapError ? (
+                      '구매 불가'
+                    ) : (
+                      formatCurrency(priceKRW, 'KRW')
+                    )}
+                  </Text>
+                </View>
+                {iapProduct && !iapError && (
+                  <View style={styles.iapInfoContainer}>
+                    <Text style={styles.iapInfoText}>
+                      인앱 구매 상품
+                    </Text>
+                  </View>
+                )}
+                {}
+                {iapError && !isLoadingIap && (
+                  <View style={styles.iapErrorContainer}>
+                    <Text style={styles.iapErrorIcon}>⚠️</Text>
+                    <Text style={styles.iapErrorText}>{iapError}</Text>
+                  </View>
+                )}
+              </>
             ) : (
 
               <>
@@ -274,29 +454,40 @@ export const ShopBuyScreen = () => {
             style={[
               styles.button,
               styles.primaryButton,
-              (isPurchasing || isInsufficientBalance) && styles.disabledButton,
+              (isPurchasing || isInsufficientBalance || isIapNotReady) && styles.disabledButton,
             ]}
             onPress={handlePurchase}
-            disabled={isPurchasing || isInsufficientBalance}
+            disabled={isPurchasing || isInsufficientBalance || Boolean(isIapNotReady)}
           >
             {isPurchasing ? (
               <ActivityIndicator size="small" color="#fff" />
+            ) : isLoadingIap ? (
+              <Text style={styles.primaryText}>Loading...</Text>
             ) : (
               <Text style={styles.primaryText}>{t('screens.shopBuy.payment')}</Text>
             )}
           </TouchableOpacity>
         </View>
-      </SafeScrollView>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    ...COMMON_STYLES.container,
+    flex: 1,
+    backgroundColor: '#f7f7fb',
   },
   scrollContent: {
-    ...COMMON_STYLES.scrollContent,
+    paddingBottom: 32,
+  },
+  wrapper: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
   detailCard: {
     borderRadius: 20,
@@ -412,5 +603,46 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
+  },
+
+  iapInfoContainer: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#007aff',
+  },
+  iapInfoText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#007aff',
+    textAlign: 'center',
+  },
+
+  iapErrorContainer: {
+    backgroundColor: '#fff5f5',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#dc3545',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iapErrorIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  iapErrorText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#dc3545',
+    flex: 1,
+  },
+  errorValue: {
+    color: '#dc3545',
   },
 });
