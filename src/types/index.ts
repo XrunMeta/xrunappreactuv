@@ -1027,7 +1027,10 @@ export interface TransactionHistoryResponse {
 export interface ADXRUNEstimateItem {
   id: string | number;
   created_at?: string;
+  datetime?: string; 
   priceasXrun?: string;
+  amountasxrun?: string; 
+  transaction?: string | number; 
   [key: string]: any;
 }
 
