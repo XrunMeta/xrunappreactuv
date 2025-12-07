@@ -6,6 +6,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_d7d5a2 } from '../services';
+import { v_a61db3 } from '../constants';
 
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 
@@ -60,7 +61,7 @@ export const v_865e57 = () => {
   };
 
   return (
-    <SafeView style={v_d81136.container}>
+    <SafeView style={v_d81136.container} backgroundColor={"#f7f7fb"}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.myInfoCloseMembershipSuccess.title')} showBackButton={false} />
       <View style={v_d81136.overlay}>
@@ -81,8 +82,7 @@ export const v_865e57 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...v_a61db3.container,
   },
   overlay: {
     flex: 1,

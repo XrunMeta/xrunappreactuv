@@ -8,7 +8,7 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_368e80, v_570c34 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_a61db3 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_8025d1 } from '../services';
@@ -81,30 +81,28 @@ export const v_dec378 = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={v_d81136.formWrapper}>
-          <FormField
-            label={v_8d41d7('screens.myInfoEmailAuth.emailLabel')}
-            value={v_e0c7e8}
-            onChangeText={v_fedf34}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            placeholder={v_8d41d7('screens.myInfoEmailAuth.emailPlaceholder')}
-            containerStyle={v_d81136.fieldContainer}
-            rightAccessory={
-              <TouchableOpacity
-                style={v_d81136.inlineButton}
-                onPress={v_d23445}
-                disabled={v_5e23ec}
-                activeOpacity={0.7}
-              >
-                <Text style={v_d81136.inlineButtonText}>
-                  {v_5e23ec ? v_8d41d7('screens.myInfoEmailAuth.sending') : v_8d41d7('screens.myInfoEmailAuth.sendButton')}
-                </Text>
-              </TouchableOpacity>
-            }
-          />
-        </View>
+        <FormField
+          label={v_8d41d7('screens.myInfoEmailAuth.emailLabel')}
+          value={v_e0c7e8}
+          onChangeText={v_fedf34}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          placeholder={v_8d41d7('screens.myInfoEmailAuth.emailPlaceholder')}
+          containerStyle={v_d81136.fieldContainer}
+          rightAccessory={
+            <TouchableOpacity
+              style={v_d81136.inlineButton}
+              onPress={v_d23445}
+              disabled={v_5e23ec}
+              activeOpacity={0.7}
+            >
+              <Text style={v_d81136.inlineButtonText}>
+                {v_5e23ec ? v_8d41d7('screens.myInfoEmailAuth.sending') : v_8d41d7('screens.myInfoEmailAuth.sendButton')}
+              </Text>
+            </TouchableOpacity>
+          }
+        />
 
       </SafeScrollView>
     </View>
@@ -113,19 +111,11 @@ export const v_dec378 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
-  },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...v_a61db3.scrollContent,
   },
   fieldContainer: {
     marginBottom: 32,

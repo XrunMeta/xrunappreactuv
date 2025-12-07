@@ -50,8 +50,7 @@ export const v_41dfd5 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
     ...v_a61db3.scrollContent,

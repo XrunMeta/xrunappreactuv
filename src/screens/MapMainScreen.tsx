@@ -28,7 +28,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 import { v_772971 } from 'jmpfvteuuztnp';
 
-import { v_f4e704, v_a77ce6 } from '../components';
+import { v_f4e704, v_a77ce6, v_556baf } from '../components';
 
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -43,6 +43,7 @@ import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
+import { v_a61db3 } from '../constants';
 
 interface LocationData {
 
@@ -422,61 +423,61 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       const v_958ad1 = v_f6123d?.data && Array.isArray(v_f6123d.data)
         ? v_f6123d.data
-            .slice(0, Math.random() < 0.5 ? 1 : 2)
-            .map((v_8c0b26, v_a56041, v_09228c) => {
+          .slice(0, Math.random() < 0.5 ? 1 : 2)
+          .map((v_8c0b26, v_a56041, v_09228c) => {
 
-              if (v_09228c.length === 2 && v_a56041 === 1) {
-                return {
-                  ...v_8c0b26,
-                  coin: 1,
-                  lat: 0,
-                  lng: 0,
-                  title: v_8c0b26.title,
-                  distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-                  advertisement: v_8c0b26.advertisement,
-                  coins: v_8c0b26.coins,
-                  iconurl: v_8c0b26.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                  joindesc: v_8c0b26.joindesc || '가상 코인 설명',
-                  name: v_8c0b26.name || v_8c0b26.title || v_8c0b26.brand,
-                  campid: v_8c0b26.campid || v_8c0b26.campId || '',
-                  xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
-                };
-              }
+            if (v_09228c.length === 2 && v_a56041 === 1) {
               return {
                 ...v_8c0b26,
-                currency: 18,
+                coin: 1,
                 lat: 0,
                 lng: 0,
                 title: v_8c0b26.title,
                 distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-                coins: v_8f5869,
-                advertisement: 672,
+                advertisement: v_8c0b26.advertisement,
+                coins: v_8c0b26.coins,
                 iconurl: v_8c0b26.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                joindesc: v_8c0b26.joindesc || 'Virtual coin description',
+                joindesc: v_8c0b26.joindesc || '가상 코인 설명',
                 name: v_8c0b26.name || v_8c0b26.title || v_8c0b26.brand,
                 campid: v_8c0b26.campid || v_8c0b26.campId || '',
                 xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
               };
-            })
+            }
+            return {
+              ...v_8c0b26,
+              currency: 18,
+              lat: 0,
+              lng: 0,
+              title: v_8c0b26.title,
+              distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+              coins: v_8f5869,
+              advertisement: 672,
+              iconurl: v_8c0b26.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+              joindesc: v_8c0b26.joindesc || 'Virtual coin description',
+              name: v_8c0b26.name || v_8c0b26.title || v_8c0b26.brand,
+              campid: v_8c0b26.campid || v_8c0b26.campId || '',
+              xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+            };
+          })
         : [];
 
       let v_b9ce93 = v_ee8180?.data && Array.isArray(v_ee8180.data)
         ? v_ee8180.data.map((v_8c0b26) => ({
-            lat: v_8c0b26.lat,
-            lng: v_8c0b26.lng,
-            title: v_8c0b26.title,
-            distance: v_8c0b26.distance,
-            coins: v_8c0b26.coins,
-            coin: v_8c0b26.coin,
-            advertisement: v_8c0b26.advertisement,
-            iconurl: v_8c0b26.iconurl,
-            joindesc: v_8c0b26.joindesc,
-            name: v_8c0b26.name,
-            campid: v_8c0b26.campid,
-            xrunprice: v_8c0b26.xrunprice,
-            xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
-            brand: v_8c0b26.brand,
-          }))
+          lat: v_8c0b26.lat,
+          lng: v_8c0b26.lng,
+          title: v_8c0b26.title,
+          distance: v_8c0b26.distance,
+          coins: v_8c0b26.coins,
+          coin: v_8c0b26.coin,
+          advertisement: v_8c0b26.advertisement,
+          iconurl: v_8c0b26.iconurl,
+          joindesc: v_8c0b26.joindesc,
+          name: v_8c0b26.name,
+          campid: v_8c0b26.campid,
+          xrunprice: v_8c0b26.xrunprice,
+          xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
+          brand: v_8c0b26.brand,
+        }))
         : [];
 
       const v_2876a4 = [...v_958ad1, ...v_b9ce93];
@@ -696,7 +697,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     const v_dcebe9 = Date.now();
 
-    const v_f69ae0 = 
+    const v_f69ae0 =
 
       Math.abs(v_7dd198.latitude - v_5a477d.latitude) > 0.0001 ||
 
@@ -866,13 +867,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         await v_e84827.setItem('selfCoordinate', JSON.stringify(v_4a8217));
 
-        if (!v_c19838 || 
+        if (!v_c19838 ||
 
-            (v_b8d9d3 && 
+          (v_b8d9d3 &&
 
-             v_b8d9d3.latitude === v_4a8217.latitude && 
+            v_b8d9d3.latitude === v_4a8217.latitude &&
 
-             v_b8d9d3.longitude === v_4a8217.longitude)) {
+            v_b8d9d3.longitude === v_4a8217.longitude)) {
 
           await v_524200(v_4a8217);
 
@@ -896,57 +897,59 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
             [
 
-              { text: '기본 위치 사용', onPress: async () => {
+              {
+                text: '기본 위치 사용', onPress: async () => {
 
-                const v_3a1065 = {
+                  const v_3a1065 = {
 
-                  latitude: 37.5665,
+                    latitude: 37.5665,
 
-                  longitude: 126.9780,
+                    longitude: 126.9780,
 
-                };
+                  };
 
-                v_0326b2(v_3a1065);
+                  v_0326b2(v_3a1065);
 
-                const v_6ffbdc = {
-
-                  latitude: v_3a1065.latitude,
-
-                  longitude: v_3a1065.longitude,
-
-                  latitudeDelta: 0.01,
-
-                  longitudeDelta: 0.01,
-
-                };
-
-                v_ed2516(v_6ffbdc);
-
-                v_de148f.current = v_6ffbdc;
-
-                if (!v_c19838) {
-
-                  v_b6ebe9(v_3a1065);
-
-                  v_c84980(v_3a1065);
-
-                  v_c38114.current = v_3a1065;
-
-                  v_a2b40c.current = v_3a1065;
-
-                  v_c675cc.current = {
+                  const v_6ffbdc = {
 
                     latitude: v_3a1065.latitude,
 
                     longitude: v_3a1065.longitude,
 
+                    latitudeDelta: 0.01,
+
+                    longitudeDelta: 0.01,
+
                   };
 
+                  v_ed2516(v_6ffbdc);
+
+                  v_de148f.current = v_6ffbdc;
+
+                  if (!v_c19838) {
+
+                    v_b6ebe9(v_3a1065);
+
+                    v_c84980(v_3a1065);
+
+                    v_c38114.current = v_3a1065;
+
+                    v_a2b40c.current = v_3a1065;
+
+                    v_c675cc.current = {
+
+                      latitude: v_3a1065.latitude,
+
+                      longitude: v_3a1065.longitude,
+
+                    };
+
+                  }
+
+                  await v_524200(v_3a1065);
+
                 }
-
-                await v_524200(v_3a1065);
-
-              }},
+              },
 
               { text: '확인', style: 'cancel' }
 
@@ -1860,43 +1863,43 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
               return (
 
-              <Marker
+                <Marker
 
-                key={v_e149c8}
+                  key={v_e149c8}
 
-                coordinate={{
+                  coordinate={{
 
-                  latitude: v_5e3dbb.latitude!,
+                    latitude: v_5e3dbb.latitude!,
 
-                  longitude: v_5e3dbb.longitude!,
+                    longitude: v_5e3dbb.longitude!,
 
-                }}
+                  }}
 
-                anchor={{ x: 0.5, y: 0.5 }}
+                  anchor={{ x: 0.5, y: 0.5 }}
 
-                onPress={() => v_fc58d0(v_5e3dbb, v_a56041)}
+                  onPress={() => v_fc58d0(v_5e3dbb, v_a56041)}
 
-              >
+                >
 
-                {}
+                  {}
 
-                {v_232839 && (
+                  {v_232839 && (
 
-                  <Image
+                    <Image
 
-                    source={v_232839}
+                      source={v_232839}
 
-                    style={v_d81136.markerImage}
+                      style={v_d81136.markerImage}
 
-                    resizeMode="contain"
+                      resizeMode="contain"
 
-                  />
+                    />
 
-                )}
+                  )}
 
-              </Marker>
+                </Marker>
 
-            );
+              );
 
             })}
 
@@ -2061,10 +2064,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 const v_d81136 = v_472849.create({
 
   container: {
-
-    flex: 1,
-
-    backgroundColor: '#F8F8F8',
+    ...v_a61db3.container,
 
   },
 

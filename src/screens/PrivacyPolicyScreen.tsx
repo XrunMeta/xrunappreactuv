@@ -3,7 +3,7 @@ import { v_3094a2, v_472849, v_19b633, v_326be8 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 
 const v_1afece = `
@@ -37,7 +37,7 @@ export const v_086cde = () => {
   return (
     <View style={v_d81136.container}>
       <Header title={v_8d41d7('screens.privacyPolicy.title')} onBackPress={v_c7ac57} showBackButton />
-      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false} backgroundColor={"#f8f8f8"}>
         <View style={v_d81136.card}>
           <Text style={v_d81136.contentText}>{v_1afece}</Text>
         </View>
@@ -49,13 +49,10 @@ export const v_086cde = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
+    ...v_a61db3.container,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 60,
+    ...v_a61db3.scrollContent,
   },
   card: {
     backgroundColor: '#ffffff',

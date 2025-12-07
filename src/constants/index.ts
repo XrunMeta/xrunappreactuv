@@ -49,10 +49,13 @@ export const v_4922a9 = {
 } as const;
 
 export const v_a61db3 = {
-
-  bottomSection: {
+  container: {
+    flex: 1,
     width: '100%' as const,
     maxWidth: 780,
+  },
+
+  bottomSection: {
     alignSelf: 'center' as const,
     marginTop: 'auto' as const,
     paddingTop: v_9b1a04.medium, 

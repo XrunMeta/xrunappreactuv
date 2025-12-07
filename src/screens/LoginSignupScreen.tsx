@@ -37,6 +37,12 @@ export const v_54d331 = () => {
 
   const v_3b9f13 = [
 
+    { name: 'ShopMyTicketScreen', route: v_ce4741.shopMyTicket }, 
+
+    { name: 'LoginScreen', route: v_ce4741.login }, 
+
+    { name: 'MapMainScreen', route: v_ce4741.map }, 
+
   ];
 
   return (
@@ -87,9 +93,22 @@ export const v_54d331 = () => {
         </View>
 
         {}
-        {
-
-}
+        {v_731ab4 && (
+          <View style={v_d81136.devLinksContainer}>
+            <Text style={v_d81136.devLinksTitle}>🔗 개발 모드: 빠른 링크</Text>
+            <View style={v_d81136.devLinksGrid}>
+              {v_3b9f13.map((v_8dbe00) => (
+                <TouchableOpacity
+                  key={v_8dbe00.route}
+                  style={v_d81136.devLinkButton}
+                  onPress={() => v_9b57fc(v_8dbe00.route)}
+                >
+                  <Text style={v_d81136.devLinkText}>{v_8dbe00.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
       </SafeScrollView>
 
       {}
@@ -104,17 +123,11 @@ export const v_54d331 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 58, 
-    paddingBottom: v_326be8.OS === 'android'
-      ? 16 + v_9b1a04.medium 
-      : 34,
-    justifyContent: 'space-between',
+    ...v_a61db3.scrollContent,
   },
   adContainer: {
     width: '100%',
@@ -143,7 +156,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 0,
   },
   termsContainer: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
   },
   termsText: {
     fontSize: 12,

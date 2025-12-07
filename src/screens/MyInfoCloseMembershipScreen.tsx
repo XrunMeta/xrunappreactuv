@@ -125,7 +125,7 @@ export const v_9e06f6 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
+    ...v_a61db3.container,
   },
   scrollContent: {
     flexGrow: 1,

@@ -165,7 +165,7 @@ export const v_5b4c5a = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
+    ...v_a61db3.container,
   },
   loadingContainer: {
     flex: 1,

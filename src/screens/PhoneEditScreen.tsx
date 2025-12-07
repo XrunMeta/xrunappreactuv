@@ -192,7 +192,7 @@ const v_d81136 = v_472849.create({
     color: '#1a2e35',
   },
   bottomSection: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

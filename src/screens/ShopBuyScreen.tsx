@@ -293,12 +293,11 @@ export const v_1a0a02 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
+    ...v_a61db3.container,
   },
   scrollContent: {
     ...v_a61db3.scrollContent,
   },
-
   detailCard: {
     borderRadius: 20,
     borderWidth: 1,

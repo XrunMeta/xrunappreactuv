@@ -5,14 +5,14 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5, v_2cf4d9, v_c2fdd1 } from '../components';
+import { v_729608, v_b34ce5, v_2cf4d9, v_c2fdd1, v_556baf, v_4c7b5d } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
 import { v_97ad19 } from '../services';
 import { v_029bad } from '../types';
 import { v_858bfa } from '../utils/imageCache';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04 } from '../constants';
 
 const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
 
@@ -189,7 +189,7 @@ export const v_052a8a = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
+    <SafeView style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header title={v_8d41d7('screens.shop.title')} />
       {v_683210 ? (
@@ -197,28 +197,27 @@ export const v_052a8a = () => {
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
       ) : (
-        <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={v_d81136.wrapper}>
-            <SegmentedControl
-              options={[
-                { label: 'Ticket', value: 'ticket' },
-                { label: 'My Ticket', value: 'myTicket' },
-              ]}
-              value="myTicket"
-              onChange={v_c411e0}
-              containerStyle={v_d81136.segmented}
-              hideIndicator={true}
+        <View style={v_d81136.contentContainer} >
+          <SegmentedControl
+            options={[
+              { label: 'Ticket', value: 'ticket' },
+              { label: 'My Ticket', value: 'myTicket' },
+            ]}
+            value="myTicket"
+            onChange={v_c411e0}
+            containerStyle={v_d81136.segmented}
+            hideIndicator={true}
+          />
+
+          <View style={v_d81136.searchBar}>
+            <Feather name="search" size={18} color="#bcbec4" />
+            <TextInput
+              placeholder="Search"
+              placeholderTextColor="#bcbec4"
+              style={v_d81136.searchInput}
             />
-
-            <View style={v_d81136.searchBar}>
-              <Feather name="search" size={18} color="#bcbec4" />
-              <TextInput
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
-                style={v_d81136.searchInput}
-              />
-            </View>
-
+          </View>
+          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
             {v_2aaa7b.length > 0 ? (
               v_2aaa7b.map((v_8c0b26) => {
 
@@ -248,9 +247,14 @@ export const v_052a8a = () => {
                 <Text style={v_d81136.emptyText}>{v_8d41d7('screens.shopMyTicket.noPurchasedItems')}</Text>
               </View>
             )}
-          </View>
-        </SafeScrollView>
+          </SafeScrollView>
+        </View>
+
       )}
+      {}
+      <View style={v_d81136.taboolaContainer}>
+        <TaboolaBanner placementType="shop" />
+      </View>
 
       {}
       <Dialog
@@ -266,32 +270,26 @@ export const v_052a8a = () => {
         ]}>
         <Text style={v_d81136.dialogText}>{v_be52bc.description}</Text>
       </Dialog>
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
+    ...v_a61db3.container,
+  },
+  contentContainer: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...v_a61db3.contentContainer,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
   segmented: {
-    marginBottom: 20,
+    marginBottom: v_9b1a04.large,
   },
   searchBar: {
     flexDirection: 'row',
@@ -325,5 +323,10 @@ const v_d81136 = v_472849.create({
     color: '#121212',
     lineHeight: 24,
     textAlign: 'left',
+  },
+  taboolaContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#d5dde0',
+    marginTop: 10,
   },
 });

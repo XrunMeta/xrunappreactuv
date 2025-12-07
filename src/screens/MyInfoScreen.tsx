@@ -343,7 +343,7 @@ export const v_03a231 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
+    ...v_a61db3.container,
   },
   scrollContent: {
     ...v_a61db3.scrollContent,

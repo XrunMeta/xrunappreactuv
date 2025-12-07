@@ -222,28 +222,17 @@ export const v_f4f851 = () => {
         </View>
       </SafeScrollView>
 
-      {v_326be8.OS === 'ios' && (
-        <View style={v_d81136.homeIndicator}>
-          <View style={v_d81136.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: v_326be8.OS === 'android'
-      ? 16 + v_9b1a04.medium 
-      : 40,
-    justifyContent: 'space-between',
+    flex: 1,
+    ...v_a61db3.scrollContent,
   },
   fieldContainer: {
     width: '100%',
@@ -264,7 +253,7 @@ const v_d81136 = v_472849.create({
     marginBottom: 16,
   },
   bottomSection: {
-    ...v_a61db3.bottomSection,
+    ...v_a61db3.bottomButtonContainer,
   },
   loginButtonWrapper: {
     width: '100%',
@@ -299,20 +288,7 @@ const v_d81136 = v_472849.create({
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
   loadingContainer: {
     height: 56,
     width: '100%',

@@ -275,13 +275,11 @@ export const v_f57686 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...v_a61db3.container,
   },
   content: {
     flex: 1,
     ...v_a61db3.scrollContent,
-    paddingBottom: 0,
   },
   segmented: {
     marginVertical: v_9b1a04.large,
@@ -289,7 +287,6 @@ const v_d81136 = v_472849.create({
   listContainer: {
     flex: 1,
   },
-
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

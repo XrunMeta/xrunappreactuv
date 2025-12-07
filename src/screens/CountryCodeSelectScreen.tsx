@@ -9,10 +9,10 @@ import {
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_729608, v_ecee91 } from '../components';
+import { v_729608, v_ecee91, v_570c34, v_556baf } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
-import { v_1bfbd0, v_202d44, v_52495e } from '../constants';
+import { v_1bfbd0, v_a61db3, v_202d44, v_52495e } from '../constants';
 import { v_da1883 } from '../types';
 
 export const v_379bd1 = () => {
@@ -61,7 +61,7 @@ export const v_379bd1 = () => {
   };
 
   return (
-    <View style={v_d81136.container}>
+    <SafeView style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
         title={v_479a37 === 'region' ? v_8d41d7('screens.countryCodeSelect.regionSelectTitle') : v_8d41d7('screens.countryCodeSelect.countrySelectTitle')}
@@ -119,19 +119,17 @@ export const v_379bd1 = () => {
           }
         />
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    ...v_a61db3.scrollContent,
   },
   currentSection: {
     marginBottom: 16,

@@ -7,7 +7,7 @@ import {
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_368e80, v_729608, v_cb41de, v_570c34 } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_f5ecec, v_8025d1 } from '../services';
@@ -108,14 +108,11 @@ export const v_a82b55 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   fieldContainer: {
     width: '100%',

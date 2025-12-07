@@ -547,14 +547,11 @@ export const v_cdb169 = () => {
 
 const v_d81136 = v_472849.create({
   container: {
-    flex: 1,
-    backgroundColor: v_1bfbd0.background,
+    ...v_a61db3.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
   formFieldContainer: {
     ...v_bae512.fieldContainer,

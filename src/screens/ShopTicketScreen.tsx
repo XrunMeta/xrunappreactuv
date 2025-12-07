@@ -13,7 +13,7 @@ import { v_dd87bc, v_81c40d } from '../services';
 import { v_20035e } from '../types';
 import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
-import { v_1bfbd0, v_a61db3 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_9b1a04 } from '../constants';
 
 const v_3e6a6a = (
   item: v_20035e,
@@ -355,11 +355,7 @@ export const v_38326c = () => {
         </View>
       ) : (
         <>
-          <SafeScrollView
-            contentContainerStyle={v_d81136.scrollContent}
-            showsVerticalScrollIndicator={false}
-            showBottomBackground={false}
-          >
+          <View style={v_d81136.contentContainer} >
 
             <SegmentedControl
               options={v_1c4d31}
@@ -377,31 +373,32 @@ export const v_38326c = () => {
                 placeholderTextColor="#bcbec4"
               />
             </View>
+            <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
+              {v_11083e === 'ticket' && v_b1c029.length > 0
+                ? v_b1c029.map((v_8c0b26) => {
 
-            {v_11083e === 'ticket' && v_b1c029.length > 0
-              ? v_b1c029.map((v_8c0b26) => {
+                  const v_63070e = v_f9a2c9[v_8c0b26.id];
+                  const v_c322f7 = v_63070e
+                    ? { uri: `data:image/png;base64,${v_63070e}` }
+                    : v_8c0b26.image;
 
-                const v_63070e = v_f9a2c9[v_8c0b26.id];
-                const v_c322f7 = v_63070e
-                  ? { uri: `data:image/png;base64,${v_63070e}` }
-                  : v_8c0b26.image;
+                  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+                  const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
+                  const v_e72b09 = v_d6cf14
+                    ? (v_817eee || 'Loading...')
+                    : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
 
-                const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
-                const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                const v_e72b09 = v_d6cf14
-                  ? (v_817eee || 'Loading...')
-                  : v_89f939(v_8c0b26.priceKRW || '0', 'KRW');
-
-                return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
-              })
-              : v_11083e === 'ticket' && v_b1c029.length === 0
-                ? (
-                  <View style={v_d81136.emptyContainer}>
-                    <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                  </View>
-                )
-                : null}
-          </SafeScrollView>
+                  return v_719647(v_8c0b26.title, v_e72b09, v_c322f7, { shopItem: v_8c0b26 });
+                })
+                : v_11083e === 'ticket' && v_b1c029.length === 0
+                  ? (
+                    <View style={v_d81136.emptyContainer}>
+                      <Text style={v_d81136.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                    </View>
+                  )
+                  : null}
+            </SafeScrollView>
+          </View>
 
           {}
           <View style={v_d81136.taboolaContainer}>
@@ -415,20 +412,20 @@ export const v_38326c = () => {
 
 const v_d81136 = v_472849.create({
   container: {
+    ...v_a61db3.container,
+  },
+  contentContainer: {
     flex: 1,
+    ...v_a61db3.contentContainer,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    flexGrow: 1,
-    ...v_a61db3.scrollContent,
-  },
-
   segmented: {
-    marginBottom: 20,
+    marginBottom: v_9b1a04.large,
   },
   searchBar: {
     flexDirection: 'row',
