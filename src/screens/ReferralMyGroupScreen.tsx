@@ -244,6 +244,7 @@ const v_d81136 = v_472849.create({
   content: {
     flex: 1,
     ...v_a61db3.scrollContent,
+    paddingBottom: 0,
   },
   segmented: {
     marginVertical: v_9b1a04.large,

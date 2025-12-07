@@ -325,8 +325,8 @@ const v_d81136 = v_472849.create({
     textAlign: 'left',
   },
   taboolaContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#d5dde0',
+    borderWidth: 2,
+    borderColor: '#ededed',
     marginTop: 10,
   },
 });
