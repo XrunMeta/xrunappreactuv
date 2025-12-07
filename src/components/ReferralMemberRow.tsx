@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   rank: {
-    width: 28,
+    minWidth: 28,
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: COLORS.white,

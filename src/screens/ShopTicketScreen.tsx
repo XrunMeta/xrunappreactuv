@@ -128,6 +128,7 @@ export const ShopTicketScreen = () => {
   const [gopaxPrice, setGopaxPrice] = useState<number>(0);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [itemImages, setItemImages] = useState<Record<string, string>>({}); 
+  const [searchQuery, setSearchQuery] = useState<string>(''); 
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -330,6 +331,20 @@ export const ShopTicketScreen = () => {
     navigate(ROUTES.shopBuy);
   };
 
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return shopItems;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return shopItems.filter((item) => {
+      const title = (item.title || '').toLowerCase();
+      const description = ((item as any)?.description || '').toLowerCase();
+
+      return title.includes(query) || description.includes(query);
+    });
+  }, [shopItems, searchQuery]);
+
   const renderCard = (
     title: string,
     price: string,
@@ -371,11 +386,13 @@ export const ShopTicketScreen = () => {
                 style={styles.searchInput}
                 placeholder="Search"
                 placeholderTextColor="#bcbec4"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
               />
             </View>
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-              {tab === 'ticket' && shopItems.length > 0
-                ? shopItems.map((item) => {
+              {tab === 'ticket' && filteredItems.length > 0
+                ? filteredItems.map((item) => {
 
                   const itemImage = itemImages[item.id];
                   const imageSource = itemImage
@@ -390,10 +407,15 @@ export const ShopTicketScreen = () => {
 
                   return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
                 })
-                : tab === 'ticket' && shopItems.length === 0
+                : tab === 'ticket' && filteredItems.length === 0
                   ? (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                      <Text style={styles.emptyText}>
+                        {searchQuery.trim()
+                          ? 'No search results'
+                          : '구매 가능한 아이템이 없습니다.'
+                        }
+                      </Text>
                     </View>
                   )
                   : null}
