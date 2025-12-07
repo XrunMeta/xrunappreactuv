@@ -30,6 +30,7 @@ import {
   MyInfoEmailAuthScreen,
   MyInfoEditScreen,
   PhoneEditScreen,
+  ChangePasswordScreen,
   MyInfoSettingsScreen,
   MyInfoCloseMembershipScreen,
   MyInfoCloseMembershipSuccessScreen,
@@ -251,6 +252,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoPhoneEdit') {
     return <PhoneEditScreen />;
+  }
+
+  if (currentScreen === 'myInfoChangePassword') {
+    return <ChangePasswordScreen />;
   }
 
   if (currentScreen === 'myInfoSettings') {

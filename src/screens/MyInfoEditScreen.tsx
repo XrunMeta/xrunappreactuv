@@ -253,7 +253,7 @@ export const MyInfoEditScreen = () => {
   };
 
   const handleChangePassword = async () => {
-    await showAlert(t('screens.myInfoEdit.alerts.passwordChange'), t('screens.myInfoEdit.alerts.passwordChangeMessage'));
+    navigate(ROUTES.myInfoChangePassword);
   };
 
   const handlePhoneEdit = async () => {
@@ -434,18 +434,16 @@ export const MyInfoEditScreen = () => {
               </View>
             </View>
 
-            <View style={styles.fieldContainer}>
-              <View style={styles.inlineLabelRow}>
-                <Text style={styles.sectionLabel}>Password</Text>
-                <TouchableOpacity onPress={handleChangePassword}>
-                  <Text style={styles.linkText}>Change Password</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.readonlyInput}>
-                <Text style={styles.readonlyText}>
-                  {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
-                </Text>
-              </View>
+            <View style={styles.inlineLabelRow}>
+              <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.password')}</Text>
+              <TouchableOpacity onPress={handleChangePassword}>
+                <Text style={styles.linkText}>{t('screens.myInfoEdit.changePassword')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.readonlyInput}>
+              <Text style={styles.readonlyText}>
+                {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+              </Text>
             </View>
 
             <View style={styles.fieldContainer} >

@@ -5,6 +5,8 @@ export default {
   lastName: '성',
   lastNamePlaceholder: '성을 입력하세요',
   email: '이메일',
+  password: '비밀번호',
+  changePassword: '비밀번호 변경',
   phone: '전화번호',
   region: '지역',
   gender: '성별',

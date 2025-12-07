@@ -57,6 +57,8 @@ import {
   LogoutResponse,
   CloseMembershipRequest,
   CloseMembershipResponse,
+  UpdatePasswordRequest,
+  UpdatePasswordResponse,
   SpotData,
   NotificationItem,
   NotificationListRequest,
@@ -1351,6 +1353,44 @@ export const closeMembership = async (
     console.error('[회원 탈퇴] 회원 탈퇴 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[회원 탈퇴] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const updatePassword = async (
+  member: number,
+  pin: string,
+  navigation?: any,
+): Promise<UpdatePasswordResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: UpdatePasswordRequest = {
+      member,
+      pin,
+    };
+
+    console.log('[비밀번호 변경] 비밀번호 변경 요청:', { member });
+
+    const response = await axiosInstance.post<UpdatePasswordResponse>(
+      '/app7163-01',
+      request,
+    );
+
+    console.log('[비밀번호 변경] 비밀번호 변경 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[비밀번호 변경] 비밀번호 변경 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[비밀번호 변경] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
