@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,98 +83,186 @@ export const MyInfoEditScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [memberId, setMemberId] = useState<number | null>(null);
-  const [countries, setCountries] = useState<Array<{ country?: string; callnumber?: number; cCode?: number; cName?: string }>>([]);
   const [regions, setRegions] = useState<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
-  const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
   const [isLoadingRegions, setIsLoadingRegions] = useState(false);
 
   const [tempCountry, setTempCountry] = useState<{ cDesc: string; cCode: number | null }>({ cDesc: '', cCode: null });
   const [tempRegion, setTempRegion] = useState<{ rDesc: string; rCode: number | null }>({ rDesc: '', rCode: null });
 
-  useEffect(() => {
-    const loadUserInfo = async () => {
-      try {
-        const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          const member = userData.member;
+  const [regionModalVisible, setRegionModalVisible] = useState(false);
+  const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
 
-          if (member) {
-            setMemberId(member);
-            const response = await getMyPageUserInfo(member, navigate);
-            const user = response.data[0];
+  const [originalFirstName, setOriginalFirstName] = useState('');
+  const [originalLastName, setOriginalLastName] = useState('');
+  const [originalGender, setOriginalGender] = useState<'male' | 'female'>('male');
+  const [originalAge, setOriginalAge] = useState<(typeof AGE_OPTIONS)[number]>('10');
+  const [originalCountryCode, setOriginalCountryCode] = useState<number | null>(null);
+  const [originalRegionCode, setOriginalRegionCode] = useState<number | null>(null);
 
-            if (user) {
-              setFirstName(user.firstname || '');
-              setLastName(user.lastname || '');
-              setEmail(user.email || '');
+  const loadUserInfo = async (showLoading: boolean = true) => {
+    try {
+      if (showLoading) {
+        setIsLoading(true);
+      }
+      const userDataStr = await AsyncStorage.getItem('userData');
+      if (userDataStr) {
+        const userData = JSON.parse(userDataStr);
+        const member = userData.member;
 
-              if (user.mobile) {
-                setPhone(user.mobile.replace(/\s/g, ''));
-              }
+        if (member) {
+          setMemberId(member);
+          const response = await getMyPageUserInfo(member, navigate);
+          const user = response.data[0];
 
-              setGender(convertGenderFromApi(user.gender));
+          if (user) {
+            const loadedFirstName = user.firstname || '';
+            const loadedLastName = user.lastname || '';
+            const loadedGender = convertGenderFromApi(user.gender);
+            const loadedAge = convertAgeFromApi(user.ages);
 
-              setAge(convertAgeFromApi(user.ages));
+            setFirstName(loadedFirstName);
+            setLastName(loadedLastName);
+            setEmail(user.email || '');
 
-              if (user.country) {
-                setCountryCode(user.country);
-                setSelectedCountry(user.country);
+            setOriginalFirstName(loadedFirstName);
+            setOriginalLastName(loadedLastName);
+            setOriginalGender(loadedGender);
+            setOriginalAge(loadedAge);
 
-                try {
-                  const countriesResponse = await getCountries(navigate);
-                  const countriesList = countriesResponse.data || [];
-                  setCountries(countriesList);
+            if (user.mobile) {
+              setPhone(user.mobile.replace(/\s/g, ''));
+            }
 
-                  const countryItem = countriesList.find((c) => (c.cCode === user.country || c.callnumber === user.country));
-                  const countryName = countryItem?.country || countryItem?.cName || '';
-                  const countryCode = countryItem?.callnumber || countryItem?.cCode || user.country;
+            setGender(loadedGender);
 
-                  setTempCountry({ cDesc: countryName, cCode: countryCode });
+            setAge(loadedAge);
 
-                  if (user.region) {
-                    setRegionCode(user.region);
-                    setSelectedRegion(user.region);
+            console.log('[정보수정] 사용자 국가/지역 정보 (원본):', { country: user.country, region: user.region, countryType: typeof user.country, regionType: typeof user.region });
 
-                    const regionsResponse = await getRegionsByCountry(user.country, navigate);
-                    const regionsList = regionsResponse.data || [];
-                    setRegions(regionsList);
+            const userCountry = typeof user.country === 'string' ? parseInt(user.country, 10) : user.country;
+            const userRegion = typeof user.region === 'string' ? parseInt(user.region, 10) : user.region;
 
-                    const regionItem = regionsList.find((r) => (r.subcode === user.region || r.rCode === user.region));
-                    const regionName = regionItem?.description || regionItem?.rName || '';
-                    const regionCode = regionItem?.subcode || regionItem?.rCode || user.region;
+            console.log('[정보수정] 변환된 국가/지역 정보:', { country: userCountry, region: userRegion, countryType: typeof userCountry, regionType: typeof userRegion });
 
-                    setTempRegion({ rDesc: regionName, rCode: regionCode });
+            if (userCountry && !isNaN(userCountry)) {
+              setCountryCode(userCountry);
+              setOriginalCountryCode(userCountry);
 
-                    if (regionName) {
-                      setRegion(`${countryName} ${regionName}`);
-                    }
+              try {
+                const countriesResponse = await getCountries(navigate);
+                const countriesList = countriesResponse.data || [];
+
+                const countryItem = countriesList.find((c) => {
+                  const cCode = typeof c.cCode === 'string' ? parseInt(c.cCode, 10) : c.cCode;
+                  const callnumber = typeof c.callnumber === 'string' ? parseInt(c.callnumber, 10) : c.callnumber;
+                  return cCode === userCountry || callnumber === userCountry;
+                });
+
+                const countryName = countryItem?.country || countryItem?.cName || '';
+                const countryCode = countryItem?.callnumber || countryItem?.cCode || userCountry;
+
+                console.log('[정보수정] 국가 매칭 결과:', {
+                  userCountry,
+                  countryItem,
+                  countryName,
+                  countryCode,
+                });
+
+                setTempCountry({ cDesc: countryName, cCode: countryCode });
+                console.log('[정보수정] tempCountry 설정됨:', { cDesc: countryName, cCode: countryCode });
+
+                if (userRegion !== undefined && userRegion !== null && !isNaN(userRegion)) {
+                  const regionNum = typeof userRegion === 'string' ? parseInt(userRegion, 10) : userRegion;
+                  setRegionCode(regionNum);
+                  setOriginalRegionCode(regionNum);
+
+                  console.log('[정보수정] 지역 정보 설정:', { regionNum, regionType: typeof regionNum });
+
+                  if (regionNum === 0) {
+                    const allRegionsText = t('screens.myInfoEdit.allRegions');
+                    setTempRegion({ rDesc: allRegionsText, rCode: 0 });
+                    setSelectedRegionId(allRegionsText);
+                    console.log('[정보수정] 전체지역 설정됨 (region: 0)');
                   } else {
 
-                    setTempRegion({ rDesc: 'Please Select', rCode: 0 });
+                    try {
+                      setIsLoadingRegions(true);
+                      const regionsResponse = await getRegionsByCountry(countryCode, navigate);
+                      const regionsList = regionsResponse.data || [];
+                      setRegions(regionsList);
+
+                      const regionItem = regionsList.find((r) => {
+                        const rCode = typeof r.subcode === 'string' ? parseInt(r.subcode, 10) : r.subcode;
+                        const rCode2 = typeof r.rCode === 'string' ? parseInt(r.rCode, 10) : r.rCode;
+                        return rCode === regionNum || rCode2 === regionNum;
+                      });
+
+                      const regionName = regionItem?.description || regionItem?.rName || '';
+
+                      if (regionName) {
+                        setTempRegion({ rDesc: regionName, rCode: regionNum });
+                        setSelectedRegionId(regionName);
+                        console.log('[정보수정] 초기 로드 - 지역 이름 찾음:', { rDesc: regionName, rCode: regionNum });
+                      } else {
+                        setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                        setSelectedRegionId(null);
+                        console.log('[정보수정] 초기 로드 - 지역 이름 없음:', { rCode: regionNum });
+                      }
+                      setIsLoadingRegions(false);
+                    } catch (error) {
+                      console.error('[정보수정] 초기 로드 - 지역 목록 로드 실패:', error);
+                      setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                      setSelectedRegionId(null);
+                      setIsLoadingRegions(false);
+                    }
                   }
-                } catch (error) {
-                  console.error('[정보수정] 국가/지역 정보 로드 실패:', error);
+                } else {
+
+                  setTempRegion({ rDesc: 'Please Select', rCode: 0 });
+                  setSelectedRegionId(null);
+                  console.log('[정보수정] 지역 정보 없음 - 초기화');
                 }
-              } else if (user.region) {
-                setRegionCode(user.region);
+              } catch (error) {
+                console.error('[정보수정] 국가/지역 정보 로드 실패:', error);
+              }
+            } else {
+
+              if (userRegion !== undefined && userRegion !== null && !isNaN(userRegion)) {
+                const regionNum = typeof userRegion === 'string' ? parseInt(userRegion, 10) : userRegion;
+                setRegionCode(regionNum);
+                setOriginalRegionCode(regionNum);
+
+                if (regionNum === 0) {
+                  const allRegionsText = t('screens.myInfoEdit.allRegions');
+                  setTempRegion({ rDesc: allRegionsText, rCode: 0 });
+                  setSelectedRegionId(allRegionsText);
+                  console.log('[정보수정] 전체지역 설정됨 (region: 0, country 없음)');
+                } else {
+                  setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                  setSelectedRegionId(null);
+                }
               } else {
 
                 setTempCountry({ cDesc: '', cCode: null });
                 setTempRegion({ rDesc: 'Please Select', rCode: 0 });
+                setSelectedRegionId(null);
+                console.log('[정보수정] 국가와 지역 모두 없음 - 초기화');
               }
             }
           }
         }
-      } catch (error) {
-        console.error('[정보수정] 사용자 정보 로드 실패:', error);
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.loadFailed'));
-      } finally {
+      }
+    } catch (error) {
+      console.error('[정보수정] 사용자 정보 로드 실패:', error);
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.loadFailed'));
+    } finally {
+      if (showLoading) {
         setIsLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     loadUserInfo();
   }, [navigate, t]);
 
@@ -207,43 +297,53 @@ export const MyInfoEditScreen = () => {
 
       const promises = [];
 
-      if (firstName.trim()) {
+      if (firstName.trim() !== originalFirstName.trim()) {
+        console.log('[정보수정] 이름 변경 감지:', { original: originalFirstName, new: firstName.trim() });
         promises.push(updateName(memberId, firstName.trim(), navigate));
       }
 
-      if (lastName.trim()) {
+      if (lastName.trim() !== originalLastName.trim()) {
+        console.log('[정보수정] 성 변경 감지:', { original: originalLastName, new: lastName.trim() });
         promises.push(updateLastName(memberId, lastName.trim(), navigate));
       }
 
       const genderCode = convertGenderToApi(gender);
-      if (genderCode !== undefined && genderCode !== null) {
+      const originalGenderCode = convertGenderToApi(originalGender);
+      if (genderCode !== undefined && genderCode !== null && genderCode !== originalGenderCode) {
+        console.log('[정보수정] 성별 변경 감지:', { original: originalGenderCode, new: genderCode });
         promises.push(updateGender(memberId, genderCode, navigate));
-      } else {
-        console.warn('[정보수정] 성별 값이 유효하지 않습니다:', gender);
       }
 
       const ageCode = convertAgeToApi(age);
-      if (ageCode !== undefined && ageCode !== null) {
+      const originalAgeCode = convertAgeToApi(originalAge);
+      if (ageCode !== undefined && ageCode !== null && ageCode !== originalAgeCode) {
+        console.log('[정보수정] 나이 변경 감지:', { original: originalAgeCode, new: ageCode });
         promises.push(updateAge(memberId, ageCode, navigate));
-      } else {
-        console.warn('[정보수정] 나이 값이 유효하지 않습니다:', age);
       }
 
-      await Promise.all(promises);
+      if (tempCountry.cCode !== null && tempRegion.rCode !== null && tempRegion.rCode !== 0 && tempRegion.rCode !== -1) {
+        const currentCountryCode = tempCountry.cCode;
+        const currentRegionCode = tempRegion.rCode;
+        if (currentCountryCode !== originalCountryCode || currentRegionCode !== originalRegionCode) {
+          console.log('[정보수정] 국가/지역 변경 감지:', {
+            original: { country: originalCountryCode, region: originalRegionCode },
+            new: { country: currentCountryCode, region: currentRegionCode },
+          });
+          promises.push(updateRegion(memberId, currentCountryCode, currentRegionCode, navigate));
+        }
+      }
 
-      await showAlert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'), [
-        {
-          text: t('screens.myInfoEdit.alerts.confirm'),
-          onPress: () => {
+      if (promises.length > 0) {
 
-            if (canGoBack) {
-              goBack();
-            } else {
-              reset(ROUTES.myInfo);
-            }
-          },
-        },
-      ]);
+        await Promise.all(promises);
+
+        await showAlert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'));
+
+        await loadUserInfo(false);
+      } else {
+
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.noChanges'));
+      }
     } catch (error) {
       console.error('[정보수정] 정보 수정 실패:', error);
       await showAlert(t('screens.myInfoEdit.alerts.saveFailed'), t('screens.myInfoEdit.alerts.saveFailedMessage'));
@@ -254,6 +354,16 @@ export const MyInfoEditScreen = () => {
 
   const handleChangePassword = async () => {
     navigate(ROUTES.myInfoChangePassword);
+  };
+
+  const handleCountrySelect = async () => {
+    try {
+
+      setSelectMode('country');
+      navigate('countryCodeSelect');
+    } catch (error) {
+      console.error('[정보수정] 국가 선택 화면 이동 실패:', error);
+    }
   };
 
   const handlePhoneEdit = async () => {
@@ -299,89 +409,165 @@ export const MyInfoEditScreen = () => {
     }
   };
 
-  const handleCountrySelect = async () => {
+  const getCountryCodeFromDialCode = (dialCode: string): number | null => {
+
     try {
 
-      setSelectMode('country');
-      navigate('countryCodeSelect');
+      const dialCodeNumber = parseInt(dialCode.replace('+', ''), 10);
+      return dialCodeNumber || null;
     } catch (error) {
-      console.error('[정보수정] 국가 선택 화면 이동 실패:', error);
+      console.error('[정보수정] 국가 코드 추출 실패:', error);
+      return null;
     }
   };
 
-  useEffect(() => {
-    const updateCountryFromDialCode = async () => {
-      if (!selectedCountryDialCode || isLoadingRegions) {
-        return;
+  const handleSelectRegion = (selectedRegion: { description?: string; subcode?: number; rCode?: number; rName?: string }) => {
+    const regionCode = selectedRegion.subcode || selectedRegion.rCode || 0;
+    const regionDesc = selectedRegion.description || selectedRegion.rName || '';
+
+    console.log('[정보수정] 지역 선택:', { regionCode, regionDesc, selectedRegion });
+
+    if (!regionDesc) {
+      console.warn('[정보수정] 지역 설명이 없습니다:', selectedRegion);
+
+      const fallbackDesc = 'Unknown';
+      setTempRegion({
+        rDesc: fallbackDesc,
+        rCode: regionCode,
+      });
+      setSelectedRegionId(fallbackDesc);
+    } else {
+
+      if (regionCode === -1) {
+        setTempRegion({
+          rDesc: regionDesc,
+          rCode: -1, 
+        });
+        console.log('[정보수정] 전체 지역 선택됨:', regionDesc);
+      } else {
+        setTempRegion({
+          rDesc: regionDesc,
+          rCode: regionCode,
+        });
+        console.log('[정보수정] 지역 선택됨:', { rDesc: regionDesc, rCode: regionCode });
       }
 
+      setSelectedRegionId(regionDesc);
+    }
+
+    setRegionModalVisible(false);
+
+    setTimeout(() => {
+      console.log('[정보수정] 지역 선택 후 상태 확인:', {
+        tempCountry,
+        tempRegion: { rDesc: regionDesc || 'Unknown', rCode: regionCode },
+        selectedRegionId: regionDesc || 'Unknown',
+      });
+    }, 100);
+  };
+
+  const handleOpenRegionModal = async () => {
+    console.log('handleOpenRegionModal');
+
+    if (!selectedCountryDialCode || !selectedCountryDialCode.dialCode) {
+      await showAlert(
+        t('screens.myInfoEdit.alerts.error'),
+        t('screens.myInfoEdit.alerts.selectCountryFirst')
+      );
+
+      handleCountrySelect();
+      return;
+    }
+
+    const countryCode = getCountryCodeFromDialCode(selectedCountryDialCode.dialCode); 
+    if (!countryCode) {
+      await showAlert(
+        t('screens.myInfoEdit.alerts.error'),
+        t('screens.myInfoEdit.alerts.invalidCountryCode')
+      );
+      return;
+    }
+
+    const currentCountryCode = tempCountry.cCode;
+    if (regions.length === 0 || currentCountryCode !== countryCode) {
+      setIsLoadingRegions(true);
       try {
+        console.log('[정보수정] 지역 목록 조회:', { countryCode, dialCode: selectedCountryDialCode.dialCode });
 
-        const dialCodeNumber = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10);
+        const regionsResponse = await getRegionsByCountry(countryCode, navigate);
+        const regionsList = regionsResponse.data || [];
+        setRegions(regionsList);
 
-        if (!dialCodeNumber) {
-          return;
-        }
+        setTempCountry({
+          cDesc: selectedCountryDialCode.name,
+          cCode: countryCode,
+        });
 
-        if (countries.length === 0) {
-          const countriesResponse = await getCountries(navigate);
-          const countriesList = countriesResponse.data || [];
-          setCountries(countriesList);
-
-          const countryItem = countriesList.find(
-            (c) => (c.callnumber === dialCodeNumber || c.cCode === dialCodeNumber)
-          );
-
-          if (countryItem) {
-            const countryCode = countryItem.callnumber || countryItem.cCode;
-            const countryName = countryItem.country || countryItem.cName || selectedCountryDialCode.name;
-
-            setTempCountry({
-              cDesc: countryName,
-              cCode: countryCode || dialCodeNumber,
-            });
-
-          } else {
-
-            setTempCountry({
-              cDesc: selectedCountryDialCode.name,
-              cCode: dialCodeNumber,
-            });
-
-          }
-        } else {
-
-          const countryItem = countries.find(
-            (c) => (c.callnumber === dialCodeNumber || c.cCode === dialCodeNumber)
-          );
-
-          if (countryItem) {
-            const countryCode = countryItem.callnumber || countryItem.cCode;
-            const countryName = countryItem.country || countryItem.cName || selectedCountryDialCode.name;
-
-            setTempCountry({
-              cDesc: countryName,
-              cCode: countryCode || dialCodeNumber,
-            });
-
-          }
+        if (regionsList.length === 0) {
+          console.log('[정보수정] 지역 목록이 없습니다. 전체 지역을 선택할 수 있습니다.');
+          setRegions([{
+            description: t('screens.myInfoEdit.allRegions'),
+            subcode: -1,
+            rCode: -1,
+            rName: t('screens.myInfoEdit.allRegions'),
+          }]);
         }
       } catch (error) {
-        console.error('[정보수정] 국가 정보 업데이트 실패:', error);
+        console.error('[정보수정] 지역 목록 로드 실패:', error);
+
+        setRegions([{
+          description: t('screens.myInfoEdit.allRegions'),
+          subcode: -1,
+          rCode: -1,
+          rName: t('screens.myInfoEdit.allRegions'),
+        }]);
       } finally {
         setIsLoadingRegions(false);
       }
-    };
+    }
+
+    setRegionModalVisible(true);
+  };
+
+  useEffect(() => {
+    console.log('[정보수정] useEffect 트리거됨 - selectedCountryDialCode 변경 감지:', {
+      selectedCountryDialCode,
+      iso2: selectedCountryDialCode?.iso2,
+      isLoading,
+      조건체크: selectedCountryDialCode && !isLoading,
+    });
 
     if (selectedCountryDialCode && !isLoading) {
+      console.log('[정보수정] 전화번호 국가 선택됨 (CountryCodeSelectScreen에서):', {
+        iso2: selectedCountryDialCode.iso2,
+        name: selectedCountryDialCode.name,
+        dialCode: selectedCountryDialCode.dialCode,
+        flagEmoji: selectedCountryDialCode.flagEmoji,
+      });
 
-      const timer = setTimeout(() => {
-        updateCountryFromDialCode();
-      }, 100);
+      const countryCode = getCountryCodeFromDialCode(selectedCountryDialCode.dialCode);
+      console.log('[정보수정] 추출된 국가 코드:', { dialCode: selectedCountryDialCode.dialCode, countryCode });
 
-      return () => clearTimeout(timer);
+      if (countryCode) {
+
+        setTempCountry({
+          cDesc: selectedCountryDialCode.name,
+          cCode: countryCode,
+        });
+        console.log('[정보수정] tempCountry 업데이트 완료:', {
+          cDesc: selectedCountryDialCode.name,
+          cCode: countryCode,
+        });
+
+        setRegions([]);
+
+        if (tempRegion.rCode !== null && tempRegion.rCode !== 0) {
+          setTempRegion({ rDesc: 'Please Select', rCode: 0 });
+          setSelectedRegionId(null);
+        }
+      }
     }
-  }, [selectedCountryDialCode?.iso2, navigate]); 
+  }, [selectedCountryDialCode?.iso2]);
 
   return (
     <View style={styles.container}>
@@ -450,12 +636,17 @@ export const MyInfoEditScreen = () => {
               <Text style={styles.label}>{t('screens.myInfoEdit.phone')}</Text>
               <View style={styles.phoneFieldContainer}>
                 {}
-                <View style={styles.phonePrefixDisabled}>
+                <TouchableOpacity
+                  style={styles.phonePrefix}
+                  onPress={handleCountrySelect}
+                  activeOpacity={0.7}
+                  disabled={isSaving}
+                >
                   <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
-                  <Text style={styles.phonePrefixTextDisabled}>
-                    +{selectedCountryDialCode.dialCode.replace('+', '')}
+                  <Text style={styles.phonePrefixText}>
+                    {selectedCountryDialCode.dialCode}
                   </Text>
-                </View>
+                </TouchableOpacity>
                 {}
                 <TouchableOpacity
                   style={styles.phoneValueContainer}
@@ -468,20 +659,21 @@ export const MyInfoEditScreen = () => {
               </View>
             </View>
 
+            {}
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Country</Text>
+              <Text style={styles.label}>{t('screens.myInfoEdit.region')}</Text>
               <TouchableOpacity
                 style={styles.regionField}
-                onPress={handleCountrySelect}
+                onPress={handleOpenRegionModal}
                 activeOpacity={0.7}
-                disabled={isSaving}
+                disabled={isSaving || isLoadingRegions}
               >
-                <Text style={[styles.regionValue, !tempCountry.cDesc && styles.regionPlaceholder]}>
-                  {tempCountry.cDesc
-                    ? `${tempCountry.cDesc} (+${tempCountry.cCode})`
-                    : selectedCountryDialCode
-                      ? `${selectedCountryDialCode.name} (${selectedCountryDialCode.dialCode})`
-                      : '국가를 선택하세요'}
+                <Text style={[styles.regionValue, (!tempCountry.cDesc || !tempRegion.rDesc || tempRegion.rCode === 0 || tempRegion.rCode === null || tempRegion.rCode === -1) && styles.regionPlaceholder]}>
+                  {tempCountry.cDesc && tempRegion.rDesc && tempRegion.rDesc !== 'Please Select' && tempRegion.rCode !== null && tempRegion.rCode !== 0 && tempRegion.rCode !== -1
+                    ? `${tempCountry.cDesc}, ${tempRegion.rDesc}`
+                    : tempCountry.cDesc
+                      ? `${tempCountry.cDesc}, ${t('screens.myInfoEdit.pleaseSelect')}`
+                      : t('screens.myInfoEdit.selectCountryAndRegion')}
                 </Text>
                 <Text style={styles.arrow}>›</Text>
               </TouchableOpacity>
@@ -539,6 +731,64 @@ export const MyInfoEditScreen = () => {
         </View>
       </SafeScrollView>
 
+      {}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={regionModalVisible}
+        onRequestClose={() => setRegionModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalBackdrop}
+            activeOpacity={1}
+            onPress={() => setRegionModalVisible(false)}
+          />
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {tempCountry.cDesc ? `${t('screens.myInfoEdit.selectRegion')} - ${tempCountry.cDesc}` : t('screens.myInfoEdit.selectRegion')}
+              </Text>
+              <TouchableOpacity onPress={() => setRegionModalVisible(false)}>
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {isLoadingRegions ? (
+              <View style={styles.modalLoadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+              </View>
+            ) : (
+              <ScrollView style={styles.modalScrollView}>
+                {regions.length > 0 ? (
+                  regions.map((region) => (
+                    <TouchableOpacity
+                      key={region.subcode || region.rCode || region.description}
+                      style={[
+                        styles.modalItem,
+                        selectedRegionId === (region.description || region.rName) && styles.modalItemSelected,
+                      ]}
+                      onPress={() => handleSelectRegion(region)}
+                    >
+                      <Text style={styles.modalItemText}>
+                        {region.description || region.rName || 'Unknown'}
+                      </Text>
+                      {selectedRegionId === (region.description || region.rName) && (
+                        <Text style={styles.checkmark}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>{t('screens.myInfoEdit.noRegions')}</Text>
+                    <Text style={styles.emptyTextSub}>{t('screens.myInfoEdit.selectAllRegions')}</Text>
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -594,7 +844,7 @@ const styles = StyleSheet.create({
     minHeight: 52, 
     overflow: 'hidden',
   },
-  phonePrefixDisabled: {
+  phonePrefix: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -602,16 +852,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#ededed',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fefefe',
   },
   flagEmoji: {
     fontSize: FONTS.size.large,
     marginRight: 6,
   },
-  phonePrefixTextDisabled: {
+  phonePrefixText: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
-    color: '#a8a8a7',
+    color: '#343a59',
   },
   phoneValueContainer: {
     flex: 1,
@@ -782,6 +1032,85 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
+  },
+  emptyTextSub: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
+    marginTop: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '90%',
+    maxWidth: 400,
+    maxHeight: '80%',
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ededed',
+  },
+  modalTitle: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a2e35',
+    flex: 1,
+  },
+  modalCloseButton: {
+    fontSize: FONTS.size.xlarge,
+    fontFamily: 'Roboto-Regular',
+    color: '#9e9e9e',
+    padding: 4,
+  },
+  modalScrollView: {
+    maxHeight: 400,
+  },
+  modalLoadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+    marginHorizontal: 16,
+  },
+  modalItemSelected: {
+    borderColor: COLORS.buttonPrimary,
+    backgroundColor: '#f5f6fa',
+  },
+  modalItemText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#1a2e35',
+    flex: 1,
   },
 });
 
