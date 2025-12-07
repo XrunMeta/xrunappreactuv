@@ -43,7 +43,7 @@ import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
-import { COMMON_STYLES } from '../constants';
+import { COMMON_STYLES, FONTS } from '../constants';
 
 interface LocationData {
 
@@ -2210,7 +2210,7 @@ const styles = StyleSheet.create({
 
   calloutDistance: {
 
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
 
     fontFamily: 'Roboto-Regular',
 
@@ -2234,7 +2234,7 @@ const styles = StyleSheet.create({
 
   calloutBrand: {
 
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
 
     fontFamily: 'Roboto-Medium',
 

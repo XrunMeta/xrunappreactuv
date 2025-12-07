@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import { Header, FormField, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   amountLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   amountInput: {
-    fontSize: 32,
+    fontSize: FONTS.fontSize.xxxlarge,
     lineHeight: 48,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   tokenBadgeText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     fontFamily: 'Roboto-SemiBold',
     color: COLORS.headerText,

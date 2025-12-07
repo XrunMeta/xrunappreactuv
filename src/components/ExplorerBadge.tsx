@@ -11,6 +11,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { FONTS } from '../constants';
 
 interface ExplorerBadgeProps {
   label: string;
@@ -96,21 +97,21 @@ const styles = StyleSheet.create({
     height: 18,
   },
   label: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   caption: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#5f6478',
   },
   compactLabel: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     color: '#1f6880',
   },
   compactCaption: {
-    fontSize: 11,
+    fontSize: FONTS.fontSize.xsmall,
   },
   textColumn: {
     justifyContent: 'center',

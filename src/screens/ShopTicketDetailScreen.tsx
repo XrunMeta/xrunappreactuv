@@ -19,7 +19,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { PurchasedItemData } from '../types';
 import { getXrunPurchasedItems, deleteXrunPurchasedItem } from '../services';
 import { getEnv } from '../utils/env';
-import { COLORS, COMMON_STYLES, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 
 export const ShopTicketDetailScreen = () => {
   const { selectedShopItem } = useAppContext();
@@ -414,12 +414,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   errorText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#999',
     textAlign: 'center',
   },
   itemTitle: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#111',
     marginBottom: 12,
@@ -438,13 +438,13 @@ const styles = StyleSheet.create({
     marginBottom: 5, 
   },
   ticketFieldLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#000',
     marginBottom: 0, 
     fontWeight: '500',
   },
   ticketFieldStatus: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontWeight: '500',
   },
   ticketFieldBox: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     marginTop: 0, 
   },
   ticketFieldNumber: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#000',
     fontWeight: '600',
   },
@@ -486,11 +486,11 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: '#FFF',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
   },
   shareButtonText: {
     color: '#000',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
   },
 });

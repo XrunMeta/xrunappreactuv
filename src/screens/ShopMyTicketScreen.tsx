@@ -12,7 +12,7 @@ import { ShopItem } from '../types';
 import { getXrunPurchasedItems } from '../services';
 import { PurchasedItemData } from '../types';
 import { cashingimages } from '../utils/imageCache';
-import { COLORS, COMMON_STYLES, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 
 const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any): ShopItem => {
 
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -314,12 +314,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
   dialogText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#121212',
     lineHeight: 24,
     textAlign: 'left',

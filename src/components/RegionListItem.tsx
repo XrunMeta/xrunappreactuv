@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Region } from '../constants/regions';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 type Props = {
   region: Region;
@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   regionName: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',
   },
   regionNameEn: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 2,

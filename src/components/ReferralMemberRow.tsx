@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
 } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 interface ReferralMemberRowProps {
   rank?: number | string;
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   rank: {
     width: 28,
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
   },
@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   email: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   description: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -107,13 +107,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   date: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#707070',
   },
   value: {
     marginTop: 4,
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

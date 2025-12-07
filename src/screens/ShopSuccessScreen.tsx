@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { COMMON_STYLES } from '../constants';
+import { COMMON_STYLES, FONTS } from '../constants';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   message: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
     marginBottom: 24,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

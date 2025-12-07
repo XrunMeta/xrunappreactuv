@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { FONTS } from '../constants';
 
 type QuickAction = {
   label: string;
@@ -116,26 +117,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#ffffff',
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
   },
   cardAddress: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#f0f3ff',
     fontFamily: 'Roboto-Regular',
     marginTop: 4,
     textAlign: 'left',
   },
   balanceLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#ebebff',
     fontFamily: 'Roboto-Regular',
     marginBottom: 4,
   },
   balanceValue: {
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   actionLabel: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#454545',
   },

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -60,18 +60,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#EBF6FF',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#D6E6EE',
     fontFamily: 'Roboto-Medium',
   },
   value: {
     marginTop: 4,
-    fontSize: 32,
+    fontSize: FONTS.fontSize.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: COLORS.background,
   },

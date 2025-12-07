@@ -11,7 +11,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import { Header, PrimaryButton, ExplorerBadge, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { getTokenIcon } from '../constants/tokenMeta';
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   hashValue: {
     flex: 1,
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#1a2e35',
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   copyText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
     color: '#747474',
     marginTop: 4,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 6,
@@ -226,14 +226,14 @@ const styles = StyleSheet.create({
   },
   cardValue: {
     flex: 1,
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     lineHeight: 22,
   },
   statusText: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1f6880',
     marginTop: 16,

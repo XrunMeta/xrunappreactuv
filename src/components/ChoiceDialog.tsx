@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Dialog } from './Dialog';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { FONTS } from '../constants';
 
 export interface ChoiceDialogStep {
   title: string;
@@ -46,7 +47,7 @@ interface ChoiceDialogProps {
   initialStep?: number; 
   onClose?: () => void;
   fullScreen?: boolean; 
-  containerStyle?: ViewStyle;
+  containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: ViewStyle; 
 }
 
@@ -246,7 +247,7 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
         actions={actions}
         containerStyle={[
           containerStyle,
-          fullScreen && styles.fullScreenContainer,
+          fullScreen ? styles.fullScreenContainer : undefined,
         ]}
       >
         {renderBody()}
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

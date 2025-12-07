@@ -8,6 +8,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { COLORS } from '../constants';
+import { FONTS } from '../constants';
 
 type CheckboxVariant = 'square' | 'circle';
 
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
   },

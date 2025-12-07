@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
+import { FONTS } from '../constants';
 
 interface EmergencyStopDialogProps {
   visible: boolean;
@@ -50,7 +51,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
     <Modal
       visible={visible}
       animationType="slide"
-      onRequestClose={() => {}} 
+      onRequestClose={() => { }} 
       presentationStyle="fullScreen"
     >
       <View style={styles.container}>
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   message: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     lineHeight: 28,
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   linkText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#4c4e55',
   },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { getIosWalletShowStatus } from '../services';
 
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.buttonPrimary,
   },
   label: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontWeight: '600',
     color: '#4C4E55',
     textAlign: 'center',

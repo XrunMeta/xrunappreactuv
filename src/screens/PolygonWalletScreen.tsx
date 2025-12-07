@@ -4,7 +4,7 @@ import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

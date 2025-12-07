@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
-import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES } from '../constants';
+import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 
 export const MyInfoSettingsScreen = () => {
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Dialog } from './Dialog';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { FONTS } from '../constants';
 
 type TokenOption = {
   id: string;
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
   tabLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   tokenLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#f8f8f8',
     paddingHorizontal: 16,
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
@@ -314,12 +315,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#b8b8b8',
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },

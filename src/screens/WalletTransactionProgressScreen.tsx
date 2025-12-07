@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { postTransferNew } from '../services';
@@ -227,19 +227,19 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   balanceLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
     marginBottom: 8,
   },
   balanceValue: {
-    fontSize: 32,
+    fontSize: FONTS.fontSize.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
     lineHeight: 48,
   },
   balanceToken: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Medium',
     color: '#10192d',
   },
@@ -253,13 +253,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     marginBottom: 6,
   },
   cardValue: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     lineHeight: 22,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   progressText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },

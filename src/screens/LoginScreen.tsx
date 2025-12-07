@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { FormCheckbox, FormField, Header, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS, SIZES, COMMON_STYLES } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import {
   loginWithEmailPassword,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     width: '100%',
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   emailVerificationText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   mapLinkText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     lineHeight: 20,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',

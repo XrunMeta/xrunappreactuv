@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView } from '../components';
 import { Header, FormField, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { updatePhone } from '../services';
@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     marginRight: 6,
   },
   phonePrefixText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },

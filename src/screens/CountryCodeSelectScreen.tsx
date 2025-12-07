@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, CountryCodeListItem, SafeScrollView, SafeView } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
+import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, FONTS } from '../constants';
 import { CountryDialCode } from '../types';
 
 export const CountryCodeSelectScreen = () => {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#9ca3af',
     marginBottom: 8,
     fontFamily: 'Roboto-Medium',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   flagEmoji: {
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
   },
   currentInfo: {
     flexDirection: 'row',
@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   currentCountry: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: COLORS.headerText,
   },
   currentDial: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: COLORS.buttonPrimary,
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
     fontFamily: 'Roboto-Medium',
     color: COLORS.headerText,
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
     color: '#9ca3af',
     fontFamily: 'Roboto-Regular',
   },

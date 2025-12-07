@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { Header, PrimaryButton, SecondaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   addressLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#1a2e35',
     marginBottom: 8,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   addressValue: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     fontFamily: 'Roboto-Regular',
     color: '#121212',

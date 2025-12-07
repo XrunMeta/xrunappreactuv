@@ -10,7 +10,7 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header, TaboolaBanner } from '../components';
-import { COLORS, COMMON_STYLES, LANG } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
 import { useAppContext } from '../context';
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   adText: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontWeight: '700',
     color: '#000',
   },
@@ -380,12 +380,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileName: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#10192d',
   },
   profileEmail: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
     marginTop: 4,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
   },
   cardLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111',
   },

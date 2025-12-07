@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, OptionButton, Dialog, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -563,12 +563,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
   linkText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#707070',
     fontFamily: 'Roboto-SemiBold',
   },
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   readonlyText: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     color: '#1a2e35',
     fontFamily: 'Roboto-Bold',
   },
@@ -607,11 +607,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     marginRight: 6,
   },
   phonePrefixTextDisabled: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#a8a8a7',
   },
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   phoneValue: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343a59',
   },
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
     marginBottom: 8,
@@ -685,13 +685,13 @@ const styles = StyleSheet.create({
   },
   phoneValueText: {
     flex: 1,
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
     marginLeft: 12,
   },
   editHint: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
     marginLeft: 8,
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   },
   regionValue: {
     flex: 1,
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
   },
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     color: '#dedede',
   },
   arrow: {
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
     color: '#747474',
     marginLeft: 8,
   },
@@ -752,12 +752,12 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   listItemText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
   },
   checkmark: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     color: COLORS.buttonPrimary,
     fontFamily: 'Roboto-Bold',
   },
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   disabledText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },
@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#9e9e9e',
   },

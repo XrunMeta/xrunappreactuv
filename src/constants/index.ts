@@ -22,6 +22,30 @@ export const SIZES = {
   xlarge: 24,
 };
 
+export const FONTS = {
+  family: {
+  regular: 'Roboto-Regular',
+    medium: 'Roboto-Medium',
+    semibold: 'Roboto-SemiBold',
+    bold: 'Roboto-Bold',
+    black: 'Roboto-Black',
+  },
+  fontSize: {
+    xxsmall: 10,   
+    xsmall: 11,   
+    small: 12,
+    ssmall: 13,
+    msmall: 14,
+    lsmall: 15,
+    medium: 16,
+    mmedium: 18,
+    large: 20,
+    xlarge: 24,
+    xxlarge: 28,
+    xxxlarge: 32,
+  },
+};    
+
 export const IS_DEV_MODE = __DEV__;
 
 export const LANG = {

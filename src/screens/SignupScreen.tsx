@@ -16,7 +16,7 @@ import {
   OptionButton,
   PrimaryButton,
 } from '../components';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -452,11 +452,11 @@ const styles = StyleSheet.create({
     borderRightColor: '#ededed',
   },
   flagEmoji: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     marginRight: 6,
   },
   countryCode: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   termsText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',

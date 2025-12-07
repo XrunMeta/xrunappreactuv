@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components';
+import { FONTS } from '../constants';
 
 export const HomeScreen = () => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
     fontWeight: 'bold',
     marginBottom: 20,
   },

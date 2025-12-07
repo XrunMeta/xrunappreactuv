@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGE_CODES, LanguageCode, setStoredLanguage } from '../locales';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 interface LanguageSelectorProps {
   visible: boolean;
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     maxHeight: '70%',
   },
   title: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
     marginBottom: 20,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.buttonPrimary,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: COLORS.text,
   },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
   },
   checkmark: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     color: '#fff',
     fontFamily: 'Roboto-Bold',
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: COLORS.text,
   },

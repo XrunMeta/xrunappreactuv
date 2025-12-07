@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, TaboolaBannerCore, SafeScrollView } from '../components';
 import { getTaboolaPlacement, getTaboolaPageUrl, isTaboolaNativeModuleAvailable } from '../services/taboola';
-import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     ...COMMON_STYLES.bottomButtonContainer,
   },
   termsText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.06,
   },
   linkText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   previewLink: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.buttonPrimary,
     fontFamily: 'Roboto-SemiBold',
   },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
   },
   devLinksTitle: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     fontWeight: 'bold',
     color: '#10192d',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   devLinkText: {
-    fontSize: 11,
+    fontSize: FONTS.fontSize.xsmall,
     fontFamily: 'Roboto-Regular',
     color: COLORS.buttonPrimary,
   },

@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { getCompletedAds, getSavedAds } from '../services';
 import { CompletedAdItem } from '../types';
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -233,17 +233,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mediumText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   smallText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
   normalText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
   },

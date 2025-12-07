@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { SpotData } from '../types';
+import { FONTS } from '../constants';
 
 let iconArrow: any = null;
 let iconXrunLogo: any = null;
@@ -177,7 +178,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Medium',
-                      fontSize: 16,
+                      fontSize: FONTS.fontSize.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
                       marginBottom: 4,
@@ -187,7 +188,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   <Text
                     style={{
                       fontFamily: 'Roboto-Regular',
-                      fontSize: 12,
+                      fontSize: FONTS.fontSize.small,
                       color: '#4c4e55',
                       lineHeight: 15,
                       letterSpacing: 0.06,

@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES, FONTS } from '../constants';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   question: {
     flex: 1,
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
     fontFamily: 'Roboto-Medium',
     color: '#111827',
     marginRight: 12,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.small,
   },
   answer: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     lineHeight: 20,
     color: '#4b5563',
     fontFamily: 'Roboto-Regular',

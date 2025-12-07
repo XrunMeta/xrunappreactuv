@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, DataList, DataListRef, SafeScrollView, SafeView } from '../components';
-import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
@@ -269,14 +269,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#2a2727',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',

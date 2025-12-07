@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
   },
@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     lineHeight: 24,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',

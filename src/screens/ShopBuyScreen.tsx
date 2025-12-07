@@ -10,7 +10,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShopItemData } from '../types';
 import { getUserBalance, purchaseXrunItem } from '../services';
 import { formatCurrency, formatXrunAmount } from '../utils';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -313,20 +313,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   itemTitle: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#111111',
     marginBottom: 6,
   },
   description: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     marginBottom: 12,
     lineHeight: 20,
   },
   link: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#007aff',
     marginBottom: 30,
@@ -340,12 +340,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#78828a',
   },
   value: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#111111',
   },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontFamily: 'Roboto-Bold',
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
   },
   balanceInfo: {
     borderTopWidth: 1,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     color: '#dc3545',
   },
   insufficientBalanceText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#dc3545',
     textAlign: 'center',
@@ -405,12 +405,12 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
 });

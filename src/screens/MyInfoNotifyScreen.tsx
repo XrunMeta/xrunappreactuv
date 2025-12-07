@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SafeScrollView } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import {
   getNotificationList,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -531,17 +531,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   badge: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Bold',
     color: '#000',
   },
   description: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Regular',
     color: '#4c4e55',
   },
   eventDate: {
-    fontSize: 11,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     marginTop: 4,
@@ -558,12 +558,12 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Bold',
   },
   timestamp: {
     marginTop: 8,
-    fontSize: 10,
+    fontSize: FONTS.fontSize.xxsmall,
     color: '#7d7e83',
     fontFamily: 'Roboto-Regular',
     textAlign: 'left',
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   dateChipText: {
-    fontSize: 10,
+    fontSize: FONTS.fontSize.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#000',
   },
@@ -600,13 +600,13 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   replyText: {
-    fontSize: 12,
-    fontFamily: 'Roboto-Bold',
+    fontSize: FONTS.fontSize.msmall,
+    fontFamily: 'Roboto-Regular',
     color: '#10192d',
   },
 
   replyTimestamp: {
-    fontSize: 10,
+    fontSize: FONTS.fontSize.xxsmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     paddingRight: 0,
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#2a2727',
     minHeight: 24,
@@ -657,14 +657,14 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
   },
   deleteAllButton: {
     paddingRight: 16,
   },
   deleteAllText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#ff3b30',
   },

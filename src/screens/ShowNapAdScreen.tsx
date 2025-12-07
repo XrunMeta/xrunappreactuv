@@ -19,6 +19,7 @@ import { getNasmobAds, sendNasmobCallback, gatewayNodeJSApp3100 } from '../servi
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
+import { FONTS } from '../constants';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -755,7 +756,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: 'grey',
     textAlign: 'center',
     marginTop: 10,
@@ -764,7 +765,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#388Dc8',
     textAlign: 'center',
     marginTop: 10,
@@ -790,7 +791,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   alternativeAdButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -814,7 +815,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   backButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -824,7 +825,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   goToMapLink: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#388Dc8',
     textAlign: 'center',
@@ -858,14 +859,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
   },
   modalText: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Regular',
     marginBottom: 10,
     color: 'black',
     textAlign: 'center',
   },
   modalSubText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     marginBottom: 20,
     color: '#666',
@@ -890,7 +891,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   okButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -914,21 +915,21 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   campaignTitle: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
   },
   campaignReward: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     marginBottom: 10,
     color: '#388Dc8',
     textAlign: 'center',
   },
   campaignDesc: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     textAlign: 'center',
@@ -959,7 +960,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   watchAdButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -981,7 +982,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#666',
     textAlign: 'center',
@@ -993,7 +994,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   joinDescTitle: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -1010,7 +1011,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   joinDescText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#495057',
     lineHeight: 18,

@@ -4,7 +4,7 @@ import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
-import { COMMON_STYLES } from '../constants';
+import { COMMON_STYLES, FONTS } from '../constants';
 
 const TERMS_TEXT = `
 XRUN Location-Based Service Terms and Conditions
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',

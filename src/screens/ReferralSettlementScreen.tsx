@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getSettlementList, getSettlementAmount } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent } from '../utils';
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -334,22 +334,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   refTypeText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   dateText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#707070',
   },
   descriptionText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#343434',
   },
   amountText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#1f6880',
   },

@@ -4,7 +4,7 @@ import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyRecommender, checkCanSetRecommender, setRecommender } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     ...LIST_STYLES.large,
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardName: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Medium',
     color: '#33395b',
   },
   cardEmail: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#bababa',
   },

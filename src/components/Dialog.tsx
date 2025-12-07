@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ViewStyle,
+  StyleProp,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { FONTS } from '../constants';
 
 type DialogAction = {
   label: string;
@@ -22,7 +24,7 @@ interface DialogProps {
   children?: React.ReactNode;
   actions?: DialogAction[];
   onClose?: () => void;
-  containerStyle?: ViewStyle;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const Dialog: React.FC<DialogProps> = ({
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFDC04',
   },
   actionLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   primaryLabel: {

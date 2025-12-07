@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import { FONTS } from '../constants';
 
 interface SegmentedControlOption<T extends string> {
   label: string;
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ffdc04',
   },
   optionLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
   },
   optionLabelActive: {

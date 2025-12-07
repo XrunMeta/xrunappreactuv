@@ -9,7 +9,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { useKeyboardScroll } from '../context/KeyboardScrollContext';
-import { SIZES } from '../constants';
+import { FONTS } from '../constants';
 
 interface FormFieldProps extends TextInputProps {
   label: string;
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 
   },
   label: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     color: '#2a2727',
     fontFamily: 'Roboto-Bold',
     paddingVertical: 0,

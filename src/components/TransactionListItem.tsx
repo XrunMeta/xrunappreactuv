@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
+import { FONTS } from '../constants';
 
 interface TransactionListItemProps extends TouchableOpacityProps {
   title: string;
@@ -101,19 +102,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fallbackLabel: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
   },
   middle: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#343434',
     fontFamily: 'Roboto-Medium',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#979797',
     fontFamily: 'Roboto-Regular',
   },
@@ -121,13 +122,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   timestamp: {
-    fontSize: 9,
+    fontSize: FONTS.fontSize.xxsmall,
     color: '#aeaeae',
     fontFamily: 'Roboto-Medium',
     marginBottom: 6,
   },
   amount: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     color: '#363636',
     fontFamily: 'Roboto-Bold',
   },

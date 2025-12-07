@@ -15,7 +15,7 @@ import {
   CameraView,
   useCameraPermissions,
 } from 'expo-camera';
-import { COLORS, COMMON_STYLES, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { SafeView } from '../components';
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderWidth: 5,
   },
   title: {
-    fontSize: 24,
+    fontSize: FONTS.fontSize.xlarge,
     lineHeight: 28,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   permissionText: {
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
     lineHeight: 22,
     color: '#ffffff',
     textAlign: 'center',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   permissionButtonText: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
     fontFamily: 'Roboto-Medium',
   },
 

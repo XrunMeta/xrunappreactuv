@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
   },
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   addTokenText: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
   },
@@ -804,19 +804,19 @@ const styles = StyleSheet.create({
     height: 40,
   },
   tokenIconText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
   },
   tokenItemMiddle: {
     flex: 1,
   },
   tokenItemTitle: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   tokenItemSubtitle: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   tokenItemAmount: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
   },

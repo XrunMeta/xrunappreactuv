@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { SafeScrollView } from '../components';
 import { Header, ExplorerBadge } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { getTokenIcon } from '../constants/tokenMeta';
 import { useTranslation } from 'react-i18next';
@@ -110,18 +110,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   infoLabel: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#B8B8B8',
   },
   infoValue: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
     marginTop: 4,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     marginBottom: 16,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   explorerLabel: {
     color: '#683AB5',
-    fontSize: 15,
+    fontSize: FONTS.fontSize.lsmall,
   },
 
 });

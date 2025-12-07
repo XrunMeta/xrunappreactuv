@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CountryDialCode } from '../types';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 type Props = {
   country: CountryDialCode;
@@ -69,18 +69,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   countryName: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',
   },
   isoText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     color: '#8e9bae',
     textTransform: 'uppercase',
     fontFamily: 'Roboto-Regular',
   },
   dialCode: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#1f2933',
     fontFamily: 'Roboto-Bold',
   },

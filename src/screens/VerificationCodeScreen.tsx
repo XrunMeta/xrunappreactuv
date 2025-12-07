@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   description: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     lineHeight: 24,
     color: '#747474',
     fontFamily: 'Roboto-Regular',
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   codeText: {
-    fontSize: 20,
+    fontSize: FONTS.fontSize.large,
     fontFamily: 'Roboto-Bold',
     color: COLORS.headerText,
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   resendText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     lineHeight: 24,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Medium',

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeScrollView } from '../components';
 import { Header } from '../components';
-import { COMMON_STYLES } from '../constants';
+import { COMMON_STYLES, FONTS } from '../constants';
 
 let xrunRoundLogo: any = null;
 try {
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     height: 115,
   },
   title: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     fontWeight: '500',
     lineHeight: 24,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   description: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     lineHeight: 24,

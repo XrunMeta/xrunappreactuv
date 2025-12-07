@@ -6,7 +6,8 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
+
 
 interface OptionButtonProps {
   label: string;
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   label: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#2a2727',
   },

@@ -8,7 +8,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Header, FormField, SafeScrollView } from '../components';
-import { COMMON_STYLES } from '../constants';
+import { COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { sendEmailVerificationCode } from '../services';
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   inlineButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
   },
 });

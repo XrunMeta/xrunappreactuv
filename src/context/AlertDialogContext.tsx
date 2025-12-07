@@ -2,6 +2,7 @@ import React, { createContext, useContext, useRef, ReactNode, useState } from 'r
 import { ChoiceDialog, ChoiceDialogRef } from '../components/ChoiceDialog';
 import { Dialog } from '../components/Dialog';
 import { Text, View, StyleSheet } from 'react-native';
+import { FONTS } from '../constants';
 
 interface AlertDialogContextValue {
   showAlert: (
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   message: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
     lineHeight: 24,

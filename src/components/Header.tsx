@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { useHeaderDimensions } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
-
+import { FONTS } from '../constants';
 const { width } = Dimensions.get('window');
 
 interface HeaderProps {
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontWeight: '700',
     lineHeight: 22,
     color: COLORS.headerText,

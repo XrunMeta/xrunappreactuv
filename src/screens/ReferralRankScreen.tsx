@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { COLORS, COMMON_STYLES, LANG, SIZES } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
 
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
@@ -317,14 +317,14 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   rankHelper: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#d2edf4',
     fontFamily: 'Roboto-Bold',
     marginBottom: 4,
     lineHeight: 20,
   },
   rankEmail: {
-    fontSize: 18,
+    fontSize: FONTS.fontSize.mmedium,
     fontFamily: 'Roboto-Bold',
     color: '#ffffff',
     lineHeight: 22,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rankValue: {
-    fontSize: 32,
+    fontSize: FONTS.fontSize.xxxlarge,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },

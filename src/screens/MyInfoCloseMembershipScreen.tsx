@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { closeMembership } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   helperText: {
     marginTop: 8,
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 15,
     color: '#747474',
     fontFamily: 'Roboto-Regular',

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
+import { FONTS } from '../constants';
 
 interface TokenListItemProps extends TouchableOpacityProps {
   title: string;
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   iconText: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Bold',
   },
   badge: {
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: FONTS.fontSize.xxsmall,
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
@@ -115,12 +116,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-Medium',
     color: '#343434',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: 13,
+    fontSize: FONTS.fontSize.ssmall,
     fontFamily: 'Roboto-Bold',
     color: '#363636',
   },
   suffix: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },

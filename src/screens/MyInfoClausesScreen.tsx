@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS, COMMON_STYLES, LIST_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: FONTS.fontSize.msmall,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },

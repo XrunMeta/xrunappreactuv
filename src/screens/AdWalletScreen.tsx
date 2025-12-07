@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SegmentedControl, DataList } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { formatCurrency } from '../utils';
 import {
@@ -159,8 +159,8 @@ export const AdWalletScreen = () => {
     (item: ADXRUNEstimateItem): AdEntry => {
       const status = t('screens.adWallet.pending');
       const date = formatDate(item.created_at);
-      const expectedAdRevenue = item.priceasXrun 
-        ? `${parseFloat(item.priceasXrun || '0').toFixed(2)} XRUN` 
+      const expectedAdRevenue = item.priceasXrun
+        ? `${parseFloat(item.priceasXrun || '0').toFixed(2)} XRUN`
         : '0.00 XRUN';
       const adRevenueSettlement = '- XRUN';
 
@@ -439,18 +439,18 @@ const styles = StyleSheet.create({
     borderRadius: 70,
   },
   summaryLabel: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#E6E6E6',
     fontFamily: 'Roboto-SemiBold',
   },
   summaryValue: {
-    fontSize: 32,
+    fontSize: FONTS.fontSize.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: '#FFFFFF',
     marginTop: 8,
   },
   summaryExtra: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     color: '#FFFFFF',
     opacity: 0.8,
     marginTop: 4,
@@ -489,12 +489,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   adCardStatus: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
   adCardDate: {
-    fontSize: 16,
+    fontSize: FONTS.fontSize.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
@@ -504,12 +504,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   adCardRowLabel: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-Regular',
     color: '#979797',
   },
   adCardRowAmount: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontFamily: 'Roboto-SemiBold',
   },
   homeIndicator: {

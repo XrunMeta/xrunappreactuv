@@ -18,6 +18,7 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar } from '../components';
+import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -49,10 +50,10 @@ interface TokenComponentProps {
   calculateScaleBasedOnDistance: (distance: number) => number;
 }
 
-const TokenComponent: React.FC<TokenComponentProps> = ({ 
-  token, 
-  onPress, 
-  animationRefs, 
+const TokenComponent: React.FC<TokenComponentProps> = ({
+  token,
+  onPress,
+  animationRefs,
   appState,
   rageProgress,
   isRageMode,
@@ -1000,8 +1001,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const advertisement = token.advertisement 
-        ? String(token.advertisement) 
+      const advertisement = token.advertisement
+        ? String(token.advertisement)
         : (token.coin ? String(token.coin) : '');
       const campid = token.campid ? String(token.campid) : '';
 
@@ -1067,8 +1068,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const advertisement = token.advertisement 
-        ? String(token.advertisement) 
+      const advertisement = token.advertisement
+        ? String(token.advertisement)
         : (token.coin ? String(token.coin) : '');
       const campid = token.campid ? String(token.campid) : '';
 
@@ -1341,29 +1342,29 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
                 .map((token) => {
 
-                const handleClick = () => {
-                  console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
-                    spotID: token.spotID,
-                    advertisement: token.advertisement,
-                    campid: token.campid,
-                    coin: token.coin,
-                    name: token.name,
-                  });
-                  handleTokenClick(token);
-                };
+                  const handleClick = () => {
+                    console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
+                      spotID: token.spotID,
+                      advertisement: token.advertisement,
+                      campid: token.campid,
+                      coin: token.coin,
+                      name: token.name,
+                    });
+                    handleTokenClick(token);
+                  };
 
-                return (
-                  <TokenComponent
-                    key={token.spotID}
-                    token={token}
-                    onPress={handleClick} 
-                    animationRefs={animationRefs}
-                    appState={appState}
-                    rageProgress={rageProgress}
-                    isRageMode={isRageMode}
-                    rageColor={rageColor}
-                    calculateScaleBasedOnDistance={calculateScaleBasedOnDistance}
-                  />
+                  return (
+                    <TokenComponent
+                      key={token.spotID}
+                      token={token}
+                      onPress={handleClick} 
+                      animationRefs={animationRefs}
+                      appState={appState}
+                      rageProgress={rageProgress}
+                      isRageMode={isRageMode}
+                      rageColor={rageColor}
+                      calculateScaleBasedOnDistance={calculateScaleBasedOnDistance}
+                    />
                   );
                 });
             })()}
@@ -1411,147 +1412,147 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 minHeight: showBottomPanel && selectedToken ? 100 : 35,
               },
             ]}>
-              {}
-              {showBottomPanel && (
+            {}
+            {showBottomPanel && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: 8,
+                  paddingBottom: 0, 
+                }}>
                 <View
                   style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingTop: 8,
-                    paddingBottom: 0, 
-                  }}>
-                  <View
-                    style={{
-                      width: 40,
-                      height: 4,
-                      backgroundColor: '#D9D9D9',
-                      borderRadius: 2,
-                    }}
-                  />
-                </View>
-              )}
-              {}
-              {showBottomPanel && selectedToken && (
+                    width: 40,
+                    height: 4,
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: 2,
+                  }}
+                />
+              </View>
+            )}
+            {}
+            {showBottomPanel && selectedToken && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  paddingHorizontal: 20,
+                  paddingTop: 0,
+                  paddingBottom: 12,
+                  pointerEvents: 'box-none', 
+                }}>
+                {}
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingHorizontal: 20,
-                    paddingTop: 0,
-                    paddingBottom: 12,
-                    pointerEvents: 'box-none', 
+                    flex: 1,
                   }}>
                   {}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}>
-                    {}
-                    {!selectedToken?.iconurl ||
+                  {!selectedToken?.iconurl ||
                     selectedToken?.iconurl.toString().trim() === '' ||
                     typeof selectedToken?.iconurl !== 'string' ? (
-                      iconXrunWhite && (
-                        <Image
-                          source={iconXrunWhite}
-                          resizeMode="contain"
-                          style={{
-                            width: 44,
-                            height: 44,
-                            marginRight: 12,
-                          }}
-                        />
-                      )
-                    ) : (
+                    iconXrunWhite && (
                       <Image
-                        source={{ uri: selectedToken?.iconurl }}
+                        source={iconXrunWhite}
                         resizeMode="contain"
                         style={{
                           width: 44,
                           height: 44,
                           marginRight: 12,
-                          borderRadius: 8,
                         }}
                       />
-                    )}
-
-                    {}
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: 'Roboto-Medium',
-                          fontSize: 16,
-                          color: '#4c4e55',
-                          lineHeight: 24,
-                          marginTop:20,
-                          marginBottom: 4,
-                        }}
-                        numberOfLines={1}
-                        ellipsizeMode="tail">
-                        {!selectedToken?.name ||
-                        selectedToken?.name.toString().trim() === ''
-                          ? 'XRUN coin'
-                          : selectedToken?.name}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: 'Roboto-Regular',
-                          fontSize: 12,
-                          color: '#4c4e55',
-                          lineHeight: 15,
-                          letterSpacing: 0.06,
-                        }}
-                        numberOfLines={2}
-                        ellipsizeMode="tail">
-                        {!selectedToken?.joindesc ||
-                        selectedToken?.joindesc.toString().trim() === ''
-                          ? 'XRUN으로 리워드를 획득하세요'
-                          : selectedToken?.joindesc}
-                      </Text>
-                    </View>
-                  </View>
+                    )
+                  ) : (
+                    <Image
+                      source={{ uri: selectedToken?.iconurl }}
+                      resizeMode="contain"
+                      style={{
+                        width: 44,
+                        height: 44,
+                        marginRight: 12,
+                        borderRadius: 8,
+                      }}
+                    />
+                  )}
 
                   {}
-                  <TouchableOpacity
-                    onPress={async () => {
-                      console.log('=== View ad 버튼 클릭 ===');
-                      console.log('현재 selectedToken:', JSON.stringify(selectedToken, null, 2));
-
-                      if (autoAdTimeoutRef.current) {
-                        clearTimeout(autoAdTimeoutRef.current);
-                        autoAdTimeoutRef.current = null;
-                      }
-                      hasAutoAdTriggeredRef.current = true; 
-
-                      if (selectedToken) {
-                        await showAdInModal(selectedToken);
-                      } else {
-                        console.error('❌ View ad 버튼 - selectedToken이 없습니다!');
-                      }
-                    }}
-                    style={{
-                      backgroundColor: '#FFDC04',
-                      paddingHorizontal: 15,
-                      paddingVertical: 8,
-                      borderRadius: 8,
-                      marginLeft: 12,
-                    }}>
+                  <View style={{ flex: 1 }}>
                     <Text
                       style={{
-                        fontSize: 14,
-                        fontFamily: 'Roboto-Bold',
-                        color: '#000000',
-                      }}>
-                      View ad
+                        fontFamily: 'Roboto-Medium',
+                        fontSize: FONTS.fontSize.medium,
+                        color: '#4c4e55',
+                        lineHeight: 24,
+                        marginTop: 20,
+                        marginBottom: 4,
+                      }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail">
+                      {!selectedToken?.name ||
+                        selectedToken?.name.toString().trim() === ''
+                        ? 'XRUN coin'
+                        : selectedToken?.name}
                     </Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: FONTS.fontSize.small,
+                        color: '#4c4e55',
+                        lineHeight: 15,
+                        letterSpacing: 0.06,
+                      }}
+                      numberOfLines={2}
+                      ellipsizeMode="tail">
+                      {!selectedToken?.joindesc ||
+                        selectedToken?.joindesc.toString().trim() === ''
+                        ? 'XRUN으로 리워드를 획득하세요'
+                        : selectedToken?.joindesc}
+                    </Text>
+                  </View>
                 </View>
-              )}
-            </Pressable>
-          </Animated.View>
+
+                {}
+                <TouchableOpacity
+                  onPress={async () => {
+                    console.log('=== View ad 버튼 클릭 ===');
+                    console.log('현재 selectedToken:', JSON.stringify(selectedToken, null, 2));
+
+                    if (autoAdTimeoutRef.current) {
+                      clearTimeout(autoAdTimeoutRef.current);
+                      autoAdTimeoutRef.current = null;
+                    }
+                    hasAutoAdTriggeredRef.current = true; 
+
+                    if (selectedToken) {
+                      await showAdInModal(selectedToken);
+                    } else {
+                      console.error('❌ View ad 버튼 - selectedToken이 없습니다!');
+                    }
+                  }}
+                  style={{
+                    backgroundColor: '#FFDC04',
+                    paddingHorizontal: 15,
+                    paddingVertical: 8,
+                    borderRadius: 8,
+                    marginLeft: 12,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: FONTS.fontSize.msmall,
+                      fontFamily: 'Roboto-Bold',
+                      color: '#000000',
+                    }}>
+                    View ad
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Pressable>
+        </Animated.View>
       </View>
 
       {}
@@ -1575,7 +1576,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           console.log('모달 닫기 요청');
           setShowAdModal(false);
         }}>
-        <ShowNapAdScreen 
+        <ShowNapAdScreen
           onClose={() => {
             console.log('ShowNapAdScreen 모달 닫기');
             setShowAdModal(false);
@@ -1598,7 +1599,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.log('모달 닫기 버튼 클릭');
             setShowAdModal(false);
           }}>
-          <Text style={{ color: '#FFFFFF', fontSize: 24, fontWeight: 'bold' }}>×</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: FONTS.fontSize.xlarge, fontWeight: 'bold' }}>×</Text>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -1710,14 +1711,14 @@ const styles = StyleSheet.create({
 
   tokenPriceText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     fontWeight: 'bold',
     textAlign: 'center',
   },
 
   tokenDistanceText: {
     color: '#CCCCCC',
-    fontSize: 10,
+    fontSize: FONTS.fontSize.xxsmall,
     marginTop: -2,
     textAlign: 'center',
   },

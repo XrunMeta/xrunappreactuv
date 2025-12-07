@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Platform } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 
 const PRIVACY_TEXT = `
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: 12,
+    fontSize: FONTS.fontSize.small,
     lineHeight: 18,
     color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
