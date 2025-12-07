@@ -18,7 +18,7 @@ import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_729608, v_570c34 } from '../components';
+import { v_729608, v_570c34, v_556baf } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
@@ -376,98 +376,86 @@ export const v_386af2 = () => {
     }
   }, [v_a87c3a, v_ac3ab7]);
 
-  const v_5dedb1 =
-    v_326be8.OS === 'android'
-      ? v_ac3ab7
-        ? 16
-        : Math.max(v_eb358e.current, 24)
-      : 16;
-
   return (
-    <KeyboardAvoidingView
-      style={v_d81136.flex}
-      behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={v_326be8.OS === 'ios' ? 0 : 0}
-      enabled={v_326be8.OS === 'ios' ? true : v_ac3ab7}
-    >
-      <View style={v_d81136.container}>
-        <StatusBar style="dark" />
-        <Header
-          title={v_8d41d7('screens.myInfoNotify.title')}
-          onBackPress={v_c7ac57}
-          showBackButton
-          rightComponent={
-            v_b9c00c.length > 0 ? (
-              <TouchableOpacity
-                onPress={v_30a30f}
-                activeOpacity={0.7}
-                style={v_d81136.deleteAllButton}
-              >
-                <Text style={v_d81136.deleteAllText}>{v_8d41d7('screens.myInfoNotify.deleteAll')}</Text>
-              </TouchableOpacity>
-            ) : undefined
-          }
-        />
-        {v_683210 ? (
-          <View style={v_d81136.loadingContainer}>
-            <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-          </View>
-        ) : (
-          <SafeScrollView
-            ref={v_e99f51}
-            style={v_d81136.list}
-            backgroundColor={'#f2f2f7'}
-            contentContainerStyle={v_d81136.listContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            onContentSizeChange={v_11b765}
-            onScrollBeginDrag={v_397f64}
-            refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
-            showBottomBackground={false}
-          >
-            {v_b9c00c.length === 0 ? (
-              <View style={v_d81136.emptyContainer}>
-                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.myInfoNotify.emptyMessage')}</Text>
-              </View>
-            ) : (
-              v_718f6b()
-            )}
-          </SafeScrollView>
-        )}
+    <SafeView>
+      <KeyboardAvoidingView
+        style={v_d81136.flex}
+        behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={v_326be8.OS === 'ios' ? 0 : 0}
+        enabled={v_326be8.OS === 'ios' ? true : v_ac3ab7}
+      >
+        <View style={v_d81136.container}>
+          <StatusBar style="dark" />
+          <Header
+            title={v_8d41d7('screens.myInfoNotify.title')}
+            onBackPress={v_c7ac57}
+            showBackButton
+            rightComponent={
+              v_b9c00c.length > 0 ? (
+                <TouchableOpacity
+                  onPress={v_30a30f}
+                  activeOpacity={0.7}
+                  style={v_d81136.deleteAllButton}
+                >
+                  <Text style={v_d81136.deleteAllText}>{v_8d41d7('screens.myInfoNotify.deleteAll')}</Text>
+                </TouchableOpacity>
+              ) : undefined
+            }
+          />
+          {v_683210 ? (
+            <View style={v_d81136.loadingContainer}>
+              <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+            </View>
+          ) : (
+            <SafeScrollView
+              ref={v_e99f51}
+              style={v_d81136.list}
+              backgroundColor={'#f2f2f7'}
+              contentContainerStyle={v_d81136.listContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              onContentSizeChange={v_11b765}
+              onScrollBeginDrag={v_397f64}
+              refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
+              showBottomBackground={false}
+            >
+              {v_b9c00c.length === 0 ? (
+                <View style={v_d81136.emptyContainer}>
+                  <Text style={v_d81136.emptyText}>{v_8d41d7('screens.myInfoNotify.emptyMessage')}</Text>
+                </View>
+              ) : (
+                v_718f6b()
+              )}
+            </SafeScrollView>
+          )}
 
-        <View
-          style={[
-            v_d81136.inputBar,
-            {
-              paddingBottom: v_5dedb1,
-            },
-          ]}
-        >
-          <View style={v_d81136.inputWrapper}>
-            <TextInput
-              style={v_d81136.input}
-              placeholder={v_8d41d7('screens.myInfoNotify.placeholder')}
-              placeholderTextColor="#7d7e83"
-              value={v_180423}
-              onChangeText={v_8f2787}
-              editable={!v_5e23ec}
-            />
+          <View style={v_d81136.inputBar}>
+            <View style={v_d81136.inputWrapper}>
+              <TextInput
+                style={v_d81136.input}
+                placeholder={v_8d41d7('screens.myInfoNotify.placeholder')}
+                placeholderTextColor="#7d7e83"
+                value={v_180423}
+                onChangeText={v_8f2787}
+                editable={!v_5e23ec}
+              />
+            </View>
+            <TouchableOpacity
+              style={[v_d81136.sendButton, v_5e23ec && v_d81136.sendButtonDisabled]}
+              onPress={v_465869}
+              activeOpacity={0.8}
+              disabled={v_5e23ec}
+            >
+              {v_5e23ec ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={v_d81136.sendButtonText}>{v_8d41d7('screens.myInfoNotify.sendButton')}</Text>
+              )}
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={[v_d81136.sendButton, v_5e23ec && v_d81136.sendButtonDisabled]}
-            onPress={v_465869}
-            activeOpacity={0.8}
-            disabled={v_5e23ec}
-          >
-            {v_5e23ec ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={v_d81136.sendButtonText}>{v_8d41d7('screens.myInfoNotify.sendButton')}</Text>
-            )}
-          </TouchableOpacity>
         </View>
-      </View>
-    </KeyboardAvoidingView >
+      </KeyboardAvoidingView >
+    </SafeView>
   );
 };
 
@@ -624,7 +612,7 @@ const v_d81136 = v_472849.create({
   inputWrapper: {
     flex: 1,
     borderRadius: 6,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#edeced',
     backgroundColor: '#fff',
     paddingHorizontal: 12,
