@@ -14,6 +14,9 @@ type AppContextValue = {
   walletReceiveAddress: string;
   setWalletReceiveAddress: (address: string) => void;
   resetWalletReceiveAddress: () => void;
+  walletReceiveCurrency: number;
+  setWalletReceiveCurrency: (currency: number) => void;
+  resetWalletReceiveCurrency: () => void;
   addTokenDialogVisible: boolean;
   openAddTokenDialog: () => void;
   closeAddTokenDialog: () => void;
@@ -89,6 +92,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [walletSendAddress, setWalletSendAddress] = useState('');
   const [walletSendAmount, setWalletSendAmount] = useState('0');
   const [walletReceiveAddress, setWalletReceiveAddress] = useState('');
+  const [walletReceiveCurrency, setWalletReceiveCurrency] = useState<number>(1);
   const [addTokenDialogVisible, setAddTokenDialogVisible] = useState(false);
   const [verificationSuccessRoute, setVerificationSuccessRoute] =
     useState<ScreenName>(ROUTES.login);
@@ -149,6 +153,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       walletReceiveAddress,
       setWalletReceiveAddress,
       resetWalletReceiveAddress: () => setWalletReceiveAddress(''),
+      walletReceiveCurrency,
+      setWalletReceiveCurrency,
+      resetWalletReceiveCurrency: () => setWalletReceiveCurrency(1),
       addTokenDialogVisible,
       openAddTokenDialog: () => setAddTokenDialogVisible(true),
       closeAddTokenDialog: () => setAddTokenDialogVisible(false),
@@ -209,6 +216,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       walletSendAddress,
       walletSendAmount,
       walletReceiveAddress,
+      walletReceiveCurrency,
       addTokenDialogVisible,
       verificationSuccessRoute,
       verificationEmail,

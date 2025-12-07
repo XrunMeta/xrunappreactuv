@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FONTS } from '../constants';
+import { FONTS, SIZES } from '../constants';
 
 type QuickAction = {
   label: string;
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: SIZES.medium,
     padding: 24,
     minHeight: 170,
     justifyContent: 'space-between',

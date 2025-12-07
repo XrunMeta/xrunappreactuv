@@ -8,12 +8,12 @@ import {
   View,
   Alert,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
-import { Header, PrimaryButton, SecondaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, FONTS } from '../constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Header, SafeScrollView, SafeView } from '../components';
+import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
@@ -23,9 +23,35 @@ export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
-  const { walletReceiveAddress, resetWalletReceiveAddress } = useAppContext();
+  const { walletReceiveAddress, walletReceiveCurrency, resetWalletReceiveAddress, resetWalletReceiveCurrency } = useAppContext();
   const qrCodeRef = useRef<any>(null);
   const [walletAddress, setWalletAddress] = useState('');
+
+  const getCurrencyInfo = (currency: number) => {
+    switch (currency) {
+      case 1:
+        return { symbol: 'XRUN', name: 'Main Wallet', network: 'Ethereum Network' };
+      case 2:
+        return { symbol: 'ETH', name: 'Ethereum', network: 'Ethereum Network' };
+      case 3:
+        return { symbol: 'RUN', name: 'RUN', network: 'Ethereum Network' };
+      case 16:
+        return { symbol: 'POL', name: 'Polygon', network: 'Polygon Network' };
+      case 18:
+        return { symbol: 'XRUN', name: 'XRUN', network: 'Polygon Network' };
+      case 19:
+        return { symbol: 'XRUN', name: 'AD XRUN', network: '' };
+      default:
+        return { symbol: 'XRUN', name: 'Main Wallet', network: 'Ethereum Network' };
+    }
+  };
+
+  const currencyInfo = getCurrencyInfo(walletReceiveCurrency);
+
+  useEffect(() => {
+    console.log('[WalletReceiveScreen] currency:', walletReceiveCurrency);
+    console.log('[WalletReceiveScreen] currencyInfo:', currencyInfo);
+  }, [walletReceiveCurrency, currencyInfo]);
 
   useEffect(() => {
 
@@ -34,13 +60,19 @@ export const WalletReceiveScreen = () => {
     } else {
 
     }
+  }, [walletReceiveAddress]);
 
+  useEffect(() => {
     return () => {
-      resetWalletReceiveAddress();
-    };
-  }, [walletReceiveAddress, resetWalletReceiveAddress]);
 
-  const handleCopy = async () => {
+      console.log('[WalletReceiveScreen] cleanup 실행 - Context 초기화');
+      resetWalletReceiveAddress();
+      resetWalletReceiveCurrency();
+    };
+
+  }, []); 
+
+  const handleCopyAddress = async () => {
     if (walletAddress) {
       await copyToClipboard(walletAddress, showAlert);
     } else {
@@ -51,7 +83,7 @@ export const WalletReceiveScreen = () => {
     }
   };
 
-  const handleShare = async () => {
+  const handleShareAddress = async () => {
     if (!walletAddress) {
       Alert.alert(
         t('screens.walletReceive.alerts.error'),
@@ -70,61 +102,130 @@ export const WalletReceiveScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header title={t('screens.walletReceive.title')} onBackPress={goBack} showBackButton />
+    <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
+      <Header
+        title={t('screens.walletReceive.title')}
+        onBackPress={goBack}
+        showBackButton
+        containerStyle={{ backgroundColor: 'transparent' }}
+      />
 
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
+        backgroundColor="transparent"
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.content]}>
-          <View style={styles.qrWrapper}>
+        {}
+        <View style={styles.topSection}>
+          <View style={styles.tokenInfo}>
+            <Text style={styles.tokenName}>
+              {currencyInfo.symbol}
+            </Text>
+            <Text style={styles.walletName}>{currencyInfo.name}</Text>
+          </View>
+
+          <View style={styles.qrContainer}>
             <View style={styles.qrBorder}>
-              <View style={styles.qrInnerBorder}>
-                <View style={styles.qrPlaceholder}>
-                  {walletAddress ? (
-                    <QRCode
-                      value={walletAddress}
-                      size={200}
-                      color="#000000"
-                      backgroundColor="#FFFFFF"
-                      getRef={(c) => (qrCodeRef.current = c)}
-                    />
-                  ) : (
-                    <Ionicons name="qr-code-outline" size={120} color="#10192d" />
-                  )}
+              <View style={styles.qrBase}>
+                {walletAddress ? (
+                  <QRCode
+                    value={walletAddress}
+                    size={180}
+                    color="#000000"
+                    backgroundColor="#FFFFFF"
+                    getRef={(c) => (qrCodeRef.current = c)}
+                  />
+                ) : (
+                  <Ionicons name="qr-code" size={180} color="#121212" />
+                )}
+                <View style={styles.qrLogoBadge}>
+                  <Ionicons name="logo-electron" size={24} color="white" />
                 </View>
               </View>
             </View>
           </View>
 
-          <View style={styles.addressSection}>
-            <Text style={styles.addressLabel}>{t('screens.walletReceive.address')}</Text>
-            <View style={styles.addressBox}>
-              <Text style={styles.addressValue}>{walletAddress || t('screens.walletReceive.loadingAddress')}</Text>
-            </View>
+          {}
+          <View style={styles.actionRow}>
+            <ActionItem
+              icon="copy-outline"
+              label={t('screens.walletReceive.copyAddress')}
+              onPress={handleCopyAddress}
+            />
+            <ActionItem
+              icon="share-social-outline"
+              label={t('screens.walletReceive.shareAddress')}
+              onPress={handleShareAddress}
+            />
           </View>
         </View>
 
-        <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
-          <PrimaryButton
-            title={t('screens.walletReceive.copyAddress')}
-            fullWidth
-            onPress={handleCopy}
-            style={styles.primaryButton}
+        {}
+        <View style={styles.bottomCard}>
+          <InfoRow
+            label="Network"
+            value={currencyInfo.network || '-'}
+            icon="git-network-outline"
           />
-          <SecondaryButton
-            title={t('screens.walletReceive.shareAddress')}
-            fullWidth
-            onPress={handleShare}
-            style={styles.secondaryButton}
+          <View style={styles.divider} />
+          <InfoRow
+            label={t('screens.walletReceive.address')}
+            value={walletAddress || t('screens.walletReceive.loadingAddress')}
+            icon="wallet-outline"
+            isAddress
+            onCopy={handleCopyAddress}
           />
         </View>
       </SafeScrollView>
-
-    </View>
+    </SafeView>
   );
 };
+
+interface ActionItemProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}
+
+const ActionItem: React.FC<ActionItemProps> = ({ icon, label, onPress }) => (
+  <View style={styles.actionItem}>
+    <TouchableOpacity style={styles.actionBtn} onPress={onPress} activeOpacity={0.8}>
+      <Ionicons name={icon} size={24} color="white" />
+    </TouchableOpacity>
+    <Text style={styles.actionLabel}>{label}</Text>
+  </View>
+);
+
+interface InfoRowProps {
+  label: string;
+  value: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  isAddress?: boolean;
+  onCopy?: () => void;
+}
+
+const InfoRow: React.FC<InfoRowProps> = ({ label, value, icon, isAddress, onCopy }) => (
+  <View style={styles.infoRow}>
+    <View style={styles.infoIconWrapper}>
+      <Ionicons name={icon} size={20} color={COLORS.text} />
+    </View>
+    <View style={styles.infoContent}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text
+        style={[styles.infoValue, isAddress && styles.addressValue]}
+        numberOfLines={1}
+        ellipsizeMode="middle"
+      >
+        {value}
+      </Text>
+    </View>
+    {isAddress && onCopy && (
+      <TouchableOpacity onPress={onCopy} style={styles.copyIconBtn}>
+        <Ionicons name="copy-outline" size={18} color={COLORS.headerText} />
+      </TouchableOpacity>
+    )}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -134,71 +235,134 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     ...COMMON_STYLES.scrollContent,
   },
-  content: {
+  topSection: {
     alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 30,
   },
-  qrWrapper: {
-    marginTop: 24,
-    marginBottom: 32,
-    width: '100%',
+  tokenInfo: {
     alignItems: 'center',
+    marginBottom: 30,
+  },
+  tokenName: {
+    fontSize: 24,
+    fontFamily: FONTS.family.bold,
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  walletName: {
+    fontSize: 14,
+    fontFamily: FONTS.family.regular,
+    color: COLORS.headerText,
+    opacity: 0.6,
+  },
+  qrContainer: {
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   qrBorder: {
-    width: 263,
-    height: 263,
-    borderRadius: 32,
-    backgroundColor: '#dedede',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qrInnerBorder: {
-    width: 247,
-    height: 247,
+    padding: 10,
+    backgroundColor: 'white',
     borderRadius: 24,
-    backgroundColor: '#ffffff',
+  },
+  qrBase: {
+    width: 220,
+    height: 220,
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
-  qrPlaceholder: {
-    width: 200,
-    height: 200,
+  qrLogoBadge: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F7931A', 
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: 'white',
   },
-  addressSection: {
-    width: '100%',
-    alignItems: 'flex-start',
+  actionRow: {
+    flexDirection: 'row',
+    gap: 40,
   },
-  addressLabel: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: '#1a2e35',
-    marginBottom: 8,
+  actionItem: {
+    alignItems: 'center',
+    gap: 8,
   },
-  addressBox: {
-    width: '100%',
-    borderRadius: 12,
-    backgroundColor: '#ffffff',
-    borderWidth: 1.5,
-    borderColor: '#f0f0f5',
-    padding: 16,
+  actionBtn: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.primary, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  addressValue: {
-    fontSize: FONTS.size.small,
-    lineHeight: 15,
-    fontFamily: 'Roboto-Regular',
-    color: '#121212',
+  actionLabel: {
+    fontSize: 13,
+    fontFamily: FONTS.family.medium,
+    color: COLORS.text,
   },
-  bottomSection: {
-    width: '100%',
+  bottomCard: {
+    backgroundColor: 'white',
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
-  primaryButton: {
-    borderRadius: 16,
+  infoIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F5F7FA',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  secondaryButton: {
-    borderRadius: 16,
+  infoContent: {
+    flex: 1,
   },
-
+  infoLabel: {
+    fontSize: 12,
+    fontFamily: FONTS.family.regular,
+    color: COLORS.headerText,
+    opacity: 0.6,
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontSize: 16,
+    fontFamily: FONTS.family.bold,
+    color: COLORS.text,
+  },
+  addressValue: {
+    fontSize: 14,
+    fontFamily: FONTS.family.medium,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EEF0F5',
+    marginVertical: 16,
+    marginLeft: 52, 
+  },
+  copyIconBtn: {
+    padding: 8,
+  },
 });
-

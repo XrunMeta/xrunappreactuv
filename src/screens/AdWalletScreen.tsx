@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, SegmentedControl, DataList } from '../components';
-import { COLORS, FONTS } from '../constants';
+import { Header, SegmentedControl, DataList, SafeView } from '../components';
+import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { formatCurrency } from '../utils';
 import {
@@ -339,20 +341,39 @@ export const AdWalletScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
       <Header title={t('screens.adWallet.title')} onBackPress={goBack} showBackButton />
       <View style={styles.content}>
         <View style={styles.summaryCard}>
-          <View style={styles.cardAccentOne} />
-          <View style={styles.cardAccentTwo} />
-          <Text style={styles.summaryLabel}>{summaryLabel}</Text>
-          <Text style={styles.summaryValue}>
-            {topBannersLoading ? '...' : topBannersData.amountasxrun}
-          </Text>
-          <Text style={styles.summaryExtra}>
-            {topBannersLoading ? '...' : topBannersData.krwamount}
-          </Text>
+          <LinearGradient
+            colors={['#1E3A8A', '#1E40AF', '#1E293B']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradient}
+          >
+            {}
+            <View style={styles.backgroundIcon}>
+              <Ionicons name="wallet" size={120} color="#FFFFFF" style={styles.iconStyle} />
+            </View>
+
+            {}
+            <View style={styles.summaryContent}>
+              <View style={styles.summaryTitleRow}>
+                <View style={styles.summaryTitleLeft}>
+                  <View style={styles.iconContainer}>
+                    <Ionicons name="wallet" size={20} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.summaryLabel}>{summaryLabel}</Text>
+                </View>
+              </View>
+              <Text style={styles.summaryValue}>
+                {topBannersLoading ? '...' : topBannersData.amountasxrun}
+              </Text>
+              <Text style={styles.summaryExtra}>
+                {topBannersLoading ? '...' : topBannersData.krwamount}
+              </Text>
+            </View>
+          </LinearGradient>
         </View>
 
         <SegmentedControl
@@ -370,7 +391,7 @@ export const AdWalletScreen = () => {
               fetchData={fetchPendingData}
               ItemComponent={AdEntryItem}
               pageSize={20}
-              contentContainerStyle={styles.dataListContent}
+              contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `pending-${item.id}-${index}`}
             />
           ) : (
@@ -379,151 +400,162 @@ export const AdWalletScreen = () => {
               fetchData={fetchSettledData}
               ItemComponent={AdEntryItem}
               pageSize={20}
-              contentContainerStyle={styles.dataListContent}
+              contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `settled-${item.id}-${index}`}
             />
           )}
         </View>
       </View>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    ...COMMON_STYLES.scrollContent,
+    paddingBottom: 0,
   },
   summaryCard: {
-    height: 128,
-    borderRadius: 20,
-    backgroundColor: '#353A5B',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    justifyContent: 'center',
-    marginBottom: 24,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  cardAccentOne: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    top: -40,
-    right: -80,
-    borderRadius: 100,
-  },
-  cardAccentTwo: {
-    position: 'absolute',
-    width: 140,
+    borderRadius: SIZES.medium,
+    shadowColor: '#1E3A8A',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 10,
     height: 140,
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    bottom: -60,
-    left: -40,
-    borderRadius: 70,
+    overflow: 'hidden',
+  },
+  gradient: {
+    flex: 1,
+    borderRadius: SIZES.medium,
+    position: 'relative',
+  },
+  backgroundIcon: {
+    position: 'absolute',
+    right: -20,
+    top: -20,
+    opacity: 0.15,
+  },
+  iconStyle: {
+    transform: [{ rotate: '-15deg' }],
+  },
+  summaryContent: {
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+    flex: 1,
+    justifyContent: 'space-between',
+    zIndex: 1,
+  },
+  summaryTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   summaryLabel: {
-    fontSize: FONTS.size.medium,
-    color: '#E6E6E6',
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-SemiBold',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+    letterSpacing: 0.3,
   },
   summaryValue: {
     fontSize: FONTS.size.xxxlarge,
     fontFamily: 'Roboto-Bold',
     color: '#FFFFFF',
-    marginTop: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: -0.8,
   },
   summaryExtra: {
     fontSize: FONTS.size.medium,
-    color: '#FFFFFF',
-    opacity: 0.8,
-    marginTop: 4,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontFamily: 'Roboto-Regular',
+    opacity: 0.9,
   },
   segmentedControl: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    marginBottom: 24,
+    marginVertical: SIZES.large,
   },
   listWrapper: {
     flex: 1,
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    paddingTop: 0,
+    paddingBottom: 0,
   },
-  dataListContent: {
-    paddingBottom: 32,
-    gap: 12,
-  },
+
   adCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+    backgroundColor: COLORS.background,
+    borderRadius: SIZES.medium,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    shadowColor: '#3629B7',
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    shadowColor: '#00000014',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07,
-    shadowRadius: 30,
-    elevation: 5,
-    marginBottom: 12,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: SIZES.small,
+    marginTop: 0,
+
   },
   adCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
+
   },
   adCardStatus: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: '#343434',
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-medium',
+    color: COLORS.white,
+    paddingHorizontal: SIZES.small,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#1E3A8A',
   },
   adCardDate: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: '#343434',
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-regular',
+    color: '#666666',
   },
   adCardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 4,
+    marginBottom: 4,
   },
   adCardRowLabel: {
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
-    color: '#979797',
+    color: '#333333',
+    letterSpacing: -0.5,
   },
   adCardRowAmount: {
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
+  dataList: {
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 });

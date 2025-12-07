@@ -6,23 +6,25 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header, TaboolaBanner } from '../components';
-import { COLORS, COMMON_STYLES, LANG, FONTS } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { SafeView } from '../components';
+import { SafeScrollView, SafeView } from '../components';
 
-type CardConfig = {
+type MenuConfig = {
   id: string;
   label: string;
+  subtitle: string;
   iconName: string;
-  iconLibrary: 'Feather' | 'Material';
+  iconLibrary: 'Feather' | 'Material' | 'Ionicons';
+  iconColor: string;
   route?: keyof typeof ROUTES;
   disabled?: boolean;
 };
@@ -37,50 +39,63 @@ export const MyInfoScreen = () => {
     email?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
-  const cardConfigs: CardConfig[] = useMemo(
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(IS_DEV_MODE ? true : false);
+
+  const menuConfigs: MenuConfig[] = useMemo(
     () => [
       {
         id: 'edit',
         label: t('screens.myInfo.editInfo'),
-        iconName: 'edit-3',
-        iconLibrary: 'Feather',
+        subtitle: '이메일, 비밀번호 변경',
+        iconName: 'person-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),
-        iconName: 'bell',
-        iconLibrary: 'Feather',
+        subtitle: '알림 설정, 알림 내역',
+        iconName: 'notifications-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#10B981',
         route: 'myInfoNotify',
       },
       {
         id: 'faq',
         label: t('screens.myInfo.faq'),
-        iconName: 'head-question-outline',
-        iconLibrary: 'Material',
+        subtitle: '자주 묻는 질문',
+        iconName: 'help-circle-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#F59E0B',
         route: 'myInfoFaq',
       },
       {
         id: 'clause',
         label: t('screens.myInfo.terms'),
-        iconName: 'file-text',
-        iconLibrary: 'Feather',
+        subtitle: '이용약관, 개인정보처리방침',
+        iconName: 'document-text-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#3B82F6',
         route: 'myInfoClauses',
       },
       {
         id: 'setting',
         label: t('screens.myInfo.settings'),
-        iconName: 'settings',
-        iconLibrary: 'Feather',
+        subtitle: '앱 설정, 언어 설정',
+        iconName: 'settings-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#8B5CF6',
         route: 'myInfoSettings',
       },
       {
         id: 'referral',
         label: t('screens.myInfo.referralEdit'),
-        iconName: 'refresh-ccw',
-        iconLibrary: 'Feather',
+        subtitle: '추천인 관리, 정산 내역',
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#EC4899',
         route: 'myInfoReferral',
       },
     ],
@@ -167,13 +182,13 @@ export const MyInfoScreen = () => {
     return () => clearInterval(interval);
   }, [navigate, currentScreen]);
 
-  const handleCardPress = (card: CardConfig) => {
-    if (card.route) {
+  const handleMenuPress = (menu: MenuConfig) => {
+    if (menu.route) {
 
-      if (card.id === 'edit' && userInfo?.email) {
+      if (menu.id === 'edit' && userInfo?.email) {
         setVerificationEmail(userInfo.email);
       }
-      navigate(ROUTES[card.route]);
+      navigate(ROUTES[menu.route]);
     }
   };
 
@@ -247,21 +262,25 @@ export const MyInfoScreen = () => {
     );
   };
 
-  const renderIcon = (card: CardConfig) => {
-    if (card.iconLibrary === 'Material') {
+  const renderMenuIcon = (menu: MenuConfig) => {
+    const iconSize = 24;
+    if (menu.iconLibrary === 'Ionicons') {
+      return <Ionicons name={menu.iconName as any} size={iconSize} color={menu.iconColor} />;
+    }
+    if (menu.iconLibrary === 'Material') {
       return (
         <MaterialCommunityIcons
-          name={card.iconName as any}
-          size={18}
-          color="#fff"
+          name={menu.iconName as any}
+          size={iconSize}
+          color={menu.iconColor}
         />
       );
     }
-    return <Feather name={card.iconName as any} size={18} color="#fff" />;
+    return <Feather name={menu.iconName as any} size={iconSize} color={menu.iconColor} />;
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
       <Header
         title={t('screens.myInfo.title')}
         onBackPress={() => {
@@ -273,71 +292,79 @@ export const MyInfoScreen = () => {
         }}
         showBackButton
       />
+      {}
+      <View style={styles.adBanner}>
+        < TaboolaBanner placementType="myinfo_OS_395x80" />
+      </View>
+
       <View style={styles.scrollContent}>
-        <View style={styles.inner}>
-          {}
-          <TaboolaBanner placementType="myinfo_OS_395x80" />
-
-          <View style={styles.profileCard}>
-            <View>
-              {isLoading ? (
-                <ActivityIndicator size="small" color={COLORS.headerText} />
-              ) : (
-                <>
-                  <Text style={styles.profileName}>
-                    {userInfo?.name || '사용자'}
-                  </Text>
-                  <Text style={styles.profileEmail}>
-                    {userInfo?.email || ''}
-                  </Text>
-                </>
-              )}
-            </View>
-            <View style={styles.profileActions}>
-              <TouchableOpacity
-                onPress={handleShare}
-                style={styles.actionButton}
-                activeOpacity={0.7}
-              >
-                <Feather name="share-2" size={18} color={COLORS.headerText} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleLogout}
-                style={styles.actionButton}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons
-                  name="logout"
-                  size={18}
-                  color={COLORS.headerText}
-                />
-              </TouchableOpacity>
-            </View>
+        <View style={styles.profileCard}>
+          <View style={styles.profileIconContainer}>
+            <Ionicons name="person-outline" size={32} color="#666666" />
           </View>
-
-          <View style={styles.grid}>
-            {cardConfigs.map((card) => (
-              <TouchableOpacity
-                key={card.id}
-                style={[
-                  styles.card,
-                ]}
-                onPress={() => handleCardPress(card)}
-                activeOpacity={0.85}
-              >
-                <View style={styles.cardIconContainer}>
-                  <View style={styles.cardIcon}>{renderIcon(card)}</View>
-                  {card.id === 'notify' && hasUnreadNotifications && (
-                    <View style={styles.notificationBadge} />
-                  )}
-                </View>
-                <Text style={styles.cardLabel}>{card.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.profileInfo}>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={COLORS.headerText} />
+            ) : (
+              <>
+                <Text style={styles.profileName}>
+                  {userInfo?.name || '사용자'}
+                </Text>
+                <Text style={styles.profileEmail}>
+                  {userInfo?.email || ''}
+                </Text>
+              </>
+            )}
+          </View>
+          <View style={styles.profileActions}>
+            <TouchableOpacity
+              onPress={handleShare}
+              style={styles.actionButton}
+              activeOpacity={0.7}
+            >
+              <Feather name="share-2" size={18} color={COLORS.headerText} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.actionButton}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons
+                name="logout"
+                size={18}
+                color={COLORS.headerText}
+              />
+            </TouchableOpacity>
           </View>
         </View>
+        <SafeScrollView style={styles.menuListContainer} showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
+          {}
+          <View style={styles.menuList}>
+            {menuConfigs.map((menu, index) => (
+              <React.Fragment key={menu.id}>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => handleMenuPress(menu)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.menuIconContainer}>
+                    {renderMenuIcon(menu)}
+                    {menu.id === 'notify' && hasUnreadNotifications && (
+                      <View style={styles.notificationBadge} />
+                    )}
+                  </View>
+                  <View style={styles.menuTextContainer}>
+                    <Text style={styles.menuLabel}>{menu.label}</Text>
+                    <Text style={styles.menuSubtitle}>{menu.subtitle}</Text>
+                  </View>
+                </TouchableOpacity>
+                {index < menuConfigs.length - 1 && <View style={styles.menuDivider} />}
+              </React.Fragment>
+            ))}
+          </View>
+        </SafeScrollView>
       </View>
-    </SafeView>
+    </SafeView >
   );
 };
 
@@ -346,18 +373,22 @@ const styles = StyleSheet.create({
     ...COMMON_STYLES.container,
   },
   scrollContent: {
-    ...COMMON_STYLES.scrollContent,
+
+    marginHorizontal: SIZES.large,
+    gap: SIZES.small,
+    paddingTop: SIZES.small,
+    flex: 1,
   },
-  inner: {
-    gap: 24,
+
+  menuListContainer: {
+    flex: 1,
   },
   adBanner: {
     width: '100%',
-    height: 97,
-    borderRadius: 8,
-    backgroundColor: '#d9d9d9',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 84,
+    borderWidth: 1,
+    overflow: 'hidden',
+    borderColor: '#ededed',
   },
   adText: {
     fontSize: FONTS.size.large,
@@ -376,8 +407,21 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 16,
+  },
+  profileIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 30,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#ededed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileInfo: {
+    flex: 1,
   },
   profileName: {
     fontSize: FONTS.size.medium,
@@ -392,63 +436,70 @@ const styles = StyleSheet.create({
   },
   profileActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
     width: 36,
     height: 36,
-    borderRadius: 12,
+    borderRadius: SIZES.small,
     backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    width: '31%',
-    minWidth: 100,
-    height: 110,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e3e7ec',
+  menuList: {
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
-    paddingHorizontal: 8,
-    gap: 12,
+    borderRadius: SIZES.medium,
+    overflow: 'hidden',
+    shadowColor: '#00000014',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  cardIconContainer: {
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.large,
+    paddingVertical: SIZES.medium,
+    gap: 16,
+  },
+  menuIconContainer: {
     position: 'relative',
-    width: 36,
-    height: 36,
-  },
-  cardIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#343a5a',
+    width: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  menuTextContainer: {
+    flex: 1,
+  },
+  menuLabel: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#10192d',
+    marginBottom: 2,
+  },
+  menuSubtitle: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#6B7280',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#EEF0F5',
+    marginLeft: 60, 
   },
   notificationBadge: {
     position: 'absolute',
     top: -2,
     right: -2,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#FF6B6B',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#fff',
   },
-  cardLabel: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-Medium',
-    color: '#111',
-  },
+
 });
 

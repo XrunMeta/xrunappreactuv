@@ -104,7 +104,7 @@ interface TransactionListItemData extends TransactionHistoryItem {
 export const WalletDetailScreen = () => {
   const { t } = useTranslation();
   const { navigate, goBack } = useAppNavigation();
-  const { selectedWalletAsset, resetSelectedWalletAsset, setSelectedWalletAsset, setWalletReceiveAddress } = useAppContext();
+  const { selectedWalletAsset, resetSelectedWalletAsset, setSelectedWalletAsset, setWalletReceiveAddress, setWalletReceiveCurrency } = useAppContext();
   const { showAlert } = useAlertDialog();
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -313,6 +313,10 @@ export const WalletDetailScreen = () => {
       if (publicAddress) {
         setWalletReceiveAddress(publicAddress);
       }
+      if (selectedWalletAsset?.currency) {
+        console.log('[WalletDetailScreen] receive 버튼 클릭 - currency:', selectedWalletAsset.currency);
+        setWalletReceiveCurrency(selectedWalletAsset.currency);
+      }
       navigate(ROUTES.walletReceive);
       return;
     }
@@ -326,7 +330,7 @@ export const WalletDetailScreen = () => {
       }
       return;
     }
-  }, [navigate, selectedWalletAsset, publicAddress, setWalletReceiveAddress, setSelectedWalletAsset]);
+  }, [navigate, selectedWalletAsset, publicAddress, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset]);
 
   const handleCopyAddress = useCallback(() => {
     if (publicAddress) {
