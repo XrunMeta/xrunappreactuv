@@ -123,9 +123,18 @@ export const AdWalletScreen = () => {
 
       try {
 
-        let utcDateString = utcString;
-        if (!utcDateString.includes('T')) {
-          utcDateString = utcDateString.replace(' ', 'T') + 'Z';
+        let utcDateString = utcString.trim();
+
+        const hasTimezone = utcDateString.endsWith('Z') || 
+          utcDateString.includes('+') || 
+          (utcDateString.length > 10 && utcDateString.slice(10).includes('-'));
+
+        if (!hasTimezone) {
+
+          if (!utcDateString.includes('T')) {
+            utcDateString = utcDateString.replace(' ', 'T');
+          }
+          utcDateString += 'Z'; 
         }
 
         const localDate = new Date(utcDateString);
@@ -160,14 +169,17 @@ export const AdWalletScreen = () => {
   const convertEstimateToAdEntry = useCallback(
     (item: ADXRUNEstimateItem): AdEntry => {
       const status = t('screens.adWallet.pending');
-      const date = formatDate(item.created_at);
-      const expectedAdRevenue = item.priceasXrun
-        ? `${parseFloat(item.priceasXrun || '0').toFixed(2)} XRUN`
-        : '0.00 XRUN';
+      const date = formatDate(item.datetime);
+      console.log('🔍 [convertEstimateToAdEntry] item:', item);
+
+      const amountValue = item.amountasxrun || item.priceasXrun || '0';
+      const expectedAdRevenue = `${parseFloat(amountValue).toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
+      const itemId = item.transaction || item.id;
+
       return {
-        id: item.id,
+        id: itemId,
         status,
         date,
         expectedAdRevenue,
@@ -183,7 +195,7 @@ export const AdWalletScreen = () => {
     (item: ADXRUNResultItem): AdEntry => {
 
       const status =
-        item.action === 3307 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
+        item.action === 3304 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
       const date = formatDate(item.datetime);
 
       let expectedAdRevenue = '0 XRUN';
