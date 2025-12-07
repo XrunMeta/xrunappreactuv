@@ -1233,7 +1233,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       brand: token.brand,
     };
 
-    console.log('✅ 저장할 토큰 복사본:', JSON.stringify(tokenCopy, null, 2));
     console.log('🔍 tokenCopy 상세 검증:', {
       spotID: tokenCopy.spotID,
       advertisement: tokenCopy.advertisement,

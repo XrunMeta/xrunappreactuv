@@ -57,6 +57,7 @@ import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/compone
 import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
+import { getTopAd5 } from './src/services';
 import {
   useFonts,
   Roboto_400Regular,
@@ -378,6 +379,15 @@ export default function App() {
         console.log('[App] Taboola 초기화 완료');
       } catch (error) {
         console.error('[App] Taboola 초기화 실패:', error);
+      }
+
+      try {
+        console.log('[App] TopAd5 광고 캐시 시작');
+        await getTopAd5();
+        console.log('[App] TopAd5 광고 캐시 완료');
+      } catch (error) {
+        console.error('[App] TopAd5 광고 캐시 실패:', error);
+
       }
     };
 

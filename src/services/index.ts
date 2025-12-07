@@ -3,6 +3,8 @@ import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { ROUTES } from '../navigation';
+import { cashingimages } from '../utils/imageCache';
+import { getEnv } from '../utils/env';
 import {
   AliveResponse,
   KeepAliveServerResponse,
@@ -134,7 +136,6 @@ import {
   DeleteXrunPurchasedItemResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
-import { getEnv } from '../utils/env';
 
 const API_TIMEOUT = 20000;
 
@@ -3840,6 +3841,98 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
     if (response) {
       await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(response));
       console.log('[getTopAd5] AsyncStorage에 저장 완료');
+    }
+
+    if (response && Array.isArray(response)) {
+      try {
+        console.log('[getTopAd5] 이미지 캐싱 시작');
+        const imageFileIds: (string | number)[] = [];
+
+        response.forEach((ad: any) => {
+
+          const imageFields = [
+            ad?.brandlogo,
+            ad?.adthumbnail2,
+            ad?.symbolimg,
+            ad?.thumbnail,
+            ad?.iconurl,
+          ];
+
+          imageFields.forEach((field) => {
+
+            if (field && (typeof field === 'number' || (typeof field === 'string' && !field.startsWith('http') && !field.startsWith('data:')))) {
+              const fileId = typeof field === 'string' ? field.trim() : field;
+              if (fileId && !imageFileIds.includes(fileId)) {
+                imageFileIds.push(fileId);
+              }
+            }
+          });
+        });
+
+        console.log('[getTopAd5] 추출된 이미지 파일 ID 개수:', imageFileIds.length);
+
+        if (imageFileIds.length > 0) {
+
+          const env = getEnv();
+          const gatewayApiAddress = env.GATEWAY_NODEJS;
+
+          await cashingimages.downloadMultipleImages(imageFileIds, gatewayApiAddress);
+          console.log('[getTopAd5] 이미지 캐싱 완료');
+        } else {
+          console.log('[getTopAd5] 캐싱할 이미지가 없습니다.');
+        }
+      } catch (imageCacheError) {
+        console.error('[getTopAd5] 이미지 캐싱 오류:', imageCacheError);
+
+      }
+    }
+
+    try {
+      const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+      if (astorCoinsData && response && Array.isArray(response) && response.length > 0) {
+        console.log('[getTopAd5] 마커 데이터 발견 - 광고 매핑 시작');
+
+        const coinsData = JSON.parse(astorCoinsData);
+        if (Array.isArray(coinsData) && coinsData.length > 0) {
+
+          const mappedCoinsData = coinsData.map((marker: any, index: number) => {
+
+            const adIndex = index % response.length;
+            const mappedAd = response[adIndex];
+
+            return {
+              ...marker,
+
+              name: mappedAd?.name || marker.name,
+              iconurl: mappedAd?.iconurl || marker.iconurl,
+              joindesc: mappedAd?.joindesc || marker.joindesc,
+              xrunPrice: mappedAd?.xrunPrice || marker.xrunPrice || marker.xrunprice || 0,
+              campid: mappedAd?.campid || marker.campid || marker.campId || '',
+
+              thumbnail: mappedAd?.thumbnail || marker.thumbnail,
+              ad_company: mappedAd?.ad_company || marker.ad_company,
+              coins: mappedAd?.coins?.toString() || marker.coins,
+              brandlogo: mappedAd?.brandlogo || marker.brandlogo,
+              adthumbnail2: mappedAd?.adthumbnail2 || marker.adthumbnail2,
+              symbolimg: mappedAd?.symbolimg || marker.symbolimg,
+            };
+          });
+
+          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
+          console.log('[getTopAd5] 마커-광고 매핑 완료:', mappedCoinsData.length, '개 마커에 광고 매핑');
+        } else {
+          console.log('[getTopAd5] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
+        }
+      } else {
+        if (!astorCoinsData) {
+          console.log('[getTopAd5] 마커 데이터 없음 - 매핑 건너뛰기');
+        } else if (!response || !Array.isArray(response) || response.length === 0) {
+          console.log('[getTopAd5] 광고 데이터 없음 - 매핑 건너뛰기');
+        }
+      }
+    } catch (mappingError) {
+      console.error('[getTopAd5] 마커-광고 매핑 오류:', mappingError);
+
     }
 
     return response;

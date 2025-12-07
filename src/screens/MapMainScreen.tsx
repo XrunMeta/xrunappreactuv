@@ -271,6 +271,8 @@ export const MapMainScreen: React.FC = () => {
 
   const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
 
+  const LAST_MAP_REGION_KEY = 'lastMapRegion';
+
   const hasLoadedLastGpsLocationRef = useRef(false);
 
   const hasCompletedInitialLoadRef = useRef(false);
@@ -278,6 +280,8 @@ export const MapMainScreen: React.FC = () => {
   const hasMovedToGpsAfterInitialLoadRef = useRef(false);
 
   const hasMovedToFirstMarkerOnInitialLoadRef = useRef(false);
+
+  const hasMapReadyRef = useRef(false);
 
   let iconXrunBlack: any = null;
   let iconXrunLogo: any = null;
@@ -328,11 +332,8 @@ export const MapMainScreen: React.FC = () => {
     console.log('🚀 [loadMarkersForLocation] 시작:', { targetLocation, forceRefresh, hasCurrentGpsLocation: !!currentGpsLocation });
 
     if (loadingMarkersRef.current) {
-
       console.log('=== 맵 마커 로딩 중, 중복 호출 방지 ===');
-
       return;
-
     }
 
     const userData = await AsyncStorage.getItem('userData');
@@ -346,60 +347,74 @@ export const MapMainScreen: React.FC = () => {
     try {
 
       const parsedUserData = JSON.parse(userData);
-
       const member = parsedUserData?.member;
-
       if (!member) {
-
         console.log('userData에 member가 없습니다.');
-
         return;
-
       }
 
       if (!forceRefresh) {
-
         const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
-
         if (astorCoinsData) {
 
           try {
-
             const coinsData = JSON.parse(astorCoinsData);
-
             if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
 
-              const spotDataArray: SpotData[] = coinsData.map((coin: any) => ({
+              const sortedCoinsData = coinsData
+                .map((coin: any) => {
+                  const lat = coin.latitude || coin.lat;
+                  const lng = coin.longitude || coin.lng;
+
+                  if (lat && lng) {
+                    const distance = calculateDistance(
+                      targetLocation.latitude,
+                      targetLocation.longitude,
+                      lat,
+                      lng
+                    );
+                    return {
+                      ...coin,
+                      distance: distance, 
+                    };
+                  } else {
+
+                    return {
+                      ...coin,
+                      distance: coin.distance || Infinity,
+                    };
+                  }
+                })
+                .sort((a: any, b: any) => {
+
+                  return (a.distance || Infinity) - (b.distance || Infinity);
+                });
+
+              try {
+                await AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsData));
+                console.log('✅ [MapMainScreen] 캐시 데이터 거리순 정렬 후 저장 완료');
+              } catch (sortError) {
+                console.error('[MapMainScreen] 캐시 데이터 정렬 후 저장 오류:', sortError);
+              }
+
+              const spotDataArray: SpotData[] = sortedCoinsData.map((coin: any) => ({
 
                 spotID: coin.spotid || coin.spotID || coin.id || 0,
-
                 distance: coin.distance || 0,
-
                 direction: coin.direction || 0,
-
                 name: coin.name || coin.title || coin.brand || 'XRUN coin',
-
                 latitude: coin.latitude || coin.lat,
-
                 longitude: coin.longitude || coin.lng,
-
                 xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
-
                 iconurl: coin.iconurl || '',
-
                 joindesc: coin.joindesc || '',
-
                 brand: coin.brand || coin.coin || '',
-
                 coins: coin.coins || coin.coin || '',
-
                 coin: coin.coin || '',
-
                 campid: coin.campid || coin.campId || '',
-
               } as SpotData & { campid?: string }));
 
-              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', spotDataArray.length, ')');
+              console.log('✅ [MapMainScreen] 캐시된 마커 데이터 사용 (개수:', spotDataArray.length, ', 거리순 정렬됨)');
               console.log('📌 [MapMainScreen] setMarkers 호출 (캐시 데이터):', spotDataArray.length, '개');
               setMarkers(spotDataArray);
               setLastFetchedLocation(targetLocation);
@@ -744,10 +759,38 @@ export const MapMainScreen: React.FC = () => {
       if (combinedCoinsData.length > 0) {
         try {
 
-          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(combinedCoinsData));
-          console.log('✅ astorCoinsData AsyncStorage에 저장 완료');
+          const sortedCoinsData = combinedCoinsData
+            .map((coin: any) => {
+              const lat = coin.latitude || coin.lat;
+              const lng = coin.longitude || coin.lng;
 
-          console.log('astorCoinsData -> ' + combinedCoinsData.length);
+              if (lat && lng) {
+                const distance = calculateDistance(
+                  targetLocation.latitude,
+                  targetLocation.longitude,
+                  lat,
+                  lng
+                );
+                return {
+                  ...coin,
+                  distance: distance, 
+                };
+              } else {
+
+                return {
+                  ...coin,
+                  distance: coin.distance || Infinity,
+                };
+              }
+            })
+            .sort((a: any, b: any) => {
+
+              return (a.distance || Infinity) - (b.distance || Infinity);
+            });
+
+          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsData));
+          console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (거리순 정렬됨)');
+          console.log('astorCoinsData -> ' + sortedCoinsData.length);
         } catch (storageError) {
 
           console.error('AsyncStorage 저장 오류:', storageError);
@@ -758,8 +801,36 @@ export const MapMainScreen: React.FC = () => {
 
         if (coinsDataVt.length > 0) {
           try {
-            await AsyncStorage.setItem('astorCoinsData', JSON.stringify(coinsDataVt));
-            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt:', coinsDataVt.length, '개)');
+
+            const sortedCoinsDataVt = coinsDataVt
+              .map((coin: any) => {
+                const lat = coin.latitude || coin.lat;
+                const lng = coin.longitude || coin.lng;
+
+                if (lat && lng) {
+                  const distance = calculateDistance(
+                    targetLocation.latitude,
+                    targetLocation.longitude,
+                    lat,
+                    lng
+                  );
+                  return {
+                    ...coin,
+                    distance: distance,
+                  };
+                } else {
+                  return {
+                    ...coin,
+                    distance: coin.distance || Infinity,
+                  };
+                }
+              })
+              .sort((a: any, b: any) => {
+                return (a.distance || Infinity) - (b.distance || Infinity);
+              });
+
+            await AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsDataVt));
+            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt 거리순 정렬됨:', sortedCoinsDataVt.length, '개)');
           } catch (storageError) {
             console.error('AsyncStorage 저장 오류:', storageError);
           }
@@ -937,6 +1008,229 @@ export const MapMainScreen: React.FC = () => {
       }
     }
   }, [location, goToCurrentLocation]);
+
+  const handleMapReady = useCallback(async () => {
+
+    hasMapReadyRef.current = true;
+    console.log('📍 [handleMapReady] 지도 로드 완료 - 최초 위치 이동 시작');
+
+    if (!mapRef.current) {
+      console.error('❌ [handleMapReady] mapRef가 없습니다.');
+      return;
+    }
+
+    let targetLocation: LocationData | null = null;
+    let targetRegion: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number } | null = null;
+    let locationSource = '';
+
+    try {
+
+      try {
+        const storedMapRegion = await AsyncStorage.getItem(LAST_MAP_REGION_KEY);
+        if (storedMapRegion) {
+          const lastMapRegion = JSON.parse(storedMapRegion);
+          if (lastMapRegion.latitude && lastMapRegion.longitude && 
+              lastMapRegion.latitudeDelta && lastMapRegion.longitudeDelta) {
+            targetRegion = {
+              latitude: lastMapRegion.latitude,
+              longitude: lastMapRegion.longitude,
+              latitudeDelta: lastMapRegion.latitudeDelta,
+              longitudeDelta: lastMapRegion.longitudeDelta,
+            };
+            targetLocation = {
+              latitude: lastMapRegion.latitude,
+              longitude: lastMapRegion.longitude,
+            };
+            locationSource = '캐시된 맵 영역 정보';
+            console.log('✅ [handleMapReady] 캐시된 맵 영역 정보 발견:', {
+              latitude: targetRegion.latitude.toFixed(6),
+              longitude: targetRegion.longitude.toFixed(6),
+              latitudeDelta: targetRegion.latitudeDelta.toFixed(6),
+              longitudeDelta: targetRegion.longitudeDelta.toFixed(6),
+            });
+          }
+        }
+      } catch (mapRegionError) {
+        console.error('❌ [handleMapReady] 맵 영역 정보 읽기 실패:', mapRegionError);
+      }
+
+      if (!targetLocation) {
+        try {
+          const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
+          if (storedLocation) {
+            const lastGpsLocation: LocationData = JSON.parse(storedLocation);
+            if (lastGpsLocation.latitude && lastGpsLocation.longitude) {
+              targetLocation = lastGpsLocation;
+              locationSource = 'AsyncStorage 마지막 위치';
+              console.log('✅ [handleMapReady] AsyncStorage에서 마지막 위치 발견:', lastGpsLocation);
+            }
+          }
+        } catch (storageError) {
+          console.error('❌ [handleMapReady] AsyncStorage 읽기 실패:', storageError);
+        }
+      }
+
+      if (!targetLocation) {
+        try {
+
+          const { status } = await Location.getForegroundPermissionsAsync();
+          if (status === 'granted') {
+            const currentGpsLocation = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+            });
+            targetLocation = {
+              latitude: currentGpsLocation.coords.latitude,
+              longitude: currentGpsLocation.coords.longitude,
+            };
+            locationSource = '현재 GPS 위치';
+            console.log('✅ [handleMapReady] 현재 GPS 위치 가져오기 성공:', targetLocation);
+
+            await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(targetLocation));
+          } else {
+            console.log('⚠️ [handleMapReady] 위치 권한 없음 - 다음 우선순위로');
+          }
+        } catch (gpsError) {
+          console.error('❌ [handleMapReady] GPS 위치 가져오기 실패:', gpsError);
+        }
+      }
+
+      if (!targetLocation) {
+        try {
+          const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+          if (astorCoinsData) {
+            const coinsData = JSON.parse(astorCoinsData);
+            if (Array.isArray(coinsData) && coinsData.length > 0) {
+
+              const firstMarker = coinsData.find((coin: any) => 
+                (coin.latitude || coin.lat) && (coin.longitude || coin.lng)
+              );
+
+              if (firstMarker) {
+                targetLocation = {
+                  latitude: firstMarker.latitude || firstMarker.lat,
+                  longitude: firstMarker.longitude || firstMarker.lng,
+                };
+                locationSource = '저장된 마커 중 첫 번째 마커';
+                console.log('✅ [handleMapReady] 저장된 마커에서 첫 번째 마커 위치 발견:', targetLocation);
+              }
+            }
+          }
+        } catch (markerError) {
+          console.error('❌ [handleMapReady] 저장된 마커 읽기 실패:', markerError);
+        }
+      }
+
+      if (!targetLocation) {
+        targetLocation = {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        };
+        locationSource = '기본 위치(서울)';
+        console.log('✅ [handleMapReady] 기본 위치(서울) 사용:', targetLocation);
+      }
+
+      if (targetLocation) {
+        console.log(`📍 [handleMapReady] ${locationSource}로 이동:`, targetLocation);
+
+        isProgrammaticMoveRef.current = true;
+
+        const regionToUse = targetRegion || {
+          latitude: targetLocation.latitude,
+          longitude: targetLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        };
+
+        mapRef.current.animateToRegion(regionToUse, 500);
+
+        mapRegionRef.current = regionToUse;
+
+        setLocation(targetLocation);
+
+        if (!initialLocationRef.current) {
+          setInitialLocation(targetLocation);
+          setLastFetchedLocation(targetLocation);
+          initialLocationRef.current = targetLocation;
+          lastFetchedLocationRef.current = targetLocation;
+          lastUpdatedRegionRef.current = {
+            latitude: targetLocation.latitude,
+            longitude: targetLocation.longitude,
+          };
+        }
+
+        if (!targetRegion) {
+          try {
+            await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(regionToUse));
+            console.log('💾 [handleMapReady] 맵 영역 정보 저장:', {
+              latitude: regionToUse.latitude.toFixed(6),
+              longitude: regionToUse.longitude.toFixed(6),
+              latitudeDelta: regionToUse.latitudeDelta.toFixed(6),
+              longitudeDelta: regionToUse.longitudeDelta.toFixed(6),
+            });
+          } catch (cacheError) {
+            console.error('❌ [handleMapReady] 맵 영역 정보 저장 실패:', cacheError);
+          }
+        }
+
+        console.log('🔄 [handleMapReady] 마커 로드 시작');
+        lastMarkerRefreshTimeRef.current = Date.now();
+        await loadMarkersForLocation(targetLocation, false);
+        console.log('✅ [handleMapReady] 마커 로드 완료');
+
+        hasCompletedInitialLoadRef.current = true;
+
+        setTimeout(() => {
+          isProgrammaticMoveRef.current = false;
+          console.log('✅ [handleMapReady] 지도 이동 완료');
+        }, 600);
+      } else {
+        console.error('❌ [handleMapReady] 이동할 위치를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('❌ [handleMapReady] 오류 발생:', error);
+
+      const defaultLocation: LocationData = {
+        latitude: 37.5665,
+        longitude: 126.9780,
+      };
+
+      const defaultRegion = {
+        latitude: defaultLocation.latitude,
+        longitude: defaultLocation.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      };
+
+      if (mapRef.current) {
+        isProgrammaticMoveRef.current = true;
+        mapRef.current.animateToRegion(defaultRegion, 500);
+
+        mapRegionRef.current = defaultRegion;
+
+        setLocation(defaultLocation);
+
+        if (!initialLocationRef.current) {
+          setInitialLocation(defaultLocation);
+          setLastFetchedLocation(defaultLocation);
+          initialLocationRef.current = defaultLocation;
+          lastFetchedLocationRef.current = defaultLocation;
+        }
+
+        try {
+          await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(defaultRegion));
+          console.log('💾 [handleMapReady] 기본 위치 맵 영역 정보 저장');
+        } catch (cacheError) {
+          console.error('❌ [handleMapReady] 기본 위치 맵 영역 정보 저장 실패:', cacheError);
+        }
+
+        await loadMarkersForLocation(defaultLocation, false);
+
+        setTimeout(() => {
+          isProgrammaticMoveRef.current = false;
+        }, 600);
+      }
+    }
+  }, [loadMarkersForLocation]);
 
   const checkMapLocation = useCallback(async () => {
 
@@ -2267,7 +2561,7 @@ export const MapMainScreen: React.FC = () => {
 
   };
 
-  const handleRegionChangeComplete = (region: any) => {
+  const handleRegionChangeComplete = async (region: any) => {
 
     const isProgrammatic = isProgrammaticMoveRef.current;
     const platform = Platform.OS;
@@ -2353,6 +2647,26 @@ export const MapMainScreen: React.FC = () => {
     lastLocationChangeTimeRef.current = Date.now();
 
     isUserTouchRef.current = false;
+
+    if (!isProgrammatic) {
+      try {
+        const mapRegionData = {
+          latitude: region.latitude,
+          longitude: region.longitude,
+          latitudeDelta: region.latitudeDelta,
+          longitudeDelta: region.longitudeDelta,
+        };
+        await AsyncStorage.setItem(LAST_MAP_REGION_KEY, JSON.stringify(mapRegionData));
+        console.log('💾 [맵 캐싱] 맵 영역 정보 저장:', {
+          latitude: mapRegionData.latitude.toFixed(6),
+          longitude: mapRegionData.longitude.toFixed(6),
+          latitudeDelta: mapRegionData.latitudeDelta.toFixed(6),
+          longitudeDelta: mapRegionData.longitudeDelta.toFixed(6),
+        });
+      } catch (cacheError) {
+        console.error('❌ [맵 캐싱] 저장 실패:', cacheError);
+      }
+    }
 
   };
 
@@ -2499,6 +2813,8 @@ export const MapMainScreen: React.FC = () => {
           showsUserLocation={stableShowsUserLocation}
 
           showsMyLocationButton={false}
+
+          onMapReady={handleMapReady}
 
           onRegionChange={handleRegionChange}
 
