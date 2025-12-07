@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
   },
   titleLeft: {
     flexDirection: 'row',
@@ -154,11 +153,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.8,
   },
   helper: {
-    marginTop: 6,
-    fontSize: FONTS.size.small,
+    marginTop: 0,
+    fontSize: FONTS.size.medium,
     color: 'rgba(255, 255, 255, 0.9)',
     fontFamily: 'Roboto-Regular',
     opacity: 0.9,
+
   },
 });
 
