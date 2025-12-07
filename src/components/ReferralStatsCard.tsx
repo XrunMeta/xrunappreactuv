@@ -107,7 +107,6 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
   },
   titleLeft: {
     flexDirection: 'row',
@@ -154,11 +153,12 @@ const v_d81136 = v_472849.create({
     letterSpacing: -0.8,
   },
   helper: {
-    marginTop: 6,
-    fontSize: v_843035.size.small,
+    marginTop: 0,
+    fontSize: v_843035.size.medium,
     color: 'rgba(255, 255, 255, 0.9)',
     fontFamily: 'Roboto-Regular',
     opacity: 0.9,
+
   },
 });
 
