@@ -16,6 +16,7 @@ import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODE
 import { CountryDialCode } from '../types';
 
 export const CountryCodeSelectScreen = () => {
+  console.log('CountryCodeSelectScreen');
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const {
@@ -52,12 +53,29 @@ export const CountryCodeSelectScreen = () => {
   }, [query, dataSource]);
 
   const handleSelect = (item: CountryDialCode) => {
+    console.log('[국가선택] handleSelect 호출:', {
+      selectMode,
+      item,
+      iso2: item.iso2,
+      name: item.name,
+      dialCode: item.dialCode,
+    });
+
     if (selectMode === 'region') {
+      console.log('[국가선택] 지역 모드 - setSelectedRegion 호출');
       setSelectedRegion(item);
     } else {
+      console.log('[국가선택] 국가 모드 - setSelectedCountryDialCode 호출 전:', {
+        현재값: selectedCountryDialCode,
+        새값: item,
+      });
       setSelectedCountryDialCode(item);
+      console.log('[국가선택] setSelectedCountryDialCode 호출 완료');
     }
+
+    console.log('[국가선택] goBack() 호출 전');
     goBack();
+    console.log('[국가선택] goBack() 호출 완료');
   };
 
   return (
