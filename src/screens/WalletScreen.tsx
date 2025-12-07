@@ -735,9 +735,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
+    paddingBottom: 0,
   },
   headerCardWrapper: {
     marginBottom: 0,
+    paddingTop: 0,
     zIndex: 10,
   },
   sectionHeader: {

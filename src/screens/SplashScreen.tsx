@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
-
-const { width, height } = Dimensions.get('window');
 
 const XRUN_ROUND_LOGO = require('../../assets/xrun-round-logo.png');
 const XRUN_HORIZONTAL_LOGO = require('../../assets/xrun-horizontal-logo.png');
@@ -13,7 +11,7 @@ export const SplashScreen = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       {}
-      <View style={styles.centerLogoContainer}>
+      <View style={styles.centerLogoWrapper}>
         <Image
           source={XRUN_ROUND_LOGO}
           style={styles.centerLogo}
@@ -35,25 +33,25 @@ export const SplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: COLORS.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centerLogoContainer: {
-    position: 'absolute',
-    top: height / 2 - 57.5, 
-    left: width / 2 - 56.5, 
-    width: 113,
-    height: 115,
+  centerLogoWrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerLogo: {
-    width: '100%',
-    height: '100%',
+    width: 113,
+    height: 115,
   },
   bottomLogoContainer: {
     position: 'absolute',
     bottom: 100,
-    left: width / 2 - 100, 
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
