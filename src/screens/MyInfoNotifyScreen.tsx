@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, SafeScrollView } from '../components';
+import { Header, SafeScrollView, SafeView } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -376,98 +376,86 @@ export const MyInfoNotifyScreen = () => {
     }
   }, [safeInsetBottom, isKeyboardVisible]);
 
-  const androidPadding =
-    Platform.OS === 'android'
-      ? isKeyboardVisible
-        ? 16
-        : Math.max(baselineAndroidInset.current, 24)
-      : 16;
-
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      enabled={Platform.OS === 'ios' ? true : isKeyboardVisible}
-    >
-      <View style={styles.container}>
-        <StatusBar style="dark" />
-        <Header
-          title={t('screens.myInfoNotify.title')}
-          onBackPress={goBack}
-          showBackButton
-          rightComponent={
-            notifications.length > 0 ? (
-              <TouchableOpacity
-                onPress={handleDeleteAll}
-                activeOpacity={0.7}
-                style={styles.deleteAllButton}
-              >
-                <Text style={styles.deleteAllText}>{t('screens.myInfoNotify.deleteAll')}</Text>
-              </TouchableOpacity>
-            ) : undefined
-          }
-        />
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-          </View>
-        ) : (
-          <SafeScrollView
-            ref={scrollViewRef}
-            style={styles.list}
-            backgroundColor={'#f2f2f7'}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            onContentSizeChange={handleContentSizeChange}
-            onScrollBeginDrag={handleScrollBeginDrag}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            showBottomBackground={false}
-          >
-            {notifications.length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>{t('screens.myInfoNotify.emptyMessage')}</Text>
-              </View>
-            ) : (
-              renderGroupedNotifications()
-            )}
-          </SafeScrollView>
-        )}
+    <SafeView>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        enabled={Platform.OS === 'ios' ? true : isKeyboardVisible}
+      >
+        <View style={styles.container}>
+          <StatusBar style="dark" />
+          <Header
+            title={t('screens.myInfoNotify.title')}
+            onBackPress={goBack}
+            showBackButton
+            rightComponent={
+              notifications.length > 0 ? (
+                <TouchableOpacity
+                  onPress={handleDeleteAll}
+                  activeOpacity={0.7}
+                  style={styles.deleteAllButton}
+                >
+                  <Text style={styles.deleteAllText}>{t('screens.myInfoNotify.deleteAll')}</Text>
+                </TouchableOpacity>
+              ) : undefined
+            }
+          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+            </View>
+          ) : (
+            <SafeScrollView
+              ref={scrollViewRef}
+              style={styles.list}
+              backgroundColor={'#f2f2f7'}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              onContentSizeChange={handleContentSizeChange}
+              onScrollBeginDrag={handleScrollBeginDrag}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+              showBottomBackground={false}
+            >
+              {notifications.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>{t('screens.myInfoNotify.emptyMessage')}</Text>
+                </View>
+              ) : (
+                renderGroupedNotifications()
+              )}
+            </SafeScrollView>
+          )}
 
-        <View
-          style={[
-            styles.inputBar,
-            {
-              paddingBottom: androidPadding,
-            },
-          ]}
-        >
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder={t('screens.myInfoNotify.placeholder')}
-              placeholderTextColor="#7d7e83"
-              value={question}
-              onChangeText={setQuestion}
-              editable={!sending}
-            />
+          <View style={styles.inputBar}>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder={t('screens.myInfoNotify.placeholder')}
+                placeholderTextColor="#7d7e83"
+                value={question}
+                onChangeText={setQuestion}
+                editable={!sending}
+              />
+            </View>
+            <TouchableOpacity
+              style={[styles.sendButton, sending && styles.sendButtonDisabled]}
+              onPress={handleSend}
+              activeOpacity={0.8}
+              disabled={sending}
+            >
+              {sending ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.sendButtonText}>{t('screens.myInfoNotify.sendButton')}</Text>
+              )}
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={[styles.sendButton, sending && styles.sendButtonDisabled]}
-            onPress={handleSend}
-            activeOpacity={0.8}
-            disabled={sending}
-          >
-            {sending ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.sendButtonText}>{t('screens.myInfoNotify.sendButton')}</Text>
-            )}
-          </TouchableOpacity>
         </View>
-      </View>
-    </KeyboardAvoidingView >
+      </KeyboardAvoidingView >
+    </SafeView>
   );
 };
 
@@ -624,7 +612,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flex: 1,
     borderRadius: 6,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#edeced',
     backgroundColor: '#fff',
     paddingHorizontal: 12,
