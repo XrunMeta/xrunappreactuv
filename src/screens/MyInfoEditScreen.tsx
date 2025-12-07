@@ -253,7 +253,7 @@ export const v_cdb169 = () => {
   };
 
   const v_c09605 = async () => {
-    await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.passwordChange'), v_8d41d7('screens.myInfoEdit.alerts.passwordChangeMessage'));
+    v_9b57fc(v_ce4741.myInfoChangePassword);
   };
 
   const v_801fea = async () => {
@@ -434,18 +434,16 @@ export const v_cdb169 = () => {
               </View>
             </View>
 
-            <View style={v_d81136.fieldContainer}>
-              <View style={v_d81136.inlineLabelRow}>
-                <Text style={v_d81136.sectionLabel}>Password</Text>
-                <TouchableOpacity onPress={v_c09605}>
-                  <Text style={v_d81136.linkText}>Change Password</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={v_d81136.readonlyInput}>
-                <Text style={v_d81136.readonlyText}>
-                  {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
-                </Text>
-              </View>
+            <View style={v_d81136.inlineLabelRow}>
+              <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.password')}</Text>
+              <TouchableOpacity onPress={v_c09605}>
+                <Text style={v_d81136.linkText}>{v_8d41d7('screens.myInfoEdit.changePassword')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={v_d81136.readonlyInput}>
+              <Text style={v_d81136.readonlyText}>
+                {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+              </Text>
             </View>
 
             <View style={v_d81136.fieldContainer} >

@@ -57,6 +57,8 @@ import {
   v_6ffbdd,
   v_62c808,
   v_6dba58,
+  v_9d18e0,
+  v_9e5c58,
   v_f71847,
   v_d9bc70,
   v_0a585d,
@@ -1351,6 +1353,44 @@ export const v_10a69f = async (
     console.error('[회원 탈퇴] 회원 탈퇴 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[회원 탈퇴] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_b954f5 = async (
+  v_660822,
+  v_6bee94,
+  v_c65f5d,
+): Promise<v_9e5c58> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_9d18e0 = {
+      member: v_660822,
+      pin: v_6bee94,
+    };
+
+    console.log('[비밀번호 변경] 비밀번호 변경 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_9e5c58>(
+      '/app7163-01',
+      v_576f5a,
+    );
+
+    console.log('[비밀번호 변경] 비밀번호 변경 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[비밀번호 변경] 비밀번호 변경 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[비밀번호 변경] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

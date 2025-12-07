@@ -30,6 +30,7 @@ import {
   v_dec378,
   v_cdb169,
   v_e14579,
+  v_18d397,
   v_4a40b2,
   v_9e06f6,
   v_865e57,
@@ -251,6 +252,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myInfoPhoneEdit') {
     return <PhoneEditScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoChangePassword') {
+    return <ChangePasswordScreen />;
   }
 
   if (v_0f0c7b === 'myInfoSettings') {
