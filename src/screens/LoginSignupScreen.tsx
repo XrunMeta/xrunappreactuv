@@ -37,12 +37,6 @@ export const v_54d331 = () => {
 
   const v_3b9f13 = [
 
-    { name: 'ShopMyTicketScreen', route: v_ce4741.shopMyTicket }, 
-
-    { name: 'LoginScreen', route: v_ce4741.login }, 
-
-    { name: 'MapMainScreen', route: v_ce4741.map }, 
-
   ];
 
   return (
@@ -93,22 +87,9 @@ export const v_54d331 = () => {
         </View>
 
         {}
-        {v_731ab4 && (
-          <View style={v_d81136.devLinksContainer}>
-            <Text style={v_d81136.devLinksTitle}>🔗 개발 모드: 빠른 링크</Text>
-            <View style={v_d81136.devLinksGrid}>
-              {v_3b9f13.map((v_8dbe00) => (
-                <TouchableOpacity
-                  key={v_8dbe00.route}
-                  style={v_d81136.devLinkButton}
-                  onPress={() => v_9b57fc(v_8dbe00.route)}
-                >
-                  <Text style={v_d81136.devLinkText}>{v_8dbe00.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
+        {
+
+}
       </SafeScrollView>
 
       {}
