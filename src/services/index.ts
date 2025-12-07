@@ -3835,107 +3835,40 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
 
     const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
 
-    console.log('[getTopAd5] API 응답 갯수:');
-    console.log(response.length);
+    console.log('[getTopAd5] API 호출 완료 - 원본 response 타입:', typeof response);
+    console.log('[getTopAd5] API 호출 완료 - 원본 response:', response);
 
-    if (response) {
-      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(response));
-      console.log('[getTopAd5] AsyncStorage에 저장 완료');
+    if (!response) {
+      console.warn('[getTopAd5] API 응답이 없습니다.');
+      return null;
     }
 
-    if (response && Array.isArray(response)) {
-      try {
-        console.log('[getTopAd5] 이미지 캐싱 시작');
-        const imageFileIds: (string | number)[] = [];
+    let topAd5Response: any[] = [];
+    if (Array.isArray(response)) {
 
-        response.forEach((ad: any) => {
+      topAd5Response = response;
+    } else if (response?.data?.ads && Array.isArray(response.data.ads)) {
 
-          const imageFields = [
-            ad?.brandlogo,
-            ad?.adthumbnail2,
-            ad?.symbolimg,
-            ad?.thumbnail,
-            ad?.iconurl,
-          ];
+      topAd5Response = response.data.ads;
+    } else if (response?.ads && Array.isArray(response.ads)) {
 
-          imageFields.forEach((field) => {
-
-            if (field && (typeof field === 'number' || (typeof field === 'string' && !field.startsWith('http') && !field.startsWith('data:')))) {
-              const fileId = typeof field === 'string' ? field.trim() : field;
-              if (fileId && !imageFileIds.includes(fileId)) {
-                imageFileIds.push(fileId);
-              }
-            }
-          });
-        });
-
-        console.log('[getTopAd5] 추출된 이미지 파일 ID 개수:', imageFileIds.length);
-
-        if (imageFileIds.length > 0) {
-
-          const env = getEnv();
-          const gatewayApiAddress = env.GATEWAY_NODEJS;
-
-          await cashingimages.downloadMultipleImages(imageFileIds, gatewayApiAddress);
-          console.log('[getTopAd5] 이미지 캐싱 완료');
-        } else {
-          console.log('[getTopAd5] 캐싱할 이미지가 없습니다.');
-        }
-      } catch (imageCacheError) {
-        console.error('[getTopAd5] 이미지 캐싱 오류:', imageCacheError);
-
-      }
+      topAd5Response = response.ads;
+    } else {
+      console.warn('[getTopAd5] 예상하지 못한 response 구조:', response);
+      return null;
     }
 
-    try {
-      const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
-      if (astorCoinsData && response && Array.isArray(response) && response.length > 0) {
-        console.log('[getTopAd5] 마커 데이터 발견 - 광고 매핑 시작');
+    console.log('[getTopAd5] 추출된 topAd5Response 길이:', topAd5Response.length);
+    console.log('[getTopAd5] 추출된 topAd5Response:', topAd5Response);
 
-        const coinsData = JSON.parse(astorCoinsData);
-        if (Array.isArray(coinsData) && coinsData.length > 0) {
-
-          const mappedCoinsData = coinsData.map((marker: any, index: number) => {
-
-            const adIndex = index % response.length;
-            const mappedAd = response[adIndex];
-
-            return {
-              ...marker,
-
-              name: mappedAd?.name || marker.name,
-              iconurl: mappedAd?.iconurl || marker.iconurl,
-              joindesc: mappedAd?.joindesc || marker.joindesc,
-              xrunPrice: mappedAd?.xrunPrice || marker.xrunPrice || marker.xrunprice || 0,
-              campid: mappedAd?.campid || marker.campid || marker.campId || '',
-
-              thumbnail: mappedAd?.thumbnail || marker.thumbnail,
-              ad_company: mappedAd?.ad_company || marker.ad_company,
-              coins: mappedAd?.coins?.toString() || marker.coins,
-              brandlogo: mappedAd?.brandlogo || marker.brandlogo,
-              adthumbnail2: mappedAd?.adthumbnail2 || marker.adthumbnail2,
-              symbolimg: mappedAd?.symbolimg || marker.symbolimg,
-            };
-          });
-
-          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
-          console.log('[getTopAd5] 마커-광고 매핑 완료:', mappedCoinsData.length, '개 마커에 광고 매핑');
-        } else {
-          console.log('[getTopAd5] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
-        }
-      } else {
-        if (!astorCoinsData) {
-          console.log('[getTopAd5] 마커 데이터 없음 - 매핑 건너뛰기');
-        } else if (!response || !Array.isArray(response) || response.length === 0) {
-          console.log('[getTopAd5] 광고 데이터 없음 - 매핑 건너뛰기');
-        }
-      }
-    } catch (mappingError) {
-      console.error('[getTopAd5] 마커-광고 매핑 오류:', mappingError);
-
+    if (topAd5Response && topAd5Response.length > 0) {
+      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Response));
+      console.log('[getTopAd5] AsyncStorage에 저장 완료:', topAd5Response.length, '개 광고');
+    } else {
+      console.warn('[getTopAd5] 저장할 광고 데이터가 없습니다.');
     }
 
-    return response;
+    return topAd5Response;
   } catch (error) {
     console.error('[getTopAd5] API 호출 실패:', error);
     throw error;
