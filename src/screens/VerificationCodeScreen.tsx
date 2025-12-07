@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -244,13 +244,11 @@ export const VerificationCodeScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 60,
+    flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
   },
   descriptionWrapper: {
     width: '100%',

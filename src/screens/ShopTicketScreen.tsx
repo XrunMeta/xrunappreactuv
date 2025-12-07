@@ -13,7 +13,7 @@ import { getXRUNGopaxPrice, getXrunBuyableItems } from '../services';
 import { ShopItemData } from '../types';
 import { formatXrunAmount, formatWonAmount, formatCurrency } from '../utils';
 import { cashingimages } from '../utils/imageCache';
-import { COLORS, COMMON_STYLES } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES } from '../constants';
 
 const transformShopItem = (
   item: ShopItemData,
@@ -355,11 +355,7 @@ export const ShopTicketScreen = () => {
         </View>
       ) : (
         <>
-          <SafeScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            showBottomBackground={false}
-          >
+          <View style={styles.contentContainer} >
 
             <SegmentedControl
               options={segmentedOptions}
@@ -377,31 +373,32 @@ export const ShopTicketScreen = () => {
                 placeholderTextColor="#bcbec4"
               />
             </View>
+            <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
+              {tab === 'ticket' && shopItems.length > 0
+                ? shopItems.map((item) => {
 
-            {tab === 'ticket' && shopItems.length > 0
-              ? shopItems.map((item) => {
+                  const itemImage = itemImages[item.id];
+                  const imageSource = itemImage
+                    ? { uri: `data:image/png;base64,${itemImage}` }
+                    : item.image;
 
-                const itemImage = itemImages[item.id];
-                const imageSource = itemImage
-                  ? { uri: `data:image/png;base64,${itemImage}` }
-                  : item.image;
+                  const hasSku = item.sku && item.sku.trim() !== '';
+                  const iapPrice = hasSku ? getIapPrice(item.sku) : null;
+                  const displayPrice = hasSku
+                    ? (iapPrice || 'Loading...')
+                    : formatCurrency(item.priceKRW || '0', 'KRW');
 
-                const hasSku = item.sku && item.sku.trim() !== '';
-                const iapPrice = hasSku ? getIapPrice(item.sku) : null;
-                const displayPrice = hasSku
-                  ? (iapPrice || 'Loading...')
-                  : formatCurrency(item.priceKRW || '0', 'KRW');
-
-                return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
-              })
-              : tab === 'ticket' && shopItems.length === 0
-                ? (
-                  <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
-                  </View>
-                )
-                : null}
-          </SafeScrollView>
+                  return renderCard(item.title, displayPrice, imageSource, { shopItem: item });
+                })
+                : tab === 'ticket' && shopItems.length === 0
+                  ? (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>구매 가능한 아이템이 없습니다.</Text>
+                    </View>
+                  )
+                  : null}
+            </SafeScrollView>
+          </View>
 
           {}
           <View style={styles.taboolaContainer}>
@@ -415,20 +412,20 @@ export const ShopTicketScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
+    ...COMMON_STYLES.container,
+  },
+  contentContainer: {
     flex: 1,
+    ...COMMON_STYLES.contentContainer,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    flexGrow: 1,
-    ...COMMON_STYLES.scrollContent,
-  },
-
   segmented: {
-    marginBottom: 20,
+    marginBottom: SIZES.large,
   },
   searchBar: {
     flexDirection: 'row',

@@ -15,9 +15,10 @@ import {
   CameraView,
   useCameraPermissions,
 } from 'expo-camera';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { SafeView } from '../components';
 
 export const WalletQrScanScreen = () => {
   const { t } = useTranslation();
@@ -69,7 +70,7 @@ export const WalletQrScanScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container} backgroundColor='#000'>
       <StatusBar style="light" translucent />
 
       {permission?.granted ? (
@@ -96,27 +97,20 @@ export const WalletQrScanScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.content}>
+        <View style={styles.rectangleWrapper}>
           <Text style={styles.title}>{t('screens.walletQrScan.scanQrCode')}</Text>
           <View style={styles.frameOuter}>
             <View style={styles.frameInner} />
           </View>
         </View>
       </View>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#000',
+    ...COMMON_STYLES.container,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -124,7 +118,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   topBar: {
-    paddingHorizontal: 24,
+    paddingHorizontal: SIZES.xlarge,
     alignItems: 'flex-start',
   },
   backButton: {
@@ -134,12 +128,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 2,
   },
-  content: {
-    flex: 1,
-    alignItems: 'center',
+  rectangleWrapper: {
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    alignItems: 'center',
+    marginTop: -150,
+    flex: 1,
+    borderWidth: 5,
   },
   title: {
     fontSize: 24,
@@ -193,22 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Roboto-Medium',
   },
-  homeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-  },
+
 });
 
 

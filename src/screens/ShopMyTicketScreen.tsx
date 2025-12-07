@@ -5,14 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl, ShopItemCard, Dialog } from '../components';
+import { Header, SegmentedControl, ShopItemCard, Dialog, SafeView, TaboolaBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
 import { getXrunPurchasedItems } from '../services';
 import { PurchasedItemData } from '../types';
 import { cashingimages } from '../utils/imageCache';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES, SIZES } from '../constants';
 
 const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any): ShopItem => {
 
@@ -189,7 +189,7 @@ export const ShopMyTicketScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container}>
       <StatusBar style="dark" />
       <Header title={t('screens.shop.title')} />
       {loading ? (
@@ -197,28 +197,27 @@ export const ShopMyTicketScreen = () => {
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
       ) : (
-        <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.wrapper}>
-            <SegmentedControl
-              options={[
-                { label: 'Ticket', value: 'ticket' },
-                { label: 'My Ticket', value: 'myTicket' },
-              ]}
-              value="myTicket"
-              onChange={handleSegmentChange}
-              containerStyle={styles.segmented}
-              hideIndicator={true}
+        <View style={styles.contentContainer} >
+          <SegmentedControl
+            options={[
+              { label: 'Ticket', value: 'ticket' },
+              { label: 'My Ticket', value: 'myTicket' },
+            ]}
+            value="myTicket"
+            onChange={handleSegmentChange}
+            containerStyle={styles.segmented}
+            hideIndicator={true}
+          />
+
+          <View style={styles.searchBar}>
+            <Feather name="search" size={18} color="#bcbec4" />
+            <TextInput
+              placeholder="Search"
+              placeholderTextColor="#bcbec4"
+              style={styles.searchInput}
             />
-
-            <View style={styles.searchBar}>
-              <Feather name="search" size={18} color="#bcbec4" />
-              <TextInput
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
-                style={styles.searchInput}
-              />
-            </View>
-
+          </View>
+          <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false}>
             {purchasedItems.length > 0 ? (
               purchasedItems.map((item) => {
 
@@ -248,9 +247,14 @@ export const ShopMyTicketScreen = () => {
                 <Text style={styles.emptyText}>{t('screens.shopMyTicket.noPurchasedItems')}</Text>
               </View>
             )}
-          </View>
-        </SafeScrollView>
+          </SafeScrollView>
+        </View>
+
       )}
+      {}
+      <View style={styles.taboolaContainer}>
+        <TaboolaBanner placementType="shop" />
+      </View>
 
       {}
       <Dialog
@@ -266,32 +270,26 @@ export const ShopMyTicketScreen = () => {
         ]}>
         <Text style={styles.dialogText}>{transferTicketDialog.description}</Text>
       </Dialog>
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...COMMON_STYLES.container,
+  },
+  contentContainer: {
     flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...COMMON_STYLES.contentContainer,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  wrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
   segmented: {
-    marginBottom: 20,
+    marginBottom: SIZES.large,
   },
   searchBar: {
     flexDirection: 'row',
@@ -325,5 +323,10 @@ const styles = StyleSheet.create({
     color: '#121212',
     lineHeight: 24,
     textAlign: 'left',
+  },
+  taboolaContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#d5dde0',
+    marginTop: 10,
   },
 });

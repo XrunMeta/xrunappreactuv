@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { COMMON_STYLES } from '../constants';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
@@ -17,7 +18,7 @@ export const ShopSuccessScreen = () => {
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor='#f7f7fb'>
       <Header title={t('screens.shopSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
         <View style={styles.card}>
@@ -34,8 +35,7 @@ export const ShopSuccessScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...COMMON_STYLES.container,
   },
   overlay: {
     flex: 1,

@@ -9,10 +9,10 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Header, CountryCodeListItem } from '../components';
+import { Header, CountryCodeListItem, SafeScrollView, SafeView } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { COLORS, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
+import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
 import { CountryDialCode } from '../types';
 
 export const CountryCodeSelectScreen = () => {
@@ -61,7 +61,7 @@ export const CountryCodeSelectScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container}>
       <StatusBar style="dark" />
       <Header
         title={selectMode === 'region' ? t('screens.countryCodeSelect.regionSelectTitle') : t('screens.countryCodeSelect.countrySelectTitle')}
@@ -119,19 +119,17 @@ export const CountryCodeSelectScreen = () => {
           }
         />
       </View>
-    </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    ...COMMON_STYLES.scrollContent,
   },
   currentSection: {
     marginBottom: 16,

@@ -8,7 +8,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Header, FormField, SafeScrollView } from '../components';
-import { COLORS } from '../constants';
+import { COMMON_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { sendEmailVerificationCode } from '../services';
@@ -81,30 +81,28 @@ export const MyInfoEmailAuthScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.formWrapper}>
-          <FormField
-            label={t('screens.myInfoEmailAuth.emailLabel')}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            placeholder={t('screens.myInfoEmailAuth.emailPlaceholder')}
-            containerStyle={styles.fieldContainer}
-            rightAccessory={
-              <TouchableOpacity
-                style={styles.inlineButton}
-                onPress={handleSendEmail}
-                disabled={sending}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.inlineButtonText}>
-                  {sending ? t('screens.myInfoEmailAuth.sending') : t('screens.myInfoEmailAuth.sendButton')}
-                </Text>
-              </TouchableOpacity>
-            }
-          />
-        </View>
+        <FormField
+          label={t('screens.myInfoEmailAuth.emailLabel')}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          placeholder={t('screens.myInfoEmailAuth.emailPlaceholder')}
+          containerStyle={styles.fieldContainer}
+          rightAccessory={
+            <TouchableOpacity
+              style={styles.inlineButton}
+              onPress={handleSendEmail}
+              disabled={sending}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.inlineButtonText}>
+                {sending ? t('screens.myInfoEmailAuth.sending') : t('screens.myInfoEmailAuth.sendButton')}
+              </Text>
+            </TouchableOpacity>
+          }
+        />
 
       </SafeScrollView>
     </View>
@@ -113,19 +111,11 @@ export const MyInfoEmailAuthScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
-  },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+    ...COMMON_STYLES.scrollContent,
   },
   fieldContainer: {
     marginBottom: 32,

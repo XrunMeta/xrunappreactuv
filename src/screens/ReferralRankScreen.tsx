@@ -275,13 +275,11 @@ export const ReferralRankScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...COMMON_STYLES.container,
   },
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
-    paddingBottom: 0,
   },
   segmented: {
     marginVertical: SIZES.large,
@@ -289,7 +287,6 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
   },
-
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

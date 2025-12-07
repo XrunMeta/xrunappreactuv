@@ -728,7 +728,7 @@ export const WalletScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...COMMON_STYLES.container,
   },
   content: {
     flex: 1,

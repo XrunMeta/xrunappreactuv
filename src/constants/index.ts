@@ -49,10 +49,13 @@ export const LANG = {
 } as const;
 
 export const COMMON_STYLES = {
-
-  bottomSection: {
+  container: {
+    flex: 1,
     width: '100%' as const,
     maxWidth: 780,
+  },
+
+  bottomSection: {
     alignSelf: 'center' as const,
     marginTop: 'auto' as const,
     paddingTop: SIZES.medium, 

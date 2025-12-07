@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { FormField, Header, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { checkEmailExists, sendEmailVerificationCode } from '../services';
@@ -108,14 +108,11 @@ export const EmailVerificationScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   fieldContainer: {
     width: '100%',

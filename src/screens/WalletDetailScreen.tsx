@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionListItem, SafeView } from '../components';
-import { COLORS } from '../constants';
+import { COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import {
@@ -416,14 +416,11 @@ export const WalletDetailScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
+    flexGrow: 1,
   },
   sectionHeader: {
     flexDirection: 'row',

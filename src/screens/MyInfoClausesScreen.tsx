@@ -50,8 +50,7 @@ export const MyInfoClausesScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
     ...COMMON_STYLES.scrollContent,

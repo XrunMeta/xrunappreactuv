@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { logout } from '../services';
+import { COMMON_STYLES } from '../constants';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
@@ -60,7 +61,7 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
   };
 
   return (
-    <SafeView style={styles.container}>
+    <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
       <StatusBar style="dark" />
       <Header title={t('screens.myInfoCloseMembershipSuccess.title')} showBackButton={false} />
       <View style={styles.overlay}>
@@ -81,8 +82,7 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f7f7fb',
+    ...COMMON_STYLES.container,
   },
   overlay: {
     flex: 1,

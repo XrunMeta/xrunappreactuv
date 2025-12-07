@@ -28,7 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useTranslation } from 'react-i18next';
 
-import { BottomNavigationBar, MapBottomPanel } from '../components';
+import { BottomNavigationBar, MapBottomPanel, SafeView } from '../components';
 
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -43,6 +43,7 @@ import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
+import { COMMON_STYLES } from '../constants';
 
 interface LocationData {
 
@@ -422,61 +423,61 @@ export const MapMainScreen: React.FC = () => {
 
       const coinsDataVt = virtualCoinResponse?.data && Array.isArray(virtualCoinResponse.data)
         ? virtualCoinResponse.data
-            .slice(0, Math.random() < 0.5 ? 1 : 2)
-            .map((item: any, index: number, array: any[]) => {
+          .slice(0, Math.random() < 0.5 ? 1 : 2)
+          .map((item: any, index: number, array: any[]) => {
 
-              if (array.length === 2 && index === 1) {
-                return {
-                  ...item,
-                  coin: 1,
-                  lat: 0,
-                  lng: 0,
-                  title: item.title,
-                  distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-                  advertisement: item.advertisement,
-                  coins: item.coins,
-                  iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                  joindesc: item.joindesc || '가상 코인 설명',
-                  name: item.name || item.title || item.brand,
-                  campid: item.campid || item.campId || '',
-                  xrunPrice: item.xrunPrice || item.xrunprice || 0,
-                };
-              }
+            if (array.length === 2 && index === 1) {
               return {
                 ...item,
-                currency: 18,
+                coin: 1,
                 lat: 0,
                 lng: 0,
                 title: item.title,
                 distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-                coins: calculatedNasPrice,
-                advertisement: 672,
+                advertisement: item.advertisement,
+                coins: item.coins,
                 iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                joindesc: item.joindesc || 'Virtual coin description',
+                joindesc: item.joindesc || '가상 코인 설명',
                 name: item.name || item.title || item.brand,
                 campid: item.campid || item.campId || '',
                 xrunPrice: item.xrunPrice || item.xrunprice || 0,
               };
-            })
+            }
+            return {
+              ...item,
+              currency: 18,
+              lat: 0,
+              lng: 0,
+              title: item.title,
+              distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+              coins: calculatedNasPrice,
+              advertisement: 672,
+              iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+              joindesc: item.joindesc || 'Virtual coin description',
+              name: item.name || item.title || item.brand,
+              campid: item.campid || item.campId || '',
+              xrunPrice: item.xrunPrice || item.xrunprice || 0,
+            };
+          })
         : [];
 
       let coinsData = mapApiResponse?.data && Array.isArray(mapApiResponse.data)
         ? mapApiResponse.data.map((item: any) => ({
-            lat: item.lat,
-            lng: item.lng,
-            title: item.title,
-            distance: item.distance,
-            coins: item.coins,
-            coin: item.coin,
-            advertisement: item.advertisement,
-            iconurl: item.iconurl,
-            joindesc: item.joindesc,
-            name: item.name,
-            campid: item.campid,
-            xrunprice: item.xrunprice,
-            xrunPrice: item.xrunPrice || item.xrunprice || 0,
-            brand: item.brand,
-          }))
+          lat: item.lat,
+          lng: item.lng,
+          title: item.title,
+          distance: item.distance,
+          coins: item.coins,
+          coin: item.coin,
+          advertisement: item.advertisement,
+          iconurl: item.iconurl,
+          joindesc: item.joindesc,
+          name: item.name,
+          campid: item.campid,
+          xrunprice: item.xrunprice,
+          xrunPrice: item.xrunPrice || item.xrunprice || 0,
+          brand: item.brand,
+        }))
         : [];
 
       const combinedCoinsData = [...coinsDataVt, ...coinsData];
@@ -696,7 +697,7 @@ export const MapMainScreen: React.FC = () => {
 
     const currentTime = Date.now();
 
-    const locationChanged = 
+    const locationChanged =
 
       Math.abs(currentLocation.latitude - currentLastFetchedLocation.latitude) > 0.0001 ||
 
@@ -866,13 +867,13 @@ export const MapMainScreen: React.FC = () => {
 
         await AsyncStorage.setItem('selfCoordinate', JSON.stringify(newLocation));
 
-        if (!initialLocation || 
+        if (!initialLocation ||
 
-            (lastFetchedLocation && 
+          (lastFetchedLocation &&
 
-             lastFetchedLocation.latitude === newLocation.latitude && 
+            lastFetchedLocation.latitude === newLocation.latitude &&
 
-             lastFetchedLocation.longitude === newLocation.longitude)) {
+            lastFetchedLocation.longitude === newLocation.longitude)) {
 
           await loadMarkersForLocation(newLocation);
 
@@ -896,57 +897,59 @@ export const MapMainScreen: React.FC = () => {
 
             [
 
-              { text: '기본 위치 사용', onPress: async () => {
+              {
+                text: '기본 위치 사용', onPress: async () => {
 
-                const defaultLocation: LocationData = {
+                  const defaultLocation: LocationData = {
 
-                  latitude: 37.5665,
+                    latitude: 37.5665,
 
-                  longitude: 126.9780,
+                    longitude: 126.9780,
 
-                };
+                  };
 
-                setLocation(defaultLocation);
+                  setLocation(defaultLocation);
 
-                const newRegion = {
-
-                  latitude: defaultLocation.latitude,
-
-                  longitude: defaultLocation.longitude,
-
-                  latitudeDelta: 0.01,
-
-                  longitudeDelta: 0.01,
-
-                };
-
-                setMapRegion(newRegion);
-
-                mapRegionRef.current = newRegion;
-
-                if (!initialLocation) {
-
-                  setInitialLocation(defaultLocation);
-
-                  setLastFetchedLocation(defaultLocation);
-
-                  initialLocationRef.current = defaultLocation;
-
-                  lastFetchedLocationRef.current = defaultLocation;
-
-                  lastUpdatedRegionRef.current = {
+                  const newRegion = {
 
                     latitude: defaultLocation.latitude,
 
                     longitude: defaultLocation.longitude,
 
+                    latitudeDelta: 0.01,
+
+                    longitudeDelta: 0.01,
+
                   };
 
+                  setMapRegion(newRegion);
+
+                  mapRegionRef.current = newRegion;
+
+                  if (!initialLocation) {
+
+                    setInitialLocation(defaultLocation);
+
+                    setLastFetchedLocation(defaultLocation);
+
+                    initialLocationRef.current = defaultLocation;
+
+                    lastFetchedLocationRef.current = defaultLocation;
+
+                    lastUpdatedRegionRef.current = {
+
+                      latitude: defaultLocation.latitude,
+
+                      longitude: defaultLocation.longitude,
+
+                    };
+
+                  }
+
+                  await loadMarkersForLocation(defaultLocation);
+
                 }
-
-                await loadMarkersForLocation(defaultLocation);
-
-              }},
+              },
 
               { text: '확인', style: 'cancel' }
 
@@ -1860,43 +1863,43 @@ export const MapMainScreen: React.FC = () => {
 
               return (
 
-              <Marker
+                <Marker
 
-                key={uniqueKey}
+                  key={uniqueKey}
 
-                coordinate={{
+                  coordinate={{
 
-                  latitude: marker.latitude!,
+                    latitude: marker.latitude!,
 
-                  longitude: marker.longitude!,
+                    longitude: marker.longitude!,
 
-                }}
+                  }}
 
-                anchor={{ x: 0.5, y: 0.5 }}
+                  anchor={{ x: 0.5, y: 0.5 }}
 
-                onPress={() => handleMarkerPress(marker, index)}
+                  onPress={() => handleMarkerPress(marker, index)}
 
-              >
+                >
 
-                {}
+                  {}
 
-                {logoTempMarker && (
+                  {logoTempMarker && (
 
-                  <Image
+                    <Image
 
-                    source={logoTempMarker}
+                      source={logoTempMarker}
 
-                    style={styles.markerImage}
+                      style={styles.markerImage}
 
-                    resizeMode="contain"
+                      resizeMode="contain"
 
-                  />
+                    />
 
-                )}
+                  )}
 
-              </Marker>
+                </Marker>
 
-            );
+              );
 
             })}
 
@@ -2061,10 +2064,7 @@ export const MapMainScreen: React.FC = () => {
 const styles = StyleSheet.create({
 
   container: {
-
-    flex: 1,
-
-    backgroundColor: '#F8F8F8',
+    ...COMMON_STYLES.container,
 
   },
 

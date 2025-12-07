@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Platform } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, COMMON_STYLES } from '../constants';
 import { useAppNavigation } from '../navigation';
 
 const PRIVACY_TEXT = `
@@ -37,7 +37,7 @@ export const PrivacyPolicyScreen = () => {
   return (
     <View style={styles.container}>
       <Header title={t('screens.privacyPolicy.title')} onBackPress={goBack} showBackButton />
-      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} backgroundColor={"#f8f8f8"}>
         <View style={styles.card}>
           <Text style={styles.contentText}>{PRIVACY_TEXT}</Text>
         </View>
@@ -49,13 +49,10 @@ export const PrivacyPolicyScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 60,
+    ...COMMON_STYLES.scrollContent,
   },
   card: {
     backgroundColor: '#ffffff',

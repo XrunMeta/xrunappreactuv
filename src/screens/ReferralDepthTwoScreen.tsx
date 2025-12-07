@@ -38,7 +38,7 @@ export const ReferralDepthTwoScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
     ...COMMON_STYLES.scrollContent,

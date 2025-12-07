@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     color: '#1a2e35',
   },
   bottomSection: {
-    ...COMMON_STYLES.bottomSection,
+    ...COMMON_STYLES.bottomButtonContainer,
   },
   primaryButton: {
     width: '100%',

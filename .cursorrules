@@ -42,7 +42,7 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
   
   const styles = StyleSheet.create({
     bottomSection: {
-      ...COMMON_STYLES.bottomSection,
+      ...COMMON_STYLES.bottomButtonContainer,
     },
   });
   ```

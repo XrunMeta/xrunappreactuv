@@ -222,28 +222,17 @@ export const LoginScreen = () => {
         </View>
       </SafeScrollView>
 
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: Platform.OS === 'android'
-      ? 16 + SIZES.medium 
-      : 40,
-    justifyContent: 'space-between',
+    flex: 1,
+    ...COMMON_STYLES.scrollContent,
   },
   fieldContainer: {
     width: '100%',
@@ -264,7 +253,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bottomSection: {
-    ...COMMON_STYLES.bottomSection,
+    ...COMMON_STYLES.bottomButtonContainer,
   },
   loginButtonWrapper: {
     width: '100%',
@@ -299,20 +288,7 @@ const styles = StyleSheet.create({
     color: '#4c4e55',
     fontFamily: 'Roboto-Bold',
   },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
-  },
+
   loadingContainer: {
     height: 56,
     width: '100%',

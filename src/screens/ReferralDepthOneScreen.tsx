@@ -165,7 +165,7 @@ export const ReferralDepthOneScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...COMMON_STYLES.container,
   },
   loadingContainer: {
     flex: 1,

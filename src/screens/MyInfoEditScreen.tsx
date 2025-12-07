@@ -547,14 +547,11 @@ export const MyInfoEditScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
+    ...COMMON_STYLES.container,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
   formFieldContainer: {
     ...FORM_STYLES.fieldContainer,

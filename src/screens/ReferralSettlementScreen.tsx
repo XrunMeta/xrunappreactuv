@@ -284,12 +284,11 @@ export const ReferralSettlementScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...COMMON_STYLES.container,
   },
   content: {
     flex: 1,
     ...COMMON_STYLES.scrollContent,
-    paddingBottom: 0,
   },
   segmented: {
     marginVertical: SIZES.large,
