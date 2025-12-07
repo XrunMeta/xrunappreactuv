@@ -2321,6 +2321,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_d8a1fd(false);
 
       v_94e8d8(null);
+      v_6a4dcd(false);
+      v_22f943(null);
 
       return;
 
@@ -2331,6 +2333,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_d8a1fd(false);
 
       v_94e8d8(null);
+      v_6a4dcd(false);
+      v_22f943(null);
 
       return;
 
@@ -2374,7 +2378,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       v_d8a1fd(false);
       v_94e8d8(null);
-      console.log('=== 맵 클릭: 100미터 이내 마커 없음 ===');
+      v_6a4dcd(false);
+      v_22f943(null);
+      console.log('=== 맵 클릭: 100미터 이내 마커 없음 - 콜아웃 및 하단 패널 닫기 ===');
       console.log('가장 가까운 마커 거리:', v_2540f0 === Infinity ? '없음' : `${v_2540f0.toFixed(2)}m`);
       return;
     }
@@ -2385,6 +2391,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       v_d8a1fd(false);
       v_94e8d8(null);
+      v_6a4dcd(false);
+      v_22f943(null);
       return;
     }
 
