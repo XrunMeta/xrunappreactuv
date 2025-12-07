@@ -41,6 +41,12 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
   onClose: v_0890f8,
 }) => {
 
+  const [v_2aafc0, v_e0cda8] = v_a3453e.useState(false);
+
+  v_a3453e.useEffect(() => {
+    v_e0cda8(false);
+  }, [v_1d0937?.iconurl]);
+
   const v_8f79f8 = v_e662ae(new v_a2349e.Value(20)).current;
 
   v_c4deb2(() => {
@@ -199,15 +205,29 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
               </View>
 
               {}
-              {v_8c4b15 && (
-                <View
-                  style={{
-                    width: 44,
-                    height: 44,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: 12,
-                  }}>
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                }}>
+                {v_1d0937.iconurl && !v_2aafc0 ? (
+                  <Image
+                    source={{ uri: v_1d0937.iconurl }}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 8,
+                    }}
+                    resizeMode="cover"
+                    onError={() => {
+                      console.warn('[MapBottomPanel] 아이콘 이미지 로드 실패:', v_1d0937.iconurl);
+                      v_e0cda8(true);
+                    }}
+                  />
+                ) : v_8c4b15 ? (
                   <Image
                     source={v_8c4b15}
                     style={{
@@ -216,8 +236,8 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                     }}
                     resizeMode="contain"
                   />
-                </View>
-              )}
+                ) : null}
+              </View>
 
               {}
               <Pressable
