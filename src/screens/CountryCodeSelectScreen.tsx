@@ -16,6 +16,7 @@ import { v_1bfbd0, v_a61db3, v_202d44, v_52495e, v_843035 } from '../constants';
 import { v_da1883 } from '../types';
 
 export const v_379bd1 = () => {
+  console.log('CountryCodeSelectScreen');
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const {
@@ -52,12 +53,29 @@ export const v_379bd1 = () => {
   }, [v_7c5791, v_093bd4]);
 
   const v_6121dc = (item: v_da1883) => {
+    console.log('[국가선택] handleSelect 호출:', {
+      selectMode: v_479a37,
+      item: v_8c0b26,
+      iso2: v_8c0b26.iso2,
+      name: v_8c0b26.name,
+      dialCode: v_8c0b26.dialCode,
+    });
+
     if (v_479a37 === 'region') {
+      console.log('[국가선택] 지역 모드 - setSelectedRegion 호출');
       v_2f2d51(v_8c0b26);
     } else {
+      console.log('[국가선택] 국가 모드 - setSelectedCountryDialCode 호출 전:', {
+        현재값: v_459d5e,
+        새값: v_8c0b26,
+      });
       v_f693e7(v_8c0b26);
+      console.log('[국가선택] setSelectedCountryDialCode 호출 완료');
     }
+
+    console.log('[국가선택] goBack() 호출 전');
     v_c7ac57();
+    console.log('[국가선택] goBack() 호출 완료');
   };
 
   return (
