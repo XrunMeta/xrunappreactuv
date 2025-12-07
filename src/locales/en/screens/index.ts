@@ -23,6 +23,7 @@ export { default as v_f2da16 } from './transactionDetails';
 export { default as v_1bbbc2 } from './myInfo';
 export { default as v_2f29c8 } from './myInfoEdit';
 export { default as v_43300a } from './myInfoEmailAuth';
+export { default as v_5a4f75 } from './changePassword';
 export { default as v_6e026e } from './myInfoSettings';
 export { default as v_67994d } from './myInfoNotify';
 export { default as v_911fd1 } from './myInfoClauses';

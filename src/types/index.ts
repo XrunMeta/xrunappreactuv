@@ -485,6 +485,16 @@ export interface CloseMembershipResponse {
   [key: string]: any;
 }
 
+export interface UpdatePasswordRequest {
+  member: number; 
+  pin: string; 
+}
+
+export interface UpdatePasswordResponse {
+  success?: boolean;
+  [key: string]: any;
+}
+
 export type NotificationType = 9301 | 9302 | 9303; 
 
 export interface NotificationItem {

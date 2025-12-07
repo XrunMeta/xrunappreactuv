@@ -31,6 +31,7 @@ export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
 export { MyInfoFaqScreen } from './MyInfoFaqScreen';
 export { MyInfoEditScreen } from './MyInfoEditScreen';
 export { PhoneEditScreen } from './PhoneEditScreen';
+export { ChangePasswordScreen } from './ChangePasswordScreen';
 export { MyInfoSettingsScreen } from './MyInfoSettingsScreen';
 export { MyInfoCloseMembershipScreen } from './MyInfoCloseMembershipScreen';
 export { MyInfoCloseMembershipSuccessScreen } from './MyInfoCloseMembershipSuccessScreen';
