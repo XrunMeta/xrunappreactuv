@@ -2241,9 +2241,16 @@ export const getNasmobAds = async (
     const env = getEnv();
     const url = `${env.GATEWAY_NODEJS}/getNasmobAds`;
 
+    if (deviceInfo.manufacturer = 'Apple' ){
+      deviceInfo.os = 'ios';
+    } else {
+      deviceInfo.os = 'aos';
+    }
+
     const requestBody = {
       member: member,
       adid: adid || '',
+      os: deviceInfo.os,
       osver: deviceInfo.osVersion || '',
       ip: deviceInfo.ipAddress || '',
       devid: deviceInfo.deviceId || '',

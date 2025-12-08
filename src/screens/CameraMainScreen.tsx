@@ -764,17 +764,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     const adIndex = index % topAd5Response.length;
                     const mappedAd = topAd5Response[adIndex];
 
-                    console.log(`🔗 [CameraMainScreen] 토큰 ${index} 매핑:`, {
-                      distance: coin.distance,
-                      adIndex,
-                      adName: mappedAd?.name || '없음',
-                      adCompany: mappedAd?.ad_company || '없음',
-                      originalAdvertisement: coin.advertisement,
-                      originalCampid: coin.campid,
-                      mappedAdvertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || mappedAd?.coin,
-                      mappedCampid: mappedAd?.campid,
-                    });
-
                     return {
                       ...coin,
 
