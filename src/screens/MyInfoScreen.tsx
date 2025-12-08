@@ -10,7 +10,7 @@ import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { Header, TaboolaBanner } from '../components';
-import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES, IS_DEV_MODE } from '../constants';
+import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
 import { useAppContext } from '../context';
@@ -39,8 +39,7 @@ export const MyInfoScreen = () => {
     email?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(IS_DEV_MODE ? true : false);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
   const menuConfigs: MenuConfig[] = useMemo(
     () => [
