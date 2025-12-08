@@ -536,8 +536,10 @@ export const v_cdb169 = () => {
       isLoading: v_cd31a8,
       조건체크: v_459d5e && !v_cd31a8,
     });
+    console.log('selectedCountryDialCode', v_459d5e);
+    console.log('isLoading', v_cd31a8);
+    console.log('selectedCountryDialCode && !isLoading', v_459d5e && !v_cd31a8);
 
-    if (v_459d5e && !v_cd31a8) {
       console.log('[정보수정] 전화번호 국가 선택됨 (CountryCodeSelectScreen에서):', {
         iso2: v_459d5e.iso2,
         name: v_459d5e.name,
@@ -564,8 +566,7 @@ export const v_cdb169 = () => {
         if (v_167c8b.rCode !== null && v_167c8b.rCode !== 0) {
           v_655be9({ rDesc: 'Please Select', rCode: 0 });
           v_a0f6fa(null);
-        }
-      }
+        } 
     }
   }, [v_459d5e?.iso2]);
 

@@ -84,6 +84,7 @@ export type CountryDialCode = {
   name: string;
   dialCode: string;
   flagEmoji: string;
+  countryCode: number;
 };
 
 export interface AdvertisementParams {
