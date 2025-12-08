@@ -150,7 +150,7 @@ export const v_bae512 = {
 
 export const v_963c2c = {
   background: '#ffffff',
-  bottomBackground: '#fafafa',
+  bottomBackground: '#ffffff',
 };
 
 export const v_19835b = {
