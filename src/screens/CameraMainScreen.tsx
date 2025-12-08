@@ -764,17 +764,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     const v_ba7922 = v_a56041 % v_e36b07.length;
                     const v_127b33 = v_e36b07[v_ba7922];
 
-                    console.log(`🔗 [CameraMainScreen] 토큰 ${v_a56041} 매핑:`, {
-                      distance: v_51b584.distance,
-                      adIndex: v_ba7922,
-                      adName: v_127b33?.name || '없음',
-                      adCompany: v_127b33?.ad_company || '없음',
-                      originalAdvertisement: v_51b584.advertisement,
-                      originalCampid: v_51b584.campid,
-                      mappedAdvertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || v_127b33?.coin,
-                      mappedCampid: v_127b33?.campid,
-                    });
-
                     return {
                       ...v_51b584,
 

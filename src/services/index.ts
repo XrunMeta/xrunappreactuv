@@ -2241,9 +2241,16 @@ export const v_1c4683 = async (
     const v_c9c489 = v_e4a763();
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
 
+    if (v_e7f87b.manufacturer = 'Apple' ){
+      v_e7f87b.os = 'ios';
+    } else {
+      v_e7f87b.os = 'aos';
+    }
+
     const v_cd6a57 = {
       member: v_660822,
       adid: v_a4f17b || '',
+      os: v_e7f87b.os,
       osver: v_e7f87b.osVersion || '',
       ip: v_e7f87b.ipAddress || '',
       devid: v_e7f87b.deviceId || '',
