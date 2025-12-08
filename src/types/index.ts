@@ -130,6 +130,7 @@ export interface NasmobCallbackRequest {
 }
 
 export interface DeviceInfo {
+  os: string;
   deviceId: string;
   adid: string;
   ipAddress: string;
