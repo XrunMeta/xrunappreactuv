@@ -1,8 +1,8 @@
 
-import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
 import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
-import { v_202d44, v_52495e } from '../constants';
+import { v_202d44, v_52495e, v_369014, v_789afd } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -103,8 +103,23 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_b135ca, v_69fcdc] = v_5ab095<v_ac312b>(null);
   const v_d7c38a = v_202d44.find((v_b9bbbd) => v_b9bbbd.iso2 === 'kr') ?? v_202d44[0];
   const [v_459d5e, v_f693e7] = v_5ab095<v_da1883>(v_d7c38a);
-  const [v_2f03bc, v_2f2d51] = v_5ab095<v_da1883 | null>(null);
+
+  const v_2a5c62 = v_df9f57(() => {
+    const v_e94fdf = v_369014(v_d7c38a.iso2);
+    return v_e94fdf[0] || v_789afd;
+  }, []);
+  const [v_2f03bc, v_2f2d51] = v_5ab095<v_da1883 | null>(v_2a5c62);
   const [v_479a37, v_67ab1c] = v_5ab095<'country' | 'region'>('country');
+
+  v_c4deb2(() => {
+    const v_e94fdf = v_369014(v_459d5e.iso2);
+    const v_d2a53b = v_2f03bc
+      ? v_e94fdf.some((v_a6c30b) => v_a6c30b.iso2 === v_2f03bc.iso2)
+      : false;
+    if (!v_d2a53b) {
+      v_2f2d51(v_e94fdf[0] || v_789afd);
+    }
+  }, [v_459d5e, v_2f03bc]);
   const [v_8d7bc8, v_d61c3a] = v_5ab095<AppContextValue['signupFormData']>({
     familyName: '',
     givenName: '',
@@ -175,10 +190,17 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       setEmergencyStop: v_69fcdc,
       selectedCountryDialCode: v_459d5e,
       setSelectedCountryDialCode: v_f693e7,
-      resetSelectedCountryDialCode: () => v_f693e7(v_d7c38a),
+      resetSelectedCountryDialCode: () => {
+        v_f693e7(v_d7c38a);
+        const v_e94fdf = v_369014(v_d7c38a.iso2);
+        v_2f2d51(v_e94fdf[0] || v_789afd);
+      },
       selectedRegion: v_2f03bc,
       setSelectedRegion: v_2f2d51,
-      resetSelectedRegion: () => v_2f2d51(null),
+      resetSelectedRegion: () => {
+        const v_e94fdf = v_369014(v_459d5e.iso2);
+        v_2f2d51(v_e94fdf[0] || v_789afd);
+      },
       selectMode: v_479a37,
       setSelectMode: v_67ab1c,
       signupFormData: v_8d7bc8,

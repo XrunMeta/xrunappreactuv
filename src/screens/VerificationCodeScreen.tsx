@@ -12,7 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_cb41de, v_570c34 } from '../components';
-import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035, v_9553a4, v_789afd } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -22,6 +22,9 @@ import {
   v_a5170b,
   v_ea3493,
   v_8025d1,
+  v_35200c,
+  v_9d2541,
+  v_91bb22,
 } from '../services';
 
 const v_683bb6 = 6;
@@ -82,6 +85,114 @@ export const v_667a00 = () => {
         return;
       }
 
+      if (v_e6976c === v_ce4741.signup) {
+
+        console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
+
+        try {
+
+          const v_378f94 = await v_e84827.getItem('pendingSignupData');
+          if (!v_378f94) {
+            await v_889fad(
+              v_8d41d7('screens.verificationCode.alerts.error'),
+              v_8d41d7('screens.verificationCode.errors.error') || '회원가입 데이터를 찾을 수 없습니다.',
+            );
+            v_ff0c7a(false);
+            return;
+          }
+
+          const v_fad096 = JSON.parse(v_378f94);
+          console.log('[회원가입] AsyncStorage에서 회원가입 데이터 읽기 완료');
+
+          const v_6c3a47 = parseInt(v_fad096.selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
+          const v_a4d981 = v_fad096.selectedCountryDialCode.iso2 || 'KR';
+          const v_94bdf5 = v_fad096.selectedRegion
+            ? v_9553a4(v_fad096.selectedRegion.iso2)
+            : parseInt(v_789afd.dialCode, 10);
+
+          const v_df7dab = {
+            email: v_fad096.email,
+            pin: v_fad096.password,
+            firstname: v_fad096.givenName,
+            lastname: v_fad096.familyName,
+            gender: v_91bb22.getGenderCode(v_fad096.gender),
+            mobile: v_fad096.phoneNumber,
+            mobilecode: v_6c3a47,
+            countrycode: v_a4d981,
+            country: v_6c3a47,
+            region: v_94bdf5,
+            age: v_91bb22.getAgeCode(v_fad096.ageRange),
+            recommand: v_fad096.referralMemberId,
+            os: v_91bb22.getOSCode(),
+          };
+
+          console.log('[회원가입] 회원가입 API 호출 시작');
+          const v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
+
+          if (!v_d0b446) {
+
+            await v_e84827.removeItem('pendingSignupData');
+            await v_889fad(
+              v_8d41d7('screens.signup.alerts.signupFailed') || '회원가입 실패',
+              v_8d41d7('screens.signup.errors.signupFailed') || '회원가입에 실패했습니다. 다시 시도해주세요.',
+            );
+            v_036f76();
+            v_ff0c7a(false);
+            return;
+          }
+
+          console.log('[회원가입] 로그인 확인 시작');
+          const v_7e280a = await v_9d2541(v_fad096.email, v_fad096.password, v_9b57fc);
+
+          if (!v_7e280a) {
+            await v_889fad(
+              v_8d41d7('screens.signup.alerts.loginCheckFailed') || '로그인 확인 실패',
+              v_8d41d7('screens.signup.errors.loginCheckFailed') || '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+            );
+
+            await v_e84827.removeItem('pendingSignupData');
+            v_036f76();
+            v_487a25(v_ce4741.authLanding);
+            v_9b57fc(v_ce4741.login);
+            v_ff0c7a(false);
+            return;
+          }
+
+          await v_e84827.removeItem('pendingSignupData');
+          console.log('[회원가입] 회원가입 및 로그인 확인 성공');
+
+          v_036f76();
+          await v_889fad(
+            v_8d41d7('screens.signup.success.title') || '회원가입 완료',
+            v_8d41d7('screens.signup.success.message') || '회원가입이 완료되었습니다.',
+            [
+              {
+                text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                onPress: () => {
+                  v_487a25(v_ce4741.authLanding);
+                  v_9b57fc(v_ce4741.login);
+                },
+              },
+            ],
+          );
+        } catch (v_5e9bfe) {
+          console.error('[회원가입] 회원가입 처리 중 오류:', v_5e9bfe);
+          await v_889fad(
+            v_8d41d7('screens.signup.alerts.error') || '오류',
+            v_8d41d7('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.',
+          );
+
+          try {
+            await v_e84827.removeItem('pendingSignupData');
+          } catch (v_df17d5) {
+            console.error('[회원가입] AsyncStorage 정리 실패:', v_df17d5);
+          }
+        } finally {
+          v_ff0c7a(false);
+        }
+        return;
+      }
+
       if (v_e6976c === v_ce4741.login || v_e6976c === v_ce4741.map) {
 
         console.log('[로그인] 이메일 로그인 요청:', v_fc0b2c);
@@ -129,6 +240,16 @@ export const v_667a00 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[인증] 인증 코드 확인 오류:', v_5e9bfe);
+
+      if (v_e6976c === v_ce4741.signup) {
+        try {
+          await v_e84827.removeItem('pendingSignupData');
+          console.log('[인증] 에러 발생으로 인한 AsyncStorage 정리 완료 (회원가입 모드)');
+        } catch (v_df17d5) {
+          console.error('[인증] AsyncStorage 정리 실패:', v_df17d5);
+        }
+      }
+
       await v_889fad(v_8d41d7('screens.verificationCode.alerts.error'), v_8d41d7('screens.verificationCode.errors.error'));
     } finally {
       v_ff0c7a(false);
