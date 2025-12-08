@@ -435,6 +435,8 @@ export interface UpdateRegionRequest {
   member: number;
   country: number;
   region: number;
+  countrycode?: number; 
+  mobilecode?: number; 
 }
 
 export interface UpdateRegionResponse {
