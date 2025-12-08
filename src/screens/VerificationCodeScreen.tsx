@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, FONTS } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS, getRegionIdByIso2, GLOBAL_REGION } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -22,6 +22,9 @@ import {
   encryptSHA256,
   saveSession,
   sendEmailVerificationCode,
+  signup,
+  checkLogin,
+  SignupHelpers,
 } from '../services';
 
 const CODE_LENGTH = 6;
@@ -82,6 +85,114 @@ export const VerificationCodeScreen = () => {
         return;
       }
 
+      if (verificationSuccessRoute === ROUTES.signup) {
+
+        console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
+
+        try {
+
+          const pendingDataStr = await AsyncStorage.getItem('pendingSignupData');
+          if (!pendingDataStr) {
+            await showAlert(
+              t('screens.verificationCode.alerts.error'),
+              t('screens.verificationCode.errors.error') || '회원가입 데이터를 찾을 수 없습니다.',
+            );
+            setIsVerifying(false);
+            return;
+          }
+
+          const pendingData = JSON.parse(pendingDataStr);
+          console.log('[회원가입] AsyncStorage에서 회원가입 데이터 읽기 완료');
+
+          const mobileCode = parseInt(pendingData.selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
+          const countryCode = pendingData.selectedCountryDialCode.iso2 || 'KR';
+          const regionId = pendingData.selectedRegion
+            ? getRegionIdByIso2(pendingData.selectedRegion.iso2)
+            : parseInt(GLOBAL_REGION.dialCode, 10);
+
+          const signupData = {
+            email: pendingData.email,
+            pin: pendingData.password,
+            firstname: pendingData.givenName,
+            lastname: pendingData.familyName,
+            gender: SignupHelpers.getGenderCode(pendingData.gender),
+            mobile: pendingData.phoneNumber,
+            mobilecode: mobileCode,
+            countrycode: countryCode,
+            country: mobileCode,
+            region: regionId,
+            age: SignupHelpers.getAgeCode(pendingData.ageRange),
+            recommand: pendingData.referralMemberId,
+            os: SignupHelpers.getOSCode(),
+          };
+
+          console.log('[회원가입] 회원가입 API 호출 시작');
+          const signupSuccess = await signup(signupData, navigate);
+
+          if (!signupSuccess) {
+
+            await AsyncStorage.removeItem('pendingSignupData');
+            await showAlert(
+              t('screens.signup.alerts.signupFailed') || '회원가입 실패',
+              t('screens.signup.errors.signupFailed') || '회원가입에 실패했습니다. 다시 시도해주세요.',
+            );
+            resetVerificationSuccessRoute();
+            setIsVerifying(false);
+            return;
+          }
+
+          console.log('[회원가입] 로그인 확인 시작');
+          const loginSuccess = await checkLogin(pendingData.email, pendingData.password, navigate);
+
+          if (!loginSuccess) {
+            await showAlert(
+              t('screens.signup.alerts.loginCheckFailed') || '로그인 확인 실패',
+              t('screens.signup.errors.loginCheckFailed') || '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+            );
+
+            await AsyncStorage.removeItem('pendingSignupData');
+            resetVerificationSuccessRoute();
+            reset(ROUTES.authLanding);
+            navigate(ROUTES.login);
+            setIsVerifying(false);
+            return;
+          }
+
+          await AsyncStorage.removeItem('pendingSignupData');
+          console.log('[회원가입] 회원가입 및 로그인 확인 성공');
+
+          resetVerificationSuccessRoute();
+          await showAlert(
+            t('screens.signup.success.title') || '회원가입 완료',
+            t('screens.signup.success.message') || '회원가입이 완료되었습니다.',
+            [
+              {
+                text: t('screens.signup.success.confirm') || '확인',
+                onPress: () => {
+                  reset(ROUTES.authLanding);
+                  navigate(ROUTES.login);
+                },
+              },
+            ],
+          );
+        } catch (error) {
+          console.error('[회원가입] 회원가입 처리 중 오류:', error);
+          await showAlert(
+            t('screens.signup.alerts.error') || '오류',
+            t('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.',
+          );
+
+          try {
+            await AsyncStorage.removeItem('pendingSignupData');
+          } catch (storageError) {
+            console.error('[회원가입] AsyncStorage 정리 실패:', storageError);
+          }
+        } finally {
+          setIsVerifying(false);
+        }
+        return;
+      }
+
       if (verificationSuccessRoute === ROUTES.login || verificationSuccessRoute === ROUTES.map) {
 
         console.log('[로그인] 이메일 로그인 요청:', verificationEmail);
@@ -129,6 +240,16 @@ export const VerificationCodeScreen = () => {
       }
     } catch (error) {
       console.error('[인증] 인증 코드 확인 오류:', error);
+
+      if (verificationSuccessRoute === ROUTES.signup) {
+        try {
+          await AsyncStorage.removeItem('pendingSignupData');
+          console.log('[인증] 에러 발생으로 인한 AsyncStorage 정리 완료 (회원가입 모드)');
+        } catch (storageError) {
+          console.error('[인증] AsyncStorage 정리 실패:', storageError);
+        }
+      }
+
       await showAlert(t('screens.verificationCode.alerts.error'), t('screens.verificationCode.errors.error'));
     } finally {
       setIsVerifying(false);

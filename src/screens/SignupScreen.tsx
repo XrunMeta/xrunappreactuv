@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   FormCheckbox,
   FormField,
@@ -17,10 +18,10 @@ import {
   PrimaryButton,
 } from '../components';
 import { COLORS, SIZES, FONTS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { getRegionIdByIso2, getRegionNameById, COMMON_STYLES, FORM_STYLES } from '../constants';
+import { getRegionIdByIso2, getRegionNameById, getRegionsByCountryIso2, GLOBAL_REGION, COMMON_STYLES, FORM_STYLES } from '../constants';
 
 import {
   checkEmailAvailability,
@@ -46,6 +47,8 @@ export const SignupScreen = () => {
     signupFormData,
     setSignupFormData,
     resetSignupFormData,
+    setVerificationEmail,
+    setVerificationSuccessRoute,
   } = useAppContext();
 
   const GENDER_OPTIONS = [
@@ -57,12 +60,19 @@ export const SignupScreen = () => {
   const [email, setEmail] = useState(signupFormData.email);
   const [password, setPassword] = useState(signupFormData.password);
   const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
-  const [region, setRegion] = useState(signupFormData.region);
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
   const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
   const [ageRange, setAgeRange] = useState<AgeValue>(signupFormData.ageRange);
   const [termsAccepted, setTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
+
+  const regionDisplayValue = selectedRegion
+    ? selectedRegion.name
+    : isKoreaSelected
+    ? ''
+    : GLOBAL_REGION.name;
 
   const isMountedRef = React.useRef(false);
 
@@ -73,7 +83,6 @@ export const SignupScreen = () => {
       setEmail(signupFormData.email);
       setPassword(signupFormData.password);
       setPhoneNumber(signupFormData.phoneNumber);
-      setRegion(signupFormData.region);
       setReferralEmail(signupFormData.referralEmail);
       setGender(signupFormData.gender);
       setAgeRange(signupFormData.ageRange);
@@ -91,7 +100,7 @@ export const SignupScreen = () => {
       email,
       password,
       phoneNumber,
-      region,
+      region: selectedRegion ? selectedRegion.iso2 : '',
       referralEmail,
       gender,
       ageRange,
@@ -103,7 +112,7 @@ export const SignupScreen = () => {
     email,
     password,
     phoneNumber,
-    region,
+    selectedRegion,
     referralEmail,
     gender,
     ageRange,
@@ -138,7 +147,7 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!selectedRegion && !region.trim()) {
+    if (isKoreaSelected && !selectedRegion) {
       await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
       return;
     }
@@ -189,67 +198,91 @@ export const SignupScreen = () => {
           }
 
         }
-      }
+      } else {
 
-      console.log('[회원가입] 3단계: 회원가입 실행 시작');
-      const mobileCode = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
-      const countryCode = selectedCountryDialCode.iso2 || 'KR';
+        console.log('[회원가입] 2단계: 추천인 이메일이 비어있음 - 알림 표시');
+        const buttonIndex = await showAlert(
+          t('screens.signup.alerts.referralEmpty'),
+          t('screens.signup.errors.referralEmpty'),
+          [
+            {
+              text: t('screens.signup.alerts.inputReferral'),
+              style: 'cancel',
+              onPress: () => {
+                setIsSubmitting(false);
+              },
+            },
+            {
+              text: t('screens.signup.alerts.confirm'),
+              onPress: () => {
 
-      const regionId = selectedRegion
-        ? getRegionIdByIso2(selectedRegion.iso2)
-        : parseInt(region) || 2; 
-
-      const signupData = {
-        email: email.trim(),
-        pin: password,
-        firstname: givenName.trim(),
-        lastname: familyName.trim(),
-        gender: SignupHelpers.getGenderCode(gender),
-        mobile: phoneNumber.trim(),
-        mobilecode: mobileCode,
-        countrycode: countryCode,
-        country: mobileCode,
-        region: regionId,
-        age: SignupHelpers.getAgeCode(ageRange),
-        recommand: referralMemberId,
-        os: SignupHelpers.getOSCode(),
-      };
-
-      const signupSuccess = await signup(signupData, navigate);
-
-      if (!signupSuccess) {
-        await showAlert(t('screens.signup.alerts.signupFailed'), t('screens.signup.errors.signupFailed'));
-        setIsSubmitting(false);
-        return;
-      }
-
-      console.log('[회원가입] 4단계: 로그인 확인 시작');
-      const loginSuccess = await checkLogin(email.trim(), password, navigate);
-
-      if (!loginSuccess) {
-        await showAlert(
-          t('screens.signup.alerts.loginCheckFailed'),
-          t('screens.signup.errors.loginCheckFailed'),
+              },
+            },
+          ],
         );
-        reset('authLanding');
-        navigate('login');
+
+        if (buttonIndex === 0) {
+          return;
+        }
+
+      }
+
+      console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
+
+      try {
+
+        const pendingSignupData = {
+          email: email.trim(),
+          password: password,
+          familyName: familyName.trim(),
+          givenName: givenName.trim(),
+          phoneNumber: phoneNumber.trim(),
+          selectedCountryDialCode: {
+            iso2: selectedCountryDialCode.iso2,
+            dialCode: selectedCountryDialCode.dialCode,
+            flagEmoji: selectedCountryDialCode.flagEmoji,
+            name: selectedCountryDialCode.name,
+          },
+          selectedRegion: selectedRegion
+            ? {
+                iso2: selectedRegion.iso2,
+                dialCode: selectedRegion.dialCode,
+                flagEmoji: selectedRegion.flagEmoji,
+                name: selectedRegion.name,
+              }
+            : null,
+          referralMemberId: referralMemberId,
+          gender: gender,
+          ageRange: ageRange,
+        };
+
+        await AsyncStorage.setItem('pendingSignupData', JSON.stringify(pendingSignupData));
+        console.log('[회원가입] AsyncStorage에 회원가입 데이터 저장 완료');
+
+        setVerificationEmail(email.trim());
+        setVerificationSuccessRoute(ROUTES.signup); 
+
+        setIsSubmitting(false);
+        navigate(ROUTES.emailVerification);
+      } catch (storageError) {
+        console.error('[회원가입] AsyncStorage 저장 실패:', storageError);
+        await showAlert(
+          t('screens.signup.alerts.error'),
+          t('screens.signup.errors.error') || '데이터 저장에 실패했습니다. 다시 시도해주세요.',
+        );
         setIsSubmitting(false);
         return;
       }
-
-      await showAlert(t('screens.signup.success.title'), t('screens.signup.success.message'), [
-        {
-          text: t('screens.signup.success.confirm'),
-          onPress: () => {
-
-            resetSignupFormData();
-            reset('authLanding');
-            navigate('login');
-          },
-        },
-      ]);
     } catch (error: any) {
       console.error('[회원가입] 전체 프로세스 실패:', error);
+
+      try {
+        await AsyncStorage.removeItem('pendingSignupData');
+        console.log('[회원가입] 에러 발생으로 인한 AsyncStorage 정리 완료');
+      } catch (storageError) {
+        console.error('[회원가입] AsyncStorage 정리 실패:', storageError);
+      }
+
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -331,20 +364,30 @@ export const SignupScreen = () => {
             }
           />
 
-          <TouchableOpacity
-            style={styles.fieldContainer}
-            onPress={() => {
-              setSelectMode('region');
-              navigate('countryCodeSelect');
-            }}
-          >
-            <FormField
-              label={t('screens.signup.regionLabel')}
-              placeholder={t('screens.signup.regionPlaceholder')}
-              value={selectedRegion ? selectedRegion.name : region || ''}
-              editable={false}
-            />
-          </TouchableOpacity>
+          <View style={styles.fieldContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                if (!isKoreaSelected) {
+                  return;
+                }
+                setSelectMode('region');
+                navigate('countryCodeSelect');
+              }}
+              disabled={!isKoreaSelected || isSubmitting}
+            >
+              <FormField
+                label={t('screens.signup.regionLabel')}
+                placeholder={t('screens.signup.regionPlaceholder')}
+                value={regionDisplayValue}
+                editable={false}
+              />
+            </TouchableOpacity>
+            {!isKoreaSelected && (
+              <Text style={styles.regionHelper}>
+                {t('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
+              </Text>
+            )}
+          </View>
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>{t('screens.signup.genderLabel')}</Text>
@@ -493,6 +536,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     alignItems: 'center',
   },
-
+  regionHelper: {
+    fontSize: FONTS.size.small,
+    lineHeight: 18,
+    color: '#8e9bae',
+    fontFamily: 'Roboto-Regular',
+    marginTop: 4,
+  },
 });
 

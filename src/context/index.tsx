@@ -1,8 +1,8 @@
 
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
 import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
-import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
+import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, getRegionsByCountryIso2, GLOBAL_REGION } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -103,8 +103,23 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
   const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
-  const [selectedRegion, setSelectedRegion] = useState<CountryDialCode | null>(null);
+
+  const initialRegion = useMemo(() => {
+    const regions = getRegionsByCountryIso2(defaultCountry.iso2);
+    return regions[0] || GLOBAL_REGION;
+  }, []);
+  const [selectedRegion, setSelectedRegion] = useState<CountryDialCode | null>(initialRegion);
   const [selectMode, setSelectMode] = useState<'country' | 'region'>('country');
+
+  useEffect(() => {
+    const regions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
+    const isRegionValid = selectedRegion
+      ? regions.some((region) => region.iso2 === selectedRegion.iso2)
+      : false;
+    if (!isRegionValid) {
+      setSelectedRegion(regions[0] || GLOBAL_REGION);
+    }
+  }, [selectedCountryDialCode, selectedRegion]);
   const [signupFormData, setSignupFormDataState] = useState<AppContextValue['signupFormData']>({
     familyName: '',
     givenName: '',
@@ -175,10 +190,17 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setEmergencyStop,
       selectedCountryDialCode,
       setSelectedCountryDialCode,
-      resetSelectedCountryDialCode: () => setSelectedCountryDialCode(defaultCountry),
+      resetSelectedCountryDialCode: () => {
+        setSelectedCountryDialCode(defaultCountry);
+        const regions = getRegionsByCountryIso2(defaultCountry.iso2);
+        setSelectedRegion(regions[0] || GLOBAL_REGION);
+      },
       selectedRegion,
       setSelectedRegion,
-      resetSelectedRegion: () => setSelectedRegion(null),
+      resetSelectedRegion: () => {
+        const regions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
+        setSelectedRegion(regions[0] || GLOBAL_REGION);
+      },
       selectMode,
       setSelectMode,
       signupFormData,
