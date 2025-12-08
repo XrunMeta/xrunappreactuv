@@ -6,47 +6,37 @@ export interface Region {
   nameEn: string;
 }
 
-export const REGIONS_AS_COUNTRY_DIAL_CODES: v_da1883[] = [
+export const GLOBAL_REGION: v_da1883 = {
+  iso2: 'global',
+  name: 'Global',
+  dialCode: '0',
+  flagEmoji: '🌐',
+  countryCode: 0,
+};
 
-  { iso2: 'aceh', name: 'ACEH', dialCode: '1', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'bali', name: 'BALI', dialCode: '2', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'banten', name: 'BANTEN', dialCode: '3', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'bengkulu', name: 'BENGKULU', dialCode: '4', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'di_yogyakarta', name: 'DI YOGYAKARTA', dialCode: '5', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'dki_jakarta', name: 'DKI JAKARTA', dialCode: '6', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'gorontalo', name: 'GORONTALO', dialCode: '7', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jambi', name: 'JAMBI', dialCode: '8', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jawa_barat', name: 'JAWA BARAT', dialCode: '9', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jawa_tengah', name: 'JAWA TENGAH', dialCode: '10', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jawa_timur', name: 'JAWA TIMUR', dialCode: '11', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kalimantan_barat', name: 'KALIMANTAN BARAT', dialCode: '12', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kalimantan_selatan', name: 'KALIMANTAN SELATAN', dialCode: '13', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kalimantan_tengah', name: 'KALIMANTAN TENGAH', dialCode: '14', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kalimantan_timur', name: 'KALIMANTAN TIMUR', dialCode: '15', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kalimantan_utara', name: 'KALIMANTAN UTARA', dialCode: '16', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kepulauan_bangka_belitung', name: 'KEPULAUAN BANGKA BELITUNG', dialCode: '17', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'kepulauan_riau', name: 'KEPULAUAN RIAU', dialCode: '18', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'lampung', name: 'LAMPUNG', dialCode: '19', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'maluku', name: 'MALUKU', dialCode: '20', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'maluku_utara', name: 'MALUKU UTARA', dialCode: '21', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'nusa_tenggara_barat', name: 'NUSA TENGGARA BARAT', dialCode: '22', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'nusa_tenggara_timur', name: 'NUSA TENGGARA TIMUR', dialCode: '23', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'papua', name: 'PAPUA', dialCode: '24', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'papua_barat', name: 'PAPUA BARAT', dialCode: '25', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'riau', name: 'RIAU', dialCode: '26', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sulawesi_barat', name: 'SULAWESI BARAT', dialCode: '27', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sulawesi_selatan', name: 'SULAWESI SELATAN', dialCode: '28', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sulawesi_tengah', name: 'SULAWESI TENGAH', dialCode: '29', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sulawesi_tenggara', name: 'SULAWESI TENGGARA', dialCode: '30', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sulawesi_utara', name: 'SULAWESI UTARA', dialCode: '31', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sumatera_barat', name: 'SUMATERA BARAT', dialCode: '32', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sumatera_selatan', name: 'SUMATERA SELATAN', dialCode: '33', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'sumatera_utara', name: 'SUMATERA UTARA', dialCode: '34', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jakarta_barat', name: 'JAKARTA BARAT', dialCode: '35', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jakarta_selatan', name: 'JAKARTA SELATAN', dialCode: '36', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jakarta_tengah', name: 'JAKARTA TENGAH', dialCode: '37', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jakarta_timur', name: 'JAKARTA TIMUR', dialCode: '38', flagEmoji: '📍' , 'countryCode': 62},
-  { iso2: 'jakarta_utara', name: 'JAKARTA UTARA', dialCode: '39', flagEmoji: '📍' , 'countryCode': 62},
+export const v_369014 = (v_cc0c7d): v_da1883[] => {
+  if (!v_cc0c7d) {
+    return [v_789afd];
+  }
+  const v_550aed = v_cc0c7d.toLowerCase();
+
+  if (v_550aed === 'kr' || v_550aed === 'id') {
+    return v_52495e.filter(
+      (v_a6c30b) => {
+        const v_a4d981 = (v_a6c30b as any).countryCode;
+        if (v_550aed === 'kr') {
+          return v_a4d981 === 82;
+        } else if (v_550aed === 'id') {
+          return v_a4d981 === 62;
+        }
+        return false;
+      }
+    );
+  }
+  return [v_789afd];
+};
+
+export const REGIONS_AS_COUNTRY_DIAL_CODES: v_da1883[] = [
 
   { iso2: '서울', name: '서울', dialCode: '2', flagEmoji: '📍' , 'countryCode': 82},
   { iso2: '경기도', name: '경기도 (Kyeonggi-do)', dialCode: '31', flagEmoji: '📍' , 'countryCode': 82},

@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_472849,
@@ -6,6 +6,7 @@ import {
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_368e80, v_729608, v_cb41de, v_570c34 } from '../components';
 import { v_1bfbd0, v_a61db3 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
@@ -19,7 +20,29 @@ export const v_a82b55 = () => {
   const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_cd31a8, v_deef62] = v_5ab095(false);
-  const { setVerificationSuccessRoute: v_8f89f3, setVerificationEmail: v_b572c3 } = v_700ef9();
+  const { setVerificationSuccessRoute: v_8f89f3, setVerificationEmail: v_b572c3, verificationSuccessRoute: v_e6976c } = v_700ef9();
+
+  const v_9d6cc7 = v_e6976c === v_ce4741.signup;
+
+  v_c4deb2(() => {
+    if (v_9d6cc7) {
+      const v_004f3f = async () => {
+        try {
+          const v_fad096 = await v_e84827.getItem('pendingSignupData');
+          if (v_fad096) {
+            const v_9390e8 = JSON.parse(v_fad096);
+            if (v_9390e8.email) {
+              v_fedf34(v_9390e8.email);
+              v_b572c3(v_9390e8.email);
+            }
+          }
+        } catch (v_5e9bfe) {
+          console.error('[이메일 인증] AsyncStorage에서 이메일 읽기 실패:', v_5e9bfe);
+        }
+      };
+      v_004f3f();
+    }
+  }, [v_9d6cc7, v_b572c3]);
 
   const v_465869 = async () => {
     if (!v_e0c7e8.trim()) {
@@ -37,19 +60,24 @@ export const v_a82b55 = () => {
 
     try {
 
-      console.log('[로그인] 이메일 존재 확인 요청:', v_e0c7e8.trim());
-      const v_dbae58 = await v_f5ecec(v_e0c7e8.trim(), v_9b57fc);
+      if (!v_9d6cc7) {
+        console.log('[로그인] 이메일 존재 확인 요청:', v_e0c7e8.trim());
+        const v_dbae58 = await v_f5ecec(v_e0c7e8.trim(), v_9b57fc);
 
-      if (!v_dbae58) {
-        await v_889fad(
-          v_8d41d7('screens.emailVerification.alerts.emailCheck'),
-          v_8d41d7('screens.emailVerification.errors.emailNotRegistered'),
-        );
-        v_deef62(false);
-        return;
+        if (!v_dbae58) {
+          await v_889fad(
+            v_8d41d7('screens.emailVerification.alerts.emailCheck'),
+            v_8d41d7('screens.emailVerification.errors.emailNotRegistered'),
+          );
+          v_deef62(false);
+          return;
+        }
+      } else {
+        console.log('[회원가입] 이메일 존재 확인 건너뛰기 (회원가입 모드)');
       }
 
-      console.log('[로그인] 이메일 인증 코드 전송 요청:', v_e0c7e8.trim());
+      const v_95b5c1 = v_9d6cc7 ? '[회원가입]' : '[로그인]';
+      console.log(`${v_95b5c1} 이메일 인증 코드 전송 요청:`, v_e0c7e8.trim());
       const v_f438c1 = await v_8025d1(v_e0c7e8.trim(), v_9b57fc);
 
       if (!v_f438c1) {
@@ -59,10 +87,23 @@ export const v_a82b55 = () => {
       }
 
       v_b572c3(v_e0c7e8.trim());
-      v_8f89f3(v_ce4741.map); 
+      if (!v_9d6cc7) {
+        v_8f89f3(v_ce4741.map); 
+      }
+
       v_9b57fc(v_ce4741.verificationCode);
     } catch (v_5e9bfe) {
-      console.error('[로그인] 이메일 인증 처리 중 오류:', v_5e9bfe);
+      console.error('[이메일 인증] 이메일 인증 처리 중 오류:', v_5e9bfe);
+
+      if (v_9d6cc7) {
+        try {
+          await v_e84827.removeItem('pendingSignupData');
+          console.log('[이메일 인증] 에러 발생으로 인한 AsyncStorage 정리 완료 (회원가입 모드)');
+        } catch (v_df17d5) {
+          console.error('[이메일 인증] AsyncStorage 정리 실패:', v_df17d5);
+        }
+      }
+
       await v_889fad(v_8d41d7('screens.emailVerification.alerts.error'), v_8d41d7('screens.emailVerification.errors.error'));
     } finally {
       v_deef62(false);
