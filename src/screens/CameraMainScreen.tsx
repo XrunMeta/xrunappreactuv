@@ -1525,7 +1525,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }
 
   return (
-    <View key={refreshKey} style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
 
       {}
