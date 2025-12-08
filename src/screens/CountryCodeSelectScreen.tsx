@@ -119,11 +119,11 @@ export const CountryCodeSelectScreen = () => {
 
         <FlatList
           data={filteredItems}
-          keyExtractor={(item) => item.iso2}
+          keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
           renderItem={({ item }) => (
             <CountryCodeListItem
               country={item}
-              isSelected={item.iso2 === selectedItem?.iso2}
+              isSelected={item.iso2 === selectedItem?.iso2 && item.dialCode === selectedItem?.dialCode}
               onPress={handleSelect}
             />
           )}

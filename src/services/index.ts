@@ -337,6 +337,25 @@ const createAxiosInstance = (navigation?: any) => {
   instance.interceptors.request.use(
     (config) => {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+
+      if (config.data) {
+        console.log(`[API Request Data] ${config.url}:`, JSON.stringify(config.data));
+        console.log(`[API Request Data 상세] ${config.url}:`, {
+          원본데이터: config.data,
+          직렬화: JSON.stringify(config.data),
+          파싱: JSON.parse(JSON.stringify(config.data)),
+          타입확인: {
+            member: config.data.member !== undefined ? { 값: config.data.member, 타입: typeof config.data.member } : '없음',
+            country: config.data.country !== undefined ? { 값: config.data.country, 타입: typeof config.data.country } : '없음',
+            region: config.data.region !== undefined ? { 값: config.data.region, 타입: typeof config.data.region } : '없음',
+          },
+          undefined체크: {
+            member: config.data.member === undefined,
+            country: config.data.country === undefined,
+            region: config.data.region === undefined,
+          },
+        });
+      }
       return config;
     },
     (error) => {
@@ -1234,28 +1253,106 @@ export const updateRegion = async (
   country: number,
   region: number,
   navigation?: any,
+  options?: { countrycode?: number; mobilecode?: number },
 ): Promise<UpdateRegionResponse> => {
   try {
 
-    if (country === undefined || country === null) {
+    if (member === undefined || member === null || isNaN(member)) {
+      throw new Error('회원 ID가 유효하지 않습니다.');
+    }
+
+    if (country === undefined || country === null || isNaN(country)) {
       throw new Error('국가 코드가 유효하지 않습니다.');
     }
-    if (region === undefined || region === null) {
+
+    if (region === undefined || region === null || isNaN(region)) {
       throw new Error('지역 코드가 유효하지 않습니다.');
     }
 
     const axiosInstance = createAxiosInstance(navigation);
+
+    const memberNum = Number(member);
+    const countryNum = Number(country);
+    const regionNum = Number(region);
+
+    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', { 
+      입력member: member,
+      입력country: country,
+      입력region: region,
+      입력타입: {
+        member: typeof member,
+        country: typeof country,
+        region: typeof region,
+      },
+    });
+
+    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', { 
+      변환member: memberNum,
+      변환country: countryNum,
+      변환region: regionNum,
+      변환타입: {
+        member: typeof memberNum,
+        country: typeof countryNum,
+        region: typeof regionNum,
+      },
+      isNaN체크: {
+        member: isNaN(memberNum),
+        country: isNaN(countryNum),
+        region: isNaN(regionNum),
+      },
+    });
+
     const request: UpdateRegionRequest = {
-      member,
-      country,
-      region,
+      member: memberNum,
+      country: countryNum,
+      region: regionNum,
     };
 
-    console.log('[마이페이지] 지역 수정 요청:', { member, country, region });
+    if (options?.countrycode !== undefined && options?.countrycode !== null) {
+      request.countrycode = options.countrycode;
+    }
+    if (options?.mobilecode !== undefined && options?.mobilecode !== null) {
+      request.mobilecode = options.mobilecode;
+    }
+
+    const cleanRequest: any = {};
+    if (request.member !== undefined) cleanRequest.member = request.member;
+    if (request.country !== undefined) cleanRequest.country = request.country;
+    if (request.region !== undefined) cleanRequest.region = request.region;
+    if (request.countrycode !== undefined) cleanRequest.countrycode = request.countrycode;
+    if (request.mobilecode !== undefined) cleanRequest.mobilecode = request.mobilecode;
+
+    console.log('[마이페이지] 지역 수정 요청 - 최종 request 객체:', JSON.stringify(cleanRequest, null, 2));
+    console.log('[마이페이지] 지역 수정 요청 - cleanRequest 확인:', {
+      원본: request,
+      정리됨: cleanRequest,
+      JSON문자열: JSON.stringify(cleanRequest),
+      파싱: JSON.parse(JSON.stringify(cleanRequest)),
+    });
+    console.log('[마이페이지] 지역 수정 요청 - request 상세:', { 
+      member: request.member, 
+      country: request.country, 
+      region: request.region,
+      types: {
+        member: typeof request.member,
+        country: typeof request.country,
+        region: typeof request.region,
+      },
+      values: {
+        memberValue: request.member,
+        countryValue: request.country,
+        regionValue: request.region,
+      },
+      hasUndefined: {
+        member: request.member === undefined,
+        country: request.country === undefined,
+        region: request.region === undefined,
+      },
+    });
 
     const response = await axiosInstance.post<UpdateRegionResponse>(
       '/app7190-02',
-      request,
+      cleanRequest, 
     );
 
     console.log('[마이페이지] 지역 수정 성공');
