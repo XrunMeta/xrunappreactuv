@@ -10,7 +10,7 @@ import { v_dec439, v_f832ec, v_25515d } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_4c7b5d } from '../components';
-import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04, v_731ab4 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
 import { v_700ef9 } from '../context';
@@ -39,8 +39,7 @@ export const v_03a231 = () => {
     email?: string;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
-
-  const [v_79b081, v_0dfa96] = v_5ab095(v_731ab4 ? true : false);
+  const [v_79b081, v_0dfa96] = v_5ab095(false);
 
   const v_e47202 = v_df9f57(
     () => [
