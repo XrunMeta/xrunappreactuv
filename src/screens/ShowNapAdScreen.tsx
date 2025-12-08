@@ -696,7 +696,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           <Text style={styles.modalSubText}>
             {t('screens.showNapAd.adCallFailedSub')}
           </Text>
-          <View style={[styles.buttonContainer, { justifyContent: 'center' }]}>
+          <View style={[styles.buttonContainer, { justifyContent: 'center', marginTop: 20 }]}>
             <TouchableOpacity onPress={handleAdCallFailedOK} style={[styles.okButton, { flex: 0, minWidth: 200 }]}>
               <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#000000A5',
+    backgroundColor: '#FFFFFF',
   },
   loadingContainer: {
     alignItems: 'center',
