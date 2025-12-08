@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -66,17 +66,32 @@ interface ShowNapAdScreenProps {
 export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
-  const { navigate, reset } = useAppNavigation();
+  const { navigate, reset, goBack } = useAppNavigation();
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
+    resetAdvertisementParams();
+    console.log('handleClose');
+    console.log('onClose', onClose);
     if (onClose) {
-      resetAdvertisementParams();
+
       onClose();
-    } else if (reset) {
-      resetAdvertisementParams();
-      reset(ROUTES.map);
+    } else {
+
+      if (Platform.OS === 'ios') {
+
+        if (goBack) {
+          goBack();
+        } else if (reset) {
+          reset(ROUTES.map);
+        }
+      } else {
+
+        if (reset) {
+          reset(ROUTES.map);
+        }
+      }
     }
-  };
+  }, [onClose, resetAdvertisementParams, goBack, reset]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -108,7 +123,17 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
     if (!advertisementParams) {
       console.log('⚠️ [ShowNapAdScreen] 광고 파라미터가 없습니다. 화면을 렌더링하지 않습니다.');
-      return;
+      console.log('🔄 모달을 닫습니다.');
+
+      const delay = Platform.OS === 'ios' && onClose ? 100 : 0;
+
+      const timeoutId = setTimeout(() => {
+        handleClose();
+      }, delay);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
     }
 
     console.log('✅ [ShowNapAdScreen] 광고 파라미터 확인 완료:', {
@@ -118,7 +143,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       name: advertisementParams.name,
       xrunPrice: advertisementParams.xrunPrice,
     });
-  }, [advertisementParams]);
+  }, [advertisementParams, handleClose]);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -603,7 +628,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   }
 
   return (
-    <View style={[styles.root, { backgroundColor: adCallFailedModalVisible ? '#000000A5' : 'white' }]}>
+    <View style={styles.root}>
       <StatusBar style="dark" />
 
       {}
@@ -663,7 +688,24 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       )}
 
       {}
-      {!isLoading && !isProcessing && !waitingForWebSocketResponse && campaignData && (
+      {!isLoading && !isProcessing && !waitingForWebSocketResponse && adCallFailedModalVisible && (
+        <View style={[styles.campaignContainer, styles.errorContainer]}>
+          <Text style={styles.modalText}>
+            {t('screens.showNapAd.adCallFailed')}
+          </Text>
+          <Text style={styles.modalSubText}>
+            {t('screens.showNapAd.adCallFailedSub')}
+          </Text>
+          <View style={[styles.buttonContainer, { justifyContent: 'center' }]}>
+            <TouchableOpacity onPress={handleAdCallFailedOK} style={[styles.okButton, { flex: 0, minWidth: 200 }]}>
+              <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {}
+      {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
         <View style={styles.campaignContainer}>
           <Text style={styles.campaignTitle}>
             {campaignData.name || t('screens.showNapAd.campaignInfo')}
@@ -744,27 +786,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         </View>
       )}
 
-      {}
-      <Modal
-        transparent
-        animationType="slide"
-        visible={adCallFailedModalVisible}
-        onRequestClose={() => setAdCallFailedModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              {t('screens.showNapAd.adCallFailed')}
-            </Text>
-            <Text style={styles.modalSubText}>
-              {t('screens.showNapAd.adCallFailedSub')}
-            </Text>
-            <TouchableOpacity onPress={handleAdCallFailedOK} style={styles.okButton}>
-              <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -1045,6 +1066,14 @@ const styles = StyleSheet.create({
     color: '#495057',
     lineHeight: 18,
     textAlign: 'left',
+  },
+  errorContainer: {
+    height: 'auto',
+    minHeight: 200,
+    maxHeight: 300,
+    maxWidth: '80%',
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
 });
 

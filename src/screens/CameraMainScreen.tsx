@@ -11,6 +11,7 @@ import {
   Easing,
   AppState,
   Modal,
+  Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -426,6 +427,47 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
   const [showAdModal, setShowAdModal] = useState(false);
+
+  useEffect(() => {
+    if (!showAdModal) {
+
+      console.log('📱 [CameraMainScreen] 모달이 닫혔습니다. 포커스 확인 중...');
+      console.log('📊 [CameraMainScreen] 현재 상태:', {
+        showAdModal,
+        activeTab,
+        loading,
+        tokensCount: tokens?.length ?? 0,
+        appState,
+      });
+
+      const delay = Platform.OS === 'ios' ? 500 : 100;
+
+      const timeoutId = setTimeout(() => {
+        console.log('✅ [CameraMainScreen] 포커스 확인 완료');
+        console.log('📊 [CameraMainScreen] AppState:', AppState.currentState);
+
+        if (Platform.OS === 'ios') {
+          console.log('🔄 [CameraMainScreen] iOS 강제 복원 시작');
+
+          setRefreshKey(prev => prev + 1);
+
+          const currentAppState = AppState.currentState;
+          if (currentAppState !== 'active') {
+            console.log('⚠️ [CameraMainScreen] AppState가 active가 아닙니다:', currentAppState);
+          }
+
+          setTimeout(() => {
+            console.log('🔄 [CameraMainScreen] iOS 추가 리렌더링 트리거');
+            setRefreshKey(prev => prev + 1);
+          }, 200);
+        }
+      }, delay);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [showAdModal, activeTab, loading, tokens, appState]);
 
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [coinsData, setCoinsData] = useState<any[]>([]); 
@@ -1785,11 +1827,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         onRequestClose={() => {
           console.log('모달 닫기 요청');
           setShowAdModal(false);
+        }}
+        onDismiss={() => {
+
+          console.log('📱 [CameraMainScreen] 모달이 완전히 닫혔습니다 (onDismiss)');
+          console.log('📊 [CameraMainScreen] 현재 상태 확인:', {
+            showAdModal,
+            activeTab,
+            loading,
+            tokensCount: tokens?.length ?? 0,
+            appState: AppState.currentState,
+          });
+
+          if (Platform.OS === 'ios') {
+            console.log('🔄 [CameraMainScreen] onDismiss에서 iOS 복원 트리거');
+            setTimeout(() => {
+              setRefreshKey(prev => prev + 1);
+            }, 100);
+          }
         }}>
         <ShowNapAdScreen
           onClose={() => {
             console.log('ShowNapAdScreen 모달 닫기');
             setShowAdModal(false);
+
           }}
         />
         <TouchableOpacity
