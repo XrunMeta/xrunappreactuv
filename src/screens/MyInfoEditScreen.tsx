@@ -159,14 +159,11 @@ export const MyInfoEditScreen = () => {
       const savedDataStr = await AsyncStorage.getItem(FORM_DATA_KEY);
       if (savedDataStr) {
         const savedData = JSON.parse(savedDataStr);
-        console.log('[정보수정] ✅ 저장된 입력값 복원 시작:', { savedData, excludeRegion });
 
         if (savedData.firstName) {
-          console.log('[정보수정] 이름 복원:', savedData.firstName);
           setFirstName(savedData.firstName);
         }
         if (savedData.lastName) {
-          console.log('[정보수정] 성 복원:', savedData.lastName);
           setLastName(savedData.lastName);
         }
         if (savedData.phone) setPhone(savedData.phone);
@@ -193,7 +190,6 @@ export const MyInfoEditScreen = () => {
         }
 
         if (excludeRegion) {
-          console.log('[정보수정] ✅ 나라 변경으로 인해 나라/지역 정보 복원 안함 - 새로 선택한 나라 사용');
 
           setTempRegion({ rDesc: '', rCode: null });
           setSelectedRegionId(null);
@@ -201,11 +197,9 @@ export const MyInfoEditScreen = () => {
         } else {
 
           if (savedData.tempCountry) {
-            console.log('[정보수정] 나라 정보 복원:', savedData.tempCountry);
             setTempCountry(savedData.tempCountry);
           }
           if (savedData.tempRegion) {
-            console.log('[정보수정] 지역 정보 복원:', savedData.tempRegion);
             setTempRegion(savedData.tempRegion);
           }
           if (savedData.regionCode !== undefined) {
@@ -216,7 +210,6 @@ export const MyInfoEditScreen = () => {
           }
         }
 
-        console.log('[정보수정] ✅ 입력값 복원 완료');
         return true; 
       }
       console.log('[정보수정] ⚠️ 저장된 입력값 없음');
@@ -230,7 +223,6 @@ export const MyInfoEditScreen = () => {
   const clearFormData = async () => {
     try {
       await AsyncStorage.removeItem(FORM_DATA_KEY);
-      console.log('[정보수정] ✅ 저장된 입력값 삭제됨');
     } catch (error) {
       console.error('[정보수정] 입력값 삭제 실패:', error);
     }
@@ -256,11 +248,6 @@ export const MyInfoEditScreen = () => {
   const loadUserInfo = async (showLoading: boolean = true) => {
     const stackTrace = new Error().stack;
     const caller = stackTrace?.split('\n')[2]?.trim() || 'unknown';
-    console.log('[정보수정] ⚠️⚠️⚠️ loadUserInfo 호출됨:', {
-      showLoading,
-      호출위치: caller,
-      hasLoadedUserInfo: hasLoadedUserInfoRef.current,
-    });
 
     if (!showLoading && hasLoadedUserInfoRef.current) {
       console.warn('[정보수정] ⚠️ 경고: 나라 선택 후 loadUserInfo가 호출되었습니다!');
@@ -268,7 +255,6 @@ export const MyInfoEditScreen = () => {
 
     try {
       if (showLoading) {
-        console.log('[정보수정] ⚠️ setIsLoading(true) 호출됨 - 화면이 로딩 상태로 변경됩니다');
         setIsLoading(true);
       }
       const userDataStr = await AsyncStorage.getItem('userData');
@@ -287,17 +273,6 @@ export const MyInfoEditScreen = () => {
             const loadedGender = convertGenderFromApi(user.gender);
             const loadedAge = convertAgeFromApi(user.ages);
 
-            console.log('[정보수정] 🔄 새로고침 - API에서 받은 원본 데이터:', {
-              firstname: user.firstname,
-              lastname: user.lastname,
-              gender: user.gender,
-              ages: user.ages,
-              변환된이름: loadedFirstName,
-              변환된성: loadedLastName,
-              변환된성별: loadedGender,
-              변환된나이: loadedAge,
-            });
-
             setFirstName(loadedFirstName);
             setLastName(loadedLastName);
             setEmail(user.email || '');
@@ -306,13 +281,6 @@ export const MyInfoEditScreen = () => {
             setOriginalLastName(loadedLastName);
             setOriginalGender(loadedGender);
             setOriginalAge(loadedAge);
-
-            console.log('[정보수정] 🔄 새로고침 - state 업데이트 완료:', {
-              firstName: loadedFirstName,
-              lastName: loadedLastName,
-              gender: loadedGender,
-              age: loadedAge,
-            });
 
             if (user.mobile) {
               setPhone(user.mobile.replace(/\s/g, ''));
@@ -325,19 +293,7 @@ export const MyInfoEditScreen = () => {
               return isNaN(genderNum) ? 'male' : (genderNum === 2111 ? 'female' : 'male');
             })();
 
-            console.log('[정보수정] 🎯 성별 state 설정 시작:', {
-              API원본값: user.gender,
-              API원본타입: typeof user.gender,
-              변환된값: loadedGender,
-              변환함수결과: convertGenderFromApi(user.gender),
-              예상값: expectedGenderValue,
-            });
             setGender(loadedGender);
-            console.log('[정보수정] ✅ 성별 state 설정 완료:', {
-              설정된값: loadedGender,
-              예상값: expectedGenderValue,
-              일치여부: loadedGender === expectedGenderValue,
-            });
 
             setAge(loadedAge);
 
@@ -372,13 +328,6 @@ export const MyInfoEditScreen = () => {
 
                 loadedCountryName = countryName;
                 loadedCountryCode = countryCode;
-
-                console.log('[정보수정] 국가 매칭 결과:', {
-                  userCountry,
-                  countryItem,
-                  countryName,
-                  countryCode,
-                });
 
                 setTempCountry({ cDesc: countryName, cCode: countryCode });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: countryName, cCode: countryCode });
@@ -465,37 +414,6 @@ export const MyInfoEditScreen = () => {
                 console.error('[정보수정] 국가/지역 정보 로드 실패:', error);
               }
 
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log('[정보수정] 📋 현재 저장된 회원 정보 (원본 데이터)');
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log(JSON.stringify({
-                memberId: member,
-                이름: {
-                  값: loadedFirstName,
-                },
-                성: {
-                  값: loadedLastName,
-                },
-                이메일: user.email || '',
-                전화번호: user.mobile ? user.mobile.replace(/\s/g, '') : '',
-                성별: {
-                  UI값: loadedGender,
-                  API코드: convertGenderToApi(loadedGender),
-                },
-                나이: {
-                  UI값: loadedAge,
-                  API코드: convertAgeToApi(loadedAge),
-                },
-                국가: {
-                  국가코드: userCountry,
-                  국가명: loadedCountryName || '알 수 없음',
-                },
-                지역: {
-                  지역코드: loadedRegionCode,
-                  지역명: loadedRegionName || '알 수 없음',
-                },
-              }, null, 2));
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             } else {
 
               if (userRegion !== undefined && userRegion !== null && !isNaN(userRegion)) {
@@ -540,39 +458,24 @@ export const MyInfoEditScreen = () => {
         const prevCountryIso2 = await AsyncStorage.getItem('PREV_COUNTRY_ISO2');
         const isReturningFromCountrySelect = prevCountryIso2 !== null;
 
-        console.log('[정보수정] 화면 진입 판단:', {
-          isReturningFromCountrySelect,
-          prevCountryIso2,
-          isMountedRef: isMountedRef.current,
-        });
-
         if (isReturningFromCountrySelect) {
-          console.log('[정보수정] ✅ 나라 선택 후 돌아옴 - 저장된 입력값 복원 시작');
 
           const userDataStr = await AsyncStorage.getItem('userData');
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             const member = userData.member;
             if (member) {
-              console.log('[정보수정] 나라 선택 후 돌아옴 - memberId 설정:', member);
               setMemberId(member);
             }
           }
 
           const currentIso2 = selectedCountryDialCode?.iso2;
 
-          console.log('[정보수정] 나라 변경 감지 비교:', {
-            이전나라: prevCountryIso2,
-            현재나라: currentIso2,
-            변경됨: prevCountryIso2 !== currentIso2,
-          });
-
           const isCountryActuallyChanged = Boolean(currentIso2 && prevCountryIso2 !== currentIso2);
 
           const restored = await restoreFormData(isCountryActuallyChanged);
 
           if (isCountryActuallyChanged && selectedCountryDialCode) {
-            console.log('[정보수정] ✅ 나라 변경 감지 - 나라 변경 처리');
 
             const newCountryCode = getCountryCodeFromDialCode(selectedCountryDialCode.dialCode);
             if (newCountryCode !== null) {
@@ -619,11 +522,9 @@ export const MyInfoEditScreen = () => {
           const userData = JSON.parse(userDataStr);
           const member = userData.member;
           if (member) {
-            console.log('[정보수정] 초기화 - memberId 설정:', member);
             setMemberId(member);
 
             if (!hasLoadedUserInfoRef.current) {
-              console.log('[정보수정] ✅ loadUserInfo 호출 시작 (초기 로드)');
 
               await loadUserInfo();
               hasLoadedUserInfoRef.current = true;
@@ -672,6 +573,26 @@ export const MyInfoEditScreen = () => {
 
     if (!lastName.trim()) {
       await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.lastNameRequired'));
+      return;
+    }
+
+    if (!gender) {
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.genderRequired'));
+      return;
+    }
+
+    if (!age) {
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.ageRequired'));
+      return;
+    }
+
+    if (!tempCountry.cCode && tempCountry.cCode !== 0) {
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.countryRequired'));
+      return;
+    }
+
+    if (tempRegion.rCode === null || tempRegion.rCode === -1) {
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.regionRequired'));
       return;
     }
 
@@ -741,11 +662,6 @@ export const MyInfoEditScreen = () => {
 
       if (firstName.trim() !== originalFirstName.trim()) {
         const request = { member: memberId, firstname: firstName.trim() };
-        console.log('[정보수정] ✅ 이름 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 이름 수정 API 요청 데이터:');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         apiCalls.push({ name: '이름', request });
         promises.push(updateName(memberId, firstName.trim(), navigate).then(response => {
           console.log('[정보수정] 📥 이름 수정 API 응답:', response);
@@ -760,11 +676,7 @@ export const MyInfoEditScreen = () => {
 
       if (lastName.trim() !== originalLastName.trim()) {
         const request = { member: memberId, lastname: lastName.trim() };
-        console.log('[정보수정] ✅ 성 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 성 수정 API 요청 데이터:');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
         apiCalls.push({ name: '성', request });
         promises.push(updateLastName(memberId, lastName.trim(), navigate).then(response => {
           console.log('[정보수정] 📥 성 수정 API 응답:', response);
@@ -781,11 +693,6 @@ export const MyInfoEditScreen = () => {
       const originalGenderCode = convertGenderToApi(originalGender);
       if (genderCode !== undefined && genderCode !== null && genderCode !== originalGenderCode) {
         const request = { member: memberId, gender: genderCode };
-        console.log('[정보수정] ✅ 성별 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 성별 수정 API 요청 데이터:');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         apiCalls.push({ name: '성별', request });
         promises.push(updateGender(memberId, genderCode, navigate).then(response => {
           console.log('[정보수정] 📥 성별 수정 API 응답:', response);
@@ -802,11 +709,6 @@ export const MyInfoEditScreen = () => {
       const originalAgeCode = convertAgeToApi(originalAge);
       if (ageCode !== undefined && ageCode !== null && ageCode !== originalAgeCode) {
         const request = { member: memberId, ages: ageCode };
-        console.log('[정보수정] ✅ 나이 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 나이 수정 API 요청 데이터:');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         apiCalls.push({ name: '나이', request });
         promises.push(updateAge(memberId, ageCode, navigate).then(response => {
           console.log('[정보수정] 📥 나이 수정 API 응답:', response);
@@ -859,12 +761,6 @@ export const MyInfoEditScreen = () => {
         const isCountryChanged = countryCodeNum !== originalCountry;
         const isRegionChanged = regionCodeNum !== originalRegion;
 
-        console.log('[정보수정] 🔍 국가/지역 변경 비교:', {
-          현재: { country: countryCodeNum, region: regionCodeNum },
-          원본: { country: originalCountry, region: originalRegion },
-          변경됨: { country: isCountryChanged, region: isRegionChanged },
-        });
-
         if (isCountryChanged || isRegionChanged) {
 
           const memberNum = Number(memberId);
@@ -876,40 +772,6 @@ export const MyInfoEditScreen = () => {
             : null;
 
           const countrycode = mobilecode;
-
-          console.log('[정보수정] 국가 코드 정보 추출:', {
-            selectedCountryDialCode,
-            countrycode,
-            mobilecode,
-            countryCodeNum,
-          });
-
-          console.log('[정보수정] ✅ 국가/지역 변경 감지');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 📤 국가/지역 수정 API 요청 데이터 생성 시작');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 변환 전 원본 값:');
-          console.log(JSON.stringify({
-            memberId_원본: memberId,
-            memberId_타입: typeof memberId,
-            countryCode_원본: currentCountryCode,
-            countryCode_타입: typeof currentCountryCode,
-            regionCode_원본: currentRegionCode,
-            regionCode_타입: typeof currentRegionCode,
-          }, null, 2));
-
-          console.log('[정보수정] 변환 후 값:');
-          console.log(JSON.stringify({
-            memberNum: memberNum,
-            memberNum_타입: typeof memberNum,
-            memberNum_isNaN: isNaN(memberNum),
-            countryNum: countryNum,
-            countryNum_타입: typeof countryNum,
-            countryNum_isNaN: isNaN(countryNum),
-            regionNum: regionNum,
-            regionNum_타입: typeof regionNum,
-            regionNum_isNaN: isNaN(regionNum),
-          }, null, 2));
 
           const request: any = {
             member: memberNum,
@@ -923,46 +785,6 @@ export const MyInfoEditScreen = () => {
             request.countrycode = mobilecode;
           }
 
-          console.log('[정보수정] 국가 코드 정보 최종:', {
-            mobilecode: request.mobilecode,
-            countrycode: request.countrycode,
-            둘이같은지: request.mobilecode === request.countrycode,
-          });
-
-          console.log('[정보수정] 📤 최종 API 요청 데이터 (JSON):');
-          console.log(JSON.stringify(request, null, 2));
-          console.log('[정보수정] 📤 최종 API 요청 데이터 (상세):');
-          console.log(JSON.stringify({
-            request: request,
-            검증: {
-              member_유효: !isNaN(memberNum) && memberNum !== undefined && memberNum !== null,
-              country_유효: !isNaN(countryNum) && countryNum !== undefined && countryNum !== null,
-              region_유효: !isNaN(regionNum) && regionNum !== undefined && regionNum !== null,
-              모두유효: !isNaN(memberNum) && !isNaN(countryNum) && !isNaN(regionNum) &&
-                memberNum !== undefined && countryNum !== undefined && regionNum !== undefined &&
-                memberNum !== null && countryNum !== null && regionNum !== null,
-            },
-            undefined체크: {
-              member: request.member === undefined,
-              country: request.country === undefined,
-              region: request.region === undefined,
-            },
-            null체크: {
-              member: request.member === null,
-              country: request.country === null,
-              region: request.region === null,
-            },
-          }, null, 2));
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          apiCalls.push({ name: '국가/지역', request });
-
-          console.log('[정보수정] 🔄 updateRegion API 호출 시작:', {
-            member: memberNum,
-            country: countryNum,
-            region: regionNum,
-            options: { countrycode, mobilecode },
-          });
-
           const options: { countrycode?: number; mobilecode?: number } = {};
           if (countrycode !== null && countrycode !== undefined && !isNaN(countrycode)) {
             options.countrycode = countrycode;
@@ -970,8 +792,6 @@ export const MyInfoEditScreen = () => {
           if (mobilecode !== null && mobilecode !== undefined && !isNaN(mobilecode)) {
             options.mobilecode = mobilecode;
           }
-
-          console.log('[정보수정] updateRegion options:', options);
 
           promises.push(updateRegion(
             memberNum,
@@ -1008,30 +828,6 @@ export const MyInfoEditScreen = () => {
       }
 
       if (promises.length > 0) {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📊 전체 API 호출 요약');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`총 ${apiCalls.length}개 API 호출 예정:`);
-        apiCalls.forEach((call, index) => {
-          console.log(`${index + 1}. ${call.name}:`);
-          console.log(JSON.stringify(call.request, null, 2));
-        });
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-        console.log('[정보수정] ⏳ API 호출 시작...');
-        const results = await Promise.all(promises);
-        console.log('[정보수정] ✅ 모든 API 호출 완료');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📥 API 호출 결과 상세:');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        results.forEach((result, index) => {
-          const apiName = apiCalls[index]?.name || '알 수 없음';
-          const requestData = apiCalls[index]?.request;
-          console.log(`${index + 1}. ${apiName}:`);
-          console.log('   요청:', JSON.stringify(requestData, null, 2));
-          console.log('   응답:', JSON.stringify(result, null, 2));
-        });
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         await showAlert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'));
 
@@ -1044,22 +840,11 @@ export const MyInfoEditScreen = () => {
           나이코드: convertAgeToApi(originalAge),
         };
 
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 🔄 저장 전 원본 값 (비교용)');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(JSON.stringify(beforeRefresh, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
         await clearFormData();
 
-        console.log('[정보수정] 🔄 저장 후 데이터 새로고침 시작...');
         await loadUserInfo(false);
 
         setTimeout(() => {
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 🔍 저장 후 새로고침된 값 확인');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
           const afterRefresh = {
             이름: firstName,
             성: lastName,
@@ -1075,19 +860,6 @@ export const MyInfoEditScreen = () => {
             성별변경됨: gender !== beforeRefresh.성별,
             나이변경됨: age !== beforeRefresh.나이,
           };
-
-          console.log(JSON.stringify({
-            '저장 전 (원본)': beforeRefresh,
-            '저장 후 (새로고침됨)': afterRefresh,
-            '변경 확인': changeCheck,
-            '원본 값 (state)': {
-              originalFirstName,
-              originalLastName,
-              originalGender,
-              originalAge,
-            },
-          }, null, 2));
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
           const anyChanged = changeCheck.이름변경됨 || changeCheck.성변경됨 || changeCheck.성별변경됨 || changeCheck.나이변경됨;
 
@@ -1468,6 +1240,11 @@ export const MyInfoEditScreen = () => {
                       : tempCountry.cDesc || selectedCountryDialCode?.name || '';
 
                     if (countryName && tempRegion.rDesc && tempRegion.rDesc !== 'Please Select' && tempRegion.rCode !== null && tempRegion.rCode !== -1 && !isCountryChanged) {
+
+                      if (tempRegion.rCode === 0) {
+                        return tempRegion.rDesc;
+                      }
+
                       return `${countryName}, ${tempRegion.rDesc}`;
                     }
 
@@ -1508,12 +1285,6 @@ export const MyInfoEditScreen = () => {
                   );
                 })}
               </View>
-              {}
-              {__DEV__ && (
-                <Text style={{ fontSize: 10, color: 'gray', marginTop: 4 }}>
-                  [디버그] 현재 gender state: {gender} (API: {convertGenderToApi(gender)})
-                </Text>
-              )}
             </View>
 
             <View style={styles.fieldContainer}>
