@@ -159,14 +159,11 @@ export const v_cdb169 = () => {
       const v_3467c8 = await v_e84827.getItem(v_c7a4de);
       if (v_3467c8) {
         const v_f1d91d = JSON.parse(v_3467c8);
-        console.log('[정보수정] ✅ 저장된 입력값 복원 시작:', { savedData: v_f1d91d, excludeRegion: v_a1e5e9 });
 
         if (v_f1d91d.firstName) {
-          console.log('[정보수정] 이름 복원:', v_f1d91d.firstName);
           v_4944f5(v_f1d91d.firstName);
         }
         if (v_f1d91d.lastName) {
-          console.log('[정보수정] 성 복원:', v_f1d91d.lastName);
           v_b7613d(v_f1d91d.lastName);
         }
         if (v_f1d91d.phone) v_fcce73(v_f1d91d.phone);
@@ -193,7 +190,6 @@ export const v_cdb169 = () => {
         }
 
         if (v_a1e5e9) {
-          console.log('[정보수정] ✅ 나라 변경으로 인해 나라/지역 정보 복원 안함 - 새로 선택한 나라 사용');
 
           v_655be9({ rDesc: '', rCode: null });
           v_a0f6fa(null);
@@ -201,11 +197,9 @@ export const v_cdb169 = () => {
         } else {
 
           if (v_f1d91d.tempCountry) {
-            console.log('[정보수정] 나라 정보 복원:', v_f1d91d.tempCountry);
             v_85a493(v_f1d91d.tempCountry);
           }
           if (v_f1d91d.tempRegion) {
-            console.log('[정보수정] 지역 정보 복원:', v_f1d91d.tempRegion);
             v_655be9(v_f1d91d.tempRegion);
           }
           if (v_f1d91d.regionCode !== undefined) {
@@ -216,7 +210,6 @@ export const v_cdb169 = () => {
           }
         }
 
-        console.log('[정보수정] ✅ 입력값 복원 완료');
         return true; 
       }
       console.log('[정보수정] ⚠️ 저장된 입력값 없음');
@@ -230,7 +223,6 @@ export const v_cdb169 = () => {
   const v_306e20 = async () => {
     try {
       await v_e84827.removeItem(v_c7a4de);
-      console.log('[정보수정] ✅ 저장된 입력값 삭제됨');
     } catch (v_5e9bfe) {
       console.error('[정보수정] 입력값 삭제 실패:', v_5e9bfe);
     }
@@ -256,11 +248,6 @@ export const v_cdb169 = () => {
   const v_ea3fa6 = async (v_587901 = true) => {
     const v_96aafe = new Error().stack;
     const v_dbc741 = v_96aafe?.split('\n')[2]?.trim() || 'unknown';
-    console.log('[정보수정] ⚠️⚠️⚠️ loadUserInfo 호출됨:', {
-      showLoading: v_587901,
-      호출위치: v_dbc741,
-      hasLoadedUserInfo: v_00d52a.current,
-    });
 
     if (!v_587901 && v_00d52a.current) {
       console.warn('[정보수정] ⚠️ 경고: 나라 선택 후 loadUserInfo가 호출되었습니다!');
@@ -268,7 +255,6 @@ export const v_cdb169 = () => {
 
     try {
       if (v_587901) {
-        console.log('[정보수정] ⚠️ setIsLoading(true) 호출됨 - 화면이 로딩 상태로 변경됩니다');
         v_deef62(true);
       }
       const v_f24fd5 = await v_e84827.getItem('userData');
@@ -287,17 +273,6 @@ export const v_cdb169 = () => {
             const v_df7343 = v_d6877d(v_625c74.gender);
             const v_9c69cf = v_596588(v_625c74.ages);
 
-            console.log('[정보수정] 🔄 새로고침 - API에서 받은 원본 데이터:', {
-              firstname: v_625c74.firstname,
-              lastname: v_625c74.lastname,
-              gender: v_625c74.gender,
-              ages: v_625c74.ages,
-              변환된이름: v_898d5f,
-              변환된성: v_8e4db1,
-              변환된성별: v_df7343,
-              변환된나이: v_9c69cf,
-            });
-
             v_4944f5(v_898d5f);
             v_b7613d(v_8e4db1);
             v_fedf34(v_625c74.email || '');
@@ -306,13 +281,6 @@ export const v_cdb169 = () => {
             v_c94311(v_8e4db1);
             v_edd340(v_df7343);
             v_27ff98(v_9c69cf);
-
-            console.log('[정보수정] 🔄 새로고침 - state 업데이트 완료:', {
-              firstName: v_898d5f,
-              lastName: v_8e4db1,
-              gender: v_df7343,
-              age: v_9c69cf,
-            });
 
             if (v_625c74.mobile) {
               v_fcce73(v_625c74.mobile.replace(/\s/g, ''));
@@ -325,19 +293,7 @@ export const v_cdb169 = () => {
               return isNaN(v_7ac969) ? 'male' : (v_7ac969 === 2111 ? 'female' : 'male');
             })();
 
-            console.log('[정보수정] 🎯 성별 state 설정 시작:', {
-              API원본값: v_625c74.gender,
-              API원본타입: typeof v_625c74.gender,
-              변환된값: v_df7343,
-              변환함수결과: v_d6877d(v_625c74.gender),
-              예상값: v_fc3a4e,
-            });
             v_bdc43c(v_df7343);
-            console.log('[정보수정] ✅ 성별 state 설정 완료:', {
-              설정된값: v_df7343,
-              예상값: v_fc3a4e,
-              일치여부: v_df7343 === v_fc3a4e,
-            });
 
             v_6e5c76(v_9c69cf);
 
@@ -372,13 +328,6 @@ export const v_cdb169 = () => {
 
                 v_af0247 = v_67cb9c;
                 v_551ac0 = v_a4d981;
-
-                console.log('[정보수정] 국가 매칭 결과:', {
-                  userCountry: v_851a40,
-                  countryItem: v_a54b0c,
-                  countryName: v_67cb9c,
-                  countryCode: v_a4d981,
-                });
 
                 v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: v_67cb9c, cCode: v_a4d981 });
@@ -465,37 +414,6 @@ export const v_cdb169 = () => {
                 console.error('[정보수정] 국가/지역 정보 로드 실패:', v_5e9bfe);
               }
 
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log('[정보수정] 📋 현재 저장된 회원 정보 (원본 데이터)');
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log(JSON.stringify({
-                memberId: v_660822,
-                이름: {
-                  값: v_898d5f,
-                },
-                성: {
-                  값: v_8e4db1,
-                },
-                이메일: v_625c74.email || '',
-                전화번호: v_625c74.mobile ? v_625c74.mobile.replace(/\s/g, '') : '',
-                성별: {
-                  UI값: v_df7343,
-                  API코드: v_a1244c(v_df7343),
-                },
-                나이: {
-                  UI값: v_9c69cf,
-                  API코드: v_e9394b(v_9c69cf),
-                },
-                국가: {
-                  국가코드: v_851a40,
-                  국가명: v_af0247 || '알 수 없음',
-                },
-                지역: {
-                  지역코드: v_8622c9,
-                  지역명: v_565f82 || '알 수 없음',
-                },
-              }, null, 2));
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             } else {
 
               if (v_23b15e !== undefined && v_23b15e !== null && !isNaN(v_23b15e)) {
@@ -540,39 +458,24 @@ export const v_cdb169 = () => {
         const v_6d31f9 = await v_e84827.getItem('PREV_COUNTRY_ISO2');
         const v_f34a8d = v_6d31f9 !== null;
 
-        console.log('[정보수정] 화면 진입 판단:', {
-          isReturningFromCountrySelect: v_f34a8d,
-          prevCountryIso2: v_6d31f9,
-          isMountedRef: v_2ca208.current,
-        });
-
         if (v_f34a8d) {
-          console.log('[정보수정] ✅ 나라 선택 후 돌아옴 - 저장된 입력값 복원 시작');
 
           const v_f24fd5 = await v_e84827.getItem('userData');
           if (v_f24fd5) {
             const v_ef7306 = JSON.parse(v_f24fd5);
             const v_660822 = v_ef7306.member;
             if (v_660822) {
-              console.log('[정보수정] 나라 선택 후 돌아옴 - memberId 설정:', v_660822);
               v_9d6aeb(v_660822);
             }
           }
 
           const v_395426 = v_459d5e?.iso2;
 
-          console.log('[정보수정] 나라 변경 감지 비교:', {
-            이전나라: v_6d31f9,
-            현재나라: v_395426,
-            변경됨: v_6d31f9 !== v_395426,
-          });
-
           const v_a70697 = Boolean(v_395426 && v_6d31f9 !== v_395426);
 
           const v_b53d24 = await v_f26975(v_a70697);
 
           if (v_a70697 && v_459d5e) {
-            console.log('[정보수정] ✅ 나라 변경 감지 - 나라 변경 처리');
 
             const v_32c8b6 = v_bec697(v_459d5e.dialCode);
             if (v_32c8b6 !== null) {
@@ -619,11 +522,9 @@ export const v_cdb169 = () => {
           const v_ef7306 = JSON.parse(v_f24fd5);
           const v_660822 = v_ef7306.member;
           if (v_660822) {
-            console.log('[정보수정] 초기화 - memberId 설정:', v_660822);
             v_9d6aeb(v_660822);
 
             if (!v_00d52a.current) {
-              console.log('[정보수정] ✅ loadUserInfo 호출 시작 (초기 로드)');
 
               await v_ea3fa6();
               v_00d52a.current = true;
@@ -672,6 +573,26 @@ export const v_cdb169 = () => {
 
     if (!v_328bb4.trim()) {
       await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.lastNameRequired'));
+      return;
+    }
+
+    if (!v_c3eac4) {
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.genderRequired'));
+      return;
+    }
+
+    if (!v_2694bd) {
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.ageRequired'));
+      return;
+    }
+
+    if (!v_add96c.cCode && v_add96c.cCode !== 0) {
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.countryRequired'));
+      return;
+    }
+
+    if (v_167c8b.rCode === null || v_167c8b.rCode === -1) {
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.regionRequired'));
       return;
     }
 
@@ -741,11 +662,6 @@ export const v_cdb169 = () => {
 
       if (v_a32a50.trim() !== v_9d09f1.trim()) {
         const v_576f5a = { member: v_717992, firstname: v_a32a50.trim() };
-        console.log('[정보수정] ✅ 이름 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 이름 수정 API 요청 데이터:');
-        console.log(JSON.stringify(v_576f5a, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         v_57285d.push({ name: '이름', request: v_576f5a });
         v_e01f71.push(v_152d53(v_717992, v_a32a50.trim(), v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
@@ -760,11 +676,7 @@ export const v_cdb169 = () => {
 
       if (v_328bb4.trim() !== v_b6daf3.trim()) {
         const v_576f5a = { member: v_717992, lastname: v_328bb4.trim() };
-        console.log('[정보수정] ✅ 성 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 성 수정 API 요청 데이터:');
-        console.log(JSON.stringify(v_576f5a, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
         v_57285d.push({ name: '성', request: v_576f5a });
         v_e01f71.push(v_7f8c9e(v_717992, v_328bb4.trim(), v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
@@ -781,11 +693,6 @@ export const v_cdb169 = () => {
       const v_9f4b02 = v_a1244c(v_318eac);
       if (v_d199d8 !== undefined && v_d199d8 !== null && v_d199d8 !== v_9f4b02) {
         const v_576f5a = { member: v_717992, gender: v_d199d8 };
-        console.log('[정보수정] ✅ 성별 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 성별 수정 API 요청 데이터:');
-        console.log(JSON.stringify(v_576f5a, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         v_57285d.push({ name: '성별', request: v_576f5a });
         v_e01f71.push(v_71d37e(v_717992, v_d199d8, v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 성별 수정 API 응답:', v_3393e3);
@@ -802,11 +709,6 @@ export const v_cdb169 = () => {
       const v_08fe20 = v_e9394b(v_30922c);
       if (v_2d2cbc !== undefined && v_2d2cbc !== null && v_2d2cbc !== v_08fe20) {
         const v_576f5a = { member: v_717992, ages: v_2d2cbc };
-        console.log('[정보수정] ✅ 나이 변경 감지');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📤 나이 수정 API 요청 데이터:');
-        console.log(JSON.stringify(v_576f5a, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         v_57285d.push({ name: '나이', request: v_576f5a });
         v_e01f71.push(v_07f367(v_717992, v_2d2cbc, v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 나이 수정 API 응답:', v_3393e3);
@@ -859,12 +761,6 @@ export const v_cdb169 = () => {
         const v_e5393e = v_4f5607 !== v_ca7297;
         const v_c0f7d6 = v_e1db8a !== v_bbbc5d;
 
-        console.log('[정보수정] 🔍 국가/지역 변경 비교:', {
-          현재: { country: v_4f5607, region: v_e1db8a },
-          원본: { country: v_ca7297, region: v_bbbc5d },
-          변경됨: { country: v_e5393e, region: v_c0f7d6 },
-        });
-
         if (v_e5393e || v_c0f7d6) {
 
           const v_90772d = Number(v_717992);
@@ -876,40 +772,6 @@ export const v_cdb169 = () => {
             : null;
 
           const v_f6504f = v_3f1fb1;
-
-          console.log('[정보수정] 국가 코드 정보 추출:', {
-            selectedCountryDialCode: v_459d5e,
-            countrycode: v_f6504f,
-            mobilecode: v_3f1fb1,
-            countryCodeNum: v_4f5607,
-          });
-
-          console.log('[정보수정] ✅ 국가/지역 변경 감지');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 📤 국가/지역 수정 API 요청 데이터 생성 시작');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 변환 전 원본 값:');
-          console.log(JSON.stringify({
-            memberId_원본: v_717992,
-            memberId_타입: typeof v_717992,
-            countryCode_원본: v_ca520f,
-            countryCode_타입: typeof v_ca520f,
-            regionCode_원본: v_c61e4f,
-            regionCode_타입: typeof v_c61e4f,
-          }, null, 2));
-
-          console.log('[정보수정] 변환 후 값:');
-          console.log(JSON.stringify({
-            memberNum: v_90772d,
-            memberNum_타입: typeof v_90772d,
-            memberNum_isNaN: isNaN(v_90772d),
-            countryNum: v_f6907d,
-            countryNum_타입: typeof v_f6907d,
-            countryNum_isNaN: isNaN(v_f6907d),
-            regionNum: v_5cf162,
-            regionNum_타입: typeof v_5cf162,
-            regionNum_isNaN: isNaN(v_5cf162),
-          }, null, 2));
 
           const v_576f5a = {
             member: v_90772d,
@@ -923,46 +785,6 @@ export const v_cdb169 = () => {
             v_576f5a.countrycode = v_3f1fb1;
           }
 
-          console.log('[정보수정] 국가 코드 정보 최종:', {
-            mobilecode: v_576f5a.mobilecode,
-            countrycode: v_576f5a.countrycode,
-            둘이같은지: v_576f5a.mobilecode === v_576f5a.countrycode,
-          });
-
-          console.log('[정보수정] 📤 최종 API 요청 데이터 (JSON):');
-          console.log(JSON.stringify(v_576f5a, null, 2));
-          console.log('[정보수정] 📤 최종 API 요청 데이터 (상세):');
-          console.log(JSON.stringify({
-            request: v_576f5a,
-            검증: {
-              member_유효: !isNaN(v_90772d) && v_90772d !== undefined && v_90772d !== null,
-              country_유효: !isNaN(v_f6907d) && v_f6907d !== undefined && v_f6907d !== null,
-              region_유효: !isNaN(v_5cf162) && v_5cf162 !== undefined && v_5cf162 !== null,
-              모두유효: !isNaN(v_90772d) && !isNaN(v_f6907d) && !isNaN(v_5cf162) &&
-                v_90772d !== undefined && v_f6907d !== undefined && v_5cf162 !== undefined &&
-                v_90772d !== null && v_f6907d !== null && v_5cf162 !== null,
-            },
-            undefined체크: {
-              member: v_576f5a.member === undefined,
-              country: v_576f5a.country === undefined,
-              region: v_576f5a.region === undefined,
-            },
-            null체크: {
-              member: v_576f5a.member === null,
-              country: v_576f5a.country === null,
-              region: v_576f5a.region === null,
-            },
-          }, null, 2));
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          v_57285d.push({ name: '국가/지역', request: v_576f5a });
-
-          console.log('[정보수정] 🔄 updateRegion API 호출 시작:', {
-            member: v_90772d,
-            country: v_f6907d,
-            region: v_5cf162,
-            options: { countrycode: v_f6504f, mobilecode: v_3f1fb1 },
-          });
-
           const v_b36f96 = {};
           if (v_f6504f !== null && v_f6504f !== undefined && !isNaN(v_f6504f)) {
             v_b36f96.countrycode = v_f6504f;
@@ -970,8 +792,6 @@ export const v_cdb169 = () => {
           if (v_3f1fb1 !== null && v_3f1fb1 !== undefined && !isNaN(v_3f1fb1)) {
             v_b36f96.mobilecode = v_3f1fb1;
           }
-
-          console.log('[정보수정] updateRegion options:', v_b36f96);
 
           v_e01f71.push(v_4296b8(
             v_90772d,
@@ -1008,30 +828,6 @@ export const v_cdb169 = () => {
       }
 
       if (v_e01f71.length > 0) {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📊 전체 API 호출 요약');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`총 ${v_57285d.length}개 API 호출 예정:`);
-        v_57285d.forEach((v_51c3d2, v_a56041) => {
-          console.log(`${v_a56041 + 1}. ${v_51c3d2.name}:`);
-          console.log(JSON.stringify(v_51c3d2.request, null, 2));
-        });
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-        console.log('[정보수정] ⏳ API 호출 시작...');
-        const v_a7f568 = await Promise.all(v_e01f71);
-        console.log('[정보수정] ✅ 모든 API 호출 완료');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 📥 API 호출 결과 상세:');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        v_a7f568.forEach((v_43c42e, v_a56041) => {
-          const v_9f7bb8 = v_57285d[v_a56041]?.name || '알 수 없음';
-          const v_1c571a = v_57285d[v_a56041]?.request;
-          console.log(`${v_a56041 + 1}. ${v_9f7bb8}:`);
-          console.log('   요청:', JSON.stringify(v_1c571a, null, 2));
-          console.log('   응답:', JSON.stringify(v_43c42e, null, 2));
-        });
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'));
 
@@ -1044,22 +840,11 @@ export const v_cdb169 = () => {
           나이코드: v_e9394b(v_30922c),
         };
 
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[정보수정] 🔄 저장 전 원본 값 (비교용)');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(JSON.stringify(v_6961e0, null, 2));
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
         await v_306e20();
 
-        console.log('[정보수정] 🔄 저장 후 데이터 새로고침 시작...');
         await v_ea3fa6(false);
 
         setTimeout(() => {
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('[정보수정] 🔍 저장 후 새로고침된 값 확인');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
           const v_03a7be = {
             이름: v_a32a50,
             성: v_328bb4,
@@ -1075,19 +860,6 @@ export const v_cdb169 = () => {
             성별변경됨: v_c3eac4 !== v_6961e0.성별,
             나이변경됨: v_2694bd !== v_6961e0.나이,
           };
-
-          console.log(JSON.stringify({
-            '저장 전 (원본)': v_6961e0,
-            '저장 후 (새로고침됨)': v_03a7be,
-            '변경 확인': v_58ab64,
-            '원본 값 (state)': {
-              originalFirstName: v_9d09f1,
-              originalLastName: v_b6daf3,
-              originalGender: v_318eac,
-              originalAge: v_30922c,
-            },
-          }, null, 2));
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
           const v_0e3ee0 = v_58ab64.이름변경됨 || v_58ab64.성변경됨 || v_58ab64.성별변경됨 || v_58ab64.나이변경됨;
 
@@ -1468,6 +1240,11 @@ export const v_cdb169 = () => {
                       : v_add96c.cDesc || v_459d5e?.name || '';
 
                     if (v_67cb9c && v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' && v_167c8b.rCode !== null && v_167c8b.rCode !== -1 && !v_e5393e) {
+
+                      if (v_167c8b.rCode === 0) {
+                        return v_167c8b.rDesc;
+                      }
+
                       return `${v_67cb9c}, ${v_167c8b.rDesc}`;
                     }
 
@@ -1508,12 +1285,6 @@ export const v_cdb169 = () => {
                   );
                 })}
               </View>
-              {}
-              {__DEV__ && (
-                <Text style={{ fontSize: 10, color: 'gray', marginTop: 4 }}>
-                  [디버그] 현재 gender state: {v_c3eac4} (API: {v_a1244c(v_c3eac4)})
-                </Text>
-              )}
             </View>
 
             <View style={v_d81136.fieldContainer}>
