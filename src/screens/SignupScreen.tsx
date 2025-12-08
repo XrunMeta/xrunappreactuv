@@ -355,7 +355,10 @@ export const v_f40fc5 = () => {
             leftAccessory={
               <TouchableOpacity
                 style={v_d81136.phonePrefix}
-                onPress={() => v_9b57fc('countryCodeSelect')}
+                onPress={() => {
+                  v_67ab1c('country');
+                  v_9b57fc('countryCodeSelect');
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={v_d81136.flagEmoji}>{v_459d5e.flagEmoji}</Text>
