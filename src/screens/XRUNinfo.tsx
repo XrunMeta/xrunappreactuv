@@ -1,5 +1,5 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_cf9c33 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_cf9c33, v_4623af, v_f2c756 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
 import { v_a61db3, v_843035 } from '../constants';
@@ -12,6 +12,13 @@ try {
 }
 
 export const v_f7bdb9 = () => {
+  const v_b4b37e = () => {
+    const v_98b464 = 'https://www.xrun.run';
+    v_f2c756.openURL(v_98b464).catch((v_49263d) => {
+      console.error('홈페이지 열기 실패:', v_49263d);
+    });
+  };
+
   return (
     <View style={v_d81136.container}>
       <Header title="XRUN" />
@@ -44,6 +51,15 @@ export const v_f7bdb9 = () => {
             리워드를 받는 보상형 광고 플랫폼입니다.
           </Text>
         </View>
+
+        {}
+        <TouchableOpacity
+          style={v_d81136.homepageLink}
+          onPress={v_b4b37e}
+          activeOpacity={0.7}
+        >
+          <Text style={v_d81136.homepageLinkText}>홈페이지 바로가기</Text>
+        </TouchableOpacity>
       </SafeScrollView>
     </View>
   );
@@ -86,6 +102,19 @@ const v_d81136 = v_472849.create({
     lineHeight: 24,
     color: '#121212',
     textAlign: 'left',
+  },
+  homepageLink: {
+    marginTop: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+  },
+  homepageLinkText: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    fontWeight: '500',
+    color: '#007AFF',
+    textDecorationLine: 'underline',
   },
 });
 
