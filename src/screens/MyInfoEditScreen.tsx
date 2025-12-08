@@ -96,6 +96,7 @@ export const MyInfoEditScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [datepinchanged, setDatepinchanged] = useState<string>('');
   const [phone, setPhone] = useState('010 2487 6746');
   const [region, setRegion] = useState('대한민국 서울');
   const [regionCode, setRegionCode] = useState<number | null>(null);
@@ -276,6 +277,7 @@ export const MyInfoEditScreen = () => {
             setFirstName(loadedFirstName);
             setLastName(loadedLastName);
             setEmail(user.email || '');
+            setDatepinchanged(user.datepinchanged || '');
 
             setOriginalFirstName(loadedFirstName);
             setOriginalLastName(loadedLastName);
@@ -1192,7 +1194,7 @@ export const MyInfoEditScreen = () => {
             </View>
             <View style={styles.readonlyInput}>
               <Text style={styles.readonlyText}>
-                {t('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+                {t('screens.myInfoEdit.lastPasswordChangeDateLabel','e', { date: datepinchanged || '-' })}
               </Text>
             </View>
 
