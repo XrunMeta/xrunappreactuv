@@ -881,7 +881,14 @@ export const v_cdb169 = () => {
         }, 1000);
       } else {
 
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.noChanges'));
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.noChanges'), [
+          {
+            text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
+            onPress: () => {
+              v_487a25(v_ce4741.myInfo);
+            },
+          },
+        ]);
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 정보 수정 실패:', v_5e9bfe);
