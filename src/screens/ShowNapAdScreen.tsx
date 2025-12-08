@@ -1,4 +1,4 @@
-import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae, v_de06a3 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -66,17 +66,32 @@ interface ShowNapAdScreenProps {
 export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8 }) => {
   const { t: v_8d41d7 } = v_772971();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
-  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
 
-  const v_7f2e65 = () => {
+  const v_7f2e65 = v_de06a3(() => {
+    v_e10ff9();
+    console.log('handleClose');
+    console.log('onClose', v_0890f8);
     if (v_0890f8) {
-      v_e10ff9();
+
       v_0890f8();
-    } else if (v_487a25) {
-      v_e10ff9();
-      v_487a25(v_ce4741.map);
+    } else {
+
+      if (v_326be8.OS === 'ios') {
+
+        if (v_c7ac57) {
+          v_c7ac57();
+        } else if (v_487a25) {
+          v_487a25(v_ce4741.map);
+        }
+      } else {
+
+        if (v_487a25) {
+          v_487a25(v_ce4741.map);
+        }
+      }
     }
-  };
+  }, [v_0890f8, v_e10ff9, v_c7ac57, v_487a25]);
 
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_915a6b, v_d2702f] = v_5ab095(false);
@@ -108,7 +123,17 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
     if (!v_d0b6d4) {
       console.log('⚠️ [ShowNapAdScreen] 광고 파라미터가 없습니다. 화면을 렌더링하지 않습니다.');
-      return;
+      console.log('🔄 모달을 닫습니다.');
+
+      const v_4b24d2 = v_326be8.OS === 'ios' && v_0890f8 ? 100 : 0;
+
+      const v_3894d5 = setTimeout(() => {
+        v_7f2e65();
+      }, v_4b24d2);
+
+      return () => {
+        clearTimeout(v_3894d5);
+      };
     }
 
     console.log('✅ [ShowNapAdScreen] 광고 파라미터 확인 완료:', {
@@ -118,7 +143,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       name: v_d0b6d4.name,
       xrunPrice: v_d0b6d4.xrunPrice,
     });
-  }, [v_d0b6d4]);
+  }, [v_d0b6d4, v_7f2e65]);
 
   v_c4deb2(() => {
     const v_b2bcc9 = async () => {
@@ -603,7 +628,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   }
 
   return (
-    <View style={[v_d81136.root, { backgroundColor: v_7b73c7 ? '#000000A5' : 'white' }]}>
+    <View style={v_d81136.root}>
       <StatusBar style="dark" />
 
       {}
@@ -663,7 +688,24 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       )}
 
       {}
-      {!v_cd31a8 && !v_915a6b && !v_7a79cf && v_3aedd0 && (
+      {!v_cd31a8 && !v_915a6b && !v_7a79cf && v_7b73c7 && (
+        <View style={[v_d81136.campaignContainer, v_d81136.errorContainer]}>
+          <Text style={v_d81136.modalText}>
+            {v_8d41d7('screens.showNapAd.adCallFailed')}
+          </Text>
+          <Text style={v_d81136.modalSubText}>
+            {v_8d41d7('screens.showNapAd.adCallFailedSub')}
+          </Text>
+          <View style={[v_d81136.buttonContainer, { justifyContent: 'center' }]}>
+            <TouchableOpacity onPress={v_34fafc} style={[v_d81136.okButton, { flex: 0, minWidth: 200 }]}>
+              <Text style={v_d81136.okButtonText}>{v_8d41d7('screens.showNapAd.confirm')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {}
+      {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_3aedd0 && (
         <View style={v_d81136.campaignContainer}>
           <Text style={v_d81136.campaignTitle}>
             {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
@@ -744,27 +786,6 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         </View>
       )}
 
-      {}
-      <Modal
-        transparent
-        animationType="slide"
-        visible={v_7b73c7}
-        onRequestClose={() => v_ed6932(false)}
-      >
-        <View style={v_d81136.modalContainer}>
-          <View style={v_d81136.modalContent}>
-            <Text style={v_d81136.modalText}>
-              {v_8d41d7('screens.showNapAd.adCallFailed')}
-            </Text>
-            <Text style={v_d81136.modalSubText}>
-              {v_8d41d7('screens.showNapAd.adCallFailedSub')}
-            </Text>
-            <TouchableOpacity onPress={v_34fafc} style={v_d81136.okButton}>
-              <Text style={v_d81136.okButtonText}>{v_8d41d7('screens.showNapAd.confirm')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -1045,6 +1066,14 @@ const v_d81136 = v_472849.create({
     color: '#495057',
     lineHeight: 18,
     textAlign: 'left',
+  },
+  errorContainer: {
+    height: 'auto',
+    minHeight: 200,
+    maxHeight: 300,
+    maxWidth: '80%',
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
 });
 

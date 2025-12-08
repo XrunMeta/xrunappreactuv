@@ -11,6 +11,7 @@ import {
   v_cdbae1,
   v_6b5698,
   v_aa7413,
+  v_326be8,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
@@ -426,6 +427,47 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_8f79f8 = v_e662ae(new v_a2349e.Value(20)).current;
 
   const [v_fa7c50, v_219124] = v_5ab095(false);
+
+  v_c4deb2(() => {
+    if (!v_fa7c50) {
+
+      console.log('📱 [CameraMainScreen] 모달이 닫혔습니다. 포커스 확인 중...');
+      console.log('📊 [CameraMainScreen] 현재 상태:', {
+        showAdModal: v_fa7c50,
+        activeTab: v_ac1d22,
+        loading: v_683210,
+        tokensCount: v_ef86b6?.length ?? 0,
+        appState: v_94a194,
+      });
+
+      const v_4b24d2 = v_326be8.OS === 'ios' ? 500 : 100;
+
+      const v_3894d5 = setTimeout(() => {
+        console.log('✅ [CameraMainScreen] 포커스 확인 완료');
+        console.log('📊 [CameraMainScreen] AppState:', v_6b5698.currentState);
+
+        if (v_326be8.OS === 'ios') {
+          console.log('🔄 [CameraMainScreen] iOS 강제 복원 시작');
+
+          v_7d7b3a(v_ba2215 => v_ba2215 + 1);
+
+          const v_5b44a3 = v_6b5698.currentState;
+          if (v_5b44a3 !== 'active') {
+            console.log('⚠️ [CameraMainScreen] AppState가 active가 아닙니다:', v_5b44a3);
+          }
+
+          setTimeout(() => {
+            console.log('🔄 [CameraMainScreen] iOS 추가 리렌더링 트리거');
+            v_7d7b3a(v_ba2215 => v_ba2215 + 1);
+          }, 200);
+        }
+      }, v_4b24d2);
+
+      return () => {
+        clearTimeout(v_3894d5);
+      };
+    }
+  }, [v_fa7c50, v_ac1d22, v_683210, v_ef86b6, v_94a194]);
 
   const [v_ef86b6, v_8ce112] = v_5ab095<v_60c7c3[]>([]);
   const [v_b9ce93, v_7bb835] = v_5ab095<any[]>([]); 
@@ -1785,11 +1827,30 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         onRequestClose={() => {
           console.log('모달 닫기 요청');
           v_219124(false);
+        }}
+        onDismiss={() => {
+
+          console.log('📱 [CameraMainScreen] 모달이 완전히 닫혔습니다 (onDismiss)');
+          console.log('📊 [CameraMainScreen] 현재 상태 확인:', {
+            showAdModal: v_fa7c50,
+            activeTab: v_ac1d22,
+            loading: v_683210,
+            tokensCount: v_ef86b6?.length ?? 0,
+            appState: v_6b5698.currentState,
+          });
+
+          if (v_326be8.OS === 'ios') {
+            console.log('🔄 [CameraMainScreen] onDismiss에서 iOS 복원 트리거');
+            setTimeout(() => {
+              v_7d7b3a(v_ba2215 => v_ba2215 + 1);
+            }, 100);
+          }
         }}>
         <ShowNapAdScreen
           onClose={() => {
             console.log('ShowNapAdScreen 모달 닫기');
             v_219124(false);
+
           }}
         />
         <TouchableOpacity
