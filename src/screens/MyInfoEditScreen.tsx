@@ -96,6 +96,7 @@ export const v_cdb169 = () => {
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
+  const [v_3535cd, v_9f928c] = v_5ab095<string>('');
   const [v_d74a81, v_fcce73] = v_5ab095('010 2487 6746');
   const [v_a6c30b, v_c030e3] = v_5ab095('대한민국 서울');
   const [v_222917, v_b8bf44] = v_5ab095<number | null>(null);
@@ -276,6 +277,7 @@ export const v_cdb169 = () => {
             v_4944f5(v_898d5f);
             v_b7613d(v_8e4db1);
             v_fedf34(v_625c74.email || '');
+            v_9f928c(v_625c74.datepinchanged || '');
 
             v_d0e79e(v_898d5f);
             v_c94311(v_8e4db1);
@@ -1192,7 +1194,7 @@ export const v_cdb169 = () => {
             </View>
             <View style={v_d81136.readonlyInput}>
               <Text style={v_d81136.readonlyText}>
-                {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', { date: '2025.05.02' })}
+                {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel','e', { date: v_3535cd || '-' })}
               </Text>
             </View>
 

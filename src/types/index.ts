@@ -340,6 +340,7 @@ export interface GetMyPageUserInfoResponse {
     countrycode?: string;
     region?: number;
     ages?: number;
+    datepinchanged?: string;
     [key: string]: any;
   }>;
 }
