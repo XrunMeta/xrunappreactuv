@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FormField, Header, PrimaryButton, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
@@ -19,7 +20,29 @@ export const EmailVerificationScreen = () => {
   const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setVerificationSuccessRoute, setVerificationEmail } = useAppContext();
+  const { setVerificationSuccessRoute, setVerificationEmail, verificationSuccessRoute } = useAppContext();
+
+  const isSignupMode = verificationSuccessRoute === ROUTES.signup;
+
+  useEffect(() => {
+    if (isSignupMode) {
+      const loadSignupEmail = async () => {
+        try {
+          const pendingData = await AsyncStorage.getItem('pendingSignupData');
+          if (pendingData) {
+            const data = JSON.parse(pendingData);
+            if (data.email) {
+              setEmail(data.email);
+              setVerificationEmail(data.email);
+            }
+          }
+        } catch (error) {
+          console.error('[이메일 인증] AsyncStorage에서 이메일 읽기 실패:', error);
+        }
+      };
+      loadSignupEmail();
+    }
+  }, [isSignupMode, setVerificationEmail]);
 
   const handleSend = async () => {
     if (!email.trim()) {
@@ -37,19 +60,24 @@ export const EmailVerificationScreen = () => {
 
     try {
 
-      console.log('[로그인] 이메일 존재 확인 요청:', email.trim());
-      const emailExists = await checkEmailExists(email.trim(), navigate);
+      if (!isSignupMode) {
+        console.log('[로그인] 이메일 존재 확인 요청:', email.trim());
+        const emailExists = await checkEmailExists(email.trim(), navigate);
 
-      if (!emailExists) {
-        await showAlert(
-          t('screens.emailVerification.alerts.emailCheck'),
-          t('screens.emailVerification.errors.emailNotRegistered'),
-        );
-        setIsLoading(false);
-        return;
+        if (!emailExists) {
+          await showAlert(
+            t('screens.emailVerification.alerts.emailCheck'),
+            t('screens.emailVerification.errors.emailNotRegistered'),
+          );
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        console.log('[회원가입] 이메일 존재 확인 건너뛰기 (회원가입 모드)');
       }
 
-      console.log('[로그인] 이메일 인증 코드 전송 요청:', email.trim());
+      const logPrefix = isSignupMode ? '[회원가입]' : '[로그인]';
+      console.log(`${logPrefix} 이메일 인증 코드 전송 요청:`, email.trim());
       const codeSent = await sendEmailVerificationCode(email.trim(), navigate);
 
       if (!codeSent) {
@@ -59,10 +87,23 @@ export const EmailVerificationScreen = () => {
       }
 
       setVerificationEmail(email.trim());
-      setVerificationSuccessRoute(ROUTES.map); 
+      if (!isSignupMode) {
+        setVerificationSuccessRoute(ROUTES.map); 
+      }
+
       navigate(ROUTES.verificationCode);
     } catch (error) {
-      console.error('[로그인] 이메일 인증 처리 중 오류:', error);
+      console.error('[이메일 인증] 이메일 인증 처리 중 오류:', error);
+
+      if (isSignupMode) {
+        try {
+          await AsyncStorage.removeItem('pendingSignupData');
+          console.log('[이메일 인증] 에러 발생으로 인한 AsyncStorage 정리 완료 (회원가입 모드)');
+        } catch (storageError) {
+          console.error('[이메일 인증] AsyncStorage 정리 실패:', storageError);
+        }
+      }
+
       await showAlert(t('screens.emailVerification.alerts.error'), t('screens.emailVerification.errors.error'));
     } finally {
       setIsLoading(false);

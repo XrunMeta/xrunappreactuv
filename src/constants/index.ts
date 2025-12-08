@@ -166,5 +166,7 @@ export {
   getRegionIdByIso2,
   getIso2ByRegionId,
   getRegionNameById,
+  getRegionsByCountryIso2,
+  GLOBAL_REGION,
 } from './regions';
 
