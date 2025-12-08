@@ -119,11 +119,11 @@ export const v_379bd1 = () => {
 
         <FlatList
           data={v_973c3e}
-          keyExtractor={(v_8c0b26) => v_8c0b26.iso2}
+          keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
           renderItem={({ item: v_8c0b26 }) => (
             <CountryCodeListItem
               country={v_8c0b26}
-              isSelected={v_8c0b26.iso2 === v_c6e76b?.iso2}
+              isSelected={v_8c0b26.iso2 === v_c6e76b?.iso2 && v_8c0b26.dialCode === v_c6e76b?.dialCode}
               onPress={v_6121dc}
             />
           )}

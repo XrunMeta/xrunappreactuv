@@ -337,6 +337,25 @@ const v_7488d5 = (v_c65f5d) => {
   v_0c3a5b.interceptors.request.use(
     (v_74a79c) => {
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
+
+      if (v_74a79c.data) {
+        console.log(`[API Request Data] ${v_74a79c.url}:`, JSON.stringify(v_74a79c.data));
+        console.log(`[API Request Data 상세] ${v_74a79c.url}:`, {
+          원본데이터: v_74a79c.data,
+          직렬화: JSON.stringify(v_74a79c.data),
+          파싱: JSON.parse(JSON.stringify(v_74a79c.data)),
+          타입확인: {
+            member: v_74a79c.data.member !== undefined ? { 값: v_74a79c.data.member, 타입: typeof v_74a79c.data.member } : '없음',
+            country: v_74a79c.data.country !== undefined ? { 값: v_74a79c.data.country, 타입: typeof v_74a79c.data.country } : '없음',
+            region: v_74a79c.data.region !== undefined ? { 값: v_74a79c.data.region, 타입: typeof v_74a79c.data.region } : '없음',
+          },
+          undefined체크: {
+            member: v_74a79c.data.member === undefined,
+            country: v_74a79c.data.country === undefined,
+            region: v_74a79c.data.region === undefined,
+          },
+        });
+      }
       return v_74a79c;
     },
     (v_5e9bfe) => {
@@ -1234,28 +1253,106 @@ export const v_4296b8 = async (
   v_b9bbbd,
   v_a6c30b,
   v_c65f5d,
+  v_b36f96,
 ): Promise<v_9b135d> => {
   try {
 
-    if (v_b9bbbd === undefined || v_b9bbbd === null) {
+    if (v_660822 === undefined || v_660822 === null || isNaN(v_660822)) {
+      throw new Error('회원 ID가 유효하지 않습니다.');
+    }
+
+    if (v_b9bbbd === undefined || v_b9bbbd === null || isNaN(v_b9bbbd)) {
       throw new Error('국가 코드가 유효하지 않습니다.');
     }
-    if (v_a6c30b === undefined || v_a6c30b === null) {
+
+    if (v_a6c30b === undefined || v_a6c30b === null || isNaN(v_a6c30b)) {
       throw new Error('지역 코드가 유효하지 않습니다.');
     }
 
     const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    const v_90772d = Number(v_660822);
+    const v_f6907d = Number(v_b9bbbd);
+    const v_5cf162 = Number(v_a6c30b);
+
+    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', { 
+      입력member: v_660822,
+      입력country: v_b9bbbd,
+      입력region: v_a6c30b,
+      입력타입: {
+        member: typeof v_660822,
+        country: typeof v_b9bbbd,
+        region: typeof v_a6c30b,
+      },
+    });
+
+    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', { 
+      변환member: v_90772d,
+      변환country: v_f6907d,
+      변환region: v_5cf162,
+      변환타입: {
+        member: typeof v_90772d,
+        country: typeof v_f6907d,
+        region: typeof v_5cf162,
+      },
+      isNaN체크: {
+        member: isNaN(v_90772d),
+        country: isNaN(v_f6907d),
+        region: isNaN(v_5cf162),
+      },
+    });
+
     const request: v_bf21af = {
-      member: v_660822,
-      country: v_b9bbbd,
-      region: v_a6c30b,
+      member: v_90772d,
+      country: v_f6907d,
+      region: v_5cf162,
     };
 
-    console.log('[마이페이지] 지역 수정 요청:', { member: v_660822, country: v_b9bbbd, region: v_a6c30b });
+    if (v_b36f96?.countrycode !== undefined && v_b36f96?.countrycode !== null) {
+      v_576f5a.countrycode = v_b36f96.countrycode;
+    }
+    if (v_b36f96?.mobilecode !== undefined && v_b36f96?.mobilecode !== null) {
+      v_576f5a.mobilecode = v_b36f96.mobilecode;
+    }
+
+    const v_2bb785 = {};
+    if (v_576f5a.member !== undefined) v_2bb785.member = v_576f5a.member;
+    if (v_576f5a.country !== undefined) v_2bb785.country = v_576f5a.country;
+    if (v_576f5a.region !== undefined) v_2bb785.region = v_576f5a.region;
+    if (v_576f5a.countrycode !== undefined) v_2bb785.countrycode = v_576f5a.countrycode;
+    if (v_576f5a.mobilecode !== undefined) v_2bb785.mobilecode = v_576f5a.mobilecode;
+
+    console.log('[마이페이지] 지역 수정 요청 - 최종 request 객체:', JSON.stringify(v_2bb785, null, 2));
+    console.log('[마이페이지] 지역 수정 요청 - cleanRequest 확인:', {
+      원본: v_576f5a,
+      정리됨: v_2bb785,
+      JSON문자열: JSON.stringify(v_2bb785),
+      파싱: JSON.parse(JSON.stringify(v_2bb785)),
+    });
+    console.log('[마이페이지] 지역 수정 요청 - request 상세:', { 
+      member: v_576f5a.member, 
+      country: v_576f5a.country, 
+      region: v_576f5a.region,
+      types: {
+        member: typeof v_576f5a.member,
+        country: typeof v_576f5a.country,
+        region: typeof v_576f5a.region,
+      },
+      values: {
+        memberValue: v_576f5a.member,
+        countryValue: v_576f5a.country,
+        regionValue: v_576f5a.region,
+      },
+      hasUndefined: {
+        member: v_576f5a.member === undefined,
+        country: v_576f5a.country === undefined,
+        region: v_576f5a.region === undefined,
+      },
+    });
 
     const v_3393e3 = await v_9f42a4.post<v_9b135d>(
       '/app7190-02',
-      v_576f5a,
+      v_2bb785, 
     );
 
     console.log('[마이페이지] 지역 수정 성공');
