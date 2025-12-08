@@ -216,7 +216,6 @@ export const COUNTRY_DIAL_CODES: CountryDialCode[] = [
   { iso2: 'gu', name: 'Guam', dialCode: '+1671', flagEmoji: '🇬🇺' },
   { iso2: 'cn', name: 'China', dialCode: '+86', flagEmoji: '🇨🇳' },
   { iso2: 'jp', name: 'Japan', dialCode: '+81', flagEmoji: '🇯🇵' },
-  { iso2: 'kr', name: 'Korea', dialCode: '+82', flagEmoji: '🇰🇷' },
   { iso2: 'vn', name: 'Vietnam', dialCode: '+84', flagEmoji: '🇻🇳' },
   { iso2: 'hk', name: 'Hong Kong', dialCode: '+852', flagEmoji: '🇭🇰' },
   { iso2: 'bd', name: 'Bangladesh', dialCode: '+880', flagEmoji: '🇧🇩' },

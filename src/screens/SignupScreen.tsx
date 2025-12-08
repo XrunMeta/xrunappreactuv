@@ -355,7 +355,10 @@ export const SignupScreen = () => {
             leftAccessory={
               <TouchableOpacity
                 style={styles.phonePrefix}
-                onPress={() => navigate('countryCodeSelect')}
+                onPress={() => {
+                  setSelectMode('country');
+                  navigate('countryCodeSelect');
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={styles.flagEmoji}>{selectedCountryDialCode.flagEmoji}</Text>
