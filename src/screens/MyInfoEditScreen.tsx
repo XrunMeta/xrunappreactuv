@@ -881,7 +881,14 @@ export const MyInfoEditScreen = () => {
         }, 1000);
       } else {
 
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.noChanges'));
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.noChanges'), [
+          {
+            text: t('screens.myInfoEdit.alerts.confirm'),
+            onPress: () => {
+              reset(ROUTES.myInfo);
+            },
+          },
+        ]);
       }
     } catch (error) {
       console.error('[정보수정] 정보 수정 실패:', error);
