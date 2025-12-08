@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
@@ -9,12 +9,6 @@ import { useAppContext } from '../context';
 import { ClauseId } from '../types';
 import { getClauseContent } from '../services';
 
-const clauseTitleMap: Record<ClauseId, string> = {
-  service: 'Terms of Service',
-  location: 'Personal Location Information',
-  personal: 'Personal Information Usage',
-};
-
 export const ClauseDetailScreen = () => {
   const { i18n, t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
@@ -22,6 +16,15 @@ export const ClauseDetailScreen = () => {
   const [content, setContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const clauseTitleMap: Record<ClauseId, string> = useMemo(
+    () => ({
+      service: t('screens.myInfoClauses.serviceClause'),
+      location: t('screens.myInfoClauses.locationClause'),
+      personal: t('screens.myInfoClauses.personalClause'),
+    }),
+    [t],
+  );
 
   useEffect(() => {
     const fetchClauseContent = async () => {
@@ -55,7 +58,7 @@ export const ClauseDetailScreen = () => {
     };
 
     fetchClauseContent();
-  }, [selectedClauseId, i18n.language, navigate]);
+  }, [selectedClauseId, i18n.language, navigate, t]);
 
   const title = clauseTitleMap[selectedClauseId];
 
