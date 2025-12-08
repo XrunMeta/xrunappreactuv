@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, FONTS } from '../constants';
+import { COLORS, COMMON_STYLES, FONTS, FORM_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { updatePassword } from '../services';
@@ -122,7 +122,7 @@ export const ChangePasswordScreen = () => {
         showsVerticalScrollIndicator={false}
         autoAdjustKeyboardPadding={true}
       >
-        <View style={styles.inner}>
+        <View style={styles.formFieldContainer}>
           <FormField
             label={t('screens.changePassword.currentPassword')}
             placeholder={t('screens.changePassword.currentPasswordPlaceholder')}
@@ -134,6 +134,7 @@ export const ChangePasswordScreen = () => {
                 <Feather name={currentPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={styles.fieldContainer}
           />
 
           <FormField
@@ -147,6 +148,7 @@ export const ChangePasswordScreen = () => {
                 <Feather name={newPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={styles.fieldContainer}
           />
 
           <FormField
@@ -160,6 +162,7 @@ export const ChangePasswordScreen = () => {
                 <Feather name={confirmPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={styles.fieldContainer}
           />
 
           <Text style={styles.helperText}>
@@ -187,17 +190,15 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...COMMON_STYLES.scrollContent,
   },
-  inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  formFieldContainer: {
+    ...FORM_STYLES.fieldContainer,
+  },
+  fieldContainer: {
+    borderWidth: 0,
   },
   helperText: {
-    marginTop: 8,
     fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#747474',
@@ -205,7 +206,6 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     ...COMMON_STYLES.bottomButtonContainer,
-    marginTop: 24,
   },
   primaryButton: {
     width: '100%',

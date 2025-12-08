@@ -4,8 +4,10 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import { BackHandler, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ROUTES = {
@@ -79,9 +81,15 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [stack, setStack] = useState<ScreenName[]>(['authLanding']);
   const [isInitialized, setIsInitialized] = useState(false);
+  const backHandlerTimeRef = useRef<number>(0);
+  const stackRef = useRef<ScreenName[]>(['authLanding']);
 
   const currentScreen = stack[stack.length - 1];
   const previousScreen = stack.length > 1 ? stack[stack.length - 2] : null;
+
+  useEffect(() => {
+    stackRef.current = stack;
+  }, [stack]);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -112,7 +120,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       if (prev[prev.length - 1] === screen) {
         return prev;
       }
-      return [...prev, screen];
+      const newStack = [...prev, screen];
+      stackRef.current = newStack; 
+      return newStack;
     });
   }, []);
 
@@ -121,13 +131,62 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       if (prev.length <= 1) {
         return prev;
       }
-      return prev.slice(0, -1);
+      const newStack = prev.slice(0, -1);
+      stackRef.current = newStack; 
+      return newStack;
     });
   }, []);
 
   const reset = useCallback((screen: ScreenName) => {
-    setStack([screen]);
+    const newStack = [screen];
+    stackRef.current = newStack; 
+    setStack(newStack);
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      console.log('[Navigation] BackHandler: iOS 환경이므로 BackHandler를 등록하지 않습니다.');
+      return;
+    }
+
+    console.log('[Navigation] BackHandler: Android 하드웨어 백 버튼 리스너 등록');
+
+    const backAction = () => {
+
+      const currentStack = stackRef.current;
+      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack);
+
+      if (currentStack.length > 1) {
+        console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
+        goBack();
+        return true; 
+      }
+
+      const now = Date.now();
+      const timeSinceLastPress = now - backHandlerTimeRef.current;
+      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');
+
+      if (timeSinceLastPress < 2000) {
+
+        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+        BackHandler.exitApp();
+        return true;
+      } else {
+
+        backHandlerTimeRef.current = now;
+        console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+        return true; 
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    console.log('[Navigation] BackHandler: 리스너 등록 완료');
+
+    return () => {
+      console.log('[Navigation] BackHandler: 리스너 제거');
+      backHandler.remove();
+    };
+  }, [goBack]); 
 
   const value = useMemo(
     () => ({
