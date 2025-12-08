@@ -4,8 +4,10 @@ import v_a3453e, {
   v_76a8a9,
   v_c4deb2,
   v_df9f57,
+  v_e662ae,
   v_5ab095,
 } from 'bapkr';
+import { v_1ed974, v_326be8 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 export const v_ce4741 = {
@@ -79,9 +81,15 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
 }) => {
   const [v_8d490a, v_768005] = v_5ab095<ScreenName[]>(['authLanding']);
   const [v_2167f0, v_da6fbe] = v_5ab095(false);
+  const v_f5057b = v_e662ae<number>(0);
+  const v_cf6dc2 = v_e662ae<ScreenName[]>(['authLanding']);
 
   const v_0f0c7b = v_8d490a[v_8d490a.length - 1];
   const v_640ccc = v_8d490a.length > 1 ? v_8d490a[v_8d490a.length - 2] : null;
+
+  v_c4deb2(() => {
+    v_cf6dc2.current = v_8d490a;
+  }, [v_8d490a]);
 
   v_c4deb2(() => {
     const v_d0a230 = async () => {
@@ -112,7 +120,9 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       if (v_ba2215[v_ba2215.length - 1] === v_53746a) {
         return v_ba2215;
       }
-      return [...v_ba2215, v_53746a];
+      const v_0be3f3 = [...v_ba2215, v_53746a];
+      v_cf6dc2.current = v_0be3f3; 
+      return v_0be3f3;
     });
   }, []);
 
@@ -121,13 +131,62 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       if (v_ba2215.length <= 1) {
         return v_ba2215;
       }
-      return v_ba2215.slice(0, -1);
+      const v_0be3f3 = v_ba2215.slice(0, -1);
+      v_cf6dc2.current = v_0be3f3; 
+      return v_0be3f3;
     });
   }, []);
 
   const v_487a25 = v_de06a3((v_53746a) => {
-    v_768005([v_53746a]);
+    const v_0be3f3 = [v_53746a];
+    v_cf6dc2.current = v_0be3f3; 
+    v_768005(v_0be3f3);
   }, []);
+
+  v_c4deb2(() => {
+    if (v_326be8.OS !== 'android') {
+      console.log('[Navigation] BackHandler: iOS 환경이므로 BackHandler를 등록하지 않습니다.');
+      return;
+    }
+
+    console.log('[Navigation] BackHandler: Android 하드웨어 백 버튼 리스너 등록');
+
+    const v_4499d0 = () => {
+
+      const v_393a6b = v_cf6dc2.current;
+      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b);
+
+      if (v_393a6b.length > 1) {
+        console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
+        v_c7ac57();
+        return true; 
+      }
+
+      const v_5c2f9f = Date.now();
+      const v_78e1e8 = v_5c2f9f - v_f5057b.current;
+      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');
+
+      if (v_78e1e8 < 2000) {
+
+        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+        v_1ed974.exitApp();
+        return true;
+      } else {
+
+        v_f5057b.current = v_5c2f9f;
+        console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+        return true; 
+      }
+    };
+
+    const v_d9821c = v_1ed974.addEventListener('hardwareBackPress', v_4499d0);
+    console.log('[Navigation] BackHandler: 리스너 등록 완료');
+
+    return () => {
+      console.log('[Navigation] BackHandler: 리스너 제거');
+      v_d9821c.remove();
+    };
+  }, [v_c7ac57]); 
 
   const v_3b402b = v_df9f57(
     () => ({

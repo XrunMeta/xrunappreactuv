@@ -4,7 +4,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_368e80, v_cb41de, v_570c34 } from '../components';
-import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035, v_bae512 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_b954f5 } from '../services';
@@ -122,7 +122,7 @@ export const v_18d397 = () => {
         showsVerticalScrollIndicator={false}
         autoAdjustKeyboardPadding={true}
       >
-        <View style={v_d81136.inner}>
+        <View style={v_d81136.formFieldContainer}>
           <FormField
             label={v_8d41d7('screens.changePassword.currentPassword')}
             placeholder={v_8d41d7('screens.changePassword.currentPasswordPlaceholder')}
@@ -134,6 +134,7 @@ export const v_18d397 = () => {
                 <Feather name={v_e2a098 ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={v_d81136.fieldContainer}
           />
 
           <FormField
@@ -147,6 +148,7 @@ export const v_18d397 = () => {
                 <Feather name={v_cad69a ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={v_d81136.fieldContainer}
           />
 
           <FormField
@@ -160,6 +162,7 @@ export const v_18d397 = () => {
                 <Feather name={v_9e430e ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
               </TouchableOpacity>
             }
+            containerStyle={v_d81136.fieldContainer}
           />
 
           <Text style={v_d81136.helperText}>
@@ -187,17 +190,15 @@ const v_d81136 = v_472849.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    ...v_a61db3.scrollContent,
   },
-  inner: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
+  formFieldContainer: {
+    ...v_bae512.fieldContainer,
+  },
+  fieldContainer: {
+    borderWidth: 0,
   },
   helperText: {
-    marginTop: 8,
     fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#747474',
@@ -205,7 +206,6 @@ const v_d81136 = v_472849.create({
   },
   bottomSection: {
     ...v_a61db3.bottomButtonContainer,
-    marginTop: 24,
   },
   primaryButton: {
     width: '100%',

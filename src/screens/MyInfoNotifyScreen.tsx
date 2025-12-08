@@ -49,11 +49,12 @@ const v_e065e5 = (v_a86996): string => {
 const v_9f6fdd = (v_a86996): string => {
   try {
     const v_8dffde = new Date(v_a86996);
+    const v_0eaaff = v_8dffde.getFullYear();
     const v_033a94 = String(v_8dffde.getMonth() + 1).padStart(2, '0');
     const v_087ffc = String(v_8dffde.getDate()).padStart(2, '0');
     const v_12ebc1 = String(v_8dffde.getHours()).padStart(2, '0');
     const v_ef3543 = String(v_8dffde.getMinutes()).padStart(2, '0');
-    return `${v_033a94}-${v_087ffc} | ${v_12ebc1}:${v_ef3543}`;
+    return `${v_0eaaff}-${v_033a94}-${v_087ffc} | ${v_12ebc1}:${v_ef3543}`;
   } catch {
     return v_a86996;
   }
