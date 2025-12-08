@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_df9f57 } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -9,12 +9,6 @@ import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
 import { v_4dba02 } from '../services';
 
-const clauseTitleMap: Record<v_9dd03c, string> = {
-  service: 'Terms of Service',
-  location: 'Personal Location Information',
-  personal: 'Personal Information Usage',
-};
-
 export const v_5fdcb2 = () => {
   const { i18n: v_9c213b, t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -22,6 +16,15 @@ export const v_5fdcb2 = () => {
   const [v_b43b74, v_f435cb] = v_5ab095<string>('');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_5e9bfe, v_3a7d09] = v_5ab095<string | null>(null);
+
+  const clauseTitleMap: Record<v_9dd03c, string> = v_df9f57(
+    () => ({
+      service: v_8d41d7('screens.myInfoClauses.serviceClause'),
+      location: v_8d41d7('screens.myInfoClauses.locationClause'),
+      personal: v_8d41d7('screens.myInfoClauses.personalClause'),
+    }),
+    [v_8d41d7],
+  );
 
   v_c4deb2(() => {
     const v_b29dc3 = async () => {
@@ -55,7 +58,7 @@ export const v_5fdcb2 = () => {
     };
 
     v_b29dc3();
-  }, [v_6e7459, v_9c213b.language, v_9b57fc]);
+  }, [v_6e7459, v_9c213b.language, v_9b57fc, v_8d41d7]);
 
   const v_9f1622 = v_c6eb94[v_6e7459];
 
