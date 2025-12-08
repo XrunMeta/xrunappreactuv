@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native';
 import { SafeScrollView } from '../components';
 import { Header } from '../components';
 import { COMMON_STYLES, FONTS } from '../constants';
@@ -12,6 +12,13 @@ try {
 }
 
 export const XRUNinfoScreen = () => {
+  const handleHomepagePress = () => {
+    const homepageUrl = 'https://www.xrun.run';
+    Linking.openURL(homepageUrl).catch((err) => {
+      console.error('홈페이지 열기 실패:', err);
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Header title="XRUN" />
@@ -44,6 +51,15 @@ export const XRUNinfoScreen = () => {
             리워드를 받는 보상형 광고 플랫폼입니다.
           </Text>
         </View>
+
+        {}
+        <TouchableOpacity
+          style={styles.homepageLink}
+          onPress={handleHomepagePress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.homepageLinkText}>홈페이지 바로가기</Text>
+        </TouchableOpacity>
       </SafeScrollView>
     </View>
   );
@@ -86,6 +102,19 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#121212',
     textAlign: 'left',
+  },
+  homepageLink: {
+    marginTop: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+  },
+  homepageLinkText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    fontWeight: '500',
+    color: '#007AFF',
+    textDecorationLine: 'underline',
   },
 });
 
