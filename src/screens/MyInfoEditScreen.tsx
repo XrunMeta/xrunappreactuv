@@ -536,8 +536,10 @@ export const MyInfoEditScreen = () => {
       isLoading,
       조건체크: selectedCountryDialCode && !isLoading,
     });
+    console.log('selectedCountryDialCode', selectedCountryDialCode);
+    console.log('isLoading', isLoading);
+    console.log('selectedCountryDialCode && !isLoading', selectedCountryDialCode && !isLoading);
 
-    if (selectedCountryDialCode && !isLoading) {
       console.log('[정보수정] 전화번호 국가 선택됨 (CountryCodeSelectScreen에서):', {
         iso2: selectedCountryDialCode.iso2,
         name: selectedCountryDialCode.name,
@@ -564,8 +566,7 @@ export const MyInfoEditScreen = () => {
         if (tempRegion.rCode !== null && tempRegion.rCode !== 0) {
           setTempRegion({ rDesc: 'Please Select', rCode: 0 });
           setSelectedRegionId(null);
-        }
-      }
+        } 
     }
   }, [selectedCountryDialCode?.iso2]);
 
