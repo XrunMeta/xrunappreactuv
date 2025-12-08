@@ -1525,7 +1525,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }
 
   return (
-    <View key={v_1f3d99} style={v_d81136.container}>
+    <View style={v_d81136.container}>
       <StatusBar style="light" />
 
       {}
