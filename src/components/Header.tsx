@@ -32,9 +32,15 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
       return;
     }
 
+    const v_7af375 = v_0f0c7b?.startsWith('wallet') || v_0f0c7b === 'polygonHistory' || v_0f0c7b === 'xrunHistory' || v_0f0c7b === 'nftHistory' || v_0f0c7b === 'xrunHistory2' || v_0f0c7b === 'adHistory';
+
     const v_439a85 = v_0f0c7b?.startsWith('myInfo');
 
-    if (v_439a85) {
+    const v_2a04b0 = v_0f0c7b?.startsWith('shop');
+
+    const v_3485f6 = v_0f0c7b?.startsWith('referral');
+
+    if (v_7af375 || v_439a85) {
 
       if (v_7e32fb) {
         v_c7ac57();
@@ -42,6 +48,9 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
         v_487a25(v_ce4741.map);
       }
+    } else if (v_2a04b0 || v_3485f6) {
+
+      v_487a25(v_ce4741.map);
     } else {
 
       v_487a25(v_ce4741.map);
