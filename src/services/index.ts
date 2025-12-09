@@ -4005,7 +4005,6 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
     }
 
     console.log('[getTopAd5] 추출된 topAd5Response 길이:', v_e36b07.length);
-    console.log('[getTopAd5] 추출된 topAd5Response:', v_e36b07);
 
     if (v_e36b07 && v_e36b07.length > 0) {
       await v_e84827.setItem(v_332c06, JSON.stringify(v_e36b07));

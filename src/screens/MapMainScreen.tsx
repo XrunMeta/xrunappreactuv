@@ -2969,6 +2969,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         }}
 
+        onExpand={() => {
+
+          v_6a4dcd(true);
+
+        }}
+
       />
 
       {}
