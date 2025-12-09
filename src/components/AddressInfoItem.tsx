@@ -8,6 +8,7 @@ interface AddressInfoItemProps {
     address: string;
     network?: string;
     name: string;
+    networkColor?: string;
     onPress?: () => void;
     onCopy?: () => void;
 }
@@ -17,6 +18,7 @@ export const AddressInfoItem: React.FC<AddressInfoItemProps> = ({
     address,
     network,
     name,
+    networkColor = COLORS.primary,
     onPress,
     onCopy,
 }) => {
@@ -38,7 +40,7 @@ export const AddressInfoItem: React.FC<AddressInfoItemProps> = ({
                     <Text style={styles.name} numberOfLines={1}>{name}</Text>
                     {network && (
                         <View style={styles.networkBadge}>
-                            <Text style={styles.networkText}>{network}</Text>
+                            <Text style={[styles.networkText, { color: networkColor }]}>{network}</Text>
                             {symbol && <Text style={styles.symbolText}> • {symbol}</Text>}
                         </View>
                     )}
@@ -94,7 +96,6 @@ const styles = StyleSheet.create({
     networkText: {
         fontSize: FONTS.size.small,
         fontFamily: 'Roboto-Medium',
-        color: COLORS.primary,
     },
     symbolText: {
         fontSize: FONTS.size.small,

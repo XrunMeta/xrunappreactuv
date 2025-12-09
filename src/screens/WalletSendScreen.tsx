@@ -23,18 +23,21 @@ const SAMPLE_ADDRESS_BOOK = [
     name: '내 지갑',
     address: '0x1234567890abcdef1234567890abcdef12345678',
     network: 'Ethereum',
+    networkColor: '#627EEA',
   },
   {
     id: '2',
     name: '회사 지갑',
     address: '0xabcdef1234567890abcdef1234567890abcdef12',
     network: 'Polygon',
+    networkColor: '#8247E5',
   },
   {
     id: '3',
     name: '거래소 입금주소',
     address: '0x9876543210fedcba9876543210fedcba98765432',
     network: 'Ethereum',
+    networkColor: '#627EEA',
   },
 ];
 
@@ -240,6 +243,7 @@ export const WalletSendScreen = () => {
                     symbol={selectedWalletAsset.symbol}
                     address={item.address}
                     network={item.network}
+                    networkColor={item.networkColor}
                     name={item.name}
                     onPress={() => setWalletSendAddress(item.address)}
                   />
