@@ -63,16 +63,20 @@ export const v_f40fc5 = () => {
   const [v_9bf12c, v_fb6bbb] = v_5ab095(v_8d7bc8.referralEmail);
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(v_8d7bc8.gender);
   const [v_f83808, v_64a312] = v_5ab095<AgeValue>(v_8d7bc8.ageRange);
-  const [v_91ca05, v_cbfe22] = v_5ab095(v_8d7bc8.termsAccepted);
+  const [v_471e49, v_7f4d53] = v_5ab095(v_8d7bc8.termsAccepted);
+  const [v_68a5a9, v_8e53ad] = v_5ab095(v_8d7bc8.termsAccepted);
+  const [v_e55f34, v_f932c8] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
+
+  const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
 
   const v_590486 = v_459d5e?.iso2?.toLowerCase() === 'kr';
 
   const v_56743f = v_2f03bc
     ? v_2f03bc.name
     : v_590486
-    ? ''
-    : v_789afd.name;
+      ? ''
+      : v_789afd.name;
 
   const v_2ca208 = v_a3453e.useRef(false);
 
@@ -86,7 +90,9 @@ export const v_f40fc5 = () => {
       v_fb6bbb(v_8d7bc8.referralEmail);
       v_bdc43c(v_8d7bc8.gender);
       v_64a312(v_8d7bc8.ageRange);
-      v_cbfe22(v_8d7bc8.termsAccepted);
+      v_7f4d53(v_8d7bc8.termsAccepted);
+      v_8e53ad(v_8d7bc8.termsAccepted);
+      v_f932c8(v_8d7bc8.termsAccepted);
       v_2ca208.current = true;
     }
   }, [v_8d7bc8]);
@@ -104,7 +110,7 @@ export const v_f40fc5 = () => {
       referralEmail: v_9bf12c,
       gender: v_c3eac4,
       ageRange: v_f83808,
-      termsAccepted: v_91ca05,
+      termsAccepted: v_b1f14f,
     });
   }, [
     v_f142d8,
@@ -116,13 +122,13 @@ export const v_f40fc5 = () => {
     v_9bf12c,
     v_c3eac4,
     v_f83808,
-    v_91ca05,
+    v_b1f14f,
 
   ]);
 
   const v_585b02 = async () => {
 
-    if (!v_91ca05) {
+    if (!v_b1f14f) {
       await v_889fad(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
       return;
     }
@@ -245,11 +251,11 @@ export const v_f40fc5 = () => {
           },
           selectedRegion: v_2f03bc
             ? {
-                iso2: v_2f03bc.iso2,
-                dialCode: v_2f03bc.dialCode,
-                flagEmoji: v_2f03bc.flagEmoji,
-                name: v_2f03bc.name,
-              }
+              iso2: v_2f03bc.iso2,
+              dialCode: v_2f03bc.dialCode,
+              flagEmoji: v_2f03bc.flagEmoji,
+              name: v_2f03bc.name,
+            }
             : null,
           referralMemberId: v_65bdb1,
           gender: v_c3eac4,
@@ -307,15 +313,9 @@ export const v_f40fc5 = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.formFieldContainer}>
-          <FormField
-            label={v_8d41d7('screens.signup.familyNameLabel')}
-            placeholder={v_8d41d7('screens.signup.familyNamePlaceholder')}
-            value={v_f142d8}
-            onChangeText={v_6dde2f}
-            autoCapitalize="none"
-            containerStyle={v_d81136.fieldContainer}
-          />
+          {
 
+}
           <FormField
             label={v_8d41d7('screens.signup.givenNameLabel')}
             placeholder={v_8d41d7('screens.signup.givenNamePlaceholder')}
@@ -437,15 +437,41 @@ export const v_f40fc5 = () => {
             containerStyle={v_d81136.fieldContainer}
           />
 
+          {}
           <View style={v_d81136.termsRow}>
             <FormCheckbox
-              checked={v_91ca05}
-              onToggle={() => v_cbfe22((v_ba2215) => !v_ba2215)}
+              checked={v_471e49}
+              onToggle={() => v_7f4d53((v_ba2215) => !v_ba2215)}
               variant="square"
             />
             <Text style={v_d81136.termsText}>
-              {v_8d41d7('screens.signup.termsText')}{' '}
-              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.termsHighlight')}</Text>{' '}
+              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.service')}</Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_68a5a9}
+              onToggle={() => v_8e53ad((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.location')}</Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_e55f34}
+              onToggle={() => v_f932c8((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.privacy')}</Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -483,11 +509,7 @@ const v_d81136 = v_472849.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: v_843035.size.medium,
-    lineHeight: 24,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
+    ...v_bae512.label,
   },
   phonePrefix: {
     flexDirection: 'row',
@@ -523,14 +545,15 @@ const v_d81136 = v_472849.create({
   },
   termsText: {
     flex: 1,
-    fontSize: v_843035.size.small,
+    fontSize: v_843035.size.msmall,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
+    alignSelf: 'center',
   },
   termsHighlight: {
     fontFamily: 'Roboto-SemiBold',
-    color: '#8e9bae',
+    color: '#343A5A',
   },
   buttonWrapper: {
     ...v_a61db3.bottomButtonContainer,

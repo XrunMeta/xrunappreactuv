@@ -84,9 +84,9 @@ const v_d81136 = v_472849.create({
   },
   input: {
     flex: 1,
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.medium,
     color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Roboto-Medium',
     paddingVertical: 0,
   },
   leftAccessory: {
