@@ -22,7 +22,7 @@ import {
 
 import { v_b5df25 } from 'ernurodqvmtspux';
 
-import v_2b5678, { v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
+import v_2b5678, { v_a1c801, v_65a8f9, v_b4043e } from 'voblsepvtvpzyatxk';
 
 import * as v_8a44cb from 'zryrlwvgokjhz';
 
@@ -225,6 +225,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_5db874 = v_e662ae(false); 
 
   const [v_4cf0ad, v_6549d0] = v_5ab095<TopAd5Item[]>([]);
+
+  const [v_679b8a, v_3c92ee] = v_5ab095<string | null>('테스트 알림 메시지');
 
   const [v_001c8f, v_d8a1fd] = v_5ab095(false);
 
@@ -2768,6 +2770,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   ];
 
+  const v_05cebe = "969d34dfed181f71fbfdf0b9";
+
   if (v_ac1d22 === 'Camera') {
 
     return (
@@ -2788,57 +2792,43 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     <View style={v_d81136.container}>
 
-      <StatusBar style="dark" />
+      {}
+      {v_679b8a &&(
+        <View style={v_d81136.notificationTextContainer}>
+          <Text style={v_d81136.notificationText}>{v_679b8a}</Text>
+        </View>
+      )}
 
+      <StatusBar style="dark" />
       {}
 
       <View style={v_d81136.statusBar}>
-
         <View style={v_d81136.statusBarContent}>
-
           <View style={v_d81136.timeContainer}>
-
             {}
-
           </View>
-
         </View>
-
       </View>
-
-      {}
-      {
-
-}
 
       {}
 
       <View style={v_d81136.mapContainer}>
 
         <MapView
-
           ref={v_3ec640}
-
           provider={v_b4043e}
-
           style={v_d81136.map}
-
+          userInterfaceStyle="light"
+          customMapStyle={lightMapStyle}
           initialRegion={v_90608c}
-
           showsUserLocation={v_15f7cd}
-
           showsMyLocationButton={false}
-
           onMapReady={v_64543d}
-
           onRegionChange={v_0424a1}
-
           onRegionChangeComplete={v_6b4469}
-
           onPanDrag={v_f127bf}
-
           onPress={v_4e890f}
-
+          googleMapId={v_05cebe}
         >
 
           {}
@@ -2850,33 +2840,22 @@ export const MapMainScreen: v_a3453e.FC = () => {
                 key={v_5e3dbb.uniqueKey}
 
                 coordinate={{
-
                   latitude: v_5e3dbb.latitude!,
-
                   longitude: v_5e3dbb.longitude!,
-
                 }}
 
                 anchor={{ x: 0.5, y: 0.5 }}
-
                 onPress={() => v_fc58d0(v_5e3dbb)}
-
                 tracksViewChanges={true}
-
               >
 
                 {}
-
                 {v_232839 ? (
                   <View style={v_d81136.markerImageContainer}>
                     <Image
-
                       source={v_232839}
-
                       style={v_d81136.markerImage}
-
                       resizeMode="contain"
-
                     />
                   </View>
                 ) : (
@@ -2887,26 +2866,32 @@ export const MapMainScreen: v_a3453e.FC = () => {
               </Marker>
             );
             })}
-
         </MapView>
+
+         {}
+      {v_5dede3 && (
+        <View style={v_d81136.topLogo}>
+          <Image
+            source={v_5dede3}
+            style={{ width: v_700696.get('window').width / 4 }}
+            resizeMode="contain"
+          />
+        </View>
+      )} 
 
         {}
 
         {v_16772f && (
-
           <Pressable 
             style={v_d81136.mapPinButton}
             onPress={v_30b908}
           >
-
             <Image
               source={v_16772f}
               style={v_d81136.mapPinIcon}
               resizeMode="contain"
             />
-
           </Pressable>
-
         )}
 
         {}
@@ -2914,61 +2899,36 @@ export const MapMainScreen: v_a3453e.FC = () => {
         {v_001c8f && v_456f34 && (
 
           <View
-
             style={[
-
               v_d81136.calloutPopup,
-
               {
-
                 left: v_96b118.x,
-
                 top: v_96b118.y,
-
               },
-
             ]}
-
             pointerEvents="box-none"
-
           >
-
             <View style={v_d81136.calloutContainer}>
-
               <View style={v_d81136.calloutLeft}>
-
                 {}
-
                 {v_456f34.iconurl ? (
                   <Image
-
                     source={{ uri: v_456f34.iconurl }}
-
                     style={[v_d81136.calloutImage, { borderRadius: 6 }]}
-
                     resizeMode="cover"
-
                   />
                 ) : v_8c4b15 ? (
                   <Image
-
                     source={v_8c4b15}
-
                     style={v_d81136.calloutImage}
-
                     resizeMode="contain"
-
                   />
                 ) : (
                   v_be97ff && (
                     <Image
-
                       source={v_be97ff}
-
                       style={v_d81136.calloutImage}
-
                       resizeMode="contain"
-
                     />
                   )
                 )}
@@ -2976,29 +2936,18 @@ export const MapMainScreen: v_a3453e.FC = () => {
                 {}
 
                 <Text style={v_d81136.calloutDistance}>
-
                   {v_456f34.distance.toFixed(2)}m
-
                 </Text>
-
               </View>
 
               <View style={v_d81136.calloutRight}>
-
                 <Text style={v_d81136.calloutBrand} numberOfLines={2}>
-
                   {v_456f34.name || v_456f34.brand || 'XRUN'} 획득 가능합니다.
-
                 </Text>
-
               </View>
-
             </View>
-
           </View>
-
         )}
-
       </View>
 
       {}
@@ -3109,38 +3058,50 @@ const v_d81136 = v_472849.create({
   },
 
   mapPinButton: {
-
     position: 'absolute',
-
     top: 61,
-
     right: 16,
-
     width: 25,
-
     height: 25,
-
     alignItems: 'center',
-
     justifyContent: 'center',
-
   },
 
   mapPinIcon: {
-
-    width: 25,
-
-    height: 25,
-
+    width: v_700696.get('window').width / 10,
+    height: v_700696.get('window').width / 10,
   },
 
   topLogo: {
-
     position: 'absolute',
+    top: 16, 
     left: 16,
     width: v_700696.get('window').width / 4,
+    height: v_700696.get('window').width / 4,
     zIndex: 10, 
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
+  notificationTextContainer: {
+    position: 'absolute',
+    top: 42,
+    left: 0,
+    right: 0,
+    width: '100%',
+    height: 28,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    zIndex: 9999, 
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+
+  notificationText: {
+    color: '#000',
+    fontSize: 16,
+    textAlign: 'left',
+    fontWeight: '500',
   },
 
   calloutPopup: {
