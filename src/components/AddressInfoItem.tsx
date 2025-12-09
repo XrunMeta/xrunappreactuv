@@ -8,6 +8,7 @@ interface AddressInfoItemProps {
     address: string;
     network?: string;
     name: string;
+    networkColor?: string;
     onPress?: () => void;
     onCopy?: () => void;
 }
@@ -17,6 +18,7 @@ export const AddressInfoItem: v_a3453e.FC<AddressInfoItemProps> = ({
     address: v_157c04,
     network: v_74efc1,
     name: v_1833e7,
+    networkColor: v_aeaf3c = v_1bfbd0.primary,
     onPress: v_719eed,
     onCopy: v_abd785,
 }) => {
@@ -38,7 +40,7 @@ export const AddressInfoItem: v_a3453e.FC<AddressInfoItemProps> = ({
                     <Text style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
                     {v_74efc1 && (
                         <View style={v_d81136.networkBadge}>
-                            <Text style={v_d81136.networkText}>{v_74efc1}</Text>
+                            <Text style={[v_d81136.networkText, { color: v_aeaf3c }]}>{v_74efc1}</Text>
                             {v_ae69a0 && <Text style={v_d81136.symbolText}> • {v_ae69a0}</Text>}
                         </View>
                     )}
@@ -94,7 +96,6 @@ const v_d81136 = v_472849.create({
     networkText: {
         fontSize: v_843035.size.small,
         fontFamily: 'Roboto-Medium',
-        color: v_1bfbd0.primary,
     },
     symbolText: {
         fontSize: v_843035.size.small,
