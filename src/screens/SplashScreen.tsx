@@ -18,14 +18,6 @@ export const v_7c6176 = () => {
           resizeMode="contain"
         />
       </View>
-      {}
-      <View style={v_d81136.bottomLogoContainer}>
-        <Image
-          source={v_34a8ff}
-          style={v_d81136.bottomLogo}
-          resizeMode="contain"
-        />
-      </View>
     </View>
   );
 };

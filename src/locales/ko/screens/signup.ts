@@ -19,9 +19,12 @@ export default {
   ageLabel: '나이',
   referralEmailLabel: '추천이메일',
   referralEmailPlaceholder: 'oth-staff@example.invalid',
-  termsText: 'XRUN 서비스 약관 및',
-  termsHighlight: '개인정보 보호정책',
   termsAgree: '에 동의합니다.',
+  terms: {
+    service: 'XRUN 서비스 약관',
+    location: '개인 위치정보 약관',
+    privacy: '개인정보 이용 약관',
+  },
   submitButton: '가입하기',
   submitting: '처리 중...',
   errors: {
