@@ -154,28 +154,56 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
     const v_4499d0 = () => {
 
       const v_393a6b = v_cf6dc2.current;
-      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b);
+      const v_0f0c7b = v_393a6b[v_393a6b.length - 1];
+      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b, '현재 화면:', v_0f0c7b);
 
-      if (v_393a6b.length > 1) {
-        console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
-        v_c7ac57();
-        return true; 
-      }
+      const v_7af375 = v_0f0c7b?.startsWith('wallet') || v_0f0c7b === 'polygonHistory' || v_0f0c7b === 'xrunHistory' || v_0f0c7b === 'nftHistory' || v_0f0c7b === 'xrunHistory2' || v_0f0c7b === 'adHistory';
 
-      const v_5c2f9f = Date.now();
-      const v_78e1e8 = v_5c2f9f - v_f5057b.current;
-      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');
+      const v_439a85 = v_0f0c7b?.startsWith('myInfo');
 
-      if (v_78e1e8 < 2000) {
+      const v_2a04b0 = v_0f0c7b?.startsWith('shop');
 
-        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
-        v_1ed974.exitApp();
+      const v_3485f6 = v_0f0c7b?.startsWith('referral');
+
+      if (v_7af375 || v_439a85) {
+        if (v_393a6b.length > 1) {
+          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 이전 화면으로 이동');
+          v_c7ac57();
+          return true; 
+        } else {
+
+          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 뒤로 갈 수 없으므로 맵으로 이동');
+          v_487a25(v_ce4741.map);
+          return true;
+        }
+      } else if (v_2a04b0 || v_3485f6) {
+
+        console.log('[Navigation] BackHandler: 쇼핑/추천 화면 - 맵으로 이동');
+        v_487a25(v_ce4741.map);
         return true;
       } else {
 
-        v_f5057b.current = v_5c2f9f;
-        console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
-        return true; 
+        if (v_393a6b.length > 1) {
+          console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
+          v_c7ac57();
+          return true; 
+        }
+
+        const v_5c2f9f = Date.now();
+        const v_78e1e8 = v_5c2f9f - v_f5057b.current;
+        console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');
+
+        if (v_78e1e8 < 2000) {
+
+          console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+          v_1ed974.exitApp();
+          return true;
+        } else {
+
+          v_f5057b.current = v_5c2f9f;
+          console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+          return true; 
+        }
       }
     };
 
@@ -186,7 +214,7 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       console.log('[Navigation] BackHandler: 리스너 제거');
       v_d9821c.remove();
     };
-  }, [v_c7ac57]); 
+  }, [v_c7ac57, v_487a25]); 
 
   const v_3b402b = v_df9f57(
     () => ({
