@@ -37,3 +37,4 @@ export { isTaboolaNativeViewAvailable } from './TaboolaNativeView';
 export { default as SafeView } from './SafeView';
 export { default as SafeScrollView } from './SafeScrollView';
 export type { SafeScrollViewProps } from './SafeScrollView';
+export { LevelNotification } from './LevelNotification';
