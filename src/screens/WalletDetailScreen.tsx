@@ -370,7 +370,7 @@ export const WalletDetailScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton />
+      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton onBackPress={() => navigate(ROUTES.wallet)} />
       <View style={styles.content}>
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}
@@ -403,15 +403,10 @@ export const WalletDetailScreen = () => {
 
               navigate(ROUTES.transactionDetails);
             }}
+            emptyMessage={t('screens.walletDetail.noHistory')}
           />
         </View>
       </View>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
 
       <WalletFilterDialog
         visible={filterVisible}
@@ -451,20 +446,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
   },
 });
 
