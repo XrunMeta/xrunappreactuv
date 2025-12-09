@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
   cardTitle: {
     fontSize: FONTS.size.medium,
@@ -175,17 +174,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     marginBottom: 4,
   },
+
   balanceValue: {
-    fontSize: FONTS.size.xlarge,
-    color: '#ffffff',
+    marginTop: 0,
+    fontSize: FONTS.size.xxxlarge,
     fontFamily: 'Roboto-Bold',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: -0.8,
   },
   subValue: {
-    fontSize: FONTS.size.small,
-    color: '#c8c8d0',
+    marginTop: 0,
+    fontSize: FONTS.size.medium,
+    color: 'rgba(255, 255, 255, 0.9)',
     fontFamily: 'Roboto-Regular',
-    marginTop: 4,
+    opacity: 0.9,
   },
+
   quickActions: {
     flexDirection: 'row',
     backgroundColor: '#ffffff',

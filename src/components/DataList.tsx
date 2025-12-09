@@ -5,9 +5,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
+  Text,
 } from 'react-native';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types';
-import { COLORS, SIZES } from '../constants';
+import { COLORS, SIZES, FONTS } from '../constants';
 
 export interface DataListProps<T> {
 
@@ -22,6 +23,8 @@ export interface DataListProps<T> {
   keyExtractor?: (item: T, index: number) => string;
 
   onItemPress?: (item: T, index: number) => void;
+
+  emptyMessage?: string;
 }
 
 const DataListComponent = <T extends Record<string, any>>(
@@ -32,6 +35,7 @@ const DataListComponent = <T extends Record<string, any>>(
     contentContainerStyle,
     keyExtractor,
     onItemPress,
+    emptyMessage,
   }: DataListProps<T>,
   ref: React.Ref<DataListRef>
 ) => {
@@ -209,7 +213,7 @@ const DataListComponent = <T extends Record<string, any>>(
           {}
           {!hasMore && data.length === 0 && !loading && (
             <View style={styles.emptyContainer}>
-              {}
+              {emptyMessage && <Text style={styles.emptyText}>{emptyMessage}</Text>}
             </View>
           )}
         </>
@@ -244,6 +248,13 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     paddingVertical: SIZES.xlarge,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: FONTS.size.medium,
+    color: '#888888',
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
   },
 });
 
