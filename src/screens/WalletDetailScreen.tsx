@@ -19,6 +19,11 @@ import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard } from '../utils';
 
+const iconEtherscan = require('../../assets/icon_etherscan.png');
+const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+const iconSend = require('../../assets/icon-send.png');
+const iconReceive = require('../../assets/icon-receive.png');
+
 const dateFormatter = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -365,15 +370,16 @@ export const WalletDetailScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton onBackPress={goBack} />
+      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton onBackPress={() => navigate(ROUTES.wallet)} />
       <View style={styles.content}>
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}
           mainValue={formattedBalance}
+          subValue="KRW 10,000,000"
           address={shortenedAddress}
           onCopy={handleCopyAddress}
           actions={[
-            { label: explorerLabel, icon: 'scan-outline', onPress: () => handleAction('scan') },
+            { label: explorerLabel, iconImage: selectedWalletAsset.currency === 1 || selectedWalletAsset.currency === 2 ? iconEtherscan : iconPolygonscan, onPress: () => handleAction('scan') },
             { label: t('screens.walletDetail.receive'), icon: 'download-outline', onPress: () => handleAction('receive') },
             { label: t('screens.walletDetail.send'), icon: 'send-outline', onPress: () => handleAction('send') },
           ]}
@@ -397,15 +403,10 @@ export const WalletDetailScreen = () => {
 
               navigate(ROUTES.transactionDetails);
             }}
+            emptyMessage={t('screens.walletDetail.noHistory')}
           />
         </View>
       </View>
-
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-      )}
 
       <WalletFilterDialog
         visible={filterVisible}
@@ -445,20 +446,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
-  },
-  homeIndicator: {
-    height: 34,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 9,
-  },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
   },
 });
 

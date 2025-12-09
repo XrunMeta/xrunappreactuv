@@ -2,6 +2,7 @@ export default {
   title: 'Detail Dompet',
   myBalance: 'Saldo Saya',
   history: 'Riwayat',
+  noHistory: 'Tidak ada riwayat transaksi.',
   receive: 'Terima',
   send: 'Kirim',
   received: 'Diterima',
