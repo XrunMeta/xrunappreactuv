@@ -30,7 +30,7 @@ const NFT_HISTORY = [
 
 export const NftWalletScreen = () => {
   const { t } = useTranslation();
-  const { navigate } = useAppNavigation();
+  const { navigate, goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const handleAction = (type: 'scan' | 'receive' | 'send') => {
     if (type === 'send') {
@@ -43,7 +43,7 @@ export const NftWalletScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title={t('screens.nftWallet.title')} showBackButton />
+      <Header title={t('screens.nftWallet.title')} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <WalletHeaderCard
           title={t('screens.nftWallet.myBalance')}
