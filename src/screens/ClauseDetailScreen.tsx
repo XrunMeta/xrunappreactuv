@@ -113,10 +113,10 @@ const styles = StyleSheet.create({
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: FONTS.size.msmall,
-    lineHeight: 24,
+    fontSize: FONTS.size.medium,
+    lineHeight: 28,
     fontFamily: 'Roboto-Regular',
-    color: '#8e9bae',
+    color: '#333333',
   },
 });
 
