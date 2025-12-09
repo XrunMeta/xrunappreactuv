@@ -4092,3 +4092,25 @@ export const sendInAppPurchase = async (
   }
 };
 
+export const getMembersLevelInfo = async (
+  member: number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const requestBody = {
+      member: member,
+    };
+
+    console.log('[레벨 정보] 사용자 레벨 정보 조회 요청:', member);
+
+    const response = await gatewayNodeJS('getMembersLevelInfo', 'POST', requestBody, navigation);
+
+    console.log('[레벨 정보] 사용자 레벨 정보 조회 성공:', response);
+
+    return response;
+  } catch (error) {
+    console.error('[레벨 정보] 사용자 레벨 정보 조회 오류:', error);
+    throw error;
+  }
+};
+

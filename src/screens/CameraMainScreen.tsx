@@ -18,7 +18,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { BottomNavigationBar } from '../components';
+import { BottomNavigationBar, LevelNotification } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5 } from '../services';
@@ -1523,6 +1523,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+
+      {}
+      <LevelNotification navigation={navigate} />
 
       {}
       <View style={styles.statusBar}>
