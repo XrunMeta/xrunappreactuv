@@ -46,7 +46,7 @@ export const v_03a231 = () => {
       {
         id: 'edit',
         label: v_8d41d7('screens.myInfo.editInfo'),
-        subtitle: '이메일, 비밀번호 변경',
+        subtitle: v_8d41d7('screens.myInfo.editInfoSubtitle'),
         iconName: 'person-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
@@ -55,7 +55,7 @@ export const v_03a231 = () => {
       {
         id: 'notify',
         label: v_8d41d7('screens.myInfo.notify'),
-        subtitle: '알림 설정, 알림 내역',
+        subtitle: v_8d41d7('screens.myInfo.notifySubtitle'),
         iconName: 'notifications-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#10B981',
@@ -64,7 +64,7 @@ export const v_03a231 = () => {
       {
         id: 'faq',
         label: v_8d41d7('screens.myInfo.faq'),
-        subtitle: '자주 묻는 질문',
+        subtitle: v_8d41d7('screens.myInfo.faqSubtitle'),
         iconName: 'help-circle-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#F59E0B',
@@ -73,7 +73,7 @@ export const v_03a231 = () => {
       {
         id: 'clause',
         label: v_8d41d7('screens.myInfo.terms'),
-        subtitle: '이용약관, 개인정보처리방침',
+        subtitle: v_8d41d7('screens.myInfo.termsSubtitle'),
         iconName: 'document-text-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#3B82F6',
@@ -82,7 +82,7 @@ export const v_03a231 = () => {
       {
         id: 'setting',
         label: v_8d41d7('screens.myInfo.settings'),
-        subtitle: '앱 설정, 언어 설정',
+        subtitle: v_8d41d7('screens.myInfo.settingsSubtitle'),
         iconName: 'settings-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#8B5CF6',
@@ -91,7 +91,7 @@ export const v_03a231 = () => {
       {
         id: 'referral',
         label: v_8d41d7('screens.myInfo.referralEdit'),
-        subtitle: '추천인 관리, 정산 내역',
+        subtitle: v_8d41d7('screens.myInfo.referralEditSubtitle'),
         iconName: 'people-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#EC4899',

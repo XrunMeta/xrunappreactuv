@@ -5,9 +5,10 @@ import {
   v_472849,
   v_39a996,
   v_7e4944,
+  v_19b633,
 } from 'rcmrninabrnb';
 import { v_5b0045, v_ae32ae, v_029581 } from '../types';
-import { v_1bfbd0, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 
 export interface DataListProps<T> {
 
@@ -22,6 +23,8 @@ export interface DataListProps<T> {
   keyExtractor?: (item: T, index: number) => string;
 
   onItemPress?: (item: T, index: number) => void;
+
+  emptyMessage?: string;
 }
 
 const v_2219b3 = <T extends Record<string, any>>(
@@ -32,6 +35,7 @@ const v_2219b3 = <T extends Record<string, any>>(
     contentContainerStyle: v_9aecf5,
     keyExtractor: v_4c0e3e,
     onItemPress: v_659a80,
+    emptyMessage: v_76ab9a,
   }: DataListProps<T>,
   ref: v_a3453e.Ref<v_029581>
 ) => {
@@ -209,7 +213,7 @@ const v_2219b3 = <T extends Record<string, any>>(
           {}
           {!v_6bbe19 && v_9390e8.length === 0 && !v_683210 && (
             <View style={v_d81136.emptyContainer}>
-              {}
+              {v_76ab9a && <Text style={v_d81136.emptyText}>{v_76ab9a}</Text>}
             </View>
           )}
         </>
@@ -244,6 +248,13 @@ const v_d81136 = v_472849.create({
   },
   emptyContainer: {
     paddingVertical: v_9b1a04.xlarge,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: v_843035.size.medium,
+    color: '#888888',
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
   },
 });
 
