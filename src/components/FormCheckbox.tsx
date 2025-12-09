@@ -7,7 +7,7 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FORM_STYLES } from '../constants';
 import { FONTS } from '../constants';
 
 type CheckboxVariant = 'square' | 'circle';
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+
     gap: 12,
   },
   indicatorBase: {
@@ -96,10 +97,8 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: FONTS.size.ssmall,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
+    ...FORM_STYLES.label,
+    marginBottom: 0, 
   },
 });
-
 
