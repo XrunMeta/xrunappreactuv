@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNavigationBar, MapBottomPanel, SafeView } from '../components';
+import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification } from '../components';
 
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -225,8 +225,6 @@ export const MapMainScreen: React.FC = () => {
   const loadingMarkersRef = useRef(false); 
 
   const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
-
-  const [notifitext, setNotifitext] = useState<string | null>('테스트 알림 메시지');
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
 
@@ -2801,11 +2799,7 @@ export const MapMainScreen: React.FC = () => {
     <View style={styles.container}>
 
       {}
-      {notifitext &&(
-        <View style={styles.notificationTextContainer}>
-          <Text style={styles.notificationText}>{notifitext}</Text>
-        </View>
-      )}
+      <LevelNotification navigation={navigate} />
 
       <StatusBar style="dark" />
       {}
@@ -3088,27 +3082,6 @@ const styles = StyleSheet.create({
     zIndex: 10, 
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  notificationTextContainer: {
-    position: 'absolute',
-    top: 42,
-    left: 0,
-    right: 0,
-    width: '100%',
-    height: 28,
-    paddingVertical: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    zIndex: 9999, 
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-
-  notificationText: {
-    color: '#000',
-    fontSize: 16,
-    textAlign: 'left',
-    fontWeight: '500',
   },
 
   calloutPopup: {
