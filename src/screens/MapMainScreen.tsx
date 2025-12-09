@@ -32,7 +32,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
-import { v_f4e704, v_a77ce6, v_556baf } from '../components';
+import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc } from '../components';
 
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -225,8 +225,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_5db874 = v_e662ae(false); 
 
   const [v_4cf0ad, v_6549d0] = v_5ab095<TopAd5Item[]>([]);
-
-  const [v_679b8a, v_3c92ee] = v_5ab095<string | null>('테스트 알림 메시지');
 
   const [v_001c8f, v_d8a1fd] = v_5ab095(false);
 
@@ -2801,11 +2799,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
     <View style={v_d81136.container}>
 
       {}
-      {v_679b8a &&(
-        <View style={v_d81136.notificationTextContainer}>
-          <Text style={v_d81136.notificationText}>{v_679b8a}</Text>
-        </View>
-      )}
+      <LevelNotification navigation={v_9b57fc} />
 
       <StatusBar style="dark" />
       {}
@@ -3088,27 +3082,6 @@ const v_d81136 = v_472849.create({
     zIndex: 10, 
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  notificationTextContainer: {
-    position: 'absolute',
-    top: 42,
-    left: 0,
-    right: 0,
-    width: '100%',
-    height: 28,
-    paddingVertical: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    zIndex: 9999, 
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-
-  notificationText: {
-    color: '#000',
-    fontSize: 16,
-    textAlign: 'left',
-    fontWeight: '500',
   },
 
   calloutPopup: {

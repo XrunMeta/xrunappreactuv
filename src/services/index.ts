@@ -4092,3 +4092,25 @@ export const v_d751d6 = async (
   }
 };
 
+export const v_dedaa7 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('[레벨 정보] 사용자 레벨 정보 조회 요청:', v_660822);
+
+    const v_3393e3 = await v_c07360('getMembersLevelInfo', 'POST', v_cd6a57, v_c65f5d);
+
+    console.log('[레벨 정보] 사용자 레벨 정보 조회 성공:', v_3393e3);
+
+    return v_3393e3;
+  } catch (v_5e9bfe) {
+    console.error('[레벨 정보] 사용자 레벨 정보 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+

@@ -18,7 +18,7 @@ import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_f4e704 } from '../components';
+import { v_f4e704, v_66b9cc } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5, v_5d7ca4 } from '../services';
@@ -1523,6 +1523,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   return (
     <View style={v_d81136.container}>
       <StatusBar style="light" />
+
+      {}
+      <LevelNotification navigation={v_9b57fc} />
 
       {}
       <View style={v_d81136.statusBar}>
