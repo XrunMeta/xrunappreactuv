@@ -372,13 +372,9 @@ export const ShopBuyScreen = () => {
                     )}
                   </Text>
                 </View>
-                {iapProduct && !iapError && (
-                  <View style={styles.iapInfoContainer}>
-                    <Text style={styles.iapInfoText}>
-                      인앱 구매 상품
-                    </Text>
-                  </View>
-                )}
+                {
+
+}
                 {}
                 {iapError && !isLoadingIap && (
                   <View style={styles.iapErrorContainer}>
@@ -585,17 +581,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#747474',
+    backgroundColor: COLORS.buttonSecondary,
   },
   primaryButton: {
-    backgroundColor: '#020406',
+    backgroundColor: COLORS.buttonPrimary,
   },
   disabledButton: {
     backgroundColor: '#ccc',
     opacity: 0.6,
   },
   cancelText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },

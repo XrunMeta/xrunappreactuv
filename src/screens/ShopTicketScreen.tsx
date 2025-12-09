@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TextInput, ImageSourcePropType, ActivityIndicator, Text, Platform } from 'react-native';
+import { View, StyleSheet, TextInput, ImageSourcePropType, ActivityIndicator, Text, Platform, TouchableOpacity } from 'react-native';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -130,6 +130,7 @@ export const ShopTicketScreen = () => {
   const [memberId, setMemberId] = useState<string | null>(null);
   const [itemImages, setItemImages] = useState<Record<string, string>>({}); 
   const [searchQuery, setSearchQuery] = useState<string>(''); 
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false); 
 
   const [iapProducts, setIapProducts] = useState<Record<string, any>>({});
   const [iapLoading, setIapLoading] = useState(false);
@@ -438,7 +439,18 @@ export const ShopTicketScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor='#F8FAFC'>
-      <Header title={t('screens.shop.title')} />
+      <Header 
+        title={t('screens.shop.title')} 
+        rightComponent={
+          <TouchableOpacity 
+            onPress={() => setShowSearchBar(!showSearchBar)}
+            activeOpacity={0.7}
+            style={styles.searchButton}
+          >
+            <Text style={styles.searchButtonText}>{t('screens.shop.search')}</Text>
+          </TouchableOpacity>
+        }
+      />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -455,16 +467,18 @@ export const ShopTicketScreen = () => {
               hideIndicator={true}
             />
 
-            <View style={styles.searchBar}>
-              <Feather name="search" size={18} color="#0296f2" />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
+            {showSearchBar && (
+              <View style={styles.searchBar}>
+                <Feather name="search" size={18} color="#0296f2" />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder={t('screens.shop.searchPlaceholder')}
+                  placeholderTextColor="#bcbec4"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+            )}
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
               {tab === 'ticket' && filteredItems.length > 0
                 ? filteredItems.map((item) => {
@@ -583,5 +597,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ededed',
     marginTop: 10,
+  },
+  searchButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  searchButtonText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.headerText,
   },
 });
