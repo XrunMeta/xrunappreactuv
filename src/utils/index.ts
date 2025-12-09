@@ -1,7 +1,16 @@
-import { v_5f4661 } from 'rcmrninabrnb';
+import { v_5f4661, v_326be8, v_405151, v_03e392 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import * as v_a928e1 from 'yvptvjtrs';
+
+const v_cba33f = (v_a8cd21) => {
+  if (v_326be8.OS === 'android') {
+    v_405151.show(v_a8cd21, v_405151.SHORT);
+  } else {
+
+    v_03e392.alert('', v_a8cd21, [{ text: '확인' }]);
+  }
+};
 
 export const v_db97fb = async (
   v_3b402b,
@@ -10,9 +19,13 @@ export const v_db97fb = async (
 ) => {
   try {
     await v_fba5a0.setStringAsync(v_3b402b);
-    await v_889fad('주소 복사', v_e5db92);
+
+    if (v_326be8.OS === 'ios') {
+      v_cba33f(v_e5db92);
+    }
   } catch (v_5e9bfe) {
-    await v_889fad('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
+
+    v_cba33f('주소를 복사하지 못했습니다. 다시 시도해주세요.');
   }
 };
 
