@@ -18,6 +18,8 @@ import {
 
   v_09d0e5,
 
+  v_39a996,
+
 } from 'rcmrninabrnb';
 
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -224,6 +226,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_5db874 = v_e662ae(false); 
 
+  const [v_b6e060, v_9cd9d5] = v_5ab095(false);
+
   const [v_4cf0ad, v_6549d0] = v_5ab095<TopAd5Item[]>([]);
 
   const [v_001c8f, v_d8a1fd] = v_5ab095(false);
@@ -293,6 +297,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_9d72cd = v_e662ae(false);
 
   const v_1b0a7f = v_e662ae(false);
+
+  const v_ceef35 = v_e662ae(false);
 
   let v_be97ff = null;
   let v_8c4b15 = null;
@@ -859,6 +865,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('✅ [loadMarkersForLocation] 완료 (로딩 상태 해제)');
       v_5db874.current = false;
       v_e1bb1a(false);
+      v_9cd9d5(false); 
+
+      v_ceef35.current = false;
     }
   }, [v_9b57fc]);
 
@@ -1440,6 +1449,92 @@ export const MapMainScreen: v_a3453e.FC = () => {
     };
     v_6dea10();
   }, [v_ac1d22]); 
+
+  v_c4deb2(() => {
+
+    if (v_ac1d22 !== 'Map') {
+
+      v_ceef35.current = false;
+      return;
+    }
+
+    const v_f10a0a = async () => {
+      try {
+
+        let v_7dd198 = null;
+
+        if (!v_a55f0b) {
+
+          console.log('📍 [MapMainScreen] 위치 정보 없음 - 위치 정보 대기 중...');
+          v_9cd9d5(true);
+
+          try {
+            const v_4da25a = await v_8a44cb.getCurrentPositionAsync({
+              accuracy: v_8a44cb.Accuracy.High,
+            });
+            v_7dd198 = {
+              latitude: v_4da25a.coords.latitude,
+              longitude: v_4da25a.coords.longitude,
+            };
+            v_0326b2(v_7dd198);
+            console.log('📍 [MapMainScreen] 위치 정보 수신:', v_7dd198);
+
+            v_ceef35.current = false;
+          } catch (v_cd6da1) {
+            console.error('❌ [MapMainScreen] 위치 정보 가져오기 실패:', v_cd6da1);
+            v_9cd9d5(false);
+            return;
+          }
+        } else {
+          v_7dd198 = v_a55f0b;
+        }
+
+        if (v_ceef35.current && v_7dd198) {
+          return;
+        }
+
+        v_ceef35.current = true;
+
+        const v_2be6ee = v_b4d4c5;
+        if (v_2be6ee.length === 0) {
+
+          console.log('📍 [MapMainScreen] 마커 없음 - 현재 위치 기준으로 마커 로드 시작');
+          v_9cd9d5(true);
+
+          if (v_7dd198) {
+            await v_524200(v_7dd198, true);
+          }
+          return;
+        }
+
+        const v_97e2bc = v_2be6ee.find(v_5e3dbb => v_5e3dbb.latitude && v_5e3dbb.longitude);
+        if (v_97e2bc && v_97e2bc.latitude && v_97e2bc.longitude && v_7dd198) {
+          const v_926d1c = v_b464ed(
+            v_7dd198.latitude,
+            v_7dd198.longitude,
+            v_97e2bc.latitude,
+            v_97e2bc.longitude
+          );
+
+          if (v_926d1c >= 500) {
+
+            console.log(`📍 [MapMainScreen] 첫번째 마커와 현재 위치 거리: ${v_926d1c.toFixed(2)}m (500m 이상) - 마커 재로드 시작`);
+            v_9cd9d5(true);
+            await v_524200(v_7dd198, true);
+            return;
+          }
+        }
+
+        v_9cd9d5(false);
+      } catch (v_5e9bfe) {
+        console.error('❌ [MapMainScreen] 마커 체크 중 오류:', v_5e9bfe);
+        v_9cd9d5(false);
+        v_ceef35.current = false; 
+      }
+    };
+
+    v_f10a0a();
+  }, [v_ac1d22, v_a55f0b, v_524200]); 
 
   v_c4deb2(() => {
     if (!v_a55f0b) return;
@@ -2999,6 +3094,24 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       </View>
 
+      {}
+
+      {v_b6e060 && (
+
+        <View style={v_d81136.loadingOverlay}>
+
+          <View style={v_d81136.loadingContainer}>
+
+            <ActivityIndicator size="large" color="#343a5a" />
+
+            <Text style={v_d81136.loadingText}>로딩중...</Text>
+
+          </View>
+
+        </View>
+
+      )}
+
     </View>
 
   );
@@ -3205,6 +3318,32 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#ff0000',
     borderWidth: 2,
     borderColor: '#ffffff',
+  },
+
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999, 
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#10192d',
   },
 
 });
