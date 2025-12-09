@@ -19,9 +19,12 @@ export default {
   ageLabel: 'Usia',
   referralEmailLabel: 'Email Referral',
   referralEmailPlaceholder: 'oth-staff@example.invalid',
-  termsText: 'Saya menyetujui Ketentuan Layanan XRUN dan',
-  termsHighlight: 'Kebijakan Privasi',
   termsAgree: '.',
+  terms: {
+    service: 'Ketentuan Layanan XRUN',
+    location: 'Ketentuan Informasi Lokasi Pribadi',
+    privacy: 'Ketentuan Penggunaan Informasi Pribadi',
+  },
   submitButton: 'Daftar',
   submitting: 'Memproses...',
   errors: {
