@@ -7,7 +7,7 @@ import {
   v_7e4944,
   v_961e77,
 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_bae512 } from '../constants';
 import { v_843035 } from '../constants';
 
 type CheckboxVariant = 'square' | 'circle';
@@ -57,6 +57,7 @@ const v_d81136 = v_472849.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+
     gap: 12,
   },
   indicatorBase: {
@@ -96,10 +97,8 @@ const v_d81136 = v_472849.create({
     transform: [{ rotate: '-45deg' }],
   },
   label: {
-    fontSize: v_843035.size.ssmall,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
+    ...v_bae512.label,
+    marginBottom: 0, 
   },
 });
-
 
