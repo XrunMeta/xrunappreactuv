@@ -4,6 +4,7 @@ import {
   v_19b633,
   v_472849,
   v_4623af,
+  v_09d0e5,
   v_39a996,
   v_f2c756,
   v_6b5698,
@@ -32,7 +33,7 @@ const SequentialDots: v_a3453e.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20 }}>
+    <View style={{ flexDirection: 'row', marginTop: 20}}>
       {[0, 1, 2].map(v_a56041 => (
         <View
           key={v_a56041}
@@ -623,6 +624,27 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     v_7f2e65();
   };
 
+  const v_e36569 = v_de06a3(async () => {
+    console.log('광고 보기 버튼 클릭');
+    console.log(`[광고보기] ad_company: ${v_d0b6d4?.ad_company}`);
+
+    try {
+
+      await v_f1550c();
+      console.log('[광고보기] 광고 API 호출 완료');
+
+      if (v_3aedd0?.urlAD) {
+        v_2e98c9(v_3aedd0.urlAD);
+      }
+    } catch (v_5e9bfe) {
+      console.error('[광고보기] 광고 API 호출 실패:', v_5e9bfe);
+
+      if (v_3aedd0?.urlAD) {
+        v_2e98c9(v_3aedd0.urlAD);
+      }
+    }
+  }, [v_f1550c, v_3aedd0, v_2e98c9, v_d0b6d4]);
+
   if (!v_d0b6d4) {
     return null;
   }
@@ -630,6 +652,14 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   return (
     <View style={v_d81136.root}>
       <StatusBar style="dark" />
+
+      {}
+      {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_3aedd0 && (
+        <Pressable
+          style={v_d81136.topClickArea}
+          onPress={v_e36569}
+        />
+      )}
 
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
@@ -737,26 +767,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           <View style={v_d81136.buttonContainer}>
           <TouchableOpacity
               style={v_d81136.watchAdButton}
-              onPress={async () => {
-                console.log('광고 보기 버튼 클릭');
-                console.log(`[광고보기] ad_company: ${v_d0b6d4?.ad_company}`);
-
-                try {
-
-                  await v_f1550c();
-                  console.log('[광고보기] 광고 API 호출 완료');
-
-                  if (v_3aedd0.urlAD) {
-                    v_2e98c9(v_3aedd0.urlAD);
-                  }
-                } catch (v_5e9bfe) {
-                  console.error('[광고보기] 광고 API 호출 실패:', v_5e9bfe);
-
-                  if (v_3aedd0.urlAD) {
-                    v_2e98c9(v_3aedd0.urlAD);
-                  }
-                }
-              }}
+              onPress={v_e36569}
               activeOpacity={0.7}
             >
               <Text style={v_d81136.watchAdButtonText}>{v_8d41d7('screens.showNapAd.watchAd')}</Text>
@@ -1074,6 +1085,15 @@ const v_d81136 = v_472849.create({
     maxWidth: '80%',
     alignSelf: 'center',
     justifyContent: 'center',
+  },
+  topClickArea: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    backgroundColor: 'transparent',
+    zIndex: 1,
   },
 });
 
