@@ -5,6 +5,8 @@ export default {
   shareAddress: 'Bagikan Alamat',
   loadingAddress: 'Memuat alamat dompet...',
   amount: 'Jumlah',
+  scan: 'Pindai Kode QR',
+  myQrCode: 'Kode QR Saya',
   errors: {
     shareFailed: 'Gagal membagikan alamat',
     addressNotLoaded: 'Alamat dompet belum dimuat.',
