@@ -151,9 +151,8 @@ const v_d81136 = v_472849.create({
   },
   question: {
     flex: 1,
-    fontSize: v_843035.size.lsmall,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
-    color: '#111827',
     marginRight: 12,
   },
   answerWrapper: {

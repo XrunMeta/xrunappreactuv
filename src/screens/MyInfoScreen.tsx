@@ -80,15 +80,6 @@ export const v_03a231 = () => {
         route: 'myInfoClauses',
       },
       {
-        id: 'setting',
-        label: v_8d41d7('screens.myInfo.settings'),
-        subtitle: v_8d41d7('screens.myInfo.settingsSubtitle'),
-        iconName: 'settings-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#8B5CF6',
-        route: 'myInfoSettings',
-      },
-      {
         id: 'referral',
         label: v_8d41d7('screens.myInfo.referralEdit'),
         subtitle: v_8d41d7('screens.myInfo.referralEditSubtitle'),
@@ -96,6 +87,15 @@ export const v_03a231 = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#EC4899',
         route: 'myInfoReferral',
+      },
+      {
+        id: 'setting',
+        label: v_8d41d7('screens.myInfo.settings'),
+        subtitle: v_8d41d7('screens.myInfo.settingsSubtitle'),
+        iconName: 'settings-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#8B5CF6',
+        route: 'myInfoSettings',
       },
     ],
     [v_8d41d7],
@@ -290,6 +290,15 @@ export const v_03a231 = () => {
           }
         }}
         showBackButton
+        rightComponent={
+          <TouchableOpacity
+            onPress={v_06b8a4}
+            style={v_d81136.headerLogoutButton}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons name="logout" size={20} color={v_1bfbd0.headerText} />
+          </TouchableOpacity>
+        }
       />
       {}
       <View style={v_d81136.adBanner}>
@@ -299,7 +308,7 @@ export const v_03a231 = () => {
       <View style={v_d81136.scrollContent}>
         <View style={v_d81136.profileCard}>
           <View style={v_d81136.profileIconContainer}>
-            <Ionicons name="person-outline" size={32} color="#666666" />
+            <Ionicons name="person-outline" size={28} color="#666666" />
           </View>
           <View style={v_d81136.profileInfo}>
             {v_cd31a8 ? (
@@ -315,26 +324,7 @@ export const v_03a231 = () => {
               </>
             )}
           </View>
-          <View style={v_d81136.profileActions}>
-            <TouchableOpacity
-              onPress={v_22cd2d}
-              style={v_d81136.actionButton}
-              activeOpacity={0.7}
-            >
-              <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={v_06b8a4}
-              style={v_d81136.actionButton}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name="logout"
-                size={18}
-                color={v_1bfbd0.headerText}
-              />
-            </TouchableOpacity>
-          </View>
+
         </View>
         <SafeScrollView style={v_d81136.menuListContainer} showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
           {}
@@ -410,8 +400,8 @@ const v_d81136 = v_472849.create({
     gap: 16,
   },
   profileIconContainer: {
-    width: 56,
-    height: 56,
+    width: 40,
+    height: 40,
     borderRadius: 30,
     backgroundColor: '#F8FAFC',
     borderWidth: 1,
@@ -499,6 +489,13 @@ const v_d81136 = v_472849.create({
     borderWidth: 1.5,
     borderColor: '#fff',
   },
-
+  headerLogoutButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: v_1bfbd0.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
