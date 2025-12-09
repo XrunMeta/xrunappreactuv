@@ -32,6 +32,7 @@ interface MapBottomPanelProps {
   spotData: v_f71847 | null;
   deviceHeading: number | null; 
   onClose: () => void;
+  onExpand?: () => void; 
 }
 
 export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
@@ -39,6 +40,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
   spotData: v_1d0937,
   deviceHeading: v_4b9594,
   onClose: v_0890f8,
+  onExpand: v_37d7de,
 }) => {
 
   const [v_2aafc0, v_e0cda8] = v_a3453e.useState(false);
@@ -47,29 +49,25 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
     v_e0cda8(false);
   }, [v_1d0937?.iconurl]);
 
-  const v_8f79f8 = v_e662ae(new v_a2349e.Value(20)).current;
+  const v_8f79f8 = v_e662ae(new v_a2349e.Value(80)).current;
 
   v_c4deb2(() => {
     if (v_cf55be) {
       v_a2349e.timing(v_8f79f8, {
-        toValue: 90, 
-        duration: 300,
+        toValue: 110, 
+        duration: 600,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     } else {
       v_a2349e.timing(v_8f79f8, {
-        toValue: 20, 
+        toValue: 115, 
         duration: 300,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     }
   }, [v_cf55be, v_8f79f8]);
-
-  if (!v_1d0937) {
-    return null;
-  }
 
   return (
     <View
@@ -98,6 +96,9 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
             if (v_cf55be) {
               console.log('📱 하단 패널 배경 터치 - 패널 닫기');
               v_0890f8();
+            } else if (v_37d7de && v_1d0937) {
+              console.log('📱 하단 패널 클릭 - 패널 확장');
+              v_37d7de();
             }
           }}
           style={[
@@ -107,7 +108,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
             },
           ]}>
           {}
-          {v_cf55be && (
+          {v_cf55be && v_1d0937 && (
             <View
               style={{
                 alignItems: 'center',
@@ -127,7 +128,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
           )}
 
           {}
-          {v_cf55be && (
+          {v_1d0937 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -135,8 +136,8 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                 justifyContent: 'space-between',
                 width: '100%',
                 paddingHorizontal: 20,
-                paddingTop: 0,
-                paddingBottom: 12,
+                paddingTop: v_cf55be ? 0 : 8,
+                paddingBottom: v_cf55be ? 12 : 8,
                 pointerEvents: 'box-none', 
               }}>
               {}
@@ -187,20 +188,22 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                       fontSize: v_843035.size.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
-                      marginBottom: 4,
+                      marginBottom: v_cf55be ? 4 : 0,
                     }}>
                     {v_1d0937.distance.toFixed(2)}m
                   </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Roboto-Regular',
-                      fontSize: v_843035.size.small,
-                      color: '#4c4e55',
-                      lineHeight: 15,
-                      letterSpacing: 0.06,
-                    }}>
-                    XRun으로 리워드를 획득하세요
-                  </Text>
+                  {v_cf55be && (
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: v_843035.size.small,
+                        color: '#4c4e55',
+                        lineHeight: 15,
+                        letterSpacing: 0.06,
+                      }}>
+                      XRun으로 리워드를 획득하세요
+                    </Text>
+                  )}
                 </View>
               </View>
 
@@ -240,34 +243,36 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
               </View>
 
               {}
-              <Pressable
-                onPress={() => {
-                  console.log('📱 하단 패널 닫기 버튼 클릭');
-                  v_0890f8();
-                }}
-                style={{
-                  width: 14,
-                  height: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginLeft: 12,
-                }}>
-                {v_622407 && (
-                  <View
-                    style={{
-                      transform: [{ rotate: '270deg' }],
-                    }}>
-                    <Image
-                      source={v_622407}
+              {v_cf55be && (
+                <Pressable
+                  onPress={() => {
+                    console.log('📱 하단 패널 닫기 버튼 클릭');
+                    v_0890f8();
+                  }}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 12,
+                  }}>
+                  {v_622407 && (
+                    <View
                       style={{
-                        width: 14,
-                        height: 14,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
-              </Pressable>
+                        transform: [{ rotate: '270deg' }],
+                      }}>
+                      <Image
+                        source={v_622407}
+                        style={{
+                          width: 14,
+                          height: 14,
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
+                </Pressable>
+              )}
             </View>
           )}
         </Pressable>
