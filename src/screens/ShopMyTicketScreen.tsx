@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_df9f57 } from 'bapkr';
-import { v_3094a2, v_472849, v_79c4f2, v_39a996, v_19b633 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_79c4f2, v_39a996, v_19b633, v_4623af } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -51,6 +51,7 @@ export const v_052a8a = () => {
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_f9a2c9, v_01b387] = v_5ab095<Record<string, string>>({}); 
   const [v_5d756f, v_a563de] = v_5ab095<string>(''); 
+  const [v_61d92f, v_f10880] = v_5ab095<boolean>(false); 
   const [v_be52bc, v_0e7cbf] = v_5ab095<{
     visible: boolean;
     title: string;
@@ -206,7 +207,18 @@ export const v_052a8a = () => {
   return (
     <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
-      <Header title={v_8d41d7('screens.shop.title')} />
+      <Header
+        title={v_8d41d7('screens.shop.title')}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => v_f10880(!v_61d92f)}
+            activeOpacity={0.7}
+            style={v_d81136.searchButton}
+          >
+            <Feather name="search" size={20} color={v_1bfbd0.headerText} />
+          </TouchableOpacity>
+        }
+      />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -224,16 +236,18 @@ export const v_052a8a = () => {
             hideIndicator={true}
           />
 
-          <View style={v_d81136.searchBar}>
-            <Feather name="search" size={18} color="#0296f2" />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#bcbec4"
-              style={v_d81136.searchInput}
-              value={v_5d756f}
-              onChangeText={v_a563de}
-            />
-          </View>
+          {v_61d92f && (
+            <View style={v_d81136.searchBar}>
+              <Feather name="search" size={18} color="#0296f2" />
+              <TextInput
+                placeholder="Search"
+                placeholderTextColor="#bcbec4"
+                style={v_d81136.searchInput}
+                value={v_5d756f}
+                onChangeText={v_a563de}
+              />
+            </View>
+          )}
           <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
             {v_973c3e.length > 0 ? (
               v_973c3e.map((v_8c0b26) => {
@@ -355,5 +369,13 @@ const v_d81136 = v_472849.create({
     borderWidth: 2,
     borderColor: '#ededed',
     marginTop: 10,
+  },
+  searchButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: v_1bfbd0.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

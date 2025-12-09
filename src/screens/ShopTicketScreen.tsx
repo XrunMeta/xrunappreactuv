@@ -439,15 +439,15 @@ export const v_38326c = () => {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
-      <Header 
-        title={v_8d41d7('screens.shop.title')} 
+      <Header
+        title={v_8d41d7('screens.shop.title')}
         rightComponent={
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => v_f10880(!v_61d92f)}
             activeOpacity={0.7}
             style={v_d81136.searchButton}
           >
-            <Text style={v_d81136.searchButtonText}>{v_8d41d7('screens.shop.search')}</Text>
+            <Feather name="search" size={20} color={v_1bfbd0.headerText} />
           </TouchableOpacity>
         }
       />
@@ -599,12 +599,11 @@ const v_d81136 = v_472849.create({
     marginTop: 10,
   },
   searchButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  searchButtonText: {
-    fontSize: v_843035.size.msmall,
-    fontFamily: 'Roboto-Regular',
-    color: v_1bfbd0.headerText,
+    width: 40,
+    height: 40,
+    backgroundColor: v_1bfbd0.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
