@@ -1,22 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SvgXml } from 'react-native-svg';
 import { FONTS, SIZES } from '../constants';
 
 type QuickAction = {
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon?: keyof typeof Ionicons.glyphMap;
+  iconImage?: ImageSourcePropType;
+  iconSvg?: string;
   onPress: () => void;
 };
 
 interface WalletHeaderCardProps {
   title: string;
   address: string;
+  cardStyle?: StyleProp<ViewStyle>;
   onPress?: () => void;
   onCopy?: () => void;
   actions: QuickAction[];
   mainValueLabel?: string;
   mainValue?: string;
+  subValue?: string; 
   theme?: {
     background: string;
     accentOne?: string;
@@ -28,10 +33,12 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
   title,
   address,
   onPress,
+  cardStyle,
   onCopy,
   actions,
   mainValueLabel,
   mainValue,
+  subValue,
   theme = {
     background: '#27345c',
     accentOne: 'rgba(255,255,255,0.12)',
@@ -40,38 +47,53 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.card, { backgroundColor: theme.background }]} activeOpacity={0.9} onPress={onPress}>
+      <TouchableOpacity style={[styles.card, { backgroundColor: theme.background }, cardStyle]} activeOpacity={0.9} onPress={onPress}>
         <View style={[styles.accentOne, { backgroundColor: theme.accentOne }]} />
         <View style={[styles.accentTwo, { backgroundColor: theme.accentTwo }]} />
 
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>{title}</Text>
+          {}
+          <View style={styles.titleRow}>
+            <Text style={styles.cardTitle}>{title}</Text>
+            {address ? (
+              <View style={styles.addressContainer}>
+                <Text style={styles.cardAddressInline} numberOfLines={1} ellipsizeMode="middle">
+                  {address}
+                </Text>
+                <TouchableOpacity style={styles.copyButtonInline} onPress={onCopy} activeOpacity={0.7}>
+                  <Ionicons name="copy-outline" size={16} color="#ffffff" />
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </View>
+
+          {}
           {mainValue ? (
-            <>
+            <View style={styles.balanceContainer}>
               {mainValueLabel ? <Text style={styles.balanceLabel}>{mainValueLabel}</Text> : null}
               <Text style={styles.balanceValue}>{mainValue}</Text>
-            </>
-          ) : null}
-          {address ? (
-            <Text style={styles.cardAddress} numberOfLines={2} ellipsizeMode="middle">
-              {address}
-            </Text>
+              {subValue ? <Text style={styles.subValue}>{subValue}</Text> : null}
+            </View>
           ) : null}
         </View>
-
-        <TouchableOpacity style={styles.copyButton} onPress={onCopy} activeOpacity={0.7}>
-          <Ionicons name="copy-outline" size={18} color="#ffffff" />
-        </TouchableOpacity>
       </TouchableOpacity>
 
-      <View style={styles.quickActions}>
-        {actions.map((action) => (
-          <TouchableOpacity key={action.label} style={styles.actionButton} activeOpacity={0.8} onPress={action.onPress}>
-            <Ionicons name={action.icon} size={24} color="#343a5a" style={styles.actionIcon} />
-            <Text style={styles.actionLabel}>{action.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {actions.length > 0 && (
+        <View style={styles.quickActions}>
+          {actions.map((action) => (
+            <TouchableOpacity key={action.label} style={styles.actionButton} activeOpacity={0.8} onPress={action.onPress}>
+              {action.iconSvg ? (
+                <SvgXml xml={action.iconSvg} width={32} height={32} style={styles.actionIcon} />
+              ) : action.iconImage ? (
+                <Image source={action.iconImage} style={[styles.actionIcon, styles.actionIconImage]} resizeMode="contain" />
+              ) : action.icon ? (
+                <Ionicons name={action.icon} size={24} color="#343a5a" style={styles.actionIcon} />
+              ) : null}
+              <Text style={styles.actionLabel}>{action.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -84,7 +106,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: SIZES.medium,
     padding: 24,
-    minHeight: 170,
+    minHeight: 160,
     justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -114,20 +136,38 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   cardTitle: {
     fontSize: FONTS.size.medium,
     color: '#ffffff',
     fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
   },
-  cardAddress: {
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'flex-end',
+  },
+  cardAddressInline: {
     fontSize: FONTS.size.small,
     color: '#f0f3ff',
     fontFamily: 'Roboto-Regular',
+    maxWidth: '80%',
+  },
+  copyButtonInline: {
+    marginLeft: 6,
+    padding: 4,
+  },
+  balanceContainer: {
     marginTop: 4,
-    textAlign: 'left',
   },
   balanceLabel: {
     fontSize: FONTS.size.msmall,
@@ -140,13 +180,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
-  copyButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    zIndex: 1,
+  subValue: {
+    fontSize: FONTS.size.small,
+    color: '#c8c8d0',
+    fontFamily: 'Roboto-Regular',
+    marginTop: 4,
   },
   quickActions: {
     flexDirection: 'row',
@@ -173,11 +211,15 @@ const styles = StyleSheet.create({
   actionIcon: {
     marginBottom: 6,
   },
+  actionIconImage: {
+    width: 24,
+    height: 24,
+
+  },
   actionLabel: {
     fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#454545',
   },
 });
-
 

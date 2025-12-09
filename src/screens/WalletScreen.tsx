@@ -34,6 +34,11 @@ import {
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 
+const iconEtherscan = require('../../assets/icon_etherscan.png');
+const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+const iconSend = require('../../assets/icon-send.png');
+const iconReceive = require('../../assets/icon-receive.png');
+
 const screenWidth = Dimensions.get('window').width;
 
 let front = 6;
@@ -156,7 +161,7 @@ export const WalletScreen = () => {
           amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
           icon:
             item.currency === 1
-              ? require('../../assets/xrun-round-logo.png')
+              ? require('../../assets/icon_xrun_round.png')
               : `data:image/png;base64,${item.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`,
           currency: item.currency,
           isCustom: false,
@@ -653,17 +658,18 @@ export const WalletScreen = () => {
         <View style={styles.headerCardWrapper}>
           <WalletHeaderCard
             title={t('screens.wallet.myWallet')}
+            cardStyle={styles.headerCard}
             address={publicAddress || ''}
             onCopy={handleCopyAddress}
             actions={[
               {
                 label: t('screens.wallet.polygonScan'),
-                icon: 'scan-outline',
+                iconImage: iconPolygonscan,
                 onPress: handlePolygonscan,
               },
               {
                 label: t('screens.wallet.etherscan'),
-                icon: 'globe-outline',
+                iconImage: iconEtherscan,
                 onPress: handleEtherscan,
               },
               {
@@ -805,10 +811,14 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0,
+    boxSizing: 'border-box',
+
   },
   tokenIconImage: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
+
   },
   tokenIconText: {
     fontSize: FONTS.size.medium,
@@ -836,5 +846,10 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#000000',
+  },
+  headerCard: {
+    borderWidth: 1,
+    borderColor: '#ebebeb',
+    minHeight: 110,
   },
 });
