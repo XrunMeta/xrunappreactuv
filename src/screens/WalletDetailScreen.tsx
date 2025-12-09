@@ -365,7 +365,7 @@ export const WalletDetailScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton />
+      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton onBackPress={goBack} />
       <View style={styles.content}>
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}

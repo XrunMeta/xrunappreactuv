@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 
 const XRUN_ROUND_LOGO = require('../../assets/xrun-round-logo.png');
-const XRUN_HORIZONTAL_LOGO = require('../../assets/xrun-horizontal-logo.png');
 
 export const SplashScreen = () => {
   return (
@@ -15,14 +14,6 @@ export const SplashScreen = () => {
         <Image
           source={XRUN_ROUND_LOGO}
           style={styles.centerLogo}
-          resizeMode="contain"
-        />
-      </View>
-      {}
-      <View style={styles.bottomLogoContainer}>
-        <Image
-          source={XRUN_HORIZONTAL_LOGO}
-          style={styles.bottomLogo}
           resizeMode="contain"
         />
       </View>
@@ -47,17 +38,6 @@ const styles = StyleSheet.create({
   centerLogo: {
     width: 113,
     height: 115,
-  },
-  bottomLogoContainer: {
-    position: 'absolute',
-    bottom: 100,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottomLogo: {
-    width: 200,
-    height: 60,
   },
 });
 
