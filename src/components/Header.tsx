@@ -32,9 +32,15 @@ export const Header: React.FC<HeaderProps> = ({
       return;
     }
 
+    const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
+
     const isMyInfoScreen = currentScreen?.startsWith('myInfo');
 
-    if (isMyInfoScreen) {
+    const isShopScreen = currentScreen?.startsWith('shop');
+
+    const isReferralScreen = currentScreen?.startsWith('referral');
+
+    if (isWalletScreen || isMyInfoScreen) {
 
       if (canGoBack) {
         goBack();
@@ -42,6 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         reset(ROUTES.map);
       }
+    } else if (isShopScreen || isReferralScreen) {
+
+      reset(ROUTES.map);
     } else {
 
       reset(ROUTES.map);

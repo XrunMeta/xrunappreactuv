@@ -25,7 +25,7 @@ const HISTORY_DATA = [
 
 export const XrunWalletScreen2 = () => {
   const { t } = useTranslation();
-  const { navigate } = useAppNavigation();
+  const { navigate, goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const handleAction = (type: 'scan' | 'receive' | 'send') => {
     if (type === 'send') {
@@ -38,7 +38,7 @@ export const XrunWalletScreen2 = () => {
 
   return (
     <View style={styles.container}>
-      <Header title={t('screens.xrunWallet2.title')} showBackButton />
+      <Header title={t('screens.xrunWallet2.title')} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <WalletHeaderCard
           title={t('screens.xrunWallet2.myBalance')}
