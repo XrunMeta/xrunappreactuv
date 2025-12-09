@@ -13,7 +13,7 @@ export const MyInfoSettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Setting" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.myInfoSettings.title')} onBackPress={goBack} showBackButton />
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -25,7 +25,7 @@ export const MyInfoSettingsScreen = () => {
               activeOpacity={0.85}
               onPress={() => setLanguageSelectorVisible(true)}
             >
-              <Text style={styles.cardText}>🌐 언어 선택 (개발 모드)</Text>
+              <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -33,7 +33,7 @@ export const MyInfoSettingsScreen = () => {
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}
           >
-            <Text style={styles.cardText}>Close Membership</Text>
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
         </View>
       </SafeScrollView>
