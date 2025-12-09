@@ -15,6 +15,7 @@ export { default as v_b12e1b } from './nftWallet';
 export { default as v_8bc52c } from './adWallet';
 export { default as v_400baf } from './walletSend';
 export { default as v_4c15cf } from './walletReceive';
+export { default as v_76f0d9 } from './walletAddressBook';
 export { default as v_dc63d4 } from './walletQrScan';
 export { default as v_2352d7 } from './walletEstimateFee';
 export { default as v_68f68e } from './walletTransactionProgress';
