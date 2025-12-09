@@ -151,9 +151,8 @@ const styles = StyleSheet.create({
   },
   question: {
     flex: 1,
-    fontSize: FONTS.size.lsmall,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
-    color: '#111827',
     marginRight: 12,
   },
   answerWrapper: {

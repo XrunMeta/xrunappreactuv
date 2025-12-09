@@ -108,9 +108,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contentText: {
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.medium,
     lineHeight: 18,
-    color: '#4c4e55',
     fontFamily: 'Roboto-Regular',
   },
 });
