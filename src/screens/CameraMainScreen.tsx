@@ -456,10 +456,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.log('⚠️ [CameraMainScreen] AppState가 active가 아닙니다:', currentAppState);
           }
 
-          setTimeout(() => {
-            console.log('🔄 [CameraMainScreen] iOS 추가 리렌더링 트리거');
-            setRefreshKey(prev => prev + 1);
-          }, 200);
         }
       }, delay);
 
@@ -1897,6 +1893,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+    marginTop: 42,
     width: '100%',
     height: '100%',
   },

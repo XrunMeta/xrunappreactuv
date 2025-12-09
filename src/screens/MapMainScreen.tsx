@@ -1373,28 +1373,32 @@ export const MapMainScreen: React.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 최초 3개만 매핑)');
         const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
-          const adIndex = index % topAd5Response.length;
-          const mappedAd = topAd5Response[adIndex];
+          if (index < 3 && topAd5Response.length > 0) {
+            const adIndex = index % topAd5Response.length;
+            const mappedAd = topAd5Response[adIndex];
 
-          return {
-            ...marker,
+            return {
+              ...marker,
 
-            name: mappedAd?.name || marker.name,
-            iconurl: mappedAd?.iconurl || marker.iconurl,
-            joindesc: mappedAd?.joindesc || marker.joindesc,
-            xrunPrice: mappedAd?.xrunPrice || marker.xrunPrice || marker.xrunprice || 0,
-            campid: mappedAd?.campid || marker.campid || marker.campId || '',
+              name: mappedAd?.name || marker.name,
+              iconurl: mappedAd?.iconurl || marker.iconurl,
+              joindesc: mappedAd?.joindesc || marker.joindesc,
+              xrunPrice: mappedAd?.xrunPrice || marker.xrunPrice || marker.xrunprice || 0,
+              campid: mappedAd?.campid || marker.campid || marker.campId || '',
 
-            thumbnail: mappedAd?.thumbnail || marker.thumbnail,
-            ad_company: mappedAd?.ad_company || marker.ad_company,
-            coins: mappedAd?.coins?.toString() || marker.coins,
-            brandlogo: mappedAd?.brandlogo || marker.brandlogo,
-            adthumbnail2: mappedAd?.adthumbnail2 || marker.adthumbnail2,
-            symbolimg: mappedAd?.symbolimg || marker.symbolimg,
-          };
+              thumbnail: mappedAd?.thumbnail || marker.thumbnail,
+              ad_company: mappedAd?.ad_company || marker.ad_company,
+              coins: mappedAd?.coins?.toString() || marker.coins,
+              brandlogo: mappedAd?.brandlogo || marker.brandlogo,
+              adthumbnail2: mappedAd?.adthumbnail2 || marker.adthumbnail2,
+              symbolimg: mappedAd?.symbolimg || marker.symbolimg,
+            };
+          }
+
+          return marker;
         });
 
         console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
@@ -1977,10 +1981,14 @@ export const MapMainScreen: React.FC = () => {
 
       const uniqueKey = `${markerKey}-${index}`;
 
-      const adIndex = index % topAd5Data.length;
-      const mappedAd = topAd5Data[adIndex];
+      if (index < 3 && topAd5Data.length > 0) {
+        const adIndex = index % topAd5Data.length;
+        const mappedAd = topAd5Data[adIndex];
+        mapping.set(uniqueKey, mappedAd);
+      } else {
 
-      mapping.set(uniqueKey, mappedAd);
+        mapping.set(uniqueKey, null);
+      }
 
       if (index < 10) {
 
@@ -2770,7 +2778,7 @@ export const MapMainScreen: React.FC = () => {
 
   ];
 
-  const LIGHT_MAP_ID = "969d34dfed181f71fbfdf0b9";
+  const LIGHT_MAP_ID = "93440b14d54bef4d8c7f9ddf";
 
   if (activeTab === 'Camera') {
 
@@ -2819,7 +2827,6 @@ export const MapMainScreen: React.FC = () => {
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           userInterfaceStyle="light"
-          customMapStyle={lightMapStyle}
           initialRegion={stableInitialRegion}
           showsUserLocation={stableShowsUserLocation}
           showsMyLocationButton={false}
