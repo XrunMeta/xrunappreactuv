@@ -4,6 +4,7 @@ export default {
   copyAddress: 'Copy Address',
   shareAddress: 'Share Address',
   loadingAddress: 'Loading wallet address...',
+  amount: 'Amount',
   errors: {
     shareFailed: 'Failed to share address',
     addressNotLoaded: 'Wallet address is not loaded.',
