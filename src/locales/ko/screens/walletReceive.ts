@@ -4,6 +4,7 @@ export default {
   copyAddress: 'Copy Address',
   shareAddress: 'Share Address',
   loadingAddress: '지갑 주소를 불러오는 중...',
+  amount: '금액',
   errors: {
     shareFailed: '주소를 공유하지 못했습니다.',
     addressNotLoaded: '지갑 주소가 로드되지 않았습니다.',

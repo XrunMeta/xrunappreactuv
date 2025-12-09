@@ -26,6 +26,7 @@ import {
   WalletTransactionProgressScreen,
   WalletTransactionResultScreen,
   WalletReceiveScreen,
+  AddWalletAddressScreen,
   MyInfoScreen,
   MyInfoEmailAuthScreen,
   MyInfoEditScreen,
@@ -237,6 +238,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'walletReceive') {
     return <WalletReceiveScreen />;
+  }
+
+  if (currentScreen === 'addWalletAddress') {
+    return <AddWalletAddressScreen />;
   }
 
   if (currentScreen === 'myInfo') {

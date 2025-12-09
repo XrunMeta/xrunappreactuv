@@ -34,6 +34,8 @@ export const ROUTES = {
   walletTransactionProgress: 'walletTransactionProgress',
   walletTransactionResult: 'walletTransactionResult',
   walletReceive: 'walletReceive',
+  walletAddressBook: 'walletAddressBook',
+  addWalletAddress: 'addWalletAddress',
   myInfo: 'myInfo',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoEdit: 'myInfoEdit',

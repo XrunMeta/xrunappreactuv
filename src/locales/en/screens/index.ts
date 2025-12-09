@@ -15,6 +15,7 @@ export { default as nftWallet } from './nftWallet';
 export { default as adWallet } from './adWallet';
 export { default as walletSend } from './walletSend';
 export { default as walletReceive } from './walletReceive';
+export { default as walletAddressBook } from './walletAddressBook';
 export { default as walletQrScan } from './walletQrScan';
 export { default as walletEstimateFee } from './walletEstimateFee';
 export { default as walletTransactionProgress } from './walletTransactionProgress';
