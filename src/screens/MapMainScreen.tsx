@@ -18,6 +18,8 @@ import {
 
   Pressable,
 
+  ActivityIndicator,
+
 } from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
@@ -224,6 +226,8 @@ export const MapMainScreen: React.FC = () => {
 
   const loadingMarkersRef = useRef(false); 
 
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+
   const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
@@ -293,6 +297,8 @@ export const MapMainScreen: React.FC = () => {
   const hasMovedToFirstMarkerOnInitialLoadRef = useRef(false);
 
   const hasMapReadyRef = useRef(false);
+
+  const hasCheckedMarkersOnEnterRef = useRef(false);
 
   let iconXrunBlack: any = null;
   let iconXrunLogo: any = null;
@@ -859,6 +865,9 @@ export const MapMainScreen: React.FC = () => {
       console.log('✅ [loadMarkersForLocation] 완료 (로딩 상태 해제)');
       loadingMarkersRef.current = false;
       setLoadingMarkers(false);
+      setShowLoadingOverlay(false); 
+
+      hasCheckedMarkersOnEnterRef.current = false;
     }
   }, [navigate]);
 
@@ -1440,6 +1449,92 @@ export const MapMainScreen: React.FC = () => {
     };
     refreshTopAd5AndMapMarkers();
   }, [activeTab]); 
+
+  useEffect(() => {
+
+    if (activeTab !== 'Map') {
+
+      hasCheckedMarkersOnEnterRef.current = false;
+      return;
+    }
+
+    const checkMarkersAndLoad = async () => {
+      try {
+
+        let currentLocation: LocationData | null = null;
+
+        if (!location) {
+
+          console.log('📍 [MapMainScreen] 위치 정보 없음 - 위치 정보 대기 중...');
+          setShowLoadingOverlay(true);
+
+          try {
+            const position = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+            });
+            currentLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
+            setLocation(currentLocation);
+            console.log('📍 [MapMainScreen] 위치 정보 수신:', currentLocation);
+
+            hasCheckedMarkersOnEnterRef.current = false;
+          } catch (locationError) {
+            console.error('❌ [MapMainScreen] 위치 정보 가져오기 실패:', locationError);
+            setShowLoadingOverlay(false);
+            return;
+          }
+        } else {
+          currentLocation = location;
+        }
+
+        if (hasCheckedMarkersOnEnterRef.current && currentLocation) {
+          return;
+        }
+
+        hasCheckedMarkersOnEnterRef.current = true;
+
+        const currentMarkers = markers;
+        if (currentMarkers.length === 0) {
+
+          console.log('📍 [MapMainScreen] 마커 없음 - 현재 위치 기준으로 마커 로드 시작');
+          setShowLoadingOverlay(true);
+
+          if (currentLocation) {
+            await loadMarkersForLocation(currentLocation, true);
+          }
+          return;
+        }
+
+        const firstMarker = currentMarkers.find(marker => marker.latitude && marker.longitude);
+        if (firstMarker && firstMarker.latitude && firstMarker.longitude && currentLocation) {
+          const distance = calculateDistance(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            firstMarker.latitude,
+            firstMarker.longitude
+          );
+
+          if (distance >= 500) {
+
+            console.log(`📍 [MapMainScreen] 첫번째 마커와 현재 위치 거리: ${distance.toFixed(2)}m (500m 이상) - 마커 재로드 시작`);
+            setShowLoadingOverlay(true);
+            await loadMarkersForLocation(currentLocation, true);
+            return;
+          }
+        }
+
+        setShowLoadingOverlay(false);
+      } catch (error) {
+        console.error('❌ [MapMainScreen] 마커 체크 중 오류:', error);
+        setShowLoadingOverlay(false);
+        hasCheckedMarkersOnEnterRef.current = false; 
+      }
+    };
+
+    checkMarkersAndLoad();
+  }, [activeTab, location, loadMarkersForLocation]); 
 
   useEffect(() => {
     if (!location) return;
@@ -2999,6 +3094,24 @@ export const MapMainScreen: React.FC = () => {
 
       </View>
 
+      {}
+
+      {showLoadingOverlay && (
+
+        <View style={styles.loadingOverlay}>
+
+          <View style={styles.loadingContainer}>
+
+            <ActivityIndicator size="large" color="#343a5a" />
+
+            <Text style={styles.loadingText}>로딩중...</Text>
+
+          </View>
+
+        </View>
+
+      )}
+
     </View>
 
   );
@@ -3205,6 +3318,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff0000',
     borderWidth: 2,
     borderColor: '#ffffff',
+  },
+
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999, 
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: '#10192d',
   },
 
 });
