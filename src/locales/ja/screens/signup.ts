@@ -19,9 +19,12 @@ export default {
   ageLabel: '年齢',
   referralEmailLabel: '紹介メール',
   referralEmailPlaceholder: 'oth-staff@example.invalid',
-  termsText: 'XRUNサービス規約および',
-  termsHighlight: 'プライバシーポリシー',
   termsAgree: 'に同意します。',
+  terms: {
+    service: 'XRUNサービス規約',
+    location: '個人位置情報規約',
+    privacy: '個人情報利用規約',
+  },
   submitButton: '登録する',
   submitting: '処理中...',
   errors: {

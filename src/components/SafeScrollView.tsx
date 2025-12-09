@@ -19,6 +19,8 @@ interface SafeScrollViewProps extends ScrollViewProps {
   backgroundColor?: string;
 
   autoAdjustKeyboardPadding?: boolean;
+
+  disableBottomPadding?: boolean;
 }
 
 const SafeScrollViewInner = forwardRef<ScrollView, SafeScrollViewProps>(({
@@ -30,6 +32,7 @@ const SafeScrollViewInner = forwardRef<ScrollView, SafeScrollViewProps>(({
   bottomBackgroundColor = SAFE_AREA.bottomBackground || "#fafafa",
   backgroundColor = SAFE_AREA.background || "#fafafa",
   autoAdjustKeyboardPadding = false,
+  disableBottomPadding = false,
   ...props
 }, ref) => {
   const insets = useSafeAreaInsets();
@@ -82,7 +85,10 @@ const SafeScrollViewInner = forwardRef<ScrollView, SafeScrollViewProps>(({
       : Math.max(navBarHeight, insets.bottom);
 
   const keyboardPadding = autoAdjustKeyboardPadding ? keyboardHeight : 0;
-  const finalBottomPadding = baseBottomPadding + additionalBottomPadding + keyboardPadding;
+
+  const finalBottomPadding = disableBottomPadding 
+    ? additionalBottomPadding + keyboardPadding
+    : baseBottomPadding + additionalBottomPadding + keyboardPadding;
 
   return (
     <View style={[styles.wrapper, { backgroundColor }]}>

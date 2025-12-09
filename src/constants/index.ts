@@ -49,6 +49,21 @@ export const FONTS = {
     xxxlarge: 32,
 
   },
+  buttonText: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16, 
+    fontWeight: '500',
+    lineHeight: 24,
+    white:{color: '#ffffff'},
+    black:{color: '#000000'},
+    gray:{color: '#808080'},
+    red:{color: '#FF0000'},
+    green:{color: '#00FF00'},
+    blue:{color: '#0000FF'},
+    yellow:{color: '#FFFF00'},
+    purple:{color: '#800080'},
+    orange:{color: '#FFA500'},
+  },
 };    
 
 export const IS_DEV_MODE = __DEV__;
@@ -145,6 +160,13 @@ export const FORM_STYLES = {
     display: 'flex' as const,
     flexDirection: 'column' as const,
     gap: SIZES.large,
+  },
+  label: {
+    fontSize: FONTS.size.medium,
+    lineHeight: 24,
+    color: '#2a2727',
+    fontFamily: 'Roboto-Medium',
+    marginBottom: 8,
   },
 }  as const;
 
