@@ -22,7 +22,7 @@ import {
 
 import { StatusBar } from 'expo-status-bar';
 
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { MapStyleElement, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import * as Location from 'expo-location';
 
@@ -225,6 +225,8 @@ export const MapMainScreen: React.FC = () => {
   const loadingMarkersRef = useRef(false); 
 
   const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
+
+  const [notifitext, setNotifitext] = useState<string | null>('테스트 알림 메시지');
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
 
@@ -2768,6 +2770,8 @@ export const MapMainScreen: React.FC = () => {
 
   ];
 
+  const LIGHT_MAP_ID = "969d34dfed181f71fbfdf0b9";
+
   if (activeTab === 'Camera') {
 
     return (
@@ -2788,57 +2792,43 @@ export const MapMainScreen: React.FC = () => {
 
     <View style={styles.container}>
 
-      <StatusBar style="dark" />
+      {}
+      {notifitext &&(
+        <View style={styles.notificationTextContainer}>
+          <Text style={styles.notificationText}>{notifitext}</Text>
+        </View>
+      )}
 
+      <StatusBar style="dark" />
       {}
 
       <View style={styles.statusBar}>
-
         <View style={styles.statusBarContent}>
-
           <View style={styles.timeContainer}>
-
             {}
-
           </View>
-
         </View>
-
       </View>
-
-      {}
-      {
-
-}
 
       {}
 
       <View style={styles.mapContainer}>
 
         <MapView
-
           ref={mapRef}
-
           provider={PROVIDER_GOOGLE}
-
           style={styles.map}
-
+          userInterfaceStyle="light"
+          customMapStyle={lightMapStyle}
           initialRegion={stableInitialRegion}
-
           showsUserLocation={stableShowsUserLocation}
-
           showsMyLocationButton={false}
-
           onMapReady={handleMapReady}
-
           onRegionChange={handleRegionChange}
-
           onRegionChangeComplete={handleRegionChangeComplete}
-
           onPanDrag={handlePanDrag}
-
           onPress={handleMapPress}
-
+          googleMapId={LIGHT_MAP_ID}
         >
 
           {}
@@ -2850,33 +2840,22 @@ export const MapMainScreen: React.FC = () => {
                 key={marker.uniqueKey}
 
                 coordinate={{
-
                   latitude: marker.latitude!,
-
                   longitude: marker.longitude!,
-
                 }}
 
                 anchor={{ x: 0.5, y: 0.5 }}
-
                 onPress={() => handleMarkerPress(marker)}
-
                 tracksViewChanges={true}
-
               >
 
                 {}
-
                 {logoTempMarker ? (
                   <View style={styles.markerImageContainer}>
                     <Image
-
                       source={logoTempMarker}
-
                       style={styles.markerImage}
-
                       resizeMode="contain"
-
                     />
                   </View>
                 ) : (
@@ -2887,26 +2866,32 @@ export const MapMainScreen: React.FC = () => {
               </Marker>
             );
             })}
-
         </MapView>
+
+         {}
+      {logoHorizontal && (
+        <View style={styles.topLogo}>
+          <Image
+            source={logoHorizontal}
+            style={{ width: Dimensions.get('window').width / 4 }}
+            resizeMode="contain"
+          />
+        </View>
+      )} 
 
         {}
 
         {iconMapPoint && (
-
           <Pressable 
             style={styles.mapPinButton}
             onPress={goToCurrentLocation}
           >
-
             <Image
               source={iconMapPoint}
               style={styles.mapPinIcon}
               resizeMode="contain"
             />
-
           </Pressable>
-
         )}
 
         {}
@@ -2914,61 +2899,36 @@ export const MapMainScreen: React.FC = () => {
         {showCalloutPopup && calloutData && (
 
           <View
-
             style={[
-
               styles.calloutPopup,
-
               {
-
                 left: calloutPosition.x,
-
                 top: calloutPosition.y,
-
               },
-
             ]}
-
             pointerEvents="box-none"
-
           >
-
             <View style={styles.calloutContainer}>
-
               <View style={styles.calloutLeft}>
-
                 {}
-
                 {calloutData.iconurl ? (
                   <Image
-
                     source={{ uri: calloutData.iconurl }}
-
                     style={[styles.calloutImage, { borderRadius: 6 }]}
-
                     resizeMode="cover"
-
                   />
                 ) : iconXrunLogo ? (
                   <Image
-
                     source={iconXrunLogo}
-
                     style={styles.calloutImage}
-
                     resizeMode="contain"
-
                   />
                 ) : (
                   iconXrunBlack && (
                     <Image
-
                       source={iconXrunBlack}
-
                       style={styles.calloutImage}
-
                       resizeMode="contain"
-
                     />
                   )
                 )}
@@ -2976,29 +2936,18 @@ export const MapMainScreen: React.FC = () => {
                 {}
 
                 <Text style={styles.calloutDistance}>
-
                   {calloutData.distance.toFixed(2)}m
-
                 </Text>
-
               </View>
 
               <View style={styles.calloutRight}>
-
                 <Text style={styles.calloutBrand} numberOfLines={2}>
-
                   {calloutData.name || calloutData.brand || 'XRUN'} 획득 가능합니다.
-
                 </Text>
-
               </View>
-
             </View>
-
           </View>
-
         )}
-
       </View>
 
       {}
@@ -3109,38 +3058,50 @@ const styles = StyleSheet.create({
   },
 
   mapPinButton: {
-
     position: 'absolute',
-
     top: 61,
-
     right: 16,
-
     width: 25,
-
     height: 25,
-
     alignItems: 'center',
-
     justifyContent: 'center',
-
   },
 
   mapPinIcon: {
-
-    width: 25,
-
-    height: 25,
-
+    width: Dimensions.get('window').width / 10,
+    height: Dimensions.get('window').width / 10,
   },
 
   topLogo: {
-
     position: 'absolute',
+    top: 16, 
     left: 16,
     width: Dimensions.get('window').width / 4,
+    height: Dimensions.get('window').width / 4,
     zIndex: 10, 
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
+  notificationTextContainer: {
+    position: 'absolute',
+    top: 42,
+    left: 0,
+    right: 0,
+    width: '100%',
+    height: 28,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    zIndex: 9999, 
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+
+  notificationText: {
+    color: '#000',
+    fontSize: 16,
+    textAlign: 'left',
+    fontWeight: '500',
   },
 
   calloutPopup: {
