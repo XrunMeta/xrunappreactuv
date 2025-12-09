@@ -32,6 +32,7 @@ interface MapBottomPanelProps {
   spotData: SpotData | null;
   deviceHeading: number | null; 
   onClose: () => void;
+  onExpand?: () => void; 
 }
 
 export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
@@ -39,6 +40,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
   spotData,
   deviceHeading,
   onClose,
+  onExpand,
 }) => {
 
   const [iconLoadError, setIconLoadError] = React.useState(false);
@@ -47,29 +49,25 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
     setIconLoadError(false);
   }, [spotData?.iconurl]);
 
-  const bottomPanelBottom = useRef(new Animated.Value(20)).current;
+  const bottomPanelBottom = useRef(new Animated.Value(80)).current;
 
   useEffect(() => {
     if (visible) {
       Animated.timing(bottomPanelBottom, {
-        toValue: 90, 
-        duration: 300,
+        toValue: 110, 
+        duration: 600,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     } else {
       Animated.timing(bottomPanelBottom, {
-        toValue: 20, 
+        toValue: 115, 
         duration: 300,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     }
   }, [visible, bottomPanelBottom]);
-
-  if (!spotData) {
-    return null;
-  }
 
   return (
     <View
@@ -98,6 +96,9 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
             if (visible) {
               console.log('📱 하단 패널 배경 터치 - 패널 닫기');
               onClose();
+            } else if (onExpand && spotData) {
+              console.log('📱 하단 패널 클릭 - 패널 확장');
+              onExpand();
             }
           }}
           style={[
@@ -107,7 +108,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
             },
           ]}>
           {}
-          {visible && (
+          {visible && spotData && (
             <View
               style={{
                 alignItems: 'center',
@@ -127,7 +128,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
           )}
 
           {}
-          {visible && (
+          {spotData && (
             <View
               style={{
                 flexDirection: 'row',
@@ -135,8 +136,8 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                 justifyContent: 'space-between',
                 width: '100%',
                 paddingHorizontal: 20,
-                paddingTop: 0,
-                paddingBottom: 12,
+                paddingTop: visible ? 0 : 8,
+                paddingBottom: visible ? 12 : 8,
                 pointerEvents: 'box-none', 
               }}>
               {}
@@ -187,20 +188,22 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                       fontSize: FONTS.size.medium,
                       color: '#4c4e55',
                       lineHeight: 24,
-                      marginBottom: 4,
+                      marginBottom: visible ? 4 : 0,
                     }}>
                     {spotData.distance.toFixed(2)}m
                   </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Roboto-Regular',
-                      fontSize: FONTS.size.small,
-                      color: '#4c4e55',
-                      lineHeight: 15,
-                      letterSpacing: 0.06,
-                    }}>
-                    XRun으로 리워드를 획득하세요
-                  </Text>
+                  {visible && (
+                    <Text
+                      style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: FONTS.size.small,
+                        color: '#4c4e55',
+                        lineHeight: 15,
+                        letterSpacing: 0.06,
+                      }}>
+                      XRun으로 리워드를 획득하세요
+                    </Text>
+                  )}
                 </View>
               </View>
 
@@ -240,34 +243,36 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
               </View>
 
               {}
-              <Pressable
-                onPress={() => {
-                  console.log('📱 하단 패널 닫기 버튼 클릭');
-                  onClose();
-                }}
-                style={{
-                  width: 14,
-                  height: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginLeft: 12,
-                }}>
-                {iconArrow && (
-                  <View
-                    style={{
-                      transform: [{ rotate: '270deg' }],
-                    }}>
-                    <Image
-                      source={iconArrow}
+              {visible && (
+                <Pressable
+                  onPress={() => {
+                    console.log('📱 하단 패널 닫기 버튼 클릭');
+                    onClose();
+                  }}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 12,
+                  }}>
+                  {iconArrow && (
+                    <View
                       style={{
-                        width: 14,
-                        height: 14,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
-              </Pressable>
+                        transform: [{ rotate: '270deg' }],
+                      }}>
+                      <Image
+                        source={iconArrow}
+                        style={{
+                          width: 14,
+                          height: 14,
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
+                </Pressable>
+              )}
             </View>
           )}
         </Pressable>

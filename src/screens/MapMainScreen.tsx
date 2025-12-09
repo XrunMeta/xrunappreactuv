@@ -2969,6 +2969,12 @@ export const MapMainScreen: React.FC = () => {
 
         }}
 
+        onExpand={() => {
+
+          setShowBottomPanel(true);
+
+        }}
+
       />
 
       {}

@@ -4005,7 +4005,6 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
     }
 
     console.log('[getTopAd5] 추출된 topAd5Response 길이:', topAd5Response.length);
-    console.log('[getTopAd5] 추출된 topAd5Response:', topAd5Response);
 
     if (topAd5Response && topAd5Response.length > 0) {
       await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Response));

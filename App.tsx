@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Linking from 'expo-linking';
 import {
   MyInfoFaqScreen,
@@ -68,6 +68,11 @@ import {
 } from '@expo-google-fonts/roboto';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import * as Location from 'expo-location';
+import { useCameraPermissions } from 'expo-camera';
+import { useAlertDialog } from './src/context/AlertDialogContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchMapMarkerData } from './src/services';
 
 const ScreenHost = () => {
   const { currentScreen, navigate } = useAppNavigation();
@@ -337,6 +342,254 @@ const ScreenHost = () => {
   return <LoginSignupScreen />;
 };
 
+const PermissionRequester = () => {
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [locationPermissionStatus, setLocationPermissionStatus] = useState<Location.PermissionStatus | null>(null);
+  const [hasCheckedPermissions, setHasCheckedPermissions] = useState(false);
+  const [hasShownDialog, setHasShownDialog] = useState(false);
+  const [isRequestingPermissions, setIsRequestingPermissions] = useState(false);
+  const { showAlert } = useAlertDialog();
+
+  const fetchAndStoreMarkerData = useCallback(async (latitude: number, longitude: number) => {
+    try {
+      console.log('[App] 마커 데이터 가져오기 시작:', { latitude, longitude });
+
+      const existingMarkerData = await AsyncStorage.getItem('astorCoinsData');
+      if (existingMarkerData) {
+        try {
+          const parsedData = JSON.parse(existingMarkerData);
+          if (parsedData && Array.isArray(parsedData) && parsedData.length > 0) {
+            console.log('[App] 마커 데이터가 이미 존재합니다. API 호출을 건너뜁니다:', parsedData.length, '개');
+            return;
+          }
+        } catch (parseError) {
+          console.log('[App] 기존 마커 데이터 파싱 실패, 새로 가져옵니다.');
+        }
+      }
+
+      const userDataStr = await AsyncStorage.getItem('userData');
+      if (!userDataStr) {
+        console.log('[App] userData가 없어 마커 데이터를 가져올 수 없습니다.');
+        return;
+      }
+
+      const userData = JSON.parse(userDataStr);
+      const member = userData?.member;
+      if (!member) {
+        console.log('[App] userData에 member가 없어 마커 데이터를 가져올 수 없습니다.');
+        return;
+      }
+
+      const markerData = await fetchMapMarkerData(latitude, longitude, member);
+
+      if (markerData && Array.isArray(markerData) && markerData.length > 0) {
+
+        await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
+        console.log('[App] 마커 데이터 저장 완료:', markerData.length, '개');
+      } else {
+        console.log('[App] 마커 데이터가 비어있습니다.');
+      }
+    } catch (error) {
+      console.error('[App] 마커 데이터 가져오기 및 저장 실패:', error);
+
+    }
+  }, []);
+
+  const requestLocationPermission = useCallback(async () => {
+    try {
+      console.log('[App] 위치 권한 요청 시작');
+      const locationStatus = await Location.requestForegroundPermissionsAsync();
+      setLocationPermissionStatus(locationStatus.status);
+      if (locationStatus.status === 'granted') {
+        console.log('[App] 위치 권한 허용됨');
+
+        try {
+          const currentLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+          const { latitude, longitude } = currentLocation.coords;
+          console.log('[App] 현재 위치 가져옴:', { latitude, longitude });
+
+          await fetchAndStoreMarkerData(latitude, longitude);
+        } catch (locationError) {
+          console.error('[App] 현재 위치 가져오기 실패:', locationError);
+        }
+      } else {
+        console.log('[App] 위치 권한 거부됨:', locationStatus.status);
+      }
+      return locationStatus.status;
+    } catch (error) {
+      console.error('[App] 위치 권한 요청 실패:', error);
+      return 'denied' as Location.PermissionStatus;
+    }
+  }, [fetchAndStoreMarkerData]);
+
+  const requestCameraPermissionAsync = useCallback(async () => {
+    try {
+      if (cameraPermission === null) {
+        console.log('[App] 카메라 권한 상태 확인 중...');
+        return 'undetermined' as const;
+      }
+
+      if (cameraPermission.granted) {
+        console.log('[App] 카메라 권한이 이미 허용되어 있습니다.');
+        return 'granted' as const;
+      }
+
+      console.log('[App] 카메라 권한 명시적 요청 시작');
+      const result = await requestCameraPermission();
+      if (result.granted) {
+        console.log('[App] 카메라 권한 허용됨');
+        return 'granted' as const;
+      } else {
+        console.log('[App] 카메라 권한 거부됨');
+        return 'denied' as const;
+      }
+    } catch (error) {
+      console.error('[App] 카메라 권한 요청 실패:', error);
+      return 'denied' as const;
+    }
+  }, [cameraPermission, requestCameraPermission]);
+
+  const checkAndShowPermissionDialog = useCallback(async () => {
+
+    if (hasShownDialog || isRequestingPermissions) {
+      return;
+    }
+
+    const currentLocationStatus = locationPermissionStatus || await Location.getForegroundPermissionsAsync().then(r => r.status);
+    const cameraStatus = cameraPermission?.granted ? 'granted' : (cameraPermission?.canAskAgain === false ? 'denied' : 'undetermined');
+
+    const locationDenied = currentLocationStatus !== 'granted';
+    const cameraDenied = cameraStatus !== 'granted';
+
+    if (locationDenied && cameraDenied) {
+      setHasShownDialog(true);
+      await showAlert(
+        '권한 필요',
+        '앱의 주요 기능을 사용하려면 위치 정보와 카메라 권한이 모두 필요합니다. 설정에서 권한을 허용해주세요.',
+        [
+          {
+            text: '다시 요청',
+            onPress: async () => {
+              setIsRequestingPermissions(true);
+              setHasShownDialog(false); 
+
+              console.log('[App] 다시 요청: 위치 및 카메라 권한 요청');
+              const locationStatus = await requestLocationPermission();
+
+              await requestCameraPermissionAsync();
+
+              await new Promise(resolve => setTimeout(resolve, 1500));
+
+              const latestLocationStatus = await Location.getForegroundPermissionsAsync().then(r => r.status);
+              setLocationPermissionStatus(latestLocationStatus);
+
+              setIsRequestingPermissions(false);
+
+              setTimeout(() => {
+                checkAndShowPermissionDialog();
+              }, 500);
+            },
+          },
+          {
+            text: '확인',
+          },
+        ]
+      );
+    } else if (locationDenied) {
+
+      setHasShownDialog(true);
+      await showAlert(
+        '위치 권한 필요',
+        '앱의 주요 기능을 사용하려면 위치 정보 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+        [
+          {
+            text: '다시 요청',
+            onPress: async () => {
+              setIsRequestingPermissions(true);
+              setHasShownDialog(false); 
+
+              console.log('[App] 다시 요청: 위치 권한 요청');
+              const locationStatus = await requestLocationPermission();
+
+              await new Promise(resolve => setTimeout(resolve, 1000));
+
+              setIsRequestingPermissions(false);
+
+              setTimeout(() => {
+                checkAndShowPermissionDialog();
+              }, 500);
+            },
+          },
+          {
+            text: '확인',
+          },
+        ]
+      );
+    } else if (cameraDenied) {
+
+      setHasShownDialog(true);
+      await showAlert(
+        '카메라 권한 필요',
+        '앱의 주요 기능을 사용하려면 카메라 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+        [
+          {
+            text: '다시 요청',
+            onPress: async () => {
+              setIsRequestingPermissions(true);
+              setHasShownDialog(false); 
+
+              console.log('[App] 다시 요청: 카메라 권한 요청');
+              await requestCameraPermissionAsync();
+
+              await new Promise(resolve => setTimeout(resolve, 1000));
+
+              setIsRequestingPermissions(false);
+
+              setTimeout(() => {
+                checkAndShowPermissionDialog();
+              }, 500);
+            },
+          },
+          {
+            text: '확인',
+          },
+        ]
+      );
+    }
+  }, [hasShownDialog, isRequestingPermissions, locationPermissionStatus, cameraPermission, showAlert, requestLocationPermission, requestCameraPermissionAsync]);
+
+  useEffect(() => {
+    const initializePermissions = async () => {
+
+      const locationStatus = await requestLocationPermission();
+      setLocationPermissionStatus(locationStatus);
+    };
+
+    initializePermissions();
+  }, [requestLocationPermission]);
+
+  useEffect(() => {
+    if (cameraPermission !== null && !hasCheckedPermissions) {
+      setHasCheckedPermissions(true);
+    }
+  }, [cameraPermission, hasCheckedPermissions]);
+
+  useEffect(() => {
+    if (hasCheckedPermissions && cameraPermission !== null && locationPermissionStatus !== null && !isRequestingPermissions) {
+
+      const timer = setTimeout(() => {
+        checkAndShowPermissionDialog();
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hasCheckedPermissions, cameraPermission, locationPermissionStatus, isRequestingPermissions, checkAndShowPermissionDialog]);
+
+  return null;
+};
+
 const GlobalDialogs = () => {
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
 
@@ -394,6 +647,7 @@ export default function App() {
         console.error('[App] TopAd5 광고 캐시 실패:', error);
 
       }
+
     };
 
     initializeApp();
@@ -427,6 +681,7 @@ export default function App() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
+            <PermissionRequester />
             <AliveService />
             <ScreenHost />
             <GlobalDialogs />
