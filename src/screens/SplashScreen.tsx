@@ -4,7 +4,6 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_1bfbd0 } from '../constants';
 
 const v_4f9e99 = require('../../assets/xrun-round-logo.png');
-const v_34a8ff = require('../../assets/xrun-horizontal-logo.png');
 
 export const v_7c6176 = () => {
   return (
@@ -15,14 +14,6 @@ export const v_7c6176 = () => {
         <Image
           source={v_4f9e99}
           style={v_d81136.centerLogo}
-          resizeMode="contain"
-        />
-      </View>
-      {}
-      <View style={v_d81136.bottomLogoContainer}>
-        <Image
-          source={v_34a8ff}
-          style={v_d81136.bottomLogo}
           resizeMode="contain"
         />
       </View>
@@ -47,17 +38,6 @@ const v_d81136 = v_472849.create({
   centerLogo: {
     width: 113,
     height: 115,
-  },
-  bottomLogoContainer: {
-    position: 'absolute',
-    bottom: 100,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottomLogo: {
-    width: 200,
-    height: 60,
   },
 });
 
