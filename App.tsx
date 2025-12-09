@@ -26,6 +26,7 @@ import {
   v_31216c,
   v_1cd2a2,
   v_a023f9,
+  v_f39418,
   v_03a231,
   v_dec378,
   v_cdb169,
@@ -237,6 +238,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'walletReceive') {
     return <WalletReceiveScreen />;
+  }
+
+  if (v_0f0c7b === 'addWalletAddress') {
+    return <AddWalletAddressScreen />;
   }
 
   if (v_0f0c7b === 'myInfo') {
