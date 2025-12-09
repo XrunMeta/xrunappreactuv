@@ -19,6 +19,11 @@ import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard } from '../utils';
 
+const iconEtherscan = require('../../assets/icon_etherscan.png');
+const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+const iconSend = require('../../assets/icon-send.png');
+const iconReceive = require('../../assets/icon-receive.png');
+
 const dateFormatter = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -370,10 +375,11 @@ export const WalletDetailScreen = () => {
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}
           mainValue={formattedBalance}
+          subValue="KRW 10,000,000"
           address={shortenedAddress}
           onCopy={handleCopyAddress}
           actions={[
-            { label: explorerLabel, icon: 'scan-outline', onPress: () => handleAction('scan') },
+            { label: explorerLabel, iconImage: selectedWalletAsset.currency === 1 || selectedWalletAsset.currency === 2 ? iconEtherscan : iconPolygonscan, onPress: () => handleAction('scan') },
             { label: t('screens.walletDetail.receive'), icon: 'download-outline', onPress: () => handleAction('receive') },
             { label: t('screens.walletDetail.send'), icon: 'send-outline', onPress: () => handleAction('send') },
           ]}
