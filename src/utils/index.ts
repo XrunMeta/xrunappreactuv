@@ -1,18 +1,31 @@
-import { Share } from 'react-native';
+import { Share, Platform, ToastAndroid, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as CryptoJS from 'crypto-js';
 
+const showToast = (message: string) => {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  } else {
+
+    Alert.alert('', message, [{ text: '확인' }]);
+  }
+};
+
 export const copyToClipboard = async (
   value: string,
-  showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
+  showAlert?: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   successMessage = '지갑 주소가 복사되었습니다.',
 ) => {
   try {
     await Clipboard.setStringAsync(value);
-    await showAlert('주소 복사', successMessage);
+
+    if (Platform.OS === 'ios') {
+      showToast(successMessage);
+    }
   } catch (error) {
-    await showAlert('복사 실패', '주소를 복사하지 못했습니다. 다시 시도해주세요.');
+
+    showToast('주소를 복사하지 못했습니다. 다시 시도해주세요.');
   }
 };
 
