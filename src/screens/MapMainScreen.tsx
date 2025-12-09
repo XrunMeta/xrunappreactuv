@@ -1970,9 +1970,7 @@ export const MapMainScreen: React.FC = () => {
   useEffect(() => {
 
     if (!initialLocation || !lastFetchedLocation) {
-
       return;
-
     }
 
     if (locationCheckTimerRef.current) {
@@ -1984,13 +1982,10 @@ export const MapMainScreen: React.FC = () => {
     }
 
     locationCheckTimerRef.current = setInterval(() => {
-
       checkMapLocation();
-
     }, 5000); 
 
     lastLocationChangeTimeRef.current = Date.now();
-
     return () => {
 
       if (locationCheckTimerRef.current) {
