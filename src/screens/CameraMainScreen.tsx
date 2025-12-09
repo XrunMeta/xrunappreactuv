@@ -456,10 +456,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.log('⚠️ [CameraMainScreen] AppState가 active가 아닙니다:', v_5b44a3);
           }
 
-          setTimeout(() => {
-            console.log('🔄 [CameraMainScreen] iOS 추가 리렌더링 트리거');
-            v_7d7b3a(v_ba2215 => v_ba2215 + 1);
-          }, 200);
         }
       }, v_4b24d2);
 
@@ -1897,6 +1893,7 @@ const v_d81136 = v_472849.create({
   },
   camera: {
     flex: 1,
+    marginTop: 42,
     width: '100%',
     height: '100%',
   },

@@ -1373,28 +1373,32 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 최초 3개만 매핑)');
         const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
-          const v_ba7922 = v_a56041 % v_e36b07.length;
-          const v_127b33 = v_e36b07[v_ba7922];
+          if (v_a56041 < 3 && v_e36b07.length > 0) {
+            const v_ba7922 = v_a56041 % v_e36b07.length;
+            const v_127b33 = v_e36b07[v_ba7922];
 
-          return {
-            ...v_5e3dbb,
+            return {
+              ...v_5e3dbb,
 
-            name: v_127b33?.name || v_5e3dbb.name,
-            iconurl: v_127b33?.iconurl || v_5e3dbb.iconurl,
-            joindesc: v_127b33?.joindesc || v_5e3dbb.joindesc,
-            xrunPrice: v_127b33?.xrunPrice || v_5e3dbb.xrunPrice || v_5e3dbb.xrunprice || 0,
-            campid: v_127b33?.campid || v_5e3dbb.campid || v_5e3dbb.campId || '',
+              name: v_127b33?.name || v_5e3dbb.name,
+              iconurl: v_127b33?.iconurl || v_5e3dbb.iconurl,
+              joindesc: v_127b33?.joindesc || v_5e3dbb.joindesc,
+              xrunPrice: v_127b33?.xrunPrice || v_5e3dbb.xrunPrice || v_5e3dbb.xrunprice || 0,
+              campid: v_127b33?.campid || v_5e3dbb.campid || v_5e3dbb.campId || '',
 
-            thumbnail: v_127b33?.thumbnail || v_5e3dbb.thumbnail,
-            ad_company: v_127b33?.ad_company || v_5e3dbb.ad_company,
-            coins: v_127b33?.coins?.toString() || v_5e3dbb.coins,
-            brandlogo: v_127b33?.brandlogo || v_5e3dbb.brandlogo,
-            adthumbnail2: v_127b33?.adthumbnail2 || v_5e3dbb.adthumbnail2,
-            symbolimg: v_127b33?.symbolimg || v_5e3dbb.symbolimg,
-          };
+              thumbnail: v_127b33?.thumbnail || v_5e3dbb.thumbnail,
+              ad_company: v_127b33?.ad_company || v_5e3dbb.ad_company,
+              coins: v_127b33?.coins?.toString() || v_5e3dbb.coins,
+              brandlogo: v_127b33?.brandlogo || v_5e3dbb.brandlogo,
+              adthumbnail2: v_127b33?.adthumbnail2 || v_5e3dbb.adthumbnail2,
+              symbolimg: v_127b33?.symbolimg || v_5e3dbb.symbolimg,
+            };
+          }
+
+          return v_5e3dbb;
         });
 
         console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
@@ -1977,10 +1981,14 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       const v_e149c8 = `${v_f81bc9}-${v_a56041}`;
 
-      const v_ba7922 = v_a56041 % v_4cf0ad.length;
-      const v_127b33 = v_4cf0ad[v_ba7922];
+      if (v_a56041 < 3 && v_4cf0ad.length > 0) {
+        const v_ba7922 = v_a56041 % v_4cf0ad.length;
+        const v_127b33 = v_4cf0ad[v_ba7922];
+        v_b3439a.set(v_e149c8, v_127b33);
+      } else {
 
-      v_b3439a.set(v_e149c8, v_127b33);
+        v_b3439a.set(v_e149c8, null);
+      }
 
       if (v_a56041 < 10) {
 
@@ -2770,7 +2778,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   ];
 
-  const v_05cebe = "969d34dfed181f71fbfdf0b9";
+  const v_05cebe = "93440b14d54bef4d8c7f9ddf";
 
   if (v_ac1d22 === 'Camera') {
 
@@ -2819,7 +2827,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
           provider={v_b4043e}
           style={v_d81136.map}
           userInterfaceStyle="light"
-          customMapStyle={lightMapStyle}
           initialRegion={v_90608c}
           showsUserLocation={v_15f7cd}
           showsMyLocationButton={false}
