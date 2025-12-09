@@ -16,13 +16,13 @@ import {
   useCameraPermissions,
 } from 'expo-camera';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { SafeView } from '../components';
 
 export const WalletQrScanScreen = () => {
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const { setWalletSendAddress } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -44,6 +44,9 @@ export const WalletQrScanScreen = () => {
     },
     [goBack, isProcessing, setWalletSendAddress],
   );
+  const handleQrScanPress = () => {
+    navigate(ROUTES.walletReceive);
+  };
 
   const renderPermissionFallback = () => {
     if (!permission) {
@@ -72,7 +75,6 @@ export const WalletQrScanScreen = () => {
   return (
     <SafeView style={styles.container} backgroundColor='#000'>
       <StatusBar style="light" translucent />
-
       {permission?.granted ? (
         <CameraView
           style={StyleSheet.absoluteFill}
@@ -87,18 +89,29 @@ export const WalletQrScanScreen = () => {
       )}
 
       <View style={styles.overlay}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={goBack}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="chevron-back" size={24} color="#ffffff" />
-          </TouchableOpacity>
+        <View style={styles.topBarContainer}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={goBack}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="chevron-back" size={24} color="#ffffff" />
+            </TouchableOpacity>
+
+          </View>
+          {}
+          <View style={styles.qrScanButtonContainer}>
+            <TouchableOpacity style={styles.qrScanButton} onPress={handleQrScanPress}>
+              <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.scan')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.qrScanButton, styles.buttonActive]}>
+              <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.myQrCode')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.rectangleWrapper}>
-          <Text style={styles.title}>{t('screens.walletQrScan.scanQrCode')}</Text>
           <View style={styles.frameOuter}>
             <View style={styles.frameInner} />
           </View>
@@ -117,9 +130,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingTop: 60,
   },
+  topBarContainer: {
+    flexDirection: 'column',
+    gap: SIZES.medium,
+  },
   topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: SIZES.xlarge,
-    alignItems: 'flex-start',
+    gap: SIZES.medium,
   },
   backButton: {
     width: 48,
@@ -189,7 +208,34 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.lsmall,
     fontFamily: 'Roboto-Medium',
   },
-
+  qrScanButtonContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: SIZES.small,
+    padding: 4,
+    gap: 8,
+    marginHorizontal: SIZES.large,
+    zIndex: 2,
+  },
+  qrScanButton: {
+    flexGrow: 1,
+    height: 40,
+    borderRadius: SIZES.small,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  qrScanButtonText: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Medium',
+  },
+  qrScanButtonTextActive: {
+    color: '#ffffff',
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Medium',
+  },
 });
-
 

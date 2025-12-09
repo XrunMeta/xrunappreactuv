@@ -17,11 +17,11 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 
 export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const { walletReceiveAddress, walletReceiveCurrency, resetWalletReceiveAddress, resetWalletReceiveCurrency } = useAppContext();
   const qrCodeRef = useRef<any>(null);
@@ -101,6 +101,10 @@ export const WalletReceiveScreen = () => {
     }
   };
 
+  const handleQrScanPress = () => {
+    navigate(ROUTES.walletQrScan);
+  };
+
   return (
     <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
       <Header
@@ -116,6 +120,15 @@ export const WalletReceiveScreen = () => {
         showsVerticalScrollIndicator={false}
         showBottomBackground={false}
       >
+        {}
+        <View style={styles.qrScanButtonContainer}>
+          <TouchableOpacity style={[styles.qrScanButton, styles.buttonActive]}>
+            <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.scan')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.qrScanButton} onPress={handleQrScanPress}>
+            <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.myQrCode')}</Text>
+          </TouchableOpacity>
+        </View>
         {}
         <View style={styles.topSection}>
           <View style={styles.tokenInfo}>
@@ -178,7 +191,7 @@ export const WalletReceiveScreen = () => {
           />
         </View>
       </SafeScrollView>
-    </SafeView>
+    </SafeView >
   );
 };
 
@@ -365,5 +378,35 @@ const styles = StyleSheet.create({
   },
   copyIconBtn: {
     padding: 8,
+  },
+  qrScanButtonContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#ebeff5',
+    borderWidth: 1,
+    borderColor: '#dfe3eb',
+    borderRadius: SIZES.small,
+    padding: 4,
+    gap: 8,
+  },
+  qrScanButton: {
+    flexGrow: 1,
+    height: 40,
+    borderRadius: SIZES.small,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonActive: {
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: SIZES.small,
+    elevation: 2,
+  },
+  qrScanButtonText: {
+    color: '#a3adc2',
+  },
+  qrScanButtonTextActive: {
+    color: '#111111',
   },
 });
