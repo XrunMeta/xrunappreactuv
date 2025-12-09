@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, StyleSheet, TextInput, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, TextInput, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
@@ -51,6 +51,7 @@ export const ShopMyTicketScreen = () => {
   const [memberId, setMemberId] = useState<string | null>(null);
   const [itemImages, setItemImages] = useState<Record<string, string>>({}); 
   const [searchQuery, setSearchQuery] = useState<string>(''); 
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false); 
   const [transferTicketDialog, setTransferTicketDialog] = useState<{
     visible: boolean;
     title: string;
@@ -206,7 +207,18 @@ export const ShopMyTicketScreen = () => {
   return (
     <SafeView style={styles.container} backgroundColor='#F8FAFC'>
       <StatusBar style="dark" />
-      <Header title={t('screens.shop.title')} />
+      <Header
+        title={t('screens.shop.title')}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => setShowSearchBar(!showSearchBar)}
+            activeOpacity={0.7}
+            style={styles.searchButton}
+          >
+            <Feather name="search" size={20} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
+      />
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
@@ -224,16 +236,18 @@ export const ShopMyTicketScreen = () => {
             hideIndicator={true}
           />
 
-          <View style={styles.searchBar}>
-            <Feather name="search" size={18} color="#0296f2" />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#bcbec4"
-              style={styles.searchInput}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
+          {showSearchBar && (
+            <View style={styles.searchBar}>
+              <Feather name="search" size={18} color="#0296f2" />
+              <TextInput
+                placeholder="Search"
+                placeholderTextColor="#bcbec4"
+                style={styles.searchInput}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+          )}
           <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
             {filteredItems.length > 0 ? (
               filteredItems.map((item) => {
@@ -355,5 +369,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ededed',
     marginTop: 10,
+  },
+  searchButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
