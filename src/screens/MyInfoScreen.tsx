@@ -46,7 +46,7 @@ export const MyInfoScreen = () => {
       {
         id: 'edit',
         label: t('screens.myInfo.editInfo'),
-        subtitle: '이메일, 비밀번호 변경',
+        subtitle: t('screens.myInfo.editInfoSubtitle'),
         iconName: 'person-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
@@ -55,7 +55,7 @@ export const MyInfoScreen = () => {
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),
-        subtitle: '알림 설정, 알림 내역',
+        subtitle: t('screens.myInfo.notifySubtitle'),
         iconName: 'notifications-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#10B981',
@@ -64,7 +64,7 @@ export const MyInfoScreen = () => {
       {
         id: 'faq',
         label: t('screens.myInfo.faq'),
-        subtitle: '자주 묻는 질문',
+        subtitle: t('screens.myInfo.faqSubtitle'),
         iconName: 'help-circle-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#F59E0B',
@@ -73,7 +73,7 @@ export const MyInfoScreen = () => {
       {
         id: 'clause',
         label: t('screens.myInfo.terms'),
-        subtitle: '이용약관, 개인정보처리방침',
+        subtitle: t('screens.myInfo.termsSubtitle'),
         iconName: 'document-text-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#3B82F6',
@@ -82,7 +82,7 @@ export const MyInfoScreen = () => {
       {
         id: 'setting',
         label: t('screens.myInfo.settings'),
-        subtitle: '앱 설정, 언어 설정',
+        subtitle: t('screens.myInfo.settingsSubtitle'),
         iconName: 'settings-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#8B5CF6',
@@ -91,7 +91,7 @@ export const MyInfoScreen = () => {
       {
         id: 'referral',
         label: t('screens.myInfo.referralEdit'),
-        subtitle: '추천인 관리, 정산 내역',
+        subtitle: t('screens.myInfo.referralEditSubtitle'),
         iconName: 'people-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#EC4899',

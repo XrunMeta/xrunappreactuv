@@ -84,9 +84,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.medium,
     color: '#2a2727',
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Roboto-Medium',
     paddingVertical: 0,
   },
   leftAccessory: {

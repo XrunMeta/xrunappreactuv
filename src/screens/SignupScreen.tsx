@@ -63,16 +63,20 @@ export const SignupScreen = () => {
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
   const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
   const [ageRange, setAgeRange] = useState<AgeValue>(signupFormData.ageRange);
-  const [termsAccepted, setTermsAccepted] = useState(signupFormData.termsAccepted);
+  const [serviceTermsAccepted, setServiceTermsAccepted] = useState(signupFormData.termsAccepted);
+  const [locationTermsAccepted, setLocationTermsAccepted] = useState(signupFormData.termsAccepted);
+  const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
 
   const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
 
   const regionDisplayValue = selectedRegion
     ? selectedRegion.name
     : isKoreaSelected
-    ? ''
-    : GLOBAL_REGION.name;
+      ? ''
+      : GLOBAL_REGION.name;
 
   const isMountedRef = React.useRef(false);
 
@@ -86,7 +90,9 @@ export const SignupScreen = () => {
       setReferralEmail(signupFormData.referralEmail);
       setGender(signupFormData.gender);
       setAgeRange(signupFormData.ageRange);
-      setTermsAccepted(signupFormData.termsAccepted);
+      setServiceTermsAccepted(signupFormData.termsAccepted);
+      setLocationTermsAccepted(signupFormData.termsAccepted);
+      setPrivacyTermsAccepted(signupFormData.termsAccepted);
       isMountedRef.current = true;
     }
   }, [signupFormData]);
@@ -104,7 +110,7 @@ export const SignupScreen = () => {
       referralEmail,
       gender,
       ageRange,
-      termsAccepted,
+      termsAccepted: allTermsAccepted,
     });
   }, [
     familyName,
@@ -116,13 +122,13 @@ export const SignupScreen = () => {
     referralEmail,
     gender,
     ageRange,
-    termsAccepted,
+    allTermsAccepted,
 
   ]);
 
   const handleSubmit = async () => {
 
-    if (!termsAccepted) {
+    if (!allTermsAccepted) {
       await showAlert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
       return;
     }
@@ -245,11 +251,11 @@ export const SignupScreen = () => {
           },
           selectedRegion: selectedRegion
             ? {
-                iso2: selectedRegion.iso2,
-                dialCode: selectedRegion.dialCode,
-                flagEmoji: selectedRegion.flagEmoji,
-                name: selectedRegion.name,
-              }
+              iso2: selectedRegion.iso2,
+              dialCode: selectedRegion.dialCode,
+              flagEmoji: selectedRegion.flagEmoji,
+              name: selectedRegion.name,
+            }
             : null,
           referralMemberId: referralMemberId,
           gender: gender,
@@ -307,15 +313,9 @@ export const SignupScreen = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={styles.formFieldContainer}>
-          <FormField
-            label={t('screens.signup.familyNameLabel')}
-            placeholder={t('screens.signup.familyNamePlaceholder')}
-            value={familyName}
-            onChangeText={setFamilyName}
-            autoCapitalize="none"
-            containerStyle={styles.fieldContainer}
-          />
+          {
 
+}
           <FormField
             label={t('screens.signup.givenNameLabel')}
             placeholder={t('screens.signup.givenNamePlaceholder')}
@@ -437,15 +437,41 @@ export const SignupScreen = () => {
             containerStyle={styles.fieldContainer}
           />
 
+          {}
           <View style={styles.termsRow}>
             <FormCheckbox
-              checked={termsAccepted}
-              onToggle={() => setTermsAccepted((prev) => !prev)}
+              checked={serviceTermsAccepted}
+              onToggle={() => setServiceTermsAccepted((prev) => !prev)}
               variant="square"
             />
             <Text style={styles.termsText}>
-              {t('screens.signup.termsText')}{' '}
-              <Text style={styles.termsHighlight}>{t('screens.signup.termsHighlight')}</Text>{' '}
+              <Text style={styles.termsHighlight}>{t('screens.signup.terms.service')}</Text>{' '}
+              {t('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={styles.termsRow}>
+            <FormCheckbox
+              checked={locationTermsAccepted}
+              onToggle={() => setLocationTermsAccepted((prev) => !prev)}
+              variant="square"
+            />
+            <Text style={styles.termsText}>
+              <Text style={styles.termsHighlight}>{t('screens.signup.terms.location')}</Text>{' '}
+              {t('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={styles.termsRow}>
+            <FormCheckbox
+              checked={privacyTermsAccepted}
+              onToggle={() => setPrivacyTermsAccepted((prev) => !prev)}
+              variant="square"
+            />
+            <Text style={styles.termsText}>
+              <Text style={styles.termsHighlight}>{t('screens.signup.terms.privacy')}</Text>{' '}
               {t('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -483,11 +509,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   label: {
-    fontSize: FONTS.size.medium,
-    lineHeight: 24,
-    color: '#2a2727',
-    fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
+    ...FORM_STYLES.label,
   },
   phonePrefix: {
     flexDirection: 'row',
@@ -523,14 +545,15 @@ const styles = StyleSheet.create({
   },
   termsText: {
     flex: 1,
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.msmall,
     lineHeight: 15,
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
+    alignSelf: 'center',
   },
   termsHighlight: {
     fontFamily: 'Roboto-SemiBold',
-    color: '#8e9bae',
+    color: '#343A5A',
   },
   buttonWrapper: {
     ...COMMON_STYLES.bottomButtonContainer,

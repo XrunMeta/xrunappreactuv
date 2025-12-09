@@ -2,6 +2,7 @@ export default {
   title: '钱包详情',
   myBalance: '我的余额',
   history: '历史记录',
+  noHistory: '没有交易记录。',
   receive: '接收',
   send: '发送',
   received: '已接收',

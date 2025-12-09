@@ -2,6 +2,7 @@ export default {
   title: 'Wallet Details',
   myBalance: 'My Balance',
   history: 'History',
+  noHistory: 'No transaction history.',
   receive: 'Receive',
   send: 'Send',
   received: 'Received',
