@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   Linking,
   AppState,
@@ -32,7 +33,7 @@ const SequentialDots: React.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20 }}>
+    <View style={{ flexDirection: 'row', marginTop: 20}}>
       {[0, 1, 2].map(index => (
         <View
           key={index}
@@ -623,6 +624,27 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     handleClose();
   };
 
+  const handleWatchAd = useCallback(async () => {
+    console.log('광고 보기 버튼 클릭');
+    console.log(`[광고보기] ad_company: ${advertisementParams?.ad_company}`);
+
+    try {
+
+      await callAdApi();
+      console.log('[광고보기] 광고 API 호출 완료');
+
+      if (campaignData?.urlAD) {
+        openUrlAD(campaignData.urlAD);
+      }
+    } catch (error) {
+      console.error('[광고보기] 광고 API 호출 실패:', error);
+
+      if (campaignData?.urlAD) {
+        openUrlAD(campaignData.urlAD);
+      }
+    }
+  }, [callAdApi, campaignData, openUrlAD, advertisementParams]);
+
   if (!advertisementParams) {
     return null;
   }
@@ -630,6 +652,14 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
+
+      {}
+      {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
+        <Pressable
+          style={styles.topClickArea}
+          onPress={handleWatchAd}
+        />
+      )}
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
@@ -737,26 +767,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           <View style={styles.buttonContainer}>
           <TouchableOpacity
               style={styles.watchAdButton}
-              onPress={async () => {
-                console.log('광고 보기 버튼 클릭');
-                console.log(`[광고보기] ad_company: ${advertisementParams?.ad_company}`);
-
-                try {
-
-                  await callAdApi();
-                  console.log('[광고보기] 광고 API 호출 완료');
-
-                  if (campaignData.urlAD) {
-                    openUrlAD(campaignData.urlAD);
-                  }
-                } catch (error) {
-                  console.error('[광고보기] 광고 API 호출 실패:', error);
-
-                  if (campaignData.urlAD) {
-                    openUrlAD(campaignData.urlAD);
-                  }
-                }
-              }}
+              onPress={handleWatchAd}
               activeOpacity={0.7}
             >
               <Text style={styles.watchAdButtonText}>{t('screens.showNapAd.watchAd')}</Text>
@@ -1074,6 +1085,15 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
     alignSelf: 'center',
     justifyContent: 'center',
+  },
+  topClickArea: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    backgroundColor: 'transparent',
+    zIndex: 1,
   },
 });
 
