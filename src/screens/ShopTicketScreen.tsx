@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_79c4f2, v_07a341, v_39a996, v_19b633, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_79c4f2, v_07a341, v_39a996, v_19b633, v_326be8, v_4623af } from 'rcmrninabrnb';
 import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -130,6 +130,7 @@ export const v_38326c = () => {
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_f9a2c9, v_01b387] = v_5ab095<Record<string, string>>({}); 
   const [v_5d756f, v_a563de] = v_5ab095<string>(''); 
+  const [v_61d92f, v_f10880] = v_5ab095<boolean>(false); 
 
   const [v_6cb0a1, v_019be3] = v_5ab095<Record<string, any>>({});
   const [v_c1f1a5, v_1c3217] = v_5ab095(false);
@@ -438,7 +439,18 @@ export const v_38326c = () => {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor='#F8FAFC'>
-      <Header title={v_8d41d7('screens.shop.title')} />
+      <Header 
+        title={v_8d41d7('screens.shop.title')} 
+        rightComponent={
+          <TouchableOpacity 
+            onPress={() => v_f10880(!v_61d92f)}
+            activeOpacity={0.7}
+            style={v_d81136.searchButton}
+          >
+            <Text style={v_d81136.searchButtonText}>{v_8d41d7('screens.shop.search')}</Text>
+          </TouchableOpacity>
+        }
+      />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
@@ -455,16 +467,18 @@ export const v_38326c = () => {
               hideIndicator={true}
             />
 
-            <View style={v_d81136.searchBar}>
-              <Feather name="search" size={18} color="#0296f2" />
-              <TextInput
-                style={v_d81136.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#bcbec4"
-                value={v_5d756f}
-                onChangeText={v_a563de}
-              />
-            </View>
+            {v_61d92f && (
+              <View style={v_d81136.searchBar}>
+                <Feather name="search" size={18} color="#0296f2" />
+                <TextInput
+                  style={v_d81136.searchInput}
+                  placeholder={v_8d41d7('screens.shop.searchPlaceholder')}
+                  placeholderTextColor="#bcbec4"
+                  value={v_5d756f}
+                  onChangeText={v_a563de}
+                />
+              </View>
+            )}
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
               {v_11083e === 'ticket' && v_973c3e.length > 0
                 ? v_973c3e.map((v_8c0b26) => {
@@ -583,5 +597,14 @@ const v_d81136 = v_472849.create({
     borderWidth: 2,
     borderColor: '#ededed',
     marginTop: 10,
+  },
+  searchButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  searchButtonText: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: v_1bfbd0.headerText,
   },
 });

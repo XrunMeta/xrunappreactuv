@@ -372,13 +372,9 @@ export const v_1a0a02 = () => {
                     )}
                   </Text>
                 </View>
-                {v_0243db && !v_b9c849 && (
-                  <View style={v_d81136.iapInfoContainer}>
-                    <Text style={v_d81136.iapInfoText}>
-                      인앱 구매 상품
-                    </Text>
-                  </View>
-                )}
+                {
+
+}
                 {}
                 {v_b9c849 && !v_7712f3 && (
                   <View style={v_d81136.iapErrorContainer}>
@@ -585,17 +581,17 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#747474',
+    backgroundColor: v_1bfbd0.buttonSecondary,
   },
   primaryButton: {
-    backgroundColor: '#020406',
+    backgroundColor: v_1bfbd0.buttonPrimary,
   },
   disabledButton: {
     backgroundColor: '#ccc',
     opacity: 0.6,
   },
   cancelText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },

@@ -4,6 +4,8 @@ export default {
   tickets: '票券',
   loading: '加载中...',
   noItems: '没有商品',
+  search: '搜索',
+  searchPlaceholder: '搜索',
 };
 
 

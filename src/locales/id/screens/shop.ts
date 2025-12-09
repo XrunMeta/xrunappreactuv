@@ -4,6 +4,8 @@ export default {
   tickets: 'Tiket',
   loading: 'Memuat...',
   noItems: 'Tidak ada item',
+  search: 'Cari',
+  searchPlaceholder: 'Cari',
 };
 
 
