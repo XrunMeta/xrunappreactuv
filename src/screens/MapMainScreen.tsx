@@ -1970,9 +1970,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
   v_c4deb2(() => {
 
     if (!v_c19838 || !v_b8d9d3) {
-
       return;
-
     }
 
     if (v_e40b2a.current) {
@@ -1984,13 +1982,10 @@ export const MapMainScreen: v_a3453e.FC = () => {
     }
 
     v_e40b2a.current = setInterval(() => {
-
       v_acecf6();
-
     }, 5000); 
 
     v_a11b30.current = Date.now();
-
     return () => {
 
       if (v_e40b2a.current) {
