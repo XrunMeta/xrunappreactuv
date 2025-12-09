@@ -19,9 +19,12 @@ export default {
   ageLabel: 'Age',
   referralEmailLabel: 'Referral Email',
   referralEmailPlaceholder: 'oth-staff@example.invalid',
-  termsText: 'I agree to the XRUN Service Terms and',
-  termsHighlight: 'Privacy Policy',
   termsAgree: '.',
+  terms: {
+    service: 'XRUN Service Terms',
+    location: 'Personal Location Information Terms',
+    privacy: 'Personal Information Usage Terms',
+  },
   submitButton: 'Sign Up',
   submitting: 'Processing...',
   errors: {

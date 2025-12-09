@@ -18,14 +18,6 @@ export const SplashScreen = () => {
           resizeMode="contain"
         />
       </View>
-      {}
-      <View style={styles.bottomLogoContainer}>
-        <Image
-          source={XRUN_HORIZONTAL_LOGO}
-          style={styles.bottomLogo}
-          resizeMode="contain"
-        />
-      </View>
     </View>
   );
 };

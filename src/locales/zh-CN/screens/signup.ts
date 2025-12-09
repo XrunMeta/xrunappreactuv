@@ -19,9 +19,12 @@ export default {
   ageLabel: '年龄',
   referralEmailLabel: '推荐邮箱',
   referralEmailPlaceholder: 'oth-staff@example.invalid',
-  termsText: '同意 XRUN 服务条款及',
-  termsHighlight: '隐私政策',
   termsAgree: '。',
+  terms: {
+    service: 'XRUN服务条款',
+    location: '个人位置信息条款',
+    privacy: '个人信息使用条款',
+  },
   submitButton: '注册',
   submitting: '处理中...',
   errors: {
