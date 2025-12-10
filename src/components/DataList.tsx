@@ -25,6 +25,8 @@ export interface DataListProps<T> {
   onItemPress?: (item: T, index: number) => void;
 
   emptyMessage?: string;
+
+  itemProps?: Record<string, any>;
 }
 
 const v_2219b3 = <T extends Record<string, any>>(
@@ -36,6 +38,7 @@ const v_2219b3 = <T extends Record<string, any>>(
     keyExtractor: v_4c0e3e,
     onItemPress: v_659a80,
     emptyMessage: v_76ab9a,
+    itemProps: v_bce170,
   }: DataListProps<T>,
   ref: v_a3453e.Ref<v_029581>
 ) => {
@@ -189,6 +192,7 @@ const v_2219b3 = <T extends Record<string, any>>(
             <View key={v_cefe14(v_8c0b26, v_a56041)}>
               <ItemComponent
                 {...v_8c0b26}
+                {...v_bce170}
                 {...(v_659a80 && {
                   onPress: () => v_8e442f(v_8c0b26, v_a56041),
                 })}

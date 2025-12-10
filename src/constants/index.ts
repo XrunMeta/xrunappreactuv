@@ -172,7 +172,7 @@ export const v_bae512 = {
 
 export const v_963c2c = {
   background: '#ffffff',
-  bottomBackground: '#ffffff',
+  bottomBackground: '#000000',
 };
 
 export const v_19835b = {
