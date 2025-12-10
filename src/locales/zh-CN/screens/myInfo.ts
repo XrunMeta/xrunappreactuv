@@ -12,6 +12,8 @@ export default {
   settingsSubtitle: '应用设置、语言设置',
   referralEdit: '修改推荐',
   referralEditSubtitle: '推荐人管理',
+  shopSales: 'Shop 销售额',
+  shopSalesSubtitle: '管理销售状态',
   logout: '登出',
   shareReferral: '分享推荐链接',
   logoutConfirm: '确定要登出吗？',

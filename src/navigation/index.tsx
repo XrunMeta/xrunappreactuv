@@ -61,6 +61,7 @@ export const v_ce4741 = {
   shopTicketDetail: 'shopTicketDetail',
   showNapAd: 'showNapAd',
   xrunInfo: 'xrunInfo',
+  myinfoShopSales: 'myinfoShopSales',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

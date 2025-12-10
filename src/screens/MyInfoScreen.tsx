@@ -23,7 +23,7 @@ type MenuConfig = {
   label: string;
   subtitle: string;
   iconName: string;
-  iconLibrary: 'Feather' | 'Material' | 'Ionicons';
+  iconLibrary: 'Feather' | 'Material' | 'Ionicons' | 'MaterialCommunityIcons';
   iconColor: string;
   route?: keyof typeof v_ce4741;
   disabled?: boolean;
@@ -51,6 +51,15 @@ export const v_03a231 = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
+      },
+      {
+        id: 'shopSales',
+        label: v_8d41d7('screens.myInfo.shopSales'),
+        subtitle: v_8d41d7('screens.myinfoShopSales.title'),
+        iconName: 'storefront-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#7ca6e8',
+        route: 'myinfoShopSales',
       },
       {
         id: 'notify',

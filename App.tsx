@@ -51,6 +51,7 @@ import {
   v_a1c4a5,
   v_287831,
   v_f7bdb9,
+  v_1cca63,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -342,6 +343,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (v_0f0c7b === 'myinfoShopSales') {
+    return <MyinfoShopSalesScreen />;
   }
 
   return <LoginSignupScreen />;
