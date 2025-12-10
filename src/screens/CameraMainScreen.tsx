@@ -386,9 +386,9 @@ try {
 }
 
 try {
-  v_16772f = require('../../assets/images/icon_mapPoint.png');
+  v_16772f = require('../../assets/images/locationpin2.png');
 } catch (v_9e86fd) {
-  console.warn('icon_mapPoint.png not found');
+  console.warn('locationpin2.png not found');
 }
 
 let v_ed24ee = null;
