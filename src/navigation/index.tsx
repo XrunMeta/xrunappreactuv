@@ -60,6 +60,7 @@ export const ROUTES = {
   shopSuccess: 'shopSuccess',
   shopTicketDetail: 'shopTicketDetail',
   showNapAd: 'showNapAd',
+  showPockAd: 'showPockAd',
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
 } as const;
