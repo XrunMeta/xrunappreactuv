@@ -229,6 +229,7 @@ export const ReferralMyGroupScreen = () => {
                 navigate(ROUTES.referralDepthOne);
               }}
               contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
+              itemProps={{ hideRank: true }}
             />
           )}
         </View>

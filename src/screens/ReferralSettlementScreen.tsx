@@ -1,14 +1,16 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
+import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getSettlementList, getSettlementAmount } from '../services';
 import { SettlementListItem } from '../types';
-import { formatXrunAmount, formatWonAmount, calculateWonEquivalent } from '../utils';
+import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 interface TransformedSettlementData {
   id: string;
@@ -78,6 +80,7 @@ const ITEMS_PER_PAGE = 15;
 
 export const ReferralSettlementScreen = () => {
   const { navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [settlementData, setSettlementData] = useState<TransformedSettlementData[]>([]);
   const [currentData, setCurrentData] = useState<TransformedSettlementData[]>([]);
@@ -88,8 +91,22 @@ export const ReferralSettlementScreen = () => {
   const [totalRevenue, setTotalRevenue] = useState<string>('0 XRUN');
   const [totalRevenueWon, setTotalRevenueWon] = useState<string>('₩0');
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
+  const [userEmail, setUserEmail] = useState<string>('');
 
   const { t } = useTranslation();
+
+  const handleShare = async () => {
+    if (!userEmail) {
+      await showAlert(t('screens.referralMyGroup.shareFailed'), t('screens.referralMyGroup.shareFailedMessage'));
+      return;
+    }
+    await shareReferralLink(
+      t,
+      { email: userEmail },
+      showAlert,
+      navigate,
+    );
+  };
   const segmentedOptions = useMemo(
     () => [
       { label: t('screens.referralSettlement.group'), value: 'group' },
@@ -107,6 +124,9 @@ export const ReferralSettlementScreen = () => {
           const userData = JSON.parse(userDataStr);
           if (userData.member) {
             setMemberId(userData.member);
+          }
+          if (userData.email) {
+            setUserEmail(userData.email);
           }
         }
       } catch (error) {
@@ -213,7 +233,6 @@ export const ReferralSettlementScreen = () => {
     return (
       <View style={styles.listItem}>
         <View style={styles.listItemRow}>
-          {item.type ? <Text style={styles.refTypeText}>{item.type}</Text> : <Text style={styles.refTypeText}>TYPE</Text>}
           {item.description ? <Text
             style={[styles.descriptionText, { flex: 1, marginRight: 10 }]}
             numberOfLines={1}
@@ -232,7 +251,14 @@ export const ReferralSettlementScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
-      <Header title={t('screens.referralSettlement.title')} />
+      <Header
+        title={t('screens.referralSettlement.title')}
+        rightComponent={
+          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+            <Feather name="share-2" size={18} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
+      />
       <View style={styles.content}>
         <ReferralStatsCard
           title={t('screens.referralSettlement.income')}
@@ -369,5 +395,13 @@ const styles = StyleSheet.create({
   },
   loadingMoreContainer: {
     paddingVertical: 16,
+  },
+  headerShareButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -118,10 +118,10 @@ export const ReferralDepthOneScreen = () => {
     return (
       <ReferralMemberRow
         key={item.id}
-        rank={item.rank}
         email={item.email}
         date={item.date}
-        highlight={item.highlight}
+        hideRank={true}
+        hideHighlightBorder={true}
         onPress={() => {
 
           setSelectedReferralMember({

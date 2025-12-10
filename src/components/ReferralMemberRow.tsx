@@ -18,6 +18,7 @@ interface ReferralMemberRowProps {
   valueText?: string;
   highlight?: boolean;
   hideHighlightBorder?: boolean;
+  hideRank?: boolean;
   rankStyle?: TextStyle;
   onPress?: (event: GestureResponderEvent) => void;
 }
@@ -30,11 +31,12 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
   valueText,
   highlight,
   hideHighlightBorder = false,
+  hideRank = false,
   rankStyle,
   onPress,
 }) => {
 
-  const shouldShowHighlight = highlight === true && hideHighlightBorder !== true;
+  const shouldShowHighlight = highlight === true && !hideHighlightBorder;
 
   return (
     <TouchableOpacity
@@ -43,13 +45,13 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
       onPress={onPress}
       disabled={!onPress}
     >
-      {typeof rank !== 'undefined' ? (
+      {!hideRank && typeof rank !== 'undefined' ? (
         <Text style={[styles.rank, rankStyle]}>{rank}</Text>
-      ) : (
+      ) : !hideRank ? (
         <View style={styles.rankPlaceholder} />
-      )}
+      ) : null}
       <View style={styles.infoColumn}>
-        <Text style={styles.email}>{email}</Text>
+        <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">{email}</Text>
         {description ? <Text style={styles.description}>{description}</Text> : null}
       </View>
       <View style={styles.metaColumn}>

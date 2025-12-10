@@ -188,17 +188,21 @@ const DataListComponent = <T extends Record<string, any>>(
       {}
       {!loading && (
         <>
-          {data.map((item, index) => (
-            <View key={getKey(item, index)}>
-              <ItemComponent
-                {...item}
-                {...itemProps}
-                {...(onItemPress && {
-                  onPress: () => handleItemPress(item, index),
-                })}
-              />
-            </View>
-          ))}
+          {data.map((item, index) => {
+
+            console.log('[DataList] item:', item, 'itemProps:', itemProps);
+            return (
+              <View key={getKey(item, index)}>
+                <ItemComponent
+                  {...item}
+                  {...itemProps}
+                  {...(onItemPress && {
+                    onPress: () => handleItemPress(item, index),
+                  })}
+                />
+              </View>
+            );
+          })}
 
           {}
           {loadingMore && (
