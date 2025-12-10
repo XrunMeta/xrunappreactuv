@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog } from '../components';
+import { Header, TransactionListItem, WalletHeaderCard, WalletFilterDialog, WalletFilterType, WalletFilterRange } from '../components';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
@@ -37,6 +37,43 @@ export const PolygonWalletScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const [filterVisible, setFilterVisible] = useState(false);
+  const [filterType, setFilterType] = useState<WalletFilterType>('all');
+  const [filterRange, setFilterRange] = useState<WalletFilterRange>('7d');
+
+  const filteredData = useMemo(() => {
+    let filtered = [...HISTORY_DATA];
+
+    if (filterType !== 'all') {
+      filtered = filtered.filter((item) => {
+        const subtitle = item.subtitle.toLowerCase();
+        if (filterType === 'send') {
+          return subtitle.includes('send');
+        } else if (filterType === 'receive') {
+          return subtitle.includes('receive');
+        }
+        return true;
+      });
+    }
+
+    const now = new Date();
+    const daysAgo = filterRange === '7d' ? 7 : filterRange === '14d' ? 14 : 30;
+    const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+
+    filtered = filtered.filter((item) => {
+
+      const dateStr = item.timestamp.split(' ')[0]; 
+      const [year, month, day] = dateStr.split('.').map(Number);
+      const itemDate = new Date(year, month - 1, day);
+      return itemDate >= cutoffDate;
+    });
+
+    return filtered;
+  }, [filterType, filterRange]);
+
+  const handleFilterApply = (selection: { type: WalletFilterType; range: WalletFilterRange }) => {
+    setFilterType(selection.type);
+    setFilterRange(selection.range);
+  };
 
   const handleFilter = () => {
     setFilterVisible(true);
@@ -74,7 +111,7 @@ export const PolygonWalletScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {HISTORY_DATA.map((item) => (
+        {filteredData.map((item) => (
           <TransactionListItem
             key={item.id}
             title={item.title}
@@ -91,7 +128,9 @@ export const PolygonWalletScreen = () => {
       <WalletFilterDialog
         visible={filterVisible}
         onClose={() => setFilterVisible(false)}
-        onApply={(selection) => console.log('Polygon filter', selection)}
+        onApply={handleFilterApply}
+        defaultType={filterType}
+        defaultRange={filterRange}
       />
     </View>
   );
@@ -119,7 +158,5 @@ const styles = StyleSheet.create({
     color: '#121212',
   },
 
-
 });
-
 
