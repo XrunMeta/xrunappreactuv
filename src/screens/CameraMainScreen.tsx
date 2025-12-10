@@ -339,10 +339,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
 
                 const price = token?.xrunPrice || 0;
                 const priceValue = parseFloat(String(price));
-                console.log(`💰 [TokenComponent] 토큰 spotID=${token.spotID} 가격:`, {
-                  xrunPrice: token?.xrunPrice,
-                  priceValue,
-                });
+
                 return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
               })()}
             </Text>
@@ -1597,7 +1594,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           <View style={[styles.tokenContainer, { bottom: showBottomPanel && selectedToken ? 200 : 110 }]}>
             {(() => {
 
-              console.log('🔍 [렌더링 전] 토큰 정보 검증:');
               tokens.forEach((t) => {
                 console.log('토큰:', {
                   spotID: t.spotID,

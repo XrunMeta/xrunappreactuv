@@ -123,6 +123,7 @@ export const WalletDetailScreen = () => {
   const [selectedRange, setSelectedRange] = useState<'7d' | '14d' | '30d'>('7d');
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
+  const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
   const isNavigatingToSendRef = useRef(false);
 
   useEffect(() => {
@@ -148,6 +149,28 @@ export const WalletDetailScreen = () => {
     if (selectedWalletAsset.originalData?.address) {
       setPublicAddress(selectedWalletAsset.originalData.address);
     }
+
+    const loadGopaxPrice = async () => {
+
+      if (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19) {
+        setGopaxPrice(null);
+        return;
+      }
+
+      try {
+        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+        if (priceDataStr) {
+          const priceData = JSON.parse(priceDataStr);
+          const price = priceData?.data?.gopaxPrice || null;
+          setGopaxPrice(price);
+          console.log('[WalletDetail] 고팍스 XRUN 가격 로드:', price);
+        }
+      } catch (error) {
+        console.error('[WalletDetail] 고팍스 XRUN 가격 로드 오류:', error);
+      }
+    };
+
+    loadGopaxPrice();
 
     return () => {
       if (!isNavigatingToSendRef.current) {
@@ -367,6 +390,29 @@ export const WalletDetailScreen = () => {
     return `${amount} ${selectedWalletAsset.symbol || ''}`;
   }, [selectedWalletAsset]);
 
+  const krwValue = useMemo(() => {
+
+    if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19) || !gopaxPrice) {
+      return null;
+    }
+
+    try {
+
+      const balanceAmount = new BigNumber(selectedWalletAsset.amount || '0');
+      const krwAmount = balanceAmount.multipliedBy(gopaxPrice);
+
+      const formatted = krwAmount.toFixed(0);
+      const parts = formatted.split('.');
+      const integerPart = parts[0];
+      const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+      return `KRW ${formattedInteger}`;
+    } catch (error) {
+      console.error('[WalletDetail] KRW 금액 계산 오류:', error);
+      return null;
+    }
+  }, [selectedWalletAsset, gopaxPrice]);
+
   const shortenedAddress = useMemo(() => {
     return publicAddress || '';
   }, [publicAddress]);
@@ -398,7 +444,7 @@ export const WalletDetailScreen = () => {
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}
           mainValue={formattedBalance}
-          subValue="KRW 10,000,000"
+          subValue={krwValue || ''}
           address={shortenedAddress}
           onCopy={handleCopyAddress}
           actions={[

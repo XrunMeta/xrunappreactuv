@@ -61,7 +61,7 @@ import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/compone
 import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
-import { getTopAd5 } from './src/services';
+import { getTopAd5, getXRUNGopaxPrice } from './src/services';
 import {
   useFonts,
   Roboto_400Regular,
@@ -660,6 +660,17 @@ export default function App() {
         console.log('[App] TopAd5 광고 캐시 완료');
       } catch (error) {
         console.error('[App] TopAd5 광고 캐시 실패:', error);
+
+      }
+
+      try {
+        console.log('[App] 고팍스 XRUN 가격 조회 시작');
+        const priceResponse = await getXRUNGopaxPrice();
+        const priceData = JSON.stringify(priceResponse);
+        await AsyncStorage.setItem('xrungopaxprice', priceData);
+        console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', priceResponse.data?.gopaxPrice);
+      } catch (error) {
+        console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', error);
 
       }
 
