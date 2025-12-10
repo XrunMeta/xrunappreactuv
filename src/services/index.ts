@@ -2318,16 +2318,27 @@ export const v_aa7dc1 = async (
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPockAds`;
 
     let v_eed089;
-    if (v_e7f87b.manufacturer === 'Apple') {
+    let v_66fa3f;
+
+    const v_df691e = v_326be8.OS === 'ios' || 
+                  v_e7f87b.manufacturer === 'Apple' || 
+                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
+                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
+
+    if (v_df691e) {
       v_eed089 = 3113; 
+      v_66fa3f = 'IOS'; 
     } else {
       v_eed089 = 3112; 
+      v_66fa3f = 'ANDROID'; 
     }
+    console.log('osTypeString', v_66fa3f);
+    console.log('osType', v_eed089);
 
     const v_cd6a57 = {
       member: v_660822,
       ad_key: v_aa0917 || '', 
-      os: v_eed089, 
+      os: v_66fa3f, 
       device_ifa: v_a4f17b || '', 
       ip: v_e7f87b.ipAddress || '',
     };
