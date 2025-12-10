@@ -13,6 +13,7 @@ export { TransactionListItem } from './TransactionListItem';
 export { SegmentedControl } from './SegmentedControl';
 export { Dialog } from './Dialog';
 export { WalletFilterDialog } from './WalletFilterDialog';
+export type { WalletFilterType, WalletFilterRange } from './WalletFilterDialog';
 export { ExplorerBadge } from './ExplorerBadge';
 export { AddTokenDialog } from './AddTokenDialog';
 export { ReferralStatsCard } from './ReferralStatsCard';
