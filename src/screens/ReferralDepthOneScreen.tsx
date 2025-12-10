@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
 import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb, v_4623af } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -18,6 +18,12 @@ interface MemberData {
   date: string;
   member: string;
   highlight?: boolean;
+}
+
+interface DepthHistoryItem {
+  member: string;
+  email: string;
+  depth: number;
 }
 
 const v_f181d8 = (apiData: v_b0f886[]): MemberData[] => {
@@ -59,9 +65,27 @@ export const v_5b4c5a = () => {
   const [v_200d98, v_284862] = v_5ab095<MemberData[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
   const [v_c09f1f, v_0d08b9] = v_5ab095<number>(2); 
+  const [v_e80987, v_bf6163] = v_5ab095<string | null>(null);
+
+  const v_6f5c01 = v_e662ae<DepthHistoryItem[]>([]);
 
   const v_7f2e65 = () => {
-    v_487a25(v_ce4741.map);
+    v_487a25(v_ce4741.referralMyGroup);
+  };
+
+  const v_6ca26b = () => {
+    if (v_6f5c01.current.length > 0) {
+
+      const v_4b80f9 = v_6f5c01.current.pop();
+      if (v_4b80f9) {
+        v_0d08b9(v_4b80f9.depth);
+        v_bf6163(v_4b80f9.member);
+        v_ee33d3(v_4b80f9.member);
+      }
+    } else {
+
+      v_487a25(v_ce4741.referralMyGroup);
+    }
   };
 
   v_c4deb2(() => {
@@ -102,35 +126,51 @@ export const v_5b4c5a = () => {
   }, [v_9b57fc]);
 
   v_c4deb2(() => {
-    if (v_f87030?.member) {
+    if (v_f87030?.member && !v_e80987) {
 
-      const v_98c1d0 = v_f87030.depth || 2;
-      v_0d08b9(v_98c1d0);
+      const v_018c7a = v_f87030.depth || 2;
+      v_0d08b9(v_018c7a);
+      v_bf6163(v_f87030.member);
       v_ee33d3(v_f87030.member);
-    } else if (v_717992) {
+    } else if (v_717992 && !v_e80987) {
 
       v_0d08b9(2);
+      v_bf6163(v_717992);
       v_ee33d3(v_717992);
     }
-  }, [v_f87030, v_717992, v_ee33d3]);
+  }, [v_f87030, v_717992, v_e80987, v_ee33d3]);
+
+  const v_8fcb86 = (v_8c0b26) => {
+
+    if (v_e80987) {
+      v_6f5c01.current.push({
+        member: v_e80987,
+        email: v_f87030?.email || '',
+        depth: v_c09f1f,
+      });
+    }
+
+    const v_74dc38 = v_c09f1f + 1;
+    v_0d08b9(v_74dc38);
+    v_bf6163(v_8c0b26.member);
+    v_ee33d3(v_8c0b26.member);
+
+    v_779227({
+      member: v_8c0b26.member,
+      email: v_8c0b26.email,
+      depth: v_74dc38,
+    });
+  };
 
   const v_a4780d = ({ item: v_8c0b26 }: { item: MemberData }) => {
     return (
       <ReferralMemberRow
         key={v_8c0b26.id}
-        rank={v_8c0b26.rank}
         email={v_8c0b26.email}
         date={v_8c0b26.date}
-        highlight={v_8c0b26.highlight}
-        onPress={() => {
-
-          v_779227({
-            member: v_8c0b26.member,
-            email: v_8c0b26.email,
-            depth: v_c09f1f + 1,
-          });
-          v_9b57fc(v_ce4741.referralDepthOne);
-        }}
+        hideRank={true}
+        hideHighlightBorder={true}
+        onPress={() => v_8fcb86(v_8c0b26)}
       />
     );
   };
@@ -141,7 +181,7 @@ export const v_5b4c5a = () => {
     <SafeView style={v_d81136.container}>
       <Header
         title={`${v_8d41d7('screens.referralDepthOne.title')} ${v_c09f1f}`}
-        onBackPress={v_c7ac57}
+        onBackPress={v_6ca26b}
         showBackButton
         rightComponent={
           <TouchableOpacity
