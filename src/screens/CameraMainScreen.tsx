@@ -26,6 +26,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
+import { ShowPockAdScreen } from './ShowPockAdScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -417,7 +418,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 }) => {
   const { navigate, reset } = useAppNavigation();
   const { t } = useTranslation();
-  const { setAdvertisementParams } = useAppContext();
+  const { advertisementParams, setAdvertisementParams } = useAppContext();
   const { showAlert } = useAlertDialog();
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -1254,6 +1255,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const adCompany = token.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', adCompany);
+
       const adParams = {
         member: member,
         advertisement: advertisement,
@@ -1263,6 +1267,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         name: token.name || 'XRUN coin',
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
+        ad_company: adCompany,
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
@@ -1290,6 +1295,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice,
         name: token.name,
         brand: token.brand,
+        ad_company: token.ad_company,
       });
 
       const userData = await AsyncStorage.getItem('userData');
@@ -1318,6 +1324,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         extractedCampid: campid,
         tokenSpotID: token.spotID,
         tokenCoin: token.coin,
+        tokenAdCompany: token.ad_company,
       });
 
       if (!advertisement || advertisement === '' || advertisement === 'undefined') {
@@ -1338,6 +1345,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const adCompany = token.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', adCompany);
+
       const adParams = {
         member: member,
         advertisement: advertisement,
@@ -1347,6 +1357,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         name: token.name || 'XRUN coin',
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
+        ad_company: adCompany,
       };
 
       console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(adParams, null, 2));
@@ -1358,6 +1369,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         name: token.name,
         xrunPrice: token.xrunPrice,
         joindesc: token.joindesc,
+        ad_company: adCompany,
       });
 
       console.log('🔄 Context에 광고 파라미터 설정 전:', {
@@ -1365,6 +1377,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         campid: adParams.campid,
         coin: adParams.coin,
         name: adParams.name,
+        ad_company: adParams.ad_company,
       });
       setAdvertisementParams(adParams);
       console.log('✅ Context에 광고 파라미터 설정 완료:', {
@@ -1372,17 +1385,34 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         campid: adParams.campid,
         coin: adParams.coin,
         name: adParams.name,
+        ad_company: adParams.ad_company,
       });
 
-      console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
-      console.log('🔍 이동 시 전달할 파라미터:', {
-        advertisement: adParams.advertisement,
-        campid: adParams.campid,
-        coin: adParams.coin,
-        name: adParams.name,
-      });
-      reset(ROUTES.showNapAd);
-      console.log('✅ ShowNapAd 화면으로 이동 완료');
+      if (adCompany === 'pock') {
+
+        console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
+        console.log('🔍 이동 시 전달할 파라미터:', {
+          advertisement: adParams.advertisement,
+          campid: adParams.campid,
+          coin: adParams.coin,
+          name: adParams.name,
+          ad_company: adParams.ad_company,
+        });
+        reset(ROUTES.showPockAd);
+        console.log('✅ ShowPockAd 화면으로 이동 완료');
+      } else {
+
+        console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
+        console.log('🔍 이동 시 전달할 파라미터:', {
+          advertisement: adParams.advertisement,
+          campid: adParams.campid,
+          coin: adParams.coin,
+          name: adParams.name,
+          ad_company: adParams.ad_company,
+        });
+        reset(ROUTES.showNapAd);
+        console.log('✅ ShowNapAd 화면으로 이동 완료');
+      }
     } catch (error) {
       console.error('❌ navigateToAd 오류:', error);
     }
@@ -1487,6 +1517,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         advertisement: tokenCopy.advertisement,
         campid: tokenCopy.campid,
         coin: tokenCopy.coin,
+        ad_company: tokenCopy.ad_company,
       });
     }, 100);
   }, []);
@@ -1575,6 +1606,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   coin: t.coin,
                   xrunPrice: t.xrunPrice,
                   distance: t.distance,
+                  ad_company: t.ad_company,
                 });
               });
 
@@ -1834,13 +1866,32 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             }, 100);
           }
         }}>
-        <ShowNapAdScreen
-          onClose={() => {
-            console.log('ShowNapAdScreen 모달 닫기');
-            setShowAdModal(false);
+        {(() => {
+          const adCompany = advertisementParams?.ad_company || 'nas';
+          console.log('🔍 모달 내부 ad_company 확인:', adCompany);
 
-          }}
-        />
+          if (adCompany === 'pock') {
+            return (
+              <ShowPockAdScreen
+                onClose={() => {
+                  console.log('ShowPockAdScreen 모달 닫기');
+                  setShowAdModal(false);
+
+                }}
+              />
+            );
+          } else {
+            return (
+              <ShowNapAdScreen
+                onClose={() => {
+                  console.log('ShowNapAdScreen 모달 닫기');
+                  setShowAdModal(false);
+
+                }}
+              />
+            );
+          }
+        })()}
         <TouchableOpacity
           style={{
             position: 'absolute',

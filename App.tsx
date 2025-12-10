@@ -50,6 +50,7 @@ import {
   ShopSuccessScreen,
   ShopTicketDetailScreen,
   ShowNapAdScreen,
+  ShowPockAdScreen,
   XRUNinfoScreen,
   MyinfoShopSalesScreen,
 } from './src/screens';
@@ -339,6 +340,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'showNapAd') {
     return <ShowNapAdScreen />;
+  }
+
+  if (currentScreen === 'showPockAd') {
+    return <ShowPockAdScreen />;
   }
 
   if (currentScreen === 'xrunInfo') {
