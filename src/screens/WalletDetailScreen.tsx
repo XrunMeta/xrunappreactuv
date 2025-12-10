@@ -109,7 +109,13 @@ interface TransactionListItemData extends TransactionHistoryItem {
 export const WalletDetailScreen = () => {
   const { t } = useTranslation();
   const { navigate, goBack } = useAppNavigation();
-  const { selectedWalletAsset, resetSelectedWalletAsset, setSelectedWalletAsset, setWalletReceiveAddress, setWalletReceiveCurrency } = useAppContext();
+  const {
+    selectedWalletAsset,
+    resetSelectedWalletAsset,
+    setSelectedWalletAsset,
+    setWalletReceiveAddress,
+    setWalletReceiveCurrency,
+  } = useAppContext();
   const { showAlert } = useAlertDialog();
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -144,19 +150,20 @@ export const WalletDetailScreen = () => {
     }
 
     return () => {
-
       if (!isNavigatingToSendRef.current) {
         resetSelectedWalletAsset();
       }
-
       isNavigatingToSendRef.current = false;
     };
   }, [selectedWalletAsset, goBack, resetSelectedWalletAsset]);
 
-  const handleFilterApply = useCallback((selection: { type: 'all' | 'send' | 'receive'; range: '7d' | '14d' | '30d' }) => {
-    setSelectedType(selection.type);
-    setSelectedRange(selection.range);
-  }, []);
+  const handleFilterApply = useCallback(
+    (selection: { type: 'all' | 'send' | 'receive'; range: '7d' | '14d' | '30d' }) => {
+      setSelectedType(selection.type);
+      setSelectedRange(selection.range);
+    },
+    [],
+  );
 
   const getDaysBefore = useCallback((range: '7d' | '14d' | '30d'): number => {
     switch (range) {
@@ -171,63 +178,68 @@ export const WalletDetailScreen = () => {
     }
   }, []);
 
-  const createFetchFunction = useCallback((
-    apiFunction: (
-      member: number | string,
-      currency: number,
-      daysbefore: number,
-      startwith: number,
-      navigation?: any,
-    ) => Promise<TransactionHistoryResponse>,
-  ) => {
-    return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
-      if (!member || !selectedWalletAsset) {
-        return { data: [], total: 0, hasMore: false };
-      }
+  const createFetchFunction = useCallback(
+    (
+      apiFunction: (
+        member: number | string,
+        currency: number,
+        daysbefore: number,
+        startwith: number,
+        navigation?: any,
+      ) => Promise<TransactionHistoryResponse>,
+    ) => {
+      return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
+        if (!member || !selectedWalletAsset) {
+          return { data: [], total: 0, hasMore: false };
+        }
 
-      const daysbefore = getDaysBefore(selectedRange);
-      const startwith = (params.page - 1) * params.pageSize;
+        const daysbefore = getDaysBefore(selectedRange);
+        const startwith = (params.page - 1) * params.pageSize;
 
-      try {
-        const response = await apiFunction(
-          member,
-          selectedWalletAsset.currency,
-          daysbefore,
-          startwith,
-        );
+        try {
+          const response = await apiFunction(
+            member,
+            selectedWalletAsset.currency,
+            daysbefore,
+            startwith,
+          );
 
-        const items = (response.data || []).map((item) => {
-          const formattedAmount = new BigNumber(item.amount || '0').toFixed();
-          const actionType = getActionType(item.action || 0, t);
-          const timestamp = dateFormatter(item.excuteddatetime || item.date || '');
+          const items = (response.data || []).map((item) => {
+            const formattedAmount = new BigNumber(item.amount || '0').toFixed();
+            const actionType = getActionType(item.action || 0, t);
+            const timestamp = dateFormatter(item.excuteddatetime || item.date || '');
+
+            return {
+              ...item,
+              title: selectedWalletAsset.symbol || selectedWalletAsset.name,
+              subtitle: actionType,
+              timestamp,
+              amount: formattedAmount,
+              suffix: selectedWalletAsset.symbol,
+              iconSource: selectedWalletAsset.icon,
+            } as TransactionListItemData;
+          });
+
+          const hasMore = items.length >= params.pageSize;
 
           return {
-            ...item,
-            title: selectedWalletAsset.symbol || selectedWalletAsset.name,
-            subtitle: actionType,
-            timestamp,
-            amount: formattedAmount,
-            suffix: selectedWalletAsset.symbol,
-            iconSource: selectedWalletAsset.icon,
-          } as TransactionListItemData;
-        });
-
-        const hasMore = items.length >= params.pageSize;
-
-        return {
-          data: items,
-          total: items.length, 
-          hasMore,
-        };
-      } catch (error) {
-        console.error('[WalletDetail] API 호출 오류:', error);
-        return { data: [], total: 0, hasMore: false };
-      }
-    };
-  }, [member, selectedWalletAsset, selectedRange, getDaysBefore, t]);
+            data: items,
+            total: items.length,
+            hasMore,
+          };
+        } catch (error) {
+          console.error('[WalletDetail] API 호출 오류:', error);
+          return { data: [], total: 0, hasMore: false };
+        }
+      };
+    },
+    [member, selectedWalletAsset, selectedRange, getDaysBefore, t],
+  );
 
   const createSendFetchFunction = useCallback(() => {
-    return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
+    return async (
+      params: PaginationParams,
+    ): Promise<PaginationResponse<TransactionListItemData>> => {
       if (!member || !selectedWalletAsset) {
         return { data: [], total: 0, hasMore: false };
       }
@@ -236,16 +248,12 @@ export const WalletDetailScreen = () => {
       const startwith = (params.page - 1) * params.pageSize;
 
       try {
-
         const [transferResponse, transitionResponse] = await Promise.all([
           fetchTransferHistory(member, selectedWalletAsset.currency, daysbefore, startwith),
           fetchTransitionHistory(member, selectedWalletAsset.currency, daysbefore, startwith),
         ]);
 
-        const allItems = [
-          ...(transferResponse.data || []),
-          ...(transitionResponse.data || []),
-        ];
+        const allItems = [...(transferResponse.data || []), ...(transitionResponse.data || [])];
 
         allItems.sort((a, b) => {
           const dateA = new Date(a.excuteddatetime || a.date || '').getTime();
@@ -300,42 +308,52 @@ export const WalletDetailScreen = () => {
     }
   }, [selectedType, createFetchFunction, createSendFetchFunction]);
 
-  const handleAction = useCallback((type: 'scan' | 'receive' | 'send') => {
-    if (type === 'send') {
-
-      if (selectedWalletAsset) {
-
-        isNavigatingToSendRef.current = true;
-        setSelectedWalletAsset(selectedWalletAsset);
-        navigate(ROUTES.walletSend);
-      } else {
-        console.warn('[WalletDetail] selectedWalletAsset이 없어 보내기 화면으로 이동할 수 없습니다.');
+  const handleAction = useCallback(
+    (type: 'scan' | 'receive' | 'send') => {
+      if (type === 'send') {
+        if (selectedWalletAsset) {
+          isNavigatingToSendRef.current = true;
+          setSelectedWalletAsset(selectedWalletAsset);
+          navigate(ROUTES.walletSend);
+        } else {
+          console.warn('[WalletDetail] selectedWalletAsset이 없어 보내기 화면으로 이동할 수 없습니다.');
+        }
+        return;
       }
-      return;
-    }
-    if (type === 'receive') {
-
-      if (publicAddress) {
-        setWalletReceiveAddress(publicAddress);
+      if (type === 'receive') {
+        if (publicAddress) {
+          setWalletReceiveAddress(publicAddress);
+        }
+        if (selectedWalletAsset?.currency) {
+          console.log(
+            '[WalletDetailScreen] receive 버튼 클릭 - currency:',
+            selectedWalletAsset.currency,
+          );
+          setWalletReceiveCurrency(selectedWalletAsset.currency);
+        }
+        navigate(ROUTES.walletReceive);
+        return;
       }
-      if (selectedWalletAsset?.currency) {
-        console.log('[WalletDetailScreen] receive 버튼 클릭 - currency:', selectedWalletAsset.currency);
-        setWalletReceiveCurrency(selectedWalletAsset.currency);
+      if (type === 'scan') {
+        const explorerLink = getExplorerLink(
+          selectedWalletAsset?.currency || 0,
+          publicAddress,
+        );
+        if (explorerLink) {
+          Linking.openURL(explorerLink);
+        }
+        return;
       }
-      navigate(ROUTES.walletReceive);
-      return;
-    }
-    if (type === 'scan') {
-      const explorerLink = getExplorerLink(
-        selectedWalletAsset?.currency || 0,
-        publicAddress,
-      );
-      if (explorerLink) {
-        Linking.openURL(explorerLink);
-      }
-      return;
-    }
-  }, [navigate, selectedWalletAsset, publicAddress, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset]);
+    },
+    [
+      navigate,
+      selectedWalletAsset,
+      publicAddress,
+      setWalletReceiveAddress,
+      setWalletReceiveCurrency,
+      setSelectedWalletAsset,
+    ],
+  );
 
   const handleCopyAddress = useCallback(() => {
     if (publicAddress) {
@@ -370,7 +388,12 @@ export const WalletDetailScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={selectedWalletAsset.name || selectedWalletAsset.symbol} showBackButton onBackPress={() => navigate(ROUTES.wallet)} />
+      <Header
+        title={selectedWalletAsset.name || selectedWalletAsset.symbol}
+        showBackButton
+        onBackPress={() => navigate(ROUTES.wallet)} 
+      />
+
       <View style={styles.content}>
         <WalletHeaderCard
           title={t('screens.walletDetail.myBalance')}
@@ -379,9 +402,24 @@ export const WalletDetailScreen = () => {
           address={shortenedAddress}
           onCopy={handleCopyAddress}
           actions={[
-            { label: explorerLabel, iconImage: selectedWalletAsset.currency === 1 || selectedWalletAsset.currency === 2 ? iconEtherscan : iconPolygonscan, onPress: () => handleAction('scan') },
-            { label: t('screens.walletDetail.receive'), icon: 'download-outline', onPress: () => handleAction('receive') },
-            { label: t('screens.walletDetail.send'), icon: 'send-outline', onPress: () => handleAction('send') },
+            {
+              label: explorerLabel,
+              iconImage:
+                selectedWalletAsset.currency === 1 || selectedWalletAsset.currency === 2
+                  ? iconEtherscan
+                  : iconPolygonscan,
+              onPress: () => handleAction('scan'),
+            },
+            {
+              label: t('screens.walletDetail.receive'),
+              icon: 'download-outline',
+              onPress: () => handleAction('receive'),
+            },
+            {
+              label: t('screens.walletDetail.send'),
+              icon: 'send-outline',
+              onPress: () => handleAction('send'),
+            },
           ]}
           theme={getCurrencyTheme(selectedWalletAsset.currency)}
         />
@@ -400,7 +438,6 @@ export const WalletDetailScreen = () => {
             pageSize={20}
             keyExtractor={(item, index) => item.id?.toString() || `txn_${index}`}
             onItemPress={(item) => {
-
               navigate(ROUTES.transactionDetails);
             }}
             emptyMessage={t('screens.walletDetail.noHistory')}
@@ -448,4 +485,3 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
-
