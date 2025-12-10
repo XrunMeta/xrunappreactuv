@@ -581,7 +581,7 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: v_1bfbd0.buttonSecondary,
+    backgroundColor: '#c1c1c1',
   },
   primaryButton: {
     backgroundColor: v_1bfbd0.buttonPrimary,
@@ -591,7 +591,7 @@ const v_d81136 = v_472849.create({
     opacity: 0.6,
   },
   cancelText: {
-    color: '#000000',
+    color: '#666666',
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
