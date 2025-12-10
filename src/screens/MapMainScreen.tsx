@@ -151,11 +151,11 @@ let iconMapPoint: any = null;
 
 try {
 
-  iconMapPoint = require('../../assets/images/icon_mapPoint.png');
+  iconMapPoint = require('../../assets/images/locationpin2.png');
 
 } catch (e) {
 
-  console.warn('icon_mapPoint.png not found');
+  console.warn('locationpin2.png not found');
 
 }
 
@@ -3174,7 +3174,7 @@ const styles = StyleSheet.create({
 
   mapPinButton: {
     position: 'absolute',
-    top: 61,
+    top: 34,
     right: 16,
     width: 25,
     height: 25,
@@ -3243,55 +3243,34 @@ const styles = StyleSheet.create({
   },
 
   calloutLeft: {
-
     justifyContent: 'space-between',
-
     marginLeft: 0,
-
   },
 
   calloutImage: {
-
     marginLeft: 4,
-
     width: 32,
-
     height: 32,
-
   },
 
   calloutDistance: {
-
     fontSize: FONTS.size.small,
-
     fontFamily: 'Roboto-Regular',
-
     color: 'black',
-
     textAlign: 'center',
-
     marginBottom: 2,
-
   },
 
   calloutRight: {
-
     paddingLeft: 10,
-
     flex: 1,
-
     justifyContent: 'flex-end',
-
   },
 
   calloutBrand: {
-
     fontSize: FONTS.size.small,
-
     fontFamily: 'Roboto-Medium',
-
     color: 'black',
-
   },
 
   markerImageContainer: {
