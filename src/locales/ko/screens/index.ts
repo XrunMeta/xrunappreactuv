@@ -49,4 +49,4 @@ export { default as v_adab30 } from './shopTicketDetail';
 export { default as v_f7c780 } from './showNapAd';
 export { default as v_400626 } from './advertiseScreen';
 export { default as v_c36a9e } from './addToken';
-
+export { default as v_ebd772 } from './myinfoShopSales';

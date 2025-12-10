@@ -6,6 +6,7 @@ import {
   v_472849,
   v_4623af,
   v_fee73b,
+  v_5e8657,
 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
 
@@ -17,6 +18,7 @@ interface ReferralMemberRowProps {
   valueText?: string;
   highlight?: boolean;
   hideHighlightBorder?: boolean;
+  rankStyle?: v_5e8657;
   onPress?: (event: v_fee73b) => void;
 }
 
@@ -28,6 +30,7 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
   valueText: v_870d58,
   highlight: v_70cffa,
   hideHighlightBorder: v_f909d6 = false,
+  rankStyle: v_9e5ed6,
   onPress: v_719eed,
 }) => {
 
@@ -41,7 +44,7 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
       disabled={!v_719eed}
     >
       {typeof v_5e1af4 !== 'undefined' ? (
-        <Text style={v_d81136.rank}>{v_5e1af4}</Text>
+        <Text style={[v_d81136.rank, v_9e5ed6]}>{v_5e1af4}</Text>
       ) : (
         <View style={v_d81136.rankPlaceholder} />
       )}
