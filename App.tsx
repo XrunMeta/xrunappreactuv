@@ -61,7 +61,7 @@ import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
 import { v_a2474a } from './src/utils/env';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
-import { v_563153 } from './src/services';
+import { v_563153, v_dd87bc } from './src/services';
 import {
   v_c06f2c,
   v_259807,
@@ -660,6 +660,17 @@ export default function v_6540c3() {
         console.log('[App] TopAd5 광고 캐시 완료');
       } catch (v_5e9bfe) {
         console.error('[App] TopAd5 광고 캐시 실패:', v_5e9bfe);
+
+      }
+
+      try {
+        console.log('[App] 고팍스 XRUN 가격 조회 시작');
+        const v_d9a946 = await v_dd87bc();
+        const v_300a65 = JSON.stringify(v_d9a946);
+        await v_e84827.setItem('xrungopaxprice', v_300a65);
+        console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', v_d9a946.data?.gopaxPrice);
+      } catch (v_5e9bfe) {
+        console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', v_5e9bfe);
 
       }
 

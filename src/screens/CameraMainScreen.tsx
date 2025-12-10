@@ -339,10 +339,7 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
 
                 const v_6bbb57 = v_21cc31?.xrunPrice || 0;
                 const v_123554 = parseFloat(String(v_6bbb57));
-                console.log(`💰 [TokenComponent] 토큰 spotID=${v_21cc31.spotID} 가격:`, {
-                  xrunPrice: v_21cc31?.xrunPrice,
-                  priceValue: v_123554,
-                });
+
                 return isNaN(v_123554) ? '0.00' : v_123554.toFixed(2);
               })()}
             </Text>
@@ -1597,7 +1594,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           <View style={[v_d81136.tokenContainer, { bottom: v_572bd3 && v_04cb77 ? 200 : 110 }]}>
             {(() => {
 
-              console.log('🔍 [렌더링 전] 토큰 정보 검증:');
               v_ef86b6.forEach((v_8d41d7) => {
                 console.log('토큰:', {
                   spotID: v_8d41d7.spotID,
