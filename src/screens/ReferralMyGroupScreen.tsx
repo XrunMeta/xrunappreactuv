@@ -150,7 +150,7 @@ export const ReferralMyGroupScreen = () => {
     () => [
       { label: t('screens.referralRank.group'), value: 'group' },
       { label: t('screens.referralRank.settlement'), value: 'settlement' },
-      { label: '순위', value: 'rank' }, 
+      { label: t('screens.referralMyGroup.rank'), value: 'rank' },
     ] as const,
     [t],
   );
@@ -210,10 +210,9 @@ export const ReferralMyGroupScreen = () => {
         <View style={styles.listContainer}>
           {!isLoading && totalMembers === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>그룹 멤버 없음</Text>
+              <Text style={styles.emptyTitle}>{t('screens.referralMyGroup.emptyTitle')}</Text>
               <Text style={styles.emptyDescription}>
-                아직 그룹에 멤버를 추가하지 않았습니다.{'\n'}
-                네트워크를 확장하기 위해 사람들을 초대해보세요!
+                {t('screens.referralMyGroup.emptyDescription')}
               </Text>
             </View>
           ) : (
