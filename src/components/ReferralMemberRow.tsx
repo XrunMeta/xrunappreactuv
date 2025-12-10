@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   GestureResponderEvent,
+  TextStyle,
 } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 
@@ -17,6 +18,7 @@ interface ReferralMemberRowProps {
   valueText?: string;
   highlight?: boolean;
   hideHighlightBorder?: boolean;
+  rankStyle?: TextStyle;
   onPress?: (event: GestureResponderEvent) => void;
 }
 
@@ -28,6 +30,7 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
   valueText,
   highlight,
   hideHighlightBorder = false,
+  rankStyle,
   onPress,
 }) => {
 
@@ -41,7 +44,7 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
       disabled={!onPress}
     >
       {typeof rank !== 'undefined' ? (
-        <Text style={styles.rank}>{rank}</Text>
+        <Text style={[styles.rank, rankStyle]}>{rank}</Text>
       ) : (
         <View style={styles.rankPlaceholder} />
       )}
