@@ -233,7 +233,7 @@ export const v_f57686 = () => {
         <ReferralStatsCard title="">
           <View style={v_d81136.rankCardContent}>
             <View style={v_d81136.rankLeft}>
-              <Text style={v_d81136.rankHelper}>My Rank</Text>
+              <Text style={v_d81136.rankHelper}>{v_8d41d7('screens.referralRank.myRank')}</Text>
               <Text style={v_d81136.rankEmail} numberOfLines={1} ellipsizeMode="tail">
                 {v_f4fb5e}
               </Text>
@@ -267,7 +267,7 @@ export const v_f57686 = () => {
             </View>
           ) : v_def2d0.length === 0 ? (
             <View style={v_d81136.emptyContainer}>
-              <Text style={v_d81136.emptyText}>순위 데이터가 없습니다.</Text>
+              <Text style={v_d81136.emptyText}>{v_8d41d7('screens.referralRank.noRankData')}</Text>
             </View>
           ) : (
             <FlatList
