@@ -33,6 +33,7 @@ import {
   CustomToken,
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
+import { TaboolaBanner } from '../components/TaboolaBanner';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan.png');
@@ -159,10 +160,7 @@ export const WalletScreen = () => {
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
           amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
-          icon:
-            item.currency === 1
-              ? require('../../assets/icon_xrun_round.png')
-              : `data:image/png;base64,${item.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`,
+          icon: `data:image/png;base64,${item.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`,
           currency: item.currency,
           isCustom: false,
           contractAddress: item.address,
@@ -653,33 +651,20 @@ export const WalletScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={t('screens.wallet.title')} onBackPress={goBack} showBackButton />
+      <Header
+        title={t('screens.wallet.title')}
+        onBackPress={() => navigate(ROUTES.map)}
+        showBackButton
+      />
+      {}
+      <View style={styles.taboolaContainer}>
+        <TaboolaBanner placementType="shop" />
+      </View>
+
       <View style={styles.content}>
-        <View style={styles.headerCardWrapper}>
-          <WalletHeaderCard
-            title={t('screens.wallet.myWallet')}
-            cardStyle={styles.headerCard}
-            address={publicAddress || ''}
-            onCopy={handleCopyAddress}
-            actions={[
-              {
-                label: t('screens.wallet.polygonScan'),
-                iconImage: iconPolygonscan,
-                onPress: handlePolygonscan,
-              },
-              {
-                label: t('screens.wallet.etherscan'),
-                iconImage: iconEtherscan,
-                onPress: handleEtherscan,
-              },
-              {
-                label: t('screens.wallet.receive'),
-                icon: 'download-outline',
-                onPress: handleReceive,
-              },
-            ]}
-          />
-        </View>
+        {
+
+}
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('screens.wallet.myBalance')}</Text>
@@ -813,12 +798,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 0,
     boxSizing: 'border-box',
-
   },
   tokenIconImage: {
-    width: 48,
-    height: 48,
-
+    width: 28,
+    height: 28,
   },
   tokenIconText: {
     fontSize: FONTS.size.medium,
@@ -851,5 +834,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ebebeb',
     minHeight: 110,
+  },
+  taboolaContainer: {
+    borderWidth: 2,
+    borderColor: '#ededed',
   },
 });
