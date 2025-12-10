@@ -48,6 +48,7 @@ export const WalletSendScreen = () => {
   const { showAlert } = useAlertDialog();
   const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
   const amountInputRef = useRef<TextInput>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
 
   const formatNumberWithCommas = useCallback((value: string): string => {
 
@@ -79,6 +80,30 @@ export const WalletSendScreen = () => {
     setSendAmount(formatted);
     setWalletSendAmount(cleanValue); 
   }, [formatNumberWithCommas, removeCommas, setWalletSendAmount]);
+
+  const prevAddressRef = useRef<string>('');
+
+  useEffect(() => {
+    const address = walletSendAddress;
+
+    if (address === prevAddressRef.current) {
+      return;
+    }
+    prevAddressRef.current = address;
+
+    if (!address || address.trim().length === 0) {
+      setAddressError(null);
+      return;
+    }
+
+    if (!address.startsWith('0x')) {
+      setAddressError(t('screens.walletSend.errors.invalidAddress'));
+
+      showAlert(t('screens.walletSend.alerts.invalidAddress'), t('screens.walletSend.errors.invalidAddress'));
+    } else {
+      setAddressError(null);
+    }
+  }, [walletSendAddress, t, showAlert]);
 
   useEffect(() => {
     if (!selectedWalletAsset) {
@@ -129,13 +154,19 @@ export const WalletSendScreen = () => {
 
   const isConfirmEnabled = useMemo(() => {
     const hasAddress = walletSendAddress && walletSendAddress.trim().length > 0;
-    return hasAddress;
+    const isValidAddress = walletSendAddress?.startsWith('0x');
+    return hasAddress && isValidAddress;
   }, [walletSendAddress]);
 
   const handleConfirm = async () => {
     const cleanAmount = removeCommas(sendAmount);
     if (!walletSendAddress) {
       await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
+      return;
+    }
+
+    if (!walletSendAddress.startsWith('0x')) {
+      await showAlert(t('screens.walletSend.alerts.invalidAddress'), t('screens.walletSend.errors.invalidAddress'));
       return;
     }
     if (!cleanAmount || new BigNumber(cleanAmount || '0').lte(0)) {
@@ -218,6 +249,10 @@ export const WalletSendScreen = () => {
             </>
           }
         />
+        {}
+        {addressError && (
+          <Text style={styles.addressErrorText}>{addressError}</Text>
+        )}
         <View style={styles.addressListSection}>
           <View style={styles.webViewContainer}>
             {}
@@ -360,6 +395,13 @@ const styles = StyleSheet.create({
   },
   formField: {
     width: '100%',
+  },
+  addressErrorText: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#E53935',
+    marginTop: 4,
+    marginLeft: 4,
   },
   qrButton: {
     width: 32,
