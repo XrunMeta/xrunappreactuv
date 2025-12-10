@@ -1,14 +1,16 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb, v_4623af } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
+import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_b7594c, v_5bb1ab } from '../services';
 import { v_5f9ea4 } from '../types';
-import { v_35c0e0, v_d7e45e, v_b9db3d } from '../utils';
+import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 interface TransformedSettlementData {
   id: string;
@@ -78,6 +80,7 @@ const v_0d35a8 = 15;
 
 export const v_08aac3 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_3af388, v_2f9613] = v_5ab095<TransformedSettlementData[]>([]);
   const [v_def2d0, v_690164] = v_5ab095<TransformedSettlementData[]>([]);
@@ -88,8 +91,22 @@ export const v_08aac3 = () => {
   const [v_13f115, v_54eab4] = v_5ab095<string>('0 XRUN');
   const [v_26e26f, v_a80d65] = v_5ab095<string>('₩0');
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0); 
+  const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('');
 
   const { t: v_8d41d7 } = v_772971();
+
+  const v_22cd2d = async () => {
+    if (!v_f4fb5e) {
+      await v_889fad(v_8d41d7('screens.referralMyGroup.shareFailed'), v_8d41d7('screens.referralMyGroup.shareFailedMessage'));
+      return;
+    }
+    await v_a3bbf0(
+      v_8d41d7,
+      { email: v_f4fb5e },
+      v_889fad,
+      v_9b57fc,
+    );
+  };
   const v_1c4d31 = v_df9f57(
     () => [
       { label: v_8d41d7('screens.referralSettlement.group'), value: 'group' },
@@ -107,6 +124,9 @@ export const v_08aac3 = () => {
           const v_ef7306 = JSON.parse(v_f24fd5);
           if (v_ef7306.member) {
             v_9d6aeb(v_ef7306.member);
+          }
+          if (v_ef7306.email) {
+            v_d9bcc7(v_ef7306.email);
           }
         }
       } catch (v_5e9bfe) {
@@ -213,7 +233,6 @@ export const v_08aac3 = () => {
     return (
       <View style={v_d81136.listItem}>
         <View style={v_d81136.listItemRow}>
-          {v_8c0b26.type ? <Text style={v_d81136.refTypeText}>{v_8c0b26.type}</Text> : <Text style={v_d81136.refTypeText}>TYPE</Text>}
           {v_8c0b26.description ? <Text
             style={[v_d81136.descriptionText, { flex: 1, marginRight: 10 }]}
             numberOfLines={1}
@@ -232,7 +251,14 @@ export const v_08aac3 = () => {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor={"#f7f7fb"}>
-      <Header title={v_8d41d7('screens.referralSettlement.title')} />
+      <Header
+        title={v_8d41d7('screens.referralSettlement.title')}
+        rightComponent={
+          <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
+            <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
+          </TouchableOpacity>
+        }
+      />
       <View style={v_d81136.content}>
         <ReferralStatsCard
           title={v_8d41d7('screens.referralSettlement.income')}
@@ -369,5 +395,13 @@ const v_d81136 = v_472849.create({
   },
   loadingMoreContainer: {
     paddingVertical: 16,
+  },
+  headerShareButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
