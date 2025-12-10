@@ -50,6 +50,7 @@ import {
   v_8734da,
   v_a1c4a5,
   v_287831,
+  v_540580,
   v_f7bdb9,
   v_1cca63,
 } from './src/screens';
@@ -339,6 +340,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'showNapAd') {
     return <ShowNapAdScreen />;
+  }
+
+  if (v_0f0c7b === 'showPockAd') {
+    return <ShowPockAdScreen />;
   }
 
   if (v_0f0c7b === 'xrunInfo') {

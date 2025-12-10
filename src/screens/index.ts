@@ -51,6 +51,7 @@ export { ShopBuyScreen } from './ShopBuyScreen';
 export { ShopSuccessScreen } from './ShopSuccessScreen';
 export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
 export { ShowNapAdScreen } from './ShowNapAdScreen';
+export { ShowPockAdScreen } from './ShowPockAdScreen';
 export { XRUNinfoScreen } from './XRUNinfo';
 export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 

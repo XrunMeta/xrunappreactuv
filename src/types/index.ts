@@ -29,6 +29,7 @@ export interface TokenData {
   coin?: string;
   member?: string;
   campid?: string;
+  ad_company?: string; 
 }
 
 export interface SpotData {
@@ -96,6 +97,7 @@ export interface AdvertisementParams {
   name: string;
   xrunPrice: number;
   coinScreen: boolean;
+  ad_company?: string; 
 }
 
 export interface NasmobAdsResponse {
@@ -110,6 +112,60 @@ export interface NasmobAdsResponse {
     name?: string;
     rewarddesc?: string;
     cbparam?: string;
+  };
+}
+
+export interface PockAdsResponse {
+  status: 'success' | 'error';
+  code: number;
+  message?: string;
+  data?: {
+    id?: number;
+    ad_key?: string;
+    ad_type?: string;
+    ad_type_sub?: string;
+    ad_name?: string;
+    ad_sub_name?: string;
+    ad_description?: string;
+    ad_participation?: string;
+    ad_profit?: number;
+    ad_currency?: string;
+    creative_icon?: string;
+    creative_list_img?: string;
+    creative_detail_img?: string;
+    creative_front_img?: string;
+    band_img?: string;
+    date_start?: string;
+    date_end?: string;
+    install_checker?: string;
+    os_type?: string;
+    category_name?: string;
+    category_level2_name?: string;
+    target_age?: string;
+    target_carrier?: string;
+    target_gender?: string;
+    target_married?: string;
+    data_round?: number;
+    is_latest?: number;
+    active?: number;
+    created_at?: string;
+    updated_at?: string;
+    memberinfo?: {
+      userid?: string;
+      age?: number;
+      os2?: string;
+      gender?: string;
+      member?: string;
+      ad_key?: string;
+      ad_name?: string;
+      ad_profit?: number;
+      ad_currency?: string;
+    };
+    custom_param?: string;
+    landing_url?: string;
+    result_code?: number;
+    result_message?: string;
+    client_ip?: string;
   };
 }
 

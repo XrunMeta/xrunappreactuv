@@ -26,6 +26,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_287831 } from './ShowNapAdScreen';
+import { v_540580 } from './ShowPockAdScreen';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -417,7 +418,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 }) => {
   const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
-  const { setAdvertisementParams: v_d48a26 } = v_700ef9();
+  const { advertisementParams: v_d0b6d4, setAdvertisementParams: v_d48a26 } = v_700ef9();
   const { showAlert: v_889fad } = v_4b1173();
   const [v_d1a6bb, v_1e66f0] = v_d4f1cc();
 
@@ -1254,6 +1255,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const v_5a9c46 = v_21cc31.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', v_5a9c46);
+
       const v_75c344 = {
         member: v_660822,
         advertisement: v_5389c3,
@@ -1263,6 +1267,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         name: v_21cc31.name || 'XRUN coin',
         xrunPrice: v_21cc31.xrunPrice || 0,
         coinScreen: true,
+        ad_company: v_5a9c46,
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
@@ -1290,6 +1295,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         xrunPrice: v_21cc31.xrunPrice,
         name: v_21cc31.name,
         brand: v_21cc31.brand,
+        ad_company: v_21cc31.ad_company,
       });
 
       const v_ef7306 = await v_e84827.getItem('userData');
@@ -1318,6 +1324,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         extractedCampid: v_aa0917,
         tokenSpotID: v_21cc31.spotID,
         tokenCoin: v_21cc31.coin,
+        tokenAdCompany: v_21cc31.ad_company,
       });
 
       if (!v_5389c3 || v_5389c3 === '' || v_5389c3 === 'undefined') {
@@ -1338,6 +1345,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const v_5a9c46 = v_21cc31.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', v_5a9c46);
+
       const v_75c344 = {
         member: v_660822,
         advertisement: v_5389c3,
@@ -1347,6 +1357,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         name: v_21cc31.name || 'XRUN coin',
         xrunPrice: v_21cc31.xrunPrice || 0,
         coinScreen: true,
+        ad_company: v_5a9c46,
       };
 
       console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
@@ -1358,6 +1369,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         name: v_21cc31.name,
         xrunPrice: v_21cc31.xrunPrice,
         joindesc: v_21cc31.joindesc,
+        ad_company: v_5a9c46,
       });
 
       console.log('🔄 Context에 광고 파라미터 설정 전:', {
@@ -1365,6 +1377,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         campid: v_75c344.campid,
         coin: v_75c344.coin,
         name: v_75c344.name,
+        ad_company: v_75c344.ad_company,
       });
       v_d48a26(v_75c344);
       console.log('✅ Context에 광고 파라미터 설정 완료:', {
@@ -1372,17 +1385,34 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         campid: v_75c344.campid,
         coin: v_75c344.coin,
         name: v_75c344.name,
+        ad_company: v_75c344.ad_company,
       });
 
-      console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
-      console.log('🔍 이동 시 전달할 파라미터:', {
-        advertisement: v_75c344.advertisement,
-        campid: v_75c344.campid,
-        coin: v_75c344.coin,
-        name: v_75c344.name,
-      });
-      v_487a25(v_ce4741.showNapAd);
-      console.log('✅ ShowNapAd 화면으로 이동 완료');
+      if (v_5a9c46 === 'pock') {
+
+        console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
+        console.log('🔍 이동 시 전달할 파라미터:', {
+          advertisement: v_75c344.advertisement,
+          campid: v_75c344.campid,
+          coin: v_75c344.coin,
+          name: v_75c344.name,
+          ad_company: v_75c344.ad_company,
+        });
+        v_487a25(v_ce4741.showPockAd);
+        console.log('✅ ShowPockAd 화면으로 이동 완료');
+      } else {
+
+        console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
+        console.log('🔍 이동 시 전달할 파라미터:', {
+          advertisement: v_75c344.advertisement,
+          campid: v_75c344.campid,
+          coin: v_75c344.coin,
+          name: v_75c344.name,
+          ad_company: v_75c344.ad_company,
+        });
+        v_487a25(v_ce4741.showNapAd);
+        console.log('✅ ShowNapAd 화면으로 이동 완료');
+      }
     } catch (v_5e9bfe) {
       console.error('❌ navigateToAd 오류:', v_5e9bfe);
     }
@@ -1487,6 +1517,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         advertisement: v_021ef9.advertisement,
         campid: v_021ef9.campid,
         coin: v_021ef9.coin,
+        ad_company: v_021ef9.ad_company,
       });
     }, 100);
   }, []);
@@ -1575,6 +1606,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   coin: v_8d41d7.coin,
                   xrunPrice: v_8d41d7.xrunPrice,
                   distance: v_8d41d7.distance,
+                  ad_company: v_8d41d7.ad_company,
                 });
               });
 
@@ -1834,13 +1866,32 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             }, 100);
           }
         }}>
-        <ShowNapAdScreen
-          onClose={() => {
-            console.log('ShowNapAdScreen 모달 닫기');
-            v_219124(false);
+        {(() => {
+          const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
+          console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46);
 
-          }}
-        />
+          if (v_5a9c46 === 'pock') {
+            return (
+              <ShowPockAdScreen
+                onClose={() => {
+                  console.log('ShowPockAdScreen 모달 닫기');
+                  v_219124(false);
+
+                }}
+              />
+            );
+          } else {
+            return (
+              <ShowNapAdScreen
+                onClose={() => {
+                  console.log('ShowNapAdScreen 모달 닫기');
+                  v_219124(false);
+
+                }}
+              />
+            );
+          }
+        })()}
         <TouchableOpacity
           style={{
             position: 'absolute',
