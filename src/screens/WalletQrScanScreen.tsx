@@ -103,10 +103,10 @@ export const WalletQrScanScreen = () => {
           {}
           <View style={styles.qrScanButtonContainer}>
             <TouchableOpacity style={styles.qrScanButton} onPress={handleQrScanPress}>
-              <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.scan')}</Text>
+              <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.myQrCode')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.qrScanButton, styles.buttonActive]}>
-              <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.myQrCode')}</Text>
+              <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.scan')}</Text>
             </TouchableOpacity>
           </View>
         </View>
