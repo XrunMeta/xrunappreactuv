@@ -1,7 +1,8 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb, v_4623af } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_814266 } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -52,12 +53,16 @@ const v_f181d8 = (apiData: v_b0f886[]): MemberData[] => {
 };
 
 export const v_5b4c5a = () => {
-  const { navigate: v_9b57fc, goBack: v_c7ac57 } = v_a0daa8();
+  const { navigate: v_9b57fc, goBack: v_c7ac57, reset: v_487a25 } = v_a0daa8();
   const { selectedReferralMember: v_f87030, setSelectedReferralMember: v_779227 } = v_700ef9();
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_200d98, v_284862] = v_5ab095<MemberData[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
   const [v_c09f1f, v_0d08b9] = v_5ab095<number>(2); 
+
+  const v_7f2e65 = () => {
+    v_487a25(v_ce4741.map);
+  };
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -138,6 +143,15 @@ export const v_5b4c5a = () => {
         title={`${v_8d41d7('screens.referralDepthOne.title')} ${v_c09f1f}`}
         onBackPress={v_c7ac57}
         showBackButton
+        rightComponent={
+          <TouchableOpacity
+            style={v_d81136.closeButton}
+            onPress={v_7f2e65}
+            activeOpacity={0.7}
+          >
+            <Feather name="x" size={20} color={v_1bfbd0.headerText} />
+          </TouchableOpacity>
+        }
       />
       {v_683210 ? (
         <View style={v_d81136.loadingContainer}>
@@ -196,5 +210,13 @@ const v_d81136 = v_472849.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: v_1bfbd0.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
