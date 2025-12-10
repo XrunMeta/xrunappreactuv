@@ -68,7 +68,7 @@ const transformSettlementData = (
         id: finalId,
         type: item.email || '',
         description,
-        amount: `+${formatXrunAmount(item.amountasxrun)} XRUN`,
+        amount: `+${parseFloat(String(item.amountasxrun)).toFixed(2)} XRUN`,
         date: formatDateTime(item.datetime),
         transaction: item.transaction,
       };
