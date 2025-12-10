@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { Header, ReferralMemberRow } from '../components';
 import { COMMON_STYLES, SIZES, COLORS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppContext } from '../context';
 
 const rows = Array.from({ length: 7 }, (_, index) => ({
   rank: index === 0 ? 2 : 1,
@@ -17,18 +18,38 @@ const rows = Array.from({ length: 7 }, (_, index) => ({
 
 export const ReferralDepthTwoScreen = () => {
   const { t } = useTranslation();
-  const { reset } = useAppNavigation();
+  const { reset, goBack, navigate } = useAppNavigation();
+  const { selectedReferralMember, setSelectedReferralMember } = useAppContext();
+
+  const currentDepth = selectedReferralMember?.depth || 2;
 
   const handleClose = () => {
-    reset(ROUTES.map);
+    reset(ROUTES.referralMyGroup);
+  };
+
+  const handleBack = () => {
+    if (currentDepth > 2) {
+
+      setSelectedReferralMember({
+        ...selectedReferralMember,
+        member: selectedReferralMember?.member || '',
+        email: selectedReferralMember?.email || '',
+        depth: currentDepth - 1,
+      });
+      goBack();
+    } else {
+
+      goBack();
+    }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header
-        title={t('screens.referralDepthTwo.title')}
-        showBackButton={false}
+        title={`${t('screens.referralDepthTwo.title')} ${currentDepth}`}
+        showBackButton={true}
+        onBackPress={handleBack}
         rightComponent={
           <TouchableOpacity
             style={styles.closeButton}
@@ -44,10 +65,10 @@ export const ReferralDepthTwoScreen = () => {
           {rows.map((row, index) => (
             <ReferralMemberRow
               key={`${row.email}-${index}`}
-              rank={row.rank}
               email={row.email}
               date={row.date}
-              highlight={row.highlight}
+              hideRank={true}
+              hideHighlightBorder={true}
             />
           ))}
         </View>
@@ -75,5 +96,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
 

@@ -1,13 +1,16 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, Text, ActivityIndicator, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
+import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralMemberRow, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
+import { shareReferralLink } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 interface TransformedRankData {
   id: string;
@@ -31,6 +34,7 @@ const ITEMS_PER_PAGE = 15;
 
 export const ReferralRankScreen = () => {
   const { navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [rankData, setRankData] = useState<TransformedRankData[]>([]);
   const [currentData, setCurrentData] = useState<TransformedRankData[]>([]);
@@ -42,6 +46,19 @@ export const ReferralRankScreen = () => {
   const [userEmail, setUserEmail] = useState<string>('-');
 
   const { t } = useTranslation();
+
+  const handleShare = async () => {
+    if (!userEmail || userEmail === '-') {
+      await showAlert(t('screens.referralMyGroup.shareFailed'), t('screens.referralMyGroup.shareFailedMessage'));
+      return;
+    }
+    await shareReferralLink(
+      t,
+      { email: userEmail },
+      showAlert,
+      navigate,
+    );
+  };
   const segmentedOptions = useMemo(
     () => [
       { label: t('screens.referralRank.group'), value: 'group' },
@@ -184,11 +201,6 @@ export const ReferralRankScreen = () => {
 
   const renderRankItem = ({ item, index }: { item: TransformedRankData; index: number }) => {
 
-    const displayEmail =
-      item.email && item.email.length > 15
-        ? item.email.substring(0, 12) + '...'
-        : item.email;
-
     const isCurrentUser = userEmail !== '-' && item.email === userEmail && String(item.rank) === userRank;
 
     const formattedRank = typeof item.rank === 'number'
@@ -199,7 +211,7 @@ export const ReferralRankScreen = () => {
       <ReferralMemberRow
         key={item.id}
         rank={formattedRank}
-        email={displayEmail}
+        email={item.email}
         highlight={isCurrentUser} 
       />
     );
@@ -209,7 +221,14 @@ export const ReferralRankScreen = () => {
     <SafeView style={styles.container}
       showBottomBackground={true}
       backgroundColor={"#f7f7fb"}>
-      <Header title={t('screens.referralRank.title')} />
+      <Header
+        title={t('screens.referralRank.title')}
+        rightComponent={
+          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+            <Feather name="share-2" size={18} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
+      />
       <View style={styles.content}>
         <ReferralStatsCard title="">
           <View style={styles.rankCardContent}>
@@ -348,5 +367,13 @@ const styles = StyleSheet.create({
   loadingMoreContainer: {
     paddingVertical: 16,
     alignItems: 'center',
+  },
+  headerShareButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
