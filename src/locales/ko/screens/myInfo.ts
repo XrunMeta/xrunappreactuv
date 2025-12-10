@@ -12,6 +12,8 @@ export default {
   settingsSubtitle: '앱 설정, 언어 설정',
   referralEdit: '레퍼럴 수정',
   referralEditSubtitle: '추천인 관리',
+  shopSales: 'Shop 매출',
+  shopSalesSubtitle: '판매 현황 관리',
   logout: '로그아웃',
   shareReferral: '레퍼럴 링크 공유',
   logoutConfirm: '로그아웃 하시겠습니까?',
