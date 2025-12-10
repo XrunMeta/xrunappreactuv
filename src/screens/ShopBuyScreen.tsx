@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: COLORS.buttonSecondary,
+    backgroundColor: '#c1c1c1',
   },
   primaryButton: {
     backgroundColor: COLORS.buttonPrimary,
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   cancelText: {
-    color: '#000000',
+    color: '#666666',
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
   },
