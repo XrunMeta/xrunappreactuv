@@ -4,6 +4,7 @@ export default {
   group: 'My Group',
   settlement: 'Settlement List',
   rank: 'Rank',
+  noRankData: 'No ranking data available.',
 };
 
 

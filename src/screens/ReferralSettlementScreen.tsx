@@ -111,7 +111,7 @@ export const ReferralSettlementScreen = () => {
     () => [
       { label: t('screens.referralSettlement.group'), value: 'group' },
       { label: t('screens.referralSettlement.settlement'), value: 'settlement' },
-      { label: 'Rank', value: 'rank' }, 
+      { label: t('screens.referralSettlement.rank'), value: 'rank' },
     ] as const,
     [t],
   );

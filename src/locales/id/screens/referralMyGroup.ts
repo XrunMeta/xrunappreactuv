@@ -4,5 +4,8 @@ export default {
   members: 'Anggota',
   shareFailed: 'Berbagi Gagal',
   shareFailedMessage: 'Informasi email pengguna tidak ditemukan.',
+  emptyTitle: 'Tidak Ada Anggota Grup',
+  emptyDescription: 'Anda belum menambahkan anggota ke grup Anda.\nUndang orang lain untuk memperluas jaringan Anda!',
+  rank: 'Peringkat',
 };
 

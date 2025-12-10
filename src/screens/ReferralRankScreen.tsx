@@ -233,7 +233,7 @@ export const ReferralRankScreen = () => {
         <ReferralStatsCard title="">
           <View style={styles.rankCardContent}>
             <View style={styles.rankLeft}>
-              <Text style={styles.rankHelper}>My Rank</Text>
+              <Text style={styles.rankHelper}>{t('screens.referralRank.myRank')}</Text>
               <Text style={styles.rankEmail} numberOfLines={1} ellipsizeMode="tail">
                 {userEmail}
               </Text>
@@ -267,7 +267,7 @@ export const ReferralRankScreen = () => {
             </View>
           ) : currentData.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>순위 데이터가 없습니다.</Text>
+              <Text style={styles.emptyText}>{t('screens.referralRank.noRankData')}</Text>
             </View>
           ) : (
             <FlatList
