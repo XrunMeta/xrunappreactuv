@@ -25,6 +25,8 @@ export interface DataListProps<T> {
   onItemPress?: (item: T, index: number) => void;
 
   emptyMessage?: string;
+
+  itemProps?: Record<string, any>;
 }
 
 const DataListComponent = <T extends Record<string, any>>(
@@ -36,6 +38,7 @@ const DataListComponent = <T extends Record<string, any>>(
     keyExtractor,
     onItemPress,
     emptyMessage,
+    itemProps,
   }: DataListProps<T>,
   ref: React.Ref<DataListRef>
 ) => {
@@ -189,6 +192,7 @@ const DataListComponent = <T extends Record<string, any>>(
             <View key={getKey(item, index)}>
               <ItemComponent
                 {...item}
+                {...itemProps}
                 {...(onItemPress && {
                   onPress: () => handleItemPress(item, index),
                 })}

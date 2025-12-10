@@ -34,6 +34,8 @@ export const ROUTES = {
   walletTransactionProgress: 'walletTransactionProgress',
   walletTransactionResult: 'walletTransactionResult',
   walletReceive: 'walletReceive',
+  walletAddressBook: 'walletAddressBook',
+  addWalletAddress: 'addWalletAddress',
   myInfo: 'myInfo',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoEdit: 'myInfoEdit',
@@ -59,6 +61,7 @@ export const ROUTES = {
   shopTicketDetail: 'shopTicketDetail',
   showNapAd: 'showNapAd',
   xrunInfo: 'xrunInfo',
+  myinfoShopSales: 'myinfoShopSales',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

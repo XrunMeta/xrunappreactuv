@@ -439,15 +439,15 @@ export const ShopTicketScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor='#F8FAFC'>
-      <Header 
-        title={t('screens.shop.title')} 
+      <Header
+        title={t('screens.shop.title')}
         rightComponent={
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setShowSearchBar(!showSearchBar)}
             activeOpacity={0.7}
             style={styles.searchButton}
           >
-            <Text style={styles.searchButtonText}>{t('screens.shop.search')}</Text>
+            <Feather name="search" size={20} color={COLORS.headerText} />
           </TouchableOpacity>
         }
       />
@@ -599,12 +599,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   searchButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  searchButtonText: {
-    fontSize: FONTS.size.msmall,
-    fontFamily: 'Roboto-Regular',
-    color: COLORS.headerText,
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
