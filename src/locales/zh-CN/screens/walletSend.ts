@@ -14,11 +14,13 @@ export default {
     addressRequired: '请通过扫描二维码输入接收地址',
     amountRequired: '请输入发送金额',
     insufficientBalance: '余额不足',
+    invalidAddress: '无效地址。地址必须以0x开头。',
   },
   alerts: {
     addressRequired: '需要地址',
     amountRequired: '需要金额',
     insufficientBalance: '余额不足',
+    invalidAddress: '无效地址',
   },
 };
 

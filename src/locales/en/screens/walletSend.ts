@@ -14,11 +14,13 @@ export default {
     addressRequired: 'Please scan QR code to enter receiver address',
     amountRequired: 'Please enter amount to send',
     insufficientBalance: 'Insufficient balance',
+    invalidAddress: 'Invalid address. Address must start with 0x.',
   },
   alerts: {
     addressRequired: 'Address Required',
     amountRequired: 'Amount Required',
     insufficientBalance: 'Insufficient Balance',
+    invalidAddress: 'Invalid Address',
   },
 };
 
