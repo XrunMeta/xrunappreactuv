@@ -7,6 +7,7 @@ import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_814266 } from '../components';
 import { v_a61db3, v_9b1a04, v_1bfbd0 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_700ef9 } from '../context';
 
 const v_18b8bf = Array.from({ length: 7 }, (v_37eab7, v_a56041) => ({
   rank: v_a56041 === 0 ? 2 : 1,
@@ -17,18 +18,38 @@ const v_18b8bf = Array.from({ length: 7 }, (v_37eab7, v_a56041) => ({
 
 export const v_8c15c4 = () => {
   const { t: v_8d41d7 } = v_772971();
-  const { reset: v_487a25 } = v_a0daa8();
+  const { reset: v_487a25, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { selectedReferralMember: v_f87030, setSelectedReferralMember: v_779227 } = v_700ef9();
+
+  const v_98c1d0 = v_f87030?.depth || 2;
 
   const v_7f2e65 = () => {
-    v_487a25(v_ce4741.map);
+    v_487a25(v_ce4741.referralMyGroup);
+  };
+
+  const v_6ca26b = () => {
+    if (v_98c1d0 > 2) {
+
+      v_779227({
+        ...v_f87030,
+        member: v_f87030?.member || '',
+        email: v_f87030?.email || '',
+        depth: v_98c1d0 - 1,
+      });
+      v_c7ac57();
+    } else {
+
+      v_c7ac57();
+    }
   };
 
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
       <Header
-        title={v_8d41d7('screens.referralDepthTwo.title')}
-        showBackButton={false}
+        title={`${v_8d41d7('screens.referralDepthTwo.title')} ${v_98c1d0}`}
+        showBackButton={true}
+        onBackPress={v_6ca26b}
         rightComponent={
           <TouchableOpacity
             style={v_d81136.closeButton}
@@ -44,10 +65,10 @@ export const v_8c15c4 = () => {
           {v_18b8bf.map((v_3ac7e7, v_a56041) => (
             <ReferralMemberRow
               key={`${v_3ac7e7.email}-${v_a56041}`}
-              rank={v_3ac7e7.rank}
               email={v_3ac7e7.email}
               date={v_3ac7e7.date}
-              highlight={v_3ac7e7.highlight}
+              hideRank={true}
+              hideHighlightBorder={true}
             />
           ))}
         </View>
@@ -75,5 +96,4 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
   },
 });
-
 

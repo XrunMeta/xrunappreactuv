@@ -118,10 +118,10 @@ export const v_5b4c5a = () => {
     return (
       <ReferralMemberRow
         key={v_8c0b26.id}
-        rank={v_8c0b26.rank}
         email={v_8c0b26.email}
         date={v_8c0b26.date}
-        highlight={v_8c0b26.highlight}
+        hideRank={true}
+        hideHighlightBorder={true}
         onPress={() => {
 
           v_779227({
