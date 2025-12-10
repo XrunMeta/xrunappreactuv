@@ -60,6 +60,7 @@ export const v_ce4741 = {
   shopSuccess: 'shopSuccess',
   shopTicketDetail: 'shopTicketDetail',
   showNapAd: 'showNapAd',
+  showPockAd: 'showPockAd',
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
 } as const;
