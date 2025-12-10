@@ -68,7 +68,7 @@ const v_325ac3 = (
         id: v_224318,
         type: v_8c0b26.email || '',
         description: v_6856a9,
-        amount: `+${v_35c0e0(v_8c0b26.amountasxrun)} XRUN`,
+        amount: `+${parseFloat(String(v_8c0b26.amountasxrun)).toFixed(2)} XRUN`,
         date: v_16897e(v_8c0b26.datetime),
         transaction: v_8c0b26.transaction,
       };
