@@ -2318,16 +2318,27 @@ export const getPockAds = async (
     const url = `${env.GATEWAY_NODEJS}/getPockAds`;
 
     let osType: number;
-    if (deviceInfo.manufacturer === 'Apple') {
+    let osTypeString: string;
+
+    const isIOS = Platform.OS === 'ios' || 
+                  deviceInfo.manufacturer === 'Apple' || 
+                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
+                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
+
+    if (isIOS) {
       osType = 3113; 
+      osTypeString = 'IOS'; 
     } else {
       osType = 3112; 
+      osTypeString = 'ANDROID'; 
     }
+    console.log('osTypeString', osTypeString);
+    console.log('osType', osType);
 
     const requestBody = {
       member: member,
       ad_key: campid || '', 
-      os: osType, 
+      os: osTypeString, 
       device_ifa: adid || '', 
       ip: deviceInfo.ipAddress || '',
     };

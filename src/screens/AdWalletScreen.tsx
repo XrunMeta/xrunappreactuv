@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BigNumber from 'bignumber.js';
 import { Header, SegmentedControl, DataList, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -43,6 +44,7 @@ export const AdWalletScreen = () => {
     amountasxrun: '0 XRUN',
   });
   const [topBannersLoading, setTopBannersLoading] = useState(false);
+  const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
 
   const pendingListRef = useRef<DataListRef>(null);
   const settledListRef = useRef<DataListRef>(null);
@@ -68,6 +70,24 @@ export const AdWalletScreen = () => {
   }, []);
 
   useEffect(() => {
+    const loadGopaxPrice = async () => {
+      try {
+        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+        if (priceDataStr) {
+          const priceData = JSON.parse(priceDataStr);
+          const price = priceData?.data?.gopaxPrice || null;
+          setGopaxPrice(price);
+          console.log('[AdWallet] 고팍스 XRUN 가격 로드:', price);
+        }
+      } catch (error) {
+        console.error('[AdWallet] 고팍스 XRUN 가격 로드 오류:', error);
+      }
+    };
+
+    loadGopaxPrice();
+  }, []);
+
+  useEffect(() => {
     if (!member) return;
 
     const loadTopBanners = async () => {
@@ -85,11 +105,32 @@ export const AdWalletScreen = () => {
         if (responseData && responseData.transactions && responseData.transactions.length > 0) {
           const transaction = responseData.transactions[0];
 
-          const krwAmountValue = parseFloat(transaction.krwamount || '0');
-          const krwamount = formatCurrency(krwAmountValue, 'KRW');
-
           const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(2);
           const amountasxrun = `${amountAsXrunValue} XRUN`;
+
+          let krwamount = '0 KRW';
+          if (gopaxPrice && transaction.amountasxrun) {
+            try {
+              const balanceAmount = new BigNumber(transaction.amountasxrun || '0');
+              const krwAmount = balanceAmount.multipliedBy(gopaxPrice);
+
+              const formatted = krwAmount.toFixed(0);
+              const parts = formatted.split('.');
+              const integerPart = parts[0];
+              const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+              krwamount = `KRW ${formattedInteger}`;
+            } catch (error) {
+              console.error('[AdWallet] KRW 금액 계산 오류:', error);
+
+              const krwAmountValue = parseFloat(transaction.krwamount || '0');
+              krwamount = formatCurrency(krwAmountValue, 'KRW');
+            }
+          } else {
+
+            const krwAmountValue = parseFloat(transaction.krwamount || '0');
+            krwamount = formatCurrency(krwAmountValue, 'KRW');
+          }
 
           setTopBannersData({
             krwamount,
@@ -113,7 +154,7 @@ export const AdWalletScreen = () => {
     };
 
     loadTopBanners();
-  }, [member, tab]);
+  }, [member, tab, gopaxPrice]);
 
   const formatDate = useCallback(
     (utcString: string | undefined): string => {
