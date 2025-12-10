@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,12 @@ interface MemberData {
   date: string;
   member: string;
   highlight?: boolean;
+}
+
+interface DepthHistoryItem {
+  member: string;
+  email: string;
+  depth: number;
 }
 
 const transformDepthData = (apiData: MyGroupItem[]): MemberData[] => {
@@ -59,9 +65,27 @@ export const ReferralDepthOneScreen = () => {
   const [depthMembers, setDepthMembers] = useState<MemberData[]>([]);
   const [loading, setLoading] = useState(true);
   const [depthLevel, setDepthLevel] = useState<number>(2); 
+  const [currentMember, setCurrentMember] = useState<string | null>(null);
+
+  const depthHistoryRef = useRef<DepthHistoryItem[]>([]);
 
   const handleClose = () => {
-    reset(ROUTES.map);
+    reset(ROUTES.referralMyGroup);
+  };
+
+  const handleBack = () => {
+    if (depthHistoryRef.current.length > 0) {
+
+      const previousDepth = depthHistoryRef.current.pop();
+      if (previousDepth) {
+        setDepthLevel(previousDepth.depth);
+        setCurrentMember(previousDepth.member);
+        fetchDepthData(previousDepth.member);
+      }
+    } else {
+
+      reset(ROUTES.referralMyGroup);
+    }
   };
 
   useEffect(() => {
@@ -102,35 +126,51 @@ export const ReferralDepthOneScreen = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (selectedReferralMember?.member) {
+    if (selectedReferralMember?.member && !currentMember) {
 
-      const currentDepth = selectedReferralMember.depth || 2;
-      setDepthLevel(currentDepth);
+      const initialDepth = selectedReferralMember.depth || 2;
+      setDepthLevel(initialDepth);
+      setCurrentMember(selectedReferralMember.member);
       fetchDepthData(selectedReferralMember.member);
-    } else if (memberId) {
+    } else if (memberId && !currentMember) {
 
       setDepthLevel(2);
+      setCurrentMember(memberId);
       fetchDepthData(memberId);
     }
-  }, [selectedReferralMember, memberId, fetchDepthData]);
+  }, [selectedReferralMember, memberId, currentMember, fetchDepthData]);
+
+  const goToNextDepth = (item: MemberData) => {
+
+    if (currentMember) {
+      depthHistoryRef.current.push({
+        member: currentMember,
+        email: selectedReferralMember?.email || '',
+        depth: depthLevel,
+      });
+    }
+
+    const nextDepth = depthLevel + 1;
+    setDepthLevel(nextDepth);
+    setCurrentMember(item.member);
+    fetchDepthData(item.member);
+
+    setSelectedReferralMember({
+      member: item.member,
+      email: item.email,
+      depth: nextDepth,
+    });
+  };
 
   const renderDepthItem = ({ item }: { item: MemberData }) => {
     return (
       <ReferralMemberRow
         key={item.id}
-        rank={item.rank}
         email={item.email}
         date={item.date}
-        highlight={item.highlight}
-        onPress={() => {
-
-          setSelectedReferralMember({
-            member: item.member,
-            email: item.email,
-            depth: depthLevel + 1,
-          });
-          navigate(ROUTES.referralDepthOne);
-        }}
+        hideRank={true}
+        hideHighlightBorder={true}
+        onPress={() => goToNextDepth(item)}
       />
     );
   };
@@ -141,7 +181,7 @@ export const ReferralDepthOneScreen = () => {
     <SafeView style={styles.container}>
       <Header
         title={`${t('screens.referralDepthOne.title')} ${depthLevel}`}
-        onBackPress={goBack}
+        onBackPress={handleBack}
         showBackButton
         rightComponent={
           <TouchableOpacity
