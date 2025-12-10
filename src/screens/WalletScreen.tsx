@@ -602,8 +602,10 @@ export const WalletScreen = () => {
   );
 
   const TokenListItemComponent: React.FC<TokenListItemData & { onPress?: () => void }> = (props) => {
-    const { title, subtitle, amount, suffix, iconSource, fallbackLabel, fallbackColors, onPress } =
+    const { title, subtitle, amount, suffix, iconSource, fallbackLabel, fallbackColors, currency, onPress } =
       props;
+
+    const iconSize = currency === 2 ? 28 : 22;
 
     return (
       <TouchableOpacity
@@ -621,7 +623,7 @@ export const WalletScreen = () => {
             {iconSource ? (
               <Image
                 source={iconSource}
-                style={styles.tokenIconImage}
+                style={[styles.tokenIconImage, { width: iconSize, height: iconSize }]}
                 resizeMode="contain"
               />
             ) : (
