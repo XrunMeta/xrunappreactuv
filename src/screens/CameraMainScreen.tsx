@@ -386,9 +386,9 @@ try {
 }
 
 try {
-  iconMapPoint = require('../../assets/images/icon_mapPoint.png');
+  iconMapPoint = require('../../assets/images/locationpin2.png');
 } catch (e) {
-  console.warn('icon_mapPoint.png not found');
+  console.warn('locationpin2.png not found');
 }
 
 let iconXrunWhite: any = null;
