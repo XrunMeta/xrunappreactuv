@@ -59,13 +59,13 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
 const v_d81136 = v_472849.create({
   notificationTextContainer: {
     position: 'absolute',
-    top: 50,
+    top: 65,
     left: 10,
     right: 0,
     width: 80,
     height: 28,
     paddingVertical: 2,
-    backgroundColor: 'rgba(141, 216, 239, 0.9)',
+    backgroundColor: 'rgb(255, 255, 255)',
     zIndex: 9999, 
     justifyContent: 'center',
     paddingHorizontal: 16,
