@@ -19,11 +19,31 @@ import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { SafeView } from '../components';
+import { CombinedAsset } from '../types';
+
+const createAssetFromCurrency = (currency: number): CombinedAsset => {
+  switch (currency) {
+    case 1:
+      return { id: 1, symbol: 'XRUN', name: 'Main Wallet', amount: '0', icon: '', currency: 1, isCustom: false };
+    case 2:
+      return { id: 2, symbol: 'ETH', name: 'Ethereum', amount: '0', icon: '', currency: 2, isCustom: false };
+    case 3:
+      return { id: 3, symbol: 'RUN', name: 'RUN', amount: '0', icon: '', currency: 3, isCustom: false };
+    case 16:
+      return { id: 16, symbol: 'POL', name: 'Polygon', amount: '0', icon: '', currency: 16, isCustom: false };
+    case 18:
+      return { id: 18, symbol: 'XRUN', name: 'XRUN', amount: '0', icon: '', currency: 18, isCustom: false };
+    case 19:
+      return { id: 19, symbol: 'XRUN', name: 'AD XRUN', amount: '0', icon: '', currency: 19, isCustom: false };
+    default:
+      return { id: 1, symbol: 'XRUN', name: 'Main Wallet', amount: '0', icon: '', currency: 1, isCustom: false };
+  }
+};
 
 export const WalletQrScanScreen = () => {
   const { t } = useTranslation();
-  const { goBack, navigate } = useAppNavigation();
-  const { setWalletSendAddress } = useAppContext();
+  const { goBack, navigate, previousScreen } = useAppNavigation();
+  const { setWalletSendAddress, walletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -40,9 +60,18 @@ export const WalletQrScanScreen = () => {
       }
       setIsProcessing(true);
       setWalletSendAddress(data);
-      goBack();
+
+      if (previousScreen === ROUTES.walletSend) {
+
+        goBack();
+      } else {
+
+        const asset = createAssetFromCurrency(walletReceiveCurrency);
+        setSelectedWalletAsset(asset);
+        navigate(ROUTES.walletSend);
+      }
     },
-    [goBack, isProcessing, setWalletSendAddress],
+    [goBack, navigate, isProcessing, setWalletSendAddress, previousScreen, walletReceiveCurrency, setSelectedWalletAsset],
   );
   const handleQrScanPress = () => {
     navigate(ROUTES.walletReceive);
