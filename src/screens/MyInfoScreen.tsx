@@ -80,15 +80,6 @@ export const MyInfoScreen = () => {
         route: 'myInfoClauses',
       },
       {
-        id: 'setting',
-        label: t('screens.myInfo.settings'),
-        subtitle: t('screens.myInfo.settingsSubtitle'),
-        iconName: 'settings-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#8B5CF6',
-        route: 'myInfoSettings',
-      },
-      {
         id: 'referral',
         label: t('screens.myInfo.referralEdit'),
         subtitle: t('screens.myInfo.referralEditSubtitle'),
@@ -96,6 +87,15 @@ export const MyInfoScreen = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#EC4899',
         route: 'myInfoReferral',
+      },
+      {
+        id: 'setting',
+        label: t('screens.myInfo.settings'),
+        subtitle: t('screens.myInfo.settingsSubtitle'),
+        iconName: 'settings-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#8B5CF6',
+        route: 'myInfoSettings',
       },
     ],
     [t],
@@ -290,6 +290,15 @@ export const MyInfoScreen = () => {
           }
         }}
         showBackButton
+        rightComponent={
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={styles.headerLogoutButton}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons name="logout" size={20} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
       />
       {}
       <View style={styles.adBanner}>
@@ -299,7 +308,7 @@ export const MyInfoScreen = () => {
       <View style={styles.scrollContent}>
         <View style={styles.profileCard}>
           <View style={styles.profileIconContainer}>
-            <Ionicons name="person-outline" size={32} color="#666666" />
+            <Ionicons name="person-outline" size={28} color="#666666" />
           </View>
           <View style={styles.profileInfo}>
             {isLoading ? (
@@ -315,26 +324,7 @@ export const MyInfoScreen = () => {
               </>
             )}
           </View>
-          <View style={styles.profileActions}>
-            <TouchableOpacity
-              onPress={handleShare}
-              style={styles.actionButton}
-              activeOpacity={0.7}
-            >
-              <Feather name="share-2" size={18} color={COLORS.headerText} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleLogout}
-              style={styles.actionButton}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name="logout"
-                size={18}
-                color={COLORS.headerText}
-              />
-            </TouchableOpacity>
-          </View>
+
         </View>
         <SafeScrollView style={styles.menuListContainer} showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
           {}
@@ -410,8 +400,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   profileIconContainer: {
-    width: 56,
-    height: 56,
+    width: 40,
+    height: 40,
     borderRadius: 30,
     backgroundColor: '#F8FAFC',
     borderWidth: 1,
@@ -499,6 +489,13 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#fff',
   },
-
+  headerLogoutButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
