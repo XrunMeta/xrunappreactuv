@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, TaboolaBannerCore, SafeScrollView, SafeView } from '../components';
@@ -8,6 +8,10 @@ import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { CameraMainScreen } from './CameraMainScreen';
 import { TaboolaBanner } from '../components/TaboolaBanner';
+
+const XRUN_HORIZONTAL_LOGO = require('../../assets/xrun-horizontal-logo.png');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
@@ -38,6 +42,15 @@ export const LoginSignupScreen = () => {
   return (
     <SafeView style={styles.container}>
       <StatusBar style="dark" />
+      {}
+      <View style={styles.logoContainer}>
+        <Image
+          source={XRUN_HORIZONTAL_LOGO}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
@@ -84,7 +97,23 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     ...COMMON_STYLES.scrollContent,
-
+    minHeight: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    position: 'absolute',
+    top: SCREEN_HEIGHT * 0.3,
+    left: 0,
+    right: 0,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  logo: {
+    width: 200,
+    height: 60,
   },
   adContainer: {
     marginBottom: SIZES.xlarge,
