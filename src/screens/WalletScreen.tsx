@@ -651,11 +651,16 @@ export const WalletScreen = () => {
 
   return (
     <SafeView style={styles.container}>
-      <Header title={t('screens.wallet.title')} onBackPress={() => navigate(ROUTES.map)} showBackButton />
+      <Header
+        title={t('screens.wallet.title')}
+        onBackPress={() => navigate(ROUTES.map)}
+        showBackButton
+      />
       {}
       <View style={styles.taboolaContainer}>
         <TaboolaBanner placementType="shop" />
       </View>
+
       <View style={styles.content}>
         {
 
@@ -793,7 +798,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 0,
     boxSizing: 'border-box',
-
   },
   tokenIconImage: {
     width: 28,

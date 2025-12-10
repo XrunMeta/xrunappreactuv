@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
 import { Header, ReferralMemberRow } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -52,12 +53,16 @@ const transformDepthData = (apiData: MyGroupItem[]): MemberData[] => {
 };
 
 export const ReferralDepthOneScreen = () => {
-  const { navigate, goBack } = useAppNavigation();
+  const { navigate, goBack, reset } = useAppNavigation();
   const { selectedReferralMember, setSelectedReferralMember } = useAppContext();
   const [memberId, setMemberId] = useState<string | null>(null);
   const [depthMembers, setDepthMembers] = useState<MemberData[]>([]);
   const [loading, setLoading] = useState(true);
   const [depthLevel, setDepthLevel] = useState<number>(2); 
+
+  const handleClose = () => {
+    reset(ROUTES.map);
+  };
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -138,6 +143,15 @@ export const ReferralDepthOneScreen = () => {
         title={`${t('screens.referralDepthOne.title')} ${depthLevel}`}
         onBackPress={goBack}
         showBackButton
+        rightComponent={
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={handleClose}
+            activeOpacity={0.7}
+          >
+            <Feather name="x" size={20} color={COLORS.headerText} />
+          </TouchableOpacity>
+        }
       />
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -196,5 +210,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.headerIconBg,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

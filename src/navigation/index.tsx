@@ -154,28 +154,56 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
     const backAction = () => {
 
       const currentStack = stackRef.current;
-      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack);
+      const currentScreen = currentStack[currentStack.length - 1];
+      console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack, '현재 화면:', currentScreen);
 
-      if (currentStack.length > 1) {
-        console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
-        goBack();
-        return true; 
-      }
+      const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
 
-      const now = Date.now();
-      const timeSinceLastPress = now - backHandlerTimeRef.current;
-      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');
+      const isMyInfoScreen = currentScreen?.startsWith('myInfo');
 
-      if (timeSinceLastPress < 2000) {
+      const isShopScreen = currentScreen?.startsWith('shop');
 
-        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
-        BackHandler.exitApp();
+      const isReferralScreen = currentScreen?.startsWith('referral');
+
+      if (isWalletScreen || isMyInfoScreen) {
+        if (currentStack.length > 1) {
+          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 이전 화면으로 이동');
+          goBack();
+          return true; 
+        } else {
+
+          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 뒤로 갈 수 없으므로 맵으로 이동');
+          reset(ROUTES.map);
+          return true;
+        }
+      } else if (isShopScreen || isReferralScreen) {
+
+        console.log('[Navigation] BackHandler: 쇼핑/추천 화면 - 맵으로 이동');
+        reset(ROUTES.map);
         return true;
       } else {
 
-        backHandlerTimeRef.current = now;
-        console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
-        return true; 
+        if (currentStack.length > 1) {
+          console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
+          goBack();
+          return true; 
+        }
+
+        const now = Date.now();
+        const timeSinceLastPress = now - backHandlerTimeRef.current;
+        console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');
+
+        if (timeSinceLastPress < 2000) {
+
+          console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+          BackHandler.exitApp();
+          return true;
+        } else {
+
+          backHandlerTimeRef.current = now;
+          console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+          return true; 
+        }
       }
     };
 
@@ -186,7 +214,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log('[Navigation] BackHandler: 리스너 제거');
       backHandler.remove();
     };
-  }, [goBack]); 
+  }, [goBack, reset]); 
 
   const value = useMemo(
     () => ({
