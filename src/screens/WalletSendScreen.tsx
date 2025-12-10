@@ -7,39 +7,56 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Modal,
+  Animated,
+  PanResponder,
+  FlatList,
+  Image,
+  ImageSourcePropType,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 
-const SAMPLE_ADDRESS_BOOK = [
-  {
-    id: '1',
-    name: '내 지갑',
-    address: '0x1234567890abcdef1234567890abcdef12345678',
-    network: 'Ethereum',
-    networkColor: '#627EEA',
-  },
-  {
-    id: '2',
-    name: '회사 지갑',
-    address: '0xabcdef1234567890abcdef1234567890abcdef12',
-    network: 'Polygon',
-    networkColor: '#8247E5',
-  },
-  {
-    id: '3',
-    name: '거래소 입금주소',
-    address: '0x9876543210fedcba9876543210fedcba98765432',
-    network: 'Ethereum',
-    networkColor: '#627EEA',
-  },
+interface AddressBookItem {
+  id: string;
+  name: string;
+  address: string;
+  network: string;
+  networkColor?: string;
+  createdAt: number;
+}
+
+interface NetworkOption {
+  value: string;
+  label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  image?: ImageSourcePropType;
+  color?: string;
+}
+
+const NETWORK_OPTIONS: NetworkOption[] = [
+  { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan.png'), color: '#8247E5' },
+  { value: 'Ethereum', label: 'Ethereum', icon: 'diamond-outline', color: '#627EEA' },
 ];
+
+const NetworkIcon = ({ option, size = 20, color = COLORS.headerText }: { option: NetworkOption; size?: number; color?: string }) => {
+  if (option.image) {
+    return <Image source={option.image} style={{ width: size, height: size }} resizeMode="contain" />;
+  }
+  if (option.icon) {
+    return <Ionicons name={option.icon} size={size} color={color} />;
+  }
+  return null;
+};
+
+const STORAGE_KEY = 'wallet_address_book';
 
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
@@ -49,6 +66,18 @@ export const WalletSendScreen = () => {
   const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
   const amountInputRef = useRef<TextInput>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
+
+  const [addressBook, setAddressBook] = useState<AddressBookItem[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<AddressBookItem | null>(null);
+  const [modalName, setModalName] = useState('');
+  const [modalAddress, setModalAddress] = useState('');
+  const [modalNetwork, setModalNetwork] = useState('Polygon');
+  const [showNetworkPicker, setShowNetworkPicker] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const swipeAnimations = useRef<{ [key: string]: Animated.Value }>({});
+  const [openSwipeableId, setOpenSwipeableId] = useState<string | null>(null);
 
   const formatNumberWithCommas = useCallback((value: string): string => {
 
@@ -106,6 +135,40 @@ export const WalletSendScreen = () => {
   }, [walletSendAddress, t, showAlert]);
 
   useEffect(() => {
+    loadAddressBook();
+  }, []);
+
+  useEffect(() => {
+    if (walletSendAddress && walletSendAddress.trim() && showEditModal) {
+      setModalAddress(walletSendAddress);
+      resetWalletSendAddress();
+    }
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+
+  const loadAddressBook = useCallback(async () => {
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const addresses: AddressBookItem[] = JSON.parse(stored);
+
+        const addressesWithColors = addresses.map((item) => ({
+          ...item,
+          networkColor: NETWORK_OPTIONS.find(n => n.value === item.network)?.color || COLORS.primary,
+        }));
+        setAddressBook(addressesWithColors);
+
+        addressesWithColors.forEach((item) => {
+          if (!swipeAnimations.current[item.id]) {
+            swipeAnimations.current[item.id] = new Animated.Value(0);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[주소록] 로드 실패:', error);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!selectedWalletAsset) {
       goBack();
     }
@@ -125,6 +188,110 @@ export const WalletSendScreen = () => {
   const handlePastePress = () => {
     navigate(ROUTES.addWalletAddress);
   };
+
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+    setModalName('');
+    setModalAddress('');
+    setModalNetwork('Polygon');
+  };
+
+  const handleSaveAddress = useCallback(async () => {
+    if (!modalName.trim()) {
+      await showAlert('오류', '이름을 입력해주세요.');
+      return;
+    }
+
+    if (!modalAddress.trim()) {
+      await showAlert('오류', '주소를 입력해주세요.');
+      return;
+    }
+
+    if (!modalAddress.trim().match(/^0x[a-fA-F0-9]{40}$/)) {
+      await showAlert('오류', '유효한 주소를 입력해주세요. (0x로 시작하는 42자)');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const existingAddresses: AddressBookItem[] = stored ? JSON.parse(stored) : [];
+
+      if (editingItem) {
+
+        const updatedAddresses = existingAddresses.map((item) =>
+          item.id === editingItem.id
+            ? {
+                ...item,
+                name: modalName.trim(),
+                address: modalAddress.trim(),
+                network: modalNetwork,
+              }
+            : item
+        );
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
+        await showAlert('성공', '주소가 수정되었습니다.');
+      } else {
+
+        const newItem: AddressBookItem = {
+          id: Date.now().toString(),
+          name: modalName.trim(),
+          address: modalAddress.trim(),
+          network: modalNetwork,
+          createdAt: Date.now(),
+        };
+        const updatedAddresses = [...existingAddresses, newItem];
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
+        await showAlert('성공', '주소가 추가되었습니다.');
+      }
+
+      loadAddressBook();
+      handleCloseModal();
+    } catch (error) {
+      console.error('[주소록] 저장 실패:', error);
+      await showAlert('오류', '저장에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [modalName, modalAddress, modalNetwork, editingItem, showAlert, loadAddressBook]);
+
+  const handleDeleteAddress = useCallback(async (itemId: string) => {
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const existingAddresses: AddressBookItem[] = stored ? JSON.parse(stored) : [];
+      const updatedAddresses = existingAddresses.filter((item) => item.id !== itemId);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
+
+      delete swipeAnimations.current[itemId];
+
+      loadAddressBook();
+      await showAlert('성공', '주소가 삭제되었습니다.');
+    } catch (error) {
+      console.error('[주소록] 삭제 실패:', error);
+      await showAlert('오류', '삭제에 실패했습니다.');
+    }
+  }, [showAlert, loadAddressBook]);
+
+  const handleEditAddress = useCallback((item: AddressBookItem) => {
+    setEditingItem(item);
+    setModalName(item.name);
+    setModalAddress(item.address);
+    setModalNetwork(item.network);
+    setShowEditModal(true);
+
+    if (swipeAnimations.current[item.id]) {
+      Animated.spring(swipeAnimations.current[item.id], {
+        toValue: 0,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, []);
+
+  const handleQrScanFromModal = useCallback(() => {
+    navigate(ROUTES.walletQrScan);
+  }, [navigate]);
 
   const handleAmountFocus = () => {
     if (sendAmount === '0') {
@@ -265,24 +432,132 @@ export const WalletSendScreen = () => {
 
           {}
           <View style={styles.addressListContainer}>
-            {SAMPLE_ADDRESS_BOOK.length === 0 ? (
+            {addressBook.length === 0 ? (
               <View style={styles.emptyAddressContainer}>
                 <Text style={styles.emptyAddressText}>{t('screens.walletSend.noAddresses')}</Text>
               </View>
             ) : (
-              <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent' autoAdjustKeyboardPadding={true}>
+              <SafeScrollView 
+                showsVerticalScrollIndicator={false} 
+                showBottomBackground={false} 
+                backgroundColor='transparent' 
+                autoAdjustKeyboardPadding={true}
+                onScrollBeginDrag={() => {
+
+                  if (openSwipeableId) {
+                    Animated.spring(swipeAnimations.current[openSwipeableId], {
+                      toValue: 0,
+                      useNativeDriver: true,
+                    }).start();
+                    setOpenSwipeableId(null);
+                  }
+                }}
+              >
                 {}
-                {SAMPLE_ADDRESS_BOOK.map((item) => (
-                  <AddressInfoItem
-                    key={item.id}
-                    symbol={selectedWalletAsset.symbol}
-                    address={item.address}
-                    network={item.network}
-                    networkColor={item.networkColor}
-                    name={item.name}
-                    onPress={() => setWalletSendAddress(item.address)}
-                  />
-                ))}
+                {addressBook.map((item) => {
+
+                  if (!swipeAnimations.current[item.id]) {
+                    swipeAnimations.current[item.id] = new Animated.Value(0);
+                  }
+
+                  const panResponder = PanResponder.create({
+                    onStartShouldSetPanResponder: () => false,
+                    onMoveShouldSetPanResponder: (_, gestureState) => {
+
+                      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
+                    },
+                    onPanResponderGrant: () => {
+
+                      if (openSwipeableId && openSwipeableId !== item.id) {
+                        Animated.spring(swipeAnimations.current[openSwipeableId], {
+                          toValue: 0,
+                          useNativeDriver: true,
+                        }).start();
+                        setOpenSwipeableId(null);
+                      }
+                    },
+                    onPanResponderMove: (_, gestureState) => {
+
+                      if (gestureState.dx < 0) {
+                        swipeAnimations.current[item.id].setValue(Math.max(gestureState.dx, -120));
+                      } else if (gestureState.dx > 0 && openSwipeableId === item.id) {
+
+                        swipeAnimations.current[item.id].setValue(Math.min(gestureState.dx - 120, 0));
+                      }
+                    },
+                    onPanResponderRelease: (_, gestureState) => {
+                      if (gestureState.dx < -60) {
+
+                        Animated.spring(swipeAnimations.current[item.id], {
+                          toValue: -120,
+                          useNativeDriver: true,
+                        }).start();
+                        setOpenSwipeableId(item.id);
+                      } else {
+
+                        Animated.spring(swipeAnimations.current[item.id], {
+                          toValue: 0,
+                          useNativeDriver: true,
+                        }).start();
+                        setOpenSwipeableId(null);
+                      }
+                    },
+                  });
+
+                  const translateX = swipeAnimations.current[item.id];
+
+                  return (
+                    <View key={item.id} style={styles.swipeableContainer}>
+                      {}
+                      <View style={styles.swipeableActions}>
+                        <TouchableOpacity
+                          style={[styles.swipeableButton, styles.editButton]}
+                          onPress={() => handleEditAddress(item)}
+                        >
+                          <Ionicons name="pencil-outline" size={20} color="#ffffff" />
+                          <Text style={styles.swipeableButtonText}>수정</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.swipeableButton, styles.deleteButton]}
+                          onPress={() => handleDeleteAddress(item.id)}
+                        >
+                          <Ionicons name="trash-outline" size={20} color="#ffffff" />
+                          <Text style={styles.swipeableButtonText}>삭제</Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {}
+                      <Animated.View
+                        style={[
+                          styles.swipeableContent,
+                          {
+                            transform: [{ translateX }],
+                          },
+                        ]}
+                        {...panResponder.panHandlers}
+                      >
+                        <AddressInfoItem
+                          symbol={selectedWalletAsset.symbol}
+                          address={item.address}
+                          network={item.network}
+                          networkColor={item.networkColor}
+                          name={item.name}
+                          onPress={() => {
+                            setWalletSendAddress(item.address);
+
+                            if (openSwipeableId === item.id) {
+                              Animated.spring(swipeAnimations.current[item.id], {
+                                toValue: 0,
+                                useNativeDriver: true,
+                              }).start();
+                              setOpenSwipeableId(null);
+                            }
+                          }}
+                        />
+                      </Animated.View>
+                    </View>
+                  );
+                })}
               </SafeScrollView>
             )}
           </View>
@@ -297,6 +572,146 @@ export const WalletSendScreen = () => {
         </View>
       </View>
 
+      {}
+      <Modal
+        visible={showEditModal}
+        transparent
+        animationType="slide"
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {editingItem ? '주소 수정' : '주소 추가'}
+              </Text>
+              <TouchableOpacity onPress={handleCloseModal} style={styles.modalCloseButton}>
+                <Ionicons name="close" size={24} color={COLORS.headerText} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+              {}
+              <View style={styles.modalInputGroup}>
+                <Text style={styles.modalInputLabel}>이름</Text>
+                <View style={styles.modalInputContainer}>
+                  <Ionicons name="person-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="이름을 입력하세요"
+                    placeholderTextColor="#999"
+                    value={modalName}
+                    onChangeText={setModalName}
+                  />
+                </View>
+              </View>
+
+              {}
+              <View style={styles.modalInputGroup}>
+                <Text style={styles.modalInputLabel}>네트워크</Text>
+                <TouchableOpacity
+                  style={styles.modalSelectContainer}
+                  onPress={() => setShowNetworkPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.modalInputIcon}>
+                    <NetworkIcon option={NETWORK_OPTIONS.find(n => n.value === modalNetwork) || NETWORK_OPTIONS[0]} size={20} color={COLORS.headerText} />
+                  </View>
+                  <Text style={styles.modalSelectText}>
+                    {NETWORK_OPTIONS.find(n => n.value === modalNetwork)?.label || 'Polygon'}
+                  </Text>
+                  <Ionicons name="chevron-down" size={20} color={COLORS.headerText} />
+                </TouchableOpacity>
+              </View>
+
+              {}
+              <View style={styles.modalInputGroup}>
+                <Text style={styles.modalInputLabel}>주소</Text>
+                <View style={styles.modalInputContainer}>
+                  <Ionicons name="wallet-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="주소를 입력하세요"
+                    placeholderTextColor="#999"
+                    value={modalAddress}
+                    onChangeText={setModalAddress}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.modalQrButton}
+                    onPress={handleQrScanFromModal}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="qr-code-outline" size={22} color={COLORS.headerText} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+
+            {}
+            <View style={styles.modalButtonContainer}>
+              <PrimaryButton
+                title={isSaving ? '저장 중...' : editingItem ? '수정' : '저장'}
+                onPress={handleSaveAddress}
+                disabled={isSaving}
+                fullWidth
+              />
+            </View>
+          </View>
+        </View>
+
+        {}
+        <Modal
+          visible={showNetworkPicker}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowNetworkPicker(false)}
+        >
+          <TouchableOpacity
+            style={styles.networkModalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowNetworkPicker(false)}
+          >
+            <View style={styles.networkModalContent}>
+              <Text style={styles.networkModalTitle}>네트워크 선택</Text>
+              <FlatList
+                data={NETWORK_OPTIONS}
+                keyExtractor={(item) => item.value}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.networkOptionItem,
+                      modalNetwork === item.value && styles.networkOptionItemActive,
+                    ]}
+                    onPress={() => {
+                      setModalNetwork(item.value);
+                      setShowNetworkPicker(false);
+                    }}
+                  >
+                    <NetworkIcon
+                      option={item}
+                      size={20}
+                      color={modalNetwork === item.value ? COLORS.primary : COLORS.headerText}
+                    />
+                    <Text
+                      style={[
+                        styles.networkOptionText,
+                        modalNetwork === item.value && styles.networkOptionTextActive,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    {modalNetwork === item.value && (
+                      <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+                    )}
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </Modal>
     </SafeView>
   );
 };
@@ -449,10 +864,176 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
+    marginLeft: SIZES.small,
   },
   bottomSection: {
     ...COMMON_STYLES.bottomButtonContainer,
   },
-
+  swipeableContainer: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  swipeableActions: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 120,
+    paddingVertical: 8,
+  },
+  swipeableButton: {
+    flex: 1,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    marginHorizontal: 3,
+  },
+  editButton: {
+    backgroundColor: COLORS.primary,
+  },
+  deleteButton: {
+    backgroundColor: '#E53935',
+  },
+  swipeableButtonText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontFamily: 'Roboto-Medium',
+    marginTop: 3,
+  },
+  swipeableContent: {
+    backgroundColor: 'transparent',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.medium,
+    paddingVertical: SIZES.medium,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e3e7ec',
+  },
+  modalTitle: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.headerText,
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalScrollView: {
+    maxHeight: 400,
+  },
+  modalInputGroup: {
+    paddingHorizontal: SIZES.medium,
+    marginBottom: SIZES.large,
+  },
+  modalInputLabel: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: COLORS.text,
+    marginBottom: SIZES.small,
+  },
+  modalInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e3e7ec',
+    paddingHorizontal: SIZES.medium,
+  },
+  modalInputIcon: {
+    marginRight: SIZES.small,
+  },
+  modalInput: {
+    flex: 1,
+    paddingVertical: SIZES.medium,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.text,
+  },
+  modalQrButton: {
+    padding: SIZES.small,
+    marginLeft: SIZES.small,
+  },
+  modalSelectContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e3e7ec',
+    paddingHorizontal: SIZES.medium,
+    paddingVertical: SIZES.medium,
+  },
+  modalSelectText: {
+    flex: 1,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.text,
+  },
+  modalButtonContainer: {
+    paddingHorizontal: SIZES.medium,
+    paddingTop: SIZES.medium,
+    paddingBottom: SIZES.small,
+  },
+  networkModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  networkModalContent: {
+    width: '80%',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: SIZES.medium,
+    maxHeight: 300,
+  },
+  networkModalTitle: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.headerText,
+    marginBottom: SIZES.medium,
+    textAlign: 'center',
+  },
+  networkOptionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SIZES.medium,
+    paddingHorizontal: SIZES.small,
+    borderRadius: 12,
+    gap: SIZES.small,
+  },
+  networkOptionItemActive: {
+    backgroundColor: '#f0f4ff',
+  },
+  networkOptionText: {
+    flex: 1,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: COLORS.headerText,
+  },
+  networkOptionTextActive: {
+    color: COLORS.primary,
+  },
 });
 
