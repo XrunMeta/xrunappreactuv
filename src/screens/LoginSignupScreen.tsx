@@ -1,5 +1,5 @@
 import v_a3453e from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_326be8, v_4623af } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_326be8, v_4623af, v_cf9c33, v_700696 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_cb41de, v_8714fe, v_eaeabd, v_570c34, v_556baf } from '../components';
@@ -8,6 +8,10 @@ import { v_1bfbd0, v_9b1a04, v_a61db3, v_731ab4, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_cc3e1f } from './CameraMainScreen';
 import { v_4c7b5d } from '../components/TaboolaBanner';
+
+const v_34a8ff = require('../../assets/xrun-horizontal-logo.png');
+const { height: v_28d8d8 } = v_700696.get('window');
+
 export const v_54d331 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
@@ -38,6 +42,15 @@ export const v_54d331 = () => {
   return (
     <SafeView style={v_d81136.container}>
       <StatusBar style="dark" />
+      {}
+      <View style={v_d81136.logoContainer}>
+        <Image
+          source={v_34a8ff}
+          style={v_d81136.logo}
+          resizeMode="contain"
+        />
+      </View>
+
       <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={true}
@@ -84,7 +97,23 @@ const v_d81136 = v_472849.create({
   scrollContent: {
     flexGrow: 1,
     ...v_a61db3.scrollContent,
-
+    minHeight: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    position: 'absolute',
+    top: v_28d8d8 * 0.3,
+    left: 0,
+    right: 0,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  logo: {
+    width: 200,
+    height: 60,
   },
   adContainer: {
     marginBottom: v_9b1a04.xlarge,
