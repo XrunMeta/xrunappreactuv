@@ -26,6 +26,7 @@ export { WalletEstimateFeeScreen } from './WalletEstimateFeeScreen';
 export { WalletTransactionProgressScreen } from './WalletTransactionProgressScreen';
 export { WalletTransactionResultScreen } from './WalletTransactionResultScreen';
 export { WalletReceiveScreen } from './WalletReceiveScreen';
+export { AddWalletAddressScreen } from './AddWalletAddressScreen';
 export { MyInfoScreen } from './MyInfoScreen';
 export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
 export { MyInfoFaqScreen } from './MyInfoFaqScreen';
@@ -51,4 +52,5 @@ export { ShopSuccessScreen } from './ShopSuccessScreen';
 export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
 export { ShowNapAdScreen } from './ShowNapAdScreen';
 export { XRUNinfoScreen } from './XRUNinfo';
+export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 

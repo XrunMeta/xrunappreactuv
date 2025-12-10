@@ -12,6 +12,8 @@ export default {
   settingsSubtitle: 'App settings, Language',
   referralEdit: 'Edit Referral',
   referralEditSubtitle: 'Manage referrals',
+  shopSales: 'Shop Sales',
+  shopSalesSubtitle: 'Manage sales status',
   logout: 'Logout',
   shareReferral: 'Share Referral Link',
   logoutConfirm: 'Do you want to logout?',

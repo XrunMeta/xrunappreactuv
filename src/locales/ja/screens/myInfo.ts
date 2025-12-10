@@ -12,6 +12,8 @@ export default {
   settingsSubtitle: 'アプリ設定、言語設定',
   referralEdit: '紹介編集',
   referralEditSubtitle: '紹介者管理',
+  shopSales: 'Shop 売上',
+  shopSalesSubtitle: '販売状況管理',
   logout: 'ログアウト',
   shareReferral: '紹介リンクを共有',
   logoutConfirm: 'ログアウトしますか？',

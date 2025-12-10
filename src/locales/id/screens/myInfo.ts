@@ -12,6 +12,8 @@ export default {
   settingsSubtitle: 'Pengaturan aplikasi, Bahasa',
   referralEdit: 'Edit Referral',
   referralEditSubtitle: 'Kelola referral',
+  shopSales: 'Penjualan Shop',
+  shopSalesSubtitle: 'Kelola status penjualan',
   logout: 'Keluar',
   shareReferral: 'Bagikan Tautan Referral',
   logoutConfirm: 'Apakah Anda ingin keluar?',
