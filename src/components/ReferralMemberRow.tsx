@@ -18,6 +18,7 @@ interface ReferralMemberRowProps {
   valueText?: string;
   highlight?: boolean;
   hideHighlightBorder?: boolean;
+  hideRank?: boolean;
   rankStyle?: v_5e8657;
   onPress?: (event: v_fee73b) => void;
 }
@@ -30,11 +31,12 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
   valueText: v_870d58,
   highlight: v_70cffa,
   hideHighlightBorder: v_f909d6 = false,
+  hideRank: v_5bc55e = false,
   rankStyle: v_9e5ed6,
   onPress: v_719eed,
 }) => {
 
-  const v_f5df09 = v_70cffa === true && v_f909d6 !== true;
+  const v_f5df09 = v_70cffa === true && !v_f909d6;
 
   return (
     <TouchableOpacity
@@ -43,13 +45,13 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
       onPress={v_719eed}
       disabled={!v_719eed}
     >
-      {typeof v_5e1af4 !== 'undefined' ? (
+      {!v_5bc55e && typeof v_5e1af4 !== 'undefined' ? (
         <Text style={[v_d81136.rank, v_9e5ed6]}>{v_5e1af4}</Text>
-      ) : (
+      ) : !v_5bc55e ? (
         <View style={v_d81136.rankPlaceholder} />
-      )}
+      ) : null}
       <View style={v_d81136.infoColumn}>
-        <Text style={v_d81136.email}>{v_e0c7e8}</Text>
+        <Text style={v_d81136.email} numberOfLines={1} ellipsizeMode="tail">{v_e0c7e8}</Text>
         {v_6856a9 ? <Text style={v_d81136.description}>{v_6856a9}</Text> : null}
       </View>
       <View style={v_d81136.metaColumn}>
