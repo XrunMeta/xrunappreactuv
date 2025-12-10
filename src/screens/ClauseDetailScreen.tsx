@@ -113,10 +113,10 @@ const v_d81136 = v_472849.create({
     color: '#ff6b6b',
   },
   contentText: {
-    fontSize: v_843035.size.msmall,
-    lineHeight: 24,
+    fontSize: v_843035.size.medium,
+    lineHeight: 28,
     fontFamily: 'Roboto-Regular',
-    color: '#8e9bae',
+    color: '#333333',
   },
 });
 

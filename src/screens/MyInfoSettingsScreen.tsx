@@ -13,7 +13,7 @@ export const v_4a40b2 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <Header title="Setting" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.myInfoSettings.title')} onBackPress={v_c7ac57} showBackButton />
       <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -25,7 +25,7 @@ export const v_4a40b2 = () => {
               activeOpacity={0.85}
               onPress={() => v_7f8510(true)}
             >
-              <Text style={v_d81136.cardText}>🌐 언어 선택 (개발 모드)</Text>
+              <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -33,7 +33,7 @@ export const v_4a40b2 = () => {
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.myInfoCloseMembership)}
           >
-            <Text style={v_d81136.cardText}>Close Membership</Text>
+            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
         </View>
       </SafeScrollView>
