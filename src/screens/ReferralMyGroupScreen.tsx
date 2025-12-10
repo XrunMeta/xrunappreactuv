@@ -150,7 +150,7 @@ export const v_58584a = () => {
     () => [
       { label: v_8d41d7('screens.referralRank.group'), value: 'group' },
       { label: v_8d41d7('screens.referralRank.settlement'), value: 'settlement' },
-      { label: '순위', value: 'rank' }, 
+      { label: v_8d41d7('screens.referralMyGroup.rank'), value: 'rank' },
     ] as const,
     [v_8d41d7],
   );
@@ -210,10 +210,9 @@ export const v_58584a = () => {
         <View style={v_d81136.listContainer}>
           {!v_cd31a8 && v_03be4c === 0 ? (
             <View style={v_d81136.emptyContainer}>
-              <Text style={v_d81136.emptyTitle}>그룹 멤버 없음</Text>
+              <Text style={v_d81136.emptyTitle}>{v_8d41d7('screens.referralMyGroup.emptyTitle')}</Text>
               <Text style={v_d81136.emptyDescription}>
-                아직 그룹에 멤버를 추가하지 않았습니다.{'\n'}
-                네트워크를 확장하기 위해 사람들을 초대해보세요!
+                {v_8d41d7('screens.referralMyGroup.emptyDescription')}
               </Text>
             </View>
           ) : (

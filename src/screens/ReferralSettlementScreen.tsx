@@ -111,7 +111,7 @@ export const v_08aac3 = () => {
     () => [
       { label: v_8d41d7('screens.referralSettlement.group'), value: 'group' },
       { label: v_8d41d7('screens.referralSettlement.settlement'), value: 'settlement' },
-      { label: 'Rank', value: 'rank' }, 
+      { label: v_8d41d7('screens.referralSettlement.rank'), value: 'rank' },
     ] as const,
     [v_8d41d7],
   );
