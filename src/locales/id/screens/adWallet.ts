@@ -9,5 +9,16 @@ export default {
   expectedAdRevenue: 'Pendapatan Iklan yang Diharapkan',
   adRevenueSettlement: 'Penyelesaian Pendapatan Iklan',
   rewardAmount: 'Jumlah Hadiah',
+  attendanceCheckTitle: 'Apakah Anda ingin check-in hari ini?',
+  attendanceCheckCompleted: 'Check-in hari ini selesai',
+  attendanceCheckRewardMessage: 'Terima hadiah check-in hari ini',
+  attendanceCheckCompletedToast: 'Check-in hari ini selesai',
+  attendanceCheckRetryToast: 'Silakan coba lagi',
+  loading: 'Memproses...',
+  processing: 'Memproses...',
+  yes: 'Ya',
+  no: 'Tidak',
+  confirm: 'Konfirmasi',
+  attendanceCheck: 'Check In',
 };
 

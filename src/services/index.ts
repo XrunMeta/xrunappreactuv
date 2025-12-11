@@ -112,6 +112,10 @@ import {
   ADXRUNTopBannersSettledResponse,
   QuestListResponse,
   QuestItem,
+  QuestCheckUserRequest,
+  QuestCheckUserResponse,
+  QuestJoinRequest,
+  QuestJoinResponse,
   TransactionHistoryResponse,
   TransactionHistoryItem,
   TokenBalanceResponse,
@@ -3684,6 +3688,93 @@ export const fetchQuestList = async (
     return response.data;
   } catch (error) {
     console.error('[Quest] 퀘스트 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Quest] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const checkQuestUser = async (
+  member: number,
+  navigation?: any,
+): Promise<QuestCheckUserResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: QuestCheckUserRequest = { member };
+
+    console.log('[Quest] 출석 체크 조회 요청:', request);
+
+    let response;
+    try {
+      response = await axiosInstance.post<QuestCheckUserResponse>(
+        '/Quests/checkuser',
+        request,
+      );
+      console.log('[Quest] 출석 체크 조회 성공 (/Quests/checkuser):', response.data);
+    } catch (error) {
+
+      console.log('[Quest] /Quests/checkuser 실패, /quest/checkuser 시도');
+      response = await axiosInstance.post<QuestCheckUserResponse>(
+        '/quest/checkuser',
+        request,
+      );
+      console.log('[Quest] 출석 체크 조회 성공 (/quest/checkuser):', response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('[Quest] 출석 체크 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Quest] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const joinQuest = async (
+  request: QuestJoinRequest,
+  navigation?: any,
+): Promise<QuestJoinResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[Quest] 퀘스트 참여 요청:', request);
+
+    let response;
+    try {
+      response = await axiosInstance.post<QuestJoinResponse>(
+        '/Quests/join',
+        request,
+      );
+      console.log('[Quest] 퀘스트 참여 성공 (/Quests/join):', response.data);
+    } catch (error) {
+
+      console.log('[Quest] /Quests/join 실패, /quest/join 시도');
+      response = await axiosInstance.post<QuestJoinResponse>(
+        '/quest/join',
+        request,
+      );
+      console.log('[Quest] 퀘스트 참여 성공 (/quest/join):', response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('[Quest] 퀘스트 참여 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[Quest] 상세 오류 정보:', {
         url: error.config?.url,
