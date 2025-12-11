@@ -2960,15 +2960,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
         </MapView>
 
          {}
-      {v_5dede3 && (
-        <View style={v_d81136.topLogo}>
-          <Image
-            source={v_5dede3}
-            style={{ width: v_700696.get('window').width / 4 }}
-            resizeMode="contain"
-          />
-        </View>
-      )} 
+      {
+
+}
 
         {}
 
@@ -3174,7 +3168,7 @@ const v_d81136 = v_472849.create({
 
   mapPinButton: {
     position: 'absolute',
-    top: 34,
+    top: 26,
     right: 16,
     width: 25,
     height: 25,

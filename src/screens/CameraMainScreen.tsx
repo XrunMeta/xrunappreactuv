@@ -1585,17 +1585,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         </CameraView>
 
          {}
-      {v_5dede3 && (
-        <View style={v_d81136.topLogo}>
-          <Image
-            source={v_5dede3}
-            style={{ 
+      {
 
-              width: v_700696.get('window').width / 4 }}
-            resizeMode="contain"
-          />
-        </View>
-      )} 
+}
 
         {}
         {
