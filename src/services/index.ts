@@ -3124,6 +3124,40 @@ export const getUserBalance = async (
   }
 };
 
+export const getUsersBalanceUpdateV2 = async (
+  member: string,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = { member };
+
+    console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 요청:', { member });
+
+    const response = await axiosInstance.post<any>(
+      '/oth-path',
+      request,
+    );
+
+    console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[잔액 업데이트] 사용자 잔액 업데이트 V2 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[잔액 업데이트] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const getXrunBuyableItems = async (
   member: string,
   navigation?: any,

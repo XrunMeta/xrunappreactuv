@@ -26,6 +26,7 @@ import {
   fetchADXRUNTopBanners,
   fetchTokenBalance,
   checkERC20Token,
+  getUsersBalanceUpdateV2,
 } from '../services';
 import {
   WalletData,
@@ -281,6 +282,10 @@ export const WalletScreen = () => {
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+
+    getUsersBalanceUpdateV2(String(member), navigate).catch((error) => {
+      console.error('[지갑] 잔액 업데이트 V2 호출 실패:', error);
+    });
 
     const fetchWalletDataAsync = async () => {
       try {

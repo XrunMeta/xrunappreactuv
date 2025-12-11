@@ -61,7 +61,7 @@ import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/compone
 import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
-import { getTopAd5, getXRUNGopaxPrice } from './src/services';
+import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import {
   useFonts,
   Roboto_400Regular,
@@ -671,6 +671,23 @@ export default function App() {
         console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', priceResponse.data?.gopaxPrice);
       } catch (error) {
         console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', error);
+
+      }
+
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          const member = userData?.member;
+          if (member) {
+            console.log('[App] 사용자 잔액 업데이트 V2 호출 시작');
+            getUsersBalanceUpdateV2(String(member)).catch((error) => {
+              console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
+            });
+          }
+        }
+      } catch (error) {
+        console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
 
       }
 
