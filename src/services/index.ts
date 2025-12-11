@@ -110,6 +110,8 @@ import {
   v_034a95,
   v_5c2ee1,
   v_ca4b36,
+  v_bae79a,
+  v_466e4f,
   v_86c24d,
   v_cc70e1,
   v_d86d2d,
@@ -3653,6 +3655,37 @@ export const v_fe6b99 = async (
     console.error('[AD XRUN] 정산완료 배너 데이터 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[AD XRUN] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_c1fabf = async (
+  v_c65f5d,
+): Promise<v_bae79a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[Quest] 퀘스트 리스트 조회 요청');
+
+    const v_3393e3 = await v_9f42a4.get<v_bae79a>(
+      '/Quests/list',
+    );
+
+    console.log('[Quest] 퀘스트 리스트 조회 성공:', v_3393e3.data.data?.length || 0, '개');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Quest] 퀘스트 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Quest] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,

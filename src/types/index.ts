@@ -1182,3 +1182,23 @@ export interface ADXRUNTopBannersSettledResponse {
   };
   [key: string]: any;
 }
+
+export interface QuestItem {
+  id: number;
+  title: string;
+  description: string;
+  start_date: string | null;
+  end_date: string | null;
+  reward_amount: number;
+  reward_amount_asxrun: string | number; 
+  reward_description: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface QuestListResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: QuestItem[];
+}
