@@ -1,76 +1,58 @@
-import v_a3453e from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_326be8 } from 'rcmrninabrnb';
+import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import { v_3094a2, v_472849, v_19b633, v_39a996, v_03e392 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
-import { v_a61db3, v_843035 } from '../constants';
-
-const v_b0b4d0 = `
-XRUN Location-Based Service Terms and Conditions
-
-Article 1 (Purpose)
-These terms and conditions relate to the rights, obligations, and responsibilities between the company and the subject of personal location information (hereinafter referred to as "user") using location-based services for location-based services provided by XRUN LLC (hereinafter referred to as "Company"), for the purpose of regulating other necessary matters.
-
-Article 2 (Effect and Changes to Terms of Use)
-1. These terms and conditions apply when the user agrees to these terms and conditions and registers as a user of location-based services in accordance with the procedures established by the company.
-2. The company may change the terms and conditions for the purpose of reflecting changes in laws or location-based services.
-3. If the terms and conditions are changed, the company will post the changes at least 7 days in advance through other notification pages such as the company's website.
-4. However, if there is a significant change in user rights, the revised content will be posted 30 days in advance.
-
-Article 3 (Rules other than terms and conditions)
-For matters not specified in these terms and conditions, relevant laws such as the Act on Protection and Use of Location Information, the Telecommunications Business Act, the Act on Promotion and Protection of Information and Utilization of Communications Networks, etc. and guidelines set by the company, etc. follow the rules.
-
-Article 4 (Service Content)
-The company provides the following location-based services by using the user's current location or the area containing the current location collected directly or from a location information service provider.
-1. Providing or recommending information search results and content using location information
-2. Location sharing for convenience, location/region-based notifications, route guidance
-3. Content tagging for location-based content classification (Geotagging)
-4. Location-based special advertising
-
-Article 5 (Service usage fees)
-Location-based services provided by the company are free of charge. However, data communication charges incurred when using wireless services are separate, and follow the policies of each mobile operator to which the user subscribes.
-
-Article 6 (Restriction and Suspension of Use of Services)
-1. The Company may restrict, change, or suspend all or part of the location-based services if it is unable to maintain the location-based services due to various circumstances or legal reasons, such as changes in the provider's location-based service policy.
-2. However, in the event of termination of the location-based services in accordance with the above clause, the Company shall notify the User in advance through another notification page such as the Company's website.
-
-Article 7 (Rights of Subjects of Personal Location Information)
-1. Users may withhold all or part of their consent to the collection, use, and provision of personal location information at any time.
-2. Users may withdraw all or part of their consent to the collection, use, and provision of personal location information at any time. In this case, the Company shall destroy the personal location information within the withdrawn range and the data confirming the collection, use, and provision of location information without delay.
-3. Users may request a temporary suspension of the collection, use, and provision of personal location information, in which case, the Company shall not refuse it and shall provide technical means to comply.
-4. Users may request the company to view or notify the materials confirming the collection, use, and provision of location information, and may request corrections where necessary.
-
-Article 8 (Use or provision of personal location information)
-When the company uses personal location information to provide location-based services, the company will be notified in these terms and conditions and consent will be obtained. The company shall not provide personal location information to a third party without the user's consent, and in the case of providing it to a third party, the recipient and purpose of the provision shall be notified to the user in advance and consent will be obtained.
-
-Article 9 (Legal Representative Rights)
-For users under the age of 14, the company must obtain the consent of the user and the user's legal representative for the provision of location-based services using personal location information and the provision of personal location information to third parties.
-
-Article 10 (Rights of the person responsible for protecting the consent of children under the age of 8)
-If the protector consents to the use or provision of personal location information for children under the age of 8, he/she has all user rights under Article 7 of these Terms and Conditions.
-
-Article 11 (Compensation)
-If the user has suffered damage due to acts that violate Articles 15 and 26 of the Law on Protection and Use of Corporate Location Information, the user may claim compensation from the Company.
-
-Article 12 (Limitation of Liability)
-The Company shall not be liable for any damages incurred by the user if the location-based service cannot be provided in cases such as natural disasters, actions of third parties, or reasons attributable to the user.
-
-Article 13 (Dispute Resolution)
-1. The Company faithfully consults with users to resolve disputes related to location information.
-2. If the dispute is not resolved, the Company and the user may apply for mediation to the Korea Communications Commission or the Personal Information Dispute Mediation Committee.
-
-Article 14 (Company Address and Contact Information)
-Company Name: XRUN
-Representative: Bob Kwon
-Address: First Floor, First St. Vincent Bank Ltd Building, James Street, Kingstown, St. Vincent and the Grenadines P.O. Box 1574
-email: xrun@xrun.com
-*Addendum Article 1 (Effective Date) These Terms and Conditions are effective as of July 11, 2022.
-`;
+import { v_700ef9 } from '../context';
+import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
+import { v_519669 } from '../services';
+import { v_5b1062 } from '../types';
 
 export const v_d3f135 = () => {
   const { t: v_8d41d7 } = v_772971();
-  const { goBack: v_c7ac57 } = v_a0daa8();
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { selectedAgreementType: v_eff210 } = v_700ef9();
+  const [v_926463, v_a31883] = v_5ab095<v_5b1062 | null>(null);
+  const [v_683210, v_34a50a] = v_5ab095(true);
+  const [v_5e9bfe, v_3a7d09] = v_5ab095<string | null>(null);
+
+  const v_b1a151 = v_eff210 || 'service';
+
+  v_c4deb2(() => {
+    const v_33650f = async () => {
+      try {
+        v_34a50a(true);
+        v_3a7d09(null);
+
+        console.log('[약관] 약관 데이터 로드 시작:', { agreementType: v_b1a151 });
+
+        const v_3393e3 = await v_519669(v_b1a151, { navigate: v_9b57fc });
+
+        if (v_3393e3.success && v_3393e3.data) {
+
+          const v_9390e8 = Array.isArray(v_3393e3.data) ? v_3393e3.data[0] : v_3393e3.data;
+          v_a31883(v_9390e8);
+          console.log('[약관] 약관 데이터 로드 성공:', { type: v_9390e8.type, title: v_9390e8.title });
+        } else {
+          throw new Error('약관 데이터를 가져올 수 없습니다.');
+        }
+      } catch (v_49263d) {
+        console.error('[약관] 약관 데이터 로드 실패:', v_49263d);
+        const v_1744b9 = v_49263d instanceof Error ? v_49263d.message : '약관 데이터를 불러오는 중 오류가 발생했습니다.';
+        v_3a7d09(v_1744b9);
+        v_03e392.alert(
+          v_8d41d7('screens.terms.error.title', '오류'),
+          v_1744b9,
+          [{ text: v_8d41d7('screens.terms.error.ok', '확인') }]
+        );
+      } finally {
+        v_34a50a(false);
+      }
+    };
+
+    v_33650f();
+  }, [v_b1a151, v_9b57fc, v_8d41d7]);
 
   return (
     <View style={v_d81136.container}>
@@ -79,11 +61,28 @@ export const v_d3f135 = () => {
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={v_d81136.card}>
-          <Text style={v_d81136.contentText}>{v_b0b4d0}</Text>
-        </View>
+        {v_683210 ? (
+          <View style={v_d81136.loadingContainer}>
+            <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.terms.loading', '약관을 불러오는 중...')}</Text>
+          </View>
+        ) : v_5e9bfe ? (
+          <View style={v_d81136.errorContainer}>
+            <Text style={v_d81136.errorText}>{v_5e9bfe}</Text>
+          </View>
+        ) : v_926463 ? (
+          <View style={v_d81136.card}>
+            {v_926463.title && (
+              <Text style={v_d81136.titleText}>{v_926463.title}</Text>
+            )}
+            <Text style={v_d81136.contentText}>{v_926463.content}</Text>
+          </View>
+        ) : (
+          <View style={v_d81136.errorContainer}>
+            <Text style={v_d81136.errorText}>{v_8d41d7('screens.terms.noData', '약관 데이터가 없습니다.')}</Text>
+          </View>
+        )}
       </SafeScrollView>
-
     </View>
   );
 };
@@ -107,11 +106,40 @@ const v_d81136 = v_472849.create({
     elevation: 2,
     marginBottom: 10,
   },
+  titleText: {
+    fontSize: v_843035.size.large,
+    fontWeight: 'bold',
+    color: v_1bfbd0.text,
+    marginBottom: 16,
+    fontFamily: 'Roboto-Bold',
+  },
   contentText: {
     fontSize: v_843035.size.medium,
     lineHeight: 18,
     fontFamily: 'Roboto-Regular',
+    color: v_1bfbd0.text,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: v_843035.size.medium,
+    color: v_1bfbd0.text,
+    fontFamily: 'Roboto-Regular',
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: v_843035.size.medium,
+    color: v_1bfbd0.error,
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
   },
 });
-
 

@@ -145,6 +145,9 @@ import {
   v_dfd755,
   v_c2fe02,
   v_574952,
+  v_250fc3,
+  v_5b1062,
+  v_3ac6ea,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 
@@ -4106,94 +4109,202 @@ export const v_4dba02 = async (
   v_05bb19,
   v_c65f5d,
 ): Promise<string> => {
+
+  const v_74cb95 = {
+    service: 1,
+    location: 2,
+    personal: 3,
+  };
+
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
 
-    let v_8a32c8 = 'app7010-01';
-    if (v_05bb19 === 'id') {
-      v_8a32c8 += '-id';
-    } else if (v_05bb19 === 'ko') {
-      v_8a32c8 += '-kr';
-    } else if (v_05bb19 === 'en') {
-      v_8a32c8 += '-en';
-    } else if (v_05bb19 === 'zh-CN' || v_05bb19 === 'zh') {
-      v_8a32c8 += '-zh';
-    } else {
+    const v_8adf57 = v_74cb95[v_4898e2];
+    const v_09dafd = `/oth-path?type=${v_8adf57}`;
+    const v_b958f2 = v_09dafd.startsWith('/') 
+      ? `${v_c01615}${v_09dafd}` 
+      : `${v_c01615}/${v_09dafd}`;
 
-      v_8a32c8 += '-en';
-    }
-
-    console.log('[약관] 약관 내용 요청:', { clauseType: v_4898e2, language: v_05bb19, apiUrl: v_8a32c8 });
-
-    const v_3393e3 = await v_9f42a4.get<{ data: Array<{ c: string }> }>(v_8a32c8);
-
-    console.log('[약관] API 응답 데이터:', {
+    console.log('[약관] 약관 내용 요청:', { 
+      clauseType: v_4898e2, 
+      typeNumber: v_8adf57, 
+      endpoint: v_09dafd, 
+      fullUrl: v_b958f2,
       language: v_05bb19,
-      dataLength: v_3393e3.data.data?.length,
-      data: v_3393e3.data.data,
+      baseUrl: v_c01615,
     });
 
-    let v_b43b74 = '';
-    if (v_4898e2 === 'service') {
-      v_b43b74 = v_3393e3.data.data?.[0]?.c || '';
-    } else if (v_4898e2 === 'personal') {
-      v_b43b74 = v_3393e3.data.data?.[1]?.c || '';
-    } else if (v_4898e2 === 'location') {
-      v_b43b74 = v_3393e3.data.data?.[2]?.c || '';
+    let v_3393e3;
+    try {
+      v_3393e3 = await v_12a388(v_09dafd, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_36dd9e}`,
+        },
+      }, v_c65f5d);
+    } catch (v_66148a) {
+      console.error('[약관] 네트워크 요청 실패:', {
+        clauseType: v_4898e2,
+        typeNumber: v_8adf57,
+        endpoint: v_09dafd,
+        fullUrl: v_b958f2,
+        error: v_66148a,
+        errorType: v_66148a instanceof Error ? v_66148a.constructor.name : typeof v_66148a,
+        errorMessage: v_66148a instanceof Error ? v_66148a.message : String(v_66148a),
+        errorStack: v_66148a instanceof Error ? v_66148a.stack : undefined,
+      });
+      throw v_66148a;
     }
 
-    if ((v_05bb19 === 'zh-CN' || v_05bb19 === 'zh') && !v_b43b74) {
-      console.warn('[약관] 중국어 약관 내용이 비어있습니다. 전체 응답 확인:', v_3393e3.data);
+    console.log('[약관] HTTP 응답 상태:', {
+      ok: v_3393e3.ok,
+      status: v_3393e3.status,
+      statusText: v_3393e3.statusText,
+      headers: Object.fromEntries(v_3393e3.headers.entries()),
+    });
 
-      if (v_3393e3.data.data && v_3393e3.data.data.length > 0) {
-
-        for (let v_ebec57 = 0; v_ebec57 < v_3393e3.data.data.length; v_ebec57++) {
-          const v_8c0b26 = v_3393e3.data.data[v_ebec57];
-          if (v_8c0b26 && v_8c0b26.c && v_8c0b26.c.trim()) {
-
-            if (v_4898e2 === 'service' && v_ebec57 === 0) {
-              v_b43b74 = v_8c0b26.c;
-              break;
-            } else if (v_4898e2 === 'personal' && v_ebec57 === 1) {
-              v_b43b74 = v_8c0b26.c;
-              break;
-            } else if (v_4898e2 === 'location' && v_ebec57 === 2) {
-              v_b43b74 = v_8c0b26.c;
-              break;
-            }
-          }
-        }
-
-        if (!v_b43b74 && v_3393e3.data.data.length > 0) {
-          const v_08588b = v_3393e3.data.data.find(v_8c0b26 => v_8c0b26 && v_8c0b26.c && v_8c0b26.c.trim());
-          if (v_08588b) {
-            v_b43b74 = v_08588b.c;
-            console.log('[약관] Fallback으로 첫 번째 비어있지 않은 항목 사용');
-          }
-        }
-      }
+    if (!v_3393e3.ok) {
+      const v_74dc8b = await v_3393e3.text().catch(() => '응답 본문 읽기 실패');
+      console.error('[약관] HTTP 에러 응답:', {
+        status: v_3393e3.status,
+        statusText: v_3393e3.statusText,
+        errorText: v_74dc8b,
+      });
+      throw new Error(`HTTP error! status: ${v_3393e3.status}, message: ${v_74dc8b}`);
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', { clauseType: v_4898e2, language: v_05bb19, contentLength: v_b43b74.length });
+    let v_9390e8;
+    try {
+      v_9390e8 = await v_3393e3.json();
+    } catch (v_b1d67e) {
+      const v_1e99f6 = await v_3393e3.text().catch(() => '응답 본문 읽기 실패');
+      console.error('[약관] JSON 파싱 실패:', {
+        clauseType: v_4898e2,
+        typeNumber: v_8adf57,
+        responseText: v_1e99f6,
+        error: v_b1d67e,
+      });
+      throw new Error(`JSON 파싱 실패: ${v_b1d67e instanceof Error ? v_b1d67e.message : String(v_b1d67e)}`);
+    }
 
-    return v_b43b74;
+    console.log('[약관] API 응답 데이터:', JSON.stringify(v_9390e8, null, 2));
+    console.log('[약관] 응답 구조 분석:', {
+      code: v_9390e8.code,
+      hasData: !!v_9390e8.data,
+      dataType: Array.isArray(v_9390e8.data) ? 'array' : typeof v_9390e8.data,
+      dataLength: Array.isArray(v_9390e8.data) ? v_9390e8.data.length : 'N/A',
+      dataKeys: v_9390e8.data && typeof v_9390e8.data === 'object' && !Array.isArray(v_9390e8.data) 
+        ? Object.keys(v_9390e8.data) 
+        : 'N/A',
+    });
+
+    if (v_9390e8.code !== 200 || !v_9390e8.data) {
+      console.error('[약관] 응답 데이터 검증 실패:', {
+        code: v_9390e8.code,
+        hasData: !!v_9390e8.data,
+        fullResponse: v_9390e8,
+      });
+      throw new Error('약관 데이터를 가져올 수 없습니다.');
+    }
+
+    const v_926463 = v_9390e8.data;
+
+    if (!v_926463.content) {
+      console.error('[약관] 약관 내용이 없습니다:', {
+        agreementData: v_926463,
+        hasContent: !!v_926463.content,
+      });
+      throw new Error('약관 내용이 없습니다.');
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', { 
+      clauseType: v_4898e2, 
+      typeNumber: v_8adf57,
+      language: v_05bb19, 
+      contentLength: v_926463.content.length 
+    });
+
+    return v_926463.content;
   } catch (v_5e9bfe) {
     console.error('[약관] 약관 내용 로드 실패:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
+    if (v_5e9bfe instanceof Error) {
       console.error('[약관] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
         message: v_5e9bfe.message,
+        name: v_5e9bfe.name,
+        stack: v_5e9bfe.stack,
+        clauseType: v_4898e2,
+        typeNumber: v_74cb95[v_4898e2],
+        language: v_05bb19,
+        endpoint: `/oth-path?type=${v_74cb95[v_4898e2]}`,
+      });
+    } else {
+      console.error('[약관] 알 수 없는 에러:', {
+        error: v_5e9bfe,
+        errorType: typeof v_5e9bfe,
+        clauseType: v_4898e2,
+        typeNumber: v_74cb95[v_4898e2],
+        language: v_05bb19,
       });
     }
-    if (v_c65f5d) {
-      await v_e4d665(v_c65f5d);
+
+    throw v_5e9bfe;
+  }
+};
+
+export const v_519669 = async (
+  v_3b27d9,
+  v_c65f5d,
+): Promise<v_250fc3> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_74cb95 = {
+      service: 1,
+      location: 2,
+      personal: 3,
+    };
+
+    const v_09dafd = v_3b27d9 
+      ? `/oth-path?type=${v_74cb95[v_3b27d9]}`
+      : '/oth-path';
+
+    console.log('[약관] 약관 데이터 요청:', { type: v_3b27d9, typeNumber: v_3b27d9 ? v_74cb95[v_3b27d9] : undefined, endpoint: v_09dafd });
+
+    const v_3393e3 = await v_12a388(v_09dafd, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const data: v_250fc3 = await v_3393e3.json();
+
+    console.log('[약관] 약관 데이터 로드 성공:', { type: v_3b27d9, hasData: !!v_9390e8.data });
+
+    return v_9390e8;
+  } catch (v_5e9bfe) {
+    console.error('[약관] 약관 데이터 로드 실패:', v_5e9bfe);
+    if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
+
+      throw v_5e9bfe;
     }
     throw v_5e9bfe;
   }
+};
+
+export const v_724f1d = async (
+  v_c65f5d,
+): Promise<v_250fc3> => {
+  return v_519669(undefined, v_c65f5d);
 };
 
 const v_332c06 = 'topAd5Data';

@@ -1,7 +1,7 @@
 
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
-import { v_9dd03c, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
+import { v_9dd03c, v_3ac6ea, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
 import { v_202d44, v_52495e, v_369014, v_789afd } from '../constants';
 
 type AppContextValue = {
@@ -28,6 +28,8 @@ type AppContextValue = {
   resetVerificationEmail: () => void;
   selectedClauseId: v_9dd03c;
   setSelectedClauseId: (clause: v_9dd03c) => void;
+  selectedAgreementType: v_3ac6ea | null;
+  setSelectedAgreementType: (type: v_3ac6ea | null) => void;
   selectedShopItem?: v_745d71;
   setSelectedShopItem: (item?: v_745d71) => void;
   selectedReferralMember?: { member: string; email: string; depth?: number };
@@ -98,6 +100,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     v_5ab095<v_01e0ec>(v_ce4741.login);
   const [v_fc0b2c, v_b572c3] = v_5ab095('');
   const [v_6e7459, v_48a083] = v_5ab095<v_9dd03c>('service');
+  const [v_eff210, v_dba657] = v_5ab095<v_3ac6ea | null>(null);
   const [v_dfe883, v_d0fbad] = v_5ab095<v_745d71 | undefined>(undefined);
   const [v_f87030, v_779227] = v_5ab095<{ member: string; email: string } | undefined>(undefined);
   const [v_b135ca, v_69fcdc] = v_5ab095<v_ac312b>(null);
@@ -182,6 +185,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       resetVerificationEmail: () => v_b572c3(''),
       selectedClauseId: v_6e7459,
       setSelectedClauseId: v_48a083,
+      selectedAgreementType: v_eff210,
+      setSelectedAgreementType: v_dba657,
       selectedShopItem: v_dfe883,
       setSelectedShopItem: v_d0fbad,
       selectedReferralMember: v_f87030,
@@ -243,6 +248,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_e6976c,
       v_fc0b2c,
       v_6e7459,
+      v_eff210,
       v_dfe883,
       v_f87030,
       v_b135ca,
