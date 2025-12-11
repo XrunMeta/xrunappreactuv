@@ -57,6 +57,11 @@ export const SignupScreen = () => {
   ] as const;
   const [familyName, setFamilyName] = useState(signupFormData.familyName);
   const [givenName, setGivenName] = useState(signupFormData.givenName);
+  const [fullName, setFullName] = useState(
+    signupFormData.familyName || signupFormData.givenName
+      ? `${signupFormData.familyName || ''} ${signupFormData.givenName || ''}`.trim()
+      : ''
+  );
   const [email, setEmail] = useState(signupFormData.email);
   const [password, setPassword] = useState(signupFormData.password);
   const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
@@ -84,6 +89,9 @@ export const SignupScreen = () => {
     if (!isMountedRef.current) {
       setFamilyName(signupFormData.familyName);
       setGivenName(signupFormData.givenName);
+
+      const combinedName = `${signupFormData.familyName || ''} ${signupFormData.givenName || ''}`.trim();
+      setFullName(combinedName);
       setEmail(signupFormData.email);
       setPassword(signupFormData.password);
       setPhoneNumber(signupFormData.phoneNumber);
@@ -133,7 +141,24 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!familyName.trim() || !givenName.trim()) {
+    const nameParts = fullName.trim().split(/\s+/);
+    let parsedGivenName = '';
+    let parsedFamilyName = '';
+
+    if (nameParts.length === 0) {
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
+      return;
+    } else if (nameParts.length === 1) {
+
+      parsedGivenName = nameParts[0];
+      parsedFamilyName = '';
+    } else {
+
+      parsedFamilyName = nameParts[0];
+      parsedGivenName = nameParts.slice(1).join(' ');
+    }
+
+    if (!parsedGivenName.trim()) {
       await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
       return;
     }
@@ -240,8 +265,8 @@ export const SignupScreen = () => {
         const pendingSignupData = {
           email: email.trim(),
           password: password,
-          familyName: familyName.trim(),
-          givenName: givenName.trim(),
+          familyName: parsedFamilyName.trim(),
+          givenName: parsedGivenName.trim(),
           phoneNumber: phoneNumber.trim(),
           selectedCountryDialCode: {
             iso2: selectedCountryDialCode.iso2,
@@ -313,14 +338,25 @@ export const SignupScreen = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={styles.formFieldContainer}>
-          {
-
-}
           <FormField
             label={t('screens.signup.givenNameLabel')}
             placeholder={t('screens.signup.givenNamePlaceholder')}
-            value={givenName}
-            onChangeText={setGivenName}
+            value={fullName}
+            onChangeText={(text) => {
+              setFullName(text);
+
+              const nameParts = text.trim().split(/\s+/);
+              if (nameParts.length === 0) {
+                setFamilyName('');
+                setGivenName('');
+              } else if (nameParts.length === 1) {
+                setFamilyName('');
+                setGivenName(nameParts[0]);
+              } else {
+                setFamilyName(nameParts[0]);
+                setGivenName(nameParts.slice(1).join(' '));
+              }
+            }}
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
           />
