@@ -112,6 +112,10 @@ import {
   v_ca4b36,
   v_bae79a,
   v_466e4f,
+  v_7ed601,
+  v_f05488,
+  v_8093a2,
+  v_30f990,
   v_86c24d,
   v_cc70e1,
   v_d86d2d,
@@ -3684,6 +3688,93 @@ export const v_c1fabf = async (
     return v_3393e3.data;
   } catch (v_5e9bfe) {
     console.error('[Quest] 퀘스트 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Quest] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_345245 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_f05488> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_7ed601 = { member: v_660822 };
+
+    console.log('[Quest] 출석 체크 조회 요청:', v_576f5a);
+
+    let v_3393e3;
+    try {
+      v_3393e3 = await v_9f42a4.post<v_f05488>(
+        '/Quests/checkuser',
+        v_576f5a,
+      );
+      console.log('[Quest] 출석 체크 조회 성공 (/Quests/checkuser):', v_3393e3.data);
+    } catch (v_5e9bfe) {
+
+      console.log('[Quest] /Quests/checkuser 실패, /quest/checkuser 시도');
+      v_3393e3 = await v_9f42a4.post<v_f05488>(
+        '/quest/checkuser',
+        v_576f5a,
+      );
+      console.log('[Quest] 출석 체크 조회 성공 (/quest/checkuser):', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Quest] 출석 체크 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Quest] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_1b8181 = async (
+  request: v_8093a2,
+  v_c65f5d,
+): Promise<v_30f990> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[Quest] 퀘스트 참여 요청:', v_576f5a);
+
+    let v_3393e3;
+    try {
+      v_3393e3 = await v_9f42a4.post<v_30f990>(
+        '/Quests/join',
+        v_576f5a,
+      );
+      console.log('[Quest] 퀘스트 참여 성공 (/Quests/join):', v_3393e3.data);
+    } catch (v_5e9bfe) {
+
+      console.log('[Quest] /Quests/join 실패, /quest/join 시도');
+      v_3393e3 = await v_9f42a4.post<v_30f990>(
+        '/quest/join',
+        v_576f5a,
+      );
+      console.log('[Quest] 퀘스트 참여 성공 (/quest/join):', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Quest] 퀘스트 참여 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[Quest] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,

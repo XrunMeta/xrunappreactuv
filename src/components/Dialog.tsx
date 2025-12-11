@@ -16,6 +16,7 @@ type DialogAction = {
   onPress: () => void;
   variant?: 'primary' | 'secondary';
   style?: v_7e4944;
+  disabled?: boolean;
 };
 
 interface DialogProps {
@@ -62,15 +63,18 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
                   style={[
                     v_d81136.actionButton,
                     v_9b064f.variant === 'primary' ? v_d81136.primaryButton : v_d81136.secondaryButton,
+                    v_9b064f.disabled && v_d81136.disabledButton,
                     v_9b064f.style,
                   ]}
-                  onPress={v_9b064f.onPress}
-                  activeOpacity={0.9}
+                  onPress={v_9b064f.disabled ? undefined : v_9b064f.onPress}
+                  activeOpacity={v_9b064f.disabled ? 1 : 0.9}
+                  disabled={v_9b064f.disabled}
                 >
                   <Text
                     style={[
                       v_d81136.actionLabel,
                       v_9b064f.variant === 'primary' ? v_d81136.primaryLabel : v_d81136.secondaryLabel,
+                      v_9b064f.disabled && v_d81136.disabledLabel,
                     ]}
                   >
                     {v_9b064f.label}
@@ -136,8 +140,8 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#e4e4e4',
   },
   body: {
-    paddingVertical: 20,
-    minHeight: 100,
+    paddingVertical: 12,
+    minHeight: 60,
   },
   actions: {
     flexDirection: 'row',
@@ -165,6 +169,12 @@ const v_d81136 = v_472849.create({
   },
   secondaryLabel: {
     color: '#000000',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  disabledLabel: {
+    opacity: 0.7,
   },
 });
 

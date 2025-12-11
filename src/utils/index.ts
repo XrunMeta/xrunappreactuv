@@ -3,7 +3,7 @@ import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import * as v_a928e1 from 'yvptvjtrs';
 
-const v_cba33f = (v_a8cd21) => {
+export const v_cba33f = (v_a8cd21) => {
   if (v_326be8.OS === 'android') {
     v_405151.show(v_a8cd21, v_405151.SHORT);
   } else {
