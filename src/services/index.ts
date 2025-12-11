@@ -2479,6 +2479,83 @@ export const v_c07360 = async (
   }
 };
 
+export const v_f7d3be = async (
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+
+    console.log('=== cryptoPricesInKRW API 호출 ===');
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+    });
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('=== cryptoPricesInKRW API 응답 ===');
+    console.log('response:', JSON.stringify(v_43c42e, null, 2));
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('cryptoPricesInKRW API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_893ed2 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/memberLimits`;
+
+    const v_cd6a57 = {
+      member: v_660822,
+    };
+
+    console.log('=== memberLimits API 호출 ===');
+    console.log('requestBody:', JSON.stringify(v_cd6a57));
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('=== memberLimits API 응답 ===');
+    console.log('response:', JSON.stringify(v_43c42e, null, 2));
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('memberLimits API 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_ad146c = async (
   v_5389c3,
   v_51b584,
