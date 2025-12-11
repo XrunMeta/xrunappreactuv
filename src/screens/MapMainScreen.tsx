@@ -3189,8 +3189,8 @@ const styles = StyleSheet.create({
 
   topLogo: {
     position: 'absolute',
-    top: 16, 
-    left: 16,
+    top: 32, 
+    left: 8,
     width: Dimensions.get('window').width / 4,
     height: Dimensions.get('window').width / 4,
     zIndex: 10, 
