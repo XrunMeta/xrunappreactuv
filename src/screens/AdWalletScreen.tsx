@@ -581,6 +581,7 @@ export const AdWalletScreen = () => {
                   </View>
                   <Text style={styles.summaryLabel}>{summaryLabel}</Text>
                 </View>
+                <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>
               </View>
               <Text style={styles.summaryValue}>
                 {topBannersLoading ? '...' : topBannersData.amountasxrun}
@@ -713,6 +714,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  settlementNotice: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: 'rgba(255, 255, 255, 0.9)',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   iconContainer: {
     width: 32,

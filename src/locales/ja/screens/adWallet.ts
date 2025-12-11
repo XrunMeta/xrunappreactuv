@@ -20,5 +20,6 @@ export default {
   no: 'いいえ',
   confirm: '確認',
   attendanceCheck: '出席チェック',
+  settlementNotice: '75日後に決済',
 };
 
