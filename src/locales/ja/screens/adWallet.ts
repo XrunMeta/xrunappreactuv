@@ -9,5 +9,16 @@ export default {
   expectedAdRevenue: '予想広告収益',
   adRevenueSettlement: '広告収益決済',
   rewardAmount: '報酬金額',
+  attendanceCheckTitle: '今日の出席チェックをしますか？',
+  attendanceCheckCompleted: '今日の出席チェック完了',
+  attendanceCheckRewardMessage: '今日の出席チェック報酬を受け取ってください',
+  attendanceCheckCompletedToast: '今日の出席チェックを完了しました',
+  attendanceCheckRetryToast: 'もう一度お試しください',
+  loading: '処理中...',
+  processing: '進行中...',
+  yes: 'はい',
+  no: 'いいえ',
+  confirm: '確認',
+  attendanceCheck: '出席チェック',
 };
 

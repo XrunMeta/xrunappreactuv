@@ -1,21 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Platform, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
-import { Header, SegmentedControl, DataList, SafeView } from '../components';
+import { Header, SegmentedControl, DataList, SafeView, Dialog } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
-import { formatCurrency } from '../utils';
+import { formatCurrency, showToast } from '../utils';
 import {
   fetchADXRUNEstimateList,
   fetchADXRUNResultList,
   fetchADXRUNTopBanners,
   fetchADXRUNTopBannersSettled,
   fetchQuestList,
+  checkQuestUser,
+  joinQuest,
 } from '../services';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
@@ -49,6 +51,10 @@ export const AdWalletScreen = () => {
   });
   const [topBannersLoading, setTopBannersLoading] = useState(false);
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+  const [attendanceCheckVisible, setAttendanceCheckVisible] = useState(false);
+  const [canReward, setCanReward] = useState<boolean | null>(null);
+  const [attendanceCheckLoading, setAttendanceCheckLoading] = useState(false);
+  const [isJoiningQuest, setIsJoiningQuest] = useState(false);
 
   const pendingListRef = useRef<DataListRef>(null);
   const questListRef = useRef<DataListRef>(null);
@@ -414,6 +420,80 @@ export const AdWalletScreen = () => {
     }
   }, []);
 
+  const handleQuestItemPress = useCallback(async (item: AdEntry) => {
+
+    if (tab === 'quest' && (item.id === 1 || item.id === '1')) {
+      if (!member) {
+        console.error('[AdWallet] member 정보가 없습니다.');
+        return;
+      }
+
+      setAttendanceCheckLoading(true);
+      try {
+        const response = await checkQuestUser(member);
+        setCanReward(response.data?.canReward ?? false);
+        setAttendanceCheckVisible(true);
+      } catch (error) {
+        console.error('[AdWallet] 출석 체크 조회 오류:', error);
+
+        setCanReward(true);
+        setAttendanceCheckVisible(true);
+      } finally {
+        setAttendanceCheckLoading(false);
+      }
+    }
+  }, [tab, member]);
+
+  const handleDialogClose = useCallback(() => {
+
+    if (isJoiningQuest) {
+      return;
+    }
+    setAttendanceCheckVisible(false);
+    setCanReward(null);
+  }, [isJoiningQuest]);
+
+  const handleAttendanceCheckConfirm = useCallback(async () => {
+
+    if (isJoiningQuest) {
+      return;
+    }
+
+    if (canReward && member) {
+      setIsJoiningQuest(true);
+      try {
+        const response = await joinQuest(
+          {
+            quest_id: 1,
+            member,
+          },
+          undefined, 
+        );
+
+        if (response.status === 'success') {
+          showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+          setAttendanceCheckVisible(false);
+          setCanReward(null);
+
+          if (questListRef.current) {
+            questListRef.current.reloadData();
+          }
+        } else {
+          showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+        }
+      } catch (error) {
+        console.error('[AdWallet] 출석 체크 참여 오류:', error);
+        showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+      } finally {
+        setIsJoiningQuest(false);
+      }
+    } else {
+
+      setAttendanceCheckVisible(false);
+      setCanReward(null);
+    }
+  }, [canReward, member, t, isJoiningQuest]);
+
   const summaryLabel = useMemo(
     () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
     [tab, t],
@@ -428,12 +508,17 @@ export const AdWalletScreen = () => {
     [t],
   );
 
-  const AdEntryItem: React.FC<AdEntry> = (item) => {
+  const AdEntryItem: React.FC<AdEntry & { onPress?: () => void }> = (item) => {
 
     const isQuest = !!item.title;
+    const { onPress, ...itemData } = item;
 
     return (
-      <View style={styles.adCard}>
+      <TouchableOpacity
+        style={styles.adCard}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
         <View style={styles.adCardHeader}>
           <Text style={styles.adCardStatus}>{item.status}</Text>
           <Text style={styles.adCardDate}>{item.date}</Text>
@@ -455,19 +540,19 @@ export const AdWalletScreen = () => {
           </Text>
         </View>
         {!isQuest && (
-          <View style={styles.adCardRow}>
-            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
-            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
-              {item.adRevenueSettlement}
-            </Text>
-          </View>
+        <View style={styles.adCardRow}>
+          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
+          <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+            {item.adRevenueSettlement}
+          </Text>
+        </View>
         )}
         {isQuest && item.rewardDescription && (
           <View style={styles.questRewardContainer}>
             <Text style={styles.questRewardDescription}>{item.rewardDescription}</Text>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -533,6 +618,7 @@ export const AdWalletScreen = () => {
               pageSize={20}
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `quest-${item.id}-${index}`}
+              onItemPress={handleQuestItemPress}
             />
           ) : (
             <DataList
@@ -546,6 +632,34 @@ export const AdWalletScreen = () => {
           )}
         </View>
       </View>
+
+      <Dialog
+        visible={attendanceCheckVisible}
+        title={t('screens.adWallet.attendanceCheckTitle')}
+        onClose={isJoiningQuest ? undefined : handleDialogClose}
+        actions={[
+          {
+            label: isJoiningQuest
+              ? t('screens.adWallet.processing')
+              : canReward === true
+              ? t('screens.adWallet.attendanceCheck')
+              : t('screens.adWallet.confirm'),
+            onPress: handleAttendanceCheckConfirm,
+            variant: 'primary',
+            disabled: isJoiningQuest,
+          },
+        ]}
+      >
+        {attendanceCheckLoading ? (
+          <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+        ) : (
+          <Text style={styles.attendanceCheckMessage}>
+            {canReward === true
+              ? t('screens.adWallet.attendanceCheckRewardMessage')
+              : t('screens.adWallet.attendanceCheckCompleted')}
+          </Text>
+        )}
+      </Dialog>
     </SafeView>
   );
 };
@@ -724,5 +838,32 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#888888',
     fontStyle: 'italic',
+  },
+  attendanceCheckMessage: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#121212',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  loadingModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingModalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  loadingModalText: {
+    marginTop: 16,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#121212',
   },
 });

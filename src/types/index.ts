@@ -1202,3 +1202,41 @@ export interface QuestListResponse {
   message: string;
   data: QuestItem[];
 }
+
+export interface QuestCheckUserRequest {
+  member: number;
+}
+
+export interface QuestCheckUserResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    canReward: boolean;
+  };
+}
+
+export interface QuestJoinRequest {
+  quest_id: number;
+  member: number;
+  detail1?: string;
+  detail2?: string;
+  detail3?: string;
+  detail4?: string;
+  detail5?: string;
+  detail6?: string;
+  detail7?: string;
+  detail8?: string;
+  detail9?: string;
+  detail10?: string;
+}
+
+export interface QuestJoinResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    quest_id: number;
+    [key: string]: any;
+  };
+}

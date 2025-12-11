@@ -16,6 +16,7 @@ type DialogAction = {
   onPress: () => void;
   variant?: 'primary' | 'secondary';
   style?: ViewStyle;
+  disabled?: boolean;
 };
 
 interface DialogProps {
@@ -62,15 +63,18 @@ export const Dialog: React.FC<DialogProps> = ({
                   style={[
                     styles.actionButton,
                     action.variant === 'primary' ? styles.primaryButton : styles.secondaryButton,
+                    action.disabled && styles.disabledButton,
                     action.style,
                   ]}
-                  onPress={action.onPress}
-                  activeOpacity={0.9}
+                  onPress={action.disabled ? undefined : action.onPress}
+                  activeOpacity={action.disabled ? 1 : 0.9}
+                  disabled={action.disabled}
                 >
                   <Text
                     style={[
                       styles.actionLabel,
                       action.variant === 'primary' ? styles.primaryLabel : styles.secondaryLabel,
+                      action.disabled && styles.disabledLabel,
                     ]}
                   >
                     {action.label}
@@ -136,8 +140,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#e4e4e4',
   },
   body: {
-    paddingVertical: 20,
-    minHeight: 100,
+    paddingVertical: 12,
+    minHeight: 60,
   },
   actions: {
     flexDirection: 'row',
@@ -165,6 +169,12 @@ const styles = StyleSheet.create({
   },
   secondaryLabel: {
     color: '#000000',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  disabledLabel: {
+    opacity: 0.7,
   },
 });
 

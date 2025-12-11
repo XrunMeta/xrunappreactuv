@@ -9,5 +9,16 @@ export default {
   expectedAdRevenue: 'Expected Ad Revenue',
   adRevenueSettlement: 'Ad Revenue Settlement',
   rewardAmount: 'Reward Amount',
+  attendanceCheckTitle: 'Would you like to check in today?',
+  attendanceCheckCompleted: 'Today\'s attendance check completed',
+  attendanceCheckRewardMessage: 'Receive today\'s attendance check reward',
+  attendanceCheckCompletedToast: 'Today\'s attendance check completed',
+  attendanceCheckRetryToast: 'Please try again',
+  loading: 'Processing...',
+  processing: 'Processing...',
+  yes: 'Yes',
+  no: 'No',
+  confirm: 'Confirm',
+  attendanceCheck: 'Check In',
 };
 
