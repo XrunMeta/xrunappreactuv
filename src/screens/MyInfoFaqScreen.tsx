@@ -37,17 +37,7 @@ export const v_083aa7 = () => {
 
   const v_4622b9 = v_df9f57(() => {
     const v_a7a4ae = v_8d41d7('screens.myInfoFaq.items', { returnObjects: true }) as any;
-    return [
-      {
-        id: 'exchange-submit',
-        question: v_a7a4ae?.exchangeSubmit?.question || '',
-        answer: v_a7a4ae?.exchangeSubmit?.answer || '',
-      },
-      {
-        id: 'conversion-schedule',
-        question: v_a7a4ae?.conversionSchedule?.question || '',
-        answer: v_a7a4ae?.conversionSchedule?.answer || '',
-      },
+    return [ 
       {
         id: 'mission-complete',
         question: v_a7a4ae?.missionComplete?.question || '',
@@ -57,12 +47,7 @@ export const v_083aa7 = () => {
         id: 'reward-check',
         question: v_a7a4ae?.rewardCheck?.question || '',
         answer: v_a7a4ae?.rewardCheck?.answer || '',
-      },
-      {
-        id: 'xrun-exchange',
-        question: v_a7a4ae?.xrunExchange?.question || '',
-        answer: v_a7a4ae?.xrunExchange?.answer || '',
-      },
+      }, 
       {
         id: 'reward-usage',
         question: v_a7a4ae?.rewardUsage?.question || '',
