@@ -3189,8 +3189,8 @@ const v_d81136 = v_472849.create({
 
   topLogo: {
     position: 'absolute',
-    top: 16, 
-    left: 16,
+    top: 32, 
+    left: 8,
     width: v_700696.get('window').width / 4,
     height: v_700696.get('window').width / 4,
     zIndex: 10, 

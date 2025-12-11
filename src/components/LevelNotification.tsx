@@ -1,5 +1,5 @@
 import v_a3453e, { v_c4deb2, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_700696 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_dedaa7 } from '../services';
 
@@ -8,7 +8,7 @@ interface LevelNotificationProps {
 }
 
 export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigation: v_c65f5d }) => {
-  const [v_679b8a, v_3c92ee] = v_5ab095<string | null>('테스트 알림 메시지');
+  const [v_679b8a, v_3c92ee] = v_5ab095<string | null>('Loading...');
 
   v_c4deb2(() => {
     const v_79caf4 = async () => {
@@ -62,7 +62,7 @@ const v_d81136 = v_472849.create({
     top: 65,
     left: 10,
     right: 0,
-    width: 80,
+    width: v_700696.get('window').width / 4,
     height: 28,
     paddingVertical: 2,
     backgroundColor: 'rgb(255, 255, 255)',
@@ -74,7 +74,7 @@ const v_d81136 = v_472849.create({
   notificationText: {
     color: '#000',
     fontSize: 16,
-    textAlign: 'left',
+    textAlign: 'center',
     fontWeight: '500',
   },
 });
