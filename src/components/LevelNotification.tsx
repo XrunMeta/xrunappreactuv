@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMembersLevelInfo } from '../services';
 
@@ -8,7 +8,7 @@ interface LevelNotificationProps {
 }
 
 export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation }) => {
-  const [notifitext, setNotifitext] = useState<string | null>('테스트 알림 메시지');
+  const [notifitext, setNotifitext] = useState<string | null>('Loading...');
 
   useEffect(() => {
     const loadUserLevelInfo = async () => {
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     top: 65,
     left: 10,
     right: 0,
-    width: 80,
+    width: Dimensions.get('window').width / 4,
     height: 28,
     paddingVertical: 2,
     backgroundColor: 'rgb(255, 255, 255)',
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   notificationText: {
     color: '#000',
     fontSize: 16,
-    textAlign: 'left',
+    textAlign: 'center',
     fontWeight: '500',
   },
 });
