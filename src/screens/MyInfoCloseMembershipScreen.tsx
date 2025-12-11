@@ -92,6 +92,13 @@ export const v_9e06f6 = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.inner}>
+          <Text style={v_d81136.warningText}>
+            회원을 탈퇴하시면, 
+            앱을 사용하기 위해 저장된 개인정보, 지갑키 등 관련된 정보가 모두 삭제됩니다. 
+            삭제후에는 복구가 불가능하니 반드시 확인하십시오.
+          </Text>
+        </View> 
+        <View style={v_d81136.inner}>
           <FormField
             label={v_8d41d7('screens.myInfoCloseMembership.passwordLabel')}
             placeholder={v_8d41d7('screens.myInfoCloseMembership.passwordPlaceholder')}
@@ -139,6 +146,14 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.small,
     lineHeight: 15,
     color: '#747474',
+    fontFamily: 'Roboto-Regular',
+  },
+  warningText: {
+    marginTop: 8,
+    marginBottom: 24,
+    fontSize: v_843035.size.medium,
+    lineHeight: 24,
+    color: '#aa0000',
     fontFamily: 'Roboto-Regular',
   },
   bottomSection: {
