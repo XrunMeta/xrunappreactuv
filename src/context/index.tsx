@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
-import { ClauseId, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
+import { ClauseId, AgreementType, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
 import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, getRegionsByCountryIso2, GLOBAL_REGION } from '../constants';
 
 type AppContextValue = {
@@ -28,6 +28,8 @@ type AppContextValue = {
   resetVerificationEmail: () => void;
   selectedClauseId: ClauseId;
   setSelectedClauseId: (clause: ClauseId) => void;
+  selectedAgreementType: AgreementType | null;
+  setSelectedAgreementType: (type: AgreementType | null) => void;
   selectedShopItem?: ShopItem;
   setSelectedShopItem: (item?: ShopItem) => void;
   selectedReferralMember?: { member: string; email: string; depth?: number };
@@ -98,6 +100,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ScreenName>(ROUTES.login);
   const [verificationEmail, setVerificationEmail] = useState('');
   const [selectedClauseId, setSelectedClauseId] = useState<ClauseId>('service');
+  const [selectedAgreementType, setSelectedAgreementType] = useState<AgreementType | null>(null);
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
   const [selectedReferralMember, setSelectedReferralMember] = useState<{ member: string; email: string } | undefined>(undefined);
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
@@ -182,6 +185,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       resetVerificationEmail: () => setVerificationEmail(''),
       selectedClauseId,
       setSelectedClauseId,
+      selectedAgreementType,
+      setSelectedAgreementType,
       selectedShopItem,
       setSelectedShopItem,
       selectedReferralMember,
@@ -243,6 +248,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       verificationSuccessRoute,
       verificationEmail,
       selectedClauseId,
+      selectedAgreementType,
       selectedShopItem,
       selectedReferralMember,
       emergencyStop,
