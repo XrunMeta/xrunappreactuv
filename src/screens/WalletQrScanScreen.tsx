@@ -74,7 +74,8 @@ export const WalletQrScanScreen = () => {
     [goBack, navigate, isProcessing, setWalletSendAddress, previousScreen, walletReceiveCurrency, setSelectedWalletAsset],
   );
   const handleQrScanPress = () => {
-    navigate(ROUTES.walletReceive);
+
+    goBack();
   };
 
   const renderPermissionFallback = () => {

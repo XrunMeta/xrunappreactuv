@@ -62,16 +62,6 @@ export const WalletReceiveScreen = () => {
     }
   }, [walletReceiveAddress]);
 
-  useEffect(() => {
-    return () => {
-
-      console.log('[WalletReceiveScreen] cleanup 실행 - Context 초기화');
-      resetWalletReceiveAddress();
-      resetWalletReceiveCurrency();
-    };
-
-  }, []); 
-
   const handleCopyAddress = async () => {
     if (walletAddress) {
       await copyToClipboard(walletAddress, showAlert);
