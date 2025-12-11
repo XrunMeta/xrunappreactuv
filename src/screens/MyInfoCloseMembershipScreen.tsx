@@ -92,6 +92,13 @@ export const MyInfoCloseMembershipScreen = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={styles.inner}>
+          <Text style={styles.warningText}>
+            회원을 탈퇴하시면, 
+            앱을 사용하기 위해 저장된 개인정보, 지갑키 등 관련된 정보가 모두 삭제됩니다. 
+            삭제후에는 복구가 불가능하니 반드시 확인하십시오.
+          </Text>
+        </View> 
+        <View style={styles.inner}>
           <FormField
             label={t('screens.myInfoCloseMembership.passwordLabel')}
             placeholder={t('screens.myInfoCloseMembership.passwordPlaceholder')}
@@ -139,6 +146,14 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.small,
     lineHeight: 15,
     color: '#747474',
+    fontFamily: 'Roboto-Regular',
+  },
+  warningText: {
+    marginTop: 8,
+    marginBottom: 24,
+    fontSize: FONTS.size.medium,
+    lineHeight: 24,
+    color: '#aa0000',
     fontFamily: 'Roboto-Regular',
   },
   bottomSection: {
