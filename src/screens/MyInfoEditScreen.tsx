@@ -95,6 +95,7 @@ export const v_cdb169 = () => {
   ];
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
+  const [v_05b02f, v_ef747e] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_3535cd, v_9f928c] = v_5ab095<string>('');
   const [v_d74a81, v_fcce73] = v_5ab095('010 2487 6746');
@@ -133,6 +134,7 @@ export const v_cdb169 = () => {
 
         firstName: v_a32a50,
         lastName: v_328bb4,
+        fullName: v_05b02f,
         phone: v_d74a81,
         gender: v_c3eac4,
         age: v_2694bd,
@@ -166,6 +168,14 @@ export const v_cdb169 = () => {
         }
         if (v_f1d91d.lastName) {
           v_b7613d(v_f1d91d.lastName);
+        }
+
+        if (v_f1d91d.fullName) {
+          v_ef747e(v_f1d91d.fullName);
+        } else if (v_f1d91d.firstName || v_f1d91d.lastName) {
+
+          const v_419da8 = `${v_f1d91d.lastName || ''} ${v_f1d91d.firstName || ''}`.trim();
+          v_ef747e(v_419da8);
         }
         if (v_f1d91d.phone) v_fcce73(v_f1d91d.phone);
         if (v_f1d91d.gender) v_bdc43c(v_f1d91d.gender);
@@ -244,7 +254,7 @@ export const v_cdb169 = () => {
     if (v_c28392 || v_add96c.cDesc || v_167c8b.rDesc) {
       v_2c39d5();
     }
-  }, [v_a32a50, v_328bb4, v_d74a81, v_c3eac4, v_2694bd, v_add96c, v_167c8b, v_222917, v_a4d981, v_cd31a8]);
+  }, [v_a32a50, v_328bb4, v_05b02f, v_d74a81, v_c3eac4, v_2694bd, v_add96c, v_167c8b, v_222917, v_a4d981, v_cd31a8]);
 
   const v_ea3fa6 = async (v_587901 = true) => {
     const v_96aafe = new Error().stack;
@@ -276,6 +286,9 @@ export const v_cdb169 = () => {
 
             v_4944f5(v_898d5f);
             v_b7613d(v_8e4db1);
+
+            const v_419da8 = `${v_8e4db1 || ''} ${v_898d5f || ''}`.trim();
+            v_ef747e(v_419da8);
             v_fedf34(v_625c74.email || '');
             v_9f928c(v_625c74.datepinchanged || '');
 
@@ -568,13 +581,25 @@ export const v_cdb169 = () => {
 
   const v_1b8283 = async () => {
 
-    if (!v_a32a50.trim()) {
+    const v_b63249 = v_05b02f.trim().split(/\s+/);
+    let v_f8f949 = '';
+    let v_480d4b = '';
+
+    if (v_b63249.length === 0) {
       await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
+    } else if (v_b63249.length === 1) {
+
+      v_f8f949 = v_b63249[0];
+      v_480d4b = '';
+    } else {
+
+      v_480d4b = v_b63249[0];
+      v_f8f949 = v_b63249.slice(1).join(' ');
     }
 
-    if (!v_328bb4.trim()) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.lastNameRequired'));
+    if (!v_f8f949.trim()) {
+      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
@@ -662,32 +687,32 @@ export const v_cdb169 = () => {
       const v_e01f71 = [];
       const v_57285d = [];
 
-      if (v_a32a50.trim() !== v_9d09f1.trim()) {
-        const v_576f5a = { member: v_717992, firstname: v_a32a50.trim() };
+      if (v_f8f949.trim() !== v_9d09f1.trim()) {
+        const v_576f5a = { member: v_717992, firstname: v_f8f949.trim() };
         v_57285d.push({ name: '이름', request: v_576f5a });
-        v_e01f71.push(v_152d53(v_717992, v_a32a50.trim(), v_9b57fc).then(v_3393e3 => {
+        v_e01f71.push(v_152d53(v_717992, v_f8f949.trim(), v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
           return v_3393e3;
         }));
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
           원본: v_9d09f1,
-          현재: v_a32a50.trim()
+          현재: v_f8f949.trim()
         });
       }
 
-      if (v_328bb4.trim() !== v_b6daf3.trim()) {
-        const v_576f5a = { member: v_717992, lastname: v_328bb4.trim() };
+      if (v_480d4b.trim() !== v_b6daf3.trim()) {
+        const v_576f5a = { member: v_717992, lastname: v_480d4b.trim() };
 
         v_57285d.push({ name: '성', request: v_576f5a });
-        v_e01f71.push(v_7f8c9e(v_717992, v_328bb4.trim(), v_9b57fc).then(v_3393e3 => {
+        v_e01f71.push(v_7f8c9e(v_717992, v_480d4b.trim(), v_9b57fc).then(v_3393e3 => {
           console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
           return v_3393e3;
         }));
       } else {
         console.log('[정보수정] ❌ 성 변경 없음:', {
           원본: v_b6daf3,
-          현재: v_328bb4.trim()
+          현재: v_480d4b.trim()
         });
       }
 
@@ -1170,18 +1195,23 @@ export const v_cdb169 = () => {
 
             <FormField
               label={v_8d41d7('screens.myInfoEdit.firstName')}
-              value={v_a32a50}
-              onChangeText={v_4944f5}
-              placeholder={v_8d41d7('screens.myInfoEdit.firstNamePlaceholder')}
-              editable={!v_e495db}
-              containerStyle={v_d81136.fieldContainer}
-            />
+              value={v_05b02f}
+              onChangeText={(v_9b6134) => {
+                v_ef747e(v_9b6134);
 
-            <FormField
-              label={v_8d41d7('screens.myInfoEdit.lastName')}
-              value={v_328bb4}
-              onChangeText={v_b7613d}
-              placeholder={v_8d41d7('screens.myInfoEdit.lastNamePlaceholder')}
+                const v_b63249 = v_9b6134.trim().split(/\s+/);
+                if (v_b63249.length === 0) {
+                  v_4944f5('');
+                  v_b7613d('');
+                } else if (v_b63249.length === 1) {
+                  v_4944f5(v_b63249[0]);
+                  v_b7613d('');
+                } else {
+                  v_b7613d(v_b63249[0]);
+                  v_4944f5(v_b63249.slice(1).join(' '));
+                }
+              }}
+              placeholder={v_8d41d7('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!v_e495db}
               containerStyle={v_d81136.fieldContainer}
             />
