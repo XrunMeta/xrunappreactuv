@@ -20,5 +20,6 @@ export default {
   no: '아니오',
   confirm: '확인',
   attendanceCheck: '출석체크',
+  settlementNotice: '75일후 정산됨',
 };
 

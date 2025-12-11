@@ -20,5 +20,6 @@ export default {
   no: 'No',
   confirm: 'Confirm',
   attendanceCheck: 'Check In',
+  settlementNotice: 'Settled in 75 days',
 };
 

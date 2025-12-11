@@ -20,5 +20,6 @@ export default {
   no: 'Tidak',
   confirm: 'Konfirmasi',
   attendanceCheck: 'Check In',
+  settlementNotice: 'Diselesaikan dalam 75 hari',
 };
 

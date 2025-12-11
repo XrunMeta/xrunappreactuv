@@ -20,5 +20,6 @@ export default {
   no: '否',
   confirm: '确认',
   attendanceCheck: '签到',
+  settlementNotice: '75天后结算',
 };
 
