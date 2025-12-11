@@ -57,6 +57,11 @@ export const v_f40fc5 = () => {
   ] as const;
   const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
   const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);
+  const [v_05b02f, v_ef747e] = v_5ab095(
+    v_8d7bc8.familyName || v_8d7bc8.givenName
+      ? `${v_8d7bc8.familyName || ''} ${v_8d7bc8.givenName || ''}`.trim()
+      : ''
+  );
   const [v_e0c7e8, v_fedf34] = v_5ab095(v_8d7bc8.email);
   const [v_adc076, v_52b279] = v_5ab095(v_8d7bc8.password);
   const [v_3a6ac4, v_f768f9] = v_5ab095(v_8d7bc8.phoneNumber);
@@ -84,6 +89,9 @@ export const v_f40fc5 = () => {
     if (!v_2ca208.current) {
       v_6dde2f(v_8d7bc8.familyName);
       v_15ded5(v_8d7bc8.givenName);
+
+      const v_419da8 = `${v_8d7bc8.familyName || ''} ${v_8d7bc8.givenName || ''}`.trim();
+      v_ef747e(v_419da8);
       v_fedf34(v_8d7bc8.email);
       v_52b279(v_8d7bc8.password);
       v_f768f9(v_8d7bc8.phoneNumber);
@@ -133,7 +141,24 @@ export const v_f40fc5 = () => {
       return;
     }
 
-    if (!v_f142d8.trim() || !v_a7c7b7.trim()) {
+    const v_b63249 = v_05b02f.trim().split(/\s+/);
+    let v_c0da8d = '';
+    let v_eb8dd4 = '';
+
+    if (v_b63249.length === 0) {
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
+      return;
+    } else if (v_b63249.length === 1) {
+
+      v_c0da8d = v_b63249[0];
+      v_eb8dd4 = '';
+    } else {
+
+      v_eb8dd4 = v_b63249[0];
+      v_c0da8d = v_b63249.slice(1).join(' ');
+    }
+
+    if (!v_c0da8d.trim()) {
       await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
       return;
     }
@@ -240,8 +265,8 @@ export const v_f40fc5 = () => {
         const v_0e0310 = {
           email: v_e0c7e8.trim(),
           password: v_adc076,
-          familyName: v_f142d8.trim(),
-          givenName: v_a7c7b7.trim(),
+          familyName: v_eb8dd4.trim(),
+          givenName: v_c0da8d.trim(),
           phoneNumber: v_3a6ac4.trim(),
           selectedCountryDialCode: {
             iso2: v_459d5e.iso2,
@@ -313,14 +338,25 @@ export const v_f40fc5 = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.formFieldContainer}>
-          {
-
-}
           <FormField
             label={v_8d41d7('screens.signup.givenNameLabel')}
             placeholder={v_8d41d7('screens.signup.givenNamePlaceholder')}
-            value={v_a7c7b7}
-            onChangeText={v_15ded5}
+            value={v_05b02f}
+            onChangeText={(v_9b6134) => {
+              v_ef747e(v_9b6134);
+
+              const v_b63249 = v_9b6134.trim().split(/\s+/);
+              if (v_b63249.length === 0) {
+                v_6dde2f('');
+                v_15ded5('');
+              } else if (v_b63249.length === 1) {
+                v_6dde2f('');
+                v_15ded5(v_b63249[0]);
+              } else {
+                v_6dde2f(v_b63249[0]);
+                v_15ded5(v_b63249.slice(1).join(' '));
+              }
+            }}
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
           />
