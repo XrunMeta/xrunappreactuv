@@ -9,7 +9,7 @@ export default {
   expectedAdRevenue: '예상광고수익',
   adRevenueSettlement: '광고수익정산',
   rewardAmount: '보상금액',
-  attendanceCheckTitle: '오늘의 출석 체크를 하시겠습니까?',
+  attendanceCheckTitle: '출석 체크를 하시겠습니까?',
   attendanceCheckCompleted: '오늘의 출석체크를 이미 완료 했습니다',
   attendanceCheckRewardMessage: '오늘의 출석체크 보상을 받으세요',
   attendanceCheckCompletedToast: '오늘의 출석체크를 완료했습니다',
