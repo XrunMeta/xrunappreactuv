@@ -145,6 +145,9 @@ import {
   DeleteXrunPurchasedItemResponse,
   InAppPurchaseRequest,
   InAppPurchaseResponse,
+  AgreementResponse,
+  AgreementData,
+  AgreementType,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 
@@ -4106,94 +4109,202 @@ export const getClauseContent = async (
   language: string,
   navigation?: any,
 ): Promise<string> => {
+
+  const typeMap: Record<'service' | 'location' | 'personal', number> = {
+    service: 1,
+    location: 2,
+    personal: 3,
+  };
+
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+    const baseUrl = env.GATEWAY_NODEJS;
 
-    let apiUrl = 'app7010-01';
-    if (language === 'id') {
-      apiUrl += '-id';
-    } else if (language === 'ko') {
-      apiUrl += '-kr';
-    } else if (language === 'en') {
-      apiUrl += '-en';
-    } else if (language === 'zh-CN' || language === 'zh') {
-      apiUrl += '-zh';
-    } else {
+    const typeNumber = typeMap[clauseType];
+    const endpoint = `/oth-path?type=${typeNumber}`;
+    const fullUrl = endpoint.startsWith('/') 
+      ? `${baseUrl}${endpoint}` 
+      : `${baseUrl}/${endpoint}`;
 
-      apiUrl += '-en';
-    }
-
-    console.log('[약관] 약관 내용 요청:', { clauseType, language, apiUrl });
-
-    const response = await axiosInstance.get<{ data: Array<{ c: string }> }>(apiUrl);
-
-    console.log('[약관] API 응답 데이터:', {
+    console.log('[약관] 약관 내용 요청:', { 
+      clauseType, 
+      typeNumber, 
+      endpoint, 
+      fullUrl,
       language,
-      dataLength: response.data.data?.length,
-      data: response.data.data,
+      baseUrl,
     });
 
-    let content = '';
-    if (clauseType === 'service') {
-      content = response.data.data?.[0]?.c || '';
-    } else if (clauseType === 'personal') {
-      content = response.data.data?.[1]?.c || '';
-    } else if (clauseType === 'location') {
-      content = response.data.data?.[2]?.c || '';
+    let response: Response;
+    try {
+      response = await nodeGatewayRequest(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authCode}`,
+        },
+      }, navigation);
+    } catch (networkError) {
+      console.error('[약관] 네트워크 요청 실패:', {
+        clauseType,
+        typeNumber,
+        endpoint,
+        fullUrl,
+        error: networkError,
+        errorType: networkError instanceof Error ? networkError.constructor.name : typeof networkError,
+        errorMessage: networkError instanceof Error ? networkError.message : String(networkError),
+        errorStack: networkError instanceof Error ? networkError.stack : undefined,
+      });
+      throw networkError;
     }
 
-    if ((language === 'zh-CN' || language === 'zh') && !content) {
-      console.warn('[약관] 중국어 약관 내용이 비어있습니다. 전체 응답 확인:', response.data);
+    console.log('[약관] HTTP 응답 상태:', {
+      ok: response.ok,
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
 
-      if (response.data.data && response.data.data.length > 0) {
-
-        for (let i = 0; i < response.data.data.length; i++) {
-          const item = response.data.data[i];
-          if (item && item.c && item.c.trim()) {
-
-            if (clauseType === 'service' && i === 0) {
-              content = item.c;
-              break;
-            } else if (clauseType === 'personal' && i === 1) {
-              content = item.c;
-              break;
-            } else if (clauseType === 'location' && i === 2) {
-              content = item.c;
-              break;
-            }
-          }
-        }
-
-        if (!content && response.data.data.length > 0) {
-          const firstNonEmpty = response.data.data.find(item => item && item.c && item.c.trim());
-          if (firstNonEmpty) {
-            content = firstNonEmpty.c;
-            console.log('[약관] Fallback으로 첫 번째 비어있지 않은 항목 사용');
-          }
-        }
-      }
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '응답 본문 읽기 실패');
+      console.error('[약관] HTTP 에러 응답:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+      });
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', { clauseType, language, contentLength: content.length });
+    let data: any;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      const responseText = await response.text().catch(() => '응답 본문 읽기 실패');
+      console.error('[약관] JSON 파싱 실패:', {
+        clauseType,
+        typeNumber,
+        responseText,
+        error: jsonError,
+      });
+      throw new Error(`JSON 파싱 실패: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
+    }
 
-    return content;
+    console.log('[약관] API 응답 데이터:', JSON.stringify(data, null, 2));
+    console.log('[약관] 응답 구조 분석:', {
+      code: data.code,
+      hasData: !!data.data,
+      dataType: Array.isArray(data.data) ? 'array' : typeof data.data,
+      dataLength: Array.isArray(data.data) ? data.data.length : 'N/A',
+      dataKeys: data.data && typeof data.data === 'object' && !Array.isArray(data.data) 
+        ? Object.keys(data.data) 
+        : 'N/A',
+    });
+
+    if (data.code !== 200 || !data.data) {
+      console.error('[약관] 응답 데이터 검증 실패:', {
+        code: data.code,
+        hasData: !!data.data,
+        fullResponse: data,
+      });
+      throw new Error('약관 데이터를 가져올 수 없습니다.');
+    }
+
+    const agreementData = data.data;
+
+    if (!agreementData.content) {
+      console.error('[약관] 약관 내용이 없습니다:', {
+        agreementData,
+        hasContent: !!agreementData.content,
+      });
+      throw new Error('약관 내용이 없습니다.');
+    }
+
+    console.log('[약관] 약관 내용 로드 성공:', { 
+      clauseType, 
+      typeNumber,
+      language, 
+      contentLength: agreementData.content.length 
+    });
+
+    return agreementData.content;
   } catch (error) {
     console.error('[약관] 약관 내용 로드 실패:', error);
-    if (error instanceof AxiosError) {
+    if (error instanceof Error) {
       console.error('[약관] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
         message: error.message,
+        name: error.name,
+        stack: error.stack,
+        clauseType,
+        typeNumber: typeMap[clauseType],
+        language,
+        endpoint: `/oth-path?type=${typeMap[clauseType]}`,
+      });
+    } else {
+      console.error('[약관] 알 수 없는 에러:', {
+        error,
+        errorType: typeof error,
+        clauseType,
+        typeNumber: typeMap[clauseType],
+        language,
       });
     }
-    if (navigation) {
-      await handleTimeoutError(navigation);
+
+    throw error;
+  }
+};
+
+export const getAgreementByType = async (
+  type?: 'service' | 'location' | 'personal',
+  navigation?: any,
+): Promise<AgreementResponse> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const typeMap: Record<'service' | 'location' | 'personal', number> = {
+      service: 1,
+      location: 2,
+      personal: 3,
+    };
+
+    const endpoint = type 
+      ? `/oth-path?type=${typeMap[type]}`
+      : '/oth-path';
+
+    console.log('[약관] 약관 데이터 요청:', { type, typeNumber: type ? typeMap[type] : undefined, endpoint });
+
+    const response = await nodeGatewayRequest(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: AgreementResponse = await response.json();
+
+    console.log('[약관] 약관 데이터 로드 성공:', { type, hasData: !!data.data });
+
+    return data;
+  } catch (error) {
+    console.error('[약관] 약관 데이터 로드 실패:', error);
+    if (error instanceof Error && error.message === 'API request timeout') {
+
+      throw error;
     }
     throw error;
   }
+};
+
+export const getAllAgreements = async (
+  navigation?: any,
+): Promise<AgreementResponse> => {
+  return getAgreementByType(undefined, navigation);
 };
 
 const TOP_AD5_STORAGE_KEY = 'topAd5Data';
