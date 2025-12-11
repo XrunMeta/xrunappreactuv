@@ -2960,15 +2960,9 @@ export const MapMainScreen: React.FC = () => {
         </MapView>
 
          {}
-      {logoHorizontal && (
-        <View style={styles.topLogo}>
-          <Image
-            source={logoHorizontal}
-            style={{ width: Dimensions.get('window').width / 4 }}
-            resizeMode="contain"
-          />
-        </View>
-      )} 
+      {
+
+}
 
         {}
 
@@ -3174,7 +3168,7 @@ const styles = StyleSheet.create({
 
   mapPinButton: {
     position: 'absolute',
-    top: 34,
+    top: 26,
     right: 16,
     width: 25,
     height: 25,
