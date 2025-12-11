@@ -404,6 +404,15 @@ try {
   console.warn('icon_catch.png not found');
 }
 
+let v_5dede3 = null;
+
+try {
+  v_5dede3 = require('../../assets/xrun-horizontal-logo.png');
+  console.log('✅ [CameraMainScreen] 상단 로고 이미지 로드 성공');
+} catch (v_9e86fd) {
+  console.warn('❌ [CameraMainScreen] xrun-horizontal-logo.png not found:', v_9e86fd);
+}
+
 interface CameraMainScreenProps {
   activeTab?: 'Map' | 'Camera';
   onTabChange?: (tab: 'Map' | 'Camera') => void;
@@ -1570,17 +1579,23 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           style={v_d81136.camera}
           facing="back"
         >
-          {}
-          {v_16772f && (
-            <View style={v_d81136.mapPinButton}>
-              <Image
-                source={v_16772f}
-                style={v_d81136.mapPinIcon}
-                resizeMode="contain"
-              />
-            </View>
-          )}
+          {
+
+}
         </CameraView>
+
+         {}
+      {v_5dede3 && (
+        <View style={v_d81136.topLogo}>
+          <Image
+            source={v_5dede3}
+            style={{ 
+
+              width: v_700696.get('window').width / 4 }}
+            resizeMode="contain"
+          />
+        </View>
+      )} 
 
         {}
         {
@@ -2036,6 +2051,21 @@ const v_d81136 = v_472849.create({
     width: 100,
     position: 'absolute',
     top: -80,
+  },
+  topLogo: {
+    position: 'absolute',
+    top: 76, 
+    left: 8,
+    width: v_700696.get('window').width / 4,
+    height: v_700696.get('window').width / 4,
+    zIndex: 10, 
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });
 
