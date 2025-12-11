@@ -37,17 +37,7 @@ export const MyInfoFaqScreen = () => {
 
   const items = useMemo(() => {
     const faqItems = t('screens.myInfoFaq.items', { returnObjects: true }) as any;
-    return [
-      {
-        id: 'exchange-submit',
-        question: faqItems?.exchangeSubmit?.question || '',
-        answer: faqItems?.exchangeSubmit?.answer || '',
-      },
-      {
-        id: 'conversion-schedule',
-        question: faqItems?.conversionSchedule?.question || '',
-        answer: faqItems?.conversionSchedule?.answer || '',
-      },
+    return [ 
       {
         id: 'mission-complete',
         question: faqItems?.missionComplete?.question || '',
@@ -57,12 +47,7 @@ export const MyInfoFaqScreen = () => {
         id: 'reward-check',
         question: faqItems?.rewardCheck?.question || '',
         answer: faqItems?.rewardCheck?.answer || '',
-      },
-      {
-        id: 'xrun-exchange',
-        question: faqItems?.xrunExchange?.question || '',
-        answer: faqItems?.xrunExchange?.answer || '',
-      },
+      }, 
       {
         id: 'reward-usage',
         question: faqItems?.rewardUsage?.question || '',
