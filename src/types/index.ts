@@ -1,6 +1,22 @@
 
 export type ClauseId = 'service' | 'location' | 'personal';
 
+export type AgreementType = 'service' | 'location' | 'personal';
+
+export interface AgreementData {
+  type: AgreementType;
+  title: string;
+  content: string;
+  language?: string;
+  updatedAt?: string;
+}
+
+export interface AgreementResponse {
+  success: boolean;
+  data: AgreementData | AgreementData[];
+  message?: string;
+}
+
 export type ShopItem = {
   id: string;
   title: string;
