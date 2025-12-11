@@ -15,11 +15,12 @@ import {
   fetchADXRUNResultList,
   fetchADXRUNTopBanners,
   fetchADXRUNTopBannersSettled,
+  fetchQuestList,
 } from '../services';
-import { ADXRUNEstimateItem, ADXRUNResultItem } from '../types';
+import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
 
-type TabValue = 'pending' | 'settled';
+type TabValue = 'pending' | 'quest' | 'settled';
 
 interface AdEntry {
   id: string | number;
@@ -29,6 +30,9 @@ interface AdEntry {
   adRevenueSettlement: string;
   expectedAdRevenueColor: string;
   adRevenueSettlementColor: string;
+  title?: string; 
+  description?: string; 
+  rewardDescription?: string; 
 }
 
 export const AdWalletScreen = () => {
@@ -47,6 +51,7 @@ export const AdWalletScreen = () => {
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
 
   const pendingListRef = useRef<DataListRef>(null);
+  const questListRef = useRef<DataListRef>(null);
   const settledListRef = useRef<DataListRef>(null);
 
   useEffect(() => {
@@ -94,7 +99,7 @@ export const AdWalletScreen = () => {
       setTopBannersLoading(true);
       try {
         let response;
-        if (tab === 'pending') {
+        if (tab === 'pending' || tab === 'quest') {
           response = await fetchADXRUNTopBanners(member);
         } else {
           response = await fetchADXRUNTopBannersSettled(member);
@@ -232,6 +237,34 @@ export const AdWalletScreen = () => {
     [t, formatDate],
   );
 
+  const convertQuestToAdEntry = useCallback(
+    (item: QuestItem): AdEntry => {
+      const status = t('screens.adWallet.quest');
+
+      const date = formatDate(item.start_date || item.created_at);
+
+      const rewardAmount = typeof item.reward_amount_asxrun === 'string' 
+        ? parseFloat(item.reward_amount_asxrun) 
+        : item.reward_amount_asxrun;
+      const expectedAdRevenue = `${rewardAmount.toFixed(2)} XRUN`;
+      const adRevenueSettlement = '- XRUN';
+
+      return {
+        id: item.id,
+        status,
+        date,
+        expectedAdRevenue,
+        adRevenueSettlement,
+        expectedAdRevenueColor: '#707070',
+        adRevenueSettlementColor: '#343434',
+        title: item.title,
+        description: item.description,
+        rewardDescription: item.reward_description,
+      };
+    },
+    [t, formatDate],
+  );
+
   const convertResultToAdEntry = useCallback(
     (item: ADXRUNResultItem): AdEntry => {
 
@@ -312,6 +345,28 @@ export const AdWalletScreen = () => {
     [member, convertEstimateToAdEntry],
   );
 
+  const fetchQuestData = useCallback(
+    async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
+      try {
+        const response = await fetchQuestList();
+
+        const questItems = response.data || [];
+
+        const adEntries: AdEntry[] = questItems.map(convertQuestToAdEntry);
+
+        return {
+          data: adEntries,
+          total: adEntries.length,
+          hasMore: false,
+        };
+      } catch (error: any) {
+        console.error('Failed to fetch quest data:', error);
+        return { data: [], total: 0, hasMore: false };
+      }
+    },
+    [convertQuestToAdEntry],
+  );
+
   const fetchSettledData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
       if (!member) {
@@ -352,43 +407,66 @@ export const AdWalletScreen = () => {
 
     if (value === 'pending' && pendingListRef.current) {
       pendingListRef.current.reloadData();
+    } else if (value === 'quest' && questListRef.current) {
+      questListRef.current.reloadData();
     } else if (value === 'settled' && settledListRef.current) {
       settledListRef.current.reloadData();
     }
   }, []);
 
   const summaryLabel = useMemo(
-    () => (tab === 'pending' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
+    () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
     [tab, t],
   );
 
   const tabs = useMemo(
     () => [
       { label: t('screens.adWallet.pending'), value: 'pending' as TabValue },
+      { label: t('screens.adWallet.quest'), value: 'quest' as TabValue },
       { label: t('screens.adWallet.settled'), value: 'settled' as TabValue },
     ],
     [t],
   );
 
   const AdEntryItem: React.FC<AdEntry> = (item) => {
+
+    const isQuest = !!item.title;
+
     return (
       <View style={styles.adCard}>
         <View style={styles.adCardHeader}>
           <Text style={styles.adCardStatus}>{item.status}</Text>
           <Text style={styles.adCardDate}>{item.date}</Text>
         </View>
+        {isQuest && item.title && (
+          <View style={styles.questTitleContainer}>
+            <Text style={styles.questTitle}>{item.title}</Text>
+            {item.description && (
+              <Text style={styles.questDescription}>{item.description}</Text>
+            )}
+          </View>
+        )}
         <View style={styles.adCardRow}>
-          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.expectedAdRevenue')}</Text>
+          <Text style={styles.adCardRowLabel}>
+            {isQuest ? t('screens.adWallet.rewardAmount') : t('screens.adWallet.expectedAdRevenue')}
+          </Text>
           <Text style={[styles.adCardRowAmount, { color: item.expectedAdRevenueColor }]}>
             {item.expectedAdRevenue}
           </Text>
         </View>
-        <View style={styles.adCardRow}>
-          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
-          <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
-            {item.adRevenueSettlement}
-          </Text>
-        </View>
+        {!isQuest && (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        )}
+        {isQuest && item.rewardDescription && (
+          <View style={styles.questRewardContainer}>
+            <Text style={styles.questRewardDescription}>{item.rewardDescription}</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -446,6 +524,15 @@ export const AdWalletScreen = () => {
               pageSize={20}
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `pending-${item.id}-${index}`}
+            />
+          ) : tab === 'quest' ? (
+            <DataList
+              ref={questListRef}
+              fetchData={fetchQuestData}
+              ItemComponent={AdEntryItem}
+              pageSize={20}
+              contentContainerStyle={styles.dataList}
+              keyExtractor={(item, index) => `quest-${item.id}-${index}`}
             />
           ) : (
             <DataList
@@ -610,5 +697,32 @@ const styles = StyleSheet.create({
   dataList: {
     paddingTop: 0,
     paddingBottom: 0,
+  },
+  questTitleContainer: {
+    marginBottom: 12,
+  },
+  questTitle: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Bold',
+    color: '#111111',
+    marginBottom: 4,
+  },
+  questDescription: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#666666',
+    lineHeight: 20,
+  },
+  questRewardContainer: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e5e5',
+  },
+  questRewardDescription: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#888888',
+    fontStyle: 'italic',
   },
 });

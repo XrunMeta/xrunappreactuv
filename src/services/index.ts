@@ -110,6 +110,8 @@ import {
   ADXRUNEstimateListResponse,
   ADXRUNResultListResponse,
   ADXRUNTopBannersSettledResponse,
+  QuestListResponse,
+  QuestItem,
   TransactionHistoryResponse,
   TransactionHistoryItem,
   TokenBalanceResponse,
@@ -3653,6 +3655,37 @@ export const fetchADXRUNTopBannersSettled = async (
     console.error('[AD XRUN] 정산완료 배너 데이터 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[AD XRUN] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const fetchQuestList = async (
+  navigation?: any,
+): Promise<QuestListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[Quest] 퀘스트 리스트 조회 요청');
+
+    const response = await axiosInstance.get<QuestListResponse>(
+      '/Quests/list',
+    );
+
+    console.log('[Quest] 퀘스트 리스트 조회 성공:', response.data.data?.length || 0, '개');
+
+    return response.data;
+  } catch (error) {
+    console.error('[Quest] 퀘스트 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Quest] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
