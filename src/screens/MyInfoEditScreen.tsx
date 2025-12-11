@@ -95,6 +95,7 @@ export const MyInfoEditScreen = () => {
   ];
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [datepinchanged, setDatepinchanged] = useState<string>('');
   const [phone, setPhone] = useState('010 2487 6746');
@@ -133,6 +134,7 @@ export const MyInfoEditScreen = () => {
 
         firstName,
         lastName,
+        fullName,
         phone,
         gender,
         age,
@@ -166,6 +168,14 @@ export const MyInfoEditScreen = () => {
         }
         if (savedData.lastName) {
           setLastName(savedData.lastName);
+        }
+
+        if (savedData.fullName) {
+          setFullName(savedData.fullName);
+        } else if (savedData.firstName || savedData.lastName) {
+
+          const combinedName = `${savedData.lastName || ''} ${savedData.firstName || ''}`.trim();
+          setFullName(combinedName);
         }
         if (savedData.phone) setPhone(savedData.phone);
         if (savedData.gender) setGender(savedData.gender);
@@ -244,7 +254,7 @@ export const MyInfoEditScreen = () => {
     if (hasChanges || tempCountry.cDesc || tempRegion.rDesc) {
       saveFormData();
     }
-  }, [firstName, lastName, phone, gender, age, tempCountry, tempRegion, regionCode, countryCode, isLoading]);
+  }, [firstName, lastName, fullName, phone, gender, age, tempCountry, tempRegion, regionCode, countryCode, isLoading]);
 
   const loadUserInfo = async (showLoading: boolean = true) => {
     const stackTrace = new Error().stack;
@@ -276,6 +286,9 @@ export const MyInfoEditScreen = () => {
 
             setFirstName(loadedFirstName);
             setLastName(loadedLastName);
+
+            const combinedName = `${loadedLastName || ''} ${loadedFirstName || ''}`.trim();
+            setFullName(combinedName);
             setEmail(user.email || '');
             setDatepinchanged(user.datepinchanged || '');
 
@@ -568,13 +581,25 @@ export const MyInfoEditScreen = () => {
 
   const handleSave = async () => {
 
-    if (!firstName.trim()) {
+    const nameParts = fullName.trim().split(/\s+/);
+    let parsedFirstName = '';
+    let parsedLastName = '';
+
+    if (nameParts.length === 0) {
       await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
+    } else if (nameParts.length === 1) {
+
+      parsedFirstName = nameParts[0];
+      parsedLastName = '';
+    } else {
+
+      parsedLastName = nameParts[0];
+      parsedFirstName = nameParts.slice(1).join(' ');
     }
 
-    if (!lastName.trim()) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.lastNameRequired'));
+    if (!parsedFirstName.trim()) {
+      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.firstNameRequired'));
       return;
     }
 
@@ -662,32 +687,32 @@ export const MyInfoEditScreen = () => {
       const promises = [];
       const apiCalls: Array<{ name: string; request: any }> = [];
 
-      if (firstName.trim() !== originalFirstName.trim()) {
-        const request = { member: memberId, firstname: firstName.trim() };
+      if (parsedFirstName.trim() !== originalFirstName.trim()) {
+        const request = { member: memberId, firstname: parsedFirstName.trim() };
         apiCalls.push({ name: '이름', request });
-        promises.push(updateName(memberId, firstName.trim(), navigate).then(response => {
+        promises.push(updateName(memberId, parsedFirstName.trim(), navigate).then(response => {
           console.log('[정보수정] 📥 이름 수정 API 응답:', response);
           return response;
         }));
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
           원본: originalFirstName,
-          현재: firstName.trim()
+          현재: parsedFirstName.trim()
         });
       }
 
-      if (lastName.trim() !== originalLastName.trim()) {
-        const request = { member: memberId, lastname: lastName.trim() };
+      if (parsedLastName.trim() !== originalLastName.trim()) {
+        const request = { member: memberId, lastname: parsedLastName.trim() };
 
         apiCalls.push({ name: '성', request });
-        promises.push(updateLastName(memberId, lastName.trim(), navigate).then(response => {
+        promises.push(updateLastName(memberId, parsedLastName.trim(), navigate).then(response => {
           console.log('[정보수정] 📥 성 수정 API 응답:', response);
           return response;
         }));
       } else {
         console.log('[정보수정] ❌ 성 변경 없음:', {
           원본: originalLastName,
-          현재: lastName.trim()
+          현재: parsedLastName.trim()
         });
       }
 
@@ -1170,18 +1195,23 @@ export const MyInfoEditScreen = () => {
 
             <FormField
               label={t('screens.myInfoEdit.firstName')}
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder={t('screens.myInfoEdit.firstNamePlaceholder')}
-              editable={!isSaving}
-              containerStyle={styles.fieldContainer}
-            />
+              value={fullName}
+              onChangeText={(text) => {
+                setFullName(text);
 
-            <FormField
-              label={t('screens.myInfoEdit.lastName')}
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder={t('screens.myInfoEdit.lastNamePlaceholder')}
+                const nameParts = text.trim().split(/\s+/);
+                if (nameParts.length === 0) {
+                  setFirstName('');
+                  setLastName('');
+                } else if (nameParts.length === 1) {
+                  setFirstName(nameParts[0]);
+                  setLastName('');
+                } else {
+                  setLastName(nameParts[0]);
+                  setFirstName(nameParts.slice(1).join(' '));
+                }
+              }}
+              placeholder={t('screens.myInfoEdit.firstNamePlaceholder')}
               editable={!isSaving}
               containerStyle={styles.fieldContainer}
             />
