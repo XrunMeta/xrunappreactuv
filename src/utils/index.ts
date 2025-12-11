@@ -160,6 +160,27 @@ export const v_a3bbf0 = async (
   }
 };
 
+export const v_8cf86b = (v_e0c7e8): string => {
+
+  if (!v_e0c7e8 || typeof v_e0c7e8 !== 'string' || !v_e0c7e8.includes('@')) {
+    return v_e0c7e8; 
+  }
+
+  const [v_2abccc, v_52b478] = v_e0c7e8.split('@');
+
+  if (!v_2abccc || v_2abccc.length === 0) {
+    return v_e0c7e8;
+  }
+
+  const v_d7216b = Math.min(2, v_2abccc.length);
+  const v_0a0e7f = v_2abccc.substring(0, v_d7216b);
+
+  const v_993e85 = Math.floor(Math.random() * 5) + 5; 
+  const v_4e6bb2 = '*'.repeat(v_993e85);
+
+  return `${v_0a0e7f}${v_4e6bb2}@${v_52b478}`;
+};
+
 export const v_3414e3 = (v_660822, v_e0c7e8): string => {
   const v_e75c90 = `${v_660822}${v_e0c7e8}`;
   return v_a928e1.SHA256(v_e75c90).toString();

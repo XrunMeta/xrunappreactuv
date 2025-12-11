@@ -9,7 +9,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_4a38fa, v_6a034c } from '../services';
 import { v_1cc79a } from '../types';
-import { v_a3bbf0 } from '../utils';
+import { v_a3bbf0, v_8cf86b } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 
 interface TransformedRankData {
@@ -23,7 +23,7 @@ interface TransformedRankData {
 const v_8b80b2 = (apiData: v_1cc79a[]): TransformedRankData[] => {
   return v_135b82.map((v_8c0b26, v_a56041) => ({
     id: `rank_${v_8c0b26.referrer_id}_${v_a56041}`,
-    email: v_8c0b26.referrer_email,
+    email: v_8cf86b(v_8c0b26.referrer_email), 
     rank: v_8c0b26.unique_rank,
     member: v_8c0b26.referrer_id,
     referralCount: v_8c0b26.referral_count,
@@ -201,7 +201,7 @@ export const v_f57686 = () => {
 
   const v_be1ec5 = ({ item: v_8c0b26, index: v_a56041 }: { item: TransformedRankData; index: number }) => {
 
-    const v_06c228 = v_f4fb5e !== '-' && v_8c0b26.email === v_f4fb5e && String(v_8c0b26.rank) === v_ad21d1;
+    const v_06c228 = v_717992 !== null && v_8c0b26.member === v_717992 && String(v_8c0b26.rank) === v_ad21d1;
 
     const v_2f2afb = typeof v_8c0b26.rank === 'number'
       ? Number(v_8c0b26.rank.toFixed(2))
@@ -211,7 +211,7 @@ export const v_f57686 = () => {
       <ReferralMemberRow
         key={v_8c0b26.id}
         rank={v_2f2afb}
-        email={v_8c0b26.email}
+        email={v_8c0b26.email} 
         highlight={v_06c228} 
       />
     );
