@@ -1585,17 +1585,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         </CameraView>
 
          {}
-      {logoHorizontal && (
-        <View style={styles.topLogo}>
-          <Image
-            source={logoHorizontal}
-            style={{ 
+      {
 
-              width: Dimensions.get('window').width / 4 }}
-            resizeMode="contain"
-          />
-        </View>
-      )} 
+}
 
         {}
         {

@@ -23,6 +23,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW } from '../services';
 
 interface AddressBookItem {
   id: string;
@@ -78,6 +79,15 @@ export const WalletSendScreen = () => {
 
   const swipeAnimations = useRef<{ [key: string]: Animated.Value }>({});
   const [openSwipeableId, setOpenSwipeableId] = useState<string | null>(null);
+
+  const [memberId, setMemberId] = useState<string | null>(null);
+  const [memberLimit, setMemberLimit] = useState<number | null>(null);
+
+  const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
+  const [cryptoPrices, setCryptoPrices] = useState<{
+    POL?: { price_krw: number };
+    ETH?: { price_krw: number };
+  } | null>(null); 
 
   const formatNumberWithCommas = useCallback((value: string): string => {
 
@@ -173,6 +183,93 @@ export const WalletSendScreen = () => {
       goBack();
     }
   }, [selectedWalletAsset, goBack]);
+
+  useEffect(() => {
+    const fetchGopaxPrice = async () => {
+      try {
+        const result = await getXRUNGopaxPrice(navigate);
+        if (result.status === 'success' && result.data) {
+          const price = result.data.gopaxPrice || 0;
+          setGopaxPrice(price);
+          console.log('[WalletSend] 고팍스 가격 가져오기 성공:', price);
+        } else {
+          console.log('[WalletSend] 고팍스 가격 가져오기 실패:', result.message);
+          setGopaxPrice(0);
+        }
+      } catch (error) {
+        console.error('[WalletSend] 고팍스 가격 가져오기 오류:', error);
+        setGopaxPrice(0);
+      }
+    };
+
+    fetchGopaxPrice();
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchCryptoPrices = async () => {
+      try {
+        const result = await getCryptoPricesInKRW(navigate);
+        if (result.status === 'success' && result.data) {
+          setCryptoPrices(result.data);
+          console.log('[WalletSend] 암호화폐 가격 가져오기 성공:', result.data);
+        } else {
+          console.log('[WalletSend] 암호화폐 가격 가져오기 실패:', result.message);
+          setCryptoPrices(null);
+        }
+      } catch (error) {
+        console.error('[WalletSend] 암호화폐 가격 가져오기 오류:', error);
+        setCryptoPrices(null);
+      }
+    };
+
+    fetchCryptoPrices();
+  }, [navigate]);
+
+  useEffect(() => {
+    const loadUserDataAndLimits = async () => {
+      try {
+
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.member) {
+            const member = String(userData.member);
+            setMemberId(member);
+
+            if (selectedWalletAsset?.currency) {
+              try {
+                const response = await getMemberLimits(member, navigate);
+                if (response?.status === 'success' && response?.data && Array.isArray(response.data)) {
+
+                  const matchedLimit = response.data.find(
+                    (item: { currency: number; limitTransferPolXrun?: number; limitTransfer?: number }) => 
+                      item.currency === selectedWalletAsset.currency
+                  );
+
+                  if (matchedLimit) {
+
+                    const limit = matchedLimit.limitTransferPolXrun || matchedLimit.limitTransfer;
+                    if (limit !== undefined) {
+                      setMemberLimit(limit);
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('[회원 한도 조회] API 호출 실패:', error);
+
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[회원 한도] 사용자 정보 로드 실패:', error);
+      }
+    };
+
+    if (selectedWalletAsset) {
+      loadUserDataAndLimits();
+    }
+  }, [selectedWalletAsset, navigate]);
 
   const handleBackPress = () => {
     setSendAmount('0');
@@ -320,10 +417,33 @@ export const WalletSendScreen = () => {
   };
 
   const isConfirmEnabled = useMemo(() => {
+
     const hasAddress = walletSendAddress && walletSendAddress.trim().length > 0;
     const isValidAddress = walletSendAddress?.startsWith('0x');
-    return hasAddress && isValidAddress;
-  }, [walletSendAddress]);
+    if (!hasAddress || !isValidAddress) {
+      return false;
+    }
+
+    const cleanAmount = removeCommas(sendAmount);
+    const amount = new BigNumber(cleanAmount || '0');
+    if (amount.lte(0)) {
+      return false;
+    }
+
+    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
+    if (amount.gt(balance)) {
+      return false;
+    }
+
+    if (memberLimit !== null) {
+      const limitAmount = new BigNumber(memberLimit);
+      if (amount.gt(limitAmount)) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [walletSendAddress, sendAmount, selectedWalletAsset?.amount, memberLimit, removeCommas]);
 
   const handleConfirm = async () => {
     const cleanAmount = removeCommas(sendAmount);
@@ -386,13 +506,45 @@ export const WalletSendScreen = () => {
           </View>
         </View>
         <View style={styles.helperContainer}>
-          <Text style={styles.helperAmount}>10,0000,000 </Text><Text style={styles.helperText}>KRW</Text>
+          <Text style={styles.helperAmount}>
+            {(() => {
+              const cleanAmount = removeCommas(sendAmount);
+              const amount = new BigNumber(cleanAmount || '0');
+              if (amount.gt(0)) {
+                let price = 0;
+                const currency = selectedWalletAsset?.currency;
+
+                if (currency === 1 || currency === 18) {
+
+                  price = gopaxPrice;
+                } else if (currency === 16) {
+
+                  price = cryptoPrices?.POL?.price_krw || 0;
+                } else if (currency === 2) {
+
+                  price = cryptoPrices?.ETH?.price_krw || 0;
+                }
+
+                if (price > 0) {
+                  const krwAmount = amount.multipliedBy(price);
+                  return krwAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+              }
+              return '0';
+            })()}
+          </Text>
+          <Text style={styles.helperText}>KRW</Text>
         </View>
         {}
         <TouchableOpacity onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
           <Text style={styles.availableBalanceLabel}>{t('screens.walletSend.availableBalance')}</Text>
           <Text style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
-          <Text style={styles.availableBalanceToken}>{selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
+          {memberLimit !== null && (
+            <>
+              <Text style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
+            </>
+          )}
+          {}
         </TouchableOpacity>
 
         <FormField
@@ -790,6 +942,11 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#10192d',
+  },
+  availableBalanceNotice: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#8e9bae',
   },
   availableBalanceToken: {
     fontSize: FONTS.size.msmall,

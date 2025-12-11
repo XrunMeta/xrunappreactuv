@@ -2479,6 +2479,83 @@ export const gatewayNodeJS = async (
   }
 };
 
+export const getCryptoPricesInKRW = async (
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+
+    console.log('=== cryptoPricesInKRW API 호출 ===');
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('=== cryptoPricesInKRW API 응답 ===');
+    console.log('response:', JSON.stringify(result, null, 2));
+
+    return result;
+  } catch (error) {
+    console.error('cryptoPricesInKRW API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
+export const getMemberLimits = async (
+  member: string,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/memberLimits`;
+
+    const requestBody = {
+      member: member,
+    };
+
+    console.log('=== memberLimits API 호출 ===');
+    console.log('requestBody:', JSON.stringify(requestBody));
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('=== memberLimits API 응답 ===');
+    console.log('response:', JSON.stringify(result, null, 2));
+
+    return result;
+  } catch (error) {
+    console.error('memberLimits API 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
 export const gatewayNodeJSApp3100 = async (
   advertisement: number,
   coin: string,

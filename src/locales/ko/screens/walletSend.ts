@@ -4,6 +4,7 @@ export default {
   amount: '금액',
   amountPlaceholder: '보낼 금액을 입력하세요',
   availableBalance: '출금가능수량',
+  settlementNotice: '제한금액',
   input: '입력',
   addressBook: '주소록',
   noAddresses: '등록되어 있는 주소가 없습니다.',
