@@ -3124,6 +3124,40 @@ export const v_54d016 = async (
   }
 };
 
+export const v_8ee299 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = { member: v_660822 };
+
+    console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<any>(
+      '/oth-path',
+      v_576f5a,
+    );
+
+    console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[잔액 업데이트] 사용자 잔액 업데이트 V2 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[잔액 업데이트] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_81c40d = async (
   v_660822,
   v_c65f5d,

@@ -61,7 +61,7 @@ import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
 import { v_a2474a } from './src/utils/env';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
-import { v_563153, v_dd87bc } from './src/services';
+import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import {
   v_c06f2c,
   v_259807,
@@ -671,6 +671,23 @@ export default function v_6540c3() {
         console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', v_d9a946.data?.gopaxPrice);
       } catch (v_5e9bfe) {
         console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', v_5e9bfe);
+
+      }
+
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          const v_660822 = v_ef7306?.member;
+          if (v_660822) {
+            console.log('[App] 사용자 잔액 업데이트 V2 호출 시작');
+            v_8ee299(String(v_660822)).catch((v_5e9bfe) => {
+              console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', v_5e9bfe);
+            });
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', v_5e9bfe);
 
       }
 
