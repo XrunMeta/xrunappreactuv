@@ -18,8 +18,11 @@ import {
   loginWithEmailPassword,
   encryptSHA256,
   saveSession,
+  checkEmailExists,
+  sendEmailVerificationCode,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useAppContext } from '../context';
 
 type LoginTab = 'account' | 'otp';
 
@@ -42,6 +45,7 @@ export const LoginScreen = () => {
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
+  const { setVerificationEmail, setVerificationSuccessRoute } = useAppContext();
 
   const [activeTab, setActiveTab] = useState<LoginTab>('account');
 
@@ -95,18 +99,47 @@ export const LoginScreen = () => {
 
   const handleSendOtp = async () => {
     if (!otpEmail.trim()) {
-      await showAlert(t('common.messages.error'), t('screens.login.errors.emailRequired'));
+      await showAlert(t('screens.emailVerification.alerts.emailInput'), t('screens.emailVerification.errors.emailRequired'));
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(otpEmail.trim())) {
+      await showAlert(t('screens.emailVerification.alerts.emailFormatError'), t('screens.emailVerification.errors.emailInvalid'));
       return;
     }
 
     setIsOtpLoading(true);
+
     try {
 
-      console.log('[OTP] OTP 전송 요청:', { email: otpEmail, rememberMe: otpRememberMe });
+      console.log('[로그인] 이메일 존재 확인 요청:', otpEmail.trim());
+      const emailExists = await checkEmailExists(otpEmail.trim(), navigate);
 
+      if (!emailExists) {
+        await showAlert(
+          t('screens.emailVerification.alerts.emailCheck'),
+          t('screens.emailVerification.errors.emailNotRegistered'),
+        );
+        setIsOtpLoading(false);
+        return;
+      }
+
+      console.log('[로그인] 이메일 인증 코드 전송 요청:', otpEmail.trim());
+      const codeSent = await sendEmailVerificationCode(otpEmail.trim(), navigate);
+
+      if (!codeSent) {
+        await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
+        setIsOtpLoading(false);
+        return;
+      }
+
+      setVerificationEmail(otpEmail.trim());
+      setVerificationSuccessRoute(ROUTES.map); 
+      navigate(ROUTES.verificationCode);
     } catch (error) {
-      console.error('[OTP] OTP 전송 오류:', error);
-      await showAlert(t('common.messages.error'), t('screens.login.errors.loginError'));
+      console.error('[로그인] 이메일 OTP 전송 오류:', error);
+      await showAlert(t('screens.emailVerification.alerts.error'), t('screens.emailVerification.errors.error'));
     } finally {
       setIsOtpLoading(false);
     }
