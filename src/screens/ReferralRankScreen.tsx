@@ -9,7 +9,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
-import { shareReferralLink } from '../utils';
+import { shareReferralLink, maskEmail } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 
 interface TransformedRankData {
@@ -23,7 +23,7 @@ interface TransformedRankData {
 const transformRankData = (apiData: RankItem[]): TransformedRankData[] => {
   return apiData.map((item, index) => ({
     id: `rank_${item.referrer_id}_${index}`,
-    email: item.referrer_email,
+    email: maskEmail(item.referrer_email), 
     rank: item.unique_rank,
     member: item.referrer_id,
     referralCount: item.referral_count,
@@ -201,7 +201,7 @@ export const ReferralRankScreen = () => {
 
   const renderRankItem = ({ item, index }: { item: TransformedRankData; index: number }) => {
 
-    const isCurrentUser = userEmail !== '-' && item.email === userEmail && String(item.rank) === userRank;
+    const isCurrentUser = memberId !== null && item.member === memberId && String(item.rank) === userRank;
 
     const formattedRank = typeof item.rank === 'number'
       ? Number(item.rank.toFixed(2))
@@ -211,7 +211,7 @@ export const ReferralRankScreen = () => {
       <ReferralMemberRow
         key={item.id}
         rank={formattedRank}
-        email={item.email}
+        email={item.email} 
         highlight={isCurrentUser} 
       />
     );

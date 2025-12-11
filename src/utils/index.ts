@@ -160,6 +160,27 @@ export const shareReferralLink = async (
   }
 };
 
+export const maskEmail = (email: string): string => {
+
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return email; 
+  }
+
+  const [localPart, domain] = email.split('@');
+
+  if (!localPart || localPart.length === 0) {
+    return email;
+  }
+
+  const visibleChars = Math.min(2, localPart.length);
+  const visiblePart = localPart.substring(0, visibleChars);
+
+  const maskedLength = Math.floor(Math.random() * 5) + 5; 
+  const maskedPart = '*'.repeat(maskedLength);
+
+  return `${visiblePart}${maskedPart}@${domain}`;
+};
+
 export const generateUserHash = (member: number | string, email: string): string => {
   const combined = `${member}${email}`;
   return CryptoJS.SHA256(combined).toString();
