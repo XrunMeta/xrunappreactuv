@@ -18,8 +18,11 @@ import {
   v_b699a9,
   v_a5170b,
   v_ea3493,
+  v_f5ecec,
+  v_8025d1,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_700ef9 } from '../context';
 
 type LoginTab = 'account' | 'otp';
 
@@ -42,6 +45,7 @@ export const v_f4f851 = () => {
   const { navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
+  const { setVerificationEmail: v_b572c3, setVerificationSuccessRoute: v_8f89f3 } = v_700ef9();
 
   const [v_ac1d22, v_02dd63] = v_5ab095<LoginTab>('account');
 
@@ -95,18 +99,47 @@ export const v_f4f851 = () => {
 
   const v_894a7c = async () => {
     if (!v_808660.trim()) {
-      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.emailRequired'));
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.emailInput'), v_8d41d7('screens.emailVerification.errors.emailRequired'));
+      return;
+    }
+
+    const v_9a3638 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!v_9a3638.test(v_808660.trim())) {
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.emailFormatError'), v_8d41d7('screens.emailVerification.errors.emailInvalid'));
       return;
     }
 
     v_47f318(true);
+
     try {
 
-      console.log('[OTP] OTP 전송 요청:', { email: v_808660, rememberMe: v_b6e894 });
+      console.log('[로그인] 이메일 존재 확인 요청:', v_808660.trim());
+      const v_dbae58 = await v_f5ecec(v_808660.trim(), v_9b57fc);
 
+      if (!v_dbae58) {
+        await v_889fad(
+          v_8d41d7('screens.emailVerification.alerts.emailCheck'),
+          v_8d41d7('screens.emailVerification.errors.emailNotRegistered'),
+        );
+        v_47f318(false);
+        return;
+      }
+
+      console.log('[로그인] 이메일 인증 코드 전송 요청:', v_808660.trim());
+      const v_f438c1 = await v_8025d1(v_808660.trim(), v_9b57fc);
+
+      if (!v_f438c1) {
+        await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
+        v_47f318(false);
+        return;
+      }
+
+      v_b572c3(v_808660.trim());
+      v_8f89f3(v_ce4741.map); 
+      v_9b57fc(v_ce4741.verificationCode);
     } catch (v_5e9bfe) {
-      console.error('[OTP] OTP 전송 오류:', v_5e9bfe);
-      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.loginError'));
+      console.error('[로그인] 이메일 OTP 전송 오류:', v_5e9bfe);
+      await v_889fad(v_8d41d7('screens.emailVerification.alerts.error'), v_8d41d7('screens.emailVerification.errors.error'));
     } finally {
       v_47f318(false);
     }
