@@ -55,7 +55,8 @@ const v_3e6a6a = (
 
   const v_c322f7 = require('../../assets/xrun-horizontal-logo.png');
 
-  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+  const v_399dbd = v_8c0b26.sku?.trim() ?? '';
+  const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
 
   if (v_c73c26 == 1) {
     const v_12ec35 = v_beea9d || v_4c0bd7 || 1;
@@ -84,7 +85,7 @@ const v_3e6a6a = (
 
   return {
     id: String(v_8c0b26.item),
-    priceLabel: v_d6cf14 ? 'Loading...' : v_1c86a8, 
+    priceLabel: v_cb677f ? 'Loading...' : v_1c86a8, 
     detailPrice: `${v_1c86a8} / ${v_35c0e0(v_dab82f)} XRUN`,
     detailFee: `${v_d7e45e(v_63e5c7)} / ${v_35c0e0(v_cd7bfc)} XRUN`,
     detailTotal: `${v_35c0e0(v_216aa2)} XRUN`,
@@ -253,8 +254,9 @@ export const v_38326c = () => {
     const v_72edf9 = [];
     v_4622b9.forEach((v_8c0b26) => {
 
-      if (v_8c0b26.sku && v_8c0b26.sku.trim() !== '' && !v_72edf9.includes(v_8c0b26.sku)) {
-        v_72edf9.push(v_8c0b26.sku);
+      const v_399dbd = v_8c0b26.sku?.trim() ?? '';
+      if (v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER') && !v_72edf9.includes(v_399dbd)) {
+        v_72edf9.push(v_399dbd);
       }
     });
     console.log('[상점] 추출된 SKU 목록:', v_72edf9);
@@ -500,12 +502,13 @@ export const v_38326c = () => {
                     v_c322f7 = v_8c0b26.image;
                   }
 
-                  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
-                  const v_817eee = v_d6cf14 ? v_c0e000(v_8c0b26.sku) : null;
-                  const v_e48882 = v_d6cf14 && v_8051fd(v_8c0b26.sku);
+                  const v_399dbd = (v_8c0b26.sku ?? '').trim();
+                  const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
+                  const v_817eee = v_cb677f ? v_c0e000(v_399dbd) : null;
+                  const v_e48882 = v_cb677f && v_8051fd(v_399dbd);
 
                   let v_e72b09;
-                  if (v_d6cf14) {
+                  if (v_cb677f) {
                     if (v_e48882 && v_817eee) {
                       v_e72b09 = v_817eee; 
                     } else if (v_c1f1a5) {
