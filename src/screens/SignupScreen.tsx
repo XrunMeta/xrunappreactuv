@@ -440,6 +440,7 @@ export const v_f40fc5 = () => {
                 placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
                 value={v_56743f}
                 editable={false}
+                showDisabledStyle={false}
               />
             </TouchableOpacity>
             {!v_590486 && (
