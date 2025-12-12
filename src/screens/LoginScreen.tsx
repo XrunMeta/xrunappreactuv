@@ -21,7 +21,6 @@ import {
   checkEmailExists,
   sendEmailVerificationCode,
   signInWithGoogle,
-  getMyPageUserInfo,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
@@ -249,20 +248,8 @@ export const LoginScreen = () => {
 
       console.log('[구글 로그인] 로그인 성공:', { memberId, email, isNewUser, isSignupCompleted });
 
-      if (isSignupCompleted === true) {
-        console.log('[구글 로그인] 백엔드 응답: 회원가입 완료 - 정상 로그인 처리');
-
-        const existingFlag = await AsyncStorage.getItem('googleSignupRequired');
-        if (existingFlag === 'true') {
-          await AsyncStorage.removeItem('googleSignupRequired');
-          await AsyncStorage.removeItem('googleSignupEmail');
-          console.log('[구글 로그인] 구글 회원가입 플래그 제거 (회원가입 완료됨)');
-        }
-
-      }
-
-      else if (isSignupCompleted === false) {
-        console.log('[구글 로그인] 백엔드 응답: 회원가입 미완료 - 회원가입 화면으로 이동');
+      if (isNewUser) {
+        console.log('[구글 로그인] 신규 사용자, 회원가입 화면으로 이동');
 
         await AsyncStorage.setItem('googleSignupRequired', 'true');
         await AsyncStorage.setItem('googleSignupEmail', email);
@@ -272,76 +259,7 @@ export const LoginScreen = () => {
         return;
       }
 
-      else {
-
-        const existingFlag = await AsyncStorage.getItem('googleSignupRequired');
-
-        if (existingFlag === 'true') {
-          console.log('[구글 로그인] 구글 회원가입 플래그 있음 - 회원가입 화면으로 이동 (백엔드 isNewUser:', isNewUser, ', isSignupCompleted:', isSignupCompleted, ')');
-
-          await AsyncStorage.setItem('googleSignupRequired', 'true');
-          await AsyncStorage.setItem('googleSignupEmail', email);
-
-          navigate(ROUTES.signup);
-          setIsLoading(false);
-          return;
-        }
-
-        console.log('[구글 로그인] isSignupCompleted가 undefined - 사용자 정보 확인 시작 (isNewUser:', isNewUser, ')');
-        try {
-          const userInfo = await getMyPageUserInfo(memberId, navigate);
-          const userData = userInfo.data?.[0];
-
-          console.log('[구글 로그인] 사용자 정보 확인:', {
-            mobile: userData?.mobile,
-            gender: userData?.gender,
-            ages: userData?.ages,
-            region: userData?.region,
-            firstname: userData?.firstname,
-          });
-
-          const hasMobile = userData?.mobile && userData.mobile.trim() !== '';
-          const hasGender = userData?.gender && (userData.gender === 2110 || userData.gender === 2111);
-          const hasAge = userData?.ages && userData.ages >= 2210 && userData.ages <= 2250;
-          const hasRegion = userData?.region && userData.region > 0;
-          const hasFirstname = userData?.firstname && userData.firstname.trim() !== '';
-
-          const isSignupCompletedFrontend = hasMobile && hasGender && hasAge && hasRegion && hasFirstname;
-
-          console.log('[구글 로그인] 프론트엔드 회원가입 완료 여부:', {
-            isSignupCompletedFrontend,
-            hasMobile,
-            hasGender,
-            hasAge,
-            hasRegion,
-            hasFirstname,
-          });
-
-          if (!isSignupCompletedFrontend) {
-            console.log('[구글 로그인] 필수 필드 누락 - 회원가입 화면으로 이동');
-
-            await AsyncStorage.setItem('googleSignupRequired', 'true');
-            await AsyncStorage.setItem('googleSignupEmail', email);
-
-            navigate(ROUTES.signup);
-            setIsLoading(false);
-            return;
-          }
-
-          console.log('[구글 로그인] 회원가입 완료된 사용자 - 정상 로그인 진행');
-        } catch (error) {
-          console.error('[구글 로그인] 사용자 정보 확인 실패:', error);
-
-          console.log('[구글 로그인] 사용자 정보 확인 실패 - 회원가입 화면으로 이동');
-          await AsyncStorage.setItem('googleSignupRequired', 'true');
-          await AsyncStorage.setItem('googleSignupEmail', email);
-          navigate(ROUTES.signup);
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      console.log('[구글 로그인] 정상 로그인 처리 시작 (isNewUser:', isNewUser, ')');
+      console.log('[구글 로그인] 기존 사용자, 로그인 처리 시작');
 
       const userData = {
         member: memberId,
@@ -364,7 +282,7 @@ export const LoginScreen = () => {
 
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
-      await AsyncStorage.setItem('userSessionToken', accessToken);
+      await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
       if (rememberMe) {

@@ -153,11 +153,10 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         };
       }
 
-      const isSignupIncomplete = data.code === 403 && data.data?.isSignupCompleted === false;
+      const requiresSignup = data.code === 200 && !data.success && (data.data?.requiresSignup === true || data.data?.isSignupCompleted === false);
 
-      if (isSignupIncomplete) {
-
-        console.log('[구글 로그인] 회원가입 미완료 - 회원가입 화면으로 이동 필요');
+      if (requiresSignup) {
+        console.log('[구글 로그인] 회원가입 필요 - 회원가입 화면으로 이동 필요');
         return {
           success: true,
           data: {
@@ -180,6 +179,7 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         success: data.success,
         isNewUser: data.data?.isNewUser,
         email: data.data?.email,
+        isSignupCompleted: data.data?.isSignupCompleted,
       });
 
       return {
