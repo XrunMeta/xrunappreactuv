@@ -172,7 +172,7 @@ export const FORM_STYLES = {
 
 export const SAFE_AREA = {
   background: '#ffffff',
-  bottomBackground: '#000000',
+  bottomBackground: '#ffffff',
 };
 
 export const HEADER = {
