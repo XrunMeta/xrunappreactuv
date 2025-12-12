@@ -2396,6 +2396,82 @@ export const v_aa7dc1 = async (
   }
 };
 
+export const v_167376 = async (
+  v_660822,
+  v_a4f17b,
+  deviceInfo: v_719e34,
+  v_b0495a = '',
+  v_c65f5d,
+): Promise<v_6b63f9> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPointClickAds`;
+
+    let v_66fa3f;
+
+    const v_df691e = v_326be8.OS === 'ios' || 
+                  v_e7f87b.manufacturer === 'Apple' || 
+                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
+                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
+
+    if (v_df691e) {
+      v_66fa3f = 'IOS';
+    } else {
+      v_66fa3f = 'ANDROID';
+    }
+
+    const v_cd6a57 = {
+      member: v_660822,
+      ad_key: v_b0495a || '',
+      os: v_66fa3f,
+      device_ifa: v_a4f17b || '',
+      ip: v_e7f87b.ipAddress || '',
+    };
+
+    console.log('PointClick 광고 API 요청:', v_cd6a57);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    const result: v_6b63f9 = await v_3393e3.json();
+    console.log('PointClick 광고 API 응답:', v_43c42e);
+
+    if (v_3393e3.ok && v_43c42e.status === 'success' && v_43c42e.code === 200) {
+      return v_43c42e;
+    } else {
+
+      const v_1744b9 = v_43c42e.message || 'PointClick 광고 API 호출 실패';
+      const v_5e9bfe = new Error(v_1744b9);
+
+      (v_5e9bfe as any).is404 = v_43c42e.code === 404;
+      throw v_5e9bfe;
+    }
+  } catch (v_5e9bfe) {
+    console.error('PointClick 광고 API 호출 실패:', v_5e9bfe);
+
+    if (v_5e9bfe.is404) {
+      console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
+      throw v_5e9bfe;
+    }
+
+    if (v_c65f5d && typeof v_c65f5d.reset === 'function') {
+      try {
+        await v_e4d665(v_c65f5d);
+      } catch (v_2d075f) {
+        console.error('타임아웃 처리 중 오류:', v_2d075f);
+
+      }
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_7a6f92 = async (
   callbackData: v_cf0182,
   v_c65f5d,

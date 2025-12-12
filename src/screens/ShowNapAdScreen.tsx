@@ -380,21 +380,6 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
           return v_43c42e;
 
-        } else if (v_5a9c46 === 'pointclick') {
-
-          const v_b0495a = v_d0b6d4?.campid || ''; 
-          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${v_b0495a}`);
-
-          const v_43c42e = await getPointClickAds(
-            v_660822,
-            v_e7f87b.adid,
-            v_e7f87b,
-            v_b0495a,
-            v_0890f8 ? undefined : v_9b57fc,
-          );
-          console.log('[callAdApi] getPointClickAds 응답:', v_43c42e);
-          return v_43c42e;
-
         } else {
 
           console.log(`[callAdApi] 알 수 없는 ad_company(${v_5a9c46}), 기본 getNasmobAds 호출`);

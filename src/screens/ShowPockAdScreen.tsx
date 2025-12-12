@@ -16,7 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_aa7dc1, v_ad146c } from '../services';
+import { v_aa7dc1, v_167376, v_ad146c } from '../services';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
@@ -517,6 +517,27 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
     try {
 
+      const v_5a9c46 = v_d0b6d4?.ad_company || 'pock';
+      if (v_5a9c46 === 'pock') {
+        const v_e7f87b = await v_f3de6d();
+        const v_b0495a = v_d0b6d4?.campid || '';
+        console.log(`[광고보기] getPointClickAds 호출 - ad_key: ${v_b0495a}`);
+
+        try {
+          const v_43c42e = await v_167376(
+            v_660822,
+            v_e7f87b.adid,
+            v_e7f87b,
+            v_b0495a,
+            v_0890f8 ? undefined : v_9b57fc,
+          );
+          console.log('[광고보기] getPointClickAds 응답:', v_43c42e);
+        } catch (v_e2241d) {
+          console.error('[광고보기] getPointClickAds 호출 실패:', v_e2241d);
+
+        }
+      }
+
       if (v_9f9e7d?.landing_url) {
         await v_ece582(v_9f9e7d.landing_url);
       } else {
@@ -527,7 +548,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
       console.error('[광고보기] URL 열기 실패:', v_5e9bfe);
       v_ed6932(true);
     }
-  }, [v_9f9e7d, v_ece582]);
+  }, [v_9f9e7d, v_ece582, v_d0b6d4, v_660822, v_0890f8, v_9b57fc]);
 
   if (!v_d0b6d4) {
     return null;
