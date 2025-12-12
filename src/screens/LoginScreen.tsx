@@ -21,6 +21,7 @@ import {
   checkEmailExists,
   sendEmailVerificationCode,
 } from '../services';
+import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
 
@@ -286,7 +287,7 @@ export const LoginScreen = () => {
             placeholder={t('screens.login.passwordPlaceholder')}
             secureTextEntry={!isPasswordVisible}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => setPassword(filterAsciiPrintable(text))}
             containerStyle={styles.fieldContainer}
             editable={!isLoading}
             rightAccessory={

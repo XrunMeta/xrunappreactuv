@@ -33,6 +33,8 @@ export * from './env';
 
 export * from './imageCache';
 
+export * from './input';
+
 export const formatXrunAmount = (amount: string | number): string => {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (isNaN(num)) return '0';
