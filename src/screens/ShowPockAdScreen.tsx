@@ -661,6 +661,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                showBottomBackground={false}
               >
                 <Text style={styles.joinDescText}>
                   {advertisementParams.joindesc}

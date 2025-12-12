@@ -741,6 +741,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                showBottomBackground={false}
               >
                 <Text style={styles.joinDescText}>
                   {advertisementParams.joindesc}
