@@ -71,6 +71,7 @@ const SafeView: v_a3453e.FC<SafeViewProps> = ({
 const v_d81136 = v_472849.create({
     wrapper: {
         flex: 1,
+        backgroundColor: '#fff',
         position: 'relative',
     },
     container: {
