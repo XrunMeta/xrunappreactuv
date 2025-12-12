@@ -27,6 +27,12 @@ export const ShopBuyScreen = () => {
   const [isLoadingIap, setIsLoadingIap] = useState(false);
   const [iapError, setIapError] = useState<string | null>(null);
 
+  const formatXrunDisplay = (amount: string | number): string => {
+    const num = typeof amount === 'string' ? Number(amount) : amount;
+    if (!Number.isFinite(num)) return '0.0000';
+    return num.toFixed(4);
+  };
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -256,8 +262,8 @@ export const ShopBuyScreen = () => {
         await showAlert(
           t('screens.shopBuy.alerts.insufficientBalanceTitle'),
           t('screens.shopBuy.alerts.insufficientBalanceMessage', {
-            currentBalance: formatXrunAmount(currentBalance),
-            requiredAmount: formatXrunAmount(totalAmount),
+            currentBalance: formatXrunDisplay(currentBalance),
+            requiredAmount: formatXrunDisplay(totalAmount),
           }),
           [{ text: t('screens.shopBuy.confirm') }],
         );
@@ -328,7 +334,6 @@ export const ShopBuyScreen = () => {
   const chargeKRW = item.charge?.won || 0;
   const chargeXrun = item.charge?.coin || 0;
   const totalXrun = item.totalPrice?.coin || 0;
-  const totalGtkrPrice = item.totalPrice?.gtkrPrice || totalXrun;
 
   const isInsufficientBalance = !hasSku && userBalance !== null && userBalance < totalXrun;
 
@@ -389,14 +394,14 @@ export const ShopBuyScreen = () => {
                 <View style={styles.row}>
                   <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
                   <Text style={styles.value}>
-                    {formatCurrency(priceKRW, 'KRW')} / {formatXrunAmount(priceXrun)} XRUN
+                    {formatCurrency(priceKRW, 'KRW')} / {formatXrunDisplay(priceXrun)} XRUN
                   </Text>
                 </View>
 
                 <View style={styles.row}>
                   <Text style={styles.label}>{t('screens.shopBuy.fee')}</Text>
                   <Text style={styles.value}>
-                    {formatCurrency(chargeKRW, 'KRW')} / {formatXrunAmount(chargeXrun)} XRUN
+                    {formatCurrency(chargeKRW, 'KRW')} / {formatXrunDisplay(chargeXrun)} XRUN
                   </Text>
                 </View>
 
@@ -405,7 +410,7 @@ export const ShopBuyScreen = () => {
                 <View style={styles.row}>
                   <Text style={[styles.label, styles.totalLabel]}>{t('screens.shopBuy.total')}</Text>
                   <Text style={[styles.value, styles.totalValue]}>
-                    {formatXrunAmount(totalGtkrPrice)} XRUN
+                    {formatXrunDisplay(totalXrun)} XRUN
                   </Text>
                 </View>
 
@@ -421,7 +426,7 @@ export const ShopBuyScreen = () => {
                       {isLoadingBalance ? (
                         t('screens.shopBuy.checking')
                       ) : userBalance !== null ? (
-                        formatXrunAmount(userBalance) + ' XRUN'
+                        formatXrunDisplay(userBalance) + ' XRUN'
                       ) : (
                         t('screens.shopBuy.checkFailed')
                       )}
