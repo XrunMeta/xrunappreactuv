@@ -27,6 +27,12 @@ export const v_1a0a02 = () => {
   const [v_7712f3, v_9bf98f] = v_5ab095(false);
   const [v_b9c849, v_9f981c] = v_5ab095<string | null>(null);
 
+  const v_06e3b4 = (v_f63e09): string => {
+    const v_0ad8c5 = typeof v_f63e09 === 'string' ? Number(v_f63e09) : v_f63e09;
+    if (!Number.isFinite(v_0ad8c5)) return '0.0000';
+    return v_0ad8c5.toFixed(4);
+  };
+
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
       try {
@@ -256,8 +262,8 @@ export const v_1a0a02 = () => {
         await v_889fad(
           v_8d41d7('screens.shopBuy.alerts.insufficientBalanceTitle'),
           v_8d41d7('screens.shopBuy.alerts.insufficientBalanceMessage', {
-            currentBalance: v_35c0e0(v_a5e3b7),
-            requiredAmount: v_35c0e0(v_2c49ad),
+            currentBalance: v_06e3b4(v_a5e3b7),
+            requiredAmount: v_06e3b4(v_2c49ad),
           }),
           [{ text: v_8d41d7('screens.shopBuy.confirm') }],
         );
@@ -328,7 +334,6 @@ export const v_1a0a02 = () => {
   const v_63e5c7 = v_8c0b26.charge?.won || 0;
   const v_cd7bfc = v_8c0b26.charge?.coin || 0;
   const v_284b46 = v_8c0b26.totalPrice?.coin || 0;
-  const v_6a3b90 = v_8c0b26.totalPrice?.gtkrPrice || v_284b46;
 
   const v_1ee1c8 = !v_d6cf14 && v_bc3e72 !== null && v_bc3e72 < v_284b46;
 
@@ -389,14 +394,14 @@ export const v_1a0a02 = () => {
                 <View style={v_d81136.row}>
                   <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
                   <Text style={v_d81136.value}>
-                    {v_89f939(v_1c86a8, 'KRW')} / {v_35c0e0(v_318e8b)} XRUN
+                    {v_89f939(v_1c86a8, 'KRW')} / {v_06e3b4(v_318e8b)} XRUN
                   </Text>
                 </View>
 
                 <View style={v_d81136.row}>
                   <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.fee')}</Text>
                   <Text style={v_d81136.value}>
-                    {v_89f939(v_63e5c7, 'KRW')} / {v_35c0e0(v_cd7bfc)} XRUN
+                    {v_89f939(v_63e5c7, 'KRW')} / {v_06e3b4(v_cd7bfc)} XRUN
                   </Text>
                 </View>
 
@@ -405,7 +410,7 @@ export const v_1a0a02 = () => {
                 <View style={v_d81136.row}>
                   <Text style={[v_d81136.label, v_d81136.totalLabel]}>{v_8d41d7('screens.shopBuy.total')}</Text>
                   <Text style={[v_d81136.value, v_d81136.totalValue]}>
-                    {v_35c0e0(v_6a3b90)} XRUN
+                    {v_06e3b4(v_284b46)} XRUN
                   </Text>
                 </View>
 
@@ -421,7 +426,7 @@ export const v_1a0a02 = () => {
                       {v_8dbb06 ? (
                         v_8d41d7('screens.shopBuy.checking')
                       ) : v_bc3e72 !== null ? (
-                        v_35c0e0(v_bc3e72) + ' XRUN'
+                        v_06e3b4(v_bc3e72) + ' XRUN'
                       ) : (
                         v_8d41d7('screens.shopBuy.checkFailed')
                       )}
