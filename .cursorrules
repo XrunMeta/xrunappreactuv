@@ -9,9 +9,16 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
 
 ## 주요 규칙
 
+### 0. 언어 및 소통 규칙
+- **모든 프롬프트와 에이전트 응답**: 반드시 **한국어(Korean)**를 사용해야 합니다.
+- **코드 주석**: 한글 작성을 원칙으로 합니다.
+- **커밋 메시지**: 이미 정의된 규칙대로 한글을 사용합니다.
+
+
 ### 1. 첫 화면 설정
-- `App.tsx`는 `HomeScreen`을 첫 페이지로 사용합니다.
-- `HomeScreen`은 화면 중앙에 "안녕하세요 엑스런 어플" 텍스트를 표시합니다.
+- `App.tsx`는 `ScreenHost` 컴포넌트를 통해 현재 화면(`currentScreen`)에 따라 조건부 렌더링을 수행합니다.
+- **기본 화면**: `LoginSignupScreen`이 `ScreenHost`의 default return으로 설정되어 있어 앱 실행 시(로그인 전) 첫 화면으로 표시됩니다.
+- 로그인 상태(`isLoggedIn`)에 따라 자동 네비게이션 처리가 있을 수 있습니다.
 
 ### 2. 컴포넌트 및 스크린 Export
 - 모든 컴포넌트와 스크린은 각 폴더의 `index.ts` 파일을 통해 export합니다.
@@ -58,8 +65,9 @@ cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHR
 4. 새로운 공용 스타일 추가 시 `src/constants/index.ts`의 `COMMON_STYLES`에 추가
 
 ### 5. 네비게이션
-- 네비게이션을 사용할 경우 `src/navigation/index.tsx`에서 설정합니다.
-- React Navigation 패키지 설치가 필요합니다.
+- **Context 기반 네비게이션**: `src/navigation/index.tsx`의 `NavigationProvider`와 `useAppNavigation` 훅을 사용해 화면을 전환합니다.
+- **사용 방법**: `const { navigate } = useAppNavigation();` 후 `navigate('screenName')` 호출.
+- `ScreenHost`가 `currentScreen` 상태를 변경하여 화면을 교체하는 방식입니다.
 
 ### 6. API 타임아웃 처리 규칙
 **중요**: 프로젝트 전역적으로 API 요청에 대한 타임아웃 처리를 구현해야 합니다.
@@ -137,6 +145,11 @@ export const apiRequest = async (
 - 로그인 상태는 `AsyncStorage.getItem('isLoggedIn')`으로 확인
 - 화면 이동은 `navigation.reset()`을 사용하여 스택을 초기화하고 이동
 - 타임아웃 발생 시 진행 중인 다른 API 요청도 취소할 수 있도록 고려
+
+### 6.6 필수 초기화 및 권한 처리 (App.tsx)
+- **초기화 순서**: `env` 로드 -> `i18n` -> `Taboola` -> `TopAd5` 캐시 -> `Gopax` 시세 -> 잔액 업데이트.
+- **권한 관리**: `PermissionRequester` 컴포넌트가 위치/카메라 권한을 관리하며, 거부 시 `checkAndShowPermissionDialog`로 재요청 팝업을 띄웁니다.
+- **마커 데이터**: 위치 권한 획득 시 즉시 `fetchAndStoreMarkerData`를 호출하여 AR/지도용 데이터를 프리패칭합니다.
 
 ### 7. Alive 신호 및 긴급 정지 기능 규칙
 **중요**: 앱은 서버와 지속적으로 연결을 유지하기 위해 Alive 신호를 주기적으로 전송하고, 긴급 정지 신호를 처리해야 합니다.
