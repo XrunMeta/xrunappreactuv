@@ -5,6 +5,8 @@ import { v_326be8 } from 'rcmrninabrnb';
 import { v_ce4741 } from '../navigation';
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
+
+export * from './googleAuth';
 import {
   v_96ef47,
   v_2fe85a,

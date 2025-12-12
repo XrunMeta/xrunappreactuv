@@ -17,6 +17,7 @@ export const v_ce4741 = {
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
   verificationCode: 'verificationCode',
+  referralInput: 'referralInput',
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
