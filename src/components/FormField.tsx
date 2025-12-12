@@ -14,6 +14,7 @@ import { v_843035 } from '../constants';
 interface FormFieldProps extends v_b60ea2 {
   label: string;
   containerStyle?: v_961e77<v_7e4944>;
+  labelRightAccessory?: v_a3453e.ReactNode;
   rightAccessory?: v_a3453e.ReactNode;
   leftAccessory?: v_a3453e.ReactNode;
 }
@@ -21,6 +22,7 @@ interface FormFieldProps extends v_b60ea2 {
 export const FormField: v_a3453e.FC<FormFieldProps> = ({
   label: v_2869c1,
   containerStyle: v_4affe9,
+  labelRightAccessory: v_9de30f,
   rightAccessory: v_de8f73,
   leftAccessory: v_bea0eb,
   style: v_7fa4e4,
@@ -43,7 +45,12 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
 
   return (
     <View style={[v_d81136.container, v_4affe9]}>
-      <Text style={v_d81136.label}>{v_2869c1}</Text>
+      <View style={v_d81136.labelRow}>
+        <Text style={v_d81136.label}>{v_2869c1}</Text>
+        {v_9de30f ? (
+          <View style={v_d81136.labelRightAccessory}>{v_9de30f}</View>
+        ) : null}
+      </View>
       <View style={v_d81136.inputWrapper}>
         {v_bea0eb ? <View style={v_d81136.leftAccessory}>{v_bea0eb}</View> : null}
         <TextInput
@@ -65,12 +72,23 @@ const v_d81136 = v_472849.create({
     width: '100%',
 
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   label: {
     fontSize: v_843035.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
+    flexShrink: 1,
+  },
+  labelRightAccessory: {
+    marginLeft: 12,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   inputWrapper: {
     flexDirection: 'row',
