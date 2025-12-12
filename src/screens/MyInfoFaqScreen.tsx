@@ -47,12 +47,7 @@ export const v_083aa7 = () => {
         id: 'reward-check',
         question: v_a7a4ae?.rewardCheck?.question || '',
         answer: v_a7a4ae?.rewardCheck?.answer || '',
-      }, 
-      {
-        id: 'reward-usage',
-        question: v_a7a4ae?.rewardUsage?.question || '',
-        answer: v_a7a4ae?.rewardUsage?.answer || '',
-      },
+      },  
       {
         id: 'ad-reward',
         question: v_a7a4ae?.adReward?.question || '',
@@ -62,12 +57,7 @@ export const v_083aa7 = () => {
         id: 'change-password-request',
         question: v_a7a4ae?.changePasswordRequest?.question || '',
         answer: v_a7a4ae?.changePasswordRequest?.answer || '',
-      },
-      {
-        id: 'change-password-how',
-        question: v_a7a4ae?.changePasswordHow?.question || '',
-        answer: v_a7a4ae?.changePasswordHow?.answer || '',
-      },
+      }, 
     ];
   }, [v_8d41d7]);
 

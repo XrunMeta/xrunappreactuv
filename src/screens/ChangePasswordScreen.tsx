@@ -13,23 +13,13 @@ export const v_18d397 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
-  const [v_e618af, v_cbc800] = v_5ab095('');
   const [v_e2bd5a, v_889581] = v_5ab095('');
   const [v_0b3ebe, v_241a35] = v_5ab095('');
-  const [v_e2a098, v_881708] = v_5ab095(true);
   const [v_cad69a, v_f9607d] = v_5ab095(true);
   const [v_9e430e, v_59222b] = v_5ab095(true);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
 
   const v_585b02 = async () => {
-
-    if (!v_e618af.trim()) {
-      await v_889fad(
-        v_8d41d7('screens.changePassword.alerts.error'),
-        v_8d41d7('screens.changePassword.alerts.currentPasswordRequired'),
-      );
-      return;
-    }
 
     if (!v_e2bd5a.trim()) {
       await v_889fad(
@@ -51,14 +41,6 @@ export const v_18d397 = () => {
       await v_889fad(
         v_8d41d7('screens.changePassword.alerts.error'),
         v_8d41d7('screens.changePassword.alerts.passwordMismatch'),
-      );
-      return;
-    }
-
-    if (v_e618af === v_e2bd5a) {
-      await v_889fad(
-        v_8d41d7('screens.changePassword.alerts.error'),
-        v_8d41d7('screens.changePassword.alerts.samePassword'),
       );
       return;
     }
@@ -123,20 +105,6 @@ export const v_18d397 = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={v_d81136.formFieldContainer}>
-          <FormField
-            label={v_8d41d7('screens.changePassword.currentPassword')}
-            placeholder={v_8d41d7('screens.changePassword.currentPasswordPlaceholder')}
-            secureTextEntry={v_e2a098}
-            value={v_e618af}
-            onChangeText={v_cbc800}
-            rightAccessory={
-              <TouchableOpacity onPress={() => v_881708((v_ba2215) => !v_ba2215)}>
-                <Feather name={v_e2a098 ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
-              </TouchableOpacity>
-            }
-            containerStyle={v_d81136.fieldContainer}
-          />
-
           <FormField
             label={v_8d41d7('screens.changePassword.newPassword')}
             placeholder={v_8d41d7('screens.changePassword.newPasswordPlaceholder')}

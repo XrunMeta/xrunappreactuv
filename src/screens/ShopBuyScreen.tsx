@@ -127,9 +127,13 @@ export const v_1a0a02 = () => {
   }, []);
 
   v_c4deb2(() => {
+
+    console.log('[구매] selectedShopItem:', v_dfe883);
     const v_8c0b26 = v_dfe883 as unknown as v_20035e;
-    if (v_8c0b26?.sku && v_8c0b26.sku.trim() !== '') {
-      v_645e19(v_8c0b26.sku);
+
+    const v_399dbd = v_8c0b26?.sku?.trim() ?? '';
+    if (v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER')) {
+      v_645e19(v_399dbd);
     }
   }, [v_dfe883, v_645e19]);
 
@@ -155,20 +159,22 @@ export const v_1a0a02 = () => {
 
     try {
       const v_8c0b26 = (v_dfe883 as unknown) as v_20035e & { totalPrice?: { coin?: number } };
-      const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
 
-      if (v_d6cf14) {
+      const v_399dbd = v_8c0b26.sku?.trim() ?? '';
+      const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
+
+      if (v_cb677f) {
 
         console.log('========================================');
         console.log('[구매] === IAP 인앱 구매 시작 ===');
         console.log('========================================');
-        console.log('[구매] 상품 ID:', v_8c0b26.sku);
+        console.log('[구매] 상품 ID:', v_399dbd);
         console.log('[구매] 사용자 번호:', v_717992);
         console.log('[구매] 플랫폼:', v_326be8.OS);
 
         if (!v_0243db) {
           console.log('[구매] IAP 제품 정보가 없습니다. 다시 가져오기...');
-          await v_645e19(v_8c0b26.sku);
+          await v_645e19(v_399dbd);
 
           if (!v_0243db) {
             await v_889fad(
@@ -185,8 +191,8 @@ export const v_1a0a02 = () => {
         console.log('[구매] IAP 구매 요청 중...');
         const v_54e15b = await v_759f4d.requestPurchase({
           request: {
-            ios: { sku: v_8c0b26.sku },
-            android: { skus: [v_8c0b26.sku] },
+            ios: { sku: v_399dbd },
+            android: { skus: [v_399dbd] },
           },
           type: 'in-app',
         });
@@ -200,7 +206,7 @@ export const v_1a0a02 = () => {
 
         const v_201434 = {
           memberId: v_717992,
-          productId: v_8c0b26.sku,
+          productId: v_399dbd,
           platform: v_326be8.OS as 'android' | 'ios',
           purchaseData: v_f908f2,
           purchaseTime: new Date().toISOString(),
@@ -327,7 +333,8 @@ export const v_1a0a02 = () => {
 
   const imageSource: v_07a341 = v_8c0b26.image || require('../../assets/xrun-horizontal-logo.png');
 
-  const v_d6cf14 = v_8c0b26.sku && v_8c0b26.sku.trim() !== '';
+  const v_399dbd = v_8c0b26.sku?.trim() ?? '';
+  const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
 
   const v_1c86a8 = v_8c0b26.priceKRW || '0';
   const v_318e8b = v_8c0b26.price?.coin || v_8c0b26.priceXrun || 0;
@@ -335,9 +342,9 @@ export const v_1a0a02 = () => {
   const v_cd7bfc = v_8c0b26.charge?.coin || 0;
   const v_284b46 = v_8c0b26.totalPrice?.coin || 0;
 
-  const v_1ee1c8 = !v_d6cf14 && v_bc3e72 !== null && v_bc3e72 < v_284b46;
+  const v_1ee1c8 = !v_cb677f && v_bc3e72 !== null && v_bc3e72 < v_284b46;
 
-  const v_decd65 = v_d6cf14 && (v_7712f3 || !v_0243db || !!v_b9c849);
+  const v_decd65 = v_cb677f && (v_7712f3 || !v_0243db || !!v_b9c849);
 
   return (
     <View style={v_d81136.container}>
@@ -360,7 +367,7 @@ export const v_1a0a02 = () => {
           )}
 
           <View style={v_d81136.priceContainer}>
-            {v_d6cf14 ? (
+            {v_cb677f ? (
 
               <>
                 <View style={v_d81136.row}>
