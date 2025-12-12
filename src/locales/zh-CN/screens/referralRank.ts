@@ -5,6 +5,7 @@ export default {
   settlement: '结算列表',
   rank: '排名',
   noRankData: '暂无排名数据。',
+  referralLabel: '推荐',
 };
 
 
