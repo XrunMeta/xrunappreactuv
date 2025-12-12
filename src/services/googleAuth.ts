@@ -7,7 +7,7 @@ import { v_ce4741 } from '../navigation';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 const v_93942f = 'oth-client.googleusercontent.invalid';
-const v_708346 = 'oth-client.googleusercontent.invalid'; 
+const v_708346 = 'oth-client.googleusercontent.invalid';
 
 const v_8a74cb = 20000;
 
