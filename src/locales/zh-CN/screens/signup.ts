@@ -27,10 +27,11 @@ export default {
     location: '个人位置信息条款',
     privacy: '个人信息使用条款',
   },
+  agreeButton: '同意',
   submitButton: '注册',
   submitting: '处理中...',
   errors: {
-    termsRequired: '必须同意条款才能继续注册',
+    termsRequired: '必须同意必选条款',
     nameRequired: '请输入姓和名',
     emailRequired: '请输入邮箱',
     passwordRequired: '请输入密码',

@@ -27,10 +27,11 @@ export default {
     location: '個人位置情報規約',
     privacy: '個人情報利用規約',
   },
+  agreeButton: '同意',
   submitButton: '登録する',
   submitting: '処理中...',
   errors: {
-    termsRequired: '規約に同意する必要があります',
+    termsRequired: '必須規約への同意が必要です',
     nameRequired: '姓と名を入力してください',
     emailRequired: 'メールアドレスを入力してください',
     passwordRequired: 'パスワードを入力してください',
