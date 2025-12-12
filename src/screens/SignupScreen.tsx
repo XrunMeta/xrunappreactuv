@@ -7,6 +7,7 @@ import {
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import {
@@ -64,6 +65,9 @@ export const v_f40fc5 = () => {
   );
   const [v_e0c7e8, v_fedf34] = v_5ab095(v_8d7bc8.email);
   const [v_adc076, v_52b279] = v_5ab095(v_8d7bc8.password);
+  const [v_1e51a9, v_014c88] = v_5ab095('');
+  const [v_f872c3, v_c6fe9e] = v_5ab095(false);
+  const [v_99a8a8, v_ed3503] = v_5ab095(false);
   const [v_3a6ac4, v_f768f9] = v_5ab095(v_8d7bc8.phoneNumber);
   const [v_9bf12c, v_fb6bbb] = v_5ab095(v_8d7bc8.referralEmail);
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(v_8d7bc8.gender);
@@ -94,6 +98,9 @@ export const v_f40fc5 = () => {
       v_ef747e(v_419da8);
       v_fedf34(v_8d7bc8.email);
       v_52b279(v_8d7bc8.password);
+      v_014c88('');
+      v_c6fe9e(false);
+      v_ed3503(false);
       v_f768f9(v_8d7bc8.phoneNumber);
       v_fb6bbb(v_8d7bc8.referralEmail);
       v_bdc43c(v_8d7bc8.gender);
@@ -168,8 +175,31 @@ export const v_f40fc5 = () => {
       return;
     }
 
-    if (!v_adc076.trim() || v_adc076.length < 6) {
+    if (!v_adc076.trim()) {
       await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordRequired'));
+      return;
+    }
+
+    const v_b947d5 = v_adc076.length >= 7;
+    const v_5af9de = /\d/.test(v_adc076);
+    const v_f18523 = /[a-z]/.test(v_adc076);
+    const v_f6f742 = /[A-Z]/.test(v_adc076);
+
+    if (!(v_b947d5 && v_5af9de && v_f18523 && v_f6f742)) {
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordPolicy'));
+      return;
+    }
+
+    if (!v_1e51a9.trim()) {
+      await v_889fad(
+        v_8d41d7('screens.signup.alerts.inputError'),
+        v_8d41d7('screens.signup.errors.passwordConfirmRequired'),
+      );
+      return;
+    }
+
+    if (v_adc076 !== v_1e51a9) {
+      await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordMismatch'));
       return;
     }
 
@@ -376,9 +406,47 @@ export const v_f40fc5 = () => {
             placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
             value={v_adc076}
             onChangeText={v_52b279}
-            secureTextEntry
+            secureTextEntry={!v_f872c3}
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={v_d81136.eyeButton}
+                onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
+                activeOpacity={0.7}
+                disabled={v_88dca2}
+              >
+                <Ionicons
+                  name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
+          />
+
+          <FormField
+            label={v_8d41d7('screens.signup.passwordConfirmLabel')}
+            placeholder={v_8d41d7('screens.signup.passwordConfirmPlaceholder')}
+            value={v_1e51a9}
+            onChangeText={v_014c88}
+            secureTextEntry={!v_99a8a8}
+            autoCapitalize="none"
+            containerStyle={v_d81136.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={v_d81136.eyeButton}
+                onPress={() => v_ed3503((v_ba2215) => !v_ba2215)}
+                activeOpacity={0.7}
+                disabled={v_88dca2}
+              >
+                <Ionicons
+                  name={v_99a8a8 ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
           />
 
           <FormField
@@ -570,6 +638,12 @@ const v_d81136 = v_472849.create({
     justifyContent: 'flex-start',
     gap: 8,
     width: '100%',
+  },
+  eyeButton: {
+    height: 24,
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   termsRow: {
     flexDirection: 'row',
