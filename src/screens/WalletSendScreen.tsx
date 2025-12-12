@@ -62,9 +62,10 @@ const STORAGE_KEY = 'wallet_address_book';
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, setWalletSendAmount, selectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
-  const [sendAmount, setSendAmount] = useState(walletSendAmount || '0');
+  const [sendAmount, setSendAmount] = useState('0');
+  const [receiverAddress, setReceiverAddress] = useState('');
   const amountInputRef = useRef<TextInput>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
 
@@ -115,15 +116,13 @@ export const WalletSendScreen = () => {
 
   const handleAmountChange = useCallback((text: string) => {
     const formatted = formatNumberWithCommas(text);
-    const cleanValue = removeCommas(formatted);
     setSendAmount(formatted);
-    setWalletSendAmount(cleanValue); 
-  }, [formatNumberWithCommas, removeCommas, setWalletSendAmount]);
+  }, [formatNumberWithCommas]);
 
   const prevAddressRef = useRef<string>('');
 
   useEffect(() => {
-    const address = walletSendAddress;
+    const address = receiverAddress;
 
     if (address === prevAddressRef.current) {
       return;
@@ -142,7 +141,7 @@ export const WalletSendScreen = () => {
     } else {
       setAddressError(null);
     }
-  }, [walletSendAddress, t, showAlert]);
+  }, [receiverAddress, t, showAlert]);
 
   useEffect(() => {
     loadAddressBook();
@@ -152,6 +151,13 @@ export const WalletSendScreen = () => {
     if (walletSendAddress && walletSendAddress.trim() && showEditModal) {
       setModalAddress(walletSendAddress);
       resetWalletSendAddress();
+    }
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+
+  useEffect(() => {
+    if (walletSendAddress && walletSendAddress.trim() && !showEditModal) {
+      setReceiverAddress(walletSendAddress);
+      resetWalletSendAddress(); 
     }
   }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
 
@@ -273,8 +279,9 @@ export const WalletSendScreen = () => {
 
   const handleBackPress = () => {
     setSendAmount('0');
-    setWalletSendAmount('0');
-    resetWalletSendAddress();
+    setReceiverAddress('');
+    setAddressError(null);
+    prevAddressRef.current = '';
     goBack();
   };
 
@@ -283,9 +290,19 @@ export const WalletSendScreen = () => {
   };
 
   const handleClearReceiverAddress = useCallback(() => {
-    resetWalletSendAddress();
+    setReceiverAddress('');
     setAddressError(null);
+    prevAddressRef.current = '';
+    resetWalletSendAddress();
   }, [resetWalletSendAddress]);
+
+  useEffect(() => {
+    setSendAmount('0');
+    setReceiverAddress('');
+    setAddressError(null);
+    prevAddressRef.current = '';
+    amountInputRef.current?.blur();
+  }, []);
 
   const handlePastePress = () => {
     navigate(ROUTES.addWalletAddress);
@@ -398,7 +415,6 @@ export const WalletSendScreen = () => {
   const handleAmountFocus = () => {
     if (sendAmount === '0') {
       setSendAmount('');
-      setWalletSendAmount('');
     } else if (sendAmount && amountInputRef.current) {
 
       setTimeout(() => {
@@ -413,18 +429,16 @@ export const WalletSendScreen = () => {
 
     if (!sendAmount || sendAmount === '') {
       setSendAmount('0');
-      setWalletSendAmount('0');
     }
   };
   const handleAvailableBalancePress = () => {
     setSendAmount(selectedWalletAsset?.amount || '0');
-    setWalletSendAmount(selectedWalletAsset?.amount || '0');
   };
 
   const isConfirmEnabled = useMemo(() => {
 
-    const hasAddress = walletSendAddress && walletSendAddress.trim().length > 0;
-    const isValidAddress = walletSendAddress?.startsWith('0x');
+    const hasAddress = receiverAddress && receiverAddress.trim().length > 0;
+    const isValidAddress = receiverAddress?.startsWith('0x');
     if (!hasAddress || !isValidAddress) {
       return false;
     }
@@ -448,16 +462,17 @@ export const WalletSendScreen = () => {
     }
 
     return true;
-  }, [walletSendAddress, sendAmount, selectedWalletAsset?.amount, memberLimit, removeCommas]);
+  }, [receiverAddress, sendAmount, selectedWalletAsset?.amount, memberLimit, removeCommas]);
 
   const handleConfirm = async () => {
     const cleanAmount = removeCommas(sendAmount);
-    if (!walletSendAddress) {
+    const trimmedAddress = receiverAddress.trim();
+    if (!trimmedAddress) {
       await showAlert(t('screens.walletSend.alerts.addressRequired'), t('screens.walletSend.errors.addressRequired'));
       return;
     }
 
-    if (!walletSendAddress.startsWith('0x')) {
+    if (!trimmedAddress.startsWith('0x')) {
       await showAlert(t('screens.walletSend.alerts.invalidAddress'), t('screens.walletSend.errors.invalidAddress'));
       return;
     }
@@ -472,6 +487,9 @@ export const WalletSendScreen = () => {
       await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
       return;
     }
+
+    setWalletSendAddress(trimmedAddress);
+    setWalletSendAmount(cleanAmount);
     navigate(ROUTES.walletEstimate);
   };
 
@@ -558,12 +576,12 @@ export const WalletSendScreen = () => {
             <TouchableOpacity
               onPress={handleClearReceiverAddress}
               activeOpacity={0.7}
-              disabled={!walletSendAddress || walletSendAddress.trim().length === 0}
+              disabled={!receiverAddress || receiverAddress.trim().length === 0}
             >
               <Text
                 style={[
                   styles.clearAddressLink,
-                  (!walletSendAddress || walletSendAddress.trim().length === 0) && styles.clearAddressLinkDisabled,
+                  (!receiverAddress || receiverAddress.trim().length === 0) && styles.clearAddressLinkDisabled,
                 ]}
               >
                 {t('screens.walletSend.clearAddress')}
@@ -571,8 +589,8 @@ export const WalletSendScreen = () => {
             </TouchableOpacity>
           }
           placeholder={t('screens.walletSend.receiverAddressPlaceholder')}
-          value={walletSendAddress}
-          onChangeText={setWalletSendAddress}
+          value={receiverAddress}
+          onChangeText={setReceiverAddress}
           autoCapitalize="none"
           autoCorrect={false}
           containerStyle={styles.formField}
@@ -718,7 +736,7 @@ export const WalletSendScreen = () => {
                           networkColor={item.networkColor}
                           name={item.name}
                           onPress={() => {
-                            setWalletSendAddress(item.address);
+                            setReceiverAddress(item.address);
 
                             if (openSwipeableId === item.id) {
                               Animated.spring(swipeAnimations.current[item.id], {
