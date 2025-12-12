@@ -13,23 +13,13 @@ export const ChangePasswordScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [currentPasswordSecure, setCurrentPasswordSecure] = useState(true);
   const [newPasswordSecure, setNewPasswordSecure] = useState(true);
   const [confirmPasswordSecure, setConfirmPasswordSecure] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-
-    if (!currentPassword.trim()) {
-      await showAlert(
-        t('screens.changePassword.alerts.error'),
-        t('screens.changePassword.alerts.currentPasswordRequired'),
-      );
-      return;
-    }
 
     if (!newPassword.trim()) {
       await showAlert(
@@ -51,14 +41,6 @@ export const ChangePasswordScreen = () => {
       await showAlert(
         t('screens.changePassword.alerts.error'),
         t('screens.changePassword.alerts.passwordMismatch'),
-      );
-      return;
-    }
-
-    if (currentPassword === newPassword) {
-      await showAlert(
-        t('screens.changePassword.alerts.error'),
-        t('screens.changePassword.alerts.samePassword'),
       );
       return;
     }
@@ -123,20 +105,6 @@ export const ChangePasswordScreen = () => {
         autoAdjustKeyboardPadding={true}
       >
         <View style={styles.formFieldContainer}>
-          <FormField
-            label={t('screens.changePassword.currentPassword')}
-            placeholder={t('screens.changePassword.currentPasswordPlaceholder')}
-            secureTextEntry={currentPasswordSecure}
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-            rightAccessory={
-              <TouchableOpacity onPress={() => setCurrentPasswordSecure((prev) => !prev)}>
-                <Feather name={currentPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
-              </TouchableOpacity>
-            }
-            containerStyle={styles.fieldContainer}
-          />
-
           <FormField
             label={t('screens.changePassword.newPassword')}
             placeholder={t('screens.changePassword.newPasswordPlaceholder')}

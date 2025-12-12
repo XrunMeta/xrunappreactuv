@@ -55,7 +55,8 @@ const transformShopItem = (
 
   const imageSource = require('../../assets/xrun-horizontal-logo.png');
 
-  const hasSku = item.sku && item.sku.trim() !== '';
+  const sku = item.sku?.trim() ?? '';
+  const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
 
   if (isxrunbuy == 1) {
     const gopaxPriceToUse = gopaxPrice || gpkrprice || 1;
@@ -84,7 +85,7 @@ const transformShopItem = (
 
   return {
     id: String(item.item),
-    priceLabel: hasSku ? 'Loading...' : priceKRW, 
+    priceLabel: isIapSku ? 'Loading...' : priceKRW, 
     detailPrice: `${priceKRW} / ${formatXrunAmount(basePriceXrun)} XRUN`,
     detailFee: `${formatWonAmount(chargeKRW)} / ${formatXrunAmount(chargeXrun)} XRUN`,
     detailTotal: `${formatXrunAmount(totalPriceXrun)} XRUN`,
@@ -253,8 +254,9 @@ export const ShopTicketScreen = () => {
     const skus: string[] = [];
     items.forEach((item) => {
 
-      if (item.sku && item.sku.trim() !== '' && !skus.includes(item.sku)) {
-        skus.push(item.sku);
+      const sku = item.sku?.trim() ?? '';
+      if (sku !== '' && !sku.startsWith('TRANSFER') && !skus.includes(sku)) {
+        skus.push(sku);
       }
     });
     console.log('[상점] 추출된 SKU 목록:', skus);
@@ -500,12 +502,13 @@ export const ShopTicketScreen = () => {
                     imageSource = item.image;
                   }
 
-                  const hasSku = item.sku && item.sku.trim() !== '';
-                  const iapPrice = hasSku ? getIapPrice(item.sku) : null;
-                  const isIapReady = hasSku && hasIapProduct(item.sku);
+                  const sku = (item.sku ?? '').trim();
+                  const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
+                  const iapPrice = isIapSku ? getIapPrice(sku) : null;
+                  const isIapReady = isIapSku && hasIapProduct(sku);
 
                   let displayPrice: string;
-                  if (hasSku) {
+                  if (isIapSku) {
                     if (isIapReady && iapPrice) {
                       displayPrice = iapPrice; 
                     } else if (iapLoading) {

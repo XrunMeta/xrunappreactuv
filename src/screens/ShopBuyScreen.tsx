@@ -127,9 +127,13 @@ export const ShopBuyScreen = () => {
   }, []);
 
   useEffect(() => {
+
+    console.log('[구매] selectedShopItem:', selectedShopItem);
     const item = selectedShopItem as unknown as ShopItemData;
-    if (item?.sku && item.sku.trim() !== '') {
-      fetchIapProduct(item.sku);
+
+    const sku = item?.sku?.trim() ?? '';
+    if (sku !== '' && !sku.startsWith('TRANSFER')) {
+      fetchIapProduct(sku);
     }
   }, [selectedShopItem, fetchIapProduct]);
 
@@ -155,20 +159,22 @@ export const ShopBuyScreen = () => {
 
     try {
       const item = (selectedShopItem as unknown) as ShopItemData & { totalPrice?: { coin?: number } };
-      const hasSku = item.sku && item.sku.trim() !== '';
 
-      if (hasSku) {
+      const sku = item.sku?.trim() ?? '';
+      const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
+
+      if (isIapSku) {
 
         console.log('========================================');
         console.log('[구매] === IAP 인앱 구매 시작 ===');
         console.log('========================================');
-        console.log('[구매] 상품 ID:', item.sku);
+        console.log('[구매] 상품 ID:', sku);
         console.log('[구매] 사용자 번호:', memberId);
         console.log('[구매] 플랫폼:', Platform.OS);
 
         if (!iapProduct) {
           console.log('[구매] IAP 제품 정보가 없습니다. 다시 가져오기...');
-          await fetchIapProduct(item.sku);
+          await fetchIapProduct(sku);
 
           if (!iapProduct) {
             await showAlert(
@@ -185,8 +191,8 @@ export const ShopBuyScreen = () => {
         console.log('[구매] IAP 구매 요청 중...');
         const purchase = await IAP.requestPurchase({
           request: {
-            ios: { sku: item.sku },
-            android: { skus: [item.sku] },
+            ios: { sku },
+            android: { skus: [sku] },
           },
           type: 'in-app',
         });
@@ -200,7 +206,7 @@ export const ShopBuyScreen = () => {
 
         const apiPayload = {
           memberId: memberId,
-          productId: item.sku,
+          productId: sku,
           platform: Platform.OS as 'android' | 'ios',
           purchaseData: purchaseDataArray,
           purchaseTime: new Date().toISOString(),
@@ -327,7 +333,8 @@ export const ShopBuyScreen = () => {
 
   const imageSource: ImageSourcePropType = item.image || require('../../assets/xrun-horizontal-logo.png');
 
-  const hasSku = item.sku && item.sku.trim() !== '';
+  const sku = item.sku?.trim() ?? '';
+  const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
 
   const priceKRW = item.priceKRW || '0';
   const priceXrun = item.price?.coin || item.priceXrun || 0;
@@ -335,9 +342,9 @@ export const ShopBuyScreen = () => {
   const chargeXrun = item.charge?.coin || 0;
   const totalXrun = item.totalPrice?.coin || 0;
 
-  const isInsufficientBalance = !hasSku && userBalance !== null && userBalance < totalXrun;
+  const isInsufficientBalance = !isIapSku && userBalance !== null && userBalance < totalXrun;
 
-  const isIapNotReady = hasSku && (isLoadingIap || !iapProduct || !!iapError);
+  const isIapNotReady = isIapSku && (isLoadingIap || !iapProduct || !!iapError);
 
   return (
     <View style={styles.container}>
@@ -360,7 +367,7 @@ export const ShopBuyScreen = () => {
           )}
 
           <View style={styles.priceContainer}>
-            {hasSku ? (
+            {isIapSku ? (
 
               <>
                 <View style={styles.row}>

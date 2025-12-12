@@ -47,12 +47,7 @@ export const MyInfoFaqScreen = () => {
         id: 'reward-check',
         question: faqItems?.rewardCheck?.question || '',
         answer: faqItems?.rewardCheck?.answer || '',
-      }, 
-      {
-        id: 'reward-usage',
-        question: faqItems?.rewardUsage?.question || '',
-        answer: faqItems?.rewardUsage?.answer || '',
-      },
+      },  
       {
         id: 'ad-reward',
         question: faqItems?.adReward?.question || '',
@@ -62,12 +57,7 @@ export const MyInfoFaqScreen = () => {
         id: 'change-password-request',
         question: faqItems?.changePasswordRequest?.question || '',
         answer: faqItems?.changePasswordRequest?.answer || '',
-      },
-      {
-        id: 'change-password-how',
-        question: faqItems?.changePasswordHow?.question || '',
-        answer: faqItems?.changePasswordHow?.answer || '',
-      },
+      }, 
     ];
   }, [t]);
 
