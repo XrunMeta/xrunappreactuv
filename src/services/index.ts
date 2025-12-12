@@ -490,6 +490,8 @@ export const v_35200c = async (
       gender: v_df7dab.gender,
       age: v_df7dab.age,
       os: v_df7dab.os,
+      mobile: v_df7dab.mobile,
+      region: v_df7dab.region,
     });
 
     const v_3393e3 = await v_9f42a4.post<v_2c1a39>(
@@ -497,12 +499,27 @@ export const v_35200c = async (
       v_df7dab,
     );
 
+    console.log('[회원가입 3단계] 회원가입 응답:', {
+      status: v_3393e3.status,
+      data: v_3393e3.data,
+    });
+
     const v_43c42e = v_3393e3.data.data[0]?.text === 'ok';
     console.log('[회원가입 3단계] 회원가입 결과:', v_43c42e ? '성공' : '실패');
 
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[회원가입 3단계] 회원가입 실행 실패:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[회원가입 3단계] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        requestData: v_5e9bfe.config?.data,
+      });
+    }
     throw v_5e9bfe;
   }
 };
@@ -821,8 +838,12 @@ export const v_415628 = async (
       v_576f5a,
     );
 
-    const v_43c42e = v_3393e3.data.status === 'success';
-    console.log('[로그인] 이메일 인증 코드 확인 결과:', v_43c42e ? '성공' : '실패');
+    const v_43c42e = !!(v_3393e3.data.member || v_3393e3.data.status === 'success');
+    console.log('[로그인] 이메일 인증 코드 확인 결과:', v_43c42e ? '성공' : '실패', {
+      member: v_3393e3.data.member,
+      transaction: v_3393e3.data.transaction,
+      status: v_3393e3.data.status,
+    });
 
     return v_43c42e;
   } catch (v_5e9bfe) {

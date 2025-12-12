@@ -7,6 +7,7 @@ import {
   v_4623af,
   v_39a996,
 } from 'rcmrninabrnb';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import {
@@ -67,6 +68,8 @@ export const v_f40fc5 = () => {
   const [v_68a5a9, v_8e53ad] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_e55f34, v_f932c8] = v_5ab095(v_8d7bc8.termsAccepted);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
+  const [v_47b466, v_dee9cd] = v_5ab095(false);
+  const [v_f872c3, v_c6fe9e] = v_5ab095(false);
 
   const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
 
@@ -81,10 +84,33 @@ export const v_f40fc5 = () => {
   const v_2ca208 = v_a3453e.useRef(false);
 
   v_a3453e.useEffect(() => {
+    const v_5e51fe = async () => {
+      try {
+        const v_ea9ffe = await v_e84827.getItem('googleSignupRequired');
+        if (v_ea9ffe === 'true') {
+          v_dee9cd(true);
+          const v_3639b5 = await v_e84827.getItem('googleSignupEmail');
+          if (v_3639b5) {
+            v_fedf34(v_3639b5);
+            console.log('[회원가입] 구글 회원가입 모드, 이메일 자동 입력:', v_3639b5);
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[회원가입] 구글 회원가입 모드 확인 실패:', v_5e9bfe);
+      }
+    };
+
+    v_5e51fe();
+  }, []);
+
+  v_a3453e.useEffect(() => {
     if (!v_2ca208.current) {
+
+      if (!v_47b466) {
+        v_fedf34(v_8d7bc8.email);
+      }
       v_6dde2f(v_8d7bc8.familyName);
       v_15ded5(v_8d7bc8.givenName);
-      v_fedf34(v_8d7bc8.email);
       v_52b279(v_8d7bc8.password);
       v_f768f9(v_8d7bc8.phoneNumber);
       v_fb6bbb(v_8d7bc8.referralEmail);
@@ -95,7 +121,7 @@ export const v_f40fc5 = () => {
       v_f932c8(v_8d7bc8.termsAccepted);
       v_2ca208.current = true;
     }
-  }, [v_8d7bc8]);
+  }, [v_8d7bc8, v_47b466]);
 
   v_a3453e.useEffect(() => {
     if (!v_2ca208.current) return;
@@ -133,7 +159,7 @@ export const v_f40fc5 = () => {
       return;
     }
 
-    if (!v_f142d8.trim() || !v_a7c7b7.trim()) {
+    if (!v_a7c7b7.trim()) {
       await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.nameRequired'));
       return;
     }
@@ -162,13 +188,17 @@ export const v_f40fc5 = () => {
 
     try {
 
-      console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
-      const v_d854e8 = await v_60e3a5(v_e0c7e8.trim(), v_9b57fc);
+      if (!v_47b466) {
+        console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
+        const v_d854e8 = await v_60e3a5(v_e0c7e8.trim(), v_9b57fc);
 
-      if (!v_d854e8) {
-        await v_889fad(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
-        v_e33ec0(false);
-        return;
+        if (!v_d854e8) {
+          await v_889fad(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
+          v_e33ec0(false);
+          return;
+        }
+      } else {
+        console.log('[회원가입] 구글 회원가입 모드 - 이메일 중복 확인 스킵');
       }
 
       let v_65bdb1 = 0;
@@ -299,12 +329,25 @@ export const v_f40fc5 = () => {
     }
   };
 
+  const v_648e0d = () => {
+
+    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', v_47b466, ')');
+
+    if (v_47b466) {
+
+      v_9b57fc(v_ce4741.login);
+    } else {
+
+      v_c7ac57();
+    }
+  };
+
   return (
     <View style={v_d81136.container}>
       <Header
-        title={v_8d41d7('screens.signup.title')}
-        onBackPress={v_c7ac57}
-        showBackButton
+        title={v_47b466 ? '구글 회원가입' : v_8d41d7('screens.signup.title')}
+        onBackPress={v_648e0d}
+        showBackButton={true}
       />
       <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
@@ -333,6 +376,7 @@ export const v_f40fc5 = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
+            editable={!v_47b466}
           />
 
           <FormField
@@ -340,9 +384,22 @@ export const v_f40fc5 = () => {
             placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
             value={v_adc076}
             onChangeText={v_52b279}
-            secureTextEntry
+            secureTextEntry={!v_f872c3}
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={v_d81136.eyeButton}
+                onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
           />
 
           <FormField
@@ -568,6 +625,12 @@ const v_d81136 = v_472849.create({
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 4,
+  },
+  eyeButton: {
+    height: 24,
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

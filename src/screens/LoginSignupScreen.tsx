@@ -2,6 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_326be8, v_4623af, v_cf9c33, v_700696 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_cb41de, v_8714fe, v_eaeabd, v_570c34, v_556baf } from '../components';
 import { v_dc5d8f, v_33aee4, v_ce593f } from '../services/taboola';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_731ab4, v_843035 } from '../constants';
@@ -23,7 +24,15 @@ export const v_54d331 = () => {
     v_9b57fc(v_ce4741.login);
   };
 
-  const v_c5a058 = () => {
+  const v_c5a058 = async () => {
+
+    try {
+      await v_e84827.removeItem('googleSignupRequired');
+      await v_e84827.removeItem('googleSignupEmail');
+      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 구글 회원가입 플래그 제거');
+    } catch (v_5e9bfe) {
+      console.error('[회원가입] 구글 회원가입 플래그 제거 실패:', v_5e9bfe);
+    }
     v_9b57fc(v_ce4741.signup);
   };
 
