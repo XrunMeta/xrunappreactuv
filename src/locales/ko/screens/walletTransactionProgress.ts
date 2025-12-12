@@ -17,7 +17,7 @@ export default {
   calculating: '계산 중...',
   alerts: {
     transferFailed: '전송 실패',
-    transferFailedMessage: '전송에 실패했습니다. 다시 시도해주세요.',
+    transferFailedMessage: '블록체인 연결이 지연되고 있습니다. 잠시 후 다시 시도 해 주세요.',
     confirm: '확인',
   },
 };

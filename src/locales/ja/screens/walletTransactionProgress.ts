@@ -17,7 +17,7 @@ export default {
   calculating: '計算中...',
   alerts: {
     transferFailed: '送金失敗',
-    transferFailedMessage: '送金に失敗しました。もう一度お試しください。',
+    transferFailedMessage: 'ブロックチェーン接続が遅延しています。しばらくしてからもう一度お試しください。',
     confirm: '確認',
   },
 };

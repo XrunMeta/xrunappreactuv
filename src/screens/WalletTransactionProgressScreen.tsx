@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { SafeScrollView } from '../components';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Dialog, SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,6 +33,7 @@ export const WalletTransactionProgressScreen = () => {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [userAddress, setUserAddress] = useState<string>('');
   const [member, setMember] = useState<string>('');
+  const [transferFailedDialogVisible, setTransferFailedDialogVisible] = useState(false);
   const transferExecutedRef = useRef(false);
 
   useEffect(() => {
@@ -141,17 +142,7 @@ export const WalletTransactionProgressScreen = () => {
         setIsProcessing(false);
         setIsSuccess(false);
         setStatusMessage(t('screens.walletTransactionProgress.transferFailed') || 'Transfer failed');
-
-        Alert.alert(
-          t('screens.walletTransactionProgress.alerts.transferFailed') || 'Transfer Failed',
-          error instanceof Error ? error.message : (t('screens.walletTransactionProgress.alerts.transferFailedMessage') || 'Transfer failed. Please try again.'),
-          [
-            {
-              text: t('screens.walletTransactionProgress.alerts.confirm') || 'OK',
-              onPress: () => navigate(ROUTES.wallet),
-            },
-          ],
-        );
+        setTransferFailedDialogVisible(true);
       }
     };
 
@@ -209,6 +200,29 @@ export const WalletTransactionProgressScreen = () => {
           </View>
         )}
       </SafeScrollView>
+
+      <Dialog
+        visible={transferFailedDialogVisible}
+        title={t('screens.walletTransactionProgress.alerts.transferFailed')}
+        onClose={() => {
+          setTransferFailedDialogVisible(false);
+          navigate(ROUTES.wallet);
+        }}
+        actions={[
+          {
+            label: t('screens.walletTransactionProgress.alerts.confirm'),
+            variant: 'primary',
+            onPress: () => {
+              setTransferFailedDialogVisible(false);
+              navigate(ROUTES.wallet);
+            },
+          },
+        ]}
+      >
+        <Text style={styles.dialogMessage}>
+          {t('screens.walletTransactionProgress.alerts.transferFailedMessage')}
+        </Text>
+      </Dialog>
     </View>
   );
 };
@@ -278,5 +292,12 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     ...COMMON_STYLES.bottomButtonContainer,
+  },
+  dialogMessage: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#1a2e35',
+    lineHeight: 22,
+    textAlign: 'center',
   },
 });

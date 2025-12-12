@@ -17,7 +17,7 @@ export default {
   calculating: '计算中...',
   alerts: {
     transferFailed: '转账失败',
-    transferFailedMessage: '转账失败。请重试。',
+    transferFailedMessage: '区块链连接延迟中。请稍后再试。',
     confirm: '确认',
   },
 };
