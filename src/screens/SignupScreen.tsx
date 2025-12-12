@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -67,6 +68,8 @@ export const SignupScreen = () => {
   const [locationTermsAccepted, setLocationTermsAccepted] = useState(signupFormData.termsAccepted);
   const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(signupFormData.termsAccepted);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSignupMode, setIsGoogleSignupMode] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
 
@@ -81,10 +84,33 @@ export const SignupScreen = () => {
   const isMountedRef = React.useRef(false);
 
   React.useEffect(() => {
+    const checkGoogleSignupMode = async () => {
+      try {
+        const googleSignupRequired = await AsyncStorage.getItem('googleSignupRequired');
+        if (googleSignupRequired === 'true') {
+          setIsGoogleSignupMode(true);
+          const googleEmail = await AsyncStorage.getItem('googleSignupEmail');
+          if (googleEmail) {
+            setEmail(googleEmail);
+            console.log('[회원가입] 구글 회원가입 모드, 이메일 자동 입력:', googleEmail);
+          }
+        }
+      } catch (error) {
+        console.error('[회원가입] 구글 회원가입 모드 확인 실패:', error);
+      }
+    };
+
+    checkGoogleSignupMode();
+  }, []);
+
+  React.useEffect(() => {
     if (!isMountedRef.current) {
+
+      if (!isGoogleSignupMode) {
+        setEmail(signupFormData.email);
+      }
       setFamilyName(signupFormData.familyName);
       setGivenName(signupFormData.givenName);
-      setEmail(signupFormData.email);
       setPassword(signupFormData.password);
       setPhoneNumber(signupFormData.phoneNumber);
       setReferralEmail(signupFormData.referralEmail);
@@ -95,7 +121,7 @@ export const SignupScreen = () => {
       setPrivacyTermsAccepted(signupFormData.termsAccepted);
       isMountedRef.current = true;
     }
-  }, [signupFormData]);
+  }, [signupFormData, isGoogleSignupMode]);
 
   React.useEffect(() => {
     if (!isMountedRef.current) return;
@@ -133,7 +159,7 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!familyName.trim() || !givenName.trim()) {
+    if (!givenName.trim()) {
       await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.nameRequired'));
       return;
     }
@@ -162,13 +188,17 @@ export const SignupScreen = () => {
 
     try {
 
-      console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
-      const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
+      if (!isGoogleSignupMode) {
+        console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
+        const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
 
-      if (!isEmailAvailable) {
-        await showAlert(t('screens.signup.alerts.emailDuplicate'), t('screens.signup.errors.emailDuplicate'));
-        setIsSubmitting(false);
-        return;
+        if (!isEmailAvailable) {
+          await showAlert(t('screens.signup.alerts.emailDuplicate'), t('screens.signup.errors.emailDuplicate'));
+          setIsSubmitting(false);
+          return;
+        }
+      } else {
+        console.log('[회원가입] 구글 회원가입 모드 - 이메일 중복 확인 스킵');
       }
 
       let referralMemberId = 0;
@@ -299,12 +329,25 @@ export const SignupScreen = () => {
     }
   };
 
+  const handleBackPress = () => {
+
+    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', isGoogleSignupMode, ')');
+
+    if (isGoogleSignupMode) {
+
+      navigate(ROUTES.login);
+    } else {
+
+      goBack();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header
-        title={t('screens.signup.title')}
-        onBackPress={goBack}
-        showBackButton
+        title={isGoogleSignupMode ? '구글 회원가입' : t('screens.signup.title')}
+        onBackPress={handleBackPress}
+        showBackButton={true}
       />
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
@@ -333,6 +376,7 @@ export const SignupScreen = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
+            editable={!isGoogleSignupMode}
           />
 
           <FormField
@@ -340,9 +384,22 @@ export const SignupScreen = () => {
             placeholder={t('screens.signup.passwordPlaceholder')}
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!isPasswordVisible}
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setIsPasswordVisible((prev) => !prev)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
           />
 
           <FormField
@@ -568,6 +625,12 @@ const styles = StyleSheet.create({
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 4,
+  },
+  eyeButton: {
+    height: 24,
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -341,7 +341,9 @@ export interface EmailVerificationCodeRequest {
 }
 
 export interface EmailVerificationCodeResponse {
-  status: string;
+  member?: number;
+  transaction?: number;
+  status?: string; 
 }
 
 export interface EmailAuthLoginRequest {
