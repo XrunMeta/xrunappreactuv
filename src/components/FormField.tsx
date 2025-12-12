@@ -16,6 +16,7 @@ interface FormFieldProps extends TextInputProps {
   containerStyle?: StyleProp<ViewStyle>;
   rightAccessory?: React.ReactNode;
   leftAccessory?: React.ReactNode;
+  showDisabledStyle?: boolean; 
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -26,11 +27,17 @@ export const FormField: React.FC<FormFieldProps> = ({
   style,
   placeholderTextColor = '#dedede',
   onFocus,
+  editable = true,
+  showDisabledStyle = true, 
   ...inputProps
 }) => {
   const keyboardScroll = useKeyboardScroll();
 
   const handleFocus = (event: any) => {
+
+    if (!editable) {
+      return;
+    }
 
     if (keyboardScroll) {
       keyboardScroll.scrollToFocusedInput(event);
@@ -41,15 +48,25 @@ export const FormField: React.FC<FormFieldProps> = ({
     }
   };
 
+  const isDisabled = editable === false && showDisabledStyle;
+
   return (
     <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputWrapper}>
+      <View style={[
+        styles.inputWrapper,
+        isDisabled && styles.inputWrapperDisabled
+      ]}>
         {leftAccessory ? <View style={styles.leftAccessory}>{leftAccessory}</View> : null}
         <TextInput
-          style={[styles.input, style]}
-          placeholderTextColor={placeholderTextColor}
+          style={[
+            styles.input,
+            isDisabled && styles.inputDisabled,
+            style
+          ]}
+          placeholderTextColor={isDisabled ? '#b3b6be' : placeholderTextColor}
           onFocus={handleFocus}
+          editable={editable}
           {...inputProps}
         />
         {rightAccessory ? (
@@ -98,6 +115,13 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  inputWrapperDisabled: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e0e0e0',
+  },
+  inputDisabled: {
+    color: '#9e9e9e',
   },
 });
 

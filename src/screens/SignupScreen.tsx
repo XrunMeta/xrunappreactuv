@@ -440,6 +440,7 @@ export const SignupScreen = () => {
                 placeholder={t('screens.signup.regionPlaceholder')}
                 value={regionDisplayValue}
                 editable={false}
+                showDisabledStyle={false}
               />
             </TouchableOpacity>
             {!isKoreaSelected && (
