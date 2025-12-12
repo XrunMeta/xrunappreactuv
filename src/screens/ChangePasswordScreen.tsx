@@ -19,6 +19,8 @@ export const v_18d397 = () => {
   const [v_9e430e, v_59222b] = v_5ab095(true);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
 
+  const v_02dd63 = (v_3b402b) => v_3b402b.replace(/[^\x21-\x7E]/g, '');
+
   const v_585b02 = async () => {
 
     if (!v_e2bd5a.trim()) {
@@ -110,7 +112,7 @@ export const v_18d397 = () => {
             placeholder={v_8d41d7('screens.changePassword.newPasswordPlaceholder')}
             secureTextEntry={v_cad69a}
             value={v_e2bd5a}
-            onChangeText={v_889581}
+            onChangeText={(v_9b6134) => v_889581(v_02dd63(v_9b6134))}
             rightAccessory={
               <TouchableOpacity onPress={() => v_f9607d((v_ba2215) => !v_ba2215)}>
                 <Feather name={v_cad69a ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
@@ -124,7 +126,7 @@ export const v_18d397 = () => {
             placeholder={v_8d41d7('screens.changePassword.confirmPasswordPlaceholder')}
             secureTextEntry={v_9e430e}
             value={v_0b3ebe}
-            onChangeText={v_241a35}
+            onChangeText={(v_9b6134) => v_241a35(v_02dd63(v_9b6134))}
             rightAccessory={
               <TouchableOpacity onPress={() => v_59222b((v_ba2215) => !v_ba2215)}>
                 <Feather name={v_9e430e ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />

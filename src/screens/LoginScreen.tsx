@@ -21,6 +21,7 @@ import {
   v_f5ecec,
   v_8025d1,
 } from '../services';
+import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_700ef9 } from '../context';
 
@@ -286,7 +287,7 @@ export const v_f4f851 = () => {
             placeholder={v_8d41d7('screens.login.passwordPlaceholder')}
             secureTextEntry={!v_f872c3}
             value={v_adc076}
-            onChangeText={v_52b279}
+            onChangeText={(v_9b6134) => v_52b279(v_96abff(v_9b6134))}
             containerStyle={v_d81136.fieldContainer}
             editable={!v_cd31a8}
             rightAccessory={

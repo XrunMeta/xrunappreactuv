@@ -33,6 +33,8 @@ export * from './env';
 
 export * from './imageCache';
 
+export * from './input';
+
 export const v_35c0e0 = (v_f63e09): string => {
   const v_0ad8c5 = typeof v_f63e09 === 'string' ? parseFloat(v_f63e09) : v_f63e09;
   if (isNaN(v_0ad8c5)) return '0';

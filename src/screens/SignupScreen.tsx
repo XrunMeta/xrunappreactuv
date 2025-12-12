@@ -27,6 +27,7 @@ import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_9553a4, v_6946fd, v_369014, v_789afd, v_a61db3, v_bae512 } from '../constants';
 import { v_9dd03c } from '../types';
+import { v_96abff } from '../utils';
 
 import {
   v_60e3a5,
@@ -504,7 +505,7 @@ export const v_f40fc5 = () => {
             label={v_8d41d7('screens.signup.passwordLabel')}
             placeholder={v_8d41d7('screens.signup.passwordPlaceholder')}
             value={v_adc076}
-            onChangeText={v_52b279}
+            onChangeText={(v_9b6134) => v_52b279(v_96abff(v_9b6134))}
             secureTextEntry={!v_f872c3}
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
@@ -528,7 +529,7 @@ export const v_f40fc5 = () => {
             label={v_8d41d7('screens.signup.passwordConfirmLabel')}
             placeholder={v_8d41d7('screens.signup.passwordConfirmPlaceholder')}
             value={v_1e51a9}
-            onChangeText={v_014c88}
+            onChangeText={(v_9b6134) => v_014c88(v_96abff(v_9b6134))}
             secureTextEntry={!v_99a8a8}
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
