@@ -7,6 +7,7 @@ export default {
   group: 'Grup Saya',
   settlement: 'Daftar Penyelesaian',
   rank: 'Peringkat',
+  referralLabel: 'Referral',
 };
 
 
