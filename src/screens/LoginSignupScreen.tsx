@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PrimaryButton, SecondaryButton, TaboolaBannerCore, SafeScrollView, SafeView } from '../components';
 import { getTaboolaPlacement, getTaboolaPageUrl, isTaboolaNativeModuleAvailable } from '../services/taboola';
 import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE, FONTS } from '../constants';
@@ -23,7 +24,15 @@ export const LoginSignupScreen = () => {
     navigate(ROUTES.login);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+
+    try {
+      await AsyncStorage.removeItem('googleSignupRequired');
+      await AsyncStorage.removeItem('googleSignupEmail');
+      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 구글 회원가입 플래그 제거');
+    } catch (error) {
+      console.error('[회원가입] 구글 회원가입 플래그 제거 실패:', error);
+    }
     navigate(ROUTES.signup);
   };
 
