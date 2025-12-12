@@ -9,6 +9,8 @@ export default {
   noAddresses: 'Tidak ada alamat yang terdaftar.',
   receiverAddress: 'Alamat Penerima',
   receiverAddressPlaceholder: 'Masukkan alamat dompet',
+  clearAddress: 'Hapus',
+  swipeHint: 'Geser alamat untuk mengedit atau menghapus.',
   confirm: 'Konfirmasi',
   errors: {
     addressRequired: 'Silakan pindai kode QR untuk memasukkan alamat penerima',

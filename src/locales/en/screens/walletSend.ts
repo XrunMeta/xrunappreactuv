@@ -9,6 +9,8 @@ export default {
   noAddresses: 'No registered addresses.',
   receiverAddress: 'Receiver Address',
   receiverAddressPlaceholder: 'Enter wallet address',
+  clearAddress: 'Clear',
+  swipeHint: 'Swipe an address to edit or delete.',
   confirm: 'Confirm',
   errors: {
     addressRequired: 'Please scan QR code to enter receiver address',

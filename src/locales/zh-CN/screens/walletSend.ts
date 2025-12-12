@@ -9,6 +9,8 @@ export default {
   noAddresses: '没有已注册的地址。',
   receiverAddress: '接收地址',
   receiverAddressPlaceholder: '请输入钱包地址',
+  clearAddress: '清除',
+  swipeHint: '滑动地址以编辑或删除。',
   confirm: '确认',
   errors: {
     addressRequired: '请通过扫描二维码输入接收地址',
