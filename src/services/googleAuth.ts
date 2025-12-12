@@ -153,11 +153,10 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         };
       }
 
-      const v_f623ec = v_9390e8.code === 403 && v_9390e8.data?.isSignupCompleted === false;
+      const v_aa93c2 = v_9390e8.code === 200 && !v_9390e8.success && (v_9390e8.data?.requiresSignup === true || v_9390e8.data?.isSignupCompleted === false);
 
-      if (v_f623ec) {
-
-        console.log('[구글 로그인] 회원가입 미완료 - 회원가입 화면으로 이동 필요');
+      if (v_aa93c2) {
+        console.log('[구글 로그인] 회원가입 필요 - 회원가입 화면으로 이동 필요');
         return {
           success: true,
           data: {
@@ -180,6 +179,7 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         success: v_9390e8.success,
         isNewUser: v_9390e8.data?.isNewUser,
         email: v_9390e8.data?.email,
+        isSignupCompleted: v_9390e8.data?.isSignupCompleted,
       });
 
       return {

@@ -21,7 +21,6 @@ import {
   v_f5ecec,
   v_8025d1,
   v_2683ec,
-  v_a7ab3c,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_700ef9 } from '../context';
@@ -249,20 +248,8 @@ export const v_f4f851 = () => {
 
       console.log('[구글 로그인] 로그인 성공:', { memberId: v_717992, email: v_e0c7e8, isNewUser: v_b0b75a, isSignupCompleted: v_22a87d });
 
-      if (v_22a87d === true) {
-        console.log('[구글 로그인] 백엔드 응답: 회원가입 완료 - 정상 로그인 처리');
-
-        const v_8e50e6 = await v_e84827.getItem('googleSignupRequired');
-        if (v_8e50e6 === 'true') {
-          await v_e84827.removeItem('googleSignupRequired');
-          await v_e84827.removeItem('googleSignupEmail');
-          console.log('[구글 로그인] 구글 회원가입 플래그 제거 (회원가입 완료됨)');
-        }
-
-      }
-
-      else if (v_22a87d === false) {
-        console.log('[구글 로그인] 백엔드 응답: 회원가입 미완료 - 회원가입 화면으로 이동');
+      if (v_b0b75a) {
+        console.log('[구글 로그인] 신규 사용자, 회원가입 화면으로 이동');
 
         await v_e84827.setItem('googleSignupRequired', 'true');
         await v_e84827.setItem('googleSignupEmail', v_e0c7e8);
@@ -272,76 +259,7 @@ export const v_f4f851 = () => {
         return;
       }
 
-      else {
-
-        const v_8e50e6 = await v_e84827.getItem('googleSignupRequired');
-
-        if (v_8e50e6 === 'true') {
-          console.log('[구글 로그인] 구글 회원가입 플래그 있음 - 회원가입 화면으로 이동 (백엔드 isNewUser:', v_b0b75a, ', isSignupCompleted:', v_22a87d, ')');
-
-          await v_e84827.setItem('googleSignupRequired', 'true');
-          await v_e84827.setItem('googleSignupEmail', v_e0c7e8);
-
-          v_9b57fc(v_ce4741.signup);
-          v_deef62(false);
-          return;
-        }
-
-        console.log('[구글 로그인] isSignupCompleted가 undefined - 사용자 정보 확인 시작 (isNewUser:', v_b0b75a, ')');
-        try {
-          const v_bb789b = await v_a7ab3c(v_717992, v_9b57fc);
-          const v_ef7306 = v_bb789b.data?.[0];
-
-          console.log('[구글 로그인] 사용자 정보 확인:', {
-            mobile: v_ef7306?.mobile,
-            gender: v_ef7306?.gender,
-            ages: v_ef7306?.ages,
-            region: v_ef7306?.region,
-            firstname: v_ef7306?.firstname,
-          });
-
-          const v_ec7c09 = v_ef7306?.mobile && v_ef7306.mobile.trim() !== '';
-          const v_74478c = v_ef7306?.gender && (v_ef7306.gender === 2110 || v_ef7306.gender === 2111);
-          const v_19b480 = v_ef7306?.ages && v_ef7306.ages >= 2210 && v_ef7306.ages <= 2250;
-          const v_2edafa = v_ef7306?.region && v_ef7306.region > 0;
-          const v_38b507 = v_ef7306?.firstname && v_ef7306.firstname.trim() !== '';
-
-          const v_b66a68 = v_ec7c09 && v_74478c && v_19b480 && v_2edafa && v_38b507;
-
-          console.log('[구글 로그인] 프론트엔드 회원가입 완료 여부:', {
-            isSignupCompletedFrontend: v_b66a68,
-            hasMobile: v_ec7c09,
-            hasGender: v_74478c,
-            hasAge: v_19b480,
-            hasRegion: v_2edafa,
-            hasFirstname: v_38b507,
-          });
-
-          if (!v_b66a68) {
-            console.log('[구글 로그인] 필수 필드 누락 - 회원가입 화면으로 이동');
-
-            await v_e84827.setItem('googleSignupRequired', 'true');
-            await v_e84827.setItem('googleSignupEmail', v_e0c7e8);
-
-            v_9b57fc(v_ce4741.signup);
-            v_deef62(false);
-            return;
-          }
-
-          console.log('[구글 로그인] 회원가입 완료된 사용자 - 정상 로그인 진행');
-        } catch (v_5e9bfe) {
-          console.error('[구글 로그인] 사용자 정보 확인 실패:', v_5e9bfe);
-
-          console.log('[구글 로그인] 사용자 정보 확인 실패 - 회원가입 화면으로 이동');
-          await v_e84827.setItem('googleSignupRequired', 'true');
-          await v_e84827.setItem('googleSignupEmail', v_e0c7e8);
-          v_9b57fc(v_ce4741.signup);
-          v_deef62(false);
-          return;
-        }
-      }
-
-      console.log('[구글 로그인] 정상 로그인 처리 시작 (isNewUser:', v_b0b75a, ')');
+      console.log('[구글 로그인] 기존 사용자, 로그인 처리 시작');
 
       const v_ef7306 = {
         member: v_717992,
@@ -364,7 +282,7 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
-      await v_e84827.setItem('userSessionToken', v_2ca7e0);
+      await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
       if (v_a964a4) {
