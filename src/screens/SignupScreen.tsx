@@ -27,6 +27,7 @@ import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { getRegionIdByIso2, getRegionNameById, getRegionsByCountryIso2, GLOBAL_REGION, COMMON_STYLES, FORM_STYLES } from '../constants';
 import { ClauseId } from '../types';
+import { filterAsciiPrintable } from '../utils';
 
 import {
   checkEmailAvailability,
@@ -504,7 +505,7 @@ export const SignupScreen = () => {
             label={t('screens.signup.passwordLabel')}
             placeholder={t('screens.signup.passwordPlaceholder')}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => setPassword(filterAsciiPrintable(text))}
             secureTextEntry={!isPasswordVisible}
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
@@ -528,7 +529,7 @@ export const SignupScreen = () => {
             label={t('screens.signup.passwordConfirmLabel')}
             placeholder={t('screens.signup.passwordConfirmPlaceholder')}
             value={passwordConfirm}
-            onChangeText={setPasswordConfirm}
+            onChangeText={(text) => setPasswordConfirm(filterAsciiPrintable(text))}
             secureTextEntry={!isPasswordConfirmVisible}
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}

@@ -19,6 +19,8 @@ export const ChangePasswordScreen = () => {
   const [confirmPasswordSecure, setConfirmPasswordSecure] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const filterPasswordInput = (value: string) => value.replace(/[^\x21-\x7E]/g, '');
+
   const handleSubmit = async () => {
 
     if (!newPassword.trim()) {
@@ -110,7 +112,7 @@ export const ChangePasswordScreen = () => {
             placeholder={t('screens.changePassword.newPasswordPlaceholder')}
             secureTextEntry={newPasswordSecure}
             value={newPassword}
-            onChangeText={setNewPassword}
+            onChangeText={(text) => setNewPassword(filterPasswordInput(text))}
             rightAccessory={
               <TouchableOpacity onPress={() => setNewPasswordSecure((prev) => !prev)}>
                 <Feather name={newPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
@@ -124,7 +126,7 @@ export const ChangePasswordScreen = () => {
             placeholder={t('screens.changePassword.confirmPasswordPlaceholder')}
             secureTextEntry={confirmPasswordSecure}
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(text) => setConfirmPassword(filterPasswordInput(text))}
             rightAccessory={
               <TouchableOpacity onPress={() => setConfirmPasswordSecure((prev) => !prev)}>
                 <Feather name={confirmPasswordSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
