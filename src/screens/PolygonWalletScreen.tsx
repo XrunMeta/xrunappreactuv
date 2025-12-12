@@ -8,6 +8,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useAppContext } from '../context';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -36,6 +37,7 @@ export const PolygonWalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
+  const { setWalletReceiveAddress, setWalletReceiveCurrency } = useAppContext();
   const [filterVisible, setFilterVisible] = useState(false);
   const [filterType, setFilterType] = useState<WalletFilterType>('all');
   const [filterRange, setFilterRange] = useState<WalletFilterRange>('7d');
@@ -90,7 +92,16 @@ export const PolygonWalletScreen = () => {
           onCopy={() => copyToClipboard(WALLET_ADDRESS, showAlert)}
           actions={[
             { label: 'PolygonScan', icon: 'scan-outline', onPress: () => console.log('scan') },
-            { label: 'Receive', icon: 'download-outline', onPress: () => navigate(ROUTES.walletReceive) },
+            {
+              label: 'Receive',
+              icon: 'download-outline',
+              onPress: () => {
+
+                setWalletReceiveAddress(WALLET_ADDRESS);
+                setWalletReceiveCurrency(16);
+                navigate(ROUTES.walletReceive);
+              },
+            },
             {
               label: 'Send',
               icon: 'send-outline',
