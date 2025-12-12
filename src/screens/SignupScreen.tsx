@@ -6,6 +6,8 @@ import {
   Platform,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -17,12 +19,14 @@ import {
   Header,
   OptionButton,
   PrimaryButton,
+  Dialog,
 } from '../components';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { getRegionIdByIso2, getRegionNameById, getRegionsByCountryIso2, GLOBAL_REGION, COMMON_STYLES, FORM_STYLES } from '../constants';
+import { ClauseId } from '../types';
 
 import {
   checkEmailAvailability,
@@ -30,6 +34,7 @@ import {
   signup,
   checkLogin,
   SignupHelpers,
+  getClauseContent,
 } from '../services';
 
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
@@ -38,7 +43,7 @@ type GenderValue = 'male' | 'female';
 type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { goBack, navigate, reset } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const {
@@ -72,12 +77,63 @@ export const SignupScreen = () => {
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
   const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
   const [ageRange, setAgeRange] = useState<AgeValue>(signupFormData.ageRange);
-  const [serviceTermsAccepted, setServiceTermsAccepted] = useState(signupFormData.termsAccepted);
-  const [locationTermsAccepted, setLocationTermsAccepted] = useState(signupFormData.termsAccepted);
-  const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(signupFormData.termsAccepted);
+  const [serviceTermsAccepted, setServiceTermsAccepted] = useState(false);
+  const [locationTermsAccepted, setLocationTermsAccepted] = useState(false);
+  const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
+
+  const [clauseDialogVisible, setClauseDialogVisible] = useState(false);
+  const [selectedClauseIdForDialog, setSelectedClauseIdForDialog] = useState<ClauseId>('service');
+  const [clauseContent, setClauseContent] = useState<string>('');
+  const [isClauseLoading, setIsClauseLoading] = useState(false);
+  const [clauseError, setClauseError] = useState<string | null>(null);
+
+  const handleAgreeClause = (clauseId: ClauseId) => {
+    if (clauseId === 'service') {
+      setServiceTermsAccepted(true);
+    } else if (clauseId === 'location') {
+      setLocationTermsAccepted(true);
+    } else if (clauseId === 'personal') {
+      setPrivacyTermsAccepted(true);
+    }
+    setClauseDialogVisible(false);
+  };
+
+  const openClauseDialog = async (clauseId: ClauseId) => {
+    setSelectedClauseIdForDialog(clauseId);
+    setClauseDialogVisible(true);
+    setIsClauseLoading(true);
+    setClauseError(null);
+    setClauseContent('');
+
+    try {
+
+      let currentLanguage = i18n.language || 'ko';
+      if (currentLanguage === 'zh' || currentLanguage === 'zhCN' || currentLanguage === 'zh-CN') {
+        currentLanguage = 'zh-CN';
+      }
+
+      const clauseType = clauseId as 'service' | 'location' | 'personal';
+      const clauseText = await getClauseContent(clauseType, currentLanguage, navigate);
+
+      if (clauseText) {
+        setClauseContent(clauseText);
+      } else {
+        setClauseError(t('screens.myInfoClauses.loadFailed'));
+      }
+    } catch (err) {
+      console.error('[회원가입] 약관 내용 로드 오류:', err);
+      setClauseError(t('screens.myInfoClauses.loadError'));
+    } finally {
+      setIsClauseLoading(false);
+    }
+  };
+
+  const closeClauseDialog = () => {
+    setClauseDialogVisible(false);
+  };
 
   const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
 
@@ -105,9 +161,10 @@ export const SignupScreen = () => {
       setReferralEmail(signupFormData.referralEmail);
       setGender(signupFormData.gender);
       setAgeRange(signupFormData.ageRange);
-      setServiceTermsAccepted(signupFormData.termsAccepted);
-      setLocationTermsAccepted(signupFormData.termsAccepted);
-      setPrivacyTermsAccepted(signupFormData.termsAccepted);
+
+      setServiceTermsAccepted(false);
+      setLocationTermsAccepted(false);
+      setPrivacyTermsAccepted(false);
       isMountedRef.current = true;
     }
   }, [signupFormData]);
@@ -142,11 +199,6 @@ export const SignupScreen = () => {
   ]);
 
   const handleSubmit = async () => {
-
-    if (!allTermsAccepted) {
-      await showAlert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
-      return;
-    }
 
     const nameParts = fullName.trim().split(/\s+/);
     let parsedGivenName = '';
@@ -210,6 +262,11 @@ export const SignupScreen = () => {
 
     if (isKoreaSelected && !selectedRegion) {
       await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
+      return;
+    }
+
+    if (!allTermsAccepted) {
+      await showAlert(t('screens.signup.alerts.termsRequired'), t('screens.signup.errors.termsRequired'));
       return;
     }
 
@@ -354,6 +411,14 @@ export const SignupScreen = () => {
     }
   };
 
+  const clauseTitleMap: Record<ClauseId, string> = {
+    service: t('screens.myInfoClauses.serviceClause'),
+    location: t('screens.myInfoClauses.locationClause'),
+    personal: t('screens.myInfoClauses.personalClause'),
+  };
+
+  const dialogBodyMaxHeight = Math.min(520, Math.round(Dimensions.get('window').height * 0.55));
+
   return (
     <View style={styles.container}>
       <Header
@@ -361,6 +426,40 @@ export const SignupScreen = () => {
         onBackPress={goBack}
         showBackButton
       />
+      <Dialog
+        visible={clauseDialogVisible}
+        title={clauseTitleMap[selectedClauseIdForDialog]}
+        onClose={closeClauseDialog}
+        actions={[
+          {
+            label: t('screens.signup.agreeButton'),
+            onPress: () => handleAgreeClause(selectedClauseIdForDialog),
+            variant: 'primary',
+          },
+          {
+            label: t('common.buttons.close'),
+            onPress: closeClauseDialog,
+            variant: 'secondary',
+          },
+        ]}
+        containerStyle={styles.clauseDialogContainer}
+      >
+        <View style={{ maxHeight: dialogBodyMaxHeight }}>
+          {isClauseLoading ? (
+            <View style={styles.clauseLoadingContainer}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+              <Text style={styles.clauseLoadingText}>{t('screens.myInfoClauses.loading')}</Text>
+            </View>
+          ) : clauseError ? (
+            <Text style={styles.clauseErrorText}>{clauseError}</Text>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={true}>
+              <Text style={styles.clauseContentText}>{clauseContent}</Text>
+            </ScrollView>
+          )}
+        </View>
+      </Dialog>
+
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -549,7 +648,9 @@ export const SignupScreen = () => {
               variant="square"
             />
             <Text style={styles.termsText}>
-              <Text style={styles.termsHighlight}>{t('screens.signup.terms.service')}</Text>{' '}
+              <Text style={styles.termsHighlight} onPress={() => openClauseDialog('service')}>
+                {t('screens.signup.terms.service')}
+              </Text>{' '}
               {t('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -562,7 +663,9 @@ export const SignupScreen = () => {
               variant="square"
             />
             <Text style={styles.termsText}>
-              <Text style={styles.termsHighlight}>{t('screens.signup.terms.location')}</Text>{' '}
+              <Text style={styles.termsHighlight} onPress={() => openClauseDialog('location')}>
+                {t('screens.signup.terms.location')}
+              </Text>{' '}
               {t('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -575,7 +678,9 @@ export const SignupScreen = () => {
               variant="square"
             />
             <Text style={styles.termsText}>
-              <Text style={styles.termsHighlight}>{t('screens.signup.terms.privacy')}</Text>{' '}
+              <Text style={styles.termsHighlight} onPress={() => openClauseDialog('personal')}>
+                {t('screens.signup.terms.privacy')}
+              </Text>{' '}
               {t('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -678,6 +783,34 @@ const styles = StyleSheet.create({
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 4,
+  },
+  clauseDialogContainer: {
+    maxWidth: 420,
+  },
+  clauseLoadingContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  clauseLoadingText: {
+    fontSize: FONTS.size.small,
+    lineHeight: 18,
+    color: '#8e9bae',
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
+  },
+  clauseErrorText: {
+    fontSize: FONTS.size.small,
+    lineHeight: 18,
+    color: '#ff6b6b',
+    fontFamily: 'Roboto-Regular',
+  },
+  clauseContentText: {
+    fontSize: FONTS.size.small,
+    lineHeight: 20,
+    color: '#333333',
+    fontFamily: 'Roboto-Regular',
   },
 });
 

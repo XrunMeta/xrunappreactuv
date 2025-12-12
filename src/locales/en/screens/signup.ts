@@ -27,10 +27,11 @@ export default {
     location: 'Personal Location Information Terms',
     privacy: 'Personal Information Usage Terms',
   },
+  agreeButton: 'Agree',
   submitButton: 'Sign Up',
   submitting: 'Processing...',
   errors: {
-    termsRequired: 'You must agree to the terms to proceed with registration',
+    termsRequired: 'You must agree to the required terms',
     nameRequired: 'Please enter your family name and given name',
     emailRequired: 'Please enter your email',
     passwordRequired: 'Please enter your password',

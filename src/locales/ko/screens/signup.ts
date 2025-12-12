@@ -27,10 +27,11 @@ export default {
     location: '개인 위치정보 약관',
     privacy: '개인정보 이용 약관',
   },
+  agreeButton: '동의',
   submitButton: '가입하기',
   submitting: '처리 중...',
   errors: {
-    termsRequired: '약관에 동의해야 가입을 진행할 수 있습니다.',
+    termsRequired: '약관 동의가 필요합니다.',
     nameRequired: '성과 이름을 입력해주세요.',
     emailRequired: '이메일을 입력해주세요.',
     passwordRequired: '비밀번호를 입력해주세요.',
