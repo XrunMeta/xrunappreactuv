@@ -72,10 +72,12 @@ export interface GoogleAuthResult {
   data?: {
     memberId: number;
     email: string;
-    name: string;
-    accessToken: string;
-    refreshToken: string;
+    name?: string; 
+    accessToken?: string; 
+    refreshToken?: string; 
     isNewUser: boolean;
+    isSignupCompleted?: boolean; 
+    missingFields?: Record<string, boolean>; 
   };
   code?: string;
   message?: string;
@@ -148,6 +150,20 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
           success: false,
           code: 'PARSE_ERROR',
           message: '서버 응답을 파싱할 수 없습니다.',
+        };
+      }
+
+      const v_f623ec = v_9390e8.code === 403 && v_9390e8.data?.isSignupCompleted === false;
+
+      if (v_f623ec) {
+
+        console.log('[구글 로그인] 회원가입 미완료 - 회원가입 화면으로 이동 필요');
+        return {
+          success: true,
+          data: {
+            ...v_9390e8.data,
+            isSignupCompleted: false,
+          },
         };
       }
 
