@@ -7,7 +7,7 @@ import { ROUTES } from '../navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GOOGLE_WEB_CLIENT_ID = 'oth-client.googleusercontent.invalid';
-const GOOGLE_IOS_CLIENT_ID = 'oth-client.googleusercontent.invalid'; 
+const GOOGLE_IOS_CLIENT_ID = 'oth-client.googleusercontent.invalid';
 
 const API_TIMEOUT = 20000;
 
