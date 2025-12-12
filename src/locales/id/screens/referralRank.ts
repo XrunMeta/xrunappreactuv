@@ -5,6 +5,7 @@ export default {
   settlement: 'Daftar Penyelesaian',
   rank: 'Peringkat',
   noRankData: 'Tidak ada data peringkat.',
+  referralLabel: 'Referral',
 };
 
 

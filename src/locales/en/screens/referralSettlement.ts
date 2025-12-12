@@ -7,6 +7,7 @@ export default {
   group: 'My Group',
   settlement: 'Settlement List',
   rank: 'Rank',
+  referralLabel: 'Referral',
 };
 
 

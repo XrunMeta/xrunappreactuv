@@ -7,6 +7,7 @@ export default {
   group: '我的组',
   settlement: '结算列表',
   rank: '排名',
+  referralLabel: '推荐',
 };
 
 

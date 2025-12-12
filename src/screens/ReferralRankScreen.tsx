@@ -226,6 +226,7 @@ export const v_f57686 = () => {
         rightComponent={
           <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
+            <Text style={v_d81136.headerShareText}>{v_8d41d7('screens.referralRank.referralLabel')}</Text>
           </TouchableOpacity>
         }
       />
@@ -369,11 +370,18 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
   },
   headerShareButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerShareText: {
+    marginTop: 2,
+    fontSize: v_843035.size.xxsmall,
+    fontFamily: 'Roboto-Medium',
+    color: v_1bfbd0.headerText,
+    lineHeight: 12,
   },
 });

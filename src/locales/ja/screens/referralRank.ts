@@ -5,6 +5,7 @@ export default {
   settlement: '精算リスト',
   rank: '順位',
   noRankData: 'ランキングデータがありません。',
+  referralLabel: '紹介',
 };
 
 
