@@ -1380,10 +1380,10 @@ export const MapMainScreen: React.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 최초 3개만 매핑)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 16개 기준으로 순차 매핑)');
         const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
-          if (index < 3 && topAd5Response.length > 0) {
+          if (index < 16 && topAd5Response.length > 0) {
             const adIndex = index % topAd5Response.length;
             const mappedAd = topAd5Response[adIndex];
 
@@ -2069,7 +2069,7 @@ export const MapMainScreen: React.FC = () => {
 
       const uniqueKey = `${markerKey}-${index}`;
 
-      if (index < 3 && topAd5Data.length > 0) {
+      if (index < 16 && topAd5Data.length > 0) {
         const adIndex = index % topAd5Data.length;
         const mappedAd = topAd5Data[adIndex];
         mapping.set(uniqueKey, mappedAd);
