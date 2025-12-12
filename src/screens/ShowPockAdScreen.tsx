@@ -661,6 +661,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                showBottomBackground={false}
               >
                 <Text style={v_d81136.joinDescText}>
                   {v_d0b6d4.joindesc}
