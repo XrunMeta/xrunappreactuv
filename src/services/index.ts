@@ -2396,6 +2396,82 @@ export const getPockAds = async (
   }
 };
 
+export const getPointClickAds = async (
+  member: string,
+  adid: string,
+  deviceInfo: DeviceInfo,
+  ad_key: string = '',
+  navigation?: any,
+): Promise<PockAdsResponse> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/getPointClickAds`;
+
+    let osTypeString: string;
+
+    const isIOS = Platform.OS === 'ios' || 
+                  deviceInfo.manufacturer === 'Apple' || 
+                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
+                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
+
+    if (isIOS) {
+      osTypeString = 'IOS';
+    } else {
+      osTypeString = 'ANDROID';
+    }
+
+    const requestBody = {
+      member: member,
+      ad_key: ad_key || '',
+      os: osTypeString,
+      device_ifa: adid || '',
+      ip: deviceInfo.ipAddress || '',
+    };
+
+    console.log('PointClick 광고 API 요청:', requestBody);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const result: PockAdsResponse = await response.json();
+    console.log('PointClick 광고 API 응답:', result);
+
+    if (response.ok && result.status === 'success' && result.code === 200) {
+      return result;
+    } else {
+
+      const errorMessage = result.message || 'PointClick 광고 API 호출 실패';
+      const error = new Error(errorMessage);
+
+      (error as any).is404 = result.code === 404;
+      throw error;
+    }
+  } catch (error: any) {
+    console.error('PointClick 광고 API 호출 실패:', error);
+
+    if (error.is404) {
+      console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
+      throw error;
+    }
+
+    if (navigation && typeof navigation.reset === 'function') {
+      try {
+        await handleTimeoutError(navigation);
+      } catch (timeoutError) {
+        console.error('타임아웃 처리 중 오류:', timeoutError);
+
+      }
+    }
+    throw error;
+  }
+};
+
 export const sendNasmobCallback = async (
   callbackData: NasmobCallbackRequest,
   navigation?: any,
