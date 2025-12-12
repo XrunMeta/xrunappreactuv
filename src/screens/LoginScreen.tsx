@@ -20,6 +20,7 @@ import {
   saveSession,
   checkEmailExists,
   sendEmailVerificationCode,
+  signInWithGoogle,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
@@ -224,12 +225,89 @@ export const LoginScreen = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    if (isLoading || isOtpLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log('[구글 로그인] 구글 로그인 시작');
+
+      const result = await signInWithGoogle(navigate);
+
+      if (!result.success || !result.data) {
+        const errorMessage = result.message || '구글 로그인에 실패했습니다.';
+        await showAlert(t('common.messages.error') || '오류', errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      const { memberId, email, name, accessToken, refreshToken, isNewUser } = result.data;
+
+      console.log('[구글 로그인] 로그인 성공:', { memberId, email, isNewUser });
+
+      const userData = {
+        member: memberId,
+        email: email,
+        firstname: name.split(' ')[0] || name,
+        lastname: name.split(' ').slice(1).join(' ') || '',
+        extrastr: accessToken, 
+      };
+
+      if (accessToken && memberId) {
+        const ssidw = encryptSHA256(accessToken);
+        const sessionSaved = await saveSession(memberId, ssidw, navigate);
+        if (!sessionSaved) {
+          console.warn('[구글 로그인] 세션 저장 실패');
+        }
+      }
+
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('userSessionToken');
+
+      await AsyncStorage.setItem('userEmail', email);
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      await AsyncStorage.setItem('userSessionToken', accessToken);
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+
+      if (rememberMe) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+      } else {
+        await AsyncStorage.removeItem('rememberMe');
+      }
+
+      console.log('[구글 로그인] 사용자 정보 저장 완료');
+
+      if (isNewUser) {
+        console.log('[구글 로그인] 신규 사용자, 추천인 입력 화면으로 이동');
+        navigate(ROUTES.referralInput);
+      } else {
+        console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
+        navigate(ROUTES.map);
+      }
+    } catch (error: any) {
+      console.error('[구글 로그인] 오류:', error);
+      await showAlert(
+        t('common.messages.error') || '오류',
+        error.message || '구글 로그인 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderSnsButtons = (disabled: boolean) => (
     <View style={styles.snsLoginContainer}>
       <Text style={styles.snsLoginLabel}>{t('screens.login.orLoginWith')}</Text>
       <View style={styles.snsButtonContainer}>
         {}
-        <TouchableOpacity style={styles.snsButton} disabled={disabled}>
+        <TouchableOpacity
+          style={styles.snsButton}
+          disabled={disabled}
+          onPress={handleGoogleLogin}
+        >
           <SvgXml xml={googleIconSvg} width={15} height={16} />
         </TouchableOpacity>
         {}

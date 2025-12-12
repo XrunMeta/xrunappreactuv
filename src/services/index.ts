@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 import { ROUTES } from '../navigation';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
+
+export * from './googleAuth';
 import {
   AliveResponse,
   KeepAliveServerResponse,

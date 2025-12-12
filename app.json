@@ -2,6 +2,7 @@
   "expo": {
     "name": "XRUN",
     "slug": "XRUN",
+    "scheme": "xrun",
     "version": "4.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
@@ -21,14 +22,24 @@
         "NSCameraUsageDescription": "앱의 주요 기능에 카메라 권한이 필요합니다",
         "NSPhotoLibraryUsageDescription": "원활한 사용을 위해서 사진 권한이 필요합니다",
         "NSLocationWhenInUseUsageDescription": "앱의 주요 기능에 위치 권한이 필요합니다",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleTypeRole": "Editor",
+            "CFBundleURLSchemes": [
+              "run.xrun.xrunapps",
+              "com.googleusercontent.apps.1003094533748-ht43iomt62g0h1dmiii3huav334pqiie"
+            ]
+          }
+        ],
+        "GIDClientID": "oth-client.googleusercontent.invalid"
       },
       "bundleIdentifier": "run.xrun.xrunapps"
     },
     "android": {
       "package": "run.xrun.xrunapp",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 177, 
+      "versionCode": 177,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -56,7 +67,8 @@
     "plugins": [
       "expo-font",
       "expo-camera",
-      "expo-location"
+      "expo-location",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
