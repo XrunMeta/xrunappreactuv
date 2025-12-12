@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, gatewayNodeJSApp3100 } from '../services';
+import { getPockAds, getPointClickAds, gatewayNodeJSApp3100 } from '../services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
@@ -517,6 +517,27 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
     try {
 
+      const adCompany = advertisementParams?.ad_company || 'pock';
+      if (adCompany === 'pock') {
+        const deviceInfo = await collectDeviceInfo();
+        const ad_key = advertisementParams?.campid || '';
+        console.log(`[광고보기] getPointClickAds 호출 - ad_key: ${ad_key}`);
+
+        try {
+          const result = await getPointClickAds(
+            member,
+            deviceInfo.adid,
+            deviceInfo,
+            ad_key,
+            onClose ? undefined : navigate,
+          );
+          console.log('[광고보기] getPointClickAds 응답:', result);
+        } catch (apiError) {
+          console.error('[광고보기] getPointClickAds 호출 실패:', apiError);
+
+        }
+      }
+
       if (pockAdData?.landing_url) {
         await openLandingUrl(pockAdData.landing_url);
       } else {
@@ -527,7 +548,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       console.error('[광고보기] URL 열기 실패:', error);
       setAdCallFailedModalVisible(true);
     }
-  }, [pockAdData, openLandingUrl]);
+  }, [pockAdData, openLandingUrl, advertisementParams, member, onClose, navigate]);
 
   if (!advertisementParams) {
     return null;

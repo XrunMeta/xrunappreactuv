@@ -380,21 +380,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           console.log('[callAdApi] getNasmobAds 응답:', result);
           return result;
 
-        } else if (adCompany === 'pointclick') {
-
-          const ad_key = advertisementParams?.campid || ''; 
-          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${ad_key}`);
-
-          const result = await getPointClickAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            ad_key,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getPointClickAds 응답:', result);
-          return result;
-
         } else {
 
           console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
