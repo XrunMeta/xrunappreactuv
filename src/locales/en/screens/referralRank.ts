@@ -5,6 +5,7 @@ export default {
   settlement: 'Settlement List',
   rank: 'Rank',
   noRankData: 'No ranking data available.',
+  referralLabel: 'Referral',
 };
 
 

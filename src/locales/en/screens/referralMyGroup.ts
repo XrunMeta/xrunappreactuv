@@ -2,6 +2,7 @@ export default {
   title: 'Referral',
   myGroupMembers: 'My Group Members',
   members: 'Members',
+  referralLabel: 'Referral',
   shareFailed: 'Share Failed',
   shareFailedMessage: 'User email information not found.',
   emptyTitle: 'No Group Members',

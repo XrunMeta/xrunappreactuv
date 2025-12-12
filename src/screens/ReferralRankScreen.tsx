@@ -226,6 +226,7 @@ export const ReferralRankScreen = () => {
         rightComponent={
           <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={COLORS.headerText} />
+            <Text style={styles.headerShareText}>{t('screens.referralRank.referralLabel')}</Text>
           </TouchableOpacity>
         }
       />
@@ -369,11 +370,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerShareButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerShareText: {
+    marginTop: 2,
+    fontSize: FONTS.size.xxsmall,
+    fontFamily: 'Roboto-Medium',
+    color: COLORS.headerText,
+    lineHeight: 12,
   },
 });

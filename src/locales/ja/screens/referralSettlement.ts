@@ -7,6 +7,7 @@ export default {
   group: 'マイグループ',
   settlement: '決済リスト',
   rank: 'ランク',
+  referralLabel: '紹介',
 };
 
 
