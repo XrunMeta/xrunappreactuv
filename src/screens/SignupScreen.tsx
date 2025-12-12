@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -64,6 +65,9 @@ export const SignupScreen = () => {
   );
   const [email, setEmail] = useState(signupFormData.email);
   const [password, setPassword] = useState(signupFormData.password);
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
   const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
@@ -94,6 +98,9 @@ export const SignupScreen = () => {
       setFullName(combinedName);
       setEmail(signupFormData.email);
       setPassword(signupFormData.password);
+      setPasswordConfirm('');
+      setIsPasswordVisible(false);
+      setIsPasswordConfirmVisible(false);
       setPhoneNumber(signupFormData.phoneNumber);
       setReferralEmail(signupFormData.referralEmail);
       setGender(signupFormData.gender);
@@ -168,8 +175,31 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!password.trim() || password.length < 6) {
+    if (!password.trim()) {
       await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
+      return;
+    }
+
+    const hasMinLength = password.length >= 7;
+    const hasNumber = /\d/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+
+    if (!(hasMinLength && hasNumber && hasLowercase && hasUppercase)) {
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordPolicy'));
+      return;
+    }
+
+    if (!passwordConfirm.trim()) {
+      await showAlert(
+        t('screens.signup.alerts.inputError'),
+        t('screens.signup.errors.passwordConfirmRequired'),
+      );
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordMismatch'));
       return;
     }
 
@@ -376,9 +406,47 @@ export const SignupScreen = () => {
             placeholder={t('screens.signup.passwordPlaceholder')}
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!isPasswordVisible}
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setIsPasswordVisible((prev) => !prev)}
+                activeOpacity={0.7}
+                disabled={isSubmitting}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
+          />
+
+          <FormField
+            label={t('screens.signup.passwordConfirmLabel')}
+            placeholder={t('screens.signup.passwordConfirmPlaceholder')}
+            value={passwordConfirm}
+            onChangeText={setPasswordConfirm}
+            secureTextEntry={!isPasswordConfirmVisible}
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setIsPasswordConfirmVisible((prev) => !prev)}
+                activeOpacity={0.7}
+                disabled={isSubmitting}
+              >
+                <Ionicons
+                  name={isPasswordConfirmVisible ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
           />
 
           <FormField
@@ -570,6 +638,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: 8,
     width: '100%',
+  },
+  eyeButton: {
+    height: 24,
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   termsRow: {
     flexDirection: 'row',
