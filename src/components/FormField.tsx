@@ -14,6 +14,7 @@ import { FONTS } from '../constants';
 interface FormFieldProps extends TextInputProps {
   label: string;
   containerStyle?: StyleProp<ViewStyle>;
+  labelRightAccessory?: React.ReactNode;
   rightAccessory?: React.ReactNode;
   leftAccessory?: React.ReactNode;
 }
@@ -21,6 +22,7 @@ interface FormFieldProps extends TextInputProps {
 export const FormField: React.FC<FormFieldProps> = ({
   label,
   containerStyle,
+  labelRightAccessory,
   rightAccessory,
   leftAccessory,
   style,
@@ -43,7 +45,12 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelRow}>
+        <Text style={styles.label}>{label}</Text>
+        {labelRightAccessory ? (
+          <View style={styles.labelRightAccessory}>{labelRightAccessory}</View>
+        ) : null}
+      </View>
       <View style={styles.inputWrapper}>
         {leftAccessory ? <View style={styles.leftAccessory}>{leftAccessory}</View> : null}
         <TextInput
@@ -65,12 +72,23 @@ const styles = StyleSheet.create({
     width: '100%',
 
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   label: {
     fontSize: FONTS.size.medium,
     lineHeight: 24,
     color: '#2a2727',
     fontFamily: 'Roboto-Medium',
-    marginBottom: 8,
+    flexShrink: 1,
+  },
+  labelRightAccessory: {
+    marginLeft: 12,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   inputWrapper: {
     flexDirection: 'row',

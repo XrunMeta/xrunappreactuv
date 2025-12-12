@@ -10,6 +10,8 @@ export default {
   noAddresses: '등록되어 있는 주소가 없습니다.',
   receiverAddress: '받는 주소',
   receiverAddressPlaceholder: '지갑 주소를 입력하세요',
+  clearAddress: '주소 지우기',
+  swipeHint: '주소를 편집,삭제하려면 주소를 밀어주세요',
   confirm: '확인',
   errors: {
     addressRequired: '바코드 스캔으로 수신자 주소를 입력해주세요.',

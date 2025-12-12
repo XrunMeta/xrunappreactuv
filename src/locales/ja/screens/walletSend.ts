@@ -9,6 +9,8 @@ export default {
   noAddresses: '登録されているアドレスがありません。',
   receiverAddress: '受取先アドレス',
   receiverAddressPlaceholder: 'ウォレットアドレスを入力してください',
+  clearAddress: 'クリア',
+  swipeHint: 'アドレスをスワイプして編集・削除できます。',
   confirm: '確認',
   errors: {
     addressRequired: 'QRコードをスキャンして受取先アドレスを入力してください',

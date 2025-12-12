@@ -282,6 +282,11 @@ export const WalletSendScreen = () => {
     navigate(ROUTES.walletQrScan);
   };
 
+  const handleClearReceiverAddress = useCallback(() => {
+    resetWalletSendAddress();
+    setAddressError(null);
+  }, [resetWalletSendAddress]);
+
   const handlePastePress = () => {
     navigate(ROUTES.addWalletAddress);
   };
@@ -549,6 +554,22 @@ export const WalletSendScreen = () => {
 
         <FormField
           label={t('screens.walletSend.receiverAddress')}
+          labelRightAccessory={
+            <TouchableOpacity
+              onPress={handleClearReceiverAddress}
+              activeOpacity={0.7}
+              disabled={!walletSendAddress || walletSendAddress.trim().length === 0}
+            >
+              <Text
+                style={[
+                  styles.clearAddressLink,
+                  (!walletSendAddress || walletSendAddress.trim().length === 0) && styles.clearAddressLinkDisabled,
+                ]}
+              >
+                {t('screens.walletSend.clearAddress')}
+              </Text>
+            </TouchableOpacity>
+          }
           placeholder={t('screens.walletSend.receiverAddressPlaceholder')}
           value={walletSendAddress}
           onChangeText={setWalletSendAddress}
@@ -581,6 +602,8 @@ export const WalletSendScreen = () => {
               <Ionicons name="add" size={18} color="#ffffff" />
             </TouchableOpacity>
           </View>
+
+          <Text style={styles.addressSwipeHint}>{t('screens.walletSend.swipeHint')}</Text>
 
           {}
           <View style={styles.addressListContainer}>
@@ -968,6 +991,16 @@ const styles = StyleSheet.create({
   formField: {
     width: '100%',
   },
+  clearAddressLink: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Medium',
+    color: COLORS.buttonPrimary,
+    textDecorationLine: 'underline',
+  },
+  clearAddressLinkDisabled: {
+    color: 'rgba(52, 58, 90, 0.35)',
+    textDecorationLine: 'none',
+  },
   addressErrorText: {
     fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
@@ -998,6 +1031,15 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#10192d',
+  },
+  addressSwipeHint: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#8e9bae',
+    marginTop: 6,
+    textAlign: 'center',
+    marginBottom: SIZES.small,
+    paddingHorizontal: SIZES.small,
   },
   addressListContainer: {
     flexGrow: 1,
