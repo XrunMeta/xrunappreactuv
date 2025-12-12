@@ -24,7 +24,7 @@ import { CombinedAsset } from '../types';
 const createAssetFromCurrency = (currency: number): CombinedAsset => {
   switch (currency) {
     case 1:
-      return { id: 1, symbol: 'XRUN', name: 'Main Wallet', amount: '0', icon: '', currency: 1, isCustom: false };
+      return { id: 1, symbol: 'XRUN', name: 'XRUN eth', amount: '0', icon: '', currency: 1, isCustom: false };
     case 2:
       return { id: 2, symbol: 'ETH', name: 'Ethereum', amount: '0', icon: '', currency: 2, isCustom: false };
     case 3:
@@ -36,14 +36,21 @@ const createAssetFromCurrency = (currency: number): CombinedAsset => {
     case 19:
       return { id: 19, symbol: 'XRUN', name: 'AD XRUN', amount: '0', icon: '', currency: 19, isCustom: false };
     default:
-      return { id: 1, symbol: 'XRUN', name: 'Main Wallet', amount: '0', icon: '', currency: 1, isCustom: false };
+      return { id: 1, symbol: 'XRUN', name: 'Wallet', amount: '0', icon: '', currency: 1, isCustom: false };
   }
 };
 
 export const WalletQrScanScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate, previousScreen } = useAppNavigation();
-  const { setWalletSendAddress, walletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
+  const {
+    setWalletSendAddress,
+    walletReceiveCurrency,
+    setSelectedWalletAsset,
+    selectedWalletAsset,
+    setWalletReceiveCurrency,
+    setWalletReceiveAddress,
+  } = useAppContext();
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -75,6 +82,18 @@ export const WalletQrScanScreen = () => {
   );
   const handleQrScanPress = () => {
 
+    if (previousScreen === ROUTES.walletSend) {
+
+      if (selectedWalletAsset?.currency) {
+        setWalletReceiveCurrency(selectedWalletAsset.currency);
+      }
+      const assetAddress = (selectedWalletAsset?.originalData as any)?.address;
+      if (typeof assetAddress === 'string' && assetAddress.trim().length > 0) {
+        setWalletReceiveAddress(assetAddress.trim());
+      }
+      navigate(ROUTES.walletReceive);
+      return;
+    }
     goBack();
   };
 

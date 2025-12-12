@@ -23,14 +23,53 @@ export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
-  const { walletReceiveAddress, walletReceiveCurrency, resetWalletReceiveAddress, resetWalletReceiveCurrency } = useAppContext();
+  const {
+    walletReceiveAddress,
+    walletReceiveCurrency,
+    setWalletReceiveAddress,
+    setWalletReceiveCurrency,
+    selectedWalletAsset,
+  } = useAppContext();
   const qrCodeRef = useRef<any>(null);
   const [walletAddress, setWalletAddress] = useState('');
+
+  const getAddressFromSelectedAsset = () => {
+    const data = selectedWalletAsset?.originalData as any;
+    if (data && typeof data.address === 'string' && data.address.trim().length > 0) {
+      return data.address.trim();
+    }
+    return '';
+  };
+
+  useEffect(() => {
+    if (!selectedWalletAsset) {
+      return;
+    }
+
+    if (
+      typeof selectedWalletAsset.currency === 'number' &&
+      selectedWalletAsset.currency > 0 &&
+      walletReceiveCurrency !== selectedWalletAsset.currency
+    ) {
+      setWalletReceiveCurrency(selectedWalletAsset.currency);
+    }
+
+    const assetAddress = getAddressFromSelectedAsset();
+    if (!walletReceiveAddress && assetAddress) {
+      setWalletReceiveAddress(assetAddress);
+    }
+  }, [
+    selectedWalletAsset,
+    walletReceiveCurrency,
+    walletReceiveAddress,
+    setWalletReceiveCurrency,
+    setWalletReceiveAddress,
+  ]);
 
   const getCurrencyInfo = (currency: number) => {
     switch (currency) {
       case 1:
-        return { symbol: 'XRUN', name: 'Main Wallet', network: 'Ethereum Network' };
+        return { symbol: 'XRUN', name: 'XRUN eth', network: 'Ethereum Network' };
       case 2:
         return { symbol: 'ETH', name: 'Ethereum', network: 'Ethereum Network' };
       case 3:
@@ -42,25 +81,24 @@ export const WalletReceiveScreen = () => {
       case 19:
         return { symbol: 'XRUN', name: 'AD XRUN', network: '' };
       default:
-        return { symbol: 'XRUN', name: 'Main Wallet', network: 'Ethereum Network' };
+        return { symbol: 'XRUN', name: 'XRUN eth', network: 'Ethereum Network' };
     }
   };
 
-  const currencyInfo = getCurrencyInfo(walletReceiveCurrency);
+  const resolvedCurrency = selectedWalletAsset?.currency || walletReceiveCurrency;
+  const currencyInfo = getCurrencyInfo(resolvedCurrency);
 
   useEffect(() => {
-    console.log('[WalletReceiveScreen] currency:', walletReceiveCurrency);
+    console.log('[WalletReceiveScreen] currency:', resolvedCurrency);
     console.log('[WalletReceiveScreen] currencyInfo:', currencyInfo);
-  }, [walletReceiveCurrency, currencyInfo]);
+  }, [resolvedCurrency, currencyInfo]);
 
   useEffect(() => {
-
-    if (walletReceiveAddress) {
-      setWalletAddress(walletReceiveAddress);
-    } else {
-
+    const resolvedAddress = walletReceiveAddress || getAddressFromSelectedAsset();
+    if (resolvedAddress) {
+      setWalletAddress(resolvedAddress);
     }
-  }, [walletReceiveAddress]);
+  }, [walletReceiveAddress, selectedWalletAsset]);
 
   const handleCopyAddress = async () => {
     if (walletAddress) {
