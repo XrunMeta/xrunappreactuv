@@ -17,7 +17,7 @@ export default {
   calculating: 'Menghitung...',
   alerts: {
     transferFailed: 'Transfer Gagal',
-    transferFailedMessage: 'Transfer gagal. Silakan coba lagi.',
+    transferFailedMessage: 'Koneksi blockchain sedang tertunda. Silakan coba lagi nanti.',
     confirm: 'OK',
   },
 };

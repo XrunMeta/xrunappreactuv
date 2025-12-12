@@ -17,7 +17,7 @@ export default {
   calculating: 'Calculating...',
   alerts: {
     transferFailed: 'Transfer Failed',
-    transferFailedMessage: 'Transfer failed. Please try again.',
+    transferFailedMessage: 'Blockchain connection is delayed. Please try again later.',
     confirm: 'OK',
   },
 };
