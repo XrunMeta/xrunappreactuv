@@ -1380,10 +1380,10 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 최초 3개만 매핑)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 16개 기준으로 순차 매핑)');
         const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
-          if (v_a56041 < 3 && v_e36b07.length > 0) {
+          if (v_a56041 < 16 && v_e36b07.length > 0) {
             const v_ba7922 = v_a56041 % v_e36b07.length;
             const v_127b33 = v_e36b07[v_ba7922];
 
@@ -2069,7 +2069,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       const v_e149c8 = `${v_f81bc9}-${v_a56041}`;
 
-      if (v_a56041 < 3 && v_4cf0ad.length > 0) {
+      if (v_a56041 < 16 && v_4cf0ad.length > 0) {
         const v_ba7922 = v_a56041 % v_4cf0ad.length;
         const v_127b33 = v_4cf0ad[v_ba7922];
         v_b3439a.set(v_e149c8, v_127b33);
