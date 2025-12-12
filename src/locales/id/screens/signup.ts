@@ -27,10 +27,11 @@ export default {
     location: 'Ketentuan Informasi Lokasi Pribadi',
     privacy: 'Ketentuan Penggunaan Informasi Pribadi',
   },
+  agreeButton: 'Setuju',
   submitButton: 'Daftar',
   submitting: 'Memproses...',
   errors: {
-    termsRequired: 'Anda harus menyetujui ketentuan untuk melanjutkan pendaftaran',
+    termsRequired: 'Anda harus menyetujui ketentuan yang diperlukan',
     nameRequired: 'Masukkan nama belakang dan nama depan',
     emailRequired: 'Masukkan email Anda',
     passwordRequired: 'Masukkan kata sandi Anda',

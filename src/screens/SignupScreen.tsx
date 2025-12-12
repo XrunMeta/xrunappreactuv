@@ -6,6 +6,8 @@ import {
   v_326be8,
   v_4623af,
   v_39a996,
+  v_122070,
+  v_700696,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -17,12 +19,14 @@ import {
   v_729608,
   v_89c10a,
   v_cb41de,
+  v_c2fdd1,
 } from '../components';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_9553a4, v_6946fd, v_369014, v_789afd, v_a61db3, v_bae512 } from '../constants';
+import { v_9dd03c } from '../types';
 
 import {
   v_60e3a5,
@@ -30,6 +34,7 @@ import {
   v_35200c,
   v_9d2541,
   v_91bb22,
+  v_4dba02,
 } from '../services';
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
@@ -38,7 +43,7 @@ type GenderValue = 'male' | 'female';
 type AgeValue = (typeof v_0c96f7)[number];
 
 export const v_f40fc5 = () => {
-  const { t: v_8d41d7 } = v_772971();
+  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
   const {
@@ -72,12 +77,63 @@ export const v_f40fc5 = () => {
   const [v_9bf12c, v_fb6bbb] = v_5ab095(v_8d7bc8.referralEmail);
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(v_8d7bc8.gender);
   const [v_f83808, v_64a312] = v_5ab095<AgeValue>(v_8d7bc8.ageRange);
-  const [v_471e49, v_7f4d53] = v_5ab095(v_8d7bc8.termsAccepted);
-  const [v_68a5a9, v_8e53ad] = v_5ab095(v_8d7bc8.termsAccepted);
-  const [v_e55f34, v_f932c8] = v_5ab095(v_8d7bc8.termsAccepted);
+  const [v_471e49, v_7f4d53] = v_5ab095(false);
+  const [v_68a5a9, v_8e53ad] = v_5ab095(false);
+  const [v_e55f34, v_f932c8] = v_5ab095(false);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
 
   const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
+
+  const [v_7dc79d, v_1bdbba] = v_5ab095(false);
+  const [v_90b6e5, v_e23b14] = v_5ab095<v_9dd03c>('service');
+  const [v_e23171, v_4f9463] = v_5ab095<string>('');
+  const [v_295e3d, v_522fa7] = v_5ab095(false);
+  const [v_528eae, v_f33b38] = v_5ab095<string | null>(null);
+
+  const v_5a46cd = (clauseId: v_9dd03c) => {
+    if (v_111946 === 'service') {
+      v_7f4d53(true);
+    } else if (v_111946 === 'location') {
+      v_8e53ad(true);
+    } else if (v_111946 === 'personal') {
+      v_f932c8(true);
+    }
+    v_1bdbba(false);
+  };
+
+  const v_ccb639 = async (clauseId: v_9dd03c) => {
+    v_e23b14(v_111946);
+    v_1bdbba(true);
+    v_522fa7(true);
+    v_f33b38(null);
+    v_4f9463('');
+
+    try {
+
+      let v_7c5e9b = v_9c213b.language || 'ko';
+      if (v_7c5e9b === 'zh' || v_7c5e9b === 'zhCN' || v_7c5e9b === 'zh-CN') {
+        v_7c5e9b = 'zh-CN';
+      }
+
+      const v_4898e2 = v_111946 as 'service' | 'location' | 'personal';
+      const v_75fec9 = await v_4dba02(v_4898e2, v_7c5e9b, v_9b57fc);
+
+      if (v_75fec9) {
+        v_4f9463(v_75fec9);
+      } else {
+        v_f33b38(v_8d41d7('screens.myInfoClauses.loadFailed'));
+      }
+    } catch (v_49263d) {
+      console.error('[회원가입] 약관 내용 로드 오류:', v_49263d);
+      v_f33b38(v_8d41d7('screens.myInfoClauses.loadError'));
+    } finally {
+      v_522fa7(false);
+    }
+  };
+
+  const v_05a7b9 = () => {
+    v_1bdbba(false);
+  };
 
   const v_590486 = v_459d5e?.iso2?.toLowerCase() === 'kr';
 
@@ -105,9 +161,10 @@ export const v_f40fc5 = () => {
       v_fb6bbb(v_8d7bc8.referralEmail);
       v_bdc43c(v_8d7bc8.gender);
       v_64a312(v_8d7bc8.ageRange);
-      v_7f4d53(v_8d7bc8.termsAccepted);
-      v_8e53ad(v_8d7bc8.termsAccepted);
-      v_f932c8(v_8d7bc8.termsAccepted);
+
+      v_7f4d53(false);
+      v_8e53ad(false);
+      v_f932c8(false);
       v_2ca208.current = true;
     }
   }, [v_8d7bc8]);
@@ -142,11 +199,6 @@ export const v_f40fc5 = () => {
   ]);
 
   const v_585b02 = async () => {
-
-    if (!v_b1f14f) {
-      await v_889fad(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
-      return;
-    }
 
     const v_b63249 = v_05b02f.trim().split(/\s+/);
     let v_c0da8d = '';
@@ -210,6 +262,11 @@ export const v_f40fc5 = () => {
 
     if (v_590486 && !v_2f03bc) {
       await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
+      return;
+    }
+
+    if (!v_b1f14f) {
+      await v_889fad(v_8d41d7('screens.signup.alerts.termsRequired'), v_8d41d7('screens.signup.errors.termsRequired'));
       return;
     }
 
@@ -354,6 +411,14 @@ export const v_f40fc5 = () => {
     }
   };
 
+  const clauseTitleMap: Record<v_9dd03c, string> = {
+    service: v_8d41d7('screens.myInfoClauses.serviceClause'),
+    location: v_8d41d7('screens.myInfoClauses.locationClause'),
+    personal: v_8d41d7('screens.myInfoClauses.personalClause'),
+  };
+
+  const v_4c70c4 = Math.min(520, Math.round(v_700696.get('window').height * 0.55));
+
   return (
     <View style={v_d81136.container}>
       <Header
@@ -361,6 +426,40 @@ export const v_f40fc5 = () => {
         onBackPress={v_c7ac57}
         showBackButton
       />
+      <Dialog
+        visible={v_7dc79d}
+        title={v_c6eb94[v_90b6e5]}
+        onClose={v_05a7b9}
+        actions={[
+          {
+            label: v_8d41d7('screens.signup.agreeButton'),
+            onPress: () => v_5a46cd(v_90b6e5),
+            variant: 'primary',
+          },
+          {
+            label: v_8d41d7('common.buttons.close'),
+            onPress: v_05a7b9,
+            variant: 'secondary',
+          },
+        ]}
+        containerStyle={v_d81136.clauseDialogContainer}
+      >
+        <View style={{ maxHeight: v_4c70c4 }}>
+          {v_295e3d ? (
+            <View style={v_d81136.clauseLoadingContainer}>
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+              <Text style={v_d81136.clauseLoadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
+            </View>
+          ) : v_528eae ? (
+            <Text style={v_d81136.clauseErrorText}>{v_528eae}</Text>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={true}>
+              <Text style={v_d81136.clauseContentText}>{v_e23171}</Text>
+            </ScrollView>
+          )}
+        </View>
+      </Dialog>
+
       <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -549,7 +648,9 @@ export const v_f40fc5 = () => {
               variant="square"
             />
             <Text style={v_d81136.termsText}>
-              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.service')}</Text>{' '}
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('service')}>
+                {v_8d41d7('screens.signup.terms.service')}
+              </Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -562,7 +663,9 @@ export const v_f40fc5 = () => {
               variant="square"
             />
             <Text style={v_d81136.termsText}>
-              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.location')}</Text>{' '}
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('location')}>
+                {v_8d41d7('screens.signup.terms.location')}
+              </Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -575,7 +678,9 @@ export const v_f40fc5 = () => {
               variant="square"
             />
             <Text style={v_d81136.termsText}>
-              <Text style={v_d81136.termsHighlight}>{v_8d41d7('screens.signup.terms.privacy')}</Text>{' '}
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('personal')}>
+                {v_8d41d7('screens.signup.terms.privacy')}
+              </Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
           </View>
@@ -678,6 +783,34 @@ const v_d81136 = v_472849.create({
     color: '#8e9bae',
     fontFamily: 'Roboto-Regular',
     marginTop: 4,
+  },
+  clauseDialogContainer: {
+    maxWidth: 420,
+  },
+  clauseLoadingContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  clauseLoadingText: {
+    fontSize: v_843035.size.small,
+    lineHeight: 18,
+    color: '#8e9bae',
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
+  },
+  clauseErrorText: {
+    fontSize: v_843035.size.small,
+    lineHeight: 18,
+    color: '#ff6b6b',
+    fontFamily: 'Roboto-Regular',
+  },
+  clauseContentText: {
+    fontSize: v_843035.size.small,
+    lineHeight: 20,
+    color: '#333333',
+    fontFamily: 'Roboto-Regular',
   },
 });
 
