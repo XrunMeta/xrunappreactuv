@@ -35,6 +35,7 @@ const v_4ac6a7 = [
   { spotID: 2, x: -100, y: 50 },
   { spotID: 3, x: 100, y: 50 },
   { spotID: 4, x: -50, y: 150 },
+  { spotID: 5, x: 50, y: 150 },
 ];
 
 const v_69ee00 = (v_3b402b, v_4f2c9c): number => {
@@ -476,7 +477,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_b9ce93, v_7bb835] = v_5ab095<any[]>([]); 
   const [v_683210, v_34a50a] = v_5ab095(true);
   const v_a96760 = v_e662ae(0);
-  const v_253a77 = 4;
+  const v_253a77 = 5;
 
   const [v_1f3d99, v_7d7b3a] = v_5ab095(0);
 
@@ -679,7 +680,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_a96760.current = (v_a96760.current + v_da1995) % v_8ac288.length;
     }
 
-    console.log('📋 [organizeData] 선택된 데이터 (처음 4개):', v_2e375c.slice(0, 4).map((v_d5dda0, v_e86ad8) => ({
+    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', v_2e375c.slice(0, 5).map((v_d5dda0, v_e86ad8) => ({
       index: v_e86ad8,
       distance: v_d5dda0.distance,
       advertisement: v_d5dda0.advertisement,
@@ -818,7 +819,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   v_7bb835(v_8ceeaa);
 
                   v_a96760.current = 0;
-                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
                   v_0a6f80(v_8ceeaa);
                 } else {
@@ -1024,7 +1025,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             v_7bb835(v_8ceeaa);
 
             v_a96760.current = 0;
-            console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+            console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
             v_0a6f80(v_8ceeaa);
           } else {
