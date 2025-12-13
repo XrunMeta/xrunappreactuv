@@ -63,12 +63,12 @@ export const v_f4f851 = () => {
 
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_adc076, v_52b279] = v_5ab095('');
-  const [v_a964a4, v_99916a] = v_5ab095(false);
+  const [v_a964a4, v_99916a] = v_5ab095(true);
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
 
   const [v_808660, v_e61149] = v_5ab095('');
-  const [v_b6e894, v_24b225] = v_5ab095(false);
+  const [v_b6e894, v_24b225] = v_5ab095(true);
   const [v_2e3b01, v_47f318] = v_5ab095(false);
 
   const [v_6f4eac, v_29378d] = v_5ab095(false);
@@ -311,13 +311,8 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('isLoggedIn', 'true');
 
-      if (v_a964a4) {
-        await v_e84827.setItem('rememberMe', 'true');
-        console.log('[계정 연동] 로그인 상태 유지 저장 완료');
-      } else {
-        await v_e84827.removeItem('rememberMe');
-        console.log('[계정 연동] 로그인 상태 유지 해제');
-      }
+      await v_e84827.setItem('rememberMe', 'true');
+      console.log('[계정 연동] 로그인 상태 유지 저장 완료');
 
       console.log('[계정 연동] 완료 및 로그인 성공');
 
@@ -425,11 +420,8 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
-      if (v_a964a4) {
-        await v_e84827.setItem('rememberMe', 'true');
-      } else {
-        await v_e84827.removeItem('rememberMe');
-      }
+      await v_e84827.setItem('rememberMe', 'true');
+      console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
 
