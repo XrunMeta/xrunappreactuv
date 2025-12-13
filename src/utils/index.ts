@@ -130,7 +130,7 @@ export const v_a3bbf0 = async (
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
     const v_c79b94 = encodeURIComponent(v_412c99.email);
-    const v_25f202 = `xrun://signup?referral=${v_c79b94}`;
+    const v_25f202 = `https://www.xrun.run/invite?referral=${v_c79b94}`;
 
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');

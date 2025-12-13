@@ -79,22 +79,29 @@ import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
 
+let v_308260 = null;
+let v_435733 = false;
+
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
-  const { setReferralCode: v_276c22 } = v_700ef9();
+  const { setSignupFormData: v_eee6b0 } = v_700ef9();
 
   v_c4deb2(() => {
-    let v_915a6b = false; 
 
     const v_90a7e8 = (v_f71b56) => {
 
-      if (v_915a6b) {
-        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기:', v_f71b56);
+      if (v_435733) {
+        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기');
+        return;
+      }
+
+      if (v_308260 === v_f71b56) {
+        console.log('[딥링크] 이미 처리된 URL, 건너뛰기:', v_f71b56);
         return;
       }
 
       try {
-        v_915a6b = true;
+        v_435733 = true;
         console.log('[딥링크] URL 처리 시작:', v_f71b56);
 
         const v_8decf8 = v_f2c756.parse(v_f71b56);
@@ -105,22 +112,19 @@ const v_c0dbdf = () => {
         if (v_fc7051) {
           console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
 
-          v_276c22(v_fc7051);
+          v_308260 = v_f71b56;
 
-          if (v_0f0c7b !== 'signup') {
-            console.log('[딥링크] 회원가입 화면으로 이동');
-            v_9b57fc('signup');
-          }
+          v_eee6b0({ referralEmail: v_fc7051 });
+
+          console.log('[딥링크] 회원가입 화면으로 이동');
+          v_9b57fc('signup');
         } else {
           console.log('[딥링크] referral 파라미터가 없습니다.');
         }
       } catch (v_5e9bfe) {
         console.error('[딥링크] URL 처리 실패:', v_5e9bfe);
       } finally {
-
-        setTimeout(() => {
-          v_915a6b = false;
-        }, 1000);
+        v_435733 = false;
       }
     };
 
@@ -140,6 +144,10 @@ const v_c0dbdf = () => {
 
     const v_269481 = v_f2c756.addEventListener('url', (v_d48baf) => {
       console.log('[딥링크] 딥링크 이벤트 감지:', v_d48baf.url);
+
+      if (v_d48baf.url !== v_308260) {
+        v_308260 = null;
+      }
       v_90a7e8(v_d48baf.url);
     });
 
@@ -154,7 +162,7 @@ const v_c0dbdf = () => {
       v_269481.remove();
       clearTimeout(v_599769);
     };
-  }, [v_276c22, v_9b57fc, v_0f0c7b]);
+  }, [v_eee6b0, v_9b57fc]);
 
   if (v_0f0c7b === 'login') {
     return <LoginScreen />;
