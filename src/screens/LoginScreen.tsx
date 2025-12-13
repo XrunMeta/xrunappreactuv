@@ -63,12 +63,12 @@ export const LoginScreen = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [otpEmail, setOtpEmail] = useState('');
-  const [otpRememberMe, setOtpRememberMe] = useState(false);
+  const [otpRememberMe, setOtpRememberMe] = useState(true);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
 
   const [linkingDialogVisible, setLinkingDialogVisible] = useState(false);
@@ -311,13 +311,8 @@ export const LoginScreen = () => {
 
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
-      if (rememberMe) {
-        await AsyncStorage.setItem('rememberMe', 'true');
-        console.log('[계정 연동] 로그인 상태 유지 저장 완료');
-      } else {
-        await AsyncStorage.removeItem('rememberMe');
-        console.log('[계정 연동] 로그인 상태 유지 해제');
-      }
+      await AsyncStorage.setItem('rememberMe', 'true');
+      console.log('[계정 연동] 로그인 상태 유지 저장 완료');
 
       console.log('[계정 연동] 완료 및 로그인 성공');
 
@@ -425,11 +420,8 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
-      if (rememberMe) {
-        await AsyncStorage.setItem('rememberMe', 'true');
-      } else {
-        await AsyncStorage.removeItem('rememberMe');
-      }
+      await AsyncStorage.setItem('rememberMe', 'true');
+      console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
 
