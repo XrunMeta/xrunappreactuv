@@ -560,6 +560,7 @@ export const AdWalletScreen = () => {
         style={cardStyle}
         onPress={onPress}
         activeOpacity={0.7}
+        disabled={isWarmStartQuestIdOne}
       >
         <View style={styles.adCardHeader}>
           <Text style={[

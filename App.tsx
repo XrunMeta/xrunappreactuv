@@ -657,33 +657,71 @@ export default function App() {
 
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      const previousState = appStateRef.current;
+      console.log('[App] AppState 변경 감지:', {
+        previous: previousState,
+        next: nextAppState,
+        currentTime: new Date().toISOString(),
+      });
+
       if (
-        appStateRef.current.match(/inactive|background/) &&
+        previousState.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
 
+        console.log('[App] 포그라운드 복귀 감지');
         await AsyncStorage.setItem('app_last_state', nextAppState);
-      } else if (
-        appStateRef.current === 'active' &&
-        nextAppState.match(/inactive|background/)
+      } 
+
+      else if (
+        previousState === 'active' &&
+        (nextAppState === 'inactive' || nextAppState === 'background')
       ) {
 
+        console.log('[App] 백그라운드/비활성화 전환 감지:', nextAppState);
         try {
-          const backgroundTimestamp = Date.now();
+
+          const backgroundTimestamp = Math.floor(Date.now() / 1000);
+          const timestampString = backgroundTimestamp.toString();
           await AsyncStorage.setItem('app_last_state', nextAppState);
-          await AsyncStorage.setItem('app_last_background_timestamp', backgroundTimestamp.toString());
-          console.log('[App] 앱 백그라운드 전환 - 백그라운드 시간 저장:', new Date(backgroundTimestamp).toISOString());
+          await AsyncStorage.setItem('app_last_background_timestamp', timestampString);
+          console.log('[App] ✅ 백그라운드 시간 저장 완료:', {
+            timestamp: timestampString,
+            date: new Date(backgroundTimestamp * 1000).toISOString(),
+            isNumeric: /^\d+$/.test(timestampString),
+          });
+
+          const savedValue = await AsyncStorage.getItem('app_last_background_timestamp');
+          console.log('[App] 저장된 값 확인:', savedValue);
         } catch (error) {
-          console.error('[App] 앱 상태 저장 실패:', error);
+          console.error('[App] ❌ 앱 상태 저장 실패:', error);
         }
+      } 
+
+      else if (
+        previousState === 'inactive' &&
+        nextAppState === 'background'
+      ) {
+
+        console.log('[App] inactive -> background 전환 (타임스탬프는 이미 저장됨)');
+        await AsyncStorage.setItem('app_last_state', nextAppState);
+      } 
+      else {
+        console.log('[App] AppState 변경 (처리하지 않음):', {
+          previous: previousState,
+          next: nextAppState,
+        });
       }
 
       appStateRef.current = nextAppState;
     };
 
+    console.log('[App] AppState 리스너 등록, 현재 상태:', AppState.currentState);
+
     const subscription = AppState.addEventListener('change', handleAppStateChange);
 
     return () => {
+      console.log('[App] AppState 리스너 제거');
       subscription?.remove();
     };
   }, []);

@@ -216,7 +216,16 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
     const coldStartChecked = await AsyncStorage.getItem('coldStartChecked');
     const lastBackgroundTimestamp = await AsyncStorage.getItem('app_last_background_timestamp');
     const checkedTimestamp = await AsyncStorage.getItem('checkedTimestamp');
-    const currentTimestamp = Date.now();
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    console.log('[Utils] checkColdStart 시작:', {
+      coldStartChecked,
+      lastBackgroundTimestamp,
+      checkedTimestamp,
+      currentTimestamp,
+      currentTimeISO: new Date(currentTimestamp * 1000).toISOString(),
+    });
 
     if (coldStartChecked === 'true' && checkedTimestamp) {
 
@@ -225,42 +234,131 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
         const isColdStart = await AsyncStorage.getItem('isColdStart');
         const elapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
         const elapsedSeconds = elapsedSecondsStr ? parseInt(elapsedSecondsStr, 10) : 0;
+        console.log('[Utils] 백그라운드 타임스탬프 없음 - 기존 결과 반환:', {
+          isColdStart,
+          elapsedSeconds,
+        });
         return {
           isColdStart: isColdStart === 'true',
           elapsedSeconds,
         };
       }
 
-      const backgroundTimestamp = parseInt(lastBackgroundTimestamp, 10);
-      if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+      let backgroundTimestamp: number;
 
-        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
-        await AsyncStorage.setItem('isColdStart', 'true');
-        await AsyncStorage.setItem('elapsedSeconds', '0');
-        await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
-        return { isColdStart: true, elapsedSeconds: 0 };
+      const isNumeric = /^\d+$/.test(lastBackgroundTimestamp);
+      if (!isNumeric) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 숫자 형식이 아닙니다:', lastBackgroundTimestamp, '(날짜 형식으로 변환 시도)');
+        try {
+
+          const dateObj = new Date(lastBackgroundTimestamp);
+          const convertedTimestamp = Math.floor(dateObj.getTime() / 1000);
+
+          if (isNaN(convertedTimestamp) || convertedTimestamp <= 0 || convertedTimestamp > currentTimestamp) {
+
+            console.warn('[Utils] 날짜 형식 변환 실패 또는 유효하지 않은 값:', lastBackgroundTimestamp, '(콜드스타트로 간주합니다.)');
+            await AsyncStorage.removeItem('app_last_background_timestamp');
+            await AsyncStorage.setItem('isColdStart', 'true');
+            await AsyncStorage.setItem('elapsedSeconds', '0');
+            await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+            return { isColdStart: true, elapsedSeconds: 0 };
+          }
+
+          backgroundTimestamp = convertedTimestamp;
+          await AsyncStorage.setItem('app_last_background_timestamp', backgroundTimestamp.toString());
+          console.log('[Utils] 날짜 형식을 타임스탬프(초 단위)로 변환하여 저장:', lastBackgroundTimestamp, '->', backgroundTimestamp);
+        } catch (error) {
+
+          console.warn('[Utils] 날짜 형식 변환 중 오류:', error, '(콜드스타트로 간주합니다.)');
+          await AsyncStorage.removeItem('app_last_background_timestamp');
+          await AsyncStorage.setItem('isColdStart', 'true');
+          await AsyncStorage.setItem('elapsedSeconds', '0');
+          await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+          return { isColdStart: true, elapsedSeconds: 0 };
+        }
+      } else {
+
+        let parsedTimestamp = parseInt(lastBackgroundTimestamp, 10);
+
+        if (parsedTimestamp >= 1000000000000) {
+          console.log('[Utils] 밀리초 형식 감지, 초 단위로 변환:', parsedTimestamp, '->', Math.floor(parsedTimestamp / 1000));
+          parsedTimestamp = Math.floor(parsedTimestamp / 1000);
+
+          await AsyncStorage.setItem('app_last_background_timestamp', parsedTimestamp.toString());
+        }
+
+        backgroundTimestamp = parsedTimestamp;
+        if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+
+          console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다:', lastBackgroundTimestamp, '(콜드스타트로 간주합니다.)');
+          await AsyncStorage.removeItem('app_last_background_timestamp');
+          await AsyncStorage.setItem('isColdStart', 'true');
+          await AsyncStorage.setItem('elapsedSeconds', '0');
+          await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+          return { isColdStart: true, elapsedSeconds: 0 };
+        }
       }
 
-      const checkedTimestampNum = parseInt(checkedTimestamp, 10);
-      if (isNaN(checkedTimestampNum) || checkedTimestampNum <= 0) {
+      let checkedTimestampNum = parseInt(checkedTimestamp, 10);
 
-      } else if (backgroundTimestamp <= checkedTimestampNum) {
+      if (checkedTimestampNum >= 1000000000000) {
+        console.log('[Utils] checkedTimestamp 밀리초 형식 감지, 초 단위로 변환:', checkedTimestampNum, '->', Math.floor(checkedTimestampNum / 1000));
+        checkedTimestampNum = Math.floor(checkedTimestampNum / 1000);
 
-        const isColdStart = await AsyncStorage.getItem('isColdStart');
-        const elapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
-        const elapsedSeconds = elapsedSecondsStr ? parseInt(elapsedSecondsStr, 10) : 0;
+        await AsyncStorage.setItem('checkedTimestamp', checkedTimestampNum.toString());
+      }
+
+      console.log('[Utils] 타임스탬프 비교:', {
+        backgroundTimestamp,
+        checkedTimestampNum,
+        currentTimestamp,
+        backgroundTimeISO: new Date(backgroundTimestamp * 1000).toISOString(),
+        checkedTimeISO: checkedTimestampNum > 0 ? new Date(checkedTimestampNum * 1000).toISOString() : 'invalid',
+        currentTimeISO: new Date(currentTimestamp * 1000).toISOString(),
+      });
+
+      const elapsedSeconds = currentTimestamp - backgroundTimestamp;
+      const isColdStart = elapsedSeconds >= 600; 
+
+      console.log('[Utils] 경과 시간 재계산:', {
+        currentTimestamp,
+        backgroundTimestamp,
+        elapsedSeconds,
+        isColdStart,
+        backgroundTimeISO: new Date(backgroundTimestamp * 1000).toISOString(),
+        currentTimeISO: new Date(currentTimestamp * 1000).toISOString(),
+      });
+
+      if (!isNaN(checkedTimestampNum) && checkedTimestampNum > 0 && backgroundTimestamp <= checkedTimestampNum) {
+        const savedIsColdStart = await AsyncStorage.getItem('isColdStart');
+        const savedElapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
+        const savedElapsedSeconds = savedElapsedSecondsStr ? parseInt(savedElapsedSecondsStr, 10) : 0;
+        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 기존 결과 반환:', {
+          savedIsColdStart,
+          savedElapsedSeconds,
+          calculatedElapsedSeconds: elapsedSeconds,
+          backgroundTimestamp,
+          checkedTimestampNum,
+        });
         return {
-          isColdStart: isColdStart === 'true',
-          elapsedSeconds,
+          isColdStart: savedIsColdStart === 'true',
+          elapsedSeconds: savedElapsedSeconds,
         };
       }
-
-      const elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
-      const isColdStart = elapsedSeconds >= 10; 
 
       await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
       await AsyncStorage.setItem('elapsedSeconds', elapsedSeconds.toString());
       await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+
+      const savedElapsedSeconds = await AsyncStorage.getItem('elapsedSeconds');
+      const savedIsColdStart = await AsyncStorage.getItem('isColdStart');
+      console.log('[Utils] 재계산 결과 저장 완료:', {
+        savedElapsedSeconds,
+        savedIsColdStart,
+        calculatedElapsedSeconds: elapsedSeconds,
+        calculatedIsColdStart: isColdStart,
+      });
 
       return { isColdStart, elapsedSeconds };
     }
@@ -274,17 +372,73 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
       elapsedSeconds = 0;
     } else {
 
-      const backgroundTimestamp = parseInt(lastBackgroundTimestamp, 10);
-      if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+      let backgroundTimestamp: number;
 
-        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
-        isColdStart = true;
-        elapsedSeconds = 0;
+      const isNumeric = /^\d+$/.test(lastBackgroundTimestamp);
+      if (!isNumeric) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 숫자 형식이 아닙니다:', lastBackgroundTimestamp, '(날짜 형식으로 변환 시도)');
+        try {
+
+          const dateObj = new Date(lastBackgroundTimestamp);
+          const convertedTimestamp = Math.floor(dateObj.getTime() / 1000);
+
+          if (isNaN(convertedTimestamp) || convertedTimestamp <= 0 || convertedTimestamp > currentTimestamp) {
+
+            console.warn('[Utils] 날짜 형식 변환 실패 또는 유효하지 않은 값:', lastBackgroundTimestamp, '(콜드스타트로 간주합니다.)');
+            await AsyncStorage.removeItem('app_last_background_timestamp');
+            isColdStart = true;
+            elapsedSeconds = 0;
+          } else {
+
+            backgroundTimestamp = convertedTimestamp;
+            await AsyncStorage.setItem('app_last_background_timestamp', backgroundTimestamp.toString());
+            console.log('[Utils] 날짜 형식을 타임스탬프(초 단위)로 변환하여 저장:', lastBackgroundTimestamp, '->', backgroundTimestamp);
+
+            elapsedSeconds = currentTimestamp - backgroundTimestamp;
+
+            isColdStart = elapsedSeconds >= 600;
+          }
+        } catch (error) {
+
+          console.warn('[Utils] 날짜 형식 변환 중 오류:', error, '(콜드스타트로 간주합니다.)');
+          await AsyncStorage.removeItem('app_last_background_timestamp');
+          isColdStart = true;
+          elapsedSeconds = 0;
+        }
       } else {
 
-        elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
+        let parsedTimestamp = parseInt(lastBackgroundTimestamp, 10);
 
-        isColdStart = elapsedSeconds >= 600;
+        if (parsedTimestamp >= 1000000000000) {
+          console.log('[Utils] 밀리초 형식 감지, 초 단위로 변환:', parsedTimestamp, '->', Math.floor(parsedTimestamp / 1000));
+          parsedTimestamp = Math.floor(parsedTimestamp / 1000);
+
+          await AsyncStorage.setItem('app_last_background_timestamp', parsedTimestamp.toString());
+        }
+
+        backgroundTimestamp = parsedTimestamp;
+        if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+
+          console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다:', lastBackgroundTimestamp, '(콜드스타트로 간주합니다.)');
+          await AsyncStorage.removeItem('app_last_background_timestamp');
+          isColdStart = true;
+          elapsedSeconds = 0;
+        } else {
+
+          elapsedSeconds = currentTimestamp - backgroundTimestamp;
+
+          isColdStart = elapsedSeconds >= 600;
+
+          console.log('[Utils] 새로 체크 - 경과 시간 계산:', {
+            currentTimestamp,
+            backgroundTimestamp,
+            elapsedSeconds,
+            isColdStart,
+            backgroundTimeISO: new Date(backgroundTimestamp * 1000).toISOString(),
+            currentTimeISO: new Date(currentTimestamp * 1000).toISOString(),
+          });
+        }
       }
     }
 
@@ -292,6 +446,15 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
     await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
     await AsyncStorage.setItem('elapsedSeconds', elapsedSeconds.toString());
     await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+
+    const savedElapsedSeconds = await AsyncStorage.getItem('elapsedSeconds');
+    const savedIsColdStart = await AsyncStorage.getItem('isColdStart');
+    console.log('[Utils] 최종 저장 확인:', {
+      savedElapsedSeconds,
+      savedIsColdStart,
+      elapsedSeconds,
+      isColdStart,
+    });
 
     return { isColdStart, elapsedSeconds };
   } catch (error) {

@@ -164,14 +164,14 @@ let logoTempMarker: any = null;
 try {
 
   logoTempMarker = require('../../assets/logo_tempMarker.png');
-  console.log('✅ [MapMainScreen] 마커 이미지 로드 성공:', logoTempMarker);
+
 } catch (e) {
 
   console.warn('❌ [MapMainScreen] logo_tempMarker.png not found:', e);
 
   try {
     logoTempMarker = require('../../assets/icon_xrun_round_logo.png');
-    console.log('✅ [MapMainScreen] 대체 마커 이미지 로드 성공');
+
   } catch (e2) {
     console.warn('❌ [MapMainScreen] 대체 마커 이미지도 없음:', e2);
   }
@@ -358,8 +358,6 @@ export const MapMainScreen: React.FC = () => {
       console.log('❌ [loadMarkersForLocation] userData가 없습니다. 로그인이 필요할 수 있습니다.');
       return;
     }
-
-    console.log('✅ [loadMarkersForLocation] userData 확인 완료');
 
     try {
 
@@ -684,14 +682,7 @@ export const MapMainScreen: React.FC = () => {
       });
 
       uniqueMarkers.slice(0, 5).forEach((marker: any, idx: number) => {
-        console.log(`📊 서버 원본 마커 [${idx}]:`, {
-          coin: marker.coin,
-          name: marker.name,
-          advertisement: marker.advertisement,
-          campid: marker.campid,
-          xrunPrice: marker.xrunPrice,
-          brand: marker.brand,
-        });
+
       });
 
       console.log('📌 [MapMainScreen] setMarkers 호출 (서버 데이터):', uniqueMarkers.length, '개');
@@ -699,7 +690,6 @@ export const MapMainScreen: React.FC = () => {
       setLastFetchedLocation(targetLocation);
       lastFetchedLocationRef.current = targetLocation;
       lastMarkerRefreshTimeRef.current = Date.now(); 
-      console.log('✅ [MapMainScreen] 마커 설정 완료');
 
       if (uniqueMarkers.length === 0 && retryCount < 1) {
         console.log(`⚠️ [MapMainScreen] 마커가 0개입니다. 2초 후 재시도합니다. (시도 ${retryCount + 1}/1)`);
@@ -711,7 +701,6 @@ export const MapMainScreen: React.FC = () => {
       const firstMarker = uniqueMarkers.find(marker => marker.latitude && marker.longitude);
       if (firstMarker && firstMarker.latitude && firstMarker.longitude) {
         if (!mapRef.current) return;
-        console.log('📍 [MapMainScreen] 서버 데이터 로드 후 첫 번째 마커 위치로 맵 이동:', firstMarker.latitude, firstMarker.longitude);
 
         isProgrammaticMoveRef.current = true;
         mapRef.current.animateToRegion({
@@ -761,7 +750,6 @@ export const MapMainScreen: React.FC = () => {
         }
       } else if (!firstMarker && currentGpsLocation && mapRef.current) {
 
-        console.log('📍 [MapMainScreen] 서버 데이터에 마커 없음 - 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
         isProgrammaticMoveRef.current = true;
         mapRef.current.animateToRegion({
           latitude: currentGpsLocation.latitude,
@@ -869,7 +857,6 @@ export const MapMainScreen: React.FC = () => {
       setMarkers([]);
     } finally {
 
-      console.log('✅ [loadMarkersForLocation] 완료 (로딩 상태 해제)');
       loadingMarkersRef.current = false;
       setLoadingMarkers(false);
       setShowLoadingOverlay(false); 
@@ -1373,7 +1360,6 @@ export const MapMainScreen: React.FC = () => {
         console.log('[MapMainScreen] 2단계: TopAd5 데이터 상태 저장:', topAd5Response.length, '개 광고');
         setTopAd5Data(topAd5Response);
 
-        console.log('[MapMainScreen] 3단계: 마커 데이터 가져오기 시작');
         const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
 
         if (!astorCoinsData) {
@@ -1387,7 +1373,6 @@ export const MapMainScreen: React.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 전체 순차 매핑)');
         const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
           if (topAd5Response.length > 0) {
@@ -1415,11 +1400,8 @@ export const MapMainScreen: React.FC = () => {
           return marker;
         });
 
-        console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
         await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
-        console.log('[MapMainScreen] 마커-광고 매핑 완료:', mappedCoinsData.length, '개 마커에 광고 매핑');
 
-        console.log('[MapMainScreen] 6단계: 화면에 마커 표시 시작');
         const spotDataArray: SpotData[] = mappedCoinsData.map((coin: any) => ({
           spotID: coin.spotid || coin.spotID || coin.id || 0,
           distance: coin.distance || 0,
@@ -1437,7 +1419,6 @@ export const MapMainScreen: React.FC = () => {
         } as SpotData & { campid?: string }));
 
         setMarkers(spotDataArray);
-        console.log('[MapMainScreen] 화면에 마커 표시 완료:', spotDataArray.length, '개 마커');
 
         console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
       } catch (error) {
@@ -2036,12 +2017,6 @@ export const MapMainScreen: React.FC = () => {
       return new Map<string, TopAd5Item | null>();
     }
 
-    console.log('[MapMainScreen] TopAd5 데이터 확인:', {
-      totalAds: topAd5Data.length,
-      adNames: topAd5Data.map(ad => ad.name || '이름 없음'),
-      adCompanies: topAd5Data.map(ad => ad.ad_company || '없음'),
-    });
-
     const sortedMarkers = [...markers]
       .filter(marker => marker.latitude && marker.longitude)
       .map(marker => ({
@@ -2054,8 +2029,6 @@ export const MapMainScreen: React.FC = () => {
         ),
       }))
       .sort((a, b) => a.distance - b.distance);
-
-    console.log('[MapMainScreen] 정렬된 마커 개수:', sortedMarkers.length);
 
     const mapping = new Map<string, TopAd5Item | null>();
     sortedMarkers.forEach(({ marker }, index) => {
@@ -2794,9 +2767,9 @@ export const MapMainScreen: React.FC = () => {
   }, [location]);
 
   const memoizedMarkers = useMemo(() => {
-    console.log('🔄 [memoizedMarkers] 재계산 시작, markers 개수:', markers.length);
+
     const filtered = markers.filter((marker) => marker.latitude && marker.longitude); 
-    console.log('✅ [memoizedMarkers] 필터링 후 개수:', filtered.length);
+
     const mapped = filtered.map((marker) => {
 
       const campId = marker.campid ?? '';
