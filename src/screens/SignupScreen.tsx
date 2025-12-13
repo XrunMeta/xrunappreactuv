@@ -83,7 +83,6 @@ export const SignupScreen = () => {
   const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSignupMode, setIsGoogleSignupMode] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
 
@@ -549,23 +548,23 @@ export const SignupScreen = () => {
             placeholder={t('screens.signup.passwordPlaceholder')}
             value={password}
             onChangeText={(text) => setPassword(filterAsciiPrintable(text))}
-            secureTextEntry={!isPasswordVisible}={!isPasswordVisible}
-          autoCapitalize="none"
-          containerStyle={styles.fieldContainer}
-          rightAccessory={
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setIsPasswordVisible((prev) => !prev)}
-              activeOpacity={0.7}
-              disabled={isSubmitting}
-            >
-              <Ionicons
-                name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
-                size={20}
-                color="#666666"
-              />
-            </TouchableOpacity>
-          }
+            secureTextEntry={!isPasswordVisible}
+            autoCapitalize="none"
+            containerStyle={styles.fieldContainer}
+            rightAccessory={
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setIsPasswordVisible((prev) => !prev)}
+                activeOpacity={0.7}
+                disabled={isSubmitting}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666666"
+                />
+              </TouchableOpacity>
+            }
           />
 
           <FormField
@@ -590,19 +589,7 @@ export const SignupScreen = () => {
                 />
               </TouchableOpacity>
             }
-            rightAccessory={
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setIsPasswordVisible((prev) => !prev)}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
-                  size={20}
-                  color="#666666"
-                />
-              </TouchableOpacity>
-            }
+
           />
 
           <FormField
@@ -870,11 +857,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     fontFamily: 'Roboto-Regular',
   },
-  eyeButton: {
-    height: 24,
-    width: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
 });
 
