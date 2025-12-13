@@ -1222,19 +1222,19 @@ export const v_cdb169 = () => {
                 <Text style={v_d81136.disabledText}>{v_e0c7e8 || v_8d41d7('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
-
-            <View style={v_d81136.inlineLabelRow}>
-              <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.password')}</Text>
-              <TouchableOpacity onPress={v_c09605}>
-                <Text style={v_d81136.linkText}>{v_8d41d7('screens.myInfoEdit.changePassword')}</Text>
-              </TouchableOpacity>
+            <View style={v_d81136.fieldContainer}>
+              <View style={[{ ...v_d81136.inlineLabelRow, ...v_d81136.label }]}>
+                <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.password')}</Text>
+                <TouchableOpacity onPress={v_c09605} style={v_d81136.linkTextContainer}>
+                  <Text style={v_d81136.linkText}>{v_8d41d7('screens.myInfoEdit.changePassword')}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[{ ...v_d81136.readonlyInput }, { marginTop: 0 }]}>
+                <Text style={v_d81136.readonlyText}>
+                  {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', 'e', { date: v_3535cd || '-' })}
+                </Text>
+              </View>
             </View>
-            <View style={v_d81136.readonlyInput}>
-              <Text style={v_d81136.readonlyText}>
-                {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel','e', { date: v_3535cd || '-' })}
-              </Text>
-            </View>
-
             <View style={v_d81136.fieldContainer} >
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.phone')}</Text>
               <View style={v_d81136.phoneFieldContainer}>
@@ -1446,7 +1446,6 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
   },
   sectionLabel: {
     fontSize: v_843035.size.medium,
@@ -1749,6 +1748,9 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     flex: 1,
+  },
+  linkTextContainer: {
+    marginBottom: 0,
   },
 });
 
