@@ -633,12 +633,15 @@ export const LoginScreen = () => {
         ]}
       >
         <View style={styles.linkingContainer}>
-          <Text style={styles.linkingMessage}>
-            구글 계정으로 XRUN의 <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
+          <Text style={styles.linkingMessage}>{`XRUN 계정에 Google 계정을 연결하면
+보다 간편하게 로그인할 수 있습니다.
+
+구글 계정과 xrun계정`}
+          <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 
           <FormField
-            label={t('screens.login.passwordLabel') || '비밀번호'}
+            label={t('screens.login.xrunPasswordLabel') || 'XRUN 계정 비밀번호'}
             placeholder={t('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
             secureTextEntry={true} 
             value={linkingPassword}
