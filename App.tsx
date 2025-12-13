@@ -79,22 +79,29 @@ import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
 
+let processedDeepLinkUrl: string | null = null;
+let isDeepLinkProcessing = false;
+
 const ScreenHost = () => {
   const { currentScreen, navigate } = useAppNavigation();
-  const { setReferralCode } = useAppContext();
+  const { setSignupFormData } = useAppContext();
 
   useEffect(() => {
-    let isProcessing = false; 
 
     const handleDeepLink = (url: string) => {
 
-      if (isProcessing) {
-        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기:', url);
+      if (isDeepLinkProcessing) {
+        console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기');
+        return;
+      }
+
+      if (processedDeepLinkUrl === url) {
+        console.log('[딥링크] 이미 처리된 URL, 건너뛰기:', url);
         return;
       }
 
       try {
-        isProcessing = true;
+        isDeepLinkProcessing = true;
         console.log('[딥링크] URL 처리 시작:', url);
 
         const parsed = Linking.parse(url);
@@ -105,22 +112,19 @@ const ScreenHost = () => {
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
 
-          setReferralCode(referral);
+          processedDeepLinkUrl = url;
 
-          if (currentScreen !== 'signup') {
-            console.log('[딥링크] 회원가입 화면으로 이동');
-            navigate('signup');
-          }
+          setSignupFormData({ referralEmail: referral });
+
+          console.log('[딥링크] 회원가입 화면으로 이동');
+          navigate('signup');
         } else {
           console.log('[딥링크] referral 파라미터가 없습니다.');
         }
       } catch (error) {
         console.error('[딥링크] URL 처리 실패:', error);
       } finally {
-
-        setTimeout(() => {
-          isProcessing = false;
-        }, 1000);
+        isDeepLinkProcessing = false;
       }
     };
 
@@ -140,6 +144,10 @@ const ScreenHost = () => {
 
     const subscription = Linking.addEventListener('url', (event) => {
       console.log('[딥링크] 딥링크 이벤트 감지:', event.url);
+
+      if (event.url !== processedDeepLinkUrl) {
+        processedDeepLinkUrl = null;
+      }
       handleDeepLink(event.url);
     });
 
@@ -154,7 +162,7 @@ const ScreenHost = () => {
       subscription.remove();
       clearTimeout(recheckTimer);
     };
-  }, [setReferralCode, navigate, currentScreen]);
+  }, [setSignupFormData, navigate]);
 
   if (currentScreen === 'login') {
     return <LoginScreen />;

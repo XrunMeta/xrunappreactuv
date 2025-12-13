@@ -1222,19 +1222,19 @@ export const MyInfoEditScreen = () => {
                 <Text style={styles.disabledText}>{email || t('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
-
-            <View style={styles.inlineLabelRow}>
-              <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.password')}</Text>
-              <TouchableOpacity onPress={handleChangePassword}>
-                <Text style={styles.linkText}>{t('screens.myInfoEdit.changePassword')}</Text>
-              </TouchableOpacity>
+            <View style={styles.fieldContainer}>
+              <View style={[{ ...styles.inlineLabelRow, ...styles.label }]}>
+                <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.password')}</Text>
+                <TouchableOpacity onPress={handleChangePassword} style={styles.linkTextContainer}>
+                  <Text style={styles.linkText}>{t('screens.myInfoEdit.changePassword')}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[{ ...styles.readonlyInput }, { marginTop: 0 }]}>
+                <Text style={styles.readonlyText}>
+                  {t('screens.myInfoEdit.lastPasswordChangeDateLabel', 'e', { date: datepinchanged || '-' })}
+                </Text>
+              </View>
             </View>
-            <View style={styles.readonlyInput}>
-              <Text style={styles.readonlyText}>
-                {t('screens.myInfoEdit.lastPasswordChangeDateLabel','e', { date: datepinchanged || '-' })}
-              </Text>
-            </View>
-
             <View style={styles.fieldContainer} >
               <Text style={styles.label}>{t('screens.myInfoEdit.phone')}</Text>
               <View style={styles.phoneFieldContainer}>
@@ -1446,7 +1446,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
   },
   sectionLabel: {
     fontSize: FONTS.size.medium,
@@ -1749,6 +1748,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
     flex: 1,
+  },
+  linkTextContainer: {
+    marginBottom: 0,
   },
 });
 
