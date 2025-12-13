@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, gatewayNodeJSApp3100 } from '../services';
+import { getPockAds, getPointClickAds, processAdReward } from '../services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
@@ -357,73 +357,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       console.log('xrunPrice:', advertisementParams?.xrunPrice);
       console.log('pockAdData:', pockAdData);
 
-      try {
-
-        const adIdRaw = advertisementParams?.advertisement;
-
-        if (!adIdRaw) {
-          console.error('[ShowPockAdScreen] ❌ advertisement가 비어있습니다. 이 상태로는 올바른 리워드를 줄 수 없습니다.', {
-            advertisementParams,
-            advertisement: advertisementParams?.advertisement,
-            coin: advertisementParams?.coin,
-            campid: advertisementParams?.campid,
-            name: advertisementParams?.name,
-          });
-
-          resetAdvertisementParams();
-          handleClose();
-          setIsProcessing(false);
-          setWaitingForWebSocketResponse(false);
-          return;
-        }
-
-        const adId = parseInt(String(adIdRaw), 10);
-
-        if (isNaN(adId) || adId === 0) {
-          console.error('[ShowPockAdScreen] ❌ advertisement가 유효하지 않은 값입니다.', {
-            adIdRaw,
-            adId,
-            advertisementParams,
-          });
-
-          resetAdvertisementParams();
-          handleClose();
-          setIsProcessing(false);
-          setWaitingForWebSocketResponse(false);
-          return;
-        }
-
-        console.log('[ShowPockAdScreen] ✅ advertisement 검증 통과:', {
-          adIdRaw,
-          adId,
-          coin: advertisementParams?.coin || '0',
-          member,
-        });
-
-        const response = await gatewayNodeJSApp3100(
-          adId,
-          advertisementParams?.coin || '0',
-          member,
-          advertisementParams?.joindesc || '',
-          advertisementParams?.name || '',
-          advertisementParams?.xrunPrice || 0,
-          navigate,
-        );
-
-        if (response && response.data) {
-          console.log('API response received:', response);
-          setIsProcessing(false);
-
-          console.log('✅ 리워드 처리 완료 - 사용자 버튼 클릭 대기');
-          setWaitingForWebSocketResponse(true);
-        }
-      } catch (error) {
-        console.error('Error calling API:', error);
-        setIsProcessing(false);
-
-        console.log('✅ 리워드 처리 완료 (에러 발생) - 사용자 버튼 클릭 대기');
-        setWaitingForWebSocketResponse(true);
-      }
+      console.log('✅ 광고 완료 처리 (리워드는 이미 버튼 클릭 시 호출 완료)');
     } catch (error) {
       console.error('Error in ad completion process:', error);
       setIsProcessing(false);
@@ -536,6 +470,32 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
           console.error('[광고보기] getPointClickAds 호출 실패:', apiError);
 
         }
+      }
+
+      const ad_key = advertisementParams?.campid || '';
+      if (ad_key && member) {
+        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
+
+        processAdReward(
+          member,
+          ad_key,
+          'pointclick',
+          onClose ? undefined : navigate,
+        )
+          .then((response) => {
+            console.log('[광고보기] processAdReward 응답:', response);
+            setWaitingForWebSocketResponse(true);
+            setIsTaboolaLoaded(false); 
+          })
+          .catch((error) => {
+            console.error('[광고보기] processAdReward 호출 실패:', error);
+
+          });
+      } else {
+        console.warn('[광고보기] ad_key 또는 member가 없어 리워드 처리를 건너뜁니다.', {
+          ad_key,
+          member,
+        });
       }
 
       if (pockAdData?.landing_url) {
