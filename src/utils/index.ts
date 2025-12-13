@@ -284,7 +284,7 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
 
         elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
 
-        isColdStart = elapsedSeconds >= 10;
+        isColdStart = elapsedSeconds >= 600;
       }
     }
 
