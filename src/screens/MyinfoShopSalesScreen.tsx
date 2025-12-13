@@ -349,7 +349,6 @@ export const v_1cca63 = () => {
                     v_99b0c1 === 'start' && v_d81136.dateInputActive
                   ]}>
                     <Text style={v_d81136.dateInputText}>{v_e065e5(v_0ec7ad)}</Text>
-                    <Ionicons name="calendar-outline" size={18} color={v_1bfbd0.headerText} />
                   </View>
                 </TouchableOpacity>
                 <Text style={v_d81136.dateSeparator}>~</Text>
@@ -364,7 +363,6 @@ export const v_1cca63 = () => {
                     v_99b0c1 === 'end' && v_d81136.dateInputActive
                   ]}>
                     <Text style={v_d81136.dateInputText}>{v_e065e5(v_331624)}</Text>
-                    <Ionicons name="calendar-outline" size={18} color={v_1bfbd0.headerText} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -535,13 +533,13 @@ const v_d81136 = v_472849.create({
   dateInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#F5F7FA',
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    justifyContent: 'center',
   },
   dateInputActive: {
     borderColor: v_1bfbd0.buttonPrimary,
@@ -601,6 +599,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
+    paddingVertical: 4,
   },
   selectedDayCell: {
     backgroundColor: v_1bfbd0.buttonPrimary,
@@ -612,6 +611,7 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#333333',
+    lineHeight: 24,
   },
   selectedDayText: {
     color: '#ffffff',
