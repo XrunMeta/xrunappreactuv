@@ -24,6 +24,8 @@ import {
   PasswordOnlyLoginRequest,
   MobileLoginRequest,
   LoginResponse,
+  ConnectGoogleAccountRequest,
+  ConnectGoogleAccountResponse,
   PhoneVerificationRequest,
   PhoneVerificationResponse,
   PhoneVerificationCodeRequest,
@@ -241,8 +243,8 @@ export const nodeGatewayRequest = async (
 ): Promise<Response> => {
   const env = getEnv();
   const baseUrl = env.GATEWAY_NODEJS;
-  const url = endpoint.startsWith('/') 
-    ? `${baseUrl}${endpoint}` 
+  const url = endpoint.startsWith('/')
+    ? `${baseUrl}${endpoint}`
     : `${baseUrl}/${endpoint}`;
 
   return apiRequest(url, options, navigation);
@@ -271,7 +273,7 @@ export const sendAliveSignal = async (
 
     if (serverResponse.status === 'success') {
       const result: AliveResponse = {
-    success: true,
+        success: true,
       };
 
       if (serverResponse.data.server_status === 'health') {
@@ -666,6 +668,42 @@ export const loginWithPassword = async (
         data: error.response?.data,
         message: error.message,
       });
+    }
+    throw error;
+  }
+};
+
+export const connectGoogleAccount = async (
+  googleData: any,
+  pin: string,
+  navigation?: any,
+): Promise<ConnectGoogleAccountResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: ConnectGoogleAccountRequest = {
+      ...googleData,
+      pin,
+    };
+
+    console.log('[계정 연동] 구글 계정 연동 요청');
+    console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(request, null, 2));
+
+    const response = await axiosInstance.post<ConnectGoogleAccountResponse>(
+      '/connect-google-account',
+      request,
+    );
+
+    console.log('[계정 연동] 요청 성공, 응답:', JSON.stringify(response.data, null, 2));
+    return response.data;
+  } catch (error: any) {
+    console.error('[계정 연동] 요청 오류:', error);
+    if (error.response?.status === 401) {
+      console.log('[계정 연동] 비밀번호 불일치 (401)');
+      return {
+        success: false,
+        code: '401',
+        message: '비밀번호가 일치하지 않습니다.',
+      };
     }
     throw error;
   }
@@ -1308,7 +1346,7 @@ export const updateRegion = async (
     const countryNum = Number(country);
     const regionNum = Number(region);
 
-    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', { 
+    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', {
       입력member: member,
       입력country: country,
       입력region: region,
@@ -1319,7 +1357,7 @@ export const updateRegion = async (
       },
     });
 
-    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', { 
+    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', {
       변환member: memberNum,
       변환country: countryNum,
       변환region: regionNum,
@@ -1362,9 +1400,9 @@ export const updateRegion = async (
       JSON문자열: JSON.stringify(cleanRequest),
       파싱: JSON.parse(JSON.stringify(cleanRequest)),
     });
-    console.log('[마이페이지] 지역 수정 요청 - request 상세:', { 
-      member: request.member, 
-      country: request.country, 
+    console.log('[마이페이지] 지역 수정 요청 - request 상세:', {
+      member: request.member,
+      country: request.country,
       region: request.region,
       types: {
         member: typeof request.member,
@@ -1422,9 +1460,9 @@ export const logout = async (
     const response = await nodeGatewayRequest(
       '/logout-9705',
       {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${authCode}`,
         },
         body: JSON.stringify({
@@ -2274,7 +2312,7 @@ export const getNasmobAds = async (
     const env = getEnv();
     const url = `${env.GATEWAY_NODEJS}/getNasmobAds`;
 
-    if (deviceInfo.manufacturer = 'Apple' ){
+    if (deviceInfo.manufacturer = 'Apple') {
       deviceInfo.os = 'ios';
     } else {
       deviceInfo.os = 'aos';
@@ -2352,10 +2390,10 @@ export const getPockAds = async (
     let osType: number;
     let osTypeString: string;
 
-    const isIOS = Platform.OS === 'ios' || 
-                  deviceInfo.manufacturer === 'Apple' || 
-                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
-                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
+    const isIOS = Platform.OS === 'ios' ||
+      deviceInfo.manufacturer === 'Apple' ||
+      (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
+      (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
 
     if (isIOS) {
       osType = 3113; 
@@ -2432,10 +2470,10 @@ export const getPointClickAds = async (
 
     let osTypeString: string;
 
-    const isIOS = Platform.OS === 'ios' || 
-                  deviceInfo.manufacturer === 'Apple' || 
-                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
-                  (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
+    const isIOS = Platform.OS === 'ios' ||
+      deviceInfo.manufacturer === 'Apple' ||
+      (deviceInfo.model && deviceInfo.model.toLowerCase().includes('iphone')) ||
+      (deviceInfo.model && deviceInfo.model.toLowerCase().includes('ipad'));
 
     if (isIOS) {
       osTypeString = 'IOS';
@@ -4299,14 +4337,14 @@ export const getClauseContent = async (
 
     const typeNumber = typeMap[clauseType];
     const endpoint = `/oth-path?type=${typeNumber}`;
-    const fullUrl = endpoint.startsWith('/') 
-      ? `${baseUrl}${endpoint}` 
+    const fullUrl = endpoint.startsWith('/')
+      ? `${baseUrl}${endpoint}`
       : `${baseUrl}/${endpoint}`;
 
-    console.log('[약관] 약관 내용 요청:', { 
-      clauseType, 
-      typeNumber, 
-      endpoint, 
+    console.log('[약관] 약관 내용 요청:', {
+      clauseType,
+      typeNumber,
+      endpoint,
       fullUrl,
       language,
       baseUrl,
@@ -4372,8 +4410,8 @@ export const getClauseContent = async (
       hasData: !!data.data,
       dataType: Array.isArray(data.data) ? 'array' : typeof data.data,
       dataLength: Array.isArray(data.data) ? data.data.length : 'N/A',
-      dataKeys: data.data && typeof data.data === 'object' && !Array.isArray(data.data) 
-        ? Object.keys(data.data) 
+      dataKeys: data.data && typeof data.data === 'object' && !Array.isArray(data.data)
+        ? Object.keys(data.data)
         : 'N/A',
     });
 
@@ -4396,11 +4434,11 @@ export const getClauseContent = async (
       throw new Error('약관 내용이 없습니다.');
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', { 
-      clauseType, 
+    console.log('[약관] 약관 내용 로드 성공:', {
+      clauseType,
       typeNumber,
-      language, 
-      contentLength: agreementData.content.length 
+      language,
+      contentLength: agreementData.content.length
     });
 
     return agreementData.content;
@@ -4444,7 +4482,7 @@ export const getAgreementByType = async (
       personal: 3,
     };
 
-    const endpoint = type 
+    const endpoint = type
       ? `/oth-path?type=${typeMap[type]}`
       : '/oth-path';
 

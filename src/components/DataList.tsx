@@ -54,6 +54,8 @@ const DataListComponent = <T extends Record<string, any>>(
 
   const isEndReachedLoadingRef = useRef(false);
 
+  const fetchIdRef = useRef(0);
+
   useImperativeHandle(ref, () => ({
     reloadData: () => {
       setData([]);
@@ -66,9 +68,12 @@ const DataListComponent = <T extends Record<string, any>>(
 
   const loadData = async (page: number, isReload: boolean = false): Promise<void> => {
 
-    if (isReload ? loading : loadingMore) {
+    if (!isReload && loadingMore) {
       return Promise.resolve();
     }
+
+    const currentFetchId = fetchIdRef.current + 1;
+    fetchIdRef.current = currentFetchId;
 
     try {
       if (isReload) {
@@ -80,6 +85,10 @@ const DataListComponent = <T extends Record<string, any>>(
 
       const response = await fetchData({ page, pageSize });
 
+      if (fetchIdRef.current !== currentFetchId) {
+        return;
+      }
+
       if (isReload) {
         setData(response.data);
       } else {
@@ -89,14 +98,22 @@ const DataListComponent = <T extends Record<string, any>>(
       setHasMore(response.hasMore);
       setCurrentPage(page);
     } catch (err) {
+
+      if (fetchIdRef.current !== currentFetchId) {
+        return;
+      }
+
       const error = err instanceof Error ? err : new Error('데이터 로드 중 오류가 발생했습니다.');
       setError(error);
       console.error('DataList loadData error:', error);
     } finally {
-      if (isReload) {
-        setLoading(false);
-      } else {
-        setLoadingMore(false);
+
+      if (fetchIdRef.current === currentFetchId) {
+        if (isReload) {
+          setLoading(false);
+        } else {
+          setLoadingMore(false);
+        }
       }
     }
   };

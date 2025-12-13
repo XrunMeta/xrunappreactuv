@@ -28,7 +28,7 @@ export type ShopItem = {
   image: any;
 };
 
-export {};
+export { };
 
 export interface TokenData {
   spotID: number;
@@ -291,6 +291,24 @@ export interface LoginCheckResponse {
   data: Array<{
     value: 'OK' | 'NO';
   }>;
+}
+
+export interface ConnectGoogleAccountRequest {
+  confirmationToken: string;
+  pin: string;
+  [key: string]: any; 
+}
+
+export interface ConnectGoogleAccountResponse {
+  success: boolean;
+  data?: Array<{
+    member: number;
+    email: string;
+    extrastr?: string; 
+    [key: string]: any;
+  }>;
+  message?: string;
+  code?: string; 
 }
 
 export interface EmailPasswordLoginRequest {

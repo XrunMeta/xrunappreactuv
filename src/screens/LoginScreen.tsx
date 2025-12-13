@@ -11,7 +11,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { FormCheckbox, FormField, Header, PrimaryButton, SafeScrollView, SegmentedControl } from '../components';
+import {
+  FormCheckbox,
+  FormField,
+  Header,
+  PrimaryButton,
+  SafeScrollView,
+  SegmentedControl,
+  Dialog,
+} from '../components';
 import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import {
@@ -21,6 +29,7 @@ import {
   checkEmailExists,
   sendEmailVerificationCode,
   signInWithGoogle,
+  connectGoogleAccount,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -60,6 +69,13 @@ export const LoginScreen = () => {
   const [otpEmail, setOtpEmail] = useState('');
   const [otpRememberMe, setOtpRememberMe] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
+
+  const [linkingDialogVisible, setLinkingDialogVisible] = useState(false);
+  const [linkingPassword, setLinkingPassword] = useState('');
+  const [linkingAgreed, setLinkingAgreed] = useState(false);
+  const [linkingEmail, setLinkingEmail] = useState('');
+  const [googleLoginData, setGoogleLoginData] = useState<any>(null);
+  const [isLinkingLoading, setIsLinkingLoading] = useState(false);
 
   const emailVerificationRoute: any = ROUTES.emailVerification;
 
@@ -226,6 +242,87 @@ export const LoginScreen = () => {
     }
   };
 
+  const handleLinkAccount = async () => {
+    if (!linkingPassword.trim()) {
+      await showAlert(t('common.messages.error'), t('screens.login.errors.passwordRequired'));
+      return;
+    }
+
+    if (!linkingAgreed) {
+      await showAlert(t('common.messages.error'), '계정 연동에 동의해주세요.');
+      return;
+    }
+
+    setIsLinkingLoading(true);
+
+    try {
+      console.log('[계정 연동] 비밀번호 확인 및 로그인 시도:', linkingEmail);
+
+      const response = await connectGoogleAccount(
+        googleLoginData,
+        linkingPassword,
+        navigate,
+      );
+
+      if (!response.success) {
+        const errorMessage = response.message || t('screens.login.errors.loginFailed');
+        await showAlert(t('common.messages.error'), errorMessage);
+        setIsLinkingLoading(false);
+        return;
+      }
+
+      const userData = response.data && response.data.length > 0 ? response.data[0] : null;
+      if (!userData) {
+        await showAlert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
+        setIsLinkingLoading(false);
+        return;
+      }
+
+      console.log('[계정 연동] 로그인(검증) 성공 - 세션 저장 진행');
+
+      const extrastr = userData.extrastr;
+      if (extrastr && userData.member) {
+        const ssidw = encryptSHA256(extrastr);
+        const sessionSaved = await saveSession(userData.member, ssidw, navigate);
+        if (!sessionSaved) {
+          console.warn('[계정 연동] 세션 저장 실패');
+        }
+      }
+
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('userSessionToken');
+
+      await AsyncStorage.setItem('userEmail', linkingEmail);
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+      const sessionToken = userData.extrastr || '';
+      await AsyncStorage.setItem('userSessionToken', sessionToken);
+
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+
+      if (rememberMe) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+        console.log('[계정 연동] 로그인 상태 유지 저장 완료');
+      } else {
+        await AsyncStorage.removeItem('rememberMe');
+        console.log('[계정 연동] 로그인 상태 유지 해제');
+      }
+
+      console.log('[계정 연동] 완료 및 로그인 성공');
+      setLinkingDialogVisible(false);
+      navigate(ROUTES.map);
+
+    } catch (error) {
+      console.error('[계정 연동] 오류:', error);
+      await showAlert(
+        t('common.messages.error'),
+        '계정 연동 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setIsLinkingLoading(false);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     if (isLoading || isOtpLoading) {
       return;
@@ -241,6 +338,17 @@ export const LoginScreen = () => {
       if (!result.success || !result.data) {
         const errorMessage = result.message || '구글 로그인에 실패했습니다.';
         await showAlert(t('common.messages.error') || '오류', errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.data.requiresLinking) {
+        console.log('[구글 로그인] 계정 연동 필요 - 팝업 표시');
+        setLinkingEmail(result.data.email);
+        setGoogleLoginData(result.data);
+        setLinkingPassword('');
+        setLinkingAgreed(false);
+        setLinkingDialogVisible(true);
         setIsLoading(false);
         return;
       }
@@ -472,6 +580,58 @@ export const LoginScreen = () => {
           </View>
         </SafeScrollView>
       )}
+
+      {}
+      <Dialog
+        visible={linkingDialogVisible}
+        title="계정 연결"
+        onClose={() => setLinkingDialogVisible(false)}
+        actions={[
+          {
+            label: t('common.buttons.cancel') || '취소',
+            onPress: () => setLinkingDialogVisible(false),
+            variant: 'secondary',
+            disabled: isLinkingLoading,
+          },
+          {
+            label: t('common.buttons.confirm') || '확인',
+            onPress: handleLinkAccount,
+            variant: 'primary',
+            disabled: isLinkingLoading || !linkingAgreed,
+          },
+        ]}
+      >
+        <View style={styles.linkingContainer}>
+          <Text style={styles.linkingMessage}>
+            구글 계정으로 XRUN의 <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
+          </Text>
+
+          <FormField
+            label={t('screens.login.passwordLabel') || '비밀번호'}
+            placeholder={t('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
+            secureTextEntry={true} 
+            value={linkingPassword}
+            onChangeText={setLinkingPassword}
+            containerStyle={styles.linkingInput}
+            editable={!isLinkingLoading}
+          />
+
+          <View style={styles.linkingCheckbox}>
+            <FormCheckbox
+              label="동의합니다."
+              checked={linkingAgreed}
+              onToggle={() => setLinkingAgreed(!linkingAgreed)}
+              variant="square"
+            />
+          </View>
+
+          {isLinkingLoading && (
+            <View style={styles.linkingLoader}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          )}
+        </View>
+      </Dialog>
     </View>
   );
 };
@@ -579,6 +739,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderColor: '#ebebeb',
     borderWidth: 1,
+  },
+  linkingContainer: {
+    paddingVertical: 8,
+  },
+  linkingMessage: {
+    fontSize: FONTS.size.medium,
+    lineHeight: 22,
+    color: '#333333',
+    marginBottom: 20,
+    marginTop: 8,
+    fontFamily: 'Roboto-Regular',
+  },
+  linkingEmail: {
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.buttonPrimary,
+  },
+  linkingInput: {
+    marginBottom: 16,
+  },
+  linkingCheckbox: {
+    marginBottom: 8,
+  },
+  linkingLoader: {
+    alignItems: 'center',
+    marginTop: 10,
   },
 });
 
