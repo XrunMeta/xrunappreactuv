@@ -17,6 +17,7 @@ export const v_ce4741 = {
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
   verificationCode: 'verificationCode',
+  referralInput: 'referralInput',
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
@@ -98,6 +99,7 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   v_c4deb2(() => {
     const v_d0a230 = async () => {
       try {
+
         const v_efe339 = await v_e84827.getItem('rememberMe');
         const v_0fd7ed = await v_e84827.getItem('isLoggedIn');
 
@@ -105,10 +107,11 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
 
           console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
           v_768005([v_ce4741.map]);
-        } else {
-
-          console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+          v_da6fbe(true);
+          return;
         }
+
+        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
       } catch (v_5e9bfe) {
         console.error('[Navigation] 로그인 상태 확인 실패:', v_5e9bfe);
       } finally {

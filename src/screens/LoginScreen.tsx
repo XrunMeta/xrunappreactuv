@@ -20,6 +20,7 @@ import {
   v_ea3493,
   v_f5ecec,
   v_8025d1,
+  v_2683ec,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -225,12 +226,97 @@ export const v_f4f851 = () => {
     }
   };
 
+  const v_6dd38d = async () => {
+    if (v_cd31a8 || v_2e3b01) {
+      return;
+    }
+
+    v_deef62(true);
+
+    try {
+      console.log('[구글 로그인] 구글 로그인 시작');
+
+      const v_43c42e = await v_2683ec(v_9b57fc);
+
+      if (!v_43c42e.success || !v_43c42e.data) {
+        const v_1744b9 = v_43c42e.message || '구글 로그인에 실패했습니다.';
+        await v_889fad(v_8d41d7('common.messages.error') || '오류', v_1744b9);
+        v_deef62(false);
+        return;
+      }
+
+      const { memberId: v_717992, email: v_e0c7e8, name: v_1833e7, accessToken: v_2ca7e0, refreshToken: v_dfaee3, isNewUser: v_b0b75a, isSignupCompleted: v_22a87d } = v_43c42e.data;
+
+      console.log('[구글 로그인] 로그인 성공:', { memberId: v_717992, email: v_e0c7e8, isNewUser: v_b0b75a, isSignupCompleted: v_22a87d });
+
+      if (v_b0b75a) {
+        console.log('[구글 로그인] 신규 사용자, 회원가입 화면으로 이동');
+
+        await v_e84827.setItem('googleSignupRequired', 'true');
+        await v_e84827.setItem('googleSignupEmail', v_e0c7e8);
+
+        v_9b57fc(v_ce4741.signup);
+        v_deef62(false);
+        return;
+      }
+
+      console.log('[구글 로그인] 기존 사용자, 로그인 처리 시작');
+
+      const v_ef7306 = {
+        member: v_717992,
+        email: v_e0c7e8,
+        firstname: v_1833e7 ? (v_1833e7.split(' ')[0] || v_1833e7) : '',
+        lastname: v_1833e7 ? v_1833e7.split(' ').slice(1).join(' ') : '',
+        extrastr: v_2ca7e0 || '', 
+      };
+
+      if (v_2ca7e0 && v_717992) {
+        const v_06cee6 = v_a5170b(v_2ca7e0);
+        const v_aa0ad8 = await v_ea3493(v_717992, v_06cee6, v_9b57fc);
+        if (!v_aa0ad8) {
+          console.warn('[구글 로그인] 세션 저장 실패');
+        }
+      }
+
+      await v_e84827.removeItem('userData');
+      await v_e84827.removeItem('userSessionToken');
+
+      await v_e84827.setItem('userEmail', v_e0c7e8);
+      await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
+      await v_e84827.setItem('isLoggedIn', 'true');
+
+      if (v_a964a4) {
+        await v_e84827.setItem('rememberMe', 'true');
+      } else {
+        await v_e84827.removeItem('rememberMe');
+      }
+
+      console.log('[구글 로그인] 사용자 정보 저장 완료');
+
+      console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
+      v_9b57fc(v_ce4741.map);
+    } catch (v_5e9bfe) {
+      console.error('[구글 로그인] 오류:', v_5e9bfe);
+      await v_889fad(
+        v_8d41d7('common.messages.error') || '오류',
+        v_5e9bfe.message || '구글 로그인 중 오류가 발생했습니다.',
+      );
+    } finally {
+      v_deef62(false);
+    }
+  };
+
   const v_482f85 = (v_4a6533) => (
     <View style={v_d81136.snsLoginContainer}>
       <Text style={v_d81136.snsLoginLabel}>{v_8d41d7('screens.login.orLoginWith')}</Text>
       <View style={v_d81136.snsButtonContainer}>
         {}
-        <TouchableOpacity style={v_d81136.snsButton} disabled={v_4a6533}>
+        <TouchableOpacity
+          style={v_d81136.snsButton}
+          disabled={v_4a6533}
+          onPress={v_6dd38d}
+        >
           <SvgXml xml={v_d7e4c7} width={15} height={16} />
         </TouchableOpacity>
         {}

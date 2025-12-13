@@ -53,6 +53,7 @@ import {
   v_540580,
   v_f7bdb9,
   v_1cca63,
+  v_0e5276,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -62,6 +63,7 @@ import { v_a2474a } from './src/utils/env';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
+import { v_83e499 } from './src/services/googleAuth';
 import {
   v_c06f2c,
   v_259807,
@@ -316,6 +318,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'referralDepthTwo') {
     return <ReferralDepthTwoScreen />;
+  }
+
+  if (v_0f0c7b === 'referralInput') {
+    return <ReferralInputScreen />;
   }
 
   if (v_0f0c7b === 'shopTicket') {
@@ -631,6 +637,8 @@ export default function v_6540c3() {
   });
 
   v_c4deb2(() => {
+
+    v_83e499();
 
     const v_139fe0 = async () => {
       try {
