@@ -52,15 +52,7 @@ export const MyInfoScreen = () => {
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
-      {
-        id: 'shopSales',
-        label: t('screens.myInfo.shopSales'),
-        subtitle: t('screens.myinfoShopSales.title'),
-        iconName: 'storefront-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#7ca6e8',
-        route: 'myinfoShopSales',
-      },
+
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),
