@@ -16,7 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_1c4683, v_7a6f92, v_ad146c } from '../services';
+import { v_1c4683, v_7a6f92, v_38f5f4 } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -442,84 +442,8 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       console.log('Callback response:', v_714642);
 
       if (v_714642.status === 'success') {
-        v_1a68d1(true);
+        console.log('✅ Nasmob 콜백 전송 성공');
 
-        if (v_27bab6.current) {
-          clearTimeout(v_27bab6.current);
-          v_27bab6.current = null;
-        }
-        if (v_d35ccb.current) {
-          clearInterval(v_d35ccb.current);
-          v_d35ccb.current = null;
-        }
-
-        try {
-
-          const v_871fbe = v_d0b6d4?.advertisement;
-
-          if (!v_871fbe) {
-            console.error('[ShowNapAdScreen] ❌ advertisement가 비어있습니다. 이 상태로는 올바른 리워드를 줄 수 없습니다.', {
-              advertisementParams: v_d0b6d4,
-              advertisement: v_d0b6d4?.advertisement,
-              coin: v_d0b6d4?.coin,
-              campid: v_d0b6d4?.campid,
-              name: v_d0b6d4?.name,
-            });
-
-            v_e10ff9();
-            v_7f2e65();
-            v_d2702f(false);
-            v_1a68d1(false);
-            return;
-          }
-
-          const v_36e78d = parseInt(String(v_871fbe), 10);
-
-          if (isNaN(v_36e78d) || v_36e78d === 0) {
-            console.error('[ShowNapAdScreen] ❌ advertisement가 유효하지 않은 값입니다.', {
-              adIdRaw: v_871fbe,
-              adId: v_36e78d,
-              advertisementParams: v_d0b6d4,
-            });
-
-            v_e10ff9();
-            v_7f2e65();
-            v_d2702f(false);
-            v_1a68d1(false);
-            return;
-          }
-
-          console.log('[ShowNapAdScreen] ✅ advertisement 검증 통과:', {
-            adIdRaw: v_871fbe,
-            adId: v_36e78d,
-            coin: v_d0b6d4?.coin || '0',
-            member: v_660822,
-          });
-
-          const v_3393e3 = await v_ad146c(
-            v_36e78d,
-            v_d0b6d4?.coin || '0',
-            v_660822,
-            v_d0b6d4?.joindesc || '',
-            v_d0b6d4?.name || '',
-            v_d0b6d4?.xrunPrice || 0,
-            v_9b57fc,
-          );
-
-          if (v_3393e3 && v_3393e3.data) {
-            console.log('API response received:', v_3393e3);
-            v_d2702f(false);
-
-            console.log('✅ 리워드 처리 완료 - 사용자 버튼 클릭 대기');
-            v_1a68d1(true);
-          }
-        } catch (v_5e9bfe) {
-          console.error('Error calling API:', v_5e9bfe);
-          v_d2702f(false);
-
-          console.log('✅ 리워드 처리 완료 (에러 발생) - 사용자 버튼 클릭 대기');
-          v_1a68d1(true);
-        }
       }
     } catch (v_5e9bfe) {
       console.error('Error in ad completion process:', v_5e9bfe);
@@ -618,6 +542,32 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       await v_f1550c();
       console.log('[광고보기] 광고 API 호출 완료');
 
+      const v_aa0917 = v_d0b6d4?.campid || v_3aedd0?.campid || '';
+      if (v_aa0917 && v_660822) {
+        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
+
+        v_38f5f4(
+          v_660822,
+          v_aa0917,
+          'nas',
+          v_0890f8 ? undefined : v_9b57fc,
+        )
+          .then((v_3393e3) => {
+            console.log('[광고보기] processAdReward 응답:', v_3393e3);
+            v_1a68d1(true);
+            v_5a7a1a(false); 
+          })
+          .catch((v_5e9bfe) => {
+            console.error('[광고보기] processAdReward 호출 실패:', v_5e9bfe);
+
+          });
+      } else {
+        console.warn('[광고보기] campid 또는 member가 없어 리워드 처리를 건너뜁니다.', {
+          campid: v_aa0917,
+          member: v_660822,
+        });
+      }
+
       if (v_3aedd0?.urlAD) {
         v_2e98c9(v_3aedd0.urlAD);
       }
@@ -628,7 +578,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         v_2e98c9(v_3aedd0.urlAD);
       }
     }
-  }, [v_f1550c, v_3aedd0, v_2e98c9, v_d0b6d4]);
+  }, [v_f1550c, v_3aedd0, v_2e98c9, v_d0b6d4, v_660822, v_0890f8, v_9b57fc]);
 
   if (!v_d0b6d4) {
     return null;

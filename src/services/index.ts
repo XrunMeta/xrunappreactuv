@@ -2735,6 +2735,45 @@ export const v_ad146c = async (
   }
 };
 
+export const v_38f5f4 = async (
+  v_660822,
+  v_36e78d,
+  v_ce5e26 = 'nas',
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/processAdReward`;
+
+    const v_cd6a57 = {
+      member: typeof v_660822 === 'number' ? v_660822 : parseInt(String(v_660822), 10),
+      adId: typeof v_36e78d === 'number' ? v_36e78d : String(v_36e78d),
+      adType: v_ce5e26,
+    };
+
+    console.log('processAdReward 요청:', v_cd6a57);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_cd6a57),
+    });
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('processAdReward 응답:', v_43c42e);
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('processAdReward 호출 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_c509a2 = async (
   v_660822,
   v_a832b3,
