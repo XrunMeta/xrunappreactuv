@@ -164,14 +164,14 @@ let v_232839 = null;
 try {
 
   v_232839 = require('../../assets/logo_tempMarker.png');
-  console.log('✅ [MapMainScreen] 마커 이미지 로드 성공:', v_232839);
+
 } catch (v_9e86fd) {
 
   console.warn('❌ [MapMainScreen] logo_tempMarker.png not found:', v_9e86fd);
 
   try {
     v_232839 = require('../../assets/icon_xrun_round_logo.png');
-    console.log('✅ [MapMainScreen] 대체 마커 이미지 로드 성공');
+
   } catch (v_85f11a) {
     console.warn('❌ [MapMainScreen] 대체 마커 이미지도 없음:', v_85f11a);
   }
@@ -358,8 +358,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('❌ [loadMarkersForLocation] userData가 없습니다. 로그인이 필요할 수 있습니다.');
       return;
     }
-
-    console.log('✅ [loadMarkersForLocation] userData 확인 완료');
 
     try {
 
@@ -684,14 +682,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
       });
 
       v_1e6d95.slice(0, 5).forEach((v_5e3dbb, v_e86ad8) => {
-        console.log(`📊 서버 원본 마커 [${v_e86ad8}]:`, {
-          coin: v_5e3dbb.coin,
-          name: v_5e3dbb.name,
-          advertisement: v_5e3dbb.advertisement,
-          campid: v_5e3dbb.campid,
-          xrunPrice: v_5e3dbb.xrunPrice,
-          brand: v_5e3dbb.brand,
-        });
+
       });
 
       console.log('📌 [MapMainScreen] setMarkers 호출 (서버 데이터):', v_1e6d95.length, '개');
@@ -699,7 +690,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_c84980(v_f18a9c);
       v_a2b40c.current = v_f18a9c;
       v_9183ca.current = Date.now(); 
-      console.log('✅ [MapMainScreen] 마커 설정 완료');
 
       if (v_1e6d95.length === 0 && v_32428f < 1) {
         console.log(`⚠️ [MapMainScreen] 마커가 0개입니다. 2초 후 재시도합니다. (시도 ${v_32428f + 1}/1)`);
@@ -711,7 +701,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       const v_97e2bc = v_1e6d95.find(v_5e3dbb => v_5e3dbb.latitude && v_5e3dbb.longitude);
       if (v_97e2bc && v_97e2bc.latitude && v_97e2bc.longitude) {
         if (!v_3ec640.current) return;
-        console.log('📍 [MapMainScreen] 서버 데이터 로드 후 첫 번째 마커 위치로 맵 이동:', v_97e2bc.latitude, v_97e2bc.longitude);
 
         v_ca338a.current = true;
         v_3ec640.current.animateToRegion({
@@ -761,7 +750,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         }
       } else if (!v_97e2bc && v_e8ec67 && v_3ec640.current) {
 
-        console.log('📍 [MapMainScreen] 서버 데이터에 마커 없음 - 현재 GPS 위치로 이동:', v_e8ec67.latitude, v_e8ec67.longitude);
         v_ca338a.current = true;
         v_3ec640.current.animateToRegion({
           latitude: v_e8ec67.latitude,
@@ -869,7 +857,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_14dd24([]);
     } finally {
 
-      console.log('✅ [loadMarkersForLocation] 완료 (로딩 상태 해제)');
       v_5db874.current = false;
       v_e1bb1a(false);
       v_9cd9d5(false); 
@@ -1373,7 +1360,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         console.log('[MapMainScreen] 2단계: TopAd5 데이터 상태 저장:', v_e36b07.length, '개 광고');
         v_6549d0(v_e36b07);
 
-        console.log('[MapMainScreen] 3단계: 마커 데이터 가져오기 시작');
         const v_99c46d = await v_e84827.getItem('astorCoinsData');
 
         if (!v_99c46d) {
@@ -1387,7 +1373,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 전체 순차 매핑)');
         const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
           if (v_e36b07.length > 0) {
@@ -1415,11 +1400,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return v_5e3dbb;
         });
 
-        console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
         await v_e84827.setItem('astorCoinsData', JSON.stringify(v_8ceeaa));
-        console.log('[MapMainScreen] 마커-광고 매핑 완료:', v_8ceeaa.length, '개 마커에 광고 매핑');
 
-        console.log('[MapMainScreen] 6단계: 화면에 마커 표시 시작');
         const spotDataArray: v_f71847[] = v_8ceeaa.map((v_51b584) => ({
           spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
           distance: v_51b584.distance || 0,
@@ -1437,7 +1419,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         } as v_f71847 & { campid?: string }));
 
         v_14dd24(v_22ecab);
-        console.log('[MapMainScreen] 화면에 마커 표시 완료:', v_22ecab.length, '개 마커');
 
         console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
       } catch (v_5e9bfe) {
@@ -2036,12 +2017,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       return new Map<string, TopAd5Item | null>();
     }
 
-    console.log('[MapMainScreen] TopAd5 데이터 확인:', {
-      totalAds: v_4cf0ad.length,
-      adNames: v_4cf0ad.map(v_ddcfed => v_ddcfed.name || '이름 없음'),
-      adCompanies: v_4cf0ad.map(v_ddcfed => v_ddcfed.ad_company || '없음'),
-    });
-
     const v_b407aa = [...v_b4d4c5]
       .filter(v_5e3dbb => v_5e3dbb.latitude && v_5e3dbb.longitude)
       .map(v_5e3dbb => ({
@@ -2054,8 +2029,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         ),
       }))
       .sort((v_779914, v_148ff6) => v_779914.distance - v_148ff6.distance);
-
-    console.log('[MapMainScreen] 정렬된 마커 개수:', v_b407aa.length);
 
     const v_b3439a = new Map<string, TopAd5Item | null>();
     v_b407aa.forEach(({ marker: v_5e3dbb }, v_a56041) => {
@@ -2794,9 +2767,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
   }, [v_a55f0b]);
 
   const v_0f8a7a = v_df9f57(() => {
-    console.log('🔄 [memoizedMarkers] 재계산 시작, markers 개수:', v_b4d4c5.length);
+
     const v_e4cf17 = v_b4d4c5.filter((v_5e3dbb) => v_5e3dbb.latitude && v_5e3dbb.longitude); 
-    console.log('✅ [memoizedMarkers] 필터링 후 개수:', v_e4cf17.length);
+
     const v_f15433 = v_e4cf17.map((v_5e3dbb) => {
 
       const v_f3fb62 = v_5e3dbb.campid ?? '';

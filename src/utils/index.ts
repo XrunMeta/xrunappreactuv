@@ -216,7 +216,16 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
     const v_48b589 = await v_e84827.getItem('coldStartChecked');
     const v_1809fa = await v_e84827.getItem('app_last_background_timestamp');
     const v_b10cff = await v_e84827.getItem('checkedTimestamp');
-    const v_3a7b16 = Date.now();
+
+    const v_3a7b16 = Math.floor(Date.now() / 1000);
+
+    console.log('[Utils] checkColdStart 시작:', {
+      coldStartChecked: v_48b589,
+      lastBackgroundTimestamp: v_1809fa,
+      checkedTimestamp: v_b10cff,
+      currentTimestamp: v_3a7b16,
+      currentTimeISO: new Date(v_3a7b16 * 1000).toISOString(),
+    });
 
     if (v_48b589 === 'true' && v_b10cff) {
 
@@ -225,42 +234,131 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
         const v_3281b5 = await v_e84827.getItem('isColdStart');
         const v_720111 = await v_e84827.getItem('elapsedSeconds');
         const v_79cdcd = v_720111 ? parseInt(v_720111, 10) : 0;
+        console.log('[Utils] 백그라운드 타임스탬프 없음 - 기존 결과 반환:', {
+          isColdStart: v_3281b5,
+          elapsedSeconds: v_79cdcd,
+        });
         return {
           isColdStart: v_3281b5 === 'true',
           elapsedSeconds: v_79cdcd,
         };
       }
 
-      const v_3d8bda = parseInt(v_1809fa, 10);
-      if (isNaN(v_3d8bda) || v_3d8bda <= 0 || v_3d8bda > v_3a7b16) {
+      let v_3d8bda;
 
-        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
-        await v_e84827.setItem('isColdStart', 'true');
-        await v_e84827.setItem('elapsedSeconds', '0');
-        await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
-        return { isColdStart: true, elapsedSeconds: 0 };
+      const v_d77ee3 = /^\d+$/.test(v_1809fa);
+      if (!v_d77ee3) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 숫자 형식이 아닙니다:', v_1809fa, '(날짜 형식으로 변환 시도)');
+        try {
+
+          const v_9cb421 = new Date(v_1809fa);
+          const v_b08759 = Math.floor(v_9cb421.getTime() / 1000);
+
+          if (isNaN(v_b08759) || v_b08759 <= 0 || v_b08759 > v_3a7b16) {
+
+            console.warn('[Utils] 날짜 형식 변환 실패 또는 유효하지 않은 값:', v_1809fa, '(콜드스타트로 간주합니다.)');
+            await v_e84827.removeItem('app_last_background_timestamp');
+            await v_e84827.setItem('isColdStart', 'true');
+            await v_e84827.setItem('elapsedSeconds', '0');
+            await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
+            return { isColdStart: true, elapsedSeconds: 0 };
+          }
+
+          v_3d8bda = v_b08759;
+          await v_e84827.setItem('app_last_background_timestamp', v_3d8bda.toString());
+          console.log('[Utils] 날짜 형식을 타임스탬프(초 단위)로 변환하여 저장:', v_1809fa, '->', v_3d8bda);
+        } catch (v_5e9bfe) {
+
+          console.warn('[Utils] 날짜 형식 변환 중 오류:', v_5e9bfe, '(콜드스타트로 간주합니다.)');
+          await v_e84827.removeItem('app_last_background_timestamp');
+          await v_e84827.setItem('isColdStart', 'true');
+          await v_e84827.setItem('elapsedSeconds', '0');
+          await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
+          return { isColdStart: true, elapsedSeconds: 0 };
+        }
+      } else {
+
+        let v_8be971 = parseInt(v_1809fa, 10);
+
+        if (v_8be971 >= 1000000000000) {
+          console.log('[Utils] 밀리초 형식 감지, 초 단위로 변환:', v_8be971, '->', Math.floor(v_8be971 / 1000));
+          v_8be971 = Math.floor(v_8be971 / 1000);
+
+          await v_e84827.setItem('app_last_background_timestamp', v_8be971.toString());
+        }
+
+        v_3d8bda = v_8be971;
+        if (isNaN(v_3d8bda) || v_3d8bda <= 0 || v_3d8bda > v_3a7b16) {
+
+          console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다:', v_1809fa, '(콜드스타트로 간주합니다.)');
+          await v_e84827.removeItem('app_last_background_timestamp');
+          await v_e84827.setItem('isColdStart', 'true');
+          await v_e84827.setItem('elapsedSeconds', '0');
+          await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
+          return { isColdStart: true, elapsedSeconds: 0 };
+        }
       }
 
-      const v_93b8e4 = parseInt(v_b10cff, 10);
-      if (isNaN(v_93b8e4) || v_93b8e4 <= 0) {
+      let v_93b8e4 = parseInt(v_b10cff, 10);
 
-      } else if (v_3d8bda <= v_93b8e4) {
+      if (v_93b8e4 >= 1000000000000) {
+        console.log('[Utils] checkedTimestamp 밀리초 형식 감지, 초 단위로 변환:', v_93b8e4, '->', Math.floor(v_93b8e4 / 1000));
+        v_93b8e4 = Math.floor(v_93b8e4 / 1000);
 
-        const v_3281b5 = await v_e84827.getItem('isColdStart');
-        const v_720111 = await v_e84827.getItem('elapsedSeconds');
-        const v_79cdcd = v_720111 ? parseInt(v_720111, 10) : 0;
+        await v_e84827.setItem('checkedTimestamp', v_93b8e4.toString());
+      }
+
+      console.log('[Utils] 타임스탬프 비교:', {
+        backgroundTimestamp: v_3d8bda,
+        checkedTimestampNum: v_93b8e4,
+        currentTimestamp: v_3a7b16,
+        backgroundTimeISO: new Date(v_3d8bda * 1000).toISOString(),
+        checkedTimeISO: v_93b8e4 > 0 ? new Date(v_93b8e4 * 1000).toISOString() : 'invalid',
+        currentTimeISO: new Date(v_3a7b16 * 1000).toISOString(),
+      });
+
+      const v_79cdcd = v_3a7b16 - v_3d8bda;
+      const v_3281b5 = v_79cdcd >= 600; 
+
+      console.log('[Utils] 경과 시간 재계산:', {
+        currentTimestamp: v_3a7b16,
+        backgroundTimestamp: v_3d8bda,
+        elapsedSeconds: v_79cdcd,
+        isColdStart: v_3281b5,
+        backgroundTimeISO: new Date(v_3d8bda * 1000).toISOString(),
+        currentTimeISO: new Date(v_3a7b16 * 1000).toISOString(),
+      });
+
+      if (!isNaN(v_93b8e4) && v_93b8e4 > 0 && v_3d8bda <= v_93b8e4) {
+        const v_9e6dda = await v_e84827.getItem('isColdStart');
+        const v_fd28ae = await v_e84827.getItem('elapsedSeconds');
+        const v_c2ebad = v_fd28ae ? parseInt(v_fd28ae, 10) : 0;
+        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 기존 결과 반환:', {
+          savedIsColdStart: v_9e6dda,
+          savedElapsedSeconds: v_c2ebad,
+          calculatedElapsedSeconds: v_79cdcd,
+          backgroundTimestamp: v_3d8bda,
+          checkedTimestampNum: v_93b8e4,
+        });
         return {
-          isColdStart: v_3281b5 === 'true',
-          elapsedSeconds: v_79cdcd,
+          isColdStart: v_9e6dda === 'true',
+          elapsedSeconds: v_c2ebad,
         };
       }
-
-      const v_79cdcd = Math.floor((v_3a7b16 - v_3d8bda) / 1000);
-      const v_3281b5 = v_79cdcd >= 10; 
 
       await v_e84827.setItem('isColdStart', v_3281b5 ? 'true' : 'false');
       await v_e84827.setItem('elapsedSeconds', v_79cdcd.toString());
       await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
+
+      const v_c2ebad = await v_e84827.getItem('elapsedSeconds');
+      const v_9e6dda = await v_e84827.getItem('isColdStart');
+      console.log('[Utils] 재계산 결과 저장 완료:', {
+        savedElapsedSeconds: v_c2ebad,
+        savedIsColdStart: v_9e6dda,
+        calculatedElapsedSeconds: v_79cdcd,
+        calculatedIsColdStart: v_3281b5,
+      });
 
       return { isColdStart: v_3281b5, elapsedSeconds: v_79cdcd };
     }
@@ -274,17 +372,73 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
       v_79cdcd = 0;
     } else {
 
-      const v_3d8bda = parseInt(v_1809fa, 10);
-      if (isNaN(v_3d8bda) || v_3d8bda <= 0 || v_3d8bda > v_3a7b16) {
+      let v_3d8bda;
 
-        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
-        v_3281b5 = true;
-        v_79cdcd = 0;
+      const v_d77ee3 = /^\d+$/.test(v_1809fa);
+      if (!v_d77ee3) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 숫자 형식이 아닙니다:', v_1809fa, '(날짜 형식으로 변환 시도)');
+        try {
+
+          const v_9cb421 = new Date(v_1809fa);
+          const v_b08759 = Math.floor(v_9cb421.getTime() / 1000);
+
+          if (isNaN(v_b08759) || v_b08759 <= 0 || v_b08759 > v_3a7b16) {
+
+            console.warn('[Utils] 날짜 형식 변환 실패 또는 유효하지 않은 값:', v_1809fa, '(콜드스타트로 간주합니다.)');
+            await v_e84827.removeItem('app_last_background_timestamp');
+            v_3281b5 = true;
+            v_79cdcd = 0;
+          } else {
+
+            v_3d8bda = v_b08759;
+            await v_e84827.setItem('app_last_background_timestamp', v_3d8bda.toString());
+            console.log('[Utils] 날짜 형식을 타임스탬프(초 단위)로 변환하여 저장:', v_1809fa, '->', v_3d8bda);
+
+            v_79cdcd = v_3a7b16 - v_3d8bda;
+
+            v_3281b5 = v_79cdcd >= 600;
+          }
+        } catch (v_5e9bfe) {
+
+          console.warn('[Utils] 날짜 형식 변환 중 오류:', v_5e9bfe, '(콜드스타트로 간주합니다.)');
+          await v_e84827.removeItem('app_last_background_timestamp');
+          v_3281b5 = true;
+          v_79cdcd = 0;
+        }
       } else {
 
-        v_79cdcd = Math.floor((v_3a7b16 - v_3d8bda) / 1000);
+        let v_8be971 = parseInt(v_1809fa, 10);
 
-        v_3281b5 = v_79cdcd >= 600;
+        if (v_8be971 >= 1000000000000) {
+          console.log('[Utils] 밀리초 형식 감지, 초 단위로 변환:', v_8be971, '->', Math.floor(v_8be971 / 1000));
+          v_8be971 = Math.floor(v_8be971 / 1000);
+
+          await v_e84827.setItem('app_last_background_timestamp', v_8be971.toString());
+        }
+
+        v_3d8bda = v_8be971;
+        if (isNaN(v_3d8bda) || v_3d8bda <= 0 || v_3d8bda > v_3a7b16) {
+
+          console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다:', v_1809fa, '(콜드스타트로 간주합니다.)');
+          await v_e84827.removeItem('app_last_background_timestamp');
+          v_3281b5 = true;
+          v_79cdcd = 0;
+        } else {
+
+          v_79cdcd = v_3a7b16 - v_3d8bda;
+
+          v_3281b5 = v_79cdcd >= 600;
+
+          console.log('[Utils] 새로 체크 - 경과 시간 계산:', {
+            currentTimestamp: v_3a7b16,
+            backgroundTimestamp: v_3d8bda,
+            elapsedSeconds: v_79cdcd,
+            isColdStart: v_3281b5,
+            backgroundTimeISO: new Date(v_3d8bda * 1000).toISOString(),
+            currentTimeISO: new Date(v_3a7b16 * 1000).toISOString(),
+          });
+        }
       }
     }
 
@@ -292,6 +446,15 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
     await v_e84827.setItem('isColdStart', v_3281b5 ? 'true' : 'false');
     await v_e84827.setItem('elapsedSeconds', v_79cdcd.toString());
     await v_e84827.setItem('checkedTimestamp', v_3a7b16.toString());
+
+    const v_c2ebad = await v_e84827.getItem('elapsedSeconds');
+    const v_9e6dda = await v_e84827.getItem('isColdStart');
+    console.log('[Utils] 최종 저장 확인:', {
+      savedElapsedSeconds: v_c2ebad,
+      savedIsColdStart: v_9e6dda,
+      elapsedSeconds: v_79cdcd,
+      isColdStart: v_3281b5,
+    });
 
     return { isColdStart: v_3281b5, elapsedSeconds: v_79cdcd };
   } catch (v_5e9bfe) {

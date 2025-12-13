@@ -657,33 +657,71 @@ export default function v_6540c3() {
 
   v_c4deb2(() => {
     const v_7a424f = async (nextAppState: v_c3551b) => {
+      const v_e263a1 = v_1b7402.current;
+      console.log('[App] AppState 변경 감지:', {
+        previous: v_e263a1,
+        next: v_3b10d8,
+        currentTime: new Date().toISOString(),
+      });
+
       if (
-        v_1b7402.current.match(/inactive|background/) &&
+        v_e263a1.match(/inactive|background/) &&
         v_3b10d8 === 'active'
       ) {
 
+        console.log('[App] 포그라운드 복귀 감지');
         await v_e84827.setItem('app_last_state', v_3b10d8);
-      } else if (
-        v_1b7402.current === 'active' &&
-        v_3b10d8.match(/inactive|background/)
+      } 
+
+      else if (
+        v_e263a1 === 'active' &&
+        (v_3b10d8 === 'inactive' || v_3b10d8 === 'background')
       ) {
 
+        console.log('[App] 백그라운드/비활성화 전환 감지:', v_3b10d8);
         try {
-          const v_3d8bda = Date.now();
+
+          const v_3d8bda = Math.floor(Date.now() / 1000);
+          const v_da5b2d = v_3d8bda.toString();
           await v_e84827.setItem('app_last_state', v_3b10d8);
-          await v_e84827.setItem('app_last_background_timestamp', v_3d8bda.toString());
-          console.log('[App] 앱 백그라운드 전환 - 백그라운드 시간 저장:', new Date(v_3d8bda).toISOString());
+          await v_e84827.setItem('app_last_background_timestamp', v_da5b2d);
+          console.log('[App] ✅ 백그라운드 시간 저장 완료:', {
+            timestamp: v_da5b2d,
+            date: new Date(v_3d8bda * 1000).toISOString(),
+            isNumeric: /^\d+$/.test(v_da5b2d),
+          });
+
+          const v_595ec2 = await v_e84827.getItem('app_last_background_timestamp');
+          console.log('[App] 저장된 값 확인:', v_595ec2);
         } catch (v_5e9bfe) {
-          console.error('[App] 앱 상태 저장 실패:', v_5e9bfe);
+          console.error('[App] ❌ 앱 상태 저장 실패:', v_5e9bfe);
         }
+      } 
+
+      else if (
+        v_e263a1 === 'inactive' &&
+        v_3b10d8 === 'background'
+      ) {
+
+        console.log('[App] inactive -> background 전환 (타임스탬프는 이미 저장됨)');
+        await v_e84827.setItem('app_last_state', v_3b10d8);
+      } 
+      else {
+        console.log('[App] AppState 변경 (처리하지 않음):', {
+          previous: v_e263a1,
+          next: v_3b10d8,
+        });
       }
 
       v_1b7402.current = v_3b10d8;
     };
 
+    console.log('[App] AppState 리스너 등록, 현재 상태:', v_6b5698.currentState);
+
     const v_269481 = v_6b5698.addEventListener('change', v_7a424f);
 
     return () => {
+      console.log('[App] AppState 리스너 제거');
       v_269481?.remove();
     };
   }, []);

@@ -353,22 +353,7 @@ const v_7488d5 = (v_c65f5d) => {
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
 
       if (v_74a79c.data) {
-        console.log(`[API Request Data] ${v_74a79c.url}:`, JSON.stringify(v_74a79c.data));
-        console.log(`[API Request Data 상세] ${v_74a79c.url}:`, {
-          원본데이터: v_74a79c.data,
-          직렬화: JSON.stringify(v_74a79c.data),
-          파싱: JSON.parse(JSON.stringify(v_74a79c.data)),
-          타입확인: {
-            member: v_74a79c.data.member !== undefined ? { 값: v_74a79c.data.member, 타입: typeof v_74a79c.data.member } : '없음',
-            country: v_74a79c.data.country !== undefined ? { 값: v_74a79c.data.country, 타입: typeof v_74a79c.data.country } : '없음',
-            region: v_74a79c.data.region !== undefined ? { 값: v_74a79c.data.region, 타입: typeof v_74a79c.data.region } : '없음',
-          },
-          undefined체크: {
-            member: v_74a79c.data.member === undefined,
-            country: v_74a79c.data.country === undefined,
-            region: v_74a79c.data.region === undefined,
-          },
-        });
+
       }
       return v_74a79c;
     },
@@ -1845,25 +1830,12 @@ export const v_f84ef5 = async (
       limit: 120,
     };
 
-    console.log('🌐 [app2000-01] fetchMapMarkerData API 호출 시작');
-    console.log('🌐 [app2000-01] endpoint: app2000-01');
-    console.log('🌐 [app2000-01] requestBody:', JSON.stringify(v_cd6a57, null, 2));
-    console.log('🌐 [app2000-01] axiosInstance.post 호출 전');
-
     const v_3393e3 = await v_9f42a4.post(
       '/app2000-01',
       v_cd6a57,
     );
 
-    console.log('✅ [app2000-01] axiosInstance.post 응답 받음');
     const v_9390e8 = v_3393e3.data;
-    console.log('✅ [app2000-01] fetchMapMarkerData API 응답 완료');
-    console.log('✅ [app2000-01] data.data length:', v_9390e8?.data?.length);
-    console.log('✅ [app2000-01] 전체 응답 구조:', {
-      success: v_9390e8?.success,
-      dataLength: v_9390e8?.data?.length,
-      hasData: !!v_9390e8?.data,
-    });
 
     if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
       return v_9390e8.data.map((v_8c0b26) => {
@@ -2575,11 +2547,6 @@ export const v_c07360 = async (
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
-    console.log(`🌐 [gatewayNodeJS] endpoint: ${v_09dafd}`);
-    console.log(`🌐 [gatewayNodeJS] method: ${v_bfe9b9}`);
-    console.log(`🌐 [gatewayNodeJS] url: ${v_f71b56}`);
-    console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(v_cd6a57, null, 2));
-    console.log(`🌐 [gatewayNodeJS] fetch 호출 전`);
 
     const v_3393e3 = await fetch(v_f71b56, {
       method: v_bfe9b9,
@@ -2590,21 +2557,11 @@ export const v_c07360 = async (
       body: JSON.stringify(v_cd6a57),
     });
 
-    console.log(`✅ [gatewayNodeJS] fetch 응답 받음, status: ${v_3393e3.status}`);
-
     if (!v_3393e3.ok) {
       throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     }
 
     const v_43c42e = await v_3393e3.json();
-    console.log(`✅ [gatewayNodeJS] API 응답 성공`);
-    console.log(`✅ [gatewayNodeJS] endpoint: ${v_09dafd}`);
-    console.log(`✅ [gatewayNodeJS] result.data length:`, v_43c42e?.data?.length || 'N/A');
-    console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
-      success: v_43c42e?.success,
-      dataLength: v_43c42e?.data?.length,
-      hasData: !!v_43c42e?.data,
-    });
 
     return v_43c42e;
   } catch (v_5e9bfe) {
@@ -4579,14 +4536,7 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
 
     const v_cd6a57 = { os: v_e16099, member: v_660822 };
 
-    console.log('[getTopAd5] API 호출 시작');
-    console.log('[getTopAd5] OS:', v_e16099);
-    console.log('[getTopAd5] member:', v_660822);
-
     const v_3393e3 = await v_c07360('getTopAd5', 'POST', v_cd6a57, v_c65f5d);
-
-    console.log('[getTopAd5] API 호출 완료 - 원본 response 타입:', typeof v_3393e3);
-    console.log('[getTopAd5] API 호출 완료 - 원본 response:', v_3393e3);
 
     if (!v_3393e3) {
       console.warn('[getTopAd5] API 응답이 없습니다.');

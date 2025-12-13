@@ -222,14 +222,6 @@ export const v_0433f6 = (
   v_967a83 = 'article',
   v_37b355 = 'mix',
 ): string => {
-  console.log('[Taboola] HTML 생성:', {
-    publisherId: v_26f42c,
-    placement: v_f36218,
-    mode: v_34e5bb,
-    pageUrl: v_cdfaaa,
-    pageType: v_967a83,
-    targetType: v_37b355,
-  });
 
   return `
 <!DOCTYPE html>
@@ -459,8 +451,6 @@ export const v_295e39 = async (): Promise<void> => {
       v_dc5d8f('shop', false),
     ];
 
-    console.log('[Taboola] HTML 프리로드 시작:', v_ab9b34);
-
     for (const v_f36218 of v_ab9b34) {
       try {
         const v_74a79c = v_968eda[v_f36218];
@@ -484,9 +474,7 @@ export const v_295e39 = async (): Promise<void> => {
       }
     }
 
-    console.log('[Taboola] HTML 프리로드 완료');
   } catch (v_5e9bfe) {
-    console.error('[Taboola] HTML 프리로드 중 오류:', v_5e9bfe);
 
   }
 };
