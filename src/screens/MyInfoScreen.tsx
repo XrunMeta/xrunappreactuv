@@ -52,15 +52,7 @@ export const v_03a231 = () => {
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
-      {
-        id: 'shopSales',
-        label: v_8d41d7('screens.myInfo.shopSales'),
-        subtitle: v_8d41d7('screens.myinfoShopSales.title'),
-        iconName: 'storefront-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#7ca6e8',
-        route: 'myinfoShopSales',
-      },
+
       {
         id: 'notify',
         label: v_8d41d7('screens.myInfo.notify'),
