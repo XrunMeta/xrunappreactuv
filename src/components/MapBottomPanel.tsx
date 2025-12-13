@@ -54,14 +54,14 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
   v_c4deb2(() => {
     if (v_cf55be) {
       v_a2349e.timing(v_8f79f8, {
-        toValue: 130, 
+        toValue: 110, 
         duration: 600,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     } else {
       v_a2349e.timing(v_8f79f8, {
-        toValue: 120, 
+        toValue: 100, 
         duration: 300,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
@@ -108,7 +108,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
             },
           ]}>
           {}
-          {v_cf55be && v_1d0937 && (
+
             <View
               style={{
                 alignItems: 'center',
@@ -124,8 +124,7 @@ export const MapBottomPanel: v_a3453e.FC<MapBottomPanelProps> = ({
                   borderRadius: 2,
                 }}
               />
-            </View>
-          )}
+            </View> 
 
           {}
           {v_1d0937 && (
