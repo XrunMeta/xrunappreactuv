@@ -35,6 +35,7 @@ const spots = [
   { spotID: 2, x: -100, y: 50 },
   { spotID: 3, x: 100, y: 50 },
   { spotID: 4, x: -50, y: 150 },
+  { spotID: 5, x: 50, y: 150 },
 ];
 
 const getRandomOffset = (value: number, range: number): number => {
@@ -476,7 +477,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [coinsData, setCoinsData] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const currentIndexRef = useRef(0);
-  const chunkSize = 4;
+  const chunkSize = 5;
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -679,7 +680,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
     }
 
-    console.log('📋 [organizeData] 선택된 데이터 (처음 4개):', nextData.slice(0, 4).map((d, idx) => ({
+    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', nextData.slice(0, 5).map((d, idx) => ({
       index: idx,
       distance: d.distance,
       advertisement: d.advertisement,
@@ -818,7 +819,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   setCoinsData(mappedCoinsData);
 
                   currentIndexRef.current = 0;
-                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
                   organizeData(mappedCoinsData);
                 } else {
@@ -1024,7 +1025,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             setCoinsData(mappedCoinsData);
 
             currentIndexRef.current = 0;
-            console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 4개 사용)');
+            console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
             organizeData(mappedCoinsData);
           } else {
