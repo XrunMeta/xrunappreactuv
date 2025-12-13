@@ -190,7 +190,6 @@ const DataListComponent = <T extends Record<string, any>>(
         <>
           {data.map((item, index) => {
 
-            console.log('[DataList] item:', item, 'itemProps:', itemProps);
             return (
               <View key={getKey(item, index)}>
                 <ItemComponent
