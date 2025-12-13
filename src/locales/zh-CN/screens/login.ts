@@ -10,6 +10,7 @@ export default {
   emailPlaceholder: '请输入邮箱',
   passwordLabel: '密码',
   passwordPlaceholder: '请输入密码',
+  xrunPasswordLabel: 'XRUN账户密码',
   rememberMe: '保持登录状态',
   loginButton: '登录',
   disclaimer: '如果您忘记密码，可以使用社交登录或邮箱OTP登录。',
