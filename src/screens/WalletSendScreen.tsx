@@ -144,6 +144,14 @@ export const WalletSendScreen = () => {
   }, [receiverAddress, t, showAlert]);
 
   useEffect(() => {
+    setSendAmount('0');
+    setReceiverAddress('');
+    setAddressError(null);
+    prevAddressRef.current = '';
+    amountInputRef.current?.blur();
+  }, []);
+
+  useEffect(() => {
     loadAddressBook();
   }, []);
 
@@ -248,7 +256,7 @@ export const WalletSendScreen = () => {
                 if (response?.status === 'success' && response?.data && Array.isArray(response.data)) {
 
                   const matchedLimit = response.data.find(
-                    (item: { currency: number; limitTransferPolXrun?: number; limitTransfer?: number }) => 
+                    (item: { currency: number; limitTransferPolXrun?: number; limitTransfer?: number }) =>
                       item.currency === selectedWalletAsset.currency
                   );
 
@@ -296,14 +304,6 @@ export const WalletSendScreen = () => {
     resetWalletSendAddress();
   }, [resetWalletSendAddress]);
 
-  useEffect(() => {
-    setSendAmount('0');
-    setReceiverAddress('');
-    setAddressError(null);
-    prevAddressRef.current = '';
-    amountInputRef.current?.blur();
-  }, []);
-
   const handlePastePress = () => {
     navigate(ROUTES.addWalletAddress);
   };
@@ -343,11 +343,11 @@ export const WalletSendScreen = () => {
         const updatedAddresses = existingAddresses.map((item) =>
           item.id === editingItem.id
             ? {
-                ...item,
-                name: modalName.trim(),
-                address: modalAddress.trim(),
-                network: modalNetwork,
-              }
+              ...item,
+              name: modalName.trim(),
+              address: modalAddress.trim(),
+              network: modalNetwork,
+            }
             : item
         );
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
@@ -630,10 +630,10 @@ export const WalletSendScreen = () => {
                 <Text style={styles.emptyAddressText}>{t('screens.walletSend.noAddresses')}</Text>
               </View>
             ) : (
-              <SafeScrollView 
-                showsVerticalScrollIndicator={false} 
-                showBottomBackground={false} 
-                backgroundColor='transparent' 
+              <SafeScrollView
+                showsVerticalScrollIndicator={false}
+                showBottomBackground={false}
+                backgroundColor='transparent'
                 autoAdjustKeyboardPadding={true}
                 onScrollBeginDrag={() => {
 
