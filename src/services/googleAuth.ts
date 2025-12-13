@@ -79,6 +79,7 @@ export interface GoogleAuthResult {
     isSignupCompleted?: boolean; 
     missingFields?: Record<string, boolean>; 
     requiresLinking?: boolean; 
+    requiresSignup?: boolean; 
     confirmationToken?: string; 
   };
   code?: string;
@@ -177,6 +178,19 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
             requiresLinking: true,
             email: data.data?.email || '', 
             confirmationToken: data.data?.confirmationToken || '', 
+          },
+        };
+      }
+
+      if (data.code === 417) {
+        console.log('[구글 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+        return {
+          success: true,
+          data: {
+            ...data.data,
+            requiresSignup: true,
+            email: data.data?.email || userInfo.data?.user.email || '', 
+            isSignupCompleted: false,
           },
         };
       }
