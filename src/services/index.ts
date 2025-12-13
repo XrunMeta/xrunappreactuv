@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 import { ROUTES } from '../navigation';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
+
+export * from './googleAuth';
 import {
   AliveResponse,
   KeepAliveServerResponse,
@@ -497,6 +499,8 @@ export const signup = async (
       gender: signupData.gender,
       age: signupData.age,
       os: signupData.os,
+      mobile: signupData.mobile,
+      region: signupData.region,
     });
 
     const response = await axiosInstance.post<SignupResponse>(
@@ -504,12 +508,27 @@ export const signup = async (
       signupData,
     );
 
+    console.log('[회원가입 3단계] 회원가입 응답:', {
+      status: response.status,
+      data: response.data,
+    });
+
     const result = response.data.data[0]?.text === 'ok';
     console.log('[회원가입 3단계] 회원가입 결과:', result ? '성공' : '실패');
 
     return result;
   } catch (error) {
     console.error('[회원가입 3단계] 회원가입 실행 실패:', error);
+    if (error instanceof AxiosError) {
+      console.error('[회원가입 3단계] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        requestData: error.config?.data,
+      });
+    }
     throw error;
   }
 };
@@ -828,8 +847,12 @@ export const verifyEmailCode = async (
       request,
     );
 
-    const result = response.data.status === 'success';
-    console.log('[로그인] 이메일 인증 코드 확인 결과:', result ? '성공' : '실패');
+    const result = !!(response.data.member || response.data.status === 'success');
+    console.log('[로그인] 이메일 인증 코드 확인 결과:', result ? '성공' : '실패', {
+      member: response.data.member,
+      transaction: response.data.transaction,
+      status: response.data.status,
+    });
 
     return result;
   } catch (error) {

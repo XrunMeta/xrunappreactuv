@@ -54,4 +54,5 @@ export { ShowNapAdScreen } from './ShowNapAdScreen';
 export { ShowPockAdScreen } from './ShowPockAdScreen';
 export { XRUNinfoScreen } from './XRUNinfo';
 export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
+export { ReferralInputScreen } from './ReferralInputScreen';
 

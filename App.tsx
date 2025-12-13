@@ -53,6 +53,7 @@ import {
   ShowPockAdScreen,
   XRUNinfoScreen,
   MyinfoShopSalesScreen,
+  ReferralInputScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -62,6 +63,7 @@ import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
+import { initGoogleSignIn } from './src/services/googleAuth';
 import {
   useFonts,
   Roboto_400Regular,
@@ -316,6 +318,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'referralDepthTwo') {
     return <ReferralDepthTwoScreen />;
+  }
+
+  if (currentScreen === 'referralInput') {
+    return <ReferralInputScreen />;
   }
 
   if (currentScreen === 'shopTicket') {
@@ -631,6 +637,8 @@ export default function App() {
   });
 
   useEffect(() => {
+
+    initGoogleSignIn();
 
     const initializeApp = async () => {
       try {
