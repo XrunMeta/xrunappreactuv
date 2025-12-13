@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { Header, SegmentedControl, DataList, SafeView, Dialog } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
-import { formatCurrency, showToast } from '../utils';
+import { formatCurrency, showToast, getColdStartResult } from '../utils';
 import {
   fetchADXRUNEstimateList,
   fetchADXRUNResultList,
@@ -55,6 +55,7 @@ export const AdWalletScreen = () => {
   const [canReward, setCanReward] = useState<boolean | null>(null);
   const [attendanceCheckLoading, setAttendanceCheckLoading] = useState(false);
   const [isJoiningQuest, setIsJoiningQuest] = useState(false);
+  const [isColdStart, setIsColdStart] = useState<boolean | null>(null);
 
   const pendingListRef = useRef<DataListRef>(null);
   const questListRef = useRef<DataListRef>(null);
@@ -78,6 +79,25 @@ export const AdWalletScreen = () => {
     };
 
     getMember();
+  }, []);
+
+  useEffect(() => {
+    const checkAppState = async () => {
+      try {
+        const result = await getColdStartResult();
+        if (result) {
+          setIsColdStart(result.isColdStart);
+        } else {
+
+          setIsColdStart(true);
+        }
+      } catch (error) {
+        console.error('[AdWallet] 앱 상태 확인 실패:', error);
+        setIsColdStart(true);
+      }
+    };
+
+    checkAppState();
   }, []);
 
   useEffect(() => {
@@ -422,6 +442,14 @@ export const AdWalletScreen = () => {
 
   const handleQuestItemPress = useCallback(async (item: AdEntry) => {
 
+    try {
+      await AsyncStorage.setItem('isColdStart', 'false');
+      setIsColdStart(false);
+      console.log('[AdWallet] 퀘스트 클릭으로 앱 상태를 웜스타트로 변경');
+    } catch (error) {
+      console.error('[AdWallet] 앱 상태 변경 실패:', error);
+    }
+
     if (tab === 'quest' && (item.id === 1 || item.id === '1')) {
       if (!member) {
         console.error('[AdWallet] member 정보가 없습니다.');
@@ -513,29 +541,70 @@ export const AdWalletScreen = () => {
     const isQuest = !!item.title;
     const { onPress, ...itemData } = item;
 
+    const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
+
+    const isWarmStartQuestIdOne = isQuestIdOne && isColdStart === false;
+
+    const cardStyle = isQuestIdOne
+      ? isColdStart === true
+        ? [styles.adCard, styles.questIdOneColdStart] 
+        : isColdStart === false
+        ? [styles.adCard, styles.questIdOneWarmStart] 
+        : styles.adCard 
+      : styles.adCard;
+
+    const disabledColor = '#cccccc';
+
     return (
       <TouchableOpacity
-        style={styles.adCard}
+        style={cardStyle}
         onPress={onPress}
         activeOpacity={0.7}
       >
         <View style={styles.adCardHeader}>
-          <Text style={styles.adCardStatus}>{item.status}</Text>
-          <Text style={styles.adCardDate}>{item.date}</Text>
+          <Text style={[
+            styles.adCardStatus,
+            isWarmStartQuestIdOne && { backgroundColor: disabledColor, color: '#ffffff' }
+          ]}>
+            {item.status}
+          </Text>
+          <Text style={[
+            styles.adCardDate,
+            isWarmStartQuestIdOne && { color: disabledColor }
+          ]}>
+            {item.date}
+          </Text>
         </View>
         {isQuest && item.title && (
           <View style={styles.questTitleContainer}>
-            <Text style={styles.questTitle}>{item.title}</Text>
+            <Text style={[
+              styles.questTitle,
+              isWarmStartQuestIdOne && { color: disabledColor }
+            ]}>
+              {item.title}
+            </Text>
             {item.description && (
-              <Text style={styles.questDescription}>{item.description}</Text>
+              <Text style={[
+                styles.questDescription,
+                isWarmStartQuestIdOne && { color: disabledColor }
+              ]}>
+                {item.description}
+              </Text>
             )}
           </View>
         )}
         <View style={styles.adCardRow}>
-          <Text style={styles.adCardRowLabel}>
+          <Text style={[
+            styles.adCardRowLabel,
+            isWarmStartQuestIdOne && { color: disabledColor }
+          ]}>
             {isQuest ? t('screens.adWallet.rewardAmount') : t('screens.adWallet.expectedAdRevenue')}
           </Text>
-          <Text style={[styles.adCardRowAmount, { color: item.expectedAdRevenueColor }]}>
+          <Text style={[
+            styles.adCardRowAmount,
+            { color: item.expectedAdRevenueColor },
+            isWarmStartQuestIdOne && { color: disabledColor }
+          ]}>
             {item.expectedAdRevenue}
           </Text>
         </View>
@@ -547,11 +616,9 @@ export const AdWalletScreen = () => {
           </Text>
         </View>
         )}
-        {isQuest && item.rewardDescription && (
-          <View style={styles.questRewardContainer}>
-            <Text style={styles.questRewardDescription}>{item.rewardDescription}</Text>
-          </View>
-        )}
+        {
+
+}
       </TouchableOpacity>
     );
   };
@@ -874,5 +941,12 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#121212',
+  },
+  questIdOneColdStart: {
+    borderWidth: 2,
+    borderColor: '#ffdc04', 
+  },
+  questIdOneWarmStart: {
+    borderWidth: 0, 
   },
 });

@@ -256,7 +256,7 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
       }
 
       const elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
-      const isColdStart = elapsedSeconds >= 600; 
+      const isColdStart = elapsedSeconds >= 10; 
 
       await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
       await AsyncStorage.setItem('elapsedSeconds', elapsedSeconds.toString());
