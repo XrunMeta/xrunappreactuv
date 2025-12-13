@@ -345,7 +345,7 @@ export const MapMainScreen: React.FC = () => {
 
   };
 
-  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData, forceRefresh: boolean = false, currentGpsLocation?: LocationData | null) => {
+  const loadMarkersForLocation = useCallback(async (targetLocation: LocationData, forceRefresh: boolean = false, currentGpsLocation?: LocationData | null, retryCount: number = 0) => {
     console.log('🚀 [loadMarkersForLocation] 시작:', { targetLocation, forceRefresh, hasCurrentGpsLocation: !!currentGpsLocation });
 
     if (loadingMarkersRef.current) {
@@ -570,9 +570,9 @@ export const MapMainScreen: React.FC = () => {
       console.log('마커 개수:', markerDataRaw.length);
 
       const virtualCoinResponse = await fetchVirtualCoin(
+        member,
         targetLocation.latitude,
         targetLocation.longitude,
-        member,
         navigate,
       );
 
@@ -700,6 +700,13 @@ export const MapMainScreen: React.FC = () => {
       lastFetchedLocationRef.current = targetLocation;
       lastMarkerRefreshTimeRef.current = Date.now(); 
       console.log('✅ [MapMainScreen] 마커 설정 완료');
+
+      if (uniqueMarkers.length === 0 && retryCount < 1) {
+        console.log(`⚠️ [MapMainScreen] 마커가 0개입니다. 2초 후 재시도합니다. (시도 ${retryCount + 1}/1)`);
+        setTimeout(() => {
+          loadMarkersForLocation(targetLocation, true, currentGpsLocation, retryCount + 1);
+        }, 2000);
+      }
 
       const firstMarker = uniqueMarkers.find(marker => marker.latitude && marker.longitude);
       if (firstMarker && firstMarker.latitude && firstMarker.longitude) {
