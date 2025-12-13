@@ -14,7 +14,6 @@ export const MyinfoShopSalesScreen = () => {
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const dataListRef = useRef<DataListRef>(null);
-  const [totalMembers] = useState<number>(3);
   const [isLoading] = useState<boolean>(false);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -233,9 +232,7 @@ export const MyinfoShopSalesScreen = () => {
   };
 
   const sampleMembers: ShopSalesMemberData[] = [
-    { id: 'user001', name: '홍길동', date: '2025.01.01', settlement: '50,000원' },
-    { id: 'user002', name: '김철수', date: '2025.01.02', settlement: '50,000원' },
-    { id: 'user003', name: '이영희', date: '2025.01.03', settlement: '50,000원' },
+
   ];
 
   const fetchSalesMembers = useCallback(async (
@@ -275,10 +272,10 @@ export const MyinfoShopSalesScreen = () => {
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>{t('screens.myinfoShopSales.productTitle')}</Text>
           <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>50,000{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>60{t('screens.myinfoShopSales.personUnit')}</Text>
+            {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>0{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>0{t('screens.myinfoShopSales.personUnit')}</Text>
           </Text>
           <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>3,000,000{t('screens.myinfoShopSales.currency')}</Text> /{t('screens.myinfoShopSales.settlementInfo')}
+            {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>0{t('screens.myinfoShopSales.currency')}</Text> /{t('screens.myinfoShopSales.settlementInfo')}
           </Text>
         </View>
 
@@ -289,7 +286,7 @@ export const MyinfoShopSalesScreen = () => {
         </View>
 
         <View style={styles.listContainer}>
-          {!isLoading && totalMembers === 0 ? (
+          {!isLoading && sampleMembers.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyDescription}>{t('screens.myinfoShopSales.noData')}</Text>
             </View>
