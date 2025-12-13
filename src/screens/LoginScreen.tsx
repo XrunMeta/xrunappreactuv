@@ -633,12 +633,15 @@ export const v_f4f851 = () => {
         ]}
       >
         <View style={v_d81136.linkingContainer}>
-          <Text style={v_d81136.linkingMessage}>
-            구글 계정으로 XRUN의 <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
+          <Text style={v_d81136.linkingMessage}>{`XRUN 계정에 Google 계정을 연결하면
+보다 간편하게 로그인할 수 있습니다.
+
+구글 계정과 xrun계정`}
+          <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 
           <FormField
-            label={v_8d41d7('screens.login.passwordLabel') || '비밀번호'}
+            label={v_8d41d7('screens.login.xrunPasswordLabel') || 'XRUN 계정 비밀번호'}
             placeholder={v_8d41d7('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
             secureTextEntry={true} 
             value={v_d11af5}

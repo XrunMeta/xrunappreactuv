@@ -10,6 +10,7 @@ export default {
   emailPlaceholder: 'メールアドレスを入力してください',
   passwordLabel: 'パスワード',
   passwordPlaceholder: 'パスワードを入力してください',
+  xrunPasswordLabel: 'XRUNアカウントパスワード',
   rememberMe: 'ログイン状態を維持',
   loginButton: 'ログイン',
   disclaimer: 'パスワードを忘れた場合は、ソーシャルログインまたはメールOTPログインでログインできます。',

@@ -10,6 +10,7 @@ export default {
   emailPlaceholder: 'Please enter your email',
   passwordLabel: 'Password',
   passwordPlaceholder: 'Please enter your password',
+  xrunPasswordLabel: 'XRUN Account Password',
   rememberMe: 'Keep me logged in',
   loginButton: 'Login',
   disclaimer: 'If you forgot your password, you can log in with social login or email OTP login.',
