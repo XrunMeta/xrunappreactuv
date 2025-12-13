@@ -256,7 +256,7 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
       }
 
       const v_79cdcd = Math.floor((v_3a7b16 - v_3d8bda) / 1000);
-      const v_3281b5 = v_79cdcd >= 30; 
+      const v_3281b5 = v_79cdcd >= 600; 
 
       await v_e84827.setItem('isColdStart', v_3281b5 ? 'true' : 'false');
       await v_e84827.setItem('elapsedSeconds', v_79cdcd.toString());
