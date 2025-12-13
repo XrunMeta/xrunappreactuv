@@ -2735,6 +2735,45 @@ export const gatewayNodeJSApp3100 = async (
   }
 };
 
+export const processAdReward = async (
+  member: number | string,
+  adId: number | string,
+  adType: 'nas' | 'pointclick' = 'nas',
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/processAdReward`;
+
+    const requestBody = {
+      member: typeof member === 'number' ? member : parseInt(String(member), 10),
+      adId: typeof adId === 'number' ? adId : String(adId),
+      adType: adType,
+    };
+
+    console.log('processAdReward 요청:', requestBody);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await response.json();
+    console.log('processAdReward 응답:', result);
+    return result;
+  } catch (error) {
+    console.error('processAdReward 호출 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
 export const getTotalHistory = async (
   member: number,
   currency: number,

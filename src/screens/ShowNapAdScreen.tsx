@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, gatewayNodeJSApp3100 } from '../services';
+import { getNasmobAds, sendNasmobCallback, processAdReward } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -442,84 +442,8 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       console.log('Callback response:', callbackResponse);
 
       if (callbackResponse.status === 'success') {
-        setWaitingForWebSocketResponse(true);
+        console.log('✅ Nasmob 콜백 전송 성공');
 
-        if (rewardProcessingTimeoutRef.current) {
-          clearTimeout(rewardProcessingTimeoutRef.current);
-          rewardProcessingTimeoutRef.current = null;
-        }
-        if (rewardProcessingIntervalRef.current) {
-          clearInterval(rewardProcessingIntervalRef.current);
-          rewardProcessingIntervalRef.current = null;
-        }
-
-        try {
-
-          const adIdRaw = advertisementParams?.advertisement;
-
-          if (!adIdRaw) {
-            console.error('[ShowNapAdScreen] ❌ advertisement가 비어있습니다. 이 상태로는 올바른 리워드를 줄 수 없습니다.', {
-              advertisementParams,
-              advertisement: advertisementParams?.advertisement,
-              coin: advertisementParams?.coin,
-              campid: advertisementParams?.campid,
-              name: advertisementParams?.name,
-            });
-
-            resetAdvertisementParams();
-            handleClose();
-            setIsProcessing(false);
-            setWaitingForWebSocketResponse(false);
-            return;
-          }
-
-          const adId = parseInt(String(adIdRaw), 10);
-
-          if (isNaN(adId) || adId === 0) {
-            console.error('[ShowNapAdScreen] ❌ advertisement가 유효하지 않은 값입니다.', {
-              adIdRaw,
-              adId,
-              advertisementParams,
-            });
-
-            resetAdvertisementParams();
-            handleClose();
-            setIsProcessing(false);
-            setWaitingForWebSocketResponse(false);
-            return;
-          }
-
-          console.log('[ShowNapAdScreen] ✅ advertisement 검증 통과:', {
-            adIdRaw,
-            adId,
-            coin: advertisementParams?.coin || '0',
-            member,
-          });
-
-          const response = await gatewayNodeJSApp3100(
-            adId,
-            advertisementParams?.coin || '0',
-            member,
-            advertisementParams?.joindesc || '',
-            advertisementParams?.name || '',
-            advertisementParams?.xrunPrice || 0,
-            navigate,
-          );
-
-          if (response && response.data) {
-            console.log('API response received:', response);
-            setIsProcessing(false);
-
-            console.log('✅ 리워드 처리 완료 - 사용자 버튼 클릭 대기');
-            setWaitingForWebSocketResponse(true);
-          }
-        } catch (error) {
-          console.error('Error calling API:', error);
-          setIsProcessing(false);
-
-          console.log('✅ 리워드 처리 완료 (에러 발생) - 사용자 버튼 클릭 대기');
-          setWaitingForWebSocketResponse(true);
-        }
       }
     } catch (error) {
       console.error('Error in ad completion process:', error);
@@ -618,6 +542,32 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       await callAdApi();
       console.log('[광고보기] 광고 API 호출 완료');
 
+      const campid = advertisementParams?.campid || campaignData?.campid || '';
+      if (campid && member) {
+        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
+
+        processAdReward(
+          member,
+          campid,
+          'nas',
+          onClose ? undefined : navigate,
+        )
+          .then((response) => {
+            console.log('[광고보기] processAdReward 응답:', response);
+            setWaitingForWebSocketResponse(true);
+            setIsTaboolaLoaded(false); 
+          })
+          .catch((error) => {
+            console.error('[광고보기] processAdReward 호출 실패:', error);
+
+          });
+      } else {
+        console.warn('[광고보기] campid 또는 member가 없어 리워드 처리를 건너뜁니다.', {
+          campid,
+          member,
+        });
+      }
+
       if (campaignData?.urlAD) {
         openUrlAD(campaignData.urlAD);
       }
@@ -628,7 +578,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         openUrlAD(campaignData.urlAD);
       }
     }
-  }, [callAdApi, campaignData, openUrlAD, advertisementParams]);
+  }, [callAdApi, campaignData, openUrlAD, advertisementParams, member, onClose, navigate]);
 
   if (!advertisementParams) {
     return null;
