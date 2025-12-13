@@ -24,6 +24,8 @@ import {
   v_073611,
   v_a88df4,
   v_74e8fc,
+  v_4228ad,
+  v_264b01,
   v_7ec238,
   v_c5fe19,
   v_07bb04,
@@ -241,8 +243,8 @@ export const v_12a388 = async (
 ): Promise<Response> => {
   const v_c9c489 = v_e4a763();
   const v_c01615 = v_c9c489.GATEWAY_NODEJS;
-  const v_f71b56 = v_09dafd.startsWith('/') 
-    ? `${v_c01615}${v_09dafd}` 
+  const v_f71b56 = v_09dafd.startsWith('/')
+    ? `${v_c01615}${v_09dafd}`
     : `${v_c01615}/${v_09dafd}`;
 
   return v_d61bb8(v_f71b56, v_b36f96, v_c65f5d);
@@ -271,7 +273,7 @@ export const v_495832 = async (
 
     if (v_2c2f8d.status === 'success') {
       const result: v_96ef47 = {
-    success: true,
+        success: true,
       };
 
       if (v_2c2f8d.data.server_status === 'health') {
@@ -666,6 +668,42 @@ export const v_508a17 = async (
         data: v_5e9bfe.response?.data,
         message: v_5e9bfe.message,
       });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4c4126 = async (
+  v_30a799,
+  v_6bee94,
+  v_c65f5d,
+): Promise<v_264b01> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_4228ad = {
+      ...v_30a799,
+      pin: v_6bee94,
+    };
+
+    console.log('[계정 연동] 구글 계정 연동 요청');
+    console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(v_576f5a, null, 2));
+
+    const v_3393e3 = await v_9f42a4.post<v_264b01>(
+      '/connect-google-account',
+      v_576f5a,
+    );
+
+    console.log('[계정 연동] 요청 성공, 응답:', JSON.stringify(v_3393e3.data, null, 2));
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[계정 연동] 요청 오류:', v_5e9bfe);
+    if (v_5e9bfe.response?.status === 401) {
+      console.log('[계정 연동] 비밀번호 불일치 (401)');
+      return {
+        success: false,
+        code: '401',
+        message: '비밀번호가 일치하지 않습니다.',
+      };
     }
     throw v_5e9bfe;
   }
@@ -1308,7 +1346,7 @@ export const v_4296b8 = async (
     const v_f6907d = Number(v_b9bbbd);
     const v_5cf162 = Number(v_a6c30b);
 
-    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', { 
+    console.log('[마이페이지] 지역 수정 요청 - 입력 파라미터:', {
       입력member: v_660822,
       입력country: v_b9bbbd,
       입력region: v_a6c30b,
@@ -1319,7 +1357,7 @@ export const v_4296b8 = async (
       },
     });
 
-    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', { 
+    console.log('[마이페이지] 지역 수정 요청 - 변환 후:', {
       변환member: v_90772d,
       변환country: v_f6907d,
       변환region: v_5cf162,
@@ -1362,9 +1400,9 @@ export const v_4296b8 = async (
       JSON문자열: JSON.stringify(v_2bb785),
       파싱: JSON.parse(JSON.stringify(v_2bb785)),
     });
-    console.log('[마이페이지] 지역 수정 요청 - request 상세:', { 
-      member: v_576f5a.member, 
-      country: v_576f5a.country, 
+    console.log('[마이페이지] 지역 수정 요청 - request 상세:', {
+      member: v_576f5a.member,
+      country: v_576f5a.country,
       region: v_576f5a.region,
       types: {
         member: typeof v_576f5a.member,
@@ -1422,9 +1460,9 @@ export const v_d7d5a2 = async (
     const v_3393e3 = await v_12a388(
       '/logout-9705',
       {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${v_36dd9e}`,
         },
         body: JSON.stringify({
@@ -2274,7 +2312,7 @@ export const v_1c4683 = async (
     const v_c9c489 = v_e4a763();
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
 
-    if (v_e7f87b.manufacturer = 'Apple' ){
+    if (v_e7f87b.manufacturer = 'Apple') {
       v_e7f87b.os = 'ios';
     } else {
       v_e7f87b.os = 'aos';
@@ -2352,10 +2390,10 @@ export const v_aa7dc1 = async (
     let v_eed089;
     let v_66fa3f;
 
-    const v_df691e = v_326be8.OS === 'ios' || 
-                  v_e7f87b.manufacturer === 'Apple' || 
-                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
-                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
+    const v_df691e = v_326be8.OS === 'ios' ||
+      v_e7f87b.manufacturer === 'Apple' ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
 
     if (v_df691e) {
       v_eed089 = 3113; 
@@ -2432,10 +2470,10 @@ export const v_167376 = async (
 
     let v_66fa3f;
 
-    const v_df691e = v_326be8.OS === 'ios' || 
-                  v_e7f87b.manufacturer === 'Apple' || 
-                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
-                  (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
+    const v_df691e = v_326be8.OS === 'ios' ||
+      v_e7f87b.manufacturer === 'Apple' ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
 
     if (v_df691e) {
       v_66fa3f = 'IOS';
@@ -4299,14 +4337,14 @@ export const v_4dba02 = async (
 
     const v_8adf57 = v_74cb95[v_4898e2];
     const v_09dafd = `/oth-path?type=${v_8adf57}`;
-    const v_b958f2 = v_09dafd.startsWith('/') 
-      ? `${v_c01615}${v_09dafd}` 
+    const v_b958f2 = v_09dafd.startsWith('/')
+      ? `${v_c01615}${v_09dafd}`
       : `${v_c01615}/${v_09dafd}`;
 
-    console.log('[약관] 약관 내용 요청:', { 
-      clauseType: v_4898e2, 
-      typeNumber: v_8adf57, 
-      endpoint: v_09dafd, 
+    console.log('[약관] 약관 내용 요청:', {
+      clauseType: v_4898e2,
+      typeNumber: v_8adf57,
+      endpoint: v_09dafd,
       fullUrl: v_b958f2,
       language: v_05bb19,
       baseUrl: v_c01615,
@@ -4372,8 +4410,8 @@ export const v_4dba02 = async (
       hasData: !!v_9390e8.data,
       dataType: Array.isArray(v_9390e8.data) ? 'array' : typeof v_9390e8.data,
       dataLength: Array.isArray(v_9390e8.data) ? v_9390e8.data.length : 'N/A',
-      dataKeys: v_9390e8.data && typeof v_9390e8.data === 'object' && !Array.isArray(v_9390e8.data) 
-        ? Object.keys(v_9390e8.data) 
+      dataKeys: v_9390e8.data && typeof v_9390e8.data === 'object' && !Array.isArray(v_9390e8.data)
+        ? Object.keys(v_9390e8.data)
         : 'N/A',
     });
 
@@ -4396,11 +4434,11 @@ export const v_4dba02 = async (
       throw new Error('약관 내용이 없습니다.');
     }
 
-    console.log('[약관] 약관 내용 로드 성공:', { 
-      clauseType: v_4898e2, 
+    console.log('[약관] 약관 내용 로드 성공:', {
+      clauseType: v_4898e2,
       typeNumber: v_8adf57,
-      language: v_05bb19, 
-      contentLength: v_926463.content.length 
+      language: v_05bb19,
+      contentLength: v_926463.content.length
     });
 
     return v_926463.content;
@@ -4444,7 +4482,7 @@ export const v_519669 = async (
       personal: 3,
     };
 
-    const v_09dafd = v_3b27d9 
+    const v_09dafd = v_3b27d9
       ? `/oth-path?type=${v_74cb95[v_3b27d9]}`
       : '/oth-path';
 
