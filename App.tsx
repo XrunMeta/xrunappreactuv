@@ -1,4 +1,5 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
+import { v_6b5698, v_c3551b } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import {
   v_083aa7,
@@ -643,6 +644,49 @@ export default function v_6540c3() {
     'Roboto-SemiBold': v_f2f1ae,
     'Roboto-Bold': v_567640,
   });
+  const v_1b7402 = v_e662ae<v_c3551b>(v_6b5698.currentState);
+
+  v_c4deb2(() => {
+    const v_6c5111 = async () => {
+
+      await v_e84827.setItem('app_last_state', v_6b5698.currentState);
+    };
+
+    v_6c5111();
+  }, []);
+
+  v_c4deb2(() => {
+    const v_7a424f = async (nextAppState: v_c3551b) => {
+      if (
+        v_1b7402.current.match(/inactive|background/) &&
+        v_3b10d8 === 'active'
+      ) {
+
+        await v_e84827.setItem('app_last_state', v_3b10d8);
+      } else if (
+        v_1b7402.current === 'active' &&
+        v_3b10d8.match(/inactive|background/)
+      ) {
+
+        try {
+          const v_3d8bda = Date.now();
+          await v_e84827.setItem('app_last_state', v_3b10d8);
+          await v_e84827.setItem('app_last_background_timestamp', v_3d8bda.toString());
+          console.log('[App] 앱 백그라운드 전환 - 백그라운드 시간 저장:', new Date(v_3d8bda).toISOString());
+        } catch (v_5e9bfe) {
+          console.error('[App] 앱 상태 저장 실패:', v_5e9bfe);
+        }
+      }
+
+      v_1b7402.current = v_3b10d8;
+    };
+
+    const v_269481 = v_6b5698.addEventListener('change', v_7a424f);
+
+    return () => {
+      v_269481?.remove();
+    };
+  }, []);
 
   v_c4deb2(() => {
 
