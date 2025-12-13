@@ -190,7 +190,6 @@ const v_2219b3 = <T extends Record<string, any>>(
         <>
           {v_9390e8.map((v_8c0b26, v_a56041) => {
 
-            console.log('[DataList] item:', v_8c0b26, 'itemProps:', v_bce170);
             return (
               <View key={v_cefe14(v_8c0b26, v_a56041)}>
                 <ItemComponent
