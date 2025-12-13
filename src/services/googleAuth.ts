@@ -78,6 +78,8 @@ export interface GoogleAuthResult {
     isNewUser: boolean;
     isSignupCompleted?: boolean; 
     missingFields?: Record<string, boolean>; 
+    requiresLinking?: boolean; 
+    confirmationToken?: string; 
   };
   code?: string;
   message?: string;
@@ -162,6 +164,19 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
           data: {
             ...v_9390e8.data,
             isSignupCompleted: false,
+          },
+        };
+      }
+
+      if (v_9390e8.code === 216) {
+        console.log('[구글 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
+        return {
+          success: true,
+          data: {
+            ...v_9390e8.data,
+            requiresLinking: true,
+            email: v_9390e8.data?.email || '', 
+            confirmationToken: v_9390e8.data?.confirmationToken || '', 
           },
         };
       }

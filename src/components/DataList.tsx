@@ -54,6 +54,8 @@ const v_2219b3 = <T extends Record<string, any>>(
 
   const v_fc9c2f = v_e662ae(false);
 
+  const v_2772fb = v_e662ae(0);
+
   v_298205(v_6d4ed3, () => ({
     reloadData: () => {
       v_d57c80([]);
@@ -66,9 +68,12 @@ const v_2219b3 = <T extends Record<string, any>>(
 
   const v_5c29ab = async (v_2365e9, v_5b37d7 = false): Promise<void> => {
 
-    if (v_5b37d7 ? v_683210 : v_f34bc3) {
+    if (!v_5b37d7 && v_f34bc3) {
       return Promise.resolve();
     }
+
+    const v_e3a9db = v_2772fb.current + 1;
+    v_2772fb.current = v_e3a9db;
 
     try {
       if (v_5b37d7) {
@@ -80,6 +85,10 @@ const v_2219b3 = <T extends Record<string, any>>(
 
       const v_3393e3 = await v_4fa913({ page: v_2365e9, pageSize: v_f70bce });
 
+      if (v_2772fb.current !== v_e3a9db) {
+        return;
+      }
+
       if (v_5b37d7) {
         v_d57c80(v_3393e3.data);
       } else {
@@ -89,14 +98,22 @@ const v_2219b3 = <T extends Record<string, any>>(
       v_1454f0(v_3393e3.hasMore);
       v_be9dba(v_2365e9);
     } catch (v_49263d) {
+
+      if (v_2772fb.current !== v_e3a9db) {
+        return;
+      }
+
       const v_5e9bfe = v_49263d instanceof Error ? v_49263d : new Error('데이터 로드 중 오류가 발생했습니다.');
       v_3a7d09(v_5e9bfe);
       console.error('DataList loadData error:', v_5e9bfe);
     } finally {
-      if (v_5b37d7) {
-        v_34a50a(false);
-      } else {
-        v_23061f(false);
+
+      if (v_2772fb.current === v_e3a9db) {
+        if (v_5b37d7) {
+          v_34a50a(false);
+        } else {
+          v_23061f(false);
+        }
       }
     }
   };

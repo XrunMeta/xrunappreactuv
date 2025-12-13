@@ -11,7 +11,15 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b6a872 } from 'vpztcxjmsfanunln';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_fa3feb, v_368e80, v_729608, v_cb41de, v_570c34, v_b34ce5 } from '../components';
+import {
+  v_fa3feb,
+  v_368e80,
+  v_729608,
+  v_cb41de,
+  v_570c34,
+  v_b34ce5,
+  v_c2fdd1,
+} from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import {
@@ -21,6 +29,7 @@ import {
   v_f5ecec,
   v_8025d1,
   v_2683ec,
+  v_4c4126,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -60,6 +69,13 @@ export const v_f4f851 = () => {
   const [v_808660, v_e61149] = v_5ab095('');
   const [v_b6e894, v_24b225] = v_5ab095(false);
   const [v_2e3b01, v_47f318] = v_5ab095(false);
+
+  const [v_6f4eac, v_29378d] = v_5ab095(false);
+  const [v_d11af5, v_4edb36] = v_5ab095('');
+  const [v_0da590, v_4b3428] = v_5ab095(false);
+  const [v_4c2a98, v_b88019] = v_5ab095('');
+  const [v_306394, v_edad7a] = v_5ab095<any>(null);
+  const [v_784d4b, v_3cf566] = v_5ab095(false);
 
   const v_0d972d = v_ce4741.emailVerification;
 
@@ -226,6 +242,87 @@ export const v_f4f851 = () => {
     }
   };
 
+  const v_9dfcb0 = async () => {
+    if (!v_d11af5.trim()) {
+      await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.passwordRequired'));
+      return;
+    }
+
+    if (!v_0da590) {
+      await v_889fad(v_8d41d7('common.messages.error'), '계정 연동에 동의해주세요.');
+      return;
+    }
+
+    v_3cf566(true);
+
+    try {
+      console.log('[계정 연동] 비밀번호 확인 및 로그인 시도:', v_4c2a98);
+
+      const v_3393e3 = await v_4c4126(
+        v_306394,
+        v_d11af5,
+        v_9b57fc,
+      );
+
+      if (!v_3393e3.success) {
+        const v_1744b9 = v_3393e3.message || v_8d41d7('screens.login.errors.loginFailed');
+        await v_889fad(v_8d41d7('common.messages.error'), v_1744b9);
+        v_3cf566(false);
+        return;
+      }
+
+      const v_ef7306 = v_3393e3.data && v_3393e3.data.length > 0 ? v_3393e3.data[0] : null;
+      if (!v_ef7306) {
+        await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.login.errors.userDataNotFound'));
+        v_3cf566(false);
+        return;
+      }
+
+      console.log('[계정 연동] 로그인(검증) 성공 - 세션 저장 진행');
+
+      const v_9e8d12 = v_ef7306.extrastr;
+      if (v_9e8d12 && v_ef7306.member) {
+        const v_06cee6 = v_a5170b(v_9e8d12);
+        const v_aa0ad8 = await v_ea3493(v_ef7306.member, v_06cee6, v_9b57fc);
+        if (!v_aa0ad8) {
+          console.warn('[계정 연동] 세션 저장 실패');
+        }
+      }
+
+      await v_e84827.removeItem('userData');
+      await v_e84827.removeItem('userSessionToken');
+
+      await v_e84827.setItem('userEmail', v_4c2a98);
+      await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+
+      const v_00b91e = v_ef7306.extrastr || '';
+      await v_e84827.setItem('userSessionToken', v_00b91e);
+
+      await v_e84827.setItem('isLoggedIn', 'true');
+
+      if (v_a964a4) {
+        await v_e84827.setItem('rememberMe', 'true');
+        console.log('[계정 연동] 로그인 상태 유지 저장 완료');
+      } else {
+        await v_e84827.removeItem('rememberMe');
+        console.log('[계정 연동] 로그인 상태 유지 해제');
+      }
+
+      console.log('[계정 연동] 완료 및 로그인 성공');
+      v_29378d(false);
+      v_9b57fc(v_ce4741.map);
+
+    } catch (v_5e9bfe) {
+      console.error('[계정 연동] 오류:', v_5e9bfe);
+      await v_889fad(
+        v_8d41d7('common.messages.error'),
+        '계정 연동 중 오류가 발생했습니다.',
+      );
+    } finally {
+      v_3cf566(false);
+    }
+  };
+
   const v_6dd38d = async () => {
     if (v_cd31a8 || v_2e3b01) {
       return;
@@ -241,6 +338,17 @@ export const v_f4f851 = () => {
       if (!v_43c42e.success || !v_43c42e.data) {
         const v_1744b9 = v_43c42e.message || '구글 로그인에 실패했습니다.';
         await v_889fad(v_8d41d7('common.messages.error') || '오류', v_1744b9);
+        v_deef62(false);
+        return;
+      }
+
+      if (v_43c42e.data.requiresLinking) {
+        console.log('[구글 로그인] 계정 연동 필요 - 팝업 표시');
+        v_b88019(v_43c42e.data.email);
+        v_edad7a(v_43c42e.data);
+        v_4edb36('');
+        v_4b3428(false);
+        v_29378d(true);
         v_deef62(false);
         return;
       }
@@ -472,6 +580,58 @@ export const v_f4f851 = () => {
           </View>
         </SafeScrollView>
       )}
+
+      {}
+      <Dialog
+        visible={v_6f4eac}
+        title="계정 연결"
+        onClose={() => v_29378d(false)}
+        actions={[
+          {
+            label: v_8d41d7('common.buttons.cancel') || '취소',
+            onPress: () => v_29378d(false),
+            variant: 'secondary',
+            disabled: v_784d4b,
+          },
+          {
+            label: v_8d41d7('common.buttons.confirm') || '확인',
+            onPress: v_9dfcb0,
+            variant: 'primary',
+            disabled: v_784d4b || !v_0da590,
+          },
+        ]}
+      >
+        <View style={v_d81136.linkingContainer}>
+          <Text style={v_d81136.linkingMessage}>
+            구글 계정으로 XRUN의 <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
+          </Text>
+
+          <FormField
+            label={v_8d41d7('screens.login.passwordLabel') || '비밀번호'}
+            placeholder={v_8d41d7('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
+            secureTextEntry={true} 
+            value={v_d11af5}
+            onChangeText={v_4edb36}
+            containerStyle={v_d81136.linkingInput}
+            editable={!v_784d4b}
+          />
+
+          <View style={v_d81136.linkingCheckbox}>
+            <FormCheckbox
+              label="동의합니다."
+              checked={v_0da590}
+              onToggle={() => v_4b3428(!v_0da590)}
+              variant="square"
+            />
+          </View>
+
+          {v_784d4b && (
+            <View style={v_d81136.linkingLoader}>
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            </View>
+          )}
+        </View>
+      </Dialog>
     </View>
   );
 };
@@ -579,6 +739,31 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
     borderColor: '#ebebeb',
     borderWidth: 1,
+  },
+  linkingContainer: {
+    paddingVertical: 8,
+  },
+  linkingMessage: {
+    fontSize: v_843035.size.medium,
+    lineHeight: 22,
+    color: '#333333',
+    marginBottom: 20,
+    marginTop: 8,
+    fontFamily: 'Roboto-Regular',
+  },
+  linkingEmail: {
+    fontFamily: 'Roboto-Bold',
+    color: v_1bfbd0.buttonPrimary,
+  },
+  linkingInput: {
+    marginBottom: 16,
+  },
+  linkingCheckbox: {
+    marginBottom: 8,
+  },
+  linkingLoader: {
+    alignItems: 'center',
+    marginTop: 10,
   },
 });
 
