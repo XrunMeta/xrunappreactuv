@@ -14,7 +14,6 @@ export const v_1cca63 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const v_e5fc4b = v_e662ae<v_029581>(null);
-  const [v_03be4c] = v_5ab095<number>(3);
   const [v_cd31a8] = v_5ab095<boolean>(false);
 
   const [v_a7e395, v_2f9f74] = v_5ab095(false);
@@ -233,9 +232,7 @@ export const v_1cca63 = () => {
   };
 
   const sampleMembers: v_b3c0a1[] = [
-    { id: 'user001', name: '홍길동', date: '2025.01.01', settlement: '50,000원' },
-    { id: 'user002', name: '김철수', date: '2025.01.02', settlement: '50,000원' },
-    { id: 'user003', name: '이영희', date: '2025.01.03', settlement: '50,000원' },
+
   ];
 
   const v_ff2128 = v_de06a3(async (
@@ -275,10 +272,10 @@ export const v_1cca63 = () => {
         <View style={v_d81136.infoCard}>
           <Text style={v_d81136.infoTitle}>{v_8d41d7('screens.myinfoShopSales.productTitle')}</Text>
           <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>50,000{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>60{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
+            {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>0{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>0{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
           </Text>
           <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>3,000,000{v_8d41d7('screens.myinfoShopSales.currency')}</Text> /{v_8d41d7('screens.myinfoShopSales.settlementInfo')}
+            {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>0{v_8d41d7('screens.myinfoShopSales.currency')}</Text> /{v_8d41d7('screens.myinfoShopSales.settlementInfo')}
           </Text>
         </View>
 
@@ -289,7 +286,7 @@ export const v_1cca63 = () => {
         </View>
 
         <View style={v_d81136.listContainer}>
-          {!v_cd31a8 && v_03be4c === 0 ? (
+          {!v_cd31a8 && v_f09264.length === 0 ? (
             <View style={v_d81136.emptyContainer}>
               <Text style={v_d81136.emptyDescription}>{v_8d41d7('screens.myinfoShopSales.noData')}</Text>
             </View>
