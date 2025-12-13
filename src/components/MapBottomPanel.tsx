@@ -54,14 +54,14 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
   useEffect(() => {
     if (visible) {
       Animated.timing(bottomPanelBottom, {
-        toValue: 130, 
+        toValue: 110, 
         duration: 600,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
       }).start();
     } else {
       Animated.timing(bottomPanelBottom, {
-        toValue: 120, 
+        toValue: 100, 
         duration: 300,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false, 
@@ -108,7 +108,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
             },
           ]}>
           {}
-          {visible && spotData && (
+
             <View
               style={{
                 alignItems: 'center',
@@ -124,8 +124,7 @@ export const MapBottomPanel: React.FC<MapBottomPanelProps> = ({
                   borderRadius: 2,
                 }}
               />
-            </View>
-          )}
+            </View> 
 
           {}
           {spotData && (
