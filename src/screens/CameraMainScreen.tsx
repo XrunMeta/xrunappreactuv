@@ -1394,7 +1394,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         ad_company: v_75c344.ad_company,
       });
 
-      if (v_5a9c46 === 'pock') {
+      if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {
@@ -1584,8 +1584,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 }
         </CameraView>
 
-         {}
-      {
+        {}
+        {
 
 }
 
@@ -1873,7 +1873,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
           console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46);
 
-          if (v_5a9c46 === 'pock') {
+          if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
             return (
               <ShowPockAdScreen
                 onClose={() => {
@@ -2046,7 +2046,7 @@ const v_d81136 = v_472849.create({
   },
   topLogo: {
     position: 'absolute',
-    top: 76, 
+    top: 76,
     left: 8,
     width: v_700696.get('window').width / 4,
     height: v_700696.get('window').width / 4,
