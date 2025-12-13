@@ -89,6 +89,10 @@ export const v_667a00 = () => {
 
         console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
 
+        const v_ea9ffe = await v_e84827.getItem('googleSignupRequired');
+        const v_47b466 = v_ea9ffe === 'true';
+        console.log('[회원가입] 구글 회원가입 모드:', v_47b466);
+
         try {
 
           const v_378f94 = await v_e84827.getItem('pendingSignupData');
@@ -114,7 +118,7 @@ export const v_667a00 = () => {
             email: v_fad096.email,
             pin: v_fad096.password,
             firstname: v_fad096.givenName,
-            lastname: v_fad096.familyName,
+            lastname: v_fad096.familyName?.trim() || '', 
             gender: v_91bb22.getGenderCode(v_fad096.gender),
             mobile: v_fad096.phoneNumber,
             mobilecode: v_6c3a47,
@@ -126,7 +130,12 @@ export const v_667a00 = () => {
             os: v_91bb22.getOSCode(),
           };
 
-          console.log('[회원가입] 회원가입 API 호출 시작');
+          console.log('[회원가입] 회원가입 API 호출 시작', {
+            isGoogleSignupMode: v_47b466,
+            email: v_df7dab.email,
+            firstname: v_df7dab.firstname,
+            mobile: v_df7dab.mobile,
+          });
           const v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
 
           if (!v_d0b446) {
@@ -159,6 +168,15 @@ export const v_667a00 = () => {
           }
 
           await v_e84827.removeItem('pendingSignupData');
+
+          try {
+            await v_e84827.removeItem('googleSignupRequired');
+            await v_e84827.removeItem('googleSignupEmail');
+            console.log('[회원가입] 구글 회원가입 플래그 제거 완료');
+          } catch (v_e7ef88) {
+            console.warn('[회원가입] 구글 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', v_e7ef88);
+          }
+
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           v_036f76();

@@ -17,6 +17,7 @@ interface FormFieldProps extends v_b60ea2 {
   labelRightAccessory?: v_a3453e.ReactNode;
   rightAccessory?: v_a3453e.ReactNode;
   leftAccessory?: v_a3453e.ReactNode;
+  showDisabledStyle?: boolean; 
 }
 
 export const FormField: v_a3453e.FC<FormFieldProps> = ({
@@ -28,11 +29,17 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
   style: v_7fa4e4,
   placeholderTextColor: v_46ec3b = '#dedede',
   onFocus: v_cd3cee,
+  editable: v_87d063 = true,
+  showDisabledStyle: v_e3745c = true, 
   ...v_3a2a5d
 }) => {
   const v_73e70b = v_f3168c();
 
   const v_086489 = (v_d48baf) => {
+
+    if (!v_87d063) {
+      return;
+    }
 
     if (v_73e70b) {
       v_73e70b.scrollToFocusedInput(v_d48baf);
@@ -43,6 +50,8 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
     }
   };
 
+  const v_1a6f6d = v_87d063 === false && v_e3745c;
+
   return (
     <View style={[v_d81136.container, v_4affe9]}>
       <View style={v_d81136.labelRow}>
@@ -51,12 +60,20 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
           <View style={v_d81136.labelRightAccessory}>{v_9de30f}</View>
         ) : null}
       </View>
-      <View style={v_d81136.inputWrapper}>
+      <View style={[
+        v_d81136.inputWrapper,
+        v_1a6f6d && v_d81136.inputWrapperDisabled
+      ]}>
         {v_bea0eb ? <View style={v_d81136.leftAccessory}>{v_bea0eb}</View> : null}
         <TextInput
-          style={[v_d81136.input, v_7fa4e4]}
-          placeholderTextColor={v_46ec3b}
+          style={[
+            v_d81136.input,
+            v_1a6f6d && v_d81136.inputDisabled,
+            v_7fa4e4
+          ]}
+          placeholderTextColor={v_1a6f6d ? '#b3b6be' : v_46ec3b}
           onFocus={v_086489}
+          editable={v_87d063}
           {...v_3a2a5d}
         />
         {v_de8f73 ? (
@@ -116,6 +133,13 @@ const v_d81136 = v_472849.create({
     marginLeft: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  inputWrapperDisabled: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e0e0e0',
+  },
+  inputDisabled: {
+    color: '#9e9e9e',
   },
 });
 
