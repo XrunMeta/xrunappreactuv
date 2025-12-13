@@ -349,7 +349,6 @@ export const MyinfoShopSalesScreen = () => {
                     datePickerTarget === 'start' && styles.dateInputActive
                   ]}>
                     <Text style={styles.dateInputText}>{formatDate(startDateObj)}</Text>
-                    <Ionicons name="calendar-outline" size={18} color={COLORS.headerText} />
                   </View>
                 </TouchableOpacity>
                 <Text style={styles.dateSeparator}>~</Text>
@@ -364,7 +363,6 @@ export const MyinfoShopSalesScreen = () => {
                     datePickerTarget === 'end' && styles.dateInputActive
                   ]}>
                     <Text style={styles.dateInputText}>{formatDate(endDateObj)}</Text>
-                    <Ionicons name="calendar-outline" size={18} color={COLORS.headerText} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -535,13 +533,13 @@ const styles = StyleSheet.create({
   dateInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#F5F7FA',
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    justifyContent: 'center',
   },
   dateInputActive: {
     borderColor: COLORS.buttonPrimary,
@@ -601,6 +599,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
+    paddingVertical: 4,
   },
   selectedDayCell: {
     backgroundColor: COLORS.buttonPrimary,
@@ -612,6 +611,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#333333',
+    lineHeight: 24,
   },
   selectedDayText: {
     color: '#ffffff',
