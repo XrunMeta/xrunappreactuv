@@ -130,7 +130,7 @@ export const shareReferralLink = async (
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
     const encodedEmail = encodeURIComponent(userDetails.email);
-    const deepLinkUrl = `xrun://signup?referral=${encodedEmail}`;
+    const deepLinkUrl = `https://www.xrun.run/invite?referral=${encodedEmail}`;
 
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
