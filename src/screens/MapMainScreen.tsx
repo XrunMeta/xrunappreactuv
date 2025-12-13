@@ -345,7 +345,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   };
 
-  const v_524200 = v_de06a3(async (v_f18a9c, v_9d6a91 = false, v_e8ec67) => {
+  const v_524200 = v_de06a3(async (v_f18a9c, v_9d6a91 = false, v_e8ec67, v_32428f = 0) => {
     console.log('🚀 [loadMarkersForLocation] 시작:', { targetLocation: v_f18a9c, forceRefresh: v_9d6a91, hasCurrentGpsLocation: !!v_e8ec67 });
 
     if (v_5db874.current) {
@@ -570,9 +570,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('마커 개수:', v_e84694.length);
 
       const v_f6123d = await v_91d5e4(
+        v_660822,
         v_f18a9c.latitude,
         v_f18a9c.longitude,
-        v_660822,
         v_9b57fc,
       );
 
@@ -700,6 +700,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_a2b40c.current = v_f18a9c;
       v_9183ca.current = Date.now(); 
       console.log('✅ [MapMainScreen] 마커 설정 완료');
+
+      if (v_1e6d95.length === 0 && v_32428f < 1) {
+        console.log(`⚠️ [MapMainScreen] 마커가 0개입니다. 2초 후 재시도합니다. (시도 ${v_32428f + 1}/1)`);
+        setTimeout(() => {
+          v_524200(v_f18a9c, true, v_e8ec67, v_32428f + 1);
+        }, 2000);
+      }
 
       const v_97e2bc = v_1e6d95.find(v_5e3dbb => v_5e3dbb.latitude && v_5e3dbb.longitude);
       if (v_97e2bc && v_97e2bc.latitude && v_97e2bc.longitude) {
