@@ -319,9 +319,9 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 16,
-    paddingBottom: 12,
-    minHeight: 104,
+    paddingTop: 4, 
+    paddingBottom: 20,
+    minHeight: 80,
     width: '100%',
   },
   navItem: {

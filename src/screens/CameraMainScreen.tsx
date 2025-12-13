@@ -1186,7 +1186,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     if (v_572bd3 && v_04cb77) {
 
       v_a2349e.timing(v_8f79f8, {
-        toValue: 140, 
+        toValue: 105, 
         duration: 300,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false,
@@ -1194,7 +1194,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     } else {
 
       v_a2349e.timing(v_8f79f8, {
-        toValue: 20, 
+        toValue: 100, 
         duration: 300,
         easing: v_cdbae1.bezier(0.25, 0.1, 0.25, 1),
         useNativeDriver: false,
@@ -1674,8 +1674,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 backgroundColor: '#FFFFFF',
                 paddingHorizontal: 0,
                 paddingVertical: 0,
-                borderTopStartRadius: 33,
-                borderTopEndRadius: 33,
+                borderTopStartRadius: 20,
+                borderTopEndRadius: 20,
                 shadowColor: '#000',
                 shadowOffset: {
                   width: 0,
@@ -1688,24 +1688,22 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               },
             ]}>
             {}
-            {v_572bd3 && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingTop: 8,
+                paddingBottom: 0, 
+              }}>
               <View
                 style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingTop: 8,
-                  paddingBottom: 0, 
-                }}>
-                <View
-                  style={{
-                    width: 40,
-                    height: 4,
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: 2,
-                  }}
-                />
-              </View>
-            )}
+                  width: 40,
+                  height: 4,
+                  backgroundColor: '#D9D9D9',
+                  borderRadius: 2,
+                }}
+              />
+            </View>
             {}
             {v_572bd3 && v_04cb77 && (
               <View
