@@ -210,3 +210,119 @@ export const loadCustomTokens = async (
   return tokens ? JSON.parse(tokens) : [];
 };
 
+export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedSeconds: number } | null> => {
+  try {
+
+    const coldStartChecked = await AsyncStorage.getItem('coldStartChecked');
+    const lastBackgroundTimestamp = await AsyncStorage.getItem('app_last_background_timestamp');
+    const checkedTimestamp = await AsyncStorage.getItem('checkedTimestamp');
+    const currentTimestamp = Date.now();
+
+    if (coldStartChecked === 'true' && checkedTimestamp) {
+
+      if (!lastBackgroundTimestamp) {
+
+        const isColdStart = await AsyncStorage.getItem('isColdStart');
+        const elapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
+        const elapsedSeconds = elapsedSecondsStr ? parseInt(elapsedSecondsStr, 10) : 0;
+        return {
+          isColdStart: isColdStart === 'true',
+          elapsedSeconds,
+        };
+      }
+
+      const backgroundTimestamp = parseInt(lastBackgroundTimestamp, 10);
+      if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
+        await AsyncStorage.setItem('isColdStart', 'true');
+        await AsyncStorage.setItem('elapsedSeconds', '0');
+        await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+        return { isColdStart: true, elapsedSeconds: 0 };
+      }
+
+      const checkedTimestampNum = parseInt(checkedTimestamp, 10);
+      if (isNaN(checkedTimestampNum) || checkedTimestampNum <= 0) {
+
+      } else if (backgroundTimestamp <= checkedTimestampNum) {
+
+        const isColdStart = await AsyncStorage.getItem('isColdStart');
+        const elapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
+        const elapsedSeconds = elapsedSecondsStr ? parseInt(elapsedSecondsStr, 10) : 0;
+        return {
+          isColdStart: isColdStart === 'true',
+          elapsedSeconds,
+        };
+      }
+
+      const elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
+      const isColdStart = elapsedSeconds >= 30; 
+
+      await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
+      await AsyncStorage.setItem('elapsedSeconds', elapsedSeconds.toString());
+      await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+
+      return { isColdStart, elapsedSeconds };
+    }
+
+    let isColdStart = false;
+    let elapsedSeconds = 0;
+
+    if (!lastBackgroundTimestamp) {
+
+      isColdStart = true;
+      elapsedSeconds = 0;
+    } else {
+
+      const backgroundTimestamp = parseInt(lastBackgroundTimestamp, 10);
+      if (isNaN(backgroundTimestamp) || backgroundTimestamp <= 0 || backgroundTimestamp > currentTimestamp) {
+
+        console.warn('[Utils] 백그라운드 타임스탬프가 유효하지 않습니다. 콜드스타트로 간주합니다.');
+        isColdStart = true;
+        elapsedSeconds = 0;
+      } else {
+
+        elapsedSeconds = Math.floor((currentTimestamp - backgroundTimestamp) / 1000);
+
+        isColdStart = elapsedSeconds >= 10;
+      }
+    }
+
+    await AsyncStorage.setItem('coldStartChecked', 'true');
+    await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
+    await AsyncStorage.setItem('elapsedSeconds', elapsedSeconds.toString());
+    await AsyncStorage.setItem('checkedTimestamp', currentTimestamp.toString());
+
+    return { isColdStart, elapsedSeconds };
+  } catch (error) {
+    console.error('[Utils] 콜드스타트 감지 실패:', error);
+
+    await AsyncStorage.setItem('coldStartChecked', 'true');
+    await AsyncStorage.setItem('isColdStart', 'true');
+    await AsyncStorage.setItem('elapsedSeconds', '0');
+    return { isColdStart: true, elapsedSeconds: 0 };
+  }
+};
+
+export const getColdStartResult = async (): Promise<{ isColdStart: boolean; elapsedSeconds: number } | null> => {
+  try {
+    const coldStartChecked = await AsyncStorage.getItem('coldStartChecked');
+    if (coldStartChecked !== 'true') {
+
+      return null;
+    }
+
+    const isColdStart = await AsyncStorage.getItem('isColdStart');
+    const elapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
+    const elapsedSeconds = elapsedSecondsStr ? parseInt(elapsedSecondsStr, 10) : 0;
+
+    return {
+      isColdStart: isColdStart === 'true',
+      elapsedSeconds,
+    };
+  } catch (error) {
+    console.error('[Utils] 콜드스타트 결과 가져오기 실패:', error);
+    return null;
+  }
+};
+

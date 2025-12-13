@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import * as Linking from 'expo-linking';
 import {
   MyInfoFaqScreen,
@@ -643,6 +644,49 @@ export default function App() {
     'Roboto-SemiBold': Roboto_600SemiBold,
     'Roboto-Bold': Roboto_700Bold,
   });
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
+  useEffect(() => {
+    const initializeAppState = async () => {
+
+      await AsyncStorage.setItem('app_last_state', AppState.currentState);
+    };
+
+    initializeAppState();
+  }, []);
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+
+        await AsyncStorage.setItem('app_last_state', nextAppState);
+      } else if (
+        appStateRef.current === 'active' &&
+        nextAppState.match(/inactive|background/)
+      ) {
+
+        try {
+          const backgroundTimestamp = Date.now();
+          await AsyncStorage.setItem('app_last_state', nextAppState);
+          await AsyncStorage.setItem('app_last_background_timestamp', backgroundTimestamp.toString());
+          console.log('[App] 앱 백그라운드 전환 - 백그라운드 시간 저장:', new Date(backgroundTimestamp).toISOString());
+        } catch (error) {
+          console.error('[App] 앱 상태 저장 실패:', error);
+        }
+      }
+
+      appStateRef.current = nextAppState;
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
 
   useEffect(() => {
 
