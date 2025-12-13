@@ -222,14 +222,6 @@ export const generateTaboolaHTML = (
   pageType: string = 'article',
   targetType: string = 'mix',
 ): string => {
-  console.log('[Taboola] HTML 생성:', {
-    publisherId,
-    placement,
-    mode,
-    pageUrl,
-    pageType,
-    targetType,
-  });
 
   return `
 <!DOCTYPE html>
@@ -459,8 +451,6 @@ export const preloadTaboolaHTML = async (): Promise<void> => {
       getTaboolaPlacement('shop', false),
     ];
 
-    console.log('[Taboola] HTML 프리로드 시작:', placementsToPreload);
-
     for (const placement of placementsToPreload) {
       try {
         const config = TABOOLA_PLACEMENTS[placement];
@@ -484,9 +474,7 @@ export const preloadTaboolaHTML = async (): Promise<void> => {
       }
     }
 
-    console.log('[Taboola] HTML 프리로드 완료');
   } catch (error) {
-    console.error('[Taboola] HTML 프리로드 중 오류:', error);
 
   }
 };

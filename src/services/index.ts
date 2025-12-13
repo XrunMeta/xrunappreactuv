@@ -353,22 +353,7 @@ const createAxiosInstance = (navigation?: any) => {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
 
       if (config.data) {
-        console.log(`[API Request Data] ${config.url}:`, JSON.stringify(config.data));
-        console.log(`[API Request Data 상세] ${config.url}:`, {
-          원본데이터: config.data,
-          직렬화: JSON.stringify(config.data),
-          파싱: JSON.parse(JSON.stringify(config.data)),
-          타입확인: {
-            member: config.data.member !== undefined ? { 값: config.data.member, 타입: typeof config.data.member } : '없음',
-            country: config.data.country !== undefined ? { 값: config.data.country, 타입: typeof config.data.country } : '없음',
-            region: config.data.region !== undefined ? { 값: config.data.region, 타입: typeof config.data.region } : '없음',
-          },
-          undefined체크: {
-            member: config.data.member === undefined,
-            country: config.data.country === undefined,
-            region: config.data.region === undefined,
-          },
-        });
+
       }
       return config;
     },
@@ -1845,25 +1830,12 @@ export const fetchMapMarkerData = async (
       limit: 120,
     };
 
-    console.log('🌐 [app2000-01] fetchMapMarkerData API 호출 시작');
-    console.log('🌐 [app2000-01] endpoint: app2000-01');
-    console.log('🌐 [app2000-01] requestBody:', JSON.stringify(requestBody, null, 2));
-    console.log('🌐 [app2000-01] axiosInstance.post 호출 전');
-
     const response = await axiosInstance.post(
       '/app2000-01',
       requestBody,
     );
 
-    console.log('✅ [app2000-01] axiosInstance.post 응답 받음');
     const data = response.data;
-    console.log('✅ [app2000-01] fetchMapMarkerData API 응답 완료');
-    console.log('✅ [app2000-01] data.data length:', data?.data?.length);
-    console.log('✅ [app2000-01] 전체 응답 구조:', {
-      success: data?.success,
-      dataLength: data?.data?.length,
-      hasData: !!data?.data,
-    });
 
     if (data?.data && Array.isArray(data.data)) {
       return data.data.map((item: any) => {
@@ -2575,11 +2547,6 @@ export const gatewayNodeJS = async (
     const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
-    console.log(`🌐 [gatewayNodeJS] endpoint: ${endpoint}`);
-    console.log(`🌐 [gatewayNodeJS] method: ${method}`);
-    console.log(`🌐 [gatewayNodeJS] url: ${url}`);
-    console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(requestBody, null, 2));
-    console.log(`🌐 [gatewayNodeJS] fetch 호출 전`);
 
     const response = await fetch(url, {
       method: method,
@@ -2590,21 +2557,11 @@ export const gatewayNodeJS = async (
       body: JSON.stringify(requestBody),
     });
 
-    console.log(`✅ [gatewayNodeJS] fetch 응답 받음, status: ${response.status}`);
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log(`✅ [gatewayNodeJS] API 응답 성공`);
-    console.log(`✅ [gatewayNodeJS] endpoint: ${endpoint}`);
-    console.log(`✅ [gatewayNodeJS] result.data length:`, result?.data?.length || 'N/A');
-    console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
-      success: result?.success,
-      dataLength: result?.data?.length,
-      hasData: !!result?.data,
-    });
 
     return result;
   } catch (error) {
@@ -4579,14 +4536,7 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
 
     const requestBody = { os, member };
 
-    console.log('[getTopAd5] API 호출 시작');
-    console.log('[getTopAd5] OS:', os);
-    console.log('[getTopAd5] member:', member);
-
     const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
-
-    console.log('[getTopAd5] API 호출 완료 - 원본 response 타입:', typeof response);
-    console.log('[getTopAd5] API 호출 완료 - 원본 response:', response);
 
     if (!response) {
       console.warn('[getTopAd5] API 응답이 없습니다.');
