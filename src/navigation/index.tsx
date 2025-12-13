@@ -17,6 +17,7 @@ export const ROUTES = {
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
   verificationCode: 'verificationCode',
+  referralInput: 'referralInput',
   terms: 'terms',
   privacy: 'privacy',
   wallet: 'wallet',
@@ -98,6 +99,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
+
         const remember = await AsyncStorage.getItem('rememberMe');
         const loggedIn = await AsyncStorage.getItem('isLoggedIn');
 
@@ -105,10 +107,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
 
           console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
           setStack([ROUTES.map]);
-        } else {
-
-          console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+          setIsInitialized(true);
+          return;
         }
+
+        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
       } catch (error) {
         console.error('[Navigation] 로그인 상태 확인 실패:', error);
       } finally {

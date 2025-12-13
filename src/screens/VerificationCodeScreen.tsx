@@ -89,6 +89,10 @@ export const VerificationCodeScreen = () => {
 
         console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
 
+        const googleSignupRequired = await AsyncStorage.getItem('googleSignupRequired');
+        const isGoogleSignupMode = googleSignupRequired === 'true';
+        console.log('[회원가입] 구글 회원가입 모드:', isGoogleSignupMode);
+
         try {
 
           const pendingDataStr = await AsyncStorage.getItem('pendingSignupData');
@@ -114,7 +118,7 @@ export const VerificationCodeScreen = () => {
             email: pendingData.email,
             pin: pendingData.password,
             firstname: pendingData.givenName,
-            lastname: pendingData.familyName,
+            lastname: pendingData.familyName?.trim() || '', 
             gender: SignupHelpers.getGenderCode(pendingData.gender),
             mobile: pendingData.phoneNumber,
             mobilecode: mobileCode,
@@ -126,7 +130,12 @@ export const VerificationCodeScreen = () => {
             os: SignupHelpers.getOSCode(),
           };
 
-          console.log('[회원가입] 회원가입 API 호출 시작');
+          console.log('[회원가입] 회원가입 API 호출 시작', {
+            isGoogleSignupMode,
+            email: signupData.email,
+            firstname: signupData.firstname,
+            mobile: signupData.mobile,
+          });
           const signupSuccess = await signup(signupData, navigate);
 
           if (!signupSuccess) {
@@ -159,6 +168,15 @@ export const VerificationCodeScreen = () => {
           }
 
           await AsyncStorage.removeItem('pendingSignupData');
+
+          try {
+            await AsyncStorage.removeItem('googleSignupRequired');
+            await AsyncStorage.removeItem('googleSignupEmail');
+            console.log('[회원가입] 구글 회원가입 플래그 제거 완료');
+          } catch (flagError) {
+            console.warn('[회원가입] 구글 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', flagError);
+          }
+
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           resetVerificationSuccessRoute();
