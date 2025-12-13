@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
@@ -76,6 +77,7 @@ export const LoginScreen = () => {
   const [linkingEmail, setLinkingEmail] = useState('');
   const [googleLoginData, setGoogleLoginData] = useState<any>(null);
   const [isLinkingLoading, setIsLinkingLoading] = useState(false);
+  const [successDialogVisible, setSuccessDialogVisible] = useState(false);
 
   const emailVerificationRoute: any = ROUTES.emailVerification;
 
@@ -264,26 +266,34 @@ export const LoginScreen = () => {
         navigate,
       );
 
-      if (!response.success) {
+      if (!response.success || (response.code !== 200 && response.code !== '200')) {
         const errorMessage = response.message || t('screens.login.errors.loginFailed');
         await showAlert(t('common.messages.error'), errorMessage);
         setIsLinkingLoading(false);
         return;
       }
 
-      const userData = response.data && response.data.length > 0 ? response.data[0] : null;
+      let userData: any = null;
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        userData = response.data[0];
+      } else if (response.data && typeof response.data === 'object') {
+
+        userData = response.data;
+      }
+
       if (!userData) {
         await showAlert(t('common.messages.error'), t('screens.login.errors.userDataNotFound'));
         setIsLinkingLoading(false);
         return;
       }
 
-      console.log('[계정 연동] 로그인(검증) 성공 - 세션 저장 진행');
+      console.log('[계정 연동] 연동 성공 - 세션 저장 진행');
 
       const extrastr = userData.extrastr;
-      if (extrastr && userData.member) {
+      const memberId = userData.member || userData.memberId;
+      if (extrastr && memberId) {
         const ssidw = encryptSHA256(extrastr);
-        const sessionSaved = await saveSession(userData.member, ssidw, navigate);
+        const sessionSaved = await saveSession(memberId, ssidw, navigate);
         if (!sessionSaved) {
           console.warn('[계정 연동] 세션 저장 실패');
         }
@@ -292,7 +302,8 @@ export const LoginScreen = () => {
       await AsyncStorage.removeItem('userData');
       await AsyncStorage.removeItem('userSessionToken');
 
-      await AsyncStorage.setItem('userEmail', linkingEmail);
+      const userEmail = userData.email || linkingEmail;
+      await AsyncStorage.setItem('userEmail', userEmail);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
 
       const sessionToken = userData.extrastr || '';
@@ -309,8 +320,10 @@ export const LoginScreen = () => {
       }
 
       console.log('[계정 연동] 완료 및 로그인 성공');
+
       setLinkingDialogVisible(false);
-      navigate(ROUTES.map);
+
+      setSuccessDialogVisible(true);
 
     } catch (error) {
       console.error('[계정 연동] 오류:', error);
@@ -349,6 +362,24 @@ export const LoginScreen = () => {
         setLinkingPassword('');
         setLinkingAgreed(false);
         setLinkingDialogVisible(true);
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.data.requiresSignup) {
+        console.log('[구글 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+
+        const email = result.data.email || '';
+        if (!email) {
+          await showAlert(t('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          setIsLoading(false);
+          return;
+        }
+
+        await AsyncStorage.setItem('googleSignupRequired', 'true');
+        await AsyncStorage.setItem('googleSignupEmail', email);
+
+        navigate(ROUTES.signup);
         setIsLoading(false);
         return;
       }
@@ -428,13 +459,13 @@ export const LoginScreen = () => {
           <SvgXml xml={googleIconSvg} width={15} height={16} />
         </TouchableOpacity>
         {}
-        <TouchableOpacity style={styles.snsButton} disabled={disabled}>
-          <SvgXml xml={appleIconSvg} width={15} height={18} />
-        </TouchableOpacity>
+        {
+
+}
         {}
-        <TouchableOpacity style={styles.snsButton} disabled={disabled}>
-          <SvgXml xml={telegramIconSvg} width={15} height={13} />
-        </TouchableOpacity>
+        {
+
+}
       </View>
     </View>
   );
@@ -632,6 +663,32 @@ export const LoginScreen = () => {
           )}
         </View>
       </Dialog>
+
+      {}
+      <Dialog
+        visible={successDialogVisible}
+        title="연동 완료"
+        onClose={() => {
+          setSuccessDialogVisible(false);
+          navigate(ROUTES.map);
+        }}
+        actions={[
+          {
+            label: t('common.buttons.confirm') || '확인',
+            onPress: () => {
+              setSuccessDialogVisible(false);
+              navigate(ROUTES.map);
+            },
+            variant: 'primary',
+          },
+        ]}
+      >
+        <View style={styles.linkingContainer}>
+          <Text style={styles.linkingMessage}>
+            연동이 완료되었습니다.
+          </Text>
+        </View>
+      </Dialog>
     </View>
   );
 };
@@ -719,6 +776,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   snsLoginLabel: {
+    marginLeft: Dimensions.get('window').width / 4,
     fontSize: FONTS.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
