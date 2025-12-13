@@ -1089,7 +1089,7 @@ export const MapMainScreen: React.FC = () => {
             const coinsData = JSON.parse(astorCoinsData);
             if (Array.isArray(coinsData) && coinsData.length > 0) {
 
-              const firstMarker = coinsData.find((coin: any) => 
+              const firstMarker = coinsData.find((coin: any) =>
                 (coin.latitude || coin.lat) && (coin.longitude || coin.lng)
               );
 
@@ -1380,10 +1380,10 @@ export const MapMainScreen: React.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 16개 기준으로 순차 매핑)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', coinsData.length, '개, 광고:', topAd5Response.length, '개, 전체 순차 매핑)');
         const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
-          if (index < 16 && topAd5Response.length > 0) {
+          if (topAd5Response.length > 0) {
             const adIndex = index % topAd5Response.length;
             const mappedAd = topAd5Response[adIndex];
 
@@ -1861,8 +1861,8 @@ export const MapMainScreen: React.FC = () => {
               const previousHeading = deviceHeadingRef.current;
 
               const MIN_HEADING_CHANGE = 5;
-              const headingDiff = previousHeading === null 
-                ? MIN_HEADING_CHANGE + 1 
+              const headingDiff = previousHeading === null
+                ? MIN_HEADING_CHANGE + 1
                 : Math.abs(heading - previousHeading);
               if (headingDiff >= MIN_HEADING_CHANGE) {
 
@@ -2003,8 +2003,8 @@ export const MapMainScreen: React.FC = () => {
   useEffect(() => {
 
     if (
-      previousScreen && 
-      previousScreen !== 'map' && 
+      previousScreen &&
+      previousScreen !== 'map' &&
       prevScreenRef.current !== previousScreen
     ) {
       console.log('[MapMainScreen] 화면 이동 감지:', previousScreen, '→ map');
@@ -2208,8 +2208,8 @@ export const MapMainScreen: React.FC = () => {
       console.log(`[현재 마커] ${currentAdName} (거리: 0m)`);
 
       const nearbyMarkers = markers
-        .filter(marker => 
-          marker.latitude && 
+        .filter(marker =>
+          marker.latitude &&
           marker.longitude &&
           !(marker.spotID === spot.spotID && marker.latitude === spot.latitude && marker.longitude === spot.longitude) 
         )
@@ -2792,17 +2792,17 @@ export const MapMainScreen: React.FC = () => {
     console.log('✅ [memoizedMarkers] 필터링 후 개수:', filtered.length);
     const mapped = filtered.map((marker) => {
 
-        const campId = marker.campid ?? '';
-        const coinValue = marker.coin ?? '';
-        const spotId = marker.spotID ?? '';
-        const lat = marker.latitude!.toFixed(6);
-        const lng = marker.longitude!.toFixed(6);
-        const uniqueKey = `marker-${campId}-${coinValue}-${spotId}-${lat}-${lng}`;
-        return {
-          ...marker,
-          uniqueKey,
-        };
-      });
+      const campId = marker.campid ?? '';
+      const coinValue = marker.coin ?? '';
+      const spotId = marker.spotID ?? '';
+      const lat = marker.latitude!.toFixed(6);
+      const lng = marker.longitude!.toFixed(6);
+      const uniqueKey = `marker-${campId}-${coinValue}-${spotId}-${lat}-${lng}`;
+      return {
+        ...marker,
+        uniqueKey,
+      };
+    });
     console.log('✅ [memoizedMarkers] 최종 마커 개수:', mapped.length);
     return mapped;
   }, [markers]);
@@ -2925,7 +2925,7 @@ export const MapMainScreen: React.FC = () => {
           {}
 
           {memoizedMarkers.map((marker) => {
-              return (
+            return (
               <Marker
 
                 key={marker.uniqueKey}
@@ -2956,18 +2956,18 @@ export const MapMainScreen: React.FC = () => {
 
               </Marker>
             );
-            })}
+          })}
         </MapView>
 
-         {}
-      {
+        {}
+        {
 
 }
 
         {}
 
         {iconMapPoint && (
-          <Pressable 
+          <Pressable
             style={styles.mapPinButton}
             onPress={goToCurrentLocation}
           >
@@ -3183,7 +3183,7 @@ const styles = StyleSheet.create({
 
   topLogo: {
     position: 'absolute',
-    top: 32, 
+    top: 32,
     left: 8,
     width: Dimensions.get('window').width / 4,
     height: Dimensions.get('window').width / 4,

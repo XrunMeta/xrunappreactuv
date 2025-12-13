@@ -1394,7 +1394,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         ad_company: adParams.ad_company,
       });
 
-      if (adCompany === 'pock') {
+      if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {
@@ -1584,8 +1584,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 }
         </CameraView>
 
-         {}
-      {
+        {}
+        {
 
 }
 
@@ -1873,7 +1873,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           const adCompany = advertisementParams?.ad_company || 'nas';
           console.log('🔍 모달 내부 ad_company 확인:', adCompany);
 
-          if (adCompany === 'pock') {
+          if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
             return (
               <ShowPockAdScreen
                 onClose={() => {
@@ -2046,7 +2046,7 @@ const styles = StyleSheet.create({
   },
   topLogo: {
     position: 'absolute',
-    top: 76, 
+    top: 76,
     left: 8,
     width: Dimensions.get('window').width / 4,
     height: Dimensions.get('window').width / 4,
