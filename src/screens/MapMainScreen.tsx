@@ -1089,7 +1089,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
             const v_b9ce93 = JSON.parse(v_99c46d);
             if (Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
 
-              const v_97e2bc = v_b9ce93.find((v_51b584) => 
+              const v_97e2bc = v_b9ce93.find((v_51b584) =>
                 (v_51b584.latitude || v_51b584.lat) && (v_51b584.longitude || v_51b584.lng)
               );
 
@@ -1380,10 +1380,10 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return;
         }
 
-        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 16개 기준으로 순차 매핑)');
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (마커:', v_b9ce93.length, '개, 광고:', v_e36b07.length, '개, 전체 순차 매핑)');
         const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
-          if (v_a56041 < 16 && v_e36b07.length > 0) {
+          if (v_e36b07.length > 0) {
             const v_ba7922 = v_a56041 % v_e36b07.length;
             const v_127b33 = v_e36b07[v_ba7922];
 
@@ -1861,8 +1861,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
               const v_ca5264 = v_aae2cb.current;
 
               const v_6c0389 = 5;
-              const v_d2e929 = v_ca5264 === null 
-                ? v_6c0389 + 1 
+              const v_d2e929 = v_ca5264 === null
+                ? v_6c0389 + 1
                 : Math.abs(v_66b19f - v_ca5264);
               if (v_d2e929 >= v_6c0389) {
 
@@ -2003,8 +2003,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   v_c4deb2(() => {
 
     if (
-      v_640ccc && 
-      v_640ccc !== 'map' && 
+      v_640ccc &&
+      v_640ccc !== 'map' &&
       v_4166d2.current !== v_640ccc
     ) {
       console.log('[MapMainScreen] 화면 이동 감지:', v_640ccc, '→ map');
@@ -2208,8 +2208,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log(`[현재 마커] ${v_b50a7e} (거리: 0m)`);
 
       const v_6442c3 = v_b4d4c5
-        .filter(v_5e3dbb => 
-          v_5e3dbb.latitude && 
+        .filter(v_5e3dbb =>
+          v_5e3dbb.latitude &&
           v_5e3dbb.longitude &&
           !(v_5e3dbb.spotID === v_c5ac8b.spotID && v_5e3dbb.latitude === v_c5ac8b.latitude && v_5e3dbb.longitude === v_c5ac8b.longitude) 
         )
@@ -2792,17 +2792,17 @@ export const MapMainScreen: v_a3453e.FC = () => {
     console.log('✅ [memoizedMarkers] 필터링 후 개수:', v_e4cf17.length);
     const v_f15433 = v_e4cf17.map((v_5e3dbb) => {
 
-        const v_f3fb62 = v_5e3dbb.campid ?? '';
-        const v_761f48 = v_5e3dbb.coin ?? '';
-        const v_27d5bf = v_5e3dbb.spotID ?? '';
-        const v_e1b1cf = v_5e3dbb.latitude!.toFixed(6);
-        const v_c87b30 = v_5e3dbb.longitude!.toFixed(6);
-        const v_e149c8 = `marker-${v_f3fb62}-${v_761f48}-${v_27d5bf}-${v_e1b1cf}-${v_c87b30}`;
-        return {
-          ...v_5e3dbb,
-          uniqueKey: v_e149c8,
-        };
-      });
+      const v_f3fb62 = v_5e3dbb.campid ?? '';
+      const v_761f48 = v_5e3dbb.coin ?? '';
+      const v_27d5bf = v_5e3dbb.spotID ?? '';
+      const v_e1b1cf = v_5e3dbb.latitude!.toFixed(6);
+      const v_c87b30 = v_5e3dbb.longitude!.toFixed(6);
+      const v_e149c8 = `marker-${v_f3fb62}-${v_761f48}-${v_27d5bf}-${v_e1b1cf}-${v_c87b30}`;
+      return {
+        ...v_5e3dbb,
+        uniqueKey: v_e149c8,
+      };
+    });
     console.log('✅ [memoizedMarkers] 최종 마커 개수:', v_f15433.length);
     return v_f15433;
   }, [v_b4d4c5]);
@@ -2925,7 +2925,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
           {}
 
           {v_0f8a7a.map((v_5e3dbb) => {
-              return (
+            return (
               <Marker
 
                 key={v_5e3dbb.uniqueKey}
@@ -2956,18 +2956,18 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
               </Marker>
             );
-            })}
+          })}
         </MapView>
 
-         {}
-      {
+        {}
+        {
 
 }
 
         {}
 
         {v_16772f && (
-          <Pressable 
+          <Pressable
             style={v_d81136.mapPinButton}
             onPress={v_30b908}
           >
@@ -3183,7 +3183,7 @@ const v_d81136 = v_472849.create({
 
   topLogo: {
     position: 'absolute',
-    top: 32, 
+    top: 32,
     left: 8,
     width: v_700696.get('window').width / 4,
     height: v_700696.get('window').width / 4,
