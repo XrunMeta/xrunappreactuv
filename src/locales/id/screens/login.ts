@@ -10,6 +10,7 @@ export default {
   emailPlaceholder: 'Masukkan email Anda',
   passwordLabel: 'Kata Sandi',
   passwordPlaceholder: 'Masukkan kata sandi Anda',
+  xrunPasswordLabel: 'Kata Sandi Akun XRUN',
   rememberMe: 'Tetap masuk',
   loginButton: 'Masuk',
   disclaimer: 'Jika Anda lupa kata sandi, Anda dapat masuk dengan login sosial atau login OTP email.',
