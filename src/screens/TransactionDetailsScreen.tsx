@@ -6,6 +6,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { getTokenIcon } from '../constants/tokenMeta';
 import { useTranslation } from 'react-i18next';
+import { useAppContext } from '../context';
 
 export interface TransactionDetails {
   id: string;
@@ -15,12 +16,15 @@ export interface TransactionDetails {
   from: string;
   to: string;
   txHash: string;
+  amount?: string; 
+  symbol?: string; 
   nonce?: string;
   gasPrice?: string;
   usedGas?: string;
   maxGas?: string;
   totalSpent?: string;
   blockHeight?: string;
+  fromWalletList?: boolean; 
 }
 
 interface TransactionDetailsScreenProps {
@@ -30,29 +34,104 @@ interface TransactionDetailsScreenProps {
 export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> = ({ data }) => {
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
-  const details = data ?? DEFAULT_DETAILS;
+  const { selectedTransactionDetails, resetSelectedTransactionDetails } = useAppContext();
+
+  const [localDetails, setLocalDetails] = React.useState<TransactionDetails | null>(null);
+
+  React.useEffect(() => {
+    const newDetails = selectedTransactionDetails || data || DEFAULT_DETAILS;
+    if (newDetails && newDetails.id !== 'default') {
+      setLocalDetails(newDetails);
+      console.log('[TransactionDetailsScreen] 로컬 state에 저장:', {
+        id: newDetails.id,
+        fromWalletList: newDetails.fromWalletList,
+      });
+    }
+  }, [selectedTransactionDetails, data]);
+
+  React.useEffect(() => {
+    return () => {
+
+      setTimeout(() => {
+        resetSelectedTransactionDetails();
+      }, 100);
+    };
+  }, [resetSelectedTransactionDetails]);
+
+  const details = localDetails || selectedTransactionDetails || data || DEFAULT_DETAILS;
   const tokenIcon = getTokenIcon(details.title, details.subtitle);
+
+  React.useEffect(() => {
+    if (selectedTransactionDetails || data) {
+      console.log('[TransactionDetailsScreen] 수신한 데이터:', {
+        selectedTransactionDetails: selectedTransactionDetails ? JSON.stringify(selectedTransactionDetails, null, 2) : null,
+        propsData: data ? JSON.stringify(data, null, 2) : null,
+        최종사용데이터: JSON.stringify(details, null, 2),
+        지갑목록에서이동: details.fromWalletList ? '예' : '아니오',
+      });
+      console.log('[TransactionDetailsScreen] 각 필드 값:', {
+        id: details.id,
+        title: details.title,
+        subtitle: details.subtitle,
+        timestamp: details.timestamp,
+        from: details.from,
+        to: details.to,
+        txHash: details.txHash,
+        nonce: details.nonce,
+        gasPrice: details.gasPrice,
+        usedGas: details.usedGas,
+        maxGas: details.maxGas,
+        totalSpent: details.totalSpent,
+        blockHeight: details.blockHeight,
+      });
+    }
+  }, [selectedTransactionDetails, data, details]);
+
+  const back = () => {
+
+    const currentDetails = localDetails || selectedTransactionDetails || data || DEFAULT_DETAILS;
+    console.log('[TransactionDetailsScreen] 뒤로가기 호출:', {
+      localDetails: localDetails ? '있음' : '없음',
+      selectedTransactionDetails: selectedTransactionDetails ? '있음' : '없음',
+      data: data ? '있음' : '없음',
+      currentDetails: currentDetails ? '있음' : '없음',
+      fromWalletList: currentDetails.fromWalletList,
+      details_fromWalletList: details.fromWalletList,
+    });
+    if (currentDetails.fromWalletList) {
+      goBack();
+    } else {
+
+      goBack();
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Header title={t('screens.transactionDetails.title')} onBackPress={goBack} showBackButton />
+      <Header title={t('screens.transactionDetails.title')} onBackPress={back} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardGroup}>
-          <InfoCard label={t('screens.transactionDetails.from')} value={details.from} />
-          <InfoCard label={t('screens.transactionDetails.to')} value={details.to} />
-          <InfoCard label={t('screens.transactionDetails.time')} value={details.timestamp} />
-          <InfoCard label={t('screens.transactionDetails.txHash')} value={details.txHash} />
+          <InfoCard label={t('screens.transactionDetails.from')} value={details.from || '-'} />
+          <InfoCard label={t('screens.transactionDetails.to')} value={details.to || '-'} />
+          {details.amount && (
+            <InfoCard 
+              label={t('screens.transactionDetails.amount')} 
+              value={`${details.amount} ${details.symbol || ''}`.trim()} 
+            />
+          )}
+          <InfoCard label={t('screens.transactionDetails.time')} value={details.timestamp || '-'} />
+          <InfoCard label={t('screens.transactionDetails.txHash')} value={details.txHash || '-'} />
         </View>
 
         <Text style={styles.sectionTitle}>{t('screens.transactionDetails.transactionDetails')}</Text>
 
         <View style={styles.cardGroup}>
-          <InfoCard label={t('screens.transactionDetails.nonce')} value={details.nonce ?? '-'} />
-          <InfoCard label={t('screens.transactionDetails.gasPrice')} value={details.gasPrice ?? '-'} />
-          <InfoCard label={t('screens.transactionDetails.usedGas')} value={details.usedGas ?? '-'} />
-          <InfoCard label={t('screens.transactionDetails.maxGas')} value={details.maxGas ?? '-'} />
-          <InfoCard label={t('screens.transactionDetails.totalSpent')} value={details.totalSpent ?? '-'} />
-          <InfoCard label={t('screens.transactionDetails.blockHeight')} value={details.blockHeight ?? '-'} />
+          <InfoCard label={t('screens.transactionDetails.nonce')} value={details.nonce || '-'} />
+          <InfoCard label={t('screens.transactionDetails.gasPrice')} value={details.gasPrice || '-'} />
+          <InfoCard label={t('screens.transactionDetails.usedGas')} value={details.usedGas || '-'} />
+          <InfoCard label={t('screens.transactionDetails.maxGas')} value={details.maxGas || '-'} />
+          <InfoCard label={t('screens.transactionDetails.totalSpent')} value={details.totalSpent || '-'} />
+          <InfoCard label={t('screens.transactionDetails.blockHeight')} value={details.blockHeight || '-'} />
         </View>
 
         <ExplorerBadge
@@ -136,5 +215,4 @@ const styles = StyleSheet.create({
   },
 
 });
-
 

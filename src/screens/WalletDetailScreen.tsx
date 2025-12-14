@@ -8,11 +8,9 @@ import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionList
 import { COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { TransactionDetails } from './TransactionDetailsScreen';
 import {
-  fetchTotalHistory,
-  fetchTransferHistory,
-  fetchReceivedDetails,
-  fetchTransitionHistory,
+  fetchEtherscanTransactions,
 } from '../services';
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
@@ -24,9 +22,40 @@ const iconPolygonscan = require('../../assets/icon_polyganscan.png');
 const iconSend = require('../../assets/icon-send.png');
 const iconReceive = require('../../assets/icon-receive.png');
 
-const dateFormatter = (dateString: string): string => {
+interface EtherscanTransactionItem {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  nonce: string;
+  blockHash: string;
+  from: string;
+  contractAddress: string;
+  to: string;
+  value: string;
+  tokenName: string;
+  tokenSymbol: string;
+  tokenDecimal: string;
+  transactionIndex: string;
+  gas: string;
+  gasPrice: string;
+  gasUsed: string;
+  cumulativeGasUsed: string;
+  input: string;
+  methodId: string;
+  functionName: string;
+  confirmations: string;
+}
+
+interface EtherscanTransactionsResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: EtherscanTransactionItem[];
+}
+
+const timestampToDate = (timestamp: string): string => {
   try {
-    const date = new Date(dateString);
+    const date = new Date(parseInt(timestamp, 10) * 1000);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -34,7 +63,56 @@ const dateFormatter = (dateString: string): string => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   } catch {
-    return dateString;
+    return timestamp;
+  }
+};
+
+const weiToEth = (weiValue: string, decimals: string = '18'): string => {
+  try {
+    const decimalPlaces = parseInt(decimals, 10);
+    const divisor = new BigNumber(10).pow(decimalPlaces);
+    const ethValue = new BigNumber(weiValue).dividedBy(divisor);
+
+    return ethValue.toFixed(4).replace(/\.?0+$/, '');
+  } catch {
+    return '0';
+  }
+};
+
+const weiToGwei = (weiValue: string): string => {
+  try {
+    const gweiValue = new BigNumber(weiValue).dividedBy(new BigNumber(10).pow(9));
+    return gweiValue.toFixed(2).replace(/\.?0+$/, '');
+  } catch {
+    return '0';
+  }
+};
+
+const calculateTotalSpent = (
+  gasUsed: string | undefined,
+  gasPrice: string | undefined,
+  currency: number
+): string | undefined => {
+  if (!gasUsed || !gasPrice) {
+    return undefined;
+  }
+
+  try {
+
+    const totalWei = new BigNumber(gasUsed).multipliedBy(new BigNumber(gasPrice));
+
+    const totalEth = totalWei.dividedBy(new BigNumber(10).pow(18));
+
+    let symbol = 'ETH';
+    if (currency === 16 || currency === 18) {
+      symbol = 'POL';
+    } else if (currency === 1 || currency === 2) {
+      symbol = 'ETH';
+    }
+
+    return `${totalEth.toFixed(8).replace(/\.?0+$/, '')} ${symbol}`;
+  } catch {
+    return undefined;
   }
 };
 
@@ -104,7 +182,32 @@ interface TransactionListItemData extends TransactionHistoryItem {
   amount: string;
   suffix?: string;
   iconSource?: any;
+
+  hash?: string;
+  from?: string;
+  to?: string;
+  nonce?: string;
+  gasPrice?: string;
+  gasUsed?: string;
+  gas?: string;
+  blockNumber?: string;
+  excuteddatetime?: string;
+  transaction?: string;
 }
+
+const TransactionListItemWrapper: React.FC<TransactionListItemData> = (props) => {
+  return (
+    <TransactionListItem
+      title={props.title}
+      subtitle={props.subtitle}
+      timestamp={props.timestamp}
+      amount={props.amount}
+      suffix={props.suffix}
+      iconSource={props.iconSource}
+      onPress={(props as any).onPress}
+    />
+  );
+};
 
 export const WalletDetailScreen = () => {
   const { t } = useTranslation();
@@ -115,8 +218,22 @@ export const WalletDetailScreen = () => {
     setSelectedWalletAsset,
     setWalletReceiveAddress,
     setWalletReceiveCurrency,
+    setSelectedTransactionDetails,
   } = useAppContext();
   const { showAlert } = useAlertDialog();
+
+  useEffect(() => {
+    console.log('[WalletDetailScreen] 컨텍스트 내용:', {
+      selectedWalletAsset: selectedWalletAsset ? {
+        currency: selectedWalletAsset.currency,
+        symbol: selectedWalletAsset.symbol,
+        name: selectedWalletAsset.name,
+        amount: selectedWalletAsset.amount,
+        icon: selectedWalletAsset.icon,
+        originalData: selectedWalletAsset.originalData,
+      } : null,
+    });
+  }, [selectedWalletAsset]);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'send' | 'receive'>('all');
@@ -201,135 +318,147 @@ export const WalletDetailScreen = () => {
     }
   }, []);
 
-  const createFetchFunction = useCallback(
-    (
-      apiFunction: (
-        member: number | string,
-        currency: number,
-        daysbefore: number,
-        startwith: number,
-        navigation?: any,
-      ) => Promise<TransactionHistoryResponse>,
-    ) => {
-      return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
-        if (!member || !selectedWalletAsset) {
-          return { data: [], total: 0, hasMore: false };
-        }
-
-        const daysbefore = getDaysBefore(selectedRange);
-        const startwith = (params.page - 1) * params.pageSize;
-
-        try {
-          const response = await apiFunction(
-            member,
-            selectedWalletAsset.currency,
-            daysbefore,
-            startwith,
-          );
-
-          const items = (response.data || []).map((item) => {
-            const formattedAmount = new BigNumber(item.amount || '0').toFixed();
-            const actionType = getActionType(item.action || 0, t);
-            const timestamp = dateFormatter(item.excuteddatetime || item.date || '');
-
-            return {
-              ...item,
-              title: selectedWalletAsset.symbol || selectedWalletAsset.name,
-              subtitle: actionType,
-              timestamp,
-              amount: formattedAmount,
-              suffix: selectedWalletAsset.symbol,
-              iconSource: selectedWalletAsset.icon,
-            } as TransactionListItemData;
-          });
-
-          const hasMore = items.length >= params.pageSize;
-
-          return {
-            data: items,
-            total: items.length,
-            hasMore,
-          };
-        } catch (error) {
-          console.error('[WalletDetail] API 호출 오류:', error);
-          return { data: [], total: 0, hasMore: false };
-        }
-      };
-    },
-    [member, selectedWalletAsset, selectedRange, getDaysBefore, t],
-  );
-
-  const createSendFetchFunction = useCallback(() => {
-    return async (
-      params: PaginationParams,
-    ): Promise<PaginationResponse<TransactionListItemData>> => {
-      if (!member || !selectedWalletAsset) {
+  const createFetchFunction = useCallback(() => {
+    return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
+      if (!member || !selectedWalletAsset || !publicAddress) {
         return { data: [], total: 0, hasMore: false };
       }
 
-      const daysbefore = getDaysBefore(selectedRange);
-      const startwith = (params.page - 1) * params.pageSize;
+      if (![1, 16, 18].includes(selectedWalletAsset.currency)) {
+        console.warn('[WalletDetail] 지원하지 않는 currency:', selectedWalletAsset.currency);
+        return { data: [], total: 0, hasMore: false };
+      }
 
       try {
-        const [transferResponse, transitionResponse] = await Promise.all([
-          fetchTransferHistory(member, selectedWalletAsset.currency, daysbefore, startwith),
-          fetchTransitionHistory(member, selectedWalletAsset.currency, daysbefore, startwith),
-        ]);
+        const response = await fetchEtherscanTransactions(
+          member,
+          selectedWalletAsset.currency,
+          params.page,
+          params.pageSize,
+        ) as EtherscanTransactionsResponse;
 
-        const allItems = [...(transferResponse.data || []), ...(transitionResponse.data || [])];
+        if (!response.data || !Array.isArray(response.data)) {
+          console.warn('[WalletDetail] 응답 데이터 형식이 올바르지 않습니다.');
+          return { data: [], total: 0, hasMore: false };
+        }
 
-        allItems.sort((a, b) => {
-          const dateA = new Date(a.excuteddatetime || a.date || '').getTime();
-          const dateB = new Date(b.excuteddatetime || b.date || '').getTime();
-          return dateB - dateA;
-        });
+        const myAddressLower = publicAddress.toLowerCase();
 
-        const startIndex = (params.page - 1) * params.pageSize;
-        const endIndex = startIndex + params.pageSize;
-        const paginatedItems = allItems.slice(startIndex, endIndex);
+        const items: TransactionListItemData[] = response.data.map((item) => {
 
-        const items = paginatedItems.map((item) => {
-          const formattedAmount = new BigNumber(item.amount || '0').toFixed();
-          const actionType = getActionType(item.action || 0, t);
-          const timestamp = dateFormatter(item.excuteddatetime || item.date || '');
+          const isReceive = item.to.toLowerCase() === myAddressLower;
+          const isSend = item.from.toLowerCase() === myAddressLower;
+
+          let actionType: string;
+          if (isReceive) {
+            actionType = t('screens.walletDetail.received');
+          } else if (isSend) {
+            actionType = t('screens.walletDetail.transfer');
+          } else {
+            actionType = t('screens.walletDetail.other');
+          }
+
+          const amountInEth = weiToEth(item.value, item.tokenDecimal);
+
+          const formattedTimestamp = timestampToDate(item.timeStamp);
 
           return {
-            ...item,
-            title: selectedWalletAsset.symbol || selectedWalletAsset.name,
+            id: item.hash,
+            transaction: item.hash,
+            excuteddatetime: timestampToDate(item.timeStamp),
+            date: timestampToDate(item.timeStamp),
+            amount: amountInEth,
+            symbol: item.tokenSymbol || selectedWalletAsset.symbol,
+            action: isReceive ? 3304 : isSend ? 3305 : 0, 
+            status: 9101, 
+            currency: selectedWalletAsset.currency,
+
+            title: item.tokenSymbol || selectedWalletAsset.symbol || selectedWalletAsset.name,
             subtitle: actionType,
-            timestamp,
-            amount: formattedAmount,
-            suffix: selectedWalletAsset.symbol,
+            timestamp: formattedTimestamp,
+            suffix: item.tokenSymbol || selectedWalletAsset.symbol,
             iconSource: selectedWalletAsset.icon,
+
+            blockNumber: item.blockNumber,
+            from: item.from,
+            to: item.to,
+            contractAddress: item.contractAddress,
+            gasUsed: item.gasUsed,
+            gas: item.gas, 
+            gasPrice: item.gasPrice, 
+            nonce: item.nonce,
+            confirmations: item.confirmations,
+            timeStamp: item.timeStamp, 
+            hash: item.hash,
+            tokenDecimal: item.tokenDecimal,
           } as TransactionListItemData;
         });
 
-        const hasMore = allItems.length > endIndex;
+        items.sort((a, b) => {
+
+          const originalItemA = response.data.find((item) => item.hash === a.id);
+          const originalItemB = response.data.find((item) => item.hash === b.id);
+          const timestampA = originalItemA ? parseInt(originalItemA.timeStamp, 10) : 0;
+          const timestampB = originalItemB ? parseInt(originalItemB.timeStamp, 10) : 0;
+          return timestampB - timestampA;
+        });
+
+        const hasMore = items.length >= params.pageSize;
 
         return {
           data: items,
-          total: allItems.length,
+          total: items.length,
           hasMore,
         };
       } catch (error) {
-        console.error('[WalletDetail] Send API 호출 오류:', error);
+        console.error('[WalletDetail] API 호출 오류:', error);
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, selectedRange, getDaysBefore, t]);
+  }, [member, selectedWalletAsset, publicAddress, t]);
+
+  const createSendFetchFunction = useCallback(() => {
+    return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
+      const baseFetch = createFetchFunction();
+      const result = await baseFetch(params);
+
+      const filteredData = result.data.filter((item) => item.action === 3305);
+
+      return {
+        data: filteredData,
+        total: filteredData.length,
+        hasMore: result.hasMore,
+      };
+    };
+  }, [createFetchFunction]);
+
+  const createReceiveFetchFunction = useCallback(() => {
+    return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
+      const baseFetch = createFetchFunction();
+      const result = await baseFetch(params);
+
+      const filteredData = result.data.filter((item) => item.action === 3304);
+
+      return {
+        data: filteredData,
+        total: filteredData.length,
+        hasMore: result.hasMore,
+      };
+    };
+  }, [createFetchFunction]);
 
   const getFetchData = useCallback(() => {
     switch (selectedType) {
       case 'all':
-        return createFetchFunction(fetchTotalHistory);
+        return createFetchFunction();
       case 'send':
         return createSendFetchFunction();
       case 'receive':
-        return createFetchFunction(fetchReceivedDetails);
+        return createReceiveFetchFunction();
       default:
-        return createFetchFunction(fetchTotalHistory);
+        return createFetchFunction();
     }
-  }, [selectedType, createFetchFunction, createSendFetchFunction]);
+  }, [selectedType, createFetchFunction, createSendFetchFunction, createReceiveFetchFunction]);
 
   const handleAction = useCallback(
     (type: 'scan' | 'receive' | 'send') => {
@@ -480,10 +609,52 @@ export const WalletDetailScreen = () => {
         <View style={styles.listWrapper}>
           <DataList
             fetchData={getFetchData()}
-            ItemComponent={TransactionListItem}
+            ItemComponent={TransactionListItemWrapper}
             pageSize={20}
             keyExtractor={(item, index) => item.id?.toString() || `txn_${index}`}
-            onItemPress={(item) => {
+            onItemPress={(item: TransactionListItemData) => {
+
+              const itemData = item as TransactionListItemData & {
+                hash?: string;
+                from?: string;
+                to?: string;
+                nonce?: string;
+                gasPrice?: string;
+                gasUsed?: string;
+                gas?: string;
+                blockNumber?: string;
+                excuteddatetime?: string;
+                transaction?: string;
+              };
+
+              const details: TransactionDetails = {
+                id: itemData.id?.toString() || itemData.hash || '',
+                title: itemData.title || selectedWalletAsset?.symbol || '',
+                subtitle: itemData.subtitle || '',
+                timestamp: itemData.timestamp || itemData.excuteddatetime || '',
+                from: itemData.from || '',
+                to: itemData.to || '',
+                txHash: itemData.hash || itemData.transaction || '',
+                amount: itemData.amount || undefined, 
+                symbol: itemData.symbol || selectedWalletAsset?.symbol || undefined, 
+                nonce: itemData.nonce || undefined,
+                gasPrice: itemData.gasPrice 
+                  ? weiToGwei(itemData.gasPrice) 
+                  : undefined,
+                usedGas: itemData.gasUsed || undefined,
+                maxGas: itemData.gas || undefined,
+                totalSpent: calculateTotalSpent(
+                  itemData.gasUsed,
+                  itemData.gasPrice,
+                  selectedWalletAsset?.currency || 0
+                ),
+                blockHeight: itemData.blockNumber || undefined,
+                fromWalletList: true, 
+              };
+
+              console.log('[WalletDetailScreen] Context에 저장할 데이터:', JSON.stringify(details, null, 2));
+              setSelectedTransactionDetails(details);
+              console.log('[WalletDetailScreen] Context 저장 완료, navigate 호출');
               navigate(ROUTES.transactionDetails);
             }}
             emptyMessage={t('screens.walletDetail.noHistory')}

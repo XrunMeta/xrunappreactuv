@@ -2,6 +2,7 @@ export default {
   title: '거래',
   from: 'From',
   to: 'To',
+  amount: '금액',
   time: 'Time',
   txHash: 'TX Hash',
   transactionDetails: 'Transaction Details',

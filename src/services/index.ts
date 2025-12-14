@@ -4208,6 +4208,48 @@ export const fetchTransitionHistory = async (
   }
 };
 
+export const fetchEtherscanTransactions = async (
+  member: number | string,
+  currency: number,
+  page: number = 1,
+  offset: number = 20,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const requestBody = {
+      member: String(member),
+      currency,
+      page,
+      offset,
+    };
+
+    console.log('[트랜잭션] Etherscan 거래내역 조회 요청:', requestBody);
+
+    const response = await axiosInstance.post<any>(
+      '/etherscan-transactions',
+      requestBody,
+    );
+
+    console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
+
+    return response.data;
+  } catch (error) {
+    console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const getGasEstimation = async (
   fromAddress: string,
   toAddress: string,
