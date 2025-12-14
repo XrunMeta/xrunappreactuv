@@ -350,7 +350,16 @@ const v_7488d5 = (v_c65f5d) => {
 
   v_0c3a5b.interceptors.request.use(
     (v_74a79c) => {
+
+      const v_f409eb = v_74a79c.baseURL 
+        ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
+            ? `${v_74a79c.baseURL.slice(0, -1)}${v_74a79c.url}`
+            : `${v_74a79c.baseURL}${v_74a79c.url}`)
+        : v_74a79c.url;
+
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
+      console.log(`[API Request] baseURL: ${v_74a79c.baseURL}`);
+      console.log(`[API Request] 최종 요청 URL: ${v_f409eb}`);
 
       if (v_74a79c.data) {
 
@@ -4232,6 +4241,7 @@ export const v_69bcd0 = async (
     );
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
+    console.log('[트랜잭션] 응답 데이터:', JSON.stringify(v_3393e3.data, null, 2));
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {

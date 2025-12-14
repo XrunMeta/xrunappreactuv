@@ -8,6 +8,7 @@ import {
   v_4623af,
   v_629153,
 } from 'rcmrninabrnb';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_843035 } from '../constants';
 
 interface TransactionListItemProps extends v_629153 {
@@ -17,6 +18,9 @@ interface TransactionListItemProps extends v_629153 {
   amount: string;
   suffix?: string;
   iconSource?: v_07a341;
+  iconName?: keyof typeof v_25515d.glyphMap;
+  iconColor?: string;
+  amountColor?: string;
   fallbackLabel?: string;
   fallbackColors?: {
     background: string;
@@ -31,6 +35,9 @@ export const TransactionListItem: v_a3453e.FC<TransactionListItemProps> = ({
   amount: v_f63e09,
   suffix: v_ae8e76,
   iconSource: v_c1dd95,
+  iconName: v_c288e9,
+  iconColor: v_ef160b = '#343a5a',
+  amountColor: v_578b11,
   onPress: v_719eed,
   fallbackLabel: v_4281e6,
   fallbackColors: v_94e1f9 = { background: '#f2f2f2', text: '#343434' },
@@ -44,7 +51,11 @@ export const TransactionListItem: v_a3453e.FC<TransactionListItemProps> = ({
       {...v_29c333}
     >
       <View style={v_d81136.left}>
-        {v_c1dd95 ? (
+        {v_c288e9 ? (
+          <View style={[v_d81136.icon, v_d81136.iconContainer]}>
+            <Ionicons name={v_c288e9} size={24} color={v_ef160b} />
+          </View>
+        ) : v_c1dd95 ? (
           <Image source={v_c1dd95} style={v_d81136.icon} />
         ) : (
           <View
@@ -68,7 +79,9 @@ export const TransactionListItem: v_a3453e.FC<TransactionListItemProps> = ({
       </View>
       <View style={v_d81136.right}>
         <Text style={v_d81136.timestamp}>{v_42044e}</Text>
-        <Text style={v_d81136.amount}>{v_ae8e76 ? `${v_f63e09} ${v_ae8e76}` : v_f63e09}</Text>
+        <Text style={[v_d81136.amount, v_578b11 ? { color: v_578b11 } : null]}>
+          {v_ae8e76 ? `${v_f63e09} ${v_ae8e76}` : v_f63e09}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -96,6 +109,11 @@ const v_d81136 = v_472849.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f9fa',
   },
   fallbackIcon: {
     alignItems: 'center',
