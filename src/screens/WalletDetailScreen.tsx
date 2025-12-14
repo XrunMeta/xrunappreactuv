@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,7 +8,7 @@ import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionList
 import { COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { TransactionDetails } from './TransactionDetailsScreen';
+import { TransactionDetails, TransactionDetailsScreen } from './TransactionDetailsScreen';
 import {
   fetchEtherscanTransactions,
 } from '../services';
@@ -19,8 +19,6 @@ import { copyToClipboard } from '../utils';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan.png');
-const iconSend = require('../../assets/icon-send.png');
-const iconReceive = require('../../assets/icon-receive.png');
 
 interface EtherscanTransactionItem {
   blockNumber: string;
@@ -182,6 +180,9 @@ interface TransactionListItemData extends TransactionHistoryItem {
   amount: string;
   suffix?: string;
   iconSource?: any;
+  iconName?: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
+  amountColor?: string;
 
   hash?: string;
   from?: string;
@@ -204,6 +205,9 @@ const TransactionListItemWrapper: React.FC<TransactionListItemData> = (props) =>
       amount={props.amount}
       suffix={props.suffix}
       iconSource={props.iconSource}
+      iconName={props.iconName}
+      iconColor={props.iconColor}
+      amountColor={props.amountColor}
       onPress={(props as any).onPress}
     />
   );
@@ -242,6 +246,11 @@ export const WalletDetailScreen = () => {
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
   const isNavigatingToSendRef = useRef(false);
+  const [transactionDetailsModalVisible, setTransactionDetailsModalVisible] = useState(false);
+  const [selectedTransactionDetailsForModal, setSelectedTransactionDetailsForModal] = useState<TransactionDetails | null>(null);
+
+  const [cachedTransactionData, setCachedTransactionData] = useState<TransactionListItemData[] | null>(null);
+  const [cacheKey, setCacheKey] = useState<string>('');
 
   useEffect(() => {
     if (!selectedWalletAsset) {
@@ -266,6 +275,9 @@ export const WalletDetailScreen = () => {
     if (selectedWalletAsset.originalData?.address) {
       setPublicAddress(selectedWalletAsset.originalData.address);
     }
+
+    setCachedTransactionData(null);
+    setCacheKey('');
 
     const loadGopaxPrice = async () => {
 
@@ -301,6 +313,9 @@ export const WalletDetailScreen = () => {
     (selection: { type: 'all' | 'send' | 'receive'; range: '7d' | '14d' | '30d' }) => {
       setSelectedType(selection.type);
       setSelectedRange(selection.range);
+
+      setCachedTransactionData(null);
+      setCacheKey('');
     },
     [],
   );
@@ -329,6 +344,27 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
 
+      const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}-${selectedRange}`;
+
+      if (params.page === 1 && cachedTransactionData && cacheKey === currentCacheKey) {
+        console.log('[WalletDetail] 캐시된 데이터 사용:', {
+          cacheKey,
+          currentCacheKey,
+          cachedDataLength: cachedTransactionData.length,
+        });
+
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        const paginatedData = cachedTransactionData.slice(startIndex, endIndex);
+        const hasMore = endIndex < cachedTransactionData.length;
+
+        return {
+          data: paginatedData,
+          total: cachedTransactionData.length,
+          hasMore,
+        };
+      }
+
       try {
         const response = await fetchEtherscanTransactions(
           member,
@@ -344,10 +380,20 @@ export const WalletDetailScreen = () => {
 
         const myAddressLower = publicAddress.toLowerCase();
 
+        const userAddress = '0xc3769f23e0b94d5d36f558c8f79e81d589ea119f';
+        const userAddressLower = userAddress.toLowerCase();
+
         const items: TransactionListItemData[] = response.data.map((item) => {
 
           const isReceive = item.to.toLowerCase() === myAddressLower;
           const isSend = item.from.toLowerCase() === myAddressLower;
+
+          const isToUserAddress = item.to.toLowerCase() === userAddressLower;
+          const iconName = isToUserAddress ? 'download-outline' : 'send-outline';
+
+          const iconColor = isToUserAddress ? '#10B981' : '#EF4444'; 
+
+          const amountColor = isToUserAddress ? '#10B981' : '#EF4444'; 
 
           let actionType: string;
           if (isReceive) {
@@ -377,7 +423,9 @@ export const WalletDetailScreen = () => {
             subtitle: actionType,
             timestamp: formattedTimestamp,
             suffix: item.tokenSymbol || selectedWalletAsset.symbol,
-            iconSource: selectedWalletAsset.icon,
+            iconName: iconName,
+            iconColor: iconColor,
+            amountColor: amountColor,
 
             blockNumber: item.blockNumber,
             from: item.from,
@@ -405,17 +453,31 @@ export const WalletDetailScreen = () => {
 
         const hasMore = items.length >= params.pageSize;
 
+        if (params.page === 1) {
+          setCachedTransactionData(items);
+          setCacheKey(currentCacheKey);
+          console.log('[WalletDetail] 데이터 캐시에 저장:', {
+            cacheKey: currentCacheKey,
+            dataLength: items.length,
+          });
+        }
+
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        const paginatedData = items.slice(startIndex, endIndex);
+        const paginatedHasMore = endIndex < items.length;
+
         return {
-          data: items,
+          data: paginatedData,
           total: items.length,
-          hasMore,
+          hasMore: paginatedHasMore,
         };
       } catch (error) {
         console.error('[WalletDetail] API 호출 오류:', error);
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, publicAddress, t]);
+  }, [member, selectedWalletAsset, publicAddress, selectedType, selectedRange, t, cachedTransactionData, cacheKey]);
 
   const createSendFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -652,10 +714,9 @@ export const WalletDetailScreen = () => {
                 fromWalletList: true, 
               };
 
-              console.log('[WalletDetailScreen] Context에 저장할 데이터:', JSON.stringify(details, null, 2));
-              setSelectedTransactionDetails(details);
-              console.log('[WalletDetailScreen] Context 저장 완료, navigate 호출');
-              navigate(ROUTES.transactionDetails);
+              console.log('[WalletDetailScreen] 모달에 표시할 데이터:', JSON.stringify(details, null, 2));
+              setSelectedTransactionDetailsForModal(details);
+              setTransactionDetailsModalVisible(true);
             }}
             emptyMessage={t('screens.walletDetail.noHistory')}
           />
@@ -669,6 +730,26 @@ export const WalletDetailScreen = () => {
         defaultType={selectedType}
         defaultRange={selectedRange}
       />
+
+      <Modal
+        visible={transactionDetailsModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => {
+          setTransactionDetailsModalVisible(false);
+          setSelectedTransactionDetailsForModal(null);
+        }}
+      >
+        {selectedTransactionDetailsForModal && (
+          <TransactionDetailsScreen
+            data={selectedTransactionDetailsForModal}
+            onClose={() => {
+              setTransactionDetailsModalVisible(false);
+              setSelectedTransactionDetailsForModal(null);
+            }}
+          />
+        )}
+      </Modal>
     </SafeView>
   );
 };
