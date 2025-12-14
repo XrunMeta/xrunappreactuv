@@ -86,6 +86,9 @@ type AppContextValue = {
     chainId: number;
   } | null) => void;
   resetTransactionResult: () => void;
+  selectedTransactionDetails: import('../screens/TransactionDetailsScreen').TransactionDetails | null;
+  setSelectedTransactionDetails: (details: import('../screens/TransactionDetailsScreen').TransactionDetails | null) => void;
+  resetSelectedTransactionDetails: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -159,6 +162,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     currency: number;
     chainId: number;
   } | null>(null);
+  const [selectedTransactionDetails, setSelectedTransactionDetails] = useState<import('../screens/TransactionDetailsScreen').TransactionDetails | null>(null);
 
   const value = useMemo(
     () => ({
@@ -238,6 +242,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       transactionResult,
       setTransactionResult,
       resetTransactionResult: () => setTransactionResult(null),
+      selectedTransactionDetails,
+      setSelectedTransactionDetails,
+      resetSelectedTransactionDetails: () => setSelectedTransactionDetails(null),
     }),
     [
       walletSendAddress,
@@ -259,6 +266,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       advertisementParams,
       selectedWalletAsset,
       transactionResult,
+      selectedTransactionDetails,
     ],
   );
 
