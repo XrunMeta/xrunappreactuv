@@ -1,5 +1,8 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import { v_326be8 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
+import * as v_222528 from 'objipkycgyawxjjk';
+import * as v_fba5a0 from 'hfxxehldoiokdq';
 import {
   v_083aa7,
   v_379bd1,
@@ -162,6 +165,99 @@ const v_c0dbdf = () => {
       v_269481.remove();
       clearTimeout(v_599769);
     };
+  }, [v_eee6b0, v_9b57fc]);
+
+  v_c4deb2(() => {
+    const v_b85291 = async () => {
+
+      if (v_326be8.OS !== 'android') {
+        return;
+      }
+
+      try {
+
+        const v_23b320 = await v_222528.getInstallReferrerAsync();
+        console.log('[Install Referrer] 원본:', v_23b320);
+
+        if (v_23b320) {
+
+          const v_24baff = new URLSearchParams(v_23b320);
+          const v_a560de = v_24baff.get('utm_source');
+          const v_2c9a0c = v_24baff.get('utm_content');
+
+          console.log('[Install Referrer] utm_source:', v_a560de);
+          console.log('[Install Referrer] utm_content:', v_2c9a0c);
+
+          if (v_a560de === 'referral' && v_2c9a0c) {
+            const v_9bf12c = decodeURIComponent(v_2c9a0c);
+            console.log('[Install Referrer] 추천인 이메일:', v_9bf12c);
+
+            const v_4b1c8e = await v_e84827.getItem('processed_install_referrer');
+            if (v_4b1c8e === v_23b320) {
+              console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
+              return;
+            }
+
+            await v_e84827.setItem('processed_install_referrer', v_23b320);
+
+            v_eee6b0({ referralEmail: v_9bf12c });
+
+            console.log('[Install Referrer] 회원가입 화면으로 이동');
+            v_9b57fc('signup');
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[Install Referrer] 처리 실패:', v_5e9bfe);
+      }
+    };
+
+    const v_cb36b1 = setTimeout(v_b85291, 3000);
+
+    return () => clearTimeout(v_cb36b1);
+  }, [v_eee6b0, v_9b57fc]);
+
+  v_c4deb2(() => {
+    const v_350d39 = async () => {
+
+      if (v_326be8.OS !== 'ios') {
+        return;
+      }
+
+      try {
+
+        const v_46a232 = await v_fba5a0.getStringAsync();
+        console.log('[iOS Clipboard] 클립보드 내용:', v_46a232);
+
+        if (v_46a232 && v_46a232.startsWith('XRUN_REFERRAL:')) {
+          const v_9bf12c = v_46a232.replace('XRUN_REFERRAL:', '').trim();
+          console.log('[iOS Clipboard] 추천인 이메일:', v_9bf12c);
+
+          if (v_9bf12c) {
+
+            const v_eee9fe = await v_e84827.getItem('processed_clipboard_referral');
+            if (v_eee9fe === v_46a232) {
+              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+              return;
+            }
+
+            await v_e84827.setItem('processed_clipboard_referral', v_46a232);
+
+            await v_fba5a0.setStringAsync('');
+
+            v_eee6b0({ referralEmail: decodeURIComponent(v_9bf12c) });
+
+            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+            v_9b57fc('signup');
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[iOS Clipboard] 처리 실패:', v_5e9bfe);
+      }
+    };
+
+    const v_cb36b1 = setTimeout(v_350d39, 3000);
+
+    return () => clearTimeout(v_cb36b1);
   }, [v_eee6b0, v_9b57fc]);
 
   if (v_0f0c7b === 'login') {
