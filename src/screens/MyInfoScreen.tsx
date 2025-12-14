@@ -52,7 +52,15 @@ export const MyInfoScreen = () => {
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
-
+      {
+        id: 'shopSales',
+        label: t('screens.myInfo.shopSales'),
+        subtitle: t('screens.myinfoShopSales.title'),
+        iconName: 'storefront-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#7ca6e8',
+        route: 'myinfoShopSales',
+      },
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),
@@ -118,7 +126,7 @@ export const MyInfoScreen = () => {
             if (user) {
               const firstName = user.firstname || '';
               const lastName = user.lastname || '';
-              const fullName = `${firstName} ${lastName}`.trim() || '사용자';
+              const fullName = `${lastName} ${firstName}`.trim() || '사용자';
 
               setUserInfo({
                 name: fullName,
