@@ -103,6 +103,13 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
         const v_efe339 = await v_e84827.getItem('rememberMe');
         const v_0fd7ed = await v_e84827.getItem('isLoggedIn');
 
+        console.log('[Navigation] 자동 로그인 확인:', {
+          remember: v_efe339,
+          loggedIn: v_0fd7ed,
+          rememberType: typeof v_efe339,
+          loggedInType: typeof v_0fd7ed,
+        });
+
         if (v_efe339 === 'true' && v_0fd7ed === 'true') {
 
           console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
@@ -111,7 +118,12 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
           return;
         }
 
-        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지', {
+          remember: v_efe339,
+          loggedIn: v_0fd7ed,
+          rememberCheck: v_efe339 === 'true',
+          loggedInCheck: v_0fd7ed === 'true',
+        });
       } catch (v_5e9bfe) {
         console.error('[Navigation] 로그인 상태 확인 실패:', v_5e9bfe);
       } finally {

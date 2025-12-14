@@ -101,9 +101,16 @@ export const v_f4f851 = () => {
             v_99916a(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
           }
+        } else {
+
+          v_99916a(true);
+          v_24b225(true);
         }
       } catch (v_5e9bfe) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', v_5e9bfe);
+
+        v_99916a(true);
+        v_24b225(true);
       }
     };
     v_2a6af5();
@@ -154,6 +161,8 @@ export const v_f4f851 = () => {
         return;
       }
 
+      await v_e84827.setItem('otpRememberMeTemp', v_b6e894 ? 'true' : 'false');
+
       v_b572c3(v_808660.trim());
       v_8f89f3(v_ce4741.map); 
       v_9b57fc(v_ce4741.verificationCode);
@@ -180,7 +189,12 @@ export const v_f4f851 = () => {
     v_deef62(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { email: v_e0c7e8, rememberMe: v_a964a4 });
+      console.log('[로그인] 로그인 시도:', { 
+        email: v_e0c7e8, 
+        rememberMe: v_a964a4, 
+        rememberMeType: typeof v_a964a4,
+        rememberMeValue: v_a964a4 === true ? 'true' : 'false',
+      });
 
       const v_b84499 = await v_b699a9(
         v_e0c7e8.trim(),
@@ -224,10 +238,17 @@ export const v_f4f851 = () => {
 
       if (v_a964a4) {
         await v_e84827.setItem('rememberMe', 'true');
-        console.log('[로그인] 로그인 상태 유지 저장 완료');
+        console.log('[로그인] 로그인 상태 유지 저장 완료, rememberMe:', v_a964a4);
+
+        const v_dd497c = await v_e84827.getItem('rememberMe');
+        const v_d854b1 = await v_e84827.getItem('isLoggedIn');
+        console.log('[로그인] 저장 확인:', {
+          rememberMe: v_dd497c,
+          isLoggedIn: v_d854b1,
+        });
       } else {
         await v_e84827.removeItem('rememberMe');
-        console.log('[로그인] 로그인 상태 유지 해제');
+        console.log('[로그인] 로그인 상태 유지 해제, rememberMe:', v_a964a4);
       }
 
       console.log('[로그인] 로그인 성공');
@@ -574,11 +595,11 @@ export const v_f4f851 = () => {
           />
 
           <View style={v_d81136.checkboxRow}>
-            <View style={v_cd31a8 ? v_d81136.checkboxDisabled : undefined}>
+            <View style={v_2e3b01 ? v_d81136.checkboxDisabled : undefined}>
               <FormCheckbox
                 label={v_8d41d7('screens.login.rememberMe')}
-                checked={v_a964a4}
-                onToggle={v_cd31a8 ? () => { } : v_8f2c24}
+                checked={v_b6e894}
+                onToggle={v_2e3b01 ? () => { } : v_2b40c7}
                 variant="square"
               />
             </View>

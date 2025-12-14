@@ -246,6 +246,17 @@ export const v_667a00 = () => {
         await v_e84827.setItem('userSessionToken', v_00b91e);
         await v_e84827.setItem('isLoggedIn', 'true');
 
+        const v_0aaad6 = await v_e84827.getItem('otpRememberMeTemp');
+        if (v_0aaad6 === 'true') {
+          await v_e84827.setItem('rememberMe', 'true');
+          console.log('[로그인] OTP 로그인 상태 유지 저장 완료');
+        } else {
+          await v_e84827.removeItem('rememberMe');
+          console.log('[로그인] OTP 로그인 상태 유지 해제');
+        }
+
+        await v_e84827.removeItem('otpRememberMeTemp');
+
         console.log('[로그인] 이메일 인증 로그인 성공');
 
         v_036f76();
