@@ -342,11 +342,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
       if (v_a42ed3) {
         await v_f2c756.openURL(v_f71b56);
-        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
-        v_3e5456(true);
-        v_deef62(false);
-        v_d2702f(true);
-        v_1a68d1(true); 
+        console.log('✅ URL 이동 성공');
 
       } else {
         console.error('❌ 지원하지 않는 URL:', v_f71b56);
@@ -554,8 +550,6 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         )
           .then((v_3393e3) => {
             console.log('[광고보기] processAdReward 응답:', v_3393e3);
-            v_1a68d1(true);
-            v_5a7a1a(false); 
           })
           .catch((v_5e9bfe) => {
             console.error('[광고보기] processAdReward 호출 실패:', v_5e9bfe);
@@ -569,16 +563,35 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       }
 
       if (v_3aedd0?.urlAD) {
-        v_2e98c9(v_3aedd0.urlAD);
+        await v_2e98c9(v_3aedd0.urlAD);
+
+        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+        v_e10ff9();
+        v_7f2e65();
       }
     } catch (v_5e9bfe) {
       console.error('[광고보기] 광고 API 호출 실패:', v_5e9bfe);
 
       if (v_3aedd0?.urlAD) {
-        v_2e98c9(v_3aedd0.urlAD);
+        try {
+          await v_2e98c9(v_3aedd0.urlAD);
+
+          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
+          v_e10ff9();
+          v_7f2e65();
+        } catch (v_0ec843) {
+          console.error('[광고보기] URL 열기 실패:', v_0ec843);
+
+          v_e10ff9();
+          v_7f2e65();
+        }
+      } else {
+
+        v_e10ff9();
+        v_7f2e65();
       }
     }
-  }, [v_f1550c, v_3aedd0, v_2e98c9, v_d0b6d4, v_660822, v_0890f8, v_9b57fc]);
+  }, [v_f1550c, v_3aedd0, v_2e98c9, v_d0b6d4, v_660822, v_0890f8, v_9b57fc, v_e10ff9, v_7f2e65]);
 
   if (!v_d0b6d4) {
     return null;
@@ -588,13 +601,9 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     <View style={v_d81136.root}>
       <StatusBar style="dark" />
 
-      {}
-      {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_3aedd0 && (
-        <Pressable
-          style={v_d81136.topClickArea}
-          onPress={v_e36569}
-        />
-      )}
+      {
+
+}
 
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
@@ -720,18 +729,9 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         </View>
       )}
 
-      {}
-      {v_7a79cf && (
-        <View style={v_d81136.bannerContainer}>
-          <TaboolaBanner
-            placementType="reward_OS_395x80"
-            onLoadComplete={() => {
-              console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
-              v_5a7a1a(true);
-            }}
-          />
-        </View>
-      )}
+      {
+
+}
 
     </View>
   );

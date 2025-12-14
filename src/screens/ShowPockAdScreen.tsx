@@ -327,11 +327,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
       if (v_a42ed3) {
         await v_f2c756.openURL(v_f71b56);
-        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
-        v_3e5456(true);
-        v_deef62(false);
-        v_d2702f(true);
-        v_1a68d1(true); 
+        console.log('✅ URL 이동 성공');
 
       } else {
         console.error('❌ 지원하지 않는 URL:', v_f71b56);
@@ -484,8 +480,6 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         )
           .then((v_3393e3) => {
             console.log('[광고보기] processAdReward 응답:', v_3393e3);
-            v_1a68d1(true);
-            v_5a7a1a(false); 
           })
           .catch((v_5e9bfe) => {
             console.error('[광고보기] processAdReward 호출 실패:', v_5e9bfe);
@@ -500,15 +494,37 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
       if (v_9f9e7d?.landing_url) {
         await v_ece582(v_9f9e7d.landing_url);
+
+        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+        v_e10ff9();
+        v_7f2e65();
       } else {
         console.error('[광고보기] landing_url이 없습니다.');
         v_ed6932(true);
       }
     } catch (v_5e9bfe) {
       console.error('[광고보기] URL 열기 실패:', v_5e9bfe);
-      v_ed6932(true);
+
+      if (v_9f9e7d?.landing_url) {
+        try {
+          await v_ece582(v_9f9e7d.landing_url);
+
+          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
+          v_e10ff9();
+          v_7f2e65();
+        } catch (v_0ec843) {
+          console.error('[광고보기] URL 열기 실패:', v_0ec843);
+
+          v_e10ff9();
+          v_7f2e65();
+        }
+      } else {
+
+        v_e10ff9();
+        v_7f2e65();
+      }
     }
-  }, [v_9f9e7d, v_ece582, v_d0b6d4, v_660822, v_0890f8, v_9b57fc]);
+  }, [v_9f9e7d, v_ece582, v_d0b6d4, v_660822, v_0890f8, v_9b57fc, v_e10ff9, v_7f2e65]);
 
   if (!v_d0b6d4) {
     return null;
