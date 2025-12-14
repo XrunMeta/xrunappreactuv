@@ -103,6 +103,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
         const remember = await AsyncStorage.getItem('rememberMe');
         const loggedIn = await AsyncStorage.getItem('isLoggedIn');
 
+        console.log('[Navigation] 자동 로그인 확인:', {
+          remember,
+          loggedIn,
+          rememberType: typeof remember,
+          loggedInType: typeof loggedIn,
+        });
+
         if (remember === 'true' && loggedIn === 'true') {
 
           console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
@@ -111,7 +118,12 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
           return;
         }
 
-        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지');
+        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지', {
+          remember,
+          loggedIn,
+          rememberCheck: remember === 'true',
+          loggedInCheck: loggedIn === 'true',
+        });
       } catch (error) {
         console.error('[Navigation] 로그인 상태 확인 실패:', error);
       } finally {

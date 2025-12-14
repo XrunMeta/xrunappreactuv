@@ -246,6 +246,17 @@ export const VerificationCodeScreen = () => {
         await AsyncStorage.setItem('userSessionToken', sessionToken);
         await AsyncStorage.setItem('isLoggedIn', 'true');
 
+        const otpRememberMeTemp = await AsyncStorage.getItem('otpRememberMeTemp');
+        if (otpRememberMeTemp === 'true') {
+          await AsyncStorage.setItem('rememberMe', 'true');
+          console.log('[로그인] OTP 로그인 상태 유지 저장 완료');
+        } else {
+          await AsyncStorage.removeItem('rememberMe');
+          console.log('[로그인] OTP 로그인 상태 유지 해제');
+        }
+
+        await AsyncStorage.removeItem('otpRememberMeTemp');
+
         console.log('[로그인] 이메일 인증 로그인 성공');
 
         resetVerificationSuccessRoute();

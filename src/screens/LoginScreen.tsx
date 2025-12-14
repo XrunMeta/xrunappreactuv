@@ -101,9 +101,16 @@ export const LoginScreen = () => {
             setRememberMe(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
           }
+        } else {
+
+          setRememberMe(true);
+          setOtpRememberMe(true);
         }
       } catch (error) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', error);
+
+        setRememberMe(true);
+        setOtpRememberMe(true);
       }
     };
     loadRememberedEmail();
@@ -154,6 +161,8 @@ export const LoginScreen = () => {
         return;
       }
 
+      await AsyncStorage.setItem('otpRememberMeTemp', otpRememberMe ? 'true' : 'false');
+
       setVerificationEmail(otpEmail.trim());
       setVerificationSuccessRoute(ROUTES.map); 
       navigate(ROUTES.verificationCode);
@@ -180,7 +189,12 @@ export const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { email, rememberMe });
+      console.log('[로그인] 로그인 시도:', { 
+        email, 
+        rememberMe, 
+        rememberMeType: typeof rememberMe,
+        rememberMeValue: rememberMe === true ? 'true' : 'false',
+      });
 
       const loginResponse = await loginWithEmailPassword(
         email.trim(),
@@ -224,10 +238,17 @@ export const LoginScreen = () => {
 
       if (rememberMe) {
         await AsyncStorage.setItem('rememberMe', 'true');
-        console.log('[로그인] 로그인 상태 유지 저장 완료');
+        console.log('[로그인] 로그인 상태 유지 저장 완료, rememberMe:', rememberMe);
+
+        const savedRememberMe = await AsyncStorage.getItem('rememberMe');
+        const savedIsLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+        console.log('[로그인] 저장 확인:', {
+          rememberMe: savedRememberMe,
+          isLoggedIn: savedIsLoggedIn,
+        });
       } else {
         await AsyncStorage.removeItem('rememberMe');
-        console.log('[로그인] 로그인 상태 유지 해제');
+        console.log('[로그인] 로그인 상태 유지 해제, rememberMe:', rememberMe);
       }
 
       console.log('[로그인] 로그인 성공');
@@ -574,11 +595,11 @@ export const LoginScreen = () => {
           />
 
           <View style={styles.checkboxRow}>
-            <View style={isLoading ? styles.checkboxDisabled : undefined}>
+            <View style={isOtpLoading ? styles.checkboxDisabled : undefined}>
               <FormCheckbox
                 label={t('screens.login.rememberMe')}
-                checked={rememberMe}
-                onToggle={isLoading ? () => { } : toggleRememberMe}
+                checked={otpRememberMe}
+                onToggle={isOtpLoading ? () => { } : toggleOtpRememberMe}
                 variant="square"
               />
             </View>
