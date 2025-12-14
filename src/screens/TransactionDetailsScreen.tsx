@@ -29,9 +29,10 @@ export interface TransactionDetails {
 
 interface TransactionDetailsScreenProps {
   data?: TransactionDetails;
+  onClose?: () => void;
 }
 
-export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> = ({ data }) => {
+export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> = ({ data, onClose }) => {
   const { t } = useTranslation();
   const { goBack } = useAppNavigation();
   const { selectedTransactionDetails, resetSelectedTransactionDetails } = useAppContext();
@@ -97,8 +98,13 @@ export const TransactionDetailsScreen: React.FC<TransactionDetailsScreenProps> =
       currentDetails: currentDetails ? '있음' : '없음',
       fromWalletList: currentDetails.fromWalletList,
       details_fromWalletList: details.fromWalletList,
+      onClose: onClose ? '있음' : '없음',
     });
-    if (currentDetails.fromWalletList) {
+
+    if (onClose) {
+      onClose();
+    } else if (currentDetails.fromWalletList) {
+
       goBack();
     } else {
 

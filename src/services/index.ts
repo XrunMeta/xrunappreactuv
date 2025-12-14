@@ -350,7 +350,16 @@ const createAxiosInstance = (navigation?: any) => {
 
   instance.interceptors.request.use(
     (config) => {
+
+      const finalUrl = config.baseURL 
+        ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
+            ? `${config.baseURL.slice(0, -1)}${config.url}`
+            : `${config.baseURL}${config.url}`)
+        : config.url;
+
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+      console.log(`[API Request] baseURL: ${config.baseURL}`);
+      console.log(`[API Request] 최종 요청 URL: ${finalUrl}`);
 
       if (config.data) {
 
@@ -4232,6 +4241,7 @@ export const fetchEtherscanTransactions = async (
     );
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
+    console.log('[트랜잭션] 응답 데이터:', JSON.stringify(response.data, null, 2));
 
     return response.data;
   } catch (error) {

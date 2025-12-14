@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
 
 interface TransactionListItemProps extends TouchableOpacityProps {
@@ -17,6 +18,9 @@ interface TransactionListItemProps extends TouchableOpacityProps {
   amount: string;
   suffix?: string;
   iconSource?: ImageSourcePropType;
+  iconName?: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
+  amountColor?: string;
   fallbackLabel?: string;
   fallbackColors?: {
     background: string;
@@ -31,6 +35,9 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   amount,
   suffix,
   iconSource,
+  iconName,
+  iconColor = '#343a5a',
+  amountColor,
   onPress,
   fallbackLabel,
   fallbackColors = { background: '#f2f2f2', text: '#343434' },
@@ -44,7 +51,11 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
       {...touchableProps}
     >
       <View style={styles.left}>
-        {iconSource ? (
+        {iconName ? (
+          <View style={[styles.icon, styles.iconContainer]}>
+            <Ionicons name={iconName} size={24} color={iconColor} />
+          </View>
+        ) : iconSource ? (
           <Image source={iconSource} style={styles.icon} />
         ) : (
           <View
@@ -68,7 +79,9 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
       </View>
       <View style={styles.right}>
         <Text style={styles.timestamp}>{timestamp}</Text>
-        <Text style={styles.amount}>{suffix ? `${amount} ${suffix}` : amount}</Text>
+        <Text style={[styles.amount, amountColor ? { color: amountColor } : null]}>
+          {suffix ? `${amount} ${suffix}` : amount}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -96,6 +109,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f9fa',
   },
   fallbackIcon: {
     alignItems: 'center',
