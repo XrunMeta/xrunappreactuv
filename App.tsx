@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Platform } from 'react-native';
 import * as Linking from 'expo-linking';
+import * as Application from 'expo-application';
+import * as Clipboard from 'expo-clipboard';
 import {
   MyInfoFaqScreen,
   CountryCodeSelectScreen,
@@ -162,6 +165,99 @@ const ScreenHost = () => {
       subscription.remove();
       clearTimeout(recheckTimer);
     };
+  }, [setSignupFormData, navigate]);
+
+  useEffect(() => {
+    const checkInstallReferrer = async () => {
+
+      if (Platform.OS !== 'android') {
+        return;
+      }
+
+      try {
+
+        const installReferrer = await Application.getInstallReferrerAsync();
+        console.log('[Install Referrer] 원본:', installReferrer);
+
+        if (installReferrer) {
+
+          const params = new URLSearchParams(installReferrer);
+          const utmSource = params.get('utm_source');
+          const utmContent = params.get('utm_content');
+
+          console.log('[Install Referrer] utm_source:', utmSource);
+          console.log('[Install Referrer] utm_content:', utmContent);
+
+          if (utmSource === 'referral' && utmContent) {
+            const referralEmail = decodeURIComponent(utmContent);
+            console.log('[Install Referrer] 추천인 이메일:', referralEmail);
+
+            const processedReferrer = await AsyncStorage.getItem('processed_install_referrer');
+            if (processedReferrer === installReferrer) {
+              console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
+              return;
+            }
+
+            await AsyncStorage.setItem('processed_install_referrer', installReferrer);
+
+            setSignupFormData({ referralEmail });
+
+            console.log('[Install Referrer] 회원가입 화면으로 이동');
+            navigate('signup');
+          }
+        }
+      } catch (error) {
+        console.error('[Install Referrer] 처리 실패:', error);
+      }
+    };
+
+    const timer = setTimeout(checkInstallReferrer, 3000);
+
+    return () => clearTimeout(timer);
+  }, [setSignupFormData, navigate]);
+
+  useEffect(() => {
+    const checkClipboardReferral = async () => {
+
+      if (Platform.OS !== 'ios') {
+        return;
+      }
+
+      try {
+
+        const clipboardContent = await Clipboard.getStringAsync();
+        console.log('[iOS Clipboard] 클립보드 내용:', clipboardContent);
+
+        if (clipboardContent && clipboardContent.startsWith('XRUN_REFERRAL:')) {
+          const referralEmail = clipboardContent.replace('XRUN_REFERRAL:', '').trim();
+          console.log('[iOS Clipboard] 추천인 이메일:', referralEmail);
+
+          if (referralEmail) {
+
+            const processedClipboard = await AsyncStorage.getItem('processed_clipboard_referral');
+            if (processedClipboard === clipboardContent) {
+              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+              return;
+            }
+
+            await AsyncStorage.setItem('processed_clipboard_referral', clipboardContent);
+
+            await Clipboard.setStringAsync('');
+
+            setSignupFormData({ referralEmail: decodeURIComponent(referralEmail) });
+
+            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+            navigate('signup');
+          }
+        }
+      } catch (error) {
+        console.error('[iOS Clipboard] 처리 실패:', error);
+      }
+    };
+
+    const timer = setTimeout(checkClipboardReferral, 3000);
+
+    return () => clearTimeout(timer);
   }, [setSignupFormData, navigate]);
 
   if (currentScreen === 'login') {
