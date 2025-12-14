@@ -342,11 +342,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
       if (supported) {
         await Linking.openURL(url);
-        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
-        setHasOpenedUrl(true);
-        setIsLoading(false);
-        setIsProcessing(true);
-        setWaitingForWebSocketResponse(true); 
+        console.log('✅ URL 이동 성공');
 
       } else {
         console.error('❌ 지원하지 않는 URL:', url);
@@ -554,8 +550,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         )
           .then((response) => {
             console.log('[광고보기] processAdReward 응답:', response);
-            setWaitingForWebSocketResponse(true);
-            setIsTaboolaLoaded(false); 
           })
           .catch((error) => {
             console.error('[광고보기] processAdReward 호출 실패:', error);
@@ -569,16 +563,35 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       }
 
       if (campaignData?.urlAD) {
-        openUrlAD(campaignData.urlAD);
+        await openUrlAD(campaignData.urlAD);
+
+        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+        resetAdvertisementParams();
+        handleClose();
       }
     } catch (error) {
       console.error('[광고보기] 광고 API 호출 실패:', error);
 
       if (campaignData?.urlAD) {
-        openUrlAD(campaignData.urlAD);
+        try {
+          await openUrlAD(campaignData.urlAD);
+
+          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
+          resetAdvertisementParams();
+          handleClose();
+        } catch (urlError) {
+          console.error('[광고보기] URL 열기 실패:', urlError);
+
+          resetAdvertisementParams();
+          handleClose();
+        }
+      } else {
+
+        resetAdvertisementParams();
+        handleClose();
       }
     }
-  }, [callAdApi, campaignData, openUrlAD, advertisementParams, member, onClose, navigate]);
+  }, [callAdApi, campaignData, openUrlAD, advertisementParams, member, onClose, navigate, resetAdvertisementParams, handleClose]);
 
   if (!advertisementParams) {
     return null;
@@ -588,13 +601,9 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     <View style={styles.root}>
       <StatusBar style="dark" />
 
-      {}
-      {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
-        <Pressable
-          style={styles.topClickArea}
-          onPress={handleWatchAd}
-        />
-      )}
+      {
+
+}
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
@@ -720,18 +729,9 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         </View>
       )}
 
-      {}
-      {waitingForWebSocketResponse && (
-        <View style={styles.bannerContainer}>
-          <TaboolaBanner
-            placementType="reward_OS_395x80"
-            onLoadComplete={() => {
-              console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
-              setIsTaboolaLoaded(true);
-            }}
-          />
-        </View>
-      )}
+      {
+
+}
 
     </View>
   );

@@ -327,11 +327,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
       if (supported) {
         await Linking.openURL(url);
-        console.log('✅ URL 이동 성공 - 리워드 처리 대기');
-        setHasOpenedUrl(true);
-        setIsLoading(false);
-        setIsProcessing(true);
-        setWaitingForWebSocketResponse(true); 
+        console.log('✅ URL 이동 성공');
 
       } else {
         console.error('❌ 지원하지 않는 URL:', url);
@@ -484,8 +480,6 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
         )
           .then((response) => {
             console.log('[광고보기] processAdReward 응답:', response);
-            setWaitingForWebSocketResponse(true);
-            setIsTaboolaLoaded(false); 
           })
           .catch((error) => {
             console.error('[광고보기] processAdReward 호출 실패:', error);
@@ -500,15 +494,37 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
       if (pockAdData?.landing_url) {
         await openLandingUrl(pockAdData.landing_url);
+
+        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+        resetAdvertisementParams();
+        handleClose();
       } else {
         console.error('[광고보기] landing_url이 없습니다.');
         setAdCallFailedModalVisible(true);
       }
     } catch (error) {
       console.error('[광고보기] URL 열기 실패:', error);
-      setAdCallFailedModalVisible(true);
+
+      if (pockAdData?.landing_url) {
+        try {
+          await openLandingUrl(pockAdData.landing_url);
+
+          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
+          resetAdvertisementParams();
+          handleClose();
+        } catch (urlError) {
+          console.error('[광고보기] URL 열기 실패:', urlError);
+
+          resetAdvertisementParams();
+          handleClose();
+        }
+      } else {
+
+        resetAdvertisementParams();
+        handleClose();
+      }
     }
-  }, [pockAdData, openLandingUrl, advertisementParams, member, onClose, navigate]);
+  }, [pockAdData, openLandingUrl, advertisementParams, member, onClose, navigate, resetAdvertisementParams, handleClose]);
 
   if (!advertisementParams) {
     return null;

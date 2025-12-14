@@ -1894,25 +1894,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             );
           }
         })()}
-        <TouchableOpacity
-          style={{
-            position: 'absolute',
-            top: 50,
-            right: 20,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            borderRadius: 20,
-            width: 40,
-            height: 40,
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-          onPress={() => {
-            console.log('모달 닫기 버튼 클릭');
-            setShowAdModal(false);
-          }}>
-          <Text style={{ color: '#FFFFFF', fontSize: FONTS.size.xlarge, fontWeight: 'bold' }}>×</Text>
-        </TouchableOpacity>
+        {
+
+}
       </Modal>
     </View>
   );
