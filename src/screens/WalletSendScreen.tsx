@@ -614,14 +614,15 @@ export const WalletSendScreen = () => {
         <View style={styles.addressListSection}>
           <View style={styles.webViewContainer}>
             {}
-            <Text style={styles.addressListTitle}>{t('screens.walletSend.addressBook')}</Text>
+            <View style={styles.addressListTitleContainer}>
+              <Text style={styles.addressListTitle}>{t('screens.walletSend.addressBook')}</Text>
+              <Text style={styles.addressSwipeHint}>{t('screens.walletSend.swipeHint')}</Text>
+            </View>
             {}
             <TouchableOpacity onPress={handlePastePress} activeOpacity={0.7} style={styles.addAddressButton}>
               <Ionicons name="add" size={18} color="#ffffff" />
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.addressSwipeHint}>{t('screens.walletSend.swipeHint')}</Text>
 
           {}
           <View style={styles.addressListContainer}>
@@ -1042,8 +1043,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: SIZES.small,
     marginBottom: SIZES.small,
+  },
+  addressListTitleContainer: {
+    flexDirection: 'column',
   },
   addressListTitle: {
     fontSize: FONTS.size.medium,
@@ -1054,10 +1057,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
-    marginTop: 6,
     textAlign: 'center',
-    marginBottom: SIZES.small,
-    paddingHorizontal: SIZES.small,
   },
   addressListContainer: {
     flexGrow: 1,
