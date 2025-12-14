@@ -29,9 +29,10 @@ export interface TransactionDetails {
 
 interface TransactionDetailsScreenProps {
   data?: TransactionDetails;
+  onClose?: () => void;
 }
 
-export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8 }) => {
+export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8, onClose: v_0890f8 }) => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
   const { selectedTransactionDetails: v_c51166, resetSelectedTransactionDetails: v_554d22 } = v_700ef9();
@@ -97,8 +98,13 @@ export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps
       currentDetails: v_421263 ? '있음' : '없음',
       fromWalletList: v_421263.fromWalletList,
       details_fromWalletList: v_5ab5bd.fromWalletList,
+      onClose: v_0890f8 ? '있음' : '없음',
     });
-    if (v_421263.fromWalletList) {
+
+    if (v_0890f8) {
+      v_0890f8();
+    } else if (v_421263.fromWalletList) {
+
       v_c7ac57();
     } else {
 
