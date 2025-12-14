@@ -52,7 +52,15 @@ export const v_03a231 = () => {
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
       },
-
+      {
+        id: 'shopSales',
+        label: v_8d41d7('screens.myInfo.shopSales'),
+        subtitle: v_8d41d7('screens.myinfoShopSales.title'),
+        iconName: 'storefront-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#7ca6e8',
+        route: 'myinfoShopSales',
+      },
       {
         id: 'notify',
         label: v_8d41d7('screens.myInfo.notify'),
@@ -118,7 +126,7 @@ export const v_03a231 = () => {
             if (v_625c74) {
               const v_a32a50 = v_625c74.firstname || '';
               const v_328bb4 = v_625c74.lastname || '';
-              const v_05b02f = `${v_a32a50} ${v_328bb4}`.trim() || '사용자';
+              const v_05b02f = `${v_328bb4} ${v_a32a50}`.trim() || '사용자';
 
               v_a61751({
                 name: v_05b02f,
