@@ -86,6 +86,9 @@ type AppContextValue = {
     chainId: number;
   } | null) => void;
   resetTransactionResult: () => void;
+  selectedTransactionDetails: import('../screens/TransactionDetailsScreen').TransactionDetails | null;
+  setSelectedTransactionDetails: (details: import('../screens/TransactionDetailsScreen').TransactionDetails | null) => void;
+  resetSelectedTransactionDetails: () => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -159,6 +162,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     currency: number;
     chainId: number;
   } | null>(null);
+  const [v_c51166, v_b2bb9d] = v_5ab095<import('../screens/TransactionDetailsScreen').TransactionDetails | null>(null);
 
   const v_3b402b = v_df9f57(
     () => ({
@@ -238,6 +242,9 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       transactionResult: v_0fc1c4,
       setTransactionResult: v_fcca8e,
       resetTransactionResult: () => v_fcca8e(null),
+      selectedTransactionDetails: v_c51166,
+      setSelectedTransactionDetails: v_b2bb9d,
+      resetSelectedTransactionDetails: () => v_b2bb9d(null),
     }),
     [
       v_ee27aa,
@@ -259,6 +266,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_d0b6d4,
       v_ea6a7a,
       v_0fc1c4,
+      v_c51166,
     ],
   );
 

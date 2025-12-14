@@ -4208,6 +4208,48 @@ export const v_629c7b = async (
   }
 };
 
+export const v_69bcd0 = async (
+  v_660822,
+  v_a832b3,
+  v_2365e9 = 1,
+  v_3bbadf = 20,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_cd6a57 = {
+      member: String(v_660822),
+      currency: v_a832b3,
+      page: v_2365e9,
+      offset: v_3bbadf,
+    };
+
+    console.log('[트랜잭션] Etherscan 거래내역 조회 요청:', v_cd6a57);
+
+    const v_3393e3 = await v_9f42a4.post<any>(
+      '/etherscan-transactions',
+      v_cd6a57,
+    );
+
+    console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[트랜잭션] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_927baf = async (
   v_231c19,
   v_0d793b,

@@ -6,6 +6,7 @@ import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_14af53 } from '../constants/tokenMeta';
 import { v_772971 } from 'jmpfvteuuztnp';
+import { v_700ef9 } from '../context';
 
 export interface TransactionDetails {
   id: string;
@@ -15,12 +16,15 @@ export interface TransactionDetails {
   from: string;
   to: string;
   txHash: string;
+  amount?: string; 
+  symbol?: string; 
   nonce?: string;
   gasPrice?: string;
   usedGas?: string;
   maxGas?: string;
   totalSpent?: string;
   blockHeight?: string;
+  fromWalletList?: boolean; 
 }
 
 interface TransactionDetailsScreenProps {
@@ -30,29 +34,104 @@ interface TransactionDetailsScreenProps {
 export const TransactionDetailsScreen: v_a3453e.FC<TransactionDetailsScreenProps> = ({ data: v_9390e8 }) => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57 } = v_a0daa8();
-  const v_5ab5bd = v_9390e8 ?? v_421f30;
+  const { selectedTransactionDetails: v_c51166, resetSelectedTransactionDetails: v_554d22 } = v_700ef9();
+
+  const [v_d7f5e7, v_04e93e] = v_a3453e.useState<TransactionDetails | null>(null);
+
+  v_a3453e.useEffect(() => {
+    const v_b87b82 = v_c51166 || v_9390e8 || v_421f30;
+    if (v_b87b82 && v_b87b82.id !== 'default') {
+      v_04e93e(v_b87b82);
+      console.log('[TransactionDetailsScreen] 로컬 state에 저장:', {
+        id: v_b87b82.id,
+        fromWalletList: v_b87b82.fromWalletList,
+      });
+    }
+  }, [v_c51166, v_9390e8]);
+
+  v_a3453e.useEffect(() => {
+    return () => {
+
+      setTimeout(() => {
+        v_554d22();
+      }, 100);
+    };
+  }, [v_554d22]);
+
+  const v_5ab5bd = v_d7f5e7 || v_c51166 || v_9390e8 || v_421f30;
   const v_17af98 = v_14af53(v_5ab5bd.title, v_5ab5bd.subtitle);
+
+  v_a3453e.useEffect(() => {
+    if (v_c51166 || v_9390e8) {
+      console.log('[TransactionDetailsScreen] 수신한 데이터:', {
+        selectedTransactionDetails: v_c51166 ? JSON.stringify(v_c51166, null, 2) : null,
+        propsData: v_9390e8 ? JSON.stringify(v_9390e8, null, 2) : null,
+        최종사용데이터: JSON.stringify(v_5ab5bd, null, 2),
+        지갑목록에서이동: v_5ab5bd.fromWalletList ? '예' : '아니오',
+      });
+      console.log('[TransactionDetailsScreen] 각 필드 값:', {
+        id: v_5ab5bd.id,
+        title: v_5ab5bd.title,
+        subtitle: v_5ab5bd.subtitle,
+        timestamp: v_5ab5bd.timestamp,
+        from: v_5ab5bd.from,
+        to: v_5ab5bd.to,
+        txHash: v_5ab5bd.txHash,
+        nonce: v_5ab5bd.nonce,
+        gasPrice: v_5ab5bd.gasPrice,
+        usedGas: v_5ab5bd.usedGas,
+        maxGas: v_5ab5bd.maxGas,
+        totalSpent: v_5ab5bd.totalSpent,
+        blockHeight: v_5ab5bd.blockHeight,
+      });
+    }
+  }, [v_c51166, v_9390e8, v_5ab5bd]);
+
+  const v_56e16d = () => {
+
+    const v_421263 = v_d7f5e7 || v_c51166 || v_9390e8 || v_421f30;
+    console.log('[TransactionDetailsScreen] 뒤로가기 호출:', {
+      localDetails: v_d7f5e7 ? '있음' : '없음',
+      selectedTransactionDetails: v_c51166 ? '있음' : '없음',
+      data: v_9390e8 ? '있음' : '없음',
+      currentDetails: v_421263 ? '있음' : '없음',
+      fromWalletList: v_421263.fromWalletList,
+      details_fromWalletList: v_5ab5bd.fromWalletList,
+    });
+    if (v_421263.fromWalletList) {
+      v_c7ac57();
+    } else {
+
+      v_c7ac57();
+    }
+  };
 
   return (
     <View style={v_d81136.container}>
-      <Header title={v_8d41d7('screens.transactionDetails.title')} onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.transactionDetails.title')} onBackPress={v_56e16d} showBackButton />
       <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.cardGroup}>
-          <InfoCard label={v_8d41d7('screens.transactionDetails.from')} value={v_5ab5bd.from} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.to')} value={v_5ab5bd.to} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.time')} value={v_5ab5bd.timestamp} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.txHash')} value={v_5ab5bd.txHash} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.from')} value={v_5ab5bd.from || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.to')} value={v_5ab5bd.to || '-'} />
+          {v_5ab5bd.amount && (
+            <InfoCard 
+              label={v_8d41d7('screens.transactionDetails.amount')} 
+              value={`${v_5ab5bd.amount} ${v_5ab5bd.symbol || ''}`.trim()} 
+            />
+          )}
+          <InfoCard label={v_8d41d7('screens.transactionDetails.time')} value={v_5ab5bd.timestamp || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.txHash')} value={v_5ab5bd.txHash || '-'} />
         </View>
 
         <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.transactionDetails.transactionDetails')}</Text>
 
         <View style={v_d81136.cardGroup}>
-          <InfoCard label={v_8d41d7('screens.transactionDetails.nonce')} value={v_5ab5bd.nonce ?? '-'} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.gasPrice')} value={v_5ab5bd.gasPrice ?? '-'} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.usedGas')} value={v_5ab5bd.usedGas ?? '-'} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.maxGas')} value={v_5ab5bd.maxGas ?? '-'} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.totalSpent')} value={v_5ab5bd.totalSpent ?? '-'} />
-          <InfoCard label={v_8d41d7('screens.transactionDetails.blockHeight')} value={v_5ab5bd.blockHeight ?? '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.nonce')} value={v_5ab5bd.nonce || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.gasPrice')} value={v_5ab5bd.gasPrice || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.usedGas')} value={v_5ab5bd.usedGas || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.maxGas')} value={v_5ab5bd.maxGas || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.totalSpent')} value={v_5ab5bd.totalSpent || '-'} />
+          <InfoCard label={v_8d41d7('screens.transactionDetails.blockHeight')} value={v_5ab5bd.blockHeight || '-'} />
         </View>
 
         <ExplorerBadge
@@ -136,5 +215,4 @@ const v_d81136 = v_472849.create({
   },
 
 });
-
 
