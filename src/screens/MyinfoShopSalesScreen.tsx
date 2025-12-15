@@ -1,20 +1,35 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Modal, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ShopSalesMemberRow, ShopSalesMemberData, DataList, DataListRef, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
+import { getItemPurchaseList } from '../services';
+import { PurchaseItem } from '../types';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
 type DatePickerTarget = 'start' | 'end' | null;
 
 export const MyinfoShopSalesScreen = () => {
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const dataListRef = useRef<DataListRef>(null);
-  const [isLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [shopmember, setShopmember] = useState<string | null>(null);
+  const [itemInfo, setItemInfo] = useState<{
+    title: string | null;
+    price: number;
+    participantCount: number;
+    totalSales: number;
+  }>({
+    title: null,
+    price: 0,
+    participantCount: 0,
+    totalSales: 0,
+  });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('1month');
@@ -53,6 +68,43 @@ export const MyinfoShopSalesScreen = () => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}.${month}.${day}`;
   };
+
+  const formatDateForAPI = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const reverseNameOrder = (name: string): string => {
+    if (!name || !name.trim()) return name;
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+
+      return parts.reverse().join(' ');
+    }
+    return name; 
+  };
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.member) {
+
+            setShopmember(String(userData.member));
+          }
+        }
+      } catch (error) {
+        console.error('[Shop 매출] 사용자 정보 로드 실패:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadUserData();
+  }, []);
 
   const handlePeriodSelect = (period: PeriodOption) => {
     setSelectedPeriod(period);
@@ -119,8 +171,15 @@ export const MyinfoShopSalesScreen = () => {
 
   const handleApplySearch = () => {
     setShowDatePicker(false);
+    setIsLoading(true);
     dataListRef.current?.reloadData();
   };
+
+  useEffect(() => {
+    if (shopmember && !isLoading) {
+      dataListRef.current?.reloadData();
+    }
+  }, [startDateObj, endDateObj, shopmember]);
 
   const renderCalendar = () => {
     const year = calendarDate.getFullYear();
@@ -231,24 +290,95 @@ export const MyinfoShopSalesScreen = () => {
     );
   };
 
-  const sampleMembers: ShopSalesMemberData[] = [
-
-  ];
-
   const fetchSalesMembers = useCallback(async (
     params: PaginationParams
   ): Promise<PaginationResponse<ShopSalesMemberData>> => {
-    const startIndex = (params.page - 1) * params.pageSize;
-    const endIndex = startIndex + params.pageSize;
-    const paginatedData = sampleMembers.slice(startIndex, endIndex);
-    const hasMore = endIndex < sampleMembers.length;
+    if (!shopmember) {
+      setIsLoading(false);
+      return { data: [], total: 0, hasMore: false };
+    }
 
-    return {
-      data: paginatedData,
-      total: sampleMembers.length,
-      hasMore,
-    };
-  }, []);
+    try {
+
+      if (params.page === 1) {
+        setIsLoading(true);
+      }
+
+      const dateFrom = formatDateForAPI(startDateObj);
+      const dateTo = formatDateForAPI(endDateObj);
+
+      const response = await getItemPurchaseList(shopmember, dateFrom, dateTo, navigate);
+
+      if (response.status === 'success' && response.data) {
+
+        if (params.page === 1 && response.data.itemInfo) {
+          setItemInfo({
+            title: response.data.itemInfo.title,
+            price: response.data.itemInfo.price || 0,
+            participantCount: response.data.itemInfo.participantCount || 0,
+            totalSales: response.data.itemInfo.totalSales || 0,
+          });
+        }
+
+        const purchaseList = response.data.purchaseList || [];
+        const members: ShopSalesMemberData[] = purchaseList.map((purchase: PurchaseItem, index: number) => {
+
+          const formattedDate = purchase.purchaseDate ? purchase.purchaseDate.replace(/-/g, '.') : '';
+
+          const formattedAmount = purchase.amount.toLocaleString('ko-KR') + t('screens.myinfoShopSales.currency');
+
+          const reversedName = reverseNameOrder(purchase.name);
+
+          const uniqueId = purchase.email && purchase.purchaseDate
+            ? `${purchase.email}-${purchase.purchaseDate}-${index}`
+            : purchase.email
+            ? `${purchase.email}-${index}`
+            : `purchase-${index}`;
+
+          return {
+            id: uniqueId, 
+            email: purchase.email, 
+            name: reversedName, 
+            date: formattedDate,
+            settlement: formattedAmount,
+          };
+        });
+
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        const paginatedData = members.slice(startIndex, endIndex);
+        const hasMore = endIndex < members.length;
+
+        if (params.page === 1) {
+          setIsLoading(false);
+        }
+
+        return {
+          data: paginatedData,
+          total: members.length,
+          hasMore,
+        };
+      } else {
+
+        if (params.page === 1) {
+          setItemInfo({
+            title: null,
+            price: 0,
+            participantCount: 0,
+            totalSales: 0,
+          });
+          setIsLoading(false);
+        }
+        return { data: [], total: 0, hasMore: false };
+      }
+    } catch (error) {
+      console.error('[Shop 매출] 구매자 명단 조회 실패:', error);
+      if (params.page === 1) {
+        setIsLoading(false);
+      }
+      return { data: [], total: 0, hasMore: false };
+    }
+  }, [shopmember, startDateObj, endDateObj, navigate, t]);
 
   const renderHeaderRight = () => (
     <TouchableOpacity
@@ -270,12 +400,12 @@ export const MyinfoShopSalesScreen = () => {
       <View style={styles.content}>
         {}
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>{t('screens.myinfoShopSales.productTitle')}</Text>
+          <Text style={styles.infoTitle}>{itemInfo.title || t('screens.myinfoShopSales.productTitle')}</Text>
           <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>0{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>0{t('screens.myinfoShopSales.personUnit')}</Text>
+            {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{itemInfo.price.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
           </Text>
           <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>0{t('screens.myinfoShopSales.currency')}</Text> /{t('screens.myinfoShopSales.settlementInfo')}
+            {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSales.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> /{t('screens.myinfoShopSales.settlementInfo')}
           </Text>
         </View>
 
@@ -286,19 +416,15 @@ export const MyinfoShopSalesScreen = () => {
         </View>
 
         <View style={styles.listContainer}>
-          {!isLoading && sampleMembers.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyDescription}>{t('screens.myinfoShopSales.noData')}</Text>
-            </View>
-          ) : (
-            <DataList<ShopSalesMemberData>
-              ref={dataListRef}
-              fetchData={fetchSalesMembers}
-              ItemComponent={ShopSalesMemberRow}
-              pageSize={20}
-              contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
-            />
-          )}
+          <DataList<ShopSalesMemberData>
+            ref={dataListRef}
+            fetchData={fetchSalesMembers}
+            ItemComponent={ShopSalesMemberRow}
+            pageSize={20}
+            contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
+            emptyMessage={!isLoading ? t('screens.myinfoShopSales.noData') : undefined}
+            keyExtractor={(item, index) => item.id || `purchase-${index}`}
+          />
         </View>
       </View>
 
