@@ -391,9 +391,9 @@ export const WalletDetailScreen = () => {
           const isToUserAddress = item.to.toLowerCase() === userAddressLower;
           const iconName = isToUserAddress ? 'download-outline' : 'send-outline';
 
-          const iconColor = isToUserAddress ? '#10B981' : '#EF4444'; 
+          const iconColor = '#6B7280'; 
 
-          const amountColor = isToUserAddress ? '#10B981' : '#EF4444'; 
+          const amountColor = '#6B7280'; 
 
           let actionType: string;
           if (isReceive) {
@@ -770,11 +770,13 @@ const styles = StyleSheet.create({
     maxWidth: 780,
     alignSelf: 'center',
     marginBottom: 16,
+    paddingRight: 15,
   },
   sectionTitle: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
+    paddingLeft: 15, 
   },
   listWrapper: {
     flex: 1,

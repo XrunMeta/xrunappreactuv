@@ -4384,7 +4384,7 @@ export const getClauseContent = async (
     const baseUrl = env.GATEWAY_NODEJS;
 
     const typeNumber = typeMap[clauseType];
-    const endpoint = `/oth-path?type=${typeNumber}`;
+    const endpoint = `/agreements?type=${typeNumber}`;
     const fullUrl = endpoint.startsWith('/')
       ? `${baseUrl}${endpoint}`
       : `${baseUrl}/${endpoint}`;

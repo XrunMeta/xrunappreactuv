@@ -78,7 +78,6 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
-import { useCameraPermissions } from 'expo-camera';
 import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
@@ -470,7 +469,6 @@ const ScreenHost = () => {
 };
 
 const PermissionRequester = () => {
-  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [locationPermissionStatus, setLocationPermissionStatus] = useState<Location.PermissionStatus | null>(null);
   const [hasCheckedPermissions, setHasCheckedPermissions] = useState(false);
   const [hasShownDialog, setHasShownDialog] = useState(false);
@@ -551,33 +549,6 @@ const PermissionRequester = () => {
     }
   }, [fetchAndStoreMarkerData]);
 
-  const requestCameraPermissionAsync = useCallback(async () => {
-    try {
-      if (cameraPermission === null) {
-        console.log('[App] 카메라 권한 상태 확인 중...');
-        return 'undetermined' as const;
-      }
-
-      if (cameraPermission.granted) {
-        console.log('[App] 카메라 권한이 이미 허용되어 있습니다.');
-        return 'granted' as const;
-      }
-
-      console.log('[App] 카메라 권한 명시적 요청 시작');
-      const result = await requestCameraPermission();
-      if (result.granted) {
-        console.log('[App] 카메라 권한 허용됨');
-        return 'granted' as const;
-      } else {
-        console.log('[App] 카메라 권한 거부됨');
-        return 'denied' as const;
-      }
-    } catch (error) {
-      console.error('[App] 카메라 권한 요청 실패:', error);
-      return 'denied' as const;
-    }
-  }, [cameraPermission, requestCameraPermission]);
-
   const checkAndShowPermissionDialog = useCallback(async () => {
 
     if (hasShownDialog || isRequestingPermissions) {
@@ -585,47 +556,10 @@ const PermissionRequester = () => {
     }
 
     const currentLocationStatus = locationPermissionStatus || await Location.getForegroundPermissionsAsync().then(r => r.status);
-    const cameraStatus = cameraPermission?.granted ? 'granted' : (cameraPermission?.canAskAgain === false ? 'denied' : 'undetermined');
 
     const locationDenied = currentLocationStatus !== 'granted';
-    const cameraDenied = cameraStatus !== 'granted';
 
-    if (locationDenied && cameraDenied) {
-      setHasShownDialog(true);
-      await showAlert(
-        '권한 필요',
-        '앱의 주요 기능을 사용하려면 위치 정보와 카메라 권한이 모두 필요합니다. 설정에서 권한을 허용해주세요.',
-        [
-          {
-            text: '다시 요청',
-            onPress: async () => {
-              setIsRequestingPermissions(true);
-              setHasShownDialog(false); 
-
-              console.log('[App] 다시 요청: 위치 및 카메라 권한 요청');
-              const locationStatus = await requestLocationPermission();
-
-              await requestCameraPermissionAsync();
-
-              await new Promise(resolve => setTimeout(resolve, 1500));
-
-              const latestLocationStatus = await Location.getForegroundPermissionsAsync().then(r => r.status);
-              setLocationPermissionStatus(latestLocationStatus);
-
-              setIsRequestingPermissions(false);
-
-              setTimeout(() => {
-                checkAndShowPermissionDialog();
-              }, 500);
-            },
-          },
-          {
-            text: '확인',
-          },
-        ]
-      );
-    } else if (locationDenied) {
-
+    if (locationDenied) {
       setHasShownDialog(true);
       await showAlert(
         '위치 권한 필요',
@@ -642,35 +576,8 @@ const PermissionRequester = () => {
 
               await new Promise(resolve => setTimeout(resolve, 1000));
 
-              setIsRequestingPermissions(false);
-
-              setTimeout(() => {
-                checkAndShowPermissionDialog();
-              }, 500);
-            },
-          },
-          {
-            text: '확인',
-          },
-        ]
-      );
-    } else if (cameraDenied) {
-
-      setHasShownDialog(true);
-      await showAlert(
-        '카메라 권한 필요',
-        '앱의 주요 기능을 사용하려면 카메라 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-        [
-          {
-            text: '다시 요청',
-            onPress: async () => {
-              setIsRequestingPermissions(true);
-              setHasShownDialog(false); 
-
-              console.log('[App] 다시 요청: 카메라 권한 요청');
-              await requestCameraPermissionAsync();
-
-              await new Promise(resolve => setTimeout(resolve, 1000));
+              const latestLocationStatus = await Location.getForegroundPermissionsAsync().then(r => r.status);
+              setLocationPermissionStatus(latestLocationStatus);
 
               setIsRequestingPermissions(false);
 
@@ -685,26 +592,21 @@ const PermissionRequester = () => {
         ]
       );
     }
-  }, [hasShownDialog, isRequestingPermissions, locationPermissionStatus, cameraPermission, showAlert, requestLocationPermission, requestCameraPermissionAsync]);
+  }, [hasShownDialog, isRequestingPermissions, locationPermissionStatus, showAlert, requestLocationPermission]);
 
   useEffect(() => {
     const initializePermissions = async () => {
 
       const locationStatus = await requestLocationPermission();
       setLocationPermissionStatus(locationStatus);
+      setHasCheckedPermissions(true);
     };
 
     initializePermissions();
   }, [requestLocationPermission]);
 
   useEffect(() => {
-    if (cameraPermission !== null && !hasCheckedPermissions) {
-      setHasCheckedPermissions(true);
-    }
-  }, [cameraPermission, hasCheckedPermissions]);
-
-  useEffect(() => {
-    if (hasCheckedPermissions && cameraPermission !== null && locationPermissionStatus !== null && !isRequestingPermissions) {
+    if (hasCheckedPermissions && locationPermissionStatus !== null && !isRequestingPermissions) {
 
       const timer = setTimeout(() => {
         checkAndShowPermissionDialog();
@@ -712,7 +614,7 @@ const PermissionRequester = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [hasCheckedPermissions, cameraPermission, locationPermissionStatus, isRequestingPermissions, checkAndShowPermissionDialog]);
+  }, [hasCheckedPermissions, locationPermissionStatus, isRequestingPermissions, checkAndShowPermissionDialog]);
 
   return null;
 };

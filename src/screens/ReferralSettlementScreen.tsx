@@ -238,7 +238,8 @@ export const ReferralSettlementScreen = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {item.description}
+            {}
+            추천예상수익
           </Text> : null}
         </View>
         <View style={styles.listItemRow2}>
