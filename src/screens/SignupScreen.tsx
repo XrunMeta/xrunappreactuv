@@ -168,6 +168,33 @@ export const v_f40fc5 = () => {
   }, []);
 
   v_a3453e.useEffect(() => {
+    const v_c9d3c8 = async () => {
+      try {
+        const v_4b1c8e = await v_e84827.getItem('processed_install_referrer');
+        if (v_4b1c8e) {
+
+          const v_24baff = new URLSearchParams(v_4b1c8e);
+          const v_a560de = v_24baff.get('utm_source');
+          const v_2c9a0c = v_24baff.get('utm_content');
+
+          if (v_a560de === 'referral' && v_2c9a0c) {
+            const v_571452 = decodeURIComponent(v_2c9a0c);
+
+            if (!v_8d7bc8.referralEmail || v_8d7bc8.referralEmail === '') {
+              v_fb6bbb(v_571452);
+              console.log('[회원가입] processed_install_referrer에서 추천인 이메일 로드:', v_571452);
+            }
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[회원가입] processed_install_referrer 로드 실패:', v_5e9bfe);
+      }
+    };
+
+    v_c9d3c8();
+  }, [v_8d7bc8.referralEmail]);
+
+  v_a3453e.useEffect(() => {
     if (!v_2ca208.current) {
 
       if (!v_47b466) {
