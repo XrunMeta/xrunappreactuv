@@ -168,6 +168,33 @@ export const SignupScreen = () => {
   }, []);
 
   React.useEffect(() => {
+    const loadReferralEmailFromStorage = async () => {
+      try {
+        const processedReferrer = await AsyncStorage.getItem('processed_install_referrer');
+        if (processedReferrer) {
+
+          const params = new URLSearchParams(processedReferrer);
+          const utmSource = params.get('utm_source');
+          const utmContent = params.get('utm_content');
+
+          if (utmSource === 'referral' && utmContent) {
+            const extractedEmail = decodeURIComponent(utmContent);
+
+            if (!signupFormData.referralEmail || signupFormData.referralEmail === '') {
+              setReferralEmail(extractedEmail);
+              console.log('[회원가입] processed_install_referrer에서 추천인 이메일 로드:', extractedEmail);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[회원가입] processed_install_referrer 로드 실패:', error);
+      }
+    };
+
+    loadReferralEmailFromStorage();
+  }, [signupFormData.referralEmail]);
+
+  React.useEffect(() => {
     if (!isMountedRef.current) {
 
       if (!isGoogleSignupMode) {
