@@ -62,7 +62,7 @@ import {
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog } from './src/components';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
 import { loadEnv } from './src/utils/env';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
@@ -82,6 +82,7 @@ import { useCameraPermissions } from 'expo-camera';
 import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
+import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable } from './src/services/versionCheck';
 
 let processedDeepLinkUrl: string | null = null;
 let isDeepLinkProcessing = false;
@@ -718,6 +719,68 @@ const PermissionRequester = () => {
 
 const GlobalDialogs = () => {
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
+  const [versionUpdateVisible, setVersionUpdateVisible] = useState(false);
+  const [latestVersion, setLatestVersion] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        console.log('[App] 버전 확인 시작');
+        const currentVersion = getCurrentAppVersion();
+        const latest = await checkLatestVersion();
+
+        console.log('[App] 버전 확인 결과:', {
+          current: currentVersion,
+          latest: latest,
+        });
+
+        if (latest && isNewVersionAvailable(currentVersion, latest)) {
+          console.log('[App] 새 버전 발견:', latest);
+          setLatestVersion(latest);
+          setVersionUpdateVisible(true);
+        } else {
+          console.log('[App] 최신 버전입니다.');
+        }
+      } catch (error) {
+        console.error('[App] 버전 확인 실패:', error);
+
+      }
+    };
+
+    const timer = setTimeout(() => {
+      checkVersion();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+
+        try {
+          const currentVersion = getCurrentAppVersion();
+          const latest = await checkLatestVersion();
+
+          if (latest && isNewVersionAvailable(currentVersion, latest)) {
+
+            if (!versionUpdateVisible) {
+              setLatestVersion(latest);
+              setVersionUpdateVisible(true);
+            }
+          }
+        } catch (error) {
+          console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', error);
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [versionUpdateVisible]);
 
   return (
     <>
@@ -727,6 +790,11 @@ const GlobalDialogs = () => {
         message={emergencyStop?.message ?? '긴급 안내가 있습니다.'}
         link={emergencyStop?.link}
 
+      />
+      <VersionUpdateDialog
+        visible={versionUpdateVisible}
+        latestVersion={latestVersion}
+        onClose={() => setVersionUpdateVisible(false)}
       />
     </>
   );
