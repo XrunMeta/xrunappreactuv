@@ -4719,3 +4719,84 @@ export const getMembersLevelInfo = async (
   }
 };
 
+export const checkShopSalesMenu = async (
+  member: string,
+  navigation?: any,
+): Promise<CheckShopSalesMenuResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: CheckShopSalesMenuRequest = {
+      member,
+    };
+
+    console.log('[Shop 매출] 메뉴 표시 여부 확인 요청:', { member });
+
+    const response = await axiosInstance.post<CheckShopSalesMenuResponse>(
+      '/checkShopSalesMenu',
+      request,
+    );
+
+    console.log('[Shop 매출] 메뉴 표시 여부 확인 성공:', response.data.data?.showMenu || false);
+
+    return response.data;
+  } catch (error) {
+    console.error('[Shop 매출] 메뉴 표시 여부 확인 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getItemPurchaseList = async (
+  shopmember: string,
+  dateFrom?: string,
+  dateTo?: string,
+  navigation?: any,
+): Promise<GetItemPurchaseListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetItemPurchaseListRequest = {
+      shopmember,
+    };
+
+    if (dateFrom) {
+      request.dateFrom = dateFrom;
+    }
+    if (dateTo) {
+      request.dateTo = dateTo;
+    }
+
+    console.log('[Shop 매출] 구매자 명단 조회 요청:', { shopmember, dateFrom, dateTo });
+
+    const response = await axiosInstance.post<GetItemPurchaseListResponse>(
+      '/getItemPurchaseList',
+      request,
+    );
+
+    console.log('[Shop 매출] 구매자 명단 조회 성공, 개수:', response.data.data?.purchaseList?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[Shop 매출] 구매자 명단 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
