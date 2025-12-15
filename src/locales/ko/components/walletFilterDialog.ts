@@ -1,13 +1,13 @@
 export default {
-  title: 'Filter',
-  all: 'All',
-  send: 'Send',
-  receive: 'Receive',
-  days7: '7 Days',
-  days14: '14 Days',
-  days30: '30 Days',
-  reset: 'Reset',
-  confirm: 'Confirm',
+  title: '필터',
+  all: '전체',
+  send: '보내기',
+  receive: '받기',
+  days7: '7일',
+  days14: '14일',
+  days30: '30일',
+  reset: '초기화',
+  confirm: '확인',
 };
 
 

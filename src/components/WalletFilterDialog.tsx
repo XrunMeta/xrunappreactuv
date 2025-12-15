@@ -1,22 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Dialog } from './Dialog';
 import { OptionButton } from './OptionButton';
 
-const TYPE_OPTIONS = [
-  { label: 'All', value: 'all' },
-  { label: 'Send', value: 'send' },
-  { label: 'Receive', value: 'receive' },
-] as const;
-
-const RANGE_OPTIONS = [
-  { label: '7 Days', value: '7d' },
-  { label: '14 Days', value: '14d' },
-  { label: '30 Days', value: '30d' },
-] as const;
-
-export type WalletFilterType = (typeof TYPE_OPTIONS)[number]['value'];
-export type WalletFilterRange = (typeof RANGE_OPTIONS)[number]['value'];
+export type WalletFilterType = 'all' | 'send' | 'receive';
+export type WalletFilterRange = '7d' | '14d' | '30d';
 
 interface WalletFilterDialogProps {
   visible: boolean;
@@ -33,6 +22,7 @@ export const WalletFilterDialog: React.FC<WalletFilterDialogProps> = ({
   defaultType = 'all',
   defaultRange = '7d',
 }) => {
+  const { t } = useTranslation();
   const [type, setType] = useState<WalletFilterType>(defaultType);
   const [range, setRange] = useState<WalletFilterRange>(defaultRange);
 
@@ -53,14 +43,26 @@ export const WalletFilterDialog: React.FC<WalletFilterDialogProps> = ({
     onClose();
   };
 
+  const TYPE_OPTIONS = [
+    { label: t('components.walletFilterDialog.all'), value: 'all' as const },
+    { label: t('components.walletFilterDialog.send'), value: 'send' as const },
+    { label: t('components.walletFilterDialog.receive'), value: 'receive' as const },
+  ];
+
+  const RANGE_OPTIONS = [
+    { label: t('components.walletFilterDialog.days7'), value: '7d' as const },
+    { label: t('components.walletFilterDialog.days14'), value: '14d' as const },
+    { label: t('components.walletFilterDialog.days30'), value: '30d' as const },
+  ];
+
   return (
     <Dialog
       visible={visible}
-      title="Filter"
+      title={t('components.walletFilterDialog.title')}
       onClose={onClose}
       actions={[
-        { label: 'Reset', onPress: handleReset, variant: 'secondary' },
-        { label: 'Confirm', onPress: handleConfirm, variant: 'primary' },
+        { label: t('components.walletFilterDialog.reset'), onPress: handleReset, variant: 'secondary' },
+        { label: t('components.walletFilterDialog.confirm'), onPress: handleConfirm, variant: 'primary' },
       ]}
       containerStyle={styles.dialogCard}
     >
@@ -108,5 +110,4 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 });
-
 
