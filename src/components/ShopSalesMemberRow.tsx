@@ -11,6 +11,7 @@ import { v_1bfbd0, v_843035 } from '../constants';
 
 export interface ShopSalesMemberData {
     id: string;        
+    email: string;     
     name: string;      
     date: string;      
     settlement: string; 
@@ -22,6 +23,7 @@ interface ShopSalesMemberRowProps extends ShopSalesMemberData {
 
 export const ShopSalesMemberRow: v_a3453e.FC<ShopSalesMemberRowProps> = ({
     id: v_389afb,
+    email: v_e0c7e8,
     name: v_1833e7,
     date: v_8dffde,
     settlement: v_16c36f,
@@ -35,7 +37,7 @@ export const ShopSalesMemberRow: v_a3453e.FC<ShopSalesMemberRowProps> = ({
             disabled={!v_719eed}
         >
             <View style={v_d81136.leftColumn}>
-                <Text style={v_d81136.id} numberOfLines={1}>{v_389afb}</Text>
+                <Text style={v_d81136.id} numberOfLines={1}>{v_e0c7e8}</Text>
                 <Text style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
             </View>
             <View style={v_d81136.rightColumn}>

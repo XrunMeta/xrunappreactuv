@@ -1276,3 +1276,48 @@ export interface QuestJoinResponse {
     [key: string]: any;
   };
 }
+
+export interface CheckShopSalesMenuRequest {
+  member: string; 
+}
+
+export interface CheckShopSalesMenuResponse {
+  status: 'success' | 'fail' | 'error';
+  code: number;
+  message: string;
+  data: {
+    showMenu: boolean; 
+    itemCount: number; 
+  };
+}
+
+export interface GetItemPurchaseListRequest {
+  shopmember: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+}
+
+export interface PurchaseItem {
+  email: string; 
+  name: string; 
+  amount: number; 
+  purchaseDate: string | null; 
+}
+
+export interface ItemInfo {
+  item: string | null; 
+  title: string | null; 
+  price: number; 
+  participantCount: number; 
+  totalSales: number; 
+}
+
+export interface GetItemPurchaseListResponse {
+  status: 'success' | 'fail' | 'error';
+  code: number;
+  message: string;
+  data: {
+    itemInfo: ItemInfo;
+    purchaseList: PurchaseItem[];
+  };
+}

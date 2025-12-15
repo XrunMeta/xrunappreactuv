@@ -4719,3 +4719,84 @@ export const v_dedaa7 = async (
   }
 };
 
+export const v_96206e = async (
+  v_660822,
+  v_c65f5d,
+): Promise<CheckShopSalesMenuResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = {
+      member: v_660822,
+    };
+
+    console.log('[Shop 매출] 메뉴 표시 여부 확인 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<CheckShopSalesMenuResponse>(
+      '/checkShopSalesMenu',
+      v_576f5a,
+    );
+
+    console.log('[Shop 매출] 메뉴 표시 여부 확인 성공:', v_3393e3.data.data?.showMenu || false);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Shop 매출] 메뉴 표시 여부 확인 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_09a96d = async (
+  v_c5bd46,
+  v_2ae65a,
+  v_2272ed,
+  v_c65f5d,
+): Promise<GetItemPurchaseListResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = {
+      shopmember: v_c5bd46,
+    };
+
+    if (v_2ae65a) {
+      v_576f5a.dateFrom = v_2ae65a;
+    }
+    if (v_2272ed) {
+      v_576f5a.dateTo = v_2272ed;
+    }
+
+    console.log('[Shop 매출] 구매자 명단 조회 요청:', { shopmember: v_c5bd46, dateFrom: v_2ae65a, dateTo: v_2272ed });
+
+    const v_3393e3 = await v_9f42a4.post<GetItemPurchaseListResponse>(
+      '/getItemPurchaseList',
+      v_576f5a,
+    );
+
+    console.log('[Shop 매출] 구매자 명단 조회 성공, 개수:', v_3393e3.data.data?.purchaseList?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Shop 매출] 구매자 명단 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
