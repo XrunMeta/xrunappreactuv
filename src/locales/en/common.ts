@@ -23,6 +23,13 @@ export default {
     emailInvalid: 'Invalid email format',
     passwordMinLength: 'Password must be at least 8 characters',
   },
+  versionUpdate: {
+    title: 'New Version Available',
+    latestVersion: 'Latest Version',
+    message: 'Please update to the latest version for a better experience.',
+    update: 'Update',
+    later: 'Later',
+  },
 };
 
 

@@ -62,7 +62,7 @@ import {
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef } from './src/components';
+import { v_aabda8, v_b631a8, v_2806ef, v_6e8088 } from './src/components';
 import { v_a2474a } from './src/utils/env';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
@@ -82,6 +82,7 @@ import { v_d4f1cc } from 'mbgbsytfgyr';
 import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
+import { v_f16a74, v_deac27, v_790b4f } from './src/services/versionCheck';
 
 let v_308260 = null;
 let v_435733 = false;
@@ -718,6 +719,68 @@ const v_512b02 = () => {
 
 const v_d0a391 = () => {
   const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
+  const [v_614e3c, v_80c653] = v_5ab095(false);
+  const [v_14feb2, v_b5ebec] = v_5ab095<string | undefined>(undefined);
+
+  v_c4deb2(() => {
+    const v_bc755f = async () => {
+      try {
+        console.log('[App] 버전 확인 시작');
+        const v_4587b3 = v_deac27();
+        const v_1300ee = await v_f16a74();
+
+        console.log('[App] 버전 확인 결과:', {
+          current: v_4587b3,
+          latest: v_1300ee,
+        });
+
+        if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
+          console.log('[App] 새 버전 발견:', v_1300ee);
+          v_b5ebec(v_1300ee);
+          v_80c653(true);
+        } else {
+          console.log('[App] 최신 버전입니다.');
+        }
+      } catch (v_5e9bfe) {
+        console.error('[App] 버전 확인 실패:', v_5e9bfe);
+
+      }
+    };
+
+    const v_cb36b1 = setTimeout(() => {
+      v_bc755f();
+    }, 3000);
+
+    return () => clearTimeout(v_cb36b1);
+  }, []);
+
+  v_c4deb2(() => {
+    const v_7a424f = async (nextAppState: v_c3551b) => {
+      if (v_3b10d8 === 'active') {
+
+        try {
+          const v_4587b3 = v_deac27();
+          const v_1300ee = await v_f16a74();
+
+          if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
+
+            if (!v_614e3c) {
+              v_b5ebec(v_1300ee);
+              v_80c653(true);
+            }
+          }
+        } catch (v_5e9bfe) {
+          console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', v_5e9bfe);
+        }
+      }
+    };
+
+    const v_269481 = v_6b5698.addEventListener('change', v_7a424f);
+
+    return () => {
+      v_269481?.remove();
+    };
+  }, [v_614e3c]);
 
   return (
     <>
@@ -727,6 +790,11 @@ const v_d0a391 = () => {
         message={v_b135ca?.message ?? '긴급 안내가 있습니다.'}
         link={v_b135ca?.link}
 
+      />
+      <VersionUpdateDialog
+        visible={v_614e3c}
+        latestVersion={v_14feb2}
+        onClose={() => v_80c653(false)}
       />
     </>
   );

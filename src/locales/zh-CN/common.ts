@@ -23,6 +23,13 @@ export default {
     emailInvalid: '邮箱格式不正确',
     passwordMinLength: '密码至少需要8个字符',
   },
+  versionUpdate: {
+    title: '有新版本',
+    latestVersion: '最新版本',
+    message: '请更新到最新版本以获得更好的体验。',
+    update: '更新',
+    later: '稍后',
+  },
 };
 
 

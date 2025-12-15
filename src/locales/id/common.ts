@@ -23,6 +23,13 @@ export default {
     emailInvalid: 'Format email tidak valid',
     passwordMinLength: 'Password minimal 8 karakter',
   },
+  versionUpdate: {
+    title: 'Versi Baru Tersedia',
+    latestVersion: 'Versi Terbaru',
+    message: 'Silakan update ke versi terbaru untuk pengalaman yang lebih baik.',
+    update: 'Update',
+    later: 'Nanti',
+  },
 };
 
 
