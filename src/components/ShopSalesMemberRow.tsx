@@ -11,6 +11,7 @@ import { COLORS, FONTS } from '../constants';
 
 export interface ShopSalesMemberData {
     id: string;        
+    email: string;     
     name: string;      
     date: string;      
     settlement: string; 
@@ -22,6 +23,7 @@ interface ShopSalesMemberRowProps extends ShopSalesMemberData {
 
 export const ShopSalesMemberRow: React.FC<ShopSalesMemberRowProps> = ({
     id,
+    email,
     name,
     date,
     settlement,
@@ -35,7 +37,7 @@ export const ShopSalesMemberRow: React.FC<ShopSalesMemberRowProps> = ({
             disabled={!onPress}
         >
             <View style={styles.leftColumn}>
-                <Text style={styles.id} numberOfLines={1}>{id}</Text>
+                <Text style={styles.id} numberOfLines={1}>{email}</Text>
                 <Text style={styles.name} numberOfLines={1}>{name}</Text>
             </View>
             <View style={styles.rightColumn}>
