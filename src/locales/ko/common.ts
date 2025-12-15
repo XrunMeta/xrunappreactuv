@@ -23,6 +23,13 @@ export default {
     emailInvalid: '올바른 이메일 형식이 아닙니다',
     passwordMinLength: '비밀번호는 최소 8자 이상이어야 합니다',
   },
+  versionUpdate: {
+    title: '새 버전이 있습니다',
+    latestVersion: '최신 버전',
+    message: '더 나은 사용 경험을 위해 최신 버전으로 업데이트해주세요.',
+    update: '업데이트',
+    later: '나중에',
+  },
 };
 
 
