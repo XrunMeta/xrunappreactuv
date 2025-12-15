@@ -4384,7 +4384,7 @@ export const v_4dba02 = async (
     const v_c01615 = v_c9c489.GATEWAY_NODEJS;
 
     const v_8adf57 = v_74cb95[v_4898e2];
-    const v_09dafd = `/oth-path?type=${v_8adf57}`;
+    const v_09dafd = `/agreements?type=${v_8adf57}`;
     const v_b958f2 = v_09dafd.startsWith('/')
       ? `${v_c01615}${v_09dafd}`
       : `${v_c01615}/${v_09dafd}`;

@@ -78,7 +78,6 @@ import {
 import { v_b2c639 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import * as v_8a44cb from 'zryrlwvgokjhz';
-import { v_d4f1cc } from 'mbgbsytfgyr';
 import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
@@ -470,7 +469,6 @@ const v_c0dbdf = () => {
 };
 
 const v_512b02 = () => {
-  const [v_9c4d84, v_35c1b7] = v_d4f1cc();
   const [v_22d5f0, v_baa579] = v_5ab095<v_8a44cb.PermissionStatus | null>(null);
   const [v_94037c, v_aa65df] = v_5ab095(false);
   const [v_73ba28, v_735eac] = v_5ab095(false);
@@ -551,33 +549,6 @@ const v_512b02 = () => {
     }
   }, [v_317b57]);
 
-  const v_7549c3 = v_de06a3(async () => {
-    try {
-      if (v_9c4d84 === null) {
-        console.log('[App] 카메라 권한 상태 확인 중...');
-        return 'undetermined' as const;
-      }
-
-      if (v_9c4d84.granted) {
-        console.log('[App] 카메라 권한이 이미 허용되어 있습니다.');
-        return 'granted' as const;
-      }
-
-      console.log('[App] 카메라 권한 명시적 요청 시작');
-      const v_43c42e = await v_35c1b7();
-      if (v_43c42e.granted) {
-        console.log('[App] 카메라 권한 허용됨');
-        return 'granted' as const;
-      } else {
-        console.log('[App] 카메라 권한 거부됨');
-        return 'denied' as const;
-      }
-    } catch (v_5e9bfe) {
-      console.error('[App] 카메라 권한 요청 실패:', v_5e9bfe);
-      return 'denied' as const;
-    }
-  }, [v_9c4d84, v_35c1b7]);
-
   const v_941aca = v_de06a3(async () => {
 
     if (v_73ba28 || v_6276b7) {
@@ -585,47 +556,10 @@ const v_512b02 = () => {
     }
 
     const v_9bc4b6 = v_22d5f0 || await v_8a44cb.getForegroundPermissionsAsync().then(v_cb35cb => v_cb35cb.status);
-    const v_40762e = v_9c4d84?.granted ? 'granted' : (v_9c4d84?.canAskAgain === false ? 'denied' : 'undetermined');
 
     const v_8c27ae = v_9bc4b6 !== 'granted';
-    const v_8233bb = v_40762e !== 'granted';
 
-    if (v_8c27ae && v_8233bb) {
-      v_735eac(true);
-      await v_889fad(
-        '권한 필요',
-        '앱의 주요 기능을 사용하려면 위치 정보와 카메라 권한이 모두 필요합니다. 설정에서 권한을 허용해주세요.',
-        [
-          {
-            text: '다시 요청',
-            onPress: async () => {
-              v_456561(true);
-              v_735eac(false); 
-
-              console.log('[App] 다시 요청: 위치 및 카메라 권한 요청');
-              const v_4042b1 = await v_594d44();
-
-              await v_7549c3();
-
-              await new Promise(v_6f7712 => setTimeout(v_6f7712, 1500));
-
-              const v_4b9906 = await v_8a44cb.getForegroundPermissionsAsync().then(v_cb35cb => v_cb35cb.status);
-              v_baa579(v_4b9906);
-
-              v_456561(false);
-
-              setTimeout(() => {
-                v_941aca();
-              }, 500);
-            },
-          },
-          {
-            text: '확인',
-          },
-        ]
-      );
-    } else if (v_8c27ae) {
-
+    if (v_8c27ae) {
       v_735eac(true);
       await v_889fad(
         '위치 권한 필요',
@@ -642,35 +576,8 @@ const v_512b02 = () => {
 
               await new Promise(v_6f7712 => setTimeout(v_6f7712, 1000));
 
-              v_456561(false);
-
-              setTimeout(() => {
-                v_941aca();
-              }, 500);
-            },
-          },
-          {
-            text: '확인',
-          },
-        ]
-      );
-    } else if (v_8233bb) {
-
-      v_735eac(true);
-      await v_889fad(
-        '카메라 권한 필요',
-        '앱의 주요 기능을 사용하려면 카메라 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-        [
-          {
-            text: '다시 요청',
-            onPress: async () => {
-              v_456561(true);
-              v_735eac(false); 
-
-              console.log('[App] 다시 요청: 카메라 권한 요청');
-              await v_7549c3();
-
-              await new Promise(v_6f7712 => setTimeout(v_6f7712, 1000));
+              const v_4b9906 = await v_8a44cb.getForegroundPermissionsAsync().then(v_cb35cb => v_cb35cb.status);
+              v_baa579(v_4b9906);
 
               v_456561(false);
 
@@ -685,26 +592,21 @@ const v_512b02 = () => {
         ]
       );
     }
-  }, [v_73ba28, v_6276b7, v_22d5f0, v_9c4d84, v_889fad, v_594d44, v_7549c3]);
+  }, [v_73ba28, v_6276b7, v_22d5f0, v_889fad, v_594d44]);
 
   v_c4deb2(() => {
     const v_42373f = async () => {
 
       const v_4042b1 = await v_594d44();
       v_baa579(v_4042b1);
+      v_aa65df(true);
     };
 
     v_42373f();
   }, [v_594d44]);
 
   v_c4deb2(() => {
-    if (v_9c4d84 !== null && !v_94037c) {
-      v_aa65df(true);
-    }
-  }, [v_9c4d84, v_94037c]);
-
-  v_c4deb2(() => {
-    if (v_94037c && v_9c4d84 !== null && v_22d5f0 !== null && !v_6276b7) {
+    if (v_94037c && v_22d5f0 !== null && !v_6276b7) {
 
       const v_cb36b1 = setTimeout(() => {
         v_941aca();
@@ -712,7 +614,7 @@ const v_512b02 = () => {
 
       return () => clearTimeout(v_cb36b1);
     }
-  }, [v_94037c, v_9c4d84, v_22d5f0, v_6276b7, v_941aca]);
+  }, [v_94037c, v_22d5f0, v_6276b7, v_941aca]);
 
   return null;
 };

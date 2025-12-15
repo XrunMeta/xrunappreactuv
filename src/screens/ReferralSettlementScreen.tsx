@@ -238,7 +238,8 @@ export const v_08aac3 = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {v_8c0b26.description}
+            {}
+            추천예상수익
           </Text> : null}
         </View>
         <View style={v_d81136.listItemRow2}>

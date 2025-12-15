@@ -106,8 +106,8 @@ const v_d81136 = v_472849.create({
     marginRight: 12,
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 25,
+    height: 25,
     borderRadius: 20,
   },
   iconContainer: {
@@ -141,7 +141,7 @@ const v_d81136 = v_472849.create({
   },
   timestamp: {
     fontSize: v_843035.size.xxsmall,
-    color: '#aeaeae',
+    color: '#777777',
     fontFamily: 'Roboto-Medium',
     marginBottom: 6,
   },
