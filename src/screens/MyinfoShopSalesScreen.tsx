@@ -1,20 +1,35 @@
-import v_a3453e, { v_e662ae, v_5ab095, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_e662ae, v_5ab095, v_de06a3, v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_aa7413, v_09d0e5, v_122070 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_58c85e, v_b3c0a1, v_60b263, v_029581, v_556baf } from '../components';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
+import { v_09a96d } from '../services';
+import { v_7710e3 } from '../types';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
 type DatePickerTarget = 'start' | 'end' | null;
 
 export const v_1cca63 = () => {
   const { t: v_8d41d7 } = v_772971();
-  const { goBack: v_c7ac57 } = v_a0daa8();
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const v_e5fc4b = v_e662ae<v_029581>(null);
-  const [v_cd31a8] = v_5ab095<boolean>(false);
+  const [v_cd31a8, v_deef62] = v_5ab095<boolean>(true);
+  const [v_c5bd46, v_1d2822] = v_5ab095<string | null>(null);
+  const [v_d20ab2, v_67c452] = v_5ab095<{
+    title: string | null;
+    price: number;
+    participantCount: number;
+    totalSales: number;
+  }>({
+    title: null,
+    price: 0,
+    participantCount: 0,
+    totalSales: 0,
+  });
 
   const [v_a7e395, v_2f9f74] = v_5ab095(false);
   const [v_0f64f4, v_9d83ae] = v_5ab095<PeriodOption>('1month');
@@ -53,6 +68,43 @@ export const v_1cca63 = () => {
     const v_087ffc = String(v_8dffde.getDate()).padStart(2, '0');
     return `${v_0eaaff}.${v_033a94}.${v_087ffc}`;
   };
+
+  const v_3a1874 = (v_8dffde): string => {
+    const v_0eaaff = v_8dffde.getFullYear();
+    const v_033a94 = String(v_8dffde.getMonth() + 1).padStart(2, '0');
+    const v_087ffc = String(v_8dffde.getDate()).padStart(2, '0');
+    return `${v_0eaaff}-${v_033a94}-${v_087ffc}`;
+  };
+
+  const v_fac091 = (v_1833e7): string => {
+    if (!v_1833e7 || !v_1833e7.trim()) return v_1833e7;
+    const v_468545 = v_1833e7.trim().split(/\s+/);
+    if (v_468545.length >= 2) {
+
+      return v_468545.reverse().join(' ');
+    }
+    return v_1833e7; 
+  };
+
+  v_c4deb2(() => {
+    const v_0e1f49 = async () => {
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          if (v_ef7306.member) {
+
+            v_1d2822(String(v_ef7306.member));
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('[Shop 매출] 사용자 정보 로드 실패:', v_5e9bfe);
+      } finally {
+        v_deef62(false);
+      }
+    };
+    v_0e1f49();
+  }, []);
 
   const v_fd2364 = (v_783ad3) => {
     v_9d83ae(v_783ad3);
@@ -119,8 +171,15 @@ export const v_1cca63 = () => {
 
   const v_16cc52 = () => {
     v_2f9f74(false);
+    v_deef62(true);
     v_e5fc4b.current?.reloadData();
   };
+
+  v_c4deb2(() => {
+    if (v_c5bd46 && !v_cd31a8) {
+      v_e5fc4b.current?.reloadData();
+    }
+  }, [v_0ec7ad, v_331624, v_c5bd46]);
 
   const v_fe02bb = () => {
     const v_0eaaff = v_10c2af.getFullYear();
@@ -231,24 +290,95 @@ export const v_1cca63 = () => {
     );
   };
 
-  const sampleMembers: v_b3c0a1[] = [
-
-  ];
-
   const v_ff2128 = v_de06a3(async (
     params: v_5b0045
   ): Promise<v_ae32ae<v_b3c0a1>> => {
-    const v_6e5804 = (v_24baff.page - 1) * v_24baff.pageSize;
-    const v_402079 = v_6e5804 + v_24baff.pageSize;
-    const v_98f5bb = v_f09264.slice(v_6e5804, v_402079);
-    const v_6bbe19 = v_402079 < v_f09264.length;
+    if (!v_c5bd46) {
+      v_deef62(false);
+      return { data: [], total: 0, hasMore: false };
+    }
 
-    return {
-      data: v_98f5bb,
-      total: v_f09264.length,
-      hasMore: v_6bbe19,
-    };
-  }, []);
+    try {
+
+      if (v_24baff.page === 1) {
+        v_deef62(true);
+      }
+
+      const v_2ae65a = v_3a1874(v_0ec7ad);
+      const v_2272ed = v_3a1874(v_331624);
+
+      const v_3393e3 = await v_09a96d(v_c5bd46, v_2ae65a, v_2272ed, v_9b57fc);
+
+      if (v_3393e3.status === 'success' && v_3393e3.data) {
+
+        if (v_24baff.page === 1 && v_3393e3.data.itemInfo) {
+          v_67c452({
+            title: v_3393e3.data.itemInfo.title,
+            price: v_3393e3.data.itemInfo.price || 0,
+            participantCount: v_3393e3.data.itemInfo.participantCount || 0,
+            totalSales: v_3393e3.data.itemInfo.totalSales || 0,
+          });
+        }
+
+        const v_431a00 = v_3393e3.data.purchaseList || [];
+        const members: v_b3c0a1[] = v_431a00.map((purchase: v_7710e3, v_a56041) => {
+
+          const v_14b228 = v_54e15b.purchaseDate ? v_54e15b.purchaseDate.replace(/-/g, '.') : '';
+
+          const v_e0fe28 = v_54e15b.amount.toLocaleString('ko-KR') + v_8d41d7('screens.myinfoShopSales.currency');
+
+          const v_90d2f8 = v_fac091(v_54e15b.name);
+
+          const v_6c35f6 = v_54e15b.email && v_54e15b.purchaseDate
+            ? `${v_54e15b.email}-${v_54e15b.purchaseDate}-${v_a56041}`
+            : v_54e15b.email
+            ? `${v_54e15b.email}-${v_a56041}`
+            : `purchase-${v_a56041}`;
+
+          return {
+            id: v_6c35f6, 
+            email: v_54e15b.email, 
+            name: v_90d2f8, 
+            date: v_14b228,
+            settlement: v_e0fe28,
+          };
+        });
+
+        const v_6e5804 = (v_24baff.page - 1) * v_24baff.pageSize;
+        const v_402079 = v_6e5804 + v_24baff.pageSize;
+        const v_98f5bb = v_8673d6.slice(v_6e5804, v_402079);
+        const v_6bbe19 = v_402079 < v_8673d6.length;
+
+        if (v_24baff.page === 1) {
+          v_deef62(false);
+        }
+
+        return {
+          data: v_98f5bb,
+          total: v_8673d6.length,
+          hasMore: v_6bbe19,
+        };
+      } else {
+
+        if (v_24baff.page === 1) {
+          v_67c452({
+            title: null,
+            price: 0,
+            participantCount: 0,
+            totalSales: 0,
+          });
+          v_deef62(false);
+        }
+        return { data: [], total: 0, hasMore: false };
+      }
+    } catch (v_5e9bfe) {
+      console.error('[Shop 매출] 구매자 명단 조회 실패:', v_5e9bfe);
+      if (v_24baff.page === 1) {
+        v_deef62(false);
+      }
+      return { data: [], total: 0, hasMore: false };
+    }
+  }, [v_c5bd46, v_0ec7ad, v_331624, v_9b57fc, v_8d41d7]);
 
   const v_a37640 = () => (
     <TouchableOpacity
@@ -270,12 +400,12 @@ export const v_1cca63 = () => {
       <View style={v_d81136.content}>
         {}
         <View style={v_d81136.infoCard}>
-          <Text style={v_d81136.infoTitle}>{v_8d41d7('screens.myinfoShopSales.productTitle')}</Text>
+          <Text style={v_d81136.infoTitle}>{v_d20ab2.title || v_8d41d7('screens.myinfoShopSales.productTitle')}</Text>
           <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>0{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>0{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
+            {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{v_d20ab2.price.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
           </Text>
           <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>0{v_8d41d7('screens.myinfoShopSales.currency')}</Text> /{v_8d41d7('screens.myinfoShopSales.settlementInfo')}
+            {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSales.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> /{v_8d41d7('screens.myinfoShopSales.settlementInfo')}
           </Text>
         </View>
 
@@ -286,19 +416,15 @@ export const v_1cca63 = () => {
         </View>
 
         <View style={v_d81136.listContainer}>
-          {!v_cd31a8 && v_f09264.length === 0 ? (
-            <View style={v_d81136.emptyContainer}>
-              <Text style={v_d81136.emptyDescription}>{v_8d41d7('screens.myinfoShopSales.noData')}</Text>
-            </View>
-          ) : (
-            <DataList<v_b3c0a1>
-              ref={v_e5fc4b}
-              fetchData={v_ff2128}
-              ItemComponent={v_58c85e}
-              pageSize={20}
-              contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
-            />
-          )}
+          <DataList<v_b3c0a1>
+            ref={v_e5fc4b}
+            fetchData={v_ff2128}
+            ItemComponent={v_58c85e}
+            pageSize={20}
+            contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
+            emptyMessage={!v_cd31a8 ? v_8d41d7('screens.myinfoShopSales.noData') : undefined}
+            keyExtractor={(v_8c0b26, v_a56041) => v_8c0b26.id || `purchase-${v_a56041}`}
+          />
         </View>
       </View>
 
