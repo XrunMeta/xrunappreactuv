@@ -1249,6 +1249,7 @@ export interface QuestCheckUserResponse {
   message: string;
   data: {
     canReward: boolean;
+    hasAttended?: boolean;
   };
 }
 

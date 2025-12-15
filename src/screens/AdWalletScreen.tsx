@@ -35,6 +35,8 @@ interface AdEntry {
   title?: string; 
   description?: string; 
   rewardDescription?: string; 
+  extrastr3?: string; 
+  hasAttended?: boolean; 
 }
 
 export const AdWalletScreen = () => {
@@ -53,6 +55,7 @@ export const AdWalletScreen = () => {
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
   const [attendanceCheckVisible, setAttendanceCheckVisible] = useState(false);
   const [canReward, setCanReward] = useState<boolean | null>(null);
+  const [hasAttended, setHasAttended] = useState<boolean | null>(null);
   const [attendanceCheckLoading, setAttendanceCheckLoading] = useState(false);
   const [isJoiningQuest, setIsJoiningQuest] = useState(false);
   const [isColdStart, setIsColdStart] = useState<boolean | null>(null);
@@ -258,6 +261,7 @@ export const AdWalletScreen = () => {
         adRevenueSettlement,
         expectedAdRevenueColor: '#707070',
         adRevenueSettlementColor: '#343434',
+        extrastr3: item.extrastr3,
       };
     },
     [t, formatDate],
@@ -380,6 +384,24 @@ export const AdWalletScreen = () => {
 
         const adEntries: AdEntry[] = questItems.map(convertQuestToAdEntry);
 
+        if (member) {
+          const questIdOneEntry = adEntries.find(
+            (entry) => entry.id === 1 || entry.id === '1'
+          );
+
+          if (questIdOneEntry) {
+            try {
+              const checkResponse = await checkQuestUser(member);
+              const responseHasAttended = checkResponse.data?.hasAttended ?? false;
+              questIdOneEntry.hasAttended = responseHasAttended;
+              console.log('[AdWallet] 퀘스트 id 1 출석체크 상태:', responseHasAttended);
+            } catch (error) {
+              console.error('[AdWallet] 출석체크 상태 확인 오류:', error);
+
+            }
+          }
+        }
+
         return {
           data: adEntries,
           total: adEntries.length,
@@ -390,7 +412,7 @@ export const AdWalletScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [convertQuestToAdEntry],
+    [convertQuestToAdEntry, member],
   );
 
   const fetchSettledData = useCallback(
@@ -459,11 +481,20 @@ export const AdWalletScreen = () => {
       setAttendanceCheckLoading(true);
       try {
         const response = await checkQuestUser(member);
-        setCanReward(response.data?.canReward ?? false);
-        setAttendanceCheckVisible(true);
+        const responseHasAttended = response.data?.hasAttended ?? false;
+        setHasAttended(responseHasAttended);
+
+        if (responseHasAttended) {
+          setCanReward(false);
+          setAttendanceCheckVisible(true);
+        } else {
+          setCanReward(response.data?.canReward ?? false);
+          setAttendanceCheckVisible(true);
+        }
       } catch (error) {
         console.error('[AdWallet] 출석 체크 조회 오류:', error);
 
+        setHasAttended(false);
         setCanReward(true);
         setAttendanceCheckVisible(true);
       } finally {
@@ -479,11 +510,19 @@ export const AdWalletScreen = () => {
     }
     setAttendanceCheckVisible(false);
     setCanReward(null);
+    setHasAttended(null);
   }, [isJoiningQuest]);
 
   const handleAttendanceCheckConfirm = useCallback(async () => {
 
     if (isJoiningQuest) {
+      return;
+    }
+
+    if (hasAttended === true) {
+      setAttendanceCheckVisible(false);
+      setCanReward(null);
+      setHasAttended(null);
       return;
     }
 
@@ -502,6 +541,7 @@ export const AdWalletScreen = () => {
           showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
           setAttendanceCheckVisible(false);
           setCanReward(null);
+          setHasAttended(null);
 
           if (questListRef.current) {
             questListRef.current.reloadData();
@@ -519,8 +559,9 @@ export const AdWalletScreen = () => {
 
       setAttendanceCheckVisible(false);
       setCanReward(null);
+      setHasAttended(null);
     }
-  }, [canReward, member, t, isJoiningQuest]);
+  }, [canReward, hasAttended, member, t, isJoiningQuest]);
 
   const summaryLabel = useMemo(
     () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
@@ -543,14 +584,16 @@ export const AdWalletScreen = () => {
 
     const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
 
-    const isWarmStartQuestIdOne = isQuestIdOne && isColdStart === false;
+    const questHasAttended = isQuestIdOne ? item.hasAttended : undefined;
 
     const cardStyle = isQuestIdOne
-      ? isColdStart === true
+      ? questHasAttended === true
+        ? styles.adCard 
+        : isColdStart === true
         ? [styles.adCard, styles.questIdOneColdStart] 
         : isColdStart === false
         ? [styles.adCard, styles.questIdOneWarmStart] 
-        : styles.adCard 
+        : [styles.adCard, styles.questIdOneColdStart] 
       : styles.adCard;
 
     const disabledColor = '#cccccc';
@@ -560,18 +603,17 @@ export const AdWalletScreen = () => {
         style={cardStyle}
         onPress={onPress}
         activeOpacity={0.7}
-        disabled={isWarmStartQuestIdOne}
       >
         <View style={styles.adCardHeader}>
           <Text style={[
             styles.adCardStatus,
-            isWarmStartQuestIdOne && { backgroundColor: disabledColor, color: '#ffffff' }
+            questHasAttended === true && { backgroundColor: disabledColor, color: '#ffffff' }
           ]}>
             {item.status}
           </Text>
           <Text style={[
             styles.adCardDate,
-            isWarmStartQuestIdOne && { color: disabledColor }
+            questHasAttended === true && { color: disabledColor }
           ]}>
             {item.date}
           </Text>
@@ -580,14 +622,14 @@ export const AdWalletScreen = () => {
           <View style={styles.questTitleContainer}>
             <Text style={[
               styles.questTitle,
-              isWarmStartQuestIdOne && { color: disabledColor }
+              questHasAttended === true && { color: disabledColor }
             ]}>
               {item.title}
             </Text>
             {item.description && (
               <Text style={[
                 styles.questDescription,
-                isWarmStartQuestIdOne && { color: disabledColor }
+                questHasAttended === true && { color: disabledColor }
               ]}>
                 {item.description}
               </Text>
@@ -597,19 +639,23 @@ export const AdWalletScreen = () => {
         <View style={styles.adCardRow}>
           <Text style={[
             styles.adCardRowLabel,
-            isWarmStartQuestIdOne && { color: disabledColor }
+            questHasAttended === true && { color: disabledColor }
           ]}>
-            {isQuest ? t('screens.adWallet.rewardAmount') : t('screens.adWallet.expectedAdRevenue')}
+            {isQuest 
+              ? t('screens.adWallet.rewardAmount') 
+              : item.extrastr3 === '출석보상' 
+                ? t('screens.adWallet.attendanceCheckCompletedReward')
+                : t('screens.adWallet.expectedAdRevenue')}
           </Text>
           <Text style={[
             styles.adCardRowAmount,
             { color: item.expectedAdRevenueColor },
-            isWarmStartQuestIdOne && { color: disabledColor }
+            questHasAttended === true && { color: disabledColor }
           ]}>
             {item.expectedAdRevenue}
           </Text>
         </View>
-        {!isQuest && (
+        {!isQuest && item.extrastr3 !== '출석보상' && (
         <View style={styles.adCardRow}>
           <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
           <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
@@ -704,12 +750,16 @@ export const AdWalletScreen = () => {
 
       <Dialog
         visible={attendanceCheckVisible}
-        title={t('screens.adWallet.attendanceCheckTitle')}
+        title={hasAttended === true 
+          ? t('screens.adWallet.attendanceCheckCompletedTitle')
+          : t('screens.adWallet.attendanceCheckTitle')}
         onClose={isJoiningQuest ? undefined : handleDialogClose}
         actions={[
           {
             label: isJoiningQuest
               ? t('screens.adWallet.processing')
+              : hasAttended === true
+              ? t('screens.adWallet.confirm')
               : canReward === true
               ? t('screens.adWallet.attendanceCheck')
               : t('screens.adWallet.confirm'),
@@ -723,7 +773,9 @@ export const AdWalletScreen = () => {
           <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
         ) : (
           <Text style={styles.attendanceCheckMessage}>
-            {canReward === true
+            {hasAttended === true
+              ? t('screens.adWallet.attendanceCheckNotAvailable')
+              : canReward === true
               ? t('screens.adWallet.attendanceCheckRewardMessage')
               : t('screens.adWallet.attendanceCheckCompleted')}
           </Text>

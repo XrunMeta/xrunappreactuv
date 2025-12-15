@@ -10,6 +10,7 @@ export default {
   adRevenueSettlement: '广告收益结算',
   rewardAmount: '奖励金额',
   attendanceCheckTitle: '您要签到吗？',
+  attendanceCheckCompletedTitle: '签到已完成',
   attendanceCheckCompleted: '签到完成',
   attendanceCheckRewardMessage: '领取签到奖励',
   attendanceCheckCompletedToast: '的签到已完成',
@@ -20,6 +21,8 @@ export default {
   no: '否',
   confirm: '确认',
   attendanceCheck: '签到',
+  attendanceCheckCompletedReward: '签到完成奖励',
+  attendanceCheckNotAvailable: '无法进行签到',
   settlementNotice: '75天后结算',
 };
 

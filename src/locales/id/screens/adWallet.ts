@@ -10,6 +10,7 @@ export default {
   adRevenueSettlement: 'Penyelesaian Pendapatan Iklan',
   rewardAmount: 'Jumlah Hadiah',
   attendanceCheckTitle: 'Apakah Anda ingin check-in?',
+  attendanceCheckCompletedTitle: 'Check-in selesai',
   attendanceCheckCompleted: 'Check-in selesai',
   attendanceCheckRewardMessage: 'Terima hadiah check-in',
   attendanceCheckCompletedToast: 'Check-in selesai',
@@ -20,6 +21,8 @@ export default {
   no: 'Tidak',
   confirm: 'Konfirmasi',
   attendanceCheck: 'Check In',
+  attendanceCheckCompletedReward: 'Hadiah Check-In Selesai',
+  attendanceCheckNotAvailable: 'Check-in tidak tersedia',
   settlementNotice: 'Diselesaikan dalam 75 hari',
 };
 

@@ -10,6 +10,7 @@ export default {
   adRevenueSettlement: '広告収益決済',
   rewardAmount: '報酬金額',
   attendanceCheckTitle: '出席チェックをしますか？',
+  attendanceCheckCompletedTitle: '出席チェックを完了しました',
   attendanceCheckCompleted: '出席チェック完了',
   attendanceCheckRewardMessage: '出席チェック報酬を受け取ってください',
   attendanceCheckCompletedToast: '出席チェックを完了しました',
@@ -20,6 +21,8 @@ export default {
   no: 'いいえ',
   confirm: '確認',
   attendanceCheck: '出席チェック',
+  attendanceCheckCompletedReward: '出席チェック完了報酬',
+  attendanceCheckNotAvailable: '出席チェックはできません',
   settlementNotice: '75日後に決済',
 };
 

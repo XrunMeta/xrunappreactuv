@@ -10,6 +10,7 @@ export default {
   adRevenueSettlement: 'Ad Revenue Settlement',
   rewardAmount: 'Reward Amount',
   attendanceCheckTitle: 'Would you like to check in today?',
+  attendanceCheckCompletedTitle: 'Attendance check completed',
   attendanceCheckCompleted: 'attendance check completed',
   attendanceCheckRewardMessage: 'Receive attendance check reward',
   attendanceCheckCompletedToast: 'attendance check completed',
@@ -20,6 +21,8 @@ export default {
   no: 'No',
   confirm: 'Confirm',
   attendanceCheck: 'Check In',
+  attendanceCheckCompletedReward: 'Attendance Check Completed Reward',
+  attendanceCheckNotAvailable: 'Attendance check is not available',
   settlementNotice: 'Settled in 75 days',
 };
 
