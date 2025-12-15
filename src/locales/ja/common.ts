@@ -23,6 +23,13 @@ export default {
     emailInvalid: '正しいメール形式ではありません',
     passwordMinLength: 'パスワードは8文字以上である必要があります',
   },
+  versionUpdate: {
+    title: '新しいバージョンがあります',
+    latestVersion: '最新バージョン',
+    message: 'より良い体験のために最新バージョンに更新してください。',
+    update: '更新',
+    later: '後で',
+  },
 };
 
 
