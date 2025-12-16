@@ -123,18 +123,25 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
     const apiUrl = `${apiBaseUrl}/oth-path`;
 
     console.log('[구글 로그인] 백엔드 API URL:', apiUrl);
+    console.log('[구글 로그인] Authorization 헤더 전송:', {
+      hasToken: !!idToken,
+      tokenLength: idToken.length,
+      headerFormat: 'Bearer <token>',
+    });
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     try {
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`, 
         },
         body: JSON.stringify({
-          idToken: idToken,
+          idToken: idToken, 
         }),
         signal: controller.signal,
       });
