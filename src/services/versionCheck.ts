@@ -2,10 +2,73 @@ import { Platform } from 'react-native';
 import * as Application from 'expo-application';
 import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
+import { gatewayNodeJS } from './index';
 
 const IOS_BUNDLE_ID = 'run.xrun.xrunapps';
 
 const ANDROID_PACKAGE_NAME = 'run.xrun.xrunapp';
+
+interface ServerCheckResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    id: number;
+    iosOnWallet: boolean;
+    created_at: string;
+    updated_at: string;
+    isTransferAble: number;
+    server_status: string;
+    version: number; 
+    version_ios: number; 
+  };
+}
+
+export const checkServerVersion = async (): Promise<ServerCheckResponse | null> => {
+  try {
+    console.log('[VersionCheck] 서버 버전 확인 시작');
+    const response = await gatewayNodeJS('servercheck', 'GET', {});
+
+    if (response && response.status === 'success' && response.data) {
+      console.log('[VersionCheck] 서버 버전 확인 성공:', response.data);
+      return response as ServerCheckResponse;
+    }
+
+    console.log('[VersionCheck] 서버 버전 확인 실패: 응답 형식 오류');
+    return null;
+  } catch (error) {
+    console.error('[VersionCheck] 서버 버전 확인 실패:', error);
+    return null;
+  }
+};
+
+export const getCurrentAppVersionNumber = (): number => {
+  try {
+    if (Platform.OS === 'android') {
+
+      const buildVersion = Application.nativeBuildVersion;
+      if (buildVersion) {
+        return parseInt(buildVersion, 10);
+      }
+
+      return Constants.expoConfig?.android?.versionCode || 0;
+    } else if (Platform.OS === 'ios') {
+
+      const version = Application.nativeApplicationVersion || Constants.expoConfig?.version || '0.0.0';
+      const parts = version.split('.');
+
+      const major = parseInt(parts[0] || '0', 10);
+      const minor = parseInt(parts[1] || '0', 10);
+      const patch = parseInt(parts[2] || '0', 10);
+      console.log('[VersionCheck] iOS 버전 숫자 가져오기:', major * 100 + minor * 10 + patch);
+      return major * 100 + minor * 10 + patch;
+    }
+    return 0;
+  } catch (error) {
+    console.error('[VersionCheck] 현재 앱 버전 숫자 가져오기 실패:', error);
+    return 0;
+  }
+};
 
 const checkIOSVersion = async (): Promise<string | null> => {
   try {
@@ -81,9 +144,9 @@ export const isNewVersionAvailable = (currentVersion: string, latestVersion: str
 export const getStoreUrl = (): string => {
   if (Platform.OS === 'ios') {
 
-    return `https://apps.apple.com/app/bundle-id/${IOS_BUNDLE_ID}`;
+    return `https://apps.apple.com/id/app/xrun-go/id6502924173`;
   } else if (Platform.OS === 'android') {
-    return `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_NAME}`;
+    return `https://play.google.com/store/apps/details?id=run.xrun.xrunapp`;
   }
   return '';
 };
@@ -101,5 +164,32 @@ export const openStore = async (): Promise<void> => {
     }
   } catch (error) {
     console.error('[VersionCheck] 스토어로 이동 실패:', error);
+  }
+};
+
+export const isServerVersionUpdateRequired = async (): Promise<boolean> => {
+  try {
+    const serverResponse = await checkServerVersion();
+    if (!serverResponse || !serverResponse.data) {
+      console.log('[VersionCheck] 서버 응답이 없어 버전 확인을 건너뜁니다.');
+      return false;
+    }
+
+    const currentVersion = getCurrentAppVersionNumber();
+    const serverVersion = Platform.OS === 'android' 
+      ? serverResponse.data.version 
+      : serverResponse.data.version_ios;
+
+    console.log('[VersionCheck] 버전 비교:', {
+      platform: Platform.OS,
+      currentVersion,
+      serverVersion,
+      needsUpdate: currentVersion < serverVersion,
+    });
+
+    return currentVersion < serverVersion;
+  } catch (error) {
+    console.error('[VersionCheck] 서버 버전 비교 실패:', error);
+    return false;
   }
 };

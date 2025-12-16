@@ -15,12 +15,14 @@ interface VersionUpdateDialogProps {
   visible: boolean;
   onClose?: () => void;
   latestVersion?: string;
+  showLaterButton?: boolean; 
 }
 
 export const VersionUpdateDialog: React.FC<VersionUpdateDialogProps> = ({
   visible,
   onClose,
   latestVersion,
+  showLaterButton = true, 
 }) => {
   const { t } = useTranslation();
 
@@ -40,7 +42,7 @@ export const VersionUpdateDialog: React.FC<VersionUpdateDialogProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={handleLater}
+      onRequestClose={showLaterButton ? handleLater : undefined}
     >
       <View style={styles.overlay}>
         <View style={styles.container}>
@@ -65,17 +67,19 @@ export const VersionUpdateDialog: React.FC<VersionUpdateDialogProps> = ({
           </View>
 
           <View style={styles.actions}>
+            {showLaterButton && (
+              <TouchableOpacity
+                style={[styles.button, styles.secondaryButton]}
+                onPress={handleLater}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+                  {t('common.versionUpdate.later')}
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              style={[styles.button, styles.secondaryButton]}
-              onPress={handleLater}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-                {t('common.versionUpdate.later')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.primaryButton]}
+              style={[styles.button, styles.primaryButton, !showLaterButton && styles.fullWidthButton]}
               onPress={handleUpdate}
               activeOpacity={0.7}
             >
@@ -145,6 +149,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  fullWidthButton: {
+    flex: 1,
   },
   primaryButton: {
     backgroundColor: COLORS.buttonPrimary,

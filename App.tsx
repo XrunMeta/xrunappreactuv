@@ -81,7 +81,7 @@ import * as Location from 'expo-location';
 import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
-import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable } from './src/services/versionCheck';
+import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
 
 let processedDeepLinkUrl: string | null = null;
 let isDeepLinkProcessing = false;
@@ -623,11 +623,23 @@ const GlobalDialogs = () => {
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
   const [versionUpdateVisible, setVersionUpdateVisible] = useState(false);
   const [latestVersion, setLatestVersion] = useState<string | undefined>(undefined);
+  const [isServerUpdateRequired, setIsServerUpdateRequired] = useState(false); 
 
   useEffect(() => {
     const checkVersion = async () => {
       try {
         console.log('[App] 버전 확인 시작');
+
+        const needsServerUpdate = await isServerVersionUpdateRequired();
+        if (needsServerUpdate) {
+          console.log('[App] 서버에서 업데이트 필요 확인');
+          const currentVersion = getCurrentAppVersion();
+          setLatestVersion(currentVersion);
+          setIsServerUpdateRequired(true); 
+          setVersionUpdateVisible(true);
+          return;
+        }
+
         const currentVersion = getCurrentAppVersion();
         const latest = await checkLatestVersion();
 
@@ -639,6 +651,7 @@ const GlobalDialogs = () => {
         if (latest && isNewVersionAvailable(currentVersion, latest)) {
           console.log('[App] 새 버전 발견:', latest);
           setLatestVersion(latest);
+          setIsServerUpdateRequired(false); 
           setVersionUpdateVisible(true);
         } else {
           console.log('[App] 최신 버전입니다.');
@@ -668,6 +681,7 @@ const GlobalDialogs = () => {
 
             if (!versionUpdateVisible) {
               setLatestVersion(latest);
+              setIsServerUpdateRequired(false); 
               setVersionUpdateVisible(true);
             }
           }
@@ -696,6 +710,7 @@ const GlobalDialogs = () => {
       <VersionUpdateDialog
         visible={versionUpdateVisible}
         latestVersion={latestVersion}
+        showLaterButton={!isServerUpdateRequired} 
         onClose={() => setVersionUpdateVisible(false)}
       />
     </>
