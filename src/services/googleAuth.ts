@@ -123,18 +123,25 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
     const v_8a32c8 = `${v_e9a15d}/oth-path`;
 
     console.log('[구글 로그인] 백엔드 API URL:', v_8a32c8);
+    console.log('[구글 로그인] Authorization 헤더 전송:', {
+      hasToken: !!v_b50834,
+      tokenLength: v_b50834.length,
+      headerFormat: 'Bearer <token>',
+    });
 
     const v_4fc7c7 = new AbortController();
     const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), v_8a74cb);
 
     try {
+
       const v_3393e3 = await fetch(v_8a32c8, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_b50834}`, 
         },
         body: JSON.stringify({
-          idToken: v_b50834,
+          idToken: v_b50834, 
         }),
         signal: v_4fc7c7.signal,
       });
