@@ -75,6 +75,8 @@ export interface KeepAliveServerResponse {
   code: number;
   message: string;
   data: {
+    version: number;
+    version_ios: number;
     server_status: string;
     timestamp: string;
     emergency_info: EmergencyInfo | null;

@@ -44,12 +44,14 @@ export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
 
 export const v_650134 = (): number => {
   try {
+    console.log('[VersionCheck] 현재 앱 버전 숫자 가져오기:', v_326be8.OS);
     if (v_326be8.OS === 'android') {
 
       const v_782d4f = v_222528.nativeBuildVersion;
       if (v_782d4f) {
         return parseInt(v_782d4f, 10);
       }
+      console.log('[VersionCheck] Android 버전 숫자 가져오기:', v_782d4f);
 
       return v_c9be60.expoConfig?.android?.versionCode || 0;
     } else if (v_326be8.OS === 'ios') {
