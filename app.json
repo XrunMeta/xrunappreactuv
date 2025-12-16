@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "config": {
         "googleMapsApiKey": "oth-google-api-key"
       },
@@ -40,7 +40,7 @@
     "android": {
       "package": "run.xrun.xrunapp",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 177,
+      "versionCode": 202,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
