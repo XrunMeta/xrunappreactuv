@@ -2557,14 +2557,19 @@ export const v_c07360 = async (
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
 
-    const v_3393e3 = await fetch(v_f71b56, {
+    const v_a611c4 = {
       method: v_bfe9b9,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
       },
-      body: JSON.stringify(v_cd6a57),
-    });
+    };
+
+    if (v_bfe9b9.toUpperCase() !== 'GET') {
+      v_a611c4.body = JSON.stringify(v_cd6a57);
+    }
+
+    const v_3393e3 = await fetch(v_f71b56, v_a611c4);
 
     if (!v_3393e3.ok) {
       throw new Error(`HTTP error! status: ${v_3393e3.status}`);

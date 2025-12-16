@@ -81,7 +81,7 @@ import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
-import { v_f16a74, v_deac27, v_790b4f } from './src/services/versionCheck';
+import { v_f16a74, v_deac27, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 
 let v_308260 = null;
 let v_435733 = false;
@@ -623,11 +623,23 @@ const v_d0a391 = () => {
   const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
   const [v_614e3c, v_80c653] = v_5ab095(false);
   const [v_14feb2, v_b5ebec] = v_5ab095<string | undefined>(undefined);
+  const [v_2fa3d1, v_d97db8] = v_5ab095(false); 
 
   v_c4deb2(() => {
     const v_bc755f = async () => {
       try {
         console.log('[App] 버전 확인 시작');
+
+        const v_090f7c = await v_5ee4ec();
+        if (v_090f7c) {
+          console.log('[App] 서버에서 업데이트 필요 확인');
+          const v_4587b3 = v_deac27();
+          v_b5ebec(v_4587b3);
+          v_d97db8(true); 
+          v_80c653(true);
+          return;
+        }
+
         const v_4587b3 = v_deac27();
         const v_1300ee = await v_f16a74();
 
@@ -639,6 +651,7 @@ const v_d0a391 = () => {
         if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
           console.log('[App] 새 버전 발견:', v_1300ee);
           v_b5ebec(v_1300ee);
+          v_d97db8(false); 
           v_80c653(true);
         } else {
           console.log('[App] 최신 버전입니다.');
@@ -668,6 +681,7 @@ const v_d0a391 = () => {
 
             if (!v_614e3c) {
               v_b5ebec(v_1300ee);
+              v_d97db8(false); 
               v_80c653(true);
             }
           }
@@ -696,6 +710,7 @@ const v_d0a391 = () => {
       <VersionUpdateDialog
         visible={v_614e3c}
         latestVersion={v_14feb2}
+        showLaterButton={!v_2fa3d1} 
         onClose={() => v_80c653(false)}
       />
     </>
