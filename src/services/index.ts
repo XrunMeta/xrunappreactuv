@@ -2557,14 +2557,19 @@ export const gatewayNodeJS = async (
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
 
-    const response = await fetch(url, {
+    const fetchOptions: RequestInit = {
       method: method,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
       },
-      body: JSON.stringify(requestBody),
-    });
+    };
+
+    if (method.toUpperCase() !== 'GET') {
+      fetchOptions.body = JSON.stringify(requestBody);
+    }
+
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
