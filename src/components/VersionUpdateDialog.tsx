@@ -15,12 +15,14 @@ interface VersionUpdateDialogProps {
   visible: boolean;
   onClose?: () => void;
   latestVersion?: string;
+  showLaterButton?: boolean; 
 }
 
 export const VersionUpdateDialog: v_a3453e.FC<VersionUpdateDialogProps> = ({
   visible: v_cf55be,
   onClose: v_0890f8,
   latestVersion: v_14feb2,
+  showLaterButton: v_ff746b = true, 
 }) => {
   const { t: v_8d41d7 } = v_772971();
 
@@ -40,7 +42,7 @@ export const VersionUpdateDialog: v_a3453e.FC<VersionUpdateDialogProps> = ({
       visible={v_cf55be}
       transparent
       animationType="fade"
-      onRequestClose={v_fbeebe}
+      onRequestClose={v_ff746b ? v_fbeebe : undefined}
     >
       <View style={v_d81136.overlay}>
         <View style={v_d81136.container}>
@@ -65,17 +67,19 @@ export const VersionUpdateDialog: v_a3453e.FC<VersionUpdateDialogProps> = ({
           </View>
 
           <View style={v_d81136.actions}>
+            {v_ff746b && (
+              <TouchableOpacity
+                style={[v_d81136.button, v_d81136.secondaryButton]}
+                onPress={v_fbeebe}
+                activeOpacity={0.7}
+              >
+                <Text style={[v_d81136.buttonText, v_d81136.secondaryButtonText]}>
+                  {v_8d41d7('common.versionUpdate.later')}
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              style={[v_d81136.button, v_d81136.secondaryButton]}
-              onPress={v_fbeebe}
-              activeOpacity={0.7}
-            >
-              <Text style={[v_d81136.buttonText, v_d81136.secondaryButtonText]}>
-                {v_8d41d7('common.versionUpdate.later')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[v_d81136.button, v_d81136.primaryButton]}
+              style={[v_d81136.button, v_d81136.primaryButton, !v_ff746b && v_d81136.fullWidthButton]}
               onPress={v_02f61c}
               activeOpacity={0.7}
             >
@@ -145,6 +149,9 @@ const v_d81136 = v_472849.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  fullWidthButton: {
+    flex: 1,
   },
   primaryButton: {
     backgroundColor: v_1bfbd0.buttonPrimary,

@@ -2,10 +2,73 @@ import { v_326be8 } from 'rcmrninabrnb';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_f2c756 from 'rddjsfilumpz';
 import v_c9be60 from 'qfrscldecidiqs';
+import { v_c07360 } from './index';
 
 const v_d929eb = 'run.xrun.xrunapps';
 
 const v_a36c92 = 'run.xrun.xrunapp';
+
+interface ServerCheckResponse {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    id: number;
+    iosOnWallet: boolean;
+    created_at: string;
+    updated_at: string;
+    isTransferAble: number;
+    server_status: string;
+    version: number; 
+    version_ios: number; 
+  };
+}
+
+export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
+  try {
+    console.log('[VersionCheck] 서버 버전 확인 시작');
+    const v_3393e3 = await v_c07360('servercheck', 'GET', {});
+
+    if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data) {
+      console.log('[VersionCheck] 서버 버전 확인 성공:', v_3393e3.data);
+      return v_3393e3 as ServerCheckResponse;
+    }
+
+    console.log('[VersionCheck] 서버 버전 확인 실패: 응답 형식 오류');
+    return null;
+  } catch (v_5e9bfe) {
+    console.error('[VersionCheck] 서버 버전 확인 실패:', v_5e9bfe);
+    return null;
+  }
+};
+
+export const v_650134 = (): number => {
+  try {
+    if (v_326be8.OS === 'android') {
+
+      const v_782d4f = v_222528.nativeBuildVersion;
+      if (v_782d4f) {
+        return parseInt(v_782d4f, 10);
+      }
+
+      return v_c9be60.expoConfig?.android?.versionCode || 0;
+    } else if (v_326be8.OS === 'ios') {
+
+      const v_0e1851 = v_222528.nativeApplicationVersion || v_c9be60.expoConfig?.version || '0.0.0';
+      const v_468545 = v_0e1851.split('.');
+
+      const v_9602a8 = parseInt(v_468545[0] || '0', 10);
+      const v_2e9d16 = parseInt(v_468545[1] || '0', 10);
+      const v_17dc8a = parseInt(v_468545[2] || '0', 10);
+      console.log('[VersionCheck] iOS 버전 숫자 가져오기:', v_9602a8 * 100 + v_2e9d16 * 10 + v_17dc8a);
+      return v_9602a8 * 100 + v_2e9d16 * 10 + v_17dc8a;
+    }
+    return 0;
+  } catch (v_5e9bfe) {
+    console.error('[VersionCheck] 현재 앱 버전 숫자 가져오기 실패:', v_5e9bfe);
+    return 0;
+  }
+};
 
 const v_b010c2 = async (): Promise<string | null> => {
   try {
@@ -81,9 +144,9 @@ export const v_790b4f = (v_4587b3, v_14feb2): boolean => {
 export const v_e8b9c4 = (): string => {
   if (v_326be8.OS === 'ios') {
 
-    return `https://apps.apple.com/app/bundle-id/${v_d929eb}`;
+    return `https://apps.apple.com/id/app/xrun-go/id6502924173`;
   } else if (v_326be8.OS === 'android') {
-    return `https://play.google.com/store/apps/details?id=${v_a36c92}`;
+    return `https://play.google.com/store/apps/details?id=run.xrun.xrunapp`;
   }
   return '';
 };
@@ -101,5 +164,32 @@ export const v_4503ee = async (): Promise<void> => {
     }
   } catch (v_5e9bfe) {
     console.error('[VersionCheck] 스토어로 이동 실패:', v_5e9bfe);
+  }
+};
+
+export const v_5ee4ec = async (): Promise<boolean> => {
+  try {
+    const v_2c2f8d = await v_de7bac();
+    if (!v_2c2f8d || !v_2c2f8d.data) {
+      console.log('[VersionCheck] 서버 응답이 없어 버전 확인을 건너뜁니다.');
+      return false;
+    }
+
+    const v_4587b3 = v_650134();
+    const v_de6359 = v_326be8.OS === 'android' 
+      ? v_2c2f8d.data.version 
+      : v_2c2f8d.data.version_ios;
+
+    console.log('[VersionCheck] 버전 비교:', {
+      platform: v_326be8.OS,
+      currentVersion: v_4587b3,
+      serverVersion: v_de6359,
+      needsUpdate: v_4587b3 < v_de6359,
+    });
+
+    return v_4587b3 < v_de6359;
+  } catch (v_5e9bfe) {
+    console.error('[VersionCheck] 서버 버전 비교 실패:', v_5e9bfe);
+    return false;
   }
 };
