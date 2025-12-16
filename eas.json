@@ -13,7 +13,10 @@
     },
     "production": {
       "autoIncrement": true,
-      "credentialsSource": "local"
+      "android": {
+        "credentialsSource": "local"
+      },
+      
     }
   },
   "submit": {
