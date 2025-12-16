@@ -54,3 +54,5 @@ yarn-error.*
 # PR messages
 PR_MESSAGE_*.md
 PR_MESSAGE.md
+debug.log
+*.log
