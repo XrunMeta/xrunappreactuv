@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -59,6 +58,13 @@ export const WalletQrScanScreen = () => {
       requestPermission();
     }
   }, [permission, requestPermission]);
+
+  useEffect(() => {
+    return () => {
+
+      setStatusBarStyle('dark');
+    };
+  }, []);
 
   const handleBarCodeScanned = useCallback(
     ({ data }: BarcodeScanningResult) => {
@@ -176,15 +182,15 @@ export const WalletQrScanScreen = () => {
 const styles = StyleSheet.create({
   container: {
     ...COMMON_STYLES.container,
+    marginTop: 0,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-start',
-    paddingTop: 60,
   },
   topBarContainer: {
     flexDirection: 'column',
-    gap: SIZES.medium,
+
   },
   topBar: {
     flexDirection: 'row',
@@ -200,13 +206,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2,
+    marginTop: 50,
+    marginBottom: 20,
   },
   rectangleWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -150,
     flex: 1,
-    borderWidth: 5,
   },
   title: {
     fontSize: FONTS.size.xlarge,
@@ -224,6 +230,7 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
     backgroundColor: 'rgba(0,0,0,0.25)',
     overflow: 'hidden',
+    marginTop: -150,
   },
   frameInner: {
     flex: 1,
