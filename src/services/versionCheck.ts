@@ -44,12 +44,14 @@ export const checkServerVersion = async (): Promise<ServerCheckResponse | null> 
 
 export const getCurrentAppVersionNumber = (): number => {
   try {
+    console.log('[VersionCheck] 현재 앱 버전 숫자 가져오기:', Platform.OS);
     if (Platform.OS === 'android') {
 
       const buildVersion = Application.nativeBuildVersion;
       if (buildVersion) {
         return parseInt(buildVersion, 10);
       }
+      console.log('[VersionCheck] Android 버전 숫자 가져오기:', buildVersion);
 
       return Constants.expoConfig?.android?.versionCode || 0;
     } else if (Platform.OS === 'ios') {
