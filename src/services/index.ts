@@ -154,6 +154,7 @@ import {
   v_3ac6ea,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
+import { v_f16a74, v_deac27, v_650134 } from './versionCheck';
 
 const v_8a74cb = 20000;
 
@@ -275,6 +276,7 @@ export const v_495832 = async (
       const result: v_96ef47 = {
         success: true,
       };
+      console.log('[KeepAlive] [App] 서버 응답:', v_2c2f8d);
 
       if (v_2c2f8d.data.server_status === 'health') {
 
@@ -294,6 +296,32 @@ export const v_495832 = async (
           enabled: false,
         };
       }
+
+      const v_1300ee = v_650134();  
+        console.log('[App] 현재 버전:', v_1300ee);
+        if (v_326be8.OS === 'android') {
+          if (v_1300ee && Number(v_2c2f8d.data.version) > Number(v_1300ee)) {
+            console.log('[App] 새 버전 발견:', v_1300ee); 
+            v_43c42e.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            };
+          } else {
+            console.log('[App android] 최신 버전입니다.', v_1300ee, v_2c2f8d.data.version);
+          }
+        } else if ( v_326be8.OS === 'ios') { 
+          if (v_1300ee && Number(v_2c2f8d.data.version_ios) > Number(v_1300ee)) {
+            console.log('[App] 새 버전 발견:', v_1300ee);
+            v_43c42e.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+            };
+          } else {
+            console.log('[App ios] 최신 버전입니다.');
+          }
+        }
 
       return v_43c42e;
     } else {
