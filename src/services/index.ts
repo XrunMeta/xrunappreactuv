@@ -154,6 +154,7 @@ import {
   AgreementType,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
+import { checkLatestVersion, getCurrentAppVersion, getCurrentAppVersionNumber } from './versionCheck';
 
 const API_TIMEOUT = 20000;
 
@@ -275,6 +276,7 @@ export const sendAliveSignal = async (
       const result: AliveResponse = {
         success: true,
       };
+      console.log('[KeepAlive] [App] 서버 응답:', serverResponse);
 
       if (serverResponse.data.server_status === 'health') {
 
@@ -294,6 +296,32 @@ export const sendAliveSignal = async (
           enabled: false,
         };
       }
+
+      const latest = getCurrentAppVersionNumber();  
+        console.log('[App] 현재 버전:', latest);
+        if (Platform.OS === 'android') {
+          if (latest && Number(serverResponse.data.version) > Number(latest)) {
+            console.log('[App] 새 버전 발견:', latest); 
+            result.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            };
+          } else {
+            console.log('[App android] 최신 버전입니다.', latest, serverResponse.data.version);
+          }
+        } else if ( Platform.OS === 'ios') { 
+          if (latest && Number(serverResponse.data.version_ios) > Number(latest)) {
+            console.log('[App] 새 버전 발견:', latest);
+            result.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+            };
+          } else {
+            console.log('[App ios] 최신 버전입니다.');
+          }
+        }
 
       return result;
     } else {
