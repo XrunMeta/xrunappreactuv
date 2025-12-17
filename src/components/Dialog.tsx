@@ -126,6 +126,9 @@ const v_d81136 = v_472849.create({
     textAlign: 'center',
   },
   close: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
     width: 32,
     height: 32,
     alignItems: 'center',
