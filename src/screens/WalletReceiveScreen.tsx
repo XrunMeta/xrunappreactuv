@@ -135,6 +135,7 @@ export const WalletReceiveScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor={"#f7f7fb"}>
+      <StatusBar style="dark" />
       <Header
         title={t('screens.walletReceive.title')}
         onBackPress={goBack}

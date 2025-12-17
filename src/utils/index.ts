@@ -20,9 +20,7 @@ export const copyToClipboard = async (
   try {
     await Clipboard.setStringAsync(value);
 
-    if (Platform.OS === 'ios') {
-      showToast(successMessage);
-    }
+    showToast(successMessage);
   } catch (error) {
 
     showToast('주소를 복사하지 못했습니다. 다시 시도해주세요.');

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
+import { StatusBar, setStatusBarStyle, setStatusBarTranslucent } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -63,6 +63,7 @@ export const WalletQrScanScreen = () => {
     return () => {
 
       setStatusBarStyle('dark');
+      setStatusBarTranslucent(false);
     };
   }, []);
 
