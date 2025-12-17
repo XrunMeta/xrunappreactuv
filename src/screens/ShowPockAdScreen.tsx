@@ -496,6 +496,9 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
         await openLandingUrl(pockAdData.landing_url);
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+
+      await AsyncStorage.setItem('isAdCompleted', 'true');
+      console.log('[광고보기] isAdCompleted 저장 완료');
         resetAdvertisementParams();
         handleClose();
       } else {
