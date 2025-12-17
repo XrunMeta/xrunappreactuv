@@ -126,6 +126,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   close: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
     width: 32,
     height: 32,
     alignItems: 'center',
