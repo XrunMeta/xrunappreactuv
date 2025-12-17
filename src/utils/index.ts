@@ -20,9 +20,7 @@ export const v_db97fb = async (
   try {
     await v_fba5a0.setStringAsync(v_3b402b);
 
-    if (v_326be8.OS === 'ios') {
-      v_cba33f(v_e5db92);
-    }
+    v_cba33f(v_e5db92);
   } catch (v_5e9bfe) {
 
     v_cba33f('주소를 복사하지 못했습니다. 다시 시도해주세요.');
