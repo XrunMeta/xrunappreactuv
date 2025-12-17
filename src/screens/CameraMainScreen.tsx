@@ -27,6 +27,7 @@ import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
+import { showToast } from '../utils';
 
 const { width, height } = Dimensions.get('window');
 

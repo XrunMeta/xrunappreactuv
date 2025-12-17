@@ -566,9 +566,12 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         await openUrlAD(campaignData.urlAD);
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+
+      await AsyncStorage.setItem('isAdCompleted', 'true');
+      console.log('[광고보기] isAdCompleted 저장 완료');
         resetAdvertisementParams();
         handleClose();
-      }
+      } 
     } catch (error) {
       console.error('[광고보기] 광고 API 호출 실패:', error);
 

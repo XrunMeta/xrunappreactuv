@@ -64,6 +64,7 @@ import { AppProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
 import { loadEnv } from './src/utils/env';
+import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
@@ -260,6 +261,26 @@ const ScreenHost = () => {
 
     return () => clearTimeout(timer);
   }, [setSignupFormData, navigate]);
+
+  useEffect(() => {
+    console.log('[App] 화면 변경 시 및 앱 포커스 시 광고 완료 상태 확인');
+
+    const checkIsAdCompleted = async () => {
+      try {
+        const isAdCompleted = await AsyncStorage.getItem('isAdCompleted');
+        if (isAdCompleted === 'true') {
+          console.log('[App] 광고 보기 완료');
+          showToast('광고보기를 완료했습니다');
+          await AsyncStorage.removeItem('isAdCompleted');
+          console.log('[App] isAdCompleted 제거 완료');
+        }
+      } catch (error) {
+        console.error('[App] 광고 완료 상태 확인 실패:', error);
+      }
+    };
+
+    checkIsAdCompleted();
+  }, [currentScreen]);
 
   if (currentScreen === 'login') {
     return <LoginScreen />;
@@ -757,6 +778,18 @@ export default function App() {
 
         console.log('[App] 포그라운드 복귀 감지');
         await AsyncStorage.setItem('app_last_state', nextAppState);
+
+        try {
+          const isAdCompleted = await AsyncStorage.getItem('isAdCompleted');
+          if (isAdCompleted === 'true') {
+            console.log('[App] 광고 보기 완료');
+            showToast('광고보기를 완료했습니다');
+            await AsyncStorage.removeItem('isAdCompleted');
+            console.log('[App] isAdCompleted 제거 완료');
+          }
+        } catch (error) {
+          console.error('[App] 광고 완료 상태 확인 실패:', error);
+        }
       } 
 
       else if (
