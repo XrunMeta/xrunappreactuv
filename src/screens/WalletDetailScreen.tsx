@@ -15,7 +15,7 @@ import {
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { copyToClipboard } from '../utils';
+import { copyToClipboard, showToast } from '../utils';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan.png');
@@ -442,25 +442,36 @@ export const WalletDetailScreen = () => {
           return timestampB - timestampA;
         });
 
-        const hasMore = items.length >= params.pageSize;
+        const now = new Date();
+        const daysAgo = getDaysBefore(selectedRange);
+        const cutoffTimestamp = Math.floor((now.getTime() - daysAgo * 24 * 60 * 60 * 1000) / 1000); 
+        const dateFilteredItems = items.filter((item) => {
+          if (item.timeStamp) {
+            const itemTimestamp = parseInt(item.timeStamp, 10);
+            return itemTimestamp >= cutoffTimestamp;
+          }
+          return true; 
+        });
+
+        const hasMore = dateFilteredItems.length >= params.pageSize;
 
         if (params.page === 1) {
-          setCachedTransactionData(items);
+          setCachedTransactionData(dateFilteredItems);
           setCacheKey(currentCacheKey);
           console.log('[WalletDetail] 데이터 캐시에 저장:', {
             cacheKey: currentCacheKey,
-            dataLength: items.length,
+            dataLength: dateFilteredItems.length,
           });
         }
 
         const startIndex = (params.page - 1) * params.pageSize;
         const endIndex = startIndex + params.pageSize;
-        const paginatedData = items.slice(startIndex, endIndex);
-        const paginatedHasMore = endIndex < items.length;
+        const paginatedData = dateFilteredItems.slice(startIndex, endIndex);
+        const paginatedHasMore = endIndex < dateFilteredItems.length;
 
         return {
           data: paginatedData,
-          total: items.length,
+          total: dateFilteredItems.length,
           hasMore: paginatedHasMore,
         };
       } catch (error) {
@@ -468,19 +479,23 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, publicAddress, selectedType, selectedRange, t, cachedTransactionData, cacheKey]);
+  }, [member, selectedWalletAsset, publicAddress, selectedType, selectedRange, t, cachedTransactionData, cacheKey, getDaysBefore]);
 
   const createSendFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
       const baseFetch = createFetchFunction();
       const result = await baseFetch(params);
 
+      console.log('[WalletDetailScreen] result', params);
+
       const filteredData = result.data.filter((item) => item.action === 3305);
+
+      const shouldLoadMore = filteredData.length < params.pageSize && result.hasMore;
 
       return {
         data: filteredData,
         total: filteredData.length,
-        hasMore: result.hasMore,
+        hasMore: shouldLoadMore || result.hasMore,
       };
     };
   }, [createFetchFunction]);
@@ -492,15 +507,18 @@ export const WalletDetailScreen = () => {
 
       const filteredData = result.data.filter((item) => item.action === 3304);
 
+      const shouldLoadMore = filteredData.length < params.pageSize && result.hasMore;
+
       return {
         data: filteredData,
         total: filteredData.length,
-        hasMore: result.hasMore,
+        hasMore: shouldLoadMore || result.hasMore,
       };
     };
   }, [createFetchFunction]);
 
   const getFetchData = useCallback(() => {
+    console.log('[WalletDetailScreen] selectedType', selectedType);
     switch (selectedType) {
       case 'all':
         return createFetchFunction();
@@ -563,6 +581,7 @@ export const WalletDetailScreen = () => {
   const handleCopyAddress = useCallback(() => {
     if (publicAddress) {
       copyToClipboard(publicAddress, showAlert);
+      showToast('광고보기를 완료했습니다');
     }
   }, [publicAddress, showAlert]);
 
