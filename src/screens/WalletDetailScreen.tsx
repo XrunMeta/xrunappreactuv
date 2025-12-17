@@ -227,16 +227,7 @@ export const WalletDetailScreen = () => {
   const { showAlert } = useAlertDialog();
 
   useEffect(() => {
-    console.log('[WalletDetailScreen] 컨텍스트 내용:', {
-      selectedWalletAsset: selectedWalletAsset ? {
-        currency: selectedWalletAsset.currency,
-        symbol: selectedWalletAsset.symbol,
-        name: selectedWalletAsset.name,
-        amount: selectedWalletAsset.amount,
-        icon: selectedWalletAsset.icon,
-        originalData: selectedWalletAsset.originalData,
-      } : null,
-    });
+
   }, [selectedWalletAsset]);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -576,8 +567,10 @@ export const WalletDetailScreen = () => {
   }, [publicAddress, showAlert]);
 
   const formattedBalance = useMemo(() => {
-    if (!selectedWalletAsset) return '0';
-    const amount = new BigNumber(selectedWalletAsset.amount || '0').toFixed();
+
+    if (!selectedWalletAsset?.amount) return '0';
+    const amount = selectedWalletAsset?.amount;
+    console.log('[WalletDetailScreen] amount', amount);
     return `${amount} ${selectedWalletAsset.symbol || ''}`;
   }, [selectedWalletAsset]);
 
