@@ -36,13 +36,11 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
         </View>
-      </SafeScrollView>
-      {IS_DEV_MODE && (
+      </SafeScrollView> 
         <LanguageSelector
           visible={languageSelectorVisible}
           onClose={() => setLanguageSelectorVisible(false)}
-        />
-      )}
+        /> 
     </View>
   );
 };

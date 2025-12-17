@@ -4610,11 +4610,6 @@ const TOP_AD5_STORAGE_KEY = 'topAd5Data';
 
 export const getTopAd5 = async (navigation?: any): Promise<any> => {
 
-  if (__DEV__) {
-    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
-    return [];
-  }
-
   try {
     const os = Platform.OS === 'ios' ? 'ios' : 'android';
 
