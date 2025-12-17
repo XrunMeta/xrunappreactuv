@@ -3400,7 +3400,7 @@ export const getUsersBalanceUpdateV2 = async (
     console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 요청:', { member });
 
     const response = await axiosInstance.post<any>(
-      '/oth-path',
+      '/getUsersBalanceUpdateV2',
       request,
     );
 
@@ -4278,7 +4278,6 @@ export const fetchEtherscanTransactions = async (
     );
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
-    console.log('[트랜잭션] 응답 데이터:', JSON.stringify(response.data, null, 2));
 
     return response.data;
   } catch (error) {

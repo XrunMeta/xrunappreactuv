@@ -228,7 +228,7 @@ const ScreenHost = () => {
       try {
 
         const clipboardContent = await Clipboard.getStringAsync();
-        console.log('[iOS Clipboard] 클립보드 내용:', clipboardContent);
+        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', clipboardContent);
 
         if (clipboardContent && clipboardContent.startsWith('XRUN_REFERRAL:')) {
           const referralEmail = clipboardContent.replace('XRUN_REFERRAL:', '').trim();

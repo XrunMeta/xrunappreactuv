@@ -133,7 +133,7 @@ export const shareReferralLink = async (
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
 
-    const message = `${shareText}${userDetails.email}\n\n${deepLinkUrl}\n\n${downloadLabel}\nAndroid: ${androidLink}\niOS: ${iosLink}`;
+    const message = `${shareText}${userDetails.email}\n\n${deepLinkUrl}`;
 
     const result = await Share.share({
       message,

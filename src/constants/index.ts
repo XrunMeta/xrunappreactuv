@@ -82,7 +82,7 @@ export const LANG = {
   },
   wallet: {
     adxrun: {
-      settlementIn45Days: '45일후 정산완료됨',
+      settlementIn45Days: '75일후 정산완료됨',
     },
   },
   screen_info: {
