@@ -176,6 +176,10 @@ export const isServerVersionUpdateRequired = async (): Promise<boolean> => {
       console.log('[VersionCheck] 서버 응답이 없어 버전 확인을 건너뜁니다.');
       return false;
     }
+    if (__DEV__) {
+      console.log('[VersionCheck] 개발 모드이므로 버전 확인을 건너뜁니다.');
+      return false;
+    }
 
     const currentVersion = getCurrentAppVersionNumber();
     const serverVersion = Platform.OS === 'android' 
