@@ -581,7 +581,6 @@ export const WalletDetailScreen = () => {
   const handleCopyAddress = useCallback(() => {
     if (publicAddress) {
       copyToClipboard(publicAddress, showAlert);
-      showToast('광고보기를 완료했습니다');
     }
   }, [publicAddress, showAlert]);
 
