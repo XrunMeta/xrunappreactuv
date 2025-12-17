@@ -627,6 +627,11 @@ const GlobalDialogs = () => {
 
   useEffect(() => {
     const checkVersion = async () => {
+
+      if (__DEV__) {
+        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
+        return;
+      }
       try {
         console.log('[App] 버전 확인 시작');
 

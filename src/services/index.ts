@@ -297,7 +297,10 @@ export const sendAliveSignal = async (
         };
       }
 
-      const latest = getCurrentAppVersionNumber();  
+      if (__DEV__) {
+        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. index.ts sendAliveSignal'); 
+      }else{
+        const latest = getCurrentAppVersionNumber();  
         console.log('[App] 현재 버전:', latest);
         if (Platform.OS === 'android') {
           if (latest && Number(serverResponse.data.version) > Number(latest)) {
@@ -322,6 +325,7 @@ export const sendAliveSignal = async (
             console.log('[App ios] 최신 버전입니다.');
           }
         }
+      }
 
       return result;
     } else {
@@ -4605,6 +4609,12 @@ export const getAllAgreements = async (
 const TOP_AD5_STORAGE_KEY = 'topAd5Data';
 
 export const getTopAd5 = async (navigation?: any): Promise<any> => {
+
+  if (__DEV__) {
+    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
+    return [];
+  }
+
   try {
     const os = Platform.OS === 'ios' ? 'ios' : 'android';
 
