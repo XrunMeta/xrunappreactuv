@@ -64,6 +64,7 @@ import { v_4b64f4, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_2806ef, v_6e8088 } from './src/components';
 import { v_a2474a } from './src/utils/env';
+import { v_cba33f } from './src/utils';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
@@ -260,6 +261,26 @@ const v_c0dbdf = () => {
 
     return () => clearTimeout(v_cb36b1);
   }, [v_eee6b0, v_9b57fc]);
+
+  v_c4deb2(() => {
+    console.log('[App] 화면 변경 시 및 앱 포커스 시 광고 완료 상태 확인');
+
+    const v_5688f9 = async () => {
+      try {
+        const v_9ef7b6 = await v_e84827.getItem('isAdCompleted');
+        if (v_9ef7b6 === 'true') {
+          console.log('[App] 광고 보기 완료');
+          v_cba33f('광고보기를 완료했습니다');
+          await v_e84827.removeItem('isAdCompleted');
+          console.log('[App] isAdCompleted 제거 완료');
+        }
+      } catch (v_5e9bfe) {
+        console.error('[App] 광고 완료 상태 확인 실패:', v_5e9bfe);
+      }
+    };
+
+    v_5688f9();
+  }, [v_0f0c7b]);
 
   if (v_0f0c7b === 'login') {
     return <LoginScreen />;
@@ -757,6 +778,18 @@ export default function v_6540c3() {
 
         console.log('[App] 포그라운드 복귀 감지');
         await v_e84827.setItem('app_last_state', v_3b10d8);
+
+        try {
+          const v_9ef7b6 = await v_e84827.getItem('isAdCompleted');
+          if (v_9ef7b6 === 'true') {
+            console.log('[App] 광고 보기 완료');
+            v_cba33f('광고보기를 완료했습니다');
+            await v_e84827.removeItem('isAdCompleted');
+            console.log('[App] isAdCompleted 제거 완료');
+          }
+        } catch (v_5e9bfe) {
+          console.error('[App] 광고 완료 상태 확인 실패:', v_5e9bfe);
+        }
       } 
 
       else if (

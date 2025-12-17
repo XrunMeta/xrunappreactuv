@@ -566,9 +566,12 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         await v_2e98c9(v_3aedd0.urlAD);
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+
+      await v_e84827.setItem('isAdCompleted', 'true');
+      console.log('[광고보기] isAdCompleted 저장 완료');
         v_e10ff9();
         v_7f2e65();
-      }
+      } 
     } catch (v_5e9bfe) {
       console.error('[광고보기] 광고 API 호출 실패:', v_5e9bfe);
 

@@ -3297,8 +3297,8 @@ const v_d81136 = v_472849.create({
   },
 
   markerImage: {
-    width: 40,
-    height: 40,
+    width: 20,
+    height: 20,
   },
 
   defaultMarker: {
