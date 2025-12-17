@@ -36,13 +36,11 @@ export const v_4a40b2 = () => {
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
         </View>
-      </SafeScrollView>
-      {v_731ab4 && (
+      </SafeScrollView> 
         <LanguageSelector
           visible={v_7b4f11}
           onClose={() => v_7f8510(false)}
-        />
-      )}
+        /> 
     </View>
   );
 };

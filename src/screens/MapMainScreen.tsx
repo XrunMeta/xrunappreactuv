@@ -1373,6 +1373,14 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return;
         }
 
+        console.log('[MapMainScreen] 마커 데이터:', v_b9ce93.length, '개');
+        console.log('[MapMainScreen] 광고 데이터:', v_e36b07.length, '개');
+        for (const v_ddcfed of v_e36b07) {
+          console.log('[MapMainScreen] 광고 데이터:',v_ddcfed.name  );
+        }
+
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
+
         const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
           if (v_e36b07.length > 0) {
@@ -1400,8 +1408,10 @@ export const MapMainScreen: v_a3453e.FC = () => {
           return v_5e3dbb;
         });
 
+        console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
         await v_e84827.setItem('astorCoinsData', JSON.stringify(v_8ceeaa));
 
+        console.log('[MapMainScreen] 6단계: 화면에 마커 표시 시작');
         const spotDataArray: v_f71847[] = v_8ceeaa.map((v_51b584) => ({
           spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
           distance: v_51b584.distance || 0,
@@ -2013,7 +2023,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
     }
 
     if (v_4cf0ad.length === 0) {
-      console.log('[MapMainScreen] TopAd5 광고 없음, 기존 마커 데이터 사용');
+      console.log('[MapMainScreen] TopAd5 광고 없음, getTopAd5 재호출 시도');
       return new Map<string, TopAd5Item | null>();
     }
 
@@ -2065,6 +2075,38 @@ export const MapMainScreen: v_a3453e.FC = () => {
     console.log('[MapMainScreen] 마커-광고 매핑 완료:', v_b3439a.size, '개 마커, TopAd5 개수:', v_4cf0ad.length);
     return v_b3439a;
   }, [v_d5e3e8, v_b4d4c5, v_4cf0ad]);
+
+  v_c4deb2(() => {
+
+    if (
+      v_ac1d22 === 'Map' &&
+      v_4cf0ad.length === 0 &&
+      v_d5e3e8 &&
+      v_b4d4c5.length > 0
+    ) {
+      console.log('[MapMainScreen] TopAd5 광고 없음 감지, getTopAd5 재호출 시작');
+      const v_29fd1b = async () => {
+        try {
+          const v_e36b07 = await v_563153();
+          if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
+            console.log('[MapMainScreen] TopAd5 재호출 성공:', v_e36b07.length, '개 광고');
+            v_6549d0(v_e36b07);
+          } else {
+            console.warn('[MapMainScreen] TopAd5 재호출 결과: 데이터 없음');
+
+            const v_fe7102 = await v_5d7ca4();
+            if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
+              v_6549d0(v_fe7102);
+              console.log('[MapMainScreen] 저장된 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
+            }
+          }
+        } catch (v_5e9bfe) {
+          console.error('[MapMainScreen] TopAd5 재호출 실패:', v_5e9bfe);
+        }
+      };
+      v_29fd1b();
+    }
+  }, [v_ac1d22, v_4cf0ad.length, v_d5e3e8, v_b4d4c5.length]);
 
   const v_3d837b = v_de06a3((marker: v_f71847): string => {
 
