@@ -27,6 +27,7 @@ import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
+import { v_cba33f } from '../utils';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 

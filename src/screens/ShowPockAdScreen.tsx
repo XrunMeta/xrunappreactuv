@@ -496,6 +496,9 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         await v_ece582(v_9f9e7d.landing_url);
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
+
+      await v_e84827.setItem('isAdCompleted', 'true');
+      console.log('[광고보기] isAdCompleted 저장 완료');
         v_e10ff9();
         v_7f2e65();
       } else {
