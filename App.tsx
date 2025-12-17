@@ -228,7 +228,7 @@ const v_c0dbdf = () => {
       try {
 
         const v_46a232 = await v_fba5a0.getStringAsync();
-        console.log('[iOS Clipboard] 클립보드 내용:', v_46a232);
+        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', v_46a232);
 
         if (v_46a232 && v_46a232.startsWith('XRUN_REFERRAL:')) {
           const v_9bf12c = v_46a232.replace('XRUN_REFERRAL:', '').trim();
