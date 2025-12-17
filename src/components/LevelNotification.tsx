@@ -31,8 +31,8 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
 
         if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data && v_3393e3.data.lv !== undefined) {
           const v_fbe91e = v_3393e3.data.lv;
-          v_3c92ee(`${v_fbe91e}Level`);
-          console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `${v_fbe91e}Level`);
+          v_3c92ee(`Level ${v_fbe91e}`);
+          console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `Level ${v_fbe91e}`);
         } else {
           console.warn('[LevelNotification] 레벨 정보 응답 형식이 올바르지 않습니다:', v_3393e3);
         }
