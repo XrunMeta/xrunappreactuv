@@ -10,6 +10,7 @@ import {
     Image,
     ImageSourcePropType,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -138,6 +139,7 @@ export const AddWalletAddressScreen = () => {
 
     return (
         <SafeView style={styles.container} backgroundColor="#f7f7fb">
+            <StatusBar style="dark" />
             <Header
                 title={t('screens.walletAddressBook.addTitle')}
                 onBackPress={goBack}
