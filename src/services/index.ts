@@ -3400,7 +3400,7 @@ export const v_8ee299 = async (
     console.log('[잔액 업데이트] 사용자 잔액 업데이트 V2 요청:', { member: v_660822 });
 
     const v_3393e3 = await v_9f42a4.post<any>(
-      '/oth-path',
+      '/getUsersBalanceUpdateV2',
       v_576f5a,
     );
 
@@ -4278,7 +4278,6 @@ export const v_69bcd0 = async (
     );
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
-    console.log('[트랜잭션] 응답 데이터:', JSON.stringify(v_3393e3.data, null, 2));
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {

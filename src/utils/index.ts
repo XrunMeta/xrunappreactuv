@@ -133,7 +133,7 @@ export const v_a3bbf0 = async (
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');
 
-    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n${v_25f202}\n\n${v_542b81}\nAndroid: ${v_17aa0b}\niOS: ${v_47d9ba}`;
+    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n${v_25f202}`;
 
     const v_43c42e = await v_5f4661.share({
       message: v_a8cd21,
