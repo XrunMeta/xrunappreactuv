@@ -14,6 +14,7 @@ import {
   Image,
   ImageSourcePropType,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
@@ -499,6 +500,7 @@ export const WalletSendScreen = () => {
 
   return (
     <SafeView style={styles.container} showBottomBackground={true}>
+      <StatusBar style="dark" />
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
       <View style={styles.contentContainer}>
