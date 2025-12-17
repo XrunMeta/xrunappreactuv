@@ -19,7 +19,6 @@ export const v_4a40b2 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
-          {v_731ab4 && (
             <TouchableOpacity
               style={v_d81136.card}
               activeOpacity={0.85}
@@ -27,7 +26,6 @@ export const v_4a40b2 = () => {
             >
               <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
             </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
