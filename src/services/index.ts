@@ -4610,11 +4610,6 @@ const v_332c06 = 'topAd5Data';
 
 export const v_563153 = async (v_c65f5d): Promise<any> => {
 
-  if (__DEV__) {
-    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
-    return [];
-  }
-
   try {
     const v_e16099 = v_326be8.OS === 'ios' ? 'ios' : 'android';
 
