@@ -627,6 +627,11 @@ const v_d0a391 = () => {
 
   v_c4deb2(() => {
     const v_bc755f = async () => {
+
+      if (__DEV__) {
+        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
+        return;
+      }
       try {
         console.log('[App] 버전 확인 시작');
 

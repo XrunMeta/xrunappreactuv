@@ -176,6 +176,10 @@ export const v_5ee4ec = async (): Promise<boolean> => {
       console.log('[VersionCheck] 서버 응답이 없어 버전 확인을 건너뜁니다.');
       return false;
     }
+    if (__DEV__) {
+      console.log('[VersionCheck] 개발 모드이므로 버전 확인을 건너뜁니다.');
+      return false;
+    }
 
     const v_4587b3 = v_650134();
     const v_de6359 = v_326be8.OS === 'android' 

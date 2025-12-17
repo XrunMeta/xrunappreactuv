@@ -297,7 +297,10 @@ export const v_495832 = async (
         };
       }
 
-      const v_1300ee = v_650134();  
+      if (__DEV__) {
+        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. index.ts sendAliveSignal'); 
+      }else{
+        const v_1300ee = v_650134();  
         console.log('[App] 현재 버전:', v_1300ee);
         if (v_326be8.OS === 'android') {
           if (v_1300ee && Number(v_2c2f8d.data.version) > Number(v_1300ee)) {
@@ -322,6 +325,7 @@ export const v_495832 = async (
             console.log('[App ios] 최신 버전입니다.');
           }
         }
+      }
 
       return v_43c42e;
     } else {
@@ -4605,6 +4609,12 @@ export const v_724f1d = async (
 const v_332c06 = 'topAd5Data';
 
 export const v_563153 = async (v_c65f5d): Promise<any> => {
+
+  if (__DEV__) {
+    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
+    return [];
+  }
+
   try {
     const v_e16099 = v_326be8.OS === 'ios' ? 'ios' : 'android';
 
