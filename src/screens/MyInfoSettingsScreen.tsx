@@ -19,7 +19,6 @@ export const MyInfoSettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
-          {IS_DEV_MODE && (
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.85}
@@ -27,7 +26,6 @@ export const MyInfoSettingsScreen = () => {
             >
               <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
             </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}

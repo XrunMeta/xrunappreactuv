@@ -31,8 +31,8 @@ export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation
 
         if (response && response.status === 'success' && response.data && response.data.lv !== undefined) {
           const level = response.data.lv;
-          setNotifitext(`${level}Level`);
-          console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `${level}Level`);
+          setNotifitext(`Level ${level}`);
+          console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `Level ${level}`);
         } else {
           console.warn('[LevelNotification] 레벨 정보 응답 형식이 올바르지 않습니다:', response);
         }
