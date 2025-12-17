@@ -1373,6 +1373,14 @@ export const MapMainScreen: React.FC = () => {
           return;
         }
 
+        console.log('[MapMainScreen] 마커 데이터:', coinsData.length, '개');
+        console.log('[MapMainScreen] 광고 데이터:', topAd5Response.length, '개');
+        for (const ad of topAd5Response) {
+          console.log('[MapMainScreen] 광고 데이터:',ad.name  );
+        }
+
+        console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
+
         const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
           if (topAd5Response.length > 0) {
@@ -1400,8 +1408,10 @@ export const MapMainScreen: React.FC = () => {
           return marker;
         });
 
+        console.log('[MapMainScreen] 5단계: 매핑된 마커 데이터 저장 시작');
         await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
 
+        console.log('[MapMainScreen] 6단계: 화면에 마커 표시 시작');
         const spotDataArray: SpotData[] = mappedCoinsData.map((coin: any) => ({
           spotID: coin.spotid || coin.spotID || coin.id || 0,
           distance: coin.distance || 0,
@@ -2013,7 +2023,7 @@ export const MapMainScreen: React.FC = () => {
     }
 
     if (topAd5Data.length === 0) {
-      console.log('[MapMainScreen] TopAd5 광고 없음, 기존 마커 데이터 사용');
+      console.log('[MapMainScreen] TopAd5 광고 없음, getTopAd5 재호출 시도');
       return new Map<string, TopAd5Item | null>();
     }
 
@@ -2065,6 +2075,38 @@ export const MapMainScreen: React.FC = () => {
     console.log('[MapMainScreen] 마커-광고 매핑 완료:', mapping.size, '개 마커, TopAd5 개수:', topAd5Data.length);
     return mapping;
   }, [mappingLocation, markers, topAd5Data]);
+
+  useEffect(() => {
+
+    if (
+      activeTab === 'Map' &&
+      topAd5Data.length === 0 &&
+      mappingLocation &&
+      markers.length > 0
+    ) {
+      console.log('[MapMainScreen] TopAd5 광고 없음 감지, getTopAd5 재호출 시작');
+      const retryGetTopAd5 = async () => {
+        try {
+          const topAd5Response = await getTopAd5();
+          if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+            console.log('[MapMainScreen] TopAd5 재호출 성공:', topAd5Response.length, '개 광고');
+            setTopAd5Data(topAd5Response);
+          } else {
+            console.warn('[MapMainScreen] TopAd5 재호출 결과: 데이터 없음');
+
+            const storedData = await getStoredTopAd5();
+            if (storedData && Array.isArray(storedData) && storedData.length > 0) {
+              setTopAd5Data(storedData);
+              console.log('[MapMainScreen] 저장된 TopAd5 데이터 사용:', storedData.length, '개 광고');
+            }
+          }
+        } catch (error) {
+          console.error('[MapMainScreen] TopAd5 재호출 실패:', error);
+        }
+      };
+      retryGetTopAd5();
+    }
+  }, [activeTab, topAd5Data.length, mappingLocation, markers.length]);
 
   const getMarkerKey = useCallback((marker: SpotData): string => {
 
