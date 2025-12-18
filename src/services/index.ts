@@ -7,6 +7,8 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 
 export * from './googleAuth';
+
+export * from './appleAuth';
 import {
   AliveResponse,
   KeepAliveServerResponse,
@@ -297,9 +299,6 @@ export const sendAliveSignal = async (
         };
       }
 
-      if (__DEV__) {
-        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. index.ts sendAliveSignal'); 
-      }else{
         const latest = getCurrentAppVersionNumber();  
         console.log('[App] 현재 버전:', latest);
         if (Platform.OS === 'android') {
@@ -315,17 +314,20 @@ export const sendAliveSignal = async (
           }
         } else if ( Platform.OS === 'ios') { 
           if (latest && Number(serverResponse.data.version_ios) > Number(latest)) {
-            console.log('[App] 새 버전 발견:', latest);
-            result.emergencyStop = {
-              enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-            };
+            console.log('[App] 새 버전 발견:', latest , serverResponse.data.version_ios);
+            if (__DEV__) {
+              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+            }else{
+              result.emergencyStop = {
+                enabled: true,
+                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+              };
+            }
           } else {
             console.log('[App ios] 최신 버전입니다.');
           }
         }
-      }
 
       return result;
     } else {
@@ -716,6 +718,42 @@ export const connectGoogleAccount = async (
 
     const response = await axiosInstance.post<ConnectGoogleAccountResponse>(
       '/connect-google-account',
+      request,
+    );
+
+    console.log('[계정 연동] 요청 성공, 응답:', JSON.stringify(response.data, null, 2));
+    return response.data;
+  } catch (error: any) {
+    console.error('[계정 연동] 요청 오류:', error);
+    if (error.response?.status === 401) {
+      console.log('[계정 연동] 비밀번호 불일치 (401)');
+      return {
+        success: false,
+        code: '401',
+        message: '비밀번호가 일치하지 않습니다.',
+      };
+    }
+    throw error;
+  }
+};
+
+export const connectAppleAccount = async (
+  appleData: any,
+  pin: string,
+  navigation?: any,
+): Promise<ConnectAppleAccountResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: ConnectAppleAccountRequest = {
+      ...appleData,
+      pin,
+    };
+
+    console.log('[계정 연동] 애플 계정 연동 요청');
+    console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(request, null, 2));
+
+    const response = await axiosInstance.post<ConnectAppleAccountResponse>(
+      '/connect-apple-account',
       request,
     );
 

@@ -31,6 +31,8 @@ import {
   sendEmailVerificationCode,
   signInWithGoogle,
   connectGoogleAccount,
+  signInWithApple,
+  connectAppleAccount,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -75,7 +77,9 @@ export const LoginScreen = () => {
   const [linkingPassword, setLinkingPassword] = useState('');
   const [linkingAgreed, setLinkingAgreed] = useState(false);
   const [linkingEmail, setLinkingEmail] = useState('');
+  const [linkingType, setLinkingType] = useState<'google' | 'apple'>('google');
   const [googleLoginData, setGoogleLoginData] = useState<any>(null);
+  const [appleLoginData, setAppleLoginData] = useState<any>(null);
   const [isLinkingLoading, setIsLinkingLoading] = useState(false);
   const [successDialogVisible, setSuccessDialogVisible] = useState(false);
 
@@ -281,11 +285,17 @@ export const LoginScreen = () => {
     try {
       console.log('[계정 연동] 비밀번호 확인 및 로그인 시도:', linkingEmail);
 
-      const response = await connectGoogleAccount(
-        googleLoginData,
-        linkingPassword,
-        navigate,
-      );
+      const response = linkingType === 'google'
+        ? await connectGoogleAccount(
+            googleLoginData,
+            linkingPassword,
+            navigate,
+          )
+        : await connectAppleAccount(
+            appleLoginData,
+            linkingPassword,
+            navigate,
+          );
 
       if (!response.success || (response.code !== 200 && response.code !== '200')) {
         const errorMessage = response.message || t('screens.login.errors.loginFailed');
@@ -375,6 +385,7 @@ export const LoginScreen = () => {
         console.log('[구글 로그인] 계정 연동 필요 - 팝업 표시');
         setLinkingEmail(result.data.email);
         setGoogleLoginData(result.data);
+        setLinkingType('google');
         setLinkingPassword('');
         setLinkingAgreed(false);
         setLinkingDialogVisible(true);
@@ -459,6 +470,122 @@ export const LoginScreen = () => {
     }
   };
 
+  const handleAppleLogin = async () => {
+    if (isLoading || isOtpLoading) {
+      return;
+    }
+
+    if (Platform.OS !== 'ios') {
+      await showAlert(
+        t('common.messages.error') || '오류',
+        '애플 로그인은 iOS에서만 지원됩니다.',
+      );
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log('[애플 로그인] 애플 로그인 시작');
+
+      const result = await signInWithApple(navigate);
+
+      if (!result.success || !result.data) {
+        const errorMessage = result.message || '애플 로그인에 실패했습니다.';
+        await showAlert(t('common.messages.error') || '오류', errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.data.requiresLinking) {
+        console.log('[애플 로그인] 계정 연동 필요 - 팝업 표시');
+        setLinkingEmail(result.data.email);
+        setAppleLoginData(result.data);
+        setLinkingType('apple');
+        setLinkingPassword('');
+        setLinkingAgreed(false);
+        setLinkingDialogVisible(true);
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.data.requiresSignup) {
+        console.log('[애플 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+
+        const email = result.data.email || '';
+        if (!email) {
+          await showAlert(t('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          setIsLoading(false);
+          return;
+        }
+
+        await AsyncStorage.setItem('appleSignupRequired', 'true');
+        await AsyncStorage.setItem('appleSignupEmail', email);
+
+        navigate(ROUTES.signup);
+        setIsLoading(false);
+        return;
+      }
+
+      const { memberId, email, name, accessToken, refreshToken, isNewUser, isSignupCompleted } = result.data;
+
+      console.log('[애플 로그인] 로그인 성공:', { memberId, email, isNewUser, isSignupCompleted });
+
+      if (isNewUser) {
+        console.log('[애플 로그인] 신규 사용자, 회원가입 화면으로 이동');
+
+        await AsyncStorage.setItem('appleSignupRequired', 'true');
+        await AsyncStorage.setItem('appleSignupEmail', email);
+
+        navigate(ROUTES.signup);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('[애플 로그인] 기존 사용자, 로그인 처리 시작');
+
+      const userData = {
+        member: memberId,
+        email: email,
+        firstname: name ? (name.split(' ')[0] || name) : '',
+        lastname: name ? name.split(' ').slice(1).join(' ') : '',
+        extrastr: accessToken || '', 
+      };
+
+      if (accessToken && memberId) {
+        const ssidw = encryptSHA256(accessToken);
+        const sessionSaved = await saveSession(memberId, ssidw, navigate);
+        if (!sessionSaved) {
+          console.warn('[애플 로그인] 세션 저장 실패');
+        }
+      }
+
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('userSessionToken');
+
+      await AsyncStorage.setItem('userEmail', email);
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      await AsyncStorage.setItem('userSessionToken', accessToken || '');
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+
+      await AsyncStorage.setItem('rememberMe', 'true');
+      console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
+
+      console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
+      navigate(ROUTES.map);
+    } catch (error: any) {
+      console.error('[애플 로그인] 오류:', error);
+      await showAlert(
+        t('common.messages.error') || '오류',
+        error.message || '애플 로그인 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderSnsButtons = (disabled: boolean) => (
     <View style={styles.snsLoginContainer}>
       <Text style={styles.snsLoginLabel}>{t('screens.login.orLoginWith')}</Text>
@@ -472,9 +599,13 @@ export const LoginScreen = () => {
           <SvgXml xml={googleIconSvg} width={15} height={16} />
         </TouchableOpacity>
         {}
-        {
-
-}
+        <TouchableOpacity
+          style={styles.snsButton}
+          disabled={disabled}
+          onPress={handleAppleLogin}
+        >
+          <SvgXml xml={appleIconSvg} width={15} height={18} />
+        </TouchableOpacity>
         {}
         {
 
@@ -792,7 +923,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   snsLoginLabel: {
-    marginLeft: Dimensions.get('window').width / 4,
+    marginLeft: Dimensions.get('window').width / 6,
     fontSize: FONTS.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',
