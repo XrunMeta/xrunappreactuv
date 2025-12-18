@@ -112,6 +112,8 @@ const v_c0dbdf = () => {
         const v_8decf8 = v_f2c756.parse(v_f71b56);
         console.log('[딥링크] 파싱된 URL:', v_8decf8);
 
+        console.log('parsed.queryParams:', v_8decf8.queryParams);
+
         const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
 
         if (v_fc7051) {
@@ -136,9 +138,22 @@ const v_c0dbdf = () => {
     const v_442744 = async () => {
       try {
         const v_7b9c4e = await v_f2c756.getInitialURL();
-        if (v_7b9c4e) {
-          console.log('[딥링크] 앱 시작 시 딥링크 감지:', v_7b9c4e);
-          v_90a7e8(v_7b9c4e);
+        if (v_7b9c4e) { 
+          const v_f24fd5 = await v_e84827.getItem('userData');
+          if (v_f24fd5) {
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822) {
+              console.log('[딥링크] 로그인 되어 있음, 딥링크 처리안함');
+            }else{
+              console.log('[딥링크] 로그인 안되어 있음, 딥링크 처리');
+              v_90a7e8(v_7b9c4e);
+            }
+          }else{
+            console.log('[딥링크] userData가 없음, 딥링크 처리');
+            v_90a7e8(v_7b9c4e);
+          }
+
         } else {
           console.log('[딥링크] 앱 시작 시 딥링크 없음');
         }
