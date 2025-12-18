@@ -19,18 +19,20 @@
         "googleMapsApiKey": "oth-google-api-key"
       },
       "infoPlist": {
-        "NSCameraUsageDescription": "앱의 주요 기능에 카메라 권한이 필요합니다",
-        "NSPhotoLibraryUsageDescription": "원활한 사용을 위해서 사진 권한이 필요합니다",
-        "NSLocationWhenInUseUsageDescription": "앱의 주요 기능에 위치 권한이 필요합니다",
+        "NSCameraUsageDescription": "서비스 지점 안내, AR 기능 사용을 위해 카메라 권한이 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "선택적으로, 사용자의 이미지를 업로드 하기 위해 사진 권한이 필요합니다.",
+        "NSLocationWhenInUseUsageDescription": "사용자 주변의 가까운 매장이나 서비스 지점을 찾아서 안내하기 위해 위치 정보가 사용됩니다.",
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleURLTypes": [
           {
             "CFBundleTypeRole": "Editor",
             "CFBundleURLSchemes": [
+              "xrungoApp",
               "run.xrun.xrunapps",
               "com.googleusercontent.apps.1003094533748-ht43iomt62g0h1dmiii3huav334pqiie",
               "com.googleusercontent.apps.1003094533748-2g87114p66dfq8v0f7imi67r9h5on6g4"
-            ]
+            ],
+            "CFBundleURLName": "run.xrun.xrunapps"
           }
         ],
         "GIDClientID": "oth-client.googleusercontent.invalid"
