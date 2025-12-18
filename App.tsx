@@ -112,6 +112,8 @@ const ScreenHost = () => {
         const parsed = Linking.parse(url);
         console.log('[딥링크] 파싱된 URL:', parsed);
 
+        console.log('parsed.queryParams:', parsed.queryParams);
+
         const referral = parsed.queryParams?.referral as string | undefined;
 
         if (referral) {
@@ -136,9 +138,22 @@ const ScreenHost = () => {
     const getInitialURL = async () => {
       try {
         const initialUrl = await Linking.getInitialURL();
-        if (initialUrl) {
-          console.log('[딥링크] 앱 시작 시 딥링크 감지:', initialUrl);
-          handleDeepLink(initialUrl);
+        if (initialUrl) { 
+          const userDataStr = await AsyncStorage.getItem('userData');
+          if (userDataStr) {
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member) {
+              console.log('[딥링크] 로그인 되어 있음, 딥링크 처리안함');
+            }else{
+              console.log('[딥링크] 로그인 안되어 있음, 딥링크 처리');
+              handleDeepLink(initialUrl);
+            }
+          }else{
+            console.log('[딥링크] userData가 없음, 딥링크 처리');
+            handleDeepLink(initialUrl);
+          }
+
         } else {
           console.log('[딥링크] 앱 시작 시 딥링크 없음');
         }

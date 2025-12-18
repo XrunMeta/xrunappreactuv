@@ -15,8 +15,7 @@
       "autoIncrement": true,
       "android": {
         "credentialsSource": "local"
-      },
-      
+      }
     }
   },
   "submit": {
