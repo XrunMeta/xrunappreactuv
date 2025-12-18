@@ -7,6 +7,8 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 
 export * from './googleAuth';
+
+export * from './appleAuth';
 import {
   v_96ef47,
   v_2fe85a,
@@ -297,9 +299,6 @@ export const v_495832 = async (
         };
       }
 
-      if (__DEV__) {
-        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. index.ts sendAliveSignal'); 
-      }else{
         const v_1300ee = v_650134();  
         console.log('[App] 현재 버전:', v_1300ee);
         if (v_326be8.OS === 'android') {
@@ -315,17 +314,20 @@ export const v_495832 = async (
           }
         } else if ( v_326be8.OS === 'ios') { 
           if (v_1300ee && Number(v_2c2f8d.data.version_ios) > Number(v_1300ee)) {
-            console.log('[App] 새 버전 발견:', v_1300ee);
-            v_43c42e.emergencyStop = {
-              enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-            };
+            console.log('[App] 새 버전 발견:', v_1300ee , v_2c2f8d.data.version_ios);
+            if (__DEV__) {
+              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+            }else{
+              v_43c42e.emergencyStop = {
+                enabled: true,
+                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+              };
+            }
           } else {
             console.log('[App ios] 최신 버전입니다.');
           }
         }
-      }
 
       return v_43c42e;
     } else {
@@ -716,6 +718,42 @@ export const v_4c4126 = async (
 
     const v_3393e3 = await v_9f42a4.post<v_264b01>(
       '/connect-google-account',
+      v_576f5a,
+    );
+
+    console.log('[계정 연동] 요청 성공, 응답:', JSON.stringify(v_3393e3.data, null, 2));
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[계정 연동] 요청 오류:', v_5e9bfe);
+    if (v_5e9bfe.response?.status === 401) {
+      console.log('[계정 연동] 비밀번호 불일치 (401)');
+      return {
+        success: false,
+        code: '401',
+        message: '비밀번호가 일치하지 않습니다.',
+      };
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_1fee11 = async (
+  v_39aae3,
+  v_6bee94,
+  v_c65f5d,
+): Promise<ConnectAppleAccountResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = {
+      ...v_39aae3,
+      pin: v_6bee94,
+    };
+
+    console.log('[계정 연동] 애플 계정 연동 요청');
+    console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(v_576f5a, null, 2));
+
+    const v_3393e3 = await v_9f42a4.post<ConnectAppleAccountResponse>(
+      '/connect-apple-account',
       v_576f5a,
     );
 
