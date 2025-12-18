@@ -649,10 +649,6 @@ const GlobalDialogs = () => {
   useEffect(() => {
     const checkVersion = async () => {
 
-      if (__DEV__) {
-        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
-        return;
-      }
       try {
         console.log('[App] 버전 확인 시작');
 
@@ -676,9 +672,14 @@ const GlobalDialogs = () => {
 
         if (latest && isNewVersionAvailable(currentVersion, latest)) {
           console.log('[App] 새 버전 발견:', latest);
-          setLatestVersion(latest);
-          setIsServerUpdateRequired(false); 
-          setVersionUpdateVisible(true);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
+            return;
+          }else{
+            setLatestVersion(latest);
+            setIsServerUpdateRequired(false); 
+            setVersionUpdateVisible(true);
+          }
         } else {
           console.log('[App] 최신 버전입니다.');
         }

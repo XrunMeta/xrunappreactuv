@@ -1,0 +1,277 @@
+
+
+import { Platform } from 'react-native';
+import appleAuth from '@invertase/react-native-apple-authentication';
+import { getEnv } from '../utils/env';
+import { ROUTES } from '../navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_TIMEOUT = 20000;
+
+const handleTimeoutError = async (navigation: any) => {
+  try {
+    if (!navigation || typeof navigation.reset !== 'function') {
+      console.log('[애플 로그인] 타임아웃 처리 스킵: navigation 또는 reset 함수가 없음');
+      return;
+    }
+
+    const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+    if (isLoggedIn === 'true') {
+      navigation.reset(ROUTES.map);
+    } else {
+      navigation.reset(ROUTES.login);
+    }
+  } catch (error) {
+    console.error('[애플 로그인] 타임아웃 처리 중 오류:', error);
+    if (navigation && typeof navigation.reset === 'function') {
+      try {
+        navigation.reset(ROUTES.login);
+      } catch (resetError) {
+        console.error('[애플 로그인] navigation.reset 호출 실패:', resetError);
+      }
+    }
+  }
+};
+
+const getApiBaseUrl = (): string => {
+  const env = getEnv();
+  const baseUrl = env.GATEWAY_NODEJS;
+
+  if (baseUrl.endsWith('/oth-path')) {
+    return baseUrl.replace('/oth-path', '');
+  }
+  return baseUrl;
+};
+
+export interface AppleAuthResult {
+  success: boolean;
+  data?: {
+    memberId: number;
+    email: string;
+    name?: string; 
+    accessToken?: string; 
+    refreshToken?: string; 
+    isNewUser: boolean;
+    isSignupCompleted?: boolean; 
+    missingFields?: Record<string, boolean>; 
+    requiresLinking?: boolean; 
+    requiresSignup?: boolean; 
+    confirmationToken?: string; 
+  };
+  code?: string;
+  message?: string;
+}
+
+export async function signInWithApple(navigation?: any): Promise<AppleAuthResult> {
+  try {
+
+    if (Platform.OS !== 'ios') {
+      return {
+        success: false,
+        code: 'PLATFORM_NOT_SUPPORTED',
+        message: '애플 로그인은 iOS에서만 지원됩니다.',
+      };
+    }
+
+    console.log('[애플 로그인] 애플 로그인 시작');
+
+    const isAvailable = appleAuth.isSupported;
+    console.log('[애플 로그인] Apple 로그인 가능 여부 확인:', isAvailable);
+    if (!isAvailable) {
+      return {
+        success: false,
+        code: 'NOT_SUPPORTED',
+        message: '이 기기에서 애플 로그인을 사용할 수 없습니다.',
+      };
+    }
+
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+
+    console.log('[애플 로그인] Apple 로그인 성공:', {
+      user: appleAuthRequestResponse.user,
+      email: appleAuthRequestResponse.email,
+      fullName: appleAuthRequestResponse.fullName,
+    });
+
+    const identityToken = appleAuthRequestResponse.identityToken;
+    if (!identityToken) {
+      return {
+        success: false,
+        code: 'IDENTITY_TOKEN_MISSING',
+        message: 'Identity 토큰을 받지 못했습니다.',
+      };
+    }
+
+    const email = appleAuthRequestResponse.email || '';
+    const fullName = appleAuthRequestResponse.fullName;
+    const name = fullName
+      ? `${fullName.givenName || ''} ${fullName.familyName || ''}`.trim()
+      : '';
+
+    console.log('[애플 로그인] Identity Token 획득, 백엔드 API 호출');
+    console.log('[애플 로그인] Identity Token 확인:', {
+      hasToken: !!identityToken,
+      tokenLength: identityToken.length,
+      tokenPreview: `${identityToken.substring(0, 30)}...`,
+    });
+
+    const apiBaseUrl = getApiBaseUrl();
+    const apiUrl = `${apiBaseUrl}/oth-path`;
+
+    console.log('[애플 로그인] 백엔드 API URL:', apiUrl);
+    console.log('[애플 로그인] Authorization 헤더 전송:', {
+      hasToken: !!identityToken,
+      tokenLength: identityToken.length,
+      headerFormat: 'Bearer <token>',
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+    try {
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${identityToken}`, 
+        },
+        body: JSON.stringify({
+          identityToken: identityToken, 
+          email: email, 
+          name: name, 
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const responseText = await response.text();
+      console.log('[애플 로그인] 백엔드 응답 본문:', responseText);
+
+      let data: any;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('[애플 로그인] 응답 파싱 오류:', parseError);
+        return {
+          success: false,
+          code: 'PARSE_ERROR',
+          message: '서버 응답을 파싱할 수 없습니다.',
+        };
+      }
+
+      const requiresSignup = data.code === 200 && !data.success && (data.data?.requiresSignup === true || data.data?.isSignupCompleted === false);
+
+      if (requiresSignup) {
+        console.log('[애플 로그인] 회원가입 필요 - 회원가입 화면으로 이동 필요');
+        return {
+          success: true,
+          data: {
+            ...data.data,
+            isSignupCompleted: false,
+          },
+        };
+      }
+
+      if (data.code === 216) {
+        console.log('[애플 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
+        return {
+          success: true,
+          data: {
+            ...data.data,
+            requiresLinking: true,
+            email: data.data?.email || email, 
+            confirmationToken: data.data?.confirmationToken || '', 
+          },
+        };
+      }
+
+      if (data.code === 417) {
+        console.log('[애플 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+        return {
+          success: true,
+          data: {
+            ...data.data,
+            requiresSignup: true,
+            email: data.data?.email || email, 
+            isSignupCompleted: false,
+          },
+        };
+      }
+
+      if (!response.ok || !data.success) {
+        console.error('[애플 로그인] 백엔드 API 실패:', data);
+        return {
+          success: false,
+          code: data.code || 'AUTH_FAILED',
+          message: data.message || '인증에 실패했습니다.',
+        };
+      }
+
+      console.log('[애플 로그인] 백엔드 API 성공:', {
+        success: data.success,
+        isNewUser: data.data?.isNewUser,
+        email: data.data?.email,
+        isSignupCompleted: data.data?.isSignupCompleted,
+      });
+
+      return {
+        success: true,
+        data: data.data,
+      };
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+
+        console.error('[애플 로그인] API 타임아웃');
+        if (navigation) {
+          await handleTimeoutError(navigation);
+        }
+        return {
+          success: false,
+          code: 'TIMEOUT',
+          message: '요청 시간이 초과되었습니다.',
+        };
+      }
+      throw fetchError;
+    }
+  } catch (error: any) {
+    console.error('[애플 로그인] 에러:', error);
+
+    if (error.code === appleAuth.Error.CANCELED) {
+      return {
+        success: false,
+        code: 'USER_CANCELLED',
+        message: '사용자가 로그인을 취소했습니다.',
+      };
+    } else if (error.code === appleAuth.Error.NOT_HANDLED) {
+      return {
+        success: false,
+        code: 'NOT_HANDLED',
+        message: '애플 로그인 처리 중 오류가 발생했습니다.',
+      };
+    } else if (error.code === appleAuth.Error.INVALID_RESPONSE) {
+      return {
+        success: false,
+        code: 'INVALID_RESPONSE',
+        message: '애플 로그인 응답이 유효하지 않습니다.',
+      };
+    } else if (error.code === appleAuth.Error.NOT_AVAILABLE) {
+      return {
+        success: false,
+        code: 'NOT_AVAILABLE',
+        message: '애플 로그인을 사용할 수 없습니다.',
+      };
+    }
+
+    return {
+      success: false,
+      code: 'UNKNOWN_ERROR',
+      message: error.message || '알 수 없는 오류가 발생했습니다.',
+    };
+  }
+}
