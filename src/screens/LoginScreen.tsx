@@ -31,6 +31,8 @@ import {
   v_8025d1,
   v_2683ec,
   v_4c4126,
+  v_7af6c9,
+  v_1fee11,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -75,7 +77,9 @@ export const v_f4f851 = () => {
   const [v_d11af5, v_4edb36] = v_5ab095('');
   const [v_0da590, v_4b3428] = v_5ab095(false);
   const [v_4c2a98, v_b88019] = v_5ab095('');
+  const [v_2156ca, v_81c395] = v_5ab095<'google' | 'apple'>('google');
   const [v_306394, v_edad7a] = v_5ab095<any>(null);
+  const [v_1ba8b3, v_36dc47] = v_5ab095<any>(null);
   const [v_784d4b, v_3cf566] = v_5ab095(false);
   const [v_381ed1, v_361e20] = v_5ab095(false);
 
@@ -281,11 +285,17 @@ export const v_f4f851 = () => {
     try {
       console.log('[계정 연동] 비밀번호 확인 및 로그인 시도:', v_4c2a98);
 
-      const v_3393e3 = await v_4c4126(
-        v_306394,
-        v_d11af5,
-        v_9b57fc,
-      );
+      const v_3393e3 = v_2156ca === 'google'
+        ? await v_4c4126(
+            v_306394,
+            v_d11af5,
+            v_9b57fc,
+          )
+        : await v_1fee11(
+            v_1ba8b3,
+            v_d11af5,
+            v_9b57fc,
+          );
 
       if (!v_3393e3.success || (v_3393e3.code !== 200 && v_3393e3.code !== '200')) {
         const v_1744b9 = v_3393e3.message || v_8d41d7('screens.login.errors.loginFailed');
@@ -375,6 +385,7 @@ export const v_f4f851 = () => {
         console.log('[구글 로그인] 계정 연동 필요 - 팝업 표시');
         v_b88019(v_43c42e.data.email);
         v_edad7a(v_43c42e.data);
+        v_81c395('google');
         v_4edb36('');
         v_4b3428(false);
         v_29378d(true);
@@ -459,6 +470,122 @@ export const v_f4f851 = () => {
     }
   };
 
+  const v_ef4111 = async () => {
+    if (v_cd31a8 || v_2e3b01) {
+      return;
+    }
+
+    if (v_326be8.OS !== 'ios') {
+      await v_889fad(
+        v_8d41d7('common.messages.error') || '오류',
+        '애플 로그인은 iOS에서만 지원됩니다.',
+      );
+      return;
+    }
+
+    v_deef62(true);
+
+    try {
+      console.log('[애플 로그인] 애플 로그인 시작');
+
+      const v_43c42e = await v_7af6c9(v_9b57fc);
+
+      if (!v_43c42e.success || !v_43c42e.data) {
+        const v_1744b9 = v_43c42e.message || '애플 로그인에 실패했습니다.';
+        await v_889fad(v_8d41d7('common.messages.error') || '오류', v_1744b9);
+        v_deef62(false);
+        return;
+      }
+
+      if (v_43c42e.data.requiresLinking) {
+        console.log('[애플 로그인] 계정 연동 필요 - 팝업 표시');
+        v_b88019(v_43c42e.data.email);
+        v_36dc47(v_43c42e.data);
+        v_81c395('apple');
+        v_4edb36('');
+        v_4b3428(false);
+        v_29378d(true);
+        v_deef62(false);
+        return;
+      }
+
+      if (v_43c42e.data.requiresSignup) {
+        console.log('[애플 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+
+        const v_e0c7e8 = v_43c42e.data.email || '';
+        if (!v_e0c7e8) {
+          await v_889fad(v_8d41d7('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          v_deef62(false);
+          return;
+        }
+
+        await v_e84827.setItem('appleSignupRequired', 'true');
+        await v_e84827.setItem('appleSignupEmail', v_e0c7e8);
+
+        v_9b57fc(v_ce4741.signup);
+        v_deef62(false);
+        return;
+      }
+
+      const { memberId: v_717992, email: v_e0c7e8, name: v_1833e7, accessToken: v_2ca7e0, refreshToken: v_dfaee3, isNewUser: v_b0b75a, isSignupCompleted: v_22a87d } = v_43c42e.data;
+
+      console.log('[애플 로그인] 로그인 성공:', { memberId: v_717992, email: v_e0c7e8, isNewUser: v_b0b75a, isSignupCompleted: v_22a87d });
+
+      if (v_b0b75a) {
+        console.log('[애플 로그인] 신규 사용자, 회원가입 화면으로 이동');
+
+        await v_e84827.setItem('appleSignupRequired', 'true');
+        await v_e84827.setItem('appleSignupEmail', v_e0c7e8);
+
+        v_9b57fc(v_ce4741.signup);
+        v_deef62(false);
+        return;
+      }
+
+      console.log('[애플 로그인] 기존 사용자, 로그인 처리 시작');
+
+      const v_ef7306 = {
+        member: v_717992,
+        email: v_e0c7e8,
+        firstname: v_1833e7 ? (v_1833e7.split(' ')[0] || v_1833e7) : '',
+        lastname: v_1833e7 ? v_1833e7.split(' ').slice(1).join(' ') : '',
+        extrastr: v_2ca7e0 || '', 
+      };
+
+      if (v_2ca7e0 && v_717992) {
+        const v_06cee6 = v_a5170b(v_2ca7e0);
+        const v_aa0ad8 = await v_ea3493(v_717992, v_06cee6, v_9b57fc);
+        if (!v_aa0ad8) {
+          console.warn('[애플 로그인] 세션 저장 실패');
+        }
+      }
+
+      await v_e84827.removeItem('userData');
+      await v_e84827.removeItem('userSessionToken');
+
+      await v_e84827.setItem('userEmail', v_e0c7e8);
+      await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
+      await v_e84827.setItem('isLoggedIn', 'true');
+
+      await v_e84827.setItem('rememberMe', 'true');
+      console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
+
+      console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
+      v_9b57fc(v_ce4741.map);
+    } catch (v_5e9bfe) {
+      console.error('[애플 로그인] 오류:', v_5e9bfe);
+      await v_889fad(
+        v_8d41d7('common.messages.error') || '오류',
+        v_5e9bfe.message || '애플 로그인 중 오류가 발생했습니다.',
+      );
+    } finally {
+      v_deef62(false);
+    }
+  };
+
   const v_482f85 = (v_4a6533) => (
     <View style={v_d81136.snsLoginContainer}>
       <Text style={v_d81136.snsLoginLabel}>{v_8d41d7('screens.login.orLoginWith')}</Text>
@@ -472,9 +599,13 @@ export const v_f4f851 = () => {
           <SvgXml xml={v_d7e4c7} width={15} height={16} />
         </TouchableOpacity>
         {}
-        {
-
-}
+        <TouchableOpacity
+          style={v_d81136.snsButton}
+          disabled={v_4a6533}
+          onPress={v_ef4111}
+        >
+          <SvgXml xml={v_fb6eac} width={15} height={18} />
+        </TouchableOpacity>
         {}
         {
 
@@ -792,7 +923,7 @@ const v_d81136 = v_472849.create({
     width: '100%',
   },
   snsLoginLabel: {
-    marginLeft: v_700696.get('window').width / 4,
+    marginLeft: v_700696.get('window').width / 6,
     fontSize: v_843035.size.msmall,
     lineHeight: 20,
     color: '#4c4e55',

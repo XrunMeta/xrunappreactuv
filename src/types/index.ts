@@ -313,6 +313,24 @@ export interface ConnectGoogleAccountResponse {
   code?: string; 
 }
 
+export interface ConnectAppleAccountRequest {
+  confirmationToken: string;
+  pin: string;
+  [key: string]: any; 
+}
+
+export interface ConnectAppleAccountResponse {
+  success: boolean;
+  data?: Array<{
+    member: number;
+    email: string;
+    extrastr?: string; 
+    [key: string]: any;
+  }>;
+  message?: string;
+  code?: string; 
+}
+
 export interface EmailPasswordLoginRequest {
   type: 4;
   email: string;

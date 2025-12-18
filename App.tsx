@@ -649,10 +649,6 @@ const v_d0a391 = () => {
   v_c4deb2(() => {
     const v_bc755f = async () => {
 
-      if (__DEV__) {
-        console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
-        return;
-      }
       try {
         console.log('[App] 버전 확인 시작');
 
@@ -676,9 +672,14 @@ const v_d0a391 = () => {
 
         if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
           console.log('[App] 새 버전 발견:', v_1300ee);
-          v_b5ebec(v_1300ee);
-          v_d97db8(false); 
-          v_80c653(true);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
+            return;
+          }else{
+            v_b5ebec(v_1300ee);
+            v_d97db8(false); 
+            v_80c653(true);
+          }
         } else {
           console.log('[App] 최신 버전입니다.');
         }
