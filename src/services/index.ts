@@ -368,7 +368,7 @@ export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean>
   }
 };
 
-const createAxiosInstance = (navigation?: any) => {
+export const createAxiosInstance = (navigation?: any) => {
   const env = getEnv();
   const baseURL = env.GATEWAY_NODEJS;
   const authCode = env.GATEWAY_AUTH_CODE;
