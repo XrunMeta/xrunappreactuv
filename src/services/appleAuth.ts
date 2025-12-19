@@ -2,6 +2,7 @@
 
 import { Platform } from 'react-native';
 import appleAuth from '@invertase/react-native-apple-authentication';
+import axios, { AxiosError } from 'axios';
 import { getEnv } from '../utils/env';
 import { ROUTES } from '../navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -38,8 +39,9 @@ const getApiBaseUrl = (): string => {
   const baseUrl = env.GATEWAY_NODEJS;
 
   if (baseUrl.endsWith('/oth-path')) {
-    return baseUrl.replace('/oth-path', '');
+    return baseUrl; 
   }
+
   return baseUrl;
 };
 
@@ -119,50 +121,77 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
     });
 
     const apiBaseUrl = getApiBaseUrl();
-    const apiUrl = `${apiBaseUrl}/oth-path`;
 
-    console.log('[애플 로그인] 백엔드 API URL:', apiUrl);
+    const endpoint = '/oth-path';
+
+      const env = getEnv(); 
+    console.log('[애플 로그인] 백엔드 API baseURL:', apiBaseUrl);
+    console.log('[애플 로그인] 백엔드 API endpoint:', endpoint);
     console.log('[애플 로그인] Authorization 헤더 전송:', {
       hasToken: !!identityToken,
       tokenLength: identityToken.length,
-      headerFormat: 'Bearer <token>',
+      headerFormat: `Bearer 99999`,
     });
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     try {
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
+      const axiosInstance = axios.create({
+        baseURL: apiBaseUrl,
+        timeout: API_TIMEOUT,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${identityToken}`, 
+          'Authorization': `Bearer 9999`,
         },
-        body: JSON.stringify({
+      });
+
+      axiosInstance.interceptors.response.use(
+        (response) => response,
+        async (error: AxiosError) => {
+          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+            console.error('[애플 로그인] API 타임아웃');
+            if (navigation) {
+              await handleTimeoutError(navigation);
+            }
+          }
+          return Promise.reject(error);
+        },
+      );
+
+      axiosInstance.interceptors.request.use(
+        (config) => {
+          console.log('[애플 로그인] 실제 요청 URL:', `${config.baseURL}${config.url}`);
+          console.log('[애플 로그인] 실제 요청 헤더:', config.headers);
+          return config;
+        },
+        (error) => {
+          return Promise.reject(error);
+        },
+      );
+
+      console.log('[애플 로그인] Authorization 헤더:', `Bearer ${env.GATEWAY_AUTH_CODE}`);
+      console.log('[애플 로그인] Body:', {
+        identityToken: identityToken,
+        email: email,
+        name: name,
+      });
+
+      const response = await axiosInstance.post(
+        endpoint,
+        {
           identityToken: identityToken, 
           email: email, 
           name: name, 
-        }),
-        signal: controller.signal,
-      });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`, 
+          },
+        },
+      );
 
-      clearTimeout(timeoutId);
+      console.log('[애플 로그인] 백엔드 응답:', response.data);
 
-      const responseText = await response.text();
-      console.log('[애플 로그인] 백엔드 응답 본문:', responseText);
-
-      let data: any;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('[애플 로그인] 응답 파싱 오류:', parseError);
-        return {
-          success: false,
-          code: 'PARSE_ERROR',
-          message: '서버 응답을 파싱할 수 없습니다.',
-        };
-      }
+      const data = response.data;
 
       const requiresSignup = data.code === 200 && !data.success && (data.data?.requiresSignup === true || data.data?.isSignupCompleted === false);
 
@@ -203,7 +232,7 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
         };
       }
 
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         console.error('[애플 로그인] 백엔드 API 실패:', data);
         return {
           success: false,
@@ -224,17 +253,27 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
         data: data.data,
       };
     } catch (fetchError: any) {
-      clearTimeout(timeoutId);
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
 
-        console.error('[애플 로그인] API 타임아웃');
-        if (navigation) {
-          await handleTimeoutError(navigation);
+      if (axios.isAxiosError(fetchError)) {
+        if (fetchError.code === 'ECONNABORTED' || fetchError.message.includes('timeout')) {
+
+          console.error('[애플 로그인] API 타임아웃');
+          return {
+            success: false,
+            code: 'TIMEOUT',
+            message: '요청 시간이 초과되었습니다.',
+          };
         }
+
+        console.error('[애플 로그인] API 에러:', {
+          message: fetchError.message,
+          response: fetchError.response?.data,
+          status: fetchError.response?.status,
+        });
         return {
           success: false,
-          code: 'TIMEOUT',
-          message: '요청 시간이 초과되었습니다.',
+          code: fetchError.response?.data?.code || 'API_ERROR',
+          message: fetchError.response?.data?.message || fetchError.message || 'API 요청 중 오류가 발생했습니다.',
         };
       }
       throw fetchError;
