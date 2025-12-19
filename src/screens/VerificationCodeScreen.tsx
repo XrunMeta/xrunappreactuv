@@ -90,8 +90,10 @@ export const v_667a00 = () => {
         console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
 
         const v_ea9ffe = await v_e84827.getItem('googleSignupRequired');
+        const v_45c706 = await v_e84827.getItem('appleSignupRequired');
         const v_47b466 = v_ea9ffe === 'true';
-        console.log('[회원가입] 구글 회원가입 모드:', v_47b466);
+        const v_d0472c = v_45c706 === 'true';
+        console.log('[회원가입] 구글 회원가입 모드:', v_47b466, ', 애플 회원가입 모드:', v_d0472c);
 
         try {
 
@@ -172,9 +174,11 @@ export const v_667a00 = () => {
           try {
             await v_e84827.removeItem('googleSignupRequired');
             await v_e84827.removeItem('googleSignupEmail');
-            console.log('[회원가입] 구글 회원가입 플래그 제거 완료');
+            await v_e84827.removeItem('appleSignupRequired');
+            await v_e84827.removeItem('appleSignupEmail');
+            console.log('[회원가입] 소셜 회원가입 플래그 제거 완료');
           } catch (v_e7ef88) {
-            console.warn('[회원가입] 구글 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', v_e7ef88);
+            console.warn('[회원가입] 소셜 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', v_e7ef88);
           }
 
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');

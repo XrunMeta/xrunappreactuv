@@ -29,9 +29,11 @@ export const v_54d331 = () => {
     try {
       await v_e84827.removeItem('googleSignupRequired');
       await v_e84827.removeItem('googleSignupEmail');
-      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 구글 회원가입 플래그 제거');
+      await v_e84827.removeItem('appleSignupRequired');
+      await v_e84827.removeItem('appleSignupEmail');
+      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 소셜 회원가입 플래그 제거');
     } catch (v_5e9bfe) {
-      console.error('[회원가입] 구글 회원가입 플래그 제거 실패:', v_5e9bfe);
+      console.error('[회원가입] 소셜 회원가입 플래그 제거 실패:', v_5e9bfe);
     }
     v_9b57fc(v_ce4741.signup);
   };
