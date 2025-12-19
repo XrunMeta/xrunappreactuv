@@ -40,13 +40,7 @@
       "bundleIdentifier": "run.xrun.xrunapps",
       "associatedDomains": [
         "applinks:www.xrun.run"
-      ],
-      "appleAuthentication": {
-        "teamId": "677WG96CUJ",
-        "clientId": "run.xrun.xrunapps.signin",
-        "keyId": "C8A3JJZJBA",
-        "redirectUri": "https://oth-path-auth.example.invalid/oth-path"
-      }
+      ]
     },
     "android": {
       "package": "run.xrun.xrunapp",
@@ -95,7 +89,8 @@
             }
           }
         }
-      ]
+      ],
+      "expo-apple-authentication"
     ],
     "extra": {
       "eas": {

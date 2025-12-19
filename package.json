@@ -19,6 +19,7 @@
     "bignumber.js": "^9.3.1",
     "crypto-js": "^4.2.0",
     "expo": "~54.0.30",
+    "expo-apple-authentication": "~8.0.8",
     "expo-application": "~7.0.8",
     "expo-auth-session": "~7.0.10",
     "expo-build-properties": "^1.0.9",
