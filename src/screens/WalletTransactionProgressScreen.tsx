@@ -98,6 +98,17 @@ export const WalletTransactionProgressScreen = () => {
         );
 
         console.log('[WalletTransactionProgress] 전송 결과:', transferResult);
+        console.log('[WalletTransactionProgress] 전송 결과 코드:', transferResult.code);
+        console.log('[WalletTransactionProgress] 전송 결과 코드 타입:', typeof transferResult.code);
+
+        const code = Number(transferResult.code);
+        if (code === 2000) {
+          setStatusMessage('전송가능 금액이 초과되었습니다.');          
+          setIsProcessing(false);
+          setIsSuccess(false);
+          setTransferFailedDialogVisible(true);
+          return;
+        }
 
         if (transferResult.status !== 'success' || !transferResult.data?.txHash) {
           throw new Error(
@@ -220,7 +231,7 @@ export const WalletTransactionProgressScreen = () => {
         ]}
       >
         <Text style={styles.dialogMessage}>
-          {t('screens.walletTransactionProgress.alerts.transferFailedMessage')}
+          {statusMessage}
         </Text>
       </Dialog>
     </View>
