@@ -1,0 +1,2 @@
+EAS 빌드커맨드 
+EXPO_NO_CAPABILITY_SYNC=1 eas build -p ios --profile production --local

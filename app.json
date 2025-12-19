@@ -39,7 +39,7 @@
       },
       "bundleIdentifier": "run.xrun.xrunapps",
       "associatedDomains": [
-          "applinks:www.xrun.run"  
+        "applinks:www.xrun.run"
       ]
     },
     "android": {
@@ -76,7 +76,8 @@
       "expo-font",
       "expo-camera",
       "expo-location",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-iap"
     ],
     "extra": {
       "eas": {
