@@ -368,7 +368,7 @@ export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
   }
 };
 
-const v_7488d5 = (v_c65f5d) => {
+export const v_7488d5 = (v_c65f5d) => {
   const v_c9c489 = v_e4a763();
   const v_fed274 = v_c9c489.GATEWAY_NODEJS;
   const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
