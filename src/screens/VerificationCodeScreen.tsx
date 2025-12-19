@@ -90,8 +90,10 @@ export const VerificationCodeScreen = () => {
         console.log('[회원가입] 이메일 인증 완료 - 회원가입 진행');
 
         const googleSignupRequired = await AsyncStorage.getItem('googleSignupRequired');
+        const appleSignupRequired = await AsyncStorage.getItem('appleSignupRequired');
         const isGoogleSignupMode = googleSignupRequired === 'true';
-        console.log('[회원가입] 구글 회원가입 모드:', isGoogleSignupMode);
+        const isAppleSignupMode = appleSignupRequired === 'true';
+        console.log('[회원가입] 구글 회원가입 모드:', isGoogleSignupMode, ', 애플 회원가입 모드:', isAppleSignupMode);
 
         try {
 
@@ -172,9 +174,11 @@ export const VerificationCodeScreen = () => {
           try {
             await AsyncStorage.removeItem('googleSignupRequired');
             await AsyncStorage.removeItem('googleSignupEmail');
-            console.log('[회원가입] 구글 회원가입 플래그 제거 완료');
+            await AsyncStorage.removeItem('appleSignupRequired');
+            await AsyncStorage.removeItem('appleSignupEmail');
+            console.log('[회원가입] 소셜 회원가입 플래그 제거 완료');
           } catch (flagError) {
-            console.warn('[회원가입] 구글 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', flagError);
+            console.warn('[회원가입] 소셜 회원가입 플래그 제거 실패 (일반 회원가입일 수 있음):', flagError);
           }
 
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');

@@ -29,9 +29,11 @@ export const LoginSignupScreen = () => {
     try {
       await AsyncStorage.removeItem('googleSignupRequired');
       await AsyncStorage.removeItem('googleSignupEmail');
-      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 구글 회원가입 플래그 제거');
+      await AsyncStorage.removeItem('appleSignupRequired');
+      await AsyncStorage.removeItem('appleSignupEmail');
+      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 소셜 회원가입 플래그 제거');
     } catch (error) {
-      console.error('[회원가입] 구글 회원가입 플래그 제거 실패:', error);
+      console.error('[회원가입] 소셜 회원가입 플래그 제거 실패:', error);
     }
     navigate(ROUTES.signup);
   };

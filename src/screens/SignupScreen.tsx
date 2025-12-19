@@ -83,6 +83,7 @@ export const SignupScreen = () => {
   const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSignupMode, setIsGoogleSignupMode] = useState(false);
+  const [isAppleSignupMode, setIsAppleSignupMode] = useState(false);
 
   const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
 
@@ -148,8 +149,9 @@ export const SignupScreen = () => {
   const isMountedRef = React.useRef(false);
 
   React.useEffect(() => {
-    const checkGoogleSignupMode = async () => {
+    const checkSocialSignupMode = async () => {
       try {
+
         const googleSignupRequired = await AsyncStorage.getItem('googleSignupRequired');
         if (googleSignupRequired === 'true') {
           setIsGoogleSignupMode(true);
@@ -158,13 +160,24 @@ export const SignupScreen = () => {
             setEmail(googleEmail);
             console.log('[회원가입] 구글 회원가입 모드, 이메일 자동 입력:', googleEmail);
           }
+          return; 
+        }
+
+        const appleSignupRequired = await AsyncStorage.getItem('appleSignupRequired');
+        if (appleSignupRequired === 'true') {
+          setIsAppleSignupMode(true);
+          const appleEmail = await AsyncStorage.getItem('appleSignupEmail');
+          if (appleEmail) {
+            setEmail(appleEmail);
+            console.log('[회원가입] 애플 회원가입 모드, 이메일 자동 입력:', appleEmail);
+          }
         }
       } catch (error) {
-        console.error('[회원가입] 구글 회원가입 모드 확인 실패:', error);
+        console.error('[회원가입] 소셜 회원가입 모드 확인 실패:', error);
       }
     };
 
-    checkGoogleSignupMode();
+    checkSocialSignupMode();
   }, []);
 
   React.useEffect(() => {
@@ -195,11 +208,11 @@ export const SignupScreen = () => {
   }, [signupFormData.referralEmail]);
 
   React.useEffect(() => {
-    if (!isMountedRef.current) {
+      if (!isMountedRef.current) {
 
-      if (!isGoogleSignupMode) {
-        setEmail(signupFormData.email);
-      }
+        if (!isGoogleSignupMode && !isAppleSignupMode) {
+          setEmail(signupFormData.email);
+        }
       setFamilyName(signupFormData.familyName);
       setGivenName(signupFormData.givenName);
 
@@ -219,7 +232,7 @@ export const SignupScreen = () => {
       setPrivacyTermsAccepted(false);
       isMountedRef.current = true;
     }
-  }, [signupFormData, isGoogleSignupMode]);
+  }, [signupFormData, isGoogleSignupMode, isAppleSignupMode]);
 
   React.useEffect(() => {
     if (!isMountedRef.current) return;
@@ -326,7 +339,7 @@ export const SignupScreen = () => {
 
     try {
 
-      if (!isGoogleSignupMode) {
+      if (!isGoogleSignupMode && !isAppleSignupMode) {
         console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
         const isEmailAvailable = await checkEmailAvailability(email.trim(), navigate);
 
@@ -336,7 +349,7 @@ export const SignupScreen = () => {
           return;
         }
       } else {
-        console.log('[회원가입] 구글 회원가입 모드 - 이메일 중복 확인 스킵');
+        console.log('[회원가입] 소셜 회원가입 모드 - 이메일 중복 확인 스킵');
       }
 
       let referralMemberId = 0;
@@ -475,12 +488,16 @@ export const SignupScreen = () => {
 
   const dialogBodyMaxHeight = Math.min(520, Math.round(Dimensions.get('window').height * 0.55));
 
-  const handleBackPress = () => {
+  const handleBackPress = async () => {
 
-    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', isGoogleSignupMode, ')');
+    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', isGoogleSignupMode, ', 애플 회원가입 모드:', isAppleSignupMode, ')');
 
-    if (isGoogleSignupMode) {
+    if (isGoogleSignupMode || isAppleSignupMode) {
 
+      await AsyncStorage.removeItem('googleSignupRequired');
+      await AsyncStorage.removeItem('googleSignupEmail');
+      await AsyncStorage.removeItem('appleSignupRequired');
+      await AsyncStorage.removeItem('appleSignupEmail');
       navigate(ROUTES.login);
     } else {
 
@@ -490,11 +507,11 @@ export const SignupScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title={isGoogleSignupMode ? '구글 회원가입' : t('screens.signup.title')}
-        onBackPress={handleBackPress}
-        showBackButton={true}
-      />
+        <Header
+          title={isGoogleSignupMode ? '구글 회원가입' : isAppleSignupMode ? '애플 회원가입' : t('screens.signup.title')}
+          onBackPress={handleBackPress}
+          showBackButton={true}
+        />
       <Dialog
         visible={clauseDialogVisible}
         title={clauseTitleMap[selectedClauseIdForDialog]}
@@ -567,7 +584,7 @@ export const SignupScreen = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             containerStyle={styles.fieldContainer}
-            editable={!isGoogleSignupMode}
+            editable={!isGoogleSignupMode && !isAppleSignupMode}
           />
 
           <FormField
