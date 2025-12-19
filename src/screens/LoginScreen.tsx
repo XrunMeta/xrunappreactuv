@@ -599,13 +599,15 @@ export const v_f4f851 = () => {
           <SvgXml xml={v_d7e4c7} width={15} height={16} />
         </TouchableOpacity>
         {}
-        <TouchableOpacity
-          style={v_d81136.snsButton}
-          disabled={v_4a6533}
-          onPress={v_ef4111}
-        >
-          <SvgXml xml={v_fb6eac} width={15} height={18} />
-        </TouchableOpacity>
+        {v_326be8.OS === 'ios' && (
+          <TouchableOpacity
+            style={v_d81136.snsButton}
+            disabled={v_4a6533}
+            onPress={v_ef4111}
+          >
+            <SvgXml xml={v_fb6eac} width={15} height={18} />
+          </TouchableOpacity>
+        )}
         {}
         {
 
@@ -777,10 +779,10 @@ export const v_f4f851 = () => {
         ]}
       >
         <View style={v_d81136.linkingContainer}>
-          <Text style={v_d81136.linkingMessage}>{`XRUN 계정에 Google 계정을 연결하면
+          <Text style={v_d81136.linkingMessage}>{`XRUN 계정에 ${v_2156ca === 'google' ? 'Google' : 'Apple'} 계정을 연결하면
 보다 간편하게 로그인할 수 있습니다.
 
-구글 계정과 xrun계정`}
+${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 

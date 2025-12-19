@@ -240,7 +240,28 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
       throw v_690fe1;
     }
   } catch (v_5e9bfe) {
-    console.error('[애플 로그인] 에러:', v_5e9bfe);
+    console.error('[애플 로그인] 에러 상세:', {
+      error: v_5e9bfe,
+      code: v_5e9bfe.code,
+      message: v_5e9bfe.message,
+      userInfo: v_5e9bfe.userInfo,
+      nativeError: v_5e9bfe.nativeError,
+      errorString: v_5e9bfe.toString(),
+      stack: v_5e9bfe.stack,
+    });
+
+    if (v_5e9bfe.code === 1000) {
+      console.error('[애플 로그인] 에러 1000 발생 - 가능한 원인:');
+      console.error('1. Apple Developer 설정 문제 (App ID에 Sign in with Apple 활성화 확인)');
+      console.error('2. 프로비저닝 프로파일 문제 (Sign in with Apple capability 포함 확인)');
+      console.error('3. Bundle Identifier 불일치 확인');
+      console.error('4. 사용자가 로그인을 취소했을 수 있음');
+      return {
+        success: false,
+        code: 'AUTHORIZATION_ERROR_1000',
+        message: '애플 로그인 설정을 확인해주세요. Apple Developer에서 App ID와 프로비저닝 프로파일을 확인하세요.',
+      };
+    }
 
     if (v_5e9bfe.code === v_d093db.Error.CANCELED) {
       return {
