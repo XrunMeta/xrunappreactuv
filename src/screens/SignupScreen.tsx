@@ -83,6 +83,7 @@ export const v_f40fc5 = () => {
   const [v_e55f34, v_f932c8] = v_5ab095(false);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
   const [v_47b466, v_dee9cd] = v_5ab095(false);
+  const [v_d0472c, v_5d25dd] = v_5ab095(false);
 
   const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
 
@@ -148,8 +149,9 @@ export const v_f40fc5 = () => {
   const v_2ca208 = v_a3453e.useRef(false);
 
   v_a3453e.useEffect(() => {
-    const v_5e51fe = async () => {
+    const v_b2b2a0 = async () => {
       try {
+
         const v_ea9ffe = await v_e84827.getItem('googleSignupRequired');
         if (v_ea9ffe === 'true') {
           v_dee9cd(true);
@@ -158,13 +160,24 @@ export const v_f40fc5 = () => {
             v_fedf34(v_3639b5);
             console.log('[회원가입] 구글 회원가입 모드, 이메일 자동 입력:', v_3639b5);
           }
+          return; 
+        }
+
+        const v_45c706 = await v_e84827.getItem('appleSignupRequired');
+        if (v_45c706 === 'true') {
+          v_5d25dd(true);
+          const v_743678 = await v_e84827.getItem('appleSignupEmail');
+          if (v_743678) {
+            v_fedf34(v_743678);
+            console.log('[회원가입] 애플 회원가입 모드, 이메일 자동 입력:', v_743678);
+          }
         }
       } catch (v_5e9bfe) {
-        console.error('[회원가입] 구글 회원가입 모드 확인 실패:', v_5e9bfe);
+        console.error('[회원가입] 소셜 회원가입 모드 확인 실패:', v_5e9bfe);
       }
     };
 
-    v_5e51fe();
+    v_b2b2a0();
   }, []);
 
   v_a3453e.useEffect(() => {
@@ -195,11 +208,11 @@ export const v_f40fc5 = () => {
   }, [v_8d7bc8.referralEmail]);
 
   v_a3453e.useEffect(() => {
-    if (!v_2ca208.current) {
+      if (!v_2ca208.current) {
 
-      if (!v_47b466) {
-        v_fedf34(v_8d7bc8.email);
-      }
+        if (!v_47b466 && !v_d0472c) {
+          v_fedf34(v_8d7bc8.email);
+        }
       v_6dde2f(v_8d7bc8.familyName);
       v_15ded5(v_8d7bc8.givenName);
 
@@ -219,7 +232,7 @@ export const v_f40fc5 = () => {
       v_f932c8(false);
       v_2ca208.current = true;
     }
-  }, [v_8d7bc8, v_47b466]);
+  }, [v_8d7bc8, v_47b466, v_d0472c]);
 
   v_a3453e.useEffect(() => {
     if (!v_2ca208.current) return;
@@ -326,7 +339,7 @@ export const v_f40fc5 = () => {
 
     try {
 
-      if (!v_47b466) {
+      if (!v_47b466 && !v_d0472c) {
         console.log('[회원가입] 1단계: 이메일 중복 확인 시작');
         const v_d854e8 = await v_60e3a5(v_e0c7e8.trim(), v_9b57fc);
 
@@ -336,7 +349,7 @@ export const v_f40fc5 = () => {
           return;
         }
       } else {
-        console.log('[회원가입] 구글 회원가입 모드 - 이메일 중복 확인 스킵');
+        console.log('[회원가입] 소셜 회원가입 모드 - 이메일 중복 확인 스킵');
       }
 
       let v_65bdb1 = 0;
@@ -475,12 +488,16 @@ export const v_f40fc5 = () => {
 
   const v_4c70c4 = Math.min(520, Math.round(v_700696.get('window').height * 0.55));
 
-  const v_648e0d = () => {
+  const v_648e0d = async () => {
 
-    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', v_47b466, ')');
+    console.log('[회원가입] 뒤로가기 (구글 회원가입 모드:', v_47b466, ', 애플 회원가입 모드:', v_d0472c, ')');
 
-    if (v_47b466) {
+    if (v_47b466 || v_d0472c) {
 
+      await v_e84827.removeItem('googleSignupRequired');
+      await v_e84827.removeItem('googleSignupEmail');
+      await v_e84827.removeItem('appleSignupRequired');
+      await v_e84827.removeItem('appleSignupEmail');
       v_9b57fc(v_ce4741.login);
     } else {
 
@@ -490,11 +507,11 @@ export const v_f40fc5 = () => {
 
   return (
     <View style={v_d81136.container}>
-      <Header
-        title={v_47b466 ? '구글 회원가입' : v_8d41d7('screens.signup.title')}
-        onBackPress={v_648e0d}
-        showBackButton={true}
-      />
+        <Header
+          title={v_47b466 ? '구글 회원가입' : v_d0472c ? '애플 회원가입' : v_8d41d7('screens.signup.title')}
+          onBackPress={v_648e0d}
+          showBackButton={true}
+        />
       <Dialog
         visible={v_7dc79d}
         title={v_c6eb94[v_90b6e5]}
@@ -567,7 +584,7 @@ export const v_f40fc5 = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
-            editable={!v_47b466}
+            editable={!v_47b466 && !v_d0472c}
           />
 
           <FormField
