@@ -599,13 +599,15 @@ export const LoginScreen = () => {
           <SvgXml xml={googleIconSvg} width={15} height={16} />
         </TouchableOpacity>
         {}
-        <TouchableOpacity
-          style={styles.snsButton}
-          disabled={disabled}
-          onPress={handleAppleLogin}
-        >
-          <SvgXml xml={appleIconSvg} width={15} height={18} />
-        </TouchableOpacity>
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={styles.snsButton}
+            disabled={disabled}
+            onPress={handleAppleLogin}
+          >
+            <SvgXml xml={appleIconSvg} width={15} height={18} />
+          </TouchableOpacity>
+        )}
         {}
         {
 
@@ -777,10 +779,10 @@ export const LoginScreen = () => {
         ]}
       >
         <View style={styles.linkingContainer}>
-          <Text style={styles.linkingMessage}>{`XRUN 계정에 Google 계정을 연결하면
+          <Text style={styles.linkingMessage}>{`XRUN 계정에 ${linkingType === 'google' ? 'Google' : 'Apple'} 계정을 연결하면
 보다 간편하게 로그인할 수 있습니다.
 
-구글 계정과 xrun계정`}
+${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 
