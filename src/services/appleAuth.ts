@@ -2,6 +2,7 @@
 
 import { v_326be8 } from 'rcmrninabrnb';
 import v_d093db from 'ocpbencskfkjxkiirvlnsmajutouhjqdyyfhsjechxbx';
+import v_b5030f, { v_3333d3 } from 'imsks';
 import { v_e4a763 } from '../utils/env';
 import { v_ce4741 } from '../navigation';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -38,8 +39,9 @@ const v_755eb9 = (): string => {
   const v_c01615 = v_c9c489.GATEWAY_NODEJS;
 
   if (v_c01615.endsWith('/oth-path')) {
-    return v_c01615.replace('/oth-path', '');
+    return v_c01615; 
   }
+
   return v_c01615;
 };
 
@@ -119,50 +121,77 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
     });
 
     const v_e9a15d = v_755eb9();
-    const v_8a32c8 = `${v_e9a15d}/oth-path`;
 
-    console.log('[애플 로그인] 백엔드 API URL:', v_8a32c8);
+    const v_09dafd = '/oth-path';
+
+      const v_c9c489 = v_e4a763(); 
+    console.log('[애플 로그인] 백엔드 API baseURL:', v_e9a15d);
+    console.log('[애플 로그인] 백엔드 API endpoint:', v_09dafd);
     console.log('[애플 로그인] Authorization 헤더 전송:', {
       hasToken: !!v_55f908,
       tokenLength: v_55f908.length,
-      headerFormat: 'Bearer <token>',
+      headerFormat: `Bearer 99999`,
     });
-
-    const v_4fc7c7 = new AbortController();
-    const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), v_8a74cb);
 
     try {
 
-      const v_3393e3 = await fetch(v_8a32c8, {
-        method: 'POST',
+      const v_9f42a4 = v_b5030f.create({
+        baseURL: v_e9a15d,
+        timeout: v_8a74cb,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${v_55f908}`, 
+          'Authorization': `Bearer 9999`,
         },
-        body: JSON.stringify({
+      });
+
+      v_9f42a4.interceptors.response.use(
+        (v_3393e3) => v_3393e3,
+        async (error: v_3333d3) => {
+          if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
+            console.error('[애플 로그인] API 타임아웃');
+            if (v_c65f5d) {
+              await v_e4d665(v_c65f5d);
+            }
+          }
+          return Promise.reject(v_5e9bfe);
+        },
+      );
+
+      v_9f42a4.interceptors.request.use(
+        (v_74a79c) => {
+          console.log('[애플 로그인] 실제 요청 URL:', `${v_74a79c.baseURL}${v_74a79c.url}`);
+          console.log('[애플 로그인] 실제 요청 헤더:', v_74a79c.headers);
+          return v_74a79c;
+        },
+        (v_5e9bfe) => {
+          return Promise.reject(v_5e9bfe);
+        },
+      );
+
+      console.log('[애플 로그인] Authorization 헤더:', `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`);
+      console.log('[애플 로그인] Body:', {
+        identityToken: v_55f908,
+        email: v_e0c7e8,
+        name: v_1833e7,
+      });
+
+      const v_3393e3 = await v_9f42a4.post(
+        v_09dafd,
+        {
           identityToken: v_55f908, 
           email: v_e0c7e8, 
           name: v_1833e7, 
-        }),
-        signal: v_4fc7c7.signal,
-      });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`, 
+          },
+        },
+      );
 
-      clearTimeout(v_3894d5);
+      console.log('[애플 로그인] 백엔드 응답:', v_3393e3.data);
 
-      const v_1e99f6 = await v_3393e3.text();
-      console.log('[애플 로그인] 백엔드 응답 본문:', v_1e99f6);
-
-      let v_9390e8;
-      try {
-        v_9390e8 = JSON.parse(v_1e99f6);
-      } catch (v_5f9add) {
-        console.error('[애플 로그인] 응답 파싱 오류:', v_5f9add);
-        return {
-          success: false,
-          code: 'PARSE_ERROR',
-          message: '서버 응답을 파싱할 수 없습니다.',
-        };
-      }
+      const v_9390e8 = v_3393e3.data;
 
       const v_aa93c2 = v_9390e8.code === 200 && !v_9390e8.success && (v_9390e8.data?.requiresSignup === true || v_9390e8.data?.isSignupCompleted === false);
 
@@ -203,7 +232,7 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
         };
       }
 
-      if (!v_3393e3.ok || !v_9390e8.success) {
+      if (!v_9390e8.success) {
         console.error('[애플 로그인] 백엔드 API 실패:', v_9390e8);
         return {
           success: false,
@@ -224,17 +253,27 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
         data: v_9390e8.data,
       };
     } catch (v_690fe1) {
-      clearTimeout(v_3894d5);
-      if (v_690fe1 instanceof Error && v_690fe1.name === 'AbortError') {
 
-        console.error('[애플 로그인] API 타임아웃');
-        if (v_c65f5d) {
-          await v_e4d665(v_c65f5d);
+      if (v_b5030f.isAxiosError(v_690fe1)) {
+        if (v_690fe1.code === 'ECONNABORTED' || v_690fe1.message.includes('timeout')) {
+
+          console.error('[애플 로그인] API 타임아웃');
+          return {
+            success: false,
+            code: 'TIMEOUT',
+            message: '요청 시간이 초과되었습니다.',
+          };
         }
+
+        console.error('[애플 로그인] API 에러:', {
+          message: v_690fe1.message,
+          response: v_690fe1.response?.data,
+          status: v_690fe1.response?.status,
+        });
         return {
           success: false,
-          code: 'TIMEOUT',
-          message: '요청 시간이 초과되었습니다.',
+          code: v_690fe1.response?.data?.code || 'API_ERROR',
+          message: v_690fe1.response?.data?.message || v_690fe1.message || 'API 요청 중 오류가 발생했습니다.',
         };
       }
       throw v_690fe1;
