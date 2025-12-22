@@ -19,9 +19,9 @@
         "googleMapsApiKey": "oth-google-api-key"
       },
       "infoPlist": {
-        "NSCameraUsageDescription": "서비스 지점 안내, AR 기능 사용을 위해 카메라 권한이 필요합니다.",
-        "NSPhotoLibraryUsageDescription": "선택적으로, 사용자의 이미지를 업로드 하기 위해 사진 권한이 필요합니다.",
-        "NSLocationWhenInUseUsageDescription": "사용자 주변의 가까운 매장이나 서비스 지점을 찾아서 안내하기 위해 위치 정보가 사용됩니다.",
+        "NSCameraUsageDescription": "서비스 지점 안내, AR 기능 사용을 위해 카메라 권한이 필요합니다. We need camera access to show you service locations and provide AR features.",
+        "NSPhotoLibraryUsageDescription": "선택적으로, 사용자의 이미지를 업로드 하기 위해 사진 권한이 필요합니다. You can optionally allow photo access if you'd like to upload your own images.",
+        "NSLocationWhenInUseUsageDescription": "사용자 주변의 가까운 매장이나 서비스 지점을 찾아서 안내하기 위해 위치 정보가 사용됩니다. Your location helps us find and suggest the nearest stores or service points for you.",
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleURLTypes": [
           {

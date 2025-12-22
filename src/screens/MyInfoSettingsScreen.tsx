@@ -1,15 +1,68 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
-import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS } from '../constants';
+import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { 
+  getCurrentAppVersionNumber, 
+  checkServerVersion, 
+  openStore 
+} from '../services/versionCheck';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
   const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
+  const [versionInfo, setVersionInfo] = useState<{
+    androidCurrent: number;
+    androidLatest: number;
+    iosCurrent: number;
+    iosLatest: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchVersionInfo = async () => {
+      try {
+
+        const currentVersion = getCurrentAppVersionNumber();
+
+        const serverResponse = await checkServerVersion();
+
+        if (serverResponse && serverResponse.data) {
+
+          const androidLatest = serverResponse.data.version || 0;
+          const iosLatest = serverResponse.data.version_ios || 0;
+
+          const androidCurrent = Platform.OS === 'android' ? currentVersion : androidLatest;
+          const iosCurrent = Platform.OS === 'ios' ? currentVersion : iosLatest;
+
+          setVersionInfo({
+            androidCurrent,
+            androidLatest,
+            iosCurrent,
+            iosLatest,
+          });
+        } else {
+
+          const androidCurrent = Platform.OS === 'android' ? currentVersion : 0;
+          const iosCurrent = Platform.OS === 'ios' ? currentVersion : 0;
+
+          setVersionInfo({
+            androidCurrent,
+            androidLatest: androidCurrent,
+            iosCurrent,
+            iosLatest: iosCurrent,
+          });
+        }
+      } catch (error) {
+        console.error('[MyInfoSettingsScreen] 버전 정보 가져오기 실패:', error);
+      }
+    };
+
+    fetchVersionInfo();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -33,6 +86,19 @@ export const MyInfoSettingsScreen = () => {
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
+
+          {}
+          {versionInfo && (
+            <TouchableOpacity
+              style={styles.versionContainer}
+              activeOpacity={0.7}
+              onPress={openStore}
+            >
+              <Text style={styles.versionText}>
+                AOS : {versionInfo.androidCurrent}/{versionInfo.androidLatest} IOS : {versionInfo.iosCurrent}/{versionInfo.iosLatest}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </SafeScrollView> 
         <LanguageSelector
@@ -70,6 +136,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
   },
+  versionContainer: {
+    width: '100%',
+    paddingTop: SIZES.medium,
+    paddingBottom: SIZES.small,
+    alignItems: 'center',
+  },
+  versionText: {
+    fontSize: FONTS.size.xsmall,
+    fontFamily: FONTS.family.regular,
+    color: '#999999',
+    textAlign: 'center',
+  },
 });
-
 
