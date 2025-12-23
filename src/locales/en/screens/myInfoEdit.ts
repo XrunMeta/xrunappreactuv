@@ -16,7 +16,9 @@ export default {
   gender: 'Gender',
   genderMale: 'Male',
   genderFemale: 'Female',
+  genderSelect: 'Select',
   age: 'Age',
+  ageSelect: 'Select',
   save: 'Save',
   cancel: 'Cancel',
   lastPasswordChangeDate: 'Last Password Change Date',
@@ -42,6 +44,8 @@ export default {
     emailNotFound: 'Email information is not available.',
     emailSendFailed: 'Failed to send email verification code. Please try again.',
     verificationError: 'An error occurred during verification. Please try again.',
+    appleLoginInfo: 'Notice',
+    appleLoginMessage: 'When using Apple login, password and phone number updates are required.',
   },
 };
 

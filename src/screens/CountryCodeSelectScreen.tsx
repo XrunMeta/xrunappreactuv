@@ -28,29 +28,54 @@ export const v_379bd1 = () => {
   } = v_700ef9();
   const [v_7c5791, v_c57190] = v_5ab095('');
 
-  const v_093bd4 = v_479a37 === 'region' ? v_52495e : v_202d44;
+  const selectOption: v_da1883 = v_df9f57(() => ({
+    iso2: 'select',
+    name: v_8d41d7('screens.signup.genderSelect') || '선택',
+    dialCode: '0',
+    flagEmoji: '📍',
+    countryCode: 0,
+  }), [v_8d41d7]);
+
+  const v_980e13 = v_479a37 === 'region' ? v_52495e : v_202d44;
+
+  const v_093bd4 = v_df9f57(() => {
+    return v_479a37 === 'region' ? [v_a35839, ...v_980e13] : v_980e13;
+  }, [v_479a37, v_a35839, v_980e13]);
+
   const v_c6e76b = v_479a37 === 'region' ? v_2f03bc : v_459d5e;
 
   const v_973c3e = v_df9f57(() => {
-    if (!v_7c5791.trim()) {
-      return v_093bd4;
+    let v_4622b9 = v_093bd4;
+
+    if (v_7c5791.trim()) {
+      const v_470e34 = v_7c5791.trim().toLowerCase();
+      const v_5a09fa = v_470e34.replace(/[^0-9]/g, '');
+
+      v_4622b9 = v_093bd4.filter((v_8c0b26) => {
+        const v_cd2b74 = v_8c0b26.name.toLowerCase();
+        const v_73b9dc = v_8c0b26.iso2.toLowerCase();
+        const v_62656e = v_8c0b26.dialCode.replace('+', '');
+
+        return (
+          v_cd2b74.includes(v_470e34) ||
+          v_73b9dc.includes(v_470e34) ||
+          (v_5a09fa.length > 0 && v_62656e.startsWith(v_5a09fa))
+        );
+      });
+
+      const v_bf5d8c = v_4622b9.some(v_8c0b26 => v_8c0b26.iso2 === 'select');
+      if (!v_bf5d8c && (v_470e34.includes('선택') || v_470e34.includes('select'))) {
+        v_4622b9 = [v_a35839, ...v_4622b9];
+      }
+    } else {
+
+      if (v_479a37 === 'region' && v_4622b9[0]?.iso2 !== 'select') {
+        v_4622b9 = [v_a35839, ...v_4622b9];
+      }
     }
 
-    const v_470e34 = v_7c5791.trim().toLowerCase();
-    const v_5a09fa = v_470e34.replace(/[^0-9]/g, '');
-
-    return v_093bd4.filter((v_8c0b26) => {
-      const v_cd2b74 = v_8c0b26.name.toLowerCase();
-      const v_73b9dc = v_8c0b26.iso2.toLowerCase();
-      const v_62656e = v_8c0b26.dialCode.replace('+', '');
-
-      return (
-        v_cd2b74.includes(v_470e34) ||
-        v_73b9dc.includes(v_470e34) ||
-        (v_5a09fa.length > 0 && v_62656e.startsWith(v_5a09fa))
-      );
-    });
-  }, [v_7c5791, v_093bd4]);
+    return v_4622b9;
+  }, [v_7c5791, v_093bd4, v_479a37, v_a35839]);
 
   const v_6121dc = (item: v_da1883) => {
     console.log('[국가선택] handleSelect 호출:', {

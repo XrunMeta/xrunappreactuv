@@ -26,6 +26,8 @@ import {
   v_9d2541,
   v_91bb22,
 } from '../services';
+import { v_7af6c9 } from '../services/appleAuth';
+import { v_3333d3 } from 'imsks';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -118,18 +120,19 @@ export const v_667a00 = () => {
 
           const v_df7dab = {
             email: v_fad096.email,
-            pin: v_fad096.password,
+            pin: v_d0472c ? '' : (v_fad096.password || ''), 
             firstname: v_fad096.givenName,
             lastname: v_fad096.familyName?.trim() || '', 
-            gender: v_91bb22.getGenderCode(v_fad096.gender),
-            mobile: v_fad096.phoneNumber,
+            gender: v_91bb22.getGenderCode(v_fad096.gender || '0'),
+            mobile: v_fad096.phoneNumber || '', 
             mobilecode: v_6c3a47,
             countrycode: v_a4d981,
             country: v_6c3a47,
             region: v_94bdf5,
-            age: v_91bb22.getAgeCode(v_fad096.ageRange),
-            recommand: v_fad096.referralMemberId,
+            age: v_91bb22.getAgeCode(v_fad096.ageRange || '0'),
+            recommand: v_fad096.referralMemberId || 0,
             os: v_91bb22.getOSCode(),
+            social_code: v_d0472c ? 2052 : (v_47b466 ? 2051 : undefined), 
           };
 
           console.log('[회원가입] 회원가입 API 호출 시작', {
@@ -138,7 +141,69 @@ export const v_667a00 = () => {
             firstname: v_df7dab.firstname,
             mobile: v_df7dab.mobile,
           });
-          const v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
+
+          let v_d0b446 = false;
+          try {
+            v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
+          } catch (v_788ec0) {
+
+            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
+              console.log('[회원가입] 이미 사용중인 이메일 (409) - 회원가입이 이미 완료된 것으로 간주, 로그인 화면으로 이동');
+
+              await v_e84827.removeItem('pendingSignupData');
+
+              try {
+                await v_e84827.removeItem('googleSignupRequired');
+                await v_e84827.removeItem('googleSignupEmail');
+                await v_e84827.removeItem('appleSignupRequired');
+                await v_e84827.removeItem('appleSignupEmail');
+              } catch (v_e7ef88) {
+                console.warn('[회원가입] 소셜 회원가입 플래그 제거 실패:', v_e7ef88);
+              }
+
+              if (v_d0472c) {
+                await v_e84827.setItem('appleSignupCompleted', 'true');
+                await v_e84827.setItem('appleSignupCompletedEmail', v_fad096.email);
+                console.log('[회원가입] 애플 회원가입 완료 플래그 저장 (409 에러):', v_fad096.email);
+              }
+
+              v_036f76();
+
+              if (v_d0472c) {
+                await v_889fad(
+                  v_8d41d7('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
+                  v_8d41d7('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 애플 로그인으로 로그인해주세요.',
+                  [
+                    {
+                      text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                      onPress: () => {
+                        v_487a25(v_ce4741.authLanding);
+                        v_9b57fc(v_ce4741.login);
+                      },
+                    },
+                  ],
+                );
+              } else {
+                await v_889fad(
+                  v_8d41d7('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
+                  v_8d41d7('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 로그인 화면에서 로그인해주세요.',
+                  [
+                    {
+                      text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                      onPress: () => {
+                        v_487a25(v_ce4741.authLanding);
+                        v_9b57fc(v_ce4741.login);
+                      },
+                    },
+                  ],
+                );
+              }
+              v_ff0c7a(false);
+              return;
+            }
+
+            throw v_788ec0;
+          }
 
           if (!v_d0b446) {
 
@@ -152,24 +217,34 @@ export const v_667a00 = () => {
             return;
           }
 
-          console.log('[회원가입] 로그인 확인 시작');
-          const v_7e280a = await v_9d2541(v_fad096.email, v_fad096.password, v_9b57fc);
+          if (!v_d0472c) {
+            console.log('[회원가입] 로그인 확인 시작');
+            const v_7e280a = await v_9d2541(v_fad096.email, v_fad096.password, v_9b57fc);
 
-          if (!v_7e280a) {
-            await v_889fad(
-              v_8d41d7('screens.signup.alerts.loginCheckFailed') || '로그인 확인 실패',
-              v_8d41d7('screens.signup.errors.loginCheckFailed') || '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
-            );
+            if (!v_7e280a) {
+              await v_889fad(
+                v_8d41d7('screens.signup.alerts.loginCheckFailed') || '로그인 확인 실패',
+                v_8d41d7('screens.signup.errors.loginCheckFailed') || '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+              );
 
-            await v_e84827.removeItem('pendingSignupData');
-            v_036f76();
-            v_487a25(v_ce4741.authLanding);
-            v_9b57fc(v_ce4741.login);
-            v_ff0c7a(false);
-            return;
+              await v_e84827.removeItem('pendingSignupData');
+              v_036f76();
+              v_487a25(v_ce4741.authLanding);
+              v_9b57fc(v_ce4741.login);
+              v_ff0c7a(false);
+              return;
+            }
+          } else {
+            console.log('[회원가입] 애플 회원가입 모드 - 로그인 확인 건너뛰기 (애플 로그인으로 직접 로그인 필요)');
           }
 
           await v_e84827.removeItem('pendingSignupData');
+
+          if (v_d0472c) {
+            await v_e84827.setItem('appleSignupCompleted', 'true');
+            await v_e84827.setItem('appleSignupCompletedEmail', v_fad096.email);
+            console.log('[회원가입] 애플 회원가입 완료 플래그 저장:', v_fad096.email);
+          }
 
           try {
             await v_e84827.removeItem('googleSignupRequired');
@@ -184,19 +259,104 @@ export const v_667a00 = () => {
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           v_036f76();
-          await v_889fad(
-            v_8d41d7('screens.signup.success.title') || '회원가입 완료',
-            v_8d41d7('screens.signup.success.message') || '회원가입이 완료되었습니다.',
-            [
-              {
-                text: v_8d41d7('screens.signup.success.confirm') || '확인',
-                onPress: () => {
-                  v_487a25(v_ce4741.authLanding);
-                  v_9b57fc(v_ce4741.login);
+
+          if (v_d0472c) {
+
+            console.log('[회원가입] 애플 회원가입 완료 - 자동 로그인 시작');
+
+            try {
+
+              const v_25c481 = await v_7af6c9(v_9b57fc);
+
+              if (!v_25c481.success || !v_25c481.data) {
+                console.error('[회원가입] 애플 자동 로그인 실패:', v_25c481.message);
+
+                await v_889fad(
+                  v_8d41d7('screens.signup.alerts.error') || '오류',
+                  v_8d41d7('screens.signup.errors.autoLoginFailed') || '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+                  [
+                    {
+                      text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                      onPress: () => {
+                        v_487a25(v_ce4741.authLanding);
+                        v_9b57fc(v_ce4741.login);
+                      },
+                    },
+                  ],
+                );
+                v_ff0c7a(false);
+                return;
+              }
+
+              const { memberId: v_717992, email: v_e0c7e8, name: v_1833e7, accessToken: v_2ca7e0, refreshToken: v_dfaee3 } = v_25c481.data;
+
+              console.log('[회원가입] 애플 자동 로그인 성공:', { memberId: v_717992, email: v_e0c7e8 });
+
+              const v_ef7306 = {
+                member: v_717992,
+                email: v_e0c7e8,
+                firstname: v_1833e7 ? (v_1833e7.split(' ')[0] || v_1833e7) : '',
+                lastname: v_1833e7 ? v_1833e7.split(' ').slice(1).join(' ') : '',
+                extrastr: v_2ca7e0 || '',
+              };
+
+              if (v_2ca7e0 && v_717992) {
+                const v_06cee6 = v_a5170b(v_2ca7e0);
+                const v_aa0ad8 = await v_ea3493(v_717992, v_06cee6, v_9b57fc);
+                if (!v_aa0ad8) {
+                  console.warn('[회원가입] 세션 저장 실패');
+                }
+              }
+
+              await v_e84827.removeItem('userData');
+              await v_e84827.removeItem('userSessionToken');
+              await v_e84827.setItem('userEmail', v_e0c7e8);
+              await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+              await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
+              await v_e84827.setItem('isLoggedIn', 'true');
+              await v_e84827.setItem('rememberMe', 'true');
+              await v_e84827.setItem('loginType', 'apple');
+
+              if (v_dfaee3) {
+                await v_e84827.setItem('refreshToken', v_dfaee3);
+              }
+
+              console.log('[회원가입] 애플 자동 로그인 완료 - 맵 페이지로 이동');
+
+              v_487a25(v_ce4741.map);
+            } catch (v_63a7d1) {
+              console.error('[회원가입] 애플 자동 로그인 중 오류:', v_63a7d1);
+
+              await v_889fad(
+                v_8d41d7('screens.signup.alerts.error') || '오류',
+                v_8d41d7('screens.signup.errors.autoLoginFailed') || '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+                [
+                  {
+                    text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                    onPress: () => {
+                      v_487a25(v_ce4741.authLanding);
+                      v_9b57fc(v_ce4741.login);
+                    },
+                  },
+                ],
+              );
+            }
+          } else {
+
+            await v_889fad(
+              v_8d41d7('screens.signup.success.title') || '회원가입 완료',
+              v_8d41d7('screens.signup.success.message') || '회원가입이 완료되었습니다.',
+              [
+                {
+                  text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                  onPress: () => {
+                    v_487a25(v_ce4741.authLanding);
+                    v_9b57fc(v_ce4741.login);
+                  },
                 },
-              },
-            ],
-          );
+              ],
+            );
+          }
         } catch (v_5e9bfe) {
           console.error('[회원가입] 회원가입 처리 중 오류:', v_5e9bfe);
           await v_889fad(

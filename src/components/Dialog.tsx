@@ -37,17 +37,20 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
   containerStyle: v_4affe9,
 }) => {
   return (
-    <Modal transparent animationType="fade" visible={v_cf55be} onRequestClose={v_0890f8}>
+    <Modal transparent animationType="fade" visible={v_cf55be} onRequestClose={v_0890f8 || (() => {})}>
       <View style={v_d81136.overlay}>
         <View style={[v_d81136.card, v_4affe9]}>
           <View style={v_d81136.header}>
-            <Text style={v_d81136.title}>{v_9f1622}</Text>
             {v_0890f8 ? (
-              <TouchableOpacity onPress={v_0890f8} hitSlop={v_f72698} style={v_d81136.close}>
-                <Ionicons name="close" size={18} color="#747474" />
-              </TouchableOpacity>
+              <>
+                <View style={v_d81136.closePlaceholder} />
+                <Text style={v_d81136.title}>{v_9f1622}</Text>
+                <TouchableOpacity onPress={v_0890f8} hitSlop={v_f72698} style={v_d81136.close}>
+                  <Ionicons name="close" size={18} color="#747474" />
+                </TouchableOpacity>
+              </>
             ) : (
-              <View style={v_d81136.closePlaceholder} />
+              <Text style={v_d81136.title}>{v_9f1622}</Text>
             )}
           </View>
 
@@ -115,8 +118,9 @@ const v_d81136 = v_472849.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 12,
+    position: 'relative',
   },
   title: {
     flex: 1,
