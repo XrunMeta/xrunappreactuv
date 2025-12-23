@@ -1555,7 +1555,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         brand: selectedToken.brand,
       };
 
-      console.log('📱 하단 패널 열림 - 20초 후 자동 광고 이동 타이머 설정');
+      console.log('📱 하단 패널 열림 - 3초 후 자동 광고 이동 타이머 설정');
       console.log('🔍 자동 광고 이동 대상 토큰 (현재 selectedToken):', {
         advertisement: currentToken.advertisement,
         campid: currentToken.campid,
@@ -1565,7 +1565,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       });
       hasAutoAdTriggeredRef.current = true;
       autoAdTimeoutRef.current = setTimeout(() => {
-        console.log('⏰ 20초 경과 - 자동으로 광고 화면으로 이동');
+        console.log('⏰ 3초 경과 - 자동으로 광고 화면으로 이동');
         console.log('🔍 자동 이동 시 토큰 정보 (저장된 currentToken):', {
           advertisement: currentToken.advertisement,
           campid: currentToken.campid,
@@ -1574,7 +1574,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           spotID: currentToken.spotID,
         });
         navigateToAd(currentToken);
-      }, 20000); 
+      }, 3000); 
     } else {
 
       if (autoAdTimeoutRef.current) {
