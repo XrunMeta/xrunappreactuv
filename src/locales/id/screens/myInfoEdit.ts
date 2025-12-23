@@ -16,7 +16,9 @@ export default {
   gender: 'Jenis Kelamin',
   genderMale: 'Laki-laki',
   genderFemale: 'Perempuan',
+  genderSelect: 'Pilih',
   age: 'Usia',
+  ageSelect: 'Pilih',
   save: 'Simpan',
   cancel: 'Batal',
   lastPasswordChangeDate: 'Tanggal Perubahan Terakhir',
@@ -38,6 +40,8 @@ export default {
     emailNotFound: 'Informasi email tidak tersedia.',
     emailSendFailed: 'Gagal mengirim kode verifikasi email. Silakan coba lagi.',
     verificationError: 'Terjadi kesalahan selama verifikasi. Silakan coba lagi.',
+    appleLoginInfo: 'Pemberitahuan',
+    appleLoginMessage: 'Saat menggunakan login Apple, pembaruan kata sandi dan nomor telepon diperlukan.',
   },
 };
 

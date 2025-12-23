@@ -519,8 +519,33 @@ export const LoginScreen = () => {
           return;
         }
 
+        const appleSignupCompleted = await AsyncStorage.getItem('appleSignupCompleted');
+        const appleSignupCompletedEmail = await AsyncStorage.getItem('appleSignupCompletedEmail');
+
+        if (appleSignupCompleted === 'true' && appleSignupCompletedEmail === email) {
+          console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, 재시도 안내');
+          await showAlert(
+            t('common.messages.error') || '오류',
+            '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
+          );
+          setIsLoading(false);
+          return;
+        }
+
         await AsyncStorage.setItem('appleSignupRequired', 'true');
         await AsyncStorage.setItem('appleSignupEmail', email);
+
+        if (result.data.fullName) {
+          const fullName = result.data.fullName;
+          const givenName = fullName.givenName || '';
+          const familyName = fullName.familyName || '';
+          const fullNameStr = `${familyName} ${givenName}`.trim();
+
+          await AsyncStorage.setItem('appleSignupFullName', fullNameStr);
+          await AsyncStorage.setItem('appleSignupGivenName', givenName);
+          await AsyncStorage.setItem('appleSignupFamilyName', familyName);
+          console.log('[애플 로그인] 사용자 이름 저장:', { fullName: fullNameStr, givenName, familyName });
+        }
 
         navigate(ROUTES.signup);
         setIsLoading(false);
@@ -536,6 +561,18 @@ export const LoginScreen = () => {
 
         await AsyncStorage.setItem('appleSignupRequired', 'true');
         await AsyncStorage.setItem('appleSignupEmail', email);
+
+        if (result.data.fullName) {
+          const fullName = result.data.fullName;
+          const givenName = fullName.givenName || '';
+          const familyName = fullName.familyName || '';
+          const fullNameStr = `${familyName} ${givenName}`.trim();
+
+          await AsyncStorage.setItem('appleSignupFullName', fullNameStr);
+          await AsyncStorage.setItem('appleSignupGivenName', givenName);
+          await AsyncStorage.setItem('appleSignupFamilyName', familyName);
+          console.log('[애플 로그인] 사용자 이름 저장:', { fullName: fullNameStr, givenName, familyName });
+        }
 
         navigate(ROUTES.signup);
         setIsLoading(false);
@@ -569,6 +606,8 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
       await AsyncStorage.setItem('rememberMe', 'true');
+
+      await AsyncStorage.setItem('loginType', 'apple');
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');

@@ -7,6 +7,7 @@ import {
   TextInputProps,
   ViewStyle,
   StyleProp,
+  TouchableOpacity,
 } from 'react-native';
 import { useKeyboardScroll } from '../context/KeyboardScrollContext';
 import { FONTS } from '../constants';
@@ -18,6 +19,7 @@ interface FormFieldProps extends TextInputProps {
   rightAccessory?: React.ReactNode;
   leftAccessory?: React.ReactNode;
   showDisabledStyle?: boolean; 
+  onPress?: () => void; 
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -29,6 +31,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   style,
   placeholderTextColor = '#dedede',
   onFocus,
+  onPress,
   editable = true,
   showDisabledStyle = true, 
   ...inputProps
@@ -52,6 +55,8 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   const isDisabled = editable === false && showDisabledStyle;
 
+  const InputWrapper = onPress ? TouchableOpacity : View;
+
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.labelRow}>
@@ -60,10 +65,15 @@ export const FormField: React.FC<FormFieldProps> = ({
           <View style={styles.labelRightAccessory}>{labelRightAccessory}</View>
         ) : null}
       </View>
-      <View style={[
-        styles.inputWrapper,
-        isDisabled && styles.inputWrapperDisabled
-      ]}>
+      <InputWrapper
+        style={[
+          styles.inputWrapper,
+          isDisabled && styles.inputWrapperDisabled
+        ]}
+        onPress={onPress}
+        disabled={isDisabled || !onPress}
+        activeOpacity={onPress ? 0.7 : 1}
+      >
         {leftAccessory ? <View style={styles.leftAccessory}>{leftAccessory}</View> : null}
         <TextInput
           style={[
@@ -74,12 +84,13 @@ export const FormField: React.FC<FormFieldProps> = ({
           placeholderTextColor={isDisabled ? '#b3b6be' : placeholderTextColor}
           onFocus={handleFocus}
           editable={editable}
+          pointerEvents={onPress ? 'none' : 'auto'}
           {...inputProps}
         />
         {rightAccessory ? (
           <View style={styles.rightAccessory}>{rightAccessory}</View>
         ) : null}
-      </View>
+      </InputWrapper>
     </View>
   );
 };

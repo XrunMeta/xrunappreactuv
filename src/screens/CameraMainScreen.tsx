@@ -18,10 +18,10 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { BottomNavigationBar, LevelNotification } from '../components';
+import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5 } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getMyPageUserInfo, updateGender, updateAge } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -485,6 +485,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [rageProgress, setRageProgress] = useState(0);
   const [isRageMode, setIsRageMode] = useState(false);
   const rageColor = '#60A5FA'; 
+
+  const [genderAgeDialogVisible, setGenderAgeDialogVisible] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
+  const [selectedAge, setSelectedAge] = useState<'10' | '20' | '30' | '40' | '50+'>('10');
+  const [isUpdatingGenderAge, setIsUpdatingGenderAge] = useState(false);
+  const [memberId, setMemberId] = useState<number | null>(null);
 
   const loadRageProgress = useCallback(async () => {
     try {
@@ -1088,10 +1094,118 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     });
   }, []);
 
+  const checkGenderAndAge = useCallback(async () => {
+    try {
+      const userDataStr = await AsyncStorage.getItem('userData');
+      if (!userDataStr) {
+        console.log('[AR 화면] userData 없음 - 성별/연령대 검증 스킵');
+        return; 
+      }
+
+      const userData = JSON.parse(userDataStr);
+      const member = userData.member;
+      if (!member) {
+        console.log('[AR 화면] member ID 없음 - 성별/연령대 검증 스킵');
+        return;
+      }
+
+      console.log('[AR 화면] 성별/연령대 검증 시작, member:', member);
+      setMemberId(member);
+      const response = await getMyPageUserInfo(member, navigate);
+
+      console.log('[AR 화면] getMyPageUserInfo 응답:', {
+        hasData: !!response.data,
+        dataLength: response.data?.length,
+        firstItem: response.data?.[0],
+      });
+
+      const user = response.data?.[0];
+
+      if (!user) {
+        console.log('[AR 화면] 사용자 정보 없음 - 성별/연령대 검증 스킵');
+        return;
+      }
+
+      console.log('[AR 화면] 사용자 정보:', {
+        gender: user.gender,
+        ages: user.ages,
+        genderType: typeof user.gender,
+        agesType: typeof user.ages,
+      });
+
+      const gender = typeof user.gender === 'string' ? parseInt(user.gender, 10) : (user.gender ?? 0);
+      const ages = typeof user.ages === 'string' ? parseInt(user.ages, 10) : (user.ages ?? 0);
+
+      console.log('[AR 화면] 성별/연령대 확인 결과:', {
+        gender,
+        ages,
+        genderOriginal: user.gender,
+        agesOriginal: user.ages,
+        shouldShowDialog: gender === 0 || ages === 0,
+      });
+
+      if (gender === 0 || ages === 0) {
+        console.log('[AR 화면] 성별/연령대가 0 - Dialog 표시');
+
+        setSelectedGender(gender === 0 ? 'male' : (gender === 2111 ? 'female' : 'male'));
+        const ageMap: Record<number, '10' | '20' | '30' | '40' | '50+'> = {
+          2210: '10',
+          2220: '20',
+          2230: '30',
+          2240: '40',
+          2250: '50+',
+        };
+
+        setSelectedAge(ages === 0 ? '10' : (ageMap[ages] || '10'));
+        setGenderAgeDialogVisible(true);
+        console.log('[AR 화면] Dialog 표시 완료, genderAgeDialogVisible:', true);
+      } else {
+        console.log('[AR 화면] 성별/연령대가 모두 설정됨 - Dialog 표시 안 함');
+      }
+    } catch (error) {
+      console.error('[AR 화면] 성별/연령대 확인 실패:', error);
+    }
+  }, [navigate]);
+
+  const handleUpdateGenderAge = useCallback(async () => {
+    if (!memberId || !selectedGender || !selectedAge) {
+      await showAlert(t('common.messages.error') || '오류', '성별과 연령대를 모두 선택해주세요.');
+      return;
+    }
+
+    setIsUpdatingGenderAge(true);
+    try {
+      const genderCode = selectedGender === 'male' ? 2110 : 2111;
+      const ageMap: Record<string, number> = {
+        '10': 2210,
+        '20': 2220,
+        '30': 2230,
+        '40': 2240,
+        '50+': 2250,
+      };
+      const ageCode = ageMap[selectedAge] || 0;
+
+      await Promise.all([
+        updateGender(memberId, genderCode, navigate),
+        updateAge(memberId, ageCode, navigate),
+      ]);
+
+      setGenderAgeDialogVisible(false);
+      await showAlert(t('common.messages.success') || '성공', '성별과 연령대가 업데이트되었습니다.');
+    } catch (error) {
+      console.error('[AR 화면] 성별/연령대 업데이트 실패:', error);
+      await showAlert(t('common.messages.error') || '오류', '업데이트에 실패했습니다.');
+    } finally {
+      setIsUpdatingGenderAge(false);
+    }
+  }, [memberId, selectedGender, selectedAge, navigate, showAlert, t]);
+
   useEffect(() => {
     const initializeData = async () => {
 
       await checkUserLoginStatus();
+
+      await checkGenderAndAge();
 
       if (!hasLoadedDataRef.current) {
         loadTokenData(false); 
@@ -1899,6 +2013,56 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
 }
       </Modal>
+
+      {}
+      <Dialog
+        visible={genderAgeDialogVisible}
+        title={t('screens.camera.genderAgeRequired') || '성별과 연령대를 입력해주세요'}
+        actions={[
+          {
+            label: t('common.buttons.confirm') || '확인',
+            onPress: handleUpdateGenderAge,
+            variant: 'primary',
+            disabled: isUpdatingGenderAge || !selectedGender || !selectedAge,
+          },
+        ]}
+      >
+        <View style={{ gap: 16 }}>
+          <View>
+            <Text style={{ fontSize: 14, marginBottom: 8, color: '#333' }}>
+              {t('screens.camera.genderLabel') || '성별'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <OptionButton
+                label={t('screens.signup.genderMale') || '남성'}
+                selected={selectedGender === 'male'}
+                onPress={() => setSelectedGender('male')}
+              />
+              <OptionButton
+                label={t('screens.signup.genderFemale') || '여성'}
+                selected={selectedGender === 'female'}
+                onPress={() => setSelectedGender('female')}
+              />
+            </View>
+          </View>
+          <View>
+            <Text style={{ fontSize: 14, marginBottom: 8, color: '#333' }}>
+              {t('screens.camera.ageLabel') || '연령대'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              {(['10', '20', '30', '40', '50+'] as const).map((age) => (
+                <OptionButton
+                  key={age}
+                  label={age}
+                  selected={selectedAge === age}
+                  onPress={() => setSelectedAge(age)}
+                  flex={age !== '50+' ? 1 : undefined}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+      </Dialog>
     </View>
   );
 };
