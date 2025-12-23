@@ -118,6 +118,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectMode, setSelectMode] = useState<'country' | 'region'>('country');
 
   useEffect(() => {
+
+    if (selectedRegion && selectedRegion.dialCode === '0') {
+      return;
+    }
     const regions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
     const isRegionValid = selectedRegion
       ? regions.some((region) => region.iso2 === selectedRegion.iso2)

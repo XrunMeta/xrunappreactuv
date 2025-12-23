@@ -16,7 +16,9 @@ export default {
   gender: '性别',
   genderMale: '男',
   genderFemale: '女',
+  genderSelect: '选择',
   age: '年龄',
+  ageSelect: '选择',
   save: '保存',
   cancel: '取消',
   lastPasswordChangeDate: '最后修改日期',
@@ -38,6 +40,8 @@ export default {
     emailNotFound: '没有电子邮件信息。',
     emailSendFailed: '发送电子邮件验证码失败。请重试。',
     verificationError: '验证过程中发生错误。请重试。',
+    appleLoginInfo: '通知',
+    appleLoginMessage: '使用Apple登录时，必须修改密码和电话号码。',
   },
 };
 

@@ -37,17 +37,20 @@ export const Dialog: React.FC<DialogProps> = ({
   containerStyle,
 }) => {
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
+    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose || (() => {})}>
       <View style={styles.overlay}>
         <View style={[styles.card, containerStyle]}>
           <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
             {onClose ? (
-              <TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP} style={styles.close}>
-                <Ionicons name="close" size={18} color="#747474" />
-              </TouchableOpacity>
+              <>
+                <View style={styles.closePlaceholder} />
+                <Text style={styles.title}>{title}</Text>
+                <TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP} style={styles.close}>
+                  <Ionicons name="close" size={18} color="#747474" />
+                </TouchableOpacity>
+              </>
             ) : (
-              <View style={styles.closePlaceholder} />
+              <Text style={styles.title}>{title}</Text>
             )}
           </View>
 
@@ -115,8 +118,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 12,
+    position: 'relative',
   },
   title: {
     flex: 1,

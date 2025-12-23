@@ -38,9 +38,9 @@ import {
   getClauseContent,
 } from '../services';
 
-const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
+const AGE_OPTIONS = ['0', '10', '20', '30', '40', '50+'] as const;
 
-type GenderValue = 'male' | 'female';
+type GenderValue = 'male' | 'female' | '0';
 type AgeValue = (typeof AGE_OPTIONS)[number];
 
 export const SignupScreen = () => {
@@ -50,6 +50,7 @@ export const SignupScreen = () => {
   const {
     selectedCountryDialCode,
     selectedRegion,
+    setSelectedRegion,
     setSelectMode,
     signupFormData,
     setSignupFormData,
@@ -58,10 +59,6 @@ export const SignupScreen = () => {
     setVerificationSuccessRoute,
   } = useAppContext();
 
-  const GENDER_OPTIONS = [
-    { value: 'male', label: t('screens.signup.genderMale') },
-    { value: 'female', label: t('screens.signup.genderFemale') },
-  ] as const;
   const [familyName, setFamilyName] = useState(signupFormData.familyName);
   const [givenName, setGivenName] = useState(signupFormData.givenName);
   const [fullName, setFullName] = useState(
@@ -76,8 +73,13 @@ export const SignupScreen = () => {
   const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
-  const [gender, setGender] = useState<GenderValue>(signupFormData.gender);
-  const [ageRange, setAgeRange] = useState<AgeValue>(signupFormData.ageRange);
+
+  const [gender, setGender] = useState<GenderValue>(
+    isAppleSignupMode ? '0' : (signupFormData.gender || 'male')
+  );
+  const [ageRange, setAgeRange] = useState<AgeValue>(
+    isAppleSignupMode ? '0' : (signupFormData.ageRange || '10')
+  );
   const [serviceTermsAccepted, setServiceTermsAccepted] = useState(false);
   const [locationTermsAccepted, setLocationTermsAccepted] = useState(false);
   const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(false);
@@ -171,6 +173,45 @@ export const SignupScreen = () => {
             setEmail(appleEmail);
             console.log('[회원가입] 애플 회원가입 모드, 이메일 자동 입력:', appleEmail);
           }
+
+          const appleFullName = await AsyncStorage.getItem('appleSignupFullName');
+          const appleGivenName = await AsyncStorage.getItem('appleSignupGivenName');
+          const appleFamilyName = await AsyncStorage.getItem('appleSignupFamilyName');
+
+          if (appleFullName || appleGivenName || appleFamilyName) {
+
+            const nameToUse = appleFullName || `${appleFamilyName || ''} ${appleGivenName || ''}`.trim();
+            if (nameToUse) {
+              setFullName(nameToUse);
+              setGivenName(appleGivenName || '');
+              setFamilyName(appleFamilyName || '');
+              console.log('[회원가입] 애플 회원가입 모드, 이름 자동 입력:', { fullName: nameToUse, givenName: appleGivenName, familyName: appleFamilyName });
+            }
+          }
+
+          setGender('0');
+          setAgeRange('0');
+
+          if (setSelectedRegion) {
+
+            const isInitialValue = !selectedRegion || 
+              (selectedRegion.iso2 === '서울' && selectedRegion.countryCode === 82) ||
+              (selectedRegion.iso2 === 'global' && selectedRegion.dialCode === '0');
+
+            if (isInitialValue) {
+              const selectRegionOption = {
+                iso2: 'select',
+                name: t('screens.signup.genderSelect') || '선택',
+                dialCode: '0',
+                flagEmoji: '📍',
+                countryCode: 0,
+              };
+              setSelectedRegion(selectRegionOption);
+              console.log('[회원가입] 애플 회원가입 모드, 지역 "선택" 옵션 설정:', selectRegionOption);
+            } else {
+              console.log('[회원가입] 애플 회원가입 모드 - 이미 지역이 선택되어 있음, 유지:', selectedRegion?.name);
+            }
+          }
         }
       } catch (error) {
         console.error('[회원가입] 소셜 회원가입 모드 확인 실패:', error);
@@ -178,7 +219,43 @@ export const SignupScreen = () => {
     };
 
     checkSocialSignupMode();
-  }, []);
+  }, [t]); 
+
+  const appleRegionInitializedRef = React.useRef(false);
+  React.useEffect(() => {
+
+    if (isAppleSignupMode && setSelectedRegion && !appleRegionInitializedRef.current) {
+
+      if (!selectedRegion || (selectedRegion.iso2 !== 'select' && selectedRegion.dialCode !== '0')) {
+
+        const isContextInitialValue = selectedRegion && (
+          (selectedRegion.iso2 === '서울' && selectedRegion.countryCode === 82) || 
+          selectedRegion.iso2 === 'global' ||
+          (!selectedRegion.countryCode && selectedRegion.dialCode !== '0' && selectedRegion.iso2 !== 'select')
+        );
+
+        if (isContextInitialValue || !selectedRegion) {
+          const selectRegionOption = {
+            iso2: 'select',
+            name: t('screens.signup.genderSelect') || '선택',
+            dialCode: '0',
+            flagEmoji: '📍',
+            countryCode: 0,
+          };
+          setSelectedRegion(selectRegionOption);
+          appleRegionInitializedRef.current = true;
+          console.log('[회원가입] 애플 회원가입 모드 - 지역을 "선택"으로 초기 설정');
+        } else {
+
+          appleRegionInitializedRef.current = true;
+          console.log('[회원가입] 애플 회원가입 모드 - 이미 지역이 선택되어 있음, 유지:', selectedRegion.name);
+        }
+      } else {
+
+        appleRegionInitializedRef.current = true;
+      }
+    }
+  }, [isAppleSignupMode, selectedRegion, setSelectedRegion, t]); 
 
   React.useEffect(() => {
     const loadReferralEmailFromStorage = async () => {
@@ -224,8 +301,9 @@ export const SignupScreen = () => {
       setIsPasswordConfirmVisible(false);
       setPhoneNumber(signupFormData.phoneNumber);
       setReferralEmail(signupFormData.referralEmail);
-      setGender(signupFormData.gender);
-      setAgeRange(signupFormData.ageRange);
+
+      setGender(isAppleSignupMode ? signupFormData.gender : (signupFormData.gender || 'male'));
+      setAgeRange(isAppleSignupMode ? signupFormData.ageRange : (signupFormData.ageRange || '10'));
 
       setServiceTermsAccepted(false);
       setLocationTermsAccepted(false);
@@ -292,42 +370,46 @@ export const SignupScreen = () => {
       return;
     }
 
-    if (!password.trim()) {
-      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
-      return;
+    if (!isAppleSignupMode) {
+      if (!password.trim()) {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordRequired'));
+        return;
+      }
+
+      const hasMinLength = password.length >= 7;
+      const hasNumber = /\d/.test(password);
+      const hasLowercase = /[a-z]/.test(password);
+      const hasUppercase = /[A-Z]/.test(password);
+
+      if (!(hasMinLength && hasNumber && hasLowercase && hasUppercase)) {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordPolicy'));
+        return;
+      }
+
+      if (!passwordConfirm.trim()) {
+        await showAlert(
+          t('screens.signup.alerts.inputError'),
+          t('screens.signup.errors.passwordConfirmRequired'),
+        );
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordMismatch'));
+        return;
+      }
     }
 
-    const hasMinLength = password.length >= 7;
-    const hasNumber = /\d/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasUppercase = /[A-Z]/.test(password);
+    if (!isAppleSignupMode) {
+      if (!phoneNumber.trim()) {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
+        return;
+      }
 
-    if (!(hasMinLength && hasNumber && hasLowercase && hasUppercase)) {
-      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordPolicy'));
-      return;
-    }
-
-    if (!passwordConfirm.trim()) {
-      await showAlert(
-        t('screens.signup.alerts.inputError'),
-        t('screens.signup.errors.passwordConfirmRequired'),
-      );
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.passwordMismatch'));
-      return;
-    }
-
-    if (!phoneNumber.trim()) {
-      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
-      return;
-    }
-
-    if (isKoreaSelected && !selectedRegion) {
-      await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
-      return;
+      if (isKoreaSelected && (!selectedRegion || selectedRegion.dialCode === '0')) {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
+        return;
+      }
     }
 
     if (!allTermsAccepted) {
@@ -420,10 +502,10 @@ export const SignupScreen = () => {
 
         const pendingSignupData = {
           email: email.trim(),
-          password: password,
+          password: isAppleSignupMode ? '' : password, 
           familyName: parsedFamilyName.trim(),
           givenName: parsedGivenName.trim(),
-          phoneNumber: phoneNumber.trim(),
+          phoneNumber: phoneNumber.trim() || '', 
           selectedCountryDialCode: {
             iso2: selectedCountryDialCode.iso2,
             dialCode: selectedCountryDialCode.dialCode,
@@ -441,6 +523,7 @@ export const SignupScreen = () => {
           referralMemberId: referralMemberId,
           gender: gender,
           ageRange: ageRange,
+          isAppleSignupMode: isAppleSignupMode, 
         };
 
         await AsyncStorage.setItem('pendingSignupData', JSON.stringify(pendingSignupData));
@@ -587,58 +670,62 @@ export const SignupScreen = () => {
             editable={!isGoogleSignupMode && !isAppleSignupMode}
           />
 
-          <FormField
-            label={t('screens.signup.passwordLabel')}
-            placeholder={t('screens.signup.passwordPlaceholder')}
-            value={password}
-            onChangeText={(text) => setPassword(filterAsciiPrintable(text))}
-            secureTextEntry={!isPasswordVisible}
-            autoCapitalize="none"
-            containerStyle={styles.fieldContainer}
-            rightAccessory={
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setIsPasswordVisible((prev) => !prev)}
-                activeOpacity={0.7}
-                disabled={isSubmitting}
-              >
-                <Ionicons
-                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
-                  size={20}
-                  color="#666666"
-                />
-              </TouchableOpacity>
-            }
-          />
+          {}
+          {!isAppleSignupMode && (
+            <>
+              <FormField
+                label={t('screens.signup.passwordLabel')}
+                placeholder={t('screens.signup.passwordPlaceholder')}
+                value={password}
+                onChangeText={(text) => setPassword(filterAsciiPrintable(text))}
+                secureTextEntry={!isPasswordVisible}
+                autoCapitalize="none"
+                containerStyle={styles.fieldContainer}
+                rightAccessory={
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsPasswordVisible((prev) => !prev)}
+                    activeOpacity={0.7}
+                    disabled={isSubmitting}
+                  >
+                    <Ionicons
+                      name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                      size={20}
+                      color="#666666"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+
+              <FormField
+                label={t('screens.signup.passwordConfirmLabel')}
+                placeholder={t('screens.signup.passwordConfirmPlaceholder')}
+                value={passwordConfirm}
+                onChangeText={(text) => setPasswordConfirm(filterAsciiPrintable(text))}
+                secureTextEntry={!isPasswordConfirmVisible}
+                autoCapitalize="none"
+                containerStyle={styles.fieldContainer}
+                rightAccessory={
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsPasswordConfirmVisible((prev) => !prev)}
+                    activeOpacity={0.7}
+                    disabled={isSubmitting}
+                  >
+                    <Ionicons
+                      name={isPasswordConfirmVisible ? 'eye-outline' : 'eye-off-outline'}
+                      size={20}
+                      color="#666666"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+            </>
+          )}
 
           <FormField
-            label={t('screens.signup.passwordConfirmLabel')}
-            placeholder={t('screens.signup.passwordConfirmPlaceholder')}
-            value={passwordConfirm}
-            onChangeText={(text) => setPasswordConfirm(filterAsciiPrintable(text))}
-            secureTextEntry={!isPasswordConfirmVisible}
-            autoCapitalize="none"
             containerStyle={styles.fieldContainer}
-            rightAccessory={
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setIsPasswordConfirmVisible((prev) => !prev)}
-                activeOpacity={0.7}
-                disabled={isSubmitting}
-              >
-                <Ionicons
-                  name={isPasswordConfirmVisible ? 'eye-outline' : 'eye-off-outline'}
-                  size={20}
-                  color="#666666"
-                />
-              </TouchableOpacity>
-            }
-
-          />
-
-          <FormField
-            containerStyle={styles.fieldContainer}
-            label={t('screens.signup.phoneNumberLabel')}
+            label={isAppleSignupMode ? `${t('screens.signup.phoneNumberLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.phoneNumberLabel')}
             placeholder={t('screens.signup.phoneNumberPlaceholder')}
             keyboardType="phone-pad"
             value={phoneNumber}
@@ -659,24 +746,20 @@ export const SignupScreen = () => {
           />
 
           <View style={styles.fieldContainer}>
-            <TouchableOpacity
+            <FormField
+              label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
+              placeholder={t('screens.signup.regionPlaceholder')}
+              value={regionDisplayValue}
+              editable={false}
+              showDisabledStyle={false}
               onPress={() => {
-                if (!isKoreaSelected) {
+                if ((!isKoreaSelected && !isAppleSignupMode) || isSubmitting) {
                   return;
                 }
                 setSelectMode('region');
                 navigate('countryCodeSelect');
               }}
-              disabled={!isKoreaSelected || isSubmitting}
-            >
-              <FormField
-                label={t('screens.signup.regionLabel')}
-                placeholder={t('screens.signup.regionPlaceholder')}
-                value={regionDisplayValue}
-                editable={false}
-                showDisabledStyle={false}
-              />
-            </TouchableOpacity>
+            />
             {!isKoreaSelected && (
               <Text style={styles.regionHelper}>
                 {t('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
@@ -685,14 +768,26 @@ export const SignupScreen = () => {
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>{t('screens.signup.genderLabel')}</Text>
+            <Text style={styles.label}>
+              {isAppleSignupMode 
+                ? `${t('screens.signup.genderLabel')} (${t('screens.signup.optional') || '선택사항'})`
+                : t('screens.signup.genderLabel')}
+            </Text>
             <View style={[styles.inlineOptions]}>
-              {GENDER_OPTIONS.map((option) => {
+              {React.useMemo(() => {
+                const selectOption = { value: '0' as const, label: t('screens.signup.genderSelect') || '선택' };
+                const maleOption = { value: 'male' as const, label: t('screens.signup.genderMale') };
+                const femaleOption = { value: 'female' as const, label: t('screens.signup.genderFemale') };
+
+                return isAppleSignupMode
+                  ? [selectOption, maleOption, femaleOption]
+                  : [maleOption, femaleOption];
+              }, [isAppleSignupMode, t]).map((option) => {
                 const isActive = gender === option.value;
                 return (
                   <OptionButton
                     key={option.value}
-                    label={option.label}
+                    label={option.value === '0' ? (t('screens.signup.genderSelect') || '선택') : option.label}
                     selected={isActive}
                     onPress={() => setGender(option.value)}
                   />
@@ -702,15 +797,23 @@ export const SignupScreen = () => {
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>{t('screens.signup.ageLabel')}</Text>
+            <Text style={styles.label}>
+              {isAppleSignupMode 
+                ? `${t('screens.signup.ageLabel')} (${t('screens.signup.optional') || '선택사항'})`
+                : t('screens.signup.ageLabel')}
+            </Text>
             <View style={[styles.inlineOptions]}>
-              {AGE_OPTIONS.map((option, index) => {
+              {React.useMemo(() => {
+                return isAppleSignupMode 
+                  ? AGE_OPTIONS 
+                  : AGE_OPTIONS.filter(option => option !== '0');
+              }, [isAppleSignupMode]).map((option, index, array) => {
                 const isActive = ageRange === option;
-                const isLast = index === AGE_OPTIONS.length - 1;
+                const isLast = index === array.length - 1;
                 return (
                   <OptionButton
                     key={option}
-                    label={option}
+                    label={option === '0' ? (t('screens.signup.ageSelect') || '선택') : option}
                     selected={isActive}
                     onPress={() => setAgeRange(option)}
                     flex={1}

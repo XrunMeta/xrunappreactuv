@@ -600,11 +600,13 @@ export const checkLogin = async (
 
 export const SignupHelpers = {
 
-  getGenderCode: (gender: 'male' | 'female'): number => {
+  getGenderCode: (gender: 'male' | 'female' | '0'): number => {
+    if (gender === '0') return 0;
     return gender === 'male' ? 2110 : 2111;
   },
 
-  getAgeCode: (ageRange: '10' | '20' | '30' | '40' | '50+'): number => {
+  getAgeCode: (ageRange: '0' | '10' | '20' | '30' | '40' | '50+'): number => {
+    if (ageRange === '0') return 0;
     const ageMap: Record<string, number> = {
       '10': 2210,
       '20': 2220,
@@ -612,7 +614,7 @@ export const SignupHelpers = {
       '40': 2240,
       '50+': 2250,
     };
-    return ageMap[ageRange] || 2220;
+    return ageMap[ageRange] || 0;
   },
 
   getOSCode: (): number => {

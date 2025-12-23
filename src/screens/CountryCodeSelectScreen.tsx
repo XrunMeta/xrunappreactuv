@@ -28,29 +28,54 @@ export const CountryCodeSelectScreen = () => {
   } = useAppContext();
   const [query, setQuery] = useState('');
 
-  const dataSource = selectMode === 'region' ? REGIONS_AS_COUNTRY_DIAL_CODES : COUNTRY_DIAL_CODES;
+  const selectOption: CountryDialCode = useMemo(() => ({
+    iso2: 'select',
+    name: t('screens.signup.genderSelect') || '선택',
+    dialCode: '0',
+    flagEmoji: '📍',
+    countryCode: 0,
+  }), [t]);
+
+  const baseDataSource = selectMode === 'region' ? REGIONS_AS_COUNTRY_DIAL_CODES : COUNTRY_DIAL_CODES;
+
+  const dataSource = useMemo(() => {
+    return selectMode === 'region' ? [selectOption, ...baseDataSource] : baseDataSource;
+  }, [selectMode, selectOption, baseDataSource]);
+
   const selectedItem = selectMode === 'region' ? selectedRegion : selectedCountryDialCode;
 
   const filteredItems = useMemo(() => {
-    if (!query.trim()) {
-      return dataSource;
+    let items = dataSource;
+
+    if (query.trim()) {
+      const normalizedQuery = query.trim().toLowerCase();
+      const numericQuery = normalizedQuery.replace(/[^0-9]/g, '');
+
+      items = dataSource.filter((item) => {
+        const searchName = item.name.toLowerCase();
+        const searchIso = item.iso2.toLowerCase();
+        const searchDial = item.dialCode.replace('+', '');
+
+        return (
+          searchName.includes(normalizedQuery) ||
+          searchIso.includes(normalizedQuery) ||
+          (numericQuery.length > 0 && searchDial.startsWith(numericQuery))
+        );
+      });
+
+      const hasSelectOption = items.some(item => item.iso2 === 'select');
+      if (!hasSelectOption && (normalizedQuery.includes('선택') || normalizedQuery.includes('select'))) {
+        items = [selectOption, ...items];
+      }
+    } else {
+
+      if (selectMode === 'region' && items[0]?.iso2 !== 'select') {
+        items = [selectOption, ...items];
+      }
     }
 
-    const normalizedQuery = query.trim().toLowerCase();
-    const numericQuery = normalizedQuery.replace(/[^0-9]/g, '');
-
-    return dataSource.filter((item) => {
-      const searchName = item.name.toLowerCase();
-      const searchIso = item.iso2.toLowerCase();
-      const searchDial = item.dialCode.replace('+', '');
-
-      return (
-        searchName.includes(normalizedQuery) ||
-        searchIso.includes(normalizedQuery) ||
-        (numericQuery.length > 0 && searchDial.startsWith(numericQuery))
-      );
-    });
-  }, [query, dataSource]);
+    return items;
+  }, [query, dataSource, selectMode, selectOption]);
 
   const handleSelect = (item: CountryDialCode) => {
     console.log('[국가선택] handleSelect 호출:', {

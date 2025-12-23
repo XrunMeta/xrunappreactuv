@@ -52,6 +52,10 @@ const convertGenderFromApi = (gender?: number | string | null): 'male' | 'female
     return 'male';
   }
 
+  if (genderNum === 0) {
+    return 'male';
+  }
+
   const result = genderNum === 2111 ? 'female' : 'male';
   return result;
 };
@@ -64,10 +68,11 @@ const convertAgeToApi = (age: string): number => {
     '40': 2240,
     '50+': 2250,
   };
-  return ageMap[age] || 2210;
+  return ageMap[age] || 2210; 
 };
 
 const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
+  if (age === 0 || age === null || age === undefined) return '10'; 
   const ageMap: Record<number, (typeof AGE_OPTIONS)[number]> = {
     2210: '10',
     2220: '20',
@@ -75,7 +80,7 @@ const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
     2240: '40',
     2250: '50+',
   };
-  return ageMap[age || 2210] || '10';
+  return ageMap[age] || '10'; 
 };
 
 export const MyInfoEditScreen = () => {
@@ -98,7 +103,7 @@ export const MyInfoEditScreen = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [datepinchanged, setDatepinchanged] = useState<string>('');
-  const [phone, setPhone] = useState('010 2487 6746');
+  const [phone, setPhone] = useState('');
   const [region, setRegion] = useState('대한민국 서울');
   const [regionCode, setRegionCode] = useState<number | null>(null);
   const [countryCode, setCountryCode] = useState<number | null>(null);
@@ -562,6 +567,14 @@ export const MyInfoEditScreen = () => {
             }
 
             console.log('[정보수정] ✅ loadUserInfo 완료, hasLoadedUserInfoRef = true로 설정');
+
+            const loginType = await AsyncStorage.getItem('loginType');
+            if (loginType === 'apple') {
+              await showAlert(
+                t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+              );
+            }
           } else {
             console.warn('[정보수정] 초기화 - member ID가 없습니다.');
             setIsLoading(false);
@@ -625,6 +638,35 @@ export const MyInfoEditScreen = () => {
 
     if (!memberId) {
       await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.userDataNotFound'));
+      return;
+    }
+
+    const genderCode = convertGenderToApi(gender);
+    const ageCode = convertAgeToApi(age);
+
+    const validationErrors: string[] = [];
+
+    if (genderCode === 0 || genderCode === null || genderCode === undefined) {
+      validationErrors.push(t('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
+    }
+
+    if (ageCode === 0 || ageCode === null || ageCode === undefined) {
+      validationErrors.push(t('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
+    }
+
+    if (tempCountry.cCode === 0 || tempCountry.cCode === null || tempCountry.cCode === undefined) {
+      validationErrors.push(t('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
+    }
+
+    if (tempRegion.rCode === 0 || tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === -1) {
+      validationErrors.push(t('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+    }
+
+    if (validationErrors.length > 0) {
+      await showAlert(
+        t('screens.myInfoEdit.alerts.error') || '오류',
+        validationErrors.join('\n')
+      );
       return;
     }
 
@@ -856,8 +898,6 @@ export const MyInfoEditScreen = () => {
 
       if (promises.length > 0) {
 
-        await showAlert(t('screens.myInfoEdit.alerts.saveSuccess'), t('screens.myInfoEdit.alerts.saveSuccessMessage'));
-
         const beforeRefresh = {
           이름: originalFirstName,
           성: originalLastName,
@@ -903,6 +943,24 @@ export const MyInfoEditScreen = () => {
             console.warn('2. 서버에서 데이터를 업데이트하지 못했을 수 있습니다');
             console.warn('3. 새로고침이 너무 빨리 발생했을 수 있습니다 (500ms 후 다시 확인)');
           }
+
+          showAlert(
+            t('screens.myInfoEdit.alerts.saveSuccess'),
+            t('screens.myInfoEdit.alerts.saveSuccessMessage'),
+            [
+              {
+                text: t('screens.myInfoEdit.alerts.confirm') || '확인',
+                onPress: () => {
+
+                  if (canGoBack) {
+                    goBack();
+                  } else {
+                    reset(ROUTES.myInfo);
+                  }
+                },
+              },
+            ],
+          );
         }, 1000);
       } else {
 

@@ -16,7 +16,9 @@ export default {
   gender: '性別',
   genderMale: '男',
   genderFemale: '女',
+  genderSelect: '選択',
   age: '年齢',
+  ageSelect: '選択',
   save: '保存',
   cancel: 'キャンセル',
   lastPasswordChangeDate: '最終変更日',
@@ -38,6 +40,8 @@ export default {
     emailNotFound: 'メール情報がありません。',
     emailSendFailed: 'メール確認コードの送信に失敗しました。もう一度お試しください。',
     verificationError: '確認中にエラーが発生しました。もう一度お試しください。',
+    appleLoginInfo: 'お知らせ',
+    appleLoginMessage: 'Appleログインを使用する場合、パスワードと電話番号の更新が必要です。',
   },
 };
 
