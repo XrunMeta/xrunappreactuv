@@ -1555,7 +1555,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         brand: v_04cb77.brand,
       };
 
-      console.log('📱 하단 패널 열림 - 20초 후 자동 광고 이동 타이머 설정');
+      console.log('📱 하단 패널 열림 - 3초 후 자동 광고 이동 타이머 설정');
       console.log('🔍 자동 광고 이동 대상 토큰 (현재 selectedToken):', {
         advertisement: v_191c8b.advertisement,
         campid: v_191c8b.campid,
@@ -1565,7 +1565,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       });
       v_6890b1.current = true;
       v_181e3e.current = setTimeout(() => {
-        console.log('⏰ 20초 경과 - 자동으로 광고 화면으로 이동');
+        console.log('⏰ 3초 경과 - 자동으로 광고 화면으로 이동');
         console.log('🔍 자동 이동 시 토큰 정보 (저장된 currentToken):', {
           advertisement: v_191c8b.advertisement,
           campid: v_191c8b.campid,
@@ -1574,7 +1574,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           spotID: v_191c8b.spotID,
         });
         v_917f22(v_191c8b);
-      }, 20000); 
+      }, 3000); 
     } else {
 
       if (v_181e3e.current) {
