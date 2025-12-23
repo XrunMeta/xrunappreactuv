@@ -7,6 +7,7 @@ import {
   v_b60ea2,
   v_7e4944,
   v_961e77,
+  v_4623af,
 } from 'rcmrninabrnb';
 import { v_f3168c } from '../context/KeyboardScrollContext';
 import { v_843035 } from '../constants';
@@ -18,6 +19,7 @@ interface FormFieldProps extends v_b60ea2 {
   rightAccessory?: v_a3453e.ReactNode;
   leftAccessory?: v_a3453e.ReactNode;
   showDisabledStyle?: boolean; 
+  onPress?: () => void; 
 }
 
 export const FormField: v_a3453e.FC<FormFieldProps> = ({
@@ -29,6 +31,7 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
   style: v_7fa4e4,
   placeholderTextColor: v_46ec3b = '#dedede',
   onFocus: v_cd3cee,
+  onPress: v_719eed,
   editable: v_87d063 = true,
   showDisabledStyle: v_e3745c = true, 
   ...v_3a2a5d
@@ -52,6 +55,8 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
 
   const v_1a6f6d = v_87d063 === false && v_e3745c;
 
+  const v_56abc6 = v_719eed ? v_4623af : v_3094a2;
+
   return (
     <View style={[v_d81136.container, v_4affe9]}>
       <View style={v_d81136.labelRow}>
@@ -60,10 +65,15 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
           <View style={v_d81136.labelRightAccessory}>{v_9de30f}</View>
         ) : null}
       </View>
-      <View style={[
-        v_d81136.inputWrapper,
-        v_1a6f6d && v_d81136.inputWrapperDisabled
-      ]}>
+      <InputWrapper
+        style={[
+          v_d81136.inputWrapper,
+          v_1a6f6d && v_d81136.inputWrapperDisabled
+        ]}
+        onPress={v_719eed}
+        disabled={v_1a6f6d || !v_719eed}
+        activeOpacity={v_719eed ? 0.7 : 1}
+      >
         {v_bea0eb ? <View style={v_d81136.leftAccessory}>{v_bea0eb}</View> : null}
         <TextInput
           style={[
@@ -74,12 +84,13 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
           placeholderTextColor={v_1a6f6d ? '#b3b6be' : v_46ec3b}
           onFocus={v_086489}
           editable={v_87d063}
+          pointerEvents={v_719eed ? 'none' : 'auto'}
           {...v_3a2a5d}
         />
         {v_de8f73 ? (
           <View style={v_d81136.rightAccessory}>{v_de8f73}</View>
         ) : null}
-      </View>
+      </InputWrapper>
     </View>
   );
 };

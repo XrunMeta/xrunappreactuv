@@ -18,10 +18,10 @@ import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_f4e704, v_66b9cc } from '../components';
+import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4 } from '../services';
+import { v_f84ef5, v_5d7ca4, v_a7ab3c, v_71d37e, v_07f367 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -485,6 +485,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_95eb72, v_6c06ae] = v_5ab095(0);
   const [v_a5ed76, v_27c4b9] = v_5ab095(false);
   const v_269c04 = '#60A5FA'; 
+
+  const [v_def1ae, v_643c94] = v_5ab095(false);
+  const [v_2610e9, v_12be53] = v_5ab095<'male' | 'female'>('male');
+  const [v_10adc9, v_8d44be] = v_5ab095<'10' | '20' | '30' | '40' | '50+'>('10');
+  const [v_46602a, v_2af968] = v_5ab095(false);
+  const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
 
   const v_055140 = v_de06a3(async () => {
     try {
@@ -1088,10 +1094,118 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     });
   }, []);
 
+  const v_9a790b = v_de06a3(async () => {
+    try {
+      const v_f24fd5 = await v_e84827.getItem('userData');
+      if (!v_f24fd5) {
+        console.log('[AR 화면] userData 없음 - 성별/연령대 검증 스킵');
+        return; 
+      }
+
+      const v_ef7306 = JSON.parse(v_f24fd5);
+      const v_660822 = v_ef7306.member;
+      if (!v_660822) {
+        console.log('[AR 화면] member ID 없음 - 성별/연령대 검증 스킵');
+        return;
+      }
+
+      console.log('[AR 화면] 성별/연령대 검증 시작, member:', v_660822);
+      v_9d6aeb(v_660822);
+      const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
+
+      console.log('[AR 화면] getMyPageUserInfo 응답:', {
+        hasData: !!v_3393e3.data,
+        dataLength: v_3393e3.data?.length,
+        firstItem: v_3393e3.data?.[0],
+      });
+
+      const v_625c74 = v_3393e3.data?.[0];
+
+      if (!v_625c74) {
+        console.log('[AR 화면] 사용자 정보 없음 - 성별/연령대 검증 스킵');
+        return;
+      }
+
+      console.log('[AR 화면] 사용자 정보:', {
+        gender: v_625c74.gender,
+        ages: v_625c74.ages,
+        genderType: typeof v_625c74.gender,
+        agesType: typeof v_625c74.ages,
+      });
+
+      const v_c3eac4 = typeof v_625c74.gender === 'string' ? parseInt(v_625c74.gender, 10) : (v_625c74.gender ?? 0);
+      const v_6e272b = typeof v_625c74.ages === 'string' ? parseInt(v_625c74.ages, 10) : (v_625c74.ages ?? 0);
+
+      console.log('[AR 화면] 성별/연령대 확인 결과:', {
+        gender: v_c3eac4,
+        ages: v_6e272b,
+        genderOriginal: v_625c74.gender,
+        agesOriginal: v_625c74.ages,
+        shouldShowDialog: v_c3eac4 === 0 || v_6e272b === 0,
+      });
+
+      if (v_c3eac4 === 0 || v_6e272b === 0) {
+        console.log('[AR 화면] 성별/연령대가 0 - Dialog 표시');
+
+        v_12be53(v_c3eac4 === 0 ? 'male' : (v_c3eac4 === 2111 ? 'female' : 'male'));
+        const v_c3889d = {
+          2210: '10',
+          2220: '20',
+          2230: '30',
+          2240: '40',
+          2250: '50+',
+        };
+
+        v_8d44be(v_6e272b === 0 ? '10' : (v_c3889d[v_6e272b] || '10'));
+        v_643c94(true);
+        console.log('[AR 화면] Dialog 표시 완료, genderAgeDialogVisible:', true);
+      } else {
+        console.log('[AR 화면] 성별/연령대가 모두 설정됨 - Dialog 표시 안 함');
+      }
+    } catch (v_5e9bfe) {
+      console.error('[AR 화면] 성별/연령대 확인 실패:', v_5e9bfe);
+    }
+  }, [v_9b57fc]);
+
+  const v_8285e9 = v_de06a3(async () => {
+    if (!v_717992 || !v_2610e9 || !v_10adc9) {
+      await v_889fad(v_8d41d7('common.messages.error') || '오류', '성별과 연령대를 모두 선택해주세요.');
+      return;
+    }
+
+    v_2af968(true);
+    try {
+      const v_d199d8 = v_2610e9 === 'male' ? 2110 : 2111;
+      const v_c3889d = {
+        '10': 2210,
+        '20': 2220,
+        '30': 2230,
+        '40': 2240,
+        '50+': 2250,
+      };
+      const v_2d2cbc = v_c3889d[v_10adc9] || 0;
+
+      await Promise.all([
+        v_71d37e(v_717992, v_d199d8, v_9b57fc),
+        v_07f367(v_717992, v_2d2cbc, v_9b57fc),
+      ]);
+
+      v_643c94(false);
+      await v_889fad(v_8d41d7('common.messages.success') || '성공', '성별과 연령대가 업데이트되었습니다.');
+    } catch (v_5e9bfe) {
+      console.error('[AR 화면] 성별/연령대 업데이트 실패:', v_5e9bfe);
+      await v_889fad(v_8d41d7('common.messages.error') || '오류', '업데이트에 실패했습니다.');
+    } finally {
+      v_2af968(false);
+    }
+  }, [v_717992, v_2610e9, v_10adc9, v_9b57fc, v_889fad, v_8d41d7]);
+
   v_c4deb2(() => {
     const v_2ff7b8 = async () => {
 
       await v_e1f9f9();
+
+      await v_9a790b();
 
       if (!v_0b2c53.current) {
         v_c4c061(false); 
@@ -1899,6 +2013,56 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
 }
       </Modal>
+
+      {}
+      <Dialog
+        visible={v_def1ae}
+        title={v_8d41d7('screens.camera.genderAgeRequired') || '성별과 연령대를 입력해주세요'}
+        actions={[
+          {
+            label: v_8d41d7('common.buttons.confirm') || '확인',
+            onPress: v_8285e9,
+            variant: 'primary',
+            disabled: v_46602a || !v_2610e9 || !v_10adc9,
+          },
+        ]}
+      >
+        <View style={{ gap: 16 }}>
+          <View>
+            <Text style={{ fontSize: 14, marginBottom: 8, color: '#333' }}>
+              {v_8d41d7('screens.camera.genderLabel') || '성별'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <OptionButton
+                label={v_8d41d7('screens.signup.genderMale') || '남성'}
+                selected={v_2610e9 === 'male'}
+                onPress={() => v_12be53('male')}
+              />
+              <OptionButton
+                label={v_8d41d7('screens.signup.genderFemale') || '여성'}
+                selected={v_2610e9 === 'female'}
+                onPress={() => v_12be53('female')}
+              />
+            </View>
+          </View>
+          <View>
+            <Text style={{ fontSize: 14, marginBottom: 8, color: '#333' }}>
+              {v_8d41d7('screens.camera.ageLabel') || '연령대'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              {(['10', '20', '30', '40', '50+'] as const).map((v_2694bd) => (
+                <OptionButton
+                  key={v_2694bd}
+                  label={v_2694bd}
+                  selected={v_10adc9 === v_2694bd}
+                  onPress={() => v_8d44be(v_2694bd)}
+                  flex={v_2694bd !== '50+' ? 1 : undefined}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+      </Dialog>
     </View>
   );
 };

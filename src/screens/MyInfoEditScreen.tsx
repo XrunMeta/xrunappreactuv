@@ -52,6 +52,10 @@ const v_d6877d = (v_c3eac4): 'male' | 'female' => {
     return 'male';
   }
 
+  if (v_7ac969 === 0) {
+    return 'male';
+  }
+
   const v_43c42e = v_7ac969 === 2111 ? 'female' : 'male';
   return v_43c42e;
 };
@@ -64,10 +68,11 @@ const v_e9394b = (v_2694bd): number => {
     '40': 2240,
     '50+': 2250,
   };
-  return v_c3889d[v_2694bd] || 2210;
+  return v_c3889d[v_2694bd] || 2210; 
 };
 
 const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
+  if (v_2694bd === 0 || v_2694bd === null || v_2694bd === undefined) return '10'; 
   const ageMap: Record<number, (typeof v_0c96f7)[number]> = {
     2210: '10',
     2220: '20',
@@ -75,7 +80,7 @@ const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
     2240: '40',
     2250: '50+',
   };
-  return v_c3889d[v_2694bd || 2210] || '10';
+  return v_c3889d[v_2694bd] || '10'; 
 };
 
 export const v_cdb169 = () => {
@@ -98,7 +103,7 @@ export const v_cdb169 = () => {
   const [v_05b02f, v_ef747e] = v_5ab095('');
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_3535cd, v_9f928c] = v_5ab095<string>('');
-  const [v_d74a81, v_fcce73] = v_5ab095('010 2487 6746');
+  const [v_d74a81, v_fcce73] = v_5ab095('');
   const [v_a6c30b, v_c030e3] = v_5ab095('대한민국 서울');
   const [v_222917, v_b8bf44] = v_5ab095<number | null>(null);
   const [v_a4d981, v_9b1714] = v_5ab095<number | null>(null);
@@ -562,6 +567,14 @@ export const v_cdb169 = () => {
             }
 
             console.log('[정보수정] ✅ loadUserInfo 완료, hasLoadedUserInfoRef = true로 설정');
+
+            const v_861648 = await v_e84827.getItem('loginType');
+            if (v_861648 === 'apple') {
+              await v_889fad(
+                v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+              );
+            }
           } else {
             console.warn('[정보수정] 초기화 - member ID가 없습니다.');
             v_deef62(false);
@@ -625,6 +638,35 @@ export const v_cdb169 = () => {
 
     if (!v_717992) {
       await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.userDataNotFound'));
+      return;
+    }
+
+    const v_d199d8 = v_a1244c(v_c3eac4);
+    const v_2d2cbc = v_e9394b(v_2694bd);
+
+    const v_ea02dc = [];
+
+    if (v_d199d8 === 0 || v_d199d8 === null || v_d199d8 === undefined) {
+      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
+    }
+
+    if (v_2d2cbc === 0 || v_2d2cbc === null || v_2d2cbc === undefined) {
+      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
+    }
+
+    if (v_add96c.cCode === 0 || v_add96c.cCode === null || v_add96c.cCode === undefined) {
+      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
+    }
+
+    if (v_167c8b.rCode === 0 || v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === -1) {
+      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+    }
+
+    if (v_ea02dc.length > 0) {
+      await v_889fad(
+        v_8d41d7('screens.myInfoEdit.alerts.error') || '오류',
+        v_ea02dc.join('\n')
+      );
       return;
     }
 
@@ -856,8 +898,6 @@ export const v_cdb169 = () => {
 
       if (v_e01f71.length > 0) {
 
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'), v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'));
-
         const v_6961e0 = {
           이름: v_9d09f1,
           성: v_b6daf3,
@@ -903,6 +943,24 @@ export const v_cdb169 = () => {
             console.warn('2. 서버에서 데이터를 업데이트하지 못했을 수 있습니다');
             console.warn('3. 새로고침이 너무 빨리 발생했을 수 있습니다 (500ms 후 다시 확인)');
           }
+
+          v_889fad(
+            v_8d41d7('screens.myInfoEdit.alerts.saveSuccess'),
+            v_8d41d7('screens.myInfoEdit.alerts.saveSuccessMessage'),
+            [
+              {
+                text: v_8d41d7('screens.myInfoEdit.alerts.confirm') || '확인',
+                onPress: () => {
+
+                  if (v_7e32fb) {
+                    v_c7ac57();
+                  } else {
+                    v_487a25(v_ce4741.myInfo);
+                  }
+                },
+              },
+            ],
+          );
         }, 1000);
       } else {
 

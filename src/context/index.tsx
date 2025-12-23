@@ -118,6 +118,10 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_479a37, v_67ab1c] = v_5ab095<'country' | 'region'>('country');
 
   v_c4deb2(() => {
+
+    if (v_2f03bc && v_2f03bc.dialCode === '0') {
+      return;
+    }
     const v_e94fdf = v_369014(v_459d5e.iso2);
     const v_d2a53b = v_2f03bc
       ? v_e94fdf.some((v_a6c30b) => v_a6c30b.iso2 === v_2f03bc.iso2)

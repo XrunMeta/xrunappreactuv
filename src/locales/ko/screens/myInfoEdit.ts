@@ -20,7 +20,9 @@ export default {
   gender: '성별',
   genderMale: '남',
   genderFemale: '여',
+  genderSelect: '선택',
   age: '나이',
+  ageSelect: '선택',
   save: '저장',
   cancel: '취소',
   alerts: {
@@ -44,6 +46,8 @@ export default {
     emailNotFound: '이메일 정보가 없습니다.',
     emailSendFailed: '이메일 인증 코드 발송에 실패했습니다. 다시 시도해주세요.',
     verificationError: '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.',
+    appleLoginInfo: '알림',
+    appleLoginMessage: '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.',
   },
   lastPasswordChangeDate: '최종변경날짜',
   lastPasswordChangeDateLabel: '최종변경날짜  : {{date}}',

@@ -519,8 +519,33 @@ export const v_f4f851 = () => {
           return;
         }
 
+        const v_4f2a1a = await v_e84827.getItem('appleSignupCompleted');
+        const v_911040 = await v_e84827.getItem('appleSignupCompletedEmail');
+
+        if (v_4f2a1a === 'true' && v_911040 === v_e0c7e8) {
+          console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, 재시도 안내');
+          await v_889fad(
+            v_8d41d7('common.messages.error') || '오류',
+            '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
+          );
+          v_deef62(false);
+          return;
+        }
+
         await v_e84827.setItem('appleSignupRequired', 'true');
         await v_e84827.setItem('appleSignupEmail', v_e0c7e8);
+
+        if (v_43c42e.data.fullName) {
+          const v_05b02f = v_43c42e.data.fullName;
+          const v_a7c7b7 = v_05b02f.givenName || '';
+          const v_f142d8 = v_05b02f.familyName || '';
+          const v_5a9575 = `${v_f142d8} ${v_a7c7b7}`.trim();
+
+          await v_e84827.setItem('appleSignupFullName', v_5a9575);
+          await v_e84827.setItem('appleSignupGivenName', v_a7c7b7);
+          await v_e84827.setItem('appleSignupFamilyName', v_f142d8);
+          console.log('[애플 로그인] 사용자 이름 저장:', { fullName: v_5a9575, givenName: v_a7c7b7, familyName: v_f142d8 });
+        }
 
         v_9b57fc(v_ce4741.signup);
         v_deef62(false);
@@ -536,6 +561,18 @@ export const v_f4f851 = () => {
 
         await v_e84827.setItem('appleSignupRequired', 'true');
         await v_e84827.setItem('appleSignupEmail', v_e0c7e8);
+
+        if (v_43c42e.data.fullName) {
+          const v_05b02f = v_43c42e.data.fullName;
+          const v_a7c7b7 = v_05b02f.givenName || '';
+          const v_f142d8 = v_05b02f.familyName || '';
+          const v_5a9575 = `${v_f142d8} ${v_a7c7b7}`.trim();
+
+          await v_e84827.setItem('appleSignupFullName', v_5a9575);
+          await v_e84827.setItem('appleSignupGivenName', v_a7c7b7);
+          await v_e84827.setItem('appleSignupFamilyName', v_f142d8);
+          console.log('[애플 로그인] 사용자 이름 저장:', { fullName: v_5a9575, givenName: v_a7c7b7, familyName: v_f142d8 });
+        }
 
         v_9b57fc(v_ce4741.signup);
         v_deef62(false);
@@ -569,6 +606,8 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('isLoggedIn', 'true');
 
       await v_e84827.setItem('rememberMe', 'true');
+
+      await v_e84827.setItem('loginType', 'apple');
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');

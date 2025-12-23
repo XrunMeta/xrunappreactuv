@@ -601,10 +601,12 @@ export const v_9d2541 = async (
 export const v_91bb22 = {
 
   getGenderCode: (v_c3eac4): number => {
+    if (v_c3eac4 === '0') return 0;
     return v_c3eac4 === 'male' ? 2110 : 2111;
   },
 
   getAgeCode: (v_f83808): number => {
+    if (v_f83808 === '0') return 0;
     const v_c3889d = {
       '10': 2210,
       '20': 2220,
@@ -612,7 +614,7 @@ export const v_91bb22 = {
       '40': 2240,
       '50+': 2250,
     };
-    return v_c3889d[v_f83808] || 2220;
+    return v_c3889d[v_f83808] || 0;
   },
 
   getOSCode: (): number => {
