@@ -610,7 +610,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
           <Text style={styles.modalSubText}>
             {t('screens.showNapAd.adCallFailedSub')}
           </Text>
-          <View style={[styles.buttonContainer, { justifyContent: 'center', alignItems: 'center', marginTop: 20 }]}>
+          <View style={[styles.buttonContainers, { justifyContent: 'center', alignItems: 'center', marginTop: 20 }]}>
             <TouchableOpacity onPress={handleAdCallFailedOK} style={[styles.okButton, { flex: 0, minWidth: 200 }]}>
               <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
@@ -880,14 +880,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 'auto',
-    gap: 15,
-    paddingTop: 10,
-  },
+      buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 'auto',
+        gap: 15,
+        paddingTop: 10,
+      },
+      buttonContainers: {
+        justifyContent: 'center',
+        width: '100%',
+        paddingTop: 10,
+      },
   watchAdButton: {
     backgroundColor: '#FFDC04',
     paddingHorizontal: 30,
