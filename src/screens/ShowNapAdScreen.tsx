@@ -673,7 +673,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           <Text style={v_d81136.modalSubText}>
             {v_8d41d7('screens.showNapAd.adCallFailedSub')}
           </Text>
-          <View style={[v_d81136.buttonContainer, { justifyContent: 'center', marginTop: 20 }]}>
+          <View style={[v_d81136.buttonContainers]}>
             <TouchableOpacity onPress={v_34fafc} style={[v_d81136.okButton, { flex: 0, minWidth: 200 }]}>
               <Text style={v_d81136.okButtonText}>{v_8d41d7('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
@@ -941,6 +941,11 @@ const v_d81136 = v_472849.create({
     width: '100%',
     marginTop: 'auto',
     gap: 15,
+    paddingTop: 10,
+  },
+  buttonContainers: {
+    justifyContent: 'center',
+    width: '100%',
     paddingTop: 10,
   },
   watchAdButton: {
