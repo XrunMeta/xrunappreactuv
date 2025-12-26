@@ -36,7 +36,11 @@ import {
   checkLogin,
   SignupHelpers,
   getClauseContent,
+  encryptSHA256,
+  saveSession,
 } from '../services';
+import { signInWithApple } from '../services/appleAuth';
+import { AxiosError } from 'axios';
 
 const AGE_OPTIONS = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -73,6 +77,9 @@ export const SignupScreen = () => {
   const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(signupFormData.phoneNumber);
   const [referralEmail, setReferralEmail] = useState(signupFormData.referralEmail);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSignupMode, setIsGoogleSignupMode] = useState(false);
+  const [isAppleSignupMode, setIsAppleSignupMode] = useState(false);
 
   const [gender, setGender] = useState<GenderValue>(
     isAppleSignupMode ? '0' : (signupFormData.gender || 'male')
@@ -83,9 +90,6 @@ export const SignupScreen = () => {
   const [serviceTermsAccepted, setServiceTermsAccepted] = useState(false);
   const [locationTermsAccepted, setLocationTermsAccepted] = useState(false);
   const [privacyTermsAccepted, setPrivacyTermsAccepted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGoogleSignupMode, setIsGoogleSignupMode] = useState(false);
-  const [isAppleSignupMode, setIsAppleSignupMode] = useState(false);
 
   const allTermsAccepted = serviceTermsAccepted && locationTermsAccepted && privacyTermsAccepted;
 
@@ -496,16 +500,160 @@ export const SignupScreen = () => {
 
       }
 
+      if (isAppleSignupMode) {
+        console.log('[회원가입] 애플 회원가입 모드 - 이메일 인증 건너뛰고 바로 회원가입 진행');
+
+        try {
+
+          const mobileCode = parseInt(selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
+          const countryCode = selectedCountryDialCode.iso2 || 'KR';
+          const regionId = selectedRegion
+            ? getRegionIdByIso2(selectedRegion.iso2)
+            : parseInt(GLOBAL_REGION.dialCode, 10);
+
+          const signupData = {
+            email: email.trim(),
+            pin: '', 
+            firstname: parsedGivenName.trim(),
+            lastname: parsedFamilyName.trim() || '',
+            gender: SignupHelpers.getGenderCode(gender || '0'),
+            mobile: phoneNumber.trim() || '',
+            mobilecode: mobileCode,
+            countrycode: countryCode,
+            country: mobileCode,
+            region: regionId,
+            age: SignupHelpers.getAgeCode(ageRange || '0'),
+            recommand: referralMemberId || 0,
+            os: SignupHelpers.getOSCode(),
+            social_code: 2052, 
+          };
+
+          console.log('[회원가입] 애플 회원가입 API 호출 시작');
+
+          let signupSuccess = false;
+          try {
+            signupSuccess = await signup(signupData, navigate);
+          } catch (signupError) {
+
+            if (signupError instanceof AxiosError && signupError.response?.status === 409) {
+              console.log('[회원가입] 이미 사용중인 이메일 (409) - 애플 로그인으로 로그인 안내');
+              await showAlert(
+                t('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
+                t('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 애플 로그인으로 로그인해주세요.',
+                [
+                  {
+                    text: t('screens.signup.success.confirm') || '확인',
+                    onPress: () => {
+                      reset(ROUTES.authLanding);
+                      navigate(ROUTES.login);
+                    },
+                  },
+                ],
+              );
+              setIsSubmitting(false);
+              return;
+            }
+            throw signupError;
+          }
+
+          if (!signupSuccess) {
+            await showAlert(
+              t('screens.signup.alerts.signupFailed') || '회원가입 실패',
+              t('screens.signup.errors.signupFailed') || '회원가입에 실패했습니다. 다시 시도해주세요.',
+            );
+            setIsSubmitting(false);
+            return;
+          }
+
+          await AsyncStorage.setItem('appleSignupCompleted', 'true');
+          await AsyncStorage.setItem('appleSignupCompletedEmail', email.trim());
+          console.log('[회원가입] 애플 회원가입 완료 플래그 저장:', email.trim());
+
+          await AsyncStorage.removeItem('appleSignupRequired');
+          await AsyncStorage.removeItem('appleSignupEmail');
+
+          console.log('[회원가입] 애플 회원가입 완료 - 자동 로그인 시작');
+
+          const appleLoginResult = await signInWithApple(navigate);
+
+          if (!appleLoginResult.success || !appleLoginResult.data) {
+            console.error('[회원가입] 애플 자동 로그인 실패:', appleLoginResult.message);
+            await showAlert(
+              t('screens.signup.alerts.error') || '오류',
+              t('screens.signup.errors.autoLoginFailed') || '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+              [
+                {
+                  text: t('screens.signup.success.confirm') || '확인',
+                  onPress: () => {
+                    reset(ROUTES.authLanding);
+                    navigate(ROUTES.login);
+                  },
+                },
+              ],
+            );
+            setIsSubmitting(false);
+            return;
+          }
+
+          const { memberId, email: loginEmail, name, accessToken, refreshToken } = appleLoginResult.data;
+
+          console.log('[회원가입] 애플 자동 로그인 성공:', { memberId, email: loginEmail });
+
+          const userData = {
+            member: memberId,
+            email: loginEmail,
+            firstname: name ? (name.split(' ')[0] || name) : '',
+            lastname: name ? name.split(' ').slice(1).join(' ') : '',
+            extrastr: accessToken || '',
+          };
+
+          if (accessToken && memberId) {
+            const ssidw = encryptSHA256(accessToken);
+            const sessionSaved = await saveSession(memberId, ssidw, navigate);
+            if (!sessionSaved) {
+              console.warn('[회원가입] 세션 저장 실패');
+            }
+          }
+
+          await AsyncStorage.removeItem('userData');
+          await AsyncStorage.removeItem('userSessionToken');
+          await AsyncStorage.setItem('userEmail', loginEmail);
+          await AsyncStorage.setItem('userData', JSON.stringify(userData));
+          await AsyncStorage.setItem('userSessionToken', accessToken || '');
+          await AsyncStorage.setItem('isLoggedIn', 'true');
+          await AsyncStorage.setItem('rememberMe', 'true');
+          await AsyncStorage.setItem('loginType', 'apple');
+
+          if (refreshToken) {
+            await AsyncStorage.setItem('refreshToken', refreshToken);
+          }
+
+          console.log('[회원가입] 애플 자동 로그인 완료 - 맵 페이지로 이동');
+
+          setIsSubmitting(false);
+          reset(ROUTES.map);
+          return;
+        } catch (error: any) {
+          console.error('[회원가입] 애플 회원가입 처리 중 오류:', error);
+          await showAlert(
+            t('screens.signup.alerts.error'),
+            t('screens.signup.errors.error') || '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
 
       try {
 
         const pendingSignupData = {
           email: email.trim(),
-          password: isAppleSignupMode ? '' : password, 
+          password: password,
           familyName: parsedFamilyName.trim(),
           givenName: parsedGivenName.trim(),
-          phoneNumber: phoneNumber.trim() || '', 
+          phoneNumber: phoneNumber.trim(),
           selectedCountryDialCode: {
             iso2: selectedCountryDialCode.iso2,
             dialCode: selectedCountryDialCode.dialCode,
@@ -523,7 +671,7 @@ export const SignupScreen = () => {
           referralMemberId: referralMemberId,
           gender: gender,
           ageRange: ageRange,
-          isAppleSignupMode: isAppleSignupMode, 
+          isAppleSignupMode: false,
         };
 
         await AsyncStorage.setItem('pendingSignupData', JSON.stringify(pendingSignupData));
