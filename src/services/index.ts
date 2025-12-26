@@ -2637,6 +2637,12 @@ export const gatewayNodeJS = async (
     const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
+    if (endpoint === 'getTopAd5') {
+      console.log(`🌐 [gatewayNodeJS] endpoint: ${endpoint}`);
+      console.log(`🌐 [gatewayNodeJS] method: ${method}`);
+      console.log(`🌐 [gatewayNodeJS] url: ${url}`);
+      console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(requestBody, null, 2));
+    }
 
     const fetchOptions: RequestInit = {
       method: method,
@@ -2657,6 +2663,18 @@ export const gatewayNodeJS = async (
     }
 
     const result = await response.json();
+    if (endpoint === 'getTopAd5') {
+      console.log(`✅ [gatewayNodeJS] API 응답 성공`);
+      console.log(`✅ [gatewayNodeJS] endpoint: ${endpoint}`);
+      console.log(`✅ [gatewayNodeJS] result.data length:`, result?.data?.length || 'N/A');
+      console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+        success: result?.success,
+        dataLength: result?.data?.length,
+        hasData: !!result?.data,
+        hasAds: !!result?.ads,
+        isArray: Array.isArray(result),
+      });
+    }
 
     return result;
   } catch (error) {
@@ -4674,6 +4692,9 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
 
     const requestBody = { os, member };
 
+    console.log('[getTopAd5] ========== API 호출 시작 ==========');
+    console.log('[getTopAd5] 요청 파라미터:', { os, member });
+
     const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
 
     if (!response) {
@@ -4681,22 +4702,59 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
       return null;
     }
 
+    console.log('[getTopAd5] ========== 응답 구조 분석 ==========');
+    console.log('[getTopAd5] response 타입:', typeof response);
+    console.log('[getTopAd5] response가 배열인가?', Array.isArray(response));
+    console.log('[getTopAd5] response 전체:', JSON.stringify(response, null, 2));
+    console.log('[getTopAd5] response.data:', response?.data);
+    console.log('[getTopAd5] response.data?.ads:', response?.data?.ads);
+    console.log('[getTopAd5] response.ads:', response?.ads);
+
     let topAd5Response: any[] = [];
     if (Array.isArray(response)) {
 
       topAd5Response = response;
+      console.log('[getTopAd5] 배열로 인식, 길이:', topAd5Response.length);
     } else if (response?.data?.ads && Array.isArray(response.data.ads)) {
 
       topAd5Response = response.data.ads;
+      console.log('[getTopAd5] response.data.ads로 인식, 길이:', topAd5Response.length);
     } else if (response?.ads && Array.isArray(response.ads)) {
 
       topAd5Response = response.ads;
+      console.log('[getTopAd5] response.ads로 인식, 길이:', topAd5Response.length);
+    } else if (response?.data && Array.isArray(response.data)) {
+
+      topAd5Response = response.data;
+      console.log('[getTopAd5] response.data로 인식, 길이:', topAd5Response.length);
     } else {
       console.warn('[getTopAd5] 예상하지 못한 response 구조:', response);
+      console.warn('[getTopAd5] response 키 목록:', Object.keys(response || {}));
       return null;
     }
 
+    console.log('[getTopAd5] ========== 최종 추출 결과 ==========');
     console.log('[getTopAd5] 추출된 topAd5Response 길이:', topAd5Response.length);
+
+    if (response?.message) {
+      console.warn('[getTopAd5] ⚠️ 백엔드 메시지:', response.message);
+    }
+
+    if (topAd5Response.length === 0) {
+      console.error('[getTopAd5] ❌ 광고 데이터가 없습니다!');
+      console.error('[getTopAd5] 백엔드 응답 상태:', {
+        status: response?.status,
+        code: response?.code,
+        message: response?.message,
+        hasData: !!response?.data,
+        dataKeys: response?.data ? Object.keys(response.data) : [],
+      });
+    } else {
+      console.log('[getTopAd5] ✅ 광고 데이터 발견:', topAd5Response.length, '개');
+      if (topAd5Response.length > 0) {
+        console.log('[getTopAd5] 첫 번째 광고:', JSON.stringify(topAd5Response[0], null, 2));
+      }
+    }
 
     if (topAd5Response && topAd5Response.length > 0) {
       await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Response));
