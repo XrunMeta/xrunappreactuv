@@ -210,6 +210,18 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
           if (v_4f2a1a === 'true' && v_911040 === v_780a85) {
             console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, requiresSignup을 false로 처리');
 
+            return {
+              success: true,
+              data: {
+                ...v_9390e8.data,
+                requiresSignup: false, 
+                isSignupCompleted: false,
+                fullName: v_05b02f ? {
+                  givenName: v_05b02f.givenName || '',
+                  familyName: v_05b02f.familyName || '',
+                } : undefined,
+              },
+            };
           }
         } catch (v_df17d5) {
           console.warn('[애플 로그인] AsyncStorage 확인 실패:', v_df17d5);
@@ -220,6 +232,7 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
           success: true,
           data: {
             ...v_9390e8.data,
+            requiresSignup: true, 
             isSignupCompleted: false,
             fullName: v_05b02f ? {
               givenName: v_05b02f.givenName || '',

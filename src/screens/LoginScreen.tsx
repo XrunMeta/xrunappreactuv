@@ -509,25 +509,22 @@ export const v_f4f851 = () => {
         return;
       }
 
-      if (v_43c42e.data.requiresSignup) {
+      if (v_43c42e.data.requiresSignup === false) {
+        console.log('[애플 로그인] 회원가입 완료 플래그 확인됨 - 서버 동기화 문제로 보임, 재시도 안내');
+        await v_889fad(
+          v_8d41d7('common.messages.error') || '오류',
+          '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
+        );
+        v_deef62(false);
+        return;
+      }
+
+      if (v_43c42e.data.requiresSignup === true) {
         console.log('[애플 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
 
         const v_e0c7e8 = v_43c42e.data.email || '';
         if (!v_e0c7e8) {
           await v_889fad(v_8d41d7('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
-          v_deef62(false);
-          return;
-        }
-
-        const v_4f2a1a = await v_e84827.getItem('appleSignupCompleted');
-        const v_911040 = await v_e84827.getItem('appleSignupCompletedEmail');
-
-        if (v_4f2a1a === 'true' && v_911040 === v_e0c7e8) {
-          console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, 재시도 안내');
-          await v_889fad(
-            v_8d41d7('common.messages.error') || '오류',
-            '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
-          );
           v_deef62(false);
           return;
         }

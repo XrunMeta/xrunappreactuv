@@ -247,6 +247,13 @@ export const v_03a231 = () => {
               await v_e84827.removeItem('rageProgressLastUpdate');
               await v_e84827.removeItem('userSessionToken');
 
+              await v_e84827.removeItem('appleSignupCompleted');
+              await v_e84827.removeItem('appleSignupCompletedEmail');
+              await v_e84827.removeItem('appleSignupRequired');
+              await v_e84827.removeItem('appleSignupEmail');
+              await v_e84827.removeItem('googleSignupRequired');
+              await v_e84827.removeItem('googleSignupEmail');
+
               v_487a25(v_ce4741.login);
             } catch (v_5e9bfe) {
               console.error('[로그아웃] 로그아웃 처리 중 오류:', v_5e9bfe);
