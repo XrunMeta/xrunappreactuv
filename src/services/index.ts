@@ -2637,6 +2637,12 @@ export const v_c07360 = async (
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
+    if (v_09dafd === 'getTopAd5') {
+      console.log(`🌐 [gatewayNodeJS] endpoint: ${v_09dafd}`);
+      console.log(`🌐 [gatewayNodeJS] method: ${v_bfe9b9}`);
+      console.log(`🌐 [gatewayNodeJS] url: ${v_f71b56}`);
+      console.log(`🌐 [gatewayNodeJS] requestBody:`, JSON.stringify(v_cd6a57, null, 2));
+    }
 
     const v_a611c4 = {
       method: v_bfe9b9,
@@ -2657,6 +2663,18 @@ export const v_c07360 = async (
     }
 
     const v_43c42e = await v_3393e3.json();
+    if (v_09dafd === 'getTopAd5') {
+      console.log(`✅ [gatewayNodeJS] API 응답 성공`);
+      console.log(`✅ [gatewayNodeJS] endpoint: ${v_09dafd}`);
+      console.log(`✅ [gatewayNodeJS] result.data length:`, v_43c42e?.data?.length || 'N/A');
+      console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+        success: v_43c42e?.success,
+        dataLength: v_43c42e?.data?.length,
+        hasData: !!v_43c42e?.data,
+        hasAds: !!v_43c42e?.ads,
+        isArray: Array.isArray(v_43c42e),
+      });
+    }
 
     return v_43c42e;
   } catch (v_5e9bfe) {
@@ -4674,6 +4692,9 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
 
     const v_cd6a57 = { os: v_e16099, member: v_660822 };
 
+    console.log('[getTopAd5] ========== API 호출 시작 ==========');
+    console.log('[getTopAd5] 요청 파라미터:', { os: v_e16099, member: v_660822 });
+
     const v_3393e3 = await v_c07360('getTopAd5', 'POST', v_cd6a57, v_c65f5d);
 
     if (!v_3393e3) {
@@ -4681,22 +4702,59 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
       return null;
     }
 
+    console.log('[getTopAd5] ========== 응답 구조 분석 ==========');
+    console.log('[getTopAd5] response 타입:', typeof v_3393e3);
+    console.log('[getTopAd5] response가 배열인가?', Array.isArray(v_3393e3));
+    console.log('[getTopAd5] response 전체:', JSON.stringify(v_3393e3, null, 2));
+    console.log('[getTopAd5] response.data:', v_3393e3?.data);
+    console.log('[getTopAd5] response.data?.ads:', v_3393e3?.data?.ads);
+    console.log('[getTopAd5] response.ads:', v_3393e3?.ads);
+
     let v_e36b07 = [];
     if (Array.isArray(v_3393e3)) {
 
       v_e36b07 = v_3393e3;
+      console.log('[getTopAd5] 배열로 인식, 길이:', v_e36b07.length);
     } else if (v_3393e3?.data?.ads && Array.isArray(v_3393e3.data.ads)) {
 
       v_e36b07 = v_3393e3.data.ads;
+      console.log('[getTopAd5] response.data.ads로 인식, 길이:', v_e36b07.length);
     } else if (v_3393e3?.ads && Array.isArray(v_3393e3.ads)) {
 
       v_e36b07 = v_3393e3.ads;
+      console.log('[getTopAd5] response.ads로 인식, 길이:', v_e36b07.length);
+    } else if (v_3393e3?.data && Array.isArray(v_3393e3.data)) {
+
+      v_e36b07 = v_3393e3.data;
+      console.log('[getTopAd5] response.data로 인식, 길이:', v_e36b07.length);
     } else {
       console.warn('[getTopAd5] 예상하지 못한 response 구조:', v_3393e3);
+      console.warn('[getTopAd5] response 키 목록:', Object.keys(v_3393e3 || {}));
       return null;
     }
 
+    console.log('[getTopAd5] ========== 최종 추출 결과 ==========');
     console.log('[getTopAd5] 추출된 topAd5Response 길이:', v_e36b07.length);
+
+    if (v_3393e3?.message) {
+      console.warn('[getTopAd5] ⚠️ 백엔드 메시지:', v_3393e3.message);
+    }
+
+    if (v_e36b07.length === 0) {
+      console.error('[getTopAd5] ❌ 광고 데이터가 없습니다!');
+      console.error('[getTopAd5] 백엔드 응답 상태:', {
+        status: v_3393e3?.status,
+        code: v_3393e3?.code,
+        message: v_3393e3?.message,
+        hasData: !!v_3393e3?.data,
+        dataKeys: v_3393e3?.data ? Object.keys(v_3393e3.data) : [],
+      });
+    } else {
+      console.log('[getTopAd5] ✅ 광고 데이터 발견:', v_e36b07.length, '개');
+      if (v_e36b07.length > 0) {
+        console.log('[getTopAd5] 첫 번째 광고:', JSON.stringify(v_e36b07[0], null, 2));
+      }
+    }
 
     if (v_e36b07 && v_e36b07.length > 0) {
       await v_e84827.setItem(v_332c06, JSON.stringify(v_e36b07));
