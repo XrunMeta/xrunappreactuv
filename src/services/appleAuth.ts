@@ -200,33 +200,6 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
       const requiresSignup = data.code === 200 && !data.success && (data.data?.requiresSignup === true || data.data?.isSignupCompleted === false);
 
       if (requiresSignup) {
-
-        try {
-          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-          const appleSignupCompleted = await AsyncStorage.getItem('appleSignupCompleted');
-          const appleSignupCompletedEmail = await AsyncStorage.getItem('appleSignupCompletedEmail');
-          const currentEmail = data.data?.email || email;
-
-          if (appleSignupCompleted === 'true' && appleSignupCompletedEmail === currentEmail) {
-            console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, requiresSignup을 false로 처리');
-
-            return {
-              success: true,
-              data: {
-                ...data.data,
-                requiresSignup: false, 
-                isSignupCompleted: false,
-                fullName: fullName ? {
-                  givenName: fullName.givenName || '',
-                  familyName: fullName.familyName || '',
-                } : undefined,
-              },
-            };
-          }
-        } catch (storageError) {
-          console.warn('[애플 로그인] AsyncStorage 확인 실패:', storageError);
-        }
-
         console.log('[애플 로그인] 회원가입 필요 - 회원가입 화면으로 이동 필요');
         return {
           success: true,

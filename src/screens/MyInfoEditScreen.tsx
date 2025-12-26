@@ -27,6 +27,7 @@ import {
   getRegionsByCountry,
   updateRegion,
   sendEmailVerificationCode,
+  signInWithApple,
 } from '../services';
 
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
@@ -1058,45 +1059,74 @@ export const MyInfoEditScreen = () => {
   }, [selectedCountryDialCode?.iso2, selectedCountryDialCode?.name, selectedCountryDialCode?.dialCode, isLoading]);
 
   const handlePhoneEdit = async () => {
-    if (!email) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
-      return;
-    }
 
-    try {
+    const loginType = await AsyncStorage.getItem('loginType');
+    const isAppleLogin = loginType === 'apple';
 
-      const waitForResponse = async () => {
-        try {
-          return await sendEmailVerificationCode(email, navigate);
-        } catch (error) {
-          console.error('[정보수정] 이메일 인증 코드 발송 오류:', error);
-          return false;
+    if (isAppleLogin) {
+
+      console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
+
+      try {
+        const appleLoginResult = await signInWithApple(navigate);
+
+        if (!appleLoginResult.success || !appleLoginResult.data) {
+          console.error('[정보수정] 애플 로그인 인증 실패:', appleLoginResult.message);
+          await showAlert(
+            t('screens.myInfoEdit.alerts.error'),
+            t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+          );
+          return;
         }
-      };
 
-      const result = await Promise.race([
-        waitForResponse(),
-        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
-      ]);
-
-      if (result) {
-
-        setVerificationEmail(email);
-        setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
-        navigate(ROUTES.verificationCode);
-      } else {
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
-          {
-            text: t('screens.myInfoEdit.alerts.confirm'),
-            onPress: () => {
-
-            },
-          },
-        ]);
+        console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
+        navigate(ROUTES.myInfoPhoneEdit);
+      } catch (error) {
+        console.error('[정보수정] 애플 로그인 인증 오류:', error);
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
       }
-    } catch (error) {
-      console.error('[정보수정] 전화번호 수정 인증 오류:', error);
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+    } else {
+
+      if (!email) {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
+        return;
+      }
+
+      try {
+
+        const waitForResponse = async () => {
+          try {
+            return await sendEmailVerificationCode(email, navigate);
+          } catch (error) {
+            console.error('[정보수정] 이메일 인증 코드 발송 오류:', error);
+            return false;
+          }
+        };
+
+        const result = await Promise.race([
+          waitForResponse(),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
+        ]);
+
+        if (result) {
+
+          setVerificationEmail(email);
+          setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
+          navigate(ROUTES.verificationCode);
+        } else {
+          await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
+            {
+              text: t('screens.myInfoEdit.alerts.confirm'),
+              onPress: () => {
+
+              },
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error('[정보수정] 전화번호 수정 인증 오류:', error);
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+      }
     }
   };
 

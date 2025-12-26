@@ -190,13 +190,28 @@ export const MyInfoScreen = () => {
     return () => clearInterval(interval);
   }, [navigate, currentScreen]);
 
-  const handleMenuPress = (menu: MenuConfig) => {
+  const handleMenuPress = async (menu: MenuConfig) => {
     if (menu.route) {
 
-      if (menu.id === 'edit' && userInfo?.email) {
-        setVerificationEmail(userInfo.email);
+      if (menu.id === 'edit') {
+
+        const loginType = await AsyncStorage.getItem('loginType');
+        const isAppleLogin = loginType === 'apple';
+
+        if (isAppleLogin) {
+
+          console.log('[내 정보] 애플 로그인 사용자 - 정보 수정 화면으로 직접 이동');
+          navigate(ROUTES.myInfoEdit);
+        } else {
+
+          if (userInfo?.email) {
+            setVerificationEmail(userInfo.email);
+          }
+          navigate(ROUTES.myInfoEmailAuth);
+        }
+      } else {
+        navigate(ROUTES[menu.route]);
       }
-      navigate(ROUTES[menu.route]);
     }
   };
 
