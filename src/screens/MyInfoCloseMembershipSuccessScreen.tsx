@@ -41,6 +41,13 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
       await AsyncStorage.removeItem('rageProgressLastUpdate');
       await AsyncStorage.removeItem('userSessionToken');
 
+      await AsyncStorage.removeItem('appleSignupCompleted');
+      await AsyncStorage.removeItem('appleSignupCompletedEmail');
+      await AsyncStorage.removeItem('appleSignupRequired');
+      await AsyncStorage.removeItem('appleSignupEmail');
+      await AsyncStorage.removeItem('googleSignupRequired');
+      await AsyncStorage.removeItem('googleSignupEmail');
+
       reset(ROUTES.login);
     } catch (error) {
       console.error('[회원 탈퇴] 로그아웃 처리 중 오류:', error);
@@ -53,6 +60,13 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
         await AsyncStorage.removeItem('userTickets');
         await AsyncStorage.removeItem('rageProgressLastUpdate');
         await AsyncStorage.removeItem('userSessionToken');
+
+        await AsyncStorage.removeItem('appleSignupCompleted');
+        await AsyncStorage.removeItem('appleSignupCompletedEmail');
+        await AsyncStorage.removeItem('appleSignupRequired');
+        await AsyncStorage.removeItem('appleSignupEmail');
+        await AsyncStorage.removeItem('googleSignupRequired');
+        await AsyncStorage.removeItem('googleSignupEmail');
       } catch (storageError) {
         console.error('[회원 탈퇴] AsyncStorage 삭제 중 오류:', storageError);
       }

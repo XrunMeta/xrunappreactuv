@@ -247,6 +247,13 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('rageProgressLastUpdate');
               await AsyncStorage.removeItem('userSessionToken');
 
+              await AsyncStorage.removeItem('appleSignupCompleted');
+              await AsyncStorage.removeItem('appleSignupCompletedEmail');
+              await AsyncStorage.removeItem('appleSignupRequired');
+              await AsyncStorage.removeItem('appleSignupEmail');
+              await AsyncStorage.removeItem('googleSignupRequired');
+              await AsyncStorage.removeItem('googleSignupEmail');
+
               reset(ROUTES.login);
             } catch (error) {
               console.error('[로그아웃] 로그아웃 처리 중 오류:', error);

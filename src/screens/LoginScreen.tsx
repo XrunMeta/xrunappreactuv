@@ -509,25 +509,22 @@ export const LoginScreen = () => {
         return;
       }
 
-      if (result.data.requiresSignup) {
+      if (result.data.requiresSignup === false) {
+        console.log('[애플 로그인] 회원가입 완료 플래그 확인됨 - 서버 동기화 문제로 보임, 재시도 안내');
+        await showAlert(
+          t('common.messages.error') || '오류',
+          '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.data.requiresSignup === true) {
         console.log('[애플 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
 
         const email = result.data.email || '';
         if (!email) {
           await showAlert(t('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
-          setIsLoading(false);
-          return;
-        }
-
-        const appleSignupCompleted = await AsyncStorage.getItem('appleSignupCompleted');
-        const appleSignupCompletedEmail = await AsyncStorage.getItem('appleSignupCompletedEmail');
-
-        if (appleSignupCompleted === 'true' && appleSignupCompletedEmail === email) {
-          console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, 재시도 안내');
-          await showAlert(
-            t('common.messages.error') || '오류',
-            '회원가입이 완료되었지만 서버 동기화가 지연되었습니다. 잠시 후 다시 시도해주세요.',
-          );
           setIsLoading(false);
           return;
         }
