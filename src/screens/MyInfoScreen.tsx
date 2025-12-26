@@ -190,13 +190,28 @@ export const v_03a231 = () => {
     return () => clearInterval(v_ad1d65);
   }, [v_9b57fc, v_0f0c7b]);
 
-  const v_18219f = (v_714568) => {
+  const v_18219f = async (v_714568) => {
     if (v_714568.route) {
 
-      if (v_714568.id === 'edit' && v_bb789b?.email) {
-        v_b572c3(v_bb789b.email);
+      if (v_714568.id === 'edit') {
+
+        const v_861648 = await v_e84827.getItem('loginType');
+        const v_1fa4eb = v_861648 === 'apple';
+
+        if (v_1fa4eb) {
+
+          console.log('[내 정보] 애플 로그인 사용자 - 정보 수정 화면으로 직접 이동');
+          v_9b57fc(v_ce4741.myInfoEdit);
+        } else {
+
+          if (v_bb789b?.email) {
+            v_b572c3(v_bb789b.email);
+          }
+          v_9b57fc(v_ce4741.myInfoEmailAuth);
+        }
+      } else {
+        v_9b57fc(v_ce4741[v_714568.route]);
       }
-      v_9b57fc(v_ce4741[v_714568.route]);
     }
   };
 

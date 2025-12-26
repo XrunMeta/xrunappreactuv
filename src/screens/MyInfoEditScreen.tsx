@@ -27,6 +27,7 @@ import {
   v_11e39e,
   v_4296b8,
   v_8025d1,
+  v_7af6c9,
 } from '../services';
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
@@ -1058,45 +1059,74 @@ export const v_cdb169 = () => {
   }, [v_459d5e?.iso2, v_459d5e?.name, v_459d5e?.dialCode, v_cd31a8]);
 
   const v_801fea = async () => {
-    if (!v_e0c7e8) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
-      return;
-    }
 
-    try {
+    const v_861648 = await v_e84827.getItem('loginType');
+    const v_1fa4eb = v_861648 === 'apple';
 
-      const v_b97179 = async () => {
-        try {
-          return await v_8025d1(v_e0c7e8, v_9b57fc);
-        } catch (v_5e9bfe) {
-          console.error('[정보수정] 이메일 인증 코드 발송 오류:', v_5e9bfe);
-          return false;
+    if (v_1fa4eb) {
+
+      console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
+
+      try {
+        const v_25c481 = await v_7af6c9(v_9b57fc);
+
+        if (!v_25c481.success || !v_25c481.data) {
+          console.error('[정보수정] 애플 로그인 인증 실패:', v_25c481.message);
+          await v_889fad(
+            v_8d41d7('screens.myInfoEdit.alerts.error'),
+            v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+          );
+          return;
         }
-      };
 
-      const v_43c42e = await Promise.race([
-        v_b97179(),
-        new Promise<boolean>((v_6f7712) => setTimeout(() => v_6f7712(false), 5000)),
-      ]);
-
-      if (v_43c42e) {
-
-        v_b572c3(v_e0c7e8);
-        v_8f89f3(v_ce4741.myInfoPhoneEdit); 
-        v_9b57fc(v_ce4741.verificationCode);
-      } else {
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
-          {
-            text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
-            onPress: () => {
-
-            },
-          },
-        ]);
+        console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
+        v_9b57fc(v_ce4741.myInfoPhoneEdit);
+      } catch (v_5e9bfe) {
+        console.error('[정보수정] 애플 로그인 인증 오류:', v_5e9bfe);
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
       }
-    } catch (v_5e9bfe) {
-      console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+    } else {
+
+      if (!v_e0c7e8) {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
+        return;
+      }
+
+      try {
+
+        const v_b97179 = async () => {
+          try {
+            return await v_8025d1(v_e0c7e8, v_9b57fc);
+          } catch (v_5e9bfe) {
+            console.error('[정보수정] 이메일 인증 코드 발송 오류:', v_5e9bfe);
+            return false;
+          }
+        };
+
+        const v_43c42e = await Promise.race([
+          v_b97179(),
+          new Promise<boolean>((v_6f7712) => setTimeout(() => v_6f7712(false), 5000)),
+        ]);
+
+        if (v_43c42e) {
+
+          v_b572c3(v_e0c7e8);
+          v_8f89f3(v_ce4741.myInfoPhoneEdit); 
+          v_9b57fc(v_ce4741.verificationCode);
+        } else {
+          await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
+            {
+              text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
+              onPress: () => {
+
+              },
+            },
+          ]);
+        }
+      } catch (v_5e9bfe) {
+        console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+      }
     }
   };
 

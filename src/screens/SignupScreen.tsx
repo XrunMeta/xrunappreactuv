@@ -36,7 +36,11 @@ import {
   v_9d2541,
   v_91bb22,
   v_4dba02,
+  v_a5170b,
+  v_ea3493,
 } from '../services';
+import { v_7af6c9 } from '../services/appleAuth';
+import { v_3333d3 } from 'imsks';
 
 const v_0c96f7 = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -73,6 +77,9 @@ export const v_f40fc5 = () => {
   const [v_99a8a8, v_ed3503] = v_5ab095(false);
   const [v_3a6ac4, v_f768f9] = v_5ab095(v_8d7bc8.phoneNumber);
   const [v_9bf12c, v_fb6bbb] = v_5ab095(v_8d7bc8.referralEmail);
+  const [v_88dca2, v_e33ec0] = v_5ab095(false);
+  const [v_47b466, v_dee9cd] = v_5ab095(false);
+  const [v_d0472c, v_5d25dd] = v_5ab095(false);
 
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(
     v_d0472c ? '0' : (v_8d7bc8.gender || 'male')
@@ -83,9 +90,6 @@ export const v_f40fc5 = () => {
   const [v_471e49, v_7f4d53] = v_5ab095(false);
   const [v_68a5a9, v_8e53ad] = v_5ab095(false);
   const [v_e55f34, v_f932c8] = v_5ab095(false);
-  const [v_88dca2, v_e33ec0] = v_5ab095(false);
-  const [v_47b466, v_dee9cd] = v_5ab095(false);
-  const [v_d0472c, v_5d25dd] = v_5ab095(false);
 
   const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
 
@@ -496,16 +500,160 @@ export const v_f40fc5 = () => {
 
       }
 
+      if (v_d0472c) {
+        console.log('[회원가입] 애플 회원가입 모드 - 이메일 인증 건너뛰고 바로 회원가입 진행');
+
+        try {
+
+          const v_6c3a47 = parseInt(v_459d5e.dialCode.replace('+', ''), 10) || 82;
+          const v_a4d981 = v_459d5e.iso2 || 'KR';
+          const v_94bdf5 = v_2f03bc
+            ? v_9553a4(v_2f03bc.iso2)
+            : parseInt(v_789afd.dialCode, 10);
+
+          const v_df7dab = {
+            email: v_e0c7e8.trim(),
+            pin: '', 
+            firstname: v_c0da8d.trim(),
+            lastname: v_eb8dd4.trim() || '',
+            gender: v_91bb22.getGenderCode(v_c3eac4 || '0'),
+            mobile: v_3a6ac4.trim() || '',
+            mobilecode: v_6c3a47,
+            countrycode: v_a4d981,
+            country: v_6c3a47,
+            region: v_94bdf5,
+            age: v_91bb22.getAgeCode(v_f83808 || '0'),
+            recommand: v_65bdb1 || 0,
+            os: v_91bb22.getOSCode(),
+            social_code: 2052, 
+          };
+
+          console.log('[회원가입] 애플 회원가입 API 호출 시작');
+
+          let v_d0b446 = false;
+          try {
+            v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
+          } catch (v_788ec0) {
+
+            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
+              console.log('[회원가입] 이미 사용중인 이메일 (409) - 애플 로그인으로 로그인 안내');
+              await v_889fad(
+                v_8d41d7('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
+                v_8d41d7('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 애플 로그인으로 로그인해주세요.',
+                [
+                  {
+                    text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                    onPress: () => {
+                      v_487a25(v_ce4741.authLanding);
+                      v_9b57fc(v_ce4741.login);
+                    },
+                  },
+                ],
+              );
+              v_e33ec0(false);
+              return;
+            }
+            throw v_788ec0;
+          }
+
+          if (!v_d0b446) {
+            await v_889fad(
+              v_8d41d7('screens.signup.alerts.signupFailed') || '회원가입 실패',
+              v_8d41d7('screens.signup.errors.signupFailed') || '회원가입에 실패했습니다. 다시 시도해주세요.',
+            );
+            v_e33ec0(false);
+            return;
+          }
+
+          await v_e84827.setItem('appleSignupCompleted', 'true');
+          await v_e84827.setItem('appleSignupCompletedEmail', v_e0c7e8.trim());
+          console.log('[회원가입] 애플 회원가입 완료 플래그 저장:', v_e0c7e8.trim());
+
+          await v_e84827.removeItem('appleSignupRequired');
+          await v_e84827.removeItem('appleSignupEmail');
+
+          console.log('[회원가입] 애플 회원가입 완료 - 자동 로그인 시작');
+
+          const v_25c481 = await v_7af6c9(v_9b57fc);
+
+          if (!v_25c481.success || !v_25c481.data) {
+            console.error('[회원가입] 애플 자동 로그인 실패:', v_25c481.message);
+            await v_889fad(
+              v_8d41d7('screens.signup.alerts.error') || '오류',
+              v_8d41d7('screens.signup.errors.autoLoginFailed') || '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
+              [
+                {
+                  text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                  onPress: () => {
+                    v_487a25(v_ce4741.authLanding);
+                    v_9b57fc(v_ce4741.login);
+                  },
+                },
+              ],
+            );
+            v_e33ec0(false);
+            return;
+          }
+
+          const { memberId: v_717992, email: v_eab62a, name: v_1833e7, accessToken: v_2ca7e0, refreshToken: v_dfaee3 } = v_25c481.data;
+
+          console.log('[회원가입] 애플 자동 로그인 성공:', { memberId: v_717992, email: v_eab62a });
+
+          const v_ef7306 = {
+            member: v_717992,
+            email: v_eab62a,
+            firstname: v_1833e7 ? (v_1833e7.split(' ')[0] || v_1833e7) : '',
+            lastname: v_1833e7 ? v_1833e7.split(' ').slice(1).join(' ') : '',
+            extrastr: v_2ca7e0 || '',
+          };
+
+          if (v_2ca7e0 && v_717992) {
+            const v_06cee6 = v_a5170b(v_2ca7e0);
+            const v_aa0ad8 = await v_ea3493(v_717992, v_06cee6, v_9b57fc);
+            if (!v_aa0ad8) {
+              console.warn('[회원가입] 세션 저장 실패');
+            }
+          }
+
+          await v_e84827.removeItem('userData');
+          await v_e84827.removeItem('userSessionToken');
+          await v_e84827.setItem('userEmail', v_eab62a);
+          await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+          await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
+          await v_e84827.setItem('isLoggedIn', 'true');
+          await v_e84827.setItem('rememberMe', 'true');
+          await v_e84827.setItem('loginType', 'apple');
+
+          if (v_dfaee3) {
+            await v_e84827.setItem('refreshToken', v_dfaee3);
+          }
+
+          console.log('[회원가입] 애플 자동 로그인 완료 - 맵 페이지로 이동');
+
+          v_e33ec0(false);
+          v_487a25(v_ce4741.map);
+          return;
+        } catch (v_5e9bfe) {
+          console.error('[회원가입] 애플 회원가입 처리 중 오류:', v_5e9bfe);
+          await v_889fad(
+            v_8d41d7('screens.signup.alerts.error'),
+            v_8d41d7('screens.signup.errors.error') || '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
+          );
+          v_e33ec0(false);
+          return;
+        }
+      }
+
       console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
 
       try {
 
         const v_0e0310 = {
           email: v_e0c7e8.trim(),
-          password: v_d0472c ? '' : v_adc076, 
+          password: v_adc076,
           familyName: v_eb8dd4.trim(),
           givenName: v_c0da8d.trim(),
-          phoneNumber: v_3a6ac4.trim() || '', 
+          phoneNumber: v_3a6ac4.trim(),
           selectedCountryDialCode: {
             iso2: v_459d5e.iso2,
             dialCode: v_459d5e.dialCode,
@@ -523,7 +671,7 @@ export const v_f40fc5 = () => {
           referralMemberId: v_65bdb1,
           gender: v_c3eac4,
           ageRange: v_f83808,
-          isAppleSignupMode: v_d0472c, 
+          isAppleSignupMode: false,
         };
 
         await v_e84827.setItem('pendingSignupData', JSON.stringify(v_0e0310));

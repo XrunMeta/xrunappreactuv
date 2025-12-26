@@ -200,33 +200,6 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
       const v_aa93c2 = v_9390e8.code === 200 && !v_9390e8.success && (v_9390e8.data?.requiresSignup === true || v_9390e8.data?.isSignupCompleted === false);
 
       if (v_aa93c2) {
-
-        try {
-          const v_e84827 = require('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv').default;
-          const v_4f2a1a = await v_e84827.getItem('appleSignupCompleted');
-          const v_911040 = await v_e84827.getItem('appleSignupCompletedEmail');
-          const v_780a85 = v_9390e8.data?.email || v_e0c7e8;
-
-          if (v_4f2a1a === 'true' && v_911040 === v_780a85) {
-            console.log('[애플 로그인] 회원가입 완료 플래그 확인 - 서버 동기화 문제로 보임, requiresSignup을 false로 처리');
-
-            return {
-              success: true,
-              data: {
-                ...v_9390e8.data,
-                requiresSignup: false, 
-                isSignupCompleted: false,
-                fullName: v_05b02f ? {
-                  givenName: v_05b02f.givenName || '',
-                  familyName: v_05b02f.familyName || '',
-                } : undefined,
-              },
-            };
-          }
-        } catch (v_df17d5) {
-          console.warn('[애플 로그인] AsyncStorage 확인 실패:', v_df17d5);
-        }
-
         console.log('[애플 로그인] 회원가입 필요 - 회원가입 화면으로 이동 필요');
         return {
           success: true,
