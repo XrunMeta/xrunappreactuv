@@ -21,7 +21,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4, v_a7ab3c, v_71d37e, v_07f367 } from '../services';
+import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -754,7 +754,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               console.log('✅ validatedCoinsData 생성 완료:', v_3d87ed.length, '개');
 
               try {
-                const v_e36b07 = await v_5d7ca4();
+
+                console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
+                let v_e36b07 = await v_563153();
+
+                if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
+                  console.warn('[CameraMainScreen] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+                  v_e36b07 = await v_5d7ca4();
+                }
+
                 if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
                   console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', v_e36b07.length, '개');
 
@@ -974,7 +982,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         });
 
         try {
-          const v_e36b07 = await v_5d7ca4();
+
+          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
+          let v_e36b07 = await v_563153();
+
+          if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
+            console.warn('[CameraMainScreen API] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+            v_e36b07 = await v_5d7ca4();
+          }
+
           if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', v_e36b07.length, '개');
 
@@ -1801,6 +1817,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 shadowRadius: 4,
                 elevation: 5,
                 minHeight: v_572bd3 && v_04cb77 ? 100 : 35,
+                maxHeight: v_572bd3 && v_04cb77 ? 150 : 35, 
               },
             ]}>
             {}
@@ -2131,7 +2148,7 @@ const v_d81136 = v_472849.create({
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 2, 
+    zIndex: 5, 
   },
 
   tokenSpot: {
