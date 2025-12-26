@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getMyPageUserInfo, updateGender, updateAge } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -754,7 +754,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
 
               try {
-                const topAd5Response = await getStoredTopAd5();
+
+                console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
+                let topAd5Response = await getTopAd5();
+
+                if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+                  console.warn('[CameraMainScreen] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+                  topAd5Response = await getStoredTopAd5();
+                }
+
                 if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                   console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', topAd5Response.length, '개');
 
@@ -974,7 +982,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         });
 
         try {
-          const topAd5Response = await getStoredTopAd5();
+
+          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
+          let topAd5Response = await getTopAd5();
+
+          if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+            console.warn('[CameraMainScreen API] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+            topAd5Response = await getStoredTopAd5();
+          }
+
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', topAd5Response.length, '개');
 
@@ -1801,6 +1817,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 shadowRadius: 4,
                 elevation: 5,
                 minHeight: showBottomPanel && selectedToken ? 100 : 35,
+                maxHeight: showBottomPanel && selectedToken ? 150 : 35, 
               },
             ]}>
             {}
@@ -2131,7 +2148,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 2, 
+    zIndex: 5, 
   },
 
   tokenSpot: {
