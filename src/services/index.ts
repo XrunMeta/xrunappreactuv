@@ -2374,7 +2374,12 @@ export const v_1c4683 = async (
     const v_c9c489 = v_e4a763();
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
 
-    if (v_e7f87b.manufacturer = 'Apple') {
+    const v_df691e = v_326be8.OS === 'ios' ||
+      v_e7f87b.manufacturer === 'Apple' ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('iphone')) ||
+      (v_e7f87b.model && v_e7f87b.model.toLowerCase().includes('ipad'));
+
+    if (v_df691e) {
       v_e7f87b.os = 'ios';
     } else {
       v_e7f87b.os = 'aos';
