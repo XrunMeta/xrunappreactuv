@@ -4746,14 +4746,11 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
     }
 
     if (v_e36b07.length === 0) {
-      console.error('[getTopAd5] ❌ 광고 데이터가 없습니다!');
-      console.error('[getTopAd5] 백엔드 응답 상태:', {
-        status: v_3393e3?.status,
-        code: v_3393e3?.code,
-        message: v_3393e3?.message,
-        hasData: !!v_3393e3?.data,
-        dataKeys: v_3393e3?.data ? Object.keys(v_3393e3.data) : [],
-      });
+
+      console.log('[getTopAd5] ℹ️ 활성 광고 캠페인이 없습니다 (정상 응답)');
+      if (v_3393e3?.message) {
+        console.log('[getTopAd5] 백엔드 메시지:', v_3393e3.message);
+      }
     } else {
       console.log('[getTopAd5] ✅ 광고 데이터 발견:', v_e36b07.length, '개');
       if (v_e36b07.length > 0) {

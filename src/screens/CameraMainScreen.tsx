@@ -758,8 +758,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
                 let v_e36b07 = await v_563153();
 
-                if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
-                  console.warn('[CameraMainScreen] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+                if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
+                  console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+                  v_e36b07 = null; 
+                }
+
+                if (!v_e36b07 || !Array.isArray(v_e36b07)) {
+                  console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
                   v_e36b07 = await v_5d7ca4();
                 }
 
@@ -779,12 +784,33 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                   console.log('📊 [CameraMainScreen] 거리 순 정렬 완료 (가까운 순서)');
 
+                  const v_dc4d18 = 5;
+                  const v_09cb96 = v_e36b07.length * v_dc4d18;
+
+                  const v_7864b3 = new Map<number, number>();
+
                   const v_8ceeaa = v_beddf3.map((v_51b584, v_a56041) => {
+
+                    if (v_a56041 >= v_09cb96) {
+                      return v_51b584;
+                    }
+
                     const v_ba7922 = v_a56041 % v_e36b07.length;
                     const v_127b33 = v_e36b07[v_ba7922];
+                    const v_aa0917 = v_127b33?.campid;
+
+                    if (v_aa0917) {
+                      const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                      if (v_375fda >= v_dc4d18) {
+                        return v_51b584;
+                      }
+                      v_7864b3.set(v_aa0917, v_375fda + 1);
+                    }
 
                     return {
                       ...v_51b584,
+
+                      distance: Number(v_51b584.distance) || 0,
 
                       name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
                       iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
@@ -986,8 +1012,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
           let v_e36b07 = await v_563153();
 
-          if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
-            console.warn('[CameraMainScreen API] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+          if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
+            console.log('[CameraMainScreen API] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+            v_e36b07 = null; 
+          }
+
+          if (!v_e36b07 || !Array.isArray(v_e36b07)) {
+            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
             v_e36b07 = await v_5d7ca4();
           }
 
@@ -1007,9 +1038,28 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
             console.log('📊 [CameraMainScreen API] 거리 순 정렬 완료 (가까운 순서)');
 
+            const v_dc4d18 = 5;
+            const v_09cb96 = v_e36b07.length * v_dc4d18;
+
+            const v_7864b3 = new Map<number, number>();
+
             const v_8ceeaa = v_beddf3.map((v_51b584, v_a56041) => {
+
+              if (v_a56041 >= v_09cb96) {
+                return v_51b584;
+              }
+
               const v_ba7922 = v_a56041 % v_e36b07.length;
               const v_127b33 = v_e36b07[v_ba7922];
+              const v_aa0917 = v_127b33?.campid;
+
+              if (v_aa0917) {
+                const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                if (v_375fda >= v_dc4d18) {
+                  return v_51b584;
+                }
+                v_7864b3.set(v_aa0917, v_375fda + 1);
+              }
 
               console.log(`🔗 [CameraMainScreen API] 토큰 ${v_a56041} 매핑:`, {
                 distance: v_51b584.distance,
@@ -1024,6 +1074,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
               return {
                 ...v_51b584,
+
+                distance: Number(v_51b584.distance) || 0,
 
                 name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
                 iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
