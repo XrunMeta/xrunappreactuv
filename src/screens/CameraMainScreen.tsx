@@ -1462,6 +1462,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
 
+      v_96a9ed(v_21cc31);
+
       v_d48a26(v_75c344);
 
       setTimeout(() => {
@@ -2053,8 +2055,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           }
         }}>
         {(() => {
-          const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
-          console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46);
+
+          const v_5a9c46 = v_d0b6d4?.ad_company || v_04cb77?.ad_company || 'nas';
+          console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46, {
+            fromParams: v_d0b6d4?.ad_company,
+            fromToken: v_04cb77?.ad_company,
+            final: v_5a9c46,
+          });
 
           if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
             return (
