@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward } from '../services';
+import { getNasmobAds, sendNasmobCallback, processAdReward, getPointClickAds } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -374,6 +374,21 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             onClose ? undefined : navigate,
           );
           console.log('[callAdApi] getNasmobAds 응답:', result);
+          return result;
+
+        } else if (adCompany === 'pointclick' || adCompany === 'pock') {
+
+          const ad_key = advertisementParams?.campid || '';
+          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${ad_key}`);
+
+          const result = await getPointClickAds(
+            member,
+            deviceInfo.adid,
+            deviceInfo,
+            ad_key,
+            onClose ? undefined : navigate,
+          );
+          console.log('[callAdApi] getPointClickAds 응답:', result);
           return result;
 
         } else {
