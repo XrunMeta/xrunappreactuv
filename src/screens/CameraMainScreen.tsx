@@ -1462,6 +1462,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
 
+      setSelectedToken(token);
+
       setAdvertisementParams(adParams);
 
       setTimeout(() => {
@@ -2053,8 +2055,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }
         }}>
         {(() => {
-          const adCompany = advertisementParams?.ad_company || 'nas';
-          console.log('🔍 모달 내부 ad_company 확인:', adCompany);
+
+          const adCompany = advertisementParams?.ad_company || selectedToken?.ad_company || 'nas';
+          console.log('🔍 모달 내부 ad_company 확인:', adCompany, {
+            fromParams: advertisementParams?.ad_company,
+            fromToken: selectedToken?.ad_company,
+            final: adCompany,
+          });
 
           if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
             return (
