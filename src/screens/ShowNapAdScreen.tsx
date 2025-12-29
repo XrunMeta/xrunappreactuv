@@ -16,7 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_1c4683, v_7a6f92, v_38f5f4 } from '../services';
+import { v_1c4683, v_7a6f92, v_38f5f4, v_167376 } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -374,6 +374,21 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             v_0890f8 ? undefined : v_9b57fc,
           );
           console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
+          return v_43c42e;
+
+        } else if (v_5a9c46 === 'pointclick' || v_5a9c46 === 'pock') {
+
+          const v_b0495a = v_d0b6d4?.campid || '';
+          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${v_b0495a}`);
+
+          const v_43c42e = await v_167376(
+            v_660822,
+            v_e7f87b.adid,
+            v_e7f87b,
+            v_b0495a,
+            v_0890f8 ? undefined : v_9b57fc,
+          );
+          console.log('[callAdApi] getPointClickAds 응답:', v_43c42e);
           return v_43c42e;
 
         } else {
