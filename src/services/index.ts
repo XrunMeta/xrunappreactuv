@@ -4746,14 +4746,11 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
     }
 
     if (topAd5Response.length === 0) {
-      console.error('[getTopAd5] ❌ 광고 데이터가 없습니다!');
-      console.error('[getTopAd5] 백엔드 응답 상태:', {
-        status: response?.status,
-        code: response?.code,
-        message: response?.message,
-        hasData: !!response?.data,
-        dataKeys: response?.data ? Object.keys(response.data) : [],
-      });
+
+      console.log('[getTopAd5] ℹ️ 활성 광고 캠페인이 없습니다 (정상 응답)');
+      if (response?.message) {
+        console.log('[getTopAd5] 백엔드 메시지:', response.message);
+      }
     } else {
       console.log('[getTopAd5] ✅ 광고 데이터 발견:', topAd5Response.length, '개');
       if (topAd5Response.length > 0) {
