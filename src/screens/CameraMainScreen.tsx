@@ -758,8 +758,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
                 let topAd5Response = await getTopAd5();
 
-                if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-                  console.warn('[CameraMainScreen] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+                if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
+                  console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+                  topAd5Response = null; 
+                }
+
+                if (!topAd5Response || !Array.isArray(topAd5Response)) {
+                  console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
                   topAd5Response = await getStoredTopAd5();
                 }
 
@@ -779,12 +784,33 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                   console.log('📊 [CameraMainScreen] 거리 순 정렬 완료 (가까운 순서)');
 
+                  const MAX_TOKENS_PER_CAMPAIGN = 5;
+                  const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
+
+                  const campaignTokenCount = new Map<number, number>();
+
                   const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+
+                    if (index >= maxMappedTokens) {
+                      return coin;
+                    }
+
                     const adIndex = index % topAd5Response.length;
                     const mappedAd = topAd5Response[adIndex];
+                    const campid = mappedAd?.campid;
+
+                    if (campid) {
+                      const currentCount = campaignTokenCount.get(campid) || 0;
+                      if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                        return coin;
+                      }
+                      campaignTokenCount.set(campid, currentCount + 1);
+                    }
 
                     return {
                       ...coin,
+
+                      distance: Number(coin.distance) || 0,
 
                       name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
                       iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
@@ -986,8 +1012,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
           let topAd5Response = await getTopAd5();
 
-          if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-            console.warn('[CameraMainScreen API] TopAd5 API 데이터가 없습니다. 저장된 데이터 사용 시도');
+          if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
+            console.log('[CameraMainScreen API] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+            topAd5Response = null; 
+          }
+
+          if (!topAd5Response || !Array.isArray(topAd5Response)) {
+            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
             topAd5Response = await getStoredTopAd5();
           }
 
@@ -1007,9 +1038,28 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             console.log('📊 [CameraMainScreen API] 거리 순 정렬 완료 (가까운 순서)');
 
+            const MAX_TOKENS_PER_CAMPAIGN = 5;
+            const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
+
+            const campaignTokenCount = new Map<number, number>();
+
             const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+
+              if (index >= maxMappedTokens) {
+                return coin;
+              }
+
               const adIndex = index % topAd5Response.length;
               const mappedAd = topAd5Response[adIndex];
+              const campid = mappedAd?.campid;
+
+              if (campid) {
+                const currentCount = campaignTokenCount.get(campid) || 0;
+                if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                  return coin;
+                }
+                campaignTokenCount.set(campid, currentCount + 1);
+              }
 
               console.log(`🔗 [CameraMainScreen API] 토큰 ${index} 매핑:`, {
                 distance: coin.distance,
@@ -1024,6 +1074,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
               return {
                 ...coin,
+
+                distance: Number(coin.distance) || 0,
 
                 name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
                 iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
