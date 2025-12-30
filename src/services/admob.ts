@@ -228,6 +228,13 @@ export const v_18f201 = async (
 
     const v_819f69 = v_61418d || v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
 
+    console.log('[AdMob] 사용할 광고 단위 ID:', v_819f69);
+    console.log('[AdMob] 광고 단위 ID 출처:', {
+      adUnitId: v_61418d || '없음',
+      mediationGroupId: v_573fcf('ADMOB_MEDIATION_GROUP_ID') || '없음',
+      defaultAdUnitId: v_2ccc13() || '없음',
+    });
+
     const v_c59680 = v_29536b.createForAdRequest(v_819f69, {
       requestNonPersonalizedAdsOnly: false,
     });
