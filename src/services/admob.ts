@@ -1,0 +1,311 @@
+
+
+import { v_326be8 } from 'rcmrninabrnb';
+import v_ebba42, { 
+  v_726e10, 
+  v_6f6da6, 
+  v_29536b, 
+  v_a23081,
+} from 'mbbgvwchnlgdjovshfkutboodeoyky';
+import { v_573fcf, v_e4a763 } from '../utils/env';
+import { v_719e34 } from '../types';
+
+let v_a422f4 = false;
+let v_d94015 = false;
+
+export const v_e88e47 = (): boolean => {
+  try {
+
+    return v_d94015;
+  } catch (v_5e9bfe) {
+    return false;
+  }
+};
+
+export const v_b357c3 = async (): Promise<void> => {
+  try {
+
+    if (v_a422f4) {
+      console.log('[AdMob] 이미 초기화되었습니다.');
+      return;
+    }
+
+    try {
+
+      if (!v_ebba42 || typeof v_ebba42 !== 'function') {
+        console.warn('[AdMob] 네이티브 모듈을 사용할 수 없습니다. mobileAds 함수가 없습니다.');
+        v_d94015 = false;
+        return;
+      }
+    } catch (v_a5e990) {
+      console.warn('[AdMob] 네이티브 모듈을 로드할 수 없습니다:', v_a5e990);
+      v_d94015 = false;
+      return;
+    }
+
+    let v_903837;
+    try {
+      v_903837 = v_326be8.OS === 'android' 
+        ? v_573fcf('ADMOB_APPID')
+        : v_573fcf('ADMOB_APPID_IOS');
+    } catch (v_1df4c8) {
+      console.warn('[AdMob] 환경 변수 로드 실패:', v_1df4c8);
+      v_d94015 = false;
+      return;
+    }
+
+    if (!v_903837) {
+      console.warn('[AdMob] App ID가 설정되지 않았습니다.');
+      v_d94015 = false;
+      return;
+    }
+
+    try {
+      const v_e1fe95 = v_ebba42().initialize();
+      const v_06d9af = new Promise<never>((v_37eab7, v_bad6f3) => 
+        setTimeout(() => v_bad6f3(new Error('AdMob 초기화 타임아웃')), 10000)
+      );
+
+      await Promise.race([v_e1fe95, v_06d9af]);
+
+      try {
+        await v_ebba42().setRequestConfiguration({
+
+          testDeviceIdentifiers: [],
+        });
+      } catch (v_15fb2a) {
+        console.warn('[AdMob] RequestConfiguration 설정 실패 (계속 진행):', v_15fb2a);
+      }
+
+      v_a422f4 = true;
+      v_d94015 = true;
+
+      console.log('[AdMob] 초기화 완료:', {
+        appId: v_903837,
+        platform: v_326be8.OS,
+      });
+    } catch (v_dedc69) {
+      console.error('[AdMob] 초기화 중 오류 발생:', v_dedc69);
+      v_d94015 = false;
+      v_a422f4 = false;
+
+    }
+  } catch (v_5e9bfe) {
+    console.error('[AdMob] 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+    v_d94015 = false;
+    v_a422f4 = false;
+
+  }
+};
+
+export const v_f78e83 = (): string => {
+  return v_326be8.OS === 'android'
+    ? v_573fcf('ADMOB_APPID')
+    : v_573fcf('ADMOB_APPID_IOS');
+};
+
+export const v_2ccc13 = (): string => {
+  return v_326be8.OS === 'android'
+    ? v_573fcf('ADMOB_ADUNIT_ANDROID')
+    : v_573fcf('ADMOB_ADUNIT_IOS');
+};
+
+export const v_41a100 = async (
+  v_61418d,
+  v_ecd42e,
+  v_0721a3,
+): Promise<void> => {
+  try {
+    if (!v_d94015) {
+      console.warn('[AdMob] AdMob이 사용 불가능합니다.');
+      return;
+    }
+
+    const v_077aae = v_726e10.createForAdRequest(v_61418d, {
+      requestNonPersonalizedAdsOnly: false,
+    });
+
+    const v_4293e9 = v_077aae.addAdEventListener(
+      v_6f6da6.LOADED,
+      () => {
+        console.log('[AdMob] 전면 광고 로드 완료');
+        v_077aae.show();
+      },
+    );
+
+    const v_c1d506 = v_077aae.addAdEventListener(
+      v_6f6da6.CLOSED,
+      () => {
+        console.log('[AdMob] 전면 광고 닫힘');
+        v_4293e9();
+        v_c1d506();
+        if (v_ecd42e) {
+          v_ecd42e();
+        }
+      },
+    );
+
+    const v_2b24ac = v_077aae.addAdEventListener(
+      v_6f6da6.ERROR,
+      (v_5e9bfe) => {
+        console.error('[AdMob] 전면 광고 로드 실패:', v_5e9bfe);
+        v_4293e9();
+        v_c1d506();
+        v_2b24ac();
+        if (v_0721a3) {
+          v_0721a3(v_5e9bfe as Error);
+        }
+      },
+    );
+
+    await v_077aae.load();
+  } catch (v_5e9bfe) {
+    console.error('[AdMob] 전면 광고 로드 중 오류:', v_5e9bfe);
+    if (v_0721a3) {
+      v_0721a3(v_5e9bfe as Error);
+    }
+  }
+};
+
+export const v_05fa9c = async (
+  v_660822,
+  deviceInfo: v_719e34,
+  v_36c043,
+  v_61418d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = v_c9c489.PANGLE_CALLBACK_URL || 'https://oth-path-51a04e.example.invalid/nodeServerTest/gateway/callbackPangle';
+    const v_fc569c = v_c9c489.PANGLE_SECURITY_KEY;
+
+    const v_d8bcf0 = {
+      app_id: v_c9c489.PANGLE_APP_ID,
+      ad_unit_id: v_61418d,
+      user_id: v_660822,
+      reward_name: v_36c043.type || 'XRUN',
+      reward_amount: v_36c043.amount || 1,
+      device_id: v_e7f87b.deviceId || '',
+      adid: v_e7f87b.adid || '',
+      os: v_e7f87b.os || v_326be8.OS === 'android' ? 'android' : 'ios',
+      os_version: v_e7f87b.osVersion || '',
+      timestamp: Math.floor(Date.now() / 1000),
+      security_key: v_fc569c,
+    };
+
+    console.log('[AdMob] Pangle 콜백 전송:', v_d8bcf0);
+
+    const v_3393e3 = await fetch(v_f71b56, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+      },
+      body: JSON.stringify(v_d8bcf0),
+    });
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[AdMob] Pangle 콜백 응답:', v_43c42e);
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[AdMob] Pangle 콜백 전송 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_18f201 = async (
+  v_61418d,
+  v_660822,
+  deviceInfo?: v_719e34,
+  v_6ae10d,
+  v_ecd42e,
+  v_0721a3,
+): Promise<void> => {
+  try {
+    if (!v_d94015) {
+      console.warn('[AdMob] AdMob이 사용 불가능합니다.');
+      return;
+    }
+
+    const v_819f69 = v_61418d || v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
+
+    const v_c59680 = v_29536b.createForAdRequest(v_819f69, {
+      requestNonPersonalizedAdsOnly: false,
+    });
+
+    const v_ed9e6f = v_c59680.addAdEventListener(
+      v_a23081.EARNED_REWARD,
+      async (v_36c043) => {
+        console.log('[AdMob] 보상 수령:', v_36c043);
+
+        if (v_660822 && v_e7f87b) {
+          try {
+            await v_05fa9c(v_660822, v_e7f87b, v_36c043, v_819f69);
+            console.log('[AdMob] Pangle 콜백 전송 완료');
+          } catch (v_33f0be) {
+            console.error('[AdMob] Pangle 콜백 전송 실패 (보상은 수령됨):', v_33f0be);
+
+          }
+        }
+
+        if (v_6ae10d) {
+          v_6ae10d(v_36c043);
+        }
+      },
+    );
+
+    const v_4293e9 = v_c59680.addAdEventListener(
+      v_a23081.LOADED,
+      () => {
+        console.log('[AdMob] 보상형 광고 로드 완료');
+        v_c59680.show();
+      },
+    );
+
+    const v_c1d506 = v_c59680.addAdEventListener(
+      v_6f6da6.CLOSED,
+      () => {
+        console.log('[AdMob] 보상형 광고 닫힘');
+        v_ed9e6f();
+        v_4293e9();
+        v_c1d506();
+        if (v_ecd42e) {
+          v_ecd42e();
+        }
+      },
+    );
+
+    const v_2b24ac = v_c59680.addAdEventListener(
+      v_6f6da6.ERROR,
+      (v_5e9bfe) => {
+        console.error('[AdMob] 보상형 광고 로드 실패:', v_5e9bfe);
+        v_ed9e6f();
+        v_4293e9();
+        v_c1d506();
+        v_2b24ac();
+        if (v_0721a3) {
+          v_0721a3(v_5e9bfe as Error);
+        }
+      },
+    );
+
+    await v_c59680.load();
+  } catch (v_5e9bfe) {
+    console.error('[AdMob] 보상형 광고 로드 중 오류:', v_5e9bfe);
+    if (v_0721a3) {
+      v_0721a3(v_5e9bfe as Error);
+    }
+  }
+};
+
+export const v_2b25f9 = (): boolean => {
+  return v_a422f4 && v_d94015;
+};
+
+export const v_3dc1fd = (): string => {
+  return v_573fcf('PANGLE_REWARDED_AD_UNIT_ID');
+};
+
+export const v_84fca1 = (): string => {
+  return v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
+};
+

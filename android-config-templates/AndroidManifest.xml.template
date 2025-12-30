@@ -1,0 +1,30 @@
+<!-- AndroidManifest.xml 템플릿 -->
+<!-- android/app/src/main/AndroidManifest.xml 파일의 <application> 태그 내부에 추가하세요 -->
+
+<manifest>
+    <!-- 인터넷 권한 (이미 있을 수 있음) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <application>
+        <!-- 기존 메타데이터들... -->
+        
+        <!-- AdMob App ID (이미 있을 수 있음) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9457909979646034~5020701276"/>
+        
+        <!-- Pangle App ID (Pangle 대시보드에서 발급받은 값으로 변경 필요) -->
+        <meta-data
+            android:name="pangle_app_id"
+            android:value="YOUR_PANGLE_APP_ID"/>
+        
+        <!-- Pangle App Key (Pangle 대시보드에서 발급받은 값으로 변경 필요) -->
+        <meta-data
+            android:name="pangle_app_key"
+            android:value="YOUR_PANGLE_APP_KEY"/>
+    </application>
+</manifest>
+
+
+
