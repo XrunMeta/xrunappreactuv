@@ -8,6 +8,7 @@
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
     "splash": {
       "image": "./assets/icon_xrun_round_logo.png",
       "resizeMode": "contain",
@@ -46,7 +47,6 @@
       "package": "run.xrun.xrunapp",
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
-      "versionCode": 202,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -87,6 +87,11 @@
                 "Default"
               ]
             }
+          },
+          "android": {
+            "minSdkVersion": 24,
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
           }
         }
       ],

@@ -28,6 +28,8 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
 import { v_cba33f } from '../utils';
+import { v_18f201, v_84fca1, v_2b25f9 } from '../services/admob';
+import { v_f3de6d } from '../utils/napApiUtils';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -671,24 +673,63 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       chunkSize: v_253a77,
     });
 
-    let v_2e375c = [];
-    let v_da1995 = Math.min(v_253a77, v_8ac288.length);
+    const v_04124c = v_8ac288.filter((v_8c0b26) => {
+      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
+      return v_5a9c46 === 'nas' || v_5a9c46 === 'nasmedia';
+    });
+    const v_e2b5bb = v_8ac288.filter((v_8c0b26) => {
+      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
+      return v_5a9c46 === 'pointclick' || v_5a9c46 === 'pock';
+    });
+    const v_7964aa = v_8ac288.filter((v_8c0b26) => {
+      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
+      return v_5a9c46 === 'pangle';
+    });
 
-    if (v_a96760.current + v_da1995 > v_8ac288.length) {
+    console.log('📊 [organizeData] ad_company별 데이터 분류:', {
+      nas: v_04124c.length,
+      pointclick: v_e2b5bb.length,
+      pangle: v_7964aa.length,
+      total: v_8ac288.length,
+    });
 
-      v_2e375c = [
-        ...v_8ac288.slice(v_a96760.current),
-        ...v_8ac288.slice(0, (v_a96760.current + v_da1995) % v_8ac288.length),
-      ];
-      v_a96760.current = (v_a96760.current + v_da1995) % v_8ac288.length;
-    } else {
+    const v_1a7867 = (v_9390e8, v_9e8c70) => {
+      const v_b16994 = [...v_9390e8].sort((v_779914, v_148ff6) => {
+        const v_1b0610 = parseFloat(String(v_779914.distance || 0));
+        const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
+        return v_1b0610 - v_161ea9;
+      });
+      return v_b16994.slice(0, v_9e8c70);
+    };
 
-      v_2e375c = v_8ac288.slice(v_a96760.current, v_a96760.current + v_da1995);
-      v_a96760.current = (v_a96760.current + v_da1995) % v_8ac288.length;
-    }
+    const v_caccc7 = v_1a7867(v_04124c, 3);
+    const v_3b1ff8 = v_1a7867(v_e2b5bb, 3);
+    const v_f123bd = v_1a7867(v_7964aa, 3);
 
-    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', v_2e375c.slice(0, 5).map((v_d5dda0, v_e86ad8) => ({
+    const v_200647 = [...v_caccc7, ...v_3b1ff8, ...v_f123bd];
+
+    console.log('📋 [organizeData] 카테고리별 선택 결과:', {
+      nas: v_caccc7.length,
+      pointclick: v_3b1ff8.length,
+      pangle: v_f123bd.length,
+      combined: v_200647.length,
+    });
+
+    const v_d95801 = <T,>(v_09228c): T[] => {
+      const v_d937d0 = [...v_09228c];
+      for (let v_ebec57 = v_d937d0.length - 1; v_ebec57 > 0; v_ebec57--) {
+        const v_b75e36 = Math.floor(Math.random() * (v_ebec57 + 1));
+        [v_d937d0[v_ebec57], v_d937d0[v_b75e36]] = [v_d937d0[v_b75e36], v_d937d0[v_ebec57]];
+      }
+      return v_d937d0;
+    };
+
+    const v_690acf = v_d95801(v_200647);
+    const v_d2f480 = v_690acf.slice(0, Math.min(5, v_690acf.length));
+
+    console.log('📋 [organizeData] 랜덤 선택된 데이터 (5개):', v_d2f480.map((v_d5dda0, v_e86ad8) => ({
       index: v_e86ad8,
+      ad_company: v_d5dda0.ad_company,
       distance: v_d5dda0.distance,
       advertisement: v_d5dda0.advertisement,
       campid: v_d5dda0.campid,
@@ -696,12 +737,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       xrunPrice: v_d5dda0.xrunPrice,
     })));
 
-    const v_368ba7 = v_2e375c.map((v_9390e8, v_a56041) => {
+    const v_368ba7 = v_d2f480.map((v_9390e8, v_a56041) => {
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
     });
 
     console.log('✅ [organizeData] 최종 토큰 데이터:', v_368ba7.map((v_8d41d7, v_e86ad8) => ({
       spotID: v_8d41d7.spotID,
+      ad_company: v_8d41d7.ad_company,
       distance: v_8d41d7.distance,
       advertisement: v_8d41d7.advertisement,
       campid: v_8d41d7.campid,
@@ -1430,6 +1472,50 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const v_5a9c46 = v_21cc31.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', v_5a9c46);
+
+      if (v_2b25f9()) {
+        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 (모달)');
+        try {
+
+          const v_e7f87b = await v_f3de6d();
+
+          await v_18f201(
+            v_84fca1(),
+            v_660822,
+            v_e7f87b,
+            (v_36c043) => {
+              console.log('[CameraMainScreen] 보상 수령 (모달):', v_36c043);
+              v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
+
+              v_219124(false);
+              v_6a4dcd(false);
+            },
+            () => {
+              console.log('[CameraMainScreen] 광고 닫힘 (모달)');
+
+              v_219124(false);
+              v_6a4dcd(false);
+            },
+            (v_5e9bfe) => {
+              console.error('[CameraMainScreen] 광고 로드 실패 (모달):', v_5e9bfe);
+              v_cba33f('광고를 불러올 수 없습니다.');
+
+              v_219124(true);
+            }
+          );
+        } catch (v_5e9bfe) {
+          console.error('[CameraMainScreen] 광고 표시 오류 (모달):', v_5e9bfe);
+          v_cba33f('광고를 표시할 수 없습니다.');
+
+          v_219124(true);
+        }
+        return; 
+      }
+
+      console.log('⚠️ AdMob이 초기화되지 않아 기존 광고 로직 사용');
+
       const v_5389c3 = v_21cc31.advertisement
         ? String(v_21cc31.advertisement)
         : (v_21cc31.coin ? String(v_21cc31.coin) : '');
@@ -1444,9 +1530,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         console.error('❌ campid가 유효하지 않습니다');
         return;
       }
-
-      const v_5a9c46 = v_21cc31.ad_company || 'nas';
-      console.log('🔍 ad_company 확인:', v_5a9c46);
 
       const v_75c344 = {
         member: v_660822,
@@ -1580,7 +1663,51 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         ad_company: v_75c344.ad_company,
       });
 
-      if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
+      if (v_2b25f9()) {
+        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 시작...');
+        console.log('🔍 광고 파라미터:', {
+          member: v_660822,
+          campid: v_75c344.campid,
+          name: v_75c344.name,
+          xrunPrice: v_75c344.xrunPrice,
+          ad_company: v_5a9c46,
+        });
+
+        try {
+
+          const v_e7f87b = await v_f3de6d();
+
+          await v_18f201(
+            v_84fca1(),
+            v_660822,
+            v_e7f87b,
+            (v_36c043) => {
+              console.log('[CameraMainScreen] 보상 수령:', v_36c043);
+              v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
+
+              setTimeout(() => {
+                v_9b57fc(v_ce4741.map);
+              }, 1000);
+            },
+            () => {
+              console.log('[CameraMainScreen] 광고 닫힘');
+
+              v_9b57fc(v_ce4741.map);
+            },
+            (v_5e9bfe) => {
+              console.error('[CameraMainScreen] 광고 로드 실패:', v_5e9bfe);
+              v_cba33f('광고를 불러올 수 없습니다.');
+
+              v_487a25(v_ce4741.showNapAd);
+            }
+          );
+        } catch (v_5e9bfe) {
+          console.error('[CameraMainScreen] Pangle 광고 표시 오류:', v_5e9bfe);
+          v_cba33f('광고를 표시할 수 없습니다.');
+
+          v_487a25(v_ce4741.showNapAd);
+        }
+      } else if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {
