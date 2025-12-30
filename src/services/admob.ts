@@ -6,6 +6,7 @@ import mobileAds, {
   AdEventType, 
   RewardedAd, 
   RewardedAdEventType,
+  TestIds,
 } from 'react-native-google-mobile-ads';
 import { getEnvValue, getEnv } from '../utils/env';
 import { DeviceInfo } from '../types';
@@ -203,8 +204,29 @@ export const sendPangleCallback = async (
       body: JSON.stringify(callbackData),
     });
 
-    const result = await response.json();
-    console.log('[AdMob] Pangle 콜백 응답:', result);
+    const responseText = await response.text();
+    console.log('[AdMob] Pangle 콜백 응답 (원본):', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type'),
+      text: responseText.substring(0, 200), 
+    });
+
+    let result: any;
+    try {
+      result = JSON.parse(responseText);
+      console.log('[AdMob] Pangle 콜백 응답 (파싱됨):', result);
+    } catch (parseError) {
+
+      console.warn('[AdMob] Pangle 콜백 응답이 JSON이 아닙니다:', parseError);
+
+      if (response.ok) {
+        console.log('[AdMob] Pangle 콜백 전송 성공 (비JSON 응답)');
+        return { success: true, message: '콜백 전송 완료 (비JSON 응답)' };
+      }
+      throw new Error(`콜백 응답 파싱 실패: ${responseText.substring(0, 100)}`);
+    }
+
     return result;
   } catch (error) {
     console.error('[AdMob] Pangle 콜백 전송 실패:', error);
@@ -226,10 +248,19 @@ export const loadAndShowRewardedAd = async (
       return;
     }
 
-    const finalAdUnitId = adUnitId || getEnvValue('ADMOB_MEDIATION_GROUP_ID') || getAdMobAdUnitId();
+    let finalAdUnitId: string;
+    if (__DEV__) {
+
+      finalAdUnitId = TestIds.REWARDED;
+      console.log('[AdMob] 개발 모드: 테스트 광고 단위 ID 사용');
+    } else {
+
+      finalAdUnitId = adUnitId || getEnvValue('ADMOB_MEDIATION_GROUP_ID') || getAdMobAdUnitId();
+    }
 
     console.log('[AdMob] 사용할 광고 단위 ID:', finalAdUnitId);
     console.log('[AdMob] 광고 단위 ID 출처:', {
+      개발모드: __DEV__,
       adUnitId: adUnitId || '없음',
       mediationGroupId: getEnvValue('ADMOB_MEDIATION_GROUP_ID') || '없음',
       defaultAdUnitId: getAdMobAdUnitId() || '없음',
