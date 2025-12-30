@@ -28,8 +28,6 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 import { showToast } from '../utils';
-import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
-import { collectDeviceInfo } from '../utils/napApiUtils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -1435,47 +1433,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const adCompany = token.ad_company || 'nas';
       console.log('🔍 ad_company 확인:', adCompany);
 
-      if (isAdMobReady()) {
-        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 (모달)');
-        try {
-
-          const deviceInfo = await collectDeviceInfo();
-
-          await loadAndShowRewardedAd(
-            getAdMobMediationGroupId(),
-            member,
-            deviceInfo,
-            (reward) => {
-              console.log('[CameraMainScreen] 보상 수령 (모달):', reward);
-              showToast(`보상 수령: ${reward.amount} ${reward.type}`);
-
-              setShowAdModal(false);
-              setShowBottomPanel(false);
-            },
-            () => {
-              console.log('[CameraMainScreen] 광고 닫힘 (모달)');
-
-              setShowAdModal(false);
-              setShowBottomPanel(false);
-            },
-            (error) => {
-              console.error('[CameraMainScreen] 광고 로드 실패 (모달):', error);
-              showToast('광고를 불러올 수 없습니다.');
-
-              setShowAdModal(true);
-            }
-          );
-        } catch (error) {
-          console.error('[CameraMainScreen] 광고 표시 오류 (모달):', error);
-          showToast('광고를 표시할 수 없습니다.');
-
-          setShowAdModal(true);
-        }
-        return; 
-      }
-
-      console.log('⚠️ AdMob이 초기화되지 않아 기존 광고 로직 사용');
-
       const advertisement = token.advertisement
         ? String(token.advertisement)
         : (token.coin ? String(token.coin) : '');
@@ -1623,51 +1580,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         ad_company: adParams.ad_company,
       });
 
-      if (isAdMobReady()) {
-        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 시작...');
-        console.log('🔍 광고 파라미터:', {
-          member,
-          campid: adParams.campid,
-          name: adParams.name,
-          xrunPrice: adParams.xrunPrice,
-          ad_company: adCompany,
-        });
-
-        try {
-
-          const deviceInfo = await collectDeviceInfo();
-
-          await loadAndShowRewardedAd(
-            getAdMobMediationGroupId(),
-            member,
-            deviceInfo,
-            (reward) => {
-              console.log('[CameraMainScreen] 보상 수령:', reward);
-              showToast(`보상 수령: ${reward.amount} ${reward.type}`);
-
-              setTimeout(() => {
-                navigate(ROUTES.map);
-              }, 1000);
-            },
-            () => {
-              console.log('[CameraMainScreen] 광고 닫힘');
-
-              navigate(ROUTES.map);
-            },
-            (error) => {
-              console.error('[CameraMainScreen] 광고 로드 실패:', error);
-              showToast('광고를 불러올 수 없습니다.');
-
-              reset(ROUTES.showNapAd);
-            }
-          );
-        } catch (error) {
-          console.error('[CameraMainScreen] Pangle 광고 표시 오류:', error);
-          showToast('광고를 표시할 수 없습니다.');
-
-          reset(ROUTES.showNapAd);
-        }
-      } else if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
+      if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {
