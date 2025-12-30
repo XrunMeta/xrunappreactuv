@@ -673,63 +673,24 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       chunkSize: chunkSize,
     });
 
-    const nasData = oCoinData.filter((item) => {
-      const adCompany = (item.ad_company || '').toLowerCase();
-      return adCompany === 'nas' || adCompany === 'nasmedia';
-    });
-    const pointclickData = oCoinData.filter((item) => {
-      const adCompany = (item.ad_company || '').toLowerCase();
-      return adCompany === 'pointclick' || adCompany === 'pock';
-    });
-    const pangleData = oCoinData.filter((item) => {
-      const adCompany = (item.ad_company || '').toLowerCase();
-      return adCompany === 'pangle';
-    });
+    let nextData: any[] = [];
+    let actualChunkSize = Math.min(chunkSize, oCoinData.length);
 
-    console.log('📊 [organizeData] ad_company별 데이터 분류:', {
-      nas: nasData.length,
-      pointclick: pointclickData.length,
-      pangle: pangleData.length,
-      total: oCoinData.length,
-    });
+    if (currentIndexRef.current + actualChunkSize > oCoinData.length) {
 
-    const selectByDistance = (data: any[], count: number) => {
-      const sorted = [...data].sort((a, b) => {
-        const distanceA = parseFloat(String(a.distance || 0));
-        const distanceB = parseFloat(String(b.distance || 0));
-        return distanceA - distanceB;
-      });
-      return sorted.slice(0, count);
-    };
+      nextData = [
+        ...oCoinData.slice(currentIndexRef.current),
+        ...oCoinData.slice(0, (currentIndexRef.current + actualChunkSize) % oCoinData.length),
+      ];
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    } else {
 
-    const selectedNas = selectByDistance(nasData, 3);
-    const selectedPointclick = selectByDistance(pointclickData, 3);
-    const selectedPangle = selectByDistance(pangleData, 3);
+      nextData = oCoinData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+    }
 
-    const combinedData = [...selectedNas, ...selectedPointclick, ...selectedPangle];
-
-    console.log('📋 [organizeData] 카테고리별 선택 결과:', {
-      nas: selectedNas.length,
-      pointclick: selectedPointclick.length,
-      pangle: selectedPangle.length,
-      combined: combinedData.length,
-    });
-
-    const shuffleArray = <T,>(array: T[]): T[] => {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    };
-
-    const shuffledData = shuffleArray(combinedData);
-    const selectedData = shuffledData.slice(0, Math.min(5, shuffledData.length));
-
-    console.log('📋 [organizeData] 랜덤 선택된 데이터 (5개):', selectedData.map((d, idx) => ({
+    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', nextData.slice(0, 5).map((d, idx) => ({
       index: idx,
-      ad_company: d.ad_company,
       distance: d.distance,
       advertisement: d.advertisement,
       campid: d.campid,
@@ -737,13 +698,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       xrunPrice: d.xrunPrice,
     })));
 
-    const newOrganizedData = selectedData.map((data, index) => {
+    const newOrganizedData = nextData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
     });
 
     console.log('✅ [organizeData] 최종 토큰 데이터:', newOrganizedData.map((t, idx) => ({
       spotID: t.spotID,
-      ad_company: t.ad_company,
       distance: t.distance,
       advertisement: t.advertisement,
       campid: t.campid,

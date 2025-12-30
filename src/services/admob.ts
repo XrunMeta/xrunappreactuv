@@ -228,6 +228,13 @@ export const loadAndShowRewardedAd = async (
 
     const finalAdUnitId = adUnitId || getEnvValue('ADMOB_MEDIATION_GROUP_ID') || getAdMobAdUnitId();
 
+    console.log('[AdMob] 사용할 광고 단위 ID:', finalAdUnitId);
+    console.log('[AdMob] 광고 단위 ID 출처:', {
+      adUnitId: adUnitId || '없음',
+      mediationGroupId: getEnvValue('ADMOB_MEDIATION_GROUP_ID') || '없음',
+      defaultAdUnitId: getAdMobAdUnitId() || '없음',
+    });
+
     const rewarded = RewardedAd.createForAdRequest(finalAdUnitId, {
       requestNonPersonalizedAdsOnly: false,
     });
