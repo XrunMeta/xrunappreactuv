@@ -673,63 +673,24 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       chunkSize: v_253a77,
     });
 
-    const v_04124c = v_8ac288.filter((v_8c0b26) => {
-      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
-      return v_5a9c46 === 'nas' || v_5a9c46 === 'nasmedia';
-    });
-    const v_e2b5bb = v_8ac288.filter((v_8c0b26) => {
-      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
-      return v_5a9c46 === 'pointclick' || v_5a9c46 === 'pock';
-    });
-    const v_7964aa = v_8ac288.filter((v_8c0b26) => {
-      const v_5a9c46 = (v_8c0b26.ad_company || '').toLowerCase();
-      return v_5a9c46 === 'pangle';
-    });
+    let v_2e375c = [];
+    let v_da1995 = Math.min(v_253a77, v_8ac288.length);
 
-    console.log('📊 [organizeData] ad_company별 데이터 분류:', {
-      nas: v_04124c.length,
-      pointclick: v_e2b5bb.length,
-      pangle: v_7964aa.length,
-      total: v_8ac288.length,
-    });
+    if (v_a96760.current + v_da1995 > v_8ac288.length) {
 
-    const v_1a7867 = (v_9390e8, v_9e8c70) => {
-      const v_b16994 = [...v_9390e8].sort((v_779914, v_148ff6) => {
-        const v_1b0610 = parseFloat(String(v_779914.distance || 0));
-        const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
-        return v_1b0610 - v_161ea9;
-      });
-      return v_b16994.slice(0, v_9e8c70);
-    };
+      v_2e375c = [
+        ...v_8ac288.slice(v_a96760.current),
+        ...v_8ac288.slice(0, (v_a96760.current + v_da1995) % v_8ac288.length),
+      ];
+      v_a96760.current = (v_a96760.current + v_da1995) % v_8ac288.length;
+    } else {
 
-    const v_caccc7 = v_1a7867(v_04124c, 3);
-    const v_3b1ff8 = v_1a7867(v_e2b5bb, 3);
-    const v_f123bd = v_1a7867(v_7964aa, 3);
+      v_2e375c = v_8ac288.slice(v_a96760.current, v_a96760.current + v_da1995);
+      v_a96760.current = (v_a96760.current + v_da1995) % v_8ac288.length;
+    }
 
-    const v_200647 = [...v_caccc7, ...v_3b1ff8, ...v_f123bd];
-
-    console.log('📋 [organizeData] 카테고리별 선택 결과:', {
-      nas: v_caccc7.length,
-      pointclick: v_3b1ff8.length,
-      pangle: v_f123bd.length,
-      combined: v_200647.length,
-    });
-
-    const v_d95801 = <T,>(v_09228c): T[] => {
-      const v_d937d0 = [...v_09228c];
-      for (let v_ebec57 = v_d937d0.length - 1; v_ebec57 > 0; v_ebec57--) {
-        const v_b75e36 = Math.floor(Math.random() * (v_ebec57 + 1));
-        [v_d937d0[v_ebec57], v_d937d0[v_b75e36]] = [v_d937d0[v_b75e36], v_d937d0[v_ebec57]];
-      }
-      return v_d937d0;
-    };
-
-    const v_690acf = v_d95801(v_200647);
-    const v_d2f480 = v_690acf.slice(0, Math.min(5, v_690acf.length));
-
-    console.log('📋 [organizeData] 랜덤 선택된 데이터 (5개):', v_d2f480.map((v_d5dda0, v_e86ad8) => ({
+    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', v_2e375c.slice(0, 5).map((v_d5dda0, v_e86ad8) => ({
       index: v_e86ad8,
-      ad_company: v_d5dda0.ad_company,
       distance: v_d5dda0.distance,
       advertisement: v_d5dda0.advertisement,
       campid: v_d5dda0.campid,
@@ -737,13 +698,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       xrunPrice: v_d5dda0.xrunPrice,
     })));
 
-    const v_368ba7 = v_d2f480.map((v_9390e8, v_a56041) => {
+    const v_368ba7 = v_2e375c.map((v_9390e8, v_a56041) => {
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
     });
 
     console.log('✅ [organizeData] 최종 토큰 데이터:', v_368ba7.map((v_8d41d7, v_e86ad8) => ({
       spotID: v_8d41d7.spotID,
-      ad_company: v_8d41d7.ad_company,
       distance: v_8d41d7.distance,
       advertisement: v_8d41d7.advertisement,
       campid: v_8d41d7.campid,
