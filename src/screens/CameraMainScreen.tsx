@@ -28,6 +28,8 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 import { showToast } from '../utils';
+import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
+import { collectDeviceInfo } from '../utils/napApiUtils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -671,24 +673,63 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       chunkSize: chunkSize,
     });
 
-    let nextData: any[] = [];
-    let actualChunkSize = Math.min(chunkSize, oCoinData.length);
+    const nasData = oCoinData.filter((item) => {
+      const adCompany = (item.ad_company || '').toLowerCase();
+      return adCompany === 'nas' || adCompany === 'nasmedia';
+    });
+    const pointclickData = oCoinData.filter((item) => {
+      const adCompany = (item.ad_company || '').toLowerCase();
+      return adCompany === 'pointclick' || adCompany === 'pock';
+    });
+    const pangleData = oCoinData.filter((item) => {
+      const adCompany = (item.ad_company || '').toLowerCase();
+      return adCompany === 'pangle';
+    });
 
-    if (currentIndexRef.current + actualChunkSize > oCoinData.length) {
+    console.log('📊 [organizeData] ad_company별 데이터 분류:', {
+      nas: nasData.length,
+      pointclick: pointclickData.length,
+      pangle: pangleData.length,
+      total: oCoinData.length,
+    });
 
-      nextData = [
-        ...oCoinData.slice(currentIndexRef.current),
-        ...oCoinData.slice(0, (currentIndexRef.current + actualChunkSize) % oCoinData.length),
-      ];
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
-    } else {
+    const selectByDistance = (data: any[], count: number) => {
+      const sorted = [...data].sort((a, b) => {
+        const distanceA = parseFloat(String(a.distance || 0));
+        const distanceB = parseFloat(String(b.distance || 0));
+        return distanceA - distanceB;
+      });
+      return sorted.slice(0, count);
+    };
 
-      nextData = oCoinData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
-    }
+    const selectedNas = selectByDistance(nasData, 3);
+    const selectedPointclick = selectByDistance(pointclickData, 3);
+    const selectedPangle = selectByDistance(pangleData, 3);
 
-    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', nextData.slice(0, 5).map((d, idx) => ({
+    const combinedData = [...selectedNas, ...selectedPointclick, ...selectedPangle];
+
+    console.log('📋 [organizeData] 카테고리별 선택 결과:', {
+      nas: selectedNas.length,
+      pointclick: selectedPointclick.length,
+      pangle: selectedPangle.length,
+      combined: combinedData.length,
+    });
+
+    const shuffleArray = <T,>(array: T[]): T[] => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    const shuffledData = shuffleArray(combinedData);
+    const selectedData = shuffledData.slice(0, Math.min(5, shuffledData.length));
+
+    console.log('📋 [organizeData] 랜덤 선택된 데이터 (5개):', selectedData.map((d, idx) => ({
       index: idx,
+      ad_company: d.ad_company,
       distance: d.distance,
       advertisement: d.advertisement,
       campid: d.campid,
@@ -696,12 +737,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       xrunPrice: d.xrunPrice,
     })));
 
-    const newOrganizedData = nextData.map((data, index) => {
+    const newOrganizedData = selectedData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
     });
 
     console.log('✅ [organizeData] 최종 토큰 데이터:', newOrganizedData.map((t, idx) => ({
       spotID: t.spotID,
+      ad_company: t.ad_company,
       distance: t.distance,
       advertisement: t.advertisement,
       campid: t.campid,
@@ -1430,6 +1472,50 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const adCompany = token.ad_company || 'nas';
+      console.log('🔍 ad_company 확인:', adCompany);
+
+      if (isAdMobReady()) {
+        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 (모달)');
+        try {
+
+          const deviceInfo = await collectDeviceInfo();
+
+          await loadAndShowRewardedAd(
+            getAdMobMediationGroupId(),
+            member,
+            deviceInfo,
+            (reward) => {
+              console.log('[CameraMainScreen] 보상 수령 (모달):', reward);
+              showToast(`보상 수령: ${reward.amount} ${reward.type}`);
+
+              setShowAdModal(false);
+              setShowBottomPanel(false);
+            },
+            () => {
+              console.log('[CameraMainScreen] 광고 닫힘 (모달)');
+
+              setShowAdModal(false);
+              setShowBottomPanel(false);
+            },
+            (error) => {
+              console.error('[CameraMainScreen] 광고 로드 실패 (모달):', error);
+              showToast('광고를 불러올 수 없습니다.');
+
+              setShowAdModal(true);
+            }
+          );
+        } catch (error) {
+          console.error('[CameraMainScreen] 광고 표시 오류 (모달):', error);
+          showToast('광고를 표시할 수 없습니다.');
+
+          setShowAdModal(true);
+        }
+        return; 
+      }
+
+      console.log('⚠️ AdMob이 초기화되지 않아 기존 광고 로직 사용');
+
       const advertisement = token.advertisement
         ? String(token.advertisement)
         : (token.coin ? String(token.coin) : '');
@@ -1444,9 +1530,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         console.error('❌ campid가 유효하지 않습니다');
         return;
       }
-
-      const adCompany = token.ad_company || 'nas';
-      console.log('🔍 ad_company 확인:', adCompany);
 
       const adParams = {
         member: member,
@@ -1580,7 +1663,51 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         ad_company: adParams.ad_company,
       });
 
-      if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
+      if (isAdMobReady()) {
+        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 시작...');
+        console.log('🔍 광고 파라미터:', {
+          member,
+          campid: adParams.campid,
+          name: adParams.name,
+          xrunPrice: adParams.xrunPrice,
+          ad_company: adCompany,
+        });
+
+        try {
+
+          const deviceInfo = await collectDeviceInfo();
+
+          await loadAndShowRewardedAd(
+            getAdMobMediationGroupId(),
+            member,
+            deviceInfo,
+            (reward) => {
+              console.log('[CameraMainScreen] 보상 수령:', reward);
+              showToast(`보상 수령: ${reward.amount} ${reward.type}`);
+
+              setTimeout(() => {
+                navigate(ROUTES.map);
+              }, 1000);
+            },
+            () => {
+              console.log('[CameraMainScreen] 광고 닫힘');
+
+              navigate(ROUTES.map);
+            },
+            (error) => {
+              console.error('[CameraMainScreen] 광고 로드 실패:', error);
+              showToast('광고를 불러올 수 없습니다.');
+
+              reset(ROUTES.showNapAd);
+            }
+          );
+        } catch (error) {
+          console.error('[CameraMainScreen] Pangle 광고 표시 오류:', error);
+          showToast('광고를 표시할 수 없습니다.');
+
+          reset(ROUTES.showNapAd);
+        }
+      } else if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {

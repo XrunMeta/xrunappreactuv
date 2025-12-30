@@ -67,6 +67,7 @@ import { loadEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
+import { initializeAdMob } from './src/services/admob';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -646,85 +647,6 @@ const GlobalDialogs = () => {
   const [latestVersion, setLatestVersion] = useState<string | undefined>(undefined);
   const [isServerUpdateRequired, setIsServerUpdateRequired] = useState(false); 
 
-  useEffect(() => {
-    const checkVersion = async () => {
-
-      try {
-        console.log('[App] 버전 확인 시작');
-
-        const needsServerUpdate = await isServerVersionUpdateRequired();
-        if (needsServerUpdate) {
-          console.log('[App] 서버에서 업데이트 필요 확인');
-          const currentVersion = getCurrentAppVersion();
-          setLatestVersion(currentVersion);
-          setIsServerUpdateRequired(true); 
-          setVersionUpdateVisible(true);
-          return;
-        }
-
-        const currentVersion = getCurrentAppVersion();
-        const latest = await checkLatestVersion();
-
-        console.log('[App] 버전 확인 결과:', {
-          current: currentVersion,
-          latest: latest,
-        });
-
-        if (latest && isNewVersionAvailable(currentVersion, latest)) {
-          console.log('[App] 새 버전 발견:', latest);
-          if (__DEV__) {
-            console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
-            return;
-          }else{
-            setLatestVersion(latest);
-            setIsServerUpdateRequired(false); 
-            setVersionUpdateVisible(true);
-          }
-        } else {
-          console.log('[App] 최신 버전입니다.');
-        }
-      } catch (error) {
-        console.error('[App] 버전 확인 실패:', error);
-
-      }
-    };
-
-    const timer = setTimeout(() => {
-      checkVersion();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') {
-
-        try {
-          const currentVersion = getCurrentAppVersion();
-          const latest = await checkLatestVersion();
-
-          if (latest && isNewVersionAvailable(currentVersion, latest)) {
-
-            if (!versionUpdateVisible) {
-              setLatestVersion(latest);
-              setIsServerUpdateRequired(false); 
-              setVersionUpdateVisible(true);
-            }
-          }
-        } catch (error) {
-          console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', error);
-        }
-      }
-    };
-
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      subscription?.remove();
-    };
-  }, [versionUpdateVisible]);
-
   return (
     <>
       <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
@@ -871,6 +793,14 @@ export default function App() {
       } catch (error) {
         console.error('[App] Taboola 초기화 실패:', error);
       }
+
+      setTimeout(() => {
+        initializeAdMob().then(() => {
+          console.log('[App] AdMob 초기화 완료');
+        }).catch((error) => {
+          console.error('[App] AdMob 초기화 실패 (앱은 계속 실행됩니다):', error);
+        });
+      }, 1000); 
 
       try {
         console.log('[App] TopAd5 광고 캐시 시작');
