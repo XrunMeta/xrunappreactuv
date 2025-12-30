@@ -28,8 +28,6 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
 import { v_cba33f } from '../utils';
-import { v_18f201, v_84fca1, v_2b25f9 } from '../services/admob';
-import { v_f3de6d } from '../utils/napApiUtils';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -1435,47 +1433,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       const v_5a9c46 = v_21cc31.ad_company || 'nas';
       console.log('🔍 ad_company 확인:', v_5a9c46);
 
-      if (v_2b25f9()) {
-        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 (모달)');
-        try {
-
-          const v_e7f87b = await v_f3de6d();
-
-          await v_18f201(
-            v_84fca1(),
-            v_660822,
-            v_e7f87b,
-            (v_36c043) => {
-              console.log('[CameraMainScreen] 보상 수령 (모달):', v_36c043);
-              v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
-
-              v_219124(false);
-              v_6a4dcd(false);
-            },
-            () => {
-              console.log('[CameraMainScreen] 광고 닫힘 (모달)');
-
-              v_219124(false);
-              v_6a4dcd(false);
-            },
-            (v_5e9bfe) => {
-              console.error('[CameraMainScreen] 광고 로드 실패 (모달):', v_5e9bfe);
-              v_cba33f('광고를 불러올 수 없습니다.');
-
-              v_219124(true);
-            }
-          );
-        } catch (v_5e9bfe) {
-          console.error('[CameraMainScreen] 광고 표시 오류 (모달):', v_5e9bfe);
-          v_cba33f('광고를 표시할 수 없습니다.');
-
-          v_219124(true);
-        }
-        return; 
-      }
-
-      console.log('⚠️ AdMob이 초기화되지 않아 기존 광고 로직 사용');
-
       const v_5389c3 = v_21cc31.advertisement
         ? String(v_21cc31.advertisement)
         : (v_21cc31.coin ? String(v_21cc31.coin) : '');
@@ -1623,51 +1580,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         ad_company: v_75c344.ad_company,
       });
 
-      if (v_2b25f9()) {
-        console.log('🚀 AdMob 미디에이션을 통한 보상형 광고 표시 시작...');
-        console.log('🔍 광고 파라미터:', {
-          member: v_660822,
-          campid: v_75c344.campid,
-          name: v_75c344.name,
-          xrunPrice: v_75c344.xrunPrice,
-          ad_company: v_5a9c46,
-        });
-
-        try {
-
-          const v_e7f87b = await v_f3de6d();
-
-          await v_18f201(
-            v_84fca1(),
-            v_660822,
-            v_e7f87b,
-            (v_36c043) => {
-              console.log('[CameraMainScreen] 보상 수령:', v_36c043);
-              v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
-
-              setTimeout(() => {
-                v_9b57fc(v_ce4741.map);
-              }, 1000);
-            },
-            () => {
-              console.log('[CameraMainScreen] 광고 닫힘');
-
-              v_9b57fc(v_ce4741.map);
-            },
-            (v_5e9bfe) => {
-              console.error('[CameraMainScreen] 광고 로드 실패:', v_5e9bfe);
-              v_cba33f('광고를 불러올 수 없습니다.');
-
-              v_487a25(v_ce4741.showNapAd);
-            }
-          );
-        } catch (v_5e9bfe) {
-          console.error('[CameraMainScreen] Pangle 광고 표시 오류:', v_5e9bfe);
-          v_cba33f('광고를 표시할 수 없습니다.');
-
-          v_487a25(v_ce4741.showNapAd);
-        }
-      } else if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
+      if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
 
         console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
         console.log('🔍 이동 시 전달할 파라미터:', {
