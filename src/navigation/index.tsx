@@ -64,6 +64,7 @@ export const v_ce4741 = {
   showPockAd: 'showPockAd',
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
+  pangleList: 'pangleList',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

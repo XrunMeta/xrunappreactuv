@@ -6,6 +6,7 @@ import v_ebba42, {
   v_6f6da6, 
   v_29536b, 
   v_a23081,
+  v_54fae1,
 } from 'mbbgvwchnlgdjovshfkutboodeoyky';
 import { v_573fcf, v_e4a763 } from '../utils/env';
 import { v_719e34 } from '../types';
@@ -203,8 +204,29 @@ export const v_05fa9c = async (
       body: JSON.stringify(v_d8bcf0),
     });
 
-    const v_43c42e = await v_3393e3.json();
-    console.log('[AdMob] Pangle 콜백 응답:', v_43c42e);
+    const v_1e99f6 = await v_3393e3.text();
+    console.log('[AdMob] Pangle 콜백 응답 (원본):', {
+      status: v_3393e3.status,
+      statusText: v_3393e3.statusText,
+      contentType: v_3393e3.headers.get('content-type'),
+      text: v_1e99f6.substring(0, 200), 
+    });
+
+    let v_43c42e;
+    try {
+      v_43c42e = JSON.parse(v_1e99f6);
+      console.log('[AdMob] Pangle 콜백 응답 (파싱됨):', v_43c42e);
+    } catch (v_5f9add) {
+
+      console.warn('[AdMob] Pangle 콜백 응답이 JSON이 아닙니다:', v_5f9add);
+
+      if (v_3393e3.ok) {
+        console.log('[AdMob] Pangle 콜백 전송 성공 (비JSON 응답)');
+        return { success: true, message: '콜백 전송 완료 (비JSON 응답)' };
+      }
+      throw new Error(`콜백 응답 파싱 실패: ${v_1e99f6.substring(0, 100)}`);
+    }
+
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[AdMob] Pangle 콜백 전송 실패:', v_5e9bfe);
@@ -226,10 +248,19 @@ export const v_18f201 = async (
       return;
     }
 
-    const v_819f69 = v_61418d || v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
+    let v_819f69;
+    if (__DEV__) {
+
+      v_819f69 = v_54fae1.REWARDED;
+      console.log('[AdMob] 개발 모드: 테스트 광고 단위 ID 사용');
+    } else {
+
+      v_819f69 = v_61418d || v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
+    }
 
     console.log('[AdMob] 사용할 광고 단위 ID:', v_819f69);
     console.log('[AdMob] 광고 단위 ID 출처:', {
+      개발모드: __DEV__,
       adUnitId: v_61418d || '없음',
       mediationGroupId: v_573fcf('ADMOB_MEDIATION_GROUP_ID') || '없음',
       defaultAdUnitId: v_2ccc13() || '없음',

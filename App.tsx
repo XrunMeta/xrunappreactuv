@@ -58,6 +58,7 @@ import {
   v_f7bdb9,
   v_1cca63,
   v_0e5276,
+  v_4a5627,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -401,6 +402,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myInfoSettings') {
     return <MyInfoSettingsScreen />;
+  }
+
+  if (v_0f0c7b === 'pangleList') {
+    return <PangleListScreen />;
   }
 
   if (v_0f0c7b === 'myInfoCloseMembership') {
