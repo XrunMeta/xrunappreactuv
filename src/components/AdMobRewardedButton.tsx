@@ -2,7 +2,7 @@
 
 import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_39a996, v_7e4944, v_5e8657 } from 'rcmrninabrnb';
-import { v_18f201, v_84fca1, v_2b25f9 } from '../services/admob';
+import { v_18f201, v_3dc1fd, v_8c8ab6 } from '../services/pangle';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_719e34 } from '../types';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -46,7 +46,7 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
   const [v_cd31a8, v_deef62] = v_5ab095(false);
 
   const v_5ba0f2 = async () => {
-    if (v_4a6533 || v_cd31a8 || !v_2b25f9()) {
+    if (v_4a6533 || v_cd31a8 || !v_8c8ab6()) {
       return;
     }
 
@@ -68,7 +68,7 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
 
       const v_e7f87b = await v_f3de6d();
 
-      const v_819f69 = v_61418d || v_84fca1();
+      const v_819f69 = v_61418d || v_3dc1fd();
 
       await v_18f201(
         v_819f69,
@@ -110,10 +110,10 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
       style={[
         v_d81136.button,
         v_91b9f8,
-        (v_4a6533 || v_cd31a8 || !v_2b25f9()) && v_d81136.buttonDisabled,
+        (v_4a6533 || v_cd31a8 || !isAdMobReady()) && v_d81136.buttonDisabled,
       ]}
       onPress={v_5ba0f2}
-      disabled={v_4a6533 || v_cd31a8 || !v_2b25f9()}
+      disabled={v_4a6533 || v_cd31a8 || !isPangleReady()}
       activeOpacity={0.7}
     >
       {v_cd31a8 ? (

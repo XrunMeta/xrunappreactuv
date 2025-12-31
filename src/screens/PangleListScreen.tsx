@@ -5,7 +5,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_18f201, v_84fca1, v_2b25f9 } from '../services/admob';
+import { v_18f201, v_3dc1fd, v_ad3a98, v_8c8ab6, v_f095b0 } from '../services/pangle';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_573fcf } from '../utils/env';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -36,7 +36,6 @@ export const v_4a5627 = () => {
 
       const v_417f93 = v_573fcf('PANGLE_APP_ID') || '8747763';
       const v_df39ae = v_573fcf('PANGLE_REWARDED_AD_UNIT_ID') || '982589865';
-      const v_13c434 = v_573fcf('ADMOB_MEDIATION_GROUP_ID') || '';
       const v_769156 = 0.07422680412371134; 
       const v_bd63f1 = 'https://www.xrun.run/assets/images/logo_visual_black.png';
 
@@ -50,7 +49,7 @@ export const v_4a5627 = () => {
         joindesc: '동영상 광고를 시청하시면 리워드가 지급됩니다.',
         ad_company: 'pangle',
 
-        adUnitId: v_13c434 || v_df39ae,
+        adUnitId: v_df39ae,
       }));
 
       console.log('[PangleListScreen] 동적 팽글 광고 생성 완료:', {
@@ -90,38 +89,52 @@ export const v_4a5627 = () => {
         return;
       }
 
-      if (v_2b25f9()) {
-        console.log('[PangleListScreen] AdMob 미디에이션을 통한 보상형 광고 표시');
-        try {
+            let v_a0af7d = await v_ad3a98();
 
-          const v_e7f87b = await v_f3de6d();
+            if (!v_a0af7d) {
+              console.log('[PangleListScreen] Pangle 초기화 시도');
+              try {
+                await v_f095b0();
 
-          const v_61418d = v_ddcfed.adUnitId || v_84fca1();
-          console.log('[PangleListScreen] 사용할 광고 단위 ID:', v_61418d);
-
-          await v_18f201(
-            v_61418d,
-            v_660822,
-            v_e7f87b,
-            (v_36c043) => {
-              console.log('[PangleListScreen] 보상 수령:', v_36c043);
-              v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
-            },
-            () => {
-              console.log('[PangleListScreen] 광고 닫힘');
-            },
-            (v_5e9bfe) => {
-              console.error('[PangleListScreen] 광고 로드 실패:', v_5e9bfe);
-              v_cba33f('광고를 불러올 수 없습니다.');
+                v_a0af7d = await v_ad3a98();
+              } catch (v_dedc69) {
+                console.error('[PangleListScreen] Pangle 초기화 실패:', v_dedc69);
+              }
             }
-          );
-        } catch (v_5e9bfe) {
-          console.error('[PangleListScreen] 광고 표시 오류:', v_5e9bfe);
-          v_cba33f('광고를 표시할 수 없습니다.');
-        }
-      } else {
-        v_cba33f('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
-      }
+
+            if (v_a0af7d) {
+              console.log('[PangleListScreen] Pangle 보상형 광고 표시');
+              try {
+
+                const v_e7f87b = await v_f3de6d();
+
+                const v_61418d = v_ddcfed.adUnitId || v_3dc1fd();
+                console.log('[PangleListScreen] 사용할 광고 단위 ID:', v_61418d);
+
+                await v_18f201(
+                  v_61418d,
+                  v_660822,
+                  v_e7f87b,
+                  (v_36c043) => {
+                    console.log('[PangleListScreen] 보상 수령:', v_36c043);
+                    v_cba33f(`보상 수령: ${v_36c043.amount} ${v_36c043.type}`);
+                  },
+                  () => {
+                    console.log('[PangleListScreen] 광고 닫힘');
+                  },
+                  (v_5e9bfe) => {
+                    console.error('[PangleListScreen] 광고 로드 실패:', v_5e9bfe);
+                    v_cba33f('광고를 불러올 수 없습니다.');
+                  }
+                );
+              } catch (v_5e9bfe) {
+                console.error('[PangleListScreen] 광고 표시 오류:', v_5e9bfe);
+                v_cba33f('광고를 표시할 수 없습니다.');
+              }
+            } else {
+              console.warn('[PangleListScreen] Pangle이 준비되지 않았습니다.');
+              v_cba33f('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
+            }
     } catch (v_5e9bfe) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', v_5e9bfe);
       v_cba33f('오류가 발생했습니다.');
