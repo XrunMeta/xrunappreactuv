@@ -6,6 +6,7 @@ import mobileAds, {
   AdEventType, 
   RewardedAd, 
   RewardedAdEventType,
+  AppOpenAd,
   TestIds,
 } from 'react-native-google-mobile-ads';
 import { getEnvValue, getEnv } from '../utils/env';
@@ -336,5 +337,87 @@ export const getPangleRewardedAdUnitId = (): string => {
 
 export const getAdMobMediationGroupId = (): string => {
   return getEnvValue('ADMOB_MEDIATION_GROUP_ID') || getAdMobAdUnitId();
+};
+
+export const getPangleAppOpeningAdUnitId = (): string => {
+  return getEnvValue('PANGLE_APP_OPENING_AD_UNIT_ID');
+};
+
+let appOpenAd: AppOpenAd | null = null;
+
+export const loadAndShowAppOpenAd = async (): Promise<void> => {
+  try {
+    if (!isAdMobAvailable) {
+      console.warn('[AdMob] AdMob이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
+      return;
+    }
+
+    let finalAdUnitId: string;
+    if (__DEV__) {
+      finalAdUnitId = TestIds.APP_OPEN;
+      console.log('[AdMob] 개발 모드: 테스트 앱 오프닝 광고 단위 ID 사용');
+    } else {
+      finalAdUnitId = getPangleAppOpeningAdUnitId();
+    }
+
+    if (!finalAdUnitId) {
+      console.warn('[AdMob] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
+      return;
+    }
+
+    console.log('[AdMob] 앱 오프닝 광고 로드 시작:', finalAdUnitId);
+
+    appOpenAd = AppOpenAd.createForAdRequest(finalAdUnitId, {
+      requestNonPersonalizedAdsOnly: false,
+    });
+
+    const unsubscribeLoaded = appOpenAd.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 로드 완료');
+
+        if (appOpenAd) {
+          appOpenAd.show();
+        }
+      },
+    );
+
+    const unsubscribeOpened = appOpenAd.addAdEventListener(
+      AdEventType.OPENED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 표시됨');
+      },
+    );
+
+    const unsubscribeClosed = appOpenAd.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 닫힘');
+
+        unsubscribeLoaded();
+        unsubscribeOpened();
+        unsubscribeClosed();
+        appOpenAd = null;
+      },
+    );
+
+    const unsubscribeFailedToLoad = appOpenAd.addAdEventListener(
+      AdEventType.ERROR,
+      (error) => {
+        console.error('[AdMob] 앱 오프닝 광고 로드 실패:', error);
+
+        unsubscribeLoaded();
+        unsubscribeOpened();
+        unsubscribeClosed();
+        unsubscribeFailedToLoad();
+        appOpenAd = null;
+      },
+    );
+
+    appOpenAd.load();
+  } catch (error) {
+    console.error('[AdMob] 앱 오프닝 광고 로드 중 오류:', error);
+    appOpenAd = null;
+  }
 };
 
