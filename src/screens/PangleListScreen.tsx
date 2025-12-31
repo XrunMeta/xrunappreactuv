@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
+import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReady, isPangleReadySync, initializePangle } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getEnvValue } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,7 +36,6 @@ export const PangleListScreen = () => {
 
       const pangleAppId = getEnvValue('PANGLE_APP_ID') || '8747763';
       const pangleAdUnitId = getEnvValue('PANGLE_REWARDED_AD_UNIT_ID') || '982589865';
-      const mediationGroupId = getEnvValue('ADMOB_MEDIATION_GROUP_ID') || '';
       const defaultReward = 0.07422680412371134; 
       const defaultThumbnail = 'https://www.xrun.run/assets/images/logo_visual_black.png';
 
@@ -50,7 +49,7 @@ export const PangleListScreen = () => {
         joindesc: '동영상 광고를 시청하시면 리워드가 지급됩니다.',
         ad_company: 'pangle',
 
-        adUnitId: mediationGroupId || pangleAdUnitId,
+        adUnitId: pangleAdUnitId,
       }));
 
       console.log('[PangleListScreen] 동적 팽글 광고 생성 완료:', {
@@ -90,38 +89,52 @@ export const PangleListScreen = () => {
         return;
       }
 
-      if (isAdMobReady()) {
-        console.log('[PangleListScreen] AdMob 미디에이션을 통한 보상형 광고 표시');
-        try {
+            let pangleReady = await isPangleReady();
 
-          const deviceInfo = await collectDeviceInfo();
+            if (!pangleReady) {
+              console.log('[PangleListScreen] Pangle 초기화 시도');
+              try {
+                await initializePangle();
 
-          const adUnitId = ad.adUnitId || getAdMobMediationGroupId();
-          console.log('[PangleListScreen] 사용할 광고 단위 ID:', adUnitId);
-
-          await loadAndShowRewardedAd(
-            adUnitId,
-            member,
-            deviceInfo,
-            (reward) => {
-              console.log('[PangleListScreen] 보상 수령:', reward);
-              showToast(`보상 수령: ${reward.amount} ${reward.type}`);
-            },
-            () => {
-              console.log('[PangleListScreen] 광고 닫힘');
-            },
-            (error) => {
-              console.error('[PangleListScreen] 광고 로드 실패:', error);
-              showToast('광고를 불러올 수 없습니다.');
+                pangleReady = await isPangleReady();
+              } catch (initError) {
+                console.error('[PangleListScreen] Pangle 초기화 실패:', initError);
+              }
             }
-          );
-        } catch (error) {
-          console.error('[PangleListScreen] 광고 표시 오류:', error);
-          showToast('광고를 표시할 수 없습니다.');
-        }
-      } else {
-        showToast('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
-      }
+
+            if (pangleReady) {
+              console.log('[PangleListScreen] Pangle 보상형 광고 표시');
+              try {
+
+                const deviceInfo = await collectDeviceInfo();
+
+                const adUnitId = ad.adUnitId || getPangleRewardedAdUnitId();
+                console.log('[PangleListScreen] 사용할 광고 단위 ID:', adUnitId);
+
+                await loadAndShowRewardedAd(
+                  adUnitId,
+                  member,
+                  deviceInfo,
+                  (reward) => {
+                    console.log('[PangleListScreen] 보상 수령:', reward);
+                    showToast(`보상 수령: ${reward.amount} ${reward.type}`);
+                  },
+                  () => {
+                    console.log('[PangleListScreen] 광고 닫힘');
+                  },
+                  (error) => {
+                    console.error('[PangleListScreen] 광고 로드 실패:', error);
+                    showToast('광고를 불러올 수 없습니다.');
+                  }
+                );
+              } catch (error) {
+                console.error('[PangleListScreen] 광고 표시 오류:', error);
+                showToast('광고를 표시할 수 없습니다.');
+              }
+            } else {
+              console.warn('[PangleListScreen] Pangle이 준비되지 않았습니다.');
+              showToast('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
+            }
     } catch (error) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', error);
       showToast('오류가 발생했습니다.');

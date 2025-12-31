@@ -68,7 +68,7 @@ import { loadEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
-import { initializeAdMob, loadAndShowAppOpenAd } from './src/services/admob';
+import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -800,8 +800,8 @@ export default function App() {
       }
 
       setTimeout(() => {
-        initializeAdMob().then(() => {
-          console.log('[App] AdMob 초기화 완료');
+        initializePangle().then(() => {
+          console.log('[App] Pangle 초기화 완료');
 
           setTimeout(() => {
             loadAndShowAppOpenAd().catch((error) => {
@@ -809,7 +809,7 @@ export default function App() {
             });
           }, 500); 
         }).catch((error) => {
-          console.error('[App] AdMob 초기화 실패 (앱은 계속 실행됩니다):', error);
+          console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', error);
         });
       }, 1000); 
 

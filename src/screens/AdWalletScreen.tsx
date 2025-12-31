@@ -19,7 +19,7 @@ import {
   checkQuestUser,
   joinQuest,
 } from '../services';
-import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
+import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
@@ -531,13 +531,13 @@ export const AdWalletScreen = () => {
     if (canReward && member) {
       setIsJoiningQuest(true);
 
-      if (isAdMobReady()) {
+      if (isPangleReadySync()) {
         try {
 
           const deviceInfo = await collectDeviceInfo();
 
           await loadAndShowRewardedAd(
-            getAdMobMediationGroupId(),
+            getPangleRewardedAdUnitId(),
             member.toString(),
             deviceInfo,
             async (reward) => {

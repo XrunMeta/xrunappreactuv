@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
+import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { DeviceInfo } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,7 +46,7 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePress = async () => {
-    if (disabled || isLoading || !isAdMobReady()) {
+    if (disabled || isLoading || !isPangleReadySync()) {
       return;
     }
 
@@ -68,7 +68,7 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
 
       const deviceInfo = await collectDeviceInfo();
 
-      const finalAdUnitId = adUnitId || getAdMobMediationGroupId();
+      const finalAdUnitId = adUnitId || getPangleRewardedAdUnitId();
 
       await loadAndShowRewardedAd(
         finalAdUnitId,
@@ -113,7 +113,7 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
         (disabled || isLoading || !isAdMobReady()) && styles.buttonDisabled,
       ]}
       onPress={handlePress}
-      disabled={disabled || isLoading || !isAdMobReady()}
+      disabled={disabled || isLoading || !isPangleReady()}
       activeOpacity={0.7}
     >
       {isLoading ? (
