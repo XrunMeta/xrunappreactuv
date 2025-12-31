@@ -68,7 +68,7 @@ import { v_a2474a } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
-import { v_b357c3 } from './src/services/admob';
+import { v_b357c3, v_e55270 } from './src/services/admob';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
@@ -802,6 +802,12 @@ export default function v_6540c3() {
       setTimeout(() => {
         v_b357c3().then(() => {
           console.log('[App] AdMob 초기화 완료');
+
+          setTimeout(() => {
+            v_e55270().catch((v_5e9bfe) => {
+              console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+            });
+          }, 500); 
         }).catch((v_5e9bfe) => {
           console.error('[App] AdMob 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
         });

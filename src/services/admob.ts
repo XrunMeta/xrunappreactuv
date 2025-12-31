@@ -6,6 +6,7 @@ import v_ebba42, {
   v_6f6da6, 
   v_29536b, 
   v_a23081,
+  v_43eac7,
   v_54fae1,
 } from 'mbbgvwchnlgdjovshfkutboodeoyky';
 import { v_573fcf, v_e4a763 } from '../utils/env';
@@ -336,5 +337,87 @@ export const v_3dc1fd = (): string => {
 
 export const v_84fca1 = (): string => {
   return v_573fcf('ADMOB_MEDIATION_GROUP_ID') || v_2ccc13();
+};
+
+export const v_7522a9 = (): string => {
+  return v_573fcf('PANGLE_APP_OPENING_AD_UNIT_ID');
+};
+
+let appOpenAd: v_43eac7 | null = null;
+
+export const v_e55270 = async (): Promise<void> => {
+  try {
+    if (!v_d94015) {
+      console.warn('[AdMob] AdMob이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
+      return;
+    }
+
+    let v_819f69;
+    if (__DEV__) {
+      v_819f69 = v_54fae1.APP_OPEN;
+      console.log('[AdMob] 개발 모드: 테스트 앱 오프닝 광고 단위 ID 사용');
+    } else {
+      v_819f69 = v_7522a9();
+    }
+
+    if (!v_819f69) {
+      console.warn('[AdMob] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
+      return;
+    }
+
+    console.log('[AdMob] 앱 오프닝 광고 로드 시작:', v_819f69);
+
+    v_d27d1b = v_43eac7.createForAdRequest(v_819f69, {
+      requestNonPersonalizedAdsOnly: false,
+    });
+
+    const v_4293e9 = v_d27d1b.addAdEventListener(
+      v_6f6da6.LOADED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 로드 완료');
+
+        if (v_d27d1b) {
+          v_d27d1b.show();
+        }
+      },
+    );
+
+    const v_346536 = v_d27d1b.addAdEventListener(
+      v_6f6da6.OPENED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 표시됨');
+      },
+    );
+
+    const v_c1d506 = v_d27d1b.addAdEventListener(
+      v_6f6da6.CLOSED,
+      () => {
+        console.log('[AdMob] 앱 오프닝 광고 닫힘');
+
+        v_4293e9();
+        v_346536();
+        v_c1d506();
+        v_d27d1b = null;
+      },
+    );
+
+    const v_2b24ac = v_d27d1b.addAdEventListener(
+      v_6f6da6.ERROR,
+      (v_5e9bfe) => {
+        console.error('[AdMob] 앱 오프닝 광고 로드 실패:', v_5e9bfe);
+
+        v_4293e9();
+        v_346536();
+        v_c1d506();
+        v_2b24ac();
+        v_d27d1b = null;
+      },
+    );
+
+    v_d27d1b.load();
+  } catch (v_5e9bfe) {
+    console.error('[AdMob] 앱 오프닝 광고 로드 중 오류:', v_5e9bfe);
+    v_d27d1b = null;
+  }
 };
 
