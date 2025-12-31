@@ -176,7 +176,8 @@ export const v_05fa9c = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = v_c9c489.PANGLE_CALLBACK_URL || 'https://oth-path-51a04e.example.invalid/nodeServerTest/gateway/callbackPangle';
+
+    const v_f71b56 = v_c9c489.PANGLE_CALLBACK_URL || `${v_c9c489.GATEWAY_NODEJS}/callbackPangle`;
     const v_fc569c = v_c9c489.PANGLE_SECURITY_KEY;
 
     const v_d8bcf0 = {
@@ -274,16 +275,6 @@ export const v_18f201 = async (
       v_a23081.EARNED_REWARD,
       async (v_36c043) => {
         console.log('[AdMob] 보상 수령:', v_36c043);
-
-        if (v_660822 && v_e7f87b) {
-          try {
-            await v_05fa9c(v_660822, v_e7f87b, v_36c043, v_819f69);
-            console.log('[AdMob] Pangle 콜백 전송 완료');
-          } catch (v_33f0be) {
-            console.error('[AdMob] Pangle 콜백 전송 실패 (보상은 수령됨):', v_33f0be);
-
-          }
-        }
 
         if (v_6ae10d) {
           v_6ae10d(v_36c043);
