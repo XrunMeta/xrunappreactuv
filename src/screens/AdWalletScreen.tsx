@@ -19,6 +19,8 @@ import {
   checkQuestUser,
   joinQuest,
 } from '../services';
+import { loadAndShowRewardedAd, getAdMobMediationGroupId, isAdMobReady } from '../services/admob';
+import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
 
@@ -528,32 +530,144 @@ export const AdWalletScreen = () => {
 
     if (canReward && member) {
       setIsJoiningQuest(true);
-      try {
-        const response = await joinQuest(
-          {
-            quest_id: 1,
-            member,
-          },
-          undefined, 
-        );
 
-        if (response.status === 'success') {
-          showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-          setAttendanceCheckVisible(false);
-          setCanReward(null);
-          setHasAttended(null);
+      if (isAdMobReady()) {
+        try {
 
-          if (questListRef.current) {
-            questListRef.current.reloadData();
+          const deviceInfo = await collectDeviceInfo();
+
+          await loadAndShowRewardedAd(
+            getAdMobMediationGroupId(),
+            member.toString(),
+            deviceInfo,
+            async (reward) => {
+              console.log('[AdWallet] 출석체크 Pangle 광고 보상 수령:', reward);
+
+              try {
+                const response = await joinQuest(
+                  {
+                    quest_id: 1,
+                    member,
+                  },
+                  undefined, 
+                );
+
+                if (response.status === 'success') {
+                  showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+                  setAttendanceCheckVisible(false);
+                  setCanReward(null);
+                  setHasAttended(null);
+
+                  if (questListRef.current) {
+                    questListRef.current.reloadData();
+                  }
+                } else {
+                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                }
+              } catch (error) {
+                console.error('[AdWallet] 출석 체크 참여 오류:', error);
+                showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+              } finally {
+                setIsJoiningQuest(false);
+              }
+            },
+            () => {
+
+              console.log('[AdWallet] 출석체크 Pangle 광고 닫힘 (시청 미완료)');
+              setIsJoiningQuest(false);
+            },
+            (error) => {
+
+              console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
+              showToast('광고를 불러올 수 없습니다. 출석체크를 진행합니다.');
+
+              joinQuest(
+                {
+                  quest_id: 1,
+                  member,
+                },
+                undefined,
+              )
+                .then((response) => {
+                  if (response.status === 'success') {
+                    showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+                    setAttendanceCheckVisible(false);
+                    setCanReward(null);
+                    setHasAttended(null);
+                    if (questListRef.current) {
+                      questListRef.current.reloadData();
+                    }
+                  } else {
+                    showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                  }
+                })
+                .catch((error) => {
+                  console.error('[AdWallet] 출석 체크 참여 오류:', error);
+                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                })
+                .finally(() => {
+                  setIsJoiningQuest(false);
+                });
+            }
+          );
+        } catch (error) {
+          console.error('[AdWallet] 출석체크 Pangle 광고 표시 오류:', error);
+
+          try {
+            const response = await joinQuest(
+              {
+                quest_id: 1,
+                member,
+              },
+              undefined,
+            );
+
+            if (response.status === 'success') {
+              showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+              setAttendanceCheckVisible(false);
+              setCanReward(null);
+              setHasAttended(null);
+              if (questListRef.current) {
+                questListRef.current.reloadData();
+              }
+            } else {
+              showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+            }
+          } catch (questError) {
+            console.error('[AdWallet] 출석 체크 참여 오류:', questError);
+            showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+          } finally {
+            setIsJoiningQuest(false);
           }
-        } else {
-          showToast(t('screens.adWallet.attendanceCheckRetryToast'));
         }
-      } catch (error) {
-        console.error('[AdWallet] 출석 체크 참여 오류:', error);
-        showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-      } finally {
-        setIsJoiningQuest(false);
+      } else {
+
+        try {
+          const response = await joinQuest(
+            {
+              quest_id: 1,
+              member,
+            },
+            undefined,
+          );
+
+          if (response.status === 'success') {
+            showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+            setAttendanceCheckVisible(false);
+            setCanReward(null);
+            setHasAttended(null);
+            if (questListRef.current) {
+              questListRef.current.reloadData();
+            }
+          } else {
+            showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+          }
+        } catch (error) {
+          console.error('[AdWallet] 출석 체크 참여 오류:', error);
+          showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+        } finally {
+          setIsJoiningQuest(false);
+        }
       }
     } else {
 

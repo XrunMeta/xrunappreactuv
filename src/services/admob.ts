@@ -176,7 +176,8 @@ export const sendPangleCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = env.PANGLE_CALLBACK_URL || 'https://oth-path-app.example.invalid/nodeServerTest/gateway/callbackPangle';
+
+    const url = env.PANGLE_CALLBACK_URL || `${env.GATEWAY_NODEJS}/callbackPangle`;
     const securityKey = env.PANGLE_SECURITY_KEY;
 
     const callbackData = {
@@ -274,16 +275,6 @@ export const loadAndShowRewardedAd = async (
       RewardedAdEventType.EARNED_REWARD,
       async (reward) => {
         console.log('[AdMob] 보상 수령:', reward);
-
-        if (member && deviceInfo) {
-          try {
-            await sendPangleCallback(member, deviceInfo, reward, finalAdUnitId);
-            console.log('[AdMob] Pangle 콜백 전송 완료');
-          } catch (callbackError) {
-            console.error('[AdMob] Pangle 콜백 전송 실패 (보상은 수령됨):', callbackError);
-
-          }
-        }
 
         if (onRewarded) {
           onRewarded(reward);
