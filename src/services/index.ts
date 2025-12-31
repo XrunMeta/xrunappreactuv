@@ -10,8 +10,8 @@ export * from './googleAuth';
 
 export * from './appleAuth';
 
-export * from './admob';
-export { sendPangleCallback } from './admob';
+export * from './pangle';
+export { sendPangleCallback } from './pangle';
 import {
   v_96ef47,
   v_2fe85a,
