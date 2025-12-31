@@ -202,20 +202,40 @@ export const ShopTicketDetailScreen = () => {
       qrCodeRef.current?.toDataURL(async (dataURL: string) => {
         try {
 
-          const shareMessage = `${t('screens.shopTicketDetail.share.ticketNumber')} ${ticketNumber}\n${t('screens.shopTicketDetail.share.qrCodeUrl')} ${valueToShare}`;
+          const base64Data = dataURL.replace(/^data:image\/png;base64,/, '');
 
-          await Share.share({
-            message: shareMessage,
-            title: t('screens.shopTicketDetail.share.qrCodeTitle'),
+          const fileName = `qr_code_${ticketNumber}_${Date.now()}.png`;
+          const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+          await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+            encoding: FileSystem.EncodingType.Base64,
           });
+
+          const isAvailable = await Sharing.isAvailableAsync();
+          if (isAvailable) {
+            await Sharing.shareAsync(fileUri, {
+              mimeType: 'image/png',
+              dialogTitle: t('screens.shopTicketDetail.share.qrCodeTitle'),
+            });
+          } else {
+
+            const shareMessage = `${t('screens.shopTicketDetail.share.ticketNumber')} ${ticketNumber}\n${t('screens.shopTicketDetail.share.qrCodeUrl')} ${valueToShare}`;
+            await Clipboard.setStringAsync(shareMessage);
+            await showAlert(
+              t('screens.shopTicketDetail.share.qrCodeTitle'),
+              t('screens.shopTicketDetail.share.qrCodeUrl') + ' ' + valueToShare + '\n\n' + t('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.'
+            );
+          }
         } catch (shareError) {
           console.error('[티켓 상세] QR 공유 오류:', shareError);
 
           try {
-            await Share.share({
-              message: `${t('screens.shopTicketDetail.share.qrCodeTitle')}: ${valueToShare}`,
-              title: t('screens.shopTicketDetail.share.qrCodeTitle'),
-            });
+            const shareMessage = `${t('screens.shopTicketDetail.share.ticketNumber')} ${ticketNumber}\n${t('screens.shopTicketDetail.share.qrCodeUrl')} ${valueToShare}`;
+            await Clipboard.setStringAsync(shareMessage);
+            await showAlert(
+              t('screens.shopTicketDetail.share.qrCodeTitle'),
+              t('screens.shopTicketDetail.share.qrCodeUrl') + ' ' + valueToShare + '\n\n' + (t('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.')
+            );
           } catch (fallbackError) {
             console.error('[티켓 상세] QR 공유 대안 실패:', fallbackError);
             await showAlert(t('common.messages.error'), t('screens.shopTicketDetail.share.shareFailed'));
@@ -226,10 +246,12 @@ export const ShopTicketDetailScreen = () => {
       console.error('[티켓 상세] QR 공유 오류:', error);
 
       try {
-        await Share.share({
-          message: `${t('screens.shopTicketDetail.share.qrCodeTitle')}: ${qrCodeValue}`,
-          title: t('screens.shopTicketDetail.share.qrCodeTitle'),
-        });
+        const shareMessage = `${t('screens.shopTicketDetail.share.qrCodeTitle')}: ${qrCodeValue}`;
+        await Clipboard.setStringAsync(shareMessage);
+        await showAlert(
+          t('screens.shopTicketDetail.share.qrCodeTitle'),
+          shareMessage + '\n\n' + (t('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.')
+        );
       } catch (fallbackError) {
         await showAlert(t('common.messages.error'), t('screens.shopTicketDetail.share.shareFailed'));
       }
