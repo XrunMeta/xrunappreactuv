@@ -263,6 +263,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
     console.log('[Pangle] 앱 오프닝 광고 로드 시작:', finalAdUnitId);
 
     const subscriptions: Array<() => void> = [];
+    let errorHandledByEvent = false; 
 
     if (pangleEventEmitter) {
 
@@ -293,14 +294,78 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         },
       );
       subscriptions.push(() => closeSubscription.remove());
+
+      const errorSubscription = pangleEventEmitter.addListener(
+        'onAppOpenAdLoadError',
+        (event: { adUnitId: string; errorCode: number; errorMsg: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            errorHandledByEvent = true;
+            console.error('[Pangle] 앱 오프닝 광고 로드 실패:', event.errorMsg, `(${event.errorCode})`);
+
+            if (event.errorCode === 40006) {
+              console.warn('[Pangle] 해결 방법:', {
+                '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+                '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+                '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+              });
+            }
+
+            subscriptions.forEach(unsubscribe => unsubscribe());
+          }
+        },
+      );
+      subscriptions.push(() => errorSubscription.remove());
     }
 
-    await PangleModule.loadAppOpenAd(finalAdUnitId);
+    try {
+      await PangleModule.loadAppOpenAd(finalAdUnitId);
+    } catch (loadError) {
+
+      if (pangleEventEmitter) {
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (errorHandledByEvent) {
+          return; 
+        }
+
+        const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+        console.warn('[Pangle] 앱 오프닝 광고 로드 promise reject (이벤트 리스너 있음, 이벤트 미수신):', errorMessage);
+        return;
+      }
+
+      const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+      console.error('[Pangle] 앱 오프닝 광고 로드 promise 실패 (이벤트 리스너 없음):', loadError);
+
+      appOpenAdLoaded = false;
+
+      if (errorMessage.includes('40006')) {
+        console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 유효하지 않습니다. 광고 단위가 아직 완전히 활성화되지 않았을 수 있습니다. 잠시 후 다시 시도하세요.');
+        console.warn('[Pangle] 해결 방법:', {
+          '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+          '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+          '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+        });
+      } else if (errorMessage.includes('40034') || errorMessage.includes('지원되지 않')) {
+        console.warn('[Pangle] 앱 오프닝 광고가 현재 SDK 버전에서 지원되지 않거나 광고 단위 ID가 올바르지 않습니다. 앱은 계속 실행됩니다.');
+      } else {
+        console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', loadError);
+      }
+
+      subscriptions.forEach(unsubscribe => unsubscribe());
+    }
   } catch (error) {
     appOpenAdLoaded = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
 
-    if (errorMessage.includes('40034') || errorMessage.includes('지원되지 않')) {
+    if (errorMessage.includes('40006')) {
+      console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 유효하지 않습니다. 광고 단위가 아직 완전히 활성화되지 않았을 수 있습니다. 잠시 후 다시 시도하세요.');
+      console.warn('[Pangle] 해결 방법:', {
+        '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+        '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+        '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+      });
+    } else if (errorMessage.includes('40034') || errorMessage.includes('지원되지 않')) {
       console.warn('[Pangle] 앱 오프닝 광고가 현재 SDK 버전에서 지원되지 않거나 광고 단위 ID가 올바르지 않습니다. 앱은 계속 실행됩니다.');
     } else {
       console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', error);
