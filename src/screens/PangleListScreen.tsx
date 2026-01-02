@@ -35,7 +35,7 @@ export const v_4a5627 = () => {
       console.log('[PangleListScreen] 팽글 광고 로드 시작');
 
       const v_417f93 = v_573fcf('PANGLE_APP_ID') || '8747763';
-      const v_df39ae = v_573fcf('PANGLE_REWARDED_AD_UNIT_ID') || '982589865';
+      const v_df39ae = v_573fcf('PANGLE_REWARDED_AD_UNIT_ID') || '982684202';
       const v_769156 = 0.07422680412371134; 
       const v_bd63f1 = 'https://www.xrun.run/assets/images/logo_visual_black.png';
 
