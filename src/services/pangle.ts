@@ -28,9 +28,16 @@ export const v_f095b0 = async (): Promise<void> => {
 
     if (!v_986693()) {
       console.warn('[Pangle] 네이티브 모듈을 사용할 수 없습니다.');
+      console.warn('[Pangle] PangleModule이 null이거나 undefined입니다.');
+      console.warn('[Pangle] 네이티브 모듈이 제대로 등록되었는지 확인하세요.');
       v_d0574b = false;
       return;
     }
+
+    console.log('[Pangle] 네이티브 모듈 사용 가능:', {
+      PangleModule: v_dae2ac !== null && v_dae2ac !== undefined,
+      hasInitialize: typeof v_dae2ac?.initialize === 'function',
+    });
 
     try {
       const v_e1fe95 = v_dae2ac.initialize();
@@ -116,6 +123,7 @@ export const v_18f201 = async (
     console.log('[Pangle] 보상형 광고 로드 시작:', v_819f69);
 
     const v_60a14d = [];
+    let v_1fc80e = false; 
 
     if (v_1619e5) {
 
@@ -166,13 +174,24 @@ export const v_18f201 = async (
       v_60a14d.push(() => v_08c38a.remove());
 
       const v_30c524 = v_1619e5.addListener(
-        'onRewardedAdVideoError',
+        'onRewardedAdLoadError',
         (v_d48baf) => {
           if (v_d48baf.adUnitId === v_819f69) {
-            console.error('[Pangle] 보상형 광고 로드 실패');
+            v_1fc80e = true; 
+            console.error('[Pangle] 보상형 광고 로드 실패:', v_d48baf.errorMsg, `(${v_d48baf.errorCode})`);
+
+            if (v_d48baf.errorCode === 40034) {
+              console.warn('[Pangle] 해결 방법:', {
+                '1': 'Pangle 대시보드에서 광고 단위 ID가 올바른지 확인',
+                '2': '광고 형식(보상형 광고)이 활성화되어 있는지 확인',
+                '3': 'App ID와 App Key가 올바른지 확인',
+                '4': '네트워크 연결 상태 확인',
+              });
+            }
+
             v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
             if (v_0721a3) {
-              v_0721a3(new Error('보상형 광고 로드 실패'));
+              v_0721a3(new Error(`보상형 광고 로드 실패: ${v_d48baf.errorMsg} (${v_d48baf.errorCode})`));
             }
           }
         },
@@ -180,7 +199,43 @@ export const v_18f201 = async (
       v_60a14d.push(() => v_30c524.remove());
     }
 
-    await v_dae2ac.loadRewardedAd(v_819f69);
+    try {
+      await v_dae2ac.loadRewardedAd(v_819f69);
+    } catch (v_95616f) {
+
+      if (v_1619e5) {
+
+        await new Promise(v_6f7712 => setTimeout(v_6f7712, 100));
+
+        if (v_1fc80e) {
+          return; 
+        }
+
+        const v_1744b9 = v_95616f instanceof Error ? v_95616f.message : String(v_95616f);
+        console.warn('[Pangle] 보상형 광고 로드 promise reject (이벤트 리스너 있음, 이벤트 미수신):', v_1744b9);
+
+        return;
+      }
+
+      const v_1744b9 = v_95616f instanceof Error ? v_95616f.message : String(v_95616f);
+      console.error('[Pangle] 보상형 광고 로드 promise 실패 (이벤트 리스너 없음):', v_95616f);
+
+      let v_8eaa8e = v_1744b9;
+      if (v_1744b9.includes('40034')) {
+        v_8eaa8e = `Pangle 서버 오류 (40034): 광고 단위 ID(${v_819f69})가 올바르지 않거나 Pangle 대시보드에서 활성화되지 않았을 수 있습니다. Pangle 대시보드를 확인해주세요.`;
+        console.warn('[Pangle] 해결 방법:', {
+          '1': 'Pangle 대시보드에서 광고 단위 ID가 올바른지 확인',
+          '2': '광고 형식(보상형 광고)이 활성화되어 있는지 확인',
+          '3': 'App ID와 App Key가 올바른지 확인',
+          '4': '네트워크 연결 상태 확인',
+        });
+      }
+
+      v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
+      if (v_0721a3) {
+        v_0721a3(new Error(v_8eaa8e));
+      }
+    }
   } catch (v_5e9bfe) {
     console.error('[Pangle] 보상형 광고 로드 중 오류:', v_5e9bfe);
     if (v_0721a3) {
@@ -242,8 +297,14 @@ export const v_e55270 = async (): Promise<void> => {
 
     await v_dae2ac.loadAppOpenAd(v_819f69);
   } catch (v_5e9bfe) {
-    console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', v_5e9bfe);
     v_8e7548 = false;
+    const v_1744b9 = v_5e9bfe instanceof Error ? v_5e9bfe.message : String(v_5e9bfe);
+
+    if (v_1744b9.includes('40034') || v_1744b9.includes('지원되지 않')) {
+      console.warn('[Pangle] 앱 오프닝 광고가 현재 SDK 버전에서 지원되지 않거나 광고 단위 ID가 올바르지 않습니다. 앱은 계속 실행됩니다.');
+    } else {
+      console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', v_5e9bfe);
+    }
   }
 };
 
