@@ -35,7 +35,7 @@ export const PangleListScreen = () => {
       console.log('[PangleListScreen] 팽글 광고 로드 시작');
 
       const pangleAppId = getEnvValue('PANGLE_APP_ID') || '8747763';
-      const pangleAdUnitId = getEnvValue('PANGLE_REWARDED_AD_UNIT_ID') || '982589865';
+      const pangleAdUnitId = getEnvValue('PANGLE_REWARDED_AD_UNIT_ID') || '982684202';
       const defaultReward = 0.07422680412371134; 
       const defaultThumbnail = 'https://www.xrun.run/assets/images/logo_visual_black.png';
 
