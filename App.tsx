@@ -138,18 +138,18 @@ const ScreenHost = () => {
     const getInitialURL = async () => {
       try {
         const initialUrl = await Linking.getInitialURL();
-        if (initialUrl) { 
+        if (initialUrl) {
           const userDataStr = await AsyncStorage.getItem('userData');
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             const member = userData?.member;
             if (member) {
               console.log('[딥링크] 로그인 되어 있음, 딥링크 처리안함');
-            }else{
+            } else {
               console.log('[딥링크] 로그인 안되어 있음, 딥링크 처리');
               handleDeepLink(initialUrl);
             }
-          }else{
+          } else {
             console.log('[딥링크] userData가 없음, 딥링크 처리');
             handleDeepLink(initialUrl);
           }
@@ -239,6 +239,8 @@ const ScreenHost = () => {
       if (Platform.OS !== 'ios') {
         return;
       }
+
+      return;
 
       try {
 
@@ -675,7 +677,7 @@ const GlobalDialogs = () => {
           if (__DEV__) {
             console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
             return;
-          }else{
+          } else {
             setLatestVersion(latest);
             setIsServerUpdateRequired(false); 
             setVersionUpdateVisible(true);
@@ -791,7 +793,7 @@ export default function App() {
         } catch (error) {
           console.error('[App] 광고 완료 상태 확인 실패:', error);
         }
-      } 
+      }
 
       else if (
         previousState === 'active' &&
@@ -816,7 +818,7 @@ export default function App() {
         } catch (error) {
           console.error('[App] ❌ 앱 상태 저장 실패:', error);
         }
-      } 
+      }
 
       else if (
         previousState === 'inactive' &&
@@ -825,7 +827,7 @@ export default function App() {
 
         console.log('[App] inactive -> background 전환 (타임스탬프는 이미 저장됨)');
         await AsyncStorage.setItem('app_last_state', nextAppState);
-      } 
+      }
       else {
         console.log('[App] AppState 변경 (처리하지 않음):', {
           previous: previousState,
