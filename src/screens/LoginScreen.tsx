@@ -21,7 +21,7 @@ import {
   v_b34ce5,
   v_c2fdd1,
 } from '../components';
-import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035 } from '../constants';
+import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import {
   v_b699a9,
@@ -33,6 +33,7 @@ import {
   v_4c4126,
   v_7af6c9,
   v_1fee11,
+  v_a763e6,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -68,6 +69,7 @@ export const v_f4f851 = () => {
   const [v_a964a4, v_99916a] = v_5ab095(true);
   const [v_f872c3, v_c6fe9e] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
+  const [v_b86921, v_92f24d] = v_5ab095(false);
 
   const [v_808660, v_e61149] = v_5ab095('');
   const [v_b6e894, v_24b225] = v_5ab095(true);
@@ -193,9 +195,9 @@ export const v_f4f851 = () => {
     v_deef62(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { 
-        email: v_e0c7e8, 
-        rememberMe: v_a964a4, 
+      console.log('[로그인] 로그인 시도:', {
+        email: v_e0c7e8,
+        rememberMe: v_a964a4,
         rememberMeType: typeof v_a964a4,
         rememberMeValue: v_a964a4 === true ? 'true' : 'false',
       });
@@ -287,15 +289,15 @@ export const v_f4f851 = () => {
 
       const v_3393e3 = v_2156ca === 'google'
         ? await v_4c4126(
-            v_306394,
-            v_d11af5,
-            v_9b57fc,
-          )
+          v_306394,
+          v_d11af5,
+          v_9b57fc,
+        )
         : await v_1fee11(
-            v_1ba8b3,
-            v_d11af5,
-            v_9b57fc,
-          );
+          v_1ba8b3,
+          v_d11af5,
+          v_9b57fc,
+        );
 
       if (!v_3393e3.success || (v_3393e3.code !== 200 && v_3393e3.code !== '200')) {
         const v_1744b9 = v_3393e3.message || v_8d41d7('screens.login.errors.loginFailed');
@@ -779,7 +781,6 @@ export const v_f4f851 = () => {
             <Text style={v_d81136.disclaimer}>
               {v_8d41d7('screens.login.disclaimer')}
             </Text>
-
           </View>
         </SafeScrollView>
       )}
@@ -809,7 +810,7 @@ export const v_f4f851 = () => {
 보다 간편하게 로그인할 수 있습니다.
 
 ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
-          <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
+            <Text style={v_d81136.linkingEmail}>{v_4c2a98}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 
           <FormField
@@ -864,6 +865,83 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           </Text>
         </View>
       </Dialog>
+
+      {}
+      {v_731ab4 && v_326be8.OS === 'ios' && (
+        <View style={[v_d81136.pangleTestContainer, { paddingHorizontal: v_9b1a04.large, paddingBottom: 20 }]}>
+          <TouchableOpacity
+            style={[v_d81136.pangleTestButton, { backgroundColor: v_1bfbd0.success, marginBottom: 10 }]}
+            onPress={async () => {
+              try {
+                await v_a763e6();
+              } catch (v_5e9bfe) {
+                v_889fad('네이티브 화면 표시 실패', String(v_5e9bfe));
+              }
+            }}
+          >
+            <Text style={v_d81136.pangleTestButtonText}>네이티브 화면 연결 테스트</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[v_d81136.pangleTestButton, { backgroundColor: '#FF9800', marginBottom: 10 }]}
+            disabled={v_b86921}
+            onPress={async () => {
+              try {
+                v_92f24d(true);
+                const { loadAndShowInterstitialAd: v_41a100 } = require('../services/pangle');
+                console.log('[테스트] 전면광고 원터치 시작');
+                await v_41a100();
+              } catch (v_5e9bfe) {
+                v_889fad('테스트 실패', String(v_5e9bfe));
+              } finally {
+                v_92f24d(false);
+              }
+            }}
+          >
+            {v_b86921 ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={v_d81136.pangleTestButtonText}>전면광고 원터치 테스트 (로드+노출)</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              style={[v_d81136.pangleTestButton, { backgroundColor: '#6200EE', flex: 1 }]}
+              disabled={v_b86921}
+              onPress={async () => {
+                try {
+                  v_92f24d(true);
+                  const { loadInterstitialAd: v_95c236 } = require('../services/pangle');
+                  await v_95c236();
+                  v_889fad('로드 성공', '광고가 준비되었습니다.');
+                } catch (v_5e9bfe) {
+                  v_889fad('로드 실패', String(v_5e9bfe));
+                } finally {
+                  v_92f24d(false);
+                }
+              }}
+            >
+              <Text style={[v_d81136.pangleTestButtonText, { fontSize: 13 }]}>수동 로드</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[v_d81136.pangleTestButton, { backgroundColor: '#03DAC6', flex: 1 }]}
+              disabled={v_b86921}
+              onPress={async () => {
+                try {
+                  const { showInterstitialAd: v_5c0644 } = require('../services/pangle');
+                  await v_5c0644();
+                } catch (v_5e9bfe) {
+                  v_889fad('노출 실패', '광고가 로드되지 않았습니다.');
+                }
+              }}
+            >
+              <Text style={[v_d81136.pangleTestButtonText, { fontSize: 13, color: '#000' }]}>수동 노출</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -997,6 +1075,45 @@ const v_d81136 = v_472849.create({
   linkingLoader: {
     alignItems: 'center',
     marginTop: 10,
+  },
+  pangleTestContainer: {
+    marginTop: v_9b1a04.large,
+    width: '100%',
+  },
+  pangleTestButton: {
+    backgroundColor: v_1bfbd0.buttonSecondary,
+    borderRadius: 16,
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: v_9b1a04.medium,
+  },
+  pangleTestButtonText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: v_843035.family.medium,
+    color: v_1bfbd0.text,
+  },
+  pangleTestButtonsRow: {
+    flexDirection: 'row',
+    gap: v_9b1a04.medium,
+    width: '100%',
+  },
+  pangleTestButtonSmall: {
+    flex: 1,
+    backgroundColor: v_1bfbd0.buttonPrimary,
+    borderRadius: 12,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pangleTestButtonSecondary: {
+    backgroundColor: v_1bfbd0.buttonSecondary,
+  },
+  pangleTestButtonTextSmall: {
+    fontSize: v_843035.size.ssmall,
+    fontFamily: v_843035.family.medium,
+    color: v_1bfbd0.text,
   },
 });
 
