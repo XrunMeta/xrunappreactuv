@@ -189,6 +189,18 @@ class PangleModule: RCTEventEmitter {
     }
   }
 
+  @objc
+  func loadAndShowNativeAd(_ slotId: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.main.async {
+      if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+        appDelegate.loadAndShowNativeAd(slotId: slotId)
+        resolver(["success": true, "message": "Native Ad loading and display requested via AppDelegate"])
+      } else {
+        rejecter("ERROR", "AppDelegate not found", nil)
+      }
+    }
+  }
+
   private func getRootViewController() -> UIViewController? {
     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
        let window = windowScene.windows.first {

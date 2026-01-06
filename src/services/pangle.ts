@@ -6,6 +6,8 @@ const { PangleModule: v_dae2ac } = v_80fa10;
 
 export const v_69c328 = '982684319';
 
+export const v_8060b7 = '982690267';
+
 export const v_3152de = (): boolean => {
   return v_326be8.OS === 'ios' && v_dae2ac !== undefined && v_dae2ac !== null;
 };
@@ -71,6 +73,23 @@ export const v_41a100 = async (v_a15489 = v_69c328): Promise<any> => {
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[Native] 팽글 전면광고 로드 및 노출 실패:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_df6735 = async (v_a15489 = v_8060b7): Promise<any> => {
+  try {
+    if (!v_3152de()) {
+      return { success: false, error: '모듈을 찾을 수 없습니다' };
+    }
+
+    console.log('[Native] 팽글 네이티브 광고 로드 및 노출 시도:', v_a15489);
+
+    const v_43c42e = await v_dae2ac.loadAndShowNativeAd(v_a15489);
+    console.log('[Native] 팽글 네이티브 광고 호출 성공:', v_43c42e);
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[Native] 팽글 네이티브 광고 로드 및 노출 실패:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
