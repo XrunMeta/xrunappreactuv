@@ -652,7 +652,6 @@ const GlobalDialogs = () => {
     const checkVersion = async () => {
 
       try {
-        console.log('[App] 버전 확인 시작');
 
         const needsServerUpdate = await isServerVersionUpdateRequired();
         if (needsServerUpdate) {
@@ -667,11 +666,6 @@ const GlobalDialogs = () => {
         const currentVersion = getCurrentAppVersion();
         const latest = await checkLatestVersion();
 
-        console.log('[App] 버전 확인 결과:', {
-          current: currentVersion,
-          latest: latest,
-        });
-
         if (latest && isNewVersionAvailable(currentVersion, latest)) {
           console.log('[App] 새 버전 발견:', latest);
           if (__DEV__) {
@@ -683,7 +677,7 @@ const GlobalDialogs = () => {
             setVersionUpdateVisible(true);
           }
         } else {
-          console.log('[App] 최신 버전입니다.');
+
         }
       } catch (error) {
         console.error('[App] 버전 확인 실패:', error);

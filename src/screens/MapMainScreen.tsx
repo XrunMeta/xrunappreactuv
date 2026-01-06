@@ -44,12 +44,13 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 
 import { SpotData } from '../types';
 
-import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5 } from '../services';
+import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, getNasmobAds, getPockAds } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
+import { collectDeviceInfo } from '../utils/napApiUtils';
 
 interface LocationData {
 
@@ -299,6 +300,104 @@ export const MapMainScreen: React.FC = () => {
   const hasMapReadyRef = useRef(false);
 
   const hasCheckedMarkersOnEnterRef = useRef(false);
+
+  const startPreFetchAdUrls = useCallback(async (ads: any[]) => {
+    try {
+      console.log('🚀 [MapMainScreen] 백그라운드 urlAD pre-fetch 시작');
+      const userData = await AsyncStorage.getItem('userData');
+      const parsedUserData = userData ? JSON.parse(userData) : null;
+      const memberId = parsedUserData?.member;
+
+      if (!memberId) {
+        console.log('[MapMainScreen] memberId가 없어 pre-fetch를 중단합니다.');
+        return;
+      }
+
+      const deviceInfo = await collectDeviceInfo();
+
+      const adsToFetch = ads.filter((ad: any) => ad.campid && !ad.urlAD);
+
+      console.log(`🔍 [MapMainScreen] 고유 광고 pre-fetch 대상: ${adsToFetch.length}개`);
+
+      for (const ad of adsToFetch) {
+        try {
+          let result;
+          if (ad.ad_company === 'nas') {
+            result = await getNasmobAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
+            if (result.code === 200 && result.data?.urlAD) {
+              const fetchedUrl = result.data.urlAD;
+
+              setTopAd5Data(prev => prev.map(item =>
+                (item.campid === ad.campid && item.ad_company === 'nas') ? { ...item, urlAD: fetchedUrl } : item
+              ));
+
+              setMarkers(prev => prev.map(m =>
+                (m.campid === ad.campid && m.ad_company === 'nas') ? { ...m, urlAD: fetchedUrl } : m
+              ));
+
+              try {
+                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
+                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+
+                const newData = {
+                  urlAD: fetchedUrl,
+                  joindesc: result.data.rewarddesc || '',
+                  name: result.data.name || '',
+                  xrunPrice: result.data.price ? (result.data.price / 2) : 0
+                };
+
+                currentCache[ad.campid] = newData;
+                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
+                console.log(`💾 [MapMainScreen] NAS 데이터 캐시 저장 완료: ${ad.campid}`);
+                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
+              } catch (cacheErr) {
+                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
+              }
+
+              console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${ad.campid}`);
+            }
+          } else if (ad.ad_company === 'pointclick') {
+            result = await getPockAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
+            if (result.code === 200 && result.data?.landing_url) {
+              const fetchedUrl = result.data.landing_url;
+              setTopAd5Data(prev => prev.map(item =>
+                (item.campid === ad.campid && item.ad_company === 'pointclick') ? { ...item, urlAD: fetchedUrl } : item
+              ));
+              setMarkers(prev => prev.map(m =>
+                (m.campid === ad.campid && m.ad_company === 'pointclick') ? { ...m, urlAD: fetchedUrl } : m
+              ));
+
+              try {
+                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
+                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+
+                const newData = {
+                  urlAD: fetchedUrl,
+                  joindesc: result.data.ad_participation || '',
+                  name: result.data.ad_name || '',
+                  xrunPrice: result.data.ad_profit || 0
+                };
+
+                currentCache[ad.campid] = newData;
+                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
+                console.log(`💾 [MapMainScreen] PointClick 데이터 캐시 저장 완료: ${ad.campid}`);
+                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
+              } catch (cacheErr) {
+                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
+              }
+
+              console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${ad.campid}`);
+            } 
+
+          }
+        } catch (e) {
+          console.log(`⚠️ [MapMainScreen] ${ad.campid} pre-fetch 실패:`, e);
+        }
+      }
+    } catch (err) {
+      console.error('❌ [MapMainScreen] 백그라운드 pre-fetch 오류:', err);
+    }
+  }, []);
 
   let iconXrunBlack: any = null;
   let iconXrunLogo: any = null;
@@ -1376,7 +1475,7 @@ export const MapMainScreen: React.FC = () => {
         console.log('[MapMainScreen] 마커 데이터:', coinsData.length, '개');
         console.log('[MapMainScreen] 광고 데이터:', topAd5Response.length, '개');
         for (const ad of topAd5Response) {
-          console.log('[MapMainScreen] 광고 데이터:',ad.name  );
+          console.log('[MapMainScreen] 광고 데이터:', ad.name);
         }
 
         console.log('[MapMainScreen] 4단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
@@ -1426,11 +1525,15 @@ export const MapMainScreen: React.FC = () => {
           coins: coin.coins || coin.coin || '',
           coin: coin.coin || '',
           campid: coin.campid || coin.campId || '',
-        } as SpotData & { campid?: string }));
+          ad_company: coin.ad_company || '',
+          urlAD: coin.urlAD || '',
+        } as SpotData));
 
         setMarkers(spotDataArray);
 
         console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
+
+        startPreFetchAdUrls(topAd5Response);
       } catch (error) {
         console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', error);
 
@@ -2091,6 +2194,8 @@ export const MapMainScreen: React.FC = () => {
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
             console.log('[MapMainScreen] TopAd5 재호출 성공:', topAd5Response.length, '개 광고');
             setTopAd5Data(topAd5Response);
+
+            startPreFetchAdUrls(topAd5Response);
           } else {
             console.warn('[MapMainScreen] TopAd5 재호출 결과: 데이터 없음');
 
