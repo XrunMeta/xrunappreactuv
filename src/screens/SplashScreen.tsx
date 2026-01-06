@@ -1,12 +1,10 @@
 import v_a3453e, { v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_cf9c33, v_472849 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_1bfbd0 } from '../constants';
 import { v_bebb2d } from '../utils';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_6b5698 } from 'rcmrninabrnb';
-
-const v_4f9e99 = require('../../assets/xrun-round-logo.png');
 
 export const v_7c6176 = () => {
   v_c4deb2(() => {
@@ -26,14 +24,6 @@ export const v_7c6176 = () => {
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      {}
-      <View style={v_d81136.centerLogoWrapper}>
-        <Image
-          source={v_4f9e99}
-          style={v_d81136.centerLogo}
-          resizeMode="contain"
-        />
-      </View>
     </View>
   );
 };
@@ -43,18 +33,6 @@ const v_d81136 = v_472849.create({
     flex: 1,
     width: '100%',
     backgroundColor: v_1bfbd0.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLogoWrapper: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLogo: {
-    width: 113,
-    height: 115,
   },
 });
 
