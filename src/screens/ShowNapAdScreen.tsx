@@ -33,7 +33,7 @@ const SequentialDots: v_a3453e.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20}}>
+    <View style={{ flexDirection: 'row', marginTop: 20 }}>
       {[0, 1, 2].map(v_a56041 => (
         <View
           key={v_a56041}
@@ -108,6 +108,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
   const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
   const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_64c30d = v_e662ae(false);
 
   v_c4deb2(() => {
     console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -175,23 +176,18 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     try {
 
       const v_766d99 = v_24baff || v_d0b6d4;
+      const v_aa0917 = v_766d99?.campid || '';
 
       console.log('Starting NStation advertisement initialization');
-      v_deef62(true);
 
-      console.log('=== ShowNapAdScreen 진입 advertisementParams ===');
-      console.log('advertisement:', v_766d99?.advertisement);
-      console.log('coin:', v_766d99?.coin);
-      console.log('campid:', v_766d99?.campid);
-      console.log('name:', v_766d99?.name);
-      console.log('xrunPrice:', v_766d99?.xrunPrice);
-      console.log('joindesc:', v_766d99?.joindesc);
-      console.log('전체 advertisementParams:', JSON.stringify(v_766d99, null, 2));
-      console.log('=== ShowNapAdScreen 진입 advertisementParams 끝 ===');
+      if (v_64c30d.current) {
+        console.log('[ShowNapAdScreen] 이미 광고 데이터를 가져오는 중입니다.');
+        return;
+      }
 
-      if (!v_766d99 || !v_766d99.campid || v_766d99.campid === '') {
+      if (!v_766d99 || v_aa0917 === '') {
         console.error('❌ [ShowNapAdScreen] campid가 유효하지 않습니다:', {
-          campid: v_766d99?.campid,
+          campid: v_aa0917,
           advertisement: v_766d99?.advertisement,
           fullParams: JSON.stringify(v_766d99, null, 2),
         });
@@ -200,21 +196,31 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         return;
       }
 
+      if (!v_3aedd0) {
+        console.log('✅ [ShowNapAdScreen] 기본 정보로 UI 우선 표시');
+        v_6f8b23({
+          urlResult: 200,
+          urlAD: v_766d99.urlAD || '',
+          campid: v_aa0917.toString(),
+          name: v_766d99.name || '',
+          rewarddesc: '', 
+        });
+        v_deef62(false); 
+      }
+
+      if (v_766d99?.urlAD && v_766d99.urlAD !== '') {
+        console.log('✅ [ShowNapAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        return;
+      }
+
       const v_e7f87b = await v_f3de6d();
 
-      const v_aa0917 = v_766d99.campid || '';
       console.log('=== ShowNapAdScreen API 호출 정보 ===');
       console.log('member:', v_660822);
       console.log('adid:', v_e7f87b.adid);
       console.log('campid:', v_aa0917);
       console.log('advertisementParams (currentParams):', JSON.stringify(v_766d99, null, 2));
       console.log('deviceInfo:', JSON.stringify(v_e7f87b, null, 2));
-      console.log('🔍 [ShowNapAdScreen] 최종 API 호출 campid 검증:', {
-        campid: v_aa0917,
-        advertisement: v_766d99?.advertisement,
-        coin: v_766d99?.coin,
-        name: v_766d99?.name,
-      });
       console.log('=== API 호출 정보 끝 ===');
 
       const v_43c42e = await v_1c4683(
@@ -226,18 +232,33 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       );
 
       if (v_43c42e.data && v_43c42e.data.urlResult === 200 && v_43c42e.data.urlAD) {
-        v_6f8b23(v_43c42e.data);
+        console.log('✅ [ShowNapAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
+        const v_4d73f0 = v_43c42e.data;
+        v_6f8b23(v_ba2215 => {
+          if (!v_ba2215) return v_4d73f0 as CampaignData;
+          return {
+            ...v_ba2215,
+            ...v_4d73f0,
+            urlResult: v_4d73f0.urlResult ?? v_ba2215.urlResult,
+          } as CampaignData;
+        });
         v_deef62(false);
         return;
       } else {
-        throw new Error(`URL 결과 실패: ${v_43c42e.data?.urlResult}`);
+
+        console.warn(`NStation 광고 API 응답 결과가 정상이 아닙니다: urlResult=${v_43c42e.data?.urlResult}`);
+        if (!v_3aedd0?.urlAD) {
+          throw new Error(`URL 결과 실패: ${v_43c42e.data?.urlResult}`);
+        }
       }
     } catch (v_5e9bfe) {
       console.error('NStation 광고 초기화 실패:', v_5e9bfe);
 
-      console.log('❌ 광고 초기화 실패 - 팝업 표시');
-      v_deef62(false);
-      v_ed6932(true);
+      if (!v_3aedd0?.urlAD) {
+        console.log('❌ 광고 초기화 실패 - 팝업 표시');
+        v_deef62(false);
+        v_ed6932(true);
+      }
     }
   };
 
@@ -354,48 +375,56 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     }
   };
 
-    const v_f1550c = async () => {
-      try {
-        const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
-        const v_e7f87b = await v_f3de6d();
+  const v_f1550c = async () => {
+    try {
 
-        console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${v_5a9c46}`);
-
-        if (v_5a9c46 === 'nas') {
-
-          const v_aa0917 = v_d0b6d4?.campid || '';
-          console.log(`[callAdApi] getNasmobAds 호출 - campid: ${v_aa0917}`);
-
-          const v_43c42e = await v_1c4683(
-            v_660822,
-            v_e7f87b.adid,
-            v_e7f87b,
-            v_aa0917,
-            v_0890f8 ? undefined : v_9b57fc,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
-          return v_43c42e;
-
-        } else {
-
-          console.log(`[callAdApi] 알 수 없는 ad_company(${v_5a9c46}), 기본 getNasmobAds 호출`);
-          const v_aa0917 = v_d0b6d4?.campid || '';
-
-          const v_43c42e = await v_1c4683(
-            v_660822,
-            v_e7f87b.adid,
-            v_e7f87b,
-            v_aa0917,
-            v_0890f8 ? undefined : v_9b57fc,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
-          return v_43c42e;
-        }
-      } catch (v_5e9bfe) {
-        console.error('[callAdApi] 광고 API 호출 실패:', v_5e9bfe);
-        throw v_5e9bfe;
+      if (v_3aedd0?.urlAD && v_3aedd0.urlAD !== '') {
+        console.log('[callAdApi] 이미 urlAD가 있어 API 호출을 건너뜁니다.');
+        return { data: v_3aedd0 };
       }
-    };
+
+      const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
+      const v_e7f87b = await v_f3de6d();
+
+      console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${v_5a9c46}`);
+
+      if (v_5a9c46 === 'nas') {
+
+        const v_aa0917 = v_d0b6d4?.campid || '';
+        console.log(`[callAdApi] getNasmobAds 호출 - campid: ${v_aa0917}`);
+
+        v_64c30d.current = true;
+        const v_43c42e = await v_1c4683(
+          v_660822,
+          v_e7f87b.adid,
+          v_e7f87b,
+          v_aa0917,
+          v_0890f8 ? undefined : v_9b57fc,
+        );
+        v_64c30d.current = false;
+        console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
+        return v_43c42e;
+
+      } else {
+
+        console.log(`[callAdApi] 알 수 없는 ad_company(${v_5a9c46}), 기본 getNasmobAds 호출`);
+        const v_aa0917 = v_d0b6d4?.campid || '';
+
+        const v_43c42e = await v_1c4683(
+          v_660822,
+          v_e7f87b.adid,
+          v_e7f87b,
+          v_aa0917,
+          v_0890f8 ? undefined : v_9b57fc,
+        );
+        console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
+        return v_43c42e;
+      }
+    } catch (v_5e9bfe) {
+      console.error('[callAdApi] 광고 API 호출 실패:', v_5e9bfe);
+      throw v_5e9bfe;
+    }
+  };
 
   const v_653132 = async () => {
     try {
@@ -567,11 +596,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
 
-      await v_e84827.setItem('isAdCompleted', 'true');
-      console.log('[광고보기] isAdCompleted 저장 완료');
+        await v_e84827.setItem('isAdCompleted', 'true');
+        console.log('[광고보기] isAdCompleted 저장 완료');
         v_e10ff9();
         v_7f2e65();
-      } 
+      }
     } catch (v_5e9bfe) {
       console.error('[광고보기] 광고 API 호출 실패:', v_5e9bfe);
 
@@ -691,11 +720,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             {v_8d41d7('screens.showNapAd.reward')} : {(v_d0b6d4.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={v_d81136.campaignDesc}>
-            {v_3aedd0.rewarddesc || v_8d41d7('screens.showNapAd.campaignDesc')}
+            {v_3aedd0.rewarddesc || ''}
           </Text>
 
           {}
-          {v_d0b6d4.joindesc && v_d0b6d4.joindesc !== '' && (
+          {(v_3aedd0.rewarddesc || v_d0b6d4.joindesc) && (
             <View style={v_d81136.joinDescContainer}>
               <Text style={v_d81136.joinDescTitle}>{v_8d41d7('screens.showNapAd.joinMethod')}</Text>
               <SafeScrollView
@@ -706,14 +735,14 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                 showBottomBackground={false}
               >
                 <Text style={v_d81136.joinDescText}>
-                  {v_d0b6d4.joindesc}
+                  {v_3aedd0.rewarddesc || v_d0b6d4.joindesc}
                 </Text>
               </SafeScrollView>
             </View>
           )}
 
           <View style={v_d81136.buttonContainer}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={v_d81136.watchAdButton}
               onPress={v_e36569}
               activeOpacity={0.7}

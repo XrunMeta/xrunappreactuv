@@ -46,6 +46,7 @@ export interface TokenData {
   member?: string;
   campid?: string;
   ad_company?: string; 
+  urlAD?: string; 
 }
 
 export interface SpotData {
@@ -63,6 +64,8 @@ export interface SpotData {
   coin?: string; 
   advertisement?: string | number; 
   campid?: string | number; 
+  ad_company?: string; 
+  urlAD?: string; 
 }
 
 export interface EmergencyInfo {
@@ -116,6 +119,7 @@ export interface AdvertisementParams {
   xrunPrice: number;
   coinScreen: boolean;
   ad_company?: string; 
+  urlAD?: string; 
 }
 
 export interface NasmobAdsResponse {

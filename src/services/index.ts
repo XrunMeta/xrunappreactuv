@@ -299,44 +299,44 @@ export const v_495832 = async (
         };
       }
 
-        const v_4587b3 = v_650134();  
-        const v_6cd443 = Number(v_2c2f8d.data.version) || 0;
-        const v_1e5d57 = Number(v_2c2f8d.data.version_ios) || 0;
+      const v_4587b3 = v_650134();
+      const v_6cd443 = Number(v_2c2f8d.data.version) || 0;
+      const v_1e5d57 = Number(v_2c2f8d.data.version_ios) || 0;
 
-        console.log('[App] 버전 확인:', {
-          currentVersion: v_4587b3,
-          serverAndroidVersion: v_6cd443,
-          serverIOSVersion: v_1e5d57,
-          platform: v_326be8.OS,
-        });
+      console.log('[App] 버전 확인:', {
+        currentVersion: v_4587b3,
+        serverAndroidVersion: v_6cd443,
+        serverIOSVersion: v_1e5d57,
+        platform: v_326be8.OS,
+      });
 
-        if (v_326be8.OS === 'android') {
-          if (v_4587b3 && v_6cd443 > v_4587b3) {
-            console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
+      if (v_326be8.OS === 'android') {
+        if (v_4587b3 && v_6cd443 > v_4587b3) {
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443);
+          v_43c42e.emergencyStop = {
+            enabled: true,
+            message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+          };
+        } else {
+          console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
+        }
+      } else if (v_326be8.OS === 'ios') {
+        if (v_4587b3 && v_1e5d57 > v_4587b3) {
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+          } else {
             v_43c42e.emergencyStop = {
               enabled: true,
               message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
             };
-          } else {
-            console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
           }
-        } else if (v_326be8.OS === 'ios') { 
-          if (v_4587b3 && v_1e5d57 > v_4587b3) {
-            console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
-            if (__DEV__) {
-              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
-            } else {
-              v_43c42e.emergencyStop = {
-                enabled: true,
-                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-              };
-            }
-          } else {
-            console.log('[App ios] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_1e5d57);
-          }
+        } else {
+          console.log('[App ios] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_1e5d57);
         }
+      }
 
       return v_43c42e;
     } else {
@@ -394,10 +394,10 @@ export const v_7488d5 = (v_c65f5d) => {
   v_0c3a5b.interceptors.request.use(
     (v_74a79c) => {
 
-      const v_f409eb = v_74a79c.baseURL 
+      const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
-            ? `${v_74a79c.baseURL.slice(0, -1)}${v_74a79c.url}`
-            : `${v_74a79c.baseURL}${v_74a79c.url}`)
+          ? `${v_74a79c.baseURL.slice(0, -1)}${v_74a79c.url}`
+          : `${v_74a79c.baseURL}${v_74a79c.url}`)
         : v_74a79c.url;
 
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
@@ -1905,82 +1905,94 @@ export const v_c615aa = async (
   }
 };
 
+let fetchMapMarkerPromise: Promise<v_f71847[]> | null = null;
+
 export const v_f84ef5 = async (
   v_b5de9c,
   v_985be2,
   v_660822,
   v_c65f5d,
 ): Promise<v_f71847[]> => {
-  try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
-    const v_cd6a57 = {
-      member: v_660822,
-      latitude: v_b5de9c,
-      longitude: v_985be2,
-      limit: 120,
-    };
-
-    const v_3393e3 = await v_9f42a4.post(
-      '/app2000-01',
-      v_cd6a57,
-    );
-
-    const v_9390e8 = v_3393e3.data;
-
-    if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
-      return v_9390e8.data.map((v_8c0b26) => {
-        const v_1906d6 = v_8c0b26.lat || v_8c0b26.latitude;
-        const v_8cd402 = v_8c0b26.lng || v_8c0b26.longitude;
-
-        let v_926d1c = v_8c0b26.distance || 0;
-        if (v_1906d6 && v_8cd402 && (v_926d1c === 0 || !v_8c0b26.distance)) {
-          v_926d1c = v_b464ed(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
-        }
-
-        let v_1fec52 = v_8c0b26.direction || 0;
-        if (v_1906d6 && v_8cd402 && (v_1fec52 === 0 || !v_8c0b26.direction)) {
-          v_1fec52 = v_2dc24c(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
-        }
-
-        return {
-          spotID: v_8c0b26.spotid || v_8c0b26.spotID || v_8c0b26.id || 0,
-          distance: v_926d1c,
-          direction: v_1fec52,
-          name: v_8c0b26.name || v_8c0b26.brand || v_8c0b26.coin || v_8c0b26.title || 'XRUN coin',
-          latitude: v_1906d6,
-          longitude: v_8cd402,
-          xrunPrice: v_8c0b26.xrunprice || v_8c0b26.xrunPrice || v_8c0b26.price || 0,
-          iconurl: v_8c0b26.iconurl || v_8c0b26.brandlogo || v_8c0b26.brandlogo_file || v_8c0b26.adthumbnail2 || v_8c0b26.adthumbnail2_file || '',
-          joindesc: v_8c0b26.joindesc || v_8c0b26.description || '',
-          brand: v_8c0b26.brand || v_8c0b26.coin || '',
-          coins: v_8c0b26.coins || v_8c0b26.coin || '',
-          coin: v_8c0b26.coin || '', 
-
-          campid: v_8c0b26.campid || v_8c0b26.campId || v_8c0b26.campaignid || v_8c0b26.campaignId || '',
-
-          advertisement: v_8c0b26.advertisement || v_8c0b26.adid || v_8c0b26.ad || v_8c0b26.coin || '',
-        } as v_f71847 & { campid?: string; advertisement?: string | number };
-      });
-    }
-
-    console.log('API 응답에 data.data가 없거나 배열이 아님');
-    return [];
-  } catch (v_5e9bfe) {
-    console.error('맵 마커 데이터 가져오기 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[맵 마커] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
-    }
-
-    return [];
+  if (v_69fe4e) {
+    console.log('[Deduplication] fetchMapMarkerData is already in progress, returning pending promise');
+    return v_69fe4e;
   }
+
+  v_69fe4e = (async () => {
+    try {
+      const v_9f42a4 = v_7488d5(v_c65f5d);
+      const v_cd6a57 = {
+        member: v_660822,
+        latitude: v_b5de9c,
+        longitude: v_985be2,
+        limit: 120,
+      };
+
+      const v_3393e3 = await v_9f42a4.post(
+        '/app2000-01',
+        v_cd6a57,
+      );
+
+      const v_9390e8 = v_3393e3.data;
+
+      if (v_9390e8?.data && Array.isArray(v_9390e8.data)) {
+        return v_9390e8.data.map((v_8c0b26) => {
+          const v_1906d6 = v_8c0b26.lat || v_8c0b26.latitude;
+          const v_8cd402 = v_8c0b26.lng || v_8c0b26.longitude;
+
+          let v_926d1c = v_8c0b26.distance || 0;
+          if (v_1906d6 && v_8cd402 && (v_926d1c === 0 || !v_8c0b26.distance)) {
+            v_926d1c = v_b464ed(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
+          }
+
+          let v_1fec52 = v_8c0b26.direction || 0;
+          if (v_1906d6 && v_8cd402 && (v_1fec52 === 0 || !v_8c0b26.direction)) {
+            v_1fec52 = v_2dc24c(v_b5de9c, v_985be2, v_1906d6, v_8cd402);
+          }
+
+          return {
+            spotID: v_8c0b26.spotid || v_8c0b26.spotID || v_8c0b26.id || 0,
+            distance: v_926d1c,
+            direction: v_1fec52,
+            name: v_8c0b26.name || v_8c0b26.brand || v_8c0b26.coin || v_8c0b26.title || 'XRUN coin',
+            latitude: v_1906d6,
+            longitude: v_8cd402,
+            xrunPrice: v_8c0b26.xrunprice || v_8c0b26.xrunPrice || v_8c0b26.price || 0,
+            iconurl: v_8c0b26.iconurl || v_8c0b26.brandlogo || v_8c0b26.brandlogo_file || v_8c0b26.adthumbnail2 || v_8c0b26.adthumbnail2_file || '',
+            joindesc: v_8c0b26.joindesc || v_8c0b26.description || '',
+            brand: v_8c0b26.brand || v_8c0b26.coin || '',
+            coins: v_8c0b26.coins || v_8c0b26.coin || '',
+            coin: v_8c0b26.coin || '',
+            campid: v_8c0b26.campid || v_8c0b26.campId || v_8c0b26.campaignid || v_8c0b26.campaignId || '',
+            advertisement: v_8c0b26.advertisement || v_8c0b26.adid || v_8c0b26.ad || v_8c0b26.coin || '',
+          } as v_f71847 & { campid?: string; advertisement?: string | number };
+        });
+      }
+
+      console.log('API 응답에 data.data가 없거나 배열이 아님');
+      return [];
+    } catch (v_5e9bfe) {
+      console.error('맵 마커 데이터 가져오기 오류:', v_5e9bfe);
+      if (v_5e9bfe instanceof v_3333d3) {
+        console.error('[맵 마커] 상세 오류 정보:', {
+          url: v_5e9bfe.config?.url,
+          method: v_5e9bfe.config?.method,
+          status: v_5e9bfe.response?.status,
+          statusText: v_5e9bfe.response?.statusText,
+          data: v_5e9bfe.response?.data,
+          message: v_5e9bfe.message,
+        });
+      }
+      return [];
+    } finally {
+      v_69fe4e = null;
+    }
+  })();
+
+  return v_69fe4e as Promise<v_f71847[]>;
 };
+
+let v_be1ee0 = null;
 
 export const v_91d5e4 = async (
   v_660822,
@@ -1988,80 +2000,104 @@ export const v_91d5e4 = async (
   v_985be2,
   v_c65f5d,
 ): Promise<any> => {
-  try {
-    const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/virtualCoin`;
-
-    const v_cd6a57 = {
-      member: v_660822,
-      latitude: v_b5de9c,
-      longitude: v_985be2,
-    };
-
-    console.log('=== virtualCoin API 호출 ===');
-    console.log('requestBody:', JSON.stringify(v_cd6a57));
-
-    const v_3393e3 = await fetch(v_f71b56, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
-      },
-      body: JSON.stringify(v_cd6a57),
-    });
-
-    if (!v_3393e3.ok) {
-      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
-    }
-
-    const v_43c42e = await v_3393e3.json();
-    console.log('=== virtualCoin API 응답 ===');
-    console.log('response.data length:', v_43c42e?.data?.length);
-
-    return v_43c42e;
-  } catch (v_5e9bfe) {
-    console.error('virtualCoin API 호출 실패:', v_5e9bfe);
-    if (v_c65f5d) {
-      await v_e4d665(v_c65f5d);
-    }
-    throw v_5e9bfe;
+  if (v_be1ee0) {
+    console.log('[Deduplication] fetchVirtualCoin is already in progress, returning pending promise');
+    return v_be1ee0 as Promise<any>;
   }
+
+  v_be1ee0 = (async () => {
+    try {
+      const v_c9c489 = v_e4a763();
+      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/virtualCoin`;
+
+      const v_cd6a57 = {
+        member: v_660822,
+        latitude: v_b5de9c,
+        longitude: v_985be2,
+      };
+
+      console.log('=== virtualCoin API 호출 ===');
+      console.log('requestBody:', JSON.stringify(v_cd6a57));
+
+      const v_3393e3 = await fetch(v_f71b56, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+        },
+        body: JSON.stringify(v_cd6a57),
+      });
+
+      if (!v_3393e3.ok) {
+        throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+      }
+
+      const v_43c42e = await v_3393e3.json();
+      console.log('=== virtualCoin API 응답 ===');
+      console.log('response.data length:', v_43c42e?.data?.length);
+
+      return v_43c42e;
+    } catch (v_5e9bfe) {
+      console.error('virtualCoin API 호출 실패:', v_5e9bfe);
+      if (v_c65f5d) {
+        await v_e4d665(v_c65f5d);
+      }
+      throw v_5e9bfe;
+    } finally {
+      v_be1ee0 = null;
+    }
+  })();
+
+  return v_be1ee0;
 };
+
+let v_a71a9b = null;
 
 export const v_965f93 = async (
   v_c65f5d,
 ): Promise<any> => {
-  try {
-    const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getCoinNasPrice`;
-
-    console.log('=== getCoinNasPrice API 호출 ===');
-
-    const v_3393e3 = await fetch(v_f71b56, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
-      },
-      body: JSON.stringify({}),
-    });
-
-    if (!v_3393e3.ok) {
-      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
-    }
-
-    const v_43c42e = await v_3393e3.json();
-    console.log('=== getCoinNasPrice API 응답 ===');
-    console.log('calculatedNasPrice:', v_43c42e?.data?.coins);
-
-    return v_43c42e;
-  } catch (v_5e9bfe) {
-    console.error('getCoinNasPrice API 호출 실패:', v_5e9bfe);
-    if (v_c65f5d) {
-      await v_e4d665(v_c65f5d);
-    }
-    throw v_5e9bfe;
+  if (v_a71a9b) {
+    console.log('[Deduplication] getCoinNasPrice is already in progress, returning pending promise');
+    return v_a71a9b as Promise<any>;
   }
+
+  v_a71a9b = (async () => {
+    try {
+      const v_c9c489 = v_e4a763();
+      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getCoinNasPrice`;
+
+      console.log('=== getCoinNasPrice API 호출 ===');
+
+      const v_3393e3 = await fetch(v_f71b56, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!v_3393e3.ok) {
+        throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+      }
+
+      const v_43c42e = await v_3393e3.json();
+      console.log('=== getCoinNasPrice API 응답 ===');
+      console.log('calculatedNasPrice:', v_43c42e?.data?.coins);
+
+      return v_43c42e;
+    } catch (v_5e9bfe) {
+      console.error('getCoinNasPrice API 호출 실패:', v_5e9bfe);
+      if (v_c65f5d) {
+        await v_e4d665(v_c65f5d);
+      }
+      throw v_5e9bfe;
+    } finally {
+      v_a71a9b = null;
+    }
+  })();
+
+  return v_a71a9b as Promise<any>;
 };
 
 export const v_4b1d5e = async (
@@ -4690,7 +4726,19 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
       console.log('[getTopAd5] userData 가져오기 실패:', v_7f5774);
     }
 
-    const v_cd6a57 = { os: v_e16099, member: v_660822 };
+    let v_e7f87b = {};
+    try {
+      const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
+      v_e7f87b = await v_f3de6d();
+    } catch (v_b7d530) {
+      console.log('[getTopAd5] 디바이스 정보 수집 실패:', v_b7d530);
+    }
+
+    const v_cd6a57 = {
+      os: v_e16099,
+      member: v_660822,
+      ...v_e7f87b
+    };
 
     console.log('[getTopAd5] ========== API 호출 시작 ==========');
     console.log('[getTopAd5] 요청 파라미터:', { os: v_e16099, member: v_660822 });
@@ -4705,10 +4753,6 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
     console.log('[getTopAd5] ========== 응답 구조 분석 ==========');
     console.log('[getTopAd5] response 타입:', typeof v_3393e3);
     console.log('[getTopAd5] response가 배열인가?', Array.isArray(v_3393e3));
-    console.log('[getTopAd5] response 전체:', JSON.stringify(v_3393e3, null, 2));
-    console.log('[getTopAd5] response.data:', v_3393e3?.data);
-    console.log('[getTopAd5] response.data?.ads:', v_3393e3?.data?.ads);
-    console.log('[getTopAd5] response.ads:', v_3393e3?.ads);
 
     let v_e36b07 = [];
     if (Array.isArray(v_3393e3)) {
@@ -4750,9 +4794,9 @@ export const v_563153 = async (v_c65f5d): Promise<any> => {
         dataKeys: v_3393e3?.data ? Object.keys(v_3393e3.data) : [],
       });
     } else {
-      console.log('[getTopAd5] ✅ 광고 데이터 발견:', v_e36b07.length, '개');
+
       if (v_e36b07.length > 0) {
-        console.log('[getTopAd5] 첫 번째 광고:', JSON.stringify(v_e36b07[0], null, 2));
+
       }
     }
 
