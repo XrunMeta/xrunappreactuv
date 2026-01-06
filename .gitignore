@@ -84,3 +84,7 @@ project.xcworkspace
 
 # CocoaPods
 /Pods/
+
+# Global rules
+.cursorrules
+.cursorrules.bak
