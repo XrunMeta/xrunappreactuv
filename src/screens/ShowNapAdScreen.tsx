@@ -33,7 +33,7 @@ const SequentialDots: React.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20}}>
+    <View style={{ flexDirection: 'row', marginTop: 20 }}>
       {[0, 1, 2].map(index => (
         <View
           key={index}
@@ -108,6 +108,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -175,23 +176,18 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     try {
 
       const currentParams = params || advertisementParams;
+      const campid = currentParams?.campid || '';
 
       console.log('Starting NStation advertisement initialization');
-      setIsLoading(true);
 
-      console.log('=== ShowNapAdScreen 진입 advertisementParams ===');
-      console.log('advertisement:', currentParams?.advertisement);
-      console.log('coin:', currentParams?.coin);
-      console.log('campid:', currentParams?.campid);
-      console.log('name:', currentParams?.name);
-      console.log('xrunPrice:', currentParams?.xrunPrice);
-      console.log('joindesc:', currentParams?.joindesc);
-      console.log('전체 advertisementParams:', JSON.stringify(currentParams, null, 2));
-      console.log('=== ShowNapAdScreen 진입 advertisementParams 끝 ===');
+      if (isFetchingRef.current) {
+        console.log('[ShowNapAdScreen] 이미 광고 데이터를 가져오는 중입니다.');
+        return;
+      }
 
-      if (!currentParams || !currentParams.campid || currentParams.campid === '') {
+      if (!currentParams || campid === '') {
         console.error('❌ [ShowNapAdScreen] campid가 유효하지 않습니다:', {
-          campid: currentParams?.campid,
+          campid: campid,
           advertisement: currentParams?.advertisement,
           fullParams: JSON.stringify(currentParams, null, 2),
         });
@@ -200,21 +196,31 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         return;
       }
 
+      if (!campaignData) {
+        console.log('✅ [ShowNapAdScreen] 기본 정보로 UI 우선 표시');
+        setCampaignData({
+          urlResult: 200,
+          urlAD: currentParams.urlAD || '',
+          campid: campid.toString(),
+          name: currentParams.name || '',
+          rewarddesc: '', 
+        });
+        setIsLoading(false); 
+      }
+
+      if (currentParams?.urlAD && currentParams.urlAD !== '') {
+        console.log('✅ [ShowNapAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        return;
+      }
+
       const deviceInfo = await collectDeviceInfo();
 
-      const campid = currentParams.campid || '';
       console.log('=== ShowNapAdScreen API 호출 정보 ===');
       console.log('member:', member);
       console.log('adid:', deviceInfo.adid);
       console.log('campid:', campid);
       console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
       console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
-      console.log('🔍 [ShowNapAdScreen] 최종 API 호출 campid 검증:', {
-        campid,
-        advertisement: currentParams?.advertisement,
-        coin: currentParams?.coin,
-        name: currentParams?.name,
-      });
       console.log('=== API 호출 정보 끝 ===');
 
       const result = await getNasmobAds(
@@ -226,18 +232,33 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       );
 
       if (result.data && result.data.urlResult === 200 && result.data.urlAD) {
-        setCampaignData(result.data);
+        console.log('✅ [ShowNapAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
+        const newData = result.data;
+        setCampaignData(prev => {
+          if (!prev) return newData as CampaignData;
+          return {
+            ...prev,
+            ...newData,
+            urlResult: newData.urlResult ?? prev.urlResult,
+          } as CampaignData;
+        });
         setIsLoading(false);
         return;
       } else {
-        throw new Error(`URL 결과 실패: ${result.data?.urlResult}`);
+
+        console.warn(`NStation 광고 API 응답 결과가 정상이 아닙니다: urlResult=${result.data?.urlResult}`);
+        if (!campaignData?.urlAD) {
+          throw new Error(`URL 결과 실패: ${result.data?.urlResult}`);
+        }
       }
     } catch (error: any) {
       console.error('NStation 광고 초기화 실패:', error);
 
-      console.log('❌ 광고 초기화 실패 - 팝업 표시');
-      setIsLoading(false);
-      setAdCallFailedModalVisible(true);
+      if (!campaignData?.urlAD) {
+        console.log('❌ 광고 초기화 실패 - 팝업 표시');
+        setIsLoading(false);
+        setAdCallFailedModalVisible(true);
+      }
     }
   };
 
@@ -354,48 +375,56 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     }
   };
 
-    const callAdApi = async () => {
-      try {
-        const adCompany = advertisementParams?.ad_company || 'nas';
-        const deviceInfo = await collectDeviceInfo();
+  const callAdApi = async () => {
+    try {
 
-        console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${adCompany}`);
-
-        if (adCompany === 'nas') {
-
-          const campid = advertisementParams?.campid || '';
-          console.log(`[callAdApi] getNasmobAds 호출 - campid: ${campid}`);
-
-          const result = await getNasmobAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            campid,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', result);
-          return result;
-
-        } else {
-
-          console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
-          const campid = advertisementParams?.campid || '';
-
-          const result = await getNasmobAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            campid,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', result);
-          return result;
-        }
-      } catch (error) {
-        console.error('[callAdApi] 광고 API 호출 실패:', error);
-        throw error;
+      if (campaignData?.urlAD && campaignData.urlAD !== '') {
+        console.log('[callAdApi] 이미 urlAD가 있어 API 호출을 건너뜁니다.');
+        return { data: campaignData };
       }
-    };
+
+      const adCompany = advertisementParams?.ad_company || 'nas';
+      const deviceInfo = await collectDeviceInfo();
+
+      console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${adCompany}`);
+
+      if (adCompany === 'nas') {
+
+        const campid = advertisementParams?.campid || '';
+        console.log(`[callAdApi] getNasmobAds 호출 - campid: ${campid}`);
+
+        isFetchingRef.current = true;
+        const result = await getNasmobAds(
+          member,
+          deviceInfo.adid,
+          deviceInfo,
+          campid,
+          onClose ? undefined : navigate,
+        );
+        isFetchingRef.current = false;
+        console.log('[callAdApi] getNasmobAds 응답:', result);
+        return result;
+
+      } else {
+
+        console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
+        const campid = advertisementParams?.campid || '';
+
+        const result = await getNasmobAds(
+          member,
+          deviceInfo.adid,
+          deviceInfo,
+          campid,
+          onClose ? undefined : navigate,
+        );
+        console.log('[callAdApi] getNasmobAds 응답:', result);
+        return result;
+      }
+    } catch (error) {
+      console.error('[callAdApi] 광고 API 호출 실패:', error);
+      throw error;
+    }
+  };
 
   const handleAdCompletion = async () => {
     try {
@@ -567,11 +596,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
 
-      await AsyncStorage.setItem('isAdCompleted', 'true');
-      console.log('[광고보기] isAdCompleted 저장 완료');
+        await AsyncStorage.setItem('isAdCompleted', 'true');
+        console.log('[광고보기] isAdCompleted 저장 완료');
         resetAdvertisementParams();
         handleClose();
-      } 
+      }
     } catch (error) {
       console.error('[광고보기] 광고 API 호출 실패:', error);
 
@@ -691,11 +720,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
-            {campaignData.rewarddesc || t('screens.showNapAd.campaignDesc')}
+            {campaignData.rewarddesc || ''}
           </Text>
 
           {}
-          {advertisementParams.joindesc && advertisementParams.joindesc !== '' && (
+          {(campaignData.rewarddesc || advertisementParams.joindesc) && (
             <View style={styles.joinDescContainer}>
               <Text style={styles.joinDescTitle}>{t('screens.showNapAd.joinMethod')}</Text>
               <SafeScrollView
@@ -706,14 +735,14 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
                 showBottomBackground={false}
               >
                 <Text style={styles.joinDescText}>
-                  {advertisementParams.joindesc}
+                  {campaignData.rewarddesc || advertisementParams.joindesc}
                 </Text>
               </SafeScrollView>
             </View>
           )}
 
           <View style={styles.buttonContainer}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={styles.watchAdButton}
               onPress={handleWatchAd}
               activeOpacity={0.7}

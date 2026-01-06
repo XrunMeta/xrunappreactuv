@@ -108,41 +108,62 @@ GMSServices.provideAPIKey("oth-google-api-key")
 
         print("[AppDelegate] 네이티브 광고 노출 시도 - Title: \(ad.data.adTitle)")
 
-        let adVC = UIViewController()
-        adVC.view.backgroundColor = .systemBackground
+        let relatedView = PAGLNativeAdRelatedView()
+        relatedView.refresh(with: ad)
 
-        let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-        adVC.view.addSubview(container)
+        let adVC = UIViewController()
+        adVC.view.backgroundColor = .black 
+
+        let mainView = UIView()
+        mainView.backgroundColor = .systemBackground
+        mainView.translatesAutoresizingMaskIntoConstraints = false
+        adVC.view.addSubview(mainView)
+
+        let mediaView = relatedView.mediaView
+        mediaView.translatesAutoresizingMaskIntoConstraints = false
+        mainView.addSubview(mediaView)
+
+        let adChoicesView = relatedView.adChoicesView
+        adChoicesView.translatesAutoresizingMaskIntoConstraints = false
+        mainView.addSubview(adChoicesView)
+
+        let logoView = relatedView.logoADImageView
+        logoView.translatesAutoresizingMaskIntoConstraints = false
+        mainView.addSubview(logoView)
+
+        let infoContainer = UIView()
+        infoContainer.translatesAutoresizingMaskIntoConstraints = false
+        mainView.addSubview(infoContainer)
 
         let titleLabel = UILabel()
         titleLabel.text = ad.data.adTitle
-        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
-        titleLabel.numberOfLines = 0
-        titleLabel.textAlignment = .center
+        titleLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        titleLabel.numberOfLines = 2
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(titleLabel)
+        infoContainer.addSubview(titleLabel)
 
         let descLabel = UILabel()
         descLabel.text = ad.data.adDescription
         descLabel.font = .systemFont(ofSize: 16)
         descLabel.textColor = .secondaryLabel
         descLabel.numberOfLines = 0
-        descLabel.textAlignment = .center
         descLabel.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(descLabel)
+        infoContainer.addSubview(descLabel)
 
         let actionButton = UIButton(type: .system)
         actionButton.setTitle(ad.data.buttonText ?? "자세히 보기", for: .normal)
-        actionButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        actionButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         actionButton.backgroundColor = .systemBlue
         actionButton.setTitleColor(.white, for: .normal)
-        actionButton.layer.cornerRadius = 10
+        actionButton.layer.cornerRadius = 12
         actionButton.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(actionButton)
+        infoContainer.addSubview(actionButton)
 
         let closeButton = UIButton(type: .system)
-        closeButton.setTitle("광고 닫기", for: .normal)
+        let closeConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .bold)
+        let closeImage = UIImage(systemName: "xmark.circle.fill", withConfiguration: closeConfig)
+        closeButton.setImage(closeImage, for: .normal)
+        closeButton.tintColor = .white
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.addAction(UIAction { _ in
           adVC.dismiss(animated: true)
@@ -150,31 +171,47 @@ GMSServices.provideAPIKey("oth-google-api-key")
         adVC.view.addSubview(closeButton)
 
         NSLayoutConstraint.activate([
-          container.centerXAnchor.constraint(equalTo: adVC.view.centerXAnchor),
-          container.centerYAnchor.constraint(equalTo: adVC.view.centerYAnchor),
-          container.leadingAnchor.constraint(equalTo: adVC.view.leadingAnchor, constant: 20),
-          container.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor, constant: -20),
 
-          titleLabel.topAnchor.constraint(equalTo: container.topAnchor),
-          titleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-          titleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+          mainView.topAnchor.constraint(equalTo: adVC.view.topAnchor),
+          mainView.leadingAnchor.constraint(equalTo: adVC.view.leadingAnchor),
+          mainView.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor),
+          mainView.bottomAnchor.constraint(equalTo: adVC.view.bottomAnchor),
 
-          descLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-          descLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-          descLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+          mediaView.topAnchor.constraint(equalTo: mainView.topAnchor),
+          mediaView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor),
+          mediaView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor),
+          mediaView.heightAnchor.constraint(equalTo: mainView.heightAnchor, multiplier: 0.5),
 
-          actionButton.topAnchor.constraint(equalTo: descLabel.bottomAnchor, constant: 30),
-          actionButton.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-          actionButton.widthAnchor.constraint(equalToConstant: 200),
-          actionButton.heightAnchor.constraint(equalToConstant: 50),
-          actionButton.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+          adChoicesView.trailingAnchor.constraint(equalTo: mediaView.trailingAnchor, constant: -5),
+          adChoicesView.topAnchor.constraint(equalTo: mediaView.topAnchor, constant: 5),
+          adChoicesView.widthAnchor.constraint(equalToConstant: 20),
+          adChoicesView.heightAnchor.constraint(equalToConstant: 20),
 
-          closeButton.topAnchor.constraint(equalTo: adVC.view.safeAreaLayoutGuide.topAnchor, constant: 20),
-          closeButton.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor, constant: -20)
+          infoContainer.topAnchor.constraint(equalTo: mediaView.bottomAnchor),
+          infoContainer.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 20),
+          infoContainer.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -20),
+          infoContainer.bottomAnchor.constraint(equalTo: mainView.bottomAnchor, constant: -40),
+
+          titleLabel.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 25),
+          titleLabel.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor),
+          titleLabel.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor),
+
+          descLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
+          descLabel.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor),
+          descLabel.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor),
+
+          actionButton.bottomAnchor.constraint(equalTo: infoContainer.bottomAnchor),
+          actionButton.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor),
+          actionButton.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor),
+          actionButton.heightAnchor.constraint(equalToConstant: 56),
+
+          closeButton.topAnchor.constraint(equalTo: adVC.view.safeAreaLayoutGuide.topAnchor, constant: 10),
+          closeButton.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor, constant: -15)
         ])
 
         ad.rootViewController = adVC
-        ad.registerContainer(container, withClickableViews: [actionButton, titleLabel])
+
+        ad.registerContainer(mainView, withClickableViews: [actionButton, mediaView, titleLabel])
 
         adVC.modalPresentationStyle = .fullScreen
         visibleVC.present(adVC, animated: true)

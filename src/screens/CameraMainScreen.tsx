@@ -21,13 +21,14 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 import { showToast } from '../utils';
+import { collectDeviceInfo } from '../utils/napApiUtils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -437,6 +438,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const [showAdModal, setShowAdModal] = useState(false);
 
+  const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [coinsData, setCoinsData] = useState<any[]>([]); 
+  const [cachedAds, setCachedAds] = useState<{ [key: string]: any }>({}); 
+  const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [appState, setAppState] = useState(AppState.currentState);
+
   useEffect(() => {
     if (!showAdModal) {
 
@@ -474,13 +482,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }
   }, [showAdModal, activeTab, loading, tokens, appState]);
 
-  const [tokens, setTokens] = useState<TokenData[]>([]);
-  const [coinsData, setCoinsData] = useState<any[]>([]); 
-  const [loading, setLoading] = useState(true);
   const currentIndexRef = useRef(0);
   const chunkSize = 5;
-
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const [rageProgress, setRageProgress] = useState(0);
   const [isRageMode, setIsRageMode] = useState(false);
@@ -615,9 +618,47 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const animationRefs = useRef<Map<number, React.MutableRefObject<Animated.CompositeAnimation | null>>>(new Map());
 
-  const [appState, setAppState] = useState(AppState.currentState);
-
   const hasLoadedDataRef = useRef(false);
+  const isPreFetchingRef = useRef(false);
+
+  const loadCachedAds = useCallback(async () => {
+    try {
+      const cached = await AsyncStorage.getItem('cached_AD');
+      console.log('📂 [CameraMainScreen] AsyncStorage raw cached_AD:', cached ? '데이터 있음' : '데이터 없음(null)');
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setCachedAds(parsed);
+
+        const keys = Object.keys(parsed);
+        console.log(`💾 [CameraMainScreen] 캐시된 광고 데이터 로드 완료: ${keys.length}개`);
+        console.log('📦 [CameraMainScreen] 전체 캐시 데이터:', JSON.stringify(parsed, null, 2));
+
+        return parsed;
+      } else {
+        console.warn('⚠️ [CameraMainScreen] cached_AD가 비어있습니다 (null). Map 화면에서 저장이 안 되었거나 초기화되었습니다.');
+      }
+      return {};
+    } catch (e) {
+      console.error('❌ [CameraMainScreen] 캐시 로드 실패:', e);
+      return {};
+    }
+  }, []);
+
+  const saveCachedAd = useCallback(async (campid: string, data: any) => {
+    try {
+      const currentCacheStr = await AsyncStorage.getItem('cached_AD');
+      const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+
+      currentCache[campid] = data;
+
+      await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
+      setCachedAds({ ...currentCache }); 
+      console.log(`💾 [CameraMainScreen] 광고 데이터 캐시 저장: ${campid}`);
+    } catch (e) {
+      console.error('❌ [CameraMainScreen] 캐시 저장 실패:', e);
+    }
+  }, []);
 
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasAutoAdTriggeredRef = useRef(false); 
@@ -659,32 +700,71 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     requestCameraPermission();
   }, [permission, requestPermission, showAlert]);
 
-  const organizeData = useCallback((oCoinData: any[]) => {
-    if (oCoinData.length === 0) {
+  const organizeData = useCallback((oCoinData: any[], externalCache?: any) => {
+
+    const effectiveCache = externalCache || cachedAds;
+
+    const enrichedData = oCoinData.map(d => {
+
+      if (d.urlAD && d.urlAD !== '') return d;
+
+      const key = String(d.campid || '');
+      const cached = effectiveCache[key]; 
+      if (cached && cached.urlAD) {
+        console.log(`✨ [organizeData] 캐시에서 누락된 정보 보완: ${key}`);
+        return {
+          ...d,
+          urlAD: cached.urlAD,
+          landing_url: cached.urlAD, 
+          joindesc: cached.joindesc || d.joindesc,
+          name: cached.name || d.name,
+          xrunPrice: cached.xrunPrice || d.xrunPrice,
+        };
+      }
+      return d;
+    });
+
+    console.log("ℹ️ [organizeData] 사용된 캐시 소스:", externalCache ? "External (Latest)" : "State (May be stale)");
+    console.log("ℹ️ [organizeData] 캐시 데이터 수:", Object.keys(effectiveCache).length);
+
+    const validData = enrichedData;
+
+    console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', validData.slice(0, 5).map((d, idx) => ({
+      ...d,
+      urlAD: d.urlAD || '없음',
+      landing_url: d.landing_url || '없음',
+    })));
+
+    if (validData.length === 0) {
+      console.log('⚠️ [organizeData] 표시할 유효한(URL이 있는) 광고가 없습니다.');
+
+      console.log(`🔍 [organizeData] 현재 캐시 키 목록: ${Object.keys(cachedAds).join(', ')}`);
       setTokens([]);
       return;
     }
 
     console.log('🔄 [organizeData] 호출:', {
       currentIndex: currentIndexRef.current,
-      totalDataLength: oCoinData.length,
+      totalDataLength: validData.length,
+      originalLength: oCoinData.length,
       chunkSize: chunkSize,
+      cachedAdsCount: Object.keys(cachedAds).length
     });
 
     let nextData: any[] = [];
-    let actualChunkSize = Math.min(chunkSize, oCoinData.length);
+    let actualChunkSize = Math.min(chunkSize, validData.length);
 
-    if (currentIndexRef.current + actualChunkSize > oCoinData.length) {
+    if (currentIndexRef.current + actualChunkSize > validData.length) {
 
       nextData = [
-        ...oCoinData.slice(currentIndexRef.current),
-        ...oCoinData.slice(0, (currentIndexRef.current + actualChunkSize) % oCoinData.length),
+        ...validData.slice(currentIndexRef.current),
+        ...validData.slice(0, (currentIndexRef.current + actualChunkSize) % validData.length),
       ];
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % validData.length;
     } else {
 
-      nextData = oCoinData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % oCoinData.length;
+      nextData = validData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
+      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % validData.length;
     }
 
     console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', nextData.slice(0, 5).map((d, idx) => ({
@@ -694,6 +774,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       campid: d.campid,
       name: d.name,
       xrunPrice: d.xrunPrice,
+      urlAD: d.urlAD ? 'Yes' : 'No'
     })));
 
     const newOrganizedData = nextData.map((data, index) => {
@@ -704,13 +785,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       spotID: t.spotID,
       distance: t.distance,
       advertisement: t.advertisement,
-      campid: t.campid,
-      name: t.name,
-      xrunPrice: t.xrunPrice,
+      urlAD: t.urlAD
     })));
 
     setTokens(newOrganizedData);
-  }, []);
+  }, [chunkSize, cachedAds]);
 
   const loadTokenData = useCallback(async (forceRefresh: boolean = false) => {
 
@@ -983,6 +1062,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
         try {
 
+          const loadedCache = await loadCachedAds();
+
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
           let topAd5Response = await getTopAd5();
 
@@ -992,11 +1073,32 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }
 
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+            console.warn('🚦 [CameraMainScreen API] TopAd5 조건 충족. 로직 진입. 개수:', topAd5Response.length);
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', topAd5Response.length, '개');
 
+            for (const ad of topAd5Response) {
+              if (ad.campid && ad.urlAD) {
+                const cacheKey = String(ad.campid);
+
+                const adData = {
+                  urlAD: ad.urlAD,
+                  joindesc: ad.joindesc || '',
+                  name: ad.name || '',
+                  xrunPrice: ad.xrunPrice || 0
+                };
+                await saveCachedAd(cacheKey, adData);
+                console.log(`💾 [CameraMainScreen API] TopAd5 데이터 캐시 저장 완료: ${cacheKey}`);
+              }
+            }
+
+            const latestCache = await loadCachedAds();
+            Object.assign(loadedCache, latestCache);
+            console.log('🔄 [CameraMainScreen API] TopAd5 저장 후 캐시 객체 업데이트 완료');
+
             console.log('🔍 [CameraMainScreen API] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
-              keys: Object.keys(topAd5Response[0] || {}),
-              firstItem: topAd5Response[0],
+              item: topAd5Response[0],
+              hasUrlAD: !!topAd5Response[0].urlAD,
+              urlAD_preview: topAd5Response[0].urlAD ? topAd5Response[0].urlAD.substring(0, 30) + '...' : 'MISSING'
             });
 
             const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
@@ -1011,29 +1113,34 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               const adIndex = index % topAd5Response.length;
               const mappedAd = topAd5Response[adIndex];
 
-              console.log(`🔗 [CameraMainScreen API] 토큰 ${index} 매핑:`, {
-                distance: coin.distance,
+              console.log(`🔗 [CameraMainScreen API] 토큰 ${index} 매핑 상세:`, {
                 adIndex,
-                adName: mappedAd?.name || '없음',
-                adCompany: mappedAd?.ad_company || '없음',
-                originalAdvertisement: coin.advertisement,
-                originalCampid: coin.campid,
-                mappedAdvertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || mappedAd?.coin,
-                mappedCampid: mappedAd?.campid,
+                adCompany: mappedAd?.ad_company,
+                campid: mappedAd?.campid,
+                hasUrlAD: !!mappedAd?.urlAD,
+                urlAD_val: mappedAd?.urlAD || 'EMPTY'
               });
+
+              const adKey = String(mappedAd?.campid || '');
+              const cachedItem = loadedCache[adKey];
+              if (cachedItem) {
+                console.log(`💾 [CameraMainScreen API] 매핑 중 캐시 데이터 발견: ${adKey}`);
+              }
 
               return {
                 ...coin,
 
-                name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                name: cachedItem?.name || mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
                 iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                joindesc: mappedAd?.joindesc || coin.joindesc || '',
-                xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
-                xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                joindesc: cachedItem?.joindesc || mappedAd?.joindesc || coin.joindesc || '',
+                xrunPrice: cachedItem?.xrunPrice || mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                xrunprice: cachedItem?.xrunPrice || mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
                 campid: mappedAd?.campid || coin.campid || coin.campId || '',
 
                 advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
 
+                urlAD: cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '',
+                landing_url: cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '', 
                 thumbnail: mappedAd?.thumbnail || coin.thumbnail,
                 ad_company: mappedAd?.ad_company || coin.ad_company,
                 coins: mappedAd?.coins?.toString() || coin.coins,
@@ -1050,7 +1157,161 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             currentIndexRef.current = 0;
             console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
-            organizeData(mappedCoinsData);
+            try {
+              console.log('🔄 [CameraMainScreen API] organizeData 호출 시작');
+              organizeData(mappedCoinsData, loadedCache);
+              console.log('✅ [CameraMainScreen API] organizeData 호출 완료');
+            } catch (organizeErr) {
+              console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', organizeErr);
+            }
+
+            console.warn('🚀 [CameraMainScreen API] Pre-fetch 로직 진입점 도달 (여기 안 보이면 앞 단계 오류)');
+            const startPreFetch = async (cache: { [key: string]: any }) => {
+              console.log('🏁 [PreFetch] 함수 진입. isPreFetching:', isPreFetchingRef.current);
+
+              if (isPreFetchingRef.current) {
+                console.log('🚫 [PreFetch] 이미 실행 중이라 중단됨');
+                return;
+              }
+              isPreFetchingRef.current = true;
+
+              try {
+                console.log('🔍 [PreFetch] 캐시 키 목록 확인:', Object.keys(cache).length, '개');
+                const deviceInfo = await collectDeviceInfo();
+
+                const adsToFetch = topAd5Response.filter((ad: any) => {
+                  const key = String(ad.campid || '');
+
+                  if (cache[key] && cache[key].urlAD) return false;
+
+                  if (ad.urlAD) return false;
+                  return ad.campid;
+                });
+
+                console.log(`🔍 [CameraMainScreen API] 고유 광고 pre-fetch 대상: ${adsToFetch.length}개`);
+
+                let updatedCoinsData = [...mappedCoinsData];
+
+                let currentPreFetchCache = { ...cache };
+
+                for (const ad of adsToFetch) {
+                  try {
+
+                    const cacheKey = String(ad.campid || '');
+                    const company = (ad.ad_company || '').toLowerCase(); 
+
+                    console.log(`🚀 [PreFetch] 처리 시작: campid=${ad.campid}, company=${company}`);
+
+                    if (cacheKey && cachedAds[cacheKey] && cachedAds[cacheKey].urlAD) {
+                      console.log(`💾 [PreFetch] 캐시 HIT: ${cacheKey}`);
+
+                      const cachedItem = cachedAds[cacheKey];
+
+                      currentPreFetchCache[cacheKey] = cachedItem;
+
+                      updatedCoinsData = updatedCoinsData.map(c =>
+                        (c.campid === ad.campid) ? {
+                          ...c,
+                          urlAD: cachedItem.urlAD,
+                          landing_url: cachedItem.urlAD,
+                          joindesc: cachedItem.joindesc || c.joindesc,
+                          name: cachedItem.name || c.name,
+                          xrunPrice: cachedItem.xrunPrice || c.xrunPrice,
+                        } : c
+                      );
+
+                      continue;
+                    }
+
+                    let result;
+
+                    if (company === 'nas') {
+                      console.log(`🌐 [PreFetch] NAS 요청 시작: ${ad.campid}`);
+                      result = await getNasmobAds(member, deviceInfo.adid, deviceInfo, ad.campid);
+
+                      if (result.data && result.data.urlResult === 200 && result.data.urlAD) {
+
+                        console.log(`✅ [PreFetch] NAS 성공: ${ad.campid}`);
+                        const fetchedData = result.data;
+                        const newData = {
+                          urlAD: fetchedData.urlAD,
+                          joindesc: fetchedData.rewarddesc,
+                          name: fetchedData.name,
+                          xrunPrice: fetchedData.price ? (fetchedData.price / 2) : undefined
+                        };
+
+                        await saveCachedAd(cacheKey, newData);
+
+                        currentPreFetchCache[cacheKey] = newData;
+
+                        updatedCoinsData = updatedCoinsData.map(c =>
+                          (c.campid === ad.campid && String(c.ad_company).toLowerCase() === 'nas') ? {
+                            ...c,
+                            urlAD: newData.urlAD,
+                            landing_url: newData.urlAD,
+                            joindesc: newData.joindesc || c.joindesc,
+                            name: newData.name || c.name,
+                            xrunPrice: newData.xrunPrice !== undefined ? newData.xrunPrice : c.xrunPrice,
+                          } : c
+                        );
+
+                      } else {
+                        console.warn(`⚠️ [PreFetch] NAS 실패/응답없음: ${ad.campid}, urlResult=${result.data?.urlResult}`);
+                      }
+                    } else if (company === 'pointclick') {
+                      console.log(`🌐 [PreFetch] Pock 요청 시작: ${ad.campid}`);
+                      result = await getPockAds(member, deviceInfo.adid, deviceInfo, ad.campid);
+
+                      if (result.code === 200 && result.data && result.data.landing_url) {
+
+                        console.log(`✅ [PreFetch] Pock 성공: ${ad.campid}`);
+                        const fetchedData = result.data;
+                        const newData = {
+                          urlAD: fetchedData.landing_url,
+                          joindesc: fetchedData.ad_participation,
+                          name: fetchedData.ad_name,
+                          xrunPrice: fetchedData.ad_profit
+                        };
+
+                        await saveCachedAd(cacheKey, newData);
+
+                        currentPreFetchCache[cacheKey] = newData;
+
+                        updatedCoinsData = updatedCoinsData.map(c =>
+                          (c.campid === ad.campid && String(c.ad_company).toLowerCase() === 'pointclick') ? {
+                            ...c,
+                            urlAD: newData.urlAD,
+                            landing_url: newData.urlAD,
+                            joindesc: newData.joindesc || c.joindesc,
+                            name: newData.name || c.name,
+                            xrunPrice: newData.xrunPrice !== undefined ? newData.xrunPrice : c.xrunPrice,
+                          } : c
+                        );
+
+                      } else {
+                        console.warn(`⚠️ [PreFetch] Pock 실패/응답없음: ${ad.campid}, code=${result.code}`);
+                      }
+                    } else {
+                      console.warn(`⚠️ [PreFetch] 알 수 없는 ad_company: ${ad.ad_company}`);
+                    }
+                  } catch (e) {
+                    console.log(`⚠️ [CameraMainScreen API] ${ad.campid} pre-fetch 실패:`, e);
+                  }
+                } 
+
+                console.log('🏁 [PreFetch] 모든 처리 완료. organizeData 호출하여 AR 갱신');
+                setCoinsData(updatedCoinsData);
+
+                organizeData(updatedCoinsData, currentPreFetchCache);
+
+              } catch (err) {
+                console.error('❌ [CameraMainScreen API] 백그라운드 pre-fetch 오류:', err);
+              }
+            };
+
+            console.warn('🚀 [CameraMainScreen API] startPreFetch 호출 직전');
+
+            startPreFetch(loadedCache).catch(e => console.error('❌ startPreFetch 호출 실패:', e));
           } else {
             console.log('⚠️ [CameraMainScreen API] TopAd5 데이터 없음, 기존 데이터 사용');
 
@@ -1232,6 +1493,28 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, []); 
 
   useEffect(() => {
+    const checkCacheDirectly = async () => {
+      try {
+        const rawCache = await AsyncStorage.getItem('cached_AD');
+        console.warn('🕵️ [DEBUG] 마운트 시 cached_AD 직접 확인:', rawCache ? '데이터 있음' : 'NULL');
+        if (rawCache) {
+          console.warn('🕵️ [DEBUG] 캐시 내용:', rawCache);
+        }
+      } catch (err) {
+        console.error('🕵️ [DEBUG] 캐시 확인 실패:', err);
+      }
+    };
+    checkCacheDirectly();
+  }, []);
+
+  useEffect(() => {
+    if (coinsData && coinsData.length > 0) {
+      console.log('🔄 [Effect] coinsData 업데이트됨 -> organizeData 호출');
+      organizeData(coinsData);
+    }
+  }, [coinsData, organizeData]);
+
+  useEffect(() => {
 
     const interval = setInterval(() => {
       console.log('⏰ 3분 경과 - 다른 코인들로 교체');
@@ -1406,6 +1689,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
         ad_company: adCompany,
+        urlAD: token.urlAD || '',
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
@@ -1496,6 +1780,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
         ad_company: adCompany,
+        urlAD: token.urlAD || '',
       };
 
       console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(adParams, null, 2));
