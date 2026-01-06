@@ -313,6 +313,34 @@ export const v_495832 = async (
           platform: v_326be8.OS,
         });
 
+        if (v_326be8.OS === 'android') {
+          if (v_4587b3 && v_6cd443 > v_4587b3) {
+            console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
+            v_43c42e.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            };
+          } else {
+            console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
+          }
+        } else if (v_326be8.OS === 'ios') { 
+          if (v_4587b3 && v_1e5d57 > v_4587b3) {
+            console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
+            if (__DEV__) {
+              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+            } else {
+              v_43c42e.emergencyStop = {
+                enabled: true,
+                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+              };
+            }
+          } else {
+            console.log('[App ios] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_1e5d57);
+          }
+        }
+
       return v_43c42e;
     } else {
 
