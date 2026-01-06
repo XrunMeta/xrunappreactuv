@@ -6,6 +6,8 @@ const { PangleModule } = NativeModules;
 
 export const PANGLE_SLOT_ID = '982684319';
 
+export const PANGLE_NATIVE_AD_SLOT_ID = '982690267';
+
 export const isNativeModuleAvailable = (): boolean => {
   return Platform.OS === 'ios' && PangleModule !== undefined && PangleModule !== null;
 };
@@ -71,6 +73,23 @@ export const loadAndShowInterstitialAd = async (slotId: string = PANGLE_SLOT_ID)
     return result;
   } catch (error) {
     console.error('[Native] 팽글 전면광고 로드 및 노출 실패:', error);
+    throw error;
+  }
+};
+
+export const loadAndShowNativeAd = async (slotId: string = PANGLE_NATIVE_AD_SLOT_ID): Promise<any> => {
+  try {
+    if (!isNativeModuleAvailable()) {
+      return { success: false, error: '모듈을 찾을 수 없습니다' };
+    }
+
+    console.log('[Native] 팽글 네이티브 광고 로드 및 노출 시도:', slotId);
+
+    const result = await PangleModule.loadAndShowNativeAd(slotId);
+    console.log('[Native] 팽글 네이티브 광고 호출 성공:', result);
+    return result;
+  } catch (error) {
+    console.error('[Native] 팽글 네이티브 광고 로드 및 노출 실패:', error);
     throw error;
   }
 };
