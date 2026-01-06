@@ -69,23 +69,14 @@ GMSServices.provideAPIKey("oth-google-api-key")
         print("[AppDelegate] ❌ 전면 광고 로드 실패")
         print("  - SlotID: \(slotId)")
         print("  - Error: \(nsError.localizedDescription)")
-        print("  - Code: \(nsError.code)")
-        print("  - UserInfo: \(nsError.userInfo)")
-        if nsError.code == 40001 {
-            print("  - 도움말: SlotID가 유효하지 않거나 AppID와 매칭되지 않습니다.")
-        } else if nsError.code == 40034 {
-            print("  - 도움말: Bidding 전용 SlotID를 Waterfall 방식으로 로드했습니다. 980088188로 테스트하세요.")
-        } else if nsError.code == 40029 || nsError.localizedDescription.contains("internal service error") {
-            print("  - 도움말: 서버 내부 오류입니다. 번들 ID(\(Bundle.main.bundleIdentifier ?? ""))가 Pangle에 등록된 것과 일치하는지 확인하세요.")
-        } else if nsError.code == 20001 {
-            print("  - 도움말: 네트워크 연결 상태를 확인하세요.")
+        if nsError.code == 40034 {
+            print("  - 도움말: Bidding 전용 SlotID를 Waterfall 방식으로 로드했습니다. 테스트용 ID를 확인하세요.")
         }
         return
       }
 
       DispatchQueue.main.async {
         self?.currentInterstitialAd = ad
-
         guard let visibleVC = self?.findVisibleViewController() else {
           print("[AppDelegate] 광고를 표시할 수 있는 View Controller를 찾을 수 없습니다.")
           return
@@ -94,6 +85,99 @@ GMSServices.provideAPIKey("oth-google-api-key")
         print("[AppDelegate] 전면 광고 노출 시도 (VisibleVC: \(type(of: visibleVC)))")
         ad?.delegate = self
         ad?.present(fromRootViewController: visibleVC)
+      }
+    }
+  }
+
+  @objc public func loadAndShowNativeAd(slotId: String) {
+    print("[AppDelegate] 네이티브 광고 로드 시작 (SlotID: \(slotId))")
+    let request = PAGNativeRequest()
+
+    PAGLNativeAd.load(withSlotID: slotId, request: request) { [weak self] ad, error in
+      if let error = error {
+        print("[AppDelegate] ❌ 네이티브 광고 로드 실패: \(error.localizedDescription)")
+        return
+      }
+
+      DispatchQueue.main.async {
+        guard let ad = ad else { return }
+        guard let visibleVC = self?.findVisibleViewController() else {
+          print("[AppDelegate] 광고를 표시할 수 있는 View Controller를 찾을 수 없습니다.")
+          return
+        }
+
+        print("[AppDelegate] 네이티브 광고 노출 시도 - Title: \(ad.data.adTitle)")
+
+        let adVC = UIViewController()
+        adVC.view.backgroundColor = .systemBackground
+
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        adVC.view.addSubview(container)
+
+        let titleLabel = UILabel()
+        titleLabel.text = ad.data.adTitle
+        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
+        titleLabel.numberOfLines = 0
+        titleLabel.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(titleLabel)
+
+        let descLabel = UILabel()
+        descLabel.text = ad.data.adDescription
+        descLabel.font = .systemFont(ofSize: 16)
+        descLabel.textColor = .secondaryLabel
+        descLabel.numberOfLines = 0
+        descLabel.textAlignment = .center
+        descLabel.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(descLabel)
+
+        let actionButton = UIButton(type: .system)
+        actionButton.setTitle(ad.data.buttonText ?? "자세히 보기", for: .normal)
+        actionButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        actionButton.backgroundColor = .systemBlue
+        actionButton.setTitleColor(.white, for: .normal)
+        actionButton.layer.cornerRadius = 10
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(actionButton)
+
+        let closeButton = UIButton(type: .system)
+        closeButton.setTitle("광고 닫기", for: .normal)
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.addAction(UIAction { _ in
+          adVC.dismiss(animated: true)
+        }, for: .touchUpInside)
+        adVC.view.addSubview(closeButton)
+
+        NSLayoutConstraint.activate([
+          container.centerXAnchor.constraint(equalTo: adVC.view.centerXAnchor),
+          container.centerYAnchor.constraint(equalTo: adVC.view.centerYAnchor),
+          container.leadingAnchor.constraint(equalTo: adVC.view.leadingAnchor, constant: 20),
+          container.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor, constant: -20),
+
+          titleLabel.topAnchor.constraint(equalTo: container.topAnchor),
+          titleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+          titleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+
+          descLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+          descLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+          descLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+
+          actionButton.topAnchor.constraint(equalTo: descLabel.bottomAnchor, constant: 30),
+          actionButton.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+          actionButton.widthAnchor.constraint(equalToConstant: 200),
+          actionButton.heightAnchor.constraint(equalToConstant: 50),
+          actionButton.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+
+          closeButton.topAnchor.constraint(equalTo: adVC.view.safeAreaLayoutGuide.topAnchor, constant: 20),
+          closeButton.trailingAnchor.constraint(equalTo: adVC.view.trailingAnchor, constant: -20)
+        ])
+
+        ad.rootViewController = adVC
+        ad.registerContainer(container, withClickableViews: [actionButton, titleLabel])
+
+        adVC.modalPresentationStyle = .fullScreen
+        visibleVC.present(adVC, animated: true)
       }
     }
   }

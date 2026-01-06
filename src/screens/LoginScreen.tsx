@@ -905,41 +905,28 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
             )}
           </TouchableOpacity>
 
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <TouchableOpacity
-              style={[styles.pangleTestButton, { backgroundColor: '#6200EE', flex: 1 }]}
-              disabled={isPangleLoading}
-              onPress={async () => {
-                try {
-                  setIsPangleLoading(true);
-                  const { loadInterstitialAd } = require('../services/pangle');
-                  await loadInterstitialAd();
-                  showAlert('로드 성공', '광고가 준비되었습니다.');
-                } catch (error) {
-                  showAlert('로드 실패', String(error));
-                } finally {
-                  setIsPangleLoading(false);
-                }
-              }}
-            >
-              <Text style={[styles.pangleTestButtonText, { fontSize: 13 }]}>수동 로드</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.pangleTestButton, { backgroundColor: '#03DAC6', flex: 1 }]}
-              disabled={isPangleLoading}
-              onPress={async () => {
-                try {
-                  const { showInterstitialAd } = require('../services/pangle');
-                  await showInterstitialAd();
-                } catch (error) {
-                  showAlert('노출 실패', '광고가 로드되지 않았습니다.');
-                }
-              }}
-            >
-              <Text style={[styles.pangleTestButtonText, { fontSize: 13, color: '#000' }]}>수동 노출</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[styles.pangleTestButton, { backgroundColor: '#FF5722' }]}
+            disabled={isPangleLoading}
+            onPress={async () => {
+              try {
+                setIsPangleLoading(true);
+                const { loadAndShowNativeAd } = require('../services/pangle');
+                console.log('[테스트] 네이티브 광고 시작');
+                await loadAndShowNativeAd();
+              } catch (error) {
+                showAlert('네이티브 광고 실패', String(error));
+              } finally {
+                setIsPangleLoading(false);
+              }
+            }}
+          >
+            {isPangleLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.pangleTestButtonText}>네이티브광고 보기</Text>
+            )}
+          </TouchableOpacity>
         </View>
       )}
     </View>
