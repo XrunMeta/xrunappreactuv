@@ -652,7 +652,6 @@ const v_d0a391 = () => {
     const v_bc755f = async () => {
 
       try {
-        console.log('[App] 버전 확인 시작');
 
         const v_090f7c = await v_5ee4ec();
         if (v_090f7c) {
@@ -667,11 +666,6 @@ const v_d0a391 = () => {
         const v_4587b3 = v_deac27();
         const v_1300ee = await v_f16a74();
 
-        console.log('[App] 버전 확인 결과:', {
-          current: v_4587b3,
-          latest: v_1300ee,
-        });
-
         if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
           console.log('[App] 새 버전 발견:', v_1300ee);
           if (__DEV__) {
@@ -683,7 +677,7 @@ const v_d0a391 = () => {
             v_80c653(true);
           }
         } else {
-          console.log('[App] 최신 버전입니다.');
+
         }
       } catch (v_5e9bfe) {
         console.error('[App] 버전 확인 실패:', v_5e9bfe);
