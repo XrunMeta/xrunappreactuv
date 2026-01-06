@@ -313,6 +313,34 @@ export const sendAliveSignal = async (
           platform: Platform.OS,
         });
 
+        if (Platform.OS === 'android') {
+          if (currentVersion && serverAndroidVersion > currentVersion) {
+            console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
+            result.emergencyStop = {
+              enabled: true,
+              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            };
+          } else {
+            console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
+          }
+        } else if (Platform.OS === 'ios') { 
+          if (currentVersion && serverIOSVersion > currentVersion) {
+            console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
+            if (__DEV__) {
+              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+            } else {
+              result.emergencyStop = {
+                enabled: true,
+                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+              };
+            }
+          } else {
+            console.log('[App ios] 최신 버전입니다. 현재:', currentVersion, '서버:', serverIOSVersion);
+          }
+        }
+
       return result;
     } else {
 
