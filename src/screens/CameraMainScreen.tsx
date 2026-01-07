@@ -650,11 +650,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const currentCacheStr = await AsyncStorage.getItem('cached_AD');
       const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
 
-      currentCache[campid] = data;
+      const newCache = {
+        ...currentCache,
+        [campid]: data,
+      };
 
-      await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
-      setCachedAds({ ...currentCache }); 
-      console.log(`💾 [CameraMainScreen] 광고 데이터 캐시 저장: ${campid}`);
+      await AsyncStorage.setItem('cached_AD', JSON.stringify(newCache));
+      console.log(`💾 [CameraMainScreen][saveCachedAd] 캐시 저장 성공: key=${campid}, 현재 총 키 수=${Object.keys(newCache).length}`);
+
+      setCachedAds(newCache);
     } catch (e) {
       console.error('❌ [CameraMainScreen] 캐시 저장 실패:', e);
     }
@@ -1022,30 +1026,23 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      console.log('📍 [Trace] 0. loadTokenData 진입, 마커 데이터 요청 시작');
       const markerData = await fetchMapMarkerData(
         currentLocation.coords.latitude,
         currentLocation.coords.longitude,
         member,
         navigate,
       );
+      console.log('📍 [Trace] 1. 마커 데이터 요청 완료. 개수:', markerData ? markerData.length : 0);
 
       if (markerData && markerData.length > 0) {
+        console.log('📍 [Trace] 2. 데이터 유효, 로컬 저장 시작');
 
         await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
 
         const validatedCoinsData = markerData.map((coin: any) => {
 
           const originalXrunPrice = coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0;
-
-          console.log(`🔍 [loadTokenData API] 코인 원본 데이터 확인:`, {
-            coin: coin.coin,
-            advertisement: coin.advertisement,
-            xrunPrice: coin.xrunPrice,
-            xrunprice: coin.xrunprice,
-            price: coin.price,
-            coins: coin.coins,
-            originalXrunPrice,
-          });
 
           return {
             ...coin, 
@@ -1061,8 +1058,19 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         });
 
         try {
+          console.log('📍 [Trace] 3. 초기 캐시 로드 시작');
 
-          const loadedCache = await loadCachedAds();
+          let loadedCache: any = {};
+          try {
+            const rawCache = await AsyncStorage.getItem('cached_AD');
+            console.warn('📂 [CameraMainScreen][Direct] raw cached_AD:', rawCache ? '데이터 있음' : 'NULL');
+            if (rawCache) {
+              loadedCache = JSON.parse(rawCache);
+              console.warn('📦 [CameraMainScreen][Direct] 파싱된 캐시 키 수:', Object.keys(loadedCache).length);
+            }
+          } catch (err) {
+            console.error('❌ [CameraMainScreen][Direct] 캐시 직접 로드 실패:', err);
+          }
 
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
           let topAd5Response = await getTopAd5();
@@ -1091,8 +1099,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               }
             }
 
-            const latestCache = await loadCachedAds();
-            Object.assign(loadedCache, latestCache);
+            try {
+              const rawLatest = await AsyncStorage.getItem('cached_AD');
+              if (rawLatest) {
+                const latestCache = JSON.parse(rawLatest);
+                Object.assign(loadedCache, latestCache); 
+                console.warn('🔄 [CameraMainScreen][Direct] 캐시 갱신 완료. 키 수:', Object.keys(loadedCache).length);
+              }
+            } catch (e) {
+              console.error('❌ [CameraMainScreen][Direct] 캐시 갱신 로드 실패:', e);
+            }
             console.log('🔄 [CameraMainScreen API] TopAd5 저장 후 캐시 객체 업데이트 완료');
 
             console.log('🔍 [CameraMainScreen API] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
@@ -1109,6 +1125,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             console.log('📊 [CameraMainScreen API] 거리 순 정렬 완료 (가까운 순서)');
 
+            console.log('📍 [Trace] 5. 매핑 시작');
             const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
               const adIndex = index % topAd5Response.length;
               const mappedAd = topAd5Response[adIndex];
@@ -1151,6 +1168,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             });
 
             console.log('✅ [CameraMainScreen API] TopAd5 매핑 완료:', mappedCoinsData.length, '개 토큰');
+            console.log('📍 [Trace] 6. 매핑 완료. 개수:', mappedCoinsData.length);
 
             setCoinsData(mappedCoinsData);
 
@@ -1158,14 +1176,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
             try {
-              console.log('🔄 [CameraMainScreen API] organizeData 호출 시작');
+              console.log('📍 [Trace] 7-1. organizeData 호출 시작');
               organizeData(mappedCoinsData, loadedCache);
-              console.log('✅ [CameraMainScreen API] organizeData 호출 완료');
+              console.log('📍 [Trace] 7-2. organizeData 호출 완료');
             } catch (organizeErr) {
               console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', organizeErr);
             }
 
-            console.warn('🚀 [CameraMainScreen API] Pre-fetch 로직 진입점 도달 (여기 안 보이면 앞 단계 오류)');
+            console.warn('📍 [Trace] 8. Pre-fetch 로직 진입점 도달 (여기 안 보이면 앞 단계 오류)');
             const startPreFetch = async (cache: { [key: string]: any }) => {
               console.log('🏁 [PreFetch] 함수 진입. isPreFetching:', isPreFetchingRef.current);
 

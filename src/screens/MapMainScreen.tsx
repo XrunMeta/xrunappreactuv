@@ -319,10 +319,15 @@ export const MapMainScreen: React.FC = () => {
 
       console.log(`🔍 [MapMainScreen] 고유 광고 pre-fetch 대상: ${adsToFetch.length}개`);
 
+      adsToFetch.forEach((ad, i) => console.log(`📋 [PreFetch] 대상 ${i}: id=${ad.campid}, company=${ad.ad_company}`));
+
       for (const ad of adsToFetch) {
         try {
           let result;
-          if (ad.ad_company === 'nas') {
+          const company = (ad.ad_company || '').toLowerCase();
+          console.log(`⚙️ [PreFetch] 처리 진입: id=${ad.campid}, lowercase_company='${company}'`);
+
+          if (company === 'nas') {
             result = await getNasmobAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
             if (result.code === 200 && result.data?.urlAD) {
               const fetchedUrl = result.data.urlAD;
@@ -356,12 +361,12 @@ export const MapMainScreen: React.FC = () => {
 
               console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${ad.campid}`);
             }
-          } else if (ad.ad_company === 'pointclick') {
+          } else if (company === 'pointclick') {
             result = await getPockAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
             if (result.code === 200 && result.data?.landing_url) {
               const fetchedUrl = result.data.landing_url;
               setTopAd5Data(prev => prev.map(item =>
-                (item.campid === ad.campid && item.ad_company === 'pointclick') ? { ...item, urlAD: fetchedUrl } : item
+                (item.campid === ad.campid && String(item.ad_company).toLowerCase() === 'pointclick') ? { ...item, urlAD: fetchedUrl } : item
               ));
               setMarkers(prev => prev.map(m =>
                 (m.campid === ad.campid && m.ad_company === 'pointclick') ? { ...m, urlAD: fetchedUrl } : m
