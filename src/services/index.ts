@@ -302,47 +302,6 @@ export const sendAliveSignal = async (
         };
       }
 
-<<<<<<< HEAD
-
-        const currentVersion = getCurrentAppVersionNumber();  
-        const serverAndroidVersion = Number(serverResponse.data.version) || 0;
-        const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
-
-        console.log('[App] 버전 확인:', {
-          currentVersion,
-          serverAndroidVersion,
-          serverIOSVersion,
-          platform: Platform.OS,
-        });
-
-        if (Platform.OS === 'android') {
-          if (currentVersion && serverAndroidVersion > currentVersion) {
-            console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
-            result.emergencyStop = {
-              enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
-            };
-          } else {
-            console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
-          }
-        } else if (Platform.OS === 'ios') {
-          if (currentVersion && serverIOSVersion > currentVersion) {
-            console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
-            if (__DEV__) {
-              console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
-            } else {
-              result.emergencyStop = {
-                enabled: true,
-                message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-                link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-              };
-            }
-          } else {
-            console.log('[App ios] 최신 버전입니다. 현재:', currentVersion, '서버:', serverIOSVersion);
-          }
-        }
-
       return result;
     } else {
 
@@ -2011,6 +1970,9 @@ export const fetchVirtualCoin = async (
   }
 
   fetchVirtualCoinPromise = (async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
     try {
       const env = getEnv();
       const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
@@ -2031,9 +1993,17 @@ export const fetchVirtualCoin = async (
           Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
         },
         body: JSON.stringify(requestBody),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
+
+        if (response.status === 504) {
+          console.warn('virtualCoin API 504 에러 (게이트웨이 타임아웃) - 빈 데이터 반환');
+          return { data: [] };
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -2042,12 +2012,25 @@ export const fetchVirtualCoin = async (
       console.log('response.data length:', result?.data?.length);
 
       return result;
-    } catch (error) {
-      console.error('virtualCoin API 호출 실패:', error);
-      if (navigation) {
-        await handleTimeoutError(navigation);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+
+      if (error?.name === 'AbortError' || error?.message?.includes('504') || error?.message?.includes('timeout')) {
+        console.warn('virtualCoin API 타임아웃 또는 504 에러 - 빈 데이터 반환');
+        return { data: [] };
       }
-      throw error;
+
+      console.error('virtualCoin API 호출 실패:', error);
+
+      if (navigation && error?.name === 'AbortError') {
+        try {
+          await handleTimeoutError(navigation);
+        } catch (handlerError) {
+          console.warn('타임아웃 처리 스킵:', handlerError);
+        }
+      }
+
+      return { data: [] };
     } finally {
       fetchVirtualCoinPromise = null;
     }
@@ -2067,6 +2050,9 @@ export const getCoinNasPrice = async (
   }
 
   getCoinNasPricePromise = (async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
     try {
       const env = getEnv();
       const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
@@ -2080,9 +2066,17 @@ export const getCoinNasPrice = async (
           Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
         },
         body: JSON.stringify({}),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
+
+        if (response.status === 504) {
+          console.warn('getCoinNasPrice API 504 에러 (게이트웨이 타임아웃) - 기본값 반환');
+          return { data: { coins: 0 } };
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -2091,12 +2085,25 @@ export const getCoinNasPrice = async (
       console.log('calculatedNasPrice:', result?.data?.coins);
 
       return result;
-    } catch (error) {
-      console.error('getCoinNasPrice API 호출 실패:', error);
-      if (navigation) {
-        await handleTimeoutError(navigation);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+
+      if (error?.name === 'AbortError' || error?.message?.includes('504') || error?.message?.includes('timeout')) {
+        console.warn('getCoinNasPrice API 타임아웃 또는 504 에러 - 기본값 반환');
+        return { data: { coins: 0 } };
       }
-      throw error;
+
+      console.error('getCoinNasPrice API 호출 실패:', error);
+
+      if (navigation && error?.name === 'AbortError') {
+        try {
+          await handleTimeoutError(navigation);
+        } catch (handlerError) {
+          console.warn('타임아웃 처리 스킵:', handlerError);
+        }
+      }
+
+      return { data: { coins: 0 } };
     } finally {
       getCoinNasPricePromise = null;
     }
@@ -2451,10 +2458,38 @@ export const getNasmobAds = async (
       body: JSON.stringify(requestBody),
     });
 
+    if (!response.ok) {
+
+      const errorText = await response.text();
+      console.error(`[NStation] HTTP 에러 (${response.status}):`, errorText.substring(0, 500));
+
+      if (response.status >= 500) {
+        throw new Error(`서버 에러 (${response.status}): ${errorText.substring(0, 200)}`);
+      }
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        const errorMessage = errorJson.message || `HTTP error! status: ${response.status}`;
+        const error = new Error(errorMessage);
+        (error as any).is404 = errorJson.code === 404 || response.status === 404;
+        throw error;
+      } catch (parseError) {
+
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText.substring(0, 200)}`);
+      }
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('[NStation] 비-JSON 응답:', contentType, text.substring(0, 500));
+      throw new Error(`Expected JSON but got ${contentType || 'unknown'}`);
+    }
+
     const result: NasmobAdsResponse = await response.json();
     console.log('NStation 광고 API 응답:', result);
 
-    if (response.ok && result.status === 'success' && result.code === 200) {
+    if (result.status === 'success' && result.code === 200) {
       return result;
     } else {
 
@@ -2532,10 +2567,38 @@ export const getPockAds = async (
       body: JSON.stringify(requestBody),
     });
 
+    if (!response.ok) {
+
+      const errorText = await response.text();
+      console.error(`[Pock] HTTP 에러 (${response.status}):`, errorText.substring(0, 500));
+
+      if (response.status >= 500) {
+        throw new Error(`서버 에러 (${response.status}): ${errorText.substring(0, 200)}`);
+      }
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        const errorMessage = errorJson.message || `HTTP error! status: ${response.status}`;
+        const error = new Error(errorMessage);
+        (error as any).is404 = errorJson.code === 404 || response.status === 404;
+        throw error;
+      } catch (parseError) {
+
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText.substring(0, 200)}`);
+      }
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('[Pock] 비-JSON 응답:', contentType, text.substring(0, 500));
+      throw new Error(`Expected JSON but got ${contentType || 'unknown'}`);
+    }
+
     const result: PockAdsResponse = await response.json();
     console.log('Pock 광고 API 응답:', result);
 
-    if (response.ok && result.status === 'success' && result.code === 200) {
+    if (result.status === 'success' && result.code === 200) {
       return result;
     } else {
 
@@ -4719,10 +4782,185 @@ export const getAllAgreements = async (
 };
 
 const TOP_AD5_STORAGE_KEY = 'topAd5Data';
+const TOP_AD5_TIMESTAMP_KEY = 'topAd5Timestamp';
+const TOP_AD5_REFRESH_INTERVAL = 10 * 60 * 1000; 
 
-export const getTopAd5 = async (navigation?: any): Promise<any> => {
+export const removeAdFromTopAd5 = async (campid: string | number, navigation?: any): Promise<void> => {
+  try {
+    const campidStr = String(campid);
+    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 시작`);
+
+    const storedData = await AsyncStorage.getItem(TOP_AD5_STORAGE_KEY);
+    let topAd5Data: any[] = [];
+    if (storedData) {
+      topAd5Data = JSON.parse(storedData);
+      if (Array.isArray(topAd5Data)) {
+        const beforeCount = topAd5Data.length;
+        topAd5Data = topAd5Data.filter((ad: any) => String(ad.campid || '') !== campidStr);
+        if (topAd5Data.length !== beforeCount) {
+          console.log(`[removeAdFromTopAd5] TopAd5에서 제거: ${beforeCount} → ${topAd5Data.length}개`);
+        }
+      }
+    }
+
+    try {
+      console.log(`[removeAdFromTopAd5] 새로운 광고 가져오기 시작`);
+      const newTopAd5Data = await getTopAd5(navigation, true); 
+
+      if (newTopAd5Data && Array.isArray(newTopAd5Data) && newTopAd5Data.length > 0) {
+
+        const existingCampids = new Set(topAd5Data.map((ad: any) => String(ad.campid || '')));
+        const newAds = newTopAd5Data.filter((ad: any) => {
+          const newCampid = String(ad.campid || '');
+          return newCampid !== campidStr && !existingCampids.has(newCampid);
+        });
+
+        if (newAds.length > 0) {
+
+          const replacementAd = newAds[0];
+          topAd5Data.push(replacementAd);
+          console.log(`[removeAdFromTopAd5] 새로운 광고 추가: ${replacementAd.campid || 'N/A'}`);
+
+          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+          await AsyncStorage.setItem(TOP_AD5_TIMESTAMP_KEY, Date.now().toString());
+          console.log(`[removeAdFromTopAd5] TopAd5 업데이트 완료: ${topAd5Data.length}개`);
+        } else {
+          console.log(`[removeAdFromTopAd5] 새로운 광고 없음 - 기존 데이터만 업데이트`);
+
+          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+        }
+      } else {
+        console.log(`[removeAdFromTopAd5] 새로운 TopAd5 데이터 없음 - 기존 데이터만 업데이트`);
+
+        await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+      }
+    } catch (newAdError) {
+      console.warn(`[removeAdFromTopAd5] 새로운 광고 가져오기 실패:`, newAdError);
+
+      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+    }
+
+    const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+    if (cachedAdStr) {
+      const cachedAd = JSON.parse(cachedAdStr);
+      if (cachedAd[campidStr]) {
+        delete cachedAd[campidStr];
+        await AsyncStorage.setItem('cached_AD', JSON.stringify(cachedAd));
+        console.log(`[removeAdFromTopAd5] cached_AD에서 제거: ${campidStr}`);
+      }
+    }
+
+    const failedStr = await AsyncStorage.getItem('failedPreFetchCampids');
+    if (failedStr) {
+      const failed = JSON.parse(failedStr);
+      if (Array.isArray(failed) && failed.includes(campidStr)) {
+        const filteredFailed = failed.filter((id: string) => id !== campidStr);
+        await AsyncStorage.setItem('failedPreFetchCampids', JSON.stringify(filteredFailed));
+        console.log(`[removeAdFromTopAd5] failedPreFetchCampids에서 제거: ${campidStr}`);
+      }
+    }
+
+    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 완료`);
+  } catch (error) {
+    console.error(`[removeAdFromTopAd5] ${campid} 제거 실패:`, error);
+  }
+};
+
+const COMPLETED_ADS_CACHE_KEY = 'completedAdsCache';
+const COMPLETED_ADS_CACHE_TIMESTAMP_KEY = 'completedAdsCacheTimestamp';
+const COMPLETED_ADS_CACHE_INTERVAL = 5 * 60 * 1000; 
+
+export const getCompletedAdsSet = async (member: number | string, navigation?: any, forceRefresh: boolean = false): Promise<Set<string>> => {
+  try {
+    const memberNum = typeof member === 'string' ? parseInt(member, 10) : member;
+
+    if (!forceRefresh) {
+      try {
+        const timestampStr = await AsyncStorage.getItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY);
+        if (timestampStr) {
+          const timestamp = parseInt(timestampStr, 10);
+          const now = Date.now();
+          const elapsed = now - timestamp;
+
+          if (elapsed < COMPLETED_ADS_CACHE_INTERVAL) {
+            const cachedStr = await AsyncStorage.getItem(COMPLETED_ADS_CACHE_KEY);
+            if (cachedStr) {
+              const cached = JSON.parse(cachedStr);
+              console.log(`[getCompletedAdsSet] 캐시 사용 (${Math.floor(elapsed / 1000)}초 전 저장)`);
+              return new Set(cached);
+            }
+          }
+        }
+      } catch (cacheError) {
+        console.warn('[getCompletedAdsSet] 캐시 확인 실패, API 호출:', cacheError);
+      }
+    } else {
+      console.log('[getCompletedAdsSet] 강제 새로고침 - 캐시 무시');
+    }
+
+    const completedAdsResponse = await getCompletedAds(memberNum, navigation);
+    const completedAdsSet = new Set<string>();
+
+    if (completedAdsResponse?.data && Array.isArray(completedAdsResponse.data)) {
+      completedAdsResponse.data.forEach((ad: any) => {
+
+        const adTransaction = String(ad.transaction || '');
+        const adExtracode = String(ad.extracode || '');
+        const adTitle = String(ad.title || '');
+
+        if (adTransaction && /^\d+$/.test(adTransaction)) {
+          completedAdsSet.add(adTransaction);
+        }
+        if (adExtracode && /^\d+$/.test(adExtracode)) {
+          completedAdsSet.add(adExtracode);
+        }
+      });
+
+      try {
+        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify(Array.from(completedAdsSet)));
+        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY, Date.now().toString());
+        console.log(`[getCompletedAdsSet] 캐시 저장 완료: ${completedAdsSet.size}개`);
+      } catch (cacheError) {
+        console.warn('[getCompletedAdsSet] 캐시 저장 실패:', cacheError);
+      }
+    }
+
+    return completedAdsSet;
+  } catch (error) {
+    console.error('[getCompletedAdsSet] 완료된 광고 목록 조회 실패:', error);
+
+    return new Set<string>();
+  }
+};
+
+export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false): Promise<any> => {
 
   try {
+
+    if (!forceRefresh) {
+      const storedData = await getStoredTopAd5();
+      if (storedData) {
+        try {
+          const timestampStr = await AsyncStorage.getItem(TOP_AD5_TIMESTAMP_KEY);
+          if (timestampStr) {
+            const timestamp = parseInt(timestampStr, 10);
+            const now = Date.now();
+            const elapsed = now - timestamp;
+
+            if (elapsed < TOP_AD5_REFRESH_INTERVAL) {
+              console.log(`[getTopAd5] 캐시 사용 (${Math.floor(elapsed / 1000)}초 전 저장, ${Math.floor((TOP_AD5_REFRESH_INTERVAL - elapsed) / 1000)}초 남음)`);
+              return storedData;
+            } else {
+              console.log(`[getTopAd5] 캐시 만료 (${Math.floor(elapsed / 1000)}초 경과, 10분 초과)`);
+            }
+          }
+        } catch (timestampError) {
+          console.log('[getTopAd5] timestamp 확인 실패, API 호출 진행:', timestampError);
+        }
+      }
+    } else {
+      console.log('[getTopAd5] 강제 새로고침 모드 - API 호출');
+    }
     const os = Platform.OS === 'ios' ? 'ios' : 'android';
 
     let member: number | string = '';
@@ -4807,8 +5045,88 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
       }
     }
 
+    if (topAd5Response && topAd5Response.length > 0 && member) {
+      console.log('[getTopAd5] 광고 유효성 검증 시작:', topAd5Response.length, '개');
+
+      try {
+        const { collectDeviceInfo } = require('../utils/napApiUtils');
+        const deviceInfo = await collectDeviceInfo();
+
+        const validationResults = await Promise.allSettled(
+          topAd5Response.map(async (ad: any) => {
+            try {
+              const campid = String(ad.campid || '');
+              if (!campid) return { ad, isValid: false };
+
+              const adCompany = ad.ad_company || 'nas';
+              if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
+
+                try {
+                  const result = await getPockAds(
+                    String(member),
+                    deviceInfo.adid || '',
+                    deviceInfo,
+                    campid,
+                    undefined, 
+                  );
+                  return { ad, isValid: result.code === 200 };
+                } catch (error: any) {
+
+                  if (error.is404 || error.message?.includes('404') || error.message?.includes('No campaign data found')) {
+                    console.log(`[getTopAd5] ${campid}는 404 에러로 제외됨`);
+                    return { ad, isValid: false };
+                  }
+
+                  return { ad, isValid: true };
+                }
+              } else {
+
+                try {
+                  const result = await processAdReward(
+                    typeof member === 'number' ? member : parseInt(String(member), 10),
+                    campid,
+                    'nas',
+                    undefined, 
+                  );
+
+                  return { ad, isValid: result.code !== 404 };
+                } catch (error: any) {
+
+                  if (error.code === 404 || error.message?.includes('404') || error.message?.includes('not found')) {
+                    console.log(`[getTopAd5] ${campid}는 404 에러로 제외됨`);
+                    return { ad, isValid: false };
+                  }
+
+                  return { ad, isValid: true };
+                }
+              }
+            } catch (error) {
+              console.warn(`[getTopAd5] ${ad.campid} 검증 실패:`, error);
+
+              return { ad, isValid: true };
+            }
+          })
+        );
+
+        const validAds = validationResults
+          .filter((result) => result.status === 'fulfilled' && result.value.isValid)
+          .map((result) => (result as PromiseFulfilledResult<any>).value.ad);
+
+        const invalidCount = topAd5Response.length - validAds.length;
+        if (invalidCount > 0) {
+          console.log(`[getTopAd5] 404 광고 필터링: ${validAds.length}/${topAd5Response.length}개 유효 (${invalidCount}개 제외)`);
+        }
+
+        topAd5Response = validAds;
+      } catch (validationError) {
+        console.warn('[getTopAd5] 광고 유효성 검증 실패, 원본 데이터 사용:', validationError);
+
+      }
+    }
+
     if (topAd5Response && topAd5Response.length > 0) {
       await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Response));
+      await AsyncStorage.setItem(TOP_AD5_TIMESTAMP_KEY, Date.now().toString());
       console.log('[getTopAd5] AsyncStorage에 저장 완료:', topAd5Response.length, '개 광고');
     } else {
       console.warn('[getTopAd5] 저장할 광고 데이터가 없습니다.');
@@ -4817,6 +5135,12 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
     return topAd5Response;
   } catch (error) {
     console.error('[getTopAd5] API 호출 실패:', error);
+
+    const storedData = await getStoredTopAd5();
+    if (storedData) {
+      console.log('[getTopAd5] 에러 발생, 저장된 데이터 반환');
+      return storedData;
+    }
     throw error;
   }
 };
@@ -4832,6 +5156,99 @@ export const getStoredTopAd5 = async (): Promise<any | null> => {
     console.error('[getStoredTopAd5] AsyncStorage 읽기 실패:', error);
     return null;
   }
+};
+
+export const validateTopAd5Urls = async (topAd5Data: any[]): Promise<any[]> => {
+  if (!Array.isArray(topAd5Data) || topAd5Data.length === 0) {
+    return topAd5Data;
+  }
+
+  const itemsWithUrl = topAd5Data.filter(item => item.urlAD && typeof item.urlAD === 'string' && item.urlAD.trim() !== '');
+
+  if (itemsWithUrl.length === 0) {
+    console.log('[validateTopAd5Urls] urlAD가 있는 항목이 없습니다.');
+    return topAd5Data.map(item => ({
+      ...item,
+      isValid: true, 
+      urlValidatedAt: Date.now(),
+    }));
+  }
+
+  console.log(`[validateTopAd5Urls] URL 검증 시작: ${itemsWithUrl.length}개 항목`);
+
+  const validationResults = await Promise.allSettled(
+    itemsWithUrl.map(async (item) => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); 
+
+        const response = await fetch(item.urlAD, {
+          method: 'HEAD',
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          return {
+            item,
+            isValid: true,
+            errorMessage: null,
+          };
+        } else {
+          return {
+            item,
+            isValid: false,
+            errorMessage: `HTTP ${response.status}`,
+          };
+        }
+      } catch (error: any) {
+        return {
+          item,
+          isValid: false,
+          errorMessage: error.name === 'AbortError' ? '타임아웃' : error.message || '알 수 없는 오류',
+        };
+      }
+    })
+  );
+
+  const validatedData = topAd5Data.map((item) => {
+    if (!item.urlAD || typeof item.urlAD !== 'string' || item.urlAD.trim() === '') {
+
+      return {
+        ...item,
+        isValid: true,
+        urlValidatedAt: Date.now(),
+      };
+    }
+
+    const result = validationResults.find(
+      (result) => result.status === 'fulfilled' && result.value.item === item
+    );
+
+    if (result && result.status === 'fulfilled') {
+      return {
+        ...item,
+        isValid: result.value.isValid,
+        errorMessage: result.value.errorMessage || undefined,
+        urlValidatedAt: Date.now(),
+      };
+    } else {
+
+      return {
+        ...item,
+        isValid: false,
+        errorMessage: '검증 실패',
+        urlValidatedAt: Date.now(),
+      };
+    }
+  });
+
+  const validCount = validatedData.filter(item => item.isValid).length;
+  const invalidCount = validatedData.length - validCount;
+  console.log(`[validateTopAd5Urls] URL 검증 완료: 유효 ${validCount}개, 무효 ${invalidCount}개`);
+
+  return validatedData;
 };
 
 export const sendInAppPurchase = async (

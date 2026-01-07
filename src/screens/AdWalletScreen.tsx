@@ -543,32 +543,32 @@ export const AdWalletScreen = () => {
             async (reward) => {
               console.log('[AdWallet] 출석체크 Pangle 광고 보상 수령:', reward);
 
-              try {
-                const response = await joinQuest(
-                  {
-                    quest_id: 1,
-                    member,
-                  },
-                  undefined, 
-                );
+      try {
+        const response = await joinQuest(
+          {
+            quest_id: 1,
+            member,
+          },
+          undefined, 
+        );
 
-                if (response.status === 'success') {
-                  showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                  setAttendanceCheckVisible(false);
-                  setCanReward(null);
-                  setHasAttended(null);
+        if (response.status === 'success') {
+          showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+          setAttendanceCheckVisible(false);
+          setCanReward(null);
+          setHasAttended(null);
 
-                  if (questListRef.current) {
-                    questListRef.current.reloadData();
-                  }
-                } else {
-                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-                }
-              } catch (error) {
-                console.error('[AdWallet] 출석 체크 참여 오류:', error);
-                showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-              } finally {
-                setIsJoiningQuest(false);
+          if (questListRef.current) {
+            questListRef.current.reloadData();
+          }
+        } else {
+          showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+        }
+      } catch (error) {
+        console.error('[AdWallet] 출석 체크 참여 오류:', error);
+        showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+      } finally {
+        setIsJoiningQuest(false);
               }
             },
             () => {

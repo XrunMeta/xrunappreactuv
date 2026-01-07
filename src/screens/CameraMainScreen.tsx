@@ -12,6 +12,7 @@ import {
   AppState,
   Modal,
   Platform,
+  Linking,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -21,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -53,6 +54,7 @@ interface TokenComponentProps {
   isRageMode: boolean;
   rageColor: string;
   calculateScaleBasedOnDistance: (distance: number) => number;
+  isCompleted?: boolean; 
 }
 
 const TokenComponent: React.FC<TokenComponentProps> = ({
@@ -64,6 +66,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
   isRageMode,
   rageColor,
   calculateScaleBasedOnDistance,
+  isCompleted = false,
 }) => {
   const position = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -287,13 +290,15 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
       />
 
       <TouchableOpacity
-        onPress={onPress}
+        onPress={isCompleted ? undefined : onPress}
+        disabled={isCompleted}
         style={[
           styles.tokenButtonContainer,
           {
             transform: [
               { scale: calculateScaleBasedOnDistance(distance) },
             ],
+            opacity: isCompleted ? 0.5 : 1, 
           },
         ]}
         activeOpacity={0.7}>
@@ -310,7 +315,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          {parseFloat(String(distance)) < 30 && (
+          {!isCompleted && (
             <Animated.Image
               source={
                 isRageMode
@@ -456,6 +461,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         tokensCount: tokens?.length ?? 0,
         appState,
       });
+
+      setShowBottomPanel(false);
+      setSelectedToken(null);
+      console.log('📱 [CameraMainScreen] 광고보기 완료 - 하단 패널 닫기');
 
       const delay = Platform.OS === 'ios' ? 500 : 100;
 
@@ -620,6 +629,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const hasLoadedDataRef = useRef(false);
   const isPreFetchingRef = useRef(false);
+  const completedAdsSetRef = useRef<Set<string>>(new Set<string>());
 
   const loadCachedAds = useCallback(async () => {
     try {
@@ -733,6 +743,17 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
     const validData = enrichedData;
 
+    enrichedData.forEach(d => {
+      const hasDirectUrl = (d.urlAD && d.urlAD !== '') || (d.landing_url && d.landing_url !== '');
+      const campid = String(d.campid || '');
+      const cachedUrl = effectiveCache[campid]?.urlAD;
+      const hasCachedUrl = cachedUrl && cachedUrl !== '';
+
+      if (!hasDirectUrl && !hasCachedUrl) {
+        console.log(`⚠️ [organizeData] ${d.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`);
+      }
+    });
+
     console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', validData.slice(0, 5).map((d, idx) => ({
       ...d,
       urlAD: d.urlAD || '없음',
@@ -838,18 +859,28 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
               try {
 
-                console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
-                let topAd5Response = await getTopAd5();
+          console.log('[CameraMainScreen] 1단계: TopAd5 데이터 확인 시작');
+          const storedTopAd5 = await getStoredTopAd5();
 
-                if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
-                  console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
-                  topAd5Response = null; 
-                }
+          let topAd5Response: any[] | null = null;
 
-                if (!topAd5Response || !Array.isArray(topAd5Response)) {
-                  console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
-                  topAd5Response = await getStoredTopAd5();
-                }
+          if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
+            topAd5Response = await getTopAd5(); 
+          } else {
+
+            console.log('[CameraMainScreen] 저장된 TopAd5 데이터 없음, API 호출');
+            topAd5Response = await getTopAd5();
+          }
+
+          if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
+            console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+            topAd5Response = null; 
+          }
+
+          if (!topAd5Response || !Array.isArray(topAd5Response)) {
+            console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
+            topAd5Response = await getStoredTopAd5();
+          }
 
                 if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                   console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', topAd5Response.length, '개');
@@ -1033,9 +1064,78 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const currentLocation = await Location.getCurrentPositionAsync({
+      const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
+      const LAST_GPS_LOCATION_TIMESTAMP_KEY = 'lastGpsLocationTimestamp';
+      const LOCATION_REUSE_TIME = 60 * 1000; 
+      const LOCATION_REUSE_DISTANCE = 500; 
+
+      const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+        const R = 6371000; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      };
+
+      const newLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
+
+      const newLocationData = {
+        latitude: newLocation.coords.latitude,
+        longitude: newLocation.coords.longitude,
+      };
+
+      let locationToUse = newLocationData;
+      try {
+
+        const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
+        const storedTimestamp = await AsyncStorage.getItem(LAST_GPS_LOCATION_TIMESTAMP_KEY);
+
+        if (storedLocation && storedTimestamp) {
+          const lastGpsLocation = JSON.parse(storedLocation);
+          const lastTimestamp = parseInt(storedTimestamp, 10);
+          const now = Date.now();
+          const elapsed = now - lastTimestamp;
+
+          if (elapsed < LOCATION_REUSE_TIME) {
+
+            const distance = calculateDistance(
+              newLocationData.latitude,
+              newLocationData.longitude,
+              lastGpsLocation.latitude,
+              lastGpsLocation.longitude
+            );
+
+            if (distance < LOCATION_REUSE_DISTANCE) {
+              locationToUse = lastGpsLocation;
+              console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(elapsed / 1000)}초 전, ${distance.toFixed(0)}m)`);
+            } else {
+              console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${distance.toFixed(0)}m > ${LOCATION_REUSE_DISTANCE}m), 새 위치 사용`);
+            }
+          } else {
+            console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(elapsed / 1000)}초 > ${LOCATION_REUSE_TIME / 1000}초), 새 위치 사용`);
+          }
+        } else {
+          console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
+        }
+      } catch (storageError) {
+        console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', storageError);
+      }
+
+      await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(locationToUse));
+      await AsyncStorage.setItem(LAST_GPS_LOCATION_TIMESTAMP_KEY, Date.now().toString());
+
+      const currentLocation = {
+        coords: {
+          latitude: locationToUse.latitude,
+          longitude: locationToUse.longitude,
+        },
+      };
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {
@@ -1054,8 +1154,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       console.log('📍 [Trace] 0. loadTokenData 진입, 마커 데이터 요청 시작');
       const markerData = await fetchMapMarkerData(
-        currentLocation.coords.latitude,
-        currentLocation.coords.longitude,
+        locationToUse.latitude,
+        locationToUse.longitude,
         member,
         navigate,
       );
@@ -1083,6 +1183,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           };
         });
 
+        let completedAdsSet = new Set<string>();
+        try {
+
+          const existingCompletedAds = completedAdsSetRef.current ? new Set(completedAdsSetRef.current) : new Set<string>();
+
+          completedAdsSet = await getCompletedAdsSet(member, navigate);
+          console.log(`[CameraMainScreen] 완료된 광고 목록: ${completedAdsSet.size}개`);
+
+          const mergedSet = new Set<string>();
+          existingCompletedAds.forEach(campid => mergedSet.add(campid));
+          completedAdsSet.forEach(campid => mergedSet.add(campid));
+
+          completedAdsSetRef.current = mergedSet;
+          console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${existingCompletedAds.size}개 + 새로 ${completedAdsSet.size}개 = 총 ${mergedSet.size}개`);
+        } catch (error) {
+          console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
+
+          if (!completedAdsSetRef.current) {
+            completedAdsSetRef.current = new Set<string>();
+          }
+        }
+
+        const filteredValidatedCoinsData = validatedCoinsData;
+
         try {
           console.log('📍 [Trace] 3. 초기 캐시 로드 시작');
 
@@ -1098,8 +1222,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.error('❌ [CameraMainScreen][Direct] 캐시 직접 로드 실패:', err);
           }
 
-          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
-          let topAd5Response = await getTopAd5();
+          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 확인 시작');
+          const storedTopAd5 = await getStoredTopAd5();
+
+          let topAd5Response: any[] | null = null;
+
+          if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
+            topAd5Response = await getTopAd5(); 
+          } else {
+
+            console.log('[CameraMainScreen API] 저장된 TopAd5 데이터 없음, API 호출');
+            topAd5Response = await getTopAd5();
+          }
 
           if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
             console.log('[CameraMainScreen API] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
@@ -1107,13 +1241,58 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }
 
           if (!topAd5Response || !Array.isArray(topAd5Response)) {
-            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
+            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
             topAd5Response = await getStoredTopAd5();
           }
 
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
             console.warn('🚦 [CameraMainScreen API] TopAd5 조건 충족. 로직 진입. 개수:', topAd5Response.length);
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', topAd5Response.length, '개');
+
+            const filteredTopAd5 = topAd5Response.filter((ad: any) => {
+              const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
+              if (!hasUrl) {
+                console.log(`⚠️ [CameraMainScreen] ${ad.campid}는 urlAD가 없어 제외됨`);
+              }
+              return hasUrl;
+            });
+
+            if (filteredTopAd5.length === 0) {
+              console.warn('[CameraMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+              topAd5Response = null;
+            } else {
+
+              console.log('[CameraMainScreen] URL 검증 시작');
+              const validatedData = await validateTopAd5Urls(filteredTopAd5);
+
+              const validUrlData = validatedData.filter((item: any) => item.isValid === true);
+              if (validUrlData.length !== validatedData.length) {
+                console.log(`[CameraMainScreen] URL 검증 완료: ${validUrlData.length}/${validatedData.length}개 유효 (${validatedData.length - validUrlData.length}개 제외)`);
+              }
+
+              const filteredCompletedAds = validUrlData.filter((ad: any) => {
+                const campid = String(ad.campid || '');
+                const isCompleted = completedAdsSet.has(campid);
+                if (isCompleted) {
+                  console.log(`⚠️ [CameraMainScreen] ${campid}는 이미 본 광고로 제외됨`);
+                }
+                return !isCompleted;
+              });
+
+              if (filteredCompletedAds.length !== validUrlData.length) {
+                console.log(`[CameraMainScreen] 이미 본 광고 필터링: ${filteredCompletedAds.length}/${validUrlData.length}개 유효 (${validUrlData.length - filteredCompletedAds.length}개 제외)`);
+              }
+
+              if (filteredCompletedAds.length === 0) {
+                console.warn('[CameraMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
+                topAd5Response = null;
+              } else {
+                topAd5Response = filteredCompletedAds;
+              }
+            }
+          }
+
+          if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
 
             for (const ad of topAd5Response) {
               if (ad.campid && ad.urlAD) {
@@ -1148,7 +1327,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               urlAD_preview: topAd5Response[0].urlAD ? topAd5Response[0].urlAD.substring(0, 30) + '...' : 'MISSING'
             });
 
-            const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+            const sortedCoinsData = [...filteredValidatedCoinsData].sort((a, b) => {
               const distanceA = parseFloat(String(a.distance || 0));
               const distanceB = parseFloat(String(b.distance || 0));
               return distanceA - distanceB; 
@@ -1172,6 +1351,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               const mappedAd = topAd5Response[adIndex];
               const campid = mappedAd?.campid;
 
+              const adKey = String(mappedAd?.campid || '');
+              const cachedItem = loadedCache[adKey];
+              const finalUrlAD = cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '';
+
+              if (!finalUrlAD || finalUrlAD === '') {
+                console.log(`⚠️ [CameraMainScreen API] ${campid}는 urlAD가 없지만 매핑은 진행 (나중에 pre-fetch 예정)`);
+              }
+
               if (campid) {
                 const currentCount = campaignTokenCount.get(campid) || 0;
                 if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
@@ -1184,12 +1371,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 adIndex,
                 adCompany: mappedAd?.ad_company,
                 campid: mappedAd?.campid,
-                hasUrlAD: !!mappedAd?.urlAD,
-                urlAD_val: mappedAd?.urlAD || 'EMPTY'
+                hasUrlAD: !!finalUrlAD,
+                urlAD_val: finalUrlAD || 'EMPTY'
               });
 
-              const adKey = String(mappedAd?.campid || '');
-              const cachedItem = loadedCache[adKey];
               if (cachedItem) {
                 console.log(`💾 [CameraMainScreen API] 매핑 중 캐시 데이터 발견: ${adKey}`);
               }
@@ -1208,8 +1393,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                 advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
 
-                urlAD: cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '',
-                landing_url: cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '', 
+                urlAD: finalUrlAD,
+                landing_url: finalUrlAD, 
                 thumbnail: mappedAd?.thumbnail || coin.thumbnail,
                 ad_company: mappedAd?.ad_company || coin.ad_company,
                 coins: mappedAd?.coins?.toString() || coin.coins,
@@ -1604,6 +1789,83 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
         console.log('🔄 앱 활성화 - 토큰 애니메이션 재시작');
         resumeAllAnimations();
+
+        if (activeTab === 'Camera') {
+          const checkAndRefresh = async () => {
+            try {
+
+              const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
+              if (shouldNavigateToCamera === 'true') {
+                console.log('[CameraMainScreen] 광고보기 완료 감지 - 이미 AR 화면에 있음');
+                await AsyncStorage.removeItem('shouldNavigateToCamera');
+              }
+
+              const shouldRefresh = await AsyncStorage.getItem('shouldRefreshTopAd5');
+              if (shouldRefresh === 'true') {
+                console.log('[CameraMainScreen] 광고보기 완료 감지 - TopAd5 및 토큰 데이터 새로고침');
+                await AsyncStorage.removeItem('shouldRefreshTopAd5');
+
+                const completedAdCampid = await AsyncStorage.getItem('completedAdCampid');
+                if (completedAdCampid) {
+                  await AsyncStorage.removeItem('completedAdCampid');
+                  console.log(`[CameraMainScreen] 완료된 광고 제거 및 대체 시작: ${completedAdCampid}`);
+
+                  try {
+                    const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+                    if (cachedStr) {
+                      const cached = JSON.parse(cachedStr);
+                      if (Array.isArray(cached)) {
+                        completedAdsSetRef.current = new Set(cached);
+                        console.log(`[CameraMainScreen] completedAdsCache에서 로드: ${cached.length}개 (${completedAdCampid} 포함 여부: ${cached.includes(completedAdCampid)})`);
+                      }
+                    }
+                  } catch (cacheError) {
+                    console.warn('[CameraMainScreen] completedAdsCache 읽기 실패:', cacheError);
+                  }
+
+                  if (!completedAdsSetRef.current) {
+                    completedAdsSetRef.current = new Set<string>();
+                  }
+                  if (!completedAdsSetRef.current.has(completedAdCampid)) {
+                    completedAdsSetRef.current.add(completedAdCampid);
+                    console.log(`[CameraMainScreen] completedAdsSetRef에 추가: ${completedAdCampid} (현재 크기: ${completedAdsSetRef.current.size})`);
+                  }
+
+                  setTokens(prevTokens => [...prevTokens]);
+
+                  await removeAdFromTopAd5(completedAdCampid, navigate);
+                }
+
+                try {
+
+                  const userData = await AsyncStorage.getItem('userData');
+                  if (userData) {
+                    const parsedUserData = JSON.parse(userData);
+                    const member = parsedUserData?.member;
+                    if (member) {
+
+                      const completedAdsSet = await getCompletedAdsSet(member, navigate, true);
+                      completedAdsSetRef.current = completedAdsSet;
+                      console.log(`[CameraMainScreen] 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+
+                      setTokens(prevTokens => [...prevTokens]);
+                    }
+                  }
+
+                  console.log('[CameraMainScreen] TopAd5 및 토큰 데이터 새로고침 시작');
+                  await loadTokenData(true);
+                  console.log('[CameraMainScreen] TopAd5 및 토큰 데이터 새로고침 완료');
+                } catch (error) {
+                  console.error('[CameraMainScreen] TopAd5 새로고침 실패:', error);
+                }
+              }
+            } catch (error) {
+              console.error('[CameraMainScreen] 광고보기 완료 후 리프레시 실패:', error);
+            }
+          };
+
+          setTimeout(checkAndRefresh, 500);
+        }
       } else if (appState === 'active' && nextAppState.match(/inactive|background/)) {
 
         console.log('⏸️ 앱 비활성화 - 토큰 애니메이션 일시정지');
@@ -1618,7 +1880,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     return () => {
       subscription?.remove();
     };
-  }, [appState, pauseAllAnimations, resumeAllAnimations]);
+  }, [appState, pauseAllAnimations, resumeAllAnimations, activeTab, loadTokenData]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -1916,6 +2178,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   useEffect(() => {
     if (showBottomPanel && selectedToken && !hasAutoAdTriggeredRef.current) {
 
+      const campid = String(selectedToken.campid || '');
+      if (campid && campid !== '' && campid !== 'undefined') {
+
+        if (completedAdsSetRef.current && completedAdsSetRef.current.has(campid)) {
+          console.log(`[CameraMainScreen] 자동 광고 이동 차단: 본 광고 (${campid})`);
+          return; 
+        }
+      }
+
       const currentToken: TokenData = {
         ...selectedToken,
         advertisement: selectedToken.advertisement,
@@ -2015,7 +2286,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         ad_company: tokenCopy.ad_company,
       });
     }, 100);
-  }, []);
+
+    setTimeout(() => {
+      console.log('⏱️ 2초 후 광고 화면으로 이동');
+      showAdInModal(tokenCopy);
+    }, 2000);
+  }, [showAdInModal]);
 
   const bottomNavItems = [
     { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
@@ -2106,6 +2382,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 .sort((a, b) => (b.distance || 0) - (a.distance || 0)) 
                 .map((token) => {
 
+                  const campid = String(token.campid || '');
+
+                  const isCompleted = campid && campid !== '' && campid !== 'undefined' && completedAdsSetRef.current
+                    ? completedAdsSetRef.current.has(campid) 
+                    : false;
+
                   const handleClick = () => {
                     console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
                       spotID: token.spotID,
@@ -2113,9 +2395,20 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       campid: token.campid,
                       coin: token.coin,
                       name: token.name,
+                      isCompleted: isCompleted,
                     });
+
+                    if (isCompleted) {
+                      console.log(`[CameraMainScreen] 본 광고 클릭 차단: ${campid}`);
+                      showToast('이미 본 광고입니다.');
+                      return; 
+                    }
+
                     handleTokenClick(token);
                   };
+
+                  const shouldShowCatch = !isCompleted;
+                  console.log(`[토큰 렌더링] spotID=${token.spotID}, campid=${campid}, isCompleted=${isCompleted}, shouldShowCatch=${shouldShowCatch}, completedAdsSet 크기=${completedAdsSetRef.current?.size || 0}`);
 
                   return (
                     <TokenComponent
@@ -2128,6 +2421,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       isRageMode={isRageMode}
                       rageColor={rageColor}
                       calculateScaleBasedOnDistance={calculateScaleBasedOnDistance}
+                      isCompleted={isCompleted}
                     />
                   );
                 });
@@ -2147,7 +2441,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               bottom: bottomPanelBottom, 
               left: 0,
               right: 0,
-              zIndex: 3, 
+              zIndex: 100, 
               pointerEvents: showBottomPanel ? 'box-none' : 'none', 
             },
           ]}>
@@ -2369,20 +2663,38 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
             return (
               <ShowPockAdScreen
-                onClose={() => {
+                onClose={async () => {
                   console.log('ShowPockAdScreen 모달 닫기');
                   setShowAdModal(false);
 
+                  setShowBottomPanel(false);
+                  setSelectedToken(null);
+
+                  const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
+                  if (shouldNavigateToCamera === 'true') {
+                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                    await AsyncStorage.removeItem('shouldNavigateToCamera');
+
+                  }
                 }}
               />
             );
           } else {
             return (
               <ShowNapAdScreen
-                onClose={() => {
+                onClose={async () => {
                   console.log('ShowNapAdScreen 모달 닫기');
                   setShowAdModal(false);
 
+                  setShowBottomPanel(false);
+                  setSelectedToken(null);
+
+                  const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
+                  if (shouldNavigateToCamera === 'true') {
+                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                    await AsyncStorage.removeItem('shouldNavigateToCamera');
+
+                  }
                 }}
               />
             );
