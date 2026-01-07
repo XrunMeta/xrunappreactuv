@@ -16,7 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, processAdReward } from '../services';
+import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds } from '../services';
+import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
@@ -245,6 +246,12 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
     } catch (error: any) {
       console.error('Pock 광고 초기화 실패:', error);
 
+      if (error.is404) {
+        console.log('✅ [ShowPockAdScreen] 404 에러: 캠페인 데이터 없음 - 팝업 표시 안 함');
+        setIsLoading(false);
+        return;
+      }
+
       if (!pockAdData?.landing_url) {
         console.log('❌ 광고 초기화 실패 - 팝업 표시');
         setIsLoading(false);
@@ -442,9 +449,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
     handleClose();
   };
 
-  const handleCancel = () => {
-    console.log('취소 버튼 클릭 - CameraMainScreen으로 이동');
+  const handleCancel = async () => {
+    console.log('취소 버튼 클릭 - AR 화면으로 이동');
     resetAdvertisementParams();
+
+    await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
     handleClose();
   };
 
@@ -465,91 +474,103 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
   };
 
   const handleWatchAd = useCallback(async () => {
-    console.log('광고 보기 버튼 클릭');
+    console.log('광고 보기 버튼 클릭 (AsyncStorage URL 사용)');
 
     try {
+      const campid = advertisementParams?.campid || '';
 
-      const adCompany = advertisementParams?.ad_company || 'pock';
-      if (adCompany === 'pock') {
-        const deviceInfo = await collectDeviceInfo();
-        const ad_key = advertisementParams?.campid || '';
-        console.log(`[광고보기] getPointClickAds 호출 - ad_key: ${ad_key}`);
+      if (!campid || campid === '') {
+        console.error('[광고보기] campid가 없습니다.');
+        setAdCallFailedModalVisible(true);
+        return;
+      }
 
+      let landingUrl = advertisementParams?.urlAD || pockAdData?.landing_url || '';
+
+      if (!landingUrl) {
         try {
-          const result = await getPointClickAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            ad_key,
-            onClose ? undefined : navigate,
-          );
-          console.log('[광고보기] getPointClickAds 응답:', result);
-        } catch (apiError) {
-          console.error('[광고보기] getPointClickAds 호출 실패:', apiError);
-
+          const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+          if (cachedAdStr) {
+            const cachedAd = JSON.parse(cachedAdStr);
+            if (cachedAd[campid]?.urlAD) {
+              landingUrl = cachedAd[campid].urlAD;
+              console.log('[광고보기] AsyncStorage에서 landing_url 가져옴:', landingUrl);
+            }
+          }
+        } catch (cacheError) {
+          console.warn('[광고보기] 캐시 확인 실패:', cacheError);
         }
       }
 
-      const ad_key = advertisementParams?.campid || '';
-      if (ad_key && member) {
-        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
-
-        processAdReward(
-          member,
-          ad_key,
-          'pointclick',
-          onClose ? undefined : navigate,
-        )
-          .then((response) => {
-            console.log('[광고보기] processAdReward 응답:', response);
-          })
-          .catch((error) => {
-            console.error('[광고보기] processAdReward 호출 실패:', error);
-
-          });
-      } else {
-        console.warn('[광고보기] ad_key 또는 member가 없어 리워드 처리를 건너뜁니다.', {
-          ad_key,
-          member,
-        });
-      }
-
-      if (pockAdData?.landing_url) {
-        await openLandingUrl(pockAdData.landing_url);
-
-        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
-
-        await AsyncStorage.setItem('isAdCompleted', 'true');
-        console.log('[광고보기] isAdCompleted 저장 완료');
-        resetAdvertisementParams();
-        handleClose();
-      } else {
-        console.error('[광고보기] landing_url이 없습니다.');
+      if (!landingUrl || landingUrl === '') {
+        console.error('[광고보기] landing_url이 없습니다. AsyncStorage에 저장된 URL을 찾을 수 없습니다.');
         setAdCallFailedModalVisible(true);
+        return;
       }
+
+      try {
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          const parsedUserData = JSON.parse(userData);
+          const member = parsedUserData?.member;
+          if (member) {
+            console.log('[광고보기] processAdReward 호출 시작');
+            const rewardResult = await processAdReward(
+              parseInt(member, 10),
+              campid,
+              'pointclick',
+              navigate,
+            );
+            console.log('[광고보기] processAdReward 응답:', rewardResult);
+          }
+        }
+      } catch (rewardError: any) {
+
+        if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
+          console.log('[광고보기] 이미 본 광고 (404) - 정상 처리');
+        } else {
+          console.warn('[광고보기] processAdReward 실패 (무시):', rewardError);
+        }
+      }
+
+      try {
+        console.log('[광고보기] removeAdFromTopAd5 즉시 호출');
+        await removeAdFromTopAd5(campid, navigate);
+        console.log('[광고보기] removeAdFromTopAd5 완료');
+      } catch (removeError) {
+        console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
+      }
+
+      console.log('[광고보기] URL로 이동:', landingUrl);
+      await openLandingUrl(landingUrl);
+      console.log('[광고보기] URL 열기 완료 - AR 화면으로 이동');
+
+      try {
+        const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+        const cached = cachedStr ? JSON.parse(cachedStr) : [];
+        if (!cached.includes(campid)) {
+          cached.push(campid);
+          await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
+          await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
+          console.log(`[광고보기] completedAdsCache에 즉시 추가: ${campid}`);
+        }
+      } catch (cacheError) {
+        console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
+      }
+
+      await AsyncStorage.setItem('isAdCompleted', 'true');
+      await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
+      await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
+      await AsyncStorage.setItem('completedAdCampid', campid); 
+      console.log('[광고보기] isAdCompleted, shouldRefreshTopAd5, shouldNavigateToCamera, completedAdCampid 저장 완료');
+
+      resetAdvertisementParams();
+      handleClose();
     } catch (error) {
       console.error('[광고보기] URL 열기 실패:', error);
-
-      if (pockAdData?.landing_url) {
-        try {
-          await openLandingUrl(pockAdData.landing_url);
-
-          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
-          resetAdvertisementParams();
-          handleClose();
-        } catch (urlError) {
-          console.error('[광고보기] URL 열기 실패:', urlError);
-
-          resetAdvertisementParams();
-          handleClose();
-        }
-      } else {
-
-        resetAdvertisementParams();
-        handleClose();
-      }
+      setAdCallFailedModalVisible(true);
     }
-  }, [pockAdData, openLandingUrl, advertisementParams, member, onClose, navigate, resetAdvertisementParams, handleClose]);
+  }, [pockAdData, openLandingUrl, advertisementParams, onClose, resetAdvertisementParams, handleClose]);
 
   if (!advertisementParams) {
     return null;
@@ -647,7 +668,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
             {pockAdData.ad_name || advertisementParams.name || t('screens.showNapAd.campaignInfo')}
           </Text>
           <Text style={styles.campaignReward}>
-            {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
+            {t('screens.showNapAd.reward')} : {(() => {
+              const price = advertisementParams?.xrunPrice || 0;
+              const priceValue = parseFloat(String(price));
+              return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
+            })()} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
             {pockAdData.ad_description || ''}
