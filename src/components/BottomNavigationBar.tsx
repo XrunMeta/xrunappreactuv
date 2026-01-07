@@ -69,17 +69,12 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     const v_54e447 = new AbortController();
 
     const v_da5e9c = async () => {
-      console.log('[BottomNavigationBar] 현재 플랫폼 OS:', v_39e4a6, '(실제 Platform.OS:', v_326be8.OS, ')');
 
       if (v_39e4a6 === 'ios') {
         try {
-          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 시작');
+
           const v_5297fb = await v_85f2c8(v_9b57fc);
-          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 결과:', {
-            iosOnWallet: v_5297fb,
-            showWallet: v_5297fb,
-            timestamp: new Date().toISOString(),
-          });
+
           v_603c21(v_5297fb);
         } catch (v_5e9bfe) {
           console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
@@ -87,7 +82,7 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
         }
       } else {
         v_603c21(true); 
-        console.log('[BottomNavigationBar] Android 플랫폼 - 지갑 항상 표시');
+
       }
     };
 
@@ -319,7 +314,7 @@ const v_d81136 = v_472849.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 4, 
+    paddingTop: 4,
     paddingBottom: 20,
     minHeight: 80,
     width: '100%',

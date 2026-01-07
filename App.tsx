@@ -140,18 +140,18 @@ const v_c0dbdf = () => {
     const v_442744 = async () => {
       try {
         const v_7b9c4e = await v_f2c756.getInitialURL();
-        if (v_7b9c4e) { 
+        if (v_7b9c4e) {
           const v_f24fd5 = await v_e84827.getItem('userData');
           if (v_f24fd5) {
             const v_ef7306 = JSON.parse(v_f24fd5);
             const v_660822 = v_ef7306?.member;
             if (v_660822) {
               console.log('[딥링크] 로그인 되어 있음, 딥링크 처리안함');
-            }else{
+            } else {
               console.log('[딥링크] 로그인 안되어 있음, 딥링크 처리');
               v_90a7e8(v_7b9c4e);
             }
-          }else{
+          } else {
             console.log('[딥링크] userData가 없음, 딥링크 처리');
             v_90a7e8(v_7b9c4e);
           }
@@ -241,6 +241,8 @@ const v_c0dbdf = () => {
       if (v_326be8.OS !== 'ios') {
         return;
       }
+
+      return;
 
       try {
 
@@ -656,7 +658,6 @@ const v_d0a391 = () => {
     const v_bc755f = async () => {
 
       try {
-        console.log('[App] 버전 확인 시작');
 
         const v_090f7c = await v_5ee4ec();
         if (v_090f7c) {
@@ -671,23 +672,18 @@ const v_d0a391 = () => {
         const v_4587b3 = v_deac27();
         const v_1300ee = await v_f16a74();
 
-        console.log('[App] 버전 확인 결과:', {
-          current: v_4587b3,
-          latest: v_1300ee,
-        });
-
         if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
           console.log('[App] 새 버전 발견:', v_1300ee);
           if (__DEV__) {
             console.log('[App] 개발 모드이므로 버전 확인을 건너뜁니다. app,tsx');
             return;
-          }else{
+          } else {
             v_b5ebec(v_1300ee);
             v_d97db8(false); 
             v_80c653(true);
           }
         } else {
-          console.log('[App] 최신 버전입니다.');
+
         }
       } catch (v_5e9bfe) {
         console.error('[App] 버전 확인 실패:', v_5e9bfe);
@@ -797,7 +793,7 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] 광고 완료 상태 확인 실패:', v_5e9bfe);
         }
-      } 
+      }
 
       else if (
         v_e263a1 === 'active' &&
@@ -822,7 +818,7 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] ❌ 앱 상태 저장 실패:', v_5e9bfe);
         }
-      } 
+      }
 
       else if (
         v_e263a1 === 'inactive' &&
@@ -831,7 +827,7 @@ export default function v_6540c3() {
 
         console.log('[App] inactive -> background 전환 (타임스탬프는 이미 저장됨)');
         await v_e84827.setItem('app_last_state', v_3b10d8);
-      } 
+      }
       else {
         console.log('[App] AppState 변경 (처리하지 않음):', {
           previous: v_e263a1,
