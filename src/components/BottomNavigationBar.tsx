@@ -69,17 +69,12 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     const abortController = new AbortController();
 
     const getShowWalletStatus = async () => {
-      console.log('[BottomNavigationBar] 현재 플랫폼 OS:', currentPlatformOS, '(실제 Platform.OS:', Platform.OS, ')');
 
       if (currentPlatformOS === 'ios') {
         try {
-          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 시작');
+
           const iosOnWallet = await getIosWalletShowStatus(navigate);
-          console.log('[BottomNavigationBar] iOS 지갑 표시 상태 확인 결과:', {
-            iosOnWallet,
-            showWallet: iosOnWallet,
-            timestamp: new Date().toISOString(),
-          });
+
           setShowWallet(iosOnWallet);
         } catch (error) {
           console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', error);
@@ -87,7 +82,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
         }
       } else {
         setShowWallet(true); 
-        console.log('[BottomNavigationBar] Android 플랫폼 - 지갑 항상 표시');
+
       }
     };
 
@@ -319,7 +314,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 4, 
+    paddingTop: 4,
     paddingBottom: 20,
     minHeight: 80,
     width: '100%',

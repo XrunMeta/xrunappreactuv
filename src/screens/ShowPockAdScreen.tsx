@@ -33,7 +33,7 @@ const SequentialDots: React.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20}}>
+    <View style={{ flexDirection: 'row', marginTop: 20 }}>
       {[0, 1, 2].map(index => (
         <View
           key={index}
@@ -98,6 +98,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     console.log('=== ShowPockAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -167,17 +168,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       const currentParams = params || advertisementParams;
 
       console.log('Starting Pock advertisement initialization');
-      setIsLoading(true);
 
-      console.log('=== ShowPockAdScreen 진입 advertisementParams ===');
-      console.log('advertisement:', currentParams?.advertisement);
-      console.log('coin:', currentParams?.coin);
-      console.log('campid:', currentParams?.campid);
-      console.log('name:', currentParams?.name);
-      console.log('xrunPrice:', currentParams?.xrunPrice);
-      console.log('joindesc:', currentParams?.joindesc);
-      console.log('전체 advertisementParams:', JSON.stringify(currentParams, null, 2));
-      console.log('=== ShowPockAdScreen 진입 advertisementParams 끝 ===');
+      if (isFetchingRef.current) {
+        console.log('[ShowPockAdScreen] 이미 광고 데이터를 가져오는 중입니다.');
+        return;
+      }
 
       if (!currentParams || !currentParams.campid || currentParams.campid === '') {
         console.error('❌ [ShowPockAdScreen] campid가 유효하지 않습니다:', {
@@ -190,23 +185,35 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
         return;
       }
 
+      const campid = currentParams.campid || '';
+
+      if (!pockAdData) {
+        console.log('✅ [ShowPockAdScreen] 기본 정보로 UI 우선 표시');
+        setPockAdData({
+          ad_name: currentParams.name || '',
+          ad_description: '', 
+          ad_profit: currentParams.xrunPrice || 0,
+          landing_url: currentParams.urlAD || '',
+        } as any);
+        setIsLoading(false); 
+      }
+
+      if (currentParams?.urlAD && currentParams.urlAD !== '') {
+        console.log('✅ [ShowPockAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        return;
+      }
+
       const deviceInfo = await collectDeviceInfo();
 
-      const campid = currentParams.campid || '';
       console.log('=== ShowPockAdScreen API 호출 정보 ===');
       console.log('member:', member);
       console.log('adid:', deviceInfo.adid);
       console.log('campid:', campid);
       console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
       console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
-      console.log('🔍 [ShowPockAdScreen] 최종 API 호출 campid 검증:', {
-        campid,
-        advertisement: currentParams?.advertisement,
-        coin: currentParams?.coin,
-        name: currentParams?.name,
-      });
       console.log('=== API 호출 정보 끝 ===');
 
+      isFetchingRef.current = true;
       const result = await getPockAds(
         member,
         deviceInfo.adid,
@@ -214,20 +221,35 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
         campid,
         onClose ? undefined : navigate, 
       );
+      isFetchingRef.current = false;
 
       if (result.code === 200 && result.data && result.data.landing_url) {
-        setPockAdData(result.data);
+        console.log('✅ [ShowPockAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
+        const newData = result.data;
+        setPockAdData(prev => {
+          if (!prev) return newData;
+          return {
+            ...prev,
+            ...newData
+          };
+        });
         setIsLoading(false);
         return;
       } else {
-        throw new Error(`Pock 광고 API 응답 실패: code=${result.code}`);
+
+        console.warn(`Pock 광고 API 응답 결과가 정상이 아닙니다: code=${result.code}`);
+        if (!pockAdData?.landing_url) {
+          throw new Error(`Pock 광고 API 응답 실패: code=${result.code}`);
+        }
       }
     } catch (error: any) {
       console.error('Pock 광고 초기화 실패:', error);
 
-      console.log('❌ 광고 초기화 실패 - 팝업 표시');
-      setIsLoading(false);
-      setAdCallFailedModalVisible(true);
+      if (!pockAdData?.landing_url) {
+        console.log('❌ 광고 초기화 실패 - 팝업 표시');
+        setIsLoading(false);
+        setAdCallFailedModalVisible(true);
+      }
     }
   };
 
@@ -497,8 +519,8 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
 
-      await AsyncStorage.setItem('isAdCompleted', 'true');
-      console.log('[광고보기] isAdCompleted 저장 완료');
+        await AsyncStorage.setItem('isAdCompleted', 'true');
+        console.log('[광고보기] isAdCompleted 저장 완료');
         resetAdvertisementParams();
         handleClose();
       } else {
@@ -628,11 +650,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
             {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
-            {pockAdData.ad_description || t('screens.showNapAd.campaignDesc')}
+            {pockAdData.ad_description || ''}
           </Text>
 
           {}
-          {advertisementParams.joindesc && advertisementParams.joindesc !== '' && (
+          {(pockAdData.ad_participation || advertisementParams.joindesc) && (
             <View style={styles.joinDescContainer}>
               <Text style={styles.joinDescTitle}>{t('screens.showNapAd.joinMethod')}</Text>
               <SafeScrollView
@@ -643,7 +665,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
                 showBottomBackground={false}
               >
                 <Text style={styles.joinDescText}>
-                  {advertisementParams.joindesc}
+                  {pockAdData.ad_participation || advertisementParams.joindesc}
                 </Text>
               </SafeScrollView>
             </View>
@@ -880,19 +902,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-      buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 'auto',
-        gap: 15,
-        paddingTop: 10,
-      },
-      buttonContainers: {
-        justifyContent: 'center',
-        width: '100%',
-        paddingTop: 10,
-      },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 'auto',
+    gap: 15,
+    paddingTop: 10,
+  },
+  buttonContainers: {
+    justifyContent: 'center',
+    width: '100%',
+    paddingTop: 10,
+  },
   watchAdButton: {
     backgroundColor: '#FFDC04',
     paddingHorizontal: 30,

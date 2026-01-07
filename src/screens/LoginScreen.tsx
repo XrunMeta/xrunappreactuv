@@ -21,7 +21,7 @@ import {
   SegmentedControl,
   Dialog,
 } from '../components';
-import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import {
   loginWithEmailPassword,
@@ -33,6 +33,7 @@ import {
   connectGoogleAccount,
   signInWithApple,
   connectAppleAccount,
+  showNativeScreen,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -68,6 +69,7 @@ export const LoginScreen = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPangleLoading, setIsPangleLoading] = useState(false);
 
   const [otpEmail, setOtpEmail] = useState('');
   const [otpRememberMe, setOtpRememberMe] = useState(true);
@@ -193,9 +195,9 @@ export const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      console.log('[로그인] 로그인 시도:', { 
-        email, 
-        rememberMe, 
+      console.log('[로그인] 로그인 시도:', {
+        email,
+        rememberMe,
         rememberMeType: typeof rememberMe,
         rememberMeValue: rememberMe === true ? 'true' : 'false',
       });
@@ -287,15 +289,15 @@ export const LoginScreen = () => {
 
       const response = linkingType === 'google'
         ? await connectGoogleAccount(
-            googleLoginData,
-            linkingPassword,
-            navigate,
-          )
+          googleLoginData,
+          linkingPassword,
+          navigate,
+        )
         : await connectAppleAccount(
-            appleLoginData,
-            linkingPassword,
-            navigate,
-          );
+          appleLoginData,
+          linkingPassword,
+          navigate,
+        );
 
       if (!response.success || (response.code !== 200 && response.code !== '200')) {
         const errorMessage = response.message || t('screens.login.errors.loginFailed');
@@ -779,7 +781,6 @@ export const LoginScreen = () => {
             <Text style={styles.disclaimer}>
               {t('screens.login.disclaimer')}
             </Text>
-
           </View>
         </SafeScrollView>
       )}
@@ -809,7 +810,7 @@ export const LoginScreen = () => {
 보다 간편하게 로그인할 수 있습니다.
 
 ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
-          <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
+            <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
           </Text>
 
           <FormField
@@ -864,6 +865,70 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           </Text>
         </View>
       </Dialog>
+
+      {}
+      {IS_DEV_MODE && Platform.OS === 'ios' && (
+        <View style={[styles.pangleTestContainer, { paddingHorizontal: SIZES.large, paddingBottom: 20 }]}>
+          <TouchableOpacity
+            style={[styles.pangleTestButton, { backgroundColor: COLORS.success, marginBottom: 10 }]}
+            onPress={async () => {
+              try {
+                await showNativeScreen();
+              } catch (error) {
+                showAlert('네이티브 화면 표시 실패', String(error));
+              }
+            }}
+          >
+            <Text style={styles.pangleTestButtonText}>네이티브 화면 연결 테스트</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.pangleTestButton, { backgroundColor: '#FF9800', marginBottom: 10 }]}
+            disabled={isPangleLoading}
+            onPress={async () => {
+              try {
+                setIsPangleLoading(true);
+                const { loadAndShowInterstitialAd } = require('../services/pangle');
+                console.log('[테스트] 전면광고 원터치 시작');
+                await loadAndShowInterstitialAd();
+              } catch (error) {
+                showAlert('테스트 실패', String(error));
+              } finally {
+                setIsPangleLoading(false);
+              }
+            }}
+          >
+            {isPangleLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.pangleTestButtonText}>전면광고 원터치 테스트 (로드+노출)</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.pangleTestButton, { backgroundColor: '#FF5722' }]}
+            disabled={isPangleLoading}
+            onPress={async () => {
+              try {
+                setIsPangleLoading(true);
+                const { loadAndShowNativeAd } = require('../services/pangle');
+                console.log('[테스트] 네이티브 광고 시작');
+                await loadAndShowNativeAd();
+              } catch (error) {
+                showAlert('네이티브 광고 실패', String(error));
+              } finally {
+                setIsPangleLoading(false);
+              }
+            }}
+          >
+            {isPangleLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.pangleTestButtonText}>네이티브광고 보기</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -997,6 +1062,45 @@ const styles = StyleSheet.create({
   linkingLoader: {
     alignItems: 'center',
     marginTop: 10,
+  },
+  pangleTestContainer: {
+    marginTop: SIZES.large,
+    width: '100%',
+  },
+  pangleTestButton: {
+    backgroundColor: COLORS.buttonSecondary,
+    borderRadius: 16,
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SIZES.medium,
+  },
+  pangleTestButtonText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: FONTS.family.medium,
+    color: COLORS.text,
+  },
+  pangleTestButtonsRow: {
+    flexDirection: 'row',
+    gap: SIZES.medium,
+    width: '100%',
+  },
+  pangleTestButtonSmall: {
+    flex: 1,
+    backgroundColor: COLORS.buttonPrimary,
+    borderRadius: 12,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pangleTestButtonSecondary: {
+    backgroundColor: COLORS.buttonSecondary,
+  },
+  pangleTestButtonTextSmall: {
+    fontSize: FONTS.size.ssmall,
+    fontFamily: FONTS.family.medium,
+    color: COLORS.text,
   },
 });
 
