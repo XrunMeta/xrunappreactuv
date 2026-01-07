@@ -33,7 +33,7 @@ const SequentialDots: v_a3453e.FC = () => {
   }, []);
 
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20}}>
+    <View style={{ flexDirection: 'row', marginTop: 20 }}>
       {[0, 1, 2].map(v_a56041 => (
         <View
           key={v_a56041}
@@ -98,6 +98,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
   const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
   const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_64c30d = v_e662ae(false);
 
   v_c4deb2(() => {
     console.log('=== ShowPockAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -167,17 +168,11 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
       const v_766d99 = v_24baff || v_d0b6d4;
 
       console.log('Starting Pock advertisement initialization');
-      v_deef62(true);
 
-      console.log('=== ShowPockAdScreen 진입 advertisementParams ===');
-      console.log('advertisement:', v_766d99?.advertisement);
-      console.log('coin:', v_766d99?.coin);
-      console.log('campid:', v_766d99?.campid);
-      console.log('name:', v_766d99?.name);
-      console.log('xrunPrice:', v_766d99?.xrunPrice);
-      console.log('joindesc:', v_766d99?.joindesc);
-      console.log('전체 advertisementParams:', JSON.stringify(v_766d99, null, 2));
-      console.log('=== ShowPockAdScreen 진입 advertisementParams 끝 ===');
+      if (v_64c30d.current) {
+        console.log('[ShowPockAdScreen] 이미 광고 데이터를 가져오는 중입니다.');
+        return;
+      }
 
       if (!v_766d99 || !v_766d99.campid || v_766d99.campid === '') {
         console.error('❌ [ShowPockAdScreen] campid가 유효하지 않습니다:', {
@@ -190,23 +185,35 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         return;
       }
 
+      const v_aa0917 = v_766d99.campid || '';
+
+      if (!v_9f9e7d) {
+        console.log('✅ [ShowPockAdScreen] 기본 정보로 UI 우선 표시');
+        v_32baa9({
+          ad_name: v_766d99.name || '',
+          ad_description: '', 
+          ad_profit: v_766d99.xrunPrice || 0,
+          landing_url: v_766d99.urlAD || '',
+        } as any);
+        v_deef62(false); 
+      }
+
+      if (v_766d99?.urlAD && v_766d99.urlAD !== '') {
+        console.log('✅ [ShowPockAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        return;
+      }
+
       const v_e7f87b = await v_f3de6d();
 
-      const v_aa0917 = v_766d99.campid || '';
       console.log('=== ShowPockAdScreen API 호출 정보 ===');
       console.log('member:', v_660822);
       console.log('adid:', v_e7f87b.adid);
       console.log('campid:', v_aa0917);
       console.log('advertisementParams (currentParams):', JSON.stringify(v_766d99, null, 2));
       console.log('deviceInfo:', JSON.stringify(v_e7f87b, null, 2));
-      console.log('🔍 [ShowPockAdScreen] 최종 API 호출 campid 검증:', {
-        campid: v_aa0917,
-        advertisement: v_766d99?.advertisement,
-        coin: v_766d99?.coin,
-        name: v_766d99?.name,
-      });
       console.log('=== API 호출 정보 끝 ===');
 
+      v_64c30d.current = true;
       const v_43c42e = await v_aa7dc1(
         v_660822,
         v_e7f87b.adid,
@@ -214,20 +221,35 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         v_aa0917,
         v_0890f8 ? undefined : v_9b57fc, 
       );
+      v_64c30d.current = false;
 
       if (v_43c42e.code === 200 && v_43c42e.data && v_43c42e.data.landing_url) {
-        v_32baa9(v_43c42e.data);
+        console.log('✅ [ShowPockAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
+        const v_4d73f0 = v_43c42e.data;
+        v_32baa9(v_ba2215 => {
+          if (!v_ba2215) return v_4d73f0;
+          return {
+            ...v_ba2215,
+            ...v_4d73f0
+          };
+        });
         v_deef62(false);
         return;
       } else {
-        throw new Error(`Pock 광고 API 응답 실패: code=${v_43c42e.code}`);
+
+        console.warn(`Pock 광고 API 응답 결과가 정상이 아닙니다: code=${v_43c42e.code}`);
+        if (!v_9f9e7d?.landing_url) {
+          throw new Error(`Pock 광고 API 응답 실패: code=${v_43c42e.code}`);
+        }
       }
     } catch (v_5e9bfe) {
       console.error('Pock 광고 초기화 실패:', v_5e9bfe);
 
-      console.log('❌ 광고 초기화 실패 - 팝업 표시');
-      v_deef62(false);
-      v_ed6932(true);
+      if (!v_9f9e7d?.landing_url) {
+        console.log('❌ 광고 초기화 실패 - 팝업 표시');
+        v_deef62(false);
+        v_ed6932(true);
+      }
     }
   };
 
@@ -497,8 +519,8 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
         console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
 
-      await v_e84827.setItem('isAdCompleted', 'true');
-      console.log('[광고보기] isAdCompleted 저장 완료');
+        await v_e84827.setItem('isAdCompleted', 'true');
+        console.log('[광고보기] isAdCompleted 저장 완료');
         v_e10ff9();
         v_7f2e65();
       } else {
@@ -628,11 +650,11 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             {v_8d41d7('screens.showNapAd.reward')} : {(v_d0b6d4.xrunPrice || 0).toFixed(2)} XRUN
           </Text>
           <Text style={v_d81136.campaignDesc}>
-            {v_9f9e7d.ad_description || v_8d41d7('screens.showNapAd.campaignDesc')}
+            {v_9f9e7d.ad_description || ''}
           </Text>
 
           {}
-          {v_d0b6d4.joindesc && v_d0b6d4.joindesc !== '' && (
+          {(v_9f9e7d.ad_participation || v_d0b6d4.joindesc) && (
             <View style={v_d81136.joinDescContainer}>
               <Text style={v_d81136.joinDescTitle}>{v_8d41d7('screens.showNapAd.joinMethod')}</Text>
               <SafeScrollView
@@ -643,7 +665,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
                 showBottomBackground={false}
               >
                 <Text style={v_d81136.joinDescText}>
-                  {v_d0b6d4.joindesc}
+                  {v_9f9e7d.ad_participation || v_d0b6d4.joindesc}
                 </Text>
               </SafeScrollView>
             </View>
@@ -880,19 +902,19 @@ const v_d81136 = v_472849.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-      buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 'auto',
-        gap: 15,
-        paddingTop: 10,
-      },
-      buttonContainers: {
-        justifyContent: 'center',
-        width: '100%',
-        paddingTop: 10,
-      },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 'auto',
+    gap: 15,
+    paddingTop: 10,
+  },
+  buttonContainers: {
+    justifyContent: 'center',
+    width: '100%',
+    paddingTop: 10,
+  },
   watchAdButton: {
     backgroundColor: '#FFDC04',
     paddingHorizontal: 30,
