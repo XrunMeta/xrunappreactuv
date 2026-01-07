@@ -302,6 +302,8 @@ export const sendAliveSignal = async (
         };
       }
 
+<<<<<<< HEAD
+
         const currentVersion = getCurrentAppVersionNumber();  
         const serverAndroidVersion = Number(serverResponse.data.version) || 0;
         const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
@@ -324,7 +326,7 @@ export const sendAliveSignal = async (
           } else {
             console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
           }
-        } else if (Platform.OS === 'ios') { 
+        } else if (Platform.OS === 'ios') {
           if (currentVersion && serverIOSVersion > currentVersion) {
             console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
             if (__DEV__) {
@@ -397,10 +399,10 @@ export const createAxiosInstance = (navigation?: any) => {
   instance.interceptors.request.use(
     (config) => {
 
-      const finalUrl = config.baseURL 
+      const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
-            ? `${config.baseURL.slice(0, -1)}${config.url}`
-            : `${config.baseURL}${config.url}`)
+          ? `${config.baseURL.slice(0, -1)}${config.url}`
+          : `${config.baseURL}${config.url}`)
         : config.url;
 
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
@@ -1908,82 +1910,94 @@ export const fetchMapMarkerDataRaw = async (
   }
 };
 
+let fetchMapMarkerPromise: Promise<SpotData[]> | null = null;
+
 export const fetchMapMarkerData = async (
   latitude: number,
   longitude: number,
   member: number,
   navigation?: any,
 ): Promise<SpotData[]> => {
-  try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const requestBody = {
-      member,
-      latitude,
-      longitude,
-      limit: 120,
-    };
-
-    const response = await axiosInstance.post(
-      '/app2000-01',
-      requestBody,
-    );
-
-    const data = response.data;
-
-    if (data?.data && Array.isArray(data.data)) {
-      return data.data.map((item: any) => {
-        const markerLat = item.lat || item.latitude;
-        const markerLng = item.lng || item.longitude;
-
-        let distance = item.distance || 0;
-        if (markerLat && markerLng && (distance === 0 || !item.distance)) {
-          distance = calculateDistance(latitude, longitude, markerLat, markerLng);
-        }
-
-        let direction = item.direction || 0;
-        if (markerLat && markerLng && (direction === 0 || !item.direction)) {
-          direction = calculateDirection(latitude, longitude, markerLat, markerLng);
-        }
-
-        return {
-          spotID: item.spotid || item.spotID || item.id || 0,
-          distance: distance,
-          direction: direction,
-          name: item.name || item.brand || item.coin || item.title || 'XRUN coin',
-          latitude: markerLat,
-          longitude: markerLng,
-          xrunPrice: item.xrunprice || item.xrunPrice || item.price || 0,
-          iconurl: item.iconurl || item.brandlogo || item.brandlogo_file || item.adthumbnail2 || item.adthumbnail2_file || '',
-          joindesc: item.joindesc || item.description || '',
-          brand: item.brand || item.coin || '',
-          coins: item.coins || item.coin || '',
-          coin: item.coin || '', 
-
-          campid: item.campid || item.campId || item.campaignid || item.campaignId || '',
-
-          advertisement: item.advertisement || item.adid || item.ad || item.coin || '',
-        } as SpotData & { campid?: string; advertisement?: string | number };
-      });
-    }
-
-    console.log('API 응답에 data.data가 없거나 배열이 아님');
-    return [];
-  } catch (error) {
-    console.error('맵 마커 데이터 가져오기 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[맵 마커] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
-    }
-
-    return [];
+  if (fetchMapMarkerPromise) {
+    console.log('[Deduplication] fetchMapMarkerData is already in progress, returning pending promise');
+    return fetchMapMarkerPromise;
   }
+
+  fetchMapMarkerPromise = (async () => {
+    try {
+      const axiosInstance = createAxiosInstance(navigation);
+      const requestBody = {
+        member,
+        latitude,
+        longitude,
+        limit: 120,
+      };
+
+      const response = await axiosInstance.post(
+        '/app2000-01',
+        requestBody,
+      );
+
+      const data = response.data;
+
+      if (data?.data && Array.isArray(data.data)) {
+        return data.data.map((item: any) => {
+          const markerLat = item.lat || item.latitude;
+          const markerLng = item.lng || item.longitude;
+
+          let distance = item.distance || 0;
+          if (markerLat && markerLng && (distance === 0 || !item.distance)) {
+            distance = calculateDistance(latitude, longitude, markerLat, markerLng);
+          }
+
+          let direction = item.direction || 0;
+          if (markerLat && markerLng && (direction === 0 || !item.direction)) {
+            direction = calculateDirection(latitude, longitude, markerLat, markerLng);
+          }
+
+          return {
+            spotID: item.spotid || item.spotID || item.id || 0,
+            distance: distance,
+            direction: direction,
+            name: item.name || item.brand || item.coin || item.title || 'XRUN coin',
+            latitude: markerLat,
+            longitude: markerLng,
+            xrunPrice: item.xrunprice || item.xrunPrice || item.price || 0,
+            iconurl: item.iconurl || item.brandlogo || item.brandlogo_file || item.adthumbnail2 || item.adthumbnail2_file || '',
+            joindesc: item.joindesc || item.description || '',
+            brand: item.brand || item.coin || '',
+            coins: item.coins || item.coin || '',
+            coin: item.coin || '',
+            campid: item.campid || item.campId || item.campaignid || item.campaignId || '',
+            advertisement: item.advertisement || item.adid || item.ad || item.coin || '',
+          } as SpotData & { campid?: string; advertisement?: string | number };
+        });
+      }
+
+      console.log('API 응답에 data.data가 없거나 배열이 아님');
+      return [];
+    } catch (error) {
+      console.error('맵 마커 데이터 가져오기 오류:', error);
+      if (error instanceof AxiosError) {
+        console.error('[맵 마커] 상세 오류 정보:', {
+          url: error.config?.url,
+          method: error.config?.method,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          message: error.message,
+        });
+      }
+      return [];
+    } finally {
+      fetchMapMarkerPromise = null;
+    }
+  })();
+
+  return fetchMapMarkerPromise as Promise<SpotData[]>;
 };
+
+let fetchVirtualCoinPromise: Promise<any> | null = null;
 
 export const fetchVirtualCoin = async (
   member: number | string,
@@ -1991,80 +2005,104 @@ export const fetchVirtualCoin = async (
   longitude: number,
   navigation?: any,
 ): Promise<any> => {
-  try {
-    const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
-
-    const requestBody = {
-      member: member,
-      latitude: latitude,
-      longitude: longitude,
-    };
-
-    console.log('=== virtualCoin API 호출 ===');
-    console.log('requestBody:', JSON.stringify(requestBody));
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('=== virtualCoin API 응답 ===');
-    console.log('response.data length:', result?.data?.length);
-
-    return result;
-  } catch (error) {
-    console.error('virtualCoin API 호출 실패:', error);
-    if (navigation) {
-      await handleTimeoutError(navigation);
-    }
-    throw error;
+  if (fetchVirtualCoinPromise) {
+    console.log('[Deduplication] fetchVirtualCoin is already in progress, returning pending promise');
+    return fetchVirtualCoinPromise as Promise<any>;
   }
+
+  fetchVirtualCoinPromise = (async () => {
+    try {
+      const env = getEnv();
+      const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
+
+      const requestBody = {
+        member: member,
+        latitude: latitude,
+        longitude: longitude,
+      };
+
+      console.log('=== virtualCoin API 호출 ===');
+      console.log('requestBody:', JSON.stringify(requestBody));
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('=== virtualCoin API 응답 ===');
+      console.log('response.data length:', result?.data?.length);
+
+      return result;
+    } catch (error) {
+      console.error('virtualCoin API 호출 실패:', error);
+      if (navigation) {
+        await handleTimeoutError(navigation);
+      }
+      throw error;
+    } finally {
+      fetchVirtualCoinPromise = null;
+    }
+  })();
+
+  return fetchVirtualCoinPromise;
 };
+
+let getCoinNasPricePromise: Promise<any> | null = null;
 
 export const getCoinNasPrice = async (
   navigation?: any,
 ): Promise<any> => {
-  try {
-    const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
-
-    console.log('=== getCoinNasPrice API 호출 ===');
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
-      },
-      body: JSON.stringify({}),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('=== getCoinNasPrice API 응답 ===');
-    console.log('calculatedNasPrice:', result?.data?.coins);
-
-    return result;
-  } catch (error) {
-    console.error('getCoinNasPrice API 호출 실패:', error);
-    if (navigation) {
-      await handleTimeoutError(navigation);
-    }
-    throw error;
+  if (getCoinNasPricePromise) {
+    console.log('[Deduplication] getCoinNasPrice is already in progress, returning pending promise');
+    return getCoinNasPricePromise as Promise<any>;
   }
+
+  getCoinNasPricePromise = (async () => {
+    try {
+      const env = getEnv();
+      const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
+
+      console.log('=== getCoinNasPrice API 호출 ===');
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('=== getCoinNasPrice API 응답 ===');
+      console.log('calculatedNasPrice:', result?.data?.coins);
+
+      return result;
+    } catch (error) {
+      console.error('getCoinNasPrice API 호출 실패:', error);
+      if (navigation) {
+        await handleTimeoutError(navigation);
+      }
+      throw error;
+    } finally {
+      getCoinNasPricePromise = null;
+    }
+  })();
+
+  return getCoinNasPricePromise as Promise<any>;
 };
 
 export const registerReferralByEmail = async (
@@ -4698,7 +4736,19 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
       console.log('[getTopAd5] userData 가져오기 실패:', userDataError);
     }
 
-    const requestBody = { os, member };
+    let deviceInfo = {};
+    try {
+      const { collectDeviceInfo } = require('../utils/napApiUtils');
+      deviceInfo = await collectDeviceInfo();
+    } catch (deviceInfoError) {
+      console.log('[getTopAd5] 디바이스 정보 수집 실패:', deviceInfoError);
+    }
+
+    const requestBody = {
+      os,
+      member,
+      ...deviceInfo
+    };
 
     console.log('[getTopAd5] ========== API 호출 시작 ==========');
     console.log('[getTopAd5] 요청 파라미터:', { os, member });
@@ -4713,10 +4763,6 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
     console.log('[getTopAd5] ========== 응답 구조 분석 ==========');
     console.log('[getTopAd5] response 타입:', typeof response);
     console.log('[getTopAd5] response가 배열인가?', Array.isArray(response));
-    console.log('[getTopAd5] response 전체:', JSON.stringify(response, null, 2));
-    console.log('[getTopAd5] response.data:', response?.data);
-    console.log('[getTopAd5] response.data?.ads:', response?.data?.ads);
-    console.log('[getTopAd5] response.ads:', response?.ads);
 
     let topAd5Response: any[] = [];
     if (Array.isArray(response)) {
@@ -4755,9 +4801,9 @@ export const getTopAd5 = async (navigation?: any): Promise<any> => {
         console.log('[getTopAd5] 백엔드 메시지:', response.message);
       }
     } else {
-      console.log('[getTopAd5] ✅ 광고 데이터 발견:', topAd5Response.length, '개');
+
       if (topAd5Response.length > 0) {
-        console.log('[getTopAd5] 첫 번째 광고:', JSON.stringify(topAd5Response[0], null, 2));
+
       }
     }
 
@@ -4949,3 +4995,4 @@ export const getItemPurchaseList = async (
   }
 };
 
+export * from './pangle';
