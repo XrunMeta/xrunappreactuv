@@ -12,6 +12,7 @@ import {
   v_6b5698,
   v_aa7413,
   v_326be8,
+  v_f2c756,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
@@ -21,7 +22,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1 } from '../services';
+import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -53,6 +54,7 @@ interface TokenComponentProps {
   isRageMode: boolean;
   rageColor: string;
   calculateScaleBasedOnDistance: (distance: number) => number;
+  isCompleted?: boolean; 
 }
 
 const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
@@ -64,6 +66,7 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
   isRageMode: v_a5ed76,
   rageColor: v_269c04,
   calculateScaleBasedOnDistance: v_c4aeea,
+  isCompleted: v_2be890 = false,
 }) => {
   const v_4da25a = v_e662ae(new v_a2349e.ValueXY({ x: 0, y: 0 })).current;
   const v_e28e12 = v_e662ae(new v_a2349e.Value(0)).current;
@@ -287,13 +290,15 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
       />
 
       <TouchableOpacity
-        onPress={v_719eed}
+        onPress={v_2be890 ? undefined : v_719eed}
+        disabled={v_2be890}
         style={[
           v_d81136.tokenButtonContainer,
           {
             transform: [
               { scale: v_c4aeea(v_926d1c) },
             ],
+            opacity: v_2be890 ? 0.5 : 1, 
           },
         ]}
         activeOpacity={0.7}>
@@ -310,7 +315,7 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          {parseFloat(String(v_926d1c)) < 30 && (
+          {!v_2be890 && (
             <Animated.Image
               source={
                 v_a5ed76
@@ -456,6 +461,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         tokensCount: v_ef86b6?.length ?? 0,
         appState: v_94a194,
       });
+
+      v_6a4dcd(false);
+      v_96a9ed(null);
+      console.log('📱 [CameraMainScreen] 광고보기 완료 - 하단 패널 닫기');
 
       const v_4b24d2 = v_326be8.OS === 'ios' ? 500 : 100;
 
@@ -620,6 +629,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_0b2c53 = v_e662ae(false);
   const v_ba482c = v_e662ae(false);
+  const v_7c7dd0 = v_e662ae<Set<string>>(new Set<string>());
 
   const v_c9b9cb = v_de06a3(async () => {
     try {
@@ -733,6 +743,17 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
     const v_908496 = v_88aee2;
 
+    v_88aee2.forEach(v_d5dda0 => {
+      const v_e4fdb7 = (v_d5dda0.urlAD && v_d5dda0.urlAD !== '') || (v_d5dda0.landing_url && v_d5dda0.landing_url !== '');
+      const v_aa0917 = String(v_d5dda0.campid || '');
+      const v_6847e0 = v_3b73a5[v_aa0917]?.urlAD;
+      const v_5b8a93 = v_6847e0 && v_6847e0 !== '';
+
+      if (!v_e4fdb7 && !v_5b8a93) {
+        console.log(`⚠️ [organizeData] ${v_d5dda0.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`);
+      }
+    });
+
     console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', v_908496.slice(0, 5).map((v_d5dda0, v_e86ad8) => ({
       ...v_d5dda0,
       urlAD: v_d5dda0.urlAD || '없음',
@@ -838,18 +859,28 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
               try {
 
-                console.log('[CameraMainScreen] 1단계: TopAd5 데이터 새로고침 시작');
-                let v_e36b07 = await v_563153();
+          console.log('[CameraMainScreen] 1단계: TopAd5 데이터 확인 시작');
+          const v_92ed2d = await v_5d7ca4();
 
-                if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
-                  console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
-                  v_e36b07 = null; 
-                }
+          let v_e36b07 = null;
 
-                if (!v_e36b07 || !Array.isArray(v_e36b07)) {
-                  console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
-                  v_e36b07 = await v_5d7ca4();
-                }
+          if (v_92ed2d && Array.isArray(v_92ed2d) && v_92ed2d.length > 0) {
+            v_e36b07 = await v_563153(); 
+          } else {
+
+            console.log('[CameraMainScreen] 저장된 TopAd5 데이터 없음, API 호출');
+            v_e36b07 = await v_563153();
+          }
+
+          if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
+            console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
+            v_e36b07 = null; 
+          }
+
+          if (!v_e36b07 || !Array.isArray(v_e36b07)) {
+            console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
+            v_e36b07 = await v_5d7ca4();
+          }
 
                 if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
                   console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', v_e36b07.length, '개');
@@ -1033,9 +1064,78 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const v_7dd198 = await v_8a44cb.getCurrentPositionAsync({
+      const v_f3d3c8 = 'lastGpsLocationForMapMove';
+      const v_eaa10e = 'lastGpsLocationTimestamp';
+      const v_8d9416 = 60 * 1000; 
+      const v_f41f0d = 500; 
+
+      const v_b464ed = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+        const v_bef3bf = 6371000; 
+        const v_32a354 = (v_ed3911 - v_34b365) * Math.PI / 180;
+        const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+        const v_779914 =
+          Math.sin(v_32a354 / 2) * Math.sin(v_32a354 / 2) +
+          Math.cos(v_34b365 * Math.PI / 180) * Math.cos(v_ed3911 * Math.PI / 180) *
+          Math.sin(v_84b828 / 2) * Math.sin(v_84b828 / 2);
+        const v_3f4e2e = 2 * Math.atan2(Math.sqrt(v_779914), Math.sqrt(1 - v_779914));
+        return v_bef3bf * v_3f4e2e;
+      };
+
+      const v_4a8217 = await v_8a44cb.getCurrentPositionAsync({
         accuracy: v_8a44cb.Accuracy.High,
       });
+
+      const v_746c3b = {
+        latitude: v_4a8217.coords.latitude,
+        longitude: v_4a8217.coords.longitude,
+      };
+
+      let v_264a98 = v_746c3b;
+      try {
+
+        const v_05f29b = await v_e84827.getItem(v_f3d3c8);
+        const v_45b2c8 = await v_e84827.getItem(v_eaa10e);
+
+        if (v_05f29b && v_45b2c8) {
+          const v_3a14d6 = JSON.parse(v_05f29b);
+          const v_932c48 = parseInt(v_45b2c8, 10);
+          const v_5c2f9f = Date.now();
+          const v_e56026 = v_5c2f9f - v_932c48;
+
+          if (v_e56026 < v_8d9416) {
+
+            const v_926d1c = v_b464ed(
+              v_746c3b.latitude,
+              v_746c3b.longitude,
+              v_3a14d6.latitude,
+              v_3a14d6.longitude
+            );
+
+            if (v_926d1c < v_f41f0d) {
+              v_264a98 = v_3a14d6;
+              console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(v_e56026 / 1000)}초 전, ${v_926d1c.toFixed(0)}m)`);
+            } else {
+              console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${v_926d1c.toFixed(0)}m > ${v_f41f0d}m), 새 위치 사용`);
+            }
+          } else {
+            console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(v_e56026 / 1000)}초 > ${v_8d9416 / 1000}초), 새 위치 사용`);
+          }
+        } else {
+          console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
+        }
+      } catch (v_df17d5) {
+        console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', v_df17d5);
+      }
+
+      await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_264a98));
+      await v_e84827.setItem(v_eaa10e, Date.now().toString());
+
+      const v_7dd198 = {
+        coords: {
+          latitude: v_264a98.latitude,
+          longitude: v_264a98.longitude,
+        },
+      };
 
       const v_ef7306 = await v_e84827.getItem('userData');
       if (!v_ef7306) {
@@ -1054,8 +1154,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       console.log('📍 [Trace] 0. loadTokenData 진입, 마커 데이터 요청 시작');
       const v_003147 = await v_f84ef5(
-        v_7dd198.coords.latitude,
-        v_7dd198.coords.longitude,
+        v_264a98.latitude,
+        v_264a98.longitude,
         v_660822,
         v_9b57fc,
       );
@@ -1083,6 +1183,30 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           };
         });
 
+        let v_905ecb = new Set<string>();
+        try {
+
+          const v_96f338 = v_7c7dd0.current ? new Set(v_7c7dd0.current) : new Set<string>();
+
+          v_905ecb = await v_318c45(v_660822, v_9b57fc);
+          console.log(`[CameraMainScreen] 완료된 광고 목록: ${v_905ecb.size}개`);
+
+          const v_b63d4a = new Set<string>();
+          v_96f338.forEach(v_aa0917 => v_b63d4a.add(v_aa0917));
+          v_905ecb.forEach(v_aa0917 => v_b63d4a.add(v_aa0917));
+
+          v_7c7dd0.current = v_b63d4a;
+          console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${v_96f338.size}개 + 새로 ${v_905ecb.size}개 = 총 ${v_b63d4a.size}개`);
+        } catch (v_5e9bfe) {
+          console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
+
+          if (!v_7c7dd0.current) {
+            v_7c7dd0.current = new Set<string>();
+          }
+        }
+
+        const v_3ce376 = v_3d87ed;
+
         try {
           console.log('📍 [Trace] 3. 초기 캐시 로드 시작');
 
@@ -1098,8 +1222,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.error('❌ [CameraMainScreen][Direct] 캐시 직접 로드 실패:', v_49263d);
           }
 
-          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
-          let v_e36b07 = await v_563153();
+          console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 확인 시작');
+          const v_92ed2d = await v_5d7ca4();
+
+          let v_e36b07 = null;
+
+          if (v_92ed2d && Array.isArray(v_92ed2d) && v_92ed2d.length > 0) {
+            v_e36b07 = await v_563153(); 
+          } else {
+
+            console.log('[CameraMainScreen API] 저장된 TopAd5 데이터 없음, API 호출');
+            v_e36b07 = await v_563153();
+          }
 
           if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
             console.log('[CameraMainScreen API] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
@@ -1107,13 +1241,58 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           }
 
           if (!v_e36b07 || !Array.isArray(v_e36b07)) {
-            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도');
+            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
             v_e36b07 = await v_5d7ca4();
           }
 
           if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
             console.warn('🚦 [CameraMainScreen API] TopAd5 조건 충족. 로직 진입. 개수:', v_e36b07.length);
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', v_e36b07.length, '개');
+
+            const v_6c877c = v_e36b07.filter((v_ddcfed) => {
+              const v_d5d81a = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
+              if (!v_d5d81a) {
+                console.log(`⚠️ [CameraMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨`);
+              }
+              return v_d5d81a;
+            });
+
+            if (v_6c877c.length === 0) {
+              console.warn('[CameraMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+              v_e36b07 = null;
+            } else {
+
+              console.log('[CameraMainScreen] URL 검증 시작');
+              const v_507ee6 = await v_e3e9a7(v_6c877c);
+
+              const v_be75db = v_507ee6.filter((v_8c0b26) => v_8c0b26.isValid === true);
+              if (v_be75db.length !== v_507ee6.length) {
+                console.log(`[CameraMainScreen] URL 검증 완료: ${v_be75db.length}/${v_507ee6.length}개 유효 (${v_507ee6.length - v_be75db.length}개 제외)`);
+              }
+
+              const v_00c9ca = v_be75db.filter((v_ddcfed) => {
+                const v_aa0917 = String(v_ddcfed.campid || '');
+                const v_2be890 = v_905ecb.has(v_aa0917);
+                if (v_2be890) {
+                  console.log(`⚠️ [CameraMainScreen] ${v_aa0917}는 이미 본 광고로 제외됨`);
+                }
+                return !v_2be890;
+              });
+
+              if (v_00c9ca.length !== v_be75db.length) {
+                console.log(`[CameraMainScreen] 이미 본 광고 필터링: ${v_00c9ca.length}/${v_be75db.length}개 유효 (${v_be75db.length - v_00c9ca.length}개 제외)`);
+              }
+
+              if (v_00c9ca.length === 0) {
+                console.warn('[CameraMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
+                v_e36b07 = null;
+              } else {
+                v_e36b07 = v_00c9ca;
+              }
+            }
+          }
+
+          if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
 
             for (const v_ddcfed of v_e36b07) {
               if (v_ddcfed.campid && v_ddcfed.urlAD) {
@@ -1148,7 +1327,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               urlAD_preview: v_e36b07[0].urlAD ? v_e36b07[0].urlAD.substring(0, 30) + '...' : 'MISSING'
             });
 
-            const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
+            const v_beddf3 = [...v_3ce376].sort((v_779914, v_148ff6) => {
               const v_1b0610 = parseFloat(String(v_779914.distance || 0));
               const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
               return v_1b0610 - v_161ea9; 
@@ -1172,6 +1351,14 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               const v_127b33 = v_e36b07[v_ba7922];
               const v_aa0917 = v_127b33?.campid;
 
+              const v_4cda83 = String(v_127b33?.campid || '');
+              const v_0231a4 = v_ed29b7[v_4cda83];
+              const v_eda183 = v_0231a4?.urlAD || v_127b33?.urlAD || v_51b584.urlAD || '';
+
+              if (!v_eda183 || v_eda183 === '') {
+                console.log(`⚠️ [CameraMainScreen API] ${v_aa0917}는 urlAD가 없지만 매핑은 진행 (나중에 pre-fetch 예정)`);
+              }
+
               if (v_aa0917) {
                 const v_375fda = v_7864b3.get(v_aa0917) || 0;
                 if (v_375fda >= v_dc4d18) {
@@ -1184,12 +1371,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 adIndex: v_ba7922,
                 adCompany: v_127b33?.ad_company,
                 campid: v_127b33?.campid,
-                hasUrlAD: !!v_127b33?.urlAD,
-                urlAD_val: v_127b33?.urlAD || 'EMPTY'
+                hasUrlAD: !!v_eda183,
+                urlAD_val: v_eda183 || 'EMPTY'
               });
 
-              const v_4cda83 = String(v_127b33?.campid || '');
-              const v_0231a4 = v_ed29b7[v_4cda83];
               if (v_0231a4) {
                 console.log(`💾 [CameraMainScreen API] 매핑 중 캐시 데이터 발견: ${v_4cda83}`);
               }
@@ -1208,8 +1393,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                 advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
 
-                urlAD: v_0231a4?.urlAD || v_127b33?.urlAD || v_51b584.urlAD || '',
-                landing_url: v_0231a4?.urlAD || v_127b33?.urlAD || v_51b584.urlAD || '', 
+                urlAD: v_eda183,
+                landing_url: v_eda183, 
                 thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
                 ad_company: v_127b33?.ad_company || v_51b584.ad_company,
                 coins: v_127b33?.coins?.toString() || v_51b584.coins,
@@ -1604,6 +1789,83 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
         console.log('🔄 앱 활성화 - 토큰 애니메이션 재시작');
         v_0b240b();
+
+        if (v_ac1d22 === 'Camera') {
+          const v_c4aa47 = async () => {
+            try {
+
+              const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
+              if (v_764826 === 'true') {
+                console.log('[CameraMainScreen] 광고보기 완료 감지 - 이미 AR 화면에 있음');
+                await v_e84827.removeItem('shouldNavigateToCamera');
+              }
+
+              const v_172d56 = await v_e84827.getItem('shouldRefreshTopAd5');
+              if (v_172d56 === 'true') {
+                console.log('[CameraMainScreen] 광고보기 완료 감지 - TopAd5 및 토큰 데이터 새로고침');
+                await v_e84827.removeItem('shouldRefreshTopAd5');
+
+                const v_dc62a4 = await v_e84827.getItem('completedAdCampid');
+                if (v_dc62a4) {
+                  await v_e84827.removeItem('completedAdCampid');
+                  console.log(`[CameraMainScreen] 완료된 광고 제거 및 대체 시작: ${v_dc62a4}`);
+
+                  try {
+                    const v_c06630 = await v_e84827.getItem('completedAdsCache');
+                    if (v_c06630) {
+                      const v_e2a6a6 = JSON.parse(v_c06630);
+                      if (Array.isArray(v_e2a6a6)) {
+                        v_7c7dd0.current = new Set(v_e2a6a6);
+                        console.log(`[CameraMainScreen] completedAdsCache에서 로드: ${v_e2a6a6.length}개 (${v_dc62a4} 포함 여부: ${v_e2a6a6.includes(v_dc62a4)})`);
+                      }
+                    }
+                  } catch (v_2bf859) {
+                    console.warn('[CameraMainScreen] completedAdsCache 읽기 실패:', v_2bf859);
+                  }
+
+                  if (!v_7c7dd0.current) {
+                    v_7c7dd0.current = new Set<string>();
+                  }
+                  if (!v_7c7dd0.current.has(v_dc62a4)) {
+                    v_7c7dd0.current.add(v_dc62a4);
+                    console.log(`[CameraMainScreen] completedAdsSetRef에 추가: ${v_dc62a4} (현재 크기: ${v_7c7dd0.current.size})`);
+                  }
+
+                  v_8ce112(v_93ce34 => [...v_93ce34]);
+
+                  await v_8cba1e(v_dc62a4, v_9b57fc);
+                }
+
+                try {
+
+                  const v_ef7306 = await v_e84827.getItem('userData');
+                  if (v_ef7306) {
+                    const v_ff39bc = JSON.parse(v_ef7306);
+                    const v_660822 = v_ff39bc?.member;
+                    if (v_660822) {
+
+                      const v_905ecb = await v_318c45(v_660822, v_9b57fc, true);
+                      v_7c7dd0.current = v_905ecb;
+                      console.log(`[CameraMainScreen] 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+                      v_8ce112(v_93ce34 => [...v_93ce34]);
+                    }
+                  }
+
+                  console.log('[CameraMainScreen] TopAd5 및 토큰 데이터 새로고침 시작');
+                  await v_c4c061(true);
+                  console.log('[CameraMainScreen] TopAd5 및 토큰 데이터 새로고침 완료');
+                } catch (v_5e9bfe) {
+                  console.error('[CameraMainScreen] TopAd5 새로고침 실패:', v_5e9bfe);
+                }
+              }
+            } catch (v_5e9bfe) {
+              console.error('[CameraMainScreen] 광고보기 완료 후 리프레시 실패:', v_5e9bfe);
+            }
+          };
+
+          setTimeout(v_c4aa47, 500);
+        }
       } else if (v_94a194 === 'active' && v_3b10d8.match(/inactive|background/)) {
 
         console.log('⏸️ 앱 비활성화 - 토큰 애니메이션 일시정지');
@@ -1618,7 +1880,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     return () => {
       v_269481?.remove();
     };
-  }, [v_94a194, v_24b08b, v_0b240b]);
+  }, [v_94a194, v_24b08b, v_0b240b, v_ac1d22, v_c4c061]);
 
   v_c4deb2(() => {
     const v_ca94a2 = setInterval(() => {
@@ -1916,6 +2178,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   v_c4deb2(() => {
     if (v_572bd3 && v_04cb77 && !v_6890b1.current) {
 
+      const v_aa0917 = String(v_04cb77.campid || '');
+      if (v_aa0917 && v_aa0917 !== '' && v_aa0917 !== 'undefined') {
+
+        if (v_7c7dd0.current && v_7c7dd0.current.has(v_aa0917)) {
+          console.log(`[CameraMainScreen] 자동 광고 이동 차단: 본 광고 (${v_aa0917})`);
+          return; 
+        }
+      }
+
       const currentToken: v_60c7c3 = {
         ...v_04cb77,
         advertisement: v_04cb77.advertisement,
@@ -2015,7 +2286,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         ad_company: v_021ef9.ad_company,
       });
     }, 100);
-  }, []);
+
+    setTimeout(() => {
+      console.log('⏱️ 2초 후 광고 화면으로 이동');
+      v_794bb0(v_021ef9);
+    }, 2000);
+  }, [v_794bb0]);
 
   const v_fce460 = [
     { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
@@ -2106,6 +2382,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 .sort((v_779914, v_148ff6) => (v_148ff6.distance || 0) - (v_779914.distance || 0)) 
                 .map((v_21cc31) => {
 
+                  const v_aa0917 = String(v_21cc31.campid || '');
+
+                  const v_2be890 = v_aa0917 && v_aa0917 !== '' && v_aa0917 !== 'undefined' && v_7c7dd0.current
+                    ? v_7c7dd0.current.has(v_aa0917) 
+                    : false;
+
                   const v_d0be5e = () => {
                     console.log('🖱️ [TokenComponent] 토큰 클릭됨:', {
                       spotID: v_21cc31.spotID,
@@ -2113,9 +2395,20 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       campid: v_21cc31.campid,
                       coin: v_21cc31.coin,
                       name: v_21cc31.name,
+                      isCompleted: v_2be890,
                     });
+
+                    if (v_2be890) {
+                      console.log(`[CameraMainScreen] 본 광고 클릭 차단: ${v_aa0917}`);
+                      v_cba33f('이미 본 광고입니다.');
+                      return; 
+                    }
+
                     v_eed806(v_21cc31);
                   };
+
+                  const v_5a4448 = !v_2be890;
+                  console.log(`[토큰 렌더링] spotID=${v_21cc31.spotID}, campid=${v_aa0917}, isCompleted=${v_2be890}, shouldShowCatch=${v_5a4448}, completedAdsSet 크기=${v_7c7dd0.current?.size || 0}`);
 
                   return (
                     <TokenComponent
@@ -2128,6 +2421,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       isRageMode={v_a5ed76}
                       rageColor={v_269c04}
                       calculateScaleBasedOnDistance={v_c4aeea}
+                      isCompleted={v_2be890}
                     />
                   );
                 });
@@ -2147,7 +2441,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               bottom: v_8f79f8, 
               left: 0,
               right: 0,
-              zIndex: 3, 
+              zIndex: 100, 
               pointerEvents: v_572bd3 ? 'box-none' : 'none', 
             },
           ]}>
@@ -2369,20 +2663,38 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
             return (
               <ShowPockAdScreen
-                onClose={() => {
+                onClose={async () => {
                   console.log('ShowPockAdScreen 모달 닫기');
                   v_219124(false);
 
+                  v_6a4dcd(false);
+                  v_96a9ed(null);
+
+                  const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
+                  if (v_764826 === 'true') {
+                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                    await v_e84827.removeItem('shouldNavigateToCamera');
+
+                  }
                 }}
               />
             );
           } else {
             return (
               <ShowNapAdScreen
-                onClose={() => {
+                onClose={async () => {
                   console.log('ShowNapAdScreen 모달 닫기');
                   v_219124(false);
 
+                  v_6a4dcd(false);
+                  v_96a9ed(null);
+
+                  const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
+                  if (v_764826 === 'true') {
+                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                    await v_e84827.removeItem('shouldNavigateToCamera');
+
+                  }
                 }}
               />
             );

@@ -1,47 +1,48 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae, v_de06a3 } from 'bapkr';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-  ActivityIndicator,
-  Linking,
-  AppState,
-  Modal,
-  Platform,
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { useTranslation } from 'react-i18next';
-import { useAppContext } from '../context';
-import { useAppNavigation, ROUTES } from '../navigation';
-import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward, getPointClickAds } from '../services';
-import { NAP_CONFIG } from '../config/napConfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TaboolaBanner, SafeScrollView } from '../components';
-import { FONTS } from '../constants';
+  v_3094a2,
+  v_19b633,
+  v_472849,
+  v_4623af,
+  v_09d0e5,
+  v_39a996,
+  v_f2c756,
+  v_6b5698,
+  v_aa7413,
+  v_326be8,
+} from 'rcmrninabrnb';
+import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_772971 } from 'jmpfvteuuztnp';
+import { v_700ef9 } from '../context';
+import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_f3de6d } from '../utils/napApiUtils';
+import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d } from '../services';
+import { v_cba33f } from '../utils';
+import { v_ebc3c8 } from '../config/napConfig';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_4c7b5d, v_570c34 } from '../components';
+import { v_843035 } from '../constants';
 
-const SequentialDots: React.FC = () => {
-  const [activeDot, setActiveDot] = useState(0);
+const SequentialDots: v_a3453e.FC = () => {
+  const [v_9b82f3, v_67dd3d] = v_5ab095(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveDot(prev => (prev + 1) % 3);
+  v_c4deb2(() => {
+    const v_ad1d65 = setInterval(() => {
+      v_67dd3d(v_ba2215 => (v_ba2215 + 1) % 3);
     }, 300);
-    return () => clearInterval(interval);
+    return () => clearInterval(v_ad1d65);
   }, []);
 
   return (
     <View style={{ flexDirection: 'row', marginTop: 20 }}>
-      {[0, 1, 2].map(index => (
+      {[0, 1, 2].map(v_a56041 => (
         <View
-          key={index}
+          key={v_a56041}
           style={{
             width: 8,
             height: 8,
             borderRadius: 4,
-            backgroundColor: activeDot === index ? '#388Dc8' : '#ccc',
+            backgroundColor: v_9b82f3 === v_a56041 ? '#388Dc8' : '#ccc',
             marginHorizontal: 4,
           }}
         />
@@ -64,623 +65,628 @@ interface ShowNapAdScreenProps {
   onClose?: () => void; 
 }
 
-export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
-  const { t } = useTranslation();
-  const { advertisementParams, resetAdvertisementParams } = useAppContext();
-  const { navigate, reset, goBack } = useAppNavigation();
+export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8 }) => {
+  const { t: v_8d41d7 } = v_772971();
+  const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
+  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
 
-  const handleClose = useCallback(() => {
-    resetAdvertisementParams();
+  const v_7f2e65 = v_de06a3(() => {
+    v_e10ff9();
     console.log('handleClose');
-    console.log('onClose', onClose);
-    if (onClose) {
+    console.log('onClose', v_0890f8);
+    if (v_0890f8) {
 
-      onClose();
+      v_0890f8();
     } else {
 
-      if (Platform.OS === 'ios') {
+      if (v_326be8.OS === 'ios') {
 
-        if (goBack) {
-          goBack();
-        } else if (reset) {
-          reset(ROUTES.map);
+        if (v_c7ac57) {
+          v_c7ac57();
+        } else if (v_487a25) {
+          v_487a25(v_ce4741.map);
         }
       } else {
 
-        if (reset) {
-          reset(ROUTES.map);
+        if (v_487a25) {
+          v_487a25(v_ce4741.map);
         }
       }
     }
-  }, [onClose, resetAdvertisementParams, goBack, reset]);
+  }, [v_0890f8, v_e10ff9, v_c7ac57, v_487a25]);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
-  const [adCallFailedModalVisible, setAdCallFailedModalVisible] = useState(false);
-  const [showAlternativeAdButton, setShowAlternativeAdButton] = useState(false);
-  const [showBackButton, setShowBackButton] = useState(false);
-  const [appState, setAppState] = useState(AppState.currentState);
-  const [hasOpenedUrl, setHasOpenedUrl] = useState(false);
-  const [waitingForWebSocketResponse, setWaitingForWebSocketResponse] = useState(false);
-  const [member, setMember] = useState<string>('');
-  const [isTaboolaLoaded, setIsTaboolaLoaded] = useState(false);
+  const [v_cd31a8, v_deef62] = v_5ab095(true);
+  const [v_915a6b, v_d2702f] = v_5ab095(false);
+  const [v_3aedd0, v_6f8b23] = v_5ab095<CampaignData | null>(null);
+  const [v_7b73c7, v_ed6932] = v_5ab095(false);
+  const [v_5267b5, v_9b0de5] = v_5ab095(false);
+  const [v_9c4d53, v_8b3d54] = v_5ab095(false);
+  const [v_94a194, v_3fff8d] = v_5ab095(v_6b5698.currentState);
+  const [v_b42caf, v_3e5456] = v_5ab095(false);
+  const [v_7a79cf, v_1a68d1] = v_5ab095(false);
+  const [v_660822, v_06fdbc] = v_5ab095<string>('');
+  const [v_452edc, v_5a7a1a] = v_5ab095(false);
 
-  const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isFetchingRef = useRef(false);
+  const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_64c30d = v_e662ae(false);
 
-  useEffect(() => {
+  v_c4deb2(() => {
     console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
-    console.log('advertisementParams:', advertisementParams ? '있음' : '없음');
-    console.log('advertisementParams 상세:', JSON.stringify(advertisementParams, null, 2));
+    console.log('advertisementParams:', v_d0b6d4 ? '있음' : '없음');
+    console.log('advertisementParams 상세:', JSON.stringify(v_d0b6d4, null, 2));
     console.log('🔍 [ShowNapAdScreen] advertisementParams 값 검증:', {
-      advertisement: advertisementParams?.advertisement,
-      campid: advertisementParams?.campid,
-      coin: advertisementParams?.coin,
-      name: advertisementParams?.name,
-      xrunPrice: advertisementParams?.xrunPrice,
-      member: advertisementParams?.member,
+      advertisement: v_d0b6d4?.advertisement,
+      campid: v_d0b6d4?.campid,
+      coin: v_d0b6d4?.coin,
+      name: v_d0b6d4?.name,
+      xrunPrice: v_d0b6d4?.xrunPrice,
+      member: v_d0b6d4?.member,
     });
 
-    if (!advertisementParams) {
+    if (!v_d0b6d4) {
       console.log('⚠️ [ShowNapAdScreen] 광고 파라미터가 없습니다. 화면을 렌더링하지 않습니다.');
       console.log('🔄 모달을 닫습니다.');
 
-      const delay = Platform.OS === 'ios' && onClose ? 100 : 0;
+      const v_4b24d2 = v_326be8.OS === 'ios' && v_0890f8 ? 100 : 0;
 
-      const timeoutId = setTimeout(() => {
-        handleClose();
-      }, delay);
+      const v_3894d5 = setTimeout(() => {
+        v_7f2e65();
+      }, v_4b24d2);
 
       return () => {
-        clearTimeout(timeoutId);
+        clearTimeout(v_3894d5);
       };
     }
 
     console.log('✅ [ShowNapAdScreen] 광고 파라미터 확인 완료:', {
-      advertisement: advertisementParams.advertisement,
-      campid: advertisementParams.campid,
-      coin: advertisementParams.coin,
-      name: advertisementParams.name,
-      xrunPrice: advertisementParams.xrunPrice,
+      advertisement: v_d0b6d4.advertisement,
+      campid: v_d0b6d4.campid,
+      coin: v_d0b6d4.coin,
+      name: v_d0b6d4.name,
+      xrunPrice: v_d0b6d4.xrunPrice,
     });
-  }, [advertisementParams, handleClose]);
+  }, [v_d0b6d4, v_7f2e65]);
 
-  useEffect(() => {
-    const getUserData = async () => {
+  v_c4deb2(() => {
+    const v_b2bcc9 = async () => {
       try {
-        if (advertisementParams?.member) {
-          setMember(advertisementParams.member);
+        if (v_d0b6d4?.member) {
+          v_06fdbc(v_d0b6d4.member);
           return;
         }
 
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const userDataObject = JSON.parse(userData);
-          const userMember = userDataObject.member?.toString() || '';
-          setMember(userMember);
+        const v_ef7306 = await v_e84827.getItem('userData');
+        if (v_ef7306) {
+          const v_22a2f7 = JSON.parse(v_ef7306);
+          const v_7aa673 = v_22a2f7.member?.toString() || '';
+          v_06fdbc(v_7aa673);
         } else {
-          setMember('userTest');
+          v_06fdbc('userTest');
         }
-      } catch (error) {
-        console.error('userData 가져오기 실패:', error);
-        setMember('userTest');
+      } catch (v_5e9bfe) {
+        console.error('userData 가져오기 실패:', v_5e9bfe);
+        v_06fdbc('userTest');
       }
     };
 
-    getUserData();
-  }, [advertisementParams]);
+    v_b2bcc9();
+  }, [v_d0b6d4]);
 
-  const initNStationAd = async (params?: typeof advertisementParams) => {
+  const v_07cef7 = async (params?: typeof v_d0b6d4) => {
     try {
 
-      const currentParams = params || advertisementParams;
-      const campid = currentParams?.campid || '';
+      const v_766d99 = v_24baff || v_d0b6d4;
+      const v_aa0917 = v_766d99?.campid || '';
 
       console.log('Starting NStation advertisement initialization');
 
-      if (isFetchingRef.current) {
+      if (v_64c30d.current) {
         console.log('[ShowNapAdScreen] 이미 광고 데이터를 가져오는 중입니다.');
         return;
       }
 
-      if (!currentParams || campid === '') {
+      if (!v_766d99 || v_aa0917 === '') {
         console.error('❌ [ShowNapAdScreen] campid가 유효하지 않습니다:', {
-          campid: campid,
-          advertisement: currentParams?.advertisement,
-          fullParams: JSON.stringify(currentParams, null, 2),
+          campid: v_aa0917,
+          advertisement: v_766d99?.advertisement,
+          fullParams: JSON.stringify(v_766d99, null, 2),
         });
-        setIsLoading(false);
-        handleClose();
+        v_deef62(false);
+        v_7f2e65();
         return;
       }
 
-      if (!campaignData) {
+      if (!v_3aedd0) {
         console.log('✅ [ShowNapAdScreen] 기본 정보로 UI 우선 표시');
-        setCampaignData({
+        v_6f8b23({
           urlResult: 200,
-          urlAD: currentParams.urlAD || '',
-          campid: campid.toString(),
-          name: currentParams.name || '',
+          urlAD: v_766d99.urlAD || '',
+          campid: v_aa0917.toString(),
+          name: v_766d99.name || '',
           rewarddesc: '', 
         });
-        setIsLoading(false); 
+        v_deef62(false); 
       }
 
-      if (currentParams?.urlAD && currentParams.urlAD !== '') {
+      if (v_766d99?.urlAD && v_766d99.urlAD !== '') {
         console.log('✅ [ShowNapAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
         return;
       }
 
-      const deviceInfo = await collectDeviceInfo();
+      const v_e7f87b = await v_f3de6d();
 
       console.log('=== ShowNapAdScreen API 호출 정보 ===');
-      console.log('member:', member);
-      console.log('adid:', deviceInfo.adid);
-      console.log('campid:', campid);
-      console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
-      console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
+      console.log('member:', v_660822);
+      console.log('adid:', v_e7f87b.adid);
+      console.log('campid:', v_aa0917);
+      console.log('advertisementParams (currentParams):', JSON.stringify(v_766d99, null, 2));
+      console.log('deviceInfo:', JSON.stringify(v_e7f87b, null, 2));
       console.log('=== API 호출 정보 끝 ===');
 
-      const result = await getNasmobAds(
-        member,
-        deviceInfo.adid,
-        deviceInfo,
-        campid,
-        onClose ? undefined : navigate, 
+      const v_43c42e = await v_1c4683(
+        v_660822,
+        v_e7f87b.adid,
+        v_e7f87b,
+        v_aa0917,
+        v_0890f8 ? undefined : v_9b57fc, 
       );
 
-      if (result.data && result.data.urlResult === 200 && result.data.urlAD) {
+      if (v_43c42e.data && v_43c42e.data.urlResult === 200 && v_43c42e.data.urlAD) {
         console.log('✅ [ShowNapAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
-        const newData = result.data;
-        setCampaignData(prev => {
-          if (!prev) return newData as CampaignData;
+        const v_4d73f0 = v_43c42e.data;
+        v_6f8b23(v_ba2215 => {
+          if (!v_ba2215) return v_4d73f0 as CampaignData;
           return {
-            ...prev,
-            ...newData,
-            urlResult: newData.urlResult ?? prev.urlResult,
+            ...v_ba2215,
+            ...v_4d73f0,
+            urlResult: v_4d73f0.urlResult ?? v_ba2215.urlResult,
           } as CampaignData;
         });
-        setIsLoading(false);
+        v_deef62(false);
         return;
       } else {
 
-        console.warn(`NStation 광고 API 응답 결과가 정상이 아닙니다: urlResult=${result.data?.urlResult}`);
-        if (!campaignData?.urlAD) {
-          throw new Error(`URL 결과 실패: ${result.data?.urlResult}`);
+        console.warn(`NStation 광고 API 응답 결과가 정상이 아닙니다: urlResult=${v_43c42e.data?.urlResult}`);
+        if (!v_3aedd0?.urlAD) {
+          throw new Error(`URL 결과 실패: ${v_43c42e.data?.urlResult}`);
         }
       }
-    } catch (error: any) {
-      console.error('NStation 광고 초기화 실패:', error);
+    } catch (v_5e9bfe) {
+      console.error('NStation 광고 초기화 실패:', v_5e9bfe);
 
-      if (!campaignData?.urlAD) {
+      if (v_5e9bfe.is404) {
+        console.log('✅ [ShowNapAdScreen] 404 에러: 캠페인 데이터 없음 - 팝업 표시 안 함');
+        v_deef62(false);
+        return;
+      }
+
+      if (!v_3aedd0?.urlAD) {
         console.log('❌ 광고 초기화 실패 - 팝업 표시');
-        setIsLoading(false);
-        setAdCallFailedModalVisible(true);
+        v_deef62(false);
+        v_ed6932(true);
       }
     }
   };
 
-  const previousParamsRef = useRef<{ advertisement?: string; campid?: string } | null>(null);
+  const v_57519b = v_e662ae<{ advertisement?: string; campid?: string } | null>(null);
 
-  useEffect(() => {
-    if (advertisementParams) {
-      const currentKey = `${advertisementParams.advertisement}-${advertisementParams.campid}`;
-      const previousKey = previousParamsRef.current
-        ? `${previousParamsRef.current.advertisement}-${previousParamsRef.current.campid}`
+  v_c4deb2(() => {
+    if (v_d0b6d4) {
+      const v_c84c22 = `${v_d0b6d4.advertisement}-${v_d0b6d4.campid}`;
+      const v_28b331 = v_57519b.current
+        ? `${v_57519b.current.advertisement}-${v_57519b.current.campid}`
         : null;
 
-      if (previousKey && currentKey !== previousKey) {
+      if (v_28b331 && v_c84c22 !== v_28b331) {
         console.log('🔄 [ShowNapAdScreen] advertisementParams 변경 감지 - 상태 초기화');
-        console.log('🔍 이전 파라미터:', previousParamsRef.current);
+        console.log('🔍 이전 파라미터:', v_57519b.current);
         console.log('🔍 새로운 파라미터:', {
-          advertisement: advertisementParams.advertisement,
-          campid: advertisementParams.campid,
-          coin: advertisementParams.coin,
-          name: advertisementParams.name,
+          advertisement: v_d0b6d4.advertisement,
+          campid: v_d0b6d4.campid,
+          coin: v_d0b6d4.coin,
+          name: v_d0b6d4.name,
         });
 
-        setCampaignData(null);
-        setIsLoading(true);
-        setIsProcessing(false);
-        setAdCallFailedModalVisible(false);
-        setShowAlternativeAdButton(false);
-        setShowBackButton(false);
-        setHasOpenedUrl(false);
-        setWaitingForWebSocketResponse(false);
+        v_6f8b23(null);
+        v_deef62(true);
+        v_d2702f(false);
+        v_ed6932(false);
+        v_9b0de5(false);
+        v_8b3d54(false);
+        v_3e5456(false);
+        v_1a68d1(false);
 
-        if (rewardProcessingTimeoutRef.current) {
-          clearTimeout(rewardProcessingTimeoutRef.current);
-          rewardProcessingTimeoutRef.current = null;
+        if (v_27bab6.current) {
+          clearTimeout(v_27bab6.current);
+          v_27bab6.current = null;
         }
-        if (rewardProcessingIntervalRef.current) {
-          clearInterval(rewardProcessingIntervalRef.current);
-          rewardProcessingIntervalRef.current = null;
+        if (v_d35ccb.current) {
+          clearInterval(v_d35ccb.current);
+          v_d35ccb.current = null;
         }
 
         console.log('✅ [ShowNapAdScreen] 상태 초기화 완료');
       }
 
-      previousParamsRef.current = {
-        advertisement: advertisementParams.advertisement,
-        campid: advertisementParams.campid,
+      v_57519b.current = {
+        advertisement: v_d0b6d4.advertisement,
+        campid: v_d0b6d4.campid,
       };
     }
-  }, [advertisementParams?.advertisement, advertisementParams?.campid]);
+  }, [v_d0b6d4?.advertisement, v_d0b6d4?.campid]);
 
-  useEffect(() => {
+  v_c4deb2(() => {
     console.log('=== ShowNapAdScreen 광고 초기화 체크 ===');
-    console.log('member:', member ? `있음 (${member})` : '없음');
-    console.log('advertisementParams:', advertisementParams ? '있음' : '없음');
+    console.log('member:', v_660822 ? `있음 (${v_660822})` : '없음');
+    console.log('advertisementParams:', v_d0b6d4 ? '있음' : '없음');
     console.log('🔍 [ShowNapAdScreen] advertisementParams 상세:', {
-      advertisement: advertisementParams?.advertisement,
-      campid: advertisementParams?.campid,
-      coin: advertisementParams?.coin,
-      name: advertisementParams?.name,
-      xrunPrice: advertisementParams?.xrunPrice,
+      advertisement: v_d0b6d4?.advertisement,
+      campid: v_d0b6d4?.campid,
+      coin: v_d0b6d4?.coin,
+      name: v_d0b6d4?.name,
+      xrunPrice: v_d0b6d4?.xrunPrice,
     });
 
-    if (member && advertisementParams) {
+    if (v_660822 && v_d0b6d4) {
       console.log('✅ member와 advertisementParams 모두 있음 - initNStationAd 호출');
-      console.log('🔍 [ShowNapAdScreen] initNStationAd에 전달할 campid:', advertisementParams.campid);
+      console.log('🔍 [ShowNapAdScreen] initNStationAd에 전달할 campid:', v_d0b6d4.campid);
 
-      initNStationAd(advertisementParams);
+      v_07cef7(v_d0b6d4);
     } else {
       console.log('⏳ member 또는 advertisementParams 대기 중...');
-      if (!member) {
+      if (!v_660822) {
         console.log('  - member가 아직 설정되지 않음');
       }
-      if (!advertisementParams) {
+      if (!v_d0b6d4) {
         console.log('  - advertisementParams가 아직 설정되지 않음');
       }
     }
-  }, [member, advertisementParams]);
+  }, [v_660822, v_d0b6d4]);
 
-  useEffect(() => {
+  v_c4deb2(() => {
     return () => {
-      if (rewardProcessingTimeoutRef.current) {
-        clearTimeout(rewardProcessingTimeoutRef.current);
-        rewardProcessingTimeoutRef.current = null;
+      if (v_27bab6.current) {
+        clearTimeout(v_27bab6.current);
+        v_27bab6.current = null;
       }
-      if (rewardProcessingIntervalRef.current) {
-        clearInterval(rewardProcessingIntervalRef.current);
-        rewardProcessingIntervalRef.current = null;
+      if (v_d35ccb.current) {
+        clearInterval(v_d35ccb.current);
+        v_d35ccb.current = null;
       }
     };
   }, []);
 
-  const getQueryParam = (url: string, param: string): string | null => {
-    const match = url.match(new RegExp(`[?&]${param}=([^&#]*)`));
-    return match ? decodeURIComponent(match[1]) : null;
+  const v_cd5dd4 = (v_f71b56, v_e770ed): string | null => {
+    const v_a63110 = v_f71b56.match(new RegExp(`[?&]${v_e770ed}=([^&#]*)`));
+    return v_a63110 ? decodeURIComponent(v_a63110[1]) : null;
   };
 
-  const openUrlAD = async (url: string) => {
+  const v_2e98c9 = async (v_f71b56) => {
     try {
-      console.log('URL 이동 시도:', url);
+      console.log('URL 이동 시도:', v_f71b56);
 
-      const supported = await Linking.canOpenURL(url);
+      const v_a42ed3 = await v_f2c756.canOpenURL(v_f71b56);
 
-      if (supported) {
-        await Linking.openURL(url);
+      if (v_a42ed3) {
+        await v_f2c756.openURL(v_f71b56);
         console.log('✅ URL 이동 성공');
 
       } else {
-        console.error('❌ 지원하지 않는 URL:', url);
-        throw new Error(t('screens.showNapAd.unsupportedUrl'));
+        console.error('❌ 지원하지 않는 URL:', v_f71b56);
+        throw new Error(v_8d41d7('screens.showNapAd.unsupportedUrl'));
       }
-    } catch (error) {
-      console.error('❌ URL 이동 실패:', error);
-      throw error;
+    } catch (v_5e9bfe) {
+      console.error('❌ URL 이동 실패:', v_5e9bfe);
+      throw v_5e9bfe;
     }
   };
 
-<<<<<<< HEAD /oth-path ad_company에 따른 광고 API 호출
-    const callAdApi = async () => {
-      try {
-        const adCompany = advertisementParams?.ad_company || 'nas';
-        const deviceInfo = await collectDeviceInfo();
+  const v_f1550c = async () => {
+    try {
+      const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
+      const v_e7f87b = await v_f3de6d();
 
-        console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${adCompany}`);
+      console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${v_5a9c46}`);
 
-        if (adCompany === 'nas') {
+      if (v_5a9c46 === 'nas') {
 
-          const campid = advertisementParams?.campid || '';
-          console.log(`[callAdApi] getNasmobAds 호출 - campid: ${campid}`);
+        const v_aa0917 = v_d0b6d4?.campid || '';
+        console.log(`[callAdApi] getNasmobAds 호출 - campid: ${v_aa0917}`);
 
-          const result = await getNasmobAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            campid,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', result);
-          return result;
-
-        } else if (adCompany === 'pointclick' || adCompany === 'pock') {
-
-          const ad_key = advertisementParams?.campid || '';
-          console.log(`[callAdApi] getPointClickAds 호출 - ad_key: ${ad_key}`);
-
-          const result = await getPointClickAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            ad_key,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getPointClickAds 응답:', result);
-          return result;
-
-        } else {
-
-          console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
-          const campid = advertisementParams?.campid || '';
-
-          const result = await getNasmobAds(
-            member,
-            deviceInfo.adid,
-            deviceInfo,
-            campid,
-            onClose ? undefined : navigate,
-          );
-          console.log('[callAdApi] getNasmobAds 응답:', result);
-          return result;
-        }
-      } catch (error) {
-        console.error('[callAdApi] 광고 API 호출 실패:', error);
-        throw error;
-      }
-
-      const adCompany = advertisementParams?.ad_company || 'nas';
-      const deviceInfo = await collectDeviceInfo();
-
-      console.log(`[callAdApi] 광고 API 호출 시작 - ad_company: ${adCompany}`);
-
-      if (adCompany === 'nas') {
-
-        const campid = advertisementParams?.campid || '';
-        console.log(`[callAdApi] getNasmobAds 호출 - campid: ${campid}`);
-
-        isFetchingRef.current = true;
-        const result = await getNasmobAds(
-          member,
-          deviceInfo.adid,
-          deviceInfo,
-          campid,
-          onClose ? undefined : navigate,
+        v_64c30d.current = true;
+        const v_43c42e = await v_1c4683(
+          v_660822,
+          v_e7f87b.adid,
+          v_e7f87b,
+          v_aa0917,
+          v_0890f8 ? undefined : v_9b57fc,
         );
-        isFetchingRef.current = false;
-        console.log('[callAdApi] getNasmobAds 응답:', result);
-        return result;
+        v_64c30d.current = false;
+        console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
+        return v_43c42e;
+
+      } else if (v_5a9c46 === 'pointclick' || v_5a9c46 === 'pock') {
+
+        const v_b0495a = v_d0b6d4?.campid || '';
+        console.log(`[callAdApi] getPockAds 호출 - ad_key: ${v_b0495a}`);
+
+        v_64c30d.current = true;
+        const v_43c42e = await v_aa7dc1(
+          v_660822,
+          v_e7f87b.adid,
+          v_e7f87b,
+          v_b0495a,
+          v_0890f8 ? undefined : v_9b57fc,
+        );
+        v_64c30d.current = false;
+        console.log('[callAdApi] getPockAds 응답:', v_43c42e);
+        return v_43c42e;
 
       } else {
 
-        console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
-        const campid = advertisementParams?.campid || '';
+        console.log(`[callAdApi] 알 수 없는 ad_company(${v_5a9c46}), 기본 getNasmobAds 호출`);
+        const v_aa0917 = v_d0b6d4?.campid || '';
 
-        const result = await getNasmobAds(
-          member,
-          deviceInfo.adid,
-          deviceInfo,
-          campid,
-          onClose ? undefined : navigate,
+        v_64c30d.current = true;
+        const v_43c42e = await v_1c4683(
+          v_660822,
+          v_e7f87b.adid,
+          v_e7f87b,
+          v_aa0917,
+          v_0890f8 ? undefined : v_9b57fc,
         );
-        console.log('[callAdApi] getNasmobAds 응답:', result);
-        return result;
+        v_64c30d.current = false;
+        console.log('[callAdApi] getNasmobAds 응답:', v_43c42e);
+        return v_43c42e;
       }
-    } catch (error) {
-      console.error('[callAdApi] 광고 API 호출 실패:', error);
-      throw error;
+    } catch (v_5e9bfe) {
+      console.error('[callAdApi] 광고 API 호출 실패:', v_5e9bfe);
+      v_64c30d.current = false;
+      throw v_5e9bfe;
     }
   };
 
-  const handleAdCompletion = async () => {
+  const v_653132 = async () => {
     try {
-      setIsProcessing(true);
-      const deviceInfo = await collectDeviceInfo();
+      v_d2702f(true);
+      const v_e7f87b = await v_f3de6d();
 
-      if (!campaignData?.urlAD) {
-        throw new Error(t('screens.showNapAd.noAdUrl'));
+      if (!v_3aedd0?.urlAD) {
+        throw new Error(v_8d41d7('screens.showNapAd.noAdUrl'));
       }
 
-      const urlAD = campaignData.urlAD;
-      const nstkey = getQueryParam(urlAD, 'nstkey');
-      const subparam = getQueryParam(urlAD, 'subparam');
+      const v_7ec08d = v_3aedd0.urlAD;
+      const v_b0bf56 = v_cd5dd4(v_7ec08d, 'nstkey');
+      const v_511d4a = v_cd5dd4(v_7ec08d, 'subparam');
 
       console.log('=== 광고 완료 처리 정보 ===');
-      console.log('joindesc:', advertisementParams?.joindesc);
-      console.log('name:', advertisementParams?.name);
-      console.log('xrunPrice:', advertisementParams?.xrunPrice);
-      console.log('campaignData:', campaignData);
+      console.log('joindesc:', v_d0b6d4?.joindesc);
+      console.log('name:', v_d0b6d4?.name);
+      console.log('xrunPrice:', v_d0b6d4?.xrunPrice);
+      console.log('campaignData:', v_3aedd0);
 
-      const callbackResponse = await sendNasmobCallback(
+      const v_714642 = await v_7a6f92(
         {
-          cbparam: campaignData.cbparam || NAP_CONFIG.CB_PARAM,
-          mkey: NAP_CONFIG.MKEY,
-          mckey: NAP_CONFIG.MCKEY,
-          nstkey: nstkey || null,
-          subparam: subparam || null,
-          userid: member.toString(),
-          campid: (campaignData.campid || advertisementParams?.campid || '').toString(),
-          adid: deviceInfo.adid,
-          price: ((campaignData.price || 0) / 2).toString(),
-          total_sales: (campaignData.price || 0).toString(),
+          cbparam: v_3aedd0.cbparam || v_ebc3c8.CB_PARAM,
+          mkey: v_ebc3c8.MKEY,
+          mckey: v_ebc3c8.MCKEY,
+          nstkey: v_b0bf56 || null,
+          subparam: v_511d4a || null,
+          userid: v_660822.toString(),
+          campid: (v_3aedd0.campid || v_d0b6d4?.campid || '').toString(),
+          adid: v_e7f87b.adid,
+          price: ((v_3aedd0.price || 0) / 2).toString(),
+          total_sales: (v_3aedd0.price || 0).toString(),
           postback_type: null,
           postback_rewardtype: null,
-          raw_response: campaignData,
+          raw_response: v_3aedd0,
         },
-        navigate,
+        v_9b57fc,
       );
 
-      console.log('Callback response:', callbackResponse);
+      console.log('Callback response:', v_714642);
 
-      if (callbackResponse.status === 'success') {
+      if (v_714642.status === 'success') {
         console.log('✅ Nasmob 콜백 전송 성공');
 
       }
-    } catch (error) {
-      console.error('Error in ad completion process:', error);
-      setIsProcessing(false);
+    } catch (v_5e9bfe) {
+      console.error('Error in ad completion process:', v_5e9bfe);
+      v_d2702f(false);
 
-      if (rewardProcessingTimeoutRef.current) {
-        clearTimeout(rewardProcessingTimeoutRef.current);
-        rewardProcessingTimeoutRef.current = null;
+      if (v_27bab6.current) {
+        clearTimeout(v_27bab6.current);
+        v_27bab6.current = null;
       }
-      if (rewardProcessingIntervalRef.current) {
-        clearInterval(rewardProcessingIntervalRef.current);
-        rewardProcessingIntervalRef.current = null;
+      if (v_d35ccb.current) {
+        clearInterval(v_d35ccb.current);
+        v_d35ccb.current = null;
       }
 
-      setWaitingForWebSocketResponse(true);
+      v_1a68d1(true);
       console.log('✅ 리워드 처리 완료 (전체 에러) - 사용자 버튼 클릭 대기');
     } finally {
-      setIsProcessing(false);
+      v_d2702f(false);
     }
   };
 
-  useEffect(() => {
-    const handleAppStateChange = async (nextAppState: string) => {
-      console.log('App state change:', appState, '->', nextAppState);
+  v_c4deb2(() => {
+    const v_7a424f = async (v_3b10d8) => {
+      console.log('App state change:', v_94a194, '->', v_3b10d8);
 
       if (
-        appState.match(/inactive|background/) &&
-        nextAppState === 'active' &&
-        hasOpenedUrl &&
-        campaignData &&
-        !waitingForWebSocketResponse &&
-        !adCallFailedModalVisible
+        v_94a194.match(/inactive|background/) &&
+        v_3b10d8 === 'active' &&
+        v_b42caf &&
+        v_3aedd0 &&
+        !v_7a79cf &&
+        !v_7b73c7
       ) {
         console.log('✅ App returned from ad - processing completion');
-        await handleAdCompletion();
+        await v_653132();
       }
 
-      setAppState(nextAppState as 'active' | 'background' | 'inactive' | 'unknown' | 'extension');
+      v_3fff8d(v_3b10d8 as 'active' | 'background' | 'inactive' | 'unknown' | 'extension');
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const v_269481 = v_6b5698.addEventListener('change', v_7a424f);
 
     return () => {
-      subscription?.remove();
+      v_269481?.remove();
     };
-  }, [appState, hasOpenedUrl, campaignData, waitingForWebSocketResponse, adCallFailedModalVisible]);
+  }, [v_94a194, v_b42caf, v_3aedd0, v_7a79cf, v_7b73c7]);
 
-  const handleBackButtonPress = () => {
+  const v_812230 = () => {
     console.log('뒤로가기 버튼 클릭 - CameraMainScreen으로 이동');
-    setShowBackButton(false);
-    resetAdvertisementParams();
-    handleClose();
+    v_8b3d54(false);
+    v_e10ff9();
+    v_7f2e65();
   };
 
-  const handleAdCallFailedOK = () => {
+  const v_34fafc = () => {
     console.log('광고 호출 실패 확인 버튼 클릭 - CameraMainScreen으로 이동');
-    setAdCallFailedModalVisible(false);
-    resetAdvertisementParams();
-    handleClose();
+    v_ed6932(false);
+    v_e10ff9();
+    v_7f2e65();
   };
 
-  const handleAlternativeAdButton = () => {
+  const v_bde5d3 = () => {
     console.log('다른 광고 보기 버튼 클릭 - CameraMainScreen으로 이동');
-    resetAdvertisementParams();
-    handleClose();
+    v_e10ff9();
+    v_7f2e65();
   };
 
-  const handleCancel = () => {
-    console.log('취소 버튼 클릭 - CameraMainScreen으로 이동');
-    resetAdvertisementParams();
-    handleClose();
+  const v_5ca23e = async () => {
+    console.log('취소 버튼 클릭 - AR 화면으로 이동');
+    v_e10ff9();
+
+    await v_e84827.setItem('shouldNavigateToCamera', 'true');
+    v_7f2e65();
   };
 
-  const handleGoToMap = () => {
+  const v_ed89ba = () => {
     console.log('맵으로 이동 버튼 클릭 - MapMainScreen으로 이동');
 
-    if (rewardProcessingTimeoutRef.current) {
-      clearTimeout(rewardProcessingTimeoutRef.current);
-      rewardProcessingTimeoutRef.current = null;
+    if (v_27bab6.current) {
+      clearTimeout(v_27bab6.current);
+      v_27bab6.current = null;
     }
-    if (rewardProcessingIntervalRef.current) {
-      clearInterval(rewardProcessingIntervalRef.current);
-      rewardProcessingIntervalRef.current = null;
+    if (v_d35ccb.current) {
+      clearInterval(v_d35ccb.current);
+      v_d35ccb.current = null;
     }
-    setWaitingForWebSocketResponse(false);
-    resetAdvertisementParams();
-    handleClose();
+    v_1a68d1(false);
+    v_e10ff9();
+    v_7f2e65();
   };
 
-  const handleWatchAd = useCallback(async () => {
-    console.log('광고 보기 버튼 클릭');
-    console.log(`[광고보기] ad_company: ${advertisementParams?.ad_company}`);
+  const v_e36569 = v_de06a3(async () => {
+    console.log('광고 보기 버튼 클릭 (AsyncStorage URL 사용)');
+    console.log(`[광고보기] ad_company: ${v_d0b6d4?.ad_company}`);
 
     try {
+      const v_aa0917 = v_d0b6d4?.campid || v_3aedd0?.campid || '';
 
-      await callAdApi();
-      console.log('[광고보기] 광고 API 호출 완료');
-
-      const campid = advertisementParams?.campid || campaignData?.campid || '';
-      if (campid && member) {
-        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
-
-        processAdReward(
-          member,
-          campid,
-          'nas',
-          onClose ? undefined : navigate,
-        )
-          .then((response) => {
-            console.log('[광고보기] processAdReward 응답:', response);
-          })
-          .catch((error) => {
-            console.error('[광고보기] processAdReward 호출 실패:', error);
-
-          });
-      } else {
-        console.warn('[광고보기] campid 또는 member가 없어 리워드 처리를 건너뜁니다.', {
-          campid,
-          member,
-        });
+      if (!v_aa0917 || v_aa0917 === '') {
+        console.error('[광고보기] campid가 없습니다.');
+        v_ed6932(true);
+        return;
       }
 
-      if (campaignData?.urlAD) {
-        await openUrlAD(campaignData.urlAD);
+      let v_7ec08d = v_d0b6d4?.urlAD || v_3aedd0?.urlAD || '';
 
-        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
-
-        await AsyncStorage.setItem('isAdCompleted', 'true');
-        console.log('[광고보기] isAdCompleted 저장 완료');
-        resetAdvertisementParams();
-        handleClose();
-      }
-    } catch (error) {
-      console.error('[광고보기] 광고 API 호출 실패:', error);
-
-      if (campaignData?.urlAD) {
+      if (!v_7ec08d) {
         try {
-          await openUrlAD(campaignData.urlAD);
-
-          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
-          resetAdvertisementParams();
-          handleClose();
-        } catch (urlError) {
-          console.error('[광고보기] URL 열기 실패:', urlError);
-
-          resetAdvertisementParams();
-          handleClose();
+          const v_90e1d7 = await v_e84827.getItem('cached_AD');
+          if (v_90e1d7) {
+            const v_4fc87f = JSON.parse(v_90e1d7);
+            if (v_4fc87f[v_aa0917]?.urlAD) {
+              v_7ec08d = v_4fc87f[v_aa0917].urlAD;
+              console.log('[광고보기] AsyncStorage에서 urlAD 가져옴:', v_7ec08d);
+            }
+          }
+        } catch (v_2bf859) {
+          console.warn('[광고보기] 캐시 확인 실패:', v_2bf859);
         }
-      } else {
-
-        resetAdvertisementParams();
-        handleClose();
       }
-    }
-  }, [callAdApi, campaignData, openUrlAD, advertisementParams, member, onClose, navigate, resetAdvertisementParams, handleClose]);
 
-  if (!advertisementParams) {
+      if (!v_7ec08d || v_7ec08d === '') {
+        console.error('[광고보기] urlAD가 없습니다. AsyncStorage에 저장된 URL을 찾을 수 없습니다.');
+        v_ed6932(true);
+        return;
+      }
+
+      try {
+        const v_ef7306 = await v_e84827.getItem('userData');
+        if (v_ef7306) {
+          const v_ff39bc = JSON.parse(v_ef7306);
+          const v_660822 = v_ff39bc?.member;
+          if (v_660822) {
+            console.log('[광고보기] processAdReward 호출 시작');
+            const v_6c45ed = await v_38f5f4(
+              parseInt(v_660822, 10),
+              v_aa0917,
+              'nas',
+              v_9b57fc,
+            );
+            console.log('[광고보기] processAdReward 응답:', v_6c45ed);
+          }
+        }
+      } catch (v_53d118) {
+
+        if (v_53d118?.code === 404 || v_53d118?.message?.includes('404')) {
+          console.log('[광고보기] 이미 본 광고 (404) - 정상 처리');
+        } else {
+          console.warn('[광고보기] processAdReward 실패 (무시):', v_53d118);
+        }
+      }
+
+      try {
+        console.log('[광고보기] removeAdFromTopAd5 즉시 호출');
+        await v_8cba1e(v_aa0917, v_9b57fc);
+        console.log('[광고보기] removeAdFromTopAd5 완료');
+      } catch (v_61e099) {
+        console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', v_61e099);
+      }
+
+      console.log('[광고보기] URL로 이동:', v_7ec08d);
+      await v_2e98c9(v_7ec08d);
+      console.log('[광고보기] URL 열기 완료 - AR 화면으로 이동');
+
+      try {
+        const v_c06630 = await v_e84827.getItem('completedAdsCache');
+        const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
+        if (!v_e2a6a6.includes(v_aa0917)) {
+          v_e2a6a6.push(v_aa0917);
+          await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
+          await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
+          console.log(`[광고보기] completedAdsCache에 즉시 추가: ${v_aa0917}`);
+        }
+      } catch (v_2bf859) {
+        console.warn('[광고보기] completedAdsCache 업데이트 실패:', v_2bf859);
+      }
+
+      await v_e84827.setItem('isAdCompleted', 'true');
+      await v_e84827.setItem('shouldRefreshTopAd5', 'true');
+      await v_e84827.setItem('shouldNavigateToCamera', 'true');
+      await v_e84827.setItem('completedAdCampid', v_aa0917); 
+      console.log('[광고보기] isAdCompleted, shouldRefreshTopAd5, shouldNavigateToCamera, completedAdCampid 저장 완료');
+
+      v_e10ff9();
+      v_7f2e65();
+    } catch (v_5e9bfe) {
+      console.error('[광고보기] URL 열기 실패:', v_5e9bfe);
+      v_ed6932(true);
+    }
+  }, [v_3aedd0, v_2e98c9, v_d0b6d4, v_0890f8, v_e10ff9, v_7f2e65]);
+
+  if (!v_d0b6d4) {
     return null;
   }
 
   return (
-    <View style={styles.root}>
+    <View style={v_d81136.root}>
       <StatusBar style="dark" />
 
       {
@@ -688,124 +694,128 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 }
 
       {}
-      {(isLoading || isProcessing || waitingForWebSocketResponse) && (
-        <View style={styles.loadingContainer}>
-          {!waitingForWebSocketResponse || !isTaboolaLoaded ? (
+      {(v_cd31a8 || v_915a6b || v_7a79cf) && (
+        <View style={v_d81136.loadingContainer}>
+          {!v_7a79cf || !v_452edc ? (
             <>
               <SequentialDots />
-              <Text style={styles.loadingText}>
-                {waitingForWebSocketResponse
-                  ? t('screens.showNapAd.processingReward')
-                  : t('screens.showNapAd.loading')}
+              <Text style={v_d81136.loadingText}>
+                {v_7a79cf
+                  ? v_8d41d7('screens.showNapAd.processingReward')
+                  : v_8d41d7('screens.showNapAd.loading')}
               </Text>
 
-              {waitingForWebSocketResponse && <SequentialDots />}
+              {v_7a79cf && <SequentialDots />}
             </>
           ) : null}
 
-          {waitingForWebSocketResponse && (
+          {v_7a79cf && (
             <TouchableOpacity
-              onPress={isTaboolaLoaded ? handleGoToMap : undefined}
-              activeOpacity={isTaboolaLoaded ? 0.7 : 1}
-              disabled={!isTaboolaLoaded}
-              style={styles.goToMapLinkContainer}
+              onPress={v_452edc ? v_ed89ba : undefined}
+              activeOpacity={v_452edc ? 0.7 : 1}
+              disabled={!v_452edc}
+              style={v_d81136.goToMapLinkContainer}
             >
               <Text
                 style={[
-                  styles.goToMapLink,
-                  !isTaboolaLoaded && styles.goToMapLinkDisabled,
+                  v_d81136.goToMapLink,
+                  !v_452edc && v_d81136.goToMapLinkDisabled,
                 ]}
               >
-                {t('screens.showNapAd.goToMap')}
+                {v_8d41d7('screens.showNapAd.goToMap')}
               </Text>
             </TouchableOpacity>
           )}
 
-          {showBackButton && (
+          {v_9c4d53 && (
             <TouchableOpacity
-              style={styles.backButton}
-              onPress={handleBackButtonPress}
+              style={v_d81136.backButton}
+              onPress={v_812230}
               activeOpacity={0.7}
             >
-              <Text style={styles.backButtonText}>{t('screens.showNapAd.back')}</Text>
+              <Text style={v_d81136.backButtonText}>{v_8d41d7('screens.showNapAd.back')}</Text>
             </TouchableOpacity>
           )}
 
-          {showAlternativeAdButton && (
+          {v_5267b5 && (
             <TouchableOpacity
-              style={styles.alternativeAdButton}
-              onPress={handleAlternativeAdButton}
+              style={v_d81136.alternativeAdButton}
+              onPress={v_bde5d3}
               activeOpacity={0.7}
             >
-              <Text style={styles.alternativeAdButtonText}>{t('screens.showNapAd.alternativeAd')}</Text>
+              <Text style={v_d81136.alternativeAdButtonText}>{v_8d41d7('screens.showNapAd.alternativeAd')}</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
 
       {}
-      {!isLoading && !isProcessing && !waitingForWebSocketResponse && adCallFailedModalVisible && (
-        <View style={[styles.campaignContainer, styles.errorContainer]}>
-          <Text style={styles.modalText}>
-            {t('screens.showNapAd.adCallFailed')}
+      {!v_cd31a8 && !v_915a6b && !v_7a79cf && v_7b73c7 && (
+        <View style={[v_d81136.campaignContainer, v_d81136.errorContainer]}>
+          <Text style={v_d81136.modalText}>
+            {v_8d41d7('screens.showNapAd.adCallFailed')}
           </Text>
-          <Text style={styles.modalSubText}>
-            {t('screens.showNapAd.adCallFailedSub')}
+          <Text style={v_d81136.modalSubText}>
+            {v_8d41d7('screens.showNapAd.adCallFailedSub')}
           </Text>
-          <View style={[styles.buttonContainers]}>
-            <TouchableOpacity onPress={handleAdCallFailedOK} style={[styles.okButton, { flex: 0, minWidth: 200 }]}>
-              <Text style={styles.okButtonText}>{t('screens.showNapAd.confirm')}</Text>
+          <View style={[v_d81136.buttonContainers]}>
+            <TouchableOpacity onPress={v_34fafc} style={[v_d81136.okButton, { flex: 0, minWidth: 200 }]}>
+              <Text style={v_d81136.okButtonText}>{v_8d41d7('screens.showNapAd.confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
       {}
-      {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
-        <View style={styles.campaignContainer}>
-          <Text style={styles.campaignTitle}>
-            {campaignData.name || t('screens.showNapAd.campaignInfo')}
+      {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_3aedd0 && (
+        <View style={v_d81136.campaignContainer}>
+          <Text style={v_d81136.campaignTitle}>
+            {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
           </Text>
-          <Text style={styles.campaignReward}>
-            {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
+          <Text style={v_d81136.campaignReward}>
+            {v_8d41d7('screens.showNapAd.reward')} : {(() => {
+              const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
+              const v_123554 = parseFloat(String(v_6bbb57));
+              return isNaN(v_123554) ? '0.00' : v_123554.toFixed(2);
+            })()} XRUN
           </Text>
-          <Text style={styles.campaignDesc}>
-            {campaignData.rewarddesc || ''}
+          <Text style={v_d81136.campaignDesc}>
+            {v_3aedd0.rewarddesc || ''}
           </Text>
 
           {}
-          {(campaignData.rewarddesc || advertisementParams.joindesc) && (
-            <View style={styles.joinDescContainer}>
-              <Text style={styles.joinDescTitle}>{t('screens.showNapAd.joinMethod')}</Text>
+          {(v_3aedd0.rewarddesc || v_d0b6d4.joindesc) && (
+            <View style={v_d81136.joinDescContainer}>
+              <Text style={v_d81136.joinDescTitle}>{v_8d41d7('screens.showNapAd.joinMethod')}</Text>
               <SafeScrollView
-                style={styles.joinDescScrollView}
+                style={v_d81136.joinDescScrollView}
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showBottomBackground={false}
               >
-                <Text style={styles.joinDescText}>
-                  {campaignData.rewarddesc || advertisementParams.joindesc}
+                <Text style={v_d81136.joinDescText}>
+                  {v_3aedd0.rewarddesc || v_d0b6d4.joindesc}
                 </Text>
               </SafeScrollView>
             </View>
           )}
 
-          <View style={styles.buttonContainer}>
+          <View style={v_d81136.buttonContainer}>
             <TouchableOpacity
-              style={styles.watchAdButton}
-              onPress={handleWatchAd}
+              style={v_d81136.watchAdButton}
+              onPress={v_e36569}
               activeOpacity={0.7}
             >
-              <Text style={styles.watchAdButtonText}>{t('screens.showNapAd.watchAd')}</Text>
+              <Text style={v_d81136.watchAdButtonText}>{v_8d41d7('screens.showNapAd.watchAd')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
+              style={v_d81136.cancelButton}
+              onPress={v_5ca23e}
               activeOpacity={0.7}
             >
-              <Text style={styles.cancelButtonText}>{t('screens.showNapAd.cancel')}</Text>
+              <Text style={v_d81136.cancelButtonText}>{v_8d41d7('screens.showNapAd.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -819,7 +829,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   );
 };
 
-const styles = StyleSheet.create({
+const v_d81136 = v_472849.create({
   root: {
     flex: 1,
     justifyContent: 'center',
@@ -835,7 +845,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     color: 'grey',
     textAlign: 'center',
     marginTop: 10,
@@ -844,7 +854,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: FONTS.size.msmall,
+    fontSize: v_843035.size.msmall,
     color: '#388Dc8',
     textAlign: 'center',
     marginTop: 10,
@@ -870,7 +880,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   alternativeAdButtonText: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -894,7 +904,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   backButtonText: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -904,7 +914,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   goToMapLink: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#388Dc8',
     textAlign: 'center',
@@ -938,14 +948,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
   },
   modalText: {
-    fontSize: FONTS.size.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Regular',
     marginBottom: 10,
     color: 'black',
     textAlign: 'center',
   },
   modalSubText: {
-    fontSize: FONTS.size.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     marginBottom: 20,
     color: '#666',
@@ -970,7 +980,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   okButtonText: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: 'white',
     textAlign: 'center',
@@ -994,21 +1004,21 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   campaignTitle: {
-    fontSize: FONTS.size.mmedium,
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
   },
   campaignReward: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     marginBottom: 10,
     color: '#388Dc8',
     textAlign: 'center',
   },
   campaignDesc: {
-    fontSize: FONTS.size.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#666',
     textAlign: 'center',
@@ -1044,7 +1054,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   watchAdButtonText: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -1066,7 +1076,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#666',
     textAlign: 'center',
@@ -1078,7 +1088,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   joinDescTitle: {
-    fontSize: FONTS.size.medium,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Bold',
     color: '#343a59',
     textAlign: 'center',
@@ -1095,7 +1105,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   joinDescText: {
-    fontSize: FONTS.size.msmall,
+    fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#495057',
     lineHeight: 18,
