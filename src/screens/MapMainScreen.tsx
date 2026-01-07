@@ -319,10 +319,15 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       console.log(`🔍 [MapMainScreen] 고유 광고 pre-fetch 대상: ${v_e1c39d.length}개`);
 
+      v_e1c39d.forEach((v_ddcfed, v_ebec57) => console.log(`📋 [PreFetch] 대상 ${v_ebec57}: id=${v_ddcfed.campid}, company=${v_ddcfed.ad_company}`));
+
       for (const v_ddcfed of v_e1c39d) {
         try {
           let v_43c42e;
-          if (v_ddcfed.ad_company === 'nas') {
+          const v_693775 = (v_ddcfed.ad_company || '').toLowerCase();
+          console.log(`⚙️ [PreFetch] 처리 진입: id=${v_ddcfed.campid}, lowercase_company='${v_693775}'`);
+
+          if (v_693775 === 'nas') {
             v_43c42e = await v_1c4683(v_717992.toString(), v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
             if (v_43c42e.code === 200 && v_43c42e.data?.urlAD) {
               const v_f22601 = v_43c42e.data.urlAD;
@@ -356,12 +361,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
               console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${v_ddcfed.campid}`);
             }
-          } else if (v_ddcfed.ad_company === 'pointclick') {
+          } else if (v_693775 === 'pointclick') {
             v_43c42e = await v_aa7dc1(v_717992.toString(), v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
             if (v_43c42e.code === 200 && v_43c42e.data?.landing_url) {
               const v_f22601 = v_43c42e.data.landing_url;
               v_6549d0(v_ba2215 => v_ba2215.map(v_8c0b26 =>
-                (v_8c0b26.campid === v_ddcfed.campid && v_8c0b26.ad_company === 'pointclick') ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
+                (v_8c0b26.campid === v_ddcfed.campid && String(v_8c0b26.ad_company).toLowerCase() === 'pointclick') ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
               ));
               v_14dd24(v_ba2215 => v_ba2215.map(v_35f85c =>
                 (v_35f85c.campid === v_ddcfed.campid && v_35f85c.ad_company === 'pointclick') ? { ...v_35f85c, urlAD: v_f22601 } : v_35f85c

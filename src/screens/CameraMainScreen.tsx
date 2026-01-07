@@ -650,11 +650,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       const v_53db14 = await v_e84827.getItem('cached_AD');
       const v_a28e77 = v_53db14 ? JSON.parse(v_53db14) : {};
 
-      v_a28e77[v_aa0917] = v_9390e8;
+      const v_36aafd = {
+        ...v_a28e77,
+        [v_aa0917]: v_9390e8,
+      };
 
-      await v_e84827.setItem('cached_AD', JSON.stringify(v_a28e77));
-      v_42ebfb({ ...v_a28e77 }); 
-      console.log(`💾 [CameraMainScreen] 광고 데이터 캐시 저장: ${v_aa0917}`);
+      await v_e84827.setItem('cached_AD', JSON.stringify(v_36aafd));
+      console.log(`💾 [CameraMainScreen][saveCachedAd] 캐시 저장 성공: key=${v_aa0917}, 현재 총 키 수=${Object.keys(v_36aafd).length}`);
+
+      v_42ebfb(v_36aafd);
     } catch (v_9e86fd) {
       console.error('❌ [CameraMainScreen] 캐시 저장 실패:', v_9e86fd);
     }
@@ -1022,30 +1026,23 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      console.log('📍 [Trace] 0. loadTokenData 진입, 마커 데이터 요청 시작');
       const v_003147 = await v_f84ef5(
         v_7dd198.coords.latitude,
         v_7dd198.coords.longitude,
         v_660822,
         v_9b57fc,
       );
+      console.log('📍 [Trace] 1. 마커 데이터 요청 완료. 개수:', v_003147 ? v_003147.length : 0);
 
       if (v_003147 && v_003147.length > 0) {
+        console.log('📍 [Trace] 2. 데이터 유효, 로컬 저장 시작');
 
         await v_e84827.setItem('astorCoinsData', JSON.stringify(v_003147));
 
         const v_3d87ed = v_003147.map((v_51b584) => {
 
           const v_8ec93d = v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0;
-
-          console.log(`🔍 [loadTokenData API] 코인 원본 데이터 확인:`, {
-            coin: v_51b584.coin,
-            advertisement: v_51b584.advertisement,
-            xrunPrice: v_51b584.xrunPrice,
-            xrunprice: v_51b584.xrunprice,
-            price: v_51b584.price,
-            coins: v_51b584.coins,
-            originalXrunPrice: v_8ec93d,
-          });
 
           return {
             ...v_51b584, 
@@ -1061,8 +1058,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         });
 
         try {
+          console.log('📍 [Trace] 3. 초기 캐시 로드 시작');
 
-          const v_ed29b7 = await v_c9b9cb();
+          let v_ed29b7 = {};
+          try {
+            const v_2a04ed = await v_e84827.getItem('cached_AD');
+            console.warn('📂 [CameraMainScreen][Direct] raw cached_AD:', v_2a04ed ? '데이터 있음' : 'NULL');
+            if (v_2a04ed) {
+              v_ed29b7 = JSON.parse(v_2a04ed);
+              console.warn('📦 [CameraMainScreen][Direct] 파싱된 캐시 키 수:', Object.keys(v_ed29b7).length);
+            }
+          } catch (v_49263d) {
+            console.error('❌ [CameraMainScreen][Direct] 캐시 직접 로드 실패:', v_49263d);
+          }
 
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 새로고침 시작');
           let v_e36b07 = await v_563153();
@@ -1091,8 +1099,16 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               }
             }
 
-            const v_78fdd6 = await v_c9b9cb();
-            Object.assign(v_ed29b7, v_78fdd6);
+            try {
+              const v_0afcb8 = await v_e84827.getItem('cached_AD');
+              if (v_0afcb8) {
+                const v_78fdd6 = JSON.parse(v_0afcb8);
+                Object.assign(v_ed29b7, v_78fdd6); 
+                console.warn('🔄 [CameraMainScreen][Direct] 캐시 갱신 완료. 키 수:', Object.keys(v_ed29b7).length);
+              }
+            } catch (v_9e86fd) {
+              console.error('❌ [CameraMainScreen][Direct] 캐시 갱신 로드 실패:', v_9e86fd);
+            }
             console.log('🔄 [CameraMainScreen API] TopAd5 저장 후 캐시 객체 업데이트 완료');
 
             console.log('🔍 [CameraMainScreen API] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
@@ -1109,6 +1125,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
             console.log('📊 [CameraMainScreen API] 거리 순 정렬 완료 (가까운 순서)');
 
+            console.log('📍 [Trace] 5. 매핑 시작');
             const v_8ceeaa = v_beddf3.map((v_51b584, v_a56041) => {
               const v_ba7922 = v_a56041 % v_e36b07.length;
               const v_127b33 = v_e36b07[v_ba7922];
@@ -1151,6 +1168,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             });
 
             console.log('✅ [CameraMainScreen API] TopAd5 매핑 완료:', v_8ceeaa.length, '개 토큰');
+            console.log('📍 [Trace] 6. 매핑 완료. 개수:', v_8ceeaa.length);
 
             v_7bb835(v_8ceeaa);
 
@@ -1158,14 +1176,14 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.log('🔄 [CameraMainScreen API] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
 
             try {
-              console.log('🔄 [CameraMainScreen API] organizeData 호출 시작');
+              console.log('📍 [Trace] 7-1. organizeData 호출 시작');
               v_0a6f80(v_8ceeaa, v_ed29b7);
-              console.log('✅ [CameraMainScreen API] organizeData 호출 완료');
+              console.log('📍 [Trace] 7-2. organizeData 호출 완료');
             } catch (v_15a64b) {
               console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', v_15a64b);
             }
 
-            console.warn('🚀 [CameraMainScreen API] Pre-fetch 로직 진입점 도달 (여기 안 보이면 앞 단계 오류)');
+            console.warn('📍 [Trace] 8. Pre-fetch 로직 진입점 도달 (여기 안 보이면 앞 단계 오류)');
             const v_1fddfe = async (v_a23604) => {
               console.log('🏁 [PreFetch] 함수 진입. isPreFetching:', v_ba482c.current);
 
