@@ -1912,6 +1912,7 @@ export const v_f84ef5 = async (
   v_985be2,
   v_660822,
   v_c65f5d,
+  v_e7f87b, 
 ): Promise<v_f71847[]> => {
   if (v_69fe4e) {
     console.log('[Deduplication] fetchMapMarkerData is already in progress, returning pending promise');
@@ -1926,6 +1927,7 @@ export const v_f84ef5 = async (
         latitude: v_b5de9c,
         longitude: v_985be2,
         limit: 120,
+        ...(v_e7f87b || {}),
       };
 
       const v_3393e3 = await v_9f42a4.post(

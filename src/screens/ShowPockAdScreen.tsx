@@ -187,19 +187,54 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
       const v_aa0917 = v_766d99.campid || '';
 
-      if (!v_9f9e7d) {
-        console.log('✅ [ShowPockAdScreen] 기본 정보로 UI 우선 표시');
-        v_32baa9({
-          ad_name: v_766d99.name || '',
-          ad_description: '', 
-          ad_profit: v_766d99.xrunPrice || 0,
-          landing_url: v_766d99.urlAD || '',
-        } as any);
-        v_deef62(false); 
+      try {
+        console.log(`🔍 [ShowPockAdScreen] 캐시 데이터 조회 시작: campid=${v_aa0917}`);
+        const v_2b3007 = await v_e84827.getItem('cached_AD');
+
+        if (v_2b3007) {
+          const v_f6025a = JSON.parse(v_2b3007);
+
+          const v_fa53ec = Object.keys(v_f6025a);
+          console.log(`📋 [ShowPockAdScreen] cached_AD 로드됨 (${v_fa53ec.length}개 항목). 키 확인: ${v_fa53ec.includes(String(v_aa0917)) ? '있음' : '없음'}`);
+
+          const v_0231a4 = v_f6025a[String(v_aa0917)];
+          if (v_0231a4) {
+            console.log(`💾 [ShowPockAdScreen] 캐시 항목 내용:`, JSON.stringify(v_0231a4, null, 2));
+
+            if (v_0231a4.urlAD) {
+              console.log(`✅ [ShowPockAdScreen] 캐시 데이터 적용 성공: ${v_aa0917}`);
+              v_32baa9({
+                ad_name: v_0231a4.name || v_766d99.name || '',
+                ad_description: '',
+                ad_profit: v_0231a4.xrunPrice !== undefined ? v_0231a4.xrunPrice : (v_766d99.xrunPrice || 0),
+                landing_url: v_0231a4.urlAD,
+                ad_participation: v_0231a4.joindesc || '',
+              } as any);
+              v_deef62(false);
+              return; 
+            } else {
+              console.warn(`⚠️ [ShowPockAdScreen] 캐시 항목은 있으나 urlAD가 비어있습니다.`);
+            }
+          } else {
+            console.log(`⚠️ [ShowPockAdScreen] 해당 campid(${v_aa0917})에 대한 캐시 데이터가 없습니다.`);
+          }
+        } else {
+          console.log(`⚠️ [ShowPockAdScreen] cached_AD 저장소가 비어있습니다 (null).`);
+        }
+      } catch (v_9e86fd) {
+        console.error('[ShowPockAdScreen] 캐시 읽기 실패:', v_9e86fd);
       }
 
       if (v_766d99?.urlAD && v_766d99.urlAD !== '') {
         console.log('✅ [ShowPockAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        v_32baa9({
+          ad_name: v_766d99.name || '',
+          ad_description: '',
+          ad_profit: v_766d99.xrunPrice || 0,
+          landing_url: v_766d99.urlAD,
+          ad_participation: v_766d99.joindesc || '',
+        } as any);
+        v_deef62(false);
         return;
       }
 

@@ -1243,74 +1243,64 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                     let v_43c42e;
 
-                    if (v_693775 === 'nas') {
-                      console.log(`🌐 [PreFetch] NAS 요청 시작: ${v_ddcfed.campid}`);
-                      v_43c42e = await v_1c4683(v_660822, v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
+                    const v_6030b8 = v_ddcfed.ad_check_url;
+                    let v_9cb87d = null;
 
-                      if (v_43c42e.data && v_43c42e.data.urlResult === 200 && v_43c42e.data.urlAD) {
+                    if (v_6030b8) {
+                      try {
+                        console.log(`🌐 [PreFetch] 요청 시작 (${v_693775}):`, v_6030b8);
+                        const v_3393e3 = await fetch(v_6030b8);
+                        const v_4e826f = await v_3393e3.json();
 
-                        console.log(`✅ [PreFetch] NAS 성공: ${v_ddcfed.campid}`);
-                        const v_9cb87d = v_43c42e.data;
-                        const v_4d73f0 = {
-                          urlAD: v_9cb87d.urlAD,
-                          joindesc: v_9cb87d.rewarddesc,
-                          name: v_9cb87d.name,
-                          xrunPrice: v_9cb87d.price ? (v_9cb87d.price / 2) : undefined
-                        };
-
-                        await v_8911b6(v_7ac310, v_4d73f0);
-
-                        v_c34f94[v_7ac310] = v_4d73f0;
-
-                        v_0b94e1 = v_0b94e1.map(v_3f4e2e =>
-                          (v_3f4e2e.campid === v_ddcfed.campid && String(v_3f4e2e.ad_company).toLowerCase() === 'nas') ? {
-                            ...v_3f4e2e,
-                            urlAD: v_4d73f0.urlAD,
-                            landing_url: v_4d73f0.urlAD,
-                            joindesc: v_4d73f0.joindesc || v_3f4e2e.joindesc,
-                            name: v_4d73f0.name || v_3f4e2e.name,
-                            xrunPrice: v_4d73f0.xrunPrice !== undefined ? v_4d73f0.xrunPrice : v_3f4e2e.xrunPrice,
-                          } : v_3f4e2e
-                        );
-
-                      } else {
-                        console.warn(`⚠️ [PreFetch] NAS 실패/응답없음: ${v_ddcfed.campid}, urlResult=${v_43c42e.data?.urlResult}`);
-                      }
-                    } else if (v_693775 === 'pointclick') {
-                      console.log(`🌐 [PreFetch] Pock 요청 시작: ${v_ddcfed.campid}`);
-                      v_43c42e = await v_aa7dc1(v_660822, v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
-
-                      if (v_43c42e.code === 200 && v_43c42e.data && v_43c42e.data.landing_url) {
-
-                        console.log(`✅ [PreFetch] Pock 성공: ${v_ddcfed.campid}`);
-                        const v_9cb87d = v_43c42e.data;
-                        const v_4d73f0 = {
-                          urlAD: v_9cb87d.landing_url,
-                          joindesc: v_9cb87d.ad_participation,
-                          name: v_9cb87d.ad_name,
-                          xrunPrice: v_9cb87d.ad_profit
-                        };
-
-                        await v_8911b6(v_7ac310, v_4d73f0);
-
-                        v_c34f94[v_7ac310] = v_4d73f0;
-
-                        v_0b94e1 = v_0b94e1.map(v_3f4e2e =>
-                          (v_3f4e2e.campid === v_ddcfed.campid && String(v_3f4e2e.ad_company).toLowerCase() === 'pointclick') ? {
-                            ...v_3f4e2e,
-                            urlAD: v_4d73f0.urlAD,
-                            landing_url: v_4d73f0.urlAD,
-                            joindesc: v_4d73f0.joindesc || v_3f4e2e.joindesc,
-                            name: v_4d73f0.name || v_3f4e2e.name,
-                            xrunPrice: v_4d73f0.xrunPrice !== undefined ? v_4d73f0.xrunPrice : v_3f4e2e.xrunPrice,
-                          } : v_3f4e2e
-                        );
-
-                      } else {
-                        console.warn(`⚠️ [PreFetch] Pock 실패/응답없음: ${v_ddcfed.campid}, code=${v_43c42e.code}`);
+                        if (v_693775 === 'nas') {
+                          const v_679b9e = typeof v_4e826f.result === 'string' ? parseInt(v_4e826f.result, 10) : v_4e826f.result;
+                          if (v_679b9e === 200 && v_4e826f.lurl) {
+                            v_9cb87d = {
+                              urlAD: v_4e826f.lurl,
+                              name: v_4e826f.name
+                            };
+                          } else {
+                            console.warn(`⚠️ [PreFetch] NAS 실패: result=${v_679b9e}`);
+                          }
+                        } else if (v_693775 === 'pointclick') {
+                          if (v_4e826f.result_code === 200 && v_4e826f.landing_url) {
+                            v_9cb87d = {
+                              urlAD: v_4e826f.landing_url,
+                              name: v_4e826f.ad_name
+                            };
+                          } else {
+                            console.warn(`⚠️ [PreFetch] Pock 실패: code=${v_4e826f.result_code}`);
+                          }
+                        }
+                      } catch (v_da980a) {
+                        console.error(`❌ [PreFetch] Fetch 오류:`, v_da980a);
                       }
                     } else {
-                      console.warn(`⚠️ [PreFetch] 알 수 없는 ad_company: ${v_ddcfed.ad_company}`);
+                      console.warn(`⚠️ [PreFetch] ad_check_url 없음: ${v_ddcfed.campid}`);
+                    }
+
+                    if (v_9cb87d && v_9cb87d.urlAD) {
+
+                      console.log(`✅ [PreFetch] 성공: ${v_ddcfed.campid}`);
+                      const v_4d73f0 = {
+                        urlAD: v_9cb87d.urlAD,
+                        joindesc: v_ddcfed.joindesc, 
+                        name: v_9cb87d.name || v_ddcfed.name,
+                        xrunPrice: v_ddcfed.xrunPrice
+                      };
+
+                      await v_8911b6(v_7ac310, v_4d73f0);
+
+                      v_c34f94[v_7ac310] = v_4d73f0;
+
+                      v_0b94e1 = v_0b94e1.map(v_3f4e2e =>
+                        (v_3f4e2e.campid === v_ddcfed.campid) ? {
+                          ...v_3f4e2e,
+                          urlAD: v_4d73f0.urlAD,
+                          landing_url: v_4d73f0.urlAD,
+                          name: v_4d73f0.name || v_3f4e2e.name,
+                        } : v_3f4e2e
+                      );
                     }
                   } catch (v_9e86fd) {
                     console.log(`⚠️ [CameraMainScreen API] ${v_ddcfed.campid} pre-fetch 실패:`, v_9e86fd);
