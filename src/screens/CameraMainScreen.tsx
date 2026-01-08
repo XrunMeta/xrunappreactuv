@@ -290,15 +290,15 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
       />
 
       <TouchableOpacity
-        onPress={isCompleted ? undefined : onPress}
-        disabled={isCompleted}
+        onPress={onPress}
+        disabled={false}
         style={[
           styles.tokenButtonContainer,
           {
             transform: [
               { scale: calculateScaleBasedOnDistance(distance) },
             ],
-            opacity: isCompleted ? 0.5 : 1, 
+            opacity: 1, 
           },
         ]}
         activeOpacity={0.7}>
@@ -315,22 +315,20 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          {!isCompleted && (
-            <Animated.Image
-              source={
-                isRageMode
-                  ? require('../../assets/images/icon_catch_rage.png')
-                  : require('../../assets/images/icon_catch.png')
-              }
-              style={[
-                styles.blinkImage,
-                {
-                  opacity: blinkAnim,
-                },
-                isRageMode && { top: -90 },
-              ]}
-            />
-          )}
+          <Animated.Image
+            source={
+              isRageMode
+                ? require('../../assets/images/icon_catch_rage.png')
+                : require('../../assets/images/icon_catch.png')
+            }
+            style={[
+              styles.blinkImage,
+              {
+                opacity: blinkAnim,
+              },
+              isRageMode && { top: -90 },
+            ]}
+          />
           {iconXrunWhite && (
             <Image
               source={iconXrunWhite}
@@ -675,6 +673,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, []);
 
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
   const hasAutoAdTriggeredRef = useRef(false); 
 
   const hasRequestedPermissionRef = useRef(false);
@@ -744,13 +743,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     const validData = enrichedData;
 
     enrichedData.forEach(d => {
-      const hasDirectUrl = (d.urlAD && d.urlAD !== '') || (d.landing_url && d.landing_url !== '');
+      const hasDirectUrl = (d.urlAD && d.urlAD !== '' && d.urlAD !== '없음') || 
+                          (d.landing_url && d.landing_url !== '' && d.landing_url !== '없음');
       const campid = String(d.campid || '');
       const cachedUrl = effectiveCache[campid]?.urlAD;
-      const hasCachedUrl = cachedUrl && cachedUrl !== '';
+      const hasCachedUrl = cachedUrl && cachedUrl !== '' && cachedUrl !== '없음';
 
       if (!hasDirectUrl && !hasCachedUrl) {
-        console.log(`⚠️ [organizeData] ${d.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`);
+        console.log(`⚠️ [organizeData] ${d.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`, {
+          urlAD: d.urlAD,
+          landing_url: d.landing_url,
+          cachedUrl: cachedUrl,
+        });
       }
     });
 
@@ -857,189 +861,266 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
               console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
 
-              try {
+              console.log('[CameraMainScreen] 1단계: 캐시 TopAd5 데이터 확인 시작');
+              const storedTopAd5 = await getStoredTopAd5();
 
-          console.log('[CameraMainScreen] 1단계: TopAd5 데이터 확인 시작');
-          const storedTopAd5 = await getStoredTopAd5();
+              if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
+                console.log('✅ [CameraMainScreen] 캐시 TopAd5 데이터 발견 - 즉시 토큰 표시:', storedTopAd5.length, '개');
 
-          let topAd5Response: any[] | null = null;
+                const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+                  const distanceA = parseFloat(String(a.distance || 0));
+                  const distanceB = parseFloat(String(b.distance || 0));
+                  return distanceA - distanceB;
+                });
 
-          if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
-            topAd5Response = await getTopAd5(); 
-          } else {
+                const MAX_TOKENS_PER_CAMPAIGN = 5;
+                const maxMappedTokens = storedTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                const campaignTokenCount = new Map<number, number>();
 
-            console.log('[CameraMainScreen] 저장된 TopAd5 데이터 없음, API 호출');
-            topAd5Response = await getTopAd5();
-          }
+                const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+                  if (index >= maxMappedTokens) {
+                    return coin;
+                  }
 
-          if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
-            console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
-            topAd5Response = null; 
-          }
+                  const adIndex = index % storedTopAd5.length;
+                  const mappedAd = storedTopAd5[adIndex];
+                  const campid = mappedAd?.campid;
 
-          if (!topAd5Response || !Array.isArray(topAd5Response)) {
-            console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
-            topAd5Response = await getStoredTopAd5();
-          }
-
-                if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
-                  console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', topAd5Response.length, '개');
-
-                  console.log('🔍 [CameraMainScreen] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
-                    keys: Object.keys(topAd5Response[0] || {}),
-                    firstItem: topAd5Response[0],
-                  });
-
-                  const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
-                    const distanceA = parseFloat(String(a.distance || 0));
-                    const distanceB = parseFloat(String(b.distance || 0));
-                    return distanceA - distanceB; 
-                  });
-
-                  console.log('📊 [CameraMainScreen] 거리 순 정렬 완료 (가까운 순서)');
-
-                  const MAX_TOKENS_PER_CAMPAIGN = 5;
-                  const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
-
-                  const campaignTokenCount = new Map<number, number>();
-
-                  const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
-
-                    if (index >= maxMappedTokens) {
+                  if (campid) {
+                    const currentCount = campaignTokenCount.get(campid) || 0;
+                    if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
                       return coin;
                     }
+                    campaignTokenCount.set(campid, currentCount + 1);
+                  }
 
-                    const adIndex = index % topAd5Response.length;
-                    const mappedAd = topAd5Response[adIndex];
-                    const campid = mappedAd?.campid;
+                  return {
+                    ...coin,
+                    distance: Number(coin.distance) || 0,
+                    name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                    iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                    joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                    xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                    xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                    campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                    advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                    thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                    ad_company: mappedAd?.ad_company || coin.ad_company,
+                    coins: mappedAd?.coins?.toString() || coin.coins,
+                    brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                    adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                    symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                    urlAD: mappedAd?.urlAD || coin.urlAD || '',
+                  };
+                });
 
-                    if (campid) {
-                      const currentCount = campaignTokenCount.get(campid) || 0;
-                      if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
-                        return coin;
-                      }
-                      campaignTokenCount.set(campid, currentCount + 1);
+                setCoinsData(mappedCoinsData);
+                currentIndexRef.current = 0;
+                organizeData(mappedCoinsData);
+                setLoading(false);
+                hasLoadedDataRef.current = true;
+
+                console.log('✅ [CameraMainScreen] 캐시 데이터로 토큰 즉시 표시 완료');
+
+                (async () => {
+                  try {
+                    console.log('[CameraMainScreen] 백그라운드: 최신 데이터 가져오기 시작');
+
+                    const userData = await AsyncStorage.getItem('userData');
+                    if (!userData) {
+                      console.warn('[CameraMainScreen] 백그라운드: userData 없음');
+                      return;
+                    }
+                    const parsedUserData = JSON.parse(userData);
+                    const member = parsedUserData?.member?.toString() || '';
+                    if (!member) {
+                      console.warn('[CameraMainScreen] 백그라운드: member 없음');
+                      return;
                     }
 
-                    return {
-                      ...coin,
+                    const [topAd5Response, completedAdsSet] = await Promise.all([
+                      getTopAd5().catch(() => null),
+                      getCompletedAdsSet(member, navigate).catch(() => new Set<string>()),
+                    ]);
 
-                      distance: Number(coin.distance) || 0,
+                    if (completedAdsSet && completedAdsSet.size > 0) {
+                      completedAdsSetRef.current = completedAdsSet;
+                      console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+                    }
 
-                      name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
-                      iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                      joindesc: mappedAd?.joindesc || coin.joindesc || '',
-                      xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
-                      xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
-                      campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                    if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+                      console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
-                      advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                      const filteredTopAd5 = topAd5Response.filter((ad: any) => {
+                        return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
+                      });
 
-                      thumbnail: mappedAd?.thumbnail || coin.thumbnail,
-                      ad_company: mappedAd?.ad_company || coin.ad_company,
-                      coins: mappedAd?.coins?.toString() || coin.coins,
-                      brandlogo: mappedAd?.brandlogo || coin.brandlogo,
-                      adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
-                      symbolimg: mappedAd?.symbolimg || coin.symbolimg,
-                    };
-                  });
+                      if (filteredTopAd5.length > 0) {
 
-                  console.log('✅ [CameraMainScreen] TopAd5 매핑 완료:', mappedCoinsData.length, '개 토큰');
+                        const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+                          const distanceA = parseFloat(String(a.distance || 0));
+                          const distanceB = parseFloat(String(b.distance || 0));
+                          return distanceA - distanceB;
+                        });
 
-                  console.log('🔍 [loadTokenData] mappedCoinsData 고유 데이터 확인 (처음 10개):');
-                  mappedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
-                    console.log(`📋 mappedCoinsData[${idx}]:`, {
-                      name: coin.name,
-                      advertisement: coin.advertisement,
-                      campid: coin.campid,
-                      xrunPrice: coin.xrunPrice,
-                      distance: coin.distance,
-                      coin: coin.coin,
-                      brand: coin.brand,
-                    });
-                  });
+                        const MAX_TOKENS_PER_CAMPAIGN = 5;
+                        const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                        const campaignTokenCount = new Map<number, number>();
 
-                  const allAdvertisements = mappedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
-                  const allCampids = mappedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
-                  const uniqueAllAds = Array.from(new Set(allAdvertisements));
-                  const uniqueAllCampids = Array.from(new Set(allCampids));
-                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                    total: mappedCoinsData.length,
-                    uniqueAdvertisements: uniqueAllAds.length,
-                    uniqueCampids: uniqueAllCampids.length,
-                    advertisementValues: uniqueAllAds.slice(0, 10),
-                    campidValues: uniqueAllCampids.slice(0, 10),
-                  });
+                        const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+                          if (index >= maxMappedTokens) {
+                            return coin;
+                          }
 
-                  setCoinsData(mappedCoinsData);
+                          const adIndex = index % filteredTopAd5.length;
+                          const mappedAd = filteredTopAd5[adIndex];
+                          const campid = mappedAd?.campid;
 
-                  currentIndexRef.current = 0;
-                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
+                          if (campid) {
+                            const currentCount = campaignTokenCount.get(campid) || 0;
+                            if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                              return coin;
+                            }
+                            campaignTokenCount.set(campid, currentCount + 1);
+                          }
 
-                  organizeData(mappedCoinsData);
-                } else {
-                  console.log('⚠️ [CameraMainScreen] TopAd5 데이터 없음, 기존 데이터 사용');
+                          return {
+                            ...coin,
+                            distance: Number(coin.distance) || 0,
+                            name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                            iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                            joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                            xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                            xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                            campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                            advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                            thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                            ad_company: mappedAd?.ad_company || coin.ad_company,
+                            coins: mappedAd?.coins?.toString() || coin.coins,
+                            brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                            adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                            symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                            urlAD: mappedAd?.urlAD || coin.urlAD || '',
+                          };
+                        });
 
-                  console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
-                  validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
-                    console.log(`📋 validatedCoinsData[${idx}]:`, {
-                      name: coin.name,
-                      advertisement: coin.advertisement,
-                      campid: coin.campid,
-                      xrunPrice: coin.xrunPrice,
-                      coin: coin.coin,
-                      brand: coin.brand,
-                    });
-                  });
+                        setCoinsData(updatedCoinsData);
+                        currentIndexRef.current = 0;
+                        organizeData(updatedCoinsData);
+                        console.log('[CameraMainScreen] 백그라운드: 최신 데이터로 토큰 업데이트 완료');
+                      }
+                    }
+                  } catch (bgError) {
+                    console.warn('[CameraMainScreen] 백그라운드 업데이트 실패:', bgError);
+                  }
+                })();
 
-                  const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
-                  const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
-                  const uniqueAllAds = Array.from(new Set(allAdvertisements));
-                  const uniqueAllCampids = Array.from(new Set(allCampids));
-                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                    total: validatedCoinsData.length,
-                    uniqueAdvertisements: uniqueAllAds.length,
-                    uniqueCampids: uniqueAllCampids.length,
-                    advertisementValues: uniqueAllAds.slice(0, 10),
-                    campidValues: uniqueAllCampids.slice(0, 10),
-                  });
-
-                  setCoinsData(validatedCoinsData);
-
-                  organizeData(validatedCoinsData);
-                }
-              } catch (topAd5Error) {
-                console.error('❌ [CameraMainScreen] TopAd5 데이터 가져오기 실패:', topAd5Error);
-                console.log('⚠️ 기존 데이터 사용');
-
-                console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
-                validatedCoinsData.slice(0, 10).forEach((coin: any, idx: number) => {
-                  console.log(`📋 validatedCoinsData[${idx}]:`, {
-                    name: coin.name,
-                    advertisement: coin.advertisement,
-                    campid: coin.campid,
-                    xrunPrice: coin.xrunPrice,
-                    coin: coin.coin,
-                    brand: coin.brand,
-                  });
-                });
-
-                const allAdvertisements = validatedCoinsData.map((c: any) => c.advertisement).filter((v: any) => v != null && v !== undefined && v !== '');
-                const allCampids = validatedCoinsData.map((c: any) => c.campid).filter((v: any) => v != null && v !== undefined && v !== '');
-                const uniqueAllAds = Array.from(new Set(allAdvertisements));
-                const uniqueAllCampids = Array.from(new Set(allCampids));
-                console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                  total: validatedCoinsData.length,
-                  uniqueAdvertisements: uniqueAllAds.length,
-                  uniqueCampids: uniqueAllCampids.length,
-                  advertisementValues: uniqueAllAds.slice(0, 10),
-                  campidValues: uniqueAllCampids.slice(0, 10),
-                });
-
-                setCoinsData(validatedCoinsData);
-
-                organizeData(validatedCoinsData);
+                return; 
               }
+
+              console.log('[CameraMainScreen] 캐시 TopAd5 데이터 없음 - 기본 데이터 먼저 표시');
+
+              setCoinsData(validatedCoinsData);
+              organizeData(validatedCoinsData);
+              setLoading(false);
+              hasLoadedDataRef.current = true;
+
+              (async () => {
+                try {
+                  console.log('[CameraMainScreen] 백그라운드: 최신 데이터 가져오기 시작');
+
+                  const userData = await AsyncStorage.getItem('userData');
+                  if (!userData) {
+                    console.warn('[CameraMainScreen] 백그라운드: userData 없음');
+                    return;
+                  }
+                  const parsedUserData = JSON.parse(userData);
+                  const member = parsedUserData?.member?.toString() || '';
+                  if (!member) {
+                    console.warn('[CameraMainScreen] 백그라운드: member 없음');
+                    return;
+                  }
+
+                  const [topAd5Response, completedAdsSet] = await Promise.all([
+                    getTopAd5().catch(() => null),
+                    getCompletedAdsSet(member, navigate).catch(() => new Set<string>()),
+                  ]);
+
+                  if (completedAdsSet && completedAdsSet.size > 0) {
+                    completedAdsSetRef.current = completedAdsSet;
+                    console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+
+                    setTokens(prevTokens => [...prevTokens]);
+                  }
+
+                  if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+                    console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
+
+                    const filteredTopAd5 = topAd5Response.filter((ad: any) => {
+                      return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
+                    });
+
+                    if (filteredTopAd5.length > 0) {
+
+                      const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+                        const distanceA = parseFloat(String(a.distance || 0));
+                        const distanceB = parseFloat(String(b.distance || 0));
+                        return distanceA - distanceB;
+                      });
+
+                      const MAX_TOKENS_PER_CAMPAIGN = 5;
+                      const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                      const campaignTokenCount = new Map<number, number>();
+
+                      const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+                        if (index >= maxMappedTokens) {
+                          return coin;
+                        }
+
+                        const adIndex = index % filteredTopAd5.length;
+                        const mappedAd = filteredTopAd5[adIndex];
+                        const campid = mappedAd?.campid;
+
+                        if (campid) {
+                          const currentCount = campaignTokenCount.get(campid) || 0;
+                          if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                            return coin;
+                          }
+                          campaignTokenCount.set(campid, currentCount + 1);
+                        }
+
+                        return {
+                          ...coin,
+                          distance: Number(coin.distance) || 0,
+                          name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                          iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                          joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                          xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                          xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                          campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                          advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                          thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                          ad_company: mappedAd?.ad_company || coin.ad_company,
+                          coins: mappedAd?.coins?.toString() || coin.coins,
+                          brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                          adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                          symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                          urlAD: mappedAd?.urlAD || coin.urlAD || '',
+                        };
+                      });
+
+                      setCoinsData(updatedCoinsData);
+                      currentIndexRef.current = 0;
+                      organizeData(updatedCoinsData);
+                      console.log('[CameraMainScreen] 백그라운드: 최신 데이터로 토큰 업데이트 완료');
+                    }
+                  }
+                } catch (bgError) {
+                  console.warn('[CameraMainScreen] 백그라운드 업데이트 실패:', bgError);
+                }
+              })();
+
+              return; 
 
               hasLoadedDataRef.current = true;
               setLoading(false);
@@ -1249,10 +1330,22 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.warn('🚦 [CameraMainScreen API] TopAd5 조건 충족. 로직 진입. 개수:', topAd5Response.length);
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', topAd5Response.length, '개');
 
+            if (topAd5Response.length > 0) {
+              const firstAd = topAd5Response[0];
+              console.log('[CameraMainScreen API] 첫 번째 광고 urlAD 확인:', {
+                campid: firstAd?.campid,
+                ad_company: firstAd?.ad_company,
+                urlAD: firstAd?.urlAD || '없음',
+                urlAD_type: typeof firstAd?.urlAD,
+                urlAD_length: firstAd?.urlAD?.length || 0,
+                allKeys: Object.keys(firstAd || {}),
+              });
+            }
+
             const filteredTopAd5 = topAd5Response.filter((ad: any) => {
               const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
               if (!hasUrl) {
-                console.log(`⚠️ [CameraMainScreen] ${ad.campid}는 urlAD가 없어 제외됨`);
+                console.log(`⚠️ [CameraMainScreen] ${ad.campid}는 urlAD가 없어 제외됨 (urlAD 값: ${ad.urlAD}, 타입: ${typeof ad.urlAD})`);
               }
               return hasUrl;
             });
@@ -1353,10 +1446,21 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
               const adKey = String(mappedAd?.campid || '');
               const cachedItem = loadedCache[adKey];
-              const finalUrlAD = cachedItem?.urlAD || mappedAd?.urlAD || coin.urlAD || '';
+              let finalUrlAD = cachedItem?.urlAD || mappedAd?.urlAD || mappedAd?.landing_url || coin.urlAD || coin.landing_url || '';
+
+              if (finalUrlAD === '없음') {
+                finalUrlAD = '';
+              }
 
               if (!finalUrlAD || finalUrlAD === '') {
                 console.log(`⚠️ [CameraMainScreen API] ${campid}는 urlAD가 없지만 매핑은 진행 (나중에 pre-fetch 예정)`);
+                console.log(`🔍 [CameraMainScreen API] urlAD 확인 상세:`, {
+                  cachedItem_urlAD: cachedItem?.urlAD,
+                  mappedAd_urlAD: mappedAd?.urlAD,
+                  mappedAd_landing_url: mappedAd?.landing_url,
+                  coin_urlAD: coin.urlAD,
+                  coin_landing_url: coin.landing_url,
+                });
               }
 
               if (campid) {
@@ -1371,8 +1475,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 adIndex,
                 adCompany: mappedAd?.ad_company,
                 campid: mappedAd?.campid,
+                mappedAd_urlAD: mappedAd?.urlAD || '없음',
+                cachedItem_urlAD: cachedItem?.urlAD || '없음',
+                coin_urlAD: coin.urlAD || '없음',
+                finalUrlAD: finalUrlAD || 'EMPTY',
                 hasUrlAD: !!finalUrlAD,
-                urlAD_val: finalUrlAD || 'EMPTY'
               });
 
               if (cachedItem) {
@@ -1393,8 +1500,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                 advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
 
-                urlAD: finalUrlAD,
-                landing_url: finalUrlAD, 
+                urlAD: finalUrlAD && finalUrlAD !== '없음' ? finalUrlAD : '', 
+                landing_url: finalUrlAD && finalUrlAD !== '없음' ? finalUrlAD : '', 
                 thumbnail: mappedAd?.thumbnail || coin.thumbnail,
                 ad_company: mappedAd?.ad_company || coin.ad_company,
                 coins: mappedAd?.coins?.toString() || coin.coins,
@@ -1924,6 +2031,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         console.log('⏹️ 자동 광고 이동 타이머 정리됨');
       }
 
+      if (tokenClickTimeoutRef.current) {
+        clearTimeout(tokenClickTimeoutRef.current);
+        tokenClickTimeoutRef.current = null;
+        console.log('⏹️ 2초 타이머 정리됨');
+      }
+
       hasAutoAdTriggeredRef.current = false;
       console.log('🔄 자동 광고 트리거 상태 리셋됨');
     };
@@ -2011,6 +2124,38 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      let urlAD = token.urlAD || '';
+
+      if (urlAD === '없음') {
+        urlAD = '';
+      }
+
+      if (!urlAD || urlAD === '') {
+        try {
+          const storedAds = await getStoredTopAd5();
+          if (storedAds && Array.isArray(storedAds)) {
+            const foundAd = storedAds.find(ad => 
+              ad.campid === campid || 
+              String(ad.campid) === String(campid) ||
+              ad.advertisement === advertisement ||
+              String(ad.advertisement) === String(advertisement)
+            );
+            if (foundAd) {
+              urlAD = foundAd.urlAD || foundAd.landing_url || '';
+
+              if (urlAD === '없음') {
+                urlAD = '';
+              }
+              if (urlAD) {
+                console.log(`✅ [showAdInModal] getStoredTopAd5에서 urlAD 찾음:`, urlAD);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('[showAdInModal] getStoredTopAd5에서 urlAD 찾기 실패:', error);
+        }
+      }
+
       const adParams = {
         member: member,
         advertisement: advertisement,
@@ -2021,7 +2166,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
         ad_company: adCompany,
-        urlAD: token.urlAD || '',
+        urlAD: urlAD && urlAD !== '없음' ? urlAD : '', 
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
@@ -2226,12 +2371,21 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         clearTimeout(autoAdTimeoutRef.current);
         autoAdTimeoutRef.current = null;
       }
+      if (tokenClickTimeoutRef.current) {
+        console.log('📱 하단 패널 닫힘 또는 토큰 변경 - 2초 타이머 정리');
+        clearTimeout(tokenClickTimeoutRef.current);
+        tokenClickTimeoutRef.current = null;
+      }
     }
 
     return () => {
       if (autoAdTimeoutRef.current) {
         clearTimeout(autoAdTimeoutRef.current);
         autoAdTimeoutRef.current = null;
+      }
+      if (tokenClickTimeoutRef.current) {
+        clearTimeout(tokenClickTimeoutRef.current);
+        tokenClickTimeoutRef.current = null;
       }
     };
   }, [showBottomPanel, selectedToken, navigateToAd]);
@@ -2252,6 +2406,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       console.log('🔄 다른 토큰 클릭 - 이전 자동 광고 이동 타이머 정리');
       clearTimeout(autoAdTimeoutRef.current);
       autoAdTimeoutRef.current = null;
+    }
+    if (tokenClickTimeoutRef.current) {
+      console.log('🔄 다른 토큰 클릭 - 이전 2초 타이머 정리');
+      clearTimeout(tokenClickTimeoutRef.current);
+      tokenClickTimeoutRef.current = null;
     }
     hasAutoAdTriggeredRef.current = false; 
 
@@ -2287,8 +2446,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       });
     }, 100);
 
-    setTimeout(() => {
+    tokenClickTimeoutRef.current = setTimeout(() => {
       console.log('⏱️ 2초 후 광고 화면으로 이동');
+      tokenClickTimeoutRef.current = null; 
       showAdInModal(tokenCopy);
     }, 2000);
   }, [showAdInModal]);
@@ -2407,8 +2567,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     handleTokenClick(token);
                   };
 
-                  const shouldShowCatch = !isCompleted;
-                  console.log(`[토큰 렌더링] spotID=${token.spotID}, campid=${campid}, isCompleted=${isCompleted}, shouldShowCatch=${shouldShowCatch}, completedAdsSet 크기=${completedAdsSetRef.current?.size || 0}`);
+                  console.log(`[토큰 렌더링] spotID=${token.spotID}, campid=${campid}, completedAdsSet 크기=${completedAdsSetRef.current?.size || 0}`);
 
                   return (
                     <TokenComponent
@@ -2450,6 +2609,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               if (showBottomPanel) {
                 console.log('📱 하단 패널 배경 터치 - 패널 닫기');
                 setShowBottomPanel(false);
+
+                if (autoAdTimeoutRef.current) {
+                  clearTimeout(autoAdTimeoutRef.current);
+                  autoAdTimeoutRef.current = null;
+                }
+                if (tokenClickTimeoutRef.current) {
+                  clearTimeout(tokenClickTimeoutRef.current);
+                  tokenClickTimeoutRef.current = null;
+                }
+                hasAutoAdTriggeredRef.current = false;
               }
             }}
             style={[
@@ -2670,6 +2839,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   setShowBottomPanel(false);
                   setSelectedToken(null);
 
+                  if (autoAdTimeoutRef.current) {
+                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                    clearTimeout(autoAdTimeoutRef.current);
+                    autoAdTimeoutRef.current = null;
+                  }
+                  if (tokenClickTimeoutRef.current) {
+                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                    clearTimeout(tokenClickTimeoutRef.current);
+                    tokenClickTimeoutRef.current = null;
+                  }
+                  hasAutoAdTriggeredRef.current = false;
+
                   const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
                   if (shouldNavigateToCamera === 'true') {
                     console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
@@ -2688,6 +2869,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                   setShowBottomPanel(false);
                   setSelectedToken(null);
+
+                  if (autoAdTimeoutRef.current) {
+                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                    clearTimeout(autoAdTimeoutRef.current);
+                    autoAdTimeoutRef.current = null;
+                  }
+                  if (tokenClickTimeoutRef.current) {
+                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                    clearTimeout(tokenClickTimeoutRef.current);
+                    tokenClickTimeoutRef.current = null;
+                  }
+                  hasAutoAdTriggeredRef.current = false;
 
                   const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
                   if (shouldNavigateToCamera === 'true') {
