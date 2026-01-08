@@ -1912,6 +1912,7 @@ export const fetchMapMarkerData = async (
   longitude: number,
   member: number,
   navigation?: any,
+  deviceInfo?: any, 
 ): Promise<SpotData[]> => {
   if (fetchMapMarkerPromise) {
     console.log('[Deduplication] fetchMapMarkerData is already in progress, returning pending promise');
@@ -1926,6 +1927,7 @@ export const fetchMapMarkerData = async (
         latitude,
         longitude,
         limit: 120,
+        ...(deviceInfo || {}),
       };
 
       const response = await axiosInstance.post(

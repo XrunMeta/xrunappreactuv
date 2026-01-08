@@ -187,19 +187,54 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
       const campid = currentParams.campid || '';
 
-      if (!pockAdData) {
-        console.log('✅ [ShowPockAdScreen] 기본 정보로 UI 우선 표시');
-        setPockAdData({
-          ad_name: currentParams.name || '',
-          ad_description: '', 
-          ad_profit: currentParams.xrunPrice || 0,
-          landing_url: currentParams.urlAD || '',
-        } as any);
-        setIsLoading(false); 
+      try {
+        console.log(`🔍 [ShowPockAdScreen] 캐시 데이터 조회 시작: campid=${campid}`);
+        const cachedAdsStr = await AsyncStorage.getItem('cached_AD');
+
+        if (cachedAdsStr) {
+          const cachedAds = JSON.parse(cachedAdsStr);
+
+          const keys = Object.keys(cachedAds);
+          console.log(`📋 [ShowPockAdScreen] cached_AD 로드됨 (${keys.length}개 항목). 키 확인: ${keys.includes(String(campid)) ? '있음' : '없음'}`);
+
+          const cachedItem = cachedAds[String(campid)];
+          if (cachedItem) {
+            console.log(`💾 [ShowPockAdScreen] 캐시 항목 내용:`, JSON.stringify(cachedItem, null, 2));
+
+            if (cachedItem.urlAD) {
+              console.log(`✅ [ShowPockAdScreen] 캐시 데이터 적용 성공: ${campid}`);
+              setPockAdData({
+                ad_name: cachedItem.name || currentParams.name || '',
+                ad_description: '',
+                ad_profit: cachedItem.xrunPrice !== undefined ? cachedItem.xrunPrice : (currentParams.xrunPrice || 0),
+                landing_url: cachedItem.urlAD,
+                ad_participation: cachedItem.joindesc || '',
+              } as any);
+              setIsLoading(false);
+              return; 
+            } else {
+              console.warn(`⚠️ [ShowPockAdScreen] 캐시 항목은 있으나 urlAD가 비어있습니다.`);
+            }
+          } else {
+            console.log(`⚠️ [ShowPockAdScreen] 해당 campid(${campid})에 대한 캐시 데이터가 없습니다.`);
+          }
+        } else {
+          console.log(`⚠️ [ShowPockAdScreen] cached_AD 저장소가 비어있습니다 (null).`);
+        }
+      } catch (e) {
+        console.error('[ShowPockAdScreen] 캐시 읽기 실패:', e);
       }
 
       if (currentParams?.urlAD && currentParams.urlAD !== '') {
         console.log('✅ [ShowPockAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
+        setPockAdData({
+          ad_name: currentParams.name || '',
+          ad_description: '',
+          ad_profit: currentParams.xrunPrice || 0,
+          landing_url: currentParams.urlAD,
+          ad_participation: currentParams.joindesc || '',
+        } as any);
+        setIsLoading(false);
         return;
       }
 
