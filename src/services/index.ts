@@ -4785,6 +4785,9 @@ const v_332c06 = 'topAd5Data';
 const v_b5dcce = 'topAd5Timestamp';
 const v_887583 = 10 * 60 * 1000; 
 
+let v_5281af = false;
+let v_21e89f = null;
+
 export const v_8cba1e = async (v_aa0917, v_c65f5d): Promise<void> => {
   try {
     const v_92fecf = String(v_aa0917);
@@ -4935,6 +4938,11 @@ export const v_318c45 = async (v_660822, v_c65f5d, v_9d6a91 = false): Promise<Se
 
 export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
 
+  if (v_5281af && v_21e89f) {
+    console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
+    return v_21e89f;
+  }
+
   try {
 
     if (!v_9d6a91) {
@@ -4961,37 +4969,52 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
     } else {
       console.log('[getTopAd5] 강제 새로고침 모드 - API 호출');
     }
-    const v_e16099 = v_326be8.OS === 'ios' ? 'ios' : 'android';
 
-    let v_660822 = '';
-    try {
-      const v_ef7306 = await v_e84827.getItem('userData');
-      if (v_ef7306) {
-        const v_ff39bc = JSON.parse(v_ef7306);
-        v_660822 = v_ff39bc?.member || '';
+    if (v_5281af && v_21e89f) {
+      console.log('[getTopAd5] 캐시 확인 중 다른 호출이 시작되었습니다. 기존 Promise 반환');
+      return v_21e89f;
+    }
+
+    v_5281af = true;
+    const v_53a95f = (async () => {
+      const v_e16099 = v_326be8.OS === 'ios' ? 'ios' : 'android';
+
+      let v_660822 = '';
+      try {
+        const v_ef7306 = await v_e84827.getItem('userData');
+        if (v_ef7306) {
+          const v_ff39bc = JSON.parse(v_ef7306);
+          v_660822 = v_ff39bc?.member || '';
+        }
+      } catch (v_7f5774) {
+        console.log('[getTopAd5] userData 가져오기 실패:', v_7f5774);
       }
-    } catch (v_7f5774) {
-      console.log('[getTopAd5] userData 가져오기 실패:', v_7f5774);
-    }
 
-    let v_e7f87b = {};
-    try {
-      const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
-      v_e7f87b = await v_f3de6d();
-    } catch (v_b7d530) {
-      console.log('[getTopAd5] 디바이스 정보 수집 실패:', v_b7d530);
-    }
+      let v_e7f87b = {};
+      try {
+        const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
+        v_e7f87b = await v_f3de6d();
+      } catch (v_b7d530) {
+        console.log('[getTopAd5] 디바이스 정보 수집 실패:', v_b7d530);
+      }
 
-    const v_cd6a57 = {
-      os: v_e16099,
-      member: v_660822,
-      ...v_e7f87b
-    };
+      const v_cd6a57 = {
+        os: v_e16099,
+        member: v_660822,
+        ...v_e7f87b
+      };
 
-    console.log('[getTopAd5] ========== API 호출 시작 ==========');
-    console.log('[getTopAd5] 요청 파라미터:', { os: v_e16099, member: v_660822 });
+      console.log('[getTopAd5] ========== API 호출 시작 ==========');
+      console.log('[getTopAd5] 요청 파라미터:', { os: v_e16099, member: v_660822 });
 
-    const v_3393e3 = await v_c07360('getTopAd5', 'POST', v_cd6a57, v_c65f5d);
+      const v_3393e3 = await v_c07360('getTopAd5', 'POST', v_cd6a57, v_c65f5d);
+
+      return v_3393e3;
+    })();
+
+    v_21e89f = v_53a95f;
+
+    const v_3393e3 = await v_53a95f;
 
     if (!v_3393e3) {
       console.warn('[getTopAd5] API 응답이 없습니다.');
@@ -5039,89 +5062,44 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
         console.log('[getTopAd5] 백엔드 메시지:', v_3393e3.message);
       }
     } else {
+      console.log('[getTopAd5] ✅ 광고 데이터 발견:', v_e36b07.length, '개');
 
       if (v_e36b07.length > 0) {
-
+        const v_0db320 = v_e36b07[0];
+        console.log('[getTopAd5] 첫 번째 광고 전체 데이터:', JSON.stringify(v_0db320, null, 2));
+        console.log('[getTopAd5] 첫 번째 광고 urlAD 확인:', {
+          campid: v_0db320?.campid,
+          ad_company: v_0db320?.ad_company,
+          urlAD: v_0db320?.urlAD || '없음',
+          landing_url: v_0db320?.landing_url || '없음',
+          urlAD_type: typeof v_0db320?.urlAD,
+          urlAD_length: v_0db320?.urlAD?.length || 0,
+          allKeys: Object.keys(v_0db320 || {}),
+        });
       }
-    }
 
-    if (v_e36b07 && v_e36b07.length > 0 && v_660822) {
-      console.log('[getTopAd5] 광고 유효성 검증 시작:', v_e36b07.length, '개');
-
-      try {
-        const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
-        const v_e7f87b = await v_f3de6d();
-
-        const v_cf5d30 = await Promise.allSettled(
-          v_e36b07.map(async (v_ddcfed) => {
-            try {
-              const v_aa0917 = String(v_ddcfed.campid || '');
-              if (!v_aa0917) return { ad: v_ddcfed, isValid: false };
-
-              const v_5a9c46 = v_ddcfed.ad_company || 'nas';
-              if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
-
-                try {
-                  const v_43c42e = await v_aa7dc1(
-                    String(v_660822),
-                    v_e7f87b.adid || '',
-                    v_e7f87b,
-                    v_aa0917,
-                    undefined, 
-                  );
-                  return { ad: v_ddcfed, isValid: v_43c42e.code === 200 };
-                } catch (v_5e9bfe) {
-
-                  if (v_5e9bfe.is404 || v_5e9bfe.message?.includes('404') || v_5e9bfe.message?.includes('No campaign data found')) {
-                    console.log(`[getTopAd5] ${v_aa0917}는 404 에러로 제외됨`);
-                    return { ad: v_ddcfed, isValid: false };
-                  }
-
-                  return { ad: v_ddcfed, isValid: true };
-                }
-              } else {
-
-                try {
-                  const v_43c42e = await v_38f5f4(
-                    typeof v_660822 === 'number' ? v_660822 : parseInt(String(v_660822), 10),
-                    v_aa0917,
-                    'nas',
-                    undefined, 
-                  );
-
-                  return { ad: v_ddcfed, isValid: v_43c42e.code !== 404 };
-                } catch (v_5e9bfe) {
-
-                  if (v_5e9bfe.code === 404 || v_5e9bfe.message?.includes('404') || v_5e9bfe.message?.includes('not found')) {
-                    console.log(`[getTopAd5] ${v_aa0917}는 404 에러로 제외됨`);
-                    return { ad: v_ddcfed, isValid: false };
-                  }
-
-                  return { ad: v_ddcfed, isValid: true };
-                }
-              }
-            } catch (v_5e9bfe) {
-              console.warn(`[getTopAd5] ${v_ddcfed.campid} 검증 실패:`, v_5e9bfe);
-
-              return { ad: v_ddcfed, isValid: true };
-            }
-          })
-        );
-
-        const v_8eab46 = v_cf5d30
-          .filter((v_43c42e) => v_43c42e.status === 'fulfilled' && v_43c42e.value.isValid)
-          .map((v_43c42e) => (v_43c42e as PromiseFulfilledResult<any>).value.ad);
-
-        const v_e65328 = v_e36b07.length - v_8eab46.length;
-        if (v_e65328 > 0) {
-          console.log(`[getTopAd5] 404 광고 필터링: ${v_8eab46.length}/${v_e36b07.length}개 유효 (${v_e65328}개 제외)`);
+      const v_f5c83c = v_e36b07.length;
+      v_e36b07 = v_e36b07.filter(v_ddcfed => {
+        const v_7ec08d = v_ddcfed?.urlAD || v_ddcfed?.landing_url || '';
+        const v_a71df8 = v_7ec08d && 
+                       typeof v_7ec08d === 'string' && 
+                       v_7ec08d.trim() !== '' && 
+                       v_7ec08d !== '없음';
+        if (!v_a71df8) {
+          console.log(`[getTopAd5] ${v_ddcfed?.campid || 'N/A'}는 urlAD가 없거나 "없음"이어서 제외됨 (urlAD: ${v_7ec08d})`);
         }
+        return v_a71df8;
+      });
 
-        v_e36b07 = v_8eab46;
-      } catch (v_dc3cfa) {
-        console.warn('[getTopAd5] 광고 유효성 검증 실패, 원본 데이터 사용:', v_dc3cfa);
-
+      if (v_e36b07.length !== v_f5c83c) {
+        console.log(`[getTopAd5] urlAD 필터링: ${v_e36b07.length}/${v_f5c83c}개 유효 (${v_f5c83c - v_e36b07.length}개 제외)`);
       }
+
+      const v_e73e05 = v_e36b07.filter(v_ddcfed => {
+        const v_7ec08d = v_ddcfed?.urlAD || v_ddcfed?.landing_url || '';
+        return v_7ec08d && typeof v_7ec08d === 'string' && v_7ec08d.trim() !== '' && v_7ec08d !== '없음';
+      });
+      console.log('[getTopAd5] urlAD가 있는 광고 개수:', v_e73e05.length, '/', v_e36b07.length);
     }
 
     if (v_e36b07 && v_e36b07.length > 0) {
@@ -5142,6 +5120,10 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
       return v_fe7102;
     }
     throw v_5e9bfe;
+  } finally {
+
+    v_5281af = false;
+    v_21e89f = null;
   }
 };
 
@@ -5149,7 +5131,20 @@ export const v_5d7ca4 = async (): Promise<any | null> => {
   try {
     const v_fe7102 = await v_e84827.getItem(v_332c06);
     if (v_fe7102) {
-      return JSON.parse(v_fe7102);
+      const v_75d360 = JSON.parse(v_fe7102);
+
+      const v_ec1a7b = v_75d360.filter((v_ddcfed) => {
+        const v_7ec08d = v_ddcfed.urlAD || v_ddcfed.landing_url || '';
+        const v_a71df8 = v_7ec08d && 
+                       typeof v_7ec08d === 'string' && 
+                       v_7ec08d.trim() !== '' && 
+                       v_7ec08d !== '없음';
+        return v_a71df8;
+      });
+      if (v_ec1a7b.length !== v_75d360.length) {
+        console.log(`[getStoredTopAd5] urlAD 필터링: ${v_ec1a7b.length}/${v_75d360.length}개 유효`);
+      }
+      return v_ec1a7b;
     }
     return null;
   } catch (v_5e9bfe) {

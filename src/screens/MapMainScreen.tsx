@@ -51,6 +51,7 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_a61db3, v_843035 } from '../constants';
 import { v_f3de6d } from '../utils/napApiUtils';
+import { v_cba33f } from '../utils';
 
 interface LocationData {
 
@@ -230,6 +231,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const [v_b6e060, v_9cd9d5] = v_5ab095(false);
 
   const [v_4cf0ad, v_6549d0] = v_5ab095<TopAd5Item[]>([]);
+  const v_fd5fd4 = v_e662ae(false); 
 
   const [v_001c8f, v_d8a1fd] = v_5ab095(false);
 
@@ -314,10 +316,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
   v_c4deb2(() => {
     const v_43ed8b = async () => {
       try {
-        const v_5885b8 = await v_e84827.getItem('failedPreFetchCampids');
-        if (v_5885b8) {
-          const v_9b717b = new Set(JSON.parse(v_5885b8));
-          v_79311c.current = v_9b717b;
+          const v_5885b8 = await v_e84827.getItem('failedPreFetchCampids');
+          if (v_5885b8) {
+            const v_ca8416 = JSON.parse(v_5885b8) as string[];
+            const v_9b717b = new Set<string>(v_ca8416);
+            v_79311c.current = v_9b717b;
           console.log(`[MapMainScreen] 저장된 pre-fetch 실패 정보 로드: ${v_9b717b.size}개`);
         }
       } catch (v_5e9bfe) {
@@ -1553,6 +1556,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
   }, []); 
 
   const v_6dea10 = v_de06a3(async (v_9d6a91 = false) => {
+
+      if (v_fd5fd4.current) {
+        console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+        return;
+      }
+
+      v_fd5fd4.current = true;
       try {
 
         let v_905ecb = new Set<string>();
@@ -1815,6 +1825,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
         } catch (v_741f30) {
           console.error('[MapMainScreen] Fall over 실패:', v_741f30);
         }
+      } finally {
+
+        v_fd5fd4.current = false;
       }
     }, [v_ac1d22, v_a55f0b, v_4cf0ad, v_79311c, v_89e09e]); 
 
@@ -2543,10 +2556,18 @@ export const MapMainScreen: v_a3453e.FC = () => {
       v_ac1d22 === 'Map' &&
       v_4cf0ad.length === 0 &&
       v_d5e3e8 &&
-      v_b4d4c5.length > 0
+      v_b4d4c5.length > 0 &&
+      !v_fd5fd4.current 
     ) {
       console.log('[MapMainScreen] TopAd5 광고 없음 감지, getTopAd5 재호출 시작');
       const v_29fd1b = async () => {
+
+        if (v_fd5fd4.current) {
+          console.log('[MapMainScreen] getTopAd5 이미 호출 중입니다. 중복 호출 무시');
+          return;
+        }
+
+        v_fd5fd4.current = true;
         try {
           const v_e36b07 = await v_563153();
           if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
@@ -2565,6 +2586,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
           }
         } catch (v_5e9bfe) {
           console.error('[MapMainScreen] TopAd5 재호출 실패:', v_5e9bfe);
+        } finally {
+
+          v_fd5fd4.current = false;
         }
       };
       v_29fd1b();
@@ -2680,7 +2704,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
             const v_905ecb = await v_318c45(v_660822, v_9b57fc);
             if (v_905ecb.has(v_aa0917)) {
               console.log(`[MapMainScreen] 본 광고 클릭 차단: ${v_aa0917}`);
-              showToast('이미 본 광고입니다.');
+              v_cba33f('이미 본 광고입니다.');
               return; 
             }
           }
