@@ -4785,6 +4785,9 @@ const TOP_AD5_STORAGE_KEY = 'topAd5Data';
 const TOP_AD5_TIMESTAMP_KEY = 'topAd5Timestamp';
 const TOP_AD5_REFRESH_INTERVAL = 10 * 60 * 1000; 
 
+let isFetchingTopAd5 = false;
+let pendingTopAd5Promise: Promise<any> | null = null;
+
 export const removeAdFromTopAd5 = async (campid: string | number, navigation?: any): Promise<void> => {
   try {
     const campidStr = String(campid);
@@ -4935,6 +4938,11 @@ export const getCompletedAdsSet = async (member: number | string, navigation?: a
 
 export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false): Promise<any> => {
 
+  if (isFetchingTopAd5 && pendingTopAd5Promise) {
+    console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
+    return pendingTopAd5Promise;
+  }
+
   try {
 
     if (!forceRefresh) {
@@ -4961,37 +4969,52 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
     } else {
       console.log('[getTopAd5] 강제 새로고침 모드 - API 호출');
     }
-    const os = Platform.OS === 'ios' ? 'ios' : 'android';
 
-    let member: number | string = '';
-    try {
-      const userData = await AsyncStorage.getItem('userData');
-      if (userData) {
-        const parsedUserData = JSON.parse(userData);
-        member = parsedUserData?.member || '';
+    if (isFetchingTopAd5 && pendingTopAd5Promise) {
+      console.log('[getTopAd5] 캐시 확인 중 다른 호출이 시작되었습니다. 기존 Promise 반환');
+      return pendingTopAd5Promise;
+    }
+
+    isFetchingTopAd5 = true;
+    const apiCallPromise = (async () => {
+      const os = Platform.OS === 'ios' ? 'ios' : 'android';
+
+      let member: number | string = '';
+      try {
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          const parsedUserData = JSON.parse(userData);
+          member = parsedUserData?.member || '';
+        }
+      } catch (userDataError) {
+        console.log('[getTopAd5] userData 가져오기 실패:', userDataError);
       }
-    } catch (userDataError) {
-      console.log('[getTopAd5] userData 가져오기 실패:', userDataError);
-    }
 
-    let deviceInfo = {};
-    try {
-      const { collectDeviceInfo } = require('../utils/napApiUtils');
-      deviceInfo = await collectDeviceInfo();
-    } catch (deviceInfoError) {
-      console.log('[getTopAd5] 디바이스 정보 수집 실패:', deviceInfoError);
-    }
+      let deviceInfo = {};
+      try {
+        const { collectDeviceInfo } = require('../utils/napApiUtils');
+        deviceInfo = await collectDeviceInfo();
+      } catch (deviceInfoError) {
+        console.log('[getTopAd5] 디바이스 정보 수집 실패:', deviceInfoError);
+      }
 
-    const requestBody = {
-      os,
-      member,
-      ...deviceInfo
-    };
+      const requestBody = {
+        os,
+        member,
+        ...deviceInfo
+      };
 
-    console.log('[getTopAd5] ========== API 호출 시작 ==========');
-    console.log('[getTopAd5] 요청 파라미터:', { os, member });
+      console.log('[getTopAd5] ========== API 호출 시작 ==========');
+      console.log('[getTopAd5] 요청 파라미터:', { os, member });
 
-    const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
+      const response = await gatewayNodeJS('getTopAd5', 'POST', requestBody, navigation);
+
+      return response;
+    })();
+
+    pendingTopAd5Promise = apiCallPromise;
+
+    const response = await apiCallPromise;
 
     if (!response) {
       console.warn('[getTopAd5] API 응답이 없습니다.');
@@ -5039,89 +5062,44 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
         console.log('[getTopAd5] 백엔드 메시지:', response.message);
       }
     } else {
+      console.log('[getTopAd5] ✅ 광고 데이터 발견:', topAd5Response.length, '개');
 
       if (topAd5Response.length > 0) {
-
+        const firstAd = topAd5Response[0];
+        console.log('[getTopAd5] 첫 번째 광고 전체 데이터:', JSON.stringify(firstAd, null, 2));
+        console.log('[getTopAd5] 첫 번째 광고 urlAD 확인:', {
+          campid: firstAd?.campid,
+          ad_company: firstAd?.ad_company,
+          urlAD: firstAd?.urlAD || '없음',
+          landing_url: firstAd?.landing_url || '없음',
+          urlAD_type: typeof firstAd?.urlAD,
+          urlAD_length: firstAd?.urlAD?.length || 0,
+          allKeys: Object.keys(firstAd || {}),
+        });
       }
-    }
 
-    if (topAd5Response && topAd5Response.length > 0 && member) {
-      console.log('[getTopAd5] 광고 유효성 검증 시작:', topAd5Response.length, '개');
-
-      try {
-        const { collectDeviceInfo } = require('../utils/napApiUtils');
-        const deviceInfo = await collectDeviceInfo();
-
-        const validationResults = await Promise.allSettled(
-          topAd5Response.map(async (ad: any) => {
-            try {
-              const campid = String(ad.campid || '');
-              if (!campid) return { ad, isValid: false };
-
-              const adCompany = ad.ad_company || 'nas';
-              if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
-
-                try {
-                  const result = await getPockAds(
-                    String(member),
-                    deviceInfo.adid || '',
-                    deviceInfo,
-                    campid,
-                    undefined, 
-                  );
-                  return { ad, isValid: result.code === 200 };
-                } catch (error: any) {
-
-                  if (error.is404 || error.message?.includes('404') || error.message?.includes('No campaign data found')) {
-                    console.log(`[getTopAd5] ${campid}는 404 에러로 제외됨`);
-                    return { ad, isValid: false };
-                  }
-
-                  return { ad, isValid: true };
-                }
-              } else {
-
-                try {
-                  const result = await processAdReward(
-                    typeof member === 'number' ? member : parseInt(String(member), 10),
-                    campid,
-                    'nas',
-                    undefined, 
-                  );
-
-                  return { ad, isValid: result.code !== 404 };
-                } catch (error: any) {
-
-                  if (error.code === 404 || error.message?.includes('404') || error.message?.includes('not found')) {
-                    console.log(`[getTopAd5] ${campid}는 404 에러로 제외됨`);
-                    return { ad, isValid: false };
-                  }
-
-                  return { ad, isValid: true };
-                }
-              }
-            } catch (error) {
-              console.warn(`[getTopAd5] ${ad.campid} 검증 실패:`, error);
-
-              return { ad, isValid: true };
-            }
-          })
-        );
-
-        const validAds = validationResults
-          .filter((result) => result.status === 'fulfilled' && result.value.isValid)
-          .map((result) => (result as PromiseFulfilledResult<any>).value.ad);
-
-        const invalidCount = topAd5Response.length - validAds.length;
-        if (invalidCount > 0) {
-          console.log(`[getTopAd5] 404 광고 필터링: ${validAds.length}/${topAd5Response.length}개 유효 (${invalidCount}개 제외)`);
+      const beforeFilter = topAd5Response.length;
+      topAd5Response = topAd5Response.filter(ad => {
+        const urlAD = ad?.urlAD || ad?.landing_url || '';
+        const isValid = urlAD && 
+                       typeof urlAD === 'string' && 
+                       urlAD.trim() !== '' && 
+                       urlAD !== '없음';
+        if (!isValid) {
+          console.log(`[getTopAd5] ${ad?.campid || 'N/A'}는 urlAD가 없거나 "없음"이어서 제외됨 (urlAD: ${urlAD})`);
         }
+        return isValid;
+      });
 
-        topAd5Response = validAds;
-      } catch (validationError) {
-        console.warn('[getTopAd5] 광고 유효성 검증 실패, 원본 데이터 사용:', validationError);
-
+      if (topAd5Response.length !== beforeFilter) {
+        console.log(`[getTopAd5] urlAD 필터링: ${topAd5Response.length}/${beforeFilter}개 유효 (${beforeFilter - topAd5Response.length}개 제외)`);
       }
+
+      const adsWithUrlAD = topAd5Response.filter(ad => {
+        const urlAD = ad?.urlAD || ad?.landing_url || '';
+        return urlAD && typeof urlAD === 'string' && urlAD.trim() !== '' && urlAD !== '없음';
+      });
+      console.log('[getTopAd5] urlAD가 있는 광고 개수:', adsWithUrlAD.length, '/', topAd5Response.length);
     }
 
     if (topAd5Response && topAd5Response.length > 0) {
@@ -5142,6 +5120,10 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
       return storedData;
     }
     throw error;
+  } finally {
+
+    isFetchingTopAd5 = false;
+    pendingTopAd5Promise = null;
   }
 };
 
@@ -5149,7 +5131,20 @@ export const getStoredTopAd5 = async (): Promise<any | null> => {
   try {
     const storedData = await AsyncStorage.getItem(TOP_AD5_STORAGE_KEY);
     if (storedData) {
-      return JSON.parse(storedData);
+      const parsedData = JSON.parse(storedData);
+
+      const filteredData = parsedData.filter((ad: any) => {
+        const urlAD = ad.urlAD || ad.landing_url || '';
+        const isValid = urlAD && 
+                       typeof urlAD === 'string' && 
+                       urlAD.trim() !== '' && 
+                       urlAD !== '없음';
+        return isValid;
+      });
+      if (filteredData.length !== parsedData.length) {
+        console.log(`[getStoredTopAd5] urlAD 필터링: ${filteredData.length}/${parsedData.length}개 유효`);
+      }
+      return filteredData;
     }
     return null;
   } catch (error) {

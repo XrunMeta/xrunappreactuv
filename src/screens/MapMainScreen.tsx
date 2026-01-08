@@ -51,6 +51,7 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
 import { collectDeviceInfo } from '../utils/napApiUtils';
+import { showToast } from '../utils';
 
 interface LocationData {
 
@@ -230,6 +231,7 @@ export const MapMainScreen: React.FC = () => {
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
   const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
+  const isFetchingTopAd5Ref = useRef(false); 
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
 
@@ -314,10 +316,11 @@ export const MapMainScreen: React.FC = () => {
   useEffect(() => {
     const loadFailedCampids = async () => {
       try {
-        const stored = await AsyncStorage.getItem('failedPreFetchCampids');
-        if (stored) {
-          const failedSet = new Set(JSON.parse(stored));
-          failedPreFetchCampidsRef.current = failedSet;
+          const stored = await AsyncStorage.getItem('failedPreFetchCampids');
+          if (stored) {
+            const failedArray = JSON.parse(stored) as string[];
+            const failedSet = new Set<string>(failedArray);
+            failedPreFetchCampidsRef.current = failedSet;
           console.log(`[MapMainScreen] 저장된 pre-fetch 실패 정보 로드: ${failedSet.size}개`);
         }
       } catch (error) {
@@ -1553,6 +1556,13 @@ export const MapMainScreen: React.FC = () => {
   }, []); 
 
   const refreshTopAd5AndMapMarkers = useCallback(async (forceRefresh: boolean = false) => {
+
+      if (isFetchingTopAd5Ref.current) {
+        console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+        return;
+      }
+
+      isFetchingTopAd5Ref.current = true;
       try {
 
         let completedAdsSet = new Set<string>();
@@ -1815,6 +1825,9 @@ export const MapMainScreen: React.FC = () => {
         } catch (fallbackError) {
           console.error('[MapMainScreen] Fall over 실패:', fallbackError);
         }
+      } finally {
+
+        isFetchingTopAd5Ref.current = false;
       }
     }, [activeTab, location, topAd5Data, failedPreFetchCampidsRef, startPreFetchAdUrls]); 
 
@@ -2543,10 +2556,18 @@ export const MapMainScreen: React.FC = () => {
       activeTab === 'Map' &&
       topAd5Data.length === 0 &&
       mappingLocation &&
-      markers.length > 0
+      markers.length > 0 &&
+      !isFetchingTopAd5Ref.current 
     ) {
       console.log('[MapMainScreen] TopAd5 광고 없음 감지, getTopAd5 재호출 시작');
       const retryGetTopAd5 = async () => {
+
+        if (isFetchingTopAd5Ref.current) {
+          console.log('[MapMainScreen] getTopAd5 이미 호출 중입니다. 중복 호출 무시');
+          return;
+        }
+
+        isFetchingTopAd5Ref.current = true;
         try {
           const topAd5Response = await getTopAd5();
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
@@ -2565,6 +2586,9 @@ export const MapMainScreen: React.FC = () => {
           }
         } catch (error) {
           console.error('[MapMainScreen] TopAd5 재호출 실패:', error);
+        } finally {
+
+          isFetchingTopAd5Ref.current = false;
         }
       };
       retryGetTopAd5();

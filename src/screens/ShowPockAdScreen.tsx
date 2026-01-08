@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds } from '../services';
+import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5 } from '../services';
 import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -62,6 +62,9 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
 
   const handleClose = useCallback(() => {
     resetAdvertisementParams();
+
+    setHasOpenedUrl(false);
+    isWatchingAdRef.current = false;
     console.log('handleClose');
     console.log('onClose', onClose);
     if (onClose) {
@@ -100,6 +103,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isFetchingRef = useRef(false);
+  const isWatchingAdRef = useRef(false); 
 
   useEffect(() => {
     console.log('=== ShowPockAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -200,61 +204,25 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       }
 
       if (currentParams?.urlAD && currentParams.urlAD !== '') {
-        console.log('✅ [ShowPockAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
-        return;
-      }
+        console.log('✅ [ShowPockAdScreen] urlAD 사용, API 호출 불필요');
 
-      const deviceInfo = await collectDeviceInfo();
-
-      console.log('=== ShowPockAdScreen API 호출 정보 ===');
-      console.log('member:', member);
-      console.log('adid:', deviceInfo.adid);
-      console.log('campid:', campid);
-      console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
-      console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
-      console.log('=== API 호출 정보 끝 ===');
-
-      isFetchingRef.current = true;
-      const result = await getPockAds(
-        member,
-        deviceInfo.adid,
-        deviceInfo,
-        campid,
-        onClose ? undefined : navigate, 
-      );
-      isFetchingRef.current = false;
-
-      if (result.code === 200 && result.data && result.data.landing_url) {
-        console.log('✅ [ShowPockAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
-        const newData = result.data;
-        setPockAdData(prev => {
-          if (!prev) return newData;
-          return {
+        if (pockAdData) {
+          setPockAdData(prev => ({
             ...prev,
-            ...newData
-          };
-        });
-        setIsLoading(false);
-        return;
-      } else {
-
-        console.warn(`Pock 광고 API 응답 결과가 정상이 아닙니다: code=${result.code}`);
-        if (!pockAdData?.landing_url) {
-          throw new Error(`Pock 광고 API 응답 실패: code=${result.code}`);
+            landing_url: currentParams.urlAD || prev.landing_url,
+          }));
         }
+        return;
       }
+
+      console.warn('⚠️ [ShowPockAdScreen] urlAD가 없습니다. 서버 응답 확인 필요');
+      setIsLoading(false);
     } catch (error: any) {
       console.error('Pock 광고 초기화 실패:', error);
-
-      if (error.is404) {
-        console.log('✅ [ShowPockAdScreen] 404 에러: 캠페인 데이터 없음 - 팝업 표시 안 함');
-        setIsLoading(false);
-        return;
-      }
+      setIsLoading(false);
 
       if (!pockAdData?.landing_url) {
         console.log('❌ 광고 초기화 실패 - 팝업 표시');
-        setIsLoading(false);
         setAdCallFailedModalVisible(true);
       }
     }
@@ -383,6 +351,14 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       console.log('pockAdData:', pockAdData);
 
       console.log('✅ 광고 완료 처리 (리워드는 이미 버튼 클릭 시 호출 완료)');
+
+      try {
+        console.log('[광고완료] TopAd5 새로고침 시작');
+        await getTopAd5(navigate, true); 
+        console.log('[광고완료] TopAd5 새로고침 완료');
+      } catch (topAd5Error) {
+        console.warn('[광고완료] TopAd5 새로고침 실패 (무시):', topAd5Error);
+      }
     } catch (error) {
       console.error('Error in ad completion process:', error);
       setIsProcessing(false);
@@ -474,7 +450,14 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
   };
 
   const handleWatchAd = useCallback(async () => {
+
+    if (isWatchingAdRef.current) {
+      console.log('⚠️ [광고보기] 이미 처리 중입니다. 중복 호출 무시');
+      return;
+    }
+
     console.log('광고 보기 버튼 클릭 (AsyncStorage URL 사용)');
+    isWatchingAdRef.current = true;
 
     try {
       const campid = advertisementParams?.campid || '';
@@ -482,6 +465,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       if (!campid || campid === '') {
         console.error('[광고보기] campid가 없습니다.');
         setAdCallFailedModalVisible(true);
+        isWatchingAdRef.current = false;
         return;
       }
 
@@ -492,9 +476,10 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
           const cachedAdStr = await AsyncStorage.getItem('cached_AD');
           if (cachedAdStr) {
             const cachedAd = JSON.parse(cachedAdStr);
-            if (cachedAd[campid]?.urlAD) {
-              landingUrl = cachedAd[campid].urlAD;
-              console.log('[광고보기] AsyncStorage에서 landing_url 가져옴:', landingUrl);
+            const campidForCache = advertisementParams?.campid || '';
+            if (cachedAd[campidForCache]?.urlAD) {
+              landingUrl = cachedAd[campidForCache].urlAD;
+              console.log('[광고보기] AsyncStorage cached_AD에서 landing_url 가져옴:', landingUrl);
             }
           }
         } catch (cacheError) {
@@ -503,72 +488,83 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
       }
 
       if (!landingUrl || landingUrl === '') {
-        console.error('[광고보기] landing_url이 없습니다. AsyncStorage에 저장된 URL을 찾을 수 없습니다.');
+        console.error('[광고보기] landing_url이 없습니다. 서버 응답 확인 필요');
         setAdCallFailedModalVisible(true);
+        isWatchingAdRef.current = false;
         return;
       }
 
-      try {
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const parsedUserData = JSON.parse(userData);
-          const member = parsedUserData?.member;
-          if (member) {
-            console.log('[광고보기] processAdReward 호출 시작');
-            const rewardResult = await processAdReward(
-              parseInt(member, 10),
-              campid,
-              'pointclick',
-              navigate,
-            );
-            console.log('[광고보기] processAdReward 응답:', rewardResult);
-          }
-        }
-      } catch (rewardError: any) {
-
-        if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
-          console.log('[광고보기] 이미 본 광고 (404) - 정상 처리');
-        } else {
-          console.warn('[광고보기] processAdReward 실패 (무시):', rewardError);
-        }
-      }
-
-      try {
-        console.log('[광고보기] removeAdFromTopAd5 즉시 호출');
-        await removeAdFromTopAd5(campid, navigate);
-        console.log('[광고보기] removeAdFromTopAd5 완료');
-      } catch (removeError) {
-        console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
-      }
-
-      console.log('[광고보기] URL로 이동:', landingUrl);
-      await openLandingUrl(landingUrl);
-      console.log('[광고보기] URL 열기 완료 - AR 화면으로 이동');
-
-      try {
-        const cachedStr = await AsyncStorage.getItem('completedAdsCache');
-        const cached = cachedStr ? JSON.parse(cachedStr) : [];
-        if (!cached.includes(campid)) {
-          cached.push(campid);
-          await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
-          await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
-          console.log(`[광고보기] completedAdsCache에 즉시 추가: ${campid}`);
-        }
-      } catch (cacheError) {
-        console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
-      }
-
-      await AsyncStorage.setItem('isAdCompleted', 'true');
-      await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
-      await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
-      await AsyncStorage.setItem('completedAdCampid', campid); 
-      console.log('[광고보기] isAdCompleted, shouldRefreshTopAd5, shouldNavigateToCamera, completedAdCampid 저장 완료');
-
       resetAdvertisementParams();
       handleClose();
+
+      console.log('[광고보기] URL로 이동:', landingUrl);
+      setHasOpenedUrl(true);
+      await openLandingUrl(landingUrl);
+      console.log('[광고보기] URL 열기 완료');
+
+      (async () => {
+        try {
+
+          try {
+            const userData = await AsyncStorage.getItem('userData');
+            if (userData) {
+              const parsedUserData = JSON.parse(userData);
+              const member = parsedUserData?.member;
+              if (member) {
+                console.log('[광고보기] processAdReward 호출 시작 (백그라운드)');
+                const rewardResult = await processAdReward(
+                  parseInt(member, 10),
+                  campid,
+                  'pointclick',
+                  navigate,
+                );
+                console.log('[광고보기] processAdReward 응답:', rewardResult);
+              }
+            }
+          } catch (rewardError: any) {
+            if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
+              console.log('[광고보기] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[광고보기] processAdReward 실패 (무시):', rewardError);
+            }
+          }
+
+          try {
+            console.log('[광고보기] removeAdFromTopAd5 호출 (백그라운드)');
+            await removeAdFromTopAd5(campid, navigate);
+            console.log('[광고보기] removeAdFromTopAd5 완료');
+          } catch (removeError) {
+            console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
+          }
+
+          try {
+            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+            const cached = cachedStr ? JSON.parse(cachedStr) : [];
+            if (!cached.includes(campid)) {
+              cached.push(campid);
+              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
+              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[광고보기] completedAdsCache에 추가: ${campid}`);
+            }
+          } catch (cacheError) {
+            console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
+          }
+
+          await AsyncStorage.setItem('isAdCompleted', 'true');
+          await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
+          await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
+          await AsyncStorage.setItem('completedAdCampid', campid);
+          console.log('[광고보기] 백그라운드 처리 완료');
+        } catch (bgError) {
+          console.warn('[광고보기] 백그라운드 처리 실패:', bgError);
+        }
+      })();
     } catch (error) {
       console.error('[광고보기] URL 열기 실패:', error);
       setAdCallFailedModalVisible(true);
+    } finally {
+
+      isWatchingAdRef.current = false;
     }
   }, [pockAdData, openLandingUrl, advertisementParams, onClose, resetAdvertisementParams, handleClose]);
 
