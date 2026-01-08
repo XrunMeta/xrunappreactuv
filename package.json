@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
+    "start": "node scripts/set-local-ip.js && expo start",
+    "android": "node scripts/set-local-ip.js && expo run:android",
+    "ios": "node scripts/set-local-ip.js && expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
