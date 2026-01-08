@@ -1243,74 +1243,64 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                     let result;
 
-                    if (company === 'nas') {
-                      console.log(`🌐 [PreFetch] NAS 요청 시작: ${ad.campid}`);
-                      result = await getNasmobAds(member, deviceInfo.adid, deviceInfo, ad.campid);
+                    const checkUrl = ad.ad_check_url;
+                    let fetchedData = null;
 
-                      if (result.data && result.data.urlResult === 200 && result.data.urlAD) {
+                    if (checkUrl) {
+                      try {
+                        console.log(`🌐 [PreFetch] 요청 시작 (${company}):`, checkUrl);
+                        const response = await fetch(checkUrl);
+                        const jsonResponse = await response.json();
 
-                        console.log(`✅ [PreFetch] NAS 성공: ${ad.campid}`);
-                        const fetchedData = result.data;
-                        const newData = {
-                          urlAD: fetchedData.urlAD,
-                          joindesc: fetchedData.rewarddesc,
-                          name: fetchedData.name,
-                          xrunPrice: fetchedData.price ? (fetchedData.price / 2) : undefined
-                        };
-
-                        await saveCachedAd(cacheKey, newData);
-
-                        currentPreFetchCache[cacheKey] = newData;
-
-                        updatedCoinsData = updatedCoinsData.map(c =>
-                          (c.campid === ad.campid && String(c.ad_company).toLowerCase() === 'nas') ? {
-                            ...c,
-                            urlAD: newData.urlAD,
-                            landing_url: newData.urlAD,
-                            joindesc: newData.joindesc || c.joindesc,
-                            name: newData.name || c.name,
-                            xrunPrice: newData.xrunPrice !== undefined ? newData.xrunPrice : c.xrunPrice,
-                          } : c
-                        );
-
-                      } else {
-                        console.warn(`⚠️ [PreFetch] NAS 실패/응답없음: ${ad.campid}, urlResult=${result.data?.urlResult}`);
-                      }
-                    } else if (company === 'pointclick') {
-                      console.log(`🌐 [PreFetch] Pock 요청 시작: ${ad.campid}`);
-                      result = await getPockAds(member, deviceInfo.adid, deviceInfo, ad.campid);
-
-                      if (result.code === 200 && result.data && result.data.landing_url) {
-
-                        console.log(`✅ [PreFetch] Pock 성공: ${ad.campid}`);
-                        const fetchedData = result.data;
-                        const newData = {
-                          urlAD: fetchedData.landing_url,
-                          joindesc: fetchedData.ad_participation,
-                          name: fetchedData.ad_name,
-                          xrunPrice: fetchedData.ad_profit
-                        };
-
-                        await saveCachedAd(cacheKey, newData);
-
-                        currentPreFetchCache[cacheKey] = newData;
-
-                        updatedCoinsData = updatedCoinsData.map(c =>
-                          (c.campid === ad.campid && String(c.ad_company).toLowerCase() === 'pointclick') ? {
-                            ...c,
-                            urlAD: newData.urlAD,
-                            landing_url: newData.urlAD,
-                            joindesc: newData.joindesc || c.joindesc,
-                            name: newData.name || c.name,
-                            xrunPrice: newData.xrunPrice !== undefined ? newData.xrunPrice : c.xrunPrice,
-                          } : c
-                        );
-
-                      } else {
-                        console.warn(`⚠️ [PreFetch] Pock 실패/응답없음: ${ad.campid}, code=${result.code}`);
+                        if (company === 'nas') {
+                          const resCode = typeof jsonResponse.result === 'string' ? parseInt(jsonResponse.result, 10) : jsonResponse.result;
+                          if (resCode === 200 && jsonResponse.lurl) {
+                            fetchedData = {
+                              urlAD: jsonResponse.lurl,
+                              name: jsonResponse.name
+                            };
+                          } else {
+                            console.warn(`⚠️ [PreFetch] NAS 실패: result=${resCode}`);
+                          }
+                        } else if (company === 'pointclick') {
+                          if (jsonResponse.result_code === 200 && jsonResponse.landing_url) {
+                            fetchedData = {
+                              urlAD: jsonResponse.landing_url,
+                              name: jsonResponse.ad_name
+                            };
+                          } else {
+                            console.warn(`⚠️ [PreFetch] Pock 실패: code=${jsonResponse.result_code}`);
+                          }
+                        }
+                      } catch (fetchErr) {
+                        console.error(`❌ [PreFetch] Fetch 오류:`, fetchErr);
                       }
                     } else {
-                      console.warn(`⚠️ [PreFetch] 알 수 없는 ad_company: ${ad.ad_company}`);
+                      console.warn(`⚠️ [PreFetch] ad_check_url 없음: ${ad.campid}`);
+                    }
+
+                    if (fetchedData && fetchedData.urlAD) {
+
+                      console.log(`✅ [PreFetch] 성공: ${ad.campid}`);
+                      const newData = {
+                        urlAD: fetchedData.urlAD,
+                        joindesc: ad.joindesc, 
+                        name: fetchedData.name || ad.name,
+                        xrunPrice: ad.xrunPrice
+                      };
+
+                      await saveCachedAd(cacheKey, newData);
+
+                      currentPreFetchCache[cacheKey] = newData;
+
+                      updatedCoinsData = updatedCoinsData.map(c =>
+                        (c.campid === ad.campid) ? {
+                          ...c,
+                          urlAD: newData.urlAD,
+                          landing_url: newData.urlAD,
+                          name: newData.name || c.name,
+                        } : c
+                      );
                     }
                   } catch (e) {
                     console.log(`⚠️ [CameraMainScreen API] ${ad.campid} pre-fetch 실패:`, e);

@@ -323,77 +323,79 @@ export const MapMainScreen: React.FC = () => {
 
       for (const ad of adsToFetch) {
         try {
-          let result;
+
+          const checkUrl = ad.ad_check_url;
+          let fetchedData = null;
           const company = (ad.ad_company || '').toLowerCase();
-          console.log(`⚙️ [PreFetch] 처리 진입: id=${ad.campid}, lowercase_company='${company}'`);
 
-          if (company === 'nas') {
-            result = await getNasmobAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
-            if (result.code === 200 && result.data?.urlAD) {
-              const fetchedUrl = result.data.urlAD;
+          if (checkUrl) {
+            try {
+              console.log(`🌐 [PreFetch] 요청 시작 (${company}):`, checkUrl);
+              const response = await fetch(checkUrl);
+              const jsonResponse = await response.json();
 
-              setTopAd5Data(prev => prev.map(item =>
-                (item.campid === ad.campid && item.ad_company === 'nas') ? { ...item, urlAD: fetchedUrl } : item
-              ));
-
-              setMarkers(prev => prev.map(m =>
-                (m.campid === ad.campid && m.ad_company === 'nas') ? { ...m, urlAD: fetchedUrl } : m
-              ));
-
-              try {
-                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
-                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
-
-                const newData = {
-                  urlAD: fetchedUrl,
-                  joindesc: result.data.rewarddesc || '',
-                  name: result.data.name || '',
-                  xrunPrice: result.data.price ? (result.data.price / 2) : 0
-                };
-
-                currentCache[ad.campid] = newData;
-                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
-                console.log(`💾 [MapMainScreen] NAS 데이터 캐시 저장 완료: ${ad.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
-              } catch (cacheErr) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
+              if (company === 'nas') {
+                const resCode = typeof jsonResponse.result === 'string' ? parseInt(jsonResponse.result, 10) : jsonResponse.result;
+                if (resCode === 200 && jsonResponse.lurl) {
+                  fetchedData = {
+                    urlAD: jsonResponse.lurl,
+                    name: jsonResponse.name,
+                    joindesc: jsonResponse.rewarddesc,
+                    xrunPrice: jsonResponse.price ? (jsonResponse.price / 2) : undefined
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] NAS 실패: result=${resCode}`);
+                }
+              } else if (company === 'pointclick') {
+                if (jsonResponse.result_code === 200 && jsonResponse.landing_url) {
+                  fetchedData = {
+                    urlAD: jsonResponse.landing_url,
+                    name: jsonResponse.ad_name,
+                    joindesc: jsonResponse.ad_participation,
+                    xrunPrice: jsonResponse.ad_profit
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] PointClick 실패: code=${jsonResponse.result_code}`);
+                }
               }
-
-              console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${ad.campid}`);
+            } catch (fetchErr) {
+              console.error(`❌ [PreFetch] Fetch 오류:`, fetchErr);
             }
-          } else if (company === 'pointclick') {
-            result = await getPockAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
-            if (result.code === 200 && result.data?.landing_url) {
-              const fetchedUrl = result.data.landing_url;
-              setTopAd5Data(prev => prev.map(item =>
-                (item.campid === ad.campid && String(item.ad_company).toLowerCase() === 'pointclick') ? { ...item, urlAD: fetchedUrl } : item
-              ));
-              setMarkers(prev => prev.map(m =>
-                (m.campid === ad.campid && m.ad_company === 'pointclick') ? { ...m, urlAD: fetchedUrl } : m
-              ));
+          } else {
+            console.warn(`⚠️ [PreFetch] ad_check_url 없음: ${ad.campid}`);
+          }
 
-              try {
-                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
-                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+          if (fetchedData && fetchedData.urlAD) {
 
-                const newData = {
-                  urlAD: fetchedUrl,
-                  joindesc: result.data.ad_participation || '',
-                  name: result.data.ad_name || '',
-                  xrunPrice: result.data.ad_profit || 0
-                };
+            const fetchedUrl = fetchedData.urlAD;
 
-                currentCache[ad.campid] = newData;
-                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
-                console.log(`💾 [MapMainScreen] PointClick 데이터 캐시 저장 완료: ${ad.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
-              } catch (cacheErr) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
-              }
+            setTopAd5Data(prev => prev.map(item =>
+              (item.campid === ad.campid) ? { ...item, urlAD: fetchedUrl } : item
+            ));
 
-              console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${ad.campid}`);
-            } 
+            setMarkers(prev => prev.map(m =>
+              (m.campid === ad.campid) ? { ...m, urlAD: fetchedUrl } : m
+            ));
 
+            try {
+              const currentCacheStr = await AsyncStorage.getItem('cached_AD');
+              const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+
+              const newData = {
+                urlAD: fetchedUrl,
+                joindesc: fetchedData.joindesc || ad.joindesc || '',
+                name: fetchedData.name || ad.name || '',
+                xrunPrice: fetchedData.xrunPrice !== undefined ? fetchedData.xrunPrice : (ad.xrunPrice || 0)
+              };
+
+              currentCache[ad.campid] = newData;
+              await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
+              console.log(`💾 [MapMainScreen] 캐시 저장 완료: ${ad.campid}`);
+            } catch (cacheErr) {
+              console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
+            }
+
+            console.log(`✅ [MapMainScreen] Pre-fetch 성공: ${ad.campid}`);
           }
         } catch (e) {
           console.log(`⚠️ [MapMainScreen] ${ad.campid} pre-fetch 실패:`, e);
@@ -646,25 +648,23 @@ export const MapMainScreen: React.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
 
-      const env = getEnv();
-      const requestBody = {
-        member: member.toString(),
-        latitude: targetLocation.latitude,
-        longitude: targetLocation.longitude,
-        limit: 120,
-      };
-
-      const mapApiResponse = await gatewayNodeJS('app2000-01', 'POST', requestBody, navigate);
+      const deviceInfoData = await collectDeviceInfo(); 
 
       const markerDataRaw = await fetchMapMarkerData(
         targetLocation.latitude,
-
         targetLocation.longitude,
-
         member,
-
         navigate,
-
+        {
+          adid: deviceInfoData.adid,
+          ip: deviceInfoData.ipAddress,
+          osver: deviceInfoData.osVersion,
+          devid: deviceInfoData.deviceId,
+          devmodel: deviceInfoData.model,
+          devbrand: deviceInfoData.manufacturer,
+          mnetwork: deviceInfoData.mnetwork,
+          carrier: deviceInfoData.carrier
+        }
       );
 
       console.log('=== 맵 마커 데이터 가져오기 완료 ===');
@@ -721,39 +721,22 @@ export const MapMainScreen: React.FC = () => {
           })
         : [];
 
-      let coinsData = mapApiResponse?.data && Array.isArray(mapApiResponse.data)
-        ? mapApiResponse.data.map((item: any) => ({
-          lat: item.lat,
-          lng: item.lng,
-          title: item.title,
-          distance: item.distance,
-          coins: item.coins,
-          coin: item.coin,
-          advertisement: item.advertisement,
-          iconurl: item.iconurl,
-          joindesc: item.joindesc,
-          name: item.name,
-          campid: item.campid,
-          xrunprice: item.xrunprice,
-          xrunPrice: item.xrunPrice || item.xrunprice || 0,
-          brand: item.brand,
-        }))
-        : [];
-
-      const combinedCoinsData = [...coinsDataVt, ...coinsData];
+      const combinedCoinsData = [...coinsDataVt, ...markerDataRaw];
       console.log('=== 결합된 토큰 데이터 ===');
       console.log('combinedCoinsData length:', combinedCoinsData.length);
 
       const uniqueFileIds: (string | number)[] = [];
       combinedCoinsData.forEach((item) => {
-        if (item.brandlogo_file) uniqueFileIds.push(item.brandlogo_file);
-        if (item.adthumbnail2_file) uniqueFileIds.push(item.adthumbnail2_file);
-        if (item.symbolimg_file) uniqueFileIds.push(item.symbolimg_file);
+        const it = item as any;
+        if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
+        if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
+        if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
       });
 
       if (uniqueFileIds.length > 0) {
         try {
-          await cashingimages.downloadMultipleImages(uniqueFileIds, env.GATEWAY_NODEJS);
+          const envForCache = getEnv();
+          await cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS);
           console.log('✅ 이미지 캐싱 완료');
         } catch (imageCacheError) {
           console.error('이미지 캐싱 오류:', imageCacheError);
