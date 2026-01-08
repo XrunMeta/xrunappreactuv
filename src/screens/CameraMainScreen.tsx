@@ -290,15 +290,15 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
       />
 
       <TouchableOpacity
-        onPress={v_2be890 ? undefined : v_719eed}
-        disabled={v_2be890}
+        onPress={v_719eed}
+        disabled={false}
         style={[
           v_d81136.tokenButtonContainer,
           {
             transform: [
               { scale: v_c4aeea(v_926d1c) },
             ],
-            opacity: v_2be890 ? 0.5 : 1, 
+            opacity: 1, 
           },
         ]}
         activeOpacity={0.7}>
@@ -315,22 +315,20 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          {!v_2be890 && (
-            <Animated.Image
-              source={
-                v_a5ed76
-                  ? require('../../assets/images/icon_catch_rage.png')
-                  : require('../../assets/images/icon_catch.png')
-              }
-              style={[
-                v_d81136.blinkImage,
-                {
-                  opacity: v_f2d721,
-                },
-                v_a5ed76 && { top: -90 },
-              ]}
-            />
-          )}
+          <Animated.Image
+            source={
+              v_a5ed76
+                ? require('../../assets/images/icon_catch_rage.png')
+                : require('../../assets/images/icon_catch.png')
+            }
+            style={[
+              v_d81136.blinkImage,
+              {
+                opacity: v_f2d721,
+              },
+              v_a5ed76 && { top: -90 },
+            ]}
+          />
           {v_ed24ee && (
             <Image
               source={v_ed24ee}
@@ -675,6 +673,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, []);
 
   const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
+  const v_a27ed2 = v_e662ae<NodeJS.Timeout | null>(null); 
   const v_6890b1 = v_e662ae(false); 
 
   const v_ac9fa2 = v_e662ae(false);
@@ -744,13 +743,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     const v_908496 = v_88aee2;
 
     v_88aee2.forEach(v_d5dda0 => {
-      const v_e4fdb7 = (v_d5dda0.urlAD && v_d5dda0.urlAD !== '') || (v_d5dda0.landing_url && v_d5dda0.landing_url !== '');
+      const v_e4fdb7 = (v_d5dda0.urlAD && v_d5dda0.urlAD !== '' && v_d5dda0.urlAD !== '없음') || 
+                          (v_d5dda0.landing_url && v_d5dda0.landing_url !== '' && v_d5dda0.landing_url !== '없음');
       const v_aa0917 = String(v_d5dda0.campid || '');
       const v_6847e0 = v_3b73a5[v_aa0917]?.urlAD;
-      const v_5b8a93 = v_6847e0 && v_6847e0 !== '';
+      const v_5b8a93 = v_6847e0 && v_6847e0 !== '' && v_6847e0 !== '없음';
 
       if (!v_e4fdb7 && !v_5b8a93) {
-        console.log(`⚠️ [organizeData] ${v_d5dda0.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`);
+        console.log(`⚠️ [organizeData] ${v_d5dda0.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`, {
+          urlAD: v_d5dda0.urlAD,
+          landing_url: v_d5dda0.landing_url,
+          cachedUrl: v_6847e0,
+        });
       }
     });
 
@@ -857,189 +861,266 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
               console.log('✅ validatedCoinsData 생성 완료:', v_3d87ed.length, '개');
 
-              try {
+              console.log('[CameraMainScreen] 1단계: 캐시 TopAd5 데이터 확인 시작');
+              const v_92ed2d = await v_5d7ca4();
 
-          console.log('[CameraMainScreen] 1단계: TopAd5 데이터 확인 시작');
-          const v_92ed2d = await v_5d7ca4();
+              if (v_92ed2d && Array.isArray(v_92ed2d) && v_92ed2d.length > 0) {
+                console.log('✅ [CameraMainScreen] 캐시 TopAd5 데이터 발견 - 즉시 토큰 표시:', v_92ed2d.length, '개');
 
-          let v_e36b07 = null;
+                const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
+                  const v_1b0610 = parseFloat(String(v_779914.distance || 0));
+                  const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
+                  return v_1b0610 - v_161ea9;
+                });
 
-          if (v_92ed2d && Array.isArray(v_92ed2d) && v_92ed2d.length > 0) {
-            v_e36b07 = await v_563153(); 
-          } else {
+                const v_dc4d18 = 5;
+                const v_09cb96 = v_92ed2d.length * v_dc4d18;
+                const v_7864b3 = new Map<number, number>();
 
-            console.log('[CameraMainScreen] 저장된 TopAd5 데이터 없음, API 호출');
-            v_e36b07 = await v_563153();
-          }
+                const v_8ceeaa = v_beddf3.map((v_51b584, v_a56041) => {
+                  if (v_a56041 >= v_09cb96) {
+                    return v_51b584;
+                  }
 
-          if (Array.isArray(v_e36b07) && v_e36b07.length === 0) {
-            console.log('[CameraMainScreen] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
-            v_e36b07 = null; 
-          }
+                  const v_ba7922 = v_a56041 % v_92ed2d.length;
+                  const v_127b33 = v_92ed2d[v_ba7922];
+                  const v_aa0917 = v_127b33?.campid;
 
-          if (!v_e36b07 || !Array.isArray(v_e36b07)) {
-            console.warn('[CameraMainScreen] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
-            v_e36b07 = await v_5d7ca4();
-          }
-
-                if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
-                  console.log('✅ [CameraMainScreen] TopAd5 데이터 발견:', v_e36b07.length, '개');
-
-                  console.log('🔍 [CameraMainScreen] TopAd5 데이터 구조 확인 (첫 번째 항목):', {
-                    keys: Object.keys(v_e36b07[0] || {}),
-                    firstItem: v_e36b07[0],
-                  });
-
-                  const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
-                    const v_1b0610 = parseFloat(String(v_779914.distance || 0));
-                    const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
-                    return v_1b0610 - v_161ea9; 
-                  });
-
-                  console.log('📊 [CameraMainScreen] 거리 순 정렬 완료 (가까운 순서)');
-
-                  const v_dc4d18 = 5;
-                  const v_09cb96 = v_e36b07.length * v_dc4d18;
-
-                  const v_7864b3 = new Map<number, number>();
-
-                  const v_8ceeaa = v_beddf3.map((v_51b584, v_a56041) => {
-
-                    if (v_a56041 >= v_09cb96) {
+                  if (v_aa0917) {
+                    const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                    if (v_375fda >= v_dc4d18) {
                       return v_51b584;
                     }
+                    v_7864b3.set(v_aa0917, v_375fda + 1);
+                  }
 
-                    const v_ba7922 = v_a56041 % v_e36b07.length;
-                    const v_127b33 = v_e36b07[v_ba7922];
-                    const v_aa0917 = v_127b33?.campid;
+                  return {
+                    ...v_51b584,
+                    distance: Number(v_51b584.distance) || 0,
+                    name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
+                    iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                    joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
+                    xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
+                    xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
+                    campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
+                    advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+                    thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
+                    ad_company: v_127b33?.ad_company || v_51b584.ad_company,
+                    coins: v_127b33?.coins?.toString() || v_51b584.coins,
+                    brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
+                    adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
+                    symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
+                    urlAD: v_127b33?.urlAD || v_51b584.urlAD || '',
+                  };
+                });
 
-                    if (v_aa0917) {
-                      const v_375fda = v_7864b3.get(v_aa0917) || 0;
-                      if (v_375fda >= v_dc4d18) {
-                        return v_51b584;
-                      }
-                      v_7864b3.set(v_aa0917, v_375fda + 1);
+                v_7bb835(v_8ceeaa);
+                v_a96760.current = 0;
+                v_0a6f80(v_8ceeaa);
+                v_34a50a(false);
+                v_0b2c53.current = true;
+
+                console.log('✅ [CameraMainScreen] 캐시 데이터로 토큰 즉시 표시 완료');
+
+                (async () => {
+                  try {
+                    console.log('[CameraMainScreen] 백그라운드: 최신 데이터 가져오기 시작');
+
+                    const v_ef7306 = await v_e84827.getItem('userData');
+                    if (!v_ef7306) {
+                      console.warn('[CameraMainScreen] 백그라운드: userData 없음');
+                      return;
+                    }
+                    const v_ff39bc = JSON.parse(v_ef7306);
+                    const v_660822 = v_ff39bc?.member?.toString() || '';
+                    if (!v_660822) {
+                      console.warn('[CameraMainScreen] 백그라운드: member 없음');
+                      return;
                     }
 
-                    return {
-                      ...v_51b584,
+                    const [v_e36b07, v_905ecb] = await Promise.all([
+                      v_563153().catch(() => null),
+                      v_318c45(v_660822, v_9b57fc).catch(() => new Set<string>()),
+                    ]);
 
-                      distance: Number(v_51b584.distance) || 0,
+                    if (v_905ecb && v_905ecb.size > 0) {
+                      v_7c7dd0.current = v_905ecb;
+                      console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+                    }
 
-                      name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
-                      iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                      joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
-                      xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
-                      xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
-                      campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
+                    if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
+                      console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
 
-                      advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+                      const v_6c877c = v_e36b07.filter((v_ddcfed) => {
+                        return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '' && v_ddcfed.urlAD !== '없음';
+                      });
 
-                      thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
-                      ad_company: v_127b33?.ad_company || v_51b584.ad_company,
-                      coins: v_127b33?.coins?.toString() || v_51b584.coins,
-                      brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
-                      adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
-                      symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
-                    };
-                  });
+                      if (v_6c877c.length > 0) {
 
-                  console.log('✅ [CameraMainScreen] TopAd5 매핑 완료:', v_8ceeaa.length, '개 토큰');
+                        const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
+                          const v_1b0610 = parseFloat(String(v_779914.distance || 0));
+                          const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
+                          return v_1b0610 - v_161ea9;
+                        });
 
-                  console.log('🔍 [loadTokenData] mappedCoinsData 고유 데이터 확인 (처음 10개):');
-                  v_8ceeaa.slice(0, 10).forEach((v_51b584, v_e86ad8) => {
-                    console.log(`📋 mappedCoinsData[${v_e86ad8}]:`, {
-                      name: v_51b584.name,
-                      advertisement: v_51b584.advertisement,
-                      campid: v_51b584.campid,
-                      xrunPrice: v_51b584.xrunPrice,
-                      distance: v_51b584.distance,
-                      coin: v_51b584.coin,
-                      brand: v_51b584.brand,
-                    });
-                  });
+                        const v_dc4d18 = 5;
+                        const v_09cb96 = v_6c877c.length * v_dc4d18;
+                        const v_7864b3 = new Map<number, number>();
 
-                  const v_d05944 = v_8ceeaa.map((v_3f4e2e) => v_3f4e2e.advertisement).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                  const v_f1a4ef = v_8ceeaa.map((v_3f4e2e) => v_3f4e2e.campid).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                  const v_f64f3e = Array.from(new Set(v_d05944));
-                  const v_8d3fbf = Array.from(new Set(v_f1a4ef));
-                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                    total: v_8ceeaa.length,
-                    uniqueAdvertisements: v_f64f3e.length,
-                    uniqueCampids: v_8d3fbf.length,
-                    advertisementValues: v_f64f3e.slice(0, 10),
-                    campidValues: v_8d3fbf.slice(0, 10),
-                  });
+                        const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
+                          if (v_a56041 >= v_09cb96) {
+                            return v_51b584;
+                          }
 
-                  v_7bb835(v_8ceeaa);
+                          const v_ba7922 = v_a56041 % v_6c877c.length;
+                          const v_127b33 = v_6c877c[v_ba7922];
+                          const v_aa0917 = v_127b33?.campid;
 
-                  v_a96760.current = 0;
-                  console.log('🔄 [CameraMainScreen] TopAd5 매핑 후 인덱스 리셋 (항상 처음 5개 사용)');
+                          if (v_aa0917) {
+                            const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                            if (v_375fda >= v_dc4d18) {
+                              return v_51b584;
+                            }
+                            v_7864b3.set(v_aa0917, v_375fda + 1);
+                          }
 
-                  v_0a6f80(v_8ceeaa);
-                } else {
-                  console.log('⚠️ [CameraMainScreen] TopAd5 데이터 없음, 기존 데이터 사용');
+                          return {
+                            ...v_51b584,
+                            distance: Number(v_51b584.distance) || 0,
+                            name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
+                            iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                            joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
+                            xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
+                            xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
+                            campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
+                            advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+                            thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
+                            ad_company: v_127b33?.ad_company || v_51b584.ad_company,
+                            coins: v_127b33?.coins?.toString() || v_51b584.coins,
+                            brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
+                            adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
+                            symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
+                            urlAD: v_127b33?.urlAD || v_51b584.urlAD || '',
+                          };
+                        });
 
-                  console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
-                  v_3d87ed.slice(0, 10).forEach((v_51b584, v_e86ad8) => {
-                    console.log(`📋 validatedCoinsData[${v_e86ad8}]:`, {
-                      name: v_51b584.name,
-                      advertisement: v_51b584.advertisement,
-                      campid: v_51b584.campid,
-                      xrunPrice: v_51b584.xrunPrice,
-                      coin: v_51b584.coin,
-                      brand: v_51b584.brand,
-                    });
-                  });
+                        v_7bb835(v_0b94e1);
+                        v_a96760.current = 0;
+                        v_0a6f80(v_0b94e1);
+                        console.log('[CameraMainScreen] 백그라운드: 최신 데이터로 토큰 업데이트 완료');
+                      }
+                    }
+                  } catch (v_39d018) {
+                    console.warn('[CameraMainScreen] 백그라운드 업데이트 실패:', v_39d018);
+                  }
+                })();
 
-                  const v_d05944 = v_3d87ed.map((v_3f4e2e) => v_3f4e2e.advertisement).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                  const v_f1a4ef = v_3d87ed.map((v_3f4e2e) => v_3f4e2e.campid).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                  const v_f64f3e = Array.from(new Set(v_d05944));
-                  const v_8d3fbf = Array.from(new Set(v_f1a4ef));
-                  console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                    total: v_3d87ed.length,
-                    uniqueAdvertisements: v_f64f3e.length,
-                    uniqueCampids: v_8d3fbf.length,
-                    advertisementValues: v_f64f3e.slice(0, 10),
-                    campidValues: v_8d3fbf.slice(0, 10),
-                  });
-
-                  v_7bb835(v_3d87ed);
-
-                  v_0a6f80(v_3d87ed);
-                }
-              } catch (v_b87cac) {
-                console.error('❌ [CameraMainScreen] TopAd5 데이터 가져오기 실패:', v_b87cac);
-                console.log('⚠️ 기존 데이터 사용');
-
-                console.log('🔍 [loadTokenData] validatedCoinsData 고유 데이터 확인 (처음 10개):');
-                v_3d87ed.slice(0, 10).forEach((v_51b584, v_e86ad8) => {
-                  console.log(`📋 validatedCoinsData[${v_e86ad8}]:`, {
-                    name: v_51b584.name,
-                    advertisement: v_51b584.advertisement,
-                    campid: v_51b584.campid,
-                    xrunPrice: v_51b584.xrunPrice,
-                    coin: v_51b584.coin,
-                    brand: v_51b584.brand,
-                  });
-                });
-
-                const v_d05944 = v_3d87ed.map((v_3f4e2e) => v_3f4e2e.advertisement).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                const v_f1a4ef = v_3d87ed.map((v_3f4e2e) => v_3f4e2e.campid).filter((v_81e2ef) => v_81e2ef != null && v_81e2ef !== undefined && v_81e2ef !== '');
-                const v_f64f3e = Array.from(new Set(v_d05944));
-                const v_8d3fbf = Array.from(new Set(v_f1a4ef));
-                console.log('📊 [loadTokenData] 전체 데이터 고유값 통계:', {
-                  total: v_3d87ed.length,
-                  uniqueAdvertisements: v_f64f3e.length,
-                  uniqueCampids: v_8d3fbf.length,
-                  advertisementValues: v_f64f3e.slice(0, 10),
-                  campidValues: v_8d3fbf.slice(0, 10),
-                });
-
-                v_7bb835(v_3d87ed);
-
-                v_0a6f80(v_3d87ed);
+                return; 
               }
+
+              console.log('[CameraMainScreen] 캐시 TopAd5 데이터 없음 - 기본 데이터 먼저 표시');
+
+              v_7bb835(v_3d87ed);
+              v_0a6f80(v_3d87ed);
+              v_34a50a(false);
+              v_0b2c53.current = true;
+
+              (async () => {
+                try {
+                  console.log('[CameraMainScreen] 백그라운드: 최신 데이터 가져오기 시작');
+
+                  const v_ef7306 = await v_e84827.getItem('userData');
+                  if (!v_ef7306) {
+                    console.warn('[CameraMainScreen] 백그라운드: userData 없음');
+                    return;
+                  }
+                  const v_ff39bc = JSON.parse(v_ef7306);
+                  const v_660822 = v_ff39bc?.member?.toString() || '';
+                  if (!v_660822) {
+                    console.warn('[CameraMainScreen] 백그라운드: member 없음');
+                    return;
+                  }
+
+                  const [v_e36b07, v_905ecb] = await Promise.all([
+                    v_563153().catch(() => null),
+                    v_318c45(v_660822, v_9b57fc).catch(() => new Set<string>()),
+                  ]);
+
+                  if (v_905ecb && v_905ecb.size > 0) {
+                    v_7c7dd0.current = v_905ecb;
+                    console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+                    v_8ce112(v_93ce34 => [...v_93ce34]);
+                  }
+
+                  if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
+                    console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
+
+                    const v_6c877c = v_e36b07.filter((v_ddcfed) => {
+                      return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '' && v_ddcfed.urlAD !== '없음';
+                    });
+
+                    if (v_6c877c.length > 0) {
+
+                      const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
+                        const v_1b0610 = parseFloat(String(v_779914.distance || 0));
+                        const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
+                        return v_1b0610 - v_161ea9;
+                      });
+
+                      const v_dc4d18 = 5;
+                      const v_09cb96 = v_6c877c.length * v_dc4d18;
+                      const v_7864b3 = new Map<number, number>();
+
+                      const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
+                        if (v_a56041 >= v_09cb96) {
+                          return v_51b584;
+                        }
+
+                        const v_ba7922 = v_a56041 % v_6c877c.length;
+                        const v_127b33 = v_6c877c[v_ba7922];
+                        const v_aa0917 = v_127b33?.campid;
+
+                        if (v_aa0917) {
+                          const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                          if (v_375fda >= v_dc4d18) {
+                            return v_51b584;
+                          }
+                          v_7864b3.set(v_aa0917, v_375fda + 1);
+                        }
+
+                        return {
+                          ...v_51b584,
+                          distance: Number(v_51b584.distance) || 0,
+                          name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
+                          iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                          joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
+                          xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
+                          xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
+                          campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
+                          advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+                          thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
+                          ad_company: v_127b33?.ad_company || v_51b584.ad_company,
+                          coins: v_127b33?.coins?.toString() || v_51b584.coins,
+                          brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
+                          adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
+                          symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
+                          urlAD: v_127b33?.urlAD || v_51b584.urlAD || '',
+                        };
+                      });
+
+                      v_7bb835(v_0b94e1);
+                      v_a96760.current = 0;
+                      v_0a6f80(v_0b94e1);
+                      console.log('[CameraMainScreen] 백그라운드: 최신 데이터로 토큰 업데이트 완료');
+                    }
+                  }
+                } catch (v_39d018) {
+                  console.warn('[CameraMainScreen] 백그라운드 업데이트 실패:', v_39d018);
+                }
+              })();
+
+              return; 
 
               v_0b2c53.current = true;
               v_34a50a(false);
@@ -1249,10 +1330,22 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.warn('🚦 [CameraMainScreen API] TopAd5 조건 충족. 로직 진입. 개수:', v_e36b07.length);
             console.log('✅ [CameraMainScreen API] TopAd5 데이터 발견:', v_e36b07.length, '개');
 
+            if (v_e36b07.length > 0) {
+              const v_0db320 = v_e36b07[0];
+              console.log('[CameraMainScreen API] 첫 번째 광고 urlAD 확인:', {
+                campid: v_0db320?.campid,
+                ad_company: v_0db320?.ad_company,
+                urlAD: v_0db320?.urlAD || '없음',
+                urlAD_type: typeof v_0db320?.urlAD,
+                urlAD_length: v_0db320?.urlAD?.length || 0,
+                allKeys: Object.keys(v_0db320 || {}),
+              });
+            }
+
             const v_6c877c = v_e36b07.filter((v_ddcfed) => {
               const v_d5d81a = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
               if (!v_d5d81a) {
-                console.log(`⚠️ [CameraMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨`);
+                console.log(`⚠️ [CameraMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨 (urlAD 값: ${v_ddcfed.urlAD}, 타입: ${typeof v_ddcfed.urlAD})`);
               }
               return v_d5d81a;
             });
@@ -1353,10 +1446,21 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
               const v_4cda83 = String(v_127b33?.campid || '');
               const v_0231a4 = v_ed29b7[v_4cda83];
-              const v_eda183 = v_0231a4?.urlAD || v_127b33?.urlAD || v_51b584.urlAD || '';
+              let v_eda183 = v_0231a4?.urlAD || v_127b33?.urlAD || v_127b33?.landing_url || v_51b584.urlAD || v_51b584.landing_url || '';
+
+              if (v_eda183 === '없음') {
+                v_eda183 = '';
+              }
 
               if (!v_eda183 || v_eda183 === '') {
                 console.log(`⚠️ [CameraMainScreen API] ${v_aa0917}는 urlAD가 없지만 매핑은 진행 (나중에 pre-fetch 예정)`);
+                console.log(`🔍 [CameraMainScreen API] urlAD 확인 상세:`, {
+                  cachedItem_urlAD: v_0231a4?.urlAD,
+                  mappedAd_urlAD: v_127b33?.urlAD,
+                  mappedAd_landing_url: v_127b33?.landing_url,
+                  coin_urlAD: v_51b584.urlAD,
+                  coin_landing_url: v_51b584.landing_url,
+                });
               }
 
               if (v_aa0917) {
@@ -1371,8 +1475,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 adIndex: v_ba7922,
                 adCompany: v_127b33?.ad_company,
                 campid: v_127b33?.campid,
+                mappedAd_urlAD: v_127b33?.urlAD || '없음',
+                cachedItem_urlAD: v_0231a4?.urlAD || '없음',
+                coin_urlAD: v_51b584.urlAD || '없음',
+                finalUrlAD: v_eda183 || 'EMPTY',
                 hasUrlAD: !!v_eda183,
-                urlAD_val: v_eda183 || 'EMPTY'
               });
 
               if (v_0231a4) {
@@ -1393,8 +1500,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                 advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
 
-                urlAD: v_eda183,
-                landing_url: v_eda183, 
+                urlAD: v_eda183 && v_eda183 !== '없음' ? v_eda183 : '', 
+                landing_url: v_eda183 && v_eda183 !== '없음' ? v_eda183 : '', 
                 thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
                 ad_company: v_127b33?.ad_company || v_51b584.ad_company,
                 coins: v_127b33?.coins?.toString() || v_51b584.coins,
@@ -1924,6 +2031,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         console.log('⏹️ 자동 광고 이동 타이머 정리됨');
       }
 
+      if (v_a27ed2.current) {
+        clearTimeout(v_a27ed2.current);
+        v_a27ed2.current = null;
+        console.log('⏹️ 2초 타이머 정리됨');
+      }
+
       v_6890b1.current = false;
       console.log('🔄 자동 광고 트리거 상태 리셋됨');
     };
@@ -2011,6 +2124,38 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      let v_7ec08d = v_21cc31.urlAD || '';
+
+      if (v_7ec08d === '없음') {
+        v_7ec08d = '';
+      }
+
+      if (!v_7ec08d || v_7ec08d === '') {
+        try {
+          const v_b70733 = await v_5d7ca4();
+          if (v_b70733 && Array.isArray(v_b70733)) {
+            const v_d87210 = v_b70733.find(v_ddcfed => 
+              v_ddcfed.campid === v_aa0917 || 
+              String(v_ddcfed.campid) === String(v_aa0917) ||
+              v_ddcfed.advertisement === v_5389c3 ||
+              String(v_ddcfed.advertisement) === String(v_5389c3)
+            );
+            if (v_d87210) {
+              v_7ec08d = v_d87210.urlAD || v_d87210.landing_url || '';
+
+              if (v_7ec08d === '없음') {
+                v_7ec08d = '';
+              }
+              if (v_7ec08d) {
+                console.log(`✅ [showAdInModal] getStoredTopAd5에서 urlAD 찾음:`, v_7ec08d);
+              }
+            }
+          }
+        } catch (v_5e9bfe) {
+          console.warn('[showAdInModal] getStoredTopAd5에서 urlAD 찾기 실패:', v_5e9bfe);
+        }
+      }
+
       const v_75c344 = {
         member: v_660822,
         advertisement: v_5389c3,
@@ -2021,7 +2166,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         xrunPrice: v_21cc31.xrunPrice || 0,
         coinScreen: true,
         ad_company: v_5a9c46,
-        urlAD: v_21cc31.urlAD || '',
+        urlAD: v_7ec08d && v_7ec08d !== '없음' ? v_7ec08d : '', 
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
@@ -2226,12 +2371,21 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         clearTimeout(v_181e3e.current);
         v_181e3e.current = null;
       }
+      if (v_a27ed2.current) {
+        console.log('📱 하단 패널 닫힘 또는 토큰 변경 - 2초 타이머 정리');
+        clearTimeout(v_a27ed2.current);
+        v_a27ed2.current = null;
+      }
     }
 
     return () => {
       if (v_181e3e.current) {
         clearTimeout(v_181e3e.current);
         v_181e3e.current = null;
+      }
+      if (v_a27ed2.current) {
+        clearTimeout(v_a27ed2.current);
+        v_a27ed2.current = null;
       }
     };
   }, [v_572bd3, v_04cb77, v_917f22]);
@@ -2252,6 +2406,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       console.log('🔄 다른 토큰 클릭 - 이전 자동 광고 이동 타이머 정리');
       clearTimeout(v_181e3e.current);
       v_181e3e.current = null;
+    }
+    if (v_a27ed2.current) {
+      console.log('🔄 다른 토큰 클릭 - 이전 2초 타이머 정리');
+      clearTimeout(v_a27ed2.current);
+      v_a27ed2.current = null;
     }
     v_6890b1.current = false; 
 
@@ -2287,8 +2446,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       });
     }, 100);
 
-    setTimeout(() => {
+    v_a27ed2.current = setTimeout(() => {
       console.log('⏱️ 2초 후 광고 화면으로 이동');
+      v_a27ed2.current = null; 
       v_794bb0(v_021ef9);
     }, 2000);
   }, [v_794bb0]);
@@ -2407,8 +2567,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     v_eed806(v_21cc31);
                   };
 
-                  const v_5a4448 = !v_2be890;
-                  console.log(`[토큰 렌더링] spotID=${v_21cc31.spotID}, campid=${v_aa0917}, isCompleted=${v_2be890}, shouldShowCatch=${v_5a4448}, completedAdsSet 크기=${v_7c7dd0.current?.size || 0}`);
+                  console.log(`[토큰 렌더링] spotID=${v_21cc31.spotID}, campid=${v_aa0917}, completedAdsSet 크기=${v_7c7dd0.current?.size || 0}`);
 
                   return (
                     <TokenComponent
@@ -2450,6 +2609,16 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               if (v_572bd3) {
                 console.log('📱 하단 패널 배경 터치 - 패널 닫기');
                 v_6a4dcd(false);
+
+                if (v_181e3e.current) {
+                  clearTimeout(v_181e3e.current);
+                  v_181e3e.current = null;
+                }
+                if (v_a27ed2.current) {
+                  clearTimeout(v_a27ed2.current);
+                  v_a27ed2.current = null;
+                }
+                v_6890b1.current = false;
               }
             }}
             style={[
@@ -2670,6 +2839,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   v_6a4dcd(false);
                   v_96a9ed(null);
 
+                  if (v_181e3e.current) {
+                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                    clearTimeout(v_181e3e.current);
+                    v_181e3e.current = null;
+                  }
+                  if (v_a27ed2.current) {
+                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                    clearTimeout(v_a27ed2.current);
+                    v_a27ed2.current = null;
+                  }
+                  v_6890b1.current = false;
+
                   const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
                   if (v_764826 === 'true') {
                     console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
@@ -2688,6 +2869,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                   v_6a4dcd(false);
                   v_96a9ed(null);
+
+                  if (v_181e3e.current) {
+                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                    clearTimeout(v_181e3e.current);
+                    v_181e3e.current = null;
+                  }
+                  if (v_a27ed2.current) {
+                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                    clearTimeout(v_a27ed2.current);
+                    v_a27ed2.current = null;
+                  }
+                  v_6890b1.current = false;
 
                   const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
                   if (v_764826 === 'true') {
