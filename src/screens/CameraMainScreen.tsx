@@ -315,20 +315,20 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          <Animated.Image
-            source={
-              isRageMode
-                ? require('../../assets/images/icon_catch_rage.png')
-                : require('../../assets/images/icon_catch.png')
-            }
-            style={[
-              styles.blinkImage,
-              {
-                opacity: blinkAnim,
-              },
-              isRageMode && { top: -90 },
-            ]}
-          />
+            <Animated.Image
+              source={
+                isRageMode
+                  ? require('../../assets/images/icon_catch_rage.png')
+                  : require('../../assets/images/icon_catch.png')
+              }
+              style={[
+                styles.blinkImage,
+                {
+                  opacity: blinkAnim,
+                },
+                isRageMode && { top: -90 },
+              ]}
+            />
           {iconXrunWhite && (
             <Image
               source={iconXrunWhite}
@@ -946,9 +946,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     if (completedAdsSet && completedAdsSet.size > 0) {
                       completedAdsSetRef.current = completedAdsSet;
                       console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
-                    }
+                }
 
-                    if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+                if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                       console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
                       const filteredTopAd5 = topAd5Response.filter((ad: any) => {
@@ -957,52 +957,52 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                       if (filteredTopAd5.length > 0) {
 
-                        const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
-                          const distanceA = parseFloat(String(a.distance || 0));
-                          const distanceB = parseFloat(String(b.distance || 0));
+                  const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
+                    const distanceA = parseFloat(String(a.distance || 0));
+                    const distanceB = parseFloat(String(b.distance || 0));
                           return distanceA - distanceB;
-                        });
+                  });
 
-                        const MAX_TOKENS_PER_CAMPAIGN = 5;
+                  const MAX_TOKENS_PER_CAMPAIGN = 5;
                         const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
-                        const campaignTokenCount = new Map<number, number>();
+                  const campaignTokenCount = new Map<number, number>();
 
                         const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
-                          if (index >= maxMappedTokens) {
-                            return coin;
-                          }
+                    if (index >= maxMappedTokens) {
+                      return coin;
+                    }
 
                           const adIndex = index % filteredTopAd5.length;
                           const mappedAd = filteredTopAd5[adIndex];
-                          const campid = mappedAd?.campid;
+                    const campid = mappedAd?.campid;
 
-                          if (campid) {
-                            const currentCount = campaignTokenCount.get(campid) || 0;
-                            if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
-                              return coin;
-                            }
-                            campaignTokenCount.set(campid, currentCount + 1);
-                          }
+                    if (campid) {
+                      const currentCount = campaignTokenCount.get(campid) || 0;
+                      if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                        return coin;
+                      }
+                      campaignTokenCount.set(campid, currentCount + 1);
+                    }
 
-                          return {
-                            ...coin,
-                            distance: Number(coin.distance) || 0,
-                            name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
-                            iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                            joindesc: mappedAd?.joindesc || coin.joindesc || '',
-                            xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
-                            xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
-                            campid: mappedAd?.campid || coin.campid || coin.campId || '',
-                            advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
-                            thumbnail: mappedAd?.thumbnail || coin.thumbnail,
-                            ad_company: mappedAd?.ad_company || coin.ad_company,
-                            coins: mappedAd?.coins?.toString() || coin.coins,
-                            brandlogo: mappedAd?.brandlogo || coin.brandlogo,
-                            adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
-                            symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                    return {
+                      ...coin,
+                      distance: Number(coin.distance) || 0,
+                      name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                      iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                      joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                      xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                      xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                      campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                      advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                      thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                      ad_company: mappedAd?.ad_company || coin.ad_company,
+                      coins: mappedAd?.coins?.toString() || coin.coins,
+                      brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                      adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                      symbolimg: mappedAd?.symbolimg || coin.symbolimg,
                             urlAD: mappedAd?.urlAD || coin.urlAD || '',
-                          };
-                        });
+                    };
+                  });
 
                         setCoinsData(updatedCoinsData);
                         currentIndexRef.current = 0;
@@ -1066,7 +1066,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                         const distanceA = parseFloat(String(a.distance || 0));
                         const distanceB = parseFloat(String(b.distance || 0));
                         return distanceA - distanceB;
-                      });
+                  });
 
                       const MAX_TOKENS_PER_CAMPAIGN = 5;
                       const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
@@ -1107,7 +1107,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                           symbolimg: mappedAd?.symbolimg || coin.symbolimg,
                           urlAD: mappedAd?.urlAD || coin.urlAD || '',
                         };
-                      });
+                });
 
                       setCoinsData(updatedCoinsData);
                       currentIndexRef.current = 0;
