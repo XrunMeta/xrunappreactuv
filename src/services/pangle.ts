@@ -1,96 +1,405 @@
 
 
-import { Platform, NativeModules } from 'react-native';
+import { Platform, NativeModules, NativeEventEmitter } from 'react-native';
+import { getEnvValue, getEnv } from '../utils/env';
+import { DeviceInfo } from '../types';
 
 const { PangleModule } = NativeModules;
+const pangleEventEmitter = PangleModule ? new NativeEventEmitter(PangleModule) : null;
 
-export const PANGLE_SLOT_ID = '982684319';
+let isPangleInitialized = false;
+let isPangleAvailable = false;
 
-export const PANGLE_NATIVE_AD_SLOT_ID = '982690267';
-
-export const isNativeModuleAvailable = (): boolean => {
-  return Platform.OS === 'ios' && PangleModule !== undefined && PangleModule !== null;
-};
-
-export const showNativeScreen = async (): Promise<any> => {
+export const isPangleNativeModuleAvailable = (): boolean => {
   try {
-    if (!isNativeModuleAvailable()) {
-      console.warn('[Native] iOS 네이티브 모듈을 사용할 수 없습니다.');
-      return { success: false, error: '모듈을 찾을 수 없습니다' };
-    }
-
-    console.log('[Native] 네이티브 화면 호출 시작');
-    const result = await PangleModule.showNativeScreen();
-    console.log('[Native] 네이티브 화면 표시 성공:', result);
-    return result;
+    return PangleModule !== null && PangleModule !== undefined;
   } catch (error) {
-    console.error('[Native] 네이티브 화면 표시 실패:', error);
-    throw error;
+    return false;
   }
 };
 
-export const loadInterstitialAd = async (slotId: string = PANGLE_SLOT_ID): Promise<any> => {
+export const initializePangle = async (): Promise<void> => {
   try {
-    if (!isNativeModuleAvailable()) {
-      return { success: false, error: '모듈을 찾을 수 없습니다' };
+
+    if (isPangleInitialized) {
+      console.log('[Pangle] 이미 초기화되었습니다.');
+      return;
     }
 
-    console.log('[Native] 팽글 전면광고 로드 시도:', slotId);
-    const result = await PangleModule.loadInterstitialAd(slotId);
-    console.log('[Native] 팽글 전면광고 로드 성공:', result);
-    return result;
+    if (!isPangleNativeModuleAvailable()) {
+      console.warn('[Pangle] 네이티브 모듈을 사용할 수 없습니다.');
+      console.warn('[Pangle] PangleModule이 null이거나 undefined입니다.');
+      console.warn('[Pangle] 네이티브 모듈이 제대로 등록되었는지 확인하세요.');
+      isPangleAvailable = false;
+      return;
+    }
+
+    console.log('[Pangle] 네이티브 모듈 사용 가능:', {
+      PangleModule: PangleModule !== null && PangleModule !== undefined,
+      hasInitialize: typeof PangleModule?.initialize === 'function',
+    });
+
+    try {
+      const initPromise = PangleModule.initialize();
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Pangle 초기화 타임아웃')), 10000)
+      );
+
+      await Promise.race([initPromise, timeoutPromise]);
+
+      isPangleInitialized = true;
+      isPangleAvailable = true;
+      console.log('[Pangle] 초기화 완료');
+    } catch (initError) {
+      console.error('[Pangle] 초기화 실패:', initError);
+      isPangleAvailable = false;
+      throw initError;
+    }
   } catch (error) {
-    console.error('[Native] 팽글 전면광고 로드 실패:', error);
-    throw error;
+    console.error('[Pangle] 초기화 중 오류:', error);
+    isPangleAvailable = false;
+
   }
 };
 
-export const showInterstitialAd = async (): Promise<any> => {
+export const isPangleReady = async (): Promise<boolean> => {
   try {
-    if (!isNativeModuleAvailable()) {
-      return { success: false, error: '모듈을 찾을 수 없습니다' };
+    if (!isPangleInitialized || !isPangleAvailable) {
+      return false;
     }
 
-    console.log('[Native] 팽글 전면광고 노출 시도');
-    const result = await PangleModule.showInterstitialAd();
-    console.log('[Native] 팽글 전면광고 노출 성공');
-    return result;
+    if (PangleModule && PangleModule.isReady) {
+      const nativeReady = await PangleModule.isReady();
+      return nativeReady === true;
+    }
+
+    return isPangleInitialized && isPangleAvailable;
   } catch (error) {
-    console.error('[Native] 팽글 전면광고 노출 실패:', error);
-    throw error;
+    console.error('[Pangle] 초기화 상태 확인 중 오류:', error);
+    return false;
   }
 };
 
-export const loadAndShowInterstitialAd = async (slotId: string = PANGLE_SLOT_ID): Promise<any> => {
+export const isPangleReadySync = (): boolean => {
+
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+  return isPangleInitialized && isPangleAvailable;
+};
+
+export const getPangleRewardedAdUnitId = (): string => {
+  return getEnvValue('PANGLE_REWARDED_AD_UNIT_ID');
+};
+
+export const getPangleAppOpeningAdUnitId = (): string => {
+  return getEnvValue('PANGLE_APP_OPENING_AD_UNIT_ID');
+};
+
+export const loadAndShowRewardedAd = async (
+  adUnitId?: string,
+  member?: string,
+  deviceInfo?: DeviceInfo,
+  onRewarded?: (reward: { type: string; amount: number }) => void,
+  onAdClosed?: () => void,
+  onAdFailedToLoad?: (error: Error) => void,
+): Promise<void> => {
   try {
-    if (!isNativeModuleAvailable()) {
-      return { success: false, error: '모듈을 찾을 수 없습니다' };
+
+    if (Platform.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(new Error('Pangle은 안드로이드에서만 지원됩니다.'));
+      }
+      return;
     }
 
-    console.log('[Native] 팽글 전면광고 로드 및 노출 시도 (통합):', slotId);
-    const result = await PangleModule.loadAndShowInterstitialAd(slotId);
-    console.log('[Native] 팽글 전면광고 호출 성공:', result);
-    return result;
+    if (!isPangleAvailable) {
+      console.warn('[Pangle] Pangle이 사용 불가능합니다.');
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(new Error('Pangle이 초기화되지 않았습니다.'));
+      }
+      return;
+    }
+
+    const finalAdUnitId = adUnitId || getPangleRewardedAdUnitId();
+
+    if (!finalAdUnitId) {
+      const error = new Error('Pangle 보상형 광고 단위 ID가 설정되지 않았습니다.');
+      console.error('[Pangle]', error.message);
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(error);
+      }
+      return;
+    }
+
+    console.log('[Pangle] 보상형 광고 로드 시작:', finalAdUnitId);
+
+    const subscriptions: Array<() => void> = [];
+    let errorHandledByEvent = false; 
+
+    if (pangleEventEmitter) {
+
+      const rewardSubscription = pangleEventEmitter.addListener(
+        'onRewardedAdReward',
+        (event: { type: string; amount: number; adUnitId: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            console.log('[Pangle] 보상 수령:', event);
+            if (onRewarded) {
+              onRewarded({ type: event.type, amount: event.amount });
+            }
+          }
+        },
+      );
+      subscriptions.push(() => rewardSubscription.remove());
+
+      const closeSubscription = pangleEventEmitter.addListener(
+        'onRewardedAdClose',
+        (event: { adUnitId: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            console.log('[Pangle] 보상형 광고 닫힘');
+
+            subscriptions.forEach(unsubscribe => unsubscribe());
+            if (onAdClosed) {
+              onAdClosed();
+            }
+          }
+        },
+      );
+      subscriptions.push(() => closeSubscription.remove());
+
+      const loadedSubscription = pangleEventEmitter.addListener(
+        'onRewardedAdLoaded',
+        (event: { adUnitId: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            console.log('[Pangle] 보상형 광고 로드 완료');
+
+            PangleModule.showRewardedAd(finalAdUnitId).catch((error: Error) => {
+              console.error('[Pangle] 보상형 광고 표시 실패:', error);
+              subscriptions.forEach(unsubscribe => unsubscribe());
+              if (onAdFailedToLoad) {
+                onAdFailedToLoad(error);
+              }
+            });
+          }
+        },
+      );
+      subscriptions.push(() => loadedSubscription.remove());
+
+      const errorSubscription = pangleEventEmitter.addListener(
+        'onRewardedAdLoadError',
+        (event: { adUnitId: string; errorCode: number; errorMsg: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            errorHandledByEvent = true; 
+            console.error('[Pangle] 보상형 광고 로드 실패:', event.errorMsg, `(${event.errorCode})`);
+
+            if (event.errorCode === 40034) {
+              console.warn('[Pangle] 해결 방법:', {
+                '1': 'Pangle 대시보드에서 광고 단위 ID가 올바른지 확인',
+                '2': '광고 형식(보상형 광고)이 활성화되어 있는지 확인',
+                '3': 'App ID와 App Key가 올바른지 확인',
+                '4': '네트워크 연결 상태 확인',
+              });
+            }
+
+            subscriptions.forEach(unsubscribe => unsubscribe());
+            if (onAdFailedToLoad) {
+              onAdFailedToLoad(new Error(`보상형 광고 로드 실패: ${event.errorMsg} (${event.errorCode})`));
+            }
+          }
+        },
+      );
+      subscriptions.push(() => errorSubscription.remove());
+    }
+
+    try {
+      await PangleModule.loadRewardedAd(finalAdUnitId);
+    } catch (loadError) {
+
+      if (pangleEventEmitter) {
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (errorHandledByEvent) {
+          return; 
+        }
+
+        const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+        console.warn('[Pangle] 보상형 광고 로드 promise reject (이벤트 리스너 있음, 이벤트 미수신):', errorMessage);
+
+        return;
+      }
+
+      const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+      console.error('[Pangle] 보상형 광고 로드 promise 실패 (이벤트 리스너 없음):', loadError);
+
+      let userFriendlyMessage = errorMessage;
+      if (errorMessage.includes('40034')) {
+        userFriendlyMessage = `Pangle 서버 오류 (40034): 광고 단위 ID(${finalAdUnitId})가 올바르지 않거나 Pangle 대시보드에서 활성화되지 않았을 수 있습니다. Pangle 대시보드를 확인해주세요.`;
+        console.warn('[Pangle] 해결 방법:', {
+          '1': 'Pangle 대시보드에서 광고 단위 ID가 올바른지 확인',
+          '2': '광고 형식(보상형 광고)이 활성화되어 있는지 확인',
+          '3': 'App ID와 App Key가 올바른지 확인',
+          '4': '네트워크 연결 상태 확인',
+        });
+      }
+
+      subscriptions.forEach(unsubscribe => unsubscribe());
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(new Error(userFriendlyMessage));
+      }
+    }
   } catch (error) {
-    console.error('[Native] 팽글 전면광고 로드 및 노출 실패:', error);
-    throw error;
+    console.error('[Pangle] 보상형 광고 로드 중 오류:', error);
+    if (onAdFailedToLoad) {
+      onAdFailedToLoad(error as Error);
+    }
   }
 };
 
-export const loadAndShowNativeAd = async (slotId: string = PANGLE_NATIVE_AD_SLOT_ID): Promise<any> => {
+let appOpenAdLoaded = false;
+
+export const loadAndShowAppOpenAd = async (): Promise<void> => {
   try {
-    if (!isNativeModuleAvailable()) {
-      return { success: false, error: '모듈을 찾을 수 없습니다' };
+
+    if (Platform.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      return;
     }
 
-    console.log('[Native] 팽글 네이티브 광고 로드 및 노출 시도:', slotId);
+    if (!isPangleAvailable) {
+      console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
+      return;
+    }
 
-    const result = await PangleModule.loadAndShowNativeAd(slotId);
-    console.log('[Native] 팽글 네이티브 광고 호출 성공:', result);
-    return result;
+    const finalAdUnitId = getPangleAppOpeningAdUnitId();
+
+    if (!finalAdUnitId) {
+      console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
+      return;
+    }
+
+    console.log('[Pangle] 앱 오프닝 광고 로드 시작:', finalAdUnitId);
+
+    const subscriptions: Array<() => void> = [];
+    let errorHandledByEvent = false; 
+
+    if (pangleEventEmitter) {
+
+      const loadedSubscription = pangleEventEmitter.addListener(
+        'onAppOpenAdLoaded',
+        (event: { adUnitId: string }) => {
+          if (event.adUnitId === finalAdUnitId && !appOpenAdLoaded) {
+            console.log('[Pangle] 앱 오프닝 광고 로드 완료');
+            appOpenAdLoaded = true;
+
+            PangleModule.showAppOpenAd(finalAdUnitId).catch((error: Error) => {
+              console.error('[Pangle] 앱 오프닝 광고 표시 실패:', error);
+              subscriptions.forEach(unsubscribe => unsubscribe());
+            });
+          }
+        },
+      );
+      subscriptions.push(() => loadedSubscription.remove());
+
+      const closeSubscription = pangleEventEmitter.addListener(
+        'onAppOpenAdClose',
+        (event: { adUnitId: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            console.log('[Pangle] 앱 오프닝 광고 닫힘');
+            appOpenAdLoaded = false;
+            subscriptions.forEach(unsubscribe => unsubscribe());
+          }
+        },
+      );
+      subscriptions.push(() => closeSubscription.remove());
+
+      const errorSubscription = pangleEventEmitter.addListener(
+        'onAppOpenAdLoadError',
+        (event: { adUnitId: string; errorCode: number; errorMsg: string }) => {
+          if (event.adUnitId === finalAdUnitId) {
+            errorHandledByEvent = true;
+            console.error('[Pangle] 앱 오프닝 광고 로드 실패:', event.errorMsg, `(${event.errorCode})`);
+
+            if (event.errorCode === 40006) {
+              console.warn('[Pangle] 해결 방법:', {
+                '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+                '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+                '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+              });
+            }
+
+            subscriptions.forEach(unsubscribe => unsubscribe());
+          }
+        },
+      );
+      subscriptions.push(() => errorSubscription.remove());
+    }
+
+    try {
+      await PangleModule.loadAppOpenAd(finalAdUnitId);
+    } catch (loadError) {
+
+      if (pangleEventEmitter) {
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (errorHandledByEvent) {
+          return; 
+        }
+
+        const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+        console.warn('[Pangle] 앱 오프닝 광고 로드 promise reject (이벤트 리스너 있음, 이벤트 미수신):', errorMessage);
+        return;
+      }
+
+      const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+      console.error('[Pangle] 앱 오프닝 광고 로드 promise 실패 (이벤트 리스너 없음):', loadError);
+
+      appOpenAdLoaded = false;
+
+      if (errorMessage.includes('40006')) {
+        console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 유효하지 않습니다. 광고 단위가 아직 완전히 활성화되지 않았을 수 있습니다. 잠시 후 다시 시도하세요.');
+        console.warn('[Pangle] 해결 방법:', {
+          '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+          '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+          '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+        });
+      } else if (errorMessage.includes('40034') || errorMessage.includes('지원되지 않')) {
+        console.warn('[Pangle] 앱 오프닝 광고가 현재 SDK 버전에서 지원되지 않거나 광고 단위 ID가 올바르지 않습니다. 앱은 계속 실행됩니다.');
+      } else {
+        console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', loadError);
+      }
+
+      subscriptions.forEach(unsubscribe => unsubscribe());
+    }
   } catch (error) {
-    console.error('[Native] 팽글 네이티브 광고 로드 및 노출 실패:', error);
-    throw error;
+    appOpenAdLoaded = false;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (errorMessage.includes('40006')) {
+      console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 유효하지 않습니다. 광고 단위가 아직 완전히 활성화되지 않았을 수 있습니다. 잠시 후 다시 시도하세요.');
+      console.warn('[Pangle] 해결 방법:', {
+        '1': 'Pangle 대시보드에서 광고 단위가 "사용 중" 상태인지 확인',
+        '2': '광고 단위가 App ID 8747763에 연결되어 있는지 확인',
+        '3': '몇 분 후 다시 시도 (광고 단위 활성화 지연 가능)',
+      });
+    } else if (errorMessage.includes('40034') || errorMessage.includes('지원되지 않')) {
+      console.warn('[Pangle] 앱 오프닝 광고가 현재 SDK 버전에서 지원되지 않거나 광고 단위 ID가 올바르지 않습니다. 앱은 계속 실행됩니다.');
+    } else {
+      console.error('[Pangle] 앱 오프닝 광고 로드 중 오류:', error);
+    }
   }
+};
+
+export const sendPangleCallback = async (
+  member: string,
+  deviceInfo: DeviceInfo,
+  reward: { type: string; amount: number },
+  adUnitId: string,
+): Promise<any> => {
+
+  console.log('[Pangle] 콜백 전송 스킵 (리워드 제공 안 함)');
+  return { success: true, message: '콜백 전송 스킵됨' };
 };
 

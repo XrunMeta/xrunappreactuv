@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 import { checkColdStart } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
-
-const XRUN_ROUND_LOGO = require('../../assets/xrun-round-logo.png');
 
 export const SplashScreen = () => {
   useEffect(() => {
@@ -26,14 +24,6 @@ export const SplashScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      {}
-      <View style={styles.centerLogoWrapper}>
-        <Image
-          source={XRUN_ROUND_LOGO}
-          style={styles.centerLogo}
-          resizeMode="contain"
-        />
-      </View>
     </View>
   );
 };
@@ -43,18 +33,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLogoWrapper: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLogo: {
-    width: 113,
-    height: 115,
   },
 });
 
