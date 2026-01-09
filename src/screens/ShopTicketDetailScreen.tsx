@@ -202,20 +202,40 @@ export const v_a1c4a5 = () => {
       v_e74f9a.current?.toDataURL(async (v_91b89e) => {
         try {
 
-          const v_6a425b = `${v_8d41d7('screens.shopTicketDetail.share.ticketNumber')} ${v_a94bd8}\n${v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl')} ${v_bffa41}`;
+          const v_41e0ce = v_91b89e.replace(/^data:image\/png;base64,/, '');
 
-          await v_5f4661.share({
-            message: v_6a425b,
-            title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
+          const v_a7bd9e = `qr_code_${v_a94bd8}_${Date.now()}.png`;
+          const v_0c2fb2 = `${FileSystem.cacheDirectory}${v_a7bd9e}`;
+
+          await FileSystem.writeAsStringAsync(v_0c2fb2, v_41e0ce, {
+            encoding: FileSystem.EncodingType.Base64,
           });
+
+          const v_2911e0 = await Sharing.isAvailableAsync();
+          if (v_2911e0) {
+            await Sharing.shareAsync(v_0c2fb2, {
+              mimeType: 'image/png',
+              dialogTitle: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
+            });
+          } else {
+
+            const v_6a425b = `${v_8d41d7('screens.shopTicketDetail.share.ticketNumber')} ${v_a94bd8}\n${v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl')} ${v_bffa41}`;
+            await v_fba5a0.setStringAsync(v_6a425b);
+            await v_889fad(
+              v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
+              v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl') + ' ' + v_bffa41 + '\n\n' + v_8d41d7('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.'
+            );
+          }
         } catch (v_8c89c1) {
           console.error('[티켓 상세] QR 공유 오류:', v_8c89c1);
 
           try {
-            await v_5f4661.share({
-              message: `${v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle')}: ${v_bffa41}`,
-              title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
-            });
+            const v_6a425b = `${v_8d41d7('screens.shopTicketDetail.share.ticketNumber')} ${v_a94bd8}\n${v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl')} ${v_bffa41}`;
+            await v_fba5a0.setStringAsync(v_6a425b);
+            await v_889fad(
+              v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
+              v_8d41d7('screens.shopTicketDetail.share.qrCodeUrl') + ' ' + v_bffa41 + '\n\n' + (v_8d41d7('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.')
+            );
           } catch (v_741f30) {
             console.error('[티켓 상세] QR 공유 대안 실패:', v_741f30);
             await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.shopTicketDetail.share.shareFailed'));
@@ -226,10 +246,12 @@ export const v_a1c4a5 = () => {
       console.error('[티켓 상세] QR 공유 오류:', v_5e9bfe);
 
       try {
-        await v_5f4661.share({
-          message: `${v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle')}: ${v_1de78e}`,
-          title: v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
-        });
+        const v_6a425b = `${v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle')}: ${v_1de78e}`;
+        await v_fba5a0.setStringAsync(v_6a425b);
+        await v_889fad(
+          v_8d41d7('screens.shopTicketDetail.share.qrCodeTitle'),
+          v_6a425b + '\n\n' + (v_8d41d7('screens.shopTicketDetail.share.copiedToClipboard') || '클립보드에 복사되었습니다.')
+        );
       } catch (v_741f30) {
         await v_889fad(v_8d41d7('common.messages.error'), v_8d41d7('screens.shopTicketDetail.share.shareFailed'));
       }

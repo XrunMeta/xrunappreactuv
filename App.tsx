@@ -58,6 +58,7 @@ import {
   v_f7bdb9,
   v_1cca63,
   v_0e5276,
+  v_4a5627,
 } from './src/screens';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -67,6 +68,7 @@ import { v_a2474a } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
+import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
@@ -404,6 +406,10 @@ const v_c0dbdf = () => {
     return <MyInfoSettingsScreen />;
   }
 
+  if (v_0f0c7b === 'pangleList') {
+    return <PangleListScreen />;
+  }
+
   if (v_0f0c7b === 'myInfoCloseMembership') {
     return <MyInfoCloseMembershipScreen />;
   }
@@ -650,7 +656,6 @@ const v_d0a391 = () => {
 
   v_c4deb2(() => {
     const v_bc755f = async () => {
-
       try {
 
         const v_090f7c = await v_5ee4ec();
@@ -866,6 +871,22 @@ export default function v_6540c3() {
         console.log('[App] Taboola 초기화 완료');
       } catch (v_5e9bfe) {
         console.error('[App] Taboola 초기화 실패:', v_5e9bfe);
+      }
+
+      if (v_326be8.OS === 'android') {
+        setTimeout(() => {
+          v_f095b0().then(() => {
+            console.log('[App] Pangle 초기화 완료');
+
+            setTimeout(() => {
+              v_e55270().catch((v_5e9bfe) => {
+                console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+              });
+            }, 500); 
+          }).catch((v_5e9bfe) => {
+            console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+          });
+        }, 1000); 
       }
 
       try {
