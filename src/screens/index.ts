@@ -55,4 +55,5 @@ export { ShowPockAdScreen } from './ShowPockAdScreen';
 export { XRUNinfoScreen } from './XRUNinfo';
 export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 export { ReferralInputScreen } from './ReferralInputScreen';
+export { PangleListScreen } from './PangleListScreen';
 

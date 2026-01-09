@@ -1082,6 +1082,32 @@ export interface WalletData {
   [key: string]: any; 
 }
 
+export type AdMobAdFormat = 'banner' | 'interstitial' | 'rewarded' | 'rewarded-interstitial' | 'native';
+
+export type AdMobAdEventType = 'loaded' | 'opened' | 'closed' | 'clicked' | 'impression' | 'rewarded' | 'error';
+
+export interface AdMobReward {
+  type: string;
+  amount: number;
+}
+
+export interface AdMobAdLoadOptions {
+  requestNonPersonalizedAdsOnly?: boolean;
+  keywords?: string[];
+  contentUrl?: string;
+  networkExtras?: Record<string, any>;
+}
+
+export interface AdMobAdCallbacks {
+  onAdLoaded?: () => void;
+  onAdFailedToLoad?: (error: Error) => void;
+  onAdOpened?: () => void;
+  onAdClosed?: () => void;
+  onAdClicked?: () => void;
+  onAdImpression?: () => void;
+  onRewarded?: (reward: AdMobReward) => void;
+}
+
 export interface CombinedAsset {
   id: number | string; 
   symbol: string; 

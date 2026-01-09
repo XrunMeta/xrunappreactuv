@@ -58,6 +58,7 @@ import {
   XRUNinfoScreen,
   MyinfoShopSalesScreen,
   ReferralInputScreen,
+  PangleListScreen,
 } from './src/screens';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -67,6 +68,7 @@ import { loadEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
+import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -404,6 +406,10 @@ const ScreenHost = () => {
     return <MyInfoSettingsScreen />;
   }
 
+  if (currentScreen === 'pangleList') {
+    return <PangleListScreen />;
+  }
+
   if (currentScreen === 'myInfoCloseMembership') {
     return <MyInfoCloseMembershipScreen />;
   }
@@ -650,7 +656,6 @@ const GlobalDialogs = () => {
 
   useEffect(() => {
     const checkVersion = async () => {
-
       try {
 
         const needsServerUpdate = await isServerVersionUpdateRequired();
@@ -866,6 +871,22 @@ export default function App() {
         console.log('[App] Taboola 초기화 완료');
       } catch (error) {
         console.error('[App] Taboola 초기화 실패:', error);
+      }
+
+      if (Platform.OS === 'android') {
+        setTimeout(() => {
+          initializePangle().then(() => {
+            console.log('[App] Pangle 초기화 완료');
+
+            setTimeout(() => {
+              loadAndShowAppOpenAd().catch((error) => {
+                console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', error);
+              });
+            }, 500); 
+          }).catch((error) => {
+            console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', error);
+          });
+        }, 1000); 
       }
 
       try {

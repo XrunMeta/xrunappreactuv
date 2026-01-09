@@ -11,12 +11,15 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward } from '../services';
+import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5 } from '../services';
+import { showToast } from '../utils';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -66,11 +69,15 @@ interface ShowNapAdScreenProps {
 
 export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
   const { navigate, reset, goBack } = useAppNavigation();
 
   const handleClose = useCallback(() => {
     resetAdvertisementParams();
+
+    setHasOpenedUrl(false);
+    isWatchingAdRef.current = false;
     console.log('handleClose');
     console.log('onClose', onClose);
     if (onClose) {
@@ -105,10 +112,14 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   const [waitingForWebSocketResponse, setWaitingForWebSocketResponse] = useState(false);
   const [member, setMember] = useState<string>('');
   const [isTaboolaLoaded, setIsTaboolaLoaded] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
+  const [webViewUrl, setWebViewUrl] = useState('');
+  const webViewRef = useRef<WebView>(null);
 
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isFetchingRef = useRef(false);
+  const isWatchingAdRef = useRef(false); 
 
   useEffect(() => {
     console.log('=== ShowNapAdScreen 컴포넌트 마운트/업데이트 ===');
@@ -209,54 +220,28 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       }
 
       if (currentParams?.urlAD && currentParams.urlAD !== '') {
-        console.log('✅ [ShowNapAdScreen] pre-fetch된 urlAD 사용, API 호출 스킵');
-        return;
-      }
+        console.log('✅ [ShowNapAdScreen] urlAD 사용, API 호출 불필요');
 
-      const deviceInfo = await collectDeviceInfo();
-
-      console.log('=== ShowNapAdScreen API 호출 정보 ===');
-      console.log('member:', member);
-      console.log('adid:', deviceInfo.adid);
-      console.log('campid:', campid);
-      console.log('advertisementParams (currentParams):', JSON.stringify(currentParams, null, 2));
-      console.log('deviceInfo:', JSON.stringify(deviceInfo, null, 2));
-      console.log('=== API 호출 정보 끝 ===');
-
-      const result = await getNasmobAds(
-        member,
-        deviceInfo.adid,
-        deviceInfo,
-        campid,
-        onClose ? undefined : navigate, 
-      );
-
-      if (result.data && result.data.urlResult === 200 && result.data.urlAD) {
-        console.log('✅ [ShowNapAdScreen] 광고 API 호출 성공 - 데이터 업데이트');
-        const newData = result.data;
-        setCampaignData(prev => {
-          if (!prev) return newData as CampaignData;
-          return {
-            ...prev,
-            ...newData,
-            urlResult: newData.urlResult ?? prev.urlResult,
-          } as CampaignData;
-        });
-        setIsLoading(false);
-        return;
-      } else {
-
-        console.warn(`NStation 광고 API 응답 결과가 정상이 아닙니다: urlResult=${result.data?.urlResult}`);
-        if (!campaignData?.urlAD) {
-          throw new Error(`URL 결과 실패: ${result.data?.urlResult}`);
+        if (campaignData) {
+          setCampaignData(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              urlAD: currentParams.urlAD || prev.urlAD,
+            };
+          });
         }
+        return;
       }
+
+      console.warn('⚠️ [ShowNapAdScreen] urlAD가 없습니다. 서버 응답 확인 필요');
+      setIsLoading(false);
     } catch (error: any) {
       console.error('NStation 광고 초기화 실패:', error);
+      setIsLoading(false);
 
       if (!campaignData?.urlAD) {
         console.log('❌ 광고 초기화 실패 - 팝업 표시');
-        setIsLoading(false);
         setAdCallFailedModalVisible(true);
       }
     }
@@ -357,32 +342,34 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
   const openUrlAD = async (url: string) => {
     try {
-      console.log('URL 이동 시도:', url);
-
-      const supported = await Linking.canOpenURL(url);
-
-      if (supported) {
-        await Linking.openURL(url);
-        console.log('✅ URL 이동 성공');
-
-      } else {
-        console.error('❌ 지원하지 않는 URL:', url);
-        throw new Error(t('screens.showNapAd.unsupportedUrl'));
-      }
+      console.log('WebView로 URL 표시:', url);
+      setWebViewUrl(url);
+      setShowWebView(true);
+      console.log('✅ WebView 모달 표시');
     } catch (error) {
-      console.error('❌ URL 이동 실패:', error);
+      console.error('❌ WebView 표시 실패:', error);
       throw error;
     }
   };
 
+  const handleWebViewClose = useCallback(async () => {
+    console.log('[WebView] 닫기 버튼 클릭');
+    setShowWebView(false);
+    setWebViewUrl('');
+    isWatchingAdRef.current = false;
+    setHasOpenedUrl(false);
+
+    console.log('[WebView 닫기] 광고 모달 닫기 및 AR 화면으로 이동');
+    resetAdvertisementParams();
+    handleClose();
+
+    if (navigate) {
+      navigate(ROUTES.map);
+    }
+  }, [navigate, resetAdvertisementParams, handleClose]);
+
   const callAdApi = async () => {
     try {
-
-      if (campaignData?.urlAD && campaignData.urlAD !== '') {
-        console.log('[callAdApi] 이미 urlAD가 있어 API 호출을 건너뜁니다.');
-        return { data: campaignData };
-      }
-
       const adCompany = advertisementParams?.ad_company || 'nas';
       const deviceInfo = await collectDeviceInfo();
 
@@ -405,11 +392,29 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
         console.log('[callAdApi] getNasmobAds 응답:', result);
         return result;
 
+      } else if (adCompany === 'pointclick' || adCompany === 'pock') {
+
+        const ad_key = advertisementParams?.campid || '';
+        console.log(`[callAdApi] getPockAds 호출 - ad_key: ${ad_key}`);
+
+        isFetchingRef.current = true;
+        const result = await getPockAds(
+          member,
+          deviceInfo.adid,
+          deviceInfo,
+          ad_key,
+          onClose ? undefined : navigate,
+        );
+        isFetchingRef.current = false;
+        console.log('[callAdApi] getPockAds 응답:', result);
+        return result;
+
       } else {
 
         console.log(`[callAdApi] 알 수 없는 ad_company(${adCompany}), 기본 getNasmobAds 호출`);
         const campid = advertisementParams?.campid || '';
 
+        isFetchingRef.current = true;
         const result = await getNasmobAds(
           member,
           deviceInfo.adid,
@@ -417,11 +422,13 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
           campid,
           onClose ? undefined : navigate,
         );
+        isFetchingRef.current = false;
         console.log('[callAdApi] getNasmobAds 응답:', result);
         return result;
       }
     } catch (error) {
       console.error('[callAdApi] 광고 API 호출 실패:', error);
+      isFetchingRef.current = false;
       throw error;
     }
   };
@@ -469,6 +476,14 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
       if (callbackResponse.status === 'success') {
         console.log('✅ Nasmob 콜백 전송 성공');
 
+      }
+
+      try {
+        console.log('[광고완료] TopAd5 새로고침 시작');
+        await getTopAd5(navigate, true); 
+        console.log('[광고완료] TopAd5 새로고침 완료');
+      } catch (topAd5Error) {
+        console.warn('[광고완료] TopAd5 새로고침 실패 (무시):', topAd5Error);
       }
     } catch (error) {
       console.error('Error in ad completion process:', error);
@@ -536,9 +551,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     handleClose();
   };
 
-  const handleCancel = () => {
-    console.log('취소 버튼 클릭 - CameraMainScreen으로 이동');
+  const handleCancel = async () => {
+    console.log('취소 버튼 클릭 - AR 화면으로 이동');
     resetAdvertisementParams();
+
+    await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
     handleClose();
   };
 
@@ -559,71 +576,127 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   };
 
   const handleWatchAd = useCallback(async () => {
-    console.log('광고 보기 버튼 클릭');
+
+    if (isWatchingAdRef.current) {
+      console.log('⚠️ [광고보기] 이미 처리 중입니다. 중복 호출 무시');
+      return;
+    }
+
+    console.log('광고 보기 버튼 클릭 (AsyncStorage URL 사용)');
     console.log(`[광고보기] ad_company: ${advertisementParams?.ad_company}`);
+    isWatchingAdRef.current = true;
 
     try {
-
-      await callAdApi();
-      console.log('[광고보기] 광고 API 호출 완료');
-
       const campid = advertisementParams?.campid || campaignData?.campid || '';
-      if (campid && member) {
-        console.log('[광고보기] processAdReward API 호출 시작 (비동기)');
 
-        processAdReward(
-          member,
-          campid,
-          'nas',
-          onClose ? undefined : navigate,
-        )
-          .then((response) => {
-            console.log('[광고보기] processAdReward 응답:', response);
-          })
-          .catch((error) => {
-            console.error('[광고보기] processAdReward 호출 실패:', error);
-
-          });
-      } else {
-        console.warn('[광고보기] campid 또는 member가 없어 리워드 처리를 건너뜁니다.', {
-          campid,
-          member,
-        });
+      if (!campid || campid === '') {
+        console.error('[광고보기] campid가 없습니다.');
+        setAdCallFailedModalVisible(true);
+        isWatchingAdRef.current = false;
+        return;
       }
 
-      if (campaignData?.urlAD) {
-        await openUrlAD(campaignData.urlAD);
+      let urlAD = advertisementParams?.urlAD || campaignData?.urlAD || '';
 
-        console.log('[광고보기] URL 열기 완료 - 맵 화면으로 이동');
-
-        await AsyncStorage.setItem('isAdCompleted', 'true');
-        console.log('[광고보기] isAdCompleted 저장 완료');
-        resetAdvertisementParams();
-        handleClose();
-      }
-    } catch (error) {
-      console.error('[광고보기] 광고 API 호출 실패:', error);
-
-      if (campaignData?.urlAD) {
+      if (!urlAD) {
         try {
-          await openUrlAD(campaignData.urlAD);
-
-          console.log('[광고보기] URL 열기 완료 (에러 후) - 맵 화면으로 이동');
-          resetAdvertisementParams();
-          handleClose();
-        } catch (urlError) {
-          console.error('[광고보기] URL 열기 실패:', urlError);
-
-          resetAdvertisementParams();
-          handleClose();
+          const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+          if (cachedAdStr) {
+            const cachedAd = JSON.parse(cachedAdStr);
+            const campidForCache = advertisementParams?.campid || campaignData?.campid || '';
+            if (cachedAd[campidForCache]?.urlAD) {
+              urlAD = cachedAd[campidForCache].urlAD;
+              console.log('[광고보기] AsyncStorage cached_AD에서 urlAD 가져옴:', urlAD);
+            }
+          }
+        } catch (cacheError) {
+          console.warn('[광고보기] 캐시 확인 실패:', cacheError);
         }
-      } else {
-
-        resetAdvertisementParams();
-        handleClose();
       }
+
+      if (!urlAD || urlAD === '') {
+        console.error('[광고보기] urlAD가 없습니다. 서버 응답 확인 필요');
+        setAdCallFailedModalVisible(true);
+        isWatchingAdRef.current = false;
+        return;
+      }
+
+      console.log('[광고보기] [1-1] URL로 이동:', urlAD);
+      setHasOpenedUrl(true);
+      await openUrlAD(urlAD);
+      console.log('[광고보기] [1-1] WebView 모달 표시 완료');
+
+      console.log('[광고보기] [1-2] TopAd5 새로고침 시작 (백그라운드)');
+      getTopAd5(navigate, true).catch((topAd5Error) => {
+        console.warn('[광고보기] [1-2] TopAd5 새로고침 실패 (무시):', topAd5Error);
+      });
+
+      (async () => {
+        try {
+
+          try {
+            const userData = await AsyncStorage.getItem('userData');
+            if (userData) {
+              const parsedUserData = JSON.parse(userData);
+              const member = parsedUserData?.member;
+              if (member) {
+                console.log('[광고보기] processAdReward 호출 시작 (백그라운드)');
+                const rewardResult = await processAdReward(
+                  parseInt(member, 10),
+                  campid,
+                  'nas',
+                  navigate,
+                );
+                console.log('[광고보기] processAdReward 응답:', rewardResult);
+              }
+            }
+          } catch (rewardError: any) {
+            if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
+              console.log('[광고보기] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[광고보기] processAdReward 실패 (무시):', rewardError);
+            }
+          }
+
+          try {
+            console.log('[광고보기] removeAdFromTopAd5 호출 (백그라운드)');
+            await removeAdFromTopAd5(campid, navigate);
+            console.log('[광고보기] removeAdFromTopAd5 완료');
+          } catch (removeError) {
+            console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
+          }
+
+          try {
+            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+            const cached = cachedStr ? JSON.parse(cachedStr) : [];
+            if (!cached.includes(campid)) {
+              cached.push(campid);
+              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
+              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[광고보기] completedAdsCache에 추가: ${campid}`);
+            }
+          } catch (cacheError) {
+            console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
+          }
+
+          await AsyncStorage.setItem('isAdCompleted', 'true');
+          await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
+          await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
+          await AsyncStorage.setItem('completedAdCampid', campid);
+          console.log('[광고보기] [2단계] 백그라운드 처리 완료');
+
+        } catch (bgError) {
+          console.warn('[광고보기] 백그라운드 처리 실패:', bgError);
+        }
+      })();
+    } catch (error) {
+      console.error('[광고보기] URL 열기 실패:', error);
+      setAdCallFailedModalVisible(true);
+    } finally {
+
+      isWatchingAdRef.current = false;
     }
-  }, [callAdApi, campaignData, openUrlAD, advertisementParams, member, onClose, navigate, resetAdvertisementParams, handleClose]);
+  }, [campaignData, openUrlAD, advertisementParams, onClose, resetAdvertisementParams, handleClose]);
 
   if (!advertisementParams) {
     return null;
@@ -717,7 +790,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             {campaignData.name || t('screens.showNapAd.campaignInfo')}
           </Text>
           <Text style={styles.campaignReward}>
-            {t('screens.showNapAd.reward')} : {(advertisementParams.xrunPrice || 0).toFixed(2)} XRUN
+            {t('screens.showNapAd.reward')} : {(() => {
+              const price = advertisementParams?.xrunPrice || 0;
+              const priceValue = parseFloat(String(price));
+              return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
+            })()} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
             {campaignData.rewarddesc || ''}
@@ -765,6 +842,226 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
 }
 
+      {}
+      <Modal
+        visible={showWebView}
+        animationType="slide"
+        onRequestClose={handleWebViewClose}
+        presentationStyle="fullScreen"
+      >
+        <View style={styles.webViewContainer}>
+          <StatusBar style="dark" />
+          <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
+            <TouchableOpacity
+              onPress={handleWebViewClose}
+              style={styles.webViewCloseButton}
+            >
+              <Text style={styles.webViewCloseText}>닫기</Text>
+            </TouchableOpacity>
+            <Text 
+              style={styles.webViewTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {campaignData?.name || advertisementParams?.name || '광고 보기'}
+            </Text>
+            <View style={styles.webViewCloseButton} />
+          </View>
+          {webViewUrl ? (
+            <View style={styles.webViewWrapper}>
+              <WebView
+                ref={webViewRef}
+                source={{ uri: webViewUrl }}
+                style={styles.webView}
+              onNavigationStateChange={(navState) => {
+                console.log('[WebView] 네비게이션:', navState.url);
+              }}
+              onShouldStartLoadWithRequest={(request) => {
+                const { url } = request;
+                console.log('[WebView] 네비게이션 요청:', url);
+
+                if (url.startsWith('intent://')) {
+                  try {
+
+                    let packageId = '';
+
+                    const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      packageId = idMatch[1];
+                    } else {
+
+                      const packageMatch = url.match(/package=([^;]+)/);
+                      if (packageMatch) {
+                        packageId = packageMatch[1];
+                      }
+                    }
+
+                    if (packageId) {
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환:', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                      return false;
+                    } else {
+                      throw new Error('패키지 ID를 찾을 수 없음');
+                    }
+                  } catch (error) {
+                    console.error('[WebView] intent:// 변환 실패:', error);
+
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[WebView] 외부 앱 열기 실패:', err);
+                    });
+                    return false;
+                  }
+                }
+
+                if (url.startsWith('market://')) {
+                  try {
+
+                    const marketId = url.replace('market://details?id=', '').split('&')[0];
+                    const playStoreUrl = `https://play.google.com/store/apps/details?id=${marketId}`;
+                    console.log('[WebView] market://를 play.google.com으로 변환:', playStoreUrl);
+
+                    setWebViewUrl(playStoreUrl);
+                    return false; 
+                  } catch (error) {
+                    console.error('[WebView] market:// 변환 실패:', error);
+
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[WebView] 외부 앱 열기 실패:', err);
+                    });
+                    return false;
+                  }
+                }
+
+                const appSchemes = [
+                  'coupang://', 'coupangapp://', 
+                  '11st://', 'auction://', 'gmarket://', 'tmon://', 'wemakeprice://', 
+                  'lotteon://', 'ssg://', 'shinsegae://', 
+                  'instagram://', 'kakao://', 'kakaotalk://', 'line://', 'tiktok://', 
+                  'youtube://', 'twitter://', 'x://', 
+                  'netflix://', 'disneyplus://', 'watcha://', 
+                  'kakaopay://', 'naverpay://', 'toss://', 'payco://', 
+                ];
+
+                for (const scheme of appSchemes) {
+                  if (url.startsWith(scheme)) {
+                    console.log(`[WebView] ${scheme} 앱 스킴 감지, 외부 앱으로 열기:`, url);
+                    Linking.openURL(url).catch((err) => {
+                      console.error(`[WebView] ${scheme} 앱 열기 실패:`, err);
+                    });
+                    return false; 
+                  }
+                }
+
+                if (url.startsWith('tel:') || 
+                    url.startsWith('mailto:') ||
+                    url.startsWith('sms:') ||
+                    url.startsWith('fb://') ||
+                    url.startsWith('facebook://')) {
+                  console.log('[WebView] 커스텀 스킴 감지, 외부 앱으로 열기:', url);
+                  Linking.openURL(url).catch((err) => {
+                    console.error('[WebView] 외부 앱 열기 실패:', err);
+                  });
+                  return false; 
+                }
+
+                if (url.includes('facebook.com') && !url.startsWith('http://') && !url.startsWith('https://')) {
+                  console.log('[WebView] 페이스북 링크 감지, 외부 앱으로 열기 시도:', url);
+                  Linking.openURL(url).catch((err) => {
+                    console.error('[WebView] 페이스북 앱 열기 실패, WebView에서 계속 로드:', err);
+                  });
+                  return false;
+                }
+
+                return true;
+              }}
+              onLoadStart={() => {
+                console.log('[WebView] 로딩 시작');
+              }}
+              onLoadEnd={() => {
+                console.log('[WebView] 로딩 완료');
+              }}
+              onError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.error('[WebView] 에러:', nativeEvent);
+
+                if (nativeEvent.code === -10 && nativeEvent.url) {
+                  const url = nativeEvent.url;
+                  console.log('[WebView] ERR_UNKNOWN_URL_SCHEME 감지:', url);
+
+                  if (url.startsWith('intent://')) {
+                    try {
+                      let packageId = '';
+                      const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                      if (idMatch) {
+                        packageId = idMatch[1];
+                      } else {
+                        const packageMatch = url.match(/package=([^;]+)/);
+                        if (packageMatch) {
+                          packageId = packageMatch[1];
+                        }
+                      }
+                      if (packageId) {
+                        const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                        console.log('[WebView] intent://를 play.google.com으로 변환:', playStoreUrl);
+                        setWebViewUrl(playStoreUrl);
+                      } else {
+                        throw new Error('패키지 ID를 찾을 수 없음');
+                      }
+                    } catch (error) {
+                      console.error('[WebView] intent:// 변환 실패:', error);
+                      Linking.openURL(url).catch((err) => {
+                        console.error('[WebView] 외부 앱 열기 실패:', err);
+                      });
+                    }
+                  }
+
+                  else if (url.startsWith('market://')) {
+                    try {
+                      const marketId = url.replace('market://details?id=', '').split('&')[0];
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${marketId}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환:', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                    } catch (error) {
+                      console.error('[WebView] market:// 변환 실패:', error);
+                      Linking.openURL(url).catch((err) => {
+                        console.error('[WebView] 외부 앱 열기 실패:', err);
+                      });
+                    }
+                  }
+
+                  else {
+                    const appSchemes = [
+                      'tel:', 'mailto:', 'sms:', 'intent://', 'fb://', 'facebook://',
+                      'coupang://', 'coupangapp://', '11st://', 'auction://', 'gmarket://',
+                      'tmon://', 'wemakeprice://', 'lotteon://', 'ssg://', 'shinsegae://',
+                      'instagram://', 'kakao://', 'kakaotalk://', 'line://', 'tiktok://',
+                      'youtube://', 'twitter://', 'x://', 'netflix://', 'disneyplus://',
+                      'watcha://', 'kakaopay://', 'naverpay://', 'toss://', 'payco://',
+                    ];
+
+                    const isAppScheme = appSchemes.some(scheme => url.startsWith(scheme));
+                    if (isAppScheme) {
+                      Linking.openURL(url).catch((err) => {
+                        console.error('[WebView] 외부 앱 열기 실패:', err);
+                      });
+                    }
+                  }
+                }
+              }}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={true}
+              scalesPageToFit={true}
+              mixedContentMode="always"
+              originWhitelist={['*']}
+              thirdPartyCookiesEnabled={true}
+              sharedCookiesEnabled={true}
+              />
+            </View>
+          ) : null}
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -1067,6 +1364,47 @@ const styles = StyleSheet.create({
     height: '50%',
     backgroundColor: 'transparent',
     zIndex: 1,
+  },
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  webViewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 0,
+    backgroundColor: '#FFFFFF',
+    marginTop: 0,
+  },
+  webViewCloseButton: {
+    padding: 8,
+    minWidth: 50,
+  },
+  webViewCloseText: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontFamily: 'Roboto-Regular',
+  },
+  webViewTitle: {
+    fontSize: FONTS.size.mmedium,
+    fontFamily: 'Roboto-Bold',
+    color: '#343a59',
+    textAlign: 'center',
+    flex: 1,
+    overflow: 'hidden',
+  },
+  webViewWrapper: {
+    flex: 1,
+    padding: 10,
+    paddingBottom: Platform.OS === 'android' ? 40 : 10, 
+  },
+  webView: {
+    flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
 });
 
