@@ -315,20 +315,20 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-          <Animated.Image
-            source={
-              v_a5ed76
-                ? require('../../assets/images/icon_catch_rage.png')
-                : require('../../assets/images/icon_catch.png')
-            }
-            style={[
-              v_d81136.blinkImage,
-              {
-                opacity: v_f2d721,
-              },
-              v_a5ed76 && { top: -90 },
-            ]}
-          />
+            <Animated.Image
+              source={
+                v_a5ed76
+                  ? require('../../assets/images/icon_catch_rage.png')
+                  : require('../../assets/images/icon_catch.png')
+              }
+              style={[
+                v_d81136.blinkImage,
+                {
+                  opacity: v_f2d721,
+                },
+                v_a5ed76 && { top: -90 },
+              ]}
+            />
           {v_ed24ee && (
             <Image
               source={v_ed24ee}
@@ -946,9 +946,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     if (v_905ecb && v_905ecb.size > 0) {
                       v_7c7dd0.current = v_905ecb;
                       console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
-                    }
+                }
 
-                    if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
+                if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
                       console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
 
                       const v_6c877c = v_e36b07.filter((v_ddcfed) => {
@@ -957,52 +957,52 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                       if (v_6c877c.length > 0) {
 
-                        const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
-                          const v_1b0610 = parseFloat(String(v_779914.distance || 0));
-                          const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
+                  const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
+                    const v_1b0610 = parseFloat(String(v_779914.distance || 0));
+                    const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
                           return v_1b0610 - v_161ea9;
-                        });
+                  });
 
-                        const v_dc4d18 = 5;
+                  const v_dc4d18 = 5;
                         const v_09cb96 = v_6c877c.length * v_dc4d18;
-                        const v_7864b3 = new Map<number, number>();
+                  const v_7864b3 = new Map<number, number>();
 
                         const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
-                          if (v_a56041 >= v_09cb96) {
-                            return v_51b584;
-                          }
+                    if (v_a56041 >= v_09cb96) {
+                      return v_51b584;
+                    }
 
                           const v_ba7922 = v_a56041 % v_6c877c.length;
                           const v_127b33 = v_6c877c[v_ba7922];
-                          const v_aa0917 = v_127b33?.campid;
+                    const v_aa0917 = v_127b33?.campid;
 
-                          if (v_aa0917) {
-                            const v_375fda = v_7864b3.get(v_aa0917) || 0;
-                            if (v_375fda >= v_dc4d18) {
-                              return v_51b584;
-                            }
-                            v_7864b3.set(v_aa0917, v_375fda + 1);
-                          }
+                    if (v_aa0917) {
+                      const v_375fda = v_7864b3.get(v_aa0917) || 0;
+                      if (v_375fda >= v_dc4d18) {
+                        return v_51b584;
+                      }
+                      v_7864b3.set(v_aa0917, v_375fda + 1);
+                    }
 
-                          return {
-                            ...v_51b584,
-                            distance: Number(v_51b584.distance) || 0,
-                            name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
-                            iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                            joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
-                            xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
-                            xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
-                            campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
-                            advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
-                            thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
-                            ad_company: v_127b33?.ad_company || v_51b584.ad_company,
-                            coins: v_127b33?.coins?.toString() || v_51b584.coins,
-                            brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
-                            adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
-                            symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
+                    return {
+                      ...v_51b584,
+                      distance: Number(v_51b584.distance) || 0,
+                      name: v_127b33?.name || v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
+                      iconurl: v_127b33?.iconurl || v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                      joindesc: v_127b33?.joindesc || v_51b584.joindesc || '',
+                      xrunPrice: v_127b33?.xrunPrice || v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
+                      xrunprice: v_127b33?.xrunPrice || v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
+                      campid: v_127b33?.campid || v_51b584.campid || v_51b584.campId || '',
+                      advertisement: v_127b33?.advertisement || v_127b33?.adid || v_127b33?.ad || (v_127b33?.campid ? String(v_127b33.campid) : '') || v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+                      thumbnail: v_127b33?.thumbnail || v_51b584.thumbnail,
+                      ad_company: v_127b33?.ad_company || v_51b584.ad_company,
+                      coins: v_127b33?.coins?.toString() || v_51b584.coins,
+                      brandlogo: v_127b33?.brandlogo || v_51b584.brandlogo,
+                      adthumbnail2: v_127b33?.adthumbnail2 || v_51b584.adthumbnail2,
+                      symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
                             urlAD: v_127b33?.urlAD || v_51b584.urlAD || '',
-                          };
-                        });
+                    };
+                  });
 
                         v_7bb835(v_0b94e1);
                         v_a96760.current = 0;
@@ -1066,7 +1066,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                         const v_1b0610 = parseFloat(String(v_779914.distance || 0));
                         const v_161ea9 = parseFloat(String(v_148ff6.distance || 0));
                         return v_1b0610 - v_161ea9;
-                      });
+                  });
 
                       const v_dc4d18 = 5;
                       const v_09cb96 = v_6c877c.length * v_dc4d18;
@@ -1107,7 +1107,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                           symbolimg: v_127b33?.symbolimg || v_51b584.symbolimg,
                           urlAD: v_127b33?.urlAD || v_51b584.urlAD || '',
                         };
-                      });
+                });
 
                       v_7bb835(v_0b94e1);
                       v_a96760.current = 0;
