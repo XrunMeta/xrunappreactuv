@@ -13,6 +13,7 @@ import {
 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_b5df25 } from 'ernurodqvmtspux';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -68,6 +69,7 @@ interface ShowNapAdScreenProps {
 
 export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8 }) => {
   const { t: v_8d41d7 } = v_772971();
+  const v_033e14 = v_e0068c();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
   const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
 
@@ -848,14 +850,21 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         presentationStyle="fullScreen"
       >
         <View style={v_d81136.webViewContainer}>
-          <View style={v_d81136.webViewHeader}>
+          <StatusBar style="dark" />
+          <View style={[v_d81136.webViewHeader, { paddingTop: v_033e14.top + 12 }]}>
             <TouchableOpacity
               onPress={v_3aa877}
               style={v_d81136.webViewCloseButton}
             >
               <Text style={v_d81136.webViewCloseText}>닫기</Text>
             </TouchableOpacity>
-            <Text style={v_d81136.webViewTitle}>광고 보기</Text>
+            <Text 
+              style={v_d81136.webViewTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {v_3aedd0?.name || v_d0b6d4?.name || '광고 보기'}
+            </Text>
             <View style={v_d81136.webViewCloseButton} />
           </View>
           {v_b2dceb ? (
@@ -1358,18 +1367,17 @@ const v_d81136 = v_472849.create({
   },
   webViewContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   webViewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: '#fff',
-    paddingTop: v_326be8.OS === 'ios' ? 50 : 12,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 0,
+    backgroundColor: '#FFFFFF',
+    marginTop: 0,
   },
   webViewCloseButton: {
     padding: 8,
@@ -1381,14 +1389,17 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Regular',
   },
   webViewTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: v_843035.size.mmedium,
     fontFamily: 'Roboto-Bold',
+    color: '#343a59',
+    textAlign: 'center',
+    flex: 1,
+    overflow: 'hidden',
   },
   webViewWrapper: {
     flex: 1,
     padding: 10,
+    paddingBottom: v_326be8.OS === 'android' ? 40 : 10, 
   },
   webView: {
     flex: 1,
