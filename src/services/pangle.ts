@@ -81,6 +81,10 @@ export const isPangleReady = async (): Promise<boolean> => {
 };
 
 export const isPangleReadySync = (): boolean => {
+
+  if (Platform.OS !== 'android') {
+    return false;
+  }
   return isPangleInitialized && isPangleAvailable;
 };
 
@@ -101,6 +105,15 @@ export const loadAndShowRewardedAd = async (
   onAdFailedToLoad?: (error: Error) => void,
 ): Promise<void> => {
   try {
+
+    if (Platform.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(new Error('Pangle은 안드로이드에서만 지원됩니다.'));
+      }
+      return;
+    }
+
     if (!isPangleAvailable) {
       console.warn('[Pangle] Pangle이 사용 불가능합니다.');
       if (onAdFailedToLoad) {
@@ -248,6 +261,12 @@ let appOpenAdLoaded = false;
 
 export const loadAndShowAppOpenAd = async (): Promise<void> => {
   try {
+
+    if (Platform.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      return;
+    }
+
     if (!isPangleAvailable) {
       console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
       return;
