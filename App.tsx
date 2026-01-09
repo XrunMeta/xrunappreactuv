@@ -801,19 +801,21 @@ export default function v_6540c3() {
         console.error('[App] Taboola 초기화 실패:', v_5e9bfe);
       }
 
-      setTimeout(() => {
-        v_f095b0().then(() => {
-          console.log('[App] Pangle 초기화 완료');
+      if (v_326be8.OS === 'android') {
+        setTimeout(() => {
+          v_f095b0().then(() => {
+            console.log('[App] Pangle 초기화 완료');
 
-          setTimeout(() => {
-            v_e55270().catch((v_5e9bfe) => {
-              console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
-            });
-          }, 500); 
-        }).catch((v_5e9bfe) => {
-          console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
-        });
-      }, 1000); 
+            setTimeout(() => {
+              v_e55270().catch((v_5e9bfe) => {
+                console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+              });
+            }, 500); 
+          }).catch((v_5e9bfe) => {
+            console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
+          });
+        }, 1000); 
+      }
 
       try {
         console.log('[App] TopAd5 광고 캐시 시작');

@@ -81,6 +81,10 @@ export const v_ad3a98 = async (): Promise<boolean> => {
 };
 
 export const v_8c8ab6 = (): boolean => {
+
+  if (v_326be8.OS !== 'android') {
+    return false;
+  }
   return v_8f0d89 && v_d0574b;
 };
 
@@ -101,6 +105,15 @@ export const v_18f201 = async (
   v_0721a3,
 ): Promise<void> => {
   try {
+
+    if (v_326be8.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      if (v_0721a3) {
+        v_0721a3(new Error('Pangle은 안드로이드에서만 지원됩니다.'));
+      }
+      return;
+    }
+
     if (!v_d0574b) {
       console.warn('[Pangle] Pangle이 사용 불가능합니다.');
       if (v_0721a3) {
@@ -248,6 +261,12 @@ let v_8e7548 = false;
 
 export const v_e55270 = async (): Promise<void> => {
   try {
+
+    if (v_326be8.OS !== 'android') {
+      console.warn('[Pangle] 안드로이드에서만 지원됩니다.');
+      return;
+    }
+
     if (!v_d0574b) {
       console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
       return;
