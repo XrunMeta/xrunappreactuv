@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -58,6 +59,7 @@ interface ShowPockAdScreenProps {
 
 export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
   const { navigate, reset, goBack } = useAppNavigation();
 
@@ -748,14 +750,21 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
         presentationStyle="fullScreen"
       >
         <View style={styles.webViewContainer}>
-          <View style={styles.webViewHeader}>
+          <StatusBar style="dark" />
+          <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
             <TouchableOpacity
               onPress={handleWebViewClose}
               style={styles.webViewCloseButton}
             >
               <Text style={styles.webViewCloseText}>닫기</Text>
             </TouchableOpacity>
-            <Text style={styles.webViewTitle}>광고 보기</Text>
+            <Text 
+              style={styles.webViewTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {pockAdData?.ad_name || advertisementParams?.name || '광고 보기'}
+            </Text>
             <View style={styles.webViewCloseButton} />
           </View>
           {webViewUrl ? (
@@ -1258,18 +1267,17 @@ const styles = StyleSheet.create({
   },
   webViewContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   webViewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'ios' ? 50 : 12,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 0,
+    backgroundColor: '#FFFFFF',
+    marginTop: 0,
   },
   webViewCloseButton: {
     padding: 8,
@@ -1281,14 +1289,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
   },
   webViewTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: FONTS.size.mmedium,
     fontFamily: 'Roboto-Bold',
+    color: '#343a59',
+    textAlign: 'center',
+    flex: 1,
+    overflow: 'hidden',
   },
   webViewWrapper: {
     flex: 1,
     padding: 10,
+    paddingBottom: Platform.OS === 'android' ? 40 : 10, 
   },
   webView: {
     flex: 1,
