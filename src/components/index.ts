@@ -42,3 +42,5 @@ export type { SafeScrollViewProps } from './SafeScrollView';
 export { LevelNotification } from './LevelNotification';
 export { AddressInfoItem } from './AddressInfoItem';
 export { VersionUpdateDialog } from './VersionUpdateDialog';
+
+export { AdMobRewardedButton } from './AdMobRewardedButton';
