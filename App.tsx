@@ -785,7 +785,7 @@ export default function v_6540c3() {
           const v_9ef7b6 = await v_e84827.getItem('isAdCompleted');
           if (v_9ef7b6 === 'true') {
             console.log('[App] 광고 보기 완료');
-            v_cba33f('광고보기를 완료했습니다');
+
             await v_e84827.removeItem('isAdCompleted');
             console.log('[App] isAdCompleted 제거 완료');
           }
