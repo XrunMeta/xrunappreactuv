@@ -22,7 +22,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7 } from '../services';
+import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -2226,18 +2226,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.warn('[WebView 모달] removeAdFromTopAd5 실패 (무시):', v_61e099);
           }
 
-          try {
-            const v_c06630 = await v_e84827.getItem('completedAdsCache');
-            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
-            if (!v_e2a6a6.includes(v_aa0917)) {
-              v_e2a6a6.push(v_aa0917);
-              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
-              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[WebView 모달] completedAdsCache에 추가: ${v_aa0917}`);
-            }
-          } catch (v_2bf859) {
-            console.warn('[WebView 모달] completedAdsCache 업데이트 실패:', v_2bf859);
-          }
+          await v_5e0191(v_aa0917);
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
@@ -2559,18 +2548,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.warn('[navigateToAd] removeAdFromTopAd5 실패 (무시):', v_61e099);
           }
 
-          try {
-            const v_c06630 = await v_e84827.getItem('completedAdsCache');
-            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
-            if (!v_e2a6a6.includes(v_aa0917)) {
-              v_e2a6a6.push(v_aa0917);
-              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
-              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[navigateToAd] completedAdsCache에 추가: ${v_aa0917}`);
-            }
-          } catch (v_2bf859) {
-            console.warn('[navigateToAd] completedAdsCache 업데이트 실패:', v_2bf859);
-          }
+          await v_5e0191(v_aa0917);
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');

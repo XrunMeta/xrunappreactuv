@@ -18,7 +18,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153 } from '../services';
+import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
 import { v_cba33f } from '../utils';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -667,18 +667,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', v_61e099);
           }
 
-          try {
-            const v_c06630 = await v_e84827.getItem('completedAdsCache');
-            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
-            if (!v_e2a6a6.includes(v_aa0917)) {
-              v_e2a6a6.push(v_aa0917);
-              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
-              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[광고보기] completedAdsCache에 추가: ${v_aa0917}`);
-            }
-          } catch (v_2bf859) {
-            console.warn('[광고보기] completedAdsCache 업데이트 실패:', v_2bf859);
-          }
+          await v_5e0191(v_aa0917);
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
