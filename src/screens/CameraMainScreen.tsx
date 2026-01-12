@@ -447,6 +447,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const [v_6ced96, v_cb400d] = v_5ab095('');
 
+  const v_62078f = v_e662ae<v_60c7c3 | null>(null);
+  const v_63031f = v_e662ae<any>(null);
+
   const [v_ef86b6, v_8ce112] = v_5ab095<v_60c7c3[]>([]);
   const [v_b9ce93, v_7bb835] = v_5ab095<any[]>([]); 
   const [v_f6025a, v_42ebfb] = v_5ab095<{ [key: string]: any }>({}); 
@@ -2187,13 +2190,68 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
+      v_62078f.current = v_21cc31;
+      v_63031f.current = v_75c344;
+
       v_e60eaf(v_7ec08d);
       v_cb400d(v_21cc31.name || '광고');
       v_bde9a1(true);
+
+      (async () => {
+        try {
+
+          try {
+            const v_ce5e26 = v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK' ? 'pointclick' : 'nas';
+            console.log('[WebView 모달] processAdReward 호출 시작 (백그라운드)', { campid: v_aa0917, adType: v_ce5e26 });
+            const v_6c45ed = await v_38f5f4(
+              parseInt(v_660822, 10),
+              v_aa0917,
+              v_ce5e26,
+              v_9b57fc,
+            );
+            console.log('[WebView 모달] processAdReward 응답:', v_6c45ed);
+          } catch (v_53d118) {
+            if (v_53d118?.code === 404 || v_53d118?.message?.includes('404')) {
+              console.log('[WebView 모달] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[WebView 모달] processAdReward 실패 (무시):', v_53d118);
+            }
+          }
+
+          try {
+            console.log('[WebView 모달] removeAdFromTopAd5 호출 (백그라운드)');
+            await v_8cba1e(v_aa0917, v_9b57fc);
+            console.log('[WebView 모달] removeAdFromTopAd5 완료');
+          } catch (v_61e099) {
+            console.warn('[WebView 모달] removeAdFromTopAd5 실패 (무시):', v_61e099);
+          }
+
+          try {
+            const v_c06630 = await v_e84827.getItem('completedAdsCache');
+            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
+            if (!v_e2a6a6.includes(v_aa0917)) {
+              v_e2a6a6.push(v_aa0917);
+              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
+              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[WebView 모달] completedAdsCache에 추가: ${v_aa0917}`);
+            }
+          } catch (v_2bf859) {
+            console.warn('[WebView 모달] completedAdsCache 업데이트 실패:', v_2bf859);
+          }
+
+          await v_e84827.setItem('isAdCompleted', 'true');
+          await v_e84827.setItem('shouldRefreshTopAd5', 'true');
+          await v_e84827.setItem('shouldNavigateToCamera', 'true');
+          await v_e84827.setItem('completedAdCampid', v_aa0917);
+          console.log('[WebView 모달] 리워드 처리 완료');
+        } catch (v_39d018) {
+          console.warn('[WebView 모달] 리워드 처리 실패:', v_39d018);
+        }
+      })();
     } catch (v_5e9bfe) {
       console.error('❌ showAdInModal 오류:', v_5e9bfe);
     }
-  }, [v_d48a26]);
+  }, [v_d48a26, v_9b57fc]);
 
   const v_3aa877 = v_de06a3(() => {
     console.log('[WebView] 닫기 버튼 클릭');
@@ -2202,6 +2260,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     v_cb400d('');
     v_6a4dcd(false);
     v_96a9ed(null);
+
+    v_62078f.current = null;
+    v_63031f.current = null;
   }, []);
 
   const v_d59c80 = v_de06a3(async () => {
@@ -2215,15 +2276,81 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       webViewTitle: v_6ced96,
     });
 
-    if (!v_d0b6d4 && !v_04cb77 && v_3b0ada && v_b2dceb) {
+    if (!v_d0b6d4 && !v_04cb77 && v_3b0ada) {
       console.log('⚠️ advertisementParams와 selectedToken이 없지만 WebView 모달이 열려있음. 정보 재구성 시도...');
+
+      if (v_62078f.current && v_63031f.current) {
+        console.log('✅ ref에서 토큰 정보 찾음');
+        v_96a9ed(v_62078f.current);
+        v_d48a26(v_63031f.current);
+
+        setTimeout(() => {
+          v_219124(true);
+          console.log('✅ 광고 상세 모달 표시 완료 (ref 사용)');
+        }, 100);
+        return;
+      }
+
+      if (!v_b2dceb) {
+        console.error('❌ webViewUrl도 없습니다.');
+        v_cba33f('광고 정보를 찾을 수 없습니다.');
+        return;
+      }
 
       try {
         const v_b70733 = await v_5d7ca4();
+        console.log(`[i 아이콘] 저장된 광고 개수: ${v_b70733?.length || 0}`);
+        console.log(`[i 아이콘] 찾을 WebView URL: ${v_b2dceb}`);
+
         if (v_b70733 && Array.isArray(v_b70733)) {
-          const v_d87210 = v_b70733.find(v_ddcfed => 
+
+          v_b70733.forEach((v_ddcfed, v_a56041) => {
+            const v_33a490 = v_ddcfed.urlAD || v_ddcfed.landing_url || '';
+            console.log(`[i 아이콘] 저장된 광고 ${v_a56041 + 1}:`, {
+              campid: v_ddcfed.campid,
+              urlAD: v_33a490,
+              name: v_ddcfed.name,
+            });
+          });
+
+          const v_b0445c = (v_f71b56): string => {
+            try {
+              const v_c029ba = new URL(v_f71b56);
+
+              return `${v_c029ba.protocol}//${v_c029ba.host}${v_c029ba.pathname}`;
+            } catch {
+
+              return v_f71b56;
+            }
+          };
+
+          let v_d87210 = v_b70733.find(v_ddcfed => 
             v_ddcfed.urlAD === v_b2dceb || v_ddcfed.landing_url === v_b2dceb
           );
+
+          if (!v_d87210) {
+            const v_08985f = v_b0445c(v_b2dceb);
+            v_d87210 = v_b70733.find(v_ddcfed => {
+              const v_33a490 = v_ddcfed.urlAD || v_ddcfed.landing_url || '';
+              if (!v_33a490) return false;
+              const v_01b828 = v_b0445c(v_33a490);
+              return v_01b828 === v_08985f;
+            });
+          }
+
+          if (!v_d87210) {
+            const v_19ab2d = v_b2dceb.match(/https?:\/\/([^\/]+)/)?.[1];
+            const v_3614a0 = v_b2dceb.match(/https?:\/\/[^\/]+(\/[^?]*)/)?.[1];
+
+            if (v_19ab2d) {
+              v_d87210 = v_b70733.find(v_ddcfed => {
+                const v_33a490 = v_ddcfed.urlAD || v_ddcfed.landing_url || '';
+                if (!v_33a490) return false;
+                return v_33a490.includes(v_19ab2d) && 
+                       (v_3614a0 ? v_33a490.includes(v_3614a0) : true);
+              });
+            }
+          }
 
           if (v_d87210) {
             console.log('✅ WebView URL로 광고 정보 찾음:', v_d87210);
@@ -2395,14 +2522,69 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
+      v_62078f.current = v_21cc31;
+      v_63031f.current = v_75c344;
+
       v_e60eaf(v_7ec08d);
       v_cb400d(v_21cc31.name || '광고');
       v_bde9a1(true);
       console.log('✅ navigateToAd - WebView 모달 표시 완료');
+
+      (async () => {
+        try {
+
+          try {
+            const v_ce5e26 = v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK' ? 'pointclick' : 'nas';
+            console.log('[navigateToAd] processAdReward 호출 시작 (백그라운드)', { campid: v_aa0917, adType: v_ce5e26 });
+            const v_6c45ed = await v_38f5f4(
+              parseInt(v_660822, 10),
+              v_aa0917,
+              v_ce5e26,
+              v_9b57fc,
+            );
+            console.log('[navigateToAd] processAdReward 응답:', v_6c45ed);
+          } catch (v_53d118) {
+            if (v_53d118?.code === 404 || v_53d118?.message?.includes('404')) {
+              console.log('[navigateToAd] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[navigateToAd] processAdReward 실패 (무시):', v_53d118);
+            }
+          }
+
+          try {
+            console.log('[navigateToAd] removeAdFromTopAd5 호출 (백그라운드)');
+            await v_8cba1e(v_aa0917, v_9b57fc);
+            console.log('[navigateToAd] removeAdFromTopAd5 완료');
+          } catch (v_61e099) {
+            console.warn('[navigateToAd] removeAdFromTopAd5 실패 (무시):', v_61e099);
+          }
+
+          try {
+            const v_c06630 = await v_e84827.getItem('completedAdsCache');
+            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
+            if (!v_e2a6a6.includes(v_aa0917)) {
+              v_e2a6a6.push(v_aa0917);
+              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
+              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[navigateToAd] completedAdsCache에 추가: ${v_aa0917}`);
+            }
+          } catch (v_2bf859) {
+            console.warn('[navigateToAd] completedAdsCache 업데이트 실패:', v_2bf859);
+          }
+
+          await v_e84827.setItem('isAdCompleted', 'true');
+          await v_e84827.setItem('shouldRefreshTopAd5', 'true');
+          await v_e84827.setItem('shouldNavigateToCamera', 'true');
+          await v_e84827.setItem('completedAdCampid', v_aa0917);
+          console.log('[navigateToAd] 리워드 처리 완료');
+        } catch (v_39d018) {
+          console.warn('[navigateToAd] 리워드 처리 실패:', v_39d018);
+        }
+      })();
     } catch (v_5e9bfe) {
       console.error('❌ navigateToAd 오류:', v_5e9bfe);
     }
-  }, [v_d48a26]);
+  }, [v_d48a26, v_9b57fc]);
 
   v_c4deb2(() => {
     if (v_572bd3 && v_04cb77 && !v_6890b1.current) {
