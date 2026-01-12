@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -2226,18 +2226,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.warn('[WebView 모달] removeAdFromTopAd5 실패 (무시):', removeError);
           }
 
-          try {
-            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
-            const cached = cachedStr ? JSON.parse(cachedStr) : [];
-            if (!cached.includes(campid)) {
-              cached.push(campid);
-              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
-              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[WebView 모달] completedAdsCache에 추가: ${campid}`);
-            }
-          } catch (cacheError) {
-            console.warn('[WebView 모달] completedAdsCache 업데이트 실패:', cacheError);
-          }
+          await addToCompletedAdsCache(campid);
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
@@ -2559,18 +2548,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.warn('[navigateToAd] removeAdFromTopAd5 실패 (무시):', removeError);
           }
 
-          try {
-            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
-            const cached = cachedStr ? JSON.parse(cachedStr) : [];
-            if (!cached.includes(campid)) {
-              cached.push(campid);
-              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
-              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[navigateToAd] completedAdsCache에 추가: ${campid}`);
-            }
-          } catch (cacheError) {
-            console.warn('[navigateToAd] completedAdsCache 업데이트 실패:', cacheError);
-          }
+          await addToCompletedAdsCache(campid);
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
