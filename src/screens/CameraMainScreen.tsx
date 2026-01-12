@@ -447,6 +447,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [webViewUrl, setWebViewUrl] = useState('');
   const [webViewTitle, setWebViewTitle] = useState('');
 
+  const webViewTokenRef = useRef<TokenData | null>(null);
+  const webViewAdParamsRef = useRef<any>(null);
+
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [coinsData, setCoinsData] = useState<any[]>([]); 
   const [cachedAds, setCachedAds] = useState<{ [key: string]: any }>({}); 
@@ -2187,13 +2190,68 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
+      webViewTokenRef.current = token;
+      webViewAdParamsRef.current = adParams;
+
       setWebViewUrl(urlAD);
       setWebViewTitle(token.name || '광고');
       setShowWebViewModal(true);
+
+      (async () => {
+        try {
+
+          try {
+            const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+            console.log('[WebView 모달] processAdReward 호출 시작 (백그라운드)', { campid, adType });
+            const rewardResult = await processAdReward(
+              parseInt(member, 10),
+              campid,
+              adType,
+              navigate,
+            );
+            console.log('[WebView 모달] processAdReward 응답:', rewardResult);
+          } catch (rewardError: any) {
+            if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
+              console.log('[WebView 모달] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[WebView 모달] processAdReward 실패 (무시):', rewardError);
+            }
+          }
+
+          try {
+            console.log('[WebView 모달] removeAdFromTopAd5 호출 (백그라운드)');
+            await removeAdFromTopAd5(campid, navigate);
+            console.log('[WebView 모달] removeAdFromTopAd5 완료');
+          } catch (removeError) {
+            console.warn('[WebView 모달] removeAdFromTopAd5 실패 (무시):', removeError);
+          }
+
+          try {
+            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+            const cached = cachedStr ? JSON.parse(cachedStr) : [];
+            if (!cached.includes(campid)) {
+              cached.push(campid);
+              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
+              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[WebView 모달] completedAdsCache에 추가: ${campid}`);
+            }
+          } catch (cacheError) {
+            console.warn('[WebView 모달] completedAdsCache 업데이트 실패:', cacheError);
+          }
+
+          await AsyncStorage.setItem('isAdCompleted', 'true');
+          await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
+          await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
+          await AsyncStorage.setItem('completedAdCampid', campid);
+          console.log('[WebView 모달] 리워드 처리 완료');
+        } catch (bgError) {
+          console.warn('[WebView 모달] 리워드 처리 실패:', bgError);
+        }
+      })();
     } catch (error) {
       console.error('❌ showAdInModal 오류:', error);
     }
-  }, [setAdvertisementParams]);
+  }, [setAdvertisementParams, navigate]);
 
   const handleWebViewClose = useCallback(() => {
     console.log('[WebView] 닫기 버튼 클릭');
@@ -2202,6 +2260,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     setWebViewTitle('');
     setShowBottomPanel(false);
     setSelectedToken(null);
+
+    webViewTokenRef.current = null;
+    webViewAdParamsRef.current = null;
   }, []);
 
   const handleInfoIconPress = useCallback(async () => {
@@ -2215,15 +2276,81 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       webViewTitle,
     });
 
-    if (!advertisementParams && !selectedToken && showWebViewModal && webViewUrl) {
+    if (!advertisementParams && !selectedToken && showWebViewModal) {
       console.log('⚠️ advertisementParams와 selectedToken이 없지만 WebView 모달이 열려있음. 정보 재구성 시도...');
+
+      if (webViewTokenRef.current && webViewAdParamsRef.current) {
+        console.log('✅ ref에서 토큰 정보 찾음');
+        setSelectedToken(webViewTokenRef.current);
+        setAdvertisementParams(webViewAdParamsRef.current);
+
+        setTimeout(() => {
+          setShowAdModal(true);
+          console.log('✅ 광고 상세 모달 표시 완료 (ref 사용)');
+        }, 100);
+        return;
+      }
+
+      if (!webViewUrl) {
+        console.error('❌ webViewUrl도 없습니다.');
+        showToast('광고 정보를 찾을 수 없습니다.');
+        return;
+      }
 
       try {
         const storedAds = await getStoredTopAd5();
+        console.log(`[i 아이콘] 저장된 광고 개수: ${storedAds?.length || 0}`);
+        console.log(`[i 아이콘] 찾을 WebView URL: ${webViewUrl}`);
+
         if (storedAds && Array.isArray(storedAds)) {
-          const foundAd = storedAds.find(ad => 
+
+          storedAds.forEach((ad, index) => {
+            const adUrl = ad.urlAD || ad.landing_url || '';
+            console.log(`[i 아이콘] 저장된 광고 ${index + 1}:`, {
+              campid: ad.campid,
+              urlAD: adUrl,
+              name: ad.name,
+            });
+          });
+
+          const normalizeUrl = (url: string): string => {
+            try {
+              const urlObj = new URL(url);
+
+              return `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
+            } catch {
+
+              return url;
+            }
+          };
+
+          let foundAd = storedAds.find(ad => 
             ad.urlAD === webViewUrl || ad.landing_url === webViewUrl
           );
+
+          if (!foundAd) {
+            const normalizedWebViewUrl = normalizeUrl(webViewUrl);
+            foundAd = storedAds.find(ad => {
+              const adUrl = ad.urlAD || ad.landing_url || '';
+              if (!adUrl) return false;
+              const normalizedAdUrl = normalizeUrl(adUrl);
+              return normalizedAdUrl === normalizedWebViewUrl;
+            });
+          }
+
+          if (!foundAd) {
+            const webViewDomain = webViewUrl.match(/https?:\/\/([^\/]+)/)?.[1];
+            const webViewPath = webViewUrl.match(/https?:\/\/[^\/]+(\/[^?]*)/)?.[1];
+
+            if (webViewDomain) {
+              foundAd = storedAds.find(ad => {
+                const adUrl = ad.urlAD || ad.landing_url || '';
+                if (!adUrl) return false;
+                return adUrl.includes(webViewDomain) && 
+                       (webViewPath ? adUrl.includes(webViewPath) : true);
+              });
+            }
+          }
 
           if (foundAd) {
             console.log('✅ WebView URL로 광고 정보 찾음:', foundAd);
@@ -2395,14 +2522,69 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
+      webViewTokenRef.current = token;
+      webViewAdParamsRef.current = adParams;
+
       setWebViewUrl(urlAD);
       setWebViewTitle(token.name || '광고');
       setShowWebViewModal(true);
       console.log('✅ navigateToAd - WebView 모달 표시 완료');
+
+      (async () => {
+        try {
+
+          try {
+            const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+            console.log('[navigateToAd] processAdReward 호출 시작 (백그라운드)', { campid, adType });
+            const rewardResult = await processAdReward(
+              parseInt(member, 10),
+              campid,
+              adType,
+              navigate,
+            );
+            console.log('[navigateToAd] processAdReward 응답:', rewardResult);
+          } catch (rewardError: any) {
+            if (rewardError?.code === 404 || rewardError?.message?.includes('404')) {
+              console.log('[navigateToAd] 이미 본 광고 (404) - 정상 처리');
+            } else {
+              console.warn('[navigateToAd] processAdReward 실패 (무시):', rewardError);
+            }
+          }
+
+          try {
+            console.log('[navigateToAd] removeAdFromTopAd5 호출 (백그라운드)');
+            await removeAdFromTopAd5(campid, navigate);
+            console.log('[navigateToAd] removeAdFromTopAd5 완료');
+          } catch (removeError) {
+            console.warn('[navigateToAd] removeAdFromTopAd5 실패 (무시):', removeError);
+          }
+
+          try {
+            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
+            const cached = cachedStr ? JSON.parse(cachedStr) : [];
+            if (!cached.includes(campid)) {
+              cached.push(campid);
+              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
+              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
+              console.log(`[navigateToAd] completedAdsCache에 추가: ${campid}`);
+            }
+          } catch (cacheError) {
+            console.warn('[navigateToAd] completedAdsCache 업데이트 실패:', cacheError);
+          }
+
+          await AsyncStorage.setItem('isAdCompleted', 'true');
+          await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
+          await AsyncStorage.setItem('shouldNavigateToCamera', 'true');
+          await AsyncStorage.setItem('completedAdCampid', campid);
+          console.log('[navigateToAd] 리워드 처리 완료');
+        } catch (bgError) {
+          console.warn('[navigateToAd] 리워드 처리 실패:', bgError);
+        }
+      })();
     } catch (error) {
       console.error('❌ navigateToAd 오류:', error);
     }
-  }, [setAdvertisementParams]);
+  }, [setAdvertisementParams, navigate]);
 
   useEffect(() => {
     if (showBottomPanel && selectedToken && !hasAutoAdTriggeredRef.current) {
