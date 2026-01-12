@@ -24,6 +24,7 @@ import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
+import { Ionicons } from '@expo/vector-icons';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -706,9 +707,27 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
     <View style={styles.root}>
       <StatusBar style="dark" />
 
-      {
-
-}
+      {}
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingHorizontal: 16,
+        paddingTop: insets.top + 12,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        backgroundColor: '#fff',
+      }}>
+        <TouchableOpacity
+          onPress={handleClose}
+          style={{
+            padding: 8,
+          }}
+        >
+          <Ionicons name="close" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
@@ -818,23 +837,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             </View>
           )}
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.watchAdButton}
-              onPress={handleWatchAd}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.watchAdButtonText}>{t('screens.showNapAd.watchAd')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.cancelButtonText}>{t('screens.showNapAd.cancel')}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 

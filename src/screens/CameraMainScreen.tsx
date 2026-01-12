@@ -30,6 +30,8 @@ import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 import { showToast } from '../utils';
 import { collectDeviceInfo } from '../utils/napApiUtils';
+import { WebView } from 'react-native-webview';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -440,6 +442,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const bottomPanelBottom = useRef(new Animated.Value(20)).current;
 
   const [showAdModal, setShowAdModal] = useState(false);
+
+  const [showWebViewModal, setShowWebViewModal] = useState(false);
+  const [webViewUrl, setWebViewUrl] = useState('');
+  const [webViewTitle, setWebViewTitle] = useState('');
 
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [coinsData, setCoinsData] = useState<any[]>([]); 
@@ -2089,7 +2095,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const showAdInModal = useCallback(async (token: TokenData) => {
     try {
-      console.log('=== showAdInModal 함수 시작 ===');
+      console.log('=== showAdInModal 함수 시작 (WebView 모달) ===');
       console.log('📥 전달받은 토큰 원본:', JSON.stringify(token, null, 2));
 
       const userData = await AsyncStorage.getItem('userData');
@@ -2156,6 +2162,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         }
       }
 
+      if (!urlAD || urlAD === '') {
+        console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
+        showToast('광고 URL을 찾을 수 없습니다.');
+        return;
+      }
+
       const adParams = {
         member: member,
         advertisement: advertisement,
@@ -2166,7 +2178,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
         ad_company: adCompany,
-        urlAD: urlAD && urlAD !== '없음' ? urlAD : '', 
+        urlAD: urlAD && urlAD !== '없음' ? urlAD : '',
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(adParams, null, 2));
@@ -2175,14 +2187,92 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
-      setTimeout(() => {
-        console.log('🔄 Context 업데이트 완료 - 모달 표시');
-        setShowAdModal(true);
-      }, 100);
+      setWebViewUrl(urlAD);
+      setWebViewTitle(token.name || '광고');
+      setShowWebViewModal(true);
     } catch (error) {
       console.error('❌ showAdInModal 오류:', error);
     }
   }, [setAdvertisementParams]);
+
+  const handleWebViewClose = useCallback(() => {
+    console.log('[WebView] 닫기 버튼 클릭');
+    setShowWebViewModal(false);
+    setWebViewUrl('');
+    setWebViewTitle('');
+    setShowBottomPanel(false);
+    setSelectedToken(null);
+  }, []);
+
+  const handleInfoIconPress = useCallback(async () => {
+    console.log('i 아이콘 클릭 - 광고 상세 모달 표시 (WebView 모달 유지)');
+    console.log('현재 상태 확인:', {
+      showAdModal,
+      showWebViewModal,
+      hasAdvertisementParams: !!advertisementParams,
+      hasSelectedToken: !!selectedToken,
+      webViewUrl,
+      webViewTitle,
+    });
+
+    if (!advertisementParams && !selectedToken && showWebViewModal && webViewUrl) {
+      console.log('⚠️ advertisementParams와 selectedToken이 없지만 WebView 모달이 열려있음. 정보 재구성 시도...');
+
+      try {
+        const storedAds = await getStoredTopAd5();
+        if (storedAds && Array.isArray(storedAds)) {
+          const foundAd = storedAds.find(ad => 
+            ad.urlAD === webViewUrl || ad.landing_url === webViewUrl
+          );
+
+          if (foundAd) {
+            console.log('✅ WebView URL로 광고 정보 찾음:', foundAd);
+
+            const userData = await AsyncStorage.getItem('userData');
+            if (userData) {
+              const parsedUserData = JSON.parse(userData);
+              const member = parsedUserData?.member?.toString() || '';
+
+              if (member) {
+                const adParams = {
+                  member: member,
+                  advertisement: foundAd.advertisement || foundAd.coin || '',
+                  coin: foundAd.coin || '',
+                  campid: foundAd.campid || '',
+                  joindesc: foundAd.joindesc || '',
+                  name: foundAd.name || webViewTitle || 'XRUN coin',
+                  xrunPrice: foundAd.xrunPrice || 0,
+                  coinScreen: true,
+                  ad_company: foundAd.ad_company || 'nas',
+                  urlAD: webViewUrl,
+                };
+
+                setAdvertisementParams(adParams);
+                console.log('✅ advertisementParams 재설정 완료');
+              }
+            }
+          } else {
+            console.error('❌ WebView URL로 광고 정보를 찾을 수 없습니다.');
+            showToast('광고 정보를 찾을 수 없습니다.');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('❌ 광고 정보 재구성 실패:', error);
+        showToast('광고 정보를 찾을 수 없습니다.');
+        return;
+      }
+    } else if (!advertisementParams && !selectedToken) {
+      console.error('❌ i 아이콘 클릭 - advertisementParams와 selectedToken이 모두 없습니다.');
+      showToast('광고 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    setTimeout(() => {
+      setShowAdModal(true);
+      console.log('✅ 광고 상세 모달 표시 완료');
+    }, 100);
+  }, [showAdModal, showWebViewModal, advertisementParams, selectedToken, webViewUrl, webViewTitle, setAdvertisementParams]);
 
   const navigateToAd = useCallback(async (token: TokenData) => {
     try {
@@ -2249,6 +2339,43 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const adCompany = token.ad_company || 'nas';
       console.log('🔍 ad_company 확인:', adCompany);
 
+      let urlAD = token.urlAD || '';
+
+      if (urlAD === '없음') {
+        urlAD = '';
+      }
+
+      if (!urlAD || urlAD === '') {
+        try {
+          const storedAds = await getStoredTopAd5();
+          if (storedAds && Array.isArray(storedAds)) {
+            const foundAd = storedAds.find(ad => 
+              ad.campid === campid || 
+              String(ad.campid) === String(campid) ||
+              ad.advertisement === advertisement ||
+              String(ad.advertisement) === String(advertisement)
+            );
+            if (foundAd) {
+              urlAD = foundAd.urlAD || foundAd.landing_url || '';
+
+              if (urlAD === '없음') {
+                urlAD = '';
+              }
+              if (urlAD) {
+                console.log(`✅ [navigateToAd] getStoredTopAd5에서 urlAD 찾음:`, urlAD);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('[navigateToAd] getStoredTopAd5에서 urlAD 찾기 실패:', error);
+        }
+      }
+
+      if (!urlAD || urlAD === '') {
+        console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
+        return;
+      }
+
       const adParams = {
         member: member,
         advertisement: advertisement,
@@ -2259,66 +2386,23 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         xrunPrice: token.xrunPrice || 0,
         coinScreen: true,
         ad_company: adCompany,
-        urlAD: token.urlAD || '',
+        urlAD: urlAD && urlAD !== '없음' ? urlAD : '',
       };
 
       console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(adParams, null, 2));
-      console.log('🔍 파라미터 상세:', {
-        member,
-        advertisement,
-        campid,
-        coin: token.coin,
-        name: token.name,
-        xrunPrice: token.xrunPrice,
-        joindesc: token.joindesc,
-        ad_company: adCompany,
-      });
 
-      console.log('🔄 Context에 광고 파라미터 설정 전:', {
-        advertisement: adParams.advertisement,
-        campid: adParams.campid,
-        coin: adParams.coin,
-        name: adParams.name,
-        ad_company: adParams.ad_company,
-      });
+      setSelectedToken(token);
+
       setAdvertisementParams(adParams);
-      console.log('✅ Context에 광고 파라미터 설정 완료:', {
-        advertisement: adParams.advertisement,
-        campid: adParams.campid,
-        coin: adParams.coin,
-        name: adParams.name,
-        ad_company: adParams.ad_company,
-      });
 
-      if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
-
-        console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
-        console.log('🔍 이동 시 전달할 파라미터:', {
-          advertisement: adParams.advertisement,
-          campid: adParams.campid,
-          coin: adParams.coin,
-          name: adParams.name,
-          ad_company: adParams.ad_company,
-        });
-        reset(ROUTES.showPockAd);
-        console.log('✅ ShowPockAd 화면으로 이동 완료');
-      } else {
-
-        console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
-        console.log('🔍 이동 시 전달할 파라미터:', {
-          advertisement: adParams.advertisement,
-          campid: adParams.campid,
-          coin: adParams.coin,
-          name: adParams.name,
-          ad_company: adParams.ad_company,
-        });
-        reset(ROUTES.showNapAd);
-        console.log('✅ ShowNapAd 화면으로 이동 완료');
-      }
+      setWebViewUrl(urlAD);
+      setWebViewTitle(token.name || '광고');
+      setShowWebViewModal(true);
+      console.log('✅ navigateToAd - WebView 모달 표시 완료');
     } catch (error) {
       console.error('❌ navigateToAd 오류:', error);
     }
-  }, [navigate, reset, setAdvertisementParams]);
+  }, [setAdvertisementParams]);
 
   useEffect(() => {
     if (showBottomPanel && selectedToken && !hasAutoAdTriggeredRef.current) {
@@ -2795,23 +2879,91 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       {}
       <Modal
+        visible={showWebViewModal}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={handleWebViewClose}
+      >
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          {}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            paddingTop: Platform.OS === 'ios' ? 50 : 20,
+            paddingBottom: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e0e0e0',
+            backgroundColor: '#fff',
+          }}>
+            {}
+            <TouchableOpacity
+              onPress={handleWebViewClose}
+              style={{
+                padding: 8,
+                width: 40,
+                alignItems: 'flex-start',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+
+            {}
+            <Text style={{
+              fontSize: 18,
+              fontFamily: 'Roboto-Bold',
+              color: '#000',
+              flex: 1,
+              textAlign: 'center',
+            }}>
+              {webViewTitle}
+            </Text>
+
+            {}
+            <TouchableOpacity
+              onPress={handleInfoIconPress}
+              style={{
+                padding: 8,
+                width: 40,
+                alignItems: 'flex-end',
+              }}
+            >
+              <Ionicons name="information-circle-outline" size={24} color="#388Dc8" />
+            </TouchableOpacity>
+          </View>
+
+          {}
+          {webViewUrl ? (
+            <WebView
+              source={{ uri: webViewUrl }}
+              style={{ flex: 1 }}
+              onError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.error('WebView 오류:', nativeEvent);
+              }}
+              onHttpError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.error('WebView HTTP 오류:', nativeEvent);
+              }}
+            />
+          ) : null}
+        </View>
+      </Modal>
+
+      {}
+      <Modal
         visible={showAdModal}
         animationType="slide"
         presentationStyle="fullScreen"
         onRequestClose={() => {
-          console.log('모달 닫기 요청');
+          console.log('광고 상세 모달 닫기 요청');
+
           setShowAdModal(false);
         }}
         onDismiss={() => {
 
-          console.log('📱 [CameraMainScreen] 모달이 완전히 닫혔습니다 (onDismiss)');
-          console.log('📊 [CameraMainScreen] 현재 상태 확인:', {
-            showAdModal,
-            activeTab,
-            loading,
-            tokensCount: tokens?.length ?? 0,
-            appState: AppState.currentState,
-          });
+          console.log('📱 [CameraMainScreen] 광고 상세 모달이 완전히 닫혔습니다 (onDismiss)');
 
           if (Platform.OS === 'ios') {
             console.log('🔄 [CameraMainScreen] onDismiss에서 iOS 복원 트리거');
@@ -2835,9 +2987,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 onClose={async () => {
                   console.log('ShowPockAdScreen 모달 닫기');
                   setShowAdModal(false);
-
-                  setShowBottomPanel(false);
-                  setSelectedToken(null);
 
                   if (autoAdTimeoutRef.current) {
                     console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
@@ -2866,9 +3015,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 onClose={async () => {
                   console.log('ShowNapAdScreen 모달 닫기');
                   setShowAdModal(false);
-
-                  setShowBottomPanel(false);
-                  setSelectedToken(null);
 
                   if (autoAdTimeoutRef.current) {
                     console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
