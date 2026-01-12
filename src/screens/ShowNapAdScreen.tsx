@@ -24,6 +24,7 @@ import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -706,9 +707,27 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     <View style={v_d81136.root}>
       <StatusBar style="dark" />
 
-      {
-
-}
+      {}
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingHorizontal: 16,
+        paddingTop: v_033e14.top + 12,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        backgroundColor: '#fff',
+      }}>
+        <TouchableOpacity
+          onPress={v_7f2e65}
+          style={{
+            padding: 8,
+          }}
+        >
+          <Ionicons name="close" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
 
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
@@ -818,23 +837,6 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             </View>
           )}
 
-          <View style={v_d81136.buttonContainer}>
-            <TouchableOpacity
-              style={v_d81136.watchAdButton}
-              onPress={v_e36569}
-              activeOpacity={0.7}
-            >
-              <Text style={v_d81136.watchAdButtonText}>{v_8d41d7('screens.showNapAd.watchAd')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={v_d81136.cancelButton}
-              onPress={v_5ca23e}
-              activeOpacity={0.7}
-            >
-              <Text style={v_d81136.cancelButtonText}>{v_8d41d7('screens.showNapAd.cancel')}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 

@@ -30,6 +30,8 @@ import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
 import { v_cba33f } from '../utils';
 import { v_f3de6d } from '../utils/napApiUtils';
+import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -440,6 +442,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_8f79f8 = v_e662ae(new v_a2349e.Value(20)).current;
 
   const [v_fa7c50, v_219124] = v_5ab095(false);
+
+  const [v_3b0ada, v_bde9a1] = v_5ab095(false);
+  const [v_b2dceb, v_e60eaf] = v_5ab095('');
+  const [v_6ced96, v_cb400d] = v_5ab095('');
 
   const [v_ef86b6, v_8ce112] = v_5ab095<v_60c7c3[]>([]);
   const [v_b9ce93, v_7bb835] = v_5ab095<any[]>([]); 
@@ -2089,7 +2095,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_794bb0 = v_de06a3(async (token: v_60c7c3) => {
     try {
-      console.log('=== showAdInModal 함수 시작 ===');
+      console.log('=== showAdInModal 함수 시작 (WebView 모달) ===');
       console.log('📥 전달받은 토큰 원본:', JSON.stringify(v_21cc31, null, 2));
 
       const v_ef7306 = await v_e84827.getItem('userData');
@@ -2156,6 +2162,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         }
       }
 
+      if (!v_7ec08d || v_7ec08d === '') {
+        console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
+        v_cba33f('광고 URL을 찾을 수 없습니다.');
+        return;
+      }
+
       const v_75c344 = {
         member: v_660822,
         advertisement: v_5389c3,
@@ -2166,7 +2178,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         xrunPrice: v_21cc31.xrunPrice || 0,
         coinScreen: true,
         ad_company: v_5a9c46,
-        urlAD: v_7ec08d && v_7ec08d !== '없음' ? v_7ec08d : '', 
+        urlAD: v_7ec08d && v_7ec08d !== '없음' ? v_7ec08d : '',
       };
 
       console.log('✅ showAdInModal 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
@@ -2175,14 +2187,92 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
-      setTimeout(() => {
-        console.log('🔄 Context 업데이트 완료 - 모달 표시');
-        v_219124(true);
-      }, 100);
+      v_e60eaf(v_7ec08d);
+      v_cb400d(v_21cc31.name || '광고');
+      v_bde9a1(true);
     } catch (v_5e9bfe) {
       console.error('❌ showAdInModal 오류:', v_5e9bfe);
     }
   }, [v_d48a26]);
+
+  const v_3aa877 = v_de06a3(() => {
+    console.log('[WebView] 닫기 버튼 클릭');
+    v_bde9a1(false);
+    v_e60eaf('');
+    v_cb400d('');
+    v_6a4dcd(false);
+    v_96a9ed(null);
+  }, []);
+
+  const v_d59c80 = v_de06a3(async () => {
+    console.log('i 아이콘 클릭 - 광고 상세 모달 표시 (WebView 모달 유지)');
+    console.log('현재 상태 확인:', {
+      showAdModal: v_fa7c50,
+      showWebViewModal: v_3b0ada,
+      hasAdvertisementParams: !!v_d0b6d4,
+      hasSelectedToken: !!v_04cb77,
+      webViewUrl: v_b2dceb,
+      webViewTitle: v_6ced96,
+    });
+
+    if (!v_d0b6d4 && !v_04cb77 && v_3b0ada && v_b2dceb) {
+      console.log('⚠️ advertisementParams와 selectedToken이 없지만 WebView 모달이 열려있음. 정보 재구성 시도...');
+
+      try {
+        const v_b70733 = await v_5d7ca4();
+        if (v_b70733 && Array.isArray(v_b70733)) {
+          const v_d87210 = v_b70733.find(v_ddcfed => 
+            v_ddcfed.urlAD === v_b2dceb || v_ddcfed.landing_url === v_b2dceb
+          );
+
+          if (v_d87210) {
+            console.log('✅ WebView URL로 광고 정보 찾음:', v_d87210);
+
+            const v_ef7306 = await v_e84827.getItem('userData');
+            if (v_ef7306) {
+              const v_ff39bc = JSON.parse(v_ef7306);
+              const v_660822 = v_ff39bc?.member?.toString() || '';
+
+              if (v_660822) {
+                const v_75c344 = {
+                  member: v_660822,
+                  advertisement: v_d87210.advertisement || v_d87210.coin || '',
+                  coin: v_d87210.coin || '',
+                  campid: v_d87210.campid || '',
+                  joindesc: v_d87210.joindesc || '',
+                  name: v_d87210.name || v_6ced96 || 'XRUN coin',
+                  xrunPrice: v_d87210.xrunPrice || 0,
+                  coinScreen: true,
+                  ad_company: v_d87210.ad_company || 'nas',
+                  urlAD: v_b2dceb,
+                };
+
+                v_d48a26(v_75c344);
+                console.log('✅ advertisementParams 재설정 완료');
+              }
+            }
+          } else {
+            console.error('❌ WebView URL로 광고 정보를 찾을 수 없습니다.');
+            v_cba33f('광고 정보를 찾을 수 없습니다.');
+            return;
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.error('❌ 광고 정보 재구성 실패:', v_5e9bfe);
+        v_cba33f('광고 정보를 찾을 수 없습니다.');
+        return;
+      }
+    } else if (!v_d0b6d4 && !v_04cb77) {
+      console.error('❌ i 아이콘 클릭 - advertisementParams와 selectedToken이 모두 없습니다.');
+      v_cba33f('광고 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    setTimeout(() => {
+      v_219124(true);
+      console.log('✅ 광고 상세 모달 표시 완료');
+    }, 100);
+  }, [v_fa7c50, v_3b0ada, v_d0b6d4, v_04cb77, v_b2dceb, v_6ced96, v_d48a26]);
 
   const v_917f22 = v_de06a3(async (token: v_60c7c3) => {
     try {
@@ -2249,6 +2339,43 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       const v_5a9c46 = v_21cc31.ad_company || 'nas';
       console.log('🔍 ad_company 확인:', v_5a9c46);
 
+      let v_7ec08d = v_21cc31.urlAD || '';
+
+      if (v_7ec08d === '없음') {
+        v_7ec08d = '';
+      }
+
+      if (!v_7ec08d || v_7ec08d === '') {
+        try {
+          const v_b70733 = await v_5d7ca4();
+          if (v_b70733 && Array.isArray(v_b70733)) {
+            const v_d87210 = v_b70733.find(v_ddcfed => 
+              v_ddcfed.campid === v_aa0917 || 
+              String(v_ddcfed.campid) === String(v_aa0917) ||
+              v_ddcfed.advertisement === v_5389c3 ||
+              String(v_ddcfed.advertisement) === String(v_5389c3)
+            );
+            if (v_d87210) {
+              v_7ec08d = v_d87210.urlAD || v_d87210.landing_url || '';
+
+              if (v_7ec08d === '없음') {
+                v_7ec08d = '';
+              }
+              if (v_7ec08d) {
+                console.log(`✅ [navigateToAd] getStoredTopAd5에서 urlAD 찾음:`, v_7ec08d);
+              }
+            }
+          }
+        } catch (v_5e9bfe) {
+          console.warn('[navigateToAd] getStoredTopAd5에서 urlAD 찾기 실패:', v_5e9bfe);
+        }
+      }
+
+      if (!v_7ec08d || v_7ec08d === '') {
+        console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
+        return;
+      }
+
       const v_75c344 = {
         member: v_660822,
         advertisement: v_5389c3,
@@ -2259,66 +2386,23 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         xrunPrice: v_21cc31.xrunPrice || 0,
         coinScreen: true,
         ad_company: v_5a9c46,
-        urlAD: v_21cc31.urlAD || '',
+        urlAD: v_7ec08d && v_7ec08d !== '없음' ? v_7ec08d : '',
       };
 
       console.log('✅ navigateToAd 최종 파라미터:', JSON.stringify(v_75c344, null, 2));
-      console.log('🔍 파라미터 상세:', {
-        member: v_660822,
-        advertisement: v_5389c3,
-        campid: v_aa0917,
-        coin: v_21cc31.coin,
-        name: v_21cc31.name,
-        xrunPrice: v_21cc31.xrunPrice,
-        joindesc: v_21cc31.joindesc,
-        ad_company: v_5a9c46,
-      });
 
-      console.log('🔄 Context에 광고 파라미터 설정 전:', {
-        advertisement: v_75c344.advertisement,
-        campid: v_75c344.campid,
-        coin: v_75c344.coin,
-        name: v_75c344.name,
-        ad_company: v_75c344.ad_company,
-      });
+      v_96a9ed(v_21cc31);
+
       v_d48a26(v_75c344);
-      console.log('✅ Context에 광고 파라미터 설정 완료:', {
-        advertisement: v_75c344.advertisement,
-        campid: v_75c344.campid,
-        coin: v_75c344.coin,
-        name: v_75c344.name,
-        ad_company: v_75c344.ad_company,
-      });
 
-      if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
-
-        console.log('🚀 ShowPockAd 화면으로 이동 시작 (reset 사용)...');
-        console.log('🔍 이동 시 전달할 파라미터:', {
-          advertisement: v_75c344.advertisement,
-          campid: v_75c344.campid,
-          coin: v_75c344.coin,
-          name: v_75c344.name,
-          ad_company: v_75c344.ad_company,
-        });
-        v_487a25(v_ce4741.showPockAd);
-        console.log('✅ ShowPockAd 화면으로 이동 완료');
-      } else {
-
-        console.log('🚀 ShowNapAd 화면으로 이동 시작 (reset 사용)...');
-        console.log('🔍 이동 시 전달할 파라미터:', {
-          advertisement: v_75c344.advertisement,
-          campid: v_75c344.campid,
-          coin: v_75c344.coin,
-          name: v_75c344.name,
-          ad_company: v_75c344.ad_company,
-        });
-        v_487a25(v_ce4741.showNapAd);
-        console.log('✅ ShowNapAd 화면으로 이동 완료');
-      }
+      v_e60eaf(v_7ec08d);
+      v_cb400d(v_21cc31.name || '광고');
+      v_bde9a1(true);
+      console.log('✅ navigateToAd - WebView 모달 표시 완료');
     } catch (v_5e9bfe) {
       console.error('❌ navigateToAd 오류:', v_5e9bfe);
     }
-  }, [v_9b57fc, v_487a25, v_d48a26]);
+  }, [v_d48a26]);
 
   v_c4deb2(() => {
     if (v_572bd3 && v_04cb77 && !v_6890b1.current) {
@@ -2795,23 +2879,91 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       {}
       <Modal
+        visible={v_3b0ada}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={v_3aa877}
+      >
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          {}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            paddingTop: v_326be8.OS === 'ios' ? 50 : 20,
+            paddingBottom: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e0e0e0',
+            backgroundColor: '#fff',
+          }}>
+            {}
+            <TouchableOpacity
+              onPress={v_3aa877}
+              style={{
+                padding: 8,
+                width: 40,
+                alignItems: 'flex-start',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+
+            {}
+            <Text style={{
+              fontSize: 18,
+              fontFamily: 'Roboto-Bold',
+              color: '#000',
+              flex: 1,
+              textAlign: 'center',
+            }}>
+              {v_6ced96}
+            </Text>
+
+            {}
+            <TouchableOpacity
+              onPress={v_d59c80}
+              style={{
+                padding: 8,
+                width: 40,
+                alignItems: 'flex-end',
+              }}
+            >
+              <Ionicons name="information-circle-outline" size={24} color="#388Dc8" />
+            </TouchableOpacity>
+          </View>
+
+          {}
+          {v_b2dceb ? (
+            <WebView
+              source={{ uri: v_b2dceb }}
+              style={{ flex: 1 }}
+              onError={(v_6f3a9d) => {
+                const { nativeEvent: v_76b943 } = v_6f3a9d;
+                console.error('WebView 오류:', v_76b943);
+              }}
+              onHttpError={(v_6f3a9d) => {
+                const { nativeEvent: v_76b943 } = v_6f3a9d;
+                console.error('WebView HTTP 오류:', v_76b943);
+              }}
+            />
+          ) : null}
+        </View>
+      </Modal>
+
+      {}
+      <Modal
         visible={v_fa7c50}
         animationType="slide"
         presentationStyle="fullScreen"
         onRequestClose={() => {
-          console.log('모달 닫기 요청');
+          console.log('광고 상세 모달 닫기 요청');
+
           v_219124(false);
         }}
         onDismiss={() => {
 
-          console.log('📱 [CameraMainScreen] 모달이 완전히 닫혔습니다 (onDismiss)');
-          console.log('📊 [CameraMainScreen] 현재 상태 확인:', {
-            showAdModal: v_fa7c50,
-            activeTab: v_ac1d22,
-            loading: v_683210,
-            tokensCount: v_ef86b6?.length ?? 0,
-            appState: v_6b5698.currentState,
-          });
+          console.log('📱 [CameraMainScreen] 광고 상세 모달이 완전히 닫혔습니다 (onDismiss)');
 
           if (v_326be8.OS === 'ios') {
             console.log('🔄 [CameraMainScreen] onDismiss에서 iOS 복원 트리거');
@@ -2835,9 +2987,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 onClose={async () => {
                   console.log('ShowPockAdScreen 모달 닫기');
                   v_219124(false);
-
-                  v_6a4dcd(false);
-                  v_96a9ed(null);
 
                   if (v_181e3e.current) {
                     console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
@@ -2866,9 +3015,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 onClose={async () => {
                   console.log('ShowNapAdScreen 모달 닫기');
                   v_219124(false);
-
-                  v_6a4dcd(false);
-                  v_96a9ed(null);
 
                   if (v_181e3e.current) {
                     console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
