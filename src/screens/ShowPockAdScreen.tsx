@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5 } from '../services';
+import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache } from '../services';
 import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -554,18 +554,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose }) =
             console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
           }
 
-          try {
-            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
-            const cached = cachedStr ? JSON.parse(cachedStr) : [];
-            if (!cached.includes(campid)) {
-              cached.push(campid);
-              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
-              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[광고보기] completedAdsCache에 추가: ${campid}`);
-            }
-          } catch (cacheError) {
-            console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
-          }
+          await addToCompletedAdsCache(campid);
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
