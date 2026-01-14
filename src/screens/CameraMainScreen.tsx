@@ -3114,8 +3114,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       {}
       <Modal
         visible={v_fa7c50}
-        animationType="slide"
-        presentationStyle="fullScreen"
+        animationType="fade"
+        transparent={true}
         onRequestClose={() => {
           console.log('광고 상세 모달 닫기 요청');
 
@@ -3132,73 +3132,83 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             }, 100);
           }
         }}>
-        {(() => {
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}>
+          {(() => {
 
-          const v_5a9c46 = v_d0b6d4?.ad_company || v_04cb77?.ad_company || 'nas';
-          console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46, {
-            fromParams: v_d0b6d4?.ad_company,
-            fromToken: v_04cb77?.ad_company,
-            final: v_5a9c46,
-          });
+            const v_5a9c46 = v_d0b6d4?.ad_company || v_04cb77?.ad_company || 'nas';
+            console.log('🔍 모달 내부 ad_company 확인:', v_5a9c46, {
+              fromParams: v_d0b6d4?.ad_company,
+              fromToken: v_04cb77?.ad_company,
+              final: v_5a9c46,
+            });
 
-          if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
-            return (
-              <ShowPockAdScreen
-                onClose={async () => {
-                  console.log('ShowPockAdScreen 모달 닫기');
-                  v_219124(false);
+            if (v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK') {
+              return (
+                <ShowPockAdScreen
+                  onClose={async () => {
+                    console.log('ShowPockAdScreen 모달 닫기');
+                    v_219124(false);
 
-                  if (v_181e3e.current) {
-                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
-                    clearTimeout(v_181e3e.current);
-                    v_181e3e.current = null;
-                  }
-                  if (v_a27ed2.current) {
-                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
-                    clearTimeout(v_a27ed2.current);
-                    v_a27ed2.current = null;
-                  }
-                  v_6890b1.current = false;
+                    if (v_181e3e.current) {
+                      console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                      clearTimeout(v_181e3e.current);
+                      v_181e3e.current = null;
+                    }
+                    if (v_a27ed2.current) {
+                      console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                      clearTimeout(v_a27ed2.current);
+                      v_a27ed2.current = null;
+                    }
+                    v_6890b1.current = false;
 
-                  const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
-                  if (v_764826 === 'true') {
-                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
-                    await v_e84827.removeItem('shouldNavigateToCamera');
+                    const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
+                    if (v_764826 === 'true') {
+                      console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                      await v_e84827.removeItem('shouldNavigateToCamera');
 
-                  }
-                }}
-              />
-            );
-          } else {
-            return (
-              <ShowNapAdScreen
-                onClose={async () => {
-                  console.log('ShowNapAdScreen 모달 닫기');
-                  v_219124(false);
+                    }
+                  }}
+                  isModal={true}
+                />
+              );
+            } else {
+              return (
+                <ShowNapAdScreen
+                  onClose={async () => {
+                    console.log('ShowNapAdScreen 모달 닫기');
+                    v_219124(false);
 
-                  if (v_181e3e.current) {
-                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
-                    clearTimeout(v_181e3e.current);
-                    v_181e3e.current = null;
-                  }
-                  if (v_a27ed2.current) {
-                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
-                    clearTimeout(v_a27ed2.current);
-                    v_a27ed2.current = null;
-                  }
-                  v_6890b1.current = false;
+                    if (v_181e3e.current) {
+                      console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                      clearTimeout(v_181e3e.current);
+                      v_181e3e.current = null;
+                    }
+                    if (v_a27ed2.current) {
+                      console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                      clearTimeout(v_a27ed2.current);
+                      v_a27ed2.current = null;
+                    }
+                    v_6890b1.current = false;
 
-                  const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
-                  if (v_764826 === 'true') {
-                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
-                    await v_e84827.removeItem('shouldNavigateToCamera');
+                    const v_764826 = await v_e84827.getItem('shouldNavigateToCamera');
+                    if (v_764826 === 'true') {
+                      console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                      await v_e84827.removeItem('shouldNavigateToCamera');
 
-                  }
-                }}
-              />
-            );
-          }
-        })()}
+                    }
+                  }}
+                  isModal={true}
+                />
+              );
+            }
+          })()}
+        </View>
         {
 
 }

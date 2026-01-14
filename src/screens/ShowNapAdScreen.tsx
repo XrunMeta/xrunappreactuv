@@ -66,9 +66,10 @@ interface CampaignData {
 
 interface ShowNapAdScreenProps {
   onClose?: () => void; 
+  isModal?: boolean; 
 }
 
-export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8 }) => {
+export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_0890f8, isModal: v_bf1005 = false }) => {
   const { t: v_8d41d7 } = v_772971();
   const v_033e14 = v_e0068c();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
@@ -693,30 +694,32 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   }
 
   return (
-    <View style={v_d81136.root}>
-      <StatusBar style="dark" />
+    <View style={[v_d81136.root, v_bf1005 && v_d81136.modalRoot]}>
+      {!v_bf1005 && <StatusBar style="dark" />}
 
       {}
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 16,
-        paddingTop: v_033e14.top + 12,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-        backgroundColor: '#fff',
-      }}>
-        <TouchableOpacity
-          onPress={v_7f2e65}
-          style={{
-            padding: 8,
-          }}
-        >
-          <Ionicons name="close" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      {!v_bf1005 && (
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: 16,
+          paddingTop: v_033e14.top + 12,
+          paddingBottom: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e0e0e0',
+          backgroundColor: '#fff',
+        }}>
+          <TouchableOpacity
+            onPress={v_7f2e65}
+            style={{
+              padding: 8,
+            }}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
@@ -793,7 +796,23 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
       {}
       {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_3aedd0 && (
-        <View style={v_d81136.campaignContainer}>
+        <View style={[v_d81136.campaignContainer, v_bf1005 && v_d81136.modalCampaignContainer]}>
+          {}
+          {v_bf1005 && (
+            <TouchableOpacity
+              onPress={v_7f2e65}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 10,
+                padding: 8,
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+          )}
           <Text style={v_d81136.campaignTitle}>
             {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
           </Text>
@@ -1062,6 +1081,19 @@ const v_d81136 = v_472849.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  modalRoot: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'transparent',
+  },
+  modalCampaignContainer: {
+    paddingTop: 20, 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 0,
+    marginTop: 0,
+    position: 'relative', 
   },
   loadingContainer: {
     alignItems: 'center',
