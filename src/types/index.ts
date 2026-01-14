@@ -835,6 +835,21 @@ export interface GetSettlementListResponse {
   message?: string;
 }
 
+export interface SettlementCompletedItem {
+  txHash: string | null;
+  member: number;
+  amount: string; 
+  created_at: string;
+  source: 'nas' | 'pointclick';
+  [key: string]: any;
+}
+
+export interface GetSettlementCompletedListResponse {
+  status: 'success' | 'error';
+  data: SettlementCompletedItem[];
+  message?: string;
+}
+
 export interface GetSettlementAmountRequest {
   member: number; 
 }
