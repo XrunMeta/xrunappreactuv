@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Platform, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, Platform, ActivityIndicator, TouchableOpacity, Modal, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,10 +18,11 @@ import {
   fetchQuestList,
   checkQuestUser,
   joinQuest,
+  getSettlementCompletedList,
 } from '../services';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
+import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem, SettlementCompletedItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
 
 type TabValue = 'pending' | 'quest' | 'settled';
@@ -39,6 +40,7 @@ interface AdEntry {
   rewardDescription?: string; 
   extrastr3?: string; 
   hasAttended?: boolean; 
+  txHash?: string | null; 
 }
 
 export const AdWalletScreen = () => {
@@ -342,6 +344,38 @@ export const AdWalletScreen = () => {
     [t, formatDate],
   );
 
+  const convertSettlementToAdEntry = useCallback(
+    (item: SettlementCompletedItem): AdEntry => {
+
+      const status = t('screens.adWallet.settled');
+      const date = formatDate(item.created_at);
+
+      let adRevenueSettlement = '0.00 XRUN';
+      if (item.amount) {
+        try {
+          const settlementValue = parseFloat(item.amount).toFixed(2);
+          adRevenueSettlement = `${settlementValue} XRUN`;
+        } catch (error) {
+          console.log('❌ 정산 금액 파싱 오류:', error);
+        }
+      }
+
+      const id = item.txHash || `settlement-${item.member}-${item.created_at}`;
+
+      return {
+        id,
+        status,
+        date,
+        expectedAdRevenue: '', 
+        adRevenueSettlement,
+        expectedAdRevenueColor: '#111111',
+        adRevenueSettlementColor: '#111111',
+        txHash: item.txHash,
+      };
+    },
+    [t, formatDate],
+  );
+
   const fetchPendingData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
       if (!member) {
@@ -424,32 +458,30 @@ export const AdWalletScreen = () => {
       }
 
       try {
-        const response = await fetchADXRUNResultList(member, params.page);
 
-        const responseData = response.data || response;
-        const items = responseData.items || responseData || [];
-        const pagination = responseData.pagination;
+        const response = await getSettlementCompletedList(member, goBack);
 
-        const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
+        console.log('Raw API Response:', response);
+        console.log('Response Data:', response.data);
+        console.log('Data Array:', (response as any).data?.data);
+        console.log('Data Length:', (response as any).data?.data?.length);
+        console.log('Full Response:', JSON.stringify(response.data, null, 2));
 
-        let hasMore = false;
-        if (pagination) {
-          hasMore = pagination.hasNextPage || false;
-        } else {
-          hasMore = items.length > 0 && items.length >= params.pageSize;
-        }
+        const items = response.data || [];
+
+        const adEntries: AdEntry[] = items.map(convertSettlementToAdEntry);
 
         return {
           data: adEntries,
           total: adEntries.length,
-          hasMore,
+          hasMore: false,
         };
       } catch (error: any) {
         console.error('Failed to fetch settled data:', error);
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertResultToAdEntry],
+    [member, convertSettlementToAdEntry, goBack],
   );
 
   const handleTabChange = useCallback((value: TabValue) => {
@@ -694,6 +726,8 @@ export const AdWalletScreen = () => {
   const AdEntryItem: React.FC<AdEntry & { onPress?: () => void }> = (item) => {
 
     const isQuest = !!item.title;
+
+    const isSettledTab = tab === 'settled';
     const { onPress, ...itemData } = item;
 
     const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
@@ -750,32 +784,89 @@ export const AdWalletScreen = () => {
             )}
           </View>
         )}
-        <View style={styles.adCardRow}>
-          <Text style={[
-            styles.adCardRowLabel,
-            questHasAttended === true && { color: disabledColor }
-          ]}>
-            {isQuest 
-              ? t('screens.adWallet.rewardAmount') 
-              : item.extrastr3 === '출석보상' 
-                ? t('screens.adWallet.attendanceCheckCompletedReward')
-                : t('screens.adWallet.expectedAdRevenue')}
-          </Text>
-          <Text style={[
-            styles.adCardRowAmount,
-            { color: item.expectedAdRevenueColor },
-            questHasAttended === true && { color: disabledColor }
-          ]}>
-            {item.expectedAdRevenue}
-          </Text>
-        </View>
-        {!isQuest && item.extrastr3 !== '출석보상' && (
-        <View style={styles.adCardRow}>
-          <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
-          <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
-            {item.adRevenueSettlement}
-          </Text>
-        </View>
+        {isQuest ? (
+          <View style={styles.adCardRow}>
+            <Text style={[
+              styles.adCardRowLabel,
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {t('screens.adWallet.rewardAmount')}
+            </Text>
+            <Text style={[
+              styles.adCardRowAmount,
+              { color: item.expectedAdRevenueColor },
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {item.expectedAdRevenue}
+            </Text>
+          </View>
+        ) : item.extrastr3 === '출석보상' ? (
+          <View style={styles.adCardRow}>
+            <Text style={[
+              styles.adCardRowLabel,
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {t('screens.adWallet.attendanceCheckCompletedReward')}
+            </Text>
+            <Text style={[
+              styles.adCardRowAmount,
+              { color: item.expectedAdRevenueColor },
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {item.expectedAdRevenue}
+            </Text>
+          </View>
+        ) : isSettledTab ? (
+
+          <>
+            <View style={styles.adCardRow}>
+              <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
+              <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+                {item.adRevenueSettlement}
+              </Text>
+            </View>
+            {item.txHash && (
+              <View style={styles.adCardRow}>
+                <View style={styles.adCardRowSpacer} />
+                <TouchableOpacity
+                  onPress={() => {
+                    const url = `https://polygonscan.com/tx/${item.txHash}`;
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[AdWallet] 블록체인 스캐너 링크 열기 실패:', err);
+                    });
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.blockchainScannerLink}>블록체인 스캐너</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        ) : (
+
+          <>
+            <View style={styles.adCardRow}>
+              <Text style={[
+                styles.adCardRowLabel,
+                questHasAttended === true && { color: disabledColor }
+              ]}>
+                {t('screens.adWallet.expectedAdRevenue')}
+              </Text>
+              <Text style={[
+                styles.adCardRowAmount,
+                { color: item.expectedAdRevenueColor },
+                questHasAttended === true && { color: disabledColor }
+              ]}>
+                {item.expectedAdRevenue}
+              </Text>
+            </View>
+            <View style={styles.adCardRow}>
+              <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
+              <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+                {item.adRevenueSettlement}
+              </Text>
+            </View>
+          </>
         )}
         {
 
@@ -1050,6 +1141,20 @@ const styles = StyleSheet.create({
   adCardRowAmount: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
+  },
+  adCardRowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  adCardRowSpacer: {
+    flex: 1,
+  },
+  blockchainScannerLink: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#1E3A8A',
+    textDecorationLine: 'underline',
   },
   dataList: {
     paddingTop: 0,
