@@ -107,6 +107,8 @@ import {
   GetSavedAdsResponse,
   GetSettlementListRequest,
   GetSettlementListResponse,
+  GetSettlementCompletedListResponse,
+  SettlementCompletedItem,
   GetSettlementAmountRequest,
   GetSettlementAmountResponse,
   GetRankRequest,
@@ -3257,6 +3259,40 @@ export const getSettlementList = async (
     console.error('[정산] 정산 목록 조회 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[정산] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const getSettlementCompletedList = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementCompletedListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = { member };
+
+    console.log('[정산완료] 정산완료 리스트 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementCompletedListResponse>(
+      '/getSettlementList',
+      request,
+    );
+
+    console.log('[정산완료] 정산완료 리스트 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산완료] 정산완료 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산완료] 상세 오류 정보:', {
         url: error.config?.url,
         method: error.config?.method,
         status: error.response?.status,
