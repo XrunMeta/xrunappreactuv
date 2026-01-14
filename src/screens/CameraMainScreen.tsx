@@ -3114,8 +3114,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       {}
       <Modal
         visible={showAdModal}
-        animationType="slide"
-        presentationStyle="fullScreen"
+        animationType="fade"
+        transparent={true}
         onRequestClose={() => {
           console.log('광고 상세 모달 닫기 요청');
 
@@ -3132,73 +3132,83 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             }, 100);
           }
         }}>
-        {(() => {
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}>
+          {(() => {
 
-          const adCompany = advertisementParams?.ad_company || selectedToken?.ad_company || 'nas';
-          console.log('🔍 모달 내부 ad_company 확인:', adCompany, {
-            fromParams: advertisementParams?.ad_company,
-            fromToken: selectedToken?.ad_company,
-            final: adCompany,
-          });
+            const adCompany = advertisementParams?.ad_company || selectedToken?.ad_company || 'nas';
+            console.log('🔍 모달 내부 ad_company 확인:', adCompany, {
+              fromParams: advertisementParams?.ad_company,
+              fromToken: selectedToken?.ad_company,
+              final: adCompany,
+            });
 
-          if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
-            return (
-              <ShowPockAdScreen
-                onClose={async () => {
-                  console.log('ShowPockAdScreen 모달 닫기');
-                  setShowAdModal(false);
+            if (adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK') {
+              return (
+                <ShowPockAdScreen
+                  onClose={async () => {
+                    console.log('ShowPockAdScreen 모달 닫기');
+                    setShowAdModal(false);
 
-                  if (autoAdTimeoutRef.current) {
-                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
-                    clearTimeout(autoAdTimeoutRef.current);
-                    autoAdTimeoutRef.current = null;
-                  }
-                  if (tokenClickTimeoutRef.current) {
-                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
-                    clearTimeout(tokenClickTimeoutRef.current);
-                    tokenClickTimeoutRef.current = null;
-                  }
-                  hasAutoAdTriggeredRef.current = false;
+                    if (autoAdTimeoutRef.current) {
+                      console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                      clearTimeout(autoAdTimeoutRef.current);
+                      autoAdTimeoutRef.current = null;
+                    }
+                    if (tokenClickTimeoutRef.current) {
+                      console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                      clearTimeout(tokenClickTimeoutRef.current);
+                      tokenClickTimeoutRef.current = null;
+                    }
+                    hasAutoAdTriggeredRef.current = false;
 
-                  const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
-                  if (shouldNavigateToCamera === 'true') {
-                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
-                    await AsyncStorage.removeItem('shouldNavigateToCamera');
+                    const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
+                    if (shouldNavigateToCamera === 'true') {
+                      console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                      await AsyncStorage.removeItem('shouldNavigateToCamera');
 
-                  }
-                }}
-              />
-            );
-          } else {
-            return (
-              <ShowNapAdScreen
-                onClose={async () => {
-                  console.log('ShowNapAdScreen 모달 닫기');
-                  setShowAdModal(false);
+                    }
+                  }}
+                  isModal={true}
+                />
+              );
+            } else {
+              return (
+                <ShowNapAdScreen
+                  onClose={async () => {
+                    console.log('ShowNapAdScreen 모달 닫기');
+                    setShowAdModal(false);
 
-                  if (autoAdTimeoutRef.current) {
-                    console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
-                    clearTimeout(autoAdTimeoutRef.current);
-                    autoAdTimeoutRef.current = null;
-                  }
-                  if (tokenClickTimeoutRef.current) {
-                    console.log('🛑 모달 닫기 - 2초 타이머 정리');
-                    clearTimeout(tokenClickTimeoutRef.current);
-                    tokenClickTimeoutRef.current = null;
-                  }
-                  hasAutoAdTriggeredRef.current = false;
+                    if (autoAdTimeoutRef.current) {
+                      console.log('🛑 모달 닫기 - 자동 광고 이동 타이머 정리');
+                      clearTimeout(autoAdTimeoutRef.current);
+                      autoAdTimeoutRef.current = null;
+                    }
+                    if (tokenClickTimeoutRef.current) {
+                      console.log('🛑 모달 닫기 - 2초 타이머 정리');
+                      clearTimeout(tokenClickTimeoutRef.current);
+                      tokenClickTimeoutRef.current = null;
+                    }
+                    hasAutoAdTriggeredRef.current = false;
 
-                  const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
-                  if (shouldNavigateToCamera === 'true') {
-                    console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
-                    await AsyncStorage.removeItem('shouldNavigateToCamera');
+                    const shouldNavigateToCamera = await AsyncStorage.getItem('shouldNavigateToCamera');
+                    if (shouldNavigateToCamera === 'true') {
+                      console.log('[CameraMainScreen] 광고보기 완료 - 이미 AR 화면에 있음');
+                      await AsyncStorage.removeItem('shouldNavigateToCamera');
 
-                  }
-                }}
-              />
-            );
-          }
-        })()}
+                    }
+                  }}
+                  isModal={true}
+                />
+              );
+            }
+          })()}
+        </View>
         {
 
 }

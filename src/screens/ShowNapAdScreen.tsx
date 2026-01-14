@@ -66,9 +66,10 @@ interface CampaignData {
 
 interface ShowNapAdScreenProps {
   onClose?: () => void; 
+  isModal?: boolean; 
 }
 
-export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
+export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isModal = false }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
@@ -693,30 +694,32 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   }
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="dark" />
+    <View style={[styles.root, isModal && styles.modalRoot]}>
+      {!isModal && <StatusBar style="dark" />}
 
       {}
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 16,
-        paddingTop: insets.top + 12,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-        backgroundColor: '#fff',
-      }}>
-        <TouchableOpacity
-          onPress={handleClose}
-          style={{
-            padding: 8,
-          }}
-        >
-          <Ionicons name="close" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      {!isModal && (
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: 16,
+          paddingTop: insets.top + 12,
+          paddingBottom: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e0e0e0',
+          backgroundColor: '#fff',
+        }}>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={{
+              padding: 8,
+            }}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
@@ -793,7 +796,23 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
       {}
       {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
-        <View style={styles.campaignContainer}>
+        <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
+          {}
+          {isModal && (
+            <TouchableOpacity
+              onPress={handleClose}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 10,
+                padding: 8,
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+          )}
           <Text style={styles.campaignTitle}>
             {campaignData.name || t('screens.showNapAd.campaignInfo')}
           </Text>
@@ -1062,6 +1081,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  modalRoot: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'transparent',
+  },
+  modalCampaignContainer: {
+    paddingTop: 20, 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 0,
+    marginTop: 0,
+    position: 'relative', 
   },
   loadingContainer: {
     alignItems: 'center',
