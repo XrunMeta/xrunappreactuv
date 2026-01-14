@@ -1,95 +1,115 @@
-import React from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Dimensions } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PrimaryButton, SecondaryButton, TaboolaBannerCore, SafeScrollView, SafeView } from '../components';
-import { getTaboolaPlacement, getTaboolaPageUrl, isTaboolaNativeModuleAvailable } from '../services/taboola';
-import { COLORS, SIZES, COMMON_STYLES, IS_DEV_MODE, FONTS } from '../constants';
+import { PrimaryButton, SecondaryButton, SafeView } from '../components';
+import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { CameraMainScreen } from './CameraMainScreen';
 import { TaboolaBanner } from '../components/TaboolaBanner';
 
-const XRUN_HORIZONTAL_LOGO = require('../../assets/xrun-horizontal-logo.png');
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+
+interface TutorialItem {
+  id: number;
+  text: string;
+  image: any;
+}
+
+const tutorialData: TutorialItem[] = [
+  {
+    id: 1,
+    text: '광고에 참여하고 XRUN 리워드를 받아보세요',
+    image: require('../../assets/title3.png'),
+  },
+  {
+    id: 2,
+    text: '획득한 XRUN으로 Shop을 이용할 수 있어요',
+    image: require('../../assets/title2.png'),
+  },
+  {
+    id: 3,
+    text: '레퍼럴 코드 공유로 XRUN 리워드 20%를 더 획득하세요',
+    image: require('../../assets/title1.png'),
+  },
+];
 
 export const LoginSignupScreen = () => {
   const { navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
 
-  const placement = getTaboolaPlacement('apploading', true);
-  const pageUrl = getTaboolaPageUrl();
-
-  const handleLogin = () => {
-    navigate(ROUTES.login);
-  };
-
+  const handleLogin = () => navigate(ROUTES.login);
   const handleSignUp = async () => {
-
     try {
-      await AsyncStorage.removeItem('googleSignupRequired');
-      await AsyncStorage.removeItem('googleSignupEmail');
-      await AsyncStorage.removeItem('appleSignupRequired');
-      await AsyncStorage.removeItem('appleSignupEmail');
-      console.log('[회원가입] 일반 회원가입 버튼 클릭 - 소셜 회원가입 플래그 제거');
+      await AsyncStorage.multiRemove([
+        'googleSignupRequired',
+        'googleSignupEmail',
+        'appleSignupRequired',
+        'appleSignupEmail',
+      ]);
     } catch (error) {
       console.error('[회원가입] 소셜 회원가입 플래그 제거 실패:', error);
     }
     navigate(ROUTES.signup);
   };
 
-  const handleTermsOfService = () => {
-    navigate(ROUTES.terms);
+  const handlePageChange = (event: any) => {
+    const page = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+    setCurrentPage(page);
   };
 
-  const handlePrivacyPolicy = () => {
-    navigate(ROUTES.privacy);
-  };
-
-  const handleMyInfoPreview = () => {
-    navigate(ROUTES.myInfo);
-  };
+  const renderTutorialItem = ({ item }: { item: TutorialItem }) => (
+    <View style={styles.tutorialItem}>
+      <Text style={styles.tutorialText}>{item.text}</Text>
+      <Image source={item.image} style={styles.tutorialImage} resizeMode="contain" />
+    </View>
+  );
 
   return (
     <SafeView style={styles.container}>
       <StatusBar style="dark" />
+
       {}
-      <View style={styles.logoContainer}>
-        <Image
-          source={XRUN_HORIZONTAL_LOGO}
-          style={styles.logo}
-          resizeMode="contain"
+      <View style={styles.tutorialContainer}>
+        <FlatList
+          ref={flatListRef}
+          data={tutorialData}
+          renderItem={renderTutorialItem}
+          keyExtractor={(item) => `tutorial-${item.id}`}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handlePageChange}
+          style={styles.tutorialFlatList}
         />
+
+        {}
+        <View style={styles.paginationContainer}>
+          {tutorialData.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.paginationDot,
+                index === currentPage && styles.paginationDotActive,
+              ]}
+            />
+          ))}
+        </View>
       </View>
 
-      <SafeScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-        showBottomBackground={false}
-        disableBottomPadding={true}
-      >
-        {}
-        <View style={styles.adContainer}>
-          <TaboolaBannerCore
-            placementType={placement}
-            pageUrl={pageUrl}
-            style={styles.adWebView}
-            containerStyle={styles.adWebView}
-          />
-        </View>
-      </SafeScrollView>
       {}
       <View style={styles.buttonContainer}>
         <PrimaryButton
           title={t('screens.loginSignup.loginButton')}
           onPress={handleLogin}
-          fullWidth={true}
-          style={styles.loginButton}
+          fullWidth
         />
         <SecondaryButton
           title={t('screens.loginSignup.signupButton')}
           onPress={handleSignUp}
-          fullWidth={true}
+          fullWidth
         />
       </View>
 
@@ -104,61 +124,65 @@ export const LoginSignupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     ...COMMON_STYLES.container,
+    flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    ...COMMON_STYLES.scrollContent,
-    minHeight: '100%',
+  tutorialContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: SIZES.xlarge,
+    paddingBottom: SIZES.small,
+  },
+  tutorialFlatList: {
+    width: '100%',
+  },
+  tutorialItem: {
+    width: SCREEN_WIDTH,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: SIZES.large,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  tutorialText: {
+    fontSize: FONTS.size.xlarge,
+    fontFamily: 'Roboto-Bold',
+    color: '#333333',
+    textAlign: 'center',
+    marginBottom: SIZES.large,
+    paddingHorizontal: SIZES.large,
+    lineHeight: FONTS.size.xlarge * 1.4,
+  },
+  tutorialImage: {
+    width: '100%',
+    height: SCREEN_HEIGHT * 0.38,
+    maxWidth: SCREEN_WIDTH - SIZES.large * 2,
+    marginBottom: 0,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: SIZES.small,
+    gap: SIZES.small,
   },
-  logoContainer: {
-    position: 'absolute',
-    top: SCREEN_HEIGHT * 0.3,
-    left: 0,
-    right: 0,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#CCCCCC',
   },
-  logo: {
-    width: 200,
-    height: 60,
-  },
-  adContainer: {
-    marginBottom: SIZES.xlarge,
-    width: '100%',
-    aspectRatio: 3 / 4,
-    height: 'auto',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 44, 
-    alignSelf: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#cccccc',
-  },
-  adWebView: {
-    width: '100%',
-    height: '100%',
+  paginationDotActive: {
+    backgroundColor: '#1E3A8A',
   },
   buttonContainer: {
     width: '100%',
-    marginTop: 'auto', 
     gap: SIZES.medium,
-    alignSelf: 'flex-end',
     paddingHorizontal: SIZES.large,
-    marginBottom: SIZES.xlarge,
+    paddingTop: SIZES.large,
+    paddingBottom: SIZES.medium,
   },
-  loginButton: {
-    marginBottom: 0,
-  },
-
   taboolaContainer: {
     borderWidth: 2,
     borderColor: '#ededed',
   },
-
 });
-
