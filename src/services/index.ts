@@ -107,6 +107,8 @@ import {
   v_758f4f,
   v_e05ff9,
   v_678cf5,
+  v_aca92a,
+  v_a7bce8,
   v_c5ddda,
   v_c8e190,
   v_caa41f,
@@ -3257,6 +3259,40 @@ export const v_b7594c = async (
     console.error('[정산] 정산 목록 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[정산] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_602f88 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_aca92a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = { member: v_660822 };
+
+    console.log('[정산완료] 정산완료 리스트 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_aca92a>(
+      '/getSettlementList',
+      v_576f5a,
+    );
+
+    console.log('[정산완료] 정산완료 리스트 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[정산완료] 정산완료 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[정산완료] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
         method: v_5e9bfe.config?.method,
         status: v_5e9bfe.response?.status,
