@@ -9,7 +9,8 @@ import BigNumber from 'bignumber.js';
 import { Header, SegmentedControl, DataList, SafeView, Dialog } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
-import { formatCurrency, showToast, getColdStartResult } from '../utils';
+import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   fetchADXRUNEstimateList,
   fetchADXRUNResultList,
@@ -43,11 +44,14 @@ interface AdEntry {
   txHash?: string | null; 
   eventStatus?: string; 
   isReferralEvent?: boolean; 
+  eventType?: string; 
+  isReferralInvite?: boolean; 
 }
 
 export const AdWalletScreen = () => {
   const { t, i18n } = useTranslation();
   const { goBack } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [tab, setTab] = useState<TabValue>('pending');
   const [member, setMember] = useState<number | null>(null);
   const [topBannersData, setTopBannersData] = useState<{
@@ -65,6 +69,7 @@ export const AdWalletScreen = () => {
   const [attendanceCheckLoading, setAttendanceCheckLoading] = useState(false);
   const [isJoiningQuest, setIsJoiningQuest] = useState(false);
   const [isColdStart, setIsColdStart] = useState<boolean | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const pendingListRef = useRef<DataListRef>(null);
   const questListRef = useRef<DataListRef>(null);
@@ -81,7 +86,9 @@ export const AdWalletScreen = () => {
 
         const parsedUserData = JSON.parse(resUserData);
         const memberData = parsedUserData.member;
+        const emailData = parsedUserData.email;
         setMember(memberData);
+        setUserEmail(emailData || null);
       } catch (err: any) {
         console.log(`Failed to get member from async storage: ${err}`);
       }
@@ -288,14 +295,15 @@ export const AdWalletScreen = () => {
 
       const date = formatDate(item.start_date || item.created_at);
 
+      const eventType = item.event_type || 'quest';
+      const isReferralInvite = eventType === 'recommendation_invite';
+      const isReferralEvent = eventType === 'recommendation' ||
+                              (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
+
       const originalRewardValue = item.reward_amount_asxrun;
       const rewardAmount = typeof originalRewardValue === 'string' 
         ? parseFloat(originalRewardValue) 
         : originalRewardValue;
-
-      const itemId = item.id;
-      const isReferralEvent = item.event_type === 'recommendation' ||
-                              (typeof itemId === 'string' && itemId.startsWith('recommendation_'));
 
       if (isReferralEvent) {
         console.log('[AdWallet] 추천인 이벤트 변환:', {
@@ -309,7 +317,8 @@ export const AdWalletScreen = () => {
         });
       }
 
-      const expectedAdRevenue = `${rewardAmount.toFixed(2)} XRUN`;
+      const displayRewardAmount = isReferralInvite ? 0 : rewardAmount;
+      const expectedAdRevenue = `${displayRewardAmount.toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const isReviewStatus = item.event_status === 'review';
@@ -329,6 +338,8 @@ export const AdWalletScreen = () => {
         rewardDescription: item.reward_description,
         eventStatus: item.event_status,
         isReferralEvent,
+        eventType,
+        isReferralInvite,
       };
     },
     [t, formatDate],
@@ -454,14 +465,22 @@ export const AdWalletScreen = () => {
 
         const questItems = response.data || [];
 
-        const referralEvents = questItems.filter((item: QuestItem) => {
+        const sortedQuestItems = [...questItems].sort((a, b) => {
+
+          if (a.event_type === 'recommendation_invite') return -1;
+          if (b.event_type === 'recommendation_invite') return 1;
+
+          return 0;
+        });
+
+        const referralEvents = sortedQuestItems.filter((item: QuestItem) => {
           const itemId: string | number = item.id;
           return item.event_type === 'recommendation' ||
                  (typeof itemId === 'string' && itemId.startsWith('recommendation_'));
         });
 
         console.log('[AdWallet] 퀘스트 리스트 조회 결과:', {
-          전체퀘스트개수: questItems.length,
+          전체퀘스트개수: sortedQuestItems.length,
           추천인이벤트개수: referralEvents.length,
           추천인이벤트목록: referralEvents.map((e: QuestItem) => ({
             id: e.id,
@@ -472,7 +491,7 @@ export const AdWalletScreen = () => {
           })),
         });
 
-        const adEntries: AdEntry[] = questItems.map(convertQuestToAdEntry);
+        const adEntries: AdEntry[] = sortedQuestItems.map(convertQuestToAdEntry);
 
         console.log('[AdWallet] 변환된 AdEntry 목록:', adEntries.map((entry) => ({
           id: entry.id,
@@ -575,72 +594,277 @@ export const AdWalletScreen = () => {
       return;
     }
 
+    if (item.isReferralInvite || item.eventType === 'recommendation_invite') {
+      console.log('[AdWallet] 추천인 이벤트 초대하기 클릭:', item.id);
+
+      if (!userEmail) {
+        showToast('사용자 이메일 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      try {
+        await shareReferralLink(t, { email: userEmail }, showAlert, goBack);
+      } catch (error) {
+        console.error('[AdWallet] 공유하기 오류:', error);
+        showToast('공유하기에 실패했습니다.');
+      }
+      return;
+    }
+
     const itemId = item.id;
     const isReferralEvent = item.isReferralEvent ||
+                           item.eventType === 'recommendation' ||
                            (typeof itemId === 'string' && itemId.startsWith('recommendation_'));
 
     if (isReferralEvent) {
-      console.log('[AdWallet] 추천인 이벤트 클릭:', item.id);
+      console.log('[AdWallet] 추천인 이벤트 보상 클릭:', item.id);
 
       if (item.eventStatus === 'review') {
         showToast('추천인 이벤트 보상을 이미 완료했습니다.');
         return;
       }
 
+      const rewardAmount = parseFloat(item.expectedAdRevenue.replace(' XRUN', '')) || 0;
+      if (item.eventStatus !== 'pending' || rewardAmount <= 0) {
+        showToast('보상을 받을 수 없는 상태입니다.');
+        return;
+      }
+
       try {
         setIsJoiningQuest(true);
 
-        let questId: number;
-        let recommendationEventId: number | null = null;
+        if (isPangleReadySync()) {
+          try {
 
-        if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
+            const deviceInfo = await collectDeviceInfo();
 
-          const match = item.id.match(/recommendation_(\d+)/);
-          recommendationEventId = match ? parseInt(match[1], 10) : null;
-          console.log('[AdWallet] 추천인 이벤트 ID 변환:', item.id, '->', recommendationEventId);
+            await loadAndShowRewardedAd(
+              getPangleRewardedAdUnitId(),
+              member.toString(),
+              deviceInfo,
+              async (reward) => {
+                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 보상 수령:', reward);
 
-          if (!recommendationEventId) {
-            console.error('[AdWallet] 유효하지 않은 추천인 이벤트 ID:', item.id);
-            showToast('유효하지 않은 추천인 이벤트 ID입니다.');
-            setIsJoiningQuest(false);
-            return;
+                try {
+
+                  let questId: number;
+                  let recommendationEventId: number | null = null;
+
+                  if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
+
+                    const match = item.id.match(/recommendation_(\d+)/);
+                    recommendationEventId = match ? parseInt(match[1], 10) : null;
+                    console.log('[AdWallet] 추천인 이벤트 ID 변환:', item.id, '->', recommendationEventId);
+
+                    if (!recommendationEventId) {
+                      console.error('[AdWallet] 유효하지 않은 추천인 이벤트 ID:', item.id);
+                      showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                      setIsJoiningQuest(false);
+                      return;
+                    }
+
+                    questId = recommendationEventId;
+                  } else {
+                    questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
+                    if (isNaN(questId) || questId === 0) {
+                      console.error('[AdWallet] 유효하지 않은 quest_id:', item.id, questId);
+                      showToast('유효하지 않은 퀘스트 ID입니다.');
+                      setIsJoiningQuest(false);
+                      return;
+                    }
+                  }
+
+                  const response = await joinQuest(
+                    {
+                      quest_id: questId,
+                      member,
+
+                      ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
+                    },
+                    goBack,
+                  );
+
+                  if (response.status === 'success') {
+                    showToast('추천인 이벤트 보상 완료했습니다.');
+
+                    if (questListRef.current) {
+                      questListRef.current.reloadData();
+                    }
+                  } else {
+                    showToast(response.message || '처리에 실패했습니다.');
+                  }
+                } catch (error) {
+                  console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
+                  showToast('처리에 실패했습니다. 다시 시도해주세요.');
+                } finally {
+                  setIsJoiningQuest(false);
+                }
+              },
+              () => {
+
+                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 닫힘 (시청 미완료)');
+                setIsJoiningQuest(false);
+              },
+              (error) => {
+
+                console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error);
+                showToast('광고를 불러올 수 없습니다. 보상을 진행합니다.');
+
+                (async () => {
+                  try {
+                    let questId: number;
+                    let recommendationEventId: number | null = null;
+
+                    if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
+                      const match = item.id.match(/recommendation_(\d+)/);
+                      recommendationEventId = match ? parseInt(match[1], 10) : null;
+
+                      if (!recommendationEventId) {
+                        showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                        setIsJoiningQuest(false);
+                        return;
+                      }
+
+                      questId = recommendationEventId;
+                    } else {
+                      questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
+                      if (isNaN(questId) || questId === 0) {
+                        showToast('유효하지 않은 퀘스트 ID입니다.');
+                        setIsJoiningQuest(false);
+                        return;
+                      }
+                    }
+
+                    const response = await joinQuest(
+                      {
+                        quest_id: questId,
+                        member,
+                        ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
+                      },
+                      goBack,
+                    );
+
+                    if (response.status === 'success') {
+                      showToast('추천인 이벤트 보상 완료했습니다.');
+                      if (questListRef.current) {
+                        questListRef.current.reloadData();
+                      }
+                    } else {
+                      showToast(response.message || '처리에 실패했습니다.');
+                    }
+                  } catch (error) {
+                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
+                    showToast('처리에 실패했습니다. 다시 시도해주세요.');
+                  } finally {
+                    setIsJoiningQuest(false);
+                  }
+                })();
+              }
+            );
+          } catch (error) {
+            console.error('[AdWallet] 추천인 이벤트 Pangle 광고 표시 오류:', error);
+
+            try {
+              let questId: number;
+              let recommendationEventId: number | null = null;
+
+              if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
+                const match = item.id.match(/recommendation_(\d+)/);
+                recommendationEventId = match ? parseInt(match[1], 10) : null;
+
+                if (!recommendationEventId) {
+                  showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                  setIsJoiningQuest(false);
+                  return;
+                }
+
+                questId = recommendationEventId;
+              } else {
+                questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
+                if (isNaN(questId) || questId === 0) {
+                  showToast('유효하지 않은 퀘스트 ID입니다.');
+                  setIsJoiningQuest(false);
+                  return;
+                }
+              }
+
+              const response = await joinQuest(
+                {
+                  quest_id: questId,
+                  member,
+                  ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
+                },
+                goBack,
+              );
+
+              if (response.status === 'success') {
+                showToast('추천인 이벤트 보상 완료했습니다.');
+                if (questListRef.current) {
+                  questListRef.current.reloadData();
+                }
+              } else {
+                showToast(response.message || '처리에 실패했습니다.');
+              }
+            } catch (questError) {
+              console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', questError);
+              showToast('처리에 실패했습니다. 다시 시도해주세요.');
+            } finally {
+              setIsJoiningQuest(false);
+            }
           }
-
-          questId = recommendationEventId;
         } else {
 
-          questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
-          if (isNaN(questId) || questId === 0) {
-            console.error('[AdWallet] 유효하지 않은 quest_id:', item.id, questId);
-            showToast('유효하지 않은 퀘스트 ID입니다.');
+          try {
+            let questId: number;
+            let recommendationEventId: number | null = null;
+
+            if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
+              const match = item.id.match(/recommendation_(\d+)/);
+              recommendationEventId = match ? parseInt(match[1], 10) : null;
+
+              if (!recommendationEventId) {
+                showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                setIsJoiningQuest(false);
+                return;
+              }
+
+              questId = recommendationEventId;
+            } else {
+              questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
+              if (isNaN(questId) || questId === 0) {
+                showToast('유효하지 않은 퀘스트 ID입니다.');
+                setIsJoiningQuest(false);
+                return;
+              }
+            }
+
+            const response = await joinQuest(
+              {
+                quest_id: questId,
+                member,
+                ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
+              },
+              goBack,
+            );
+
+            if (response.status === 'success') {
+              showToast('추천인 이벤트 보상 완료했습니다.');
+              if (questListRef.current) {
+                questListRef.current.reloadData();
+              }
+            } else {
+              showToast(response.message || '처리에 실패했습니다.');
+            }
+          } catch (error) {
+            console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
+            showToast('처리에 실패했습니다. 다시 시도해주세요.');
+          } finally {
             setIsJoiningQuest(false);
-            return;
           }
-        }
-
-        const response = await joinQuest(
-          {
-            quest_id: questId,
-            member,
-
-            ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
-          },
-          goBack,
-        );
-
-        if (response.status === 'success') {
-          showToast('추천인 이벤트 보상 완료했습니다.');
-
-          if (questListRef.current) {
-            questListRef.current.reloadData();
-          }
-        } else {
-          showToast(response.message || '처리에 실패했습니다.');
         }
       } catch (error) {
-        console.error('[AdWallet] 추천인 이벤트 처리 오류:', error);
+        console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
         showToast('처리에 실패했습니다. 다시 시도해주세요.');
-      } finally {
         setIsJoiningQuest(false);
       }
       return;
@@ -671,7 +895,7 @@ export const AdWalletScreen = () => {
         setAttendanceCheckLoading(false);
       }
     }
-  }, [tab, member, goBack, t]);
+  }, [tab, member, goBack, t, userEmail, showAlert]);
 
   const handleDialogClose = useCallback(() => {
 
@@ -870,9 +1094,19 @@ export const AdWalletScreen = () => {
 
     const questHasAttended = isQuestIdOne ? item.hasAttended : undefined;
 
-    const isReferralEventReview = item.isReferralEvent && item.eventStatus === 'review';
+    const isReferralInvite = item.isReferralInvite || item.eventType === 'recommendation_invite';
 
-    const isDisabled = questHasAttended === true || isReferralEventReview;
+    const isReferralReward = item.isReferralEvent || item.eventType === 'recommendation';
+
+    const isReferralRewardDisabled = isReferralReward && (
+      item.eventStatus === 'review' ||
+      (item.description && (
+        item.description.includes('심사중') ||
+        item.description.includes('완료')
+      ))
+    );
+
+    const isDisabled = !isReferralInvite && (questHasAttended === true || isReferralRewardDisabled);
 
     const cardStyle = isQuestIdOne
       ? isDisabled
@@ -926,39 +1160,42 @@ export const AdWalletScreen = () => {
         )}
         {isQuest ? (
 
-          item.isReferralEvent ? (
-            <View style={styles.adCardRow}>
-              <Text style={[
-                styles.adCardRowLabel,
-                isDisabled && { color: disabledColor }
-              ]}>
-                보상금액
-              </Text>
-              <Text style={[
-                styles.adCardRowAmount,
-                { color: item.expectedAdRevenueColor },
-                isDisabled && { color: disabledColor }
-              ]}>
-                {item.expectedAdRevenue}
-              </Text>
-            </View>
-          ) : (
+          isReferralInvite ? null : (
 
-            <View style={styles.adCardRow}>
-              <Text style={[
-                styles.adCardRowLabel,
-                isDisabled && { color: disabledColor }
-              ]}>
-                {t('screens.adWallet.rewardAmount')}
-              </Text>
-              <Text style={[
-                styles.adCardRowAmount,
-                { color: item.expectedAdRevenueColor },
-                isDisabled && { color: disabledColor }
-              ]}>
-                {item.expectedAdRevenue}
-              </Text>
-            </View>
+            item.isReferralEvent ? (
+              <View style={styles.adCardRow}>
+                <Text style={[
+                  styles.adCardRowLabel,
+                  isDisabled && { color: disabledColor }
+                ]}>
+                  보상금액
+                </Text>
+                <Text style={[
+                  styles.adCardRowAmount,
+                  { color: item.expectedAdRevenueColor },
+                  isDisabled && { color: disabledColor }
+                ]}>
+                  {item.expectedAdRevenue}
+                </Text>
+              </View>
+            ) : (
+
+              <View style={styles.adCardRow}>
+                <Text style={[
+                  styles.adCardRowLabel,
+                  isDisabled && { color: disabledColor }
+                ]}>
+                  {t('screens.adWallet.rewardAmount')}
+                </Text>
+                <Text style={[
+                  styles.adCardRowAmount,
+                  { color: item.expectedAdRevenueColor },
+                  isDisabled && { color: disabledColor }
+                ]}>
+                  {item.expectedAdRevenue}
+                </Text>
+              </View>
+            )
           )
         ) : item.extrastr3 === '출석보상' ? (
           <View style={styles.adCardRow}>
