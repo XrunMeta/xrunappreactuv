@@ -474,30 +474,48 @@ export const SignupScreen = () => {
       } else {
 
         console.log('[회원가입] 2단계: 추천인 이메일이 비어있음 - 알림 표시');
-        const buttonIndex = await showAlert(
-          t('screens.signup.alerts.referralEmpty'),
-          t('screens.signup.errors.referralEmpty'),
-          [
-            {
-              text: t('screens.signup.alerts.inputReferral'),
-              style: 'cancel',
-              onPress: () => {
-                setIsSubmitting(false);
-              },
-            },
-            {
-              text: t('screens.signup.alerts.confirm'),
-              onPress: () => {
+        const title = t('screens.signup.alerts.referralEmpty');
+        const message = t('screens.signup.errors.referralEmpty');
+        const button1Text = t('screens.signup.alerts.inputReferral');
+        const button2Text = t('screens.signup.alerts.confirm');
 
-              },
-            },
-          ],
-        );
+        console.log('[회원가입] 알림 파라미터:', { title, message, button1Text, button2Text });
 
-        if (buttonIndex === 0) {
-          return;
+        try {
+          const buttonIndex = await showAlert(
+            title,
+            message,
+            [
+              {
+                text: button1Text,
+                style: 'cancel',
+                onPress: () => {
+                  console.log('[회원가입] 입력하기 버튼 클릭');
+                  setIsSubmitting(false);
+                },
+              },
+              {
+                text: button2Text,
+                onPress: () => {
+                  console.log('[회원가입] 확인 버튼 클릭');
+
+                },
+              },
+            ],
+          );
+
+          console.log('[회원가입] 알림 버튼 인덱스:', buttonIndex);
+
+          if (buttonIndex === 0) {
+            console.log('[회원가입] 입력하기 선택 - 회원가입 중단');
+            return;
+          }
+
+          console.log('[회원가입] 확인 선택 - 계속 진행');
+        } catch (error) {
+          console.error('[회원가입] 알림 표시 오류:', error);
+
         }
-
       }
 
       if (isAppleSignupMode) {

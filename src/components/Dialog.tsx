@@ -60,9 +60,9 @@ export const Dialog: React.FC<DialogProps> = ({
 
           {actions.length > 0 ? (
             <View style={styles.actions}>
-              {actions.map((action) => (
+              {actions.map((action, index) => (
                 <TouchableOpacity
-                  key={action.label}
+                  key={`${action.label}-${index}`}
                   style={[
                     styles.actionButton,
                     action.variant === 'primary' ? styles.primaryButton : styles.secondaryButton,
