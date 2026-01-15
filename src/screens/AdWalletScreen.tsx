@@ -429,24 +429,57 @@ export const AdWalletScreen = () => {
       }
 
       try {
-        const response = await fetchADXRUNEstimateList(member, params.page);
 
-        const responseData = response.data || response;
-        const items = responseData.items || responseData || [];
-        const pagination = responseData.pagination;
+        const estimateResponse = await fetchADXRUNEstimateList(member, params.page);
+        const estimateResponseData = estimateResponse.data || estimateResponse;
+        const estimateItems = estimateResponseData.items || estimateResponseData || [];
+        const pagination = estimateResponseData.pagination;
 
-        const adEntries: AdEntry[] = items.map(convertEstimateToAdEntry);
+        let reviewReferralEvents: AdEntry[] = [];
+        try {
+          const questResponse = await fetchQuestList(member, goBack);
+          const questItems = questResponse.data || [];
+
+          const reviewEvents = questItems.filter((item: QuestItem) => {
+            const isReferralEvent = item.event_type === 'recommendation' ||
+                                    (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
+            return isReferralEvent && item.event_status === 'review';
+          });
+
+          reviewReferralEvents = reviewEvents.map((item: QuestItem) => {
+            const adEntry = convertQuestToAdEntry(item);
+            return {
+              ...adEntry,
+              extrastr3: '추천인이벤트', 
+            };
+          });
+
+          console.log('[AdWallet] 심사중 탭 - review 상태 추천인 이벤트:', {
+            개수: reviewReferralEvents.length,
+            목록: reviewReferralEvents.map(e => ({
+              id: e.id,
+              title: e.title,
+              eventStatus: e.eventStatus,
+            })),
+          });
+        } catch (questError) {
+          console.error('[AdWallet] 심사중 탭 - 추천인 이벤트 조회 오류:', questError);
+        }
+
+        const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
+
+        const allAdEntries = [...estimateAdEntries, ...reviewReferralEvents];
 
         let hasMore = false;
         if (pagination) {
           hasMore = pagination.hasNextPage || false;
         } else {
-          hasMore = items.length > 0 && items.length >= params.pageSize;
+          hasMore = estimateItems.length > 0 && estimateItems.length >= params.pageSize;
         }
 
         return {
-          data: adEntries,
-          total: adEntries.length,
+          data: allAdEntries,
+          total: allAdEntries.length,
           hasMore,
         };
       } catch (error: any) {
@@ -454,7 +487,7 @@ export const AdWalletScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertEstimateToAdEntry],
+    [member, convertEstimateToAdEntry, convertQuestToAdEntry, goBack],
   );
 
   const fetchQuestData = useCallback(
@@ -1123,8 +1156,9 @@ export const AdWalletScreen = () => {
     return (
       <TouchableOpacity
         style={cardStyle}
-        onPress={onPress}
-        activeOpacity={0.7}
+        onPress={isDisabled ? undefined : onPress}
+        activeOpacity={isDisabled ? 1 : 0.7}
+        disabled={isDisabled}
       >
         <View style={styles.adCardHeader}>
           <Text style={[
