@@ -1285,7 +1285,7 @@ export interface ADXRUNTopBannersSettledResponse {
 }
 
 export interface QuestItem {
-  id: number;
+  id: number | string; 
   title: string;
   description: string;
   start_date: string | null;
@@ -1295,6 +1295,8 @@ export interface QuestItem {
   reward_description: string;
   is_active: boolean;
   created_at: string;
+  event_status?: string; 
+  event_type?: string; 
 }
 
 export interface QuestListResponse {
