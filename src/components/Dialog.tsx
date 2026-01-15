@@ -121,13 +121,17 @@ const v_d81136 = v_472849.create({
     justifyContent: 'center',
     marginBottom: 12,
     position: 'relative',
+    minHeight: 32,
   },
   title: {
-    flex: 1,
     fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
   close: {
     position: 'absolute',
