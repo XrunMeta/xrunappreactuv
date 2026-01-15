@@ -60,9 +60,9 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
 
           {v_dd943a.length > 0 ? (
             <View style={v_d81136.actions}>
-              {v_dd943a.map((v_9b064f) => (
+              {v_dd943a.map((v_9b064f, v_a56041) => (
                 <TouchableOpacity
-                  key={v_9b064f.label}
+                  key={`${v_9b064f.label}-${v_a56041}`}
                   style={[
                     v_d81136.actionButton,
                     v_9b064f.variant === 'primary' ? v_d81136.primaryButton : v_d81136.secondaryButton,

@@ -86,21 +86,29 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
     v_c4deb2(() => {
       if (!v_cf55be) {
         v_639227(v_2e5eaf);
-        v_6a010d(false);
-        v_39975e(null);
-        if (v_a52163) {
+
+        if (v_a52163 && v_72c4b8 && v_43a672) {
+
+          console.log('[ChoiceDialog] visible이 false로 변경 - Promise resolve (button1 기본값)');
           v_a52163('button1'); 
           v_8cff8b(null);
         }
+        v_6a010d(false);
+        v_39975e(null);
       }
-    }, [v_cf55be, v_2e5eaf, v_a52163]);
+    }, [v_cf55be, v_2e5eaf]);
 
     v_298205(v_6d4ed3, () => ({
       open: (v_74a79c): Promise<'button1' | 'button2'> => {
+        console.log('[ChoiceDialog] open 메서드 호출:', v_74a79c);
         return new Promise((v_6f7712) => {
+          console.log('[ChoiceDialog] Promise 생성, config 설정');
           v_39975e(v_74a79c);
           v_6a010d(true);
-          v_8cff8b(() => v_6f7712);
+          v_8cff8b(() => {
+            console.log('[ChoiceDialog] Promise resolve 함수 호출');
+            return v_6f7712;
+          });
           v_639227(0);
         });
       },
@@ -137,10 +145,16 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
       v_9b064f,
       v_5347a3,
     ) => {
-      if (!v_9b064f) return;
+      console.log('[ChoiceDialog] handleAction 호출:', v_5347a3, 'isPromiseMode:', v_72c4b8);
+      if (!v_9b064f) {
+        console.log('[ChoiceDialog] action이 없음');
+        return;
+      }
 
       try {
+        console.log('[ChoiceDialog] action 실행 시작');
         const v_43c42e = await v_9b064f();
+        console.log('[ChoiceDialog] action 실행 완료:', v_43c42e);
         if (typeof v_43c42e === 'string') {
 
           if (v_43c42e in v_ce4741) {
@@ -152,10 +166,13 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
       }
 
       if (v_72c4b8 && v_a52163) {
+        console.log('[ChoiceDialog] Promise resolve 호출:', v_5347a3);
         v_a52163(v_5347a3);
         v_8cff8b(null);
         v_6a010d(false);
         v_39975e(null);
+      } else {
+        console.log('[ChoiceDialog] Promise resolve하지 않음:', { isPromiseMode: v_72c4b8, hasResolve: !!v_a52163 });
       }
     };
 
