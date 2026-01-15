@@ -4182,16 +4182,17 @@ export const v_fe6b99 = async (
 };
 
 export const v_c1fabf = async (
+  v_660822,
   v_c65f5d,
 ): Promise<v_bae79a> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
 
-    console.log('[Quest] 퀘스트 리스트 조회 요청');
+    const v_f71b56 = v_660822 ? `/Quests/list?member=${v_660822}` : '/Quests/list';
 
-    const v_3393e3 = await v_9f42a4.get<v_bae79a>(
-      '/Quests/list',
-    );
+    console.log('[Quest] 퀘스트 리스트 조회 요청', v_660822 ? `(member: ${v_660822})` : '');
+
+    const v_3393e3 = await v_9f42a4.get<v_bae79a>(v_f71b56);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', v_3393e3.data.data?.length || 0, '개');
 
