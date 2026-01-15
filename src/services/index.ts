@@ -4182,16 +4182,17 @@ export const fetchADXRUNTopBannersSettled = async (
 };
 
 export const fetchQuestList = async (
+  member?: number,
   navigation?: any,
 ): Promise<QuestListResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
 
-    console.log('[Quest] 퀘스트 리스트 조회 요청');
+    const url = member ? `/Quests/list?member=${member}` : '/Quests/list';
 
-    const response = await axiosInstance.get<QuestListResponse>(
-      '/Quests/list',
-    );
+    console.log('[Quest] 퀘스트 리스트 조회 요청', member ? `(member: ${member})` : '');
+
+    const response = await axiosInstance.get<QuestListResponse>(url);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', response.data.data?.length || 0, '개');
 
