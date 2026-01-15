@@ -121,13 +121,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
     position: 'relative',
+    minHeight: 32,
   },
   title: {
-    flex: 1,
     fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
   close: {
     position: 'absolute',
