@@ -1348,19 +1348,55 @@ export interface GetItemPurchaseListRequest {
   dateTo?: string; 
 }
 
+export interface PurchaseItemTransaction {
+  transactionId: number | null;
+  amount: number | null;
+  amountXrun: number | null;
+  date: string | null;
+  datetime: string | null;
+  status: number | null;
+  success: boolean;
+  extrastr: string | null;
+  extrastr2: string | null;
+  extrastr3: string | null;
+}
+
+export interface PurchaseItemStorage {
+  storageId: number | null;
+  purchaseNumber: string | null;
+  txID: string | null;
+}
+
 export interface PurchaseItem {
   email: string; 
   name: string; 
   amount: number; 
   purchaseDate: string | null; 
+  transaction?: PurchaseItemTransaction; 
+  storage?: PurchaseItemStorage; 
 }
 
 export interface ItemInfo {
   item: string | null; 
   title: string | null; 
   price: number; 
+  priceXrun: number; 
   participantCount: number; 
   totalSales: number; 
+  totalSalesXrun: number; 
+  description?: string; 
+  maxpurchase?: number; 
+}
+
+export interface GetItemInfoRequest {
+  shopmember: string; 
+}
+
+export interface GetItemInfoResponse {
+  status: 'success' | 'fail' | 'error';
+  code: number;
+  message: string;
+  data: ItemInfo;
 }
 
 export interface GetItemPurchaseListResponse {
@@ -1370,5 +1406,31 @@ export interface GetItemPurchaseListResponse {
   data: {
     itemInfo: ItemInfo;
     purchaseList: PurchaseItem[];
+  };
+}
+
+export interface CreateItemFromAppRequest {
+  shopmember: string; 
+  title: string; 
+  description?: string; 
+  price: number; 
+  priceKRW: number; 
+  priceXrun: number; 
+  sdk: string; 
+  unit?: string; 
+  maxpurchase?: number; 
+  type?: string; 
+  isInapp?: number; 
+  isxrunbuy?: number; 
+  image?: number; 
+  item?: string; 
+}
+
+export interface CreateItemFromAppResponse {
+  status: 'success' | 'fail' | 'error';
+  code: number;
+  message: string;
+  data?: {
+    item: number; 
   };
 }

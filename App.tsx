@@ -53,6 +53,7 @@ import {
   ShopBuyScreen,
   ShopSuccessScreen,
   ShopTicketDetailScreen,
+  ShopItemRegisterScreen,
   ShowNapAdScreen,
   ShowPockAdScreen,
   XRUNinfoScreen,
@@ -476,6 +477,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'shopTicketDetail') {
     return <ShopTicketDetailScreen />;
+  }
+
+  if (currentScreen === 'shopItemRegister') {
+    return <ShopItemRegisterScreen />;
   }
 
   if (currentScreen === 'showNapAd') {
