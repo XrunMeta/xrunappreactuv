@@ -60,6 +60,7 @@ export const ROUTES = {
   shopBuy: 'shopBuy',
   shopSuccess: 'shopSuccess',
   shopTicketDetail: 'shopTicketDetail',
+  shopItemRegister: 'shopItemRegister',
   showNapAd: 'showNapAd',
   showPockAd: 'showPockAd',
   xrunInfo: 'xrunInfo',

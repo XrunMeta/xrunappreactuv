@@ -33,5 +33,10 @@ export default {
   apply: '적용',
 
   noData: '데이터가 없습니다.',
+  noShopmember: '등록된 상점 정보가 없습니다.',
+  noItemData: '등록된 상품이 없거나 구매 내역이 없습니다.',
+
+  addItem: '상품 등록',
+  modify: '수정',
 };
 

@@ -304,20 +304,8 @@ export const AdWalletScreen = () => {
         item.action === 3304 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
       const date = formatDate(item.datetime);
 
-      let expectedAdRevenue = '0 XRUN';
-      if (item.amount && item.extrastr4) {
-        try {
-          const amountValue = parseFloat(item.amount);
-          const extrastr4Value = parseFloat(item.extrastr4);
-
-          if (!isNaN(amountValue) && !isNaN(extrastr4Value) && extrastr4Value !== 0) {
-            const result = (amountValue / extrastr4Value).toFixed(2);
-            expectedAdRevenue = `${result} XRUN`;
-          }
-        } catch (error) {
-          console.log('❌ 광고수익 계산 오류:', error);
-        }
-      }
+      let expectedAdRevenue = '0 XRUN'; 
+          expectedAdRevenue = `${item.expected} XRUN`; 
 
       let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
@@ -438,6 +426,8 @@ export const AdWalletScreen = () => {
         } else {
           hasMore = items.length > 0 && items.length >= params.pageSize;
         }
+
+        console.log('🔍 [fetchSettledData] adEntries:', response);
 
         return {
           data: adEntries,
