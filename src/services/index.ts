@@ -140,6 +140,8 @@ import {
   v_efae6a,
   v_de864e,
   v_3122ba,
+  v_8b0d2e,
+  v_fc6136,
   v_4fdd7c,
   v_ba5864,
   v_5cb2e0,
@@ -157,6 +159,8 @@ import {
   v_250fc3,
   v_5b1062,
   v_3ac6ea,
+  v_7c19d8,
+  v_368e1a,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_f16a74, v_deac27, v_650134 } from './versionCheck';
@@ -406,6 +410,11 @@ export const v_7488d5 = (v_c65f5d) => {
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
       console.log(`[API Request] baseURL: ${v_74a79c.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${v_f409eb}`);
+
+      if (v_74a79c.data instanceof FormData) {
+        delete v_74a79c.headers['Content-Type'];
+        console.log('[API Request] FormData detected, Content-Type header removed');
+      }
 
       if (v_74a79c.data) {
 
@@ -5403,6 +5412,42 @@ export const v_96206e = async (
   }
 };
 
+export const v_9509e3 = async (
+  v_c5bd46,
+  v_c65f5d,
+): Promise<v_368e1a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_7c19d8 = {
+      shopmember: v_c5bd46,
+    };
+
+    console.log('[Shop 매출] 상품 정보 조회 요청:', { shopmember: v_c5bd46 });
+
+    const v_3393e3 = await v_9f42a4.post<v_368e1a>(
+      '/getItemInfo',
+      v_576f5a,
+    );
+
+    console.log('[Shop 매출] 상품 정보 조회 성공:', v_3393e3.data.data?.title || 'No title');
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Shop 매출] 상품 정보 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_09a96d = async (
   v_c5bd46,
   v_2ae65a,
@@ -5449,3 +5494,36 @@ export const v_09a96d = async (
 };
 
 export * from './pangle';
+
+export const v_5027e2 = async (
+  request: v_8b0d2e,
+  v_c65f5d,
+): Promise<v_fc6136> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[상품 등록] 요청:', v_576f5a);
+
+    const v_3393e3 = await v_9f42a4.post<v_fc6136>(
+      '/createItemFromApp',
+      v_576f5a,
+    );
+
+    console.log('[상품 등록] 성공:', v_3393e3.data.status);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[상품 등록] 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[상품 등록] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
