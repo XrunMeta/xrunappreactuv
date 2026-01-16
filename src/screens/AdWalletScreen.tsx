@@ -202,6 +202,11 @@ export const AdWalletScreen = () => {
 
         let utcDateString = utcString.trim();
 
+        const yearMonthPattern = /^\d{4}-\d{2}$/;
+        if (yearMonthPattern.test(utcDateString)) {
+          return utcDateString;
+        }
+
         const hasTimezone = utcDateString.endsWith('Z') || 
           utcDateString.includes('+') || 
           (utcDateString.length > 10 && utcDateString.slice(10).includes('-'));
@@ -417,6 +422,8 @@ export const AdWalletScreen = () => {
         const responseData = response.data || response;
         const items = responseData.items || responseData || [];
         const pagination = responseData.pagination;
+
+        console.log('🔍 [fetchSettledData] responseData:', responseData);
 
         const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
 
@@ -681,10 +688,10 @@ export const AdWalletScreen = () => {
     [t],
   );
 
-  const AdEntryItem: React.FC<AdEntry & { onPress?: () => void }> = (item) => {
+  const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
     const isQuest = !!item.title;
-    const { onPress, ...itemData } = item;
+    const { onPress, tab: itemTab, ...itemData } = item;
 
     const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
 
@@ -740,25 +747,28 @@ export const AdWalletScreen = () => {
             )}
           </View>
         )}
-        <View style={styles.adCardRow}>
-          <Text style={[
-            styles.adCardRowLabel,
-            questHasAttended === true && { color: disabledColor }
-          ]}>
-            {isQuest 
-              ? t('screens.adWallet.rewardAmount') 
-              : item.extrastr3 === '출석보상' 
-                ? t('screens.adWallet.attendanceCheckCompletedReward')
-                : t('screens.adWallet.expectedAdRevenue')}
-          </Text>
-          <Text style={[
-            styles.adCardRowAmount,
-            { color: item.expectedAdRevenueColor },
-            questHasAttended === true && { color: disabledColor }
-          ]}>
-            {item.expectedAdRevenue}
-          </Text>
-        </View>
+        {}
+        {itemTab !== 'settled' && (
+          <View style={styles.adCardRow}>
+            <Text style={[
+              styles.adCardRowLabel,
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {isQuest 
+                ? t('screens.adWallet.rewardAmount') 
+                : item.extrastr3 === '출석보상' 
+                  ? t('screens.adWallet.attendanceCheckCompletedReward')
+                  : t('screens.adWallet.expectedAdRevenue')}
+            </Text>
+            <Text style={[
+              styles.adCardRowAmount,
+              { color: item.expectedAdRevenueColor },
+              questHasAttended === true && { color: disabledColor }
+            ]}>
+              {item.expectedAdRevenue}
+            </Text>
+          </View>
+        )}
         {!isQuest && item.extrastr3 !== '출석보상' && (
         <View style={styles.adCardRow}>
           <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
@@ -828,6 +838,7 @@ export const AdWalletScreen = () => {
               pageSize={20}
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `pending-${item.id}-${index}`}
+              itemProps={{ tab }}
             />
           ) : tab === 'quest' ? (
             <DataList
@@ -838,6 +849,7 @@ export const AdWalletScreen = () => {
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `quest-${item.id}-${index}`}
               onItemPress={handleQuestItemPress}
+              itemProps={{ tab }}
             />
           ) : (
             <DataList
@@ -847,6 +859,7 @@ export const AdWalletScreen = () => {
               pageSize={20}
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `settled-${item.id}-${index}`}
+              itemProps={{ tab }}
             />
           )}
         </View>
