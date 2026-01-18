@@ -40,12 +40,13 @@ export const initializePangle = async (): Promise<void> => {
     });
 
     try {
-      const initPromise = PangleModule.initialize();
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Pangle 초기화 타임아웃')), 10000)
-      );
-
-      await Promise.race([initPromise, timeoutPromise]);
+      if (Platform.OS === 'android') {
+        const initPromise = PangleModule.initialize();
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Pangle 초기화 타임아웃')), 10000)
+        );
+        await Promise.race([initPromise, timeoutPromise]);
+      }
 
       isPangleInitialized = true;
       isPangleAvailable = true;
@@ -401,5 +402,35 @@ export const sendPangleCallback = async (
 
   console.log('[Pangle] 콜백 전송 스킵 (리워드 제공 안 함)');
   return { success: true, message: '콜백 전송 스킵됨' };
+};
+
+export const showNativeScreen = async (): Promise<any> => {
+  if (Platform.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!isPangleNativeModuleAvailable()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await PangleModule.showNativeScreen();
+};
+
+export const loadAndShowInterstitialAd = async (slotId: string = '982684319'): Promise<any> => {
+  if (Platform.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!isPangleNativeModuleAvailable()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await PangleModule.loadAndShowInterstitialAd(slotId);
+};
+
+export const loadAndShowNativeAd = async (slotId: string = '982684334'): Promise<any> => {
+  if (Platform.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!isPangleNativeModuleAvailable()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await PangleModule.loadAndShowNativeAd(slotId);
 };
 
