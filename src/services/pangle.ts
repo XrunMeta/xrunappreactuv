@@ -27,9 +27,14 @@ export const v_f095b0 = async (): Promise<void> => {
     }
 
     if (!v_986693()) {
-      console.warn('[Pangle] 네이티브 모듈을 사용할 수 없습니다.');
-      console.warn('[Pangle] PangleModule이 null이거나 undefined입니다.');
-      console.warn('[Pangle] 네이티브 모듈이 제대로 등록되었는지 확인하세요.');
+
+      if (v_326be8.OS === 'android') {
+        console.log('[Pangle] Android에서는 Google Ad Manager 미디에이션을 통해 Pangle을 사용합니다.');
+        v_d0574b = false;
+        return;
+      }
+
+      console.warn('[Pangle] iOS 네이티브 모듈을 사용할 수 없습니다.');
       v_d0574b = false;
       return;
     }
@@ -168,23 +173,27 @@ export const v_18f201 = async (
       );
       v_60a14d.push(() => v_e6ceb8.remove());
 
-      const v_08c38a = v_1619e5.addListener(
+      const v_08c38a = v_1619e5?.addListener(
         'onRewardedAdLoaded',
         (v_d48baf) => {
           if (v_d48baf.adUnitId === v_819f69) {
             console.log('[Pangle] 보상형 광고 로드 완료');
 
-            v_dae2ac.showRewardedAd(v_819f69).catch((v_5e9bfe) => {
-              console.error('[Pangle] 보상형 광고 표시 실패:', v_5e9bfe);
-              v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
-              if (v_0721a3) {
-                v_0721a3(v_5e9bfe);
-              }
-            });
+            if (v_dae2ac?.showRewardedAd) {
+              v_dae2ac.showRewardedAd(v_819f69).catch((v_5e9bfe) => {
+                console.error('[Pangle] 보상형 광고 표시 실패:', v_5e9bfe);
+                v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
+                if (v_0721a3) {
+                  v_0721a3(v_5e9bfe);
+                }
+              });
+            }
           }
         },
       );
-      v_60a14d.push(() => v_08c38a.remove());
+      if (v_08c38a) {
+        v_60a14d.push(() => v_08c38a.remove());
+      }
 
       const v_30c524 = v_1619e5.addListener(
         'onRewardedAdLoadError',
@@ -210,6 +219,14 @@ export const v_18f201 = async (
         },
       );
       v_60a14d.push(() => v_30c524.remove());
+    }
+
+    if (!v_dae2ac || !v_dae2ac.loadRewardedAd) {
+      const v_5e9bfe = new Error('Pangle 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
+      if (v_0721a3) {
+        v_0721a3(v_5e9bfe);
+      }
+      return;
     }
 
     try {
@@ -293,10 +310,12 @@ export const v_e55270 = async (): Promise<void> => {
             console.log('[Pangle] 앱 오프닝 광고 로드 완료');
             v_8e7548 = true;
 
-            v_dae2ac.showAppOpenAd(v_819f69).catch((v_5e9bfe) => {
-              console.error('[Pangle] 앱 오프닝 광고 표시 실패:', v_5e9bfe);
-              v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
-            });
+            if (v_dae2ac?.showAppOpenAd) {
+              v_dae2ac.showAppOpenAd(v_819f69).catch((v_5e9bfe) => {
+                console.error('[Pangle] 앱 오프닝 광고 표시 실패:', v_5e9bfe);
+                v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
+              });
+            }
           }
         },
       );
@@ -334,6 +353,11 @@ export const v_e55270 = async (): Promise<void> => {
         },
       );
       v_60a14d.push(() => v_30c524.remove());
+    }
+
+    if (!v_dae2ac || !v_dae2ac.loadAppOpenAd) {
+      console.log('[Pangle] 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
+      return;
     }
 
     try {
