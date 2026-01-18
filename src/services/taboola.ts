@@ -165,7 +165,7 @@ export const v_0b0acf = async (): Promise<void> => {
 
     const v_26f42c =
       v_326be8.OS === 'android'
-        ? v_573fcf('TABOOLA_PUBLISHER_ID_ANDROID')
+        ? '' 
         : v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
 
     if (!v_26f42c) {
@@ -189,8 +189,9 @@ export const v_0b0acf = async (): Promise<void> => {
 };
 
 export const v_995f93 = (): string => {
+
   return v_326be8.OS === 'android'
-    ? v_573fcf('TABOOLA_PUBLISHER_ID_ANDROID')
+    ? '' 
     : v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
 };
 
