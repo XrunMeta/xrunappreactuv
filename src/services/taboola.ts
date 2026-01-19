@@ -163,10 +163,7 @@ export const initializeTaboola = async (): Promise<void> => {
       return;
     }
 
-    const publisherId =
-      Platform.OS === 'android'
-        ? '' 
-        : getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
+    const publisherId = getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
 
     if (!publisherId) {
       console.warn('[Taboola] Publisher ID가 설정되지 않았습니다.');
@@ -190,9 +187,7 @@ export const initializeTaboola = async (): Promise<void> => {
 
 export const getTaboolaPublisherId = (): string => {
 
-  return Platform.OS === 'android'
-    ? '' 
-    : getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
+  return getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
 };
 
 export const getTaboolaPlacement = (
