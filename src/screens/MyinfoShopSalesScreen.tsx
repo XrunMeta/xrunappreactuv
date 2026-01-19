@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ShopSalesMemberRow, ShopSalesMemberData, DataList, DataListRef, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { ROUTES, useAppNavigation } from '../navigation';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
-import { getItemPurchaseList } from '../services';
+import { getItemInfo, getItemPurchaseList } from '../services';
 import { PurchaseItem } from '../types';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
@@ -20,15 +20,25 @@ export const MyinfoShopSalesScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [shopmember, setShopmember] = useState<string | null>(null);
   const [itemInfo, setItemInfo] = useState<{
+    item: string | null;
     title: string | null;
     price: number;
+    priceXrun: number;
     participantCount: number;
     totalSales: number;
+    totalSalesXrun: number;
+    description?: string;
+    maxpurchase?: number;
   }>({
+    item: null,
     title: null,
     price: 0,
+    priceXrun: 0,
     participantCount: 0,
     totalSales: 0,
+    totalSalesXrun: 0,
+    description: undefined,
+    maxpurchase: undefined,
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -99,12 +109,67 @@ export const MyinfoShopSalesScreen = () => {
         }
       } catch (error) {
         console.error('[Shop 매출] 사용자 정보 로드 실패:', error);
+        setIsLoading(false);
+      }
+
+    };
+    loadUserData();
+  }, []);
+
+  useEffect(() => {
+    const loadItemInfo = async () => {
+      if (!shopmember) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await getItemInfo(shopmember, navigate);
+
+        if (response.status === 'success' && response.data) {
+          const itemTitle = response.data.title;
+          setItemInfo({
+            item: response.data.item || null,
+            title: itemTitle && itemTitle.trim() ? itemTitle : null,
+            price: response.data.price || 0,
+            priceXrun: response.data.priceXrun || 0,
+            participantCount: response.data.participantCount || 0,
+            totalSales: response.data.totalSales || 0,
+            totalSalesXrun: response.data.totalSalesXrun || 0,
+            description: response.data.description,
+            maxpurchase: response.data.maxpurchase,
+          });
+        } else {
+
+          setItemInfo({
+            item: null,
+            title: null,
+            price: 0,
+            priceXrun: 0,
+            participantCount: 0,
+            totalSales: 0,
+            totalSalesXrun: 0,
+          });
+        }
+      } catch (error) {
+        console.error('[Shop 매출] 상품 정보 조회 실패:', error);
+        setItemInfo({
+          item: null,
+          title: null,
+          price: 0,
+          priceXrun: 0,
+          participantCount: 0,
+          totalSales: 0,
+          totalSalesXrun: 0,
+        });
       } finally {
         setIsLoading(false);
       }
     };
-    loadUserData();
-  }, []);
+
+    loadItemInfo();
+  }, [shopmember, navigate]);
 
   const handlePeriodSelect = (period: PeriodOption) => {
     setSelectedPeriod(period);
@@ -173,6 +238,30 @@ export const MyinfoShopSalesScreen = () => {
     setShowDatePicker(false);
     setIsLoading(true);
     dataListRef.current?.reloadData();
+  };
+
+  const handleModifyItem = async () => {
+    if (!itemInfo.item || !itemInfo.title) {
+      return;
+    }
+
+    try {
+
+      const editItemData = {
+        item: itemInfo.item,
+        title: itemInfo.title,
+        price: itemInfo.price,
+        priceXrun: itemInfo.priceXrun,
+        description: itemInfo.description || '',
+        maxpurchase: itemInfo.maxpurchase || 1,
+        isEditMode: true,
+      };
+      await AsyncStorage.setItem('editShopItem', JSON.stringify(editItemData));
+
+      navigate(ROUTES.shopItemRegister);
+    } catch (error) {
+      console.error('[Shop 매출] 상품 수정 정보 저장 실패:', error);
+    }
   };
 
   useEffect(() => {
@@ -311,15 +400,6 @@ export const MyinfoShopSalesScreen = () => {
 
       if (response.status === 'success' && response.data) {
 
-        if (params.page === 1 && response.data.itemInfo) {
-          setItemInfo({
-            title: response.data.itemInfo.title,
-            price: response.data.itemInfo.price || 0,
-            participantCount: response.data.itemInfo.participantCount || 0,
-            totalSales: response.data.itemInfo.totalSales || 0,
-          });
-        }
-
         const purchaseList = response.data.purchaseList || [];
         const members: ShopSalesMemberData[] = purchaseList.map((purchase: PurchaseItem, index: number) => {
 
@@ -361,12 +441,6 @@ export const MyinfoShopSalesScreen = () => {
       } else {
 
         if (params.page === 1) {
-          setItemInfo({
-            title: null,
-            price: 0,
-            participantCount: 0,
-            totalSales: 0,
-          });
           setIsLoading(false);
         }
         return { data: [], total: 0, hasMore: false };
@@ -399,33 +473,62 @@ export const MyinfoShopSalesScreen = () => {
       />
       <View style={styles.content}>
         {}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>{itemInfo.title || t('screens.myinfoShopSales.productTitle')}</Text>
-          <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{itemInfo.price.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
-          </Text>
-          <Text style={styles.infoText}>
-            {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSales.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> /{t('screens.myinfoShopSales.settlementInfo')}
-          </Text>
-        </View>
+        {!isLoading && shopmember && itemInfo.title && itemInfo.title.trim() ? (
+          <View style={styles.infoCard}>
+            <Text style={styles.infoTitle}>{itemInfo.title}</Text>
+            <Text style={styles.infoText}>
+              {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{itemInfo.price.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
+            </Text>
+            <Text style={styles.infoText}>
+              {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <TouchableOpacity onPress={handleModifyItem} activeOpacity={0.7}><Text style={[styles.infoText, styles.modifyLink]}>{t('screens.myinfoShopSales.modify')}</Text></TouchableOpacity>
+            </Text>
+          </View>
+        ) : null}
 
         {}
-        <View style={styles.selectedPeriodContainer}>
-          <Ionicons name="calendar" size={16} color={COLORS.headerText} />
-          <Text style={styles.selectedPeriodText}>{formatDate(startDateObj)} ~ {formatDate(endDateObj)}</Text>
-        </View>
+        {!isLoading && shopmember && (!itemInfo.title || !itemInfo.title.trim()) ? (
+          <View style={styles.emptyItemContainer}>
+            <Text style={styles.emptyItemDescription}>{t('screens.myinfoShopSales.noItemData')}</Text>
+            <TouchableOpacity
+              style={styles.addItemButton}
+              onPress={() => navigate(ROUTES.shopItemRegister)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={20} color="#ffffff" style={styles.addItemIcon} />
+              <Text style={styles.addItemButtonText}>{t('screens.myinfoShopSales.addItem')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
-        <View style={styles.listContainer}>
-          <DataList<ShopSalesMemberData>
-            ref={dataListRef}
-            fetchData={fetchSalesMembers}
-            ItemComponent={ShopSalesMemberRow}
-            pageSize={20}
-            contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
-            emptyMessage={!isLoading ? t('screens.myinfoShopSales.noData') : undefined}
-            keyExtractor={(item, index) => item.id || `purchase-${index}`}
-          />
-        </View>
+        {}
+        {!isLoading && shopmember && itemInfo.title && (
+          <View style={styles.selectedPeriodContainer}>
+            <Ionicons name="calendar" size={16} color={COLORS.headerText} />
+            <Text style={styles.selectedPeriodText}>{formatDate(startDateObj)} ~ {formatDate(endDateObj)}</Text>
+          </View>
+        )}
+
+        {shopmember ? (
+          itemInfo.title && itemInfo.title.trim() ? (
+            <View style={styles.listContainer}>
+              <DataList<ShopSalesMemberData>
+                ref={dataListRef}
+                fetchData={fetchSalesMembers}
+                ItemComponent={ShopSalesMemberRow}
+                pageSize={20}
+                contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
+                emptyMessage={!isLoading ? t('screens.myinfoShopSales.noData') : undefined}
+                keyExtractor={(item, index) => item.id || `purchase-${index}`}
+              />
+            </View>
+          ) : null
+        ) : (
+          !isLoading && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyDescription}>{t('screens.myinfoShopSales.noShopmember')}</Text>
+            </View>
+          )
+        )}
       </View>
 
       {}
@@ -585,13 +688,48 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: SIZES.xlarge,
   },
   emptyDescription: {
-    fontSize: FONTS.size.msmall,
+    fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 24,
+  },
+  emptyItemContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: SIZES.xlarge,
+    paddingHorizontal: SIZES.large,
+  },
+  emptyItemDescription: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#7d7e83',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: SIZES.large,
+  },
+  addItemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.buttonPrimary,
+    paddingHorizontal: SIZES.xlarge,
+    paddingVertical: SIZES.medium,
+    borderRadius: 12,
+    gap: 8,
+  },
+  addItemIcon: {
+    marginRight: 4,
+  },
+  addItemButtonText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#ffffff',
   },
 
   modalOverlay: {
@@ -789,5 +927,9 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#ffffff',
+  },
+  modifyLink: {
+    color: COLORS.buttonPrimary,
+    textDecorationLine: 'underline',
   },
 });

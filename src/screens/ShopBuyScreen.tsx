@@ -131,9 +131,9 @@ export const ShopBuyScreen = () => {
     console.log('[구매] selectedShopItem:', selectedShopItem);
     const item = selectedShopItem as unknown as ShopItemData;
 
-    const sku = item?.sku?.trim() ?? '';
-    if (sku !== '' && !sku.startsWith('TRANSFER')) {
-      fetchIapProduct(sku);
+    const isXRUNBuy = Boolean(item.isxrunbuy === 0);
+    if (isXRUNBuy) {
+      fetchIapProduct(item.sku);
     }
   }, [selectedShopItem, fetchIapProduct]);
 
@@ -161,9 +161,14 @@ export const ShopBuyScreen = () => {
       const item = (selectedShopItem as unknown) as ShopItemData & { totalPrice?: { coin?: number } };
 
       const sku = item.sku?.trim() ?? '';
-      const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
+      const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER') || !sku.startsWith('GG'));
 
-      if (isIapSku) {
+      const isXRUNBuy = Boolean(item.isxrunbuy === 1);
+
+      console.log('[구매] isXRUNBuy:', isXRUNBuy);
+      console.log('[구매] isIapSku:', isIapSku);
+
+      if (isXRUNBuy) {
 
         console.log('========================================');
         console.log('[구매] === IAP 인앱 구매 시작 ===');
@@ -334,7 +339,10 @@ export const ShopBuyScreen = () => {
   const imageSource: ImageSourcePropType = item.image || require('../../assets/xrun-horizontal-logo.png');
 
   const sku = item.sku?.trim() ?? '';
-  const isIapSku = Boolean(sku !== '' && !sku.startsWith('TRANSFER'));
+  const isIapSku = Boolean(item.isxrunbuy === 0); 
+  if (isIapSku) {
+    fetchIapProduct(item.sku);
+  }
 
   const priceKRW = item.priceKRW || '0';
   const priceXrun = item.price?.coin || item.priceXrun || 0;
