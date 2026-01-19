@@ -753,7 +753,24 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     console.log("ℹ️ [organizeData] 사용된 캐시 소스:", v_60d099 ? "External (Latest)" : "State (May be stale)");
     console.log("ℹ️ [organizeData] 캐시 데이터 수:", Object.keys(v_3b73a5).length);
 
-    const v_908496 = v_88aee2;
+    const v_6385ff = v_88aee2.length;
+    const v_289b73 = v_88aee2.filter((v_d5dda0) => {
+      const v_aa0917 = String(v_d5dda0.campid || '');
+      if (v_aa0917 && v_aa0917 !== '' && v_aa0917 !== 'undefined' && v_7c7dd0.current) {
+        const v_2be890 = v_7c7dd0.current.has(v_aa0917);
+        if (v_2be890) {
+          console.log(`[organizeData] 이미 본 광고 제외: ${v_aa0917}`);
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (v_289b73.length !== v_6385ff) {
+      console.log(`[organizeData] 이미 본 광고 필터링: ${v_289b73.length}/${v_6385ff}개 유효 (${v_6385ff - v_289b73.length}개 제외)`);
+    }
+
+    const v_908496 = v_289b73;
 
     v_88aee2.forEach(v_d5dda0 => {
       const v_e4fdb7 = (v_d5dda0.urlAD && v_d5dda0.urlAD !== '' && v_d5dda0.urlAD !== '없음') || 
@@ -965,11 +982,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
                       console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
 
-                      const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-                        return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '' && v_ddcfed.urlAD !== '없음';
-                      });
-
-                      if (v_6c877c.length > 0) {
+                      if (v_e36b07.length > 0) {
 
                   const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
                     const v_1b0610 = parseFloat(String(v_779914.distance || 0));
@@ -978,7 +991,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   });
 
                   const v_dc4d18 = 5;
-                        const v_09cb96 = v_6c877c.length * v_dc4d18;
+                        const v_09cb96 = v_e36b07.length * v_dc4d18;
                   const v_7864b3 = new Map<number, number>();
 
                         const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
@@ -986,8 +999,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       return v_51b584;
                     }
 
-                          const v_ba7922 = v_a56041 % v_6c877c.length;
-                          const v_127b33 = v_6c877c[v_ba7922];
+                          const v_ba7922 = v_a56041 % v_e36b07.length;
+                          const v_127b33 = v_e36b07[v_ba7922];
                     const v_aa0917 = v_127b33?.campid;
 
                     if (v_aa0917) {
@@ -1070,11 +1083,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
                     console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
 
-                    const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-                      return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '' && v_ddcfed.urlAD !== '없음';
-                    });
-
-                    if (v_6c877c.length > 0) {
+                    if (v_e36b07.length > 0) {
 
                       const v_beddf3 = [...v_3d87ed].sort((v_779914, v_148ff6) => {
                         const v_1b0610 = parseFloat(String(v_779914.distance || 0));
@@ -1083,7 +1092,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   });
 
                       const v_dc4d18 = 5;
-                      const v_09cb96 = v_6c877c.length * v_dc4d18;
+                      const v_09cb96 = v_e36b07.length * v_dc4d18;
                       const v_7864b3 = new Map<number, number>();
 
                       const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
@@ -1091,8 +1100,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                           return v_51b584;
                         }
 
-                        const v_ba7922 = v_a56041 % v_6c877c.length;
-                        const v_127b33 = v_6c877c[v_ba7922];
+                        const v_ba7922 = v_a56041 % v_e36b07.length;
+                        const v_127b33 = v_e36b07[v_ba7922];
                         const v_aa0917 = v_127b33?.campid;
 
                         if (v_aa0917) {
@@ -1870,13 +1879,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       }
 
       if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
-        console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', v_e36b07.length, '개');
+        console.log('[CameraMainScreen] 백그라운드: TopAd5 데이터 가져옴 (캐시 또는 API):', v_e36b07.length, '개');
 
-        const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-          return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '' && v_ddcfed.urlAD !== '없음';
-        });
-
-        if (v_6c877c.length > 0) {
+        if (v_e36b07.length > 0) {
 
           v_7bb835((v_e8cc2e) => {
             if (!v_e8cc2e || v_e8cc2e.length === 0) {
@@ -1890,7 +1895,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             });
 
             const v_dc4d18 = 5;
-            const v_09cb96 = v_6c877c.length * v_dc4d18;
+            const v_09cb96 = v_e36b07.length * v_dc4d18;
             const v_7864b3 = new Map<number, number>();
 
             const v_0b94e1 = v_beddf3.map((v_51b584, v_a56041) => {
@@ -1898,8 +1903,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 return v_51b584;
               }
 
-              const v_ba7922 = v_a56041 % v_6c877c.length;
-              const v_127b33 = v_6c877c[v_ba7922];
+              const v_ba7922 = v_a56041 % v_e36b07.length;
+              const v_127b33 = v_e36b07[v_ba7922];
               const v_aa0917 = v_127b33?.campid;
 
               if (v_aa0917) {
