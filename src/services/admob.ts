@@ -107,8 +107,9 @@ export const v_f78e83 = (): string => {
 };
 
 export const v_2ccc13 = (): string => {
+
   return v_326be8.OS === 'android'
-    ? v_573fcf('ADMOB_ADUNIT_ANDROID')
+    ? '' 
     : v_573fcf('ADMOB_ADUNIT_IOS');
 };
 

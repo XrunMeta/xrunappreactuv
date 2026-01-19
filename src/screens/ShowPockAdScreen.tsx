@@ -18,12 +18,13 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_aa7dc1, v_167376, v_38f5f4, v_8cba1e, v_f4cc2d, v_563153 } from '../services';
+import { v_aa7dc1, v_167376, v_38f5f4, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
 import { v_cba33f } from '../utils';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_6b63f9 } from '../types';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -55,9 +56,10 @@ const SequentialDots: v_a3453e.FC = () => {
 
 interface ShowPockAdScreenProps {
   onClose?: () => void; 
+  isModal?: boolean; 
 }
 
-export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: v_0890f8 }) => {
+export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: v_0890f8, isModal: v_bf1005 = false }) => {
   const { t: v_8d41d7 } = v_772971();
   const v_033e14 = v_e0068c();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
@@ -561,18 +563,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', v_61e099);
           }
 
-          try {
-            const v_c06630 = await v_e84827.getItem('completedAdsCache');
-            const v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
-            if (!v_e2a6a6.includes(v_aa0917)) {
-              v_e2a6a6.push(v_aa0917);
-              await v_e84827.setItem('completedAdsCache', JSON.stringify(v_e2a6a6));
-              await v_e84827.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[광고보기] completedAdsCache에 추가: ${v_aa0917}`);
-            }
-          } catch (v_2bf859) {
-            console.warn('[광고보기] completedAdsCache 업데이트 실패:', v_2bf859);
-          }
+          await v_5e0191(v_aa0917);
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
@@ -598,15 +589,31 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
   }
 
   return (
-    <View style={v_d81136.root}>
-      <StatusBar style="dark" />
+    <View style={[v_d81136.root, v_bf1005 && v_d81136.modalRoot]}>
+      {!v_bf1005 && <StatusBar style="dark" />}
 
       {}
-      {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_9f9e7d && (
-        <Pressable
-          style={v_d81136.topClickArea}
-          onPress={v_e36569}
-        />
+      {!v_bf1005 && (
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: 16,
+          paddingTop: v_033e14.top + 12,
+          paddingBottom: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e0e0e0',
+          backgroundColor: '#fff',
+        }}>
+          <TouchableOpacity
+            onPress={v_7f2e65}
+            style={{
+              padding: 8,
+            }}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
       )}
 
       {}
@@ -684,7 +691,23 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
       {}
       {!v_cd31a8 && !v_915a6b && !v_7a79cf && !v_7b73c7 && v_9f9e7d && (
-        <View style={v_d81136.campaignContainer}>
+        <View style={[v_d81136.campaignContainer, v_bf1005 && v_d81136.modalCampaignContainer]}>
+          {}
+          {v_bf1005 && (
+            <TouchableOpacity
+              onPress={v_7f2e65}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 10,
+                padding: 8,
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+          )}
           <Text style={v_d81136.campaignTitle}>
             {v_9f9e7d.ad_name || v_d0b6d4.name || v_8d41d7('screens.showNapAd.campaignInfo')}
           </Text>
@@ -717,23 +740,6 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             </View>
           )}
 
-          <View style={v_d81136.buttonContainer}>
-            <TouchableOpacity
-              style={v_d81136.watchAdButton}
-              onPress={v_e36569}
-              activeOpacity={0.7}
-            >
-              <Text style={v_d81136.watchAdButtonText}>{v_8d41d7('screens.showNapAd.watchAd')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={v_d81136.cancelButton}
-              onPress={v_5ca23e}
-              activeOpacity={0.7}
-            >
-              <Text style={v_d81136.cancelButtonText}>{v_8d41d7('screens.showNapAd.cancel')}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 
@@ -979,6 +985,19 @@ const v_d81136 = v_472849.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  modalRoot: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'transparent',
+  },
+  modalCampaignContainer: {
+    paddingTop: 20, 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 0,
+    marginTop: 0,
+    position: 'relative', 
   },
   loadingContainer: {
     alignItems: 'center',
