@@ -766,10 +766,10 @@ export const connectAppleAccount = async (
   appleData: any,
   pin: string,
   navigation?: any,
-): Promise<ConnectAppleAccountResponse> => {
+): Promise<any> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: ConnectAppleAccountRequest = {
+    const request: any = {
       ...appleData,
       pin,
     };
@@ -777,7 +777,7 @@ export const connectAppleAccount = async (
     console.log('[계정 연동] 애플 계정 연동 요청');
     console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(request, null, 2));
 
-    const response = await axiosInstance.post<ConnectAppleAccountResponse>(
+    const response = await axiosInstance.post<any>(
       '/connect-apple-account',
       request,
     );
@@ -2515,6 +2515,31 @@ export const getNasmobAds = async (
       const errorText = await response.text();
       console.error(`[NStation] HTTP 에러 (${response.status}):`, errorText.substring(0, 500));
 
+      if (response.status === 403) {
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.status === 'error' && errorJson.code === 403) {
+            console.warn(`[NStation] 블록리스트된 캠페인: ${campid} - ${errorJson.message || 'Campaign is blocked'}`);
+
+            if (campid) {
+              await removeBlocklistedCampaignFromCache(campid);
+            }
+
+            const error = new Error(errorJson.message || 'Campaign is blocked');
+            (error as any).is403 = true;
+            (error as any).campid = campid;
+            throw error;
+          }
+        } catch (parseError) {
+
+          console.warn(`[NStation] 403 에러 (JSON 파싱 실패): ${errorText.substring(0, 200)}`);
+          const error = new Error(`Campaign is blocked (403)`);
+          (error as any).is403 = true;
+          (error as any).campid = campid;
+          throw error;
+        }
+      }
+
       if (response.status >= 500) {
         throw new Error(`서버 에러 (${response.status}): ${errorText.substring(0, 200)}`);
       }
@@ -2541,6 +2566,18 @@ export const getNasmobAds = async (
     const result: NasmobAdsResponse = await response.json();
     console.log('NStation 광고 API 응답:', result);
 
+    if (result.status === 'error' && result.code === 403) {
+      console.warn(`[NStation] 블록리스트된 캠페인: ${campid} - ${result.message || 'Campaign is blocked'}`);
+
+      if (campid) {
+        await removeBlocklistedCampaignFromCache(campid);
+      }
+      const error = new Error(result.message || 'Campaign is blocked');
+      (error as any).is403 = true;
+      (error as any).campid = campid;
+      throw error;
+    }
+
     if (result.status === 'success' && result.code === 200) {
       return result;
     } else {
@@ -2553,6 +2590,11 @@ export const getNasmobAds = async (
     }
   } catch (error: any) {
     console.error('NStation 광고 API 호출 실패:', error);
+
+    if (error.is403) {
+      console.log('403 에러: 블록리스트된 캠페인 - 타임아웃 처리 스킵');
+      throw error;
+    }
 
     if (error.is404) {
       console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
@@ -2624,6 +2666,31 @@ export const getPockAds = async (
       const errorText = await response.text();
       console.error(`[Pock] HTTP 에러 (${response.status}):`, errorText.substring(0, 500));
 
+      if (response.status === 403) {
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.status === 'error' && errorJson.code === 403) {
+            console.warn(`[Pock] 블록리스트된 캠페인: ${campid} - ${errorJson.message || 'Campaign is blocked'}`);
+
+            if (campid) {
+              await removeBlocklistedCampaignFromCache(campid);
+            }
+
+            const error = new Error(errorJson.message || 'Campaign is blocked');
+            (error as any).is403 = true;
+            (error as any).campid = campid;
+            throw error;
+          }
+        } catch (parseError) {
+
+          console.warn(`[Pock] 403 에러 (JSON 파싱 실패): ${errorText.substring(0, 200)}`);
+          const error = new Error(`Campaign is blocked (403)`);
+          (error as any).is403 = true;
+          (error as any).campid = campid;
+          throw error;
+        }
+      }
+
       if (response.status >= 500) {
         throw new Error(`서버 에러 (${response.status}): ${errorText.substring(0, 200)}`);
       }
@@ -2649,6 +2716,18 @@ export const getPockAds = async (
 
     const result: PockAdsResponse = await response.json();
     console.log('Pock 광고 API 응답:', result);
+
+    if (result.status === 'error' && result.code === 403) {
+      console.warn(`[Pock] 블록리스트된 캠페인: ${campid} - ${result.message || 'Campaign is blocked'}`);
+
+      if (campid) {
+        await removeBlocklistedCampaignFromCache(campid);
+      }
+      const error = new Error(result.message || 'Campaign is blocked');
+      (error as any).is403 = true;
+      (error as any).campid = campid;
+      throw error;
+    }
 
     if (result.status === 'success' && result.code === 200) {
       return result;
@@ -2723,8 +2802,73 @@ export const getPointClickAds = async (
       body: JSON.stringify(requestBody),
     });
 
+    if (!response.ok) {
+
+      const errorText = await response.text();
+      console.error(`[PointClick] HTTP 에러 (${response.status}):`, errorText.substring(0, 500));
+
+      if (response.status === 403) {
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.status === 'error' && errorJson.code === 403) {
+            console.warn(`[PointClick] 블록리스트된 캠페인: ${ad_key} - ${errorJson.message || 'Campaign is blocked'}`);
+
+            if (ad_key) {
+              await removeBlocklistedCampaignFromCache(ad_key);
+            }
+
+            const error = new Error(errorJson.message || 'Campaign is blocked');
+            (error as any).is403 = true;
+            (error as any).campid = ad_key;
+            throw error;
+          }
+        } catch (parseError) {
+
+          console.warn(`[PointClick] 403 에러 (JSON 파싱 실패): ${errorText.substring(0, 200)}`);
+          const error = new Error(`Campaign is blocked (403)`);
+          (error as any).is403 = true;
+          (error as any).campid = ad_key;
+          throw error;
+        }
+      }
+
+      if (response.status >= 500) {
+        throw new Error(`서버 에러 (${response.status}): ${errorText.substring(0, 200)}`);
+      }
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        const errorMessage = errorJson.message || `HTTP error! status: ${response.status}`;
+        const error = new Error(errorMessage);
+        (error as any).is404 = errorJson.code === 404 || response.status === 404;
+        throw error;
+      } catch (parseError) {
+
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText.substring(0, 200)}`);
+      }
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('[PointClick] 비-JSON 응답:', contentType, text.substring(0, 500));
+      throw new Error(`Expected JSON but got ${contentType || 'unknown'}`);
+    }
+
     const result: PockAdsResponse = await response.json();
     console.log('PointClick 광고 API 응답:', result);
+
+    if (result.status === 'error' && result.code === 403) {
+      console.warn(`[PointClick] 블록리스트된 캠페인: ${ad_key} - ${result.message || 'Campaign is blocked'}`);
+
+      if (ad_key) {
+        await removeBlocklistedCampaignFromCache(ad_key);
+      }
+      const error = new Error(result.message || 'Campaign is blocked');
+      (error as any).is403 = true;
+      (error as any).campid = ad_key;
+      throw error;
+    }
 
     if (response.ok && result.status === 'success' && result.code === 200) {
       return result;
@@ -2738,6 +2882,11 @@ export const getPointClickAds = async (
     }
   } catch (error: any) {
     console.error('PointClick 광고 API 호출 실패:', error);
+
+    if (error.is403) {
+      console.log('403 에러: 블록리스트된 캠페인 - 타임아웃 처리 스킵');
+      throw error;
+    }
 
     if (error.is404) {
       console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
@@ -4872,8 +5021,64 @@ const TOP_AD5_STORAGE_KEY = 'topAd5Data';
 const TOP_AD5_TIMESTAMP_KEY = 'topAd5Timestamp';
 const TOP_AD5_REFRESH_INTERVAL = 10 * 60 * 1000; 
 
+const BLOCKLISTED_CAMPAIGN_IDS = new Set<string>(['2151261']);
+
+const isBlocklistedCampaign = (campid: string | number | undefined): boolean => {
+  if (!campid) return false;
+  return BLOCKLISTED_CAMPAIGN_IDS.has(String(campid));
+};
+
+const filterBlocklistedAds = (ads: any[]): any[] => {
+  if (!Array.isArray(ads)) return [];
+  return ads.filter((ad) => !isBlocklistedCampaign(ad?.campid));
+};
+
 let isFetchingTopAd5 = false;
 let pendingTopAd5Promise: Promise<any> | null = null;
+
+export const filterBlocklistedAdsFromCache = async (): Promise<void> => {
+  try {
+    const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+    if (cachedAdStr) {
+      const cachedAd = JSON.parse(cachedAdStr);
+      const beforeCount = Object.keys(cachedAd).length;
+
+      const filteredCache: any = {};
+      for (const [campid, data] of Object.entries(cachedAd)) {
+        if (!isBlocklistedCampaign(campid)) {
+          filteredCache[campid] = data;
+        }
+      }
+
+      if (Object.keys(filteredCache).length !== beforeCount) {
+        await AsyncStorage.setItem('cached_AD', JSON.stringify(filteredCache));
+        console.log(`[filterBlocklistedAdsFromCache] 블록리스트 필터링: ${Object.keys(filteredCache).length}/${beforeCount}개 유효`);
+      }
+    }
+  } catch (error) {
+    console.error('[filterBlocklistedAdsFromCache] 필터링 실패:', error);
+  }
+};
+
+export const removeBlocklistedCampaignFromCache = async (campid: string | number): Promise<void> => {
+  const campidStr = String(campid);
+  try {
+
+    const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+    if (cachedAdStr) {
+      const cachedAd = JSON.parse(cachedAdStr);
+      if (cachedAd[campidStr]) {
+        delete cachedAd[campidStr];
+        await AsyncStorage.setItem('cached_AD', JSON.stringify(cachedAd));
+        console.log(`[removeBlocklistedCampaignFromCache] cached_AD에서 제거: ${campidStr}`);
+      }
+    }
+
+    await removeAdFromTopAd5(campidStr, undefined); 
+  } catch (error) {
+    console.error(`[removeBlocklistedCampaignFromCache] ${campidStr} 제거 실패:`, error);
+  }
+};
 
 export const removeAdFromTopAd5 = async (campid: string | number, navigation?: any): Promise<void> => {
   try {
@@ -5226,28 +5431,19 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
         });
       }
 
-      const beforeFilter = topAd5Response.length;
-      topAd5Response = topAd5Response.filter(ad => {
-        const urlAD = ad?.urlAD || ad?.landing_url || '';
-        const isValid = urlAD && 
-                       typeof urlAD === 'string' && 
-                       urlAD.trim() !== '' && 
-                       urlAD !== '없음';
-        if (!isValid) {
-          console.log(`[getTopAd5] ${ad?.campid || 'N/A'}는 urlAD가 없거나 "없음"이어서 제외됨 (urlAD: ${urlAD})`);
+      if (topAd5Response.length > 0) {
+        console.log('[getTopAd5] ✅ 백엔드에서 이미 필터링/정렬/제한 처리된 광고 데이터:', topAd5Response.length, '개');
+
+        if (topAd5Response[0]?.priority !== undefined) {
+          console.log('[getTopAd5] 첫 번째 광고 priority:', topAd5Response[0].priority);
         }
-        return isValid;
-      });
-
-      if (topAd5Response.length !== beforeFilter) {
-        console.log(`[getTopAd5] urlAD 필터링: ${topAd5Response.length}/${beforeFilter}개 유효 (${beforeFilter - topAd5Response.length}개 제외)`);
       }
+    }
 
-      const adsWithUrlAD = topAd5Response.filter(ad => {
-        const urlAD = ad?.urlAD || ad?.landing_url || '';
-        return urlAD && typeof urlAD === 'string' && urlAD.trim() !== '' && urlAD !== '없음';
-      });
-      console.log('[getTopAd5] urlAD가 있는 광고 개수:', adsWithUrlAD.length, '/', topAd5Response.length);
+    const beforeBlocklistFilter = topAd5Response.length;
+    topAd5Response = filterBlocklistedAds(topAd5Response);
+    if (topAd5Response.length !== beforeBlocklistFilter) {
+      console.log(`[getTopAd5] 블록리스트 필터링: ${topAd5Response.length}/${beforeBlocklistFilter}개 유효`);
     }
 
     if (topAd5Response && topAd5Response.length > 0) {
@@ -5281,18 +5477,7 @@ export const getStoredTopAd5 = async (): Promise<any | null> => {
     if (storedData) {
       const parsedData = JSON.parse(storedData);
 
-      const filteredData = parsedData.filter((ad: any) => {
-        const urlAD = ad.urlAD || ad.landing_url || '';
-        const isValid = urlAD && 
-                       typeof urlAD === 'string' && 
-                       urlAD.trim() !== '' && 
-                       urlAD !== '없음';
-        return isValid;
-      });
-      if (filteredData.length !== parsedData.length) {
-        console.log(`[getStoredTopAd5] urlAD 필터링: ${filteredData.length}/${parsedData.length}개 유효`);
-      }
-      return filteredData;
+      return parsedData;
     }
     return null;
   } catch (error) {
@@ -5477,16 +5662,16 @@ export const getMembersLevelInfo = async (
 export const checkShopSalesMenu = async (
   member: string,
   navigation?: any,
-): Promise<CheckShopSalesMenuResponse> => {
+): Promise<any> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: CheckShopSalesMenuRequest = {
+    const request: any = {
       member,
     };
 
     console.log('[Shop 매출] 메뉴 표시 여부 확인 요청:', { member });
 
-    const response = await axiosInstance.post<CheckShopSalesMenuResponse>(
+    const response = await axiosInstance.post<any>(
       '/checkShopSalesMenu',
       request,
     );
@@ -5551,10 +5736,10 @@ export const getItemPurchaseList = async (
   dateFrom?: string,
   dateTo?: string,
   navigation?: any,
-): Promise<GetItemPurchaseListResponse> => {
+): Promise<any> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: GetItemPurchaseListRequest = {
+    const request: any = {
       shopmember,
     };
 
@@ -5567,7 +5752,7 @@ export const getItemPurchaseList = async (
 
     console.log('[Shop 매출] 구매자 명단 조회 요청:', { shopmember, dateFrom, dateTo });
 
-    const response = await axiosInstance.post<GetItemPurchaseListResponse>(
+    const response = await axiosInstance.post<any>(
       '/getItemPurchaseList',
       request,
     );
