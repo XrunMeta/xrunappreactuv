@@ -428,9 +428,16 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         console.log('[callAdApi] getNasmobAds 응답:', result);
         return result;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[callAdApi] 광고 API 호출 실패:', error);
       isFetchingRef.current = false;
+
+      if (error.is403) {
+        console.warn(`[callAdApi] 블록리스트된 캠페인: ${error.campid || 'N/A'} - ${error.message}`);
+
+        throw error;
+      }
+
       throw error;
     }
   };

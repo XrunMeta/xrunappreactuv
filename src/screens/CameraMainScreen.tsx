@@ -753,7 +753,24 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     console.log("ℹ️ [organizeData] 사용된 캐시 소스:", externalCache ? "External (Latest)" : "State (May be stale)");
     console.log("ℹ️ [organizeData] 캐시 데이터 수:", Object.keys(effectiveCache).length);
 
-    const validData = enrichedData;
+    const beforeCompletedFilter = enrichedData.length;
+    const filteredByCompleted = enrichedData.filter((d) => {
+      const campid = String(d.campid || '');
+      if (campid && campid !== '' && campid !== 'undefined' && completedAdsSetRef.current) {
+        const isCompleted = completedAdsSetRef.current.has(campid);
+        if (isCompleted) {
+          console.log(`[organizeData] 이미 본 광고 제외: ${campid}`);
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (filteredByCompleted.length !== beforeCompletedFilter) {
+      console.log(`[organizeData] 이미 본 광고 필터링: ${filteredByCompleted.length}/${beforeCompletedFilter}개 유효 (${beforeCompletedFilter - filteredByCompleted.length}개 제외)`);
+    }
+
+    const validData = filteredByCompleted;
 
     enrichedData.forEach(d => {
       const hasDirectUrl = (d.urlAD && d.urlAD !== '' && d.urlAD !== '없음') || 
@@ -965,11 +982,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                       console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
-                      const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-                        return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
-                      });
-
-                      if (filteredTopAd5.length > 0) {
+                      if (topAd5Response.length > 0) {
 
                   const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
                     const distanceA = parseFloat(String(a.distance || 0));
@@ -978,7 +991,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   });
 
                   const MAX_TOKENS_PER_CAMPAIGN = 5;
-                        const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                        const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
                   const campaignTokenCount = new Map<number, number>();
 
                         const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
@@ -986,8 +999,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       return coin;
                     }
 
-                          const adIndex = index % filteredTopAd5.length;
-                          const mappedAd = filteredTopAd5[adIndex];
+                          const adIndex = index % topAd5Response.length;
+                          const mappedAd = topAd5Response[adIndex];
                     const campid = mappedAd?.campid;
 
                     if (campid) {
@@ -1070,11 +1083,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                     console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
-                    const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-                      return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
-                    });
-
-                    if (filteredTopAd5.length > 0) {
+                    if (topAd5Response.length > 0) {
 
                       const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
                         const distanceA = parseFloat(String(a.distance || 0));
@@ -1083,7 +1092,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   });
 
                       const MAX_TOKENS_PER_CAMPAIGN = 5;
-                      const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                      const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
                       const campaignTokenCount = new Map<number, number>();
 
                       const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
@@ -1091,8 +1100,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                           return coin;
                         }
 
-                        const adIndex = index % filteredTopAd5.length;
-                        const mappedAd = filteredTopAd5[adIndex];
+                        const adIndex = index % topAd5Response.length;
+                        const mappedAd = topAd5Response[adIndex];
                         const campid = mappedAd?.campid;
 
                         if (campid) {
@@ -1870,13 +1879,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       }
 
       if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
-        console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
+        console.log('[CameraMainScreen] 백그라운드: TopAd5 데이터 가져옴 (캐시 또는 API):', topAd5Response.length, '개');
 
-        const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-          return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
-        });
-
-        if (filteredTopAd5.length > 0) {
+        if (topAd5Response.length > 0) {
 
           setCoinsData((prevCoinsData) => {
             if (!prevCoinsData || prevCoinsData.length === 0) {
@@ -1890,7 +1895,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             });
 
             const MAX_TOKENS_PER_CAMPAIGN = 5;
-            const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+            const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
             const campaignTokenCount = new Map<number, number>();
 
             const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
@@ -1898,8 +1903,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 return coin;
               }
 
-              const adIndex = index % filteredTopAd5.length;
-              const mappedAd = filteredTopAd5[adIndex];
+              const adIndex = index % topAd5Response.length;
+              const mappedAd = topAd5Response[adIndex];
               const campid = mappedAd?.campid;
 
               if (campid) {
