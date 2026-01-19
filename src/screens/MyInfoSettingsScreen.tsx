@@ -5,10 +5,10 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
 import { v_1bfbd0, v_731ab4, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { 
-  v_650134, 
-  v_de7bac, 
-  v_4503ee 
+import {
+  v_650134,
+  v_de7bac,
+  v_4503ee
 } from '../services/versionCheck';
 
 export const v_4a40b2 = () => {
@@ -72,13 +72,13 @@ export const v_4a40b2 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
-            <TouchableOpacity
-              style={v_d81136.card}
-              activeOpacity={0.85}
-              onPress={() => v_7f8510(true)}
-            >
-              <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={v_d81136.card}
+            activeOpacity={0.85}
+            onPress={() => v_7f8510(true)}
+          >
+            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
@@ -95,16 +95,18 @@ export const v_4a40b2 = () => {
               onPress={v_4503ee}
             >
               <Text style={v_d81136.versionText}>
-                Android : {v_ea6ee8.androidCurrent}/{v_ea6ee8.androidLatest} iOS : {v_ea6ee8.iosCurrent}/{v_ea6ee8.iosLatest}
+                {v_326be8.OS === 'android'
+                  ? `Android : ${v_ea6ee8.androidCurrent}/${v_ea6ee8.androidLatest}`
+                  : `iOS : ${v_ea6ee8.iosCurrent}/${v_ea6ee8.iosLatest}`}
               </Text>
             </TouchableOpacity>
           )}
         </View>
-      </SafeScrollView> 
-        <LanguageSelector
-          visible={v_7b4f11}
-          onClose={() => v_7f8510(false)}
-        /> 
+      </SafeScrollView>
+      <LanguageSelector
+        visible={v_7b4f11}
+        onClose={() => v_7f8510(false)}
+      />
     </View>
   );
 };
