@@ -8,7 +8,8 @@
       "distribution": "internal",
       "developmentClient": true,
       "android": {
-        "image": "latest"
+        "image": "latest",
+        "gradleCommand": ":app:assembleDebug"
       },
       "ios": {
         "simulator": false
