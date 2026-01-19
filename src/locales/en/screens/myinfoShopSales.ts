@@ -33,5 +33,7 @@ export default {
   apply: 'Apply',
 
   noData: 'No data available.',
+  noShopmember: 'No shop information registered.',
+  noItemData: 'No registered items or purchase history.',
 };
 
