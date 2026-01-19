@@ -45,12 +45,13 @@ export const v_f095b0 = async (): Promise<void> => {
     });
 
     try {
-      const v_e1fe95 = v_dae2ac.initialize();
-      const v_06d9af = new Promise<never>((v_37eab7, v_bad6f3) => 
-        setTimeout(() => v_bad6f3(new Error('Pangle 초기화 타임아웃')), 10000)
-      );
-
-      await Promise.race([v_e1fe95, v_06d9af]);
+      if (v_326be8.OS === 'android') {
+        const v_e1fe95 = v_dae2ac.initialize();
+        const v_06d9af = new Promise<never>((v_37eab7, v_bad6f3) =>
+          setTimeout(() => v_bad6f3(new Error('Pangle 초기화 타임아웃')), 10000)
+        );
+        await Promise.race([v_e1fe95, v_06d9af]);
+      }
 
       v_8f0d89 = true;
       v_d0574b = true;
@@ -425,5 +426,35 @@ export const v_05fa9c = async (
 
   console.log('[Pangle] 콜백 전송 스킵 (리워드 제공 안 함)');
   return { success: true, message: '콜백 전송 스킵됨' };
+};
+
+export const v_a763e6 = async (): Promise<any> => {
+  if (v_326be8.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!v_986693()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await v_dae2ac.showNativeScreen();
+};
+
+export const v_41a100 = async (v_a15489 = '982684319'): Promise<any> => {
+  if (v_326be8.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!v_986693()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await v_dae2ac.loadAndShowInterstitialAd(v_a15489);
+};
+
+export const v_df6735 = async (v_a15489 = '982684334'): Promise<any> => {
+  if (v_326be8.OS !== 'ios') {
+    return { success: false, message: 'iOS에서만 지원됩니다.' };
+  }
+  if (!v_986693()) {
+    throw new Error('Pangle 네이티브 모듈을 사용할 수 없습니다.');
+  }
+  return await v_dae2ac.loadAndShowNativeAd(v_a15489);
 };
 

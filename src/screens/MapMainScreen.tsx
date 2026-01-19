@@ -316,11 +316,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
   v_c4deb2(() => {
     const v_43ed8b = async () => {
       try {
-          const v_5885b8 = await v_e84827.getItem('failedPreFetchCampids');
-          if (v_5885b8) {
-            const v_ca8416 = JSON.parse(v_5885b8) as string[];
-            const v_9b717b = new Set<string>(v_ca8416);
-            v_79311c.current = v_9b717b;
+        const v_5885b8 = await v_e84827.getItem('failedPreFetchCampids');
+        if (v_5885b8) {
+          const v_ca8416 = JSON.parse(v_5885b8) as string[];
+          const v_9b717b = new Set<string>(v_ca8416);
+          v_79311c.current = v_9b717b;
           console.log(`[MapMainScreen] 저장된 pre-fetch 실패 정보 로드: ${v_9b717b.size}개`);
         }
       } catch (v_5e9bfe) {
@@ -362,84 +362,87 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       for (const v_ddcfed of v_e1c39d) {
         const v_aa0917 = String(v_ddcfed.campid || '');
-
-        if (v_b37071.current.has(v_aa0917)) {
-          console.log(`⏭️ [MapMainScreen] ${v_aa0917}는 이미 처리 중입니다. 건너뜀`);
-          continue;
-        }
-
-        v_b37071.current.add(v_aa0917);
         try {
-          let v_43c42e;
+
+          if (v_b37071.current.has(v_aa0917)) {
+            console.log(`⏭️ [MapMainScreen] ${v_aa0917}는 이미 처리 중입니다. 건너뜀`);
+            continue;
+          }
+
+          v_b37071.current.add(v_aa0917);
+
+          const v_6030b8 = v_ddcfed.ad_check_url;
+          let v_9cb87d = null;
           const v_693775 = (v_ddcfed.ad_company || '').toLowerCase();
-          console.log(`⚙️ [PreFetch] 처리 진입: id=${v_ddcfed.campid}, lowercase_company='${v_693775}'`);
 
-          if (v_693775 === 'nas') {
-            v_43c42e = await v_1c4683(v_717992.toString(), v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
-            if (v_43c42e.code === 200 && v_43c42e.data?.urlAD) {
-              const v_f22601 = v_43c42e.data.urlAD;
+          if (v_6030b8) {
+            try {
+              console.log(`🌐 [PreFetch] 요청 시작 (${v_693775}):`, v_6030b8);
+              const v_3393e3 = await fetch(v_6030b8);
+              const v_4e826f = await v_3393e3.json();
 
-              v_6549d0(v_ba2215 => v_ba2215.map(v_8c0b26 =>
-                (v_8c0b26.campid === v_ddcfed.campid && v_8c0b26.ad_company === 'nas') ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
-              ));
-
-              v_14dd24(v_ba2215 => v_ba2215.map(v_35f85c =>
-                (v_35f85c.campid === v_ddcfed.campid && v_35f85c.ad_company === 'nas') ? { ...v_35f85c, urlAD: v_f22601 } : v_35f85c
-              ));
-
-              try {
-                const v_53db14 = await v_e84827.getItem('cached_AD');
-                const v_a28e77 = v_53db14 ? JSON.parse(v_53db14) : {};
-
-                const v_4d73f0 = {
-                  urlAD: v_f22601,
-                  joindesc: v_43c42e.data.rewarddesc || '',
-                  name: v_43c42e.data.name || '',
-                  xrunPrice: v_43c42e.data.price ? (v_43c42e.data.price / 2) : 0
-                };
-
-                v_a28e77[v_ddcfed.campid] = v_4d73f0;
-                await v_e84827.setItem('cached_AD', JSON.stringify(v_a28e77));
-                console.log(`💾 [MapMainScreen] NAS 데이터 캐시 저장 완료: ${v_ddcfed.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(v_a28e77));
-              } catch (v_6b2b87) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', v_6b2b87);
+              if (v_693775 === 'nas') {
+                const v_679b9e = typeof v_4e826f.result === 'string' ? parseInt(v_4e826f.result, 10) : v_4e826f.result;
+                if (v_679b9e === 200 && v_4e826f.lurl) {
+                  v_9cb87d = {
+                    urlAD: v_4e826f.lurl,
+                    name: v_4e826f.name,
+                    joindesc: v_4e826f.rewarddesc,
+                    xrunPrice: v_4e826f.price ? (v_4e826f.price / 2) : undefined
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] NAS 실패: result=${v_679b9e}`);
+                }
+              } else if (v_693775 === 'pointclick') {
+                if (v_4e826f.result_code === 200 && v_4e826f.landing_url) {
+                  v_9cb87d = {
+                    urlAD: v_4e826f.landing_url,
+                    name: v_4e826f.ad_name,
+                    joindesc: v_4e826f.ad_participation,
+                    xrunPrice: v_4e826f.ad_profit
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] PointClick 실패: code=${v_4e826f.result_code}`);
+                }
               }
-
-              console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${v_ddcfed.campid}`);
+            } catch (v_da980a) {
+              console.error(`❌ [PreFetch] Fetch 오류:`, v_da980a);
             }
-          } else if (v_693775 === 'pointclick') {
-            v_43c42e = await v_aa7dc1(v_717992.toString(), v_e7f87b.adid, v_e7f87b, v_ddcfed.campid);
-            if (v_43c42e.code === 200 && v_43c42e.data?.landing_url) {
-              const v_f22601 = v_43c42e.data.landing_url;
-              v_6549d0(v_ba2215 => v_ba2215.map(v_8c0b26 =>
-                (v_8c0b26.campid === v_ddcfed.campid && String(v_8c0b26.ad_company).toLowerCase() === 'pointclick') ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
-              ));
-              v_14dd24(v_ba2215 => v_ba2215.map(v_35f85c =>
-                (v_35f85c.campid === v_ddcfed.campid && v_35f85c.ad_company === 'pointclick') ? { ...v_35f85c, urlAD: v_f22601 } : v_35f85c
-              ));
+          } else {
+            console.warn(`⚠️ [PreFetch] ad_check_url 없음: ${v_ddcfed.campid}`);
+          }
 
-              try {
-                const v_53db14 = await v_e84827.getItem('cached_AD');
-                const v_a28e77 = v_53db14 ? JSON.parse(v_53db14) : {};
+          if (v_9cb87d && v_9cb87d.urlAD) {
 
-                const v_4d73f0 = {
-                  urlAD: v_f22601,
-                  joindesc: v_43c42e.data.ad_participation || '',
-                  name: v_43c42e.data.ad_name || '',
-                  xrunPrice: v_43c42e.data.ad_profit || 0
-                };
+            const v_f22601 = v_9cb87d.urlAD;
 
-                v_a28e77[v_ddcfed.campid] = v_4d73f0;
-                await v_e84827.setItem('cached_AD', JSON.stringify(v_a28e77));
-                console.log(`💾 [MapMainScreen] PointClick 데이터 캐시 저장 완료: ${v_ddcfed.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(v_a28e77));
-              } catch (v_6b2b87) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', v_6b2b87);
-              }
+            v_6549d0(v_ba2215 => v_ba2215.map(v_8c0b26 =>
+              (v_8c0b26.campid === v_ddcfed.campid) ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
+            ));
 
-              console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${v_ddcfed.campid}`);
+            v_14dd24(v_ba2215 => v_ba2215.map(v_35f85c =>
+              (v_35f85c.campid === v_ddcfed.campid) ? { ...v_35f85c, urlAD: v_f22601 } : v_35f85c
+            ));
+
+            try {
+              const v_53db14 = await v_e84827.getItem('cached_AD');
+              const v_a28e77 = v_53db14 ? JSON.parse(v_53db14) : {};
+
+              const v_4d73f0 = {
+                urlAD: v_f22601,
+                joindesc: v_9cb87d.joindesc || v_ddcfed.joindesc || '',
+                name: v_9cb87d.name || v_ddcfed.name || '',
+                xrunPrice: v_9cb87d.xrunPrice !== undefined ? v_9cb87d.xrunPrice : (v_ddcfed.xrunPrice || 0)
+              };
+
+              v_a28e77[v_ddcfed.campid] = v_4d73f0;
+              await v_e84827.setItem('cached_AD', JSON.stringify(v_a28e77));
+              console.log(`💾 [MapMainScreen] 캐시 저장 완료: ${v_ddcfed.campid}`);
+            } catch (v_6b2b87) {
+              console.error('❌ [MapMainScreen] 캐시 저장 실패:', v_6b2b87);
             }
+
+            console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${v_ddcfed.campid}`);
           } else {
             console.log(`⚠️ [MapMainScreen] 알 수 없는 회사 타입: ${v_693775}, campid: ${v_ddcfed.campid}`);
           }
@@ -582,11 +585,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
                     const v_926d1c = v_129448
                       ? v_b464ed(
-                          v_f18a9c.latitude,
-                          v_f18a9c.longitude,
-                          v_e1b1cf,
-                          v_c87b30
-                        )
+                        v_f18a9c.latitude,
+                        v_f18a9c.longitude,
+                        v_e1b1cf,
+                        v_c87b30
+                      )
                       : (v_51b584.distance || 0);
                     return {
                       ...v_51b584,
@@ -748,25 +751,23 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', v_f18a9c.latitude, v_f18a9c.longitude);
 
-      const v_c9c489 = v_e4a763();
-      const v_cd6a57 = {
-        member: v_660822.toString(),
-        latitude: v_f18a9c.latitude,
-        longitude: v_f18a9c.longitude,
-        limit: 120,
-      };
-
-      const v_ee8180 = await v_c07360('app2000-01', 'POST', v_cd6a57, v_9b57fc);
+      const v_4eb397 = await v_f3de6d(); 
 
       const v_e84694 = await v_f84ef5(
         v_f18a9c.latitude,
-
         v_f18a9c.longitude,
-
         v_660822,
-
         v_9b57fc,
-
+        {
+          adid: v_4eb397.adid,
+          ip: v_4eb397.ipAddress,
+          osver: v_4eb397.osVersion,
+          devid: v_4eb397.deviceId,
+          devmodel: v_4eb397.model,
+          devbrand: v_4eb397.manufacturer,
+          mnetwork: v_4eb397.mnetwork,
+          carrier: v_4eb397.carrier
+        }
       );
 
       console.log('=== 맵 마커 데이터 가져오기 완료 ===');
@@ -838,39 +839,22 @@ export const MapMainScreen: v_a3453e.FC = () => {
           })
         : [];
 
-      let v_b9ce93 = v_ee8180?.data && Array.isArray(v_ee8180.data)
-        ? v_ee8180.data.map((v_8c0b26) => ({
-          lat: v_8c0b26.lat,
-          lng: v_8c0b26.lng,
-          title: v_8c0b26.title,
-          distance: v_8c0b26.distance,
-          coins: v_8c0b26.coins,
-          coin: v_8c0b26.coin,
-          advertisement: v_8c0b26.advertisement,
-          iconurl: v_8c0b26.iconurl,
-          joindesc: v_8c0b26.joindesc,
-          name: v_8c0b26.name,
-          campid: v_8c0b26.campid,
-          xrunprice: v_8c0b26.xrunprice,
-          xrunPrice: v_8c0b26.xrunPrice || v_8c0b26.xrunprice || 0,
-          brand: v_8c0b26.brand,
-        }))
-        : [];
-
-      const v_2876a4 = [...v_958ad1, ...v_b9ce93];
+      const v_2876a4 = [...v_958ad1, ...v_e84694];
       console.log('=== 결합된 토큰 데이터 ===');
       console.log('combinedCoinsData length:', v_2876a4.length);
 
       const v_bf588a = [];
       v_2876a4.forEach((v_8c0b26) => {
-        if (v_8c0b26.brandlogo_file) v_bf588a.push(v_8c0b26.brandlogo_file);
-        if (v_8c0b26.adthumbnail2_file) v_bf588a.push(v_8c0b26.adthumbnail2_file);
-        if (v_8c0b26.symbolimg_file) v_bf588a.push(v_8c0b26.symbolimg_file);
+        const v_23805a = v_8c0b26 as any;
+        if (v_23805a.brandlogo_file) v_bf588a.push(v_23805a.brandlogo_file);
+        if (v_23805a.adthumbnail2_file) v_bf588a.push(v_23805a.adthumbnail2_file);
+        if (v_23805a.symbolimg_file) v_bf588a.push(v_23805a.symbolimg_file);
       });
 
       if (v_bf588a.length > 0) {
         try {
-          await v_858bfa.downloadMultipleImages(v_bf588a, v_c9c489.GATEWAY_NODEJS);
+          const v_1a30c4 = v_e4a763();
+          await v_858bfa.downloadMultipleImages(v_bf588a, v_1a30c4.GATEWAY_NODEJS);
           console.log('✅ 이미지 캐싱 완료');
         } catch (v_67ab2b) {
           console.error('이미지 캐싱 오류:', v_67ab2b);
@@ -1557,180 +1541,180 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_6dea10 = v_de06a3(async (v_9d6a91 = false) => {
 
-      if (v_fd5fd4.current) {
-        console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+    if (v_fd5fd4.current) {
+      console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+      return;
+    }
+
+    v_fd5fd4.current = true;
+    try {
+
+      let v_905ecb = new Set<string>();
+      try {
+        const v_ef7306 = await v_e84827.getItem('userData');
+        if (v_ef7306) {
+          const v_ff39bc = JSON.parse(v_ef7306);
+          const v_660822 = v_ff39bc?.member;
+          if (v_660822) {
+            v_905ecb = await v_318c45(v_660822, v_9b57fc);
+            console.log(`[MapMainScreen] 완료된 광고 목록: ${v_905ecb.size}개`);
+          }
+        }
+      } catch (v_5e9bfe) {
+        console.warn('[MapMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
+      }
+
+      const v_99c46d = await v_e84827.getItem('astorCoinsData');
+      if (v_99c46d) {
+        const v_b9ce93 = JSON.parse(v_99c46d);
+        if (Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+
+          const spotDataArray: v_f71847[] = v_b9ce93
+            .filter((v_51b584) => {
+
+              const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
+              const v_c87b30 = v_51b584.longitude || v_51b584.lng;
+              return v_e1b1cf != null && v_c87b30 != null && v_e1b1cf !== 0 && v_c87b30 !== 0;
+            })
+            .map((v_51b584) => ({
+              spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
+              distance: v_51b584.distance || 0,
+              direction: v_51b584.direction || 0,
+              name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
+              latitude: v_51b584.latitude || v_51b584.lat,
+              longitude: v_51b584.longitude || v_51b584.lng,
+              xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
+              iconurl: v_51b584.iconurl || '',
+              joindesc: v_51b584.joindesc || '',
+              brand: v_51b584.brand || v_51b584.coin || '',
+              coins: v_51b584.coins || v_51b584.coin || '',
+              coin: v_51b584.coin || '',
+              campid: v_51b584.campid || v_51b584.campId || '',
+              ad_company: v_51b584.ad_company || '',
+              urlAD: v_51b584.urlAD || '',
+            } as v_f71847));
+
+          if (v_22ecab.length > 0) {
+            v_14dd24(v_22ecab);
+            console.log('[MapMainScreen] 캐시된 마커 먼저 표시:', v_22ecab.length, '개 (본 광고 제외)');
+          }
+        }
+      }
+
+      console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
+      let v_e36b07 = null;
+
+      v_e36b07 = await v_563153(undefined, v_9d6a91);
+
+      if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
+        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
         return;
       }
 
-      v_fd5fd4.current = true;
-      try {
-
-        let v_905ecb = new Set<string>();
-        try {
-          const v_ef7306 = await v_e84827.getItem('userData');
-          if (v_ef7306) {
-            const v_ff39bc = JSON.parse(v_ef7306);
-            const v_660822 = v_ff39bc?.member;
-            if (v_660822) {
-              v_905ecb = await v_318c45(v_660822, v_9b57fc);
-              console.log(`[MapMainScreen] 완료된 광고 목록: ${v_905ecb.size}개`);
-            }
-          }
-        } catch (v_5e9bfe) {
-          console.warn('[MapMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
+      const v_6c877c = v_e36b07.filter((v_ddcfed) => {
+        const v_d5d81a = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
+        if (!v_d5d81a) {
+          console.log(`⚠️ [MapMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨`);
         }
+        return v_d5d81a;
+      });
 
-        const v_99c46d = await v_e84827.getItem('astorCoinsData');
-        if (v_99c46d) {
-          const v_b9ce93 = JSON.parse(v_99c46d);
-          if (Array.isArray(v_b9ce93) && v_b9ce93.length > 0) {
+      if (v_6c877c.length === 0) {
+        console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+        return;
+      }
 
-            const spotDataArray: v_f71847[] = v_b9ce93
-              .filter((v_51b584) => {
+      if (v_6c877c.length !== v_e36b07.length) {
+        console.log(`[MapMainScreen] urlAD 필터링: ${v_6c877c.length}/${v_e36b07.length}개 유효`);
+      }
 
-                const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
-                const v_c87b30 = v_51b584.longitude || v_51b584.lng;
-                return v_e1b1cf != null && v_c87b30 != null && v_e1b1cf !== 0 && v_c87b30 !== 0;
-              })
-              .map((v_51b584) => ({
-                spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
-                distance: v_51b584.distance || 0,
-                direction: v_51b584.direction || 0,
-                name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
-                latitude: v_51b584.latitude || v_51b584.lat,
-                longitude: v_51b584.longitude || v_51b584.lng,
-                xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
-                iconurl: v_51b584.iconurl || '',
-                joindesc: v_51b584.joindesc || '',
-                brand: v_51b584.brand || v_51b584.coin || '',
-                coins: v_51b584.coins || v_51b584.coin || '',
-                coin: v_51b584.coin || '',
-                campid: v_51b584.campid || v_51b584.campId || '',
-                ad_company: v_51b584.ad_company || '',
-                urlAD: v_51b584.urlAD || '',
-              } as v_f71847));
+      v_e36b07 = v_6c877c;
 
-            if (v_22ecab.length > 0) {
-              v_14dd24(v_22ecab);
-              console.log('[MapMainScreen] 캐시된 마커 먼저 표시:', v_22ecab.length, '개 (본 광고 제외)');
-            }
-          }
+      console.log('[MapMainScreen] 2단계: URL 검증 시작');
+      const v_507ee6 = await v_e3e9a7(v_e36b07);
+
+      const v_be75db = v_507ee6.filter(v_8c0b26 => v_8c0b26.isValid === true);
+      if (v_be75db.length !== v_507ee6.length) {
+        console.log(`[MapMainScreen] URL 검증 완료: ${v_be75db.length}/${v_507ee6.length}개 유효 (${v_507ee6.length - v_be75db.length}개 제외)`);
+      }
+      v_e36b07 = v_be75db;
+
+      const v_00c9ca = v_e36b07.filter((v_ddcfed) => {
+        const v_aa0917 = String(v_ddcfed.campid || '');
+        const v_2be890 = v_905ecb.has(v_aa0917);
+        if (v_2be890) {
+          console.log(`⚠️ [MapMainScreen] ${v_aa0917}는 이미 본 광고로 제외됨`);
         }
+        return !v_2be890;
+      });
 
-        console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
-        let v_e36b07 = null;
+      if (v_00c9ca.length !== v_e36b07.length) {
+        console.log(`[MapMainScreen] 이미 본 광고 필터링: ${v_00c9ca.length}/${v_e36b07.length}개 유효 (${v_e36b07.length - v_00c9ca.length}개 제외)`);
+      }
+      v_e36b07 = v_00c9ca;
 
-        v_e36b07 = await v_563153(undefined, v_9d6a91);
+      if (v_e36b07.length === 0) {
+        console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
+        return;
+      }
 
-        if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
-          console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
-          return;
-        }
+      console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', v_e36b07.length, '개 광고');
+      v_6549d0(v_e36b07);
 
-        const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-          const v_d5d81a = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
-          if (!v_d5d81a) {
-            console.log(`⚠️ [MapMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨`);
-          }
-          return v_d5d81a;
-        });
+      if (!v_99c46d) {
+        console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
+        return;
+      }
 
-        if (v_6c877c.length === 0) {
-          console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
-          return;
-        }
+      const v_b9ce93 = JSON.parse(v_99c46d);
+      if (!Array.isArray(v_b9ce93) || v_b9ce93.length === 0) {
+        console.log('[MapMainScreen] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
+        return;
+      }
 
-        if (v_6c877c.length !== v_e36b07.length) {
-          console.log(`[MapMainScreen] urlAD 필터링: ${v_6c877c.length}/${v_e36b07.length}개 유효`);
-        }
+      console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
+      const v_c0d590 = v_e36b07.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
+      const v_c05ac2 = v_4cf0ad.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
 
-        v_e36b07 = v_6c877c;
+      const v_3f87ed = new Set(v_c0d590);
+      const v_276c8d = new Set(v_c05ac2);
+      const v_6c933c =
+        v_c0d590.length !== v_c05ac2.length ||
+        v_c0d590.some((v_389afb) => !v_276c8d.has(v_389afb)) ||
+        v_c05ac2.some((v_389afb) => !v_3f87ed.has(v_389afb));
 
-        console.log('[MapMainScreen] 2단계: URL 검증 시작');
-        const v_507ee6 = await v_e3e9a7(v_e36b07);
+      let v_5fd150 = v_b9ce93;
 
-        const v_be75db = v_507ee6.filter(v_8c0b26 => v_8c0b26.isValid === true);
-        if (v_be75db.length !== v_507ee6.length) {
-          console.log(`[MapMainScreen] URL 검증 완료: ${v_be75db.length}/${v_507ee6.length}개 유효 (${v_507ee6.length - v_be75db.length}개 제외)`);
-        }
-        v_e36b07 = v_be75db;
+      if (!v_6c933c && v_c05ac2.length > 0) {
+        console.log('[MapMainScreen] TopAd5 데이터 변경 없음, 매핑 생략');
 
-        const v_00c9ca = v_e36b07.filter((v_ddcfed) => {
+        v_5fd150 = v_b9ce93;
+      } else {
+        console.log('[MapMainScreen] TopAd5 데이터 변경됨, 매핑 시작');
+
+        const v_d94215 = v_e36b07.filter((v_ddcfed) => {
           const v_aa0917 = String(v_ddcfed.campid || '');
-          const v_2be890 = v_905ecb.has(v_aa0917);
-          if (v_2be890) {
-            console.log(`⚠️ [MapMainScreen] ${v_aa0917}는 이미 본 광고로 제외됨`);
+          const v_4b4d55 = v_79311c.current.has(v_aa0917);
+          if (v_4b4d55) {
+            console.log(`⚠️ [MapMainScreen] ${v_aa0917}는 pre-fetch 실패로 매핑에서 제외`);
           }
-          return !v_2be890;
+          return !v_4b4d55;
         });
 
-        if (v_00c9ca.length !== v_e36b07.length) {
-          console.log(`[MapMainScreen] 이미 본 광고 필터링: ${v_00c9ca.length}/${v_e36b07.length}개 유효 (${v_e36b07.length - v_00c9ca.length}개 제외)`);
-        }
-        v_e36b07 = v_00c9ca;
-
-        if (v_e36b07.length === 0) {
-          console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
-          return;
-        }
-
-        console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', v_e36b07.length, '개 광고');
-        v_6549d0(v_e36b07);
-
-        if (!v_99c46d) {
-          console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
-          return;
-        }
-
-        const v_b9ce93 = JSON.parse(v_99c46d);
-        if (!Array.isArray(v_b9ce93) || v_b9ce93.length === 0) {
-          console.log('[MapMainScreen] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
-          return;
-        }
-
-        console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
-        const v_c0d590 = v_e36b07.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
-        const v_c05ac2 = v_4cf0ad.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
-
-        const v_3f87ed = new Set(v_c0d590);
-        const v_276c8d = new Set(v_c05ac2);
-        const v_6c933c = 
-          v_c0d590.length !== v_c05ac2.length ||
-          v_c0d590.some((v_389afb) => !v_276c8d.has(v_389afb)) ||
-          v_c05ac2.some((v_389afb) => !v_3f87ed.has(v_389afb));
-
-        let v_5fd150 = v_b9ce93;
-
-        if (!v_6c933c && v_c05ac2.length > 0) {
-          console.log('[MapMainScreen] TopAd5 데이터 변경 없음, 매핑 생략');
+        if (v_d94215.length === 0) {
+          console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 pre-fetch 실패)');
 
           v_5fd150 = v_b9ce93;
         } else {
-          console.log('[MapMainScreen] TopAd5 데이터 변경됨, 매핑 시작');
+          console.log(`[MapMainScreen] 유효한 TopAd5 데이터: ${v_d94215.length}/${v_e36b07.length}개 (${v_e36b07.length - v_d94215.length}개 제외)`);
 
-          const v_d94215 = v_e36b07.filter((v_ddcfed) => {
-            const v_aa0917 = String(v_ddcfed.campid || '');
-            const v_4b4d55 = v_79311c.current.has(v_aa0917);
-            if (v_4b4d55) {
-              console.log(`⚠️ [MapMainScreen] ${v_aa0917}는 pre-fetch 실패로 매핑에서 제외`);
-            }
-            return !v_4b4d55;
-          });
+          console.log('[MapMainScreen] 5단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
 
-          if (v_d94215.length === 0) {
-            console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 pre-fetch 실패)');
+          const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
 
-            v_5fd150 = v_b9ce93;
-          } else {
-            console.log(`[MapMainScreen] 유효한 TopAd5 데이터: ${v_d94215.length}/${v_e36b07.length}개 (${v_e36b07.length - v_d94215.length}개 제외)`);
-
-            console.log('[MapMainScreen] 5단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
-
-            const v_8ceeaa = v_b9ce93.map((v_5e3dbb, v_a56041) => {
-
-              if (v_d94215.length > 0) {
-                const v_ba7922 = v_a56041 % v_d94215.length;
-                const v_127b33 = v_d94215[v_ba7922];
+            if (v_d94215.length > 0) {
+              const v_ba7922 = v_a56041 % v_d94215.length;
+              const v_127b33 = v_d94215[v_ba7922];
 
               return {
                 ...v_5e3dbb,
@@ -1751,85 +1735,85 @@ export const MapMainScreen: v_a3453e.FC = () => {
             }
 
             return v_5e3dbb;
-            });
+          });
 
-            console.log('[MapMainScreen] 6단계: 매핑된 마커 데이터 저장 시작');
-            await v_e84827.setItem('astorCoinsData', JSON.stringify(v_8ceeaa));
-            v_5fd150 = v_8ceeaa;
-          }
+          console.log('[MapMainScreen] 6단계: 매핑된 마커 데이터 저장 시작');
+          await v_e84827.setItem('astorCoinsData', JSON.stringify(v_8ceeaa));
+          v_5fd150 = v_8ceeaa;
         }
-
-        console.log('[MapMainScreen] 7단계: 화면에 마커 표시 시작');
-        console.log('[MapMainScreen] finalCoinsData 개수:', v_5fd150.length);
-
-        if (v_5fd150.length === 0) {
-          console.warn('[MapMainScreen] finalCoinsData가 비어있음, 기존 마커 유지');
-          return; 
-        }
-
-        const spotDataArray: v_f71847[] = v_5fd150
-          .filter((v_51b584) => {
-
-            const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
-            const v_c87b30 = v_51b584.longitude || v_51b584.lng;
-            return v_e1b1cf != null && v_c87b30 != null && v_e1b1cf !== 0 && v_c87b30 !== 0;
-          })
-          .map((v_51b584) => ({
-            spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
-            distance: v_51b584.distance || 0,
-            direction: v_51b584.direction || 0,
-            name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
-            latitude: v_51b584.latitude || v_51b584.lat,
-            longitude: v_51b584.longitude || v_51b584.lng,
-            xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
-            iconurl: v_51b584.iconurl || '',
-            joindesc: v_51b584.joindesc || '',
-            brand: v_51b584.brand || v_51b584.coin || '',
-            coins: v_51b584.coins || v_51b584.coin || '',
-            coin: v_51b584.coin || '',
-            campid: v_51b584.campid || v_51b584.campId || '',
-            ad_company: v_51b584.ad_company || '',
-            urlAD: v_51b584.urlAD || '',
-          } as v_f71847));
-
-        console.log('[MapMainScreen] spotDataArray 개수:', v_22ecab.length);
-
-        if (v_22ecab.length === 0) {
-          console.warn('[MapMainScreen] spotDataArray가 비어있음, 기존 마커 유지');
-          return; 
-        }
-
-        v_14dd24(v_22ecab);
-        console.log('[MapMainScreen] 화면에 마커 표시 완료:', v_22ecab.length, '개 마커');
-
-        console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
-
-        const v_325f7b = new Set(v_e36b07.map((v_ddcfed) => String(v_ddcfed.campid || '')));
-        const v_730f6c = Array.from(v_79311c.current).filter(v_aa0917 => v_325f7b.has(v_aa0917));
-        v_79311c.current = new Set(v_730f6c);
-        try {
-          await v_e84827.setItem('failedPreFetchCampids', JSON.stringify(v_730f6c));
-        } catch (v_5e9bfe) {
-          console.error('[MapMainScreen] 실패 정보 업데이트 실패:', v_5e9bfe);
-        }
-        v_89e09e(v_e36b07);
-      } catch (v_5e9bfe) {
-        console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', v_5e9bfe);
-
-        try {
-          const v_fe7102 = await v_5d7ca4();
-          if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
-            v_6549d0(v_fe7102);
-            console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
-          }
-        } catch (v_741f30) {
-          console.error('[MapMainScreen] Fall over 실패:', v_741f30);
-        }
-      } finally {
-
-        v_fd5fd4.current = false;
       }
-    }, [v_ac1d22, v_a55f0b, v_4cf0ad, v_79311c, v_89e09e]); 
+
+      console.log('[MapMainScreen] 7단계: 화면에 마커 표시 시작');
+      console.log('[MapMainScreen] finalCoinsData 개수:', v_5fd150.length);
+
+      if (v_5fd150.length === 0) {
+        console.warn('[MapMainScreen] finalCoinsData가 비어있음, 기존 마커 유지');
+        return; 
+      }
+
+      const spotDataArray: v_f71847[] = v_5fd150
+        .filter((v_51b584) => {
+
+          const v_e1b1cf = v_51b584.latitude || v_51b584.lat;
+          const v_c87b30 = v_51b584.longitude || v_51b584.lng;
+          return v_e1b1cf != null && v_c87b30 != null && v_e1b1cf !== 0 && v_c87b30 !== 0;
+        })
+        .map((v_51b584) => ({
+          spotID: v_51b584.spotid || v_51b584.spotID || v_51b584.id || 0,
+          distance: v_51b584.distance || 0,
+          direction: v_51b584.direction || 0,
+          name: v_51b584.name || v_51b584.title || v_51b584.brand || 'XRUN coin',
+          latitude: v_51b584.latitude || v_51b584.lat,
+          longitude: v_51b584.longitude || v_51b584.lng,
+          xrunPrice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || 0,
+          iconurl: v_51b584.iconurl || '',
+          joindesc: v_51b584.joindesc || '',
+          brand: v_51b584.brand || v_51b584.coin || '',
+          coins: v_51b584.coins || v_51b584.coin || '',
+          coin: v_51b584.coin || '',
+          campid: v_51b584.campid || v_51b584.campId || '',
+          ad_company: v_51b584.ad_company || '',
+          urlAD: v_51b584.urlAD || '',
+        } as v_f71847));
+
+      console.log('[MapMainScreen] spotDataArray 개수:', v_22ecab.length);
+
+      if (v_22ecab.length === 0) {
+        console.warn('[MapMainScreen] spotDataArray가 비어있음, 기존 마커 유지');
+        return; 
+      }
+
+      v_14dd24(v_22ecab);
+      console.log('[MapMainScreen] 화면에 마커 표시 완료:', v_22ecab.length, '개 마커');
+
+      console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
+
+      const v_325f7b = new Set(v_e36b07.map((v_ddcfed) => String(v_ddcfed.campid || '')));
+      const v_730f6c = Array.from(v_79311c.current).filter(v_aa0917 => v_325f7b.has(v_aa0917));
+      v_79311c.current = new Set(v_730f6c);
+      try {
+        await v_e84827.setItem('failedPreFetchCampids', JSON.stringify(v_730f6c));
+      } catch (v_5e9bfe) {
+        console.error('[MapMainScreen] 실패 정보 업데이트 실패:', v_5e9bfe);
+      }
+      v_89e09e(v_e36b07);
+    } catch (v_5e9bfe) {
+      console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', v_5e9bfe);
+
+      try {
+        const v_fe7102 = await v_5d7ca4();
+        if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
+          v_6549d0(v_fe7102);
+          console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
+        }
+      } catch (v_741f30) {
+        console.error('[MapMainScreen] Fall over 실패:', v_741f30);
+      }
+    } finally {
+
+      v_fd5fd4.current = false;
+    }
+  }, [v_ac1d22, v_a55f0b, v_4cf0ad, v_79311c, v_89e09e]); 
 
   v_c4deb2(() => {
 
