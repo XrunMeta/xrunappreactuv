@@ -316,11 +316,11 @@ export const MapMainScreen: React.FC = () => {
   useEffect(() => {
     const loadFailedCampids = async () => {
       try {
-          const stored = await AsyncStorage.getItem('failedPreFetchCampids');
-          if (stored) {
-            const failedArray = JSON.parse(stored) as string[];
-            const failedSet = new Set<string>(failedArray);
-            failedPreFetchCampidsRef.current = failedSet;
+        const stored = await AsyncStorage.getItem('failedPreFetchCampids');
+        if (stored) {
+          const failedArray = JSON.parse(stored) as string[];
+          const failedSet = new Set<string>(failedArray);
+          failedPreFetchCampidsRef.current = failedSet;
           console.log(`[MapMainScreen] 저장된 pre-fetch 실패 정보 로드: ${failedSet.size}개`);
         }
       } catch (error) {
@@ -362,84 +362,87 @@ export const MapMainScreen: React.FC = () => {
 
       for (const ad of adsToFetch) {
         const campid = String(ad.campid || '');
-
-        if (preFetchingCampidsRef.current.has(campid)) {
-          console.log(`⏭️ [MapMainScreen] ${campid}는 이미 처리 중입니다. 건너뜀`);
-          continue;
-        }
-
-        preFetchingCampidsRef.current.add(campid);
         try {
-          let result;
+
+          if (preFetchingCampidsRef.current.has(campid)) {
+            console.log(`⏭️ [MapMainScreen] ${campid}는 이미 처리 중입니다. 건너뜀`);
+            continue;
+          }
+
+          preFetchingCampidsRef.current.add(campid);
+
+          const checkUrl = ad.ad_check_url;
+          let fetchedData = null;
           const company = (ad.ad_company || '').toLowerCase();
-          console.log(`⚙️ [PreFetch] 처리 진입: id=${ad.campid}, lowercase_company='${company}'`);
 
-          if (company === 'nas') {
-            result = await getNasmobAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
-            if (result.code === 200 && result.data?.urlAD) {
-              const fetchedUrl = result.data.urlAD;
+          if (checkUrl) {
+            try {
+              console.log(`🌐 [PreFetch] 요청 시작 (${company}):`, checkUrl);
+              const response = await fetch(checkUrl);
+              const jsonResponse = await response.json();
 
-              setTopAd5Data(prev => prev.map(item =>
-                (item.campid === ad.campid && item.ad_company === 'nas') ? { ...item, urlAD: fetchedUrl } : item
-              ));
-
-              setMarkers(prev => prev.map(m =>
-                (m.campid === ad.campid && m.ad_company === 'nas') ? { ...m, urlAD: fetchedUrl } : m
-              ));
-
-              try {
-                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
-                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
-
-                const newData = {
-                  urlAD: fetchedUrl,
-                  joindesc: result.data.rewarddesc || '',
-                  name: result.data.name || '',
-                  xrunPrice: result.data.price ? (result.data.price / 2) : 0
-                };
-
-                currentCache[ad.campid] = newData;
-                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
-                console.log(`💾 [MapMainScreen] NAS 데이터 캐시 저장 완료: ${ad.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
-              } catch (cacheErr) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
+              if (company === 'nas') {
+                const resCode = typeof jsonResponse.result === 'string' ? parseInt(jsonResponse.result, 10) : jsonResponse.result;
+                if (resCode === 200 && jsonResponse.lurl) {
+                  fetchedData = {
+                    urlAD: jsonResponse.lurl,
+                    name: jsonResponse.name,
+                    joindesc: jsonResponse.rewarddesc,
+                    xrunPrice: jsonResponse.price ? (jsonResponse.price / 2) : undefined
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] NAS 실패: result=${resCode}`);
+                }
+              } else if (company === 'pointclick') {
+                if (jsonResponse.result_code === 200 && jsonResponse.landing_url) {
+                  fetchedData = {
+                    urlAD: jsonResponse.landing_url,
+                    name: jsonResponse.ad_name,
+                    joindesc: jsonResponse.ad_participation,
+                    xrunPrice: jsonResponse.ad_profit
+                  };
+                } else {
+                  console.warn(`⚠️ [PreFetch] PointClick 실패: code=${jsonResponse.result_code}`);
+                }
               }
-
-              console.log(`✅ [MapMainScreen] NAS pre-fetch 성공: ${ad.campid}`);
+            } catch (fetchErr) {
+              console.error(`❌ [PreFetch] Fetch 오류:`, fetchErr);
             }
-          } else if (company === 'pointclick') {
-            result = await getPockAds(memberId.toString(), deviceInfo.adid, deviceInfo, ad.campid);
-            if (result.code === 200 && result.data?.landing_url) {
-              const fetchedUrl = result.data.landing_url;
-              setTopAd5Data(prev => prev.map(item =>
-                (item.campid === ad.campid && String(item.ad_company).toLowerCase() === 'pointclick') ? { ...item, urlAD: fetchedUrl } : item
-              ));
-              setMarkers(prev => prev.map(m =>
-                (m.campid === ad.campid && m.ad_company === 'pointclick') ? { ...m, urlAD: fetchedUrl } : m
-              ));
+          } else {
+            console.warn(`⚠️ [PreFetch] ad_check_url 없음: ${ad.campid}`);
+          }
 
-              try {
-                const currentCacheStr = await AsyncStorage.getItem('cached_AD');
-                const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+          if (fetchedData && fetchedData.urlAD) {
 
-                const newData = {
-                  urlAD: fetchedUrl,
-                  joindesc: result.data.ad_participation || '',
-                  name: result.data.ad_name || '',
-                  xrunPrice: result.data.ad_profit || 0
-                };
+            const fetchedUrl = fetchedData.urlAD;
 
-                currentCache[ad.campid] = newData;
-                await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
-                console.log(`💾 [MapMainScreen] PointClick 데이터 캐시 저장 완료: ${ad.campid}`);
-                console.log('🔍 [MapMainScreen] 현재 cached_AD 키 목록:', Object.keys(currentCache));
-              } catch (cacheErr) {
-                console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
-              }
+            setTopAd5Data(prev => prev.map(item =>
+              (item.campid === ad.campid) ? { ...item, urlAD: fetchedUrl } : item
+            ));
 
-              console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${ad.campid}`);
+            setMarkers(prev => prev.map(m =>
+              (m.campid === ad.campid) ? { ...m, urlAD: fetchedUrl } : m
+            ));
+
+            try {
+              const currentCacheStr = await AsyncStorage.getItem('cached_AD');
+              const currentCache = currentCacheStr ? JSON.parse(currentCacheStr) : {};
+
+              const newData = {
+                urlAD: fetchedUrl,
+                joindesc: fetchedData.joindesc || ad.joindesc || '',
+                name: fetchedData.name || ad.name || '',
+                xrunPrice: fetchedData.xrunPrice !== undefined ? fetchedData.xrunPrice : (ad.xrunPrice || 0)
+              };
+
+              currentCache[ad.campid] = newData;
+              await AsyncStorage.setItem('cached_AD', JSON.stringify(currentCache));
+              console.log(`💾 [MapMainScreen] 캐시 저장 완료: ${ad.campid}`);
+            } catch (cacheErr) {
+              console.error('❌ [MapMainScreen] 캐시 저장 실패:', cacheErr);
             }
+
+            console.log(`✅ [MapMainScreen] PointClick pre-fetch 성공: ${ad.campid}`);
           } else {
             console.log(`⚠️ [MapMainScreen] 알 수 없는 회사 타입: ${company}, campid: ${ad.campid}`);
           }
@@ -582,11 +585,11 @@ export const MapMainScreen: React.FC = () => {
 
                     const distance = shouldRecalculate
                       ? calculateDistance(
-                          targetLocation.latitude,
-                          targetLocation.longitude,
-                          lat,
-                          lng
-                        )
+                        targetLocation.latitude,
+                        targetLocation.longitude,
+                        lat,
+                        lng
+                      )
                       : (coin.distance || 0);
                     return {
                       ...coin,
@@ -748,25 +751,23 @@ export const MapMainScreen: React.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
 
-      const env = getEnv();
-      const requestBody = {
-        member: member.toString(),
-        latitude: targetLocation.latitude,
-        longitude: targetLocation.longitude,
-        limit: 120,
-      };
-
-      const mapApiResponse = await gatewayNodeJS('app2000-01', 'POST', requestBody, navigate);
+      const deviceInfoData = await collectDeviceInfo(); 
 
       const markerDataRaw = await fetchMapMarkerData(
         targetLocation.latitude,
-
         targetLocation.longitude,
-
         member,
-
         navigate,
-
+        {
+          adid: deviceInfoData.adid,
+          ip: deviceInfoData.ipAddress,
+          osver: deviceInfoData.osVersion,
+          devid: deviceInfoData.deviceId,
+          devmodel: deviceInfoData.model,
+          devbrand: deviceInfoData.manufacturer,
+          mnetwork: deviceInfoData.mnetwork,
+          carrier: deviceInfoData.carrier
+        }
       );
 
       console.log('=== 맵 마커 데이터 가져오기 완료 ===');
@@ -838,39 +839,22 @@ export const MapMainScreen: React.FC = () => {
           })
         : [];
 
-      let coinsData = mapApiResponse?.data && Array.isArray(mapApiResponse.data)
-        ? mapApiResponse.data.map((item: any) => ({
-          lat: item.lat,
-          lng: item.lng,
-          title: item.title,
-          distance: item.distance,
-          coins: item.coins,
-          coin: item.coin,
-          advertisement: item.advertisement,
-          iconurl: item.iconurl,
-          joindesc: item.joindesc,
-          name: item.name,
-          campid: item.campid,
-          xrunprice: item.xrunprice,
-          xrunPrice: item.xrunPrice || item.xrunprice || 0,
-          brand: item.brand,
-        }))
-        : [];
-
-      const combinedCoinsData = [...coinsDataVt, ...coinsData];
+      const combinedCoinsData = [...coinsDataVt, ...markerDataRaw];
       console.log('=== 결합된 토큰 데이터 ===');
       console.log('combinedCoinsData length:', combinedCoinsData.length);
 
       const uniqueFileIds: (string | number)[] = [];
       combinedCoinsData.forEach((item) => {
-        if (item.brandlogo_file) uniqueFileIds.push(item.brandlogo_file);
-        if (item.adthumbnail2_file) uniqueFileIds.push(item.adthumbnail2_file);
-        if (item.symbolimg_file) uniqueFileIds.push(item.symbolimg_file);
+        const it = item as any;
+        if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
+        if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
+        if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
       });
 
       if (uniqueFileIds.length > 0) {
         try {
-          await cashingimages.downloadMultipleImages(uniqueFileIds, env.GATEWAY_NODEJS);
+          const envForCache = getEnv();
+          await cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS);
           console.log('✅ 이미지 캐싱 완료');
         } catch (imageCacheError) {
           console.error('이미지 캐싱 오류:', imageCacheError);
@@ -1557,180 +1541,180 @@ export const MapMainScreen: React.FC = () => {
 
   const refreshTopAd5AndMapMarkers = useCallback(async (forceRefresh: boolean = false) => {
 
-      if (isFetchingTopAd5Ref.current) {
-        console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+    if (isFetchingTopAd5Ref.current) {
+      console.log('[MapMainScreen] refreshTopAd5AndMapMarkers 이미 실행 중입니다. 중복 호출 무시');
+      return;
+    }
+
+    isFetchingTopAd5Ref.current = true;
+    try {
+
+      let completedAdsSet = new Set<string>();
+      try {
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          const parsedUserData = JSON.parse(userData);
+          const member = parsedUserData?.member;
+          if (member) {
+            completedAdsSet = await getCompletedAdsSet(member, navigate);
+            console.log(`[MapMainScreen] 완료된 광고 목록: ${completedAdsSet.size}개`);
+          }
+        }
+      } catch (error) {
+        console.warn('[MapMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
+      }
+
+      const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
+      if (astorCoinsData) {
+        const coinsData = JSON.parse(astorCoinsData);
+        if (Array.isArray(coinsData) && coinsData.length > 0) {
+
+          const spotDataArray: SpotData[] = coinsData
+            .filter((coin: any) => {
+
+              const lat = coin.latitude || coin.lat;
+              const lng = coin.longitude || coin.lng;
+              return lat != null && lng != null && lat !== 0 && lng !== 0;
+            })
+            .map((coin: any) => ({
+              spotID: coin.spotid || coin.spotID || coin.id || 0,
+              distance: coin.distance || 0,
+              direction: coin.direction || 0,
+              name: coin.name || coin.title || coin.brand || 'XRUN coin',
+              latitude: coin.latitude || coin.lat,
+              longitude: coin.longitude || coin.lng,
+              xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
+              iconurl: coin.iconurl || '',
+              joindesc: coin.joindesc || '',
+              brand: coin.brand || coin.coin || '',
+              coins: coin.coins || coin.coin || '',
+              coin: coin.coin || '',
+              campid: coin.campid || coin.campId || '',
+              ad_company: coin.ad_company || '',
+              urlAD: coin.urlAD || '',
+            } as SpotData));
+
+          if (spotDataArray.length > 0) {
+            setMarkers(spotDataArray);
+            console.log('[MapMainScreen] 캐시된 마커 먼저 표시:', spotDataArray.length, '개 (본 광고 제외)');
+          }
+        }
+      }
+
+      console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
+      let topAd5Response: any[] | null = null;
+
+      topAd5Response = await getTopAd5(undefined, forceRefresh);
+
+      if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
         return;
       }
 
-      isFetchingTopAd5Ref.current = true;
-      try {
-
-        let completedAdsSet = new Set<string>();
-        try {
-          const userData = await AsyncStorage.getItem('userData');
-          if (userData) {
-            const parsedUserData = JSON.parse(userData);
-            const member = parsedUserData?.member;
-            if (member) {
-              completedAdsSet = await getCompletedAdsSet(member, navigate);
-              console.log(`[MapMainScreen] 완료된 광고 목록: ${completedAdsSet.size}개`);
-            }
-          }
-        } catch (error) {
-          console.warn('[MapMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
+      const filteredTopAd5 = topAd5Response.filter((ad: any) => {
+        const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
+        if (!hasUrl) {
+          console.log(`⚠️ [MapMainScreen] ${ad.campid}는 urlAD가 없어 제외됨`);
         }
+        return hasUrl;
+      });
 
-        const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
-        if (astorCoinsData) {
-          const coinsData = JSON.parse(astorCoinsData);
-          if (Array.isArray(coinsData) && coinsData.length > 0) {
+      if (filteredTopAd5.length === 0) {
+        console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+        return;
+      }
 
-            const spotDataArray: SpotData[] = coinsData
-              .filter((coin: any) => {
+      if (filteredTopAd5.length !== topAd5Response.length) {
+        console.log(`[MapMainScreen] urlAD 필터링: ${filteredTopAd5.length}/${topAd5Response.length}개 유효`);
+      }
 
-                const lat = coin.latitude || coin.lat;
-                const lng = coin.longitude || coin.lng;
-                return lat != null && lng != null && lat !== 0 && lng !== 0;
-              })
-              .map((coin: any) => ({
-                spotID: coin.spotid || coin.spotID || coin.id || 0,
-                distance: coin.distance || 0,
-                direction: coin.direction || 0,
-                name: coin.name || coin.title || coin.brand || 'XRUN coin',
-                latitude: coin.latitude || coin.lat,
-                longitude: coin.longitude || coin.lng,
-                xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
-                iconurl: coin.iconurl || '',
-                joindesc: coin.joindesc || '',
-                brand: coin.brand || coin.coin || '',
-                coins: coin.coins || coin.coin || '',
-                coin: coin.coin || '',
-                campid: coin.campid || coin.campId || '',
-                ad_company: coin.ad_company || '',
-                urlAD: coin.urlAD || '',
-              } as SpotData));
+      topAd5Response = filteredTopAd5;
 
-            if (spotDataArray.length > 0) {
-              setMarkers(spotDataArray);
-              console.log('[MapMainScreen] 캐시된 마커 먼저 표시:', spotDataArray.length, '개 (본 광고 제외)');
-            }
-          }
+      console.log('[MapMainScreen] 2단계: URL 검증 시작');
+      const validatedData = await validateTopAd5Urls(topAd5Response);
+
+      const validUrlData = validatedData.filter(item => item.isValid === true);
+      if (validUrlData.length !== validatedData.length) {
+        console.log(`[MapMainScreen] URL 검증 완료: ${validUrlData.length}/${validatedData.length}개 유효 (${validatedData.length - validUrlData.length}개 제외)`);
+      }
+      topAd5Response = validUrlData;
+
+      const filteredCompletedAds = topAd5Response.filter((ad: any) => {
+        const campid = String(ad.campid || '');
+        const isCompleted = completedAdsSet.has(campid);
+        if (isCompleted) {
+          console.log(`⚠️ [MapMainScreen] ${campid}는 이미 본 광고로 제외됨`);
         }
+        return !isCompleted;
+      });
 
-        console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
-        let topAd5Response: any[] | null = null;
+      if (filteredCompletedAds.length !== topAd5Response.length) {
+        console.log(`[MapMainScreen] 이미 본 광고 필터링: ${filteredCompletedAds.length}/${topAd5Response.length}개 유효 (${topAd5Response.length - filteredCompletedAds.length}개 제외)`);
+      }
+      topAd5Response = filteredCompletedAds;
 
-        topAd5Response = await getTopAd5(undefined, forceRefresh);
+      if (topAd5Response.length === 0) {
+        console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
+        return;
+      }
 
-        if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-          console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
-          return;
-        }
+      console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', topAd5Response.length, '개 광고');
+      setTopAd5Data(topAd5Response);
 
-        const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-          const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
-          if (!hasUrl) {
-            console.log(`⚠️ [MapMainScreen] ${ad.campid}는 urlAD가 없어 제외됨`);
-          }
-          return hasUrl;
-        });
+      if (!astorCoinsData) {
+        console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
+        return;
+      }
 
-        if (filteredTopAd5.length === 0) {
-          console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
-          return;
-        }
+      const coinsData = JSON.parse(astorCoinsData);
+      if (!Array.isArray(coinsData) || coinsData.length === 0) {
+        console.log('[MapMainScreen] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
+        return;
+      }
 
-        if (filteredTopAd5.length !== topAd5Response.length) {
-          console.log(`[MapMainScreen] urlAD 필터링: ${filteredTopAd5.length}/${topAd5Response.length}개 유효`);
-        }
+      console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
+      const currentCampids = topAd5Response.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
+      const previousCampids = topAd5Data.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
 
-        topAd5Response = filteredTopAd5;
+      const currentCampidsSet = new Set(currentCampids);
+      const previousCampidsSet = new Set(previousCampids);
+      const isChanged =
+        currentCampids.length !== previousCampids.length ||
+        currentCampids.some((id: any) => !previousCampidsSet.has(id)) ||
+        previousCampids.some((id: any) => !currentCampidsSet.has(id));
 
-        console.log('[MapMainScreen] 2단계: URL 검증 시작');
-        const validatedData = await validateTopAd5Urls(topAd5Response);
+      let finalCoinsData: any[] = coinsData;
 
-        const validUrlData = validatedData.filter(item => item.isValid === true);
-        if (validUrlData.length !== validatedData.length) {
-          console.log(`[MapMainScreen] URL 검증 완료: ${validUrlData.length}/${validatedData.length}개 유효 (${validatedData.length - validUrlData.length}개 제외)`);
-        }
-        topAd5Response = validUrlData;
+      if (!isChanged && previousCampids.length > 0) {
+        console.log('[MapMainScreen] TopAd5 데이터 변경 없음, 매핑 생략');
 
-        const filteredCompletedAds = topAd5Response.filter((ad: any) => {
+        finalCoinsData = coinsData;
+      } else {
+        console.log('[MapMainScreen] TopAd5 데이터 변경됨, 매핑 시작');
+
+        const validTopAd5 = topAd5Response.filter((ad: any) => {
           const campid = String(ad.campid || '');
-          const isCompleted = completedAdsSet.has(campid);
-          if (isCompleted) {
-            console.log(`⚠️ [MapMainScreen] ${campid}는 이미 본 광고로 제외됨`);
+          const isFailed = failedPreFetchCampidsRef.current.has(campid);
+          if (isFailed) {
+            console.log(`⚠️ [MapMainScreen] ${campid}는 pre-fetch 실패로 매핑에서 제외`);
           }
-          return !isCompleted;
+          return !isFailed;
         });
 
-        if (filteredCompletedAds.length !== topAd5Response.length) {
-          console.log(`[MapMainScreen] 이미 본 광고 필터링: ${filteredCompletedAds.length}/${topAd5Response.length}개 유효 (${topAd5Response.length - filteredCompletedAds.length}개 제외)`);
-        }
-        topAd5Response = filteredCompletedAds;
-
-        if (topAd5Response.length === 0) {
-          console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
-          return;
-        }
-
-        console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', topAd5Response.length, '개 광고');
-        setTopAd5Data(topAd5Response);
-
-        if (!astorCoinsData) {
-          console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
-          return;
-        }
-
-        const coinsData = JSON.parse(astorCoinsData);
-        if (!Array.isArray(coinsData) || coinsData.length === 0) {
-          console.log('[MapMainScreen] 마커 데이터가 배열이 아니거나 비어있음 - 매핑 건너뛰기');
-          return;
-        }
-
-        console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
-        const currentCampids = topAd5Response.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
-        const previousCampids = topAd5Data.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
-
-        const currentCampidsSet = new Set(currentCampids);
-        const previousCampidsSet = new Set(previousCampids);
-        const isChanged = 
-          currentCampids.length !== previousCampids.length ||
-          currentCampids.some((id: any) => !previousCampidsSet.has(id)) ||
-          previousCampids.some((id: any) => !currentCampidsSet.has(id));
-
-        let finalCoinsData: any[] = coinsData;
-
-        if (!isChanged && previousCampids.length > 0) {
-          console.log('[MapMainScreen] TopAd5 데이터 변경 없음, 매핑 생략');
+        if (validTopAd5.length === 0) {
+          console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 pre-fetch 실패)');
 
           finalCoinsData = coinsData;
         } else {
-          console.log('[MapMainScreen] TopAd5 데이터 변경됨, 매핑 시작');
+          console.log(`[MapMainScreen] 유효한 TopAd5 데이터: ${validTopAd5.length}/${topAd5Response.length}개 (${topAd5Response.length - validTopAd5.length}개 제외)`);
 
-          const validTopAd5 = topAd5Response.filter((ad: any) => {
-            const campid = String(ad.campid || '');
-            const isFailed = failedPreFetchCampidsRef.current.has(campid);
-            if (isFailed) {
-              console.log(`⚠️ [MapMainScreen] ${campid}는 pre-fetch 실패로 매핑에서 제외`);
-            }
-            return !isFailed;
-          });
+          console.log('[MapMainScreen] 5단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
 
-          if (validTopAd5.length === 0) {
-            console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 pre-fetch 실패)');
+          const mappedCoinsData = coinsData.map((marker: any, index: number) => {
 
-            finalCoinsData = coinsData;
-          } else {
-            console.log(`[MapMainScreen] 유효한 TopAd5 데이터: ${validTopAd5.length}/${topAd5Response.length}개 (${topAd5Response.length - validTopAd5.length}개 제외)`);
-
-            console.log('[MapMainScreen] 5단계: 마커-광고 매핑 시작 (전체 마커에 대해 순차 매핑)');
-
-            const mappedCoinsData = coinsData.map((marker: any, index: number) => {
-
-              if (validTopAd5.length > 0) {
-                const adIndex = index % validTopAd5.length;
-                const mappedAd = validTopAd5[adIndex];
+            if (validTopAd5.length > 0) {
+              const adIndex = index % validTopAd5.length;
+              const mappedAd = validTopAd5[adIndex];
 
               return {
                 ...marker,
@@ -1751,85 +1735,85 @@ export const MapMainScreen: React.FC = () => {
             }
 
             return marker;
-            });
+          });
 
-            console.log('[MapMainScreen] 6단계: 매핑된 마커 데이터 저장 시작');
-            await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
-            finalCoinsData = mappedCoinsData;
-          }
+          console.log('[MapMainScreen] 6단계: 매핑된 마커 데이터 저장 시작');
+          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(mappedCoinsData));
+          finalCoinsData = mappedCoinsData;
         }
-
-        console.log('[MapMainScreen] 7단계: 화면에 마커 표시 시작');
-        console.log('[MapMainScreen] finalCoinsData 개수:', finalCoinsData.length);
-
-        if (finalCoinsData.length === 0) {
-          console.warn('[MapMainScreen] finalCoinsData가 비어있음, 기존 마커 유지');
-          return; 
-        }
-
-        const spotDataArray: SpotData[] = finalCoinsData
-          .filter((coin: any) => {
-
-            const lat = coin.latitude || coin.lat;
-            const lng = coin.longitude || coin.lng;
-            return lat != null && lng != null && lat !== 0 && lng !== 0;
-          })
-          .map((coin: any) => ({
-            spotID: coin.spotid || coin.spotID || coin.id || 0,
-            distance: coin.distance || 0,
-            direction: coin.direction || 0,
-            name: coin.name || coin.title || coin.brand || 'XRUN coin',
-            latitude: coin.latitude || coin.lat,
-            longitude: coin.longitude || coin.lng,
-            xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
-            iconurl: coin.iconurl || '',
-            joindesc: coin.joindesc || '',
-            brand: coin.brand || coin.coin || '',
-            coins: coin.coins || coin.coin || '',
-            coin: coin.coin || '',
-            campid: coin.campid || coin.campId || '',
-            ad_company: coin.ad_company || '',
-            urlAD: coin.urlAD || '',
-          } as SpotData));
-
-        console.log('[MapMainScreen] spotDataArray 개수:', spotDataArray.length);
-
-        if (spotDataArray.length === 0) {
-          console.warn('[MapMainScreen] spotDataArray가 비어있음, 기존 마커 유지');
-          return; 
-        }
-
-        setMarkers(spotDataArray);
-        console.log('[MapMainScreen] 화면에 마커 표시 완료:', spotDataArray.length, '개 마커');
-
-        console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
-
-        const topAd5CampidsSet = new Set(topAd5Response.map((ad: any) => String(ad.campid || '')));
-        const filteredFailed = Array.from(failedPreFetchCampidsRef.current).filter(campid => topAd5CampidsSet.has(campid));
-        failedPreFetchCampidsRef.current = new Set(filteredFailed);
-        try {
-          await AsyncStorage.setItem('failedPreFetchCampids', JSON.stringify(filteredFailed));
-        } catch (error) {
-          console.error('[MapMainScreen] 실패 정보 업데이트 실패:', error);
-        }
-        startPreFetchAdUrls(topAd5Response);
-      } catch (error) {
-        console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', error);
-
-        try {
-          const storedData = await getStoredTopAd5();
-          if (storedData && Array.isArray(storedData) && storedData.length > 0) {
-            setTopAd5Data(storedData);
-            console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', storedData.length, '개 광고');
-          }
-        } catch (fallbackError) {
-          console.error('[MapMainScreen] Fall over 실패:', fallbackError);
-        }
-      } finally {
-
-        isFetchingTopAd5Ref.current = false;
       }
-    }, [activeTab, location, topAd5Data, failedPreFetchCampidsRef, startPreFetchAdUrls]); 
+
+      console.log('[MapMainScreen] 7단계: 화면에 마커 표시 시작');
+      console.log('[MapMainScreen] finalCoinsData 개수:', finalCoinsData.length);
+
+      if (finalCoinsData.length === 0) {
+        console.warn('[MapMainScreen] finalCoinsData가 비어있음, 기존 마커 유지');
+        return; 
+      }
+
+      const spotDataArray: SpotData[] = finalCoinsData
+        .filter((coin: any) => {
+
+          const lat = coin.latitude || coin.lat;
+          const lng = coin.longitude || coin.lng;
+          return lat != null && lng != null && lat !== 0 && lng !== 0;
+        })
+        .map((coin: any) => ({
+          spotID: coin.spotid || coin.spotID || coin.id || 0,
+          distance: coin.distance || 0,
+          direction: coin.direction || 0,
+          name: coin.name || coin.title || coin.brand || 'XRUN coin',
+          latitude: coin.latitude || coin.lat,
+          longitude: coin.longitude || coin.lng,
+          xrunPrice: coin.xrunprice || coin.xrunPrice || coin.price || 0,
+          iconurl: coin.iconurl || '',
+          joindesc: coin.joindesc || '',
+          brand: coin.brand || coin.coin || '',
+          coins: coin.coins || coin.coin || '',
+          coin: coin.coin || '',
+          campid: coin.campid || coin.campId || '',
+          ad_company: coin.ad_company || '',
+          urlAD: coin.urlAD || '',
+        } as SpotData));
+
+      console.log('[MapMainScreen] spotDataArray 개수:', spotDataArray.length);
+
+      if (spotDataArray.length === 0) {
+        console.warn('[MapMainScreen] spotDataArray가 비어있음, 기존 마커 유지');
+        return; 
+      }
+
+      setMarkers(spotDataArray);
+      console.log('[MapMainScreen] 화면에 마커 표시 완료:', spotDataArray.length, '개 마커');
+
+      console.log('[MapMainScreen] TopAd5 데이터 새로고침 및 마커 매핑 완료');
+
+      const topAd5CampidsSet = new Set(topAd5Response.map((ad: any) => String(ad.campid || '')));
+      const filteredFailed = Array.from(failedPreFetchCampidsRef.current).filter(campid => topAd5CampidsSet.has(campid));
+      failedPreFetchCampidsRef.current = new Set(filteredFailed);
+      try {
+        await AsyncStorage.setItem('failedPreFetchCampids', JSON.stringify(filteredFailed));
+      } catch (error) {
+        console.error('[MapMainScreen] 실패 정보 업데이트 실패:', error);
+      }
+      startPreFetchAdUrls(topAd5Response);
+    } catch (error) {
+      console.error('[MapMainScreen] TopAd5 데이터 새로고침 실패:', error);
+
+      try {
+        const storedData = await getStoredTopAd5();
+        if (storedData && Array.isArray(storedData) && storedData.length > 0) {
+          setTopAd5Data(storedData);
+          console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', storedData.length, '개 광고');
+        }
+      } catch (fallbackError) {
+        console.error('[MapMainScreen] Fall over 실패:', fallbackError);
+      }
+    } finally {
+
+      isFetchingTopAd5Ref.current = false;
+    }
+  }, [activeTab, location, topAd5Data, failedPreFetchCampidsRef, startPreFetchAdUrls]); 
 
   useEffect(() => {
 

@@ -95,7 +95,7 @@ export const MyInfoSettingsScreen = () => {
               onPress={openStore}
             >
               <Text style={styles.versionText}>
-                AOS : {versionInfo.androidCurrent}/{versionInfo.androidLatest} IOS : {versionInfo.iosCurrent}/{versionInfo.iosLatest}
+                Android : {versionInfo.androidCurrent}/{versionInfo.androidLatest} iOS : {versionInfo.iosCurrent}/{versionInfo.iosLatest}
               </Text>
             </TouchableOpacity>
           )}
