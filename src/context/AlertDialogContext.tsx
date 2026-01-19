@@ -69,37 +69,61 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
         });
 
         if (v_580dd6.current) {
-          v_580dd6.current
-            .open({
-              title: v_9f1622,
-              message: v_a8cd21,
-              button1Label: v_eb32ab.text,
-              button1Action: async () => {
-                v_eb32ab.onPress?.();
-                v_b8817e(false);
-                v_af9459(null);
-                v_6f7712(0); 
-              },
-              button2Label: v_eaad74.text,
-              button2Action: async () => {
-                v_eaad74.onPress?.();
-                v_b8817e(false);
-                v_af9459(null);
-                v_6f7712(1); 
-              },
-            })
-            .then((v_43c42e) => {
+          console.log('[AlertDialog] ChoiceDialog open 호출:', { title: v_9f1622, message: v_a8cd21, button1: v_eb32ab.text, button2: v_eaad74.text });
 
-              if (v_43c42e === 'button1') {
-                v_6f7712(0);
-              } else if (v_43c42e === 'button2') {
-                v_6f7712(1);
-              }
-              v_b8817e(false);
-              v_af9459(null);
-            });
+          v_b8817e(true);
+          console.log('[AlertDialog] setChoiceDialogVisible(true) 호출');
+
+          setTimeout(() => {
+            if (v_580dd6.current) {
+              const v_f9e626 = v_580dd6.current.open({
+                title: v_9f1622,
+                message: v_a8cd21,
+                button1Label: v_eb32ab.text,
+                button1Action: async () => {
+                  console.log('[AlertDialog] button1 클릭');
+                  v_eb32ab.onPress?.();
+                  v_b8817e(false);
+                  v_af9459(null);
+                },
+                button2Label: v_eaad74.text,
+                button2Action: async () => {
+                  console.log('[AlertDialog] button2 클릭');
+                  v_eaad74.onPress?.();
+                  v_b8817e(false);
+                  v_af9459(null);
+                },
+              });
+
+              v_f9e626
+                .then((v_43c42e) => {
+                  console.log('[AlertDialog] ChoiceDialog Promise 결과:', v_43c42e);
+                  if (v_43c42e === 'button1') {
+                    v_6f7712(0);
+                  } else if (v_43c42e === 'button2') {
+                    v_6f7712(1);
+                  } else {
+
+                    v_6f7712(0);
+                  }
+                  v_b8817e(false);
+                  v_af9459(null);
+                })
+                .catch((v_5e9bfe) => {
+                  console.error('[AlertDialog] ChoiceDialog open 오류:', v_5e9bfe);
+
+                  v_6f7712(0);
+                });
+            } else {
+              console.error('[AlertDialog] choiceDialogRef.current가 null입니다 (setTimeout 후)');
+              v_6f7712(0);
+            }
+          }, 0);
+        } else {
+          console.error('[AlertDialog] choiceDialogRef.current가 null입니다. ChoiceDialog가 렌더링되지 않았을 수 있습니다.');
+
+          v_6f7712(0);
         }
-        v_b8817e(true);
       }
     });
   };

@@ -474,30 +474,48 @@ export const v_f40fc5 = () => {
       } else {
 
         console.log('[회원가입] 2단계: 추천인 이메일이 비어있음 - 알림 표시');
-        const v_af3e48 = await v_889fad(
-          v_8d41d7('screens.signup.alerts.referralEmpty'),
-          v_8d41d7('screens.signup.errors.referralEmpty'),
-          [
-            {
-              text: v_8d41d7('screens.signup.alerts.inputReferral'),
-              style: 'cancel',
-              onPress: () => {
-                v_e33ec0(false);
-              },
-            },
-            {
-              text: v_8d41d7('screens.signup.alerts.confirm'),
-              onPress: () => {
+        const v_9f1622 = v_8d41d7('screens.signup.alerts.referralEmpty');
+        const v_a8cd21 = v_8d41d7('screens.signup.errors.referralEmpty');
+        const v_dde6e9 = v_8d41d7('screens.signup.alerts.inputReferral');
+        const v_1b6aa4 = v_8d41d7('screens.signup.alerts.confirm');
 
-              },
-            },
-          ],
-        );
+        console.log('[회원가입] 알림 파라미터:', { title: v_9f1622, message: v_a8cd21, button1Text: v_dde6e9, button2Text: v_1b6aa4 });
 
-        if (v_af3e48 === 0) {
-          return;
+        try {
+          const v_af3e48 = await v_889fad(
+            v_9f1622,
+            v_a8cd21,
+            [
+              {
+                text: v_dde6e9,
+                style: 'cancel',
+                onPress: () => {
+                  console.log('[회원가입] 입력하기 버튼 클릭');
+                  v_e33ec0(false);
+                },
+              },
+              {
+                text: v_1b6aa4,
+                onPress: () => {
+                  console.log('[회원가입] 확인 버튼 클릭');
+
+                },
+              },
+            ],
+          );
+
+          console.log('[회원가입] 알림 버튼 인덱스:', v_af3e48);
+
+          if (v_af3e48 === 0) {
+            console.log('[회원가입] 입력하기 선택 - 회원가입 중단');
+            return;
+          }
+
+          console.log('[회원가입] 확인 선택 - 계속 진행');
+        } catch (v_5e9bfe) {
+          console.error('[회원가입] 알림 표시 오류:', v_5e9bfe);
+
         }
-
       }
 
       if (v_d0472c) {

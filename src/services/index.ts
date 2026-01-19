@@ -107,6 +107,8 @@ import {
   v_758f4f,
   v_e05ff9,
   v_678cf5,
+  v_aca92a,
+  v_a7bce8,
   v_c5ddda,
   v_c8e190,
   v_caa41f,
@@ -3280,6 +3282,40 @@ export const v_b7594c = async (
   }
 };
 
+export const v_602f88 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_aca92a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = { member: v_660822 };
+
+    console.log('[정산완료] 정산완료 리스트 조회 요청:', { member: v_660822 });
+
+    const v_3393e3 = await v_9f42a4.post<v_aca92a>(
+      '/getSettlementList',
+      v_576f5a,
+    );
+
+    console.log('[정산완료] 정산완료 리스트 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[정산완료] 정산완료 리스트 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[정산완료] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_5bb1ab = async (
   v_660822,
   v_c65f5d,
@@ -4157,16 +4193,17 @@ export const v_fe6b99 = async (
 };
 
 export const v_c1fabf = async (
+  v_660822,
   v_c65f5d,
 ): Promise<v_bae79a> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
 
-    console.log('[Quest] 퀘스트 리스트 조회 요청');
+    const v_f71b56 = v_660822 ? `/Quests/list?member=${v_660822}` : '/Quests/list';
 
-    const v_3393e3 = await v_9f42a4.get<v_bae79a>(
-      '/Quests/list',
-    );
+    console.log('[Quest] 퀘스트 리스트 조회 요청', v_660822 ? `(member: ${v_660822})` : '');
+
+    const v_3393e3 = await v_9f42a4.get<v_bae79a>(v_f71b56);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', v_3393e3.data.data?.length || 0, '개');
 
@@ -4922,6 +4959,7 @@ export const v_8cba1e = async (v_aa0917, v_c65f5d): Promise<void> => {
 const v_3398a2 = 'completedAdsCache';
 const v_8da311 = 'completedAdsCacheTimestamp';
 const v_354e72 = 5 * 60 * 1000; 
+const v_614136 = 1000; 
 
 export const v_318c45 = async (v_660822, v_c65f5d, v_9d6a91 = false): Promise<Set<string>> => {
   try {
@@ -4970,11 +5008,32 @@ export const v_318c45 = async (v_660822, v_c65f5d, v_9d6a91 = false): Promise<Se
       });
 
       try {
-        await v_e84827.setItem(v_3398a2, JSON.stringify(Array.from(v_905ecb)));
+        const v_3c955d = Array.from(v_905ecb);
+
+        const v_f7f94d = v_3c955d.length > v_614136 
+          ? v_3c955d.slice(-v_614136) 
+          : v_3c955d;
+
+        await v_e84827.setItem(v_3398a2, JSON.stringify(v_f7f94d));
         await v_e84827.setItem(v_8da311, Date.now().toString());
-        console.log(`[getCompletedAdsSet] 캐시 저장 완료: ${v_905ecb.size}개`);
+        console.log(`[getCompletedAdsSet] 캐시 저장 완료: ${v_f7f94d.length}개${v_3c955d.length > v_614136 ? ` (${v_3c955d.length - v_614136}개 제거됨)` : ''}`);
       } catch (v_2bf859) {
         console.warn('[getCompletedAdsSet] 캐시 저장 실패:', v_2bf859);
+
+        if (v_2bf859 instanceof Error && v_2bf859.message.includes('exceeds')) {
+          try {
+            console.log('[getCompletedAdsSet] 캐시 용량 초과 감지 - 캐시 초기화');
+            await v_e84827.removeItem(v_3398a2);
+            await v_e84827.removeItem(v_8da311);
+
+            const v_f7f94d = Array.from(v_905ecb).slice(-Math.floor(v_614136 / 2));
+            await v_e84827.setItem(v_3398a2, JSON.stringify(v_f7f94d));
+            await v_e84827.setItem(v_8da311, Date.now().toString());
+            console.log(`[getCompletedAdsSet] 캐시 초기화 후 저장 완료: ${v_f7f94d.length}개`);
+          } catch (v_16229f) {
+            console.error('[getCompletedAdsSet] 캐시 초기화 실패:', v_16229f);
+          }
+        }
       }
     }
 
@@ -4983,6 +5042,45 @@ export const v_318c45 = async (v_660822, v_c65f5d, v_9d6a91 = false): Promise<Se
     console.error('[getCompletedAdsSet] 완료된 광고 목록 조회 실패:', v_5e9bfe);
 
     return new Set<string>();
+  }
+};
+
+export const v_5e0191 = async (v_aa0917): Promise<void> => {
+  try {
+    const v_c06630 = await v_e84827.getItem(v_3398a2);
+    let v_e2a6a6 = v_c06630 ? JSON.parse(v_c06630) : [];
+
+    if (v_e2a6a6.includes(v_aa0917)) {
+      return;
+    }
+
+    v_e2a6a6.push(v_aa0917);
+
+    if (v_e2a6a6.length > v_614136) {
+      const v_158159 = v_e2a6a6.length - v_614136;
+      v_e2a6a6 = v_e2a6a6.slice(v_158159); 
+      console.log(`[addToCompletedAdsCache] 크기 제한 초과 - ${v_158159}개 오래된 항목 제거`);
+    }
+
+    await v_e84827.setItem(v_3398a2, JSON.stringify(v_e2a6a6));
+    await v_e84827.setItem(v_8da311, Date.now().toString());
+    console.log(`[addToCompletedAdsCache] completedAdsCache에 추가: ${v_aa0917} (총 ${v_e2a6a6.length}개)`);
+  } catch (v_2bf859) {
+    console.warn('[addToCompletedAdsCache] completedAdsCache 업데이트 실패:', v_2bf859);
+
+    if (v_2bf859 instanceof Error && v_2bf859.message.includes('exceeds')) {
+      try {
+        console.log('[addToCompletedAdsCache] 캐시 용량 초과 감지 - 캐시 초기화');
+        await v_e84827.removeItem(v_3398a2);
+        await v_e84827.removeItem(v_8da311);
+
+        await v_e84827.setItem(v_3398a2, JSON.stringify([v_aa0917]));
+        await v_e84827.setItem(v_8da311, Date.now().toString());
+        console.log('[addToCompletedAdsCache] 캐시 초기화 후 새로 추가 완료');
+      } catch (v_16229f) {
+        console.error('[addToCompletedAdsCache] 캐시 초기화 실패:', v_16229f);
+      }
+    }
   }
 };
 
