@@ -766,7 +766,7 @@ export const v_1fee11 = async (
   v_39aae3,
   v_6bee94,
   v_c65f5d,
-): Promise<ConnectAppleAccountResponse> => {
+): Promise<any> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const v_576f5a = {
@@ -777,7 +777,7 @@ export const v_1fee11 = async (
     console.log('[계정 연동] 애플 계정 연동 요청');
     console.log('[계정 연동] 요청 데이터 (비밀번호 포함):', JSON.stringify(v_576f5a, null, 2));
 
-    const v_3393e3 = await v_9f42a4.post<ConnectAppleAccountResponse>(
+    const v_3393e3 = await v_9f42a4.post<any>(
       '/connect-apple-account',
       v_576f5a,
     );
@@ -2515,6 +2515,31 @@ export const v_1c4683 = async (
       const v_74dc8b = await v_3393e3.text();
       console.error(`[NStation] HTTP 에러 (${v_3393e3.status}):`, v_74dc8b.substring(0, 500));
 
+      if (v_3393e3.status === 403) {
+        try {
+          const v_e15e6f = JSON.parse(v_74dc8b);
+          if (v_e15e6f.status === 'error' && v_e15e6f.code === 403) {
+            console.warn(`[NStation] 블록리스트된 캠페인: ${v_aa0917} - ${v_e15e6f.message || 'Campaign is blocked'}`);
+
+            if (v_aa0917) {
+              await v_18b723(v_aa0917);
+            }
+
+            const v_5e9bfe = new Error(v_e15e6f.message || 'Campaign is blocked');
+            (v_5e9bfe as any).is403 = true;
+            (v_5e9bfe as any).campid = v_aa0917;
+            throw v_5e9bfe;
+          }
+        } catch (v_5f9add) {
+
+          console.warn(`[NStation] 403 에러 (JSON 파싱 실패): ${v_74dc8b.substring(0, 200)}`);
+          const v_5e9bfe = new Error(`Campaign is blocked (403)`);
+          (v_5e9bfe as any).is403 = true;
+          (v_5e9bfe as any).campid = v_aa0917;
+          throw v_5e9bfe;
+        }
+      }
+
       if (v_3393e3.status >= 500) {
         throw new Error(`서버 에러 (${v_3393e3.status}): ${v_74dc8b.substring(0, 200)}`);
       }
@@ -2541,6 +2566,18 @@ export const v_1c4683 = async (
     const result: v_649123 = await v_3393e3.json();
     console.log('NStation 광고 API 응답:', v_43c42e);
 
+    if (v_43c42e.status === 'error' && v_43c42e.code === 403) {
+      console.warn(`[NStation] 블록리스트된 캠페인: ${v_aa0917} - ${v_43c42e.message || 'Campaign is blocked'}`);
+
+      if (v_aa0917) {
+        await v_18b723(v_aa0917);
+      }
+      const v_5e9bfe = new Error(v_43c42e.message || 'Campaign is blocked');
+      (v_5e9bfe as any).is403 = true;
+      (v_5e9bfe as any).campid = v_aa0917;
+      throw v_5e9bfe;
+    }
+
     if (v_43c42e.status === 'success' && v_43c42e.code === 200) {
       return v_43c42e;
     } else {
@@ -2553,6 +2590,11 @@ export const v_1c4683 = async (
     }
   } catch (v_5e9bfe) {
     console.error('NStation 광고 API 호출 실패:', v_5e9bfe);
+
+    if (v_5e9bfe.is403) {
+      console.log('403 에러: 블록리스트된 캠페인 - 타임아웃 처리 스킵');
+      throw v_5e9bfe;
+    }
 
     if (v_5e9bfe.is404) {
       console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
@@ -2624,6 +2666,31 @@ export const v_aa7dc1 = async (
       const v_74dc8b = await v_3393e3.text();
       console.error(`[Pock] HTTP 에러 (${v_3393e3.status}):`, v_74dc8b.substring(0, 500));
 
+      if (v_3393e3.status === 403) {
+        try {
+          const v_e15e6f = JSON.parse(v_74dc8b);
+          if (v_e15e6f.status === 'error' && v_e15e6f.code === 403) {
+            console.warn(`[Pock] 블록리스트된 캠페인: ${v_aa0917} - ${v_e15e6f.message || 'Campaign is blocked'}`);
+
+            if (v_aa0917) {
+              await v_18b723(v_aa0917);
+            }
+
+            const v_5e9bfe = new Error(v_e15e6f.message || 'Campaign is blocked');
+            (v_5e9bfe as any).is403 = true;
+            (v_5e9bfe as any).campid = v_aa0917;
+            throw v_5e9bfe;
+          }
+        } catch (v_5f9add) {
+
+          console.warn(`[Pock] 403 에러 (JSON 파싱 실패): ${v_74dc8b.substring(0, 200)}`);
+          const v_5e9bfe = new Error(`Campaign is blocked (403)`);
+          (v_5e9bfe as any).is403 = true;
+          (v_5e9bfe as any).campid = v_aa0917;
+          throw v_5e9bfe;
+        }
+      }
+
       if (v_3393e3.status >= 500) {
         throw new Error(`서버 에러 (${v_3393e3.status}): ${v_74dc8b.substring(0, 200)}`);
       }
@@ -2649,6 +2716,18 @@ export const v_aa7dc1 = async (
 
     const result: v_6b63f9 = await v_3393e3.json();
     console.log('Pock 광고 API 응답:', v_43c42e);
+
+    if (v_43c42e.status === 'error' && v_43c42e.code === 403) {
+      console.warn(`[Pock] 블록리스트된 캠페인: ${v_aa0917} - ${v_43c42e.message || 'Campaign is blocked'}`);
+
+      if (v_aa0917) {
+        await v_18b723(v_aa0917);
+      }
+      const v_5e9bfe = new Error(v_43c42e.message || 'Campaign is blocked');
+      (v_5e9bfe as any).is403 = true;
+      (v_5e9bfe as any).campid = v_aa0917;
+      throw v_5e9bfe;
+    }
 
     if (v_43c42e.status === 'success' && v_43c42e.code === 200) {
       return v_43c42e;
@@ -2723,8 +2802,73 @@ export const v_167376 = async (
       body: JSON.stringify(v_cd6a57),
     });
 
+    if (!v_3393e3.ok) {
+
+      const v_74dc8b = await v_3393e3.text();
+      console.error(`[PointClick] HTTP 에러 (${v_3393e3.status}):`, v_74dc8b.substring(0, 500));
+
+      if (v_3393e3.status === 403) {
+        try {
+          const v_e15e6f = JSON.parse(v_74dc8b);
+          if (v_e15e6f.status === 'error' && v_e15e6f.code === 403) {
+            console.warn(`[PointClick] 블록리스트된 캠페인: ${v_b0495a} - ${v_e15e6f.message || 'Campaign is blocked'}`);
+
+            if (v_b0495a) {
+              await v_18b723(v_b0495a);
+            }
+
+            const v_5e9bfe = new Error(v_e15e6f.message || 'Campaign is blocked');
+            (v_5e9bfe as any).is403 = true;
+            (v_5e9bfe as any).campid = v_b0495a;
+            throw v_5e9bfe;
+          }
+        } catch (v_5f9add) {
+
+          console.warn(`[PointClick] 403 에러 (JSON 파싱 실패): ${v_74dc8b.substring(0, 200)}`);
+          const v_5e9bfe = new Error(`Campaign is blocked (403)`);
+          (v_5e9bfe as any).is403 = true;
+          (v_5e9bfe as any).campid = v_b0495a;
+          throw v_5e9bfe;
+        }
+      }
+
+      if (v_3393e3.status >= 500) {
+        throw new Error(`서버 에러 (${v_3393e3.status}): ${v_74dc8b.substring(0, 200)}`);
+      }
+
+      try {
+        const v_e15e6f = JSON.parse(v_74dc8b);
+        const v_1744b9 = v_e15e6f.message || `HTTP error! status: ${v_3393e3.status}`;
+        const v_5e9bfe = new Error(v_1744b9);
+        (v_5e9bfe as any).is404 = v_e15e6f.code === 404 || v_3393e3.status === 404;
+        throw v_5e9bfe;
+      } catch (v_5f9add) {
+
+        throw new Error(`HTTP error! status: ${v_3393e3.status}, body: ${v_74dc8b.substring(0, 200)}`);
+      }
+    }
+
+    const v_c0c2d5 = v_3393e3.headers.get('content-type');
+    if (!v_c0c2d5 || !v_c0c2d5.includes('application/json')) {
+      const v_9b6134 = await v_3393e3.text();
+      console.error('[PointClick] 비-JSON 응답:', v_c0c2d5, v_9b6134.substring(0, 500));
+      throw new Error(`Expected JSON but got ${v_c0c2d5 || 'unknown'}`);
+    }
+
     const result: v_6b63f9 = await v_3393e3.json();
     console.log('PointClick 광고 API 응답:', v_43c42e);
+
+    if (v_43c42e.status === 'error' && v_43c42e.code === 403) {
+      console.warn(`[PointClick] 블록리스트된 캠페인: ${v_b0495a} - ${v_43c42e.message || 'Campaign is blocked'}`);
+
+      if (v_b0495a) {
+        await v_18b723(v_b0495a);
+      }
+      const v_5e9bfe = new Error(v_43c42e.message || 'Campaign is blocked');
+      (v_5e9bfe as any).is403 = true;
+      (v_5e9bfe as any).campid = v_b0495a;
+      throw v_5e9bfe;
+    }
 
     if (v_3393e3.ok && v_43c42e.status === 'success' && v_43c42e.code === 200) {
       return v_43c42e;
@@ -2738,6 +2882,11 @@ export const v_167376 = async (
     }
   } catch (v_5e9bfe) {
     console.error('PointClick 광고 API 호출 실패:', v_5e9bfe);
+
+    if (v_5e9bfe.is403) {
+      console.log('403 에러: 블록리스트된 캠페인 - 타임아웃 처리 스킵');
+      throw v_5e9bfe;
+    }
 
     if (v_5e9bfe.is404) {
       console.log('404 에러: 캠페인 데이터 없음 - 타임아웃 처리 스킵');
@@ -4872,8 +5021,64 @@ const v_332c06 = 'topAd5Data';
 const v_b5dcce = 'topAd5Timestamp';
 const v_887583 = 10 * 60 * 1000; 
 
+const v_b4b8e7 = new Set<string>(['2151261']);
+
+const v_bd0f81 = (v_aa0917): boolean => {
+  if (!v_aa0917) return false;
+  return v_b4b8e7.has(String(v_aa0917));
+};
+
+const v_60f584 = (v_04f49c): any[] => {
+  if (!Array.isArray(v_04f49c)) return [];
+  return v_04f49c.filter((v_ddcfed) => !v_bd0f81(v_ddcfed?.campid));
+};
+
 let v_5281af = false;
 let v_21e89f = null;
+
+export const v_e0bb32 = async (): Promise<void> => {
+  try {
+    const v_90e1d7 = await v_e84827.getItem('cached_AD');
+    if (v_90e1d7) {
+      const v_4fc87f = JSON.parse(v_90e1d7);
+      const v_aeaa6e = Object.keys(v_4fc87f).length;
+
+      const v_b793b5 = {};
+      for (const [v_aa0917, v_9390e8] of Object.entries(v_4fc87f)) {
+        if (!v_bd0f81(v_aa0917)) {
+          v_b793b5[v_aa0917] = v_9390e8;
+        }
+      }
+
+      if (Object.keys(v_b793b5).length !== v_aeaa6e) {
+        await v_e84827.setItem('cached_AD', JSON.stringify(v_b793b5));
+        console.log(`[filterBlocklistedAdsFromCache] 블록리스트 필터링: ${Object.keys(v_b793b5).length}/${v_aeaa6e}개 유효`);
+      }
+    }
+  } catch (v_5e9bfe) {
+    console.error('[filterBlocklistedAdsFromCache] 필터링 실패:', v_5e9bfe);
+  }
+};
+
+export const v_18b723 = async (v_aa0917): Promise<void> => {
+  const v_92fecf = String(v_aa0917);
+  try {
+
+    const v_90e1d7 = await v_e84827.getItem('cached_AD');
+    if (v_90e1d7) {
+      const v_4fc87f = JSON.parse(v_90e1d7);
+      if (v_4fc87f[v_92fecf]) {
+        delete v_4fc87f[v_92fecf];
+        await v_e84827.setItem('cached_AD', JSON.stringify(v_4fc87f));
+        console.log(`[removeBlocklistedCampaignFromCache] cached_AD에서 제거: ${v_92fecf}`);
+      }
+    }
+
+    await v_8cba1e(v_92fecf, undefined); 
+  } catch (v_5e9bfe) {
+    console.error(`[removeBlocklistedCampaignFromCache] ${v_92fecf} 제거 실패:`, v_5e9bfe);
+  }
+};
 
 export const v_8cba1e = async (v_aa0917, v_c65f5d): Promise<void> => {
   try {
@@ -5226,28 +5431,19 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
         });
       }
 
-      const v_f5c83c = v_e36b07.length;
-      v_e36b07 = v_e36b07.filter(v_ddcfed => {
-        const v_7ec08d = v_ddcfed?.urlAD || v_ddcfed?.landing_url || '';
-        const v_a71df8 = v_7ec08d && 
-                       typeof v_7ec08d === 'string' && 
-                       v_7ec08d.trim() !== '' && 
-                       v_7ec08d !== '없음';
-        if (!v_a71df8) {
-          console.log(`[getTopAd5] ${v_ddcfed?.campid || 'N/A'}는 urlAD가 없거나 "없음"이어서 제외됨 (urlAD: ${v_7ec08d})`);
+      if (v_e36b07.length > 0) {
+        console.log('[getTopAd5] ✅ 백엔드에서 이미 필터링/정렬/제한 처리된 광고 데이터:', v_e36b07.length, '개');
+
+        if (v_e36b07[0]?.priority !== undefined) {
+          console.log('[getTopAd5] 첫 번째 광고 priority:', v_e36b07[0].priority);
         }
-        return v_a71df8;
-      });
-
-      if (v_e36b07.length !== v_f5c83c) {
-        console.log(`[getTopAd5] urlAD 필터링: ${v_e36b07.length}/${v_f5c83c}개 유효 (${v_f5c83c - v_e36b07.length}개 제외)`);
       }
+    }
 
-      const v_e73e05 = v_e36b07.filter(v_ddcfed => {
-        const v_7ec08d = v_ddcfed?.urlAD || v_ddcfed?.landing_url || '';
-        return v_7ec08d && typeof v_7ec08d === 'string' && v_7ec08d.trim() !== '' && v_7ec08d !== '없음';
-      });
-      console.log('[getTopAd5] urlAD가 있는 광고 개수:', v_e73e05.length, '/', v_e36b07.length);
+    const v_7be569 = v_e36b07.length;
+    v_e36b07 = v_60f584(v_e36b07);
+    if (v_e36b07.length !== v_7be569) {
+      console.log(`[getTopAd5] 블록리스트 필터링: ${v_e36b07.length}/${v_7be569}개 유효`);
     }
 
     if (v_e36b07 && v_e36b07.length > 0) {
@@ -5281,18 +5477,7 @@ export const v_5d7ca4 = async (): Promise<any | null> => {
     if (v_fe7102) {
       const v_75d360 = JSON.parse(v_fe7102);
 
-      const v_ec1a7b = v_75d360.filter((v_ddcfed) => {
-        const v_7ec08d = v_ddcfed.urlAD || v_ddcfed.landing_url || '';
-        const v_a71df8 = v_7ec08d && 
-                       typeof v_7ec08d === 'string' && 
-                       v_7ec08d.trim() !== '' && 
-                       v_7ec08d !== '없음';
-        return v_a71df8;
-      });
-      if (v_ec1a7b.length !== v_75d360.length) {
-        console.log(`[getStoredTopAd5] urlAD 필터링: ${v_ec1a7b.length}/${v_75d360.length}개 유효`);
-      }
-      return v_ec1a7b;
+      return v_75d360;
     }
     return null;
   } catch (v_5e9bfe) {
@@ -5477,7 +5662,7 @@ export const v_dedaa7 = async (
 export const v_96206e = async (
   v_660822,
   v_c65f5d,
-): Promise<CheckShopSalesMenuResponse> => {
+): Promise<any> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const v_576f5a = {
@@ -5486,7 +5671,7 @@ export const v_96206e = async (
 
     console.log('[Shop 매출] 메뉴 표시 여부 확인 요청:', { member: v_660822 });
 
-    const v_3393e3 = await v_9f42a4.post<CheckShopSalesMenuResponse>(
+    const v_3393e3 = await v_9f42a4.post<any>(
       '/checkShopSalesMenu',
       v_576f5a,
     );
@@ -5551,7 +5736,7 @@ export const v_09a96d = async (
   v_2ae65a,
   v_2272ed,
   v_c65f5d,
-): Promise<GetItemPurchaseListResponse> => {
+): Promise<any> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const v_576f5a = {
@@ -5567,7 +5752,7 @@ export const v_09a96d = async (
 
     console.log('[Shop 매출] 구매자 명단 조회 요청:', { shopmember: v_c5bd46, dateFrom: v_2ae65a, dateTo: v_2272ed });
 
-    const v_3393e3 = await v_9f42a4.post<GetItemPurchaseListResponse>(
+    const v_3393e3 = await v_9f42a4.post<any>(
       '/getItemPurchaseList',
       v_576f5a,
     );
