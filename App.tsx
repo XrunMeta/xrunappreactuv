@@ -53,6 +53,7 @@ import {
   v_1a0a02,
   v_8734da,
   v_a1c4a5,
+  v_680bee,
   v_287831,
   v_540580,
   v_f7bdb9,
@@ -476,6 +477,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'shopTicketDetail') {
     return <ShopTicketDetailScreen />;
+  }
+
+  if (v_0f0c7b === 'shopItemRegister') {
+    return <ShopItemRegisterScreen />;
   }
 
   if (v_0f0c7b === 'showNapAd') {
@@ -969,3 +974,4 @@ export default function v_6540c3() {
     </SafeAreaProvider>
   );
 }
+
