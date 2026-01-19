@@ -142,6 +142,8 @@ import {
   SetRecommenderResponse,
   GetXRUNGopaxPriceRequest,
   GetXRUNGopaxPriceResponse,
+  CreateItemFromAppRequest,
+  CreateItemFromAppResponse,
   GetUserBalanceRequest,
   GetUserBalanceResponse,
   GetXrunBuyableItemsRequest,
@@ -159,6 +161,8 @@ import {
   AgreementResponse,
   AgreementData,
   AgreementType,
+  GetItemInfoRequest,
+  GetItemInfoResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { checkLatestVersion, getCurrentAppVersion, getCurrentAppVersionNumber } from './versionCheck';
@@ -408,6 +412,11 @@ export const createAxiosInstance = (navigation?: any) => {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
       console.log(`[API Request] baseURL: ${config.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${finalUrl}`);
+
+      if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
+        console.log('[API Request] FormData detected, Content-Type header removed');
+      }
 
       if (config.data) {
 
@@ -1917,6 +1926,7 @@ export const fetchMapMarkerData = async (
   longitude: number,
   member: number,
   navigation?: any,
+  deviceInfo?: any, 
 ): Promise<SpotData[]> => {
   if (fetchMapMarkerPromise) {
     console.log('[Deduplication] fetchMapMarkerData is already in progress, returning pending promise');
@@ -1931,6 +1941,7 @@ export const fetchMapMarkerData = async (
         latitude,
         longitude,
         limit: 120,
+        ...(deviceInfo || {}),
       };
 
       const response = await axiosInstance.post(
@@ -5499,6 +5510,42 @@ export const checkShopSalesMenu = async (
   }
 };
 
+export const getItemInfo = async (
+  shopmember: string,
+  navigation?: any,
+): Promise<GetItemInfoResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: GetItemInfoRequest = {
+      shopmember,
+    };
+
+    console.log('[Shop 매출] 상품 정보 조회 요청:', { shopmember });
+
+    const response = await axiosInstance.post<GetItemInfoResponse>(
+      '/getItemInfo',
+      request,
+    );
+
+    console.log('[Shop 매출] 상품 정보 조회 성공:', response.data.data?.title || 'No title');
+
+    return response.data;
+  } catch (error) {
+    console.error('[Shop 매출] 상품 정보 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const getItemPurchaseList = async (
   shopmember: string,
   dateFrom?: string,
@@ -5545,3 +5592,36 @@ export const getItemPurchaseList = async (
 };
 
 export * from './pangle';
+
+export const createItemFromApp = async (
+  request: CreateItemFromAppRequest,
+  navigation?: any,
+): Promise<CreateItemFromAppResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[상품 등록] 요청:', request);
+
+    const response = await axiosInstance.post<CreateItemFromAppResponse>(
+      '/createItemFromApp',
+      request,
+    );
+
+    console.log('[상품 등록] 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[상품 등록] 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[상품 등록] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
