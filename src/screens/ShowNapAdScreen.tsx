@@ -431,6 +431,13 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     } catch (v_5e9bfe) {
       console.error('[callAdApi] 광고 API 호출 실패:', v_5e9bfe);
       v_64c30d.current = false;
+
+      if (v_5e9bfe.is403) {
+        console.warn(`[callAdApi] 블록리스트된 캠페인: ${v_5e9bfe.campid || 'N/A'} - ${v_5e9bfe.message}`);
+
+        throw v_5e9bfe;
+      }
+
       throw v_5e9bfe;
     }
   };
