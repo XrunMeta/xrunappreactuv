@@ -53,6 +53,11 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
     return null;
   }
 
+  if (!publisherId || publisherId.trim() === '') {
+    console.warn('[TaboolaBannerCore] Publisher ID가 없습니다. Taboola 광고를 표시할 수 없습니다.');
+    return null;
+  }
+
   useEffect(() => {
     if (isNativeAvailable && onLoadingChange) {
 
