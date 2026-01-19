@@ -86,21 +86,29 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
     useEffect(() => {
       if (!visible) {
         setCurrentStep(initialStep);
-        setIsPromiseMode(false);
-        setPromiseConfig(null);
-        if (promiseResolve) {
+
+        if (promiseResolve && isPromiseMode && promiseConfig) {
+
+          console.log('[ChoiceDialog] visible이 false로 변경 - Promise resolve (button1 기본값)');
           promiseResolve('button1'); 
           setPromiseResolve(null);
         }
+        setIsPromiseMode(false);
+        setPromiseConfig(null);
       }
-    }, [visible, initialStep, promiseResolve]);
+    }, [visible, initialStep]);
 
     useImperativeHandle(ref, () => ({
       open: (config: ChoiceDialogConfig): Promise<'button1' | 'button2'> => {
+        console.log('[ChoiceDialog] open 메서드 호출:', config);
         return new Promise((resolve) => {
+          console.log('[ChoiceDialog] Promise 생성, config 설정');
           setPromiseConfig(config);
           setIsPromiseMode(true);
-          setPromiseResolve(() => resolve);
+          setPromiseResolve(() => {
+            console.log('[ChoiceDialog] Promise resolve 함수 호출');
+            return resolve;
+          });
           setCurrentStep(0);
         });
       },
@@ -137,10 +145,16 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
       action: (() => void | Promise<void> | string) | undefined,
       buttonType: 'button1' | 'button2',
     ) => {
-      if (!action) return;
+      console.log('[ChoiceDialog] handleAction 호출:', buttonType, 'isPromiseMode:', isPromiseMode);
+      if (!action) {
+        console.log('[ChoiceDialog] action이 없음');
+        return;
+      }
 
       try {
+        console.log('[ChoiceDialog] action 실행 시작');
         const result = await action();
+        console.log('[ChoiceDialog] action 실행 완료:', result);
         if (typeof result === 'string') {
 
           if (result in ROUTES) {
@@ -152,10 +166,13 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
       }
 
       if (isPromiseMode && promiseResolve) {
+        console.log('[ChoiceDialog] Promise resolve 호출:', buttonType);
         promiseResolve(buttonType);
         setPromiseResolve(null);
         setIsPromiseMode(false);
         setPromiseConfig(null);
+      } else {
+        console.log('[ChoiceDialog] Promise resolve하지 않음:', { isPromiseMode, hasResolve: !!promiseResolve });
       }
     };
 

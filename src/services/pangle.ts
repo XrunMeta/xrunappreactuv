@@ -27,9 +27,14 @@ export const initializePangle = async (): Promise<void> => {
     }
 
     if (!isPangleNativeModuleAvailable()) {
-      console.warn('[Pangle] 네이티브 모듈을 사용할 수 없습니다.');
-      console.warn('[Pangle] PangleModule이 null이거나 undefined입니다.');
-      console.warn('[Pangle] 네이티브 모듈이 제대로 등록되었는지 확인하세요.');
+
+      if (Platform.OS === 'android') {
+        console.log('[Pangle] Android에서는 Google Ad Manager 미디에이션을 통해 Pangle을 사용합니다.');
+        isPangleAvailable = false;
+        return;
+      }
+
+      console.warn('[Pangle] iOS 네이티브 모듈을 사용할 수 없습니다.');
       isPangleAvailable = false;
       return;
     }
@@ -169,23 +174,27 @@ export const loadAndShowRewardedAd = async (
       );
       subscriptions.push(() => closeSubscription.remove());
 
-      const loadedSubscription = pangleEventEmitter.addListener(
+      const loadedSubscription = pangleEventEmitter?.addListener(
         'onRewardedAdLoaded',
         (event: { adUnitId: string }) => {
           if (event.adUnitId === finalAdUnitId) {
             console.log('[Pangle] 보상형 광고 로드 완료');
 
-            PangleModule.showRewardedAd(finalAdUnitId).catch((error: Error) => {
-              console.error('[Pangle] 보상형 광고 표시 실패:', error);
-              subscriptions.forEach(unsubscribe => unsubscribe());
-              if (onAdFailedToLoad) {
-                onAdFailedToLoad(error);
-              }
-            });
+            if (PangleModule?.showRewardedAd) {
+              PangleModule.showRewardedAd(finalAdUnitId).catch((error: Error) => {
+                console.error('[Pangle] 보상형 광고 표시 실패:', error);
+                subscriptions.forEach(unsubscribe => unsubscribe());
+                if (onAdFailedToLoad) {
+                  onAdFailedToLoad(error);
+                }
+              });
+            }
           }
         },
       );
-      subscriptions.push(() => loadedSubscription.remove());
+      if (loadedSubscription) {
+        subscriptions.push(() => loadedSubscription.remove());
+      }
 
       const errorSubscription = pangleEventEmitter.addListener(
         'onRewardedAdLoadError',
@@ -211,6 +220,14 @@ export const loadAndShowRewardedAd = async (
         },
       );
       subscriptions.push(() => errorSubscription.remove());
+    }
+
+    if (!PangleModule || !PangleModule.loadRewardedAd) {
+      const error = new Error('Pangle 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
+      if (onAdFailedToLoad) {
+        onAdFailedToLoad(error);
+      }
+      return;
     }
 
     try {
@@ -294,10 +311,12 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
             console.log('[Pangle] 앱 오프닝 광고 로드 완료');
             appOpenAdLoaded = true;
 
-            PangleModule.showAppOpenAd(finalAdUnitId).catch((error: Error) => {
-              console.error('[Pangle] 앱 오프닝 광고 표시 실패:', error);
-              subscriptions.forEach(unsubscribe => unsubscribe());
-            });
+            if (PangleModule?.showAppOpenAd) {
+              PangleModule.showAppOpenAd(finalAdUnitId).catch((error: Error) => {
+                console.error('[Pangle] 앱 오프닝 광고 표시 실패:', error);
+                subscriptions.forEach(unsubscribe => unsubscribe());
+              });
+            }
           }
         },
       );
@@ -335,6 +354,11 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         },
       );
       subscriptions.push(() => errorSubscription.remove());
+    }
+
+    if (!PangleModule || !PangleModule.loadAppOpenAd) {
+      console.log('[Pangle] 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
+      return;
     }
 
     try {

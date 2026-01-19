@@ -73,37 +73,61 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
         });
 
         if (choiceDialogRef.current) {
-          choiceDialogRef.current
-            .open({
-              title,
-              message,
-              button1Label: button1.text,
-              button1Action: async () => {
-                button1.onPress?.();
-                setChoiceDialogVisible(false);
-                setCurrentConfig(null);
-                resolve(0); 
-              },
-              button2Label: button2.text,
-              button2Action: async () => {
-                button2.onPress?.();
-                setChoiceDialogVisible(false);
-                setCurrentConfig(null);
-                resolve(1); 
-              },
-            })
-            .then((result) => {
+          console.log('[AlertDialog] ChoiceDialog open 호출:', { title, message, button1: button1.text, button2: button2.text });
 
-              if (result === 'button1') {
-                resolve(0);
-              } else if (result === 'button2') {
-                resolve(1);
-              }
-              setChoiceDialogVisible(false);
-              setCurrentConfig(null);
-            });
+          setChoiceDialogVisible(true);
+          console.log('[AlertDialog] setChoiceDialogVisible(true) 호출');
+
+          setTimeout(() => {
+            if (choiceDialogRef.current) {
+              const dialogPromise = choiceDialogRef.current.open({
+                title,
+                message,
+                button1Label: button1.text,
+                button1Action: async () => {
+                  console.log('[AlertDialog] button1 클릭');
+                  button1.onPress?.();
+                  setChoiceDialogVisible(false);
+                  setCurrentConfig(null);
+                },
+                button2Label: button2.text,
+                button2Action: async () => {
+                  console.log('[AlertDialog] button2 클릭');
+                  button2.onPress?.();
+                  setChoiceDialogVisible(false);
+                  setCurrentConfig(null);
+                },
+              });
+
+              dialogPromise
+                .then((result) => {
+                  console.log('[AlertDialog] ChoiceDialog Promise 결과:', result);
+                  if (result === 'button1') {
+                    resolve(0);
+                  } else if (result === 'button2') {
+                    resolve(1);
+                  } else {
+
+                    resolve(0);
+                  }
+                  setChoiceDialogVisible(false);
+                  setCurrentConfig(null);
+                })
+                .catch((error) => {
+                  console.error('[AlertDialog] ChoiceDialog open 오류:', error);
+
+                  resolve(0);
+                });
+            } else {
+              console.error('[AlertDialog] choiceDialogRef.current가 null입니다 (setTimeout 후)');
+              resolve(0);
+            }
+          }, 0);
+        } else {
+          console.error('[AlertDialog] choiceDialogRef.current가 null입니다. ChoiceDialog가 렌더링되지 않았을 수 있습니다.');
+
+          resolve(0);
         }
-        setChoiceDialogVisible(true);
       }
     });
   };

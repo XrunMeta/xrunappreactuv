@@ -60,9 +60,9 @@ export const Dialog: React.FC<DialogProps> = ({
 
           {actions.length > 0 ? (
             <View style={styles.actions}>
-              {actions.map((action) => (
+              {actions.map((action, index) => (
                 <TouchableOpacity
-                  key={action.label}
+                  key={`${action.label}-${index}`}
                   style={[
                     styles.actionButton,
                     action.variant === 'primary' ? styles.primaryButton : styles.secondaryButton,
@@ -121,13 +121,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
     position: 'relative',
+    minHeight: 32,
   },
   title: {
-    flex: 1,
     fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
   close: {
     position: 'absolute',

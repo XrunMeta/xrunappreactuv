@@ -18,12 +18,13 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5 } from '../services';
+import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache } from '../services';
 import { showToast } from '../utils';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
+import { Ionicons } from '@expo/vector-icons';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -65,9 +66,10 @@ interface CampaignData {
 
 interface ShowNapAdScreenProps {
   onClose?: () => void; 
+  isModal?: boolean; 
 }
 
-export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => {
+export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isModal = false }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
@@ -666,18 +668,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             console.warn('[광고보기] removeAdFromTopAd5 실패 (무시):', removeError);
           }
 
-          try {
-            const cachedStr = await AsyncStorage.getItem('completedAdsCache');
-            const cached = cachedStr ? JSON.parse(cachedStr) : [];
-            if (!cached.includes(campid)) {
-              cached.push(campid);
-              await AsyncStorage.setItem('completedAdsCache', JSON.stringify(cached));
-              await AsyncStorage.setItem('completedAdsCacheTimestamp', Date.now().toString());
-              console.log(`[광고보기] completedAdsCache에 추가: ${campid}`);
-            }
-          } catch (cacheError) {
-            console.warn('[광고보기] completedAdsCache 업데이트 실패:', cacheError);
-          }
+          await addToCompletedAdsCache(campid);
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
@@ -703,12 +694,32 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
   }
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="dark" />
+    <View style={[styles.root, isModal && styles.modalRoot]}>
+      {!isModal && <StatusBar style="dark" />}
 
-      {
-
-}
+      {}
+      {!isModal && (
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: 16,
+          paddingTop: insets.top + 12,
+          paddingBottom: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e0e0e0',
+          backgroundColor: '#fff',
+        }}>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={{
+              padding: 8,
+            }}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (
@@ -785,7 +796,23 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
 
       {}
       {!isLoading && !isProcessing && !waitingForWebSocketResponse && !adCallFailedModalVisible && campaignData && (
-        <View style={styles.campaignContainer}>
+        <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
+          {}
+          {isModal && (
+            <TouchableOpacity
+              onPress={handleClose}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                zIndex: 10,
+                padding: 8,
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+          )}
           <Text style={styles.campaignTitle}>
             {campaignData.name || t('screens.showNapAd.campaignInfo')}
           </Text>
@@ -818,23 +845,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose }) => 
             </View>
           )}
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.watchAdButton}
-              onPress={handleWatchAd}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.watchAdButtonText}>{t('screens.showNapAd.watchAd')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.cancelButtonText}>{t('screens.showNapAd.cancel')}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 
@@ -1071,6 +1081,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  modalRoot: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'transparent',
+  },
+  modalCampaignContainer: {
+    paddingTop: 20, 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 0,
+    marginTop: 0,
+    position: 'relative', 
   },
   loadingContainer: {
     alignItems: 'center',

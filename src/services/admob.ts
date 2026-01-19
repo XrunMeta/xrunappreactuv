@@ -107,8 +107,9 @@ export const getAdMobAppId = (): string => {
 };
 
 export const getAdMobAdUnitId = (): string => {
+
   return Platform.OS === 'android'
-    ? getEnvValue('ADMOB_ADUNIT_ANDROID')
+    ? '' 
     : getEnvValue('ADMOB_ADUNIT_IOS');
 };
 

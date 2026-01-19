@@ -790,7 +790,7 @@ export default function App() {
           const isAdCompleted = await AsyncStorage.getItem('isAdCompleted');
           if (isAdCompleted === 'true') {
             console.log('[App] 광고 보기 완료');
-            showToast('광고보기를 완료했습니다');
+
             await AsyncStorage.removeItem('isAdCompleted');
             console.log('[App] isAdCompleted 제거 완료');
           }
@@ -974,3 +974,4 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+

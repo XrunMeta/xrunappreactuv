@@ -835,6 +835,21 @@ export interface GetSettlementListResponse {
   message?: string;
 }
 
+export interface SettlementCompletedItem {
+  txHash: string | null;
+  member: number;
+  amount: string; 
+  created_at: string;
+  source: 'nas' | 'pointclick';
+  [key: string]: any;
+}
+
+export interface GetSettlementCompletedListResponse {
+  status: 'success' | 'error';
+  data: SettlementCompletedItem[];
+  message?: string;
+}
+
 export interface GetSettlementAmountRequest {
   member: number; 
 }
@@ -1270,7 +1285,7 @@ export interface ADXRUNTopBannersSettledResponse {
 }
 
 export interface QuestItem {
-  id: number;
+  id: number | string; 
   title: string;
   description: string;
   start_date: string | null;
@@ -1280,6 +1295,8 @@ export interface QuestItem {
   reward_description: string;
   is_active: boolean;
   created_at: string;
+  event_status?: string; 
+  event_type?: string; 
 }
 
 export interface QuestListResponse {

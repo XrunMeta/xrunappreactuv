@@ -107,6 +107,8 @@ import {
   GetSavedAdsResponse,
   GetSettlementListRequest,
   GetSettlementListResponse,
+  GetSettlementCompletedListResponse,
+  SettlementCompletedItem,
   GetSettlementAmountRequest,
   GetSettlementAmountResponse,
   GetRankRequest,
@@ -3280,6 +3282,40 @@ export const getSettlementList = async (
   }
 };
 
+export const getSettlementCompletedList = async (
+  member: number,
+  navigation?: any,
+): Promise<GetSettlementCompletedListResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = { member };
+
+    console.log('[정산완료] 정산완료 리스트 조회 요청:', { member });
+
+    const response = await axiosInstance.post<GetSettlementCompletedListResponse>(
+      '/getSettlementList',
+      request,
+    );
+
+    console.log('[정산완료] 정산완료 리스트 조회 성공, 개수:', response.data.data?.length || 0);
+
+    return response.data;
+  } catch (error) {
+    console.error('[정산완료] 정산완료 리스트 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[정산완료] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const getSettlementAmount = async (
   member: number,
   navigation?: any,
@@ -4157,16 +4193,17 @@ export const fetchADXRUNTopBannersSettled = async (
 };
 
 export const fetchQuestList = async (
+  member?: number,
   navigation?: any,
 ): Promise<QuestListResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
 
-    console.log('[Quest] 퀘스트 리스트 조회 요청');
+    const url = member ? `/Quests/list?member=${member}` : '/Quests/list';
 
-    const response = await axiosInstance.get<QuestListResponse>(
-      '/Quests/list',
-    );
+    console.log('[Quest] 퀘스트 리스트 조회 요청', member ? `(member: ${member})` : '');
+
+    const response = await axiosInstance.get<QuestListResponse>(url);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', response.data.data?.length || 0, '개');
 
@@ -4922,6 +4959,7 @@ export const removeAdFromTopAd5 = async (campid: string | number, navigation?: a
 const COMPLETED_ADS_CACHE_KEY = 'completedAdsCache';
 const COMPLETED_ADS_CACHE_TIMESTAMP_KEY = 'completedAdsCacheTimestamp';
 const COMPLETED_ADS_CACHE_INTERVAL = 5 * 60 * 1000; 
+const COMPLETED_ADS_CACHE_MAX_SIZE = 1000; 
 
 export const getCompletedAdsSet = async (member: number | string, navigation?: any, forceRefresh: boolean = false): Promise<Set<string>> => {
   try {
@@ -4970,11 +5008,32 @@ export const getCompletedAdsSet = async (member: number | string, navigation?: a
       });
 
       try {
-        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify(Array.from(completedAdsSet)));
+        const cacheArray = Array.from(completedAdsSet);
+
+        const limitedArray = cacheArray.length > COMPLETED_ADS_CACHE_MAX_SIZE 
+          ? cacheArray.slice(-COMPLETED_ADS_CACHE_MAX_SIZE) 
+          : cacheArray;
+
+        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify(limitedArray));
         await AsyncStorage.setItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY, Date.now().toString());
-        console.log(`[getCompletedAdsSet] 캐시 저장 완료: ${completedAdsSet.size}개`);
+        console.log(`[getCompletedAdsSet] 캐시 저장 완료: ${limitedArray.length}개${cacheArray.length > COMPLETED_ADS_CACHE_MAX_SIZE ? ` (${cacheArray.length - COMPLETED_ADS_CACHE_MAX_SIZE}개 제거됨)` : ''}`);
       } catch (cacheError) {
         console.warn('[getCompletedAdsSet] 캐시 저장 실패:', cacheError);
+
+        if (cacheError instanceof Error && cacheError.message.includes('exceeds')) {
+          try {
+            console.log('[getCompletedAdsSet] 캐시 용량 초과 감지 - 캐시 초기화');
+            await AsyncStorage.removeItem(COMPLETED_ADS_CACHE_KEY);
+            await AsyncStorage.removeItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY);
+
+            const limitedArray = Array.from(completedAdsSet).slice(-Math.floor(COMPLETED_ADS_CACHE_MAX_SIZE / 2));
+            await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify(limitedArray));
+            await AsyncStorage.setItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY, Date.now().toString());
+            console.log(`[getCompletedAdsSet] 캐시 초기화 후 저장 완료: ${limitedArray.length}개`);
+          } catch (resetError) {
+            console.error('[getCompletedAdsSet] 캐시 초기화 실패:', resetError);
+          }
+        }
       }
     }
 
@@ -4983,6 +5042,45 @@ export const getCompletedAdsSet = async (member: number | string, navigation?: a
     console.error('[getCompletedAdsSet] 완료된 광고 목록 조회 실패:', error);
 
     return new Set<string>();
+  }
+};
+
+export const addToCompletedAdsCache = async (campid: string): Promise<void> => {
+  try {
+    const cachedStr = await AsyncStorage.getItem(COMPLETED_ADS_CACHE_KEY);
+    let cached: string[] = cachedStr ? JSON.parse(cachedStr) : [];
+
+    if (cached.includes(campid)) {
+      return;
+    }
+
+    cached.push(campid);
+
+    if (cached.length > COMPLETED_ADS_CACHE_MAX_SIZE) {
+      const removeCount = cached.length - COMPLETED_ADS_CACHE_MAX_SIZE;
+      cached = cached.slice(removeCount); 
+      console.log(`[addToCompletedAdsCache] 크기 제한 초과 - ${removeCount}개 오래된 항목 제거`);
+    }
+
+    await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify(cached));
+    await AsyncStorage.setItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY, Date.now().toString());
+    console.log(`[addToCompletedAdsCache] completedAdsCache에 추가: ${campid} (총 ${cached.length}개)`);
+  } catch (cacheError) {
+    console.warn('[addToCompletedAdsCache] completedAdsCache 업데이트 실패:', cacheError);
+
+    if (cacheError instanceof Error && cacheError.message.includes('exceeds')) {
+      try {
+        console.log('[addToCompletedAdsCache] 캐시 용량 초과 감지 - 캐시 초기화');
+        await AsyncStorage.removeItem(COMPLETED_ADS_CACHE_KEY);
+        await AsyncStorage.removeItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY);
+
+        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_KEY, JSON.stringify([campid]));
+        await AsyncStorage.setItem(COMPLETED_ADS_CACHE_TIMESTAMP_KEY, Date.now().toString());
+        console.log('[addToCompletedAdsCache] 캐시 초기화 후 새로 추가 완료');
+      } catch (resetError) {
+        console.error('[addToCompletedAdsCache] 캐시 초기화 실패:', resetError);
+      }
+    }
   }
 };
 

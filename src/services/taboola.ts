@@ -165,7 +165,7 @@ export const initializeTaboola = async (): Promise<void> => {
 
     const publisherId =
       Platform.OS === 'android'
-        ? getEnvValue('TABOOLA_PUBLISHER_ID_ANDROID')
+        ? '' 
         : getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
 
     if (!publisherId) {
@@ -189,8 +189,9 @@ export const initializeTaboola = async (): Promise<void> => {
 };
 
 export const getTaboolaPublisherId = (): string => {
+
   return Platform.OS === 'android'
-    ? getEnvValue('TABOOLA_PUBLISHER_ID_ANDROID')
+    ? '' 
     : getEnvValue('TABOOLA_PUBLISHER_ID_IOS');
 };
 
