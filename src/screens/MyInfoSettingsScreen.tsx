@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
 import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { 
-  getCurrentAppVersionNumber, 
-  checkServerVersion, 
-  openStore 
+import {
+  getCurrentAppVersionNumber,
+  checkServerVersion,
+  openStore
 } from '../services/versionCheck';
 
 export const MyInfoSettingsScreen = () => {
@@ -72,13 +72,13 @@ export const MyInfoSettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.85}
-              onPress={() => setLanguageSelectorVisible(true)}
-            >
-              <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => setLanguageSelectorVisible(true)}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
@@ -95,16 +95,18 @@ export const MyInfoSettingsScreen = () => {
               onPress={openStore}
             >
               <Text style={styles.versionText}>
-                Android : {versionInfo.androidCurrent}/{versionInfo.androidLatest} iOS : {versionInfo.iosCurrent}/{versionInfo.iosLatest}
+                {Platform.OS === 'android'
+                  ? `Android : ${versionInfo.androidCurrent}/${versionInfo.androidLatest}`
+                  : `iOS : ${versionInfo.iosCurrent}/${versionInfo.iosLatest}`}
               </Text>
             </TouchableOpacity>
           )}
         </View>
-      </SafeScrollView> 
-        <LanguageSelector
-          visible={languageSelectorVisible}
-          onClose={() => setLanguageSelectorVisible(false)}
-        /> 
+      </SafeScrollView>
+      <LanguageSelector
+        visible={languageSelectorVisible}
+        onClose={() => setLanguageSelectorVisible(false)}
+      />
     </View>
   );
 };
