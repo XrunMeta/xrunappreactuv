@@ -5,9 +5,9 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_58c85e, v_b3c0a1, v_60b263, v_029581, v_556baf } from '../components';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
-import { v_09a96d } from '../services';
+import { v_9509e3, v_09a96d } from '../services';
 import { v_7710e3 } from '../types';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
@@ -20,15 +20,25 @@ export const v_1cca63 = () => {
   const [v_cd31a8, v_deef62] = v_5ab095<boolean>(true);
   const [v_c5bd46, v_1d2822] = v_5ab095<string | null>(null);
   const [v_d20ab2, v_67c452] = v_5ab095<{
+    item: string | null;
     title: string | null;
     price: number;
+    priceXrun: number;
     participantCount: number;
     totalSales: number;
+    totalSalesXrun: number;
+    description?: string;
+    maxpurchase?: number;
   }>({
+    item: null,
     title: null,
     price: 0,
+    priceXrun: 0,
     participantCount: 0,
     totalSales: 0,
+    totalSalesXrun: 0,
+    description: undefined,
+    maxpurchase: undefined,
   });
 
   const [v_a7e395, v_2f9f74] = v_5ab095(false);
@@ -99,12 +109,67 @@ export const v_1cca63 = () => {
         }
       } catch (v_5e9bfe) {
         console.error('[Shop 매출] 사용자 정보 로드 실패:', v_5e9bfe);
+        v_deef62(false);
+      }
+
+    };
+    v_0e1f49();
+  }, []);
+
+  v_c4deb2(() => {
+    const v_60226a = async () => {
+      if (!v_c5bd46) {
+        v_deef62(false);
+        return;
+      }
+
+      try {
+        v_deef62(true);
+        const v_3393e3 = await v_9509e3(v_c5bd46, v_9b57fc);
+
+        if (v_3393e3.status === 'success' && v_3393e3.data) {
+          const v_f19f64 = v_3393e3.data.title;
+          v_67c452({
+            item: v_3393e3.data.item || null,
+            title: v_f19f64 && v_f19f64.trim() ? v_f19f64 : null,
+            price: v_3393e3.data.price || 0,
+            priceXrun: v_3393e3.data.priceXrun || 0,
+            participantCount: v_3393e3.data.participantCount || 0,
+            totalSales: v_3393e3.data.totalSales || 0,
+            totalSalesXrun: v_3393e3.data.totalSalesXrun || 0,
+            description: v_3393e3.data.description,
+            maxpurchase: v_3393e3.data.maxpurchase,
+          });
+        } else {
+
+          v_67c452({
+            item: null,
+            title: null,
+            price: 0,
+            priceXrun: 0,
+            participantCount: 0,
+            totalSales: 0,
+            totalSalesXrun: 0,
+          });
+        }
+      } catch (v_5e9bfe) {
+        console.error('[Shop 매출] 상품 정보 조회 실패:', v_5e9bfe);
+        v_67c452({
+          item: null,
+          title: null,
+          price: 0,
+          priceXrun: 0,
+          participantCount: 0,
+          totalSales: 0,
+          totalSalesXrun: 0,
+        });
       } finally {
         v_deef62(false);
       }
     };
-    v_0e1f49();
-  }, []);
+
+    v_60226a();
+  }, [v_c5bd46, v_9b57fc]);
 
   const v_fd2364 = (v_783ad3) => {
     v_9d83ae(v_783ad3);
@@ -173,6 +238,30 @@ export const v_1cca63 = () => {
     v_2f9f74(false);
     v_deef62(true);
     v_e5fc4b.current?.reloadData();
+  };
+
+  const v_264d8b = async () => {
+    if (!v_d20ab2.item || !v_d20ab2.title) {
+      return;
+    }
+
+    try {
+
+      const v_059d16 = {
+        item: v_d20ab2.item,
+        title: v_d20ab2.title,
+        price: v_d20ab2.price,
+        priceXrun: v_d20ab2.priceXrun,
+        description: v_d20ab2.description || '',
+        maxpurchase: v_d20ab2.maxpurchase || 1,
+        isEditMode: true,
+      };
+      await v_e84827.setItem('editShopItem', JSON.stringify(v_059d16));
+
+      v_9b57fc(v_ce4741.shopItemRegister);
+    } catch (v_5e9bfe) {
+      console.error('[Shop 매출] 상품 수정 정보 저장 실패:', v_5e9bfe);
+    }
   };
 
   v_c4deb2(() => {
@@ -311,15 +400,6 @@ export const v_1cca63 = () => {
 
       if (v_3393e3.status === 'success' && v_3393e3.data) {
 
-        if (v_24baff.page === 1 && v_3393e3.data.itemInfo) {
-          v_67c452({
-            title: v_3393e3.data.itemInfo.title,
-            price: v_3393e3.data.itemInfo.price || 0,
-            participantCount: v_3393e3.data.itemInfo.participantCount || 0,
-            totalSales: v_3393e3.data.itemInfo.totalSales || 0,
-          });
-        }
-
         const v_431a00 = v_3393e3.data.purchaseList || [];
         const members: v_b3c0a1[] = v_431a00.map((purchase: v_7710e3, v_a56041) => {
 
@@ -361,12 +441,6 @@ export const v_1cca63 = () => {
       } else {
 
         if (v_24baff.page === 1) {
-          v_67c452({
-            title: null,
-            price: 0,
-            participantCount: 0,
-            totalSales: 0,
-          });
           v_deef62(false);
         }
         return { data: [], total: 0, hasMore: false };
@@ -399,33 +473,62 @@ export const v_1cca63 = () => {
       />
       <View style={v_d81136.content}>
         {}
-        <View style={v_d81136.infoCard}>
-          <Text style={v_d81136.infoTitle}>{v_d20ab2.title || v_8d41d7('screens.myinfoShopSales.productTitle')}</Text>
-          <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{v_d20ab2.price.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
-          </Text>
-          <Text style={v_d81136.infoText}>
-            {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSales.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> /{v_8d41d7('screens.myinfoShopSales.settlementInfo')}
-          </Text>
-        </View>
+        {!v_cd31a8 && v_c5bd46 && v_d20ab2.title && v_d20ab2.title.trim() ? (
+          <View style={v_d81136.infoCard}>
+            <Text style={v_d81136.infoTitle}>{v_d20ab2.title}</Text>
+            <Text style={v_d81136.infoText}>
+              {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{v_d20ab2.price.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
+            </Text>
+            <Text style={v_d81136.infoText}>
+              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <TouchableOpacity onPress={v_264d8b} activeOpacity={0.7}><Text style={[v_d81136.infoText, v_d81136.modifyLink]}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text></TouchableOpacity>
+            </Text>
+          </View>
+        ) : null}
 
         {}
-        <View style={v_d81136.selectedPeriodContainer}>
-          <Ionicons name="calendar" size={16} color={v_1bfbd0.headerText} />
-          <Text style={v_d81136.selectedPeriodText}>{v_e065e5(v_0ec7ad)} ~ {v_e065e5(v_331624)}</Text>
-        </View>
+        {!v_cd31a8 && v_c5bd46 && (!v_d20ab2.title || !v_d20ab2.title.trim()) ? (
+          <View style={v_d81136.emptyItemContainer}>
+            <Text style={v_d81136.emptyItemDescription}>{v_8d41d7('screens.myinfoShopSales.noItemData')}</Text>
+            <TouchableOpacity
+              style={v_d81136.addItemButton}
+              onPress={() => v_9b57fc(v_ce4741.shopItemRegister)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={20} color="#ffffff" style={v_d81136.addItemIcon} />
+              <Text style={v_d81136.addItemButtonText}>{v_8d41d7('screens.myinfoShopSales.addItem')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
-        <View style={v_d81136.listContainer}>
-          <DataList<v_b3c0a1>
-            ref={v_e5fc4b}
-            fetchData={v_ff2128}
-            ItemComponent={v_58c85e}
-            pageSize={20}
-            contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
-            emptyMessage={!v_cd31a8 ? v_8d41d7('screens.myinfoShopSales.noData') : undefined}
-            keyExtractor={(v_8c0b26, v_a56041) => v_8c0b26.id || `purchase-${v_a56041}`}
-          />
-        </View>
+        {}
+        {!v_cd31a8 && v_c5bd46 && v_d20ab2.title && (
+          <View style={v_d81136.selectedPeriodContainer}>
+            <Ionicons name="calendar" size={16} color={v_1bfbd0.headerText} />
+            <Text style={v_d81136.selectedPeriodText}>{v_e065e5(v_0ec7ad)} ~ {v_e065e5(v_331624)}</Text>
+          </View>
+        )}
+
+        {v_c5bd46 ? (
+          v_d20ab2.title && v_d20ab2.title.trim() ? (
+            <View style={v_d81136.listContainer}>
+              <DataList<v_b3c0a1>
+                ref={v_e5fc4b}
+                fetchData={v_ff2128}
+                ItemComponent={v_58c85e}
+                pageSize={20}
+                contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
+                emptyMessage={!v_cd31a8 ? v_8d41d7('screens.myinfoShopSales.noData') : undefined}
+                keyExtractor={(v_8c0b26, v_a56041) => v_8c0b26.id || `purchase-${v_a56041}`}
+              />
+            </View>
+          ) : null
+        ) : (
+          !v_cd31a8 && (
+            <View style={v_d81136.emptyContainer}>
+              <Text style={v_d81136.emptyDescription}>{v_8d41d7('screens.myinfoShopSales.noShopmember')}</Text>
+            </View>
+          )
+        )}
       </View>
 
       {}
@@ -585,13 +688,48 @@ const v_d81136 = v_472849.create({
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: v_9b1a04.xlarge,
   },
   emptyDescription: {
-    fontSize: v_843035.size.msmall,
+    fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 24,
+  },
+  emptyItemContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: v_9b1a04.xlarge,
+    paddingHorizontal: v_9b1a04.large,
+  },
+  emptyItemDescription: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#7d7e83',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: v_9b1a04.large,
+  },
+  addItemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: v_1bfbd0.buttonPrimary,
+    paddingHorizontal: v_9b1a04.xlarge,
+    paddingVertical: v_9b1a04.medium,
+    borderRadius: 12,
+    gap: 8,
+  },
+  addItemIcon: {
+    marginRight: 4,
+  },
+  addItemButtonText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#ffffff',
   },
 
   modalOverlay: {
@@ -789,5 +927,9 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#ffffff',
+  },
+  modifyLink: {
+    color: v_1bfbd0.buttonPrimary,
+    textDecorationLine: 'underline',
   },
 });

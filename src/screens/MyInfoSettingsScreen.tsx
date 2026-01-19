@@ -95,7 +95,7 @@ export const v_4a40b2 = () => {
               onPress={v_4503ee}
             >
               <Text style={v_d81136.versionText}>
-                AOS : {v_ea6ee8.androidCurrent}/{v_ea6ee8.androidLatest} IOS : {v_ea6ee8.iosCurrent}/{v_ea6ee8.iosLatest}
+                Android : {v_ea6ee8.androidCurrent}/{v_ea6ee8.androidLatest} iOS : {v_ea6ee8.iosCurrent}/{v_ea6ee8.iosLatest}
               </Text>
             </TouchableOpacity>
           )}
