@@ -19,11 +19,10 @@ import {
   fetchQuestList,
   checkQuestUser,
   joinQuest,
-  getSettlementCompletedList,
 } from '../services';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem, SettlementCompletedItem } from '../types';
+import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
 
 type TabValue = 'pending' | 'quest' | 'settled';
@@ -383,44 +382,6 @@ export const AdWalletScreen = () => {
     [t, formatDate],
   );
 
-  const convertSettlementToAdEntry = useCallback(
-    (item: SettlementCompletedItem): AdEntry => {
-      console.log('[정산완료] 변환 중 item:', item);
-
-      const status = t('screens.adWallet.settled');
-      const date = formatDate(item.created_at);
-
-      let adRevenueSettlement = '0.00 XRUN';
-      const amountValue = item.amount || (item as any).amountasxrun || '0';
-      if (amountValue && amountValue !== '0') {
-        try {
-          const settlementValue = parseFloat(String(amountValue)).toFixed(2);
-          adRevenueSettlement = `${settlementValue} XRUN`;
-        } catch (error) {
-          console.log('❌ 정산 금액 파싱 오류:', error, '원본 값:', amountValue);
-        }
-      }
-
-      const id = item.txHash || `settlement-${item.member}-${item.created_at}`;
-
-      const adEntry = {
-        id,
-        status,
-        date,
-        expectedAdRevenue: '', 
-        adRevenueSettlement,
-        expectedAdRevenueColor: '#111111',
-        adRevenueSettlementColor: '#111111',
-        txHash: item.txHash,
-      };
-
-      console.log('[정산완료] 변환된 AdEntry:', adEntry);
-
-      return adEntry;
-    },
-    [t, formatDate],
-  );
-
   const fetchPendingData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
       if (!member) {
@@ -538,34 +499,36 @@ export const AdWalletScreen = () => {
       }
 
       try {
+        const response = await fetchADXRUNResultList(member, params.page);
 
-        const response = await getSettlementCompletedList(member, goBack);
+        const responseData = response.data || response;
+        const items = responseData.items || responseData || [];
+        const pagination = responseData.pagination;
 
-        console.log('[정산완료] Raw API Response:', response);
-        console.log('[정산완료] Response Status:', response.status);
-        console.log('[정산완료] Response Data:', response.data);
-        console.log('[정산완료] Data Length:', response.data?.length || 0);
+        console.log('🔍 [fetchSettledData] responseData:', responseData);
 
-        const items = response.data || [];
+        const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
 
-        console.log('[정산완료] 변환 전 items 개수:', items.length);
+        let hasMore = false;
+        if (pagination) {
+          hasMore = pagination.hasNextPage || false;
+        } else {
+          hasMore = items.length > 0 && items.length >= params.pageSize;
+        }
 
-        const adEntries: AdEntry[] = items.map(convertSettlementToAdEntry);
-
-        console.log('[정산완료] 변환 후 adEntries 개수:', adEntries.length);
-        console.log('[정산완료] adEntries 샘플:', adEntries.slice(0, 2));
+        console.log('🔍 [fetchSettledData] adEntries:', response);
 
         return {
           data: adEntries,
           total: adEntries.length,
-          hasMore: false,
+          hasMore,
         };
       } catch (error: any) {
         console.error('Failed to fetch settled data:', error);
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertSettlementToAdEntry, goBack],
+    [member, convertResultToAdEntry],
   );
 
   const handleTabChange = useCallback((value: TabValue) => {
@@ -1086,12 +1049,10 @@ export const AdWalletScreen = () => {
     [t],
   );
 
-  const AdEntryItem: React.FC<AdEntry & { onPress?: () => void }> = (item) => {
+  const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
     const isQuest = !!item.title;
-
-    const isSettledTab = tab === 'settled';
-    const { onPress, ...itemData } = item;
+    const { onPress, tab: itemTab, ...itemData } = item;
 
     const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
 
@@ -1217,74 +1178,20 @@ export const AdWalletScreen = () => {
               {item.expectedAdRevenue}
             </Text>
           </View>
-        ) : item.extrastr3 === '추천인이벤트' ? (
-          <View style={styles.adCardRow}>
-            <Text style={[
-              styles.adCardRowLabel,
-              isDisabled && { color: disabledColor }
-            ]}>
-              추천인이벤트보상
-            </Text>
-            <Text style={[
-              styles.adCardRowAmount,
-              { color: item.expectedAdRevenueColor },
-              isDisabled && { color: disabledColor }
-            ]}>
-              {item.expectedAdRevenue}
-            </Text>
-          </View>
-        ) : isSettledTab ? (
-
-          <>
-            <View style={styles.adCardRow}>
-              <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
-              <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
-                {item.adRevenueSettlement}
-              </Text>
-            </View>
-            {item.txHash && (
-              <View style={styles.adCardRow}>
-                <View style={styles.adCardRowSpacer} />
-                <TouchableOpacity
-                  onPress={() => {
-                    const url = `https://polygonscan.com/tx/${item.txHash}`;
-                    Linking.openURL(url).catch((err) => {
-                      console.error('[AdWallet] 블록체인 스캐너 링크 열기 실패:', err);
-                    });
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.blockchainScannerLink}>블록체인 스캐너</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </>
         ) : (
-
-          item.isReferralEvent ? (
-            <View style={styles.adCardRow}>
-              <Text style={[
-                styles.adCardRowLabel,
-                isDisabled && { color: disabledColor }
-              ]}>
-                추천인 이벤트 보상
-              </Text>
-              <Text style={[
-                styles.adCardRowAmount,
-                { color: item.expectedAdRevenueColor },
-                isDisabled && { color: disabledColor }
-              ]}>
-                {item.expectedAdRevenue}
-              </Text>
-            </View>
-          ) : (
-            <>
+          <>
+            {}
+            {itemTab !== 'settled' && (
               <View style={styles.adCardRow}>
                 <Text style={[
                   styles.adCardRowLabel,
                   questHasAttended === true && { color: disabledColor }
                 ]}>
-                  {t('screens.adWallet.expectedAdRevenue')}
+                  {isQuest 
+                    ? t('screens.adWallet.rewardAmount') 
+                    : item.extrastr3 === '출석보상' 
+                      ? t('screens.adWallet.attendanceCheckCompletedReward')
+                      : t('screens.adWallet.expectedAdRevenue')}
                 </Text>
                 <Text style={[
                   styles.adCardRowAmount,
@@ -1294,14 +1201,16 @@ export const AdWalletScreen = () => {
                   {item.expectedAdRevenue}
                 </Text>
               </View>
+            )}
+            {!isQuest && item.extrastr3 !== '출석보상' && (
               <View style={styles.adCardRow}>
                 <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
                 <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
                   {item.adRevenueSettlement}
                 </Text>
               </View>
-            </>
-          )
+            )}
+          </>
         )}
         {
 
