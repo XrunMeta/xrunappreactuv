@@ -53,6 +53,11 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
     return null;
   }
 
+  if (!v_26f42c || v_26f42c.trim() === '') {
+    console.warn('[TaboolaBannerCore] Publisher ID가 없습니다. Taboola 광고를 표시할 수 없습니다.');
+    return null;
+  }
+
   v_c4deb2(() => {
     if (v_d2b80a && v_c83407) {
 

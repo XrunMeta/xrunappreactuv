@@ -163,10 +163,7 @@ export const v_0b0acf = async (): Promise<void> => {
       return;
     }
 
-    const v_26f42c =
-      v_326be8.OS === 'android'
-        ? '' 
-        : v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
+    const v_26f42c = v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
 
     if (!v_26f42c) {
       console.warn('[Taboola] Publisher ID가 설정되지 않았습니다.');
@@ -190,9 +187,7 @@ export const v_0b0acf = async (): Promise<void> => {
 
 export const v_995f93 = (): string => {
 
-  return v_326be8.OS === 'android'
-    ? '' 
-    : v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
+  return v_573fcf('TABOOLA_PUBLISHER_ID_IOS');
 };
 
 export const v_dc5d8f = (
