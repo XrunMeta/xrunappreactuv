@@ -131,9 +131,9 @@ export const v_1a0a02 = () => {
     console.log('[구매] selectedShopItem:', v_dfe883);
     const v_8c0b26 = v_dfe883 as unknown as v_20035e;
 
-    const v_399dbd = v_8c0b26?.sku?.trim() ?? '';
-    if (v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER')) {
-      v_645e19(v_399dbd);
+    const v_212fd9 = Boolean(v_8c0b26.isxrunbuy === 0);
+    if (v_212fd9) {
+      v_645e19(v_8c0b26.sku);
     }
   }, [v_dfe883, v_645e19]);
 
@@ -161,9 +161,14 @@ export const v_1a0a02 = () => {
       const v_8c0b26 = (v_dfe883 as unknown) as v_20035e & { totalPrice?: { coin?: number } };
 
       const v_399dbd = v_8c0b26.sku?.trim() ?? '';
-      const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
+      const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER') || !v_399dbd.startsWith('GG'));
 
-      if (v_cb677f) {
+      const v_212fd9 = Boolean(v_8c0b26.isxrunbuy === 1);
+
+      console.log('[구매] isXRUNBuy:', v_212fd9);
+      console.log('[구매] isIapSku:', v_cb677f);
+
+      if (v_212fd9) {
 
         console.log('========================================');
         console.log('[구매] === IAP 인앱 구매 시작 ===');
@@ -334,7 +339,10 @@ export const v_1a0a02 = () => {
   const imageSource: v_07a341 = v_8c0b26.image || require('../../assets/xrun-horizontal-logo.png');
 
   const v_399dbd = v_8c0b26.sku?.trim() ?? '';
-  const v_cb677f = Boolean(v_399dbd !== '' && !v_399dbd.startsWith('TRANSFER'));
+  const v_cb677f = Boolean(v_8c0b26.isxrunbuy === 0); 
+  if (v_cb677f) {
+    v_645e19(v_8c0b26.sku);
+  }
 
   const v_1c86a8 = v_8c0b26.priceKRW || '0';
   const v_318e8b = v_8c0b26.price?.coin || v_8c0b26.priceXrun || 0;
