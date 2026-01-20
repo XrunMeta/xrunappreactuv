@@ -2645,19 +2645,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
     const v_aa0917 = String(v_c5ac8b.campid || '');
     if (v_aa0917) {
       try {
-        const v_ef7306 = await v_e84827.getItem('userData');
-        if (v_ef7306) {
-          const v_ff39bc = JSON.parse(v_ef7306);
-          const v_660822 = v_ff39bc?.member;
-          if (v_660822) {
-            const v_905ecb = await v_318c45(v_660822, v_9b57fc);
-            if (v_905ecb.has(v_aa0917)) {
-              console.log(`[MapMainScreen] 본 광고 클릭 차단: ${v_aa0917}`);
-              v_cba33f('이미 본 광고입니다.');
-              return; 
-            }
-          }
-        }
+
       } catch (v_5e9bfe) {
         console.warn('[MapMainScreen] 본 광고 확인 실패 (무시):', v_5e9bfe);
       }
