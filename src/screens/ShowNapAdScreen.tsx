@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
-  ActivityIndicator,
   Linking,
   AppState,
   Modal,
@@ -19,7 +17,6 @@ import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache } from '../services';
-import { showToast } from '../utils';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -820,9 +817,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
           )}
-          <Text style={styles.campaignTitle}>
-            {campaignData.name || t('screens.showNapAd.campaignInfo')}
-          </Text>
+          <View style={styles.campaignBox}>
+            <Text style={styles.campaignTitle}>
+              {campaignData.name || t('screens.showNapAd.campaignInfo')}
+            </Text>
+          </View>
           <Text style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
@@ -1276,6 +1275,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
+  },
+  campaignBox: {
+    width: '75%',
+    alignSelf: 'center',
+    padding: 10,
   },
   campaignReward: {
     fontSize: FONTS.size.medium,
