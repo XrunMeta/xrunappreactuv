@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node scripts/set-local-ip.js && expo start",
-    "android": "node scripts/set-local-ip.js && expo run:android",
-    "ios": "node scripts/set-local-ip.js && expo run:ios",
-    "web": "expo start --web"
+    "start": "node scripts/set-local-ip.js && npx expo start",
+    "android": "node scripts/set-local-ip.js && npx expo run:android",
+    "ios": "node scripts/set-local-ip.js && npx expo run:ios",
+    "web": "npx expo start --web"
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.4.1",
