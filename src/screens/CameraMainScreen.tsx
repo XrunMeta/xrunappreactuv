@@ -3128,14 +3128,14 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         presentationStyle="fullScreen"
         onRequestClose={v_3aa877}
       >
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' ,
+            paddingBottom: v_326be8.OS === 'ios' ? 0 : 40,}}>
           {}
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
             paddingHorizontal: 16,
-            paddingTop: v_326be8.OS === 'ios' ? 50 : 20,
+            paddingTop: v_326be8.OS === 'ios' ? 60 : 40,
             paddingBottom: 12,
             borderBottomWidth: 1,
             borderBottomColor: '#e0e0e0',
@@ -3145,22 +3145,30 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={v_3aa877}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-start',
+                justifyContent: 'center',
+                marginLeft: 8,
               }}
             >
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
 
             {}
-            <Text style={{
-              fontSize: 18,
-              fontFamily: 'Roboto-Bold',
-              color: '#000',
-              flex: 1,
-              textAlign: 'center',
-            }}>
+            <Text 
+              style={{
+                fontSize: 18,
+                fontFamily: 'Roboto-Bold',
+                color: '#000',
+                flex: 8,
+                textAlign: 'center',
+                alignContent: 'center',
+                justifyContent: 'center',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+
+            >
               {v_6ced96}
             </Text>
 
@@ -3168,9 +3176,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={v_d59c80}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-end',
+                justifyContent: 'center',
+                marginRight: 8,
               }}
             >
               <Ionicons name="information-circle-outline" size={24} color="#388Dc8" />
@@ -3215,6 +3224,25 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     }
                   } catch (v_5e9bfe) {
                     console.error('[WebView] intent:// 변환 실패:', v_5e9bfe);
+                    return false;
+                  }
+                }
+
+                if (v_f71b56.startsWith('market://')) {
+                  try {
+
+                    const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
+                    if (v_ae8a0a) {
+                      const v_77de37 = v_ae8a0a[1];
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환:', v_a1e9b4);
+                      v_e60eaf(v_a1e9b4);
+                      return false;
+                    } else {
+                      throw new Error('패키지 ID를 찾을 수 없음');
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] market:// 변환 실패:', v_5e9bfe);
                     return false;
                   }
                 }
