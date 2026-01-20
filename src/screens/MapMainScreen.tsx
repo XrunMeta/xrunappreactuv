@@ -2645,19 +2645,7 @@ export const MapMainScreen: React.FC = () => {
     const campid = String(spot.campid || '');
     if (campid) {
       try {
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const parsedUserData = JSON.parse(userData);
-          const member = parsedUserData?.member;
-          if (member) {
-            const completedAdsSet = await getCompletedAdsSet(member, navigate);
-            if (completedAdsSet.has(campid)) {
-              console.log(`[MapMainScreen] 본 광고 클릭 차단: ${campid}`);
-              showToast('이미 본 광고입니다.');
-              return; 
-            }
-          }
-        }
+
       } catch (error) {
         console.warn('[MapMainScreen] 본 광고 확인 실패 (무시):', error);
       }
