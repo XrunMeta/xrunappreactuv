@@ -867,6 +867,32 @@ export default function v_6540c3() {
       }
 
       try {
+        const v_90e1d7 = await v_e84827.getItem('cached_AD');
+        if (v_90e1d7) {
+          const v_4fc87f = JSON.parse(v_90e1d7);
+          let v_7306f6 = false;
+          const v_8fb936 = {};
+
+          Object.keys(v_4fc87f).forEach((v_aa0917) => {
+            const v_7ec08d = v_4fc87f[v_aa0917]?.urlAD;
+            if (v_7ec08d && (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://'))) {
+              console.log(`[App] 캐시에서 market:// 또는 intent:// 제거: ${v_aa0917}`);
+              v_7306f6 = true;
+            } else {
+              v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
+            }
+          });
+
+          if (v_7306f6) {
+            await v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
+            console.log('[App] 캐시 클리어 완료 (market:// 및 intent:// 제거)');
+          }
+        }
+      } catch (v_2bf859) {
+        console.warn('[App] 캐시 클리어 실패:', v_2bf859);
+      }
+
+      try {
         await v_0b0acf();
         console.log('[App] Taboola 초기화 완료');
       } catch (v_5e9bfe) {
