@@ -3128,14 +3128,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         presentationStyle="fullScreen"
         onRequestClose={handleWebViewClose}
       >
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' ,
+            paddingBottom: Platform.OS === 'ios' ? 0 : 40,}}>
           {}
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
             paddingHorizontal: 16,
-            paddingTop: Platform.OS === 'ios' ? 50 : 20,
+            paddingTop: Platform.OS === 'ios' ? 60 : 40,
             paddingBottom: 12,
             borderBottomWidth: 1,
             borderBottomColor: '#e0e0e0',
@@ -3145,22 +3145,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={handleWebViewClose}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-start',
+                justifyContent: 'center',
+                marginLeft: 8,
               }}
             >
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
 
             {}
-            <Text style={{
-              fontSize: 18,
-              fontFamily: 'Roboto-Bold',
-              color: '#000',
-              flex: 1,
-              textAlign: 'center',
-            }}>
+            <Text 
+              style={{
+                fontSize: 18,
+                fontFamily: 'Roboto-Bold',
+                color: '#000',
+                flex: 8,
+                textAlign: 'center',
+                alignContent: 'center',
+                justifyContent: 'center',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+
+            >
               {webViewTitle}
             </Text>
 
@@ -3168,9 +3176,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={handleInfoIconPress}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-end',
+                justifyContent: 'center',
+                marginRight: 8,
               }}
             >
               <Ionicons name="information-circle-outline" size={24} color="#388Dc8" />
@@ -3215,6 +3224,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     }
                   } catch (error) {
                     console.error('[WebView] intent:// 변환 실패:', error);
+                    return false;
+                  }
+                }
+
+                if (url.startsWith('market://')) {
+                  try {
+
+                    const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      const packageId = idMatch[1];
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환:', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                      return false;
+                    } else {
+                      throw new Error('패키지 ID를 찾을 수 없음');
+                    }
+                  } catch (error) {
+                    console.error('[WebView] market:// 변환 실패:', error);
                     return false;
                   }
                 }
