@@ -22,6 +22,7 @@ import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_dd87bc, v_5027e2, v_7488d5 } from '../services';
 import { v_8b0d2e } from '../types';
 import { v_e4a763 } from '../utils/env';
+import { v_858bfa } from '../utils/imageCache';
 
 export const v_680bee = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -42,6 +43,9 @@ export const v_680bee = () => {
   const [v_ee89db, v_3456cd] = v_5ab095<string | null>(null);
   const [v_373157, v_6f0c3f] = v_5ab095<number | null>(null);
   const [v_894371, v_395d5b] = v_5ab095<boolean>(false);
+  const [v_d4cc36, v_069367] = v_5ab095<string | null>(null);
+  const [v_4d0f89, v_698ad3] = v_5ab095<boolean>(false);
+  const [v_6d6ad9, v_56ef48] = v_5ab095<string | null>(null);
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -71,6 +75,19 @@ export const v_680bee = () => {
             if (v_4a9819.description) v_b7e174(v_4a9819.description);
             if (v_4a9819.maxpurchase) v_a06ef2(v_4a9819.maxpurchase.toString());
 
+              if (v_4a9819.image || v_4a9819.thumbnail) {
+                const v_53229e = v_4a9819.thumbnail || v_4a9819.image;
+                if (v_53229e) {
+                  v_6f0c3f(v_53229e);
+                  console.log('[상품 등록] 수정 모드 - 기존 이미지 파일 ID:', v_53229e);
+                }
+              }
+
+              if (v_4a9819.sdk) {
+                v_56ef48(v_4a9819.sdk);
+                console.log('[상품 등록] 수정 모드 - 기존 SDK:', v_4a9819.sdk);
+              }
+
               await v_e84827.removeItem('editShopItem');
             }
           } catch (v_5e9bfe) {
@@ -99,6 +116,56 @@ export const v_680bee = () => {
     };
     v_a16454();
   }, []);
+
+  const v_0fc63a = v_de06a3(async (v_433c46) => {
+    if (!v_433c46) {
+      v_069367(null);
+      return;
+    }
+
+    try {
+      v_698ad3(true);
+      const v_bb51e2 = String(v_433c46);
+      console.log(`[상품 등록] 기존 이미지 로드 시도: ${v_bb51e2}`);
+
+      const v_415a10 = await v_858bfa.getCachedImage(v_bb51e2);
+      if (v_415a10) {
+        console.log(`[상품 등록] ✅ 기존 이미지 ${v_bb51e2}가 캐시에서 발견됨`);
+        v_069367(v_415a10);
+        v_698ad3(false);
+        return;
+      }
+
+      console.log(`[상품 등록] ⚠️ 기존 이미지 ${v_bb51e2}가 캐시에 없음, 다운로드 시도...`);
+      const v_65903b = await v_858bfa.downloadAndCacheImage(v_bb51e2);
+
+      if (v_65903b) {
+        const v_132a3d = await v_858bfa.getCachedImage(v_bb51e2);
+        if (v_132a3d) {
+          console.log(`[상품 등록] ✅ 기존 이미지 ${v_bb51e2}가 다운로드 후 성공적으로 가져옴`);
+          v_069367(v_132a3d);
+        } else {
+          console.log(`[상품 등록] ❌ 기존 이미지 ${v_bb51e2} 다운로드 후 캐시에서 가져오기 실패`);
+        }
+      } else {
+        console.log(`[상품 등록] ❌ 기존 이미지 ${v_bb51e2} 다운로드 실패`);
+      }
+    } catch (v_5e9bfe) {
+      console.error('[상품 등록] 기존 이미지 로드 오류:', v_5e9bfe);
+    } finally {
+      v_698ad3(false);
+    }
+  }, []);
+
+  v_c4deb2(() => {
+    if (v_1b9174 && v_373157 && !v_ee89db) {
+
+      v_0fc63a(v_373157);
+    } else if (v_ee89db) {
+
+      v_069367(null);
+    }
+  }, [v_1b9174, v_373157, v_ee89db, v_0fc63a]);
 
   const v_071275 = v_de06a3((): string => {
     if (!v_f4fb5e || v_f4fb5e.length < 2) {
@@ -185,32 +252,54 @@ export const v_680bee = () => {
         ? v_c424ac 
         : `${v_c424ac.split('.')[0] || 'image'}.jpg`;
 
+      let v_0c2fb2 = v_cd1446;
+      if (v_cd1446.startsWith('file://')) {
+
+        v_0c2fb2 = v_cd1446;
+      }
+
       v_2e7cbb.append('file', {
-        uri: v_cd1446, 
+        uri: v_0c2fb2,
         type: v_3b27d9,
         name: v_f0b8ff,
       } as any);
 
-      console.log('[상품 등록] 이미지 업로드 시작:', { 
-        filename: v_f0b8ff
-      });
+      console.log('[상품 등록] ========== 이미지 업로드 시작 (axios 사용) ==========');
+      console.log('[상품 등록] filename:', v_f0b8ff);
+      console.log('[상품 등록] uri:', v_0c2fb2);
+      console.log('[상품 등록] platform:', v_326be8.OS);
+      console.log('[상품 등록] originalUri:', v_cd1446);
 
       const v_9f42a4 = v_7488d5(v_9b57fc);
+
+      console.log('[상품 등록] axios 요청 시작...');
 
       const v_3393e3 = await v_9f42a4.post('/uploadFile', v_2e7cbb, {
         headers: {
           'Accept': 'application/json',
 
         },
-        timeout: 30000, 
+        transformRequest: [], 
+        timeout: 60000, 
       });
 
-      console.log('[상품 등록] 이미지 업로드 응답:', v_3393e3.data);
+      console.log('[상품 등록] ========== axios 응답 수신 ==========');
+      console.log('[상품 등록] 응답 상태:', v_3393e3.status);
+      console.log('[상품 등록] 응답 데이터:', v_3393e3.data);
 
-      if (v_3393e3.data && v_3393e3.data.success && v_3393e3.data.data && v_3393e3.data.data.length > 0) {
-        const v_433c46 = v_3393e3.data.data[0];
-        console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', v_433c46);
-        return v_433c46;
+      if (v_3393e3.data) {
+
+        if (v_3393e3.data.success && v_3393e3.data.data && Array.isArray(v_3393e3.data.data) && v_3393e3.data.data.length > 0) {
+          const v_433c46 = v_3393e3.data.data[0];
+          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', v_433c46);
+          return v_433c46;
+        }
+
+        if (v_3393e3.data.status === 'success' && v_3393e3.data.data && Array.isArray(v_3393e3.data.data) && v_3393e3.data.data.length > 0) {
+          const v_433c46 = v_3393e3.data.data[0];
+          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', v_433c46);
+          return v_433c46;
+        }
       }
 
       console.warn('[상품 등록] 이미지 업로드 응답 형식 오류:', v_3393e3.data);
@@ -220,11 +309,13 @@ export const v_680bee = () => {
       if (v_5e9bfe.response) {
         console.error('[상품 등록] 서버 응답:', v_5e9bfe.response.data);
         console.error('[상품 등록] 서버 상태:', v_5e9bfe.response.status);
+        console.error('[상품 등록] 서버 헤더:', v_5e9bfe.response.headers);
       } else if (v_5e9bfe.request) {
         console.error('[상품 등록] 요청 전송 실패:', v_5e9bfe.request);
       } else {
         console.error('[상품 등록] 오류 메시지:', v_5e9bfe.message);
       }
+      console.error('[상품 등록] 오류 스택:', v_5e9bfe.stack);
       return null;
     }
   };
@@ -259,7 +350,14 @@ export const v_680bee = () => {
     }
 
     let v_2b9521;
-    if (!v_1b9174) {
+    if (v_1b9174) {
+      if (v_6d6ad9) {
+        v_2b9521 = v_6d6ad9;
+      } else {
+        v_03e392.alert('오류', 'SDK 정보를 찾을 수 없습니다.');
+        return;
+      }
+    } else {
       v_2b9521 = v_071275();
       if (!v_2b9521) {
         v_03e392.alert('오류', 'SDK를 생성할 수 없습니다. 이메일 정보를 확인해주세요.');
@@ -277,7 +375,7 @@ export const v_680bee = () => {
         price: 0, 
         priceKRW: v_d55c14,
         priceXrun: v_e921e1,
-        ...(v_2b9521 ? { sdk: v_2b9521 } : {}), 
+        sdk: v_2b9521, 
         unit: 'Item',
         maxpurchase: parseInt(v_e0f1a6) || 1,
         type: 'package', 
@@ -396,31 +494,57 @@ export const v_680bee = () => {
           {}
           <View style={v_d81136.section}>
             <Text style={v_d81136.label}>아이콘 이미지 (64x64)</Text>
-            <TouchableOpacity
-              style={[v_d81136.imageUploadButton, v_894371 && v_d81136.imageUploadButtonDisabled]}
-              onPress={v_85f2b3}
-              disabled={v_894371}
-              activeOpacity={0.7}
-            >
-              {v_894371 ? (
-                <View style={v_d81136.uploadingContainer}>
-                  <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                  <Text style={v_d81136.uploadingText}>업로드 중...</Text>
-                </View>
-              ) : v_ee89db ? (
-                <Image source={{ uri: v_ee89db }} style={v_d81136.imagePreview} />
-              ) : (
-                <View style={v_d81136.imagePlaceholder}>
-                  <Text style={v_d81136.imagePlaceholderText}>이미지 선택</Text>
+            <View style={v_d81136.imageContainer}>
+              {}
+              <TouchableOpacity
+                style={[v_d81136.imageUploadButton, v_894371 && v_d81136.imageUploadButtonDisabled]}
+                onPress={v_85f2b3}
+                disabled={v_894371}
+                activeOpacity={0.7}
+              >
+                {v_894371 ? (
+                  <View style={v_d81136.uploadingContainer}>
+                    <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+                    <Text style={v_d81136.uploadingText}>업로드 중...</Text>
+                  </View>
+                ) : v_ee89db ? (
+                  <Image source={{ uri: v_ee89db }} style={v_d81136.imagePreview} />
+                ) : (
+                  <View style={v_d81136.imagePlaceholder}>
+                    <Text style={v_d81136.imagePlaceholderText}>이미지 선택</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {}
+              {v_1b9174 && !v_ee89db && (
+                <View style={v_d81136.currentImageContainer}>
+                  {v_4d0f89 ? (
+                    <View style={v_d81136.currentImageLoader}>
+                      <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+                      <Text style={v_d81136.currentImageLoaderText}>로딩 중...</Text>
+                    </View>
+                  ) : v_d4cc36 ? (
+                    <>
+                      <Text style={v_d81136.currentImageLabel}>현재 이미지</Text>
+                      <Image
+                        source={{ uri: `data:image/png;base64,${v_d4cc36}` }}
+                        style={v_d81136.currentImagePreview}
+                      />
+                    </>
+                  ) : null}
                 </View>
               )}
-            </TouchableOpacity>
+            </View>
             {v_ee89db && !v_894371 && (
               <TouchableOpacity
                 style={v_d81136.removeImageButton}
                 onPress={() => {
                   v_3456cd(null);
-                  v_6f0c3f(null);
+
+                  if (!v_1b9174) {
+                    v_6f0c3f(null);
+                  }
                 }}
                 activeOpacity={0.7}
               >
@@ -641,5 +765,42 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#E53935',
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  currentImageContainer: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  currentImageLabel: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Medium',
+    color: '#666',
+  },
+  currentImagePreview: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  currentImageLoader: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  currentImageLoaderText: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#999',
   },
 });

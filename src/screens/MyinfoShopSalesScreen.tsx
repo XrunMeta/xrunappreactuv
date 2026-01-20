@@ -29,6 +29,9 @@ export const v_1cca63 = () => {
     totalSalesXrun: number;
     description?: string;
     maxpurchase?: number;
+    image?: number | null;
+    thumbnail?: number | null;
+    sdk?: string | null;
   }>({
     item: null,
     title: null,
@@ -39,6 +42,9 @@ export const v_1cca63 = () => {
     totalSalesXrun: 0,
     description: undefined,
     maxpurchase: undefined,
+    image: null,
+    thumbnail: null,
+    sdk: null,
   });
 
   const [v_a7e395, v_2f9f74] = v_5ab095(false);
@@ -139,6 +145,9 @@ export const v_1cca63 = () => {
             totalSalesXrun: v_3393e3.data.totalSalesXrun || 0,
             description: v_3393e3.data.description,
             maxpurchase: v_3393e3.data.maxpurchase,
+            image: v_3393e3.data.image || null,
+            thumbnail: v_3393e3.data.thumbnail || null,
+            sdk: v_3393e3.data.sdk || null,
           });
         } else {
 
@@ -254,6 +263,9 @@ export const v_1cca63 = () => {
         priceXrun: v_d20ab2.priceXrun,
         description: v_d20ab2.description || '',
         maxpurchase: v_d20ab2.maxpurchase || 1,
+        image: v_d20ab2.image || null,
+        thumbnail: v_d20ab2.thumbnail || null,
+        sdk: v_d20ab2.sdk || null,
         isEditMode: true,
       };
       await v_e84827.setItem('editShopItem', JSON.stringify(v_059d16));

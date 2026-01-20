@@ -53,6 +53,7 @@ import {
   v_1a0a02,
   v_8734da,
   v_a1c4a5,
+  v_680bee,
   v_287831,
   v_540580,
   v_f7bdb9,
@@ -478,6 +479,10 @@ const v_c0dbdf = () => {
     return <ShopTicketDetailScreen />;
   }
 
+  if (v_0f0c7b === 'shopItemRegister') {
+    return <ShopItemRegisterScreen />;
+  }
+
   if (v_0f0c7b === 'showNapAd') {
     return <ShowNapAdScreen />;
   }
@@ -497,7 +502,7 @@ const v_c0dbdf = () => {
   return <LoginSignupScreen />;
 };
 
-const v_512b02 = () => {
+const v_512b02 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
   const [v_22d5f0, v_baa579] = v_5ab095<v_8a44cb.PermissionStatus | null>(null);
   const [v_94037c, v_aa65df] = v_5ab095(false);
   const [v_73ba28, v_735eac] = v_5ab095(false);
@@ -626,13 +631,18 @@ const v_512b02 = () => {
   v_c4deb2(() => {
     const v_42373f = async () => {
 
+      if (!v_65941f) {
+        console.log('[App] 광고가 아직 끝나지 않아 위치 권한 요청을 대기합니다.');
+        return;
+      }
+
       const v_4042b1 = await v_594d44();
       v_baa579(v_4042b1);
       v_aa65df(true);
     };
 
     v_42373f();
-  }, [v_594d44]);
+  }, [v_594d44, v_65941f]);
 
   v_c4deb2(() => {
     if (v_94037c && v_22d5f0 !== null && !v_6276b7) {
@@ -747,6 +757,7 @@ const v_d0a391 = () => {
 
 export default function v_6540c3() {
   const [v_cd31a8, v_deef62] = v_5ab095(true);
+  const [v_65941f, v_c355f2] = v_5ab095(false); 
   const [v_43f571] = v_c06f2c({
     'Roboto-Regular': v_259807,
     'Roboto-Medium': v_b1350e,
@@ -867,27 +878,34 @@ export default function v_6540c3() {
       }
 
       try {
+        await v_a2474a();
+        console.log('[App] 환경 변수 로드 완료');
+      } catch (v_5e9bfe) {
+        console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
+      }
+
+      try {
         await v_0b0acf();
         console.log('[App] Taboola 초기화 완료');
       } catch (v_5e9bfe) {
         console.error('[App] Taboola 초기화 실패:', v_5e9bfe);
       }
 
-      if (v_326be8.OS === 'android') {
-        setTimeout(() => {
-          v_f095b0().then(() => {
-            console.log('[App] Pangle 초기화 완료');
+      setTimeout(async () => {
+        try {
+          await v_f095b0();
+          console.log('[App] Pangle 초기화 완료');
 
-            setTimeout(() => {
-              v_e55270().catch((v_5e9bfe) => {
-                console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
-              });
-            }, 500); 
-          }).catch((v_5e9bfe) => {
-            console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', v_5e9bfe);
-          });
-        }, 1000); 
-      }
+          console.log('[App] 앱 오프닝 광고 표시 시작');
+          await v_e55270();
+          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
+        } catch (v_5e9bfe) {
+          console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
+        } finally {
+
+          v_c355f2(true);
+        }
+      }, 1000);
 
       try {
         console.log('[App] TopAd5 광고 캐시 시작');
@@ -959,7 +977,7 @@ export default function v_6540c3() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester />
+            <PermissionRequester isAdFinished={v_65941f} />
             <AliveService />
             <ScreenHost />
             <GlobalDialogs />

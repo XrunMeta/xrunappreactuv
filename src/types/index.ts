@@ -1403,6 +1403,9 @@ export interface ItemInfo {
   totalSalesXrun: number; 
   description?: string; 
   maxpurchase?: number; 
+  image?: number | null; 
+  thumbnail?: number | null; 
+  sdk?: string | null; 
 }
 
 export interface GetItemInfoRequest {

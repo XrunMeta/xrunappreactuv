@@ -11,6 +11,47 @@ class PangleModule: RCTEventEmitter {
 
   override init() {
     super.init()
+    setupNotifications()
+  }
+
+  private func setupNotifications() {
+    NotificationCenter.default.addObserver(self, selector: #selector(handleAdClosed(_:)), name: NSNotification.Name("PangleAdClosed"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(handleRewarded(_:)), name: NSNotification.Name("PangleRewarded"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(handleAdLoadError(_:)), name: NSNotification.Name("PangleAdLoadError"), object: nil)
+  }
+
+  @objc private func handleAdLoadError(_ notification: Notification) {
+    if let userInfo = notification.userInfo, 
+       let type = userInfo["type"] as? String,
+       let errorMsg = userInfo["error"] as? String {
+      if type == "appOpen" {
+        sendEvent(withName: "onAppOpenAdLoadError", body: ["errorMsg": errorMsg])
+      } else if type == "rewarded" {
+        sendEvent(withName: "onRewardedAdLoadError", body: ["errorMsg": errorMsg])
+      }
+    }
+  }
+
+  @objc private func handleAdClosed(_ notification: Notification) {
+    if let userInfo = notification.userInfo, let type = userInfo["type"] as? String {
+      if type == "appOpen" {
+        sendEvent(withName: "onAppOpenAdClose", body: ["adUnitId": ""])
+      } else if type == "rewarded" {
+        sendEvent(withName: "onRewardedAdClose", body: ["adUnitId": ""])
+      }
+    }
+  }
+
+  @objc private func handleRewarded(_ notification: Notification) {
+    if let userInfo = notification.userInfo {
+      let name = userInfo["name"] as? String ?? "XRUN"
+      let amount = userInfo["amount"] as? Int ?? 0
+      sendEvent(withName: "onRewardedAdReward", body: ["rewardType": name, "rewardAmount": amount])
+    }
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
   }
 
   @objc
@@ -19,7 +60,14 @@ class PangleModule: RCTEventEmitter {
   }
 
   override func supportedEvents() -> [String]! {
-    return ["onAdEvent"]
+    return ["onAdEvent", "onAppOpenAdClose", "onAppOpenAdLoadError", "onRewardedAdReward", "onRewardedAdClose", "onRewardedAdLoadError"]
+  }
+
+  @objc
+  func isReady(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    let ready = PAGSdk.initializationState == .ready
+    print("[Native] Pangle SDK isReady: \(ready)")
+    resolver(ready)
   }
 
   @objc
@@ -195,6 +243,30 @@ class PangleModule: RCTEventEmitter {
       if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
         appDelegate.loadAndShowNativeAd(slotId: slotId)
         resolver(["success": true, "message": "Native Ad loading and display requested via AppDelegate"])
+      } else {
+        rejecter("ERROR", "AppDelegate not found", nil)
+      }
+    }
+  }
+
+  @objc
+  func loadAndShowAppOpenAd(_ slotId: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.main.async {
+      if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+        appDelegate.loadAndShowAppOpenAd(slotId: slotId)
+        resolver(["success": true, "message": "App Open Ad loading and display requested via AppDelegate"])
+      } else {
+        rejecter("ERROR", "AppDelegate not found", nil)
+      }
+    }
+  }
+
+  @objc
+  func loadAndShowRewardedAd(_ slotId: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.main.async {
+      if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+        appDelegate.loadAndShowRewardedAd(slotId: slotId)
+        resolver(["success": true, "message": "Rewarded Ad loading and display requested via AppDelegate"])
       } else {
         rejecter("ERROR", "AppDelegate not found", nil)
       }
