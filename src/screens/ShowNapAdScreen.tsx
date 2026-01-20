@@ -342,6 +342,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
   const openUrlAD = async (url: string) => {
     try {
       console.log('WebView로 URL 표시:', url);
+
       setWebViewUrl(url);
       setShowWebView(true);
       console.log('✅ WebView 모달 표시');
@@ -613,6 +614,13 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
             if (cachedAd[campidForCache]?.urlAD) {
               urlAD = cachedAd[campidForCache].urlAD;
               console.log('[광고보기] AsyncStorage cached_AD에서 urlAD 가져옴:', urlAD);
+
+              if (urlAD.startsWith('market://') || urlAD.startsWith('intent://')) {
+                console.warn('[광고보기] 캐시에 market:// 또는 intent:// 발견 - 백엔드에서 변환되어야 함. 캐시에서 제거:', campidForCache);
+                delete cachedAd[campidForCache];
+                await AsyncStorage.setItem('cached_AD', JSON.stringify(cachedAd));
+                urlAD = ''; 
+              }
             }
           }
         } catch (cacheError) {
@@ -891,62 +899,48 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
                 style={styles.webView}
               onNavigationStateChange={(navState) => {
                 console.log('[WebView] 네비게이션:', navState.url);
+
+                if (navState.url && navState.url.startsWith('market://')) {
+                  try {
+                    const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      const packageId = idMatch[1];
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환 (onNavigationStateChange):', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                    }
+                  } catch (error) {
+                    console.error('[WebView] market:// 변환 실패:', error);
+                  }
+                } else if (navState.url && navState.url.startsWith('intent://')) {
+                  try {
+                    let packageId = '';
+                    const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      packageId = idMatch[1];
+                    } else {
+                      const packageMatch = navState.url.match(/package=([^;]+)/);
+                      if (packageMatch) {
+                        packageId = packageMatch[1];
+                      }
+                    }
+                    if (packageId) {
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환 (onNavigationStateChange):', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                    }
+                  } catch (error) {
+                    console.error('[WebView] intent:// 변환 실패:', error);
+                  }
+                }
               }}
               onShouldStartLoadWithRequest={(request) => {
                 const { url } = request;
                 console.log('[WebView] 네비게이션 요청:', url);
 
-                if (url.startsWith('intent://')) {
-                  try {
-
-                    let packageId = '';
-
-                    const idMatch = url.match(/[?&]id=([^&?#]+)/);
-                    if (idMatch) {
-                      packageId = idMatch[1];
-                    } else {
-
-                      const packageMatch = url.match(/package=([^;]+)/);
-                      if (packageMatch) {
-                        packageId = packageMatch[1];
-                      }
-                    }
-
-                    if (packageId) {
-                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
-                      console.log('[WebView] intent://를 play.google.com으로 변환:', playStoreUrl);
-                      setWebViewUrl(playStoreUrl);
-                      return false;
-                    } else {
-                      throw new Error('패키지 ID를 찾을 수 없음');
-                    }
-                  } catch (error) {
-                    console.error('[WebView] intent:// 변환 실패:', error);
-
-                    Linking.openURL(url).catch((err) => {
-                      console.error('[WebView] 외부 앱 열기 실패:', err);
-                    });
-                    return false;
-                  }
-                }
-
-                if (url.startsWith('market://')) {
-                  try {
-
-                    const marketId = url.replace('market://details?id=', '').split('&')[0];
-                    const playStoreUrl = `https://play.google.com/store/apps/details?id=${marketId}`;
-                    console.log('[WebView] market://를 play.google.com으로 변환:', playStoreUrl);
-
-                    setWebViewUrl(playStoreUrl);
-                    return false; 
-                  } catch (error) {
-                    console.error('[WebView] market:// 변환 실패:', error);
-
-                    Linking.openURL(url).catch((err) => {
-                      console.error('[WebView] 외부 앱 열기 실패:', err);
-                    });
-                    return false;
-                  }
+                if (url.startsWith('market://') || url.startsWith('intent://')) {
+                  console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
+                  return false; 
                 }
 
                 const appSchemes = [
@@ -997,6 +991,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
               onLoadEnd={() => {
                 console.log('[WebView] 로딩 완료');
               }}
+
               onError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('[WebView] 에러:', nativeEvent);
@@ -1005,50 +1000,13 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
                   const url = nativeEvent.url;
                   console.log('[WebView] ERR_UNKNOWN_URL_SCHEME 감지:', url);
 
-                  if (url.startsWith('intent://')) {
-                    try {
-                      let packageId = '';
-                      const idMatch = url.match(/[?&]id=([^&?#]+)/);
-                      if (idMatch) {
-                        packageId = idMatch[1];
-                      } else {
-                        const packageMatch = url.match(/package=([^;]+)/);
-                        if (packageMatch) {
-                          packageId = packageMatch[1];
-                        }
-                      }
-                      if (packageId) {
-                        const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
-                        console.log('[WebView] intent://를 play.google.com으로 변환:', playStoreUrl);
-                        setWebViewUrl(playStoreUrl);
-                      } else {
-                        throw new Error('패키지 ID를 찾을 수 없음');
-                      }
-                    } catch (error) {
-                      console.error('[WebView] intent:// 변환 실패:', error);
-                      Linking.openURL(url).catch((err) => {
-                        console.error('[WebView] 외부 앱 열기 실패:', err);
-                      });
-                    }
-                  }
-
-                  else if (url.startsWith('market://')) {
-                    try {
-                      const marketId = url.replace('market://details?id=', '').split('&')[0];
-                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${marketId}`;
-                      console.log('[WebView] market://를 play.google.com으로 변환:', playStoreUrl);
-                      setWebViewUrl(playStoreUrl);
-                    } catch (error) {
-                      console.error('[WebView] market:// 변환 실패:', error);
-                      Linking.openURL(url).catch((err) => {
-                        console.error('[WebView] 외부 앱 열기 실패:', err);
-                      });
-                    }
+                  if (url.startsWith('market://') || url.startsWith('intent://')) {
+                    console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
                   }
 
                   else {
                     const appSchemes = [
-                      'tel:', 'mailto:', 'sms:', 'intent://', 'fb://', 'facebook://',
+                      'tel:', 'mailto:', 'sms:', 'fb://', 'facebook://',
                       'coupang://', 'coupangapp://', '11st://', 'auction://', 'gmarket://',
                       'tmon://', 'wemakeprice://', 'lotteon://', 'ssg://', 'shinsegae://',
                       'instagram://', 'kakao://', 'kakaotalk://', 'line://', 'tiktok://',
