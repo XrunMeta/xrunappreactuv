@@ -66,6 +66,7 @@ export const v_ce4741 = {
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
+  webViewTest: 'webViewTest',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;
