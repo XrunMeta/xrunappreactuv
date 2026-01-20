@@ -1611,47 +1611,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
         return;
       }
 
-      const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-        const v_d5d81a = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
-        if (!v_d5d81a) {
-          console.log(`⚠️ [MapMainScreen] ${v_ddcfed.campid}는 urlAD가 없어 제외됨`);
-        }
-        return v_d5d81a;
-      });
+      const v_6c877c = v_e36b07;
 
       if (v_6c877c.length === 0) {
-        console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
         return;
       }
-
-      if (v_6c877c.length !== v_e36b07.length) {
-        console.log(`[MapMainScreen] urlAD 필터링: ${v_6c877c.length}/${v_e36b07.length}개 유효`);
-      }
-
-      v_e36b07 = v_6c877c;
-
-      console.log('[MapMainScreen] 2단계: URL 검증 시작');
-      const v_507ee6 = await v_e3e9a7(v_e36b07);
-
-      const v_be75db = v_507ee6.filter(v_8c0b26 => v_8c0b26.isValid === true);
-      if (v_be75db.length !== v_507ee6.length) {
-        console.log(`[MapMainScreen] URL 검증 완료: ${v_be75db.length}/${v_507ee6.length}개 유효 (${v_507ee6.length - v_be75db.length}개 제외)`);
-      }
-      v_e36b07 = v_be75db;
-
-      const v_00c9ca = v_e36b07.filter((v_ddcfed) => {
-        const v_aa0917 = String(v_ddcfed.campid || '');
-        const v_2be890 = v_905ecb.has(v_aa0917);
-        if (v_2be890) {
-          console.log(`⚠️ [MapMainScreen] ${v_aa0917}는 이미 본 광고로 제외됨`);
-        }
-        return !v_2be890;
-      });
-
-      if (v_00c9ca.length !== v_e36b07.length) {
-        console.log(`[MapMainScreen] 이미 본 광고 필터링: ${v_00c9ca.length}/${v_e36b07.length}개 유효 (${v_e36b07.length - v_00c9ca.length}개 제외)`);
-      }
-      v_e36b07 = v_00c9ca;
 
       if (v_e36b07.length === 0) {
         console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
@@ -2680,19 +2645,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
     const v_aa0917 = String(v_c5ac8b.campid || '');
     if (v_aa0917) {
       try {
-        const v_ef7306 = await v_e84827.getItem('userData');
-        if (v_ef7306) {
-          const v_ff39bc = JSON.parse(v_ef7306);
-          const v_660822 = v_ff39bc?.member;
-          if (v_660822) {
-            const v_905ecb = await v_318c45(v_660822, v_9b57fc);
-            if (v_905ecb.has(v_aa0917)) {
-              console.log(`[MapMainScreen] 본 광고 클릭 차단: ${v_aa0917}`);
-              v_cba33f('이미 본 광고입니다.');
-              return; 
-            }
-          }
-        }
+
       } catch (v_5e9bfe) {
         console.warn('[MapMainScreen] 본 광고 확인 실패 (무시):', v_5e9bfe);
       }

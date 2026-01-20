@@ -4,8 +4,6 @@ import {
   v_19b633,
   v_472849,
   v_4623af,
-  v_09d0e5,
-  v_39a996,
   v_f2c756,
   v_6b5698,
   v_aa7413,
@@ -19,7 +17,6 @@ import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
-import { v_cba33f } from '../utils';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -345,6 +342,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   const v_2e98c9 = async (v_f71b56) => {
     try {
       console.log('WebView로 URL 표시:', v_f71b56);
+
       v_e60eaf(v_f71b56);
       v_1094fa(true);
       console.log('✅ WebView 모달 표시');
@@ -431,6 +429,13 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
     } catch (v_5e9bfe) {
       console.error('[callAdApi] 광고 API 호출 실패:', v_5e9bfe);
       v_64c30d.current = false;
+
+      if (v_5e9bfe.is403) {
+        console.warn(`[callAdApi] 블록리스트된 캠페인: ${v_5e9bfe.campid || 'N/A'} - ${v_5e9bfe.message}`);
+
+        throw v_5e9bfe;
+      }
+
       throw v_5e9bfe;
     }
   };
@@ -609,6 +614,13 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             if (v_4fc87f[v_ec0ea0]?.urlAD) {
               v_7ec08d = v_4fc87f[v_ec0ea0].urlAD;
               console.log('[광고보기] AsyncStorage cached_AD에서 urlAD 가져옴:', v_7ec08d);
+
+              if (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://')) {
+                console.warn('[광고보기] 캐시에 market:// 또는 intent:// 발견 - 백엔드에서 변환되어야 함. 캐시에서 제거:', v_ec0ea0);
+                delete v_4fc87f[v_ec0ea0];
+                await v_e84827.setItem('cached_AD', JSON.stringify(v_4fc87f));
+                v_7ec08d = ''; 
+              }
             }
           }
         } catch (v_2bf859) {
@@ -813,9 +825,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
           )}
-          <Text style={v_d81136.campaignTitle}>
-            {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
-          </Text>
+          <View style={v_d81136.campaignBox}>
+            <Text style={v_d81136.campaignTitle}>
+              {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
+            </Text>
+          </View>
           <Text style={v_d81136.campaignReward}>
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
@@ -885,62 +899,48 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                 style={v_d81136.webView}
               onNavigationStateChange={(v_b8df7f) => {
                 console.log('[WebView] 네비게이션:', v_b8df7f.url);
+
+                if (v_b8df7f.url && v_b8df7f.url.startsWith('market://')) {
+                  try {
+                    const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
+                    if (v_ae8a0a) {
+                      const v_77de37 = v_ae8a0a[1];
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환 (onNavigationStateChange):', v_a1e9b4);
+                      v_e60eaf(v_a1e9b4);
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] market:// 변환 실패:', v_5e9bfe);
+                  }
+                } else if (v_b8df7f.url && v_b8df7f.url.startsWith('intent://')) {
+                  try {
+                    let v_77de37 = '';
+                    const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
+                    if (v_ae8a0a) {
+                      v_77de37 = v_ae8a0a[1];
+                    } else {
+                      const v_d555bc = v_b8df7f.url.match(/package=([^;]+)/);
+                      if (v_d555bc) {
+                        v_77de37 = v_d555bc[1];
+                      }
+                    }
+                    if (v_77de37) {
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환 (onNavigationStateChange):', v_a1e9b4);
+                      v_e60eaf(v_a1e9b4);
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] intent:// 변환 실패:', v_5e9bfe);
+                  }
+                }
               }}
               onShouldStartLoadWithRequest={(v_576f5a) => {
                 const { url: v_f71b56 } = v_576f5a;
                 console.log('[WebView] 네비게이션 요청:', v_f71b56);
 
-                if (v_f71b56.startsWith('intent://')) {
-                  try {
-
-                    let v_77de37 = '';
-
-                    const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
-                    if (v_ae8a0a) {
-                      v_77de37 = v_ae8a0a[1];
-                    } else {
-
-                      const v_d555bc = v_f71b56.match(/package=([^;]+)/);
-                      if (v_d555bc) {
-                        v_77de37 = v_d555bc[1];
-                      }
-                    }
-
-                    if (v_77de37) {
-                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
-                      console.log('[WebView] intent://를 play.google.com으로 변환:', v_a1e9b4);
-                      v_e60eaf(v_a1e9b4);
-                      return false;
-                    } else {
-                      throw new Error('패키지 ID를 찾을 수 없음');
-                    }
-                  } catch (v_5e9bfe) {
-                    console.error('[WebView] intent:// 변환 실패:', v_5e9bfe);
-
-                    v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
-                      console.error('[WebView] 외부 앱 열기 실패:', v_49263d);
-                    });
-                    return false;
-                  }
-                }
-
-                if (v_f71b56.startsWith('market://')) {
-                  try {
-
-                    const v_46893c = v_f71b56.replace('market://details?id=', '').split('&')[0];
-                    const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_46893c}`;
-                    console.log('[WebView] market://를 play.google.com으로 변환:', v_a1e9b4);
-
-                    v_e60eaf(v_a1e9b4);
-                    return false; 
-                  } catch (v_5e9bfe) {
-                    console.error('[WebView] market:// 변환 실패:', v_5e9bfe);
-
-                    v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
-                      console.error('[WebView] 외부 앱 열기 실패:', v_49263d);
-                    });
-                    return false;
-                  }
+                if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+                  console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
+                  return false; 
                 }
 
                 const v_29ef18 = [
@@ -991,6 +991,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
               onLoadEnd={() => {
                 console.log('[WebView] 로딩 완료');
               }}
+
               onError={(v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('[WebView] 에러:', v_76b943);
@@ -999,50 +1000,13 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                   const v_f71b56 = v_76b943.url;
                   console.log('[WebView] ERR_UNKNOWN_URL_SCHEME 감지:', v_f71b56);
 
-                  if (v_f71b56.startsWith('intent://')) {
-                    try {
-                      let v_77de37 = '';
-                      const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
-                      if (v_ae8a0a) {
-                        v_77de37 = v_ae8a0a[1];
-                      } else {
-                        const v_d555bc = v_f71b56.match(/package=([^;]+)/);
-                        if (v_d555bc) {
-                          v_77de37 = v_d555bc[1];
-                        }
-                      }
-                      if (v_77de37) {
-                        const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
-                        console.log('[WebView] intent://를 play.google.com으로 변환:', v_a1e9b4);
-                        v_e60eaf(v_a1e9b4);
-                      } else {
-                        throw new Error('패키지 ID를 찾을 수 없음');
-                      }
-                    } catch (v_5e9bfe) {
-                      console.error('[WebView] intent:// 변환 실패:', v_5e9bfe);
-                      v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
-                        console.error('[WebView] 외부 앱 열기 실패:', v_49263d);
-                      });
-                    }
-                  }
-
-                  else if (v_f71b56.startsWith('market://')) {
-                    try {
-                      const v_46893c = v_f71b56.replace('market://details?id=', '').split('&')[0];
-                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_46893c}`;
-                      console.log('[WebView] market://를 play.google.com으로 변환:', v_a1e9b4);
-                      v_e60eaf(v_a1e9b4);
-                    } catch (v_5e9bfe) {
-                      console.error('[WebView] market:// 변환 실패:', v_5e9bfe);
-                      v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
-                        console.error('[WebView] 외부 앱 열기 실패:', v_49263d);
-                      });
-                    }
+                  if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+                    console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
                   }
 
                   else {
                     const v_29ef18 = [
-                      'tel:', 'mailto:', 'sms:', 'intent://', 'fb://', 'facebook://',
+                      'tel:', 'mailto:', 'sms:', 'fb://', 'facebook://',
                       'coupang://', 'coupangapp://', '11st://', 'auction://', 'gmarket://',
                       'tmon://', 'wemakeprice://', 'lotteon://', 'ssg://', 'shinsegae://',
                       'instagram://', 'kakao://', 'kakaotalk://', 'line://', 'tiktok://',
@@ -1269,6 +1233,11 @@ const v_d81136 = v_472849.create({
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
+  },
+  campaignBox: {
+    width: '75%',
+    alignSelf: 'center',
+    padding: 10,
   },
   campaignReward: {
     fontSize: v_843035.size.medium,
