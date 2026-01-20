@@ -1639,7 +1639,7 @@ export const MapMainScreen: React.FC = () => {
 
       console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
       const currentCampids = topAd5Response.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
-      const previousCampids = topAd5Data.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
+      const previousCampids = topAd5DataRef.current.map((ad: any) => ad.campid).filter((id: any) => id != null && id !== '');
 
       const currentCampidsSet = new Set(currentCampids);
       const previousCampidsSet = new Set(previousCampids);
@@ -1769,6 +1769,7 @@ export const MapMainScreen: React.FC = () => {
         const storedData = await getStoredTopAd5();
         if (storedData && Array.isArray(storedData) && storedData.length > 0) {
           setTopAd5Data(storedData);
+          topAd5DataRef.current = storedData; 
           console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', storedData.length, '개 광고');
         }
       } catch (fallbackError) {
@@ -1778,15 +1779,19 @@ export const MapMainScreen: React.FC = () => {
 
       isFetchingTopAd5Ref.current = false;
     }
-  }, [activeTab, location, topAd5Data, failedPreFetchCampidsRef, startPreFetchAdUrls]); 
+  }, [activeTab, location, navigate, startPreFetchAdUrls]); 
 
   useEffect(() => {
 
     if (activeTab !== 'Map') {
       return;
     }
+
+    if (isFetchingTopAd5Ref.current) {
+      return;
+    }
     refreshTopAd5AndMapMarkers();
-  }, [activeTab, refreshTopAd5AndMapMarkers]); 
+  }, [activeTab]); 
 
   useEffect(() => {
 
