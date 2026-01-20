@@ -2884,12 +2884,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       isCompleted: v_2be890,
                     });
 
-                    if (v_2be890) {
-                      console.log(`[CameraMainScreen] 본 광고 클릭 차단: ${v_aa0917}`);
-                      v_cba33f('이미 본 광고입니다.');
-                      return; 
-                    }
-
                     v_eed806(v_21cc31);
                   };
 
@@ -3189,10 +3183,133 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           {}
           {v_b2dceb ? (
             <WebView
+              key={v_b2dceb}
               source={{ uri: v_b2dceb }}
               style={{ flex: 1 }}
+              injectedJavaScript={`
+                (function() {
+                  let currentUrl = window.location.href;
+                  const checkUrl = function() {
+                    if (window.location.href !== currentUrl) {
+                      const newUrl = window.location.href;
+                      currentUrl = newUrl;
+                      if (newUrl.startsWith('market://')) {
+                        try {
+                          const idMatch = newUrl.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            console.log('[injectedJS] window.location market:// 감지, React Native에 알림:', packageId);
+                            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                              window.ReactNativeWebView.postMessage(JSON.stringify({
+                                type: 'marketRedirect',
+                                packageId: packageId
+                              }));
+                            }
+                            const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                            window.location.href = playStoreUrl;
+                            return;
+                          }
+                        } catch (error) {
+                          console.error('[injectedJS] market:// 변환 실패:', error);
+                        }
+                      }
+                    }
+                  };
+
+                  setInterval(checkUrl, 100);
+
+                  function convertMarketLinks() {
+                    const links = document.querySelectorAll('a[href]');
+                    links.forEach(function(link) {
+                      const href = link.getAttribute('href');
+                      if (href && href.startsWith('market://')) {
+                        try {
+                          const idMatch = href.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                            link.setAttribute('href', playStoreUrl);
+                            console.log('[injectedJS] market://를 play.google.com으로 변환:', playStoreUrl);
+                          }
+                        } catch (error) {
+                          console.error('[injectedJS] market:// 변환 실패:', error);
+                        }
+                      }
+                    });
+                  }
+
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', convertMarketLinks);
+                  } else {
+                    convertMarketLinks();
+                  }
+
+                  const observer = new MutationObserver(function(mutations) {
+                    convertMarketLinks();
+                  });
+
+                  observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                  });
+
+                  document.addEventListener('click', function(e) {
+                    let target = e.target;
+                    while (target && target !== document.body) {
+                      if (target.tagName === 'A' && target.href) {
+                        const url = target.href;
+                        if (url.startsWith('market://')) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          try {
+                            const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                            if (idMatch) {
+                              const packageId = idMatch[1];
+                              const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                              console.log('[injectedJS] market:// 클릭 가로채기, 변환:', playStoreUrl);
+                              window.location.href = playStoreUrl;
+                            }
+                          } catch (error) {
+                            console.error('[injectedJS] market:// 변환 실패:', error);
+                          }
+                          return false;
+                        }
+                      }
+                      target = target.parentElement;
+                    }
+                  }, true);
+                })();
+                true;
+              `}
+              onMessage={(v_d48baf) => {
+                try {
+                  const v_9390e8 = JSON.parse(v_d48baf.nativeEvent.data);
+                  if (v_9390e8.type === 'marketRedirect') {
+                    const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_9390e8.packageId}`;
+                    console.log('[WebView] onMessage에서 market:// 변환:', v_a1e9b4);
+                    v_e60eaf(v_a1e9b4);
+                  }
+                } catch (v_5e9bfe) {
+
+                }
+              }}
               onNavigationStateChange={(v_b8df7f) => {
                 console.log('[WebView] 네비게이션:', v_b8df7f.url);
+
+                if (v_b8df7f.url && v_b8df7f.url.startsWith('market://')) {
+                  try {
+                    const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
+                    if (v_ae8a0a) {
+                      const v_77de37 = v_ae8a0a[1];
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환 (onNavigationStateChange):', v_a1e9b4);
+
+                      v_e60eaf(v_a1e9b4);
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] market:// 변환 실패 (onNavigationStateChange):', v_5e9bfe);
+                  }
+                }
               }}
               onShouldStartLoadWithRequest={(v_576f5a) => {
                 const { url: v_f71b56 } = v_576f5a;
