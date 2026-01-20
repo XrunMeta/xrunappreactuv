@@ -12,6 +12,7 @@ import { getUserBalance, purchaseXrunItem, sendInAppPurchase } from '../services
 import { formatCurrency, formatXrunAmount } from '../utils';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import * as IAP from 'expo-iap';
+import { cashingimages } from '../utils/imageCache';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -26,6 +27,9 @@ export const ShopBuyScreen = () => {
   const [iapProduct, setIapProduct] = useState<any>(null);
   const [isLoadingIap, setIsLoadingIap] = useState(false);
   const [iapError, setIapError] = useState<string | null>(null);
+
+  const [itemImageBase64, setItemImageBase64] = useState<string | null>(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   const formatXrunDisplay = (amount: string | number): string => {
     const num = typeof amount === 'string' ? Number(amount) : amount;
@@ -143,6 +147,58 @@ export const ShopBuyScreen = () => {
       goBack();
     }
   }, [selectedShopItem, goBack]);
+
+  const loadItemImage = useCallback(async (item: ShopItemData) => {
+    try {
+      setIsLoadingImage(true);
+      setItemImageBase64(null);
+
+      const imageFileId = item.thumbnail || item.image;
+
+      if (!imageFileId) {
+        console.log('[구매] 이미지 파일 ID가 없습니다.');
+        setIsLoadingImage(false);
+        return;
+      }
+
+      const fileIdStr = String(imageFileId);
+      console.log(`[구매] 이미지 파일 ID로 이미지 로드 시도: ${fileIdStr}`);
+
+      const cachedImage = await cashingimages.getCachedImage(fileIdStr);
+      if (cachedImage) {
+        console.log(`[구매] ✅ 이미지 ${fileIdStr}가 캐시에서 발견됨`);
+        setItemImageBase64(cachedImage);
+        setIsLoadingImage(false);
+        return;
+      }
+
+      console.log(`[구매] ⚠️ 이미지 ${fileIdStr}가 캐시에 없음, 다운로드 시도...`);
+      const downloadSuccess = await cashingimages.downloadAndCacheImage(fileIdStr);
+
+      if (downloadSuccess) {
+        const newCachedImage = await cashingimages.getCachedImage(fileIdStr);
+        if (newCachedImage) {
+          console.log(`[구매] ✅ 이미지 ${fileIdStr}가 다운로드 후 성공적으로 가져옴`);
+          setItemImageBase64(newCachedImage);
+        } else {
+          console.log(`[구매] ❌ 이미지 ${fileIdStr} 다운로드 후 캐시에서 가져오기 실패`);
+        }
+      } else {
+        console.log(`[구매] ❌ 이미지 ${fileIdStr} 다운로드 실패`);
+      }
+    } catch (error) {
+      console.error('[구매] 이미지 로드 오류:', error);
+    } finally {
+      setIsLoadingImage(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedShopItem) {
+      const item = selectedShopItem as unknown as ShopItemData;
+      loadItemImage(item);
+    }
+  }, [selectedShopItem, loadItemImage]);
 
   const handlePurchase = async () => {
     if (!selectedShopItem || !memberId) {
@@ -336,7 +392,9 @@ export const ShopBuyScreen = () => {
     image?: ImageSourcePropType;
   };
 
-  const imageSource: ImageSourcePropType = item.image || require('../../assets/xrun-horizontal-logo.png');
+  const imageSource: ImageSourcePropType = itemImageBase64
+    ? { uri: `data:image/png;base64,${itemImageBase64}` }
+    : item.image || require('../../assets/xrun-horizontal-logo.png');
 
   const sku = item.sku?.trim() ?? '';
   const isIapSku = Boolean(item.isxrunbuy === 0); 
@@ -361,7 +419,13 @@ export const ShopBuyScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.wrapper}>
           <View style={styles.detailCard}>
-          <Image source={imageSource} style={styles.itemImage} resizeMode="contain" />
+          <View style={styles.imageContainer}>
+            {isLoadingImage ? (
+              <ActivityIndicator size="large" color={COLORS.buttonPrimary} style={styles.imageLoader} />
+            ) : (
+              <Image source={imageSource} style={styles.itemImage} resizeMode="contain" />
+            )}
+          </View>
           <Text style={styles.itemTitle}>{item.title || ''}</Text>
 
           {item.description && (
@@ -513,11 +577,22 @@ const styles = StyleSheet.create({
     padding: 24,
     marginBottom: 32,
   },
-  itemImage: {
+  imageContainer: {
     width: '100%',
-    height: 100,
+    height: 200,
     borderRadius: 10,
     marginBottom: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  itemImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageLoader: {
+    position: 'absolute',
   },
   itemTitle: {
     fontSize: FONTS.size.large,

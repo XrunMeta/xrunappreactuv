@@ -391,6 +391,9 @@ export const createAxiosInstance = (navigation?: any) => {
   const baseURL = env.GATEWAY_NODEJS;
   const authCode = env.GATEWAY_AUTH_CODE;
 
+  console.log('[createAxiosInstance] GATEWAY_NODEJS:', baseURL);
+  console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
+
   const instance = axios.create({
     baseURL,
     timeout: API_TIMEOUT,
@@ -414,12 +417,121 @@ export const createAxiosInstance = (navigation?: any) => {
       console.log(`[API Request] 최종 요청 URL: ${finalUrl}`);
 
       if (config.data instanceof FormData) {
+        console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
+        console.log('[API Request] FormData 타입 확인:', config.data instanceof FormData);
+        console.log('[API Request] URL:', config.url);
+        console.log('[API Request] Method:', config.method);
+
         delete config.headers['Content-Type'];
-        console.log('[API Request] FormData detected, Content-Type header removed');
+        delete config.headers['content-type'];
+        console.log('[API Request] Content-Type 헤더 삭제 완료');
+
+        config.transformRequest = [];
+        console.log('[API Request] transformRequest를 빈 배열로 설정');
+
+        config.maxContentLength = Infinity;
+        config.maxBodyLength = Infinity;
+        console.log('[API Request] maxContentLength=Infinity, maxBodyLength=Infinity 설정');
+
+        if (Platform.OS !== 'web') {
+
+          config.adapter = async (adapterConfig) => {
+            return new Promise((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              const url = adapterConfig.baseURL 
+                ? (adapterConfig.baseURL.endsWith('/') && adapterConfig.url?.startsWith('/')
+                  ? `${adapterConfig.baseURL.slice(0, -1)}${adapterConfig.url}`
+                  : `${adapterConfig.baseURL}${adapterConfig.url}`)
+                : adapterConfig.url;
+
+              console.log('[API Request] XMLHttpRequest adapter - URL:', url);
+              console.log('[API Request] XMLHttpRequest adapter - Method:', adapterConfig.method);
+
+              xhr.open(adapterConfig.method?.toUpperCase() || 'GET', url, true);
+
+              Object.keys(adapterConfig.headers || {}).forEach((key) => {
+                const lowerKey = key.toLowerCase();
+                if (lowerKey !== 'content-type' && lowerKey !== 'contenttype') {
+                  try {
+                    xhr.setRequestHeader(key, adapterConfig.headers[key]);
+                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${key} = ${adapterConfig.headers[key]}`);
+                  } catch (e) {
+                    console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${key}`, e);
+                  }
+                } else {
+                  console.log(`[API Request] XMLHttpRequest adapter - Content-Type 헤더 건너뜀: ${key}`);
+                }
+              });
+
+              if (adapterConfig.data instanceof FormData) {
+                console.log('[API Request] XMLHttpRequest adapter - FormData 감지, Content-Type 헤더 설정 안 함');
+              }
+
+              xhr.onload = () => {
+                console.log('[API Request] XMLHttpRequest adapter - 응답 수신:', xhr.status);
+                try {
+
+                  let responseData = xhr.response;
+                  const contentType = xhr.getResponseHeader('Content-Type');
+                  if (contentType && contentType.includes('application/json')) {
+                    try {
+                      responseData = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                      console.warn('[API Request] XMLHttpRequest adapter - JSON 파싱 실패, 원본 데이터 사용');
+                    }
+                  }
+
+                  const response = {
+                    data: responseData,
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    headers: xhr.getAllResponseHeaders(),
+                    config: adapterConfig,
+                    request: xhr,
+                  };
+                  resolve(response);
+                } catch (e) {
+                  console.error('[API Request] XMLHttpRequest adapter - 응답 처리 오류:', e);
+                  reject(e);
+                }
+              };
+
+              xhr.onerror = (error) => {
+                console.error('[API Request] XMLHttpRequest adapter - 네트워크 오류:', error);
+                console.error('[API Request] XMLHttpRequest adapter - readyState:', xhr.readyState);
+                console.error('[API Request] XMLHttpRequest adapter - status:', xhr.status);
+                reject(new Error('Network Error'));
+              };
+
+              xhr.ontimeout = () => {
+                console.error('[API Request] XMLHttpRequest adapter - 타임아웃');
+                reject(new Error('Timeout'));
+              };
+
+              xhr.timeout = adapterConfig.timeout || 60000;
+              console.log('[API Request] XMLHttpRequest adapter - 타임아웃 설정:', xhr.timeout);
+
+              if (adapterConfig.data instanceof FormData) {
+                console.log('[API Request] XMLHttpRequest adapter - FormData 전송 시작');
+                xhr.send(adapterConfig.data);
+              } else {
+                console.log('[API Request] XMLHttpRequest adapter - 일반 데이터 전송');
+                xhr.send(adapterConfig.data);
+              }
+            });
+          };
+          console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
+        }
+
+        console.log('[API Request] 최종 헤더:', JSON.stringify(config.headers, null, 2));
+        console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
       if (config.data) {
 
+        if (!(config.data instanceof FormData)) {
+
+        }
       }
       return config;
     },
@@ -436,6 +548,30 @@ export const createAxiosInstance = (navigation?: any) => {
     },
     async (error: AxiosError) => {
 
+      if (error.config?.data instanceof FormData) {
+        console.error('[API Error] ========== FormData 요청 오류 ==========');
+        console.error('[API Error] URL:', error.config.url);
+        console.error('[API Error] Method:', error.config.method);
+        console.error('[API Error] Error Code:', error.code);
+        console.error('[API Error] Error Message:', error.message);
+        console.error('[API Error] Has Response:', !!error.response);
+        console.error('[API Error] Has Request:', !!error.request);
+
+        if (error.response) {
+          console.error('[API Error] Response Status:', error.response.status);
+          console.error('[API Error] Response Status Text:', error.response.statusText);
+          console.error('[API Error] Response Data:', error.response.data);
+          console.error('[API Error] Response Headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('[API Error] Request Object:', error.request);
+          console.error('[API Error] Request Type:', typeof error.request);
+          if (error.request._response) {
+            console.error('[API Error] Request Response:', error.request._response);
+          }
+        }
+        console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
+      }
+
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
         console.error('[API Timeout]', error.config?.url);
         if (navigation) {
@@ -450,6 +586,7 @@ export const createAxiosInstance = (navigation?: any) => {
           statusText: error.response?.statusText,
           data: error.response?.data,
           message: error.message,
+          code: error.code,
         });
       }
       return Promise.reject(error);

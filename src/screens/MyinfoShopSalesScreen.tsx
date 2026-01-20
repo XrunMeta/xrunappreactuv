@@ -29,6 +29,9 @@ export const MyinfoShopSalesScreen = () => {
     totalSalesXrun: number;
     description?: string;
     maxpurchase?: number;
+    image?: number | null;
+    thumbnail?: number | null;
+    sdk?: string | null;
   }>({
     item: null,
     title: null,
@@ -39,6 +42,9 @@ export const MyinfoShopSalesScreen = () => {
     totalSalesXrun: 0,
     description: undefined,
     maxpurchase: undefined,
+    image: null,
+    thumbnail: null,
+    sdk: null,
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -139,6 +145,9 @@ export const MyinfoShopSalesScreen = () => {
             totalSalesXrun: response.data.totalSalesXrun || 0,
             description: response.data.description,
             maxpurchase: response.data.maxpurchase,
+            image: response.data.image || null,
+            thumbnail: response.data.thumbnail || null,
+            sdk: response.data.sdk || null,
           });
         } else {
 
@@ -254,6 +263,9 @@ export const MyinfoShopSalesScreen = () => {
         priceXrun: itemInfo.priceXrun,
         description: itemInfo.description || '',
         maxpurchase: itemInfo.maxpurchase || 1,
+        image: itemInfo.image || null,
+        thumbnail: itemInfo.thumbnail || null,
+        sdk: itemInfo.sdk || null,
         isEditMode: true,
       };
       await AsyncStorage.setItem('editShopItem', JSON.stringify(editItemData));
