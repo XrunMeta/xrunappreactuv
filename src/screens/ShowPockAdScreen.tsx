@@ -216,8 +216,8 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
 
         if (v_9f9e7d) {
           v_32baa9(v_ba2215 => ({
-            ...v_ba2215,
-            landing_url: v_766d99.urlAD || v_ba2215.landing_url,
+            ...(v_ba2215 || {}),
+            landing_url: v_766d99.urlAD || (v_ba2215?.landing_url || ''),
           }));
         }
         v_32baa9({
@@ -708,9 +708,11 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
           )}
-          <Text style={v_d81136.campaignTitle}>
-            {v_9f9e7d.ad_name || v_d0b6d4.name || v_8d41d7('screens.showNapAd.campaignInfo')}
-          </Text>
+          <View style={v_d81136.campaignBox}>
+            <Text style={v_d81136.campaignTitle}>
+              {v_9f9e7d.ad_name || v_d0b6d4.name || v_8d41d7('screens.showNapAd.campaignInfo')}
+            </Text>
+          </View>
           <Text style={v_d81136.campaignReward}>
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
@@ -1156,6 +1158,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 12,
     elevation: 5,
     shadowColor: '#000',
+    width:'100%',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1173,6 +1176,11 @@ const v_d81136 = v_472849.create({
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
+  },
+  campaignBox:{
+    width:'75%',
+    alignSelf:'center',
+    padding:10,
   },
   campaignReward: {
     fontSize: v_843035.size.medium,

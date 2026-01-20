@@ -4,8 +4,6 @@ import {
   v_19b633,
   v_472849,
   v_4623af,
-  v_09d0e5,
-  v_39a996,
   v_f2c756,
   v_6b5698,
   v_aa7413,
@@ -19,7 +17,6 @@ import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
-import { v_cba33f } from '../utils';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -820,9 +817,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
           )}
-          <Text style={v_d81136.campaignTitle}>
-            {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
-          </Text>
+          <View style={v_d81136.campaignBox}>
+            <Text style={v_d81136.campaignTitle}>
+              {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
+            </Text>
+          </View>
           <Text style={v_d81136.campaignReward}>
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
@@ -1276,6 +1275,11 @@ const v_d81136 = v_472849.create({
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
+  },
+  campaignBox: {
+    width: '75%',
+    alignSelf: 'center',
+    padding: 10,
   },
   campaignReward: {
     fontSize: v_843035.size.medium,
