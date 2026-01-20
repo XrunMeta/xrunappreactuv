@@ -12,6 +12,7 @@ import { v_54d016, v_9c9f1b, v_d751d6 } from '../services';
 import { v_89f939, v_35c0e0 } from '../utils';
 import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import * as v_759f4d from 'ssuyxdbb';
+import { v_858bfa } from '../utils/imageCache';
 
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -26,6 +27,9 @@ export const v_1a0a02 = () => {
   const [v_0243db, v_a568ec] = v_5ab095<any>(null);
   const [v_7712f3, v_9bf98f] = v_5ab095(false);
   const [v_b9c849, v_9f981c] = v_5ab095<string | null>(null);
+
+  const [v_91ef82, v_13803f] = v_5ab095<string | null>(null);
+  const [v_7f5811, v_0a688f] = v_5ab095(false);
 
   const v_06e3b4 = (v_f63e09): string => {
     const v_0ad8c5 = typeof v_f63e09 === 'string' ? Number(v_f63e09) : v_f63e09;
@@ -143,6 +147,58 @@ export const v_1a0a02 = () => {
       v_c7ac57();
     }
   }, [v_dfe883, v_c7ac57]);
+
+  const v_9d32cc = v_de06a3(async (item: v_20035e) => {
+    try {
+      v_0a688f(true);
+      v_13803f(null);
+
+      const v_373157 = v_8c0b26.thumbnail || v_8c0b26.image;
+
+      if (!v_373157) {
+        console.log('[구매] 이미지 파일 ID가 없습니다.');
+        v_0a688f(false);
+        return;
+      }
+
+      const v_bb51e2 = String(v_373157);
+      console.log(`[구매] 이미지 파일 ID로 이미지 로드 시도: ${v_bb51e2}`);
+
+      const v_415a10 = await v_858bfa.getCachedImage(v_bb51e2);
+      if (v_415a10) {
+        console.log(`[구매] ✅ 이미지 ${v_bb51e2}가 캐시에서 발견됨`);
+        v_13803f(v_415a10);
+        v_0a688f(false);
+        return;
+      }
+
+      console.log(`[구매] ⚠️ 이미지 ${v_bb51e2}가 캐시에 없음, 다운로드 시도...`);
+      const v_65903b = await v_858bfa.downloadAndCacheImage(v_bb51e2);
+
+      if (v_65903b) {
+        const v_132a3d = await v_858bfa.getCachedImage(v_bb51e2);
+        if (v_132a3d) {
+          console.log(`[구매] ✅ 이미지 ${v_bb51e2}가 다운로드 후 성공적으로 가져옴`);
+          v_13803f(v_132a3d);
+        } else {
+          console.log(`[구매] ❌ 이미지 ${v_bb51e2} 다운로드 후 캐시에서 가져오기 실패`);
+        }
+      } else {
+        console.log(`[구매] ❌ 이미지 ${v_bb51e2} 다운로드 실패`);
+      }
+    } catch (v_5e9bfe) {
+      console.error('[구매] 이미지 로드 오류:', v_5e9bfe);
+    } finally {
+      v_0a688f(false);
+    }
+  }, []);
+
+  v_c4deb2(() => {
+    if (v_dfe883) {
+      const v_8c0b26 = v_dfe883 as unknown as v_20035e;
+      v_9d32cc(v_8c0b26);
+    }
+  }, [v_dfe883, v_9d32cc]);
 
   const v_dfaad1 = async () => {
     if (!v_dfe883 || !v_717992) {
@@ -336,7 +392,9 @@ export const v_1a0a02 = () => {
     image?: v_07a341;
   };
 
-  const imageSource: v_07a341 = v_8c0b26.image || require('../../assets/xrun-horizontal-logo.png');
+  const imageSource: v_07a341 = v_91ef82
+    ? { uri: `data:image/png;base64,${v_91ef82}` }
+    : v_8c0b26.image || require('../../assets/xrun-horizontal-logo.png');
 
   const v_399dbd = v_8c0b26.sku?.trim() ?? '';
   const v_cb677f = Boolean(v_8c0b26.isxrunbuy === 0); 
@@ -361,7 +419,13 @@ export const v_1a0a02 = () => {
       <ScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.wrapper}>
           <View style={v_d81136.detailCard}>
-          <Image source={v_c322f7} style={v_d81136.itemImage} resizeMode="contain" />
+          <View style={v_d81136.imageContainer}>
+            {v_7f5811 ? (
+              <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} style={v_d81136.imageLoader} />
+            ) : (
+              <Image source={v_c322f7} style={v_d81136.itemImage} resizeMode="contain" />
+            )}
+          </View>
           <Text style={v_d81136.itemTitle}>{v_8c0b26.title || ''}</Text>
 
           {v_8c0b26.description && (
@@ -513,11 +577,22 @@ const v_d81136 = v_472849.create({
     padding: 24,
     marginBottom: 32,
   },
-  itemImage: {
+  imageContainer: {
     width: '100%',
-    height: 100,
+    height: 200,
     borderRadius: 10,
     marginBottom: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  itemImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageLoader: {
+    position: 'absolute',
   },
   itemTitle: {
     fontSize: v_843035.size.large,

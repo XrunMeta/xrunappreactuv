@@ -391,6 +391,9 @@ export const v_7488d5 = (v_c65f5d) => {
   const v_fed274 = v_c9c489.GATEWAY_NODEJS;
   const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
+  console.log('[createAxiosInstance] GATEWAY_NODEJS:', v_fed274);
+  console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
+
   const v_0c3a5b = v_b5030f.create({
     baseURL: v_fed274,
     timeout: v_8a74cb,
@@ -414,12 +417,121 @@ export const v_7488d5 = (v_c65f5d) => {
       console.log(`[API Request] 최종 요청 URL: ${v_f409eb}`);
 
       if (v_74a79c.data instanceof FormData) {
+        console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
+        console.log('[API Request] FormData 타입 확인:', v_74a79c.data instanceof FormData);
+        console.log('[API Request] URL:', v_74a79c.url);
+        console.log('[API Request] Method:', v_74a79c.method);
+
         delete v_74a79c.headers['Content-Type'];
-        console.log('[API Request] FormData detected, Content-Type header removed');
+        delete v_74a79c.headers['content-type'];
+        console.log('[API Request] Content-Type 헤더 삭제 완료');
+
+        v_74a79c.transformRequest = [];
+        console.log('[API Request] transformRequest를 빈 배열로 설정');
+
+        v_74a79c.maxContentLength = Infinity;
+        v_74a79c.maxBodyLength = Infinity;
+        console.log('[API Request] maxContentLength=Infinity, maxBodyLength=Infinity 설정');
+
+        if (v_326be8.OS !== 'web') {
+
+          v_74a79c.adapter = async (v_558750) => {
+            return new Promise((v_6f7712, v_bad6f3) => {
+              const v_6f3521 = new XMLHttpRequest();
+              const v_f71b56 = v_558750.baseURL 
+                ? (v_558750.baseURL.endsWith('/') && v_558750.url?.startsWith('/')
+                  ? `${v_558750.baseURL.slice(0, -1)}${v_558750.url}`
+                  : `${v_558750.baseURL}${v_558750.url}`)
+                : v_558750.url;
+
+              console.log('[API Request] XMLHttpRequest adapter - URL:', v_f71b56);
+              console.log('[API Request] XMLHttpRequest adapter - Method:', v_558750.method);
+
+              v_6f3521.open(v_558750.method?.toUpperCase() || 'GET', v_f71b56, true);
+
+              Object.keys(v_558750.headers || {}).forEach((v_b24339) => {
+                const v_627a1e = v_b24339.toLowerCase();
+                if (v_627a1e !== 'content-type' && v_627a1e !== 'contenttype') {
+                  try {
+                    v_6f3521.setRequestHeader(v_b24339, v_558750.headers[v_b24339]);
+                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${v_b24339} = ${v_558750.headers[v_b24339]}`);
+                  } catch (v_9e86fd) {
+                    console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${v_b24339}`, v_9e86fd);
+                  }
+                } else {
+                  console.log(`[API Request] XMLHttpRequest adapter - Content-Type 헤더 건너뜀: ${v_b24339}`);
+                }
+              });
+
+              if (v_558750.data instanceof FormData) {
+                console.log('[API Request] XMLHttpRequest adapter - FormData 감지, Content-Type 헤더 설정 안 함');
+              }
+
+              v_6f3521.onload = () => {
+                console.log('[API Request] XMLHttpRequest adapter - 응답 수신:', v_6f3521.status);
+                try {
+
+                  let v_f637a4 = v_6f3521.response;
+                  const v_c0c2d5 = v_6f3521.getResponseHeader('Content-Type');
+                  if (v_c0c2d5 && v_c0c2d5.includes('application/json')) {
+                    try {
+                      v_f637a4 = JSON.parse(v_6f3521.responseText);
+                    } catch (v_9e86fd) {
+                      console.warn('[API Request] XMLHttpRequest adapter - JSON 파싱 실패, 원본 데이터 사용');
+                    }
+                  }
+
+                  const v_3393e3 = {
+                    data: v_f637a4,
+                    status: v_6f3521.status,
+                    statusText: v_6f3521.statusText,
+                    headers: v_6f3521.getAllResponseHeaders(),
+                    config: v_558750,
+                    request: v_6f3521,
+                  };
+                  v_6f7712(v_3393e3);
+                } catch (v_9e86fd) {
+                  console.error('[API Request] XMLHttpRequest adapter - 응답 처리 오류:', v_9e86fd);
+                  v_bad6f3(v_9e86fd);
+                }
+              };
+
+              v_6f3521.onerror = (v_5e9bfe) => {
+                console.error('[API Request] XMLHttpRequest adapter - 네트워크 오류:', v_5e9bfe);
+                console.error('[API Request] XMLHttpRequest adapter - readyState:', v_6f3521.readyState);
+                console.error('[API Request] XMLHttpRequest adapter - status:', v_6f3521.status);
+                v_bad6f3(new Error('Network Error'));
+              };
+
+              v_6f3521.ontimeout = () => {
+                console.error('[API Request] XMLHttpRequest adapter - 타임아웃');
+                v_bad6f3(new Error('Timeout'));
+              };
+
+              v_6f3521.timeout = v_558750.timeout || 60000;
+              console.log('[API Request] XMLHttpRequest adapter - 타임아웃 설정:', v_6f3521.timeout);
+
+              if (v_558750.data instanceof FormData) {
+                console.log('[API Request] XMLHttpRequest adapter - FormData 전송 시작');
+                v_6f3521.send(v_558750.data);
+              } else {
+                console.log('[API Request] XMLHttpRequest adapter - 일반 데이터 전송');
+                v_6f3521.send(v_558750.data);
+              }
+            });
+          };
+          console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
+        }
+
+        console.log('[API Request] 최종 헤더:', JSON.stringify(v_74a79c.headers, null, 2));
+        console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
       if (v_74a79c.data) {
 
+        if (!(v_74a79c.data instanceof FormData)) {
+
+        }
       }
       return v_74a79c;
     },
@@ -436,6 +548,30 @@ export const v_7488d5 = (v_c65f5d) => {
     },
     async (error: v_3333d3) => {
 
+      if (v_5e9bfe.config?.data instanceof FormData) {
+        console.error('[API Error] ========== FormData 요청 오류 ==========');
+        console.error('[API Error] URL:', v_5e9bfe.config.url);
+        console.error('[API Error] Method:', v_5e9bfe.config.method);
+        console.error('[API Error] Error Code:', v_5e9bfe.code);
+        console.error('[API Error] Error Message:', v_5e9bfe.message);
+        console.error('[API Error] Has Response:', !!v_5e9bfe.response);
+        console.error('[API Error] Has Request:', !!v_5e9bfe.request);
+
+        if (v_5e9bfe.response) {
+          console.error('[API Error] Response Status:', v_5e9bfe.response.status);
+          console.error('[API Error] Response Status Text:', v_5e9bfe.response.statusText);
+          console.error('[API Error] Response Data:', v_5e9bfe.response.data);
+          console.error('[API Error] Response Headers:', v_5e9bfe.response.headers);
+        } else if (v_5e9bfe.request) {
+          console.error('[API Error] Request Object:', v_5e9bfe.request);
+          console.error('[API Error] Request Type:', typeof v_5e9bfe.request);
+          if (v_5e9bfe.request._response) {
+            console.error('[API Error] Request Response:', v_5e9bfe.request._response);
+          }
+        }
+        console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
+      }
+
       if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
         console.error('[API Timeout]', v_5e9bfe.config?.url);
         if (v_c65f5d) {
@@ -450,6 +586,7 @@ export const v_7488d5 = (v_c65f5d) => {
           statusText: v_5e9bfe.response?.statusText,
           data: v_5e9bfe.response?.data,
           message: v_5e9bfe.message,
+          code: v_5e9bfe.code,
         });
       }
       return Promise.reject(v_5e9bfe);
