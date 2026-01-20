@@ -22,6 +22,7 @@ import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getXRUNGopaxPrice, createItemFromApp, createAxiosInstance } from '../services';
 import { CreateItemFromAppRequest } from '../types';
 import { getEnv } from '../utils/env';
+import { cashingimages } from '../utils/imageCache';
 
 export const ShopItemRegisterScreen = () => {
   const { t } = useTranslation();
@@ -42,6 +43,9 @@ export const ShopItemRegisterScreen = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageFileId, setImageFileId] = useState<number | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const [currentImageBase64, setCurrentImageBase64] = useState<string | null>(null);
+  const [isLoadingCurrentImage, setIsLoadingCurrentImage] = useState<boolean>(false);
+  const [editSdk, setEditSdk] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -71,6 +75,19 @@ export const ShopItemRegisterScreen = () => {
             if (editItem.description) setDescription(editItem.description);
             if (editItem.maxpurchase) setMaxpurchase(editItem.maxpurchase.toString());
 
+              if (editItem.image || editItem.thumbnail) {
+                const existingImageFileId = editItem.thumbnail || editItem.image;
+                if (existingImageFileId) {
+                  setImageFileId(existingImageFileId);
+                  console.log('[상품 등록] 수정 모드 - 기존 이미지 파일 ID:', existingImageFileId);
+                }
+              }
+
+              if (editItem.sdk) {
+                setEditSdk(editItem.sdk);
+                console.log('[상품 등록] 수정 모드 - 기존 SDK:', editItem.sdk);
+              }
+
               await AsyncStorage.removeItem('editShopItem');
             }
           } catch (error) {
@@ -99,6 +116,56 @@ export const ShopItemRegisterScreen = () => {
     };
     loadGopaxPrice();
   }, []);
+
+  const loadCurrentImage = useCallback(async (fileId: number | null) => {
+    if (!fileId) {
+      setCurrentImageBase64(null);
+      return;
+    }
+
+    try {
+      setIsLoadingCurrentImage(true);
+      const fileIdStr = String(fileId);
+      console.log(`[상품 등록] 기존 이미지 로드 시도: ${fileIdStr}`);
+
+      const cachedImage = await cashingimages.getCachedImage(fileIdStr);
+      if (cachedImage) {
+        console.log(`[상품 등록] ✅ 기존 이미지 ${fileIdStr}가 캐시에서 발견됨`);
+        setCurrentImageBase64(cachedImage);
+        setIsLoadingCurrentImage(false);
+        return;
+      }
+
+      console.log(`[상품 등록] ⚠️ 기존 이미지 ${fileIdStr}가 캐시에 없음, 다운로드 시도...`);
+      const downloadSuccess = await cashingimages.downloadAndCacheImage(fileIdStr);
+
+      if (downloadSuccess) {
+        const newCachedImage = await cashingimages.getCachedImage(fileIdStr);
+        if (newCachedImage) {
+          console.log(`[상품 등록] ✅ 기존 이미지 ${fileIdStr}가 다운로드 후 성공적으로 가져옴`);
+          setCurrentImageBase64(newCachedImage);
+        } else {
+          console.log(`[상품 등록] ❌ 기존 이미지 ${fileIdStr} 다운로드 후 캐시에서 가져오기 실패`);
+        }
+      } else {
+        console.log(`[상품 등록] ❌ 기존 이미지 ${fileIdStr} 다운로드 실패`);
+      }
+    } catch (error) {
+      console.error('[상품 등록] 기존 이미지 로드 오류:', error);
+    } finally {
+      setIsLoadingCurrentImage(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isEditMode && imageFileId && !imageUri) {
+
+      loadCurrentImage(imageFileId);
+    } else if (imageUri) {
+
+      setCurrentImageBase64(null);
+    }
+  }, [isEditMode, imageFileId, imageUri, loadCurrentImage]);
 
   const generateSDK = useCallback((): string => {
     if (!userEmail || userEmail.length < 2) {
@@ -185,32 +252,54 @@ export const ShopItemRegisterScreen = () => {
         ? filename 
         : `${filename.split('.')[0] || 'image'}.jpg`;
 
+      let fileUri = uri;
+      if (uri.startsWith('file://')) {
+
+        fileUri = uri;
+      }
+
       formData.append('file', {
-        uri: uri, 
+        uri: fileUri,
         type: type,
         name: finalFilename,
       } as any);
 
-      console.log('[상품 등록] 이미지 업로드 시작:', { 
-        filename: finalFilename
-      });
+      console.log('[상품 등록] ========== 이미지 업로드 시작 (axios 사용) ==========');
+      console.log('[상품 등록] filename:', finalFilename);
+      console.log('[상품 등록] uri:', fileUri);
+      console.log('[상품 등록] platform:', Platform.OS);
+      console.log('[상품 등록] originalUri:', uri);
 
       const axiosInstance = createAxiosInstance(navigate);
+
+      console.log('[상품 등록] axios 요청 시작...');
 
       const response = await axiosInstance.post('/uploadFile', formData, {
         headers: {
           'Accept': 'application/json',
 
         },
-        timeout: 30000, 
+        transformRequest: [], 
+        timeout: 60000, 
       });
 
-      console.log('[상품 등록] 이미지 업로드 응답:', response.data);
+      console.log('[상품 등록] ========== axios 응답 수신 ==========');
+      console.log('[상품 등록] 응답 상태:', response.status);
+      console.log('[상품 등록] 응답 데이터:', response.data);
 
-      if (response.data && response.data.success && response.data.data && response.data.data.length > 0) {
-        const fileId = response.data.data[0];
-        console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', fileId);
-        return fileId;
+      if (response.data) {
+
+        if (response.data.success && response.data.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
+          const fileId = response.data.data[0];
+          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', fileId);
+          return fileId;
+        }
+
+        if (response.data.status === 'success' && response.data.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
+          const fileId = response.data.data[0];
+          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', fileId);
+          return fileId;
+        }
       }
 
       console.warn('[상품 등록] 이미지 업로드 응답 형식 오류:', response.data);
@@ -220,11 +309,13 @@ export const ShopItemRegisterScreen = () => {
       if (error.response) {
         console.error('[상품 등록] 서버 응답:', error.response.data);
         console.error('[상품 등록] 서버 상태:', error.response.status);
+        console.error('[상품 등록] 서버 헤더:', error.response.headers);
       } else if (error.request) {
         console.error('[상품 등록] 요청 전송 실패:', error.request);
       } else {
         console.error('[상품 등록] 오류 메시지:', error.message);
       }
+      console.error('[상품 등록] 오류 스택:', error.stack);
       return null;
     }
   };
@@ -259,7 +350,14 @@ export const ShopItemRegisterScreen = () => {
     }
 
     let sdk: string | undefined;
-    if (!isEditMode) {
+    if (isEditMode) {
+      if (editSdk) {
+        sdk = editSdk;
+      } else {
+        Alert.alert('오류', 'SDK 정보를 찾을 수 없습니다.');
+        return;
+      }
+    } else {
       sdk = generateSDK();
       if (!sdk) {
         Alert.alert('오류', 'SDK를 생성할 수 없습니다. 이메일 정보를 확인해주세요.');
@@ -277,7 +375,7 @@ export const ShopItemRegisterScreen = () => {
         price: 0, 
         priceKRW: finalPriceKRW,
         priceXrun: finalPriceXrun,
-        ...(sdk ? { sdk: sdk } : {}), 
+        sdk: sdk, 
         unit: 'Item',
         maxpurchase: parseInt(maxpurchase) || 1,
         type: 'package', 
@@ -396,31 +494,57 @@ export const ShopItemRegisterScreen = () => {
           {}
           <View style={styles.section}>
             <Text style={styles.label}>아이콘 이미지 (64x64)</Text>
-            <TouchableOpacity
-              style={[styles.imageUploadButton, isUploadingImage && styles.imageUploadButtonDisabled]}
-              onPress={handleImagePicker}
-              disabled={isUploadingImage}
-              activeOpacity={0.7}
-            >
-              {isUploadingImage ? (
-                <View style={styles.uploadingContainer}>
-                  <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                  <Text style={styles.uploadingText}>업로드 중...</Text>
-                </View>
-              ) : imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-              ) : (
-                <View style={styles.imagePlaceholder}>
-                  <Text style={styles.imagePlaceholderText}>이미지 선택</Text>
+            <View style={styles.imageContainer}>
+              {}
+              <TouchableOpacity
+                style={[styles.imageUploadButton, isUploadingImage && styles.imageUploadButtonDisabled]}
+                onPress={handleImagePicker}
+                disabled={isUploadingImage}
+                activeOpacity={0.7}
+              >
+                {isUploadingImage ? (
+                  <View style={styles.uploadingContainer}>
+                    <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+                    <Text style={styles.uploadingText}>업로드 중...</Text>
+                  </View>
+                ) : imageUri ? (
+                  <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Text style={styles.imagePlaceholderText}>이미지 선택</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {}
+              {isEditMode && !imageUri && (
+                <View style={styles.currentImageContainer}>
+                  {isLoadingCurrentImage ? (
+                    <View style={styles.currentImageLoader}>
+                      <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+                      <Text style={styles.currentImageLoaderText}>로딩 중...</Text>
+                    </View>
+                  ) : currentImageBase64 ? (
+                    <>
+                      <Text style={styles.currentImageLabel}>현재 이미지</Text>
+                      <Image
+                        source={{ uri: `data:image/png;base64,${currentImageBase64}` }}
+                        style={styles.currentImagePreview}
+                      />
+                    </>
+                  ) : null}
                 </View>
               )}
-            </TouchableOpacity>
+            </View>
             {imageUri && !isUploadingImage && (
               <TouchableOpacity
                 style={styles.removeImageButton}
                 onPress={() => {
                   setImageUri(null);
-                  setImageFileId(null);
+
+                  if (!isEditMode) {
+                    setImageFileId(null);
+                  }
                 }}
                 activeOpacity={0.7}
               >
@@ -641,5 +765,42 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.small,
     fontFamily: 'Roboto-Regular',
     color: '#E53935',
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  currentImageContainer: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  currentImageLabel: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Medium',
+    color: '#666',
+  },
+  currentImagePreview: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  currentImageLoader: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  currentImageLoaderText: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#999',
   },
 });

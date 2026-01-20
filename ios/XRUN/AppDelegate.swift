@@ -10,6 +10,8 @@ import GoogleMaps
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
   private var currentInterstitialAd: PAGLInterstitialAd?
+  private var currentAppOpenAd: PAGLAppOpenAd?
+  private var currentRewardedAd: PAGRewardedAd?
   var window: UIWindow?
 
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
@@ -69,9 +71,7 @@ GMSServices.provideAPIKey("oth-google-api-key")
         print("[AppDelegate] ❌ 전면 광고 로드 실패")
         print("  - SlotID: \(slotId)")
         print("  - Error: \(nsError.localizedDescription)")
-        if nsError.code == 40034 {
-            print("  - 도움말: Bidding 전용 SlotID를 Waterfall 방식으로 로드했습니다. 테스트용 ID를 확인하세요.")
-        }
+        NotificationCenter.default.post(name: NSNotification.Name("PangleAdLoadError"), object: nil, userInfo: ["type": "interstitial", "error": nsError.localizedDescription])
         return
       }
 
@@ -83,6 +83,56 @@ GMSServices.provideAPIKey("oth-google-api-key")
         }
 
         print("[AppDelegate] 전면 광고 노출 시도 (VisibleVC: \(type(of: visibleVC)))")
+        ad?.delegate = self
+        ad?.present(fromRootViewController: visibleVC)
+      }
+    }
+  }
+
+  @objc public func loadAndShowAppOpenAd(slotId: String) {
+    print("[AppDelegate] 앱 오프닝 광고 로드 시작 (SlotID: \(slotId))")
+    let request = PAGAppOpenRequest()
+    PAGLAppOpenAd.load(withSlotID: slotId, request: request) { [weak self] ad, error in
+      if let error = error {
+        print("[AppDelegate] ❌ 앱 오프닝 광고 로드 실패: \(error.localizedDescription)")
+        NotificationCenter.default.post(name: NSNotification.Name("PangleAdLoadError"), object: nil, userInfo: ["type": "appOpen", "error": error.localizedDescription])
+        return
+      }
+
+      DispatchQueue.main.async {
+        self?.currentAppOpenAd = ad
+        guard let visibleVC = self?.findVisibleViewController() else {
+          print("[AppDelegate] ❌ 광고를 표시할 수 있는 View Controller를 찾을 수 없습니다.")
+          NotificationCenter.default.post(name: NSNotification.Name("PangleAdLoadError"), object: nil, userInfo: ["type": "appOpen", "error": "Visible View Controller not found"])
+          return
+        }
+
+        print("[AppDelegate] 앱 오프닝 광고 노출 시도")
+        ad?.delegate = self
+        ad?.present(fromRootViewController: visibleVC)
+      }
+    }
+  }
+
+  @objc public func loadAndShowRewardedAd(slotId: String) {
+    print("[AppDelegate] 보상형 광고 로드 시작 (SlotID: \(slotId))")
+    let request = PAGRewardedRequest()
+    PAGRewardedAd.load(withSlotID: slotId, request: request) { [weak self] ad, error in
+      if let error = error {
+        print("[AppDelegate] ❌ 보상형 광고 로드 실패: \(error.localizedDescription)")
+        NotificationCenter.default.post(name: NSNotification.Name("PangleAdLoadError"), object: nil, userInfo: ["type": "rewarded", "error": error.localizedDescription])
+        return
+      }
+
+      DispatchQueue.main.async {
+        self?.currentRewardedAd = ad
+        guard let visibleVC = self?.findVisibleViewController() else {
+          print("[AppDelegate] ❌ 광고를 표시할 수 있는 View Controller를 찾을 수 없습니다.")
+          NotificationCenter.default.post(name: NSNotification.Name("PangleAdLoadError"), object: nil, userInfo: ["type": "rewarded", "error": "Visible View Controller not found"])
+          return
+        }
+
+        print("[AppDelegate] 보상형 광고 노출 시도")
         ad?.delegate = self
         ad?.present(fromRootViewController: visibleVC)
       }
@@ -237,7 +287,15 @@ GMSServices.provideAPIKey("oth-google-api-key")
   }
 
   private func findVisibleViewController() -> UIViewController? {
-    var topController = window?.rootViewController
+    var topController = UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap { $0.windows }
+        .first { $0.isKeyWindow }?.rootViewController
+
+    if topController == nil {
+        topController = window?.rootViewController
+    }
+
     while let presentedController = topController?.presentedViewController {
         topController = presentedController
     }
@@ -261,17 +319,35 @@ class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
   }
 }
 
-extension AppDelegate: PAGLInterstitialAdDelegate {
-  public func adDidShow(_ ad: PAGAdProtocol) {
-    print("[AppDelegate] 광고 노출 완료")
+extension AppDelegate: PAGLInterstitialAdDelegate, PAGLAppOpenAdDelegate, PAGRewardedAdDelegate {
+  @objc public func adDidShow(_ ad: PAGAdProtocol) {
+    print("[AppDelegate] \(type(of: ad)) 광고 노출 완료")
   }
 
-  public func adDidClick(_ ad: PAGAdProtocol) {
-    print("[AppDelegate] 광고 클릭됨")
+  @objc public func adDidClick(_ ad: PAGAdProtocol) {
+    print("[AppDelegate] \(type(of: ad)) 광고 클릭됨")
   }
 
-  public func adDidDismiss(_ ad: PAGAdProtocol) {
-    self.currentInterstitialAd = nil
-    print("[AppDelegate] 광고 닫힘")
+  @objc public func adDidDismiss(_ ad: PAGAdProtocol) {
+    if ad === self.currentInterstitialAd {
+      self.currentInterstitialAd = nil
+      print("[AppDelegate] 전면 광고(Interstitial) 닫힘")
+      NotificationCenter.default.post(name: NSNotification.Name("PangleAdClosed"), object: nil, userInfo: ["type": "interstitial"])
+    } else if ad === self.currentAppOpenAd {
+      self.currentAppOpenAd = nil
+      print("[AppDelegate] 앱 오프닝 광고(AppOpen) 닫힘")
+      NotificationCenter.default.post(name: NSNotification.Name("PangleAdClosed"), object: nil, userInfo: ["type": "appOpen"])
+    } else if ad === self.currentRewardedAd {
+      self.currentRewardedAd = nil
+      print("[AppDelegate] 보상형 광고(Rewarded) 닫힘")
+      NotificationCenter.default.post(name: NSNotification.Name("PangleAdClosed"), object: nil, userInfo: ["type": "rewarded"])
+    } else {
+      print("[AppDelegate] 광고 닫힘")
+    }
+  }
+
+  @objc public func rewardedAd(_ rewardedAd: PAGRewardedAd, userDidEarnReward rewardModel: PAGRewardModel) {
+    print("[AppDelegate] 보상 획득 완료: \(rewardModel.rewardName ?? "XRUN") (\(rewardModel.rewardAmount))")
+    NotificationCenter.default.post(name: NSNotification.Name("PangleRewarded"), object: nil, userInfo: ["name": rewardModel.rewardName ?? "XRUN", "amount": rewardModel.rewardAmount])
   }
 }

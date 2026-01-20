@@ -53,6 +53,7 @@ import {
   ShopBuyScreen,
   ShopSuccessScreen,
   ShopTicketDetailScreen,
+  ShopItemRegisterScreen,
   ShowNapAdScreen,
   ShowPockAdScreen,
   XRUNinfoScreen,
@@ -478,6 +479,10 @@ const ScreenHost = () => {
     return <ShopTicketDetailScreen />;
   }
 
+  if (currentScreen === 'shopItemRegister') {
+    return <ShopItemRegisterScreen />;
+  }
+
   if (currentScreen === 'showNapAd') {
     return <ShowNapAdScreen />;
   }
@@ -497,7 +502,7 @@ const ScreenHost = () => {
   return <LoginSignupScreen />;
 };
 
-const PermissionRequester = () => {
+const PermissionRequester = ({ isAdFinished }: { isAdFinished: boolean }) => {
   const [locationPermissionStatus, setLocationPermissionStatus] = useState<Location.PermissionStatus | null>(null);
   const [hasCheckedPermissions, setHasCheckedPermissions] = useState(false);
   const [hasShownDialog, setHasShownDialog] = useState(false);
@@ -626,13 +631,18 @@ const PermissionRequester = () => {
   useEffect(() => {
     const initializePermissions = async () => {
 
+      if (!isAdFinished) {
+        console.log('[App] 광고가 아직 끝나지 않아 위치 권한 요청을 대기합니다.');
+        return;
+      }
+
       const locationStatus = await requestLocationPermission();
       setLocationPermissionStatus(locationStatus);
       setHasCheckedPermissions(true);
     };
 
     initializePermissions();
-  }, [requestLocationPermission]);
+  }, [requestLocationPermission, isAdFinished]);
 
   useEffect(() => {
     if (hasCheckedPermissions && locationPermissionStatus !== null && !isRequestingPermissions) {
@@ -747,6 +757,7 @@ const GlobalDialogs = () => {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdFinished, setIsAdFinished] = useState(false); 
   const [fontsLoaded] = useFonts({
     'Roboto-Regular': Roboto_400Regular,
     'Roboto-Medium': Roboto_500Medium,
@@ -867,27 +878,34 @@ export default function App() {
       }
 
       try {
+        await loadEnv();
+        console.log('[App] 환경 변수 로드 완료');
+      } catch (error) {
+        console.error('[App] 환경 변수 로드 실패:', error);
+      }
+
+      try {
         await initializeTaboola();
         console.log('[App] Taboola 초기화 완료');
       } catch (error) {
         console.error('[App] Taboola 초기화 실패:', error);
       }
 
-      if (Platform.OS === 'android') {
-        setTimeout(() => {
-          initializePangle().then(() => {
-            console.log('[App] Pangle 초기화 완료');
+      setTimeout(async () => {
+        try {
+          await initializePangle();
+          console.log('[App] Pangle 초기화 완료');
 
-            setTimeout(() => {
-              loadAndShowAppOpenAd().catch((error) => {
-                console.error('[App] 앱 오프닝 광고 로드 실패 (앱은 계속 실행됩니다):', error);
-              });
-            }, 500); 
-          }).catch((error) => {
-            console.error('[App] Pangle 초기화 실패 (앱은 계속 실행됩니다):', error);
-          });
-        }, 1000); 
-      }
+          console.log('[App] 앱 오프닝 광고 표시 시작');
+          await loadAndShowAppOpenAd();
+          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
+        } catch (error) {
+          console.error('[App] Pangle 프로세스 실패:', error);
+        } finally {
+
+          setIsAdFinished(true);
+        }
+      }, 1000);
 
       try {
         console.log('[App] TopAd5 광고 캐시 시작');
@@ -959,7 +977,7 @@ export default function App() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester />
+            <PermissionRequester isAdFinished={isAdFinished} />
             <AliveService />
             <ScreenHost />
             <GlobalDialogs />
