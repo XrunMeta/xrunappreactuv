@@ -3182,6 +3182,49 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             <WebView
               source={{ uri: v_b2dceb }}
               style={{ flex: 1 }}
+              onNavigationStateChange={(v_b8df7f) => {
+                console.log('[WebView] 네비게이션:', v_b8df7f.url);
+              }}
+              onShouldStartLoadWithRequest={(v_576f5a) => {
+                const { url: v_f71b56 } = v_576f5a;
+                console.log('[WebView] 네비게이션 요청:', v_f71b56);
+
+                if (v_f71b56.startsWith('intent://')) {
+                  try {
+
+                    let v_77de37 = '';
+
+                    const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
+                    if (v_ae8a0a) {
+                      v_77de37 = v_ae8a0a[1];
+                    } else {
+
+                      const v_d555bc = v_f71b56.match(/package=([^;]+)/);
+                      if (v_d555bc) {
+                        v_77de37 = v_d555bc[1];
+                      }
+                    }
+
+                    if (v_77de37) {
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환:', v_a1e9b4);
+                      v_e60eaf(v_a1e9b4);
+                      return false;
+                    } else {
+                      throw new Error('패키지 ID를 찾을 수 없음');
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] intent:// 변환 실패:', v_5e9bfe);
+                    return false;
+                  }
+                }
+
+                if (v_f71b56.startsWith('http://') || v_f71b56.startsWith('https://')) {
+                  return true;
+                }
+
+                return false;
+              }}
               onError={(v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('WebView 오류:', v_76b943);
