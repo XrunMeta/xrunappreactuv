@@ -216,8 +216,8 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
 
         if (pockAdData) {
           setPockAdData(prev => ({
-            ...prev,
-            landing_url: currentParams.urlAD || prev.landing_url,
+            ...(prev || {}),
+            landing_url: currentParams.urlAD || (prev?.landing_url || ''),
           }));
         }
         setPockAdData({
@@ -708,9 +708,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
           )}
-          <Text style={styles.campaignTitle}>
-            {pockAdData.ad_name || advertisementParams.name || t('screens.showNapAd.campaignInfo')}
-          </Text>
+          <View style={styles.campaignBox}>
+            <Text style={styles.campaignTitle}>
+              {pockAdData.ad_name || advertisementParams.name || t('screens.showNapAd.campaignInfo')}
+            </Text>
+          </View>
           <Text style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
@@ -1156,6 +1158,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 5,
     shadowColor: '#000',
+    width:'100%',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1173,6 +1176,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#343a59',
     textAlign: 'center',
+  },
+  campaignBox:{
+    width:'75%',
+    alignSelf:'center',
+    padding:10,
   },
   campaignReward: {
     fontSize: FONTS.size.medium,
