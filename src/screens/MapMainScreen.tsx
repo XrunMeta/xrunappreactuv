@@ -1639,7 +1639,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
       const v_c0d590 = v_e36b07.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
-      const v_c05ac2 = v_4cf0ad.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
+      const v_c05ac2 = topAd5DataRef.current.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
 
       const v_3f87ed = new Set(v_c0d590);
       const v_276c8d = new Set(v_c05ac2);
@@ -1769,6 +1769,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
         const v_fe7102 = await v_5d7ca4();
         if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
           v_6549d0(v_fe7102);
+          topAd5DataRef.current = v_fe7102; 
           console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
         }
       } catch (v_741f30) {
@@ -1778,15 +1779,19 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       v_fd5fd4.current = false;
     }
-  }, [v_ac1d22, v_a55f0b, v_4cf0ad, v_79311c, v_89e09e]); 
+  }, [v_ac1d22, v_a55f0b, v_9b57fc, v_89e09e]); 
 
   v_c4deb2(() => {
 
     if (v_ac1d22 !== 'Map') {
       return;
     }
+
+    if (v_fd5fd4.current) {
+      return;
+    }
     v_6dea10();
-  }, [v_ac1d22, v_6dea10]); 
+  }, [v_ac1d22]); 
 
   v_c4deb2(() => {
 
