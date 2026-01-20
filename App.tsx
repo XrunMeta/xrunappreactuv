@@ -878,6 +878,32 @@ export default function App() {
       }
 
       try {
+        const cachedAdStr = await AsyncStorage.getItem('cached_AD');
+        if (cachedAdStr) {
+          const cachedAd = JSON.parse(cachedAdStr);
+          let hasMarketUrl = false;
+          const cleanedCache: any = {};
+
+          Object.keys(cachedAd).forEach((campid) => {
+            const urlAD = cachedAd[campid]?.urlAD;
+            if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) {
+              console.log(`[App] 캐시에서 market:// 또는 intent:// 제거: ${campid}`);
+              hasMarketUrl = true;
+            } else {
+              cleanedCache[campid] = cachedAd[campid];
+            }
+          });
+
+          if (hasMarketUrl) {
+            await AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
+            console.log('[App] 캐시 클리어 완료 (market:// 및 intent:// 제거)');
+          }
+        }
+      } catch (cacheError) {
+        console.warn('[App] 캐시 클리어 실패:', cacheError);
+      }
+
+      try {
         await loadEnv();
         console.log('[App] 환경 변수 로드 완료');
       } catch (error) {

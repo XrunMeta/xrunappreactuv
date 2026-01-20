@@ -274,6 +274,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
           backgroundColor: 'white',
           opacity: 0.8,
           zIndex: -1,
+          pointerEvents: 'none', 
         }}
       />
       <View
@@ -288,6 +289,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
           backgroundColor: 'white',
           opacity: 0.9,
           zIndex: -1,
+          pointerEvents: 'none', 
         }}
       />
 
@@ -638,6 +640,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const isPreFetchingRef = useRef(false);
   const completedAdsSetRef = useRef<Set<string>>(new Set<string>());
 
+  const loggedUrlMissingCampidsRef = useRef<Set<string>>(new Set<string>());
+
   const loadCachedAds = useCallback(async () => {
     try {
       const cached = await AsyncStorage.getItem('cached_AD');
@@ -749,7 +753,24 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     console.log("ℹ️ [organizeData] 사용된 캐시 소스:", externalCache ? "External (Latest)" : "State (May be stale)");
     console.log("ℹ️ [organizeData] 캐시 데이터 수:", Object.keys(effectiveCache).length);
 
-    const validData = enrichedData;
+    const beforeCompletedFilter = enrichedData.length;
+    const filteredByCompleted = enrichedData.filter((d) => {
+      const campid = String(d.campid || '');
+      if (campid && campid !== '' && campid !== 'undefined' && completedAdsSetRef.current) {
+        const isCompleted = completedAdsSetRef.current.has(campid);
+        if (isCompleted) {
+          console.log(`[organizeData] 이미 본 광고 제외: ${campid}`);
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (filteredByCompleted.length !== beforeCompletedFilter) {
+      console.log(`[organizeData] 이미 본 광고 필터링: ${filteredByCompleted.length}/${beforeCompletedFilter}개 유효 (${beforeCompletedFilter - filteredByCompleted.length}개 제외)`);
+    }
+
+    const validData = filteredByCompleted;
 
     enrichedData.forEach(d => {
       const hasDirectUrl = (d.urlAD && d.urlAD !== '' && d.urlAD !== '없음') || 
@@ -758,7 +779,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const cachedUrl = effectiveCache[campid]?.urlAD;
       const hasCachedUrl = cachedUrl && cachedUrl !== '' && cachedUrl !== '없음';
 
-      if (!hasDirectUrl && !hasCachedUrl) {
+      if (!hasDirectUrl && !hasCachedUrl && !loggedUrlMissingCampidsRef.current.has(campid)) {
+        loggedUrlMissingCampidsRef.current.add(campid);
         console.log(`⚠️ [organizeData] ${d.campid}는 urlAD가 없지만 일단 표시 (나중에 pre-fetch 예정)`, {
           urlAD: d.urlAD,
           landing_url: d.landing_url,
@@ -960,11 +982,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                       console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
-                      const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-                        return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
-                      });
-
-                      if (filteredTopAd5.length > 0) {
+                      if (topAd5Response.length > 0) {
 
                   const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
                     const distanceA = parseFloat(String(a.distance || 0));
@@ -973,7 +991,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   });
 
                   const MAX_TOKENS_PER_CAMPAIGN = 5;
-                        const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                        const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
                   const campaignTokenCount = new Map<number, number>();
 
                         const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
@@ -981,8 +999,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       return coin;
                     }
 
-                          const adIndex = index % filteredTopAd5.length;
-                          const mappedAd = filteredTopAd5[adIndex];
+                          const adIndex = index % topAd5Response.length;
+                          const mappedAd = topAd5Response[adIndex];
                     const campid = mappedAd?.campid;
 
                     if (campid) {
@@ -1065,11 +1083,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
                     console.log('[CameraMainScreen] 백그라운드: 최신 TopAd5 데이터 가져옴:', topAd5Response.length, '개');
 
-                    const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-                      return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '' && ad.urlAD !== '없음';
-                    });
-
-                    if (filteredTopAd5.length > 0) {
+                    if (topAd5Response.length > 0) {
 
                       const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
                         const distanceA = parseFloat(String(a.distance || 0));
@@ -1078,7 +1092,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   });
 
                       const MAX_TOKENS_PER_CAMPAIGN = 5;
-                      const maxMappedTokens = filteredTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
+                      const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
                       const campaignTokenCount = new Map<number, number>();
 
                       const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
@@ -1086,8 +1100,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                           return coin;
                         }
 
-                        const adIndex = index % filteredTopAd5.length;
-                        const mappedAd = filteredTopAd5[adIndex];
+                        const adIndex = index % topAd5Response.length;
+                        const mappedAd = topAd5Response[adIndex];
                         const campid = mappedAd?.campid;
 
                         if (campid) {
@@ -1351,46 +1365,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               });
             }
 
-            const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-              const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
-              if (!hasUrl) {
-                console.log(`⚠️ [CameraMainScreen] ${ad.campid}는 urlAD가 없어 제외됨 (urlAD 값: ${ad.urlAD}, 타입: ${typeof ad.urlAD})`);
-              }
-              return hasUrl;
-            });
-
-            if (filteredTopAd5.length === 0) {
-              console.warn('[CameraMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+            if (topAd5Response.length === 0) {
+              console.warn('[CameraMainScreen] TopAd5 데이터가 없습니다.');
               topAd5Response = null;
-            } else {
-
-              console.log('[CameraMainScreen] URL 검증 시작');
-              const validatedData = await validateTopAd5Urls(filteredTopAd5);
-
-              const validUrlData = validatedData.filter((item: any) => item.isValid === true);
-              if (validUrlData.length !== validatedData.length) {
-                console.log(`[CameraMainScreen] URL 검증 완료: ${validUrlData.length}/${validatedData.length}개 유효 (${validatedData.length - validUrlData.length}개 제외)`);
-              }
-
-              const filteredCompletedAds = validUrlData.filter((ad: any) => {
-                const campid = String(ad.campid || '');
-                const isCompleted = completedAdsSet.has(campid);
-                if (isCompleted) {
-                  console.log(`⚠️ [CameraMainScreen] ${campid}는 이미 본 광고로 제외됨`);
-                }
-                return !isCompleted;
-              });
-
-              if (filteredCompletedAds.length !== validUrlData.length) {
-                console.log(`[CameraMainScreen] 이미 본 광고 필터링: ${filteredCompletedAds.length}/${validUrlData.length}개 유효 (${validUrlData.length - filteredCompletedAds.length}개 제외)`);
-              }
-
-              if (filteredCompletedAds.length === 0) {
-                console.warn('[CameraMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
-                topAd5Response = null;
-              } else {
-                topAd5Response = filteredCompletedAds;
-              }
             }
           }
 
@@ -1874,6 +1851,121 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       organizeData(coinsData);
     }
   }, [coinsData, organizeData]);
+
+  const refreshTopAd5Data = useCallback(async () => {
+    try {
+      console.log('[CameraMainScreen] 백그라운드: 최신 데이터 가져오기 시작');
+
+      const userData = await AsyncStorage.getItem('userData');
+      if (!userData) {
+        console.warn('[CameraMainScreen] 백그라운드: userData 없음');
+        return;
+      }
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member?.toString() || '';
+      if (!member) {
+        console.warn('[CameraMainScreen] 백그라운드: member 없음');
+        return;
+      }
+
+      const [topAd5Response, completedAdsSet] = await Promise.all([
+        getTopAd5(navigate, true).catch(() => null), 
+        getCompletedAdsSet(member, navigate).catch(() => new Set<string>()),
+      ]);
+
+      if (completedAdsSet && completedAdsSet.size > 0) {
+        completedAdsSetRef.current = completedAdsSet;
+        console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+      }
+
+      if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+        console.log('[CameraMainScreen] 백그라운드: TopAd5 데이터 가져옴 (캐시 또는 API):', topAd5Response.length, '개');
+
+        if (topAd5Response.length > 0) {
+
+          setCoinsData((prevCoinsData) => {
+            if (!prevCoinsData || prevCoinsData.length === 0) {
+              return prevCoinsData;
+            }
+
+            const sortedCoinsData = [...prevCoinsData].sort((a, b) => {
+              const distanceA = parseFloat(String(a.distance || 0));
+              const distanceB = parseFloat(String(b.distance || 0));
+              return distanceA - distanceB;
+            });
+
+            const MAX_TOKENS_PER_CAMPAIGN = 5;
+            const maxMappedTokens = topAd5Response.length * MAX_TOKENS_PER_CAMPAIGN;
+            const campaignTokenCount = new Map<number, number>();
+
+            const updatedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
+              if (index >= maxMappedTokens) {
+                return coin;
+              }
+
+              const adIndex = index % topAd5Response.length;
+              const mappedAd = topAd5Response[adIndex];
+              const campid = mappedAd?.campid;
+
+              if (campid) {
+                const currentCount = campaignTokenCount.get(campid) || 0;
+                if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
+                  return coin;
+                }
+                campaignTokenCount.set(campid, currentCount + 1);
+              }
+
+              return {
+                ...coin,
+                distance: Number(coin.distance) || 0,
+                name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
+                iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: mappedAd?.joindesc || coin.joindesc || '',
+                xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                campid: mappedAd?.campid || coin.campid || coin.campId || '',
+                advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+                thumbnail: mappedAd?.thumbnail || coin.thumbnail,
+                ad_company: mappedAd?.ad_company || coin.ad_company,
+                coins: mappedAd?.coins?.toString() || coin.coins,
+                brandlogo: mappedAd?.brandlogo || coin.brandlogo,
+                adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
+                symbolimg: mappedAd?.symbolimg || coin.symbolimg,
+                urlAD: mappedAd?.urlAD || coin.urlAD || '',
+              };
+            });
+
+            currentIndexRef.current = 0;
+
+            setTimeout(() => {
+              organizeData(updatedCoinsData);
+            }, 0);
+            console.log('[CameraMainScreen] 백그라운드: 최신 데이터로 토큰 업데이트 완료');
+            return updatedCoinsData;
+          });
+        }
+      }
+    } catch (bgError) {
+      console.warn('[CameraMainScreen] 백그라운드 업데이트 실패:', bgError);
+    }
+  }, [navigate, organizeData]);
+
+  useEffect(() => {
+    if (activeTab !== 'Camera') {
+      return; 
+    }
+
+    console.log('⏰ [CameraMainScreen] 10분 주기 광고 목록 갱신 타이머 시작');
+    const interval = setInterval(() => {
+      console.log('⏰ 10분 경과 - 광고 목록 갱신 시작');
+      refreshTopAd5Data();
+    }, 10 * 60 * 1000); 
+
+    return () => {
+      console.log('⏰ [CameraMainScreen] 10분 주기 광고 목록 갱신 타이머 정리');
+      clearInterval(interval);
+    };
+  }, [activeTab, refreshTopAd5Data]);
 
   useEffect(() => {
 
@@ -2792,20 +2884,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       isCompleted: isCompleted,
                     });
 
-                    if (isCompleted) {
-                      console.log(`[CameraMainScreen] 본 광고 클릭 차단: ${campid}`);
-                      showToast('이미 본 광고입니다.');
-                      return; 
-                    }
-
                     handleTokenClick(token);
                   };
 
                   console.log(`[토큰 렌더링] spotID=${token.spotID}, campid=${campid}, completedAdsSet 크기=${completedAdsSetRef.current?.size || 0}`);
 
+                  const uniqueKey = `token-${token.spotID}-${campid}-${token.coin || ''}`;
+
                   return (
                     <TokenComponent
-                      key={token.spotID}
+                      key={uniqueKey}
                       token={token}
                       onPress={handleClick} 
                       animationRefs={animationRefs}
@@ -3034,14 +3122,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         presentationStyle="fullScreen"
         onRequestClose={handleWebViewClose}
       >
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' ,
+            paddingBottom: Platform.OS === 'ios' ? 0 : 40,}}>
           {}
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
             paddingHorizontal: 16,
-            paddingTop: Platform.OS === 'ios' ? 50 : 20,
+            paddingTop: Platform.OS === 'ios' ? 60 : 40,
             paddingBottom: 12,
             borderBottomWidth: 1,
             borderBottomColor: '#e0e0e0',
@@ -3051,22 +3139,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={handleWebViewClose}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-start',
+                justifyContent: 'center',
+                marginLeft: 8,
               }}
             >
               <Ionicons name="close" size={24} color="#000" />
             </TouchableOpacity>
 
             {}
-            <Text style={{
-              fontSize: 18,
-              fontFamily: 'Roboto-Bold',
-              color: '#000',
-              flex: 1,
-              textAlign: 'center',
-            }}>
+            <Text 
+              style={{
+                fontSize: 18,
+                fontFamily: 'Roboto-Bold',
+                color: '#000',
+                flex: 8,
+                textAlign: 'center',
+                alignContent: 'center',
+                justifyContent: 'center',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+
+            >
               {webViewTitle}
             </Text>
 
@@ -3074,9 +3170,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             <TouchableOpacity
               onPress={handleInfoIconPress}
               style={{
-                padding: 8,
-                width: 40,
+                flex: 2,
                 alignItems: 'flex-end',
+                justifyContent: 'center',
+                marginRight: 8,
               }}
             >
               <Ionicons name="information-circle-outline" size={24} color="#388Dc8" />
@@ -3086,8 +3183,168 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           {}
           {webViewUrl ? (
             <WebView
+              key={webViewUrl}
               source={{ uri: webViewUrl }}
               style={{ flex: 1 }}
+              injectedJavaScript={`
+                (function() {
+                  let currentUrl = window.location.href;
+                  const checkUrl = function() {
+                    if (window.location.href !== currentUrl) {
+                      const newUrl = window.location.href;
+                      currentUrl = newUrl;
+                      if (newUrl.startsWith('market://')) {
+                        try {
+                          const idMatch = newUrl.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            console.log('[injectedJS] window.location market:// 감지, React Native에 알림:', packageId);
+                            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                              window.ReactNativeWebView.postMessage(JSON.stringify({
+                                type: 'marketRedirect',
+                                packageId: packageId
+                              }));
+                            }
+                            const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                            window.location.href = playStoreUrl;
+                            return;
+                          }
+                        } catch (error) {
+                          console.error('[injectedJS] market:// 변환 실패:', error);
+                        }
+                      }
+                    }
+                  };
+
+                  setInterval(checkUrl, 100);
+
+                  function convertMarketLinks() {
+                    const links = document.querySelectorAll('a[href]');
+                    links.forEach(function(link) {
+                      const href = link.getAttribute('href');
+                      if (href && href.startsWith('market://')) {
+                        try {
+                          const idMatch = href.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                            link.setAttribute('href', playStoreUrl);
+                            console.log('[injectedJS] market://를 play.google.com으로 변환:', playStoreUrl);
+                          }
+                        } catch (error) {
+                          console.error('[injectedJS] market:// 변환 실패:', error);
+                        }
+                      }
+                    });
+                  }
+
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', convertMarketLinks);
+                  } else {
+                    convertMarketLinks();
+                  }
+
+                  const observer = new MutationObserver(function(mutations) {
+                    convertMarketLinks();
+                  });
+
+                  observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                  });
+
+                  document.addEventListener('click', function(e) {
+                    let target = e.target;
+                    while (target && target !== document.body) {
+                      if (target.tagName === 'A' && target.href) {
+                        const url = target.href;
+                        if (url.startsWith('market://')) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          try {
+                            const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                            if (idMatch) {
+                              const packageId = idMatch[1];
+                              const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                              console.log('[injectedJS] market:// 클릭 가로채기, 변환:', playStoreUrl);
+                              window.location.href = playStoreUrl;
+                            }
+                          } catch (error) {
+                            console.error('[injectedJS] market:// 변환 실패:', error);
+                          }
+                          return false;
+                        }
+                      }
+                      target = target.parentElement;
+                    }
+                  }, true);
+                })();
+                true;
+              `}
+              onMessage={(event) => {
+                try {
+                  const data = JSON.parse(event.nativeEvent.data);
+                  if (data.type === 'marketRedirect') {
+                    const playStoreUrl = `https://play.google.com/store/apps/details?id=${data.packageId}`;
+                    console.log('[WebView] onMessage에서 market:// 변환:', playStoreUrl);
+                    setWebViewUrl(playStoreUrl);
+                  }
+                } catch (error) {
+
+                }
+              }}
+              onNavigationStateChange={(navState) => {
+                console.log('[WebView] 네비게이션:', navState.url);
+
+                if (navState.url && navState.url.startsWith('market://')) {
+                  try {
+                    const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      const packageId = idMatch[1];
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] market://를 play.google.com으로 변환 (onNavigationStateChange):', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                    }
+                  } catch (error) {
+                    console.error('[WebView] market:// 변환 실패:', error);
+                  }
+                } else if (navState.url && navState.url.startsWith('intent://')) {
+                  try {
+                    let packageId = '';
+                    const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      packageId = idMatch[1];
+                    } else {
+                      const packageMatch = navState.url.match(/package=([^;]+)/);
+                      if (packageMatch) {
+                        packageId = packageMatch[1];
+                      }
+                    }
+                    if (packageId) {
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환 (onNavigationStateChange):', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                    }
+                  } catch (error) {
+                    console.error('[WebView] intent:// 변환 실패:', error);
+                  }
+                }
+              }}
+              onShouldStartLoadWithRequest={(request) => {
+                const { url } = request;
+                console.log('[WebView] 네비게이션 요청:', url);
+
+                if (url.startsWith('market://') || url.startsWith('intent://')) {
+                  console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
+                  return false; 
+                }
+
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                  return true;
+                }
+
+                return false;
+              }}
               onError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView 오류:', nativeEvent);

@@ -1611,47 +1611,12 @@ export const MapMainScreen: React.FC = () => {
         return;
       }
 
-      const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-        const hasUrl = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
-        if (!hasUrl) {
-          console.log(`⚠️ [MapMainScreen] ${ad.campid}는 urlAD가 없어 제외됨`);
-        }
-        return hasUrl;
-      });
+      const filteredTopAd5 = topAd5Response;
 
       if (filteredTopAd5.length === 0) {
-        console.warn('[MapMainScreen] urlAD가 있는 TopAd5 데이터가 없습니다.');
+        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
         return;
       }
-
-      if (filteredTopAd5.length !== topAd5Response.length) {
-        console.log(`[MapMainScreen] urlAD 필터링: ${filteredTopAd5.length}/${topAd5Response.length}개 유효`);
-      }
-
-      topAd5Response = filteredTopAd5;
-
-      console.log('[MapMainScreen] 2단계: URL 검증 시작');
-      const validatedData = await validateTopAd5Urls(topAd5Response);
-
-      const validUrlData = validatedData.filter(item => item.isValid === true);
-      if (validUrlData.length !== validatedData.length) {
-        console.log(`[MapMainScreen] URL 검증 완료: ${validUrlData.length}/${validatedData.length}개 유효 (${validatedData.length - validUrlData.length}개 제외)`);
-      }
-      topAd5Response = validUrlData;
-
-      const filteredCompletedAds = topAd5Response.filter((ad: any) => {
-        const campid = String(ad.campid || '');
-        const isCompleted = completedAdsSet.has(campid);
-        if (isCompleted) {
-          console.log(`⚠️ [MapMainScreen] ${campid}는 이미 본 광고로 제외됨`);
-        }
-        return !isCompleted;
-      });
-
-      if (filteredCompletedAds.length !== topAd5Response.length) {
-        console.log(`[MapMainScreen] 이미 본 광고 필터링: ${filteredCompletedAds.length}/${topAd5Response.length}개 유효 (${topAd5Response.length - filteredCompletedAds.length}개 제외)`);
-      }
-      topAd5Response = filteredCompletedAds;
 
       if (topAd5Response.length === 0) {
         console.warn('[MapMainScreen] 유효한 TopAd5 데이터가 없습니다 (모두 URL 검증 실패 또는 이미 본 광고)');
@@ -2680,19 +2645,7 @@ export const MapMainScreen: React.FC = () => {
     const campid = String(spot.campid || '');
     if (campid) {
       try {
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const parsedUserData = JSON.parse(userData);
-          const member = parsedUserData?.member;
-          if (member) {
-            const completedAdsSet = await getCompletedAdsSet(member, navigate);
-            if (completedAdsSet.has(campid)) {
-              console.log(`[MapMainScreen] 본 광고 클릭 차단: ${campid}`);
-              showToast('이미 본 광고입니다.');
-              return; 
-            }
-          }
-        }
+
       } catch (error) {
         console.warn('[MapMainScreen] 본 광고 확인 실패 (무시):', error);
       }

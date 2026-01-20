@@ -66,6 +66,7 @@ export const ROUTES = {
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
+  webViewTest: 'webViewTest',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
