@@ -3182,6 +3182,49 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             <WebView
               source={{ uri: webViewUrl }}
               style={{ flex: 1 }}
+              onNavigationStateChange={(navState) => {
+                console.log('[WebView] 네비게이션:', navState.url);
+              }}
+              onShouldStartLoadWithRequest={(request) => {
+                const { url } = request;
+                console.log('[WebView] 네비게이션 요청:', url);
+
+                if (url.startsWith('intent://')) {
+                  try {
+
+                    let packageId = '';
+
+                    const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                    if (idMatch) {
+                      packageId = idMatch[1];
+                    } else {
+
+                      const packageMatch = url.match(/package=([^;]+)/);
+                      if (packageMatch) {
+                        packageId = packageMatch[1];
+                      }
+                    }
+
+                    if (packageId) {
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                      console.log('[WebView] intent://를 play.google.com으로 변환:', playStoreUrl);
+                      setWebViewUrl(playStoreUrl);
+                      return false;
+                    } else {
+                      throw new Error('패키지 ID를 찾을 수 없음');
+                    }
+                  } catch (error) {
+                    console.error('[WebView] intent:// 변환 실패:', error);
+                    return false;
+                  }
+                }
+
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                  return true;
+                }
+
+                return false;
+              }}
               onError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView 오류:', nativeEvent);
