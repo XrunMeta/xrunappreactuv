@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   ActivityIndicator,
   ScrollView,
   Dimensions,
+  Modal,
+  FlatList,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -20,12 +23,14 @@ import {
   OptionButton,
   PrimaryButton,
   Dialog,
+  CountryCodeListItem,
 } from '../components';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { getRegionIdByIso2, getRegionNameById, getRegionsByCountryIso2, GLOBAL_REGION, COMMON_STYLES, FORM_STYLES } from '../constants';
+import { getRegionIdByIso2, getRegionNameById, getRegionsByCountryIso2, GLOBAL_REGION, COMMON_STYLES, FORM_STYLES, REGIONS_AS_COUNTRY_DIAL_CODES } from '../constants';
+import { CountryDialCode } from '../types';
 import { ClauseId } from '../types';
 import { filterAsciiPrintable } from '../utils';
 
@@ -98,6 +103,8 @@ export const SignupScreen = () => {
   const [clauseContent, setClauseContent] = useState<string>('');
   const [isClauseLoading, setIsClauseLoading] = useState(false);
   const [clauseError, setClauseError] = useState<string | null>(null);
+  const [regionModalVisible, setRegionModalVisible] = useState(false);
+  const [regionSearchQuery, setRegionSearchQuery] = useState('');
 
   const handleAgreeClause = (clauseId: ClauseId) => {
     if (clauseId === 'service') {
@@ -151,6 +158,36 @@ export const SignupScreen = () => {
     : isKoreaSelected
       ? ''
       : GLOBAL_REGION.name;
+
+  const selectOption: CountryDialCode = useMemo(() => ({
+    iso2: 'select',
+    name: t('screens.signup.genderSelect') || '선택',
+    dialCode: '0',
+    flagEmoji: '📍',
+    countryCode: 0,
+  }), [t]);
+
+  const regionDataSource = useMemo(() => {
+    return [selectOption, ...REGIONS_AS_COUNTRY_DIAL_CODES];
+  }, [selectOption]);
+
+  const filteredRegions = useMemo(() => {
+    if (!regionSearchQuery.trim()) {
+      return regionDataSource;
+    }
+    const normalizedQuery = regionSearchQuery.trim().toLowerCase();
+    return regionDataSource.filter((item) => {
+      const searchName = item.name.toLowerCase();
+      const searchIso = item.iso2.toLowerCase();
+      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery);
+    });
+  }, [regionSearchQuery, regionDataSource]);
+
+  const handleSelectRegion = (region: CountryDialCode) => {
+    setSelectedRegion(region);
+    setRegionModalVisible(false);
+    setRegionSearchQuery('');
+  };
 
   const isMountedRef = React.useRef(false);
 
@@ -922,8 +959,7 @@ export const SignupScreen = () => {
                 if ((!isKoreaSelected && !isAppleSignupMode) || isSubmitting) {
                   return;
                 }
-                setSelectMode('region');
-                navigate('countryCodeSelect');
+                setRegionModalVisible(true);
               }}
             />
             {!isKoreaSelected && (
@@ -1057,7 +1093,74 @@ export const SignupScreen = () => {
             )}
           </View>
         </View>
-      </SafeScrollView>
+        </SafeScrollView>
+
+      {}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={regionModalVisible}
+        onRequestClose={() => setRegionModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalBackdrop}
+            activeOpacity={1}
+            onPress={() => {
+              setRegionModalVisible(false);
+              setRegionSearchQuery('');
+            }}
+          />
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {t('screens.countryCodeSelect.regionSelectTitle') || '지역 선택'}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setRegionModalVisible(false);
+                  setRegionSearchQuery('');
+                }}
+              >
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalSearchBox}>
+              <Ionicons name="search" size={18} color="#9ca3af" />
+              <TextInput
+                style={styles.modalSearchInput}
+                value={regionSearchQuery}
+                onChangeText={setRegionSearchQuery}
+                placeholder={t('screens.countryCodeSelect.regionSearchPlaceholder') || '지역 검색'}
+                placeholderTextColor="#c4c7d1"
+                autoCorrect={false}
+              />
+            </View>
+            <FlatList
+              data={filteredRegions}
+              keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
+              renderItem={({ item }) => (
+                <CountryCodeListItem
+                  country={item}
+                  isSelected={item.iso2 === selectedRegion?.iso2 && item.dialCode === selectedRegion?.dialCode}
+                  onPress={handleSelectRegion}
+                  hideDialCode={true}
+                />
+              )}
+              contentContainerStyle={styles.modalListContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                <View style={styles.modalEmptyState}>
+                  <Text style={styles.modalEmptyText}>
+                    {t('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
+                  </Text>
+                </View>
+              }
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -1170,6 +1273,70 @@ const styles = StyleSheet.create({
     color: '#333333',
     fontFamily: 'Roboto-Regular',
   },
-
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    flex: 1,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: Dimensions.get('window').height * 0.8,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  modalTitle: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.headerText,
+  },
+  modalCloseButton: {
+    fontSize: 24,
+    color: '#8e9bae',
+    lineHeight: 24,
+  },
+  modalSearchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9fafc',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 12,
+    height: 48,
+  },
+  modalSearchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.headerText,
+  },
+  modalListContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  modalEmptyState: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  modalEmptyText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#8e9bae',
+  },
 });
 

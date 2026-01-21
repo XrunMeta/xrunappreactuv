@@ -39,7 +39,7 @@ export const getRegionsByCountryIso2 = (iso2?: string): CountryDialCode[] => {
 export const REGIONS_AS_COUNTRY_DIAL_CODES: CountryDialCode[] = [
 
   { iso2: '서울', name: '서울', dialCode: '2', flagEmoji: '📍' , 'countryCode': 82},
-  { iso2: '경기도', name: '경기도 (Kyeonggi-do)', dialCode: '31', flagEmoji: '📍' , 'countryCode': 82},
+  { iso2: '경기도', name: '경기도', dialCode: '31', flagEmoji: '📍' , 'countryCode': 82},
   { iso2: '인천광역시', name: '인천광역시', dialCode: '32', flagEmoji: '📍' , 'countryCode': 82},
   { iso2: '강원도', name: '강원도', dialCode: '33', flagEmoji: '📍' , 'countryCode': 82},
   { iso2: '충청남도', name: '충청남도', dialCode: '41', flagEmoji: '📍' , 'countryCode': 82},
