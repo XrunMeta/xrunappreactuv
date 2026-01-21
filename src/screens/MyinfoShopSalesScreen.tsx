@@ -492,7 +492,7 @@ export const MyinfoShopSalesScreen = () => {
               {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{itemInfo.price.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
             </Text>
             <Text style={styles.infoText}>
-              {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <TouchableOpacity onPress={handleModifyItem} activeOpacity={0.7}><Text style={[styles.infoText, styles.modifyLink]}>{t('screens.myinfoShopSales.modify')}</Text></TouchableOpacity>
+              {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <Text style={styles.modifyLink} onPress={handleModifyItem}>{t('screens.myinfoShopSales.modify')}</Text>
             </Text>
           </View>
         ) : null}
@@ -943,5 +943,8 @@ const styles = StyleSheet.create({
   modifyLink: {
     color: COLORS.buttonPrimary,
     textDecorationLine: 'underline',
+    lineHeight: 20,
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
   },
 });
