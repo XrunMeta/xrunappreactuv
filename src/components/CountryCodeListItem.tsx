@@ -7,12 +7,14 @@ type Props = {
   country: v_da1883;
   isSelected?: boolean;
   onPress?: (country: v_da1883) => void;
+  hideDialCode?: boolean;
 };
 
 export const CountryCodeListItem: v_a3453e.FC<Props> = ({
   country: v_b9bbbd,
   isSelected: v_599a41 = false,
   onPress: v_719eed,
+  hideDialCode: v_6e9efc = false,
 }) => {
   return (
     <Pressable
@@ -30,7 +32,7 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
         <Text style={v_d81136.countryName}>{v_b9bbbd.name}</Text>
         <Text style={v_d81136.isoText}>{v_b9bbbd.iso2.toUpperCase()}</Text>
       </View>
-      <Text style={v_d81136.dialCode}>{v_b9bbbd.dialCode}</Text>
+      {!v_6e9efc && <Text style={v_d81136.dialCode}>{v_b9bbbd.dialCode}</Text>}
     </Pressable>
   );
 };
