@@ -231,6 +231,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const [v_b6e060, v_9cd9d5] = v_5ab095(false);
 
   const [v_4cf0ad, v_6549d0] = v_5ab095<TopAd5Item[]>([]);
+  const v_0302dd = v_e662ae<TopAd5Item[]>([]); 
   const v_fd5fd4 = v_e662ae(false); 
 
   const [v_001c8f, v_d8a1fd] = v_5ab095(false);
@@ -416,9 +417,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
             const v_f22601 = v_9cb87d.urlAD;
 
-            v_6549d0(v_ba2215 => v_ba2215.map(v_8c0b26 =>
-              (v_8c0b26.campid === v_ddcfed.campid) ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
-            ));
+            v_6549d0(v_ba2215 => {
+              const v_42de16 = v_ba2215.map(v_8c0b26 =>
+                (v_8c0b26.campid === v_ddcfed.campid) ? { ...v_8c0b26, urlAD: v_f22601 } : v_8c0b26
+              );
+              v_0302dd.current = v_42de16; 
+              return v_42de16;
+            });
 
             v_14dd24(v_ba2215 => v_ba2215.map(v_35f85c =>
               (v_35f85c.campid === v_ddcfed.campid) ? { ...v_35f85c, urlAD: v_f22601 } : v_35f85c
@@ -1625,6 +1630,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', v_e36b07.length, '개 광고');
       v_6549d0(v_e36b07);
+      v_0302dd.current = v_e36b07; 
 
       if (!v_99c46d) {
         console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
@@ -1639,7 +1645,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       console.log('[MapMainScreen] 4단계: TopAd5 매핑 최적화 시작');
       const v_c0d590 = v_e36b07.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
-      const v_c05ac2 = topAd5DataRef.current.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
+      const v_c05ac2 = v_0302dd.current.map((v_ddcfed) => v_ddcfed.campid).filter((v_389afb) => v_389afb != null && v_389afb !== '');
 
       const v_3f87ed = new Set(v_c0d590);
       const v_276c8d = new Set(v_c05ac2);
@@ -1769,7 +1775,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
         const v_fe7102 = await v_5d7ca4();
         if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
           v_6549d0(v_fe7102);
-          topAd5DataRef.current = v_fe7102; 
+          v_0302dd.current = v_fe7102; 
           console.log('[MapMainScreen] Fall over: 기존 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
         }
       } catch (v_741f30) {
@@ -2307,6 +2313,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
                   });
                   if (v_6c877c.length > 0) {
                     v_6549d0(v_6c877c);
+                    v_0302dd.current = v_6c877c; 
                     console.log('[MapMainScreen] AppState active - TopAd5 업데이트:', v_6c877c.length, '개');
                   }
                 }
@@ -2527,6 +2534,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
           if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
             console.log('[MapMainScreen] TopAd5 재호출 성공:', v_e36b07.length, '개 광고');
             v_6549d0(v_e36b07);
+            v_0302dd.current = v_e36b07; 
 
             v_89e09e(v_e36b07);
           } else {
@@ -2535,6 +2543,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
             const v_fe7102 = await v_5d7ca4();
             if (v_fe7102 && Array.isArray(v_fe7102) && v_fe7102.length > 0) {
               v_6549d0(v_fe7102);
+              v_0302dd.current = v_fe7102; 
               console.log('[MapMainScreen] 저장된 TopAd5 데이터 사용:', v_fe7102.length, '개 광고');
             }
           }
