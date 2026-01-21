@@ -675,12 +675,8 @@ export const MapMainScreen: React.FC = () => {
                 }, 600);
 
                 if (currentGpsLocation) {
-                  setTimeout(async () => {
+                  setTimeout(() => {
                     console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
-
-                    console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
-                    await loadMarkersForLocation(currentGpsLocation, true);
-                    console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
 
                     if (!mapRef.current) return;
                     isProgrammaticMoveRef.current = true;
@@ -756,56 +752,55 @@ export const MapMainScreen: React.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
 
-      const deviceInfoData = await collectDeviceInfo(); 
+      const deviceInfoData = await collectDeviceInfo();
 
-      const markerDataRaw = await fetchMapMarkerData(
-        targetLocation.latitude,
-        targetLocation.longitude,
-        member,
-        navigate,
-        {
-          adid: deviceInfoData.adid,
-          ip: deviceInfoData.ipAddress,
-          osver: deviceInfoData.osVersion,
-          devid: deviceInfoData.deviceId,
-          devmodel: deviceInfoData.model,
-          devbrand: deviceInfoData.manufacturer,
-          mnetwork: deviceInfoData.mnetwork,
-          carrier: deviceInfoData.carrier
-        }
-      );
+      console.log('🚀 [loadMarkersForLocation] API 병렬 호출 시작');
+      const [markerDataRaw, virtualCoinResponse, nasPriceResponse] = await Promise.allSettled([
 
-      console.log('=== 맵 마커 데이터 가져오기 완료 ===');
+        fetchMapMarkerData(
+          targetLocation.latitude,
+          targetLocation.longitude,
+          member,
+          navigate,
+          {
+            adid: deviceInfoData.adid,
+            ip: deviceInfoData.ipAddress,
+            osver: deviceInfoData.osVersion,
+            devid: deviceInfoData.deviceId,
+            devmodel: deviceInfoData.model,
+            devbrand: deviceInfoData.manufacturer,
+            mnetwork: deviceInfoData.mnetwork,
+            carrier: deviceInfoData.carrier
+          }
+        ),
 
-      console.log('마커 개수:', markerDataRaw.length);
-
-      let virtualCoinResponse: any = { data: [] };
-      try {
-        virtualCoinResponse = await fetchVirtualCoin(
+        fetchVirtualCoin(
           member,
           targetLocation.latitude,
           targetLocation.longitude,
           navigate,
-        );
-      } catch (error) {
-        console.warn('❌ [loadMarkersForLocation] virtualCoin API 호출 실패, 빈 데이터 사용:', error);
+        ).catch((error) => {
+          console.warn('❌ [loadMarkersForLocation] virtualCoin API 호출 실패, 빈 데이터 사용:', error);
+          return { data: [] };
+        }),
 
-        virtualCoinResponse = { data: [] };
-      }
+        getCoinNasPrice(navigate).catch((error) => {
+          console.warn('❌ [loadMarkersForLocation] getCoinNasPrice API 호출 실패, 기본값 사용:', error);
+          return { data: { coins: 0 } };
+        }),
+      ]);
 
-      let nasPriceResponse: any = { data: { coins: 0 } };
-      let calculatedNasPrice = 0;
-      try {
-        nasPriceResponse = await getCoinNasPrice(navigate);
-        calculatedNasPrice = nasPriceResponse?.data?.coins || 0;
-      } catch (error) {
-        console.warn('❌ [loadMarkersForLocation] getCoinNasPrice API 호출 실패, 기본값 사용:', error);
+      const markerData = markerDataRaw.status === 'fulfilled' ? markerDataRaw.value : [];
+      const virtualCoin = virtualCoinResponse.status === 'fulfilled' ? virtualCoinResponse.value : { data: [] };
+      const nasPrice = nasPriceResponse.status === 'fulfilled' ? nasPriceResponse.value : { data: { coins: 0 } };
 
-        calculatedNasPrice = 0;
-      }
+      console.log('✅ [loadMarkersForLocation] API 병렬 호출 완료');
+      console.log('마커 개수:', markerData.length);
 
-      const coinsDataVt = virtualCoinResponse?.data && Array.isArray(virtualCoinResponse.data)
-        ? virtualCoinResponse.data
+      const calculatedNasPrice = nasPrice?.data?.coins || 0;
+
+      const coinsDataVt = virtualCoin?.data && Array.isArray(virtualCoin.data)
+        ? virtualCoin.data
           .slice(0, Math.random() < 0.5 ? 1 : 2)
           .map((item: any, index: number, array: any[]) => {
 
@@ -844,29 +839,11 @@ export const MapMainScreen: React.FC = () => {
           })
         : [];
 
-      const combinedCoinsData = [...coinsDataVt, ...markerDataRaw];
+      const combinedCoinsData = [...coinsDataVt, ...markerData];
       console.log('=== 결합된 토큰 데이터 ===');
       console.log('combinedCoinsData length:', combinedCoinsData.length);
 
-      const uniqueFileIds: (string | number)[] = [];
-      combinedCoinsData.forEach((item) => {
-        const it = item as any;
-        if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
-        if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
-        if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
-      });
-
-      if (uniqueFileIds.length > 0) {
-        try {
-          const envForCache = getEnv();
-          await cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS);
-          console.log('✅ 이미지 캐싱 완료');
-        } catch (imageCacheError) {
-          console.error('이미지 캐싱 오류:', imageCacheError);
-        }
-      }
-
-      const uniqueMarkers = markerDataRaw.reduce((acc: any[], current: any) => {
+      const uniqueMarkers = markerData.reduce((acc: any[], current: any) => {
 
         const currentKey = current.coin || `${current.latitude}-${current.longitude}`;
         const existingIndex = acc.findIndex((m: any) => {
@@ -886,10 +863,29 @@ export const MapMainScreen: React.FC = () => {
       }, []);
 
       console.log('📊 [MapMainScreen] 서버 원본 마커 데이터 사용:', {
-        원본개수: markerDataRaw.length,
+        원본개수: markerData.length,
         중복제거후개수: uniqueMarkers.length,
-        제거된개수: markerDataRaw.length - uniqueMarkers.length,
+        제거된개수: markerData.length - uniqueMarkers.length,
       });
+
+      const uniqueFileIds: (string | number)[] = [];
+      combinedCoinsData.forEach((item) => {
+        const it = item as any;
+        if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
+        if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
+        if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
+      });
+
+      if (uniqueFileIds.length > 0) {
+        const envForCache = getEnv();
+        cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS)
+          .then(() => {
+            console.log('✅ 이미지 캐싱 완료 (백그라운드)');
+          })
+          .catch((imageCacheError) => {
+            console.error('이미지 캐싱 오류 (백그라운드):', imageCacheError);
+          });
+      }
 
       uniqueMarkers.slice(0, 5).forEach((marker: any, idx: number) => {
 
@@ -932,12 +928,8 @@ export const MapMainScreen: React.FC = () => {
         }, 600);
 
         if (currentGpsLocation) {
-          setTimeout(async () => {
+          setTimeout(() => {
             console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', currentGpsLocation.latitude, currentGpsLocation.longitude);
-
-            console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
-            await loadMarkersForLocation(currentGpsLocation, true);
-            console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
 
             if (!mapRef.current) return;
             isProgrammaticMoveRef.current = true;
