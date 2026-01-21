@@ -323,7 +323,7 @@ export const AdWalletScreen = () => {
         ? ''
         : formatDate(item.start_date || item.created_at);
 
-      const displayRewardAmount = isReferralInvite ? rewardAmount : (isReferralEvent ? rewardAmount : rewardAmount);
+      const displayRewardAmount = rewardAmount;
       const expectedAdRevenue = `${displayRewardAmount.toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
@@ -397,7 +397,40 @@ export const AdWalletScreen = () => {
         const estimateItems = estimateResponseData.items || estimateResponseData || [];
         const pagination = estimateResponseData.pagination;
 
+        let reviewReferralEvents: AdEntry[] = [];
+        try {
+          const questResponse = await fetchQuestList(member, goBack);
+          const questItems = questResponse.data || [];
+
+          const reviewEvents = questItems.filter((item: QuestItem) => {
+            const isReferralEvent = item.event_type === 'recommendation' ||
+              (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
+            return isReferralEvent && item.event_status === 'review';
+          });
+
+          reviewReferralEvents = reviewEvents.map((item: QuestItem) => {
+            const adEntry = convertQuestToAdEntry(item);
+            return {
+              ...adEntry,
+              extrastr3: '추천인이벤트', 
+            };
+          });
+
+          console.log('[AdWallet] 심사중 탭 - review 상태 추천인 이벤트:', {
+            개수: reviewReferralEvents.length,
+            목록: reviewReferralEvents.map(e => ({
+              id: e.id,
+              title: e.title,
+              eventStatus: e.eventStatus,
+            })),
+          });
+        } catch (questError) {
+          console.error('[AdWallet] 심사중 탭 - 추천인 이벤트 조회 오류:', questError);
+        }
+
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
+
+        const allAdEntries = [...estimateAdEntries, ...reviewReferralEvents];
 
         let hasMore = false;
         if (pagination) {
@@ -407,8 +440,8 @@ export const AdWalletScreen = () => {
         }
 
         return {
-          data: estimateAdEntries,
-          total: estimateAdEntries.length,
+          data: allAdEntries,
+          total: allAdEntries.length,
           hasMore,
         };
       } catch (error: any) {
@@ -1055,7 +1088,7 @@ export const AdWalletScreen = () => {
 
   const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
-    const isQuest = !!item.title;
+    const isQuest = !!item.title || item.extrastr3 === '추천인이벤트';
     const { onPress, tab: itemTab, ...itemData } = item;
 
     const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
@@ -1102,12 +1135,14 @@ export const AdWalletScreen = () => {
           ]}>
             {item.status}
           </Text>
-          <Text style={[
-            styles.adCardDate,
-            isDisabled && { color: disabledColor }
-          ]}>
-            {item.date}
-          </Text>
+          {item.date ? (
+            <Text style={[
+              styles.adCardDate,
+              isDisabled && { color: disabledColor }
+            ]}>
+              {item.date}
+            </Text>
+          ) : null}
         </View>
         {isQuest && item.title && (
           <View style={styles.questTitleContainer}>
@@ -1129,13 +1164,13 @@ export const AdWalletScreen = () => {
         )}
         {isQuest ? (
 
-          isReferralInvite ? (
+          item.extrastr3 === '추천인이벤트' ? (
             <View style={styles.adCardRow}>
               <Text style={[
                 styles.adCardRowLabel,
                 isDisabled && { color: disabledColor }
               ]}>
-                보상금액
+                추천인초대보상
               </Text>
               <Text style={[
                 styles.adCardRowAmount,
@@ -1147,40 +1182,21 @@ export const AdWalletScreen = () => {
             </View>
           ) : (
 
-            item.isReferralEvent ? (
-              <View style={styles.adCardRow}>
-                <Text style={[
-                  styles.adCardRowLabel,
-                  isDisabled && { color: disabledColor }
-                ]}>
-                  보상금액
-                </Text>
-                <Text style={[
-                  styles.adCardRowAmount,
-                  { color: item.expectedAdRevenueColor },
-                  isDisabled && { color: disabledColor }
-                ]}>
-                  {item.expectedAdRevenue}
-                </Text>
-              </View>
-            ) : (
-
-              <View style={styles.adCardRow}>
-                <Text style={[
-                  styles.adCardRowLabel,
-                  isDisabled && { color: disabledColor }
-                ]}>
-                  {t('screens.adWallet.rewardAmount')}
-                </Text>
-                <Text style={[
-                  styles.adCardRowAmount,
-                  { color: item.expectedAdRevenueColor },
-                  isDisabled && { color: disabledColor }
-                ]}>
-                  {item.expectedAdRevenue}
-                </Text>
-              </View>
-            )
+            <View style={styles.adCardRow}>
+              <Text style={[
+                styles.adCardRowLabel,
+                isDisabled && { color: disabledColor }
+              ]}>
+                {t('screens.adWallet.rewardAmount')}
+              </Text>
+              <Text style={[
+                styles.adCardRowAmount,
+                { color: item.expectedAdRevenueColor },
+                isDisabled && { color: disabledColor }
+              ]}>
+                {item.expectedAdRevenue}
+              </Text>
+            </View>
           )
         ) : item.extrastr3 === '출석보상' ? (
           <View style={styles.adCardRow}>
@@ -1194,6 +1210,23 @@ export const AdWalletScreen = () => {
               styles.adCardRowAmount,
               { color: item.expectedAdRevenueColor },
               questHasAttended === true && { color: disabledColor }
+            ]}>
+              {item.expectedAdRevenue}
+            </Text>
+          </View>
+        ) : item.extrastr3 === '추천인이벤트' ? (
+
+          <View style={styles.adCardRow}>
+            <Text style={[
+              styles.adCardRowLabel,
+              isDisabled && { color: disabledColor }
+            ]}>
+              추천인초대보상
+            </Text>
+            <Text style={[
+              styles.adCardRowAmount,
+              { color: item.expectedAdRevenueColor },
+              isDisabled && { color: disabledColor }
             ]}>
               {item.expectedAdRevenue}
             </Text>
