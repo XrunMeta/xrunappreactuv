@@ -624,7 +624,7 @@ export interface NotificationItem {
   contents: string | null; 
   datetime: string; 
   type: NotificationType; 
-  image: string | null; 
+  image_file_id: string | null; 
   guid: string | null; 
   datebegin: string | null; 
   dateends: string | null; 
