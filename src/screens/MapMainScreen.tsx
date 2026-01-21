@@ -675,12 +675,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
                 }, 600);
 
                 if (v_e8ec67) {
-                  setTimeout(async () => {
+                  setTimeout(() => {
                     console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', v_e8ec67.latitude, v_e8ec67.longitude);
-
-                    console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
-                    await v_524200(v_e8ec67, true);
-                    console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
 
                     if (!v_3ec640.current) return;
                     v_ca338a.current = true;
@@ -756,56 +752,55 @@ export const MapMainScreen: v_a3453e.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', v_f18a9c.latitude, v_f18a9c.longitude);
 
-      const v_4eb397 = await v_f3de6d(); 
+      const v_4eb397 = await v_f3de6d();
 
-      const v_e84694 = await v_f84ef5(
-        v_f18a9c.latitude,
-        v_f18a9c.longitude,
-        v_660822,
-        v_9b57fc,
-        {
-          adid: v_4eb397.adid,
-          ip: v_4eb397.ipAddress,
-          osver: v_4eb397.osVersion,
-          devid: v_4eb397.deviceId,
-          devmodel: v_4eb397.model,
-          devbrand: v_4eb397.manufacturer,
-          mnetwork: v_4eb397.mnetwork,
-          carrier: v_4eb397.carrier
-        }
-      );
+      console.log('🚀 [loadMarkersForLocation] API 병렬 호출 시작');
+      const [v_e84694, v_f6123d, v_f85685] = await Promise.allSettled([
 
-      console.log('=== 맵 마커 데이터 가져오기 완료 ===');
+        v_f84ef5(
+          v_f18a9c.latitude,
+          v_f18a9c.longitude,
+          v_660822,
+          v_9b57fc,
+          {
+            adid: v_4eb397.adid,
+            ip: v_4eb397.ipAddress,
+            osver: v_4eb397.osVersion,
+            devid: v_4eb397.deviceId,
+            devmodel: v_4eb397.model,
+            devbrand: v_4eb397.manufacturer,
+            mnetwork: v_4eb397.mnetwork,
+            carrier: v_4eb397.carrier
+          }
+        ),
 
-      console.log('마커 개수:', v_e84694.length);
-
-      let v_f6123d = { data: [] };
-      try {
-        v_f6123d = await v_91d5e4(
+        v_91d5e4(
           v_660822,
           v_f18a9c.latitude,
           v_f18a9c.longitude,
           v_9b57fc,
-        );
-      } catch (v_5e9bfe) {
-        console.warn('❌ [loadMarkersForLocation] virtualCoin API 호출 실패, 빈 데이터 사용:', v_5e9bfe);
+        ).catch((v_5e9bfe) => {
+          console.warn('❌ [loadMarkersForLocation] virtualCoin API 호출 실패, 빈 데이터 사용:', v_5e9bfe);
+          return { data: [] };
+        }),
 
-        v_f6123d = { data: [] };
-      }
+        v_965f93(v_9b57fc).catch((v_5e9bfe) => {
+          console.warn('❌ [loadMarkersForLocation] getCoinNasPrice API 호출 실패, 기본값 사용:', v_5e9bfe);
+          return { data: { coins: 0 } };
+        }),
+      ]);
 
-      let v_f85685 = { data: { coins: 0 } };
-      let v_8f5869 = 0;
-      try {
-        v_f85685 = await v_965f93(v_9b57fc);
-        v_8f5869 = v_f85685?.data?.coins || 0;
-      } catch (v_5e9bfe) {
-        console.warn('❌ [loadMarkersForLocation] getCoinNasPrice API 호출 실패, 기본값 사용:', v_5e9bfe);
+      const v_003147 = v_e84694.status === 'fulfilled' ? v_e84694.value : [];
+      const v_95b93a = v_f6123d.status === 'fulfilled' ? v_f6123d.value : { data: [] };
+      const v_89c6de = v_f85685.status === 'fulfilled' ? v_f85685.value : { data: { coins: 0 } };
 
-        v_8f5869 = 0;
-      }
+      console.log('✅ [loadMarkersForLocation] API 병렬 호출 완료');
+      console.log('마커 개수:', v_003147.length);
 
-      const v_958ad1 = v_f6123d?.data && Array.isArray(v_f6123d.data)
-        ? v_f6123d.data
+      const v_8f5869 = v_89c6de?.data?.coins || 0;
+
+      const v_958ad1 = v_95b93a?.data && Array.isArray(v_95b93a.data)
+        ? v_95b93a.data
           .slice(0, Math.random() < 0.5 ? 1 : 2)
           .map((v_8c0b26, v_a56041, v_09228c) => {
 
@@ -844,29 +839,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
           })
         : [];
 
-      const v_2876a4 = [...v_958ad1, ...v_e84694];
+      const v_2876a4 = [...v_958ad1, ...v_003147];
       console.log('=== 결합된 토큰 데이터 ===');
       console.log('combinedCoinsData length:', v_2876a4.length);
 
-      const v_bf588a = [];
-      v_2876a4.forEach((v_8c0b26) => {
-        const v_23805a = v_8c0b26 as any;
-        if (v_23805a.brandlogo_file) v_bf588a.push(v_23805a.brandlogo_file);
-        if (v_23805a.adthumbnail2_file) v_bf588a.push(v_23805a.adthumbnail2_file);
-        if (v_23805a.symbolimg_file) v_bf588a.push(v_23805a.symbolimg_file);
-      });
-
-      if (v_bf588a.length > 0) {
-        try {
-          const v_1a30c4 = v_e4a763();
-          await v_858bfa.downloadMultipleImages(v_bf588a, v_1a30c4.GATEWAY_NODEJS);
-          console.log('✅ 이미지 캐싱 완료');
-        } catch (v_67ab2b) {
-          console.error('이미지 캐싱 오류:', v_67ab2b);
-        }
-      }
-
-      const v_1e6d95 = v_e84694.reduce((v_9f1d92, v_275ccd) => {
+      const v_1e6d95 = v_003147.reduce((v_9f1d92, v_275ccd) => {
 
         const v_c84c22 = v_275ccd.coin || `${v_275ccd.latitude}-${v_275ccd.longitude}`;
         const v_0bf6f9 = v_9f1d92.findIndex((v_35f85c) => {
@@ -886,10 +863,29 @@ export const MapMainScreen: v_a3453e.FC = () => {
       }, []);
 
       console.log('📊 [MapMainScreen] 서버 원본 마커 데이터 사용:', {
-        원본개수: v_e84694.length,
+        원본개수: v_003147.length,
         중복제거후개수: v_1e6d95.length,
-        제거된개수: v_e84694.length - v_1e6d95.length,
+        제거된개수: v_003147.length - v_1e6d95.length,
       });
+
+      const v_bf588a = [];
+      v_2876a4.forEach((v_8c0b26) => {
+        const v_23805a = v_8c0b26 as any;
+        if (v_23805a.brandlogo_file) v_bf588a.push(v_23805a.brandlogo_file);
+        if (v_23805a.adthumbnail2_file) v_bf588a.push(v_23805a.adthumbnail2_file);
+        if (v_23805a.symbolimg_file) v_bf588a.push(v_23805a.symbolimg_file);
+      });
+
+      if (v_bf588a.length > 0) {
+        const v_1a30c4 = v_e4a763();
+        v_858bfa.downloadMultipleImages(v_bf588a, v_1a30c4.GATEWAY_NODEJS)
+          .then(() => {
+            console.log('✅ 이미지 캐싱 완료 (백그라운드)');
+          })
+          .catch((v_67ab2b) => {
+            console.error('이미지 캐싱 오류 (백그라운드):', v_67ab2b);
+          });
+      }
 
       v_1e6d95.slice(0, 5).forEach((v_5e3dbb, v_e86ad8) => {
 
@@ -932,12 +928,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
         }, 600);
 
         if (v_e8ec67) {
-          setTimeout(async () => {
+          setTimeout(() => {
             console.log('📍 [MapMainScreen] 마커 위치 이동 후 현재 GPS 위치로 이동:', v_e8ec67.latitude, v_e8ec67.longitude);
-
-            console.log('🔄 [MapMainScreen] 현재 GPS 위치에서 마커 재로드 시작');
-            await v_524200(v_e8ec67, true);
-            console.log('✅ [MapMainScreen] 현재 GPS 위치에서 마커 재로드 완료');
 
             if (!v_3ec640.current) return;
             v_ca338a.current = true;
