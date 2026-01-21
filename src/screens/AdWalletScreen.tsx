@@ -331,6 +331,10 @@ export const AdWalletScreen = () => {
       const expectedAdRevenueColor = isReviewStatus ? '#cccccc' : '#707070';
       const adRevenueSettlementColor = isReviewStatus ? '#cccccc' : '#343434';
 
+      const displayTitle = isReferralEvent && !isReferralInvite 
+        ? '추천인 이벤트 보상 받기'
+        : item.title;
+
       return {
         id: item.id,
         status,
@@ -339,7 +343,7 @@ export const AdWalletScreen = () => {
         adRevenueSettlement,
         expectedAdRevenueColor,
         adRevenueSettlementColor,
-        title: item.title,
+        title: displayTitle,
         description: item.description,
         rewardDescription: item.reward_description,
         eventStatus: item.event_status,
