@@ -296,6 +296,8 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
       <TouchableOpacity
         onPress={onPress}
         disabled={false}
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} 
+        pressRetentionOffset={{ top: 20, bottom: 20, left: 20, right: 20 }} 
         style={[
           styles.tokenButtonContainer,
           {
@@ -319,20 +321,34 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-            <Animated.Image
-              source={
-                isRageMode
-                  ? require('../../assets/images/icon_catch_rage.png')
-                  : require('../../assets/images/icon_catch.png')
-              }
-              style={[
-                styles.blinkImage,
-                {
-                  opacity: blinkAnim,
-                },
-                isRageMode && { top: -90 },
-              ]}
-            />
+            <View 
+              pointerEvents="none" 
+              style={{ 
+                position: 'absolute', 
+                width: 100, 
+                height: 100, 
+                top: isRageMode ? -90 : -80,
+                left: '50%',
+                marginLeft: -50,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Animated.Image
+                source={
+                  isRageMode
+                    ? require('../../assets/images/icon_catch_rage.png')
+                    : require('../../assets/images/icon_catch.png')
+                }
+                style={[
+                  styles.blinkImage,
+                  {
+                    opacity: blinkAnim,
+                  },
+                  { position: 'relative', top: 0 }, 
+                ]}
+              />
+            </View>
           {iconXrunWhite && (
             <Image
               source={iconXrunWhite}
