@@ -440,14 +440,19 @@ export const createAxiosInstance = (navigation?: any) => {
               const xhr = new XMLHttpRequest();
               const url = adapterConfig.baseURL 
                 ? (adapterConfig.baseURL.endsWith('/') && adapterConfig.url?.startsWith('/')
-                  ? `${adapterConfig.baseURL.slice(0, -1)}${adapterConfig.url}`
-                  : `${adapterConfig.baseURL}${adapterConfig.url}`)
-                : adapterConfig.url;
+                  ? `${adapterConfig.baseURL.slice(0, -1)}${adapterConfig.url || ''}`
+                  : `${adapterConfig.baseURL}${adapterConfig.url || ''}`)
+                : (adapterConfig.url || '');
+
+              if (!url) {
+                reject(new Error('URL is required'));
+                return;
+              }
 
               console.log('[API Request] XMLHttpRequest adapter - URL:', url);
               console.log('[API Request] XMLHttpRequest adapter - Method:', adapterConfig.method);
 
-              xhr.open(adapterConfig.method?.toUpperCase() || 'GET', url, true);
+              xhr.open((adapterConfig.method || 'GET').toUpperCase(), url, true);
 
               Object.keys(adapterConfig.headers || {}).forEach((key) => {
                 const lowerKey = key.toLowerCase();
@@ -481,15 +486,26 @@ export const createAxiosInstance = (navigation?: any) => {
                     }
                   }
 
+                  const headersString = xhr.getAllResponseHeaders();
+                  const headers: any = {};
+                  if (headersString) {
+                    headersString.trim().split('\r\n').forEach((line) => {
+                      const parts = line.split(': ');
+                      if (parts.length === 2) {
+                        headers[parts[0].toLowerCase()] = parts[1];
+                      }
+                    });
+                  }
+
                   const response = {
                     data: responseData,
                     status: xhr.status,
                     statusText: xhr.statusText,
-                    headers: xhr.getAllResponseHeaders(),
+                    headers: headers,
                     config: adapterConfig,
                     request: xhr,
                   };
-                  resolve(response);
+                  resolve(response as any);
                 } catch (e) {
                   console.error('[API Request] XMLHttpRequest adapter - 응답 처리 오류:', e);
                   reject(e);
