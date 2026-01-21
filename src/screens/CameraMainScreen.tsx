@@ -296,6 +296,8 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
       <TouchableOpacity
         onPress={v_719eed}
         disabled={false}
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} 
+        pressRetentionOffset={{ top: 20, bottom: 20, left: 20, right: 20 }} 
         style={[
           v_d81136.tokenButtonContainer,
           {
@@ -319,20 +321,34 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
             },
           ]}>
           {}
-            <Animated.Image
-              source={
-                v_a5ed76
-                  ? require('../../assets/images/icon_catch_rage.png')
-                  : require('../../assets/images/icon_catch.png')
-              }
-              style={[
-                v_d81136.blinkImage,
-                {
-                  opacity: v_f2d721,
-                },
-                v_a5ed76 && { top: -90 },
-              ]}
-            />
+            <View 
+              pointerEvents="none" 
+              style={{ 
+                position: 'absolute', 
+                width: 100, 
+                height: 100, 
+                top: v_a5ed76 ? -90 : -80,
+                left: '50%',
+                marginLeft: -50,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Animated.Image
+                source={
+                  v_a5ed76
+                    ? require('../../assets/images/icon_catch_rage.png')
+                    : require('../../assets/images/icon_catch.png')
+                }
+                style={[
+                  v_d81136.blinkImage,
+                  {
+                    opacity: v_f2d721,
+                  },
+                  { position: 'relative', top: 0 }, 
+                ]}
+              />
+            </View>
           {v_ed24ee && (
             <Image
               source={v_ed24ee}
