@@ -786,7 +786,28 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       console.log(`[organizeData] 이미 본 광고 필터링: ${filteredByCompleted.length}/${beforeCompletedFilter}개 유효 (${beforeCompletedFilter - filteredByCompleted.length}개 제외)`);
     }
 
-    const validData = filteredByCompleted;
+    const beforeDedupFilter = filteredByCompleted.length;
+    const seenCampids = new Set<string>();
+    const deduplicatedData = filteredByCompleted.filter((d) => {
+      const campid = String(d.campid || '');
+      if (!campid || campid === '' || campid === 'undefined') {
+        return true; 
+      }
+
+      if (seenCampids.has(campid)) {
+        console.log(`[organizeData] 중복 campid 제거: ${campid}`);
+        return false;
+      }
+
+      seenCampids.add(campid);
+      return true;
+    });
+
+    if (deduplicatedData.length !== beforeDedupFilter) {
+      console.log(`[organizeData] campid 중복 제거: ${deduplicatedData.length}/${beforeDedupFilter}개 유효 (${beforeDedupFilter - deduplicatedData.length}개 제외)`);
+    }
+
+    const validData = deduplicatedData;
 
     enrichedData.forEach(d => {
       const hasDirectUrl = (d.urlAD && d.urlAD !== '' && d.urlAD !== '없음') || 
@@ -828,20 +849,20 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     });
 
     let nextData: any[] = [];
-    let actualChunkSize = Math.min(chunkSize, validData.length);
 
-    if (currentIndexRef.current + actualChunkSize > validData.length) {
+    const targetSize = chunkSize; 
 
-      nextData = [
-        ...validData.slice(currentIndexRef.current),
-        ...validData.slice(0, (currentIndexRef.current + actualChunkSize) % validData.length),
-      ];
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % validData.length;
-    } else {
-
-      nextData = validData.slice(currentIndexRef.current, currentIndexRef.current + actualChunkSize);
-      currentIndexRef.current = (currentIndexRef.current + actualChunkSize) % validData.length;
+    if (validData.length === 0) {
+      setTokens([]);
+      return;
     }
+
+    for (let i = 0; i < targetSize; i++) {
+      const index = (currentIndexRef.current + i) % validData.length;
+      nextData.push(validData[index]);
+    }
+
+    currentIndexRef.current = (currentIndexRef.current + targetSize) % validData.length;
 
     console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', nextData.slice(0, 5).map((d, idx) => ({
       index: idx,
