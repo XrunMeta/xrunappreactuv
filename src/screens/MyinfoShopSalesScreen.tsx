@@ -492,7 +492,7 @@ export const v_1cca63 = () => {
               {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{v_d20ab2.price.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
             </Text>
             <Text style={v_d81136.infoText}>
-              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <TouchableOpacity onPress={v_264d8b} activeOpacity={0.7}><Text style={[v_d81136.infoText, v_d81136.modifyLink]}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text></TouchableOpacity>
+              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <Text style={v_d81136.modifyLink} onPress={v_264d8b}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text>
             </Text>
           </View>
         ) : null}
@@ -943,5 +943,8 @@ const v_d81136 = v_472849.create({
   modifyLink: {
     color: v_1bfbd0.buttonPrimary,
     textDecorationLine: 'underline',
+    lineHeight: 20,
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Regular',
   },
 });
