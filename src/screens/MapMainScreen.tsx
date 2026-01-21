@@ -231,6 +231,7 @@ export const MapMainScreen: React.FC = () => {
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
   const [topAd5Data, setTopAd5Data] = useState<TopAd5Item[]>([]);
+  const topAd5DataRef = useRef<TopAd5Item[]>([]); 
   const isFetchingTopAd5Ref = useRef(false); 
 
   const [showCalloutPopup, setShowCalloutPopup] = useState(false);
@@ -416,9 +417,13 @@ export const MapMainScreen: React.FC = () => {
 
             const fetchedUrl = fetchedData.urlAD;
 
-            setTopAd5Data(prev => prev.map(item =>
-              (item.campid === ad.campid) ? { ...item, urlAD: fetchedUrl } : item
-            ));
+            setTopAd5Data(prev => {
+              const updated = prev.map(item =>
+                (item.campid === ad.campid) ? { ...item, urlAD: fetchedUrl } : item
+              );
+              topAd5DataRef.current = updated; 
+              return updated;
+            });
 
             setMarkers(prev => prev.map(m =>
               (m.campid === ad.campid) ? { ...m, urlAD: fetchedUrl } : m
@@ -1625,6 +1630,7 @@ export const MapMainScreen: React.FC = () => {
 
       console.log('[MapMainScreen] 3단계: TopAd5 데이터 상태 저장:', topAd5Response.length, '개 광고');
       setTopAd5Data(topAd5Response);
+      topAd5DataRef.current = topAd5Response; 
 
       if (!astorCoinsData) {
         console.log('[MapMainScreen] 마커 데이터 없음 - 매핑 건너뛰기');
@@ -2307,6 +2313,7 @@ export const MapMainScreen: React.FC = () => {
                   });
                   if (filteredTopAd5.length > 0) {
                     setTopAd5Data(filteredTopAd5);
+                    topAd5DataRef.current = filteredTopAd5; 
                     console.log('[MapMainScreen] AppState active - TopAd5 업데이트:', filteredTopAd5.length, '개');
                   }
                 }
@@ -2527,6 +2534,7 @@ export const MapMainScreen: React.FC = () => {
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
             console.log('[MapMainScreen] TopAd5 재호출 성공:', topAd5Response.length, '개 광고');
             setTopAd5Data(topAd5Response);
+            topAd5DataRef.current = topAd5Response; 
 
             startPreFetchAdUrls(topAd5Response);
           } else {
@@ -2535,6 +2543,7 @@ export const MapMainScreen: React.FC = () => {
             const storedData = await getStoredTopAd5();
             if (storedData && Array.isArray(storedData) && storedData.length > 0) {
               setTopAd5Data(storedData);
+              topAd5DataRef.current = storedData; 
               console.log('[MapMainScreen] 저장된 TopAd5 데이터 사용:', storedData.length, '개 광고');
             }
           }
