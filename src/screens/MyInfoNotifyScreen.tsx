@@ -29,6 +29,8 @@ import {
   deleteAllNotifications,
 } from '../services';
 import { NotificationItem, NotificationType } from '../types';
+import { cashingimages } from '../utils/imageCache';
+import { getEnv } from '../utils/env';
 
 const eventImage = require('../../assets/thumb_event.png');
 const chatXrun = require('../../assets/chat-xrun.png');
@@ -96,6 +98,7 @@ export const MyInfoNotifyScreen = () => {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const baselineAndroidInset = useRef(insets.bottom || 0);
   const safeInsetBottom = insets.bottom || 0;
+  const [notificationImages, setNotificationImages] = useState<Record<number, string | null>>({}); 
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -114,6 +117,20 @@ export const MyInfoNotifyScreen = () => {
     loadUserData();
   }, []);
 
+  const getImageUrlFromFileId = useCallback((fileId: string | number | null): string | null => {
+    if (!fileId) return null;
+    try {
+      const env = getEnv();
+      const fileIdStr = String(fileId);
+
+      let baseUrl = env.GATEWAY_NODEJS.replace('/oth-path', '');
+      return `${baseUrl}/files/${fileIdStr}`;
+    } catch (error) {
+      console.error('[알림] 이미지 URL 생성 실패:', error);
+      return null;
+    }
+  }, []);
+
   const loadNotifications = useCallback(async () => {
     if (!memberId) return;
 
@@ -123,6 +140,40 @@ export const MyInfoNotifyScreen = () => {
 
       if (response && response.data) {
         setNotifications(response.data);
+
+        const imageLoadPromises = response.data
+          .filter((notif: NotificationItem) => notif.image_file_id)
+          .map(async (notif: NotificationItem) => {
+            try {
+              const fileId = notif.image_file_id!;
+
+              const cachedImage = await cashingimages.getCachedImage(fileId);
+              if (cachedImage) {
+                setNotificationImages(prev => ({
+                  ...prev,
+                  [notif.board]: `data:image/jpeg;base64,${cachedImage}`,
+                }));
+                return;
+              }
+
+              const downloadSuccess = await cashingimages.downloadAndCacheImage(fileId);
+              if (downloadSuccess) {
+                const newCachedImage = await cashingimages.getCachedImage(fileId);
+                if (newCachedImage) {
+                  setNotificationImages(prev => ({
+                    ...prev,
+                    [notif.board]: `data:image/jpeg;base64,${newCachedImage}`,
+                  }));
+                }
+              }
+            } catch (error) {
+              console.error(`[알림] 이미지 ${notif.image_file_id} 로드 실패:`, error);
+            }
+          });
+
+        Promise.all(imageLoadPromises).catch((error) => {
+          console.error('[알림] 이미지 로드 중 오류:', error);
+        });
       }
     } catch (error) {
       console.error('[알림] 알림 목록 조회 실패:', error);
@@ -131,7 +182,7 @@ export const MyInfoNotifyScreen = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [memberId, navigate, t]);
+  }, [memberId, navigate, t, getImageUrlFromFileId]);
 
   useEffect(() => {
     if (memberId) {
@@ -171,11 +222,27 @@ export const MyInfoNotifyScreen = () => {
     try {
       setSending(true);
       shouldAutoScroll.current = true; 
-      await sendNotificationMessage(memberId, question.trim(), false, navigate);
+      const messageText = question.trim();
+      await sendNotificationMessage(memberId, messageText, false, navigate);
       await showAlert(t('screens.myInfoNotify.alerts.sendSuccess'), t('screens.myInfoNotify.alerts.sendSuccessMessage'));
       setQuestion('');
 
-      await loadNotifications();
+      const newMessage: NotificationItem = {
+        board: Date.now(), 
+        title: messageText,
+        type: 9303, 
+        datetime: new Date().toISOString(),
+        contents: null,
+        image_file_id: null,
+        guid: null,
+        datebegin: null,
+        dateends: null,
+      };
+      setNotifications(prev => [...prev, newMessage]);
+
+      loadNotifications().catch(error => {
+        console.error('[알림] 메시지 전송 후 동기화 실패:', error);
+      });
     } catch (error) {
       console.error('[알림] 메시지 전송 실패:', error);
       await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.sendFailed'));
@@ -204,7 +271,7 @@ export const MyInfoNotifyScreen = () => {
             try {
               await deleteNotificationMessage(memberId, board, false, navigate);
 
-              await loadNotifications();
+              setNotifications(prev => prev.filter(notif => notif.board !== board));
             } catch (error) {
               console.error('[알림] 메시지 삭제 실패:', error);
               await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteFailed'));
@@ -230,7 +297,7 @@ export const MyInfoNotifyScreen = () => {
             try {
               await deleteAllNotifications(memberId, navigate);
 
-              await loadNotifications();
+              setNotifications(prev => prev.filter(notif => notif.type !== 9303));
             } catch (error) {
               console.error('[알림] 전체 삭제 실패:', error);
               await showAlert(t('screens.myInfoNotify.alerts.error'), t('screens.myInfoNotify.alerts.deleteAllFailed'));
@@ -259,9 +326,10 @@ export const MyInfoNotifyScreen = () => {
     const isEvent = notification.type === 9302;
     const isNotice = notification.type === 9301;
 
-    const imageUri = notification.image
-      ? `data:image/jpeg;base64,${notification.image}`
-      : null;
+    const cachedImage = notificationImages[notification.board];
+    const imageUri = cachedImage 
+      ? cachedImage 
+      : (notification.image_file_id ? getImageUrlFromFileId(notification.image_file_id) : null);
 
     if (isUserMessage) {
 
