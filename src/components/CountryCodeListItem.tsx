@@ -7,12 +7,14 @@ type Props = {
   country: CountryDialCode;
   isSelected?: boolean;
   onPress?: (country: CountryDialCode) => void;
+  hideDialCode?: boolean;
 };
 
 export const CountryCodeListItem: React.FC<Props> = ({
   country,
   isSelected = false,
   onPress,
+  hideDialCode = false,
 }) => {
   return (
     <Pressable
@@ -30,7 +32,7 @@ export const CountryCodeListItem: React.FC<Props> = ({
         <Text style={styles.countryName}>{country.name}</Text>
         <Text style={styles.isoText}>{country.iso2.toUpperCase()}</Text>
       </View>
-      <Text style={styles.dialCode}>{country.dialCode}</Text>
+      {!hideDialCode && <Text style={styles.dialCode}>{country.dialCode}</Text>}
     </Pressable>
   );
 };
