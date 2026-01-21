@@ -116,9 +116,25 @@ export const WalletSendScreen = () => {
   }, []);
 
   const handleAmountChange = useCallback((text: string) => {
-    const formatted = formatNumberWithCommas(text);
-    setSendAmount(formatted);
-  }, [formatNumberWithCommas]);
+
+    if (selectedWalletAsset?.currency && [1, 2, 16].includes(selectedWalletAsset.currency)) {
+
+      const cleanValue = text.replace(/[^\d.]/g, '');
+      const parts = cleanValue.split('.');
+      let integerPart = parts[0] || '';
+
+      if (integerPart.length > 10) {
+        integerPart = integerPart.substring(0, 10);
+      }
+
+      const valueToFormat = parts.length > 1 ? `${integerPart}.${parts[1]}` : integerPart;
+      const formatted = formatNumberWithCommas(valueToFormat);
+      setSendAmount(formatted);
+    } else {
+      const formatted = formatNumberWithCommas(text);
+      setSendAmount(formatted);
+    }
+  }, [formatNumberWithCommas, selectedWalletAsset]);
 
   const prevAddressRef = useRef<string>('');
 
@@ -523,6 +539,7 @@ export const WalletSendScreen = () => {
               cursorColor="#10192d"
               selectionColor="#10192d"
               caretHidden={false}
+              maxLength={13}
             />
           </View>
 
