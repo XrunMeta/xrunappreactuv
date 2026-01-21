@@ -440,14 +440,19 @@ export const v_7488d5 = (v_c65f5d) => {
               const v_6f3521 = new XMLHttpRequest();
               const v_f71b56 = v_558750.baseURL 
                 ? (v_558750.baseURL.endsWith('/') && v_558750.url?.startsWith('/')
-                  ? `${v_558750.baseURL.slice(0, -1)}${v_558750.url}`
-                  : `${v_558750.baseURL}${v_558750.url}`)
-                : v_558750.url;
+                  ? `${v_558750.baseURL.slice(0, -1)}${v_558750.url || ''}`
+                  : `${v_558750.baseURL}${v_558750.url || ''}`)
+                : (v_558750.url || '');
+
+              if (!v_f71b56) {
+                v_bad6f3(new Error('URL is required'));
+                return;
+              }
 
               console.log('[API Request] XMLHttpRequest adapter - URL:', v_f71b56);
               console.log('[API Request] XMLHttpRequest adapter - Method:', v_558750.method);
 
-              v_6f3521.open(v_558750.method?.toUpperCase() || 'GET', v_f71b56, true);
+              v_6f3521.open((v_558750.method || 'GET').toUpperCase(), v_f71b56, true);
 
               Object.keys(v_558750.headers || {}).forEach((v_b24339) => {
                 const v_627a1e = v_b24339.toLowerCase();
@@ -481,15 +486,26 @@ export const v_7488d5 = (v_c65f5d) => {
                     }
                   }
 
+                  const v_c9bd35 = v_6f3521.getAllResponseHeaders();
+                  const v_3f4675 = {};
+                  if (v_c9bd35) {
+                    v_c9bd35.trim().split('\r\n').forEach((v_e6293e) => {
+                      const v_468545 = v_e6293e.split(': ');
+                      if (v_468545.length === 2) {
+                        v_3f4675[v_468545[0].toLowerCase()] = v_468545[1];
+                      }
+                    });
+                  }
+
                   const v_3393e3 = {
                     data: v_f637a4,
                     status: v_6f3521.status,
                     statusText: v_6f3521.statusText,
-                    headers: v_6f3521.getAllResponseHeaders(),
+                    headers: v_3f4675,
                     config: v_558750,
                     request: v_6f3521,
                   };
-                  v_6f7712(v_3393e3);
+                  v_6f7712(v_3393e3 as any);
                 } catch (v_9e86fd) {
                   console.error('[API Request] XMLHttpRequest adapter - 응답 처리 오류:', v_9e86fd);
                   v_bad6f3(v_9e86fd);
