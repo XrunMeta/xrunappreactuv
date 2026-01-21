@@ -786,7 +786,28 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       console.log(`[organizeData] 이미 본 광고 필터링: ${v_289b73.length}/${v_6385ff}개 유효 (${v_6385ff - v_289b73.length}개 제외)`);
     }
 
-    const v_908496 = v_289b73;
+    const v_d5c47b = v_289b73.length;
+    const v_fa543d = new Set<string>();
+    const v_5ab64a = v_289b73.filter((v_d5dda0) => {
+      const v_aa0917 = String(v_d5dda0.campid || '');
+      if (!v_aa0917 || v_aa0917 === '' || v_aa0917 === 'undefined') {
+        return true; 
+      }
+
+      if (v_fa543d.has(v_aa0917)) {
+        console.log(`[organizeData] 중복 campid 제거: ${v_aa0917}`);
+        return false;
+      }
+
+      v_fa543d.add(v_aa0917);
+      return true;
+    });
+
+    if (v_5ab64a.length !== v_d5c47b) {
+      console.log(`[organizeData] campid 중복 제거: ${v_5ab64a.length}/${v_d5c47b}개 유효 (${v_d5c47b - v_5ab64a.length}개 제외)`);
+    }
+
+    const v_908496 = v_5ab64a;
 
     v_88aee2.forEach(v_d5dda0 => {
       const v_e4fdb7 = (v_d5dda0.urlAD && v_d5dda0.urlAD !== '' && v_d5dda0.urlAD !== '없음') || 
@@ -828,20 +849,20 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     });
 
     let v_2e375c = [];
-    let v_da1995 = Math.min(v_253a77, v_908496.length);
 
-    if (v_a96760.current + v_da1995 > v_908496.length) {
+    const v_f64b05 = v_253a77; 
 
-      v_2e375c = [
-        ...v_908496.slice(v_a96760.current),
-        ...v_908496.slice(0, (v_a96760.current + v_da1995) % v_908496.length),
-      ];
-      v_a96760.current = (v_a96760.current + v_da1995) % v_908496.length;
-    } else {
-
-      v_2e375c = v_908496.slice(v_a96760.current, v_a96760.current + v_da1995);
-      v_a96760.current = (v_a96760.current + v_da1995) % v_908496.length;
+    if (v_908496.length === 0) {
+      v_8ce112([]);
+      return;
     }
+
+    for (let v_ebec57 = 0; v_ebec57 < v_f64b05; v_ebec57++) {
+      const v_a56041 = (v_a96760.current + v_ebec57) % v_908496.length;
+      v_2e375c.push(v_908496[v_a56041]);
+    }
+
+    v_a96760.current = (v_a96760.current + v_f64b05) % v_908496.length;
 
     console.log('📋 [organizeData] 선택된 데이터 (처음 5개):', v_2e375c.slice(0, 5).map((v_d5dda0, v_e86ad8) => ({
       index: v_e86ad8,
