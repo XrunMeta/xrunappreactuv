@@ -85,7 +85,8 @@
             "entitlements": {
               "com.apple.developer.applesignin": [
                 "Default"
-              ]
+              ],
+              "deploymentTarget": "18.0"
             }
           },
           "android": {
