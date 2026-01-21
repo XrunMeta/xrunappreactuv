@@ -20,12 +20,12 @@ const tutorialData: TutorialItem[] = [
   {
     id: 1,
     text: '광고에 참여하고 XRUN 리워드를 받아보세요',
-    image: require('../../assets/title3.png'),
+    image: require('../../assets/title2.png'),
   },
   {
     id: 2,
     text: '획득한 XRUN으로 Shop을 이용할 수 있어요',
-    image: require('../../assets/title2.png'),
+    image: require('../../assets/title3.png'),
   },
   {
     id: 3,
