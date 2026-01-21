@@ -297,8 +297,6 @@ export const AdWalletScreen = () => {
     (item: QuestItem): AdEntry => {
       const status = t('screens.adWallet.quest');
 
-      const date = formatDate(item.start_date || item.created_at);
-
       const eventType = item.event_type || 'quest';
       const isReferralInvite = eventType === 'recommendation_invite';
       const isReferralEvent = eventType === 'recommendation' ||
@@ -321,7 +319,11 @@ export const AdWalletScreen = () => {
         });
       }
 
-      const displayRewardAmount = isReferralInvite ? 0 : rewardAmount;
+      const date = isReferralInvite 
+        ? ''
+        : formatDate(item.start_date || item.created_at);
+
+      const displayRewardAmount = isReferralInvite ? rewardAmount : (isReferralEvent ? rewardAmount : rewardAmount);
       const expectedAdRevenue = `${displayRewardAmount.toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
@@ -1127,7 +1129,23 @@ export const AdWalletScreen = () => {
         )}
         {isQuest ? (
 
-          isReferralInvite ? null : (
+          isReferralInvite ? (
+            <View style={styles.adCardRow}>
+              <Text style={[
+                styles.adCardRowLabel,
+                isDisabled && { color: disabledColor }
+              ]}>
+                보상금액
+              </Text>
+              <Text style={[
+                styles.adCardRowAmount,
+                { color: item.expectedAdRevenueColor },
+                isDisabled && { color: disabledColor }
+              ]}>
+                {item.expectedAdRevenue}
+              </Text>
+            </View>
+          ) : (
 
             item.isReferralEvent ? (
               <View style={styles.adCardRow}>
