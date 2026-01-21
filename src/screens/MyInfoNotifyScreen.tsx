@@ -29,6 +29,8 @@ import {
   v_3e4cca,
 } from '../services';
 import { v_d9bc70, v_dbf3ef } from '../types';
+import { v_858bfa } from '../utils/imageCache';
+import { v_e4a763 } from '../utils/env';
 
 const v_144b19 = require('../../assets/thumb_event.png');
 const v_436552 = require('../../assets/chat-xrun.png');
@@ -96,6 +98,7 @@ export const v_386af2 = () => {
   const [v_ac3ab7, v_028502] = v_5ab095(false);
   const v_eb358e = v_e662ae(v_033e14.bottom || 0);
   const v_a87c3a = v_033e14.bottom || 0;
+  const [v_bf4689, v_8641cb] = v_5ab095<Record<number, string | null>>({}); 
 
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
@@ -114,6 +117,20 @@ export const v_386af2 = () => {
     v_0e1f49();
   }, []);
 
+  const v_521525 = v_de06a3((v_433c46): string | null => {
+    if (!v_433c46) return null;
+    try {
+      const v_c9c489 = v_e4a763();
+      const v_bb51e2 = String(v_433c46);
+
+      let v_c01615 = v_c9c489.GATEWAY_NODEJS.replace('/oth-path', '');
+      return `${v_c01615}/files/${v_bb51e2}`;
+    } catch (v_5e9bfe) {
+      console.error('[알림] 이미지 URL 생성 실패:', v_5e9bfe);
+      return null;
+    }
+  }, []);
+
   const v_496106 = v_de06a3(async () => {
     if (!v_717992) return;
 
@@ -123,6 +140,40 @@ export const v_386af2 = () => {
 
       if (v_3393e3 && v_3393e3.data) {
         v_0965ee(v_3393e3.data);
+
+        const v_0ddc67 = v_3393e3.data
+          .filter((notif: v_d9bc70) => v_25a5cd.image_file_id)
+          .map(async (notif: v_d9bc70) => {
+            try {
+              const v_433c46 = v_25a5cd.image_file_id!;
+
+              const v_415a10 = await v_858bfa.getCachedImage(v_433c46);
+              if (v_415a10) {
+                v_8641cb(v_ba2215 => ({
+                  ...v_ba2215,
+                  [v_25a5cd.board]: `data:image/jpeg;base64,${v_415a10}`,
+                }));
+                return;
+              }
+
+              const v_65903b = await v_858bfa.downloadAndCacheImage(v_433c46);
+              if (v_65903b) {
+                const v_132a3d = await v_858bfa.getCachedImage(v_433c46);
+                if (v_132a3d) {
+                  v_8641cb(v_ba2215 => ({
+                    ...v_ba2215,
+                    [v_25a5cd.board]: `data:image/jpeg;base64,${v_132a3d}`,
+                  }));
+                }
+              }
+            } catch (v_5e9bfe) {
+              console.error(`[알림] 이미지 ${v_25a5cd.image_file_id} 로드 실패:`, v_5e9bfe);
+            }
+          });
+
+        Promise.all(v_0ddc67).catch((v_5e9bfe) => {
+          console.error('[알림] 이미지 로드 중 오류:', v_5e9bfe);
+        });
       }
     } catch (v_5e9bfe) {
       console.error('[알림] 알림 목록 조회 실패:', v_5e9bfe);
@@ -131,7 +182,7 @@ export const v_386af2 = () => {
       v_34a50a(false);
       v_575aad(false);
     }
-  }, [v_717992, v_9b57fc, v_8d41d7]);
+  }, [v_717992, v_9b57fc, v_8d41d7, v_521525]);
 
   v_c4deb2(() => {
     if (v_717992) {
@@ -171,11 +222,27 @@ export const v_386af2 = () => {
     try {
       v_10837f(true);
       v_d16a0d.current = true; 
-      await v_26e528(v_717992, v_180423.trim(), false, v_9b57fc);
+      const v_890cf3 = v_180423.trim();
+      await v_26e528(v_717992, v_890cf3, false, v_9b57fc);
       await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.sendSuccess'), v_8d41d7('screens.myInfoNotify.alerts.sendSuccessMessage'));
       v_8f2787('');
 
-      await v_496106();
+      const newMessage: v_d9bc70 = {
+        board: Date.now(), 
+        title: v_890cf3,
+        type: 9303, 
+        datetime: new Date().toISOString(),
+        contents: null,
+        image_file_id: null,
+        guid: null,
+        datebegin: null,
+        dateends: null,
+      };
+      v_0965ee(v_ba2215 => [...v_ba2215, v_54d6ff]);
+
+      v_496106().catch(v_5e9bfe => {
+        console.error('[알림] 메시지 전송 후 동기화 실패:', v_5e9bfe);
+      });
     } catch (v_5e9bfe) {
       console.error('[알림] 메시지 전송 실패:', v_5e9bfe);
       await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.sendFailed'));
@@ -204,7 +271,7 @@ export const v_386af2 = () => {
             try {
               await v_1fc3f6(v_717992, v_10046b, false, v_9b57fc);
 
-              await v_496106();
+              v_0965ee(v_ba2215 => v_ba2215.filter(v_25a5cd => v_25a5cd.board !== v_10046b));
             } catch (v_5e9bfe) {
               console.error('[알림] 메시지 삭제 실패:', v_5e9bfe);
               await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.deleteFailed'));
@@ -230,7 +297,7 @@ export const v_386af2 = () => {
             try {
               await v_3e4cca(v_717992, v_9b57fc);
 
-              await v_496106();
+              v_0965ee(v_ba2215 => v_ba2215.filter(v_25a5cd => v_25a5cd.type !== 9303));
             } catch (v_5e9bfe) {
               console.error('[알림] 전체 삭제 실패:', v_5e9bfe);
               await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.error'), v_8d41d7('screens.myInfoNotify.alerts.deleteAllFailed'));
@@ -259,9 +326,10 @@ export const v_386af2 = () => {
     const v_fc7457 = v_b9faeb.type === 9302;
     const v_d37866 = v_b9faeb.type === 9301;
 
-    const v_ee89db = v_b9faeb.image
-      ? `data:image/jpeg;base64,${v_b9faeb.image}`
-      : null;
+    const v_415a10 = v_bf4689[v_b9faeb.board];
+    const v_ee89db = v_415a10 
+      ? v_415a10 
+      : (v_b9faeb.image_file_id ? v_521525(v_b9faeb.image_file_id) : null);
 
     if (v_7b6eb8) {
 
