@@ -7,11 +7,11 @@
 	objects = {
 
 		13B07FBF1A68108700A75B9A  = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A ; };
-		197FE670125E6F6695D48921  = {isa = PBXBuildFile; fileRef = 4C00B13FB2B102A9A37E111B ; };
 		373437363531313737646233346530346163623666636232  = {isa = PBXBuildFile; fileRef = 376638326339383330393366343932666132323664653233 ; };
 		3E461D99554A48A4959DE609  = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 ; };
 		4F9496F44D04B58C89A2EB01  = {isa = PBXBuildFile; fileRef = C2E94C61601A010BD91707A8 ; };
 		656538616162306566313239343963333832353835373336  = {isa = PBXBuildFile; fileRef = 383261643435666135386665346137333962636630663538 ; };
+		B8CBBB8686836EE71EE395E9  = {isa = PBXBuildFile; fileRef = EC5AFF629AE118DB6EC489C1 ; };
 		BB2F792D24A3F905000567C9  = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 ; };
 		F11748422D0307B40044C1D9  = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 ; };
 		F7E0C62AD8FABDD0C696A613  = {isa = PBXBuildFile; fileRef = B95EC09A1117A940512F7AD7 ; };
@@ -21,22 +21,22 @@
 		13B07FB61A68108700A75B9A  = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = XRUN/Info.plist; sourceTree = "<group>"; };
 		376638326339383330393366343932666132323664653233  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PangleModule.swift; path = XRUN/PangleModule.swift; sourceTree = "<group>"; };
 		383261643435666135386665346137333962636630663538  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PangleModule.m; path = XRUN/PangleModule.m; sourceTree = "<group>"; };
-		4C00B13FB2B102A9A37E111B  = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-XRUN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		64D1A1786E0A56CD31FC4094  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XRUN.debug.xcconfig"; path = "Target Support Files/Pods-XRUN/Pods-XRUN.debug.xcconfig"; sourceTree = "<group>"; };
+		6807A2CA297AB546DBA63E83  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XRUN.release.xcconfig"; path = "Target Support Files/Pods-XRUN/Pods-XRUN.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9  = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = XRUN/SplashScreen.storyboard; sourceTree = "<group>"; };
 		B95EC09A1117A940512F7AD7  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-XRUN/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9  = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		C2E94C61601A010BD91707A8  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = XRUN/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		EB55C91F8FC8E84F06359187  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XRUN.release.xcconfig"; path = "Target Support Files/Pods-XRUN/Pods-XRUN.release.xcconfig"; sourceTree = "<group>"; };
+		EC5AFF629AE118DB6EC489C1  = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-XRUN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE  = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = XRUN/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "XRUN-Bridging-Header.h"; path = "XRUN/XRUN-Bridging-Header.h"; sourceTree = "<group>"; };
-		F621A21E18E954DB5EA2E8AC  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XRUN.debug.xcconfig"; path = "Target Support Files/Pods-XRUN/Pods-XRUN.debug.xcconfig"; sourceTree = "<group>"; };
 
 		13B07F8C1A680F5B00A75B9A  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				197FE670125E6F6695D48921 ,
+				B8CBBB8686836EE71EE395E9 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE ,
-				4C00B13FB2B102A9A37E111B ,
+				EC5AFF629AE118DB6EC489C1 ,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -124,8 +124,8 @@
 		E971141B29E7B94F1056F49E  = {
 			isa = PBXGroup;
 			children = (
-				F621A21E18E954DB5EA2E8AC ,
-				EB55C91F8FC8E84F06359187 ,
+				64D1A1786E0A56CD31FC4094 ,
+				6807A2CA297AB546DBA63E83 ,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -135,14 +135,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A ;
 			buildPhases = (
-				08A4A3CD28434E44B6B9DE2E ,
+				67E64A34FA9755ECCFBAD8DE ,
 				68BF28FB83FA31861344C9D4 ,
 				13B07F871A680F5B00A75B9A ,
 				13B07F8C1A680F5B00A75B9A ,
 				13B07F8E1A680F5B00A75B9A ,
 				00DD1BFF1BD5951E006B06BC ,
-				800E24972A6A228C8D4807E9 ,
-				47D38D87E55E7A3AF98124FB ,
+				B2056702621BA71DD79204B6 ,
+				C15B7D42B348CEC8D08530F9 ,
 			);
 			buildRules = (
 			);
@@ -210,7 +210,7 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		08A4A3CD28434E44B6B9DE2E  = {
+		67E64A34FA9755ECCFBAD8DE  = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -230,28 +230,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		47D38D87E55E7A3AF98124FB  = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-XRUN/Pods-XRUN-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-XRUN/Pods-XRUN-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		68BF28FB83FA31861344C9D4  = {
@@ -278,7 +256,29 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-XRUN/expo-configure-project.sh\"\n";
 		};
-		800E24972A6A228C8D4807E9  = {
+		B2056702621BA71DD79204B6  = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-XRUN/Pods-XRUN-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-XRUN/Pods-XRUN-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C15B7D42B348CEC8D08530F9  = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -359,7 +359,7 @@
 
 		13B07F941A680F5B00A75B9A  = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F621A21E18E954DB5EA2E8AC ;
+			baseConfigurationReference = 64D1A1786E0A56CD31FC4094 ;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -372,7 +372,7 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = XRUN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -396,7 +396,7 @@
 		};
 		13B07F951A680F5B00A75B9A  = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EB55C91F8FC8E84F06359187 ;
+			baseConfigurationReference = 6807A2CA297AB546DBA63E83 ;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -404,7 +404,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 677WG96CUJ;
 				INFOPLIST_FILE = XRUN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
