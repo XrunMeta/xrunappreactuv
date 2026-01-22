@@ -45,6 +45,7 @@ export { default as v_459e8e } from './shopMyTicket';
 export { default as v_02dbe7 } from './shopBuy';
 export { default as v_294db5 } from './shopSuccess';
 export { default as v_adab30 } from './shopTicketDetail';
+export { default as v_0ec349 } from './shopItemRegister';
 export { default as v_f7c780 } from './showNapAd';
 export { default as v_400626 } from './advertiseScreen';
 export { default as v_c36a9e } from './addToken';

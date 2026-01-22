@@ -18,8 +18,9 @@ import { v_556baf, v_729608 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_a0daa8 } from '../navigation';
+import { v_4b1173 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import { v_dd87bc, v_5027e2, v_7488d5 } from '../services';
+import { v_dd87bc, v_5027e2, v_7488d5, v_d33616 } from '../services';
 import { v_8b0d2e } from '../types';
 import { v_e4a763 } from '../utils/env';
 import { v_858bfa } from '../utils/imageCache';
@@ -27,6 +28,7 @@ import { v_858bfa } from '../utils/imageCache';
 export const v_680bee = () => {
   const { t: v_8d41d7 } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_cd31a8, v_deef62] = v_5ab095<boolean>(false);
   const [v_88dca2, v_e33ec0] = v_5ab095<boolean>(false);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
@@ -306,7 +308,15 @@ export const v_680bee = () => {
       return null;
     } catch (v_5e9bfe) {
       console.error('[상품 등록] 이미지 업로드 실패:', v_5e9bfe);
-      if (v_5e9bfe.response) {
+
+      if (v_5e9bfe.message === 'Network Error' || (v_5e9bfe.request && v_5e9bfe.request.status === 0)) {
+        console.error('[상품 등록] 네트워크 연결 오류 - 서버에 연결할 수 없습니다.');
+        console.error('[상품 등록] 가능한 원인:');
+        console.error('[상품 등록]   - 네트워크 연결이 끊어졌습니다');
+        console.error('[상품 등록]   - 서버가 응답하지 않습니다');
+        console.error('[상품 등록]   - 타임아웃이 발생했습니다');
+        console.error('[상품 등록]   - CORS 또는 보안 정책 문제일 수 있습니다');
+      } else if (v_5e9bfe.response) {
         console.error('[상품 등록] 서버 응답:', v_5e9bfe.response.data);
         console.error('[상품 등록] 서버 상태:', v_5e9bfe.response.status);
         console.error('[상품 등록] 서버 헤더:', v_5e9bfe.response.headers);
@@ -315,7 +325,11 @@ export const v_680bee = () => {
       } else {
         console.error('[상품 등록] 오류 메시지:', v_5e9bfe.message);
       }
-      console.error('[상품 등록] 오류 스택:', v_5e9bfe.stack);
+
+      if (v_5e9bfe.stack) {
+        console.error('[상품 등록] 오류 스택:', v_5e9bfe.stack);
+      }
+
       return null;
     }
   };
@@ -405,10 +419,82 @@ export const v_680bee = () => {
     }
   };
 
+  const v_328f7c = async () => {
+    if (!v_7b46e6 || !v_717992 || !v_1b9174) {
+      return;
+    }
+
+    try {
+
+      const v_43c42e = await v_889fad(
+        v_8d41d7('screens.myinfoShopSales.deleteConfirm'),
+        v_8d41d7('screens.myinfoShopSales.deleteConfirmMessage'),
+        [
+          {
+            text: v_8d41d7('screens.myinfoShopSales.cancel'),
+            style: 'cancel',
+          },
+          {
+            text: v_8d41d7('screens.myinfoShopSales.delete'),
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                v_e33ec0(true);
+                const v_3393e3 = await v_d33616(v_717992, v_7b46e6, v_9b57fc);
+
+                if (v_3393e3.status === 'success' && v_3393e3.data.affectedRows > 0) {
+                  await v_889fad(v_8d41d7('screens.myinfoShopSales.deleteSuccess'));
+
+                  v_c7ac57();
+                } else {
+                  await v_889fad(
+                    v_8d41d7('screens.myinfoShopSales.deleteFailed'),
+                    v_3393e3.message || v_8d41d7('screens.myinfoShopSales.deleteFailed'),
+                  );
+                }
+              } catch (v_5e9bfe) {
+                console.error('[상품 등록] 상품 삭제 오류:', v_5e9bfe);
+                await v_889fad(
+                  v_8d41d7('screens.myinfoShopSales.deleteFailed'),
+                  v_5e9bfe instanceof Error ? v_5e9bfe.message : v_8d41d7('screens.myinfoShopSales.deleteFailed'),
+                );
+              } finally {
+                v_e33ec0(false);
+              }
+            },
+          },
+        ],
+      );
+    } catch (v_5e9bfe) {
+      console.error('[상품 등록] 삭제 확인 다이얼로그 오류:', v_5e9bfe);
+    }
+  };
+
+  const v_a37640 = () => {
+    if (!v_1b9174) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        style={v_d81136.headerDeleteButton}
+        onPress={v_328f7c}
+        activeOpacity={0.7}
+        disabled={v_88dca2}
+      >
+        <Text style={v_d81136.headerDeleteButtonText}>{v_8d41d7('screens.myinfoShopSales.delete')}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   if (v_cd31a8) {
     return (
       <SafeView style={v_d81136.container}>
-        <Header title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} onBackPress={v_c7ac57} />
+        <Header 
+          title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} 
+          onBackPress={v_c7ac57}
+          rightComponent={v_a37640()}
+        />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
@@ -418,7 +504,11 @@ export const v_680bee = () => {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
-      <Header title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} onBackPress={v_c7ac57} />
+      <Header 
+        title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} 
+        onBackPress={v_c7ac57}
+        rightComponent={v_a37640()}
+      />
       <KeyboardAvoidingView
         style={v_d81136.keyboardView}
         behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
@@ -600,6 +690,17 @@ export const v_680bee = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
+  },
+  headerDeleteButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#FF3B30',
+  },
+  headerDeleteButtonText: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Medium',
+    color: '#FFFFFF',
   },
   loadingContainer: {
     flex: 1,

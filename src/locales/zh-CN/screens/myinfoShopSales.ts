@@ -33,5 +33,15 @@ export default {
   apply: '应用',
 
   noData: '暂无数据。',
+  noShopmember: '没有注册的商店信息。',
+  noItemData: '没有注册的商品或购买记录。',
+
+  addItem: '添加商品',
+  modify: '修改',
+  delete: '删除',
+  deleteConfirm: '确定要删除吗？',
+  deleteConfirmMessage: '删除的商品将不再显示，但购买记录将保留。',
+  deleteSuccess: '商品已删除。',
+  deleteFailed: '删除商品失败。',
 };
 

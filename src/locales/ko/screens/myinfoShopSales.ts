@@ -38,5 +38,10 @@ export default {
 
   addItem: '상품 등록',
   modify: '수정',
+  delete: '삭제',
+  deleteConfirm: '정말 삭제하시겠습니까?',
+  deleteConfirmMessage: '삭제된 상품은 더 이상 표시되지 않지만, 구매 기록은 유지됩니다.',
+  deleteSuccess: '상품이 삭제되었습니다.',
+  deleteFailed: '상품 삭제에 실패했습니다.',
 };
 
