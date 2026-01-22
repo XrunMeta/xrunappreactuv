@@ -179,6 +179,11 @@ export const v_858bfa = {
         console.log(`[이미지 캐시] ✅ 이미지 다운로드 성공: ${v_bb51e2}`);
       } catch (v_5e9bfe) {
 
+        if (v_5e9bfe instanceof v_3333d3 && v_5e9bfe.response?.status === 404) {
+          console.warn(`[이미지 캐시] ⚠️ 이미지 파일을 찾을 수 없습니다 (404): ${v_bb51e2}. 파일이 삭제되었거나 존재하지 않을 수 있습니다.`);
+          return false;
+        }
+
         if (v_5e9bfe instanceof v_3333d3 && v_5e9bfe.response) {
 
           const v_d308b5 = v_5e9bfe.response.status;

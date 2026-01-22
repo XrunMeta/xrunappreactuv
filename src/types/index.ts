@@ -1408,6 +1408,20 @@ export interface ItemInfo {
   sdk?: string | null; 
 }
 
+export interface DeleteShopItemRequest {
+  shopmember: string; 
+  item: string; 
+}
+
+export interface DeleteShopItemResponse {
+  status: 'success' | 'fail';
+  code: number;
+  message: string;
+  data: {
+    affectedRows: number;
+  };
+}
+
 export interface GetItemInfoRequest {
   shopmember: string; 
 }

@@ -163,6 +163,8 @@ import {
   v_3ac6ea,
   v_7c19d8,
   v_368e1a,
+  v_6b33d2,
+  v_0ecd34,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_f16a74, v_deac27, v_650134 } from './versionCheck';
@@ -306,45 +308,6 @@ export const v_495832 = async (
         v_43c42e.emergencyStop = {
           enabled: false,
         };
-      }
-
-      const v_4587b3 = v_650134();  
-      const v_6cd443 = Number(v_2c2f8d.data.version) || 0;
-      const v_1e5d57 = Number(v_2c2f8d.data.version_ios) || 0;
-
-      console.log('[App] 버전 확인:', {
-        currentVersion: v_4587b3,
-        serverAndroidVersion: v_6cd443,
-        serverIOSVersion: v_1e5d57,
-        platform: v_326be8.OS,
-      });
-
-      if (v_326be8.OS === 'android') {
-        if (v_4587b3 && v_6cd443 > v_4587b3) {
-          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
-          v_43c42e.emergencyStop = {
-            enabled: true,
-            message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
-          };
-        } else {
-          console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
-        }
-      } else if (v_326be8.OS === 'ios') {
-        if (v_4587b3 && v_1e5d57 > v_4587b3) {
-          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
-          if (__DEV__) {
-            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
-          } else {
-            v_43c42e.emergencyStop = {
-              enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-            };
-          }
-        } else {
-          console.log('[App ios] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_1e5d57);
-        }
       }
 
       return v_43c42e;
@@ -5956,6 +5919,44 @@ export const v_09a96d = async (
     return v_3393e3.data;
   } catch (v_5e9bfe) {
     console.error('[Shop 매출] 구매자 명단 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_d33616 = async (
+  v_c5bd46,
+  v_8c0b26,
+  v_c65f5d,
+): Promise<v_0ecd34> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const request: v_6b33d2 = {
+      shopmember: v_c5bd46,
+      item: v_8c0b26,
+    };
+
+    console.log('[Shop 매출] 상품 삭제 요청:', { shopmember: v_c5bd46, item: v_8c0b26 });
+
+    const v_3393e3 = await v_9f42a4.post<v_0ecd34>(
+      '/deleteShopItem',
+      v_576f5a,
+    );
+
+    console.log('[Shop 매출] 상품 삭제 성공:', v_3393e3.data.status);
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[Shop 매출] 상품 삭제 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       console.error('[Shop 매출] 상세 오류 정보:', {
         url: v_5e9bfe.config?.url,
