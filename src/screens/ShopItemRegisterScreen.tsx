@@ -18,8 +18,9 @@ import { SafeView, Header } from '../components';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppNavigation } from '../navigation';
+import { useAlertDialog } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { getXRUNGopaxPrice, createItemFromApp, createAxiosInstance } from '../services';
+import { getXRUNGopaxPrice, createItemFromApp, createAxiosInstance, deleteShopItem } from '../services';
 import { CreateItemFromAppRequest } from '../types';
 import { getEnv } from '../utils/env';
 import { cashingimages } from '../utils/imageCache';
@@ -27,6 +28,7 @@ import { cashingimages } from '../utils/imageCache';
 export const ShopItemRegisterScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -306,7 +308,15 @@ export const ShopItemRegisterScreen = () => {
       return null;
     } catch (error: any) {
       console.error('[상품 등록] 이미지 업로드 실패:', error);
-      if (error.response) {
+
+      if (error.message === 'Network Error' || (error.request && error.request.status === 0)) {
+        console.error('[상품 등록] 네트워크 연결 오류 - 서버에 연결할 수 없습니다.');
+        console.error('[상품 등록] 가능한 원인:');
+        console.error('[상품 등록]   - 네트워크 연결이 끊어졌습니다');
+        console.error('[상품 등록]   - 서버가 응답하지 않습니다');
+        console.error('[상품 등록]   - 타임아웃이 발생했습니다');
+        console.error('[상품 등록]   - CORS 또는 보안 정책 문제일 수 있습니다');
+      } else if (error.response) {
         console.error('[상품 등록] 서버 응답:', error.response.data);
         console.error('[상품 등록] 서버 상태:', error.response.status);
         console.error('[상품 등록] 서버 헤더:', error.response.headers);
@@ -315,7 +325,11 @@ export const ShopItemRegisterScreen = () => {
       } else {
         console.error('[상품 등록] 오류 메시지:', error.message);
       }
-      console.error('[상품 등록] 오류 스택:', error.stack);
+
+      if (error.stack) {
+        console.error('[상품 등록] 오류 스택:', error.stack);
+      }
+
       return null;
     }
   };
@@ -405,10 +419,82 @@ export const ShopItemRegisterScreen = () => {
     }
   };
 
+  const handleDeleteItem = async () => {
+    if (!editItemId || !memberId || !isEditMode) {
+      return;
+    }
+
+    try {
+
+      const result = await showAlert(
+        t('screens.myinfoShopSales.deleteConfirm'),
+        t('screens.myinfoShopSales.deleteConfirmMessage'),
+        [
+          {
+            text: t('screens.myinfoShopSales.cancel'),
+            style: 'cancel',
+          },
+          {
+            text: t('screens.myinfoShopSales.delete'),
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                setIsSubmitting(true);
+                const response = await deleteShopItem(memberId, editItemId, navigate);
+
+                if (response.status === 'success' && response.data.affectedRows > 0) {
+                  await showAlert(t('screens.myinfoShopSales.deleteSuccess'));
+
+                  goBack();
+                } else {
+                  await showAlert(
+                    t('screens.myinfoShopSales.deleteFailed'),
+                    response.message || t('screens.myinfoShopSales.deleteFailed'),
+                  );
+                }
+              } catch (error) {
+                console.error('[상품 등록] 상품 삭제 오류:', error);
+                await showAlert(
+                  t('screens.myinfoShopSales.deleteFailed'),
+                  error instanceof Error ? error.message : t('screens.myinfoShopSales.deleteFailed'),
+                );
+              } finally {
+                setIsSubmitting(false);
+              }
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      console.error('[상품 등록] 삭제 확인 다이얼로그 오류:', error);
+    }
+  };
+
+  const renderHeaderRight = () => {
+    if (!isEditMode) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.headerDeleteButton}
+        onPress={handleDeleteItem}
+        activeOpacity={0.7}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.headerDeleteButtonText}>{t('screens.myinfoShopSales.delete')}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   if (isLoading) {
     return (
       <SafeView style={styles.container}>
-        <Header title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} onBackPress={goBack} />
+        <Header 
+          title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} 
+          onBackPress={goBack}
+          rightComponent={renderHeaderRight()}
+        />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
@@ -418,7 +504,11 @@ export const ShopItemRegisterScreen = () => {
 
   return (
     <SafeView style={styles.container} backgroundColor="#F8FAFC">
-      <Header title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} onBackPress={goBack} />
+      <Header 
+        title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} 
+        onBackPress={goBack}
+        rightComponent={renderHeaderRight()}
+      />
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -600,6 +690,17 @@ export const ShopItemRegisterScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  headerDeleteButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#FF3B30',
+  },
+  headerDeleteButtonText: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Medium',
+    color: '#FFFFFF',
   },
   loadingContainer: {
     flex: 1,

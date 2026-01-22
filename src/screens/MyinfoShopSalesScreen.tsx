@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ShopSalesMemberRow, ShopSalesMemberData, DataList, DataListRef, SafeView } from '../components';
+import { useAlertDialog } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { PaginationParams, PaginationResponse } from '../types/pagination';

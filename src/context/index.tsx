@@ -278,3 +278,4 @@ export const useAppContext = () => {
   return context;
 };
 
+export { useAlertDialog, AlertDialogProvider } from './AlertDialogContext';

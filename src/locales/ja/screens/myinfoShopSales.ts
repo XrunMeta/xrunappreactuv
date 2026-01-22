@@ -33,5 +33,15 @@ export default {
   apply: '適用',
 
   noData: 'データがありません。',
+  noShopmember: '登録された店舗情報がありません。',
+  noItemData: '登録された商品または購入履歴がありません。',
+
+  addItem: '商品登録',
+  modify: '修正',
+  delete: '削除',
+  deleteConfirm: '本当に削除しますか？',
+  deleteConfirmMessage: '削除された商品は表示されなくなりますが、購入記録は維持されます。',
+  deleteSuccess: '商品が削除されました。',
+  deleteFailed: '商品の削除に失敗しました。',
 };
 

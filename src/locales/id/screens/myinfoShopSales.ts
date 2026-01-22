@@ -33,5 +33,15 @@ export default {
   apply: 'Terapkan',
 
   noData: 'Tidak ada data.',
+  noShopmember: 'Tidak ada informasi toko yang terdaftar.',
+  noItemData: 'Tidak ada item terdaftar atau riwayat pembelian.',
+
+  addItem: 'Tambah Item',
+  modify: 'Ubah',
+  delete: 'Hapus',
+  deleteConfirm: 'Apakah Anda yakin ingin menghapus?',
+  deleteConfirmMessage: 'Item yang dihapus tidak akan ditampilkan lagi, tetapi catatan pembelian akan dipertahankan.',
+  deleteSuccess: 'Item telah dihapus.',
+  deleteFailed: 'Gagal menghapus item.',
 };
 

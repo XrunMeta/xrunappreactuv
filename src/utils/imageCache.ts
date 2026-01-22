@@ -179,6 +179,11 @@ export const cashingimages = {
         console.log(`[이미지 캐시] ✅ 이미지 다운로드 성공: ${fileIdStr}`);
       } catch (error: any) {
 
+        if (error instanceof AxiosError && error.response?.status === 404) {
+          console.warn(`[이미지 캐시] ⚠️ 이미지 파일을 찾을 수 없습니다 (404): ${fileIdStr}. 파일이 삭제되었거나 존재하지 않을 수 있습니다.`);
+          return false;
+        }
+
         if (error instanceof AxiosError && error.response) {
 
           const status = error.response.status;
