@@ -5553,14 +5553,6 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false, v_751f24 = false): Pr
     v_e36b07 = v_60f584(v_e36b07);
     const v_0c5d43 = v_7be569 - v_e36b07.length;
 
-    const v_f2d089 = v_e36b07.length;
-    const v_3a292f = v_e36b07.filter((v_ddcfed) => {
-      const v_dcede5 = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
-      return v_dcede5;
-    });
-    v_e36b07 = v_3a292f;
-    const v_079d81 = v_f2d089 - v_e36b07.length;
-
     const v_fa543d = new Set<string>();
     let v_6b5543 = 0;
     v_e36b07.forEach((v_ddcfed) => {
@@ -5648,7 +5640,18 @@ export const v_e3e9a7 = async (v_4cf0ad): Promise<any[]> => {
     return v_4cf0ad;
   }
 
-  const v_a35e21 = v_4cf0ad.filter(v_8c0b26 => v_8c0b26.urlAD && typeof v_8c0b26.urlAD === 'string' && v_8c0b26.urlAD.trim() !== '');
+  const v_a35e21 = v_4cf0ad.filter(v_8c0b26 => {
+    const v_7ec08d = v_8c0b26.urlAD;
+
+    if (!v_7ec08d || typeof v_7ec08d !== 'string' || v_7ec08d.trim() === '' || v_7ec08d === '없음' || v_7ec08d === 'No') {
+      console.warn('[validateTopAd5Urls] ⚠️ 백엔드에서 필터링되지 않은 항목 발견:', {
+        campid: v_8c0b26.campid,
+        urlAD: v_7ec08d,
+      });
+      return false;
+    }
+    return true;
+  });
 
   if (v_a35e21.length === 0) {
     console.log('[validateTopAd5Urls] urlAD가 있는 항목이 없습니다.');

@@ -2300,8 +2300,18 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
                 const v_e36b07 = await v_563153();
                 if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
+
                   const v_6c877c = v_e36b07.filter((v_ddcfed) => {
-                    return v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
+                    const v_7ec08d = v_ddcfed.urlAD;
+
+                    if (!v_7ec08d || typeof v_7ec08d !== 'string' || v_7ec08d.trim() === '' || v_7ec08d === '없음' || v_7ec08d === 'No') {
+                      console.warn('[MapMainScreen] ⚠️ 백엔드에서 필터링되지 않은 항목 발견:', {
+                        campid: v_ddcfed.campid,
+                        urlAD: v_7ec08d,
+                      });
+                      return false;
+                    }
+                    return true;
                   });
                   if (v_6c877c.length > 0) {
                     v_6549d0(v_6c877c);
