@@ -87,12 +87,6 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
       if (!visible) {
         setCurrentStep(initialStep);
 
-        if (promiseResolve && isPromiseMode && promiseConfig) {
-
-          console.log('[ChoiceDialog] visible이 false로 변경 - Promise resolve (button1 기본값)');
-          promiseResolve('button1'); 
-          setPromiseResolve(null);
-        }
         setIsPromiseMode(false);
         setPromiseConfig(null);
       }
@@ -167,10 +161,13 @@ export const ChoiceDialog = forwardRef<ChoiceDialogRef, ChoiceDialogProps>(
 
       if (isPromiseMode && promiseResolve) {
         console.log('[ChoiceDialog] Promise resolve 호출:', buttonType);
-        promiseResolve(buttonType);
+        const resolveFn = promiseResolve; 
+
         setPromiseResolve(null);
         setIsPromiseMode(false);
         setPromiseConfig(null);
+
+        resolveFn(buttonType);
       } else {
         console.log('[ChoiceDialog] Promise resolve하지 않음:', { isPromiseMode, hasResolve: !!promiseResolve });
       }
