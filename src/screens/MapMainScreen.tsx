@@ -2300,8 +2300,18 @@ export const MapMainScreen: React.FC = () => {
 
                 const topAd5Response = await getTopAd5();
                 if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
+
                   const filteredTopAd5 = topAd5Response.filter((ad: any) => {
-                    return ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
+                    const urlAD = ad.urlAD;
+
+                    if (!urlAD || typeof urlAD !== 'string' || urlAD.trim() === '' || urlAD === '없음' || urlAD === 'No') {
+                      console.warn('[MapMainScreen] ⚠️ 백엔드에서 필터링되지 않은 항목 발견:', {
+                        campid: ad.campid,
+                        urlAD: urlAD,
+                      });
+                      return false;
+                    }
+                    return true;
                   });
                   if (filteredTopAd5.length > 0) {
                     setTopAd5Data(filteredTopAd5);
