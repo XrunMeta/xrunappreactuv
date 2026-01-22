@@ -145,15 +145,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [advertisementParams, setAdvertisementParamsState] = useState<AdvertisementParams | null>(null);
 
   const setAdvertisementParams = (params: AdvertisementParams | null) => {
-    console.log('🔄 [Context] setAdvertisementParams 호출:', {
-      advertisement: params?.advertisement,
-      campid: params?.campid,
-      coin: params?.coin,
-      name: params?.name,
-      fullParams: JSON.stringify(params, null, 2),
-    });
     setAdvertisementParamsState(params);
-    console.log('✅ [Context] setAdvertisementParams 완료');
   };
   const [selectedWalletAsset, setSelectedWalletAsset] = useState<CombinedAsset | null>(null);
   const [transactionResult, setTransactionResult] = useState<{
@@ -237,7 +229,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       advertisementParams,
       setAdvertisementParams,
       resetAdvertisementParams: () => {
-        console.log('🔄 [Context] resetAdvertisementParams 호출');
         setAdvertisementParams(null);
       },
       selectedWalletAsset,
