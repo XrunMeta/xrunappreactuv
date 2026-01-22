@@ -409,6 +409,7 @@ export const AdWalletScreen = () => {
           const reviewEvents = questItems.filter((item: QuestItem) => {
             const isReferralEvent = item.event_type === 'recommendation' ||
               (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
+
             return isReferralEvent && item.event_status === 'review';
           });
 
@@ -434,7 +435,28 @@ export const AdWalletScreen = () => {
 
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
 
-        const allAdEntries = [...estimateAdEntries, ...reviewReferralEvents];
+        const filteredEstimateAdEntries = estimateAdEntries.filter((entry) => {
+
+          if (entry.title) {
+            return false;
+          }
+          return true;
+        });
+
+        const filteredReviewReferralEvents = reviewReferralEvents.filter((entry) => {
+
+          if (entry.eventStatus === 'completed') {
+            return false;
+          }
+
+          if (entry.description && entry.description.includes('완료')) {
+            return false;
+          }
+
+          return entry.eventStatus === 'review';
+        });
+
+        const allAdEntries = [...filteredEstimateAdEntries, ...filteredReviewReferralEvents];
 
         let hasMore = false;
         if (pagination) {
@@ -464,41 +486,7 @@ export const AdWalletScreen = () => {
 
         const questItems = response.data || [];
 
-        const sortedQuestItems = [...questItems].sort((a, b) => {
-
-          if (a.event_type === 'recommendation_invite') return -1;
-          if (b.event_type === 'recommendation_invite') return 1;
-
-          return 0;
-        });
-
-        const referralEvents = sortedQuestItems.filter((item: QuestItem) => {
-          const itemId: string | number = item.id;
-          return item.event_type === 'recommendation' ||
-            (typeof itemId === 'string' && itemId.startsWith('recommendation_'));
-        });
-
-        console.log('[AdWallet] 퀘스트 리스트 조회 결과:', {
-          전체퀘스트개수: sortedQuestItems.length,
-          추천인이벤트개수: referralEvents.length,
-          추천인이벤트목록: referralEvents.map((e: QuestItem) => ({
-            id: e.id,
-            title: e.title,
-            event_status: e.event_status,
-            event_type: e.event_type,
-            reward_amount_asxrun: e.reward_amount_asxrun,
-          })),
-        });
-
-        const adEntries: AdEntry[] = sortedQuestItems.map(convertQuestToAdEntry);
-
-        console.log('[AdWallet] 변환된 AdEntry 목록:', adEntries.map((entry) => ({
-          id: entry.id,
-          title: entry.title,
-          expectedAdRevenue: entry.expectedAdRevenue,
-          isReferralEvent: entry.isReferralEvent,
-          eventStatus: entry.eventStatus,
-        })));
+        const adEntries: AdEntry[] = questItems.map(convertQuestToAdEntry);
 
         if (member) {
           const questIdOneEntry = adEntries.find(
@@ -518,9 +506,98 @@ export const AdWalletScreen = () => {
           }
         }
 
+        const sortedAdEntries = [...adEntries].sort((a, b) => {
+
+          const aIsAttendanceNotClicked = (a.id === 1 || a.id === '1') && (a.hasAttended === false || a.hasAttended === undefined);
+          const bIsAttendanceNotClicked = (b.id === 1 || b.id === '1') && (b.hasAttended === false || b.hasAttended === undefined);
+          if (aIsAttendanceNotClicked && !bIsAttendanceNotClicked) return -1;
+          if (!aIsAttendanceNotClicked && bIsAttendanceNotClicked) return 1;
+          if (aIsAttendanceNotClicked && bIsAttendanceNotClicked) {
+
+            const dateA = new Date(a.date || '').getTime();
+            const dateB = new Date(b.date || '').getTime();
+            if (dateA !== dateB) return dateA - dateB;
+          }
+
+          if (a.isReferralInvite && !b.isReferralInvite) return -1;
+          if (!a.isReferralInvite && b.isReferralInvite) return 1;
+          if (a.isReferralInvite && b.isReferralInvite) {
+
+            const dateA = new Date(a.date || '').getTime();
+            const dateB = new Date(b.date || '').getTime();
+            if (dateA !== dateB) return dateA - dateB;
+          }
+
+          const aIsReferral = a.isReferralEvent && !a.isReferralInvite;
+          const bIsReferral = b.isReferralEvent && !b.isReferralInvite;
+          if (aIsReferral && !bIsReferral) return -1;
+          if (!aIsReferral && bIsReferral) return 1;
+          if (aIsReferral && bIsReferral) {
+
+            const dateA = new Date(a.date || '').getTime();
+            const dateB = new Date(b.date || '').getTime();
+            if (dateA !== dateB) return dateA - dateB;
+          }
+
+          const aIsAttendanceClicked = (a.id === 1 || a.id === '1') && a.hasAttended === true;
+          const bIsAttendanceClicked = (b.id === 1 || b.id === '1') && b.hasAttended === true;
+          if (aIsAttendanceClicked && !bIsAttendanceClicked) return -1;
+          if (!aIsAttendanceClicked && bIsAttendanceClicked) return 1;
+          if (aIsAttendanceClicked && bIsAttendanceClicked) {
+
+            const dateA = new Date(a.date || '').getTime();
+            const dateB = new Date(b.date || '').getTime();
+            if (dateA !== dateB) return dateA - dateB;
+          }
+
+          const aIsReferralRewardClicked = a.isReferralEvent && !a.isReferralInvite && a.eventStatus === 'completed';
+          const bIsReferralRewardClicked = b.isReferralEvent && !b.isReferralInvite && b.eventStatus === 'completed';
+          if (aIsReferralRewardClicked && !bIsReferralRewardClicked) return -1;
+          if (!aIsReferralRewardClicked && bIsReferralRewardClicked) return 1;
+          if (aIsReferralRewardClicked && bIsReferralRewardClicked) {
+
+            const dateA = new Date(a.date || '').getTime();
+            const dateB = new Date(b.date || '').getTime();
+            if (dateA !== dateB) return dateA - dateB;
+          }
+
+          const dateA = new Date(a.date || '').getTime();
+          const dateB = new Date(b.date || '').getTime();
+          if (dateA !== dateB) return dateA - dateB;
+
+          return 0;
+        });
+
+        const referralEvents = sortedAdEntries.filter((entry: AdEntry) => {
+          return entry.isReferralEvent || entry.isReferralInvite;
+        });
+
+        console.log('[AdWallet] 퀘스트 리스트 조회 결과:', {
+          전체퀘스트개수: sortedAdEntries.length,
+          추천인이벤트개수: referralEvents.length,
+          추천인이벤트목록: referralEvents.map((e: AdEntry) => ({
+            id: e.id,
+            title: e.title,
+            eventStatus: e.eventStatus,
+            eventType: e.eventType,
+            isReferralInvite: e.isReferralInvite,
+          })),
+        });
+
+        console.log('[AdWallet] 변환된 AdEntry 목록:', sortedAdEntries.map((entry) => ({
+          id: entry.id,
+          title: entry.title,
+          expectedAdRevenue: entry.expectedAdRevenue,
+          isReferralEvent: entry.isReferralEvent,
+          isReferralInvite: entry.isReferralInvite,
+          eventStatus: entry.eventStatus,
+          hasAttended: entry.hasAttended,
+          date: entry.date,
+        })));
+
         return {
-          data: adEntries,
-          total: adEntries.length,
+          data: sortedAdEntries,
+          total: sortedAdEntries.length,
           hasMore: false,
         };
       } catch (error: any) {
