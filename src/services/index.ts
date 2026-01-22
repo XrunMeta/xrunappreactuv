@@ -5172,6 +5172,7 @@ export const getAllAgreements = async (
 
 const TOP_AD5_STORAGE_KEY = 'topAd5Data';
 const TOP_AD5_TIMESTAMP_KEY = 'topAd5Timestamp';
+const NEXT_ADS_STORAGE_KEY = 'nextAdsData'; 
 const TOP_AD5_REFRESH_INTERVAL = 10 * 60 * 1000; 
 
 const BLOCKLISTED_CAMPAIGN_IDS = new Set<string>(['2151261']);
@@ -5442,7 +5443,7 @@ export const addToCompletedAdsCache = async (campid: string): Promise<void> => {
   }
 };
 
-export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false): Promise<any> => {
+export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false, showDetailedLog: boolean = false): Promise<any> => {
 
   if (isFetchingTopAd5 && pendingTopAd5Promise) {
     console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
@@ -5453,7 +5454,7 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
 
     if (!forceRefresh) {
       const storedData = await getStoredTopAd5();
-      if (storedData) {
+      if (storedData && storedData.length > 0) {
         try {
           const timestampStr = await AsyncStorage.getItem(TOP_AD5_TIMESTAMP_KEY);
           if (timestampStr) {
@@ -5470,6 +5471,33 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
           }
         } catch (timestampError) {
           console.log('[getTopAd5] timestamp 확인 실패, API 호출 진행:', timestampError);
+        }
+      } else {
+
+        try {
+          const nextAdsStr = await AsyncStorage.getItem(NEXT_ADS_STORAGE_KEY);
+          if (nextAdsStr) {
+            const nextAds = JSON.parse(nextAdsStr);
+            if (Array.isArray(nextAds) && nextAds.length > 0) {
+
+              const adsFromNext = nextAds.slice(0, 5);
+              const remainingNextAds = nextAds.slice(5);
+
+              await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(adsFromNext));
+              await AsyncStorage.setItem(TOP_AD5_TIMESTAMP_KEY, Date.now().toString());
+
+              if (remainingNextAds.length > 0) {
+                await AsyncStorage.setItem(NEXT_ADS_STORAGE_KEY, JSON.stringify(remainingNextAds));
+              } else {
+                await AsyncStorage.removeItem(NEXT_ADS_STORAGE_KEY);
+              }
+
+              console.log(`[getTopAd5] nextAds에서 ${adsFromNext.length}개 사용, ${remainingNextAds.length}개 남음`);
+              return adsFromNext;
+            }
+          }
+        } catch (nextAdsError) {
+          console.log('[getTopAd5] nextAds 확인 실패, API 호출 진행:', nextAdsError);
         }
       }
     } else {
@@ -5532,71 +5560,84 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false)
     console.log('[getTopAd5] response가 배열인가?', Array.isArray(response));
 
     let topAd5Response: any[] = [];
-    if (Array.isArray(response)) {
+    let nextAdsResponse: any[] = [];
+
+    if (response?.ads && Array.isArray(response.ads)) {
+      topAd5Response = response.ads;
+      nextAdsResponse = Array.isArray(response.nextAds) ? response.nextAds : [];
+    } else if (Array.isArray(response)) {
 
       topAd5Response = response;
-      console.log('[getTopAd5] 배열로 인식, 길이:', topAd5Response.length);
     } else if (response?.data?.ads && Array.isArray(response.data.ads)) {
 
       topAd5Response = response.data.ads;
-      console.log('[getTopAd5] response.data.ads로 인식, 길이:', topAd5Response.length);
-    } else if (response?.ads && Array.isArray(response.ads)) {
-
-      topAd5Response = response.ads;
-      console.log('[getTopAd5] response.ads로 인식, 길이:', topAd5Response.length);
+      nextAdsResponse = Array.isArray(response.data.nextAds) ? response.data.nextAds : [];
     } else if (response?.data && Array.isArray(response.data)) {
 
       topAd5Response = response.data;
-      console.log('[getTopAd5] response.data로 인식, 길이:', topAd5Response.length);
     } else {
       console.warn('[getTopAd5] 예상하지 못한 response 구조:', response);
       console.warn('[getTopAd5] response 키 목록:', Object.keys(response || {}));
       return null;
     }
 
-    console.log('[getTopAd5] ========== 최종 추출 결과 ==========');
-    console.log('[getTopAd5] 추출된 topAd5Response 길이:', topAd5Response.length);
-
-    if (response?.message) {
-      console.warn('[getTopAd5] ⚠️ 백엔드 메시지:', response.message);
-    }
-
     if (topAd5Response.length === 0) {
-
       console.log('[getTopAd5] ℹ️ 활성 광고 캠페인이 없습니다 (정상 응답)');
-      if (response?.message) {
-        console.log('[getTopAd5] 백엔드 메시지:', response.message);
-      }
-    } else {
-      console.log('[getTopAd5] ✅ 광고 데이터 발견:', topAd5Response.length, '개');
-
-      if (topAd5Response.length > 0) {
-        const firstAd = topAd5Response[0];
-        console.log('[getTopAd5] 첫 번째 광고 전체 데이터:', JSON.stringify(firstAd, null, 2));
-        console.log('[getTopAd5] 첫 번째 광고 urlAD 확인:', {
-          campid: firstAd?.campid,
-          ad_company: firstAd?.ad_company,
-          urlAD: firstAd?.urlAD || '없음',
-          landing_url: firstAd?.landing_url || '없음',
-          urlAD_type: typeof firstAd?.urlAD,
-          urlAD_length: firstAd?.urlAD?.length || 0,
-          allKeys: Object.keys(firstAd || {}),
-        });
-      }
-
-      if (topAd5Response.length > 0) {
-        console.log('[getTopAd5] ✅ 백엔드에서 이미 필터링/정렬/제한 처리된 광고 데이터:', topAd5Response.length, '개');
-
-        if (topAd5Response[0]?.priority !== undefined) {
-          console.log('[getTopAd5] 첫 번째 광고 priority:', topAd5Response[0].priority);
-        }
-      }
+      return [];
     }
 
     const beforeBlocklistFilter = topAd5Response.length;
     topAd5Response = filterBlocklistedAds(topAd5Response);
-    if (topAd5Response.length !== beforeBlocklistFilter) {
-      console.log(`[getTopAd5] 블록리스트 필터링: ${topAd5Response.length}/${beforeBlocklistFilter}개 유효`);
+    const blocklistFilteredCount = beforeBlocklistFilter - topAd5Response.length;
+
+    const beforeUrlAdFilter = topAd5Response.length;
+    const filteredAds = topAd5Response.filter((ad: any) => {
+      const hasUrlAd = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
+      return hasUrlAd;
+    });
+    topAd5Response = filteredAds;
+    const urlAdFilteredCount = beforeUrlAdFilter - topAd5Response.length;
+
+    const seenCampids = new Set<string>();
+    let duplicateCount = 0;
+    topAd5Response.forEach((ad: any) => {
+      const campid = String(ad.campid || '');
+      if (campid && campid !== '' && campid !== 'undefined') {
+        if (seenCampids.has(campid)) {
+          duplicateCount++;
+        } else {
+          seenCampids.add(campid);
+        }
+      }
+    });
+
+    if (nextAdsResponse && nextAdsResponse.length > 0) {
+
+      try {
+        const existingNextAdsStr = await AsyncStorage.getItem(NEXT_ADS_STORAGE_KEY);
+        let existingNextAds: any[] = [];
+        if (existingNextAdsStr) {
+          existingNextAds = JSON.parse(existingNextAdsStr);
+        }
+
+        const existingCampids = new Set(existingNextAds.map((ad: any) => String(ad.campid || '')));
+        const newNextAds = nextAdsResponse.filter((ad: any) => {
+          const campid = String(ad.campid || '');
+          return !existingCampids.has(campid);
+        });
+
+        const mergedNextAds = [...existingNextAds, ...newNextAds];
+        await AsyncStorage.setItem(NEXT_ADS_STORAGE_KEY, JSON.stringify(mergedNextAds));
+        console.log('[getTopAd5] ✅ nextAds 저장 완료:', mergedNextAds.length, '개 (기존:', existingNextAds.length, '개 + 신규:', newNextAds.length, '개)');
+        if (newNextAds.length > 0) {
+          console.log('[getTopAd5] 신규 nextAds campid 목록:', newNextAds.map((ad: any) => ad.campid).join(', '));
+        }
+      } catch (storageError) {
+        console.error('[getTopAd5] nextAds 저장 실패:', storageError);
+
+        await AsyncStorage.setItem(NEXT_ADS_STORAGE_KEY, JSON.stringify(nextAdsResponse));
+        console.log('[getTopAd5] nextAds 저장 완료 (병합 실패, 신규만 저장):', nextAdsResponse.length, '개');
+      }
     }
 
     if (topAd5Response && topAd5Response.length > 0) {
