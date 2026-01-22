@@ -133,22 +133,16 @@ export const shareReferralLink = async (
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
 
-    const message = `${shareText}${userDetails.email}\n\n${deepLinkUrl}`;
+    const message = `${shareText}${userDetails.email}\n\n🔗 바로가기 ${deepLinkUrl}`;
 
-    const result = await Share.share({
-      message,
-    });
-
+    const result = await Share.share({ message });
     if (result.action === Share.sharedAction) {
       if (result.activityType) {
-
         console.log(`${result.activityType}로 성공적으로 공유됨`);
       } else {
-
         console.log('성공적으로 공유됨');
       }
     } else if (result.action === Share.dismissedAction) {
-
       console.log('공유가 취소됨');
     }
   } catch (error: any) {
