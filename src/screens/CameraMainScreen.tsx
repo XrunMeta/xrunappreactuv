@@ -861,119 +861,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       await checkUserLoginStatus();
 
-      if (!forceRefresh) {
-        const astorCoinsData = await AsyncStorage.getItem('astorCoinsData');
-
-        if (astorCoinsData) {
-          console.log('✅ AsyncStorage에서 astorCoinsData 발견');
-          try {
-            const coinsData = JSON.parse(astorCoinsData);
-
-            if (coinsData && Array.isArray(coinsData) && coinsData.length > 0) {
-
-              const validatedCoinsData = coinsData.map((coin: any) => {
-
-                const originalXrunPrice = coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0;
-
-                return {
-                  ...coin, 
-                  iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                  joindesc: coin.joindesc || '',
-                  name: coin.name || coin.title || coin.brand || 'Unknown coin',
-                  xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
-                  xrunPrice: originalXrunPrice, 
-                  campid: coin.campid || coin.campId || '',
-
-                  advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
-                };
-              });
-
-              console.log('✅ validatedCoinsData 생성 완료:', validatedCoinsData.length, '개');
-
-              console.log('[CameraMainScreen] 1단계: 캐시 TopAd5 데이터 확인 시작');
-              const storedTopAd5 = await getStoredTopAd5();
-
-              if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
-                console.log('✅ [CameraMainScreen] 캐시 TopAd5 데이터 발견 - 즉시 토큰 표시:', storedTopAd5.length, '개');
-
-                const sortedCoinsData = [...validatedCoinsData].sort((a, b) => {
-                  const distanceA = parseFloat(String(a.distance || 0));
-                  const distanceB = parseFloat(String(b.distance || 0));
-                  return distanceA - distanceB;
-                });
-
-                const MAX_TOKENS_PER_CAMPAIGN = 5;
-                const maxMappedTokens = storedTopAd5.length * MAX_TOKENS_PER_CAMPAIGN;
-                const campaignTokenCount = new Map<number, number>();
-
-                const mappedCoinsData = sortedCoinsData.map((coin: any, index: number) => {
-                  if (index >= maxMappedTokens) {
-                    return coin;
-                  }
-
-                  const adIndex = index % storedTopAd5.length;
-                  const mappedAd = storedTopAd5[adIndex];
-                  const campid = mappedAd?.campid;
-
-                  if (campid) {
-                    const currentCount = campaignTokenCount.get(campid) || 0;
-                    if (currentCount >= MAX_TOKENS_PER_CAMPAIGN) {
-                      return coin;
-                    }
-                    campaignTokenCount.set(campid, currentCount + 1);
-                  }
-
-                  return {
-                    ...coin,
-                    distance: Number(coin.distance) || 0,
-                    name: mappedAd?.name || coin.name || coin.title || coin.brand || 'Unknown coin',
-                    iconurl: mappedAd?.iconurl || coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                    joindesc: mappedAd?.joindesc || coin.joindesc || '',
-                    xrunPrice: mappedAd?.xrunPrice || coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
-                    xrunprice: mappedAd?.xrunPrice || coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
-                    campid: mappedAd?.campid || coin.campid || coin.campId || '',
-                    advertisement: mappedAd?.advertisement || mappedAd?.adid || mappedAd?.ad || (mappedAd?.campid ? String(mappedAd.campid) : '') || coin.advertisement || coin.adid || coin.ad || coin.coin || '',
-                    thumbnail: mappedAd?.thumbnail || coin.thumbnail,
-                    ad_company: mappedAd?.ad_company || coin.ad_company,
-                    coins: mappedAd?.coins?.toString() || coin.coins,
-                    brandlogo: mappedAd?.brandlogo || coin.brandlogo,
-                    adthumbnail2: mappedAd?.adthumbnail2 || coin.adthumbnail2,
-                    symbolimg: mappedAd?.symbolimg || coin.symbolimg,
-                    urlAD: mappedAd?.urlAD || coin.urlAD || '',
-                  };
-                });
-
-                setCoinsData(mappedCoinsData);
-                currentIndexRef.current = 0;
-                organizeData(mappedCoinsData);
-                setLoading(false);
-                hasLoadedDataRef.current = true;
-
-                console.log('✅ [CameraMainScreen] 캐시 데이터로 토큰 즉시 표시 완료');
-
-                return; 
-              }
-
-              console.log('[CameraMainScreen] 캐시 TopAd5 데이터 없음 - 기본 데이터 먼저 표시');
-
-              setCoinsData(validatedCoinsData);
-              organizeData(validatedCoinsData);
-              setLoading(false);
-              hasLoadedDataRef.current = true;
-
-              return; 
-            }
-          } catch (parseError) {
-            console.error('astorCoinsData 파싱 오류:', parseError);
-          }
-        }
-      }
-
-      if (forceRefresh) {
-        console.log('🔄 서버에서 새 데이터 가져오기');
-      } else {
-        console.log('⚠️ AsyncStorage에 데이터 없음, API 호출');
-      }
+      console.log('🔄 서버에서 새 데이터 가져오기');
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -1070,13 +958,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      await AsyncStorage.removeItem('astorCoinsData');
-      console.log('[CameraMainScreen] 기존 토큰 캐시(astorCoinsData) 삭제 완료');
-
-      await AsyncStorage.removeItem('cached_AD');
-      console.log('[CameraMainScreen] 기존 광고 캐시(cached_AD) 삭제 완료');
-
-      const topAd5Response = await getTopAd5(undefined, false, true);
+      const topAd5Response = await getTopAd5(undefined, true, true); 
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
         console.warn('[CameraMainScreen] TopAd5 데이터 없음');
@@ -1103,8 +985,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       }));
 
       if (markerData && markerData.length > 0) {
-
-        await AsyncStorage.setItem('astorCoinsData', JSON.stringify(markerData));
 
         const validatedCoinsData = markerData.map((coin: any) => {
 
@@ -1164,22 +1044,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           console.log('[CameraMainScreen API] 1단계: TopAd5 데이터 확인 시작');
           const storedTopAd5 = await getStoredTopAd5();
 
-          let topAd5Response: any[] | null = null;
-
-          await AsyncStorage.removeItem('astorCoinsData');
-          await AsyncStorage.removeItem('cached_AD');
-          console.log('[CameraMainScreen] AR 진입 시 기존 캐시 삭제 완료');
-
-          topAd5Response = await getTopAd5(undefined, false, true);
-
-          if (Array.isArray(topAd5Response) && topAd5Response.length === 0) {
-            console.log('[CameraMainScreen API] ℹ️ 활성 광고 캠페인이 없습니다 (서버 정상 응답)');
-            topAd5Response = null; 
-          }
-
-          if (!topAd5Response || !Array.isArray(topAd5Response)) {
-            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패. 저장된 데이터 사용 시도 (오래되었어도)');
-            topAd5Response = await getStoredTopAd5();
+          if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+            console.warn('[CameraMainScreen API] TopAd5 API 호출 실패 또는 빈 배열. 저장된 데이터 사용 시도 (오래되었어도)');
+            const storedData = await getStoredTopAd5();
+            if (storedData && Array.isArray(storedData) && storedData.length > 0) {
+              topAd5Response = storedData;
+            }
           }
 
           if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
@@ -1690,10 +1560,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const refreshTopAd5Data = useCallback(async () => {
     try {
       console.log('[CameraMainScreen] 10분 주기: 최신 데이터 가져오기 시작');
-
-      await AsyncStorage.removeItem('astorCoinsData');
-      await AsyncStorage.removeItem('cached_AD');
-      console.log('[CameraMainScreen] 10분 주기: 기존 캐시 삭제 완료');
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {

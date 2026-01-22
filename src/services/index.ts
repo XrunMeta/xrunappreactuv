@@ -5553,14 +5553,6 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false,
     topAd5Response = filterBlocklistedAds(topAd5Response);
     const blocklistFilteredCount = beforeBlocklistFilter - topAd5Response.length;
 
-    const beforeUrlAdFilter = topAd5Response.length;
-    const filteredAds = topAd5Response.filter((ad: any) => {
-      const hasUrlAd = ad.urlAD && typeof ad.urlAD === 'string' && ad.urlAD.trim() !== '';
-      return hasUrlAd;
-    });
-    topAd5Response = filteredAds;
-    const urlAdFilteredCount = beforeUrlAdFilter - topAd5Response.length;
-
     const seenCampids = new Set<string>();
     let duplicateCount = 0;
     topAd5Response.forEach((ad: any) => {
@@ -5648,7 +5640,18 @@ export const validateTopAd5Urls = async (topAd5Data: any[]): Promise<any[]> => {
     return topAd5Data;
   }
 
-  const itemsWithUrl = topAd5Data.filter(item => item.urlAD && typeof item.urlAD === 'string' && item.urlAD.trim() !== '');
+  const itemsWithUrl = topAd5Data.filter(item => {
+    const urlAD = item.urlAD;
+
+    if (!urlAD || typeof urlAD !== 'string' || urlAD.trim() === '' || urlAD === '없음' || urlAD === 'No') {
+      console.warn('[validateTopAd5Urls] ⚠️ 백엔드에서 필터링되지 않은 항목 발견:', {
+        campid: item.campid,
+        urlAD: urlAD,
+      });
+      return false;
+    }
+    return true;
+  });
 
   if (itemsWithUrl.length === 0) {
     console.log('[validateTopAd5Urls] urlAD가 있는 항목이 없습니다.');
