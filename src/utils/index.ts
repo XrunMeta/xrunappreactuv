@@ -133,22 +133,16 @@ export const v_a3bbf0 = async (
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');
 
-    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n${v_25f202}`;
+    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n🔗 바로가기 ${v_25f202}`;
 
-    const v_43c42e = await v_5f4661.share({
-      message: v_a8cd21,
-    });
-
+    const v_43c42e = await v_5f4661.share({ message: v_a8cd21 });
     if (v_43c42e.action === v_5f4661.sharedAction) {
       if (v_43c42e.activityType) {
-
         console.log(`${v_43c42e.activityType}로 성공적으로 공유됨`);
       } else {
-
         console.log('성공적으로 공유됨');
       }
     } else if (v_43c42e.action === v_5f4661.dismissedAction) {
-
       console.log('공유가 취소됨');
     }
   } catch (v_5e9bfe) {
