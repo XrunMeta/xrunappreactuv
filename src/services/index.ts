@@ -5172,6 +5172,7 @@ export const v_724f1d = async (
 
 const v_332c06 = 'topAd5Data';
 const v_b5dcce = 'topAd5Timestamp';
+const v_69b0b7 = 'nextAdsData'; 
 const v_887583 = 10 * 60 * 1000; 
 
 const v_b4b8e7 = new Set<string>(['2151261']);
@@ -5442,7 +5443,7 @@ export const v_5e0191 = async (v_aa0917): Promise<void> => {
   }
 };
 
-export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
+export const v_563153 = async (v_c65f5d, v_9d6a91 = false, v_751f24 = false): Promise<any> => {
 
   if (v_5281af && v_21e89f) {
     console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
@@ -5453,7 +5454,7 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
 
     if (!v_9d6a91) {
       const v_fe7102 = await v_5d7ca4();
-      if (v_fe7102) {
+      if (v_fe7102 && v_fe7102.length > 0) {
         try {
           const v_dc1309 = await v_e84827.getItem(v_b5dcce);
           if (v_dc1309) {
@@ -5470,6 +5471,33 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
           }
         } catch (v_e6e506) {
           console.log('[getTopAd5] timestamp 확인 실패, API 호출 진행:', v_e6e506);
+        }
+      } else {
+
+        try {
+          const v_405e5f = await v_e84827.getItem(v_69b0b7);
+          if (v_405e5f) {
+            const v_17d86b = JSON.parse(v_405e5f);
+            if (Array.isArray(v_17d86b) && v_17d86b.length > 0) {
+
+              const v_5c17ee = v_17d86b.slice(0, 5);
+              const v_caaab2 = v_17d86b.slice(5);
+
+              await v_e84827.setItem(v_332c06, JSON.stringify(v_5c17ee));
+              await v_e84827.setItem(v_b5dcce, Date.now().toString());
+
+              if (v_caaab2.length > 0) {
+                await v_e84827.setItem(v_69b0b7, JSON.stringify(v_caaab2));
+              } else {
+                await v_e84827.removeItem(v_69b0b7);
+              }
+
+              console.log(`[getTopAd5] nextAds에서 ${v_5c17ee.length}개 사용, ${v_caaab2.length}개 남음`);
+              return v_5c17ee;
+            }
+          }
+        } catch (v_44ab20) {
+          console.log('[getTopAd5] nextAds 확인 실패, API 호출 진행:', v_44ab20);
         }
       }
     } else {
@@ -5532,71 +5560,84 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false): Promise<any> => {
     console.log('[getTopAd5] response가 배열인가?', Array.isArray(v_3393e3));
 
     let v_e36b07 = [];
-    if (Array.isArray(v_3393e3)) {
+    let v_b1113a = [];
+
+    if (v_3393e3?.ads && Array.isArray(v_3393e3.ads)) {
+      v_e36b07 = v_3393e3.ads;
+      v_b1113a = Array.isArray(v_3393e3.nextAds) ? v_3393e3.nextAds : [];
+    } else if (Array.isArray(v_3393e3)) {
 
       v_e36b07 = v_3393e3;
-      console.log('[getTopAd5] 배열로 인식, 길이:', v_e36b07.length);
     } else if (v_3393e3?.data?.ads && Array.isArray(v_3393e3.data.ads)) {
 
       v_e36b07 = v_3393e3.data.ads;
-      console.log('[getTopAd5] response.data.ads로 인식, 길이:', v_e36b07.length);
-    } else if (v_3393e3?.ads && Array.isArray(v_3393e3.ads)) {
-
-      v_e36b07 = v_3393e3.ads;
-      console.log('[getTopAd5] response.ads로 인식, 길이:', v_e36b07.length);
+      v_b1113a = Array.isArray(v_3393e3.data.nextAds) ? v_3393e3.data.nextAds : [];
     } else if (v_3393e3?.data && Array.isArray(v_3393e3.data)) {
 
       v_e36b07 = v_3393e3.data;
-      console.log('[getTopAd5] response.data로 인식, 길이:', v_e36b07.length);
     } else {
       console.warn('[getTopAd5] 예상하지 못한 response 구조:', v_3393e3);
       console.warn('[getTopAd5] response 키 목록:', Object.keys(v_3393e3 || {}));
       return null;
     }
 
-    console.log('[getTopAd5] ========== 최종 추출 결과 ==========');
-    console.log('[getTopAd5] 추출된 topAd5Response 길이:', v_e36b07.length);
-
-    if (v_3393e3?.message) {
-      console.warn('[getTopAd5] ⚠️ 백엔드 메시지:', v_3393e3.message);
-    }
-
     if (v_e36b07.length === 0) {
-
       console.log('[getTopAd5] ℹ️ 활성 광고 캠페인이 없습니다 (정상 응답)');
-      if (v_3393e3?.message) {
-        console.log('[getTopAd5] 백엔드 메시지:', v_3393e3.message);
-      }
-    } else {
-      console.log('[getTopAd5] ✅ 광고 데이터 발견:', v_e36b07.length, '개');
-
-      if (v_e36b07.length > 0) {
-        const v_0db320 = v_e36b07[0];
-        console.log('[getTopAd5] 첫 번째 광고 전체 데이터:', JSON.stringify(v_0db320, null, 2));
-        console.log('[getTopAd5] 첫 번째 광고 urlAD 확인:', {
-          campid: v_0db320?.campid,
-          ad_company: v_0db320?.ad_company,
-          urlAD: v_0db320?.urlAD || '없음',
-          landing_url: v_0db320?.landing_url || '없음',
-          urlAD_type: typeof v_0db320?.urlAD,
-          urlAD_length: v_0db320?.urlAD?.length || 0,
-          allKeys: Object.keys(v_0db320 || {}),
-        });
-      }
-
-      if (v_e36b07.length > 0) {
-        console.log('[getTopAd5] ✅ 백엔드에서 이미 필터링/정렬/제한 처리된 광고 데이터:', v_e36b07.length, '개');
-
-        if (v_e36b07[0]?.priority !== undefined) {
-          console.log('[getTopAd5] 첫 번째 광고 priority:', v_e36b07[0].priority);
-        }
-      }
+      return [];
     }
 
     const v_7be569 = v_e36b07.length;
     v_e36b07 = v_60f584(v_e36b07);
-    if (v_e36b07.length !== v_7be569) {
-      console.log(`[getTopAd5] 블록리스트 필터링: ${v_e36b07.length}/${v_7be569}개 유효`);
+    const v_0c5d43 = v_7be569 - v_e36b07.length;
+
+    const v_f2d089 = v_e36b07.length;
+    const v_3a292f = v_e36b07.filter((v_ddcfed) => {
+      const v_dcede5 = v_ddcfed.urlAD && typeof v_ddcfed.urlAD === 'string' && v_ddcfed.urlAD.trim() !== '';
+      return v_dcede5;
+    });
+    v_e36b07 = v_3a292f;
+    const v_079d81 = v_f2d089 - v_e36b07.length;
+
+    const v_fa543d = new Set<string>();
+    let v_6b5543 = 0;
+    v_e36b07.forEach((v_ddcfed) => {
+      const v_aa0917 = String(v_ddcfed.campid || '');
+      if (v_aa0917 && v_aa0917 !== '' && v_aa0917 !== 'undefined') {
+        if (v_fa543d.has(v_aa0917)) {
+          v_6b5543++;
+        } else {
+          v_fa543d.add(v_aa0917);
+        }
+      }
+    });
+
+    if (v_b1113a && v_b1113a.length > 0) {
+
+      try {
+        const v_898796 = await v_e84827.getItem(v_69b0b7);
+        let v_e3e5d0 = [];
+        if (v_898796) {
+          v_e3e5d0 = JSON.parse(v_898796);
+        }
+
+        const v_dc091b = new Set(v_e3e5d0.map((v_ddcfed) => String(v_ddcfed.campid || '')));
+        const v_cda9f9 = v_b1113a.filter((v_ddcfed) => {
+          const v_aa0917 = String(v_ddcfed.campid || '');
+          return !v_dc091b.has(v_aa0917);
+        });
+
+        const v_fe3b1a = [...v_e3e5d0, ...v_cda9f9];
+        await v_e84827.setItem(v_69b0b7, JSON.stringify(v_fe3b1a));
+        console.log('[getTopAd5] ✅ nextAds 저장 완료:', v_fe3b1a.length, '개 (기존:', v_e3e5d0.length, '개 + 신규:', v_cda9f9.length, '개)');
+        if (v_cda9f9.length > 0) {
+          console.log('[getTopAd5] 신규 nextAds campid 목록:', v_cda9f9.map((v_ddcfed) => v_ddcfed.campid).join(', '));
+        }
+      } catch (v_df17d5) {
+        console.error('[getTopAd5] nextAds 저장 실패:', v_df17d5);
+
+        await v_e84827.setItem(v_69b0b7, JSON.stringify(v_b1113a));
+        console.log('[getTopAd5] nextAds 저장 완료 (병합 실패, 신규만 저장):', v_b1113a.length, '개');
+      }
     }
 
     if (v_e36b07 && v_e36b07.length > 0) {
