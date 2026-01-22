@@ -6,7 +6,7 @@ export default {
   shareReferral: 'Share Referral Link',
   noResults: 'No results found',
   share: {
-    shareText: 'Join XRUN Referral and your ad revenue will increase by 20% per level up to 8 levels in a unilevel system.\n\nPlease recommend us!\n\n\nAfter signing up, please be sure to enter the email below as your referrer. \n\n 👉Referrer Email: \n',
+    shareText: '[XRUN Invitation: Together 5 XRUN]\n\nExperience growing benefits with the XRUN Referral Program.\n\n🎁 Reward Details\n\n* 5 XRUN Reward: Issued to both the Inviter and the New Member upon sign-up.\n\n* 8-Tier Revenue Sharing: Earn 20% of your friends\' ad revenue through our Uni-level system, extending up to 8 tiers.\n\n⚙️ How to Participate\n\n* Step: Launch XRUN App ➔ Wallet ➔ AD XRUN ➔ Quest ➔ Share Referral Code ➔ Sign-up Completed\n\n📩 Referral Email ',
     download: 'Download:',
     shareFailed: 'Share Failed',
     shareFailedMessage: 'Failed to share referral link.',
