@@ -87,12 +87,6 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
       if (!v_cf55be) {
         v_639227(v_2e5eaf);
 
-        if (v_a52163 && v_72c4b8 && v_43a672) {
-
-          console.log('[ChoiceDialog] visible이 false로 변경 - Promise resolve (button1 기본값)');
-          v_a52163('button1'); 
-          v_8cff8b(null);
-        }
         v_6a010d(false);
         v_39975e(null);
       }
@@ -167,10 +161,13 @@ export const v_3a67b0 = v_680bcc<ChoiceDialogRef, ChoiceDialogProps>(
 
       if (v_72c4b8 && v_a52163) {
         console.log('[ChoiceDialog] Promise resolve 호출:', v_5347a3);
-        v_a52163(v_5347a3);
+        const v_a83962 = v_a52163; 
+
         v_8cff8b(null);
         v_6a010d(false);
         v_39975e(null);
+
+        v_a83962(v_5347a3);
       } else {
         console.log('[ChoiceDialog] Promise resolve하지 않음:', { isPromiseMode: v_72c4b8, hasResolve: !!v_a52163 });
       }
