@@ -163,6 +163,8 @@ import {
   AgreementType,
   GetItemInfoRequest,
   GetItemInfoResponse,
+  DeleteShopItemRequest,
+  DeleteShopItemResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
 import { checkLatestVersion, getCurrentAppVersion, getCurrentAppVersionNumber } from './versionCheck';
@@ -306,45 +308,6 @@ export const sendAliveSignal = async (
         result.emergencyStop = {
           enabled: false,
         };
-      }
-
-      const currentVersion = getCurrentAppVersionNumber();  
-      const serverAndroidVersion = Number(serverResponse.data.version) || 0;
-      const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
-
-      console.log('[App] 버전 확인:', {
-        currentVersion,
-        serverAndroidVersion,
-        serverIOSVersion,
-        platform: Platform.OS,
-      });
-
-      if (Platform.OS === 'android') {
-        if (currentVersion && serverAndroidVersion > currentVersion) {
-          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
-          result.emergencyStop = {
-            enabled: true,
-            message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
-          };
-        } else {
-          console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
-        }
-      } else if (Platform.OS === 'ios') {
-        if (currentVersion && serverIOSVersion > currentVersion) {
-          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
-          if (__DEV__) {
-            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
-          } else {
-            result.emergencyStop = {
-              enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
-              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
-            };
-          }
-        } else {
-          console.log('[App ios] 최신 버전입니다. 현재:', currentVersion, '서버:', serverIOSVersion);
-        }
       }
 
       return result;
@@ -5956,6 +5919,44 @@ export const getItemPurchaseList = async (
     return response.data;
   } catch (error) {
     console.error('[Shop 매출] 구매자 명단 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[Shop 매출] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export const deleteShopItem = async (
+  shopmember: string,
+  item: string,
+  navigation?: any,
+): Promise<DeleteShopItemResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request: DeleteShopItemRequest = {
+      shopmember,
+      item,
+    };
+
+    console.log('[Shop 매출] 상품 삭제 요청:', { shopmember, item });
+
+    const response = await axiosInstance.post<DeleteShopItemResponse>(
+      '/deleteShopItem',
+      request,
+    );
+
+    console.log('[Shop 매출] 상품 삭제 성공:', response.data.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('[Shop 매출] 상품 삭제 오류:', error);
     if (error instanceof AxiosError) {
       console.error('[Shop 매출] 상세 오류 정보:', {
         url: error.config?.url,
