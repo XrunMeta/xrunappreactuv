@@ -107,6 +107,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
   const [v_cd0b08, v_1094fa] = v_5ab095(false);
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const v_35f830 = v_e662ae<v_2694e4>(null);
+  const v_3e9bc0 = v_e662ae<string>(''); 
 
   const v_27bab6 = v_e662ae<NodeJS.Timeout | null>(null);
   const v_d35ccb = v_e662ae<NodeJS.Timeout | null>(null);
@@ -337,6 +338,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
       console.log('WebView로 URL 표시:', v_f71b56);
 
       v_e60eaf(v_f71b56);
+      v_3e9bc0.current = v_f71b56; 
       v_1094fa(true);
       console.log('✅ WebView 모달 표시');
     } catch (v_5e9bfe) {
@@ -349,6 +351,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
     console.log('[WebView] 닫기 버튼 클릭');
     v_1094fa(false);
     v_e60eaf('');
+    v_3e9bc0.current = ''; 
     v_73b253.current = false;
     v_3e5456(false);
 
@@ -800,6 +803,32 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
                 onNavigationStateChange={(v_b8df7f) => {
                   console.log('[WebView] 네비게이션:', v_b8df7f.url);
 
+                  const v_a74ae7 = v_3e9bc0.current;
+                  if (v_a74ae7 && v_a74ae7.includes('buzzvil.com')) {
+                    if (v_b8df7f.url && (v_b8df7f.url.startsWith('market://') || v_b8df7f.url.startsWith('intent://'))) {
+                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                        originalUrl: v_a74ae7,
+                        redirectedUrl: v_b8df7f.url,
+                      });
+
+                      v_e60eaf(v_a74ae7);
+                      return;
+                    }
+
+                    if (v_b8df7f.url && (v_b8df7f.url.includes('play.google.com') || v_b8df7f.url.includes('apps.apple.com'))) {
+
+                      if (!v_a74ae7.includes('play.google.com') && !v_a74ae7.includes('apps.apple.com')) {
+                        console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                          originalUrl: v_a74ae7,
+                          redirectedUrl: v_b8df7f.url,
+                        });
+
+                        v_e60eaf(v_a74ae7);
+                        return;
+                      }
+                    }
+                  }
+
                   if (v_b8df7f.url && v_b8df7f.url.startsWith('market://')) {
                     try {
                       const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
@@ -837,6 +866,28 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
                 onShouldStartLoadWithRequest={(v_576f5a) => {
                   const { url: v_f71b56 } = v_576f5a;
                   console.log('[WebView] 네비게이션 요청:', v_f71b56);
+
+                  const v_a74ae7 = v_3e9bc0.current;
+                  if (v_a74ae7 && v_a74ae7.includes('buzzvil.com')) {
+                    if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                        originalUrl: v_a74ae7,
+                        redirectedUrl: v_f71b56,
+                      });
+                      return false; 
+                    }
+
+                    if (v_f71b56.includes('play.google.com') || v_f71b56.includes('apps.apple.com')) {
+
+                      if (!v_a74ae7.includes('play.google.com') && !v_a74ae7.includes('apps.apple.com')) {
+                        console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                          originalUrl: v_a74ae7,
+                          redirectedUrl: v_f71b56,
+                        });
+                        return false; 
+                      }
+                    }
+                  }
 
                   if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
                     console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
