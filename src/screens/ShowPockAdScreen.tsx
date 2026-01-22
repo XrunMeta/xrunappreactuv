@@ -107,6 +107,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
   const [showWebView, setShowWebView] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState('');
   const webViewRef = useRef<WebView>(null);
+  const originalWebViewUrlRef = useRef<string>(''); 
 
   const rewardProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rewardProcessingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -337,6 +338,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
       console.log('WebView로 URL 표시:', url);
 
       setWebViewUrl(url);
+      originalWebViewUrlRef.current = url; 
       setShowWebView(true);
       console.log('✅ WebView 모달 표시');
     } catch (error) {
@@ -349,6 +351,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
     console.log('[WebView] 닫기 버튼 클릭');
     setShowWebView(false);
     setWebViewUrl('');
+    originalWebViewUrlRef.current = ''; 
     isWatchingAdRef.current = false;
     setHasOpenedUrl(false);
 
@@ -800,6 +803,32 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
                 onNavigationStateChange={(navState) => {
                   console.log('[WebView] 네비게이션:', navState.url);
 
+                  const originalUrl = originalWebViewUrlRef.current;
+                  if (originalUrl && originalUrl.includes('buzzvil.com')) {
+                    if (navState.url && (navState.url.startsWith('market://') || navState.url.startsWith('intent://'))) {
+                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                        originalUrl,
+                        redirectedUrl: navState.url,
+                      });
+
+                      setWebViewUrl(originalUrl);
+                      return;
+                    }
+
+                    if (navState.url && (navState.url.includes('play.google.com') || navState.url.includes('apps.apple.com'))) {
+
+                      if (!originalUrl.includes('play.google.com') && !originalUrl.includes('apps.apple.com')) {
+                        console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                          originalUrl,
+                          redirectedUrl: navState.url,
+                        });
+
+                        setWebViewUrl(originalUrl);
+                        return;
+                      }
+                    }
+                  }
+
                   if (navState.url && navState.url.startsWith('market://')) {
                     try {
                       const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
@@ -837,6 +866,28 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
                 onShouldStartLoadWithRequest={(request) => {
                   const { url } = request;
                   console.log('[WebView] 네비게이션 요청:', url);
+
+                  const originalUrl = originalWebViewUrlRef.current;
+                  if (originalUrl && originalUrl.includes('buzzvil.com')) {
+                    if (url.startsWith('market://') || url.startsWith('intent://')) {
+                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                        originalUrl,
+                        redirectedUrl: url,
+                      });
+                      return false; 
+                    }
+
+                    if (url.includes('play.google.com') || url.includes('apps.apple.com')) {
+
+                      if (!originalUrl.includes('play.google.com') && !originalUrl.includes('apps.apple.com')) {
+                        console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                          originalUrl,
+                          redirectedUrl: url,
+                        });
+                        return false; 
+                      }
+                    }
+                  }
 
                   if (url.startsWith('market://') || url.startsWith('intent://')) {
                     console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
