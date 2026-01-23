@@ -5447,11 +5447,6 @@ export const addToCompletedAdsCache = async (campid: string): Promise<void> => {
 
 export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false, showDetailedLog: boolean = false): Promise<any> => {
 
-  if (__DEV__) {
-    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
-    return;
-  }
-
   if (isFetchingTopAd5 && pendingTopAd5Promise) {
     console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
     return pendingTopAd5Promise;
@@ -5711,10 +5706,27 @@ export const validateTopAd5Urls = async (topAd5Data: any[]): Promise<any[]> => {
   const validationResults = await Promise.allSettled(
     itemsWithUrl.map(async (item) => {
       try {
+        const urlAD = item.urlAD;
+
+        const isIOSAppStoreUrl = urlAD && typeof urlAD === 'string' && (
+          urlAD.includes('apps.apple.com') ||
+          urlAD.startsWith('itms-apps://') ||
+          urlAD.startsWith('itms://')
+        );
+
+        if (isIOSAppStoreUrl) {
+          console.log(`[validateTopAd5Urls] iOS App Store URL 검증 건너뜀: ${urlAD}`);
+          return {
+            item,
+            isValid: true,
+            errorMessage: null,
+          };
+        }
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); 
 
-        const response = await fetch(item.urlAD, {
+        const response = await fetch(urlAD, {
           method: 'HEAD',
           signal: controller.signal,
         });

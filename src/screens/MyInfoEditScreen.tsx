@@ -8,6 +8,8 @@ import {
   FlatList,
   Modal,
   ScrollView,
+  InteractionManager,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -571,10 +573,23 @@ export const MyInfoEditScreen = () => {
 
             const loginType = await AsyncStorage.getItem('loginType');
             if (loginType === 'apple') {
-              await showAlert(
-                t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-              );
+              if (Platform.OS === 'ios') {
+
+                InteractionManager.runAfterInteractions(() => {
+                  setTimeout(() => {
+                    showAlert(
+                      t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                      t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                    );
+                  }, 300);
+                });
+              } else {
+
+                await showAlert(
+                  t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                  t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                );
+              }
             }
           } else {
             console.warn('[정보수정] 초기화 - member ID가 없습니다.');

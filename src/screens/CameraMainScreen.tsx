@@ -863,85 +863,95 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       console.log('🔄 서버에서 새 데이터 가져오기');
 
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('위치 권한이 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
-      const LAST_GPS_LOCATION_TIMESTAMP_KEY = 'lastGpsLocationTimestamp';
-      const LOCATION_REUSE_TIME = 60 * 1000; 
-      const LOCATION_REUSE_DISTANCE = 500; 
-
-      const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-        const R = 6371000; 
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-      };
-
-      const newLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      const newLocationData = {
-        latitude: newLocation.coords.latitude,
-        longitude: newLocation.coords.longitude,
-      };
-
-      let locationToUse = newLocationData;
-      try {
-
-        const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
-        const storedTimestamp = await AsyncStorage.getItem(LAST_GPS_LOCATION_TIMESTAMP_KEY);
-
-        if (storedLocation && storedTimestamp) {
-          const lastGpsLocation = JSON.parse(storedLocation);
-          const lastTimestamp = parseInt(storedTimestamp, 10);
-          const now = Date.now();
-          const elapsed = now - lastTimestamp;
-
-          if (elapsed < LOCATION_REUSE_TIME) {
-
-            const distance = calculateDistance(
-              newLocationData.latitude,
-              newLocationData.longitude,
-              lastGpsLocation.latitude,
-              lastGpsLocation.longitude
-            );
-
-            if (distance < LOCATION_REUSE_DISTANCE) {
-              locationToUse = lastGpsLocation;
-              console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(elapsed / 1000)}초 전, ${distance.toFixed(0)}m)`);
-            } else {
-              console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${distance.toFixed(0)}m > ${LOCATION_REUSE_DISTANCE}m), 새 위치 사용`);
-            }
-          } else {
-            console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(elapsed / 1000)}초 > ${LOCATION_REUSE_TIME / 1000}초), 새 위치 사용`);
-          }
-        } else {
-          console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
-        }
-      } catch (storageError) {
-        console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', storageError);
-      }
-
-      await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(locationToUse));
-      await AsyncStorage.setItem(LAST_GPS_LOCATION_TIMESTAMP_KEY, Date.now().toString());
-
-      const currentLocation = {
+      let currentLocation = {
         coords: {
-          latitude: locationToUse.latitude,
-          longitude: locationToUse.longitude,
+          latitude: 0,
+          longitude: 0,
         },
       };
+
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+
+          const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
+          const LAST_GPS_LOCATION_TIMESTAMP_KEY = 'lastGpsLocationTimestamp';
+          const LOCATION_REUSE_TIME = 60 * 1000; 
+          const LOCATION_REUSE_DISTANCE = 500; 
+
+          const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+            const R = 6371000; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+              Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+          };
+
+          const newLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          });
+
+          const newLocationData = {
+            latitude: newLocation.coords.latitude,
+            longitude: newLocation.coords.longitude,
+          };
+
+          let locationToUse = newLocationData;
+          try {
+
+            const storedLocation = await AsyncStorage.getItem(LAST_GPS_LOCATION_KEY);
+            const storedTimestamp = await AsyncStorage.getItem(LAST_GPS_LOCATION_TIMESTAMP_KEY);
+
+            if (storedLocation && storedTimestamp) {
+              const lastGpsLocation = JSON.parse(storedLocation);
+              const lastTimestamp = parseInt(storedTimestamp, 10);
+              const now = Date.now();
+              const elapsed = now - lastTimestamp;
+
+              if (elapsed < LOCATION_REUSE_TIME) {
+
+                const distance = calculateDistance(
+                  newLocationData.latitude,
+                  newLocationData.longitude,
+                  lastGpsLocation.latitude,
+                  lastGpsLocation.longitude
+                );
+
+                if (distance < LOCATION_REUSE_DISTANCE) {
+                  locationToUse = lastGpsLocation;
+                  console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(elapsed / 1000)}초 전, ${distance.toFixed(0)}m)`);
+                } else {
+                  console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${distance.toFixed(0)}m > ${LOCATION_REUSE_DISTANCE}m), 새 위치 사용`);
+                }
+              } else {
+                console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(elapsed / 1000)}초 > ${LOCATION_REUSE_TIME / 1000}초), 새 위치 사용`);
+              }
+            } else {
+              console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
+            }
+          } catch (storageError) {
+            console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', storageError);
+          }
+
+          await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(locationToUse));
+          await AsyncStorage.setItem(LAST_GPS_LOCATION_TIMESTAMP_KEY, Date.now().toString());
+
+          currentLocation = {
+            coords: {
+              latitude: locationToUse.latitude,
+              longitude: locationToUse.longitude,
+            },
+          };
+        } else {
+          console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+        }
+      } catch (locationError) {
+        console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', locationError);
+      }
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {
@@ -2679,7 +2689,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       <Modal
         visible={showWebViewModal}
         animationType="slide"
-        presentationStyle="fullScreen"
+        presentationStyle={Platform.OS === 'ios' ? 'pageSheet' : 'fullScreen'}
         onRequestClose={handleWebViewClose}
       >
         <View style={{ flex: 1, backgroundColor: '#fff' ,
