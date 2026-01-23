@@ -240,20 +240,27 @@ export const v_03a231 = () => {
             try {
 
               const v_f24fd5 = await v_e84827.getItem('userData');
-              if (!v_f24fd5) {
-                await v_889fad(v_8d41d7('screens.myInfo.alerts.error'), v_8d41d7('screens.myInfo.alerts.userDataNotFound'));
-                return;
+              let v_660822 = undefined;
+
+              if (v_f24fd5) {
+                try {
+                  const v_ef7306 = JSON.parse(v_f24fd5);
+                  v_660822 = v_ef7306.member;
+                } catch (v_5f9add) {
+                  console.error('[로그아웃] userData 파싱 오류:', v_5f9add);
+                }
               }
 
-              const v_ef7306 = JSON.parse(v_f24fd5);
-              const v_660822 = v_ef7306.member;
+              if (v_660822) {
+                try {
+                  await v_d7d5a2(v_660822, v_9b57fc);
+                } catch (v_340b4d) {
+                  console.error('[로그아웃] 로그아웃 API 호출 실패:', v_340b4d);
 
-              if (!v_660822) {
-                await v_889fad(v_8d41d7('screens.myInfo.alerts.error'), v_8d41d7('screens.myInfo.alerts.userDataNotFound'));
-                return;
+                }
+              } else {
+                console.log('[로그아웃] 사용자 정보 없음 - 로컬 데이터만 삭제하고 로그인 화면으로 이동');
               }
-
-              await v_d7d5a2(v_660822, v_9b57fc);
 
               await v_e84827.removeItem('isLoggedIn');
               await v_e84827.removeItem('userEmail');
@@ -282,6 +289,13 @@ export const v_03a231 = () => {
                 await v_e84827.removeItem('userTickets');
                 await v_e84827.removeItem('rageProgressLastUpdate');
                 await v_e84827.removeItem('userSessionToken');
+
+                await v_e84827.removeItem('appleSignupCompleted');
+                await v_e84827.removeItem('appleSignupCompletedEmail');
+                await v_e84827.removeItem('appleSignupRequired');
+                await v_e84827.removeItem('appleSignupEmail');
+                await v_e84827.removeItem('googleSignupRequired');
+                await v_e84827.removeItem('googleSignupEmail');
               } catch (v_df17d5) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', v_df17d5);
               }
