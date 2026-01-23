@@ -8,6 +8,8 @@ import {
   v_9cabcb,
   v_aa7413,
   v_122070,
+  v_2d4718,
+  v_326be8,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -571,10 +573,23 @@ export const v_cdb169 = () => {
 
             const v_861648 = await v_e84827.getItem('loginType');
             if (v_861648 === 'apple') {
-              await v_889fad(
-                v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-              );
+              if (v_326be8.OS === 'ios') {
+
+                v_2d4718.runAfterInteractions(() => {
+                  setTimeout(() => {
+                    v_889fad(
+                      v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                      v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                    );
+                  }, 300);
+                });
+              } else {
+
+                await v_889fad(
+                  v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                  v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                );
+              }
             }
           } else {
             console.warn('[정보수정] 초기화 - member ID가 없습니다.');

@@ -863,85 +863,95 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       console.log('🔄 서버에서 새 데이터 가져오기');
 
-      const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
-      if (v_d308b5 !== 'granted') {
-        console.log('위치 권한이 없습니다.');
-        v_34a50a(false);
-        return;
-      }
-
-      const v_f3d3c8 = 'lastGpsLocationForMapMove';
-      const v_eaa10e = 'lastGpsLocationTimestamp';
-      const v_8d9416 = 60 * 1000; 
-      const v_f41f0d = 500; 
-
-      const v_b464ed = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
-        const v_bef3bf = 6371000; 
-        const v_32a354 = (v_ed3911 - v_34b365) * Math.PI / 180;
-        const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
-        const v_779914 =
-          Math.sin(v_32a354 / 2) * Math.sin(v_32a354 / 2) +
-          Math.cos(v_34b365 * Math.PI / 180) * Math.cos(v_ed3911 * Math.PI / 180) *
-          Math.sin(v_84b828 / 2) * Math.sin(v_84b828 / 2);
-        const v_3f4e2e = 2 * Math.atan2(Math.sqrt(v_779914), Math.sqrt(1 - v_779914));
-        return v_bef3bf * v_3f4e2e;
-      };
-
-      const v_4a8217 = await v_8a44cb.getCurrentPositionAsync({
-        accuracy: v_8a44cb.Accuracy.High,
-      });
-
-      const v_746c3b = {
-        latitude: v_4a8217.coords.latitude,
-        longitude: v_4a8217.coords.longitude,
-      };
-
-      let v_264a98 = v_746c3b;
-      try {
-
-        const v_05f29b = await v_e84827.getItem(v_f3d3c8);
-        const v_45b2c8 = await v_e84827.getItem(v_eaa10e);
-
-        if (v_05f29b && v_45b2c8) {
-          const v_3a14d6 = JSON.parse(v_05f29b);
-          const v_932c48 = parseInt(v_45b2c8, 10);
-          const v_5c2f9f = Date.now();
-          const v_e56026 = v_5c2f9f - v_932c48;
-
-          if (v_e56026 < v_8d9416) {
-
-            const v_926d1c = v_b464ed(
-              v_746c3b.latitude,
-              v_746c3b.longitude,
-              v_3a14d6.latitude,
-              v_3a14d6.longitude
-            );
-
-            if (v_926d1c < v_f41f0d) {
-              v_264a98 = v_3a14d6;
-              console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(v_e56026 / 1000)}초 전, ${v_926d1c.toFixed(0)}m)`);
-            } else {
-              console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${v_926d1c.toFixed(0)}m > ${v_f41f0d}m), 새 위치 사용`);
-            }
-          } else {
-            console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(v_e56026 / 1000)}초 > ${v_8d9416 / 1000}초), 새 위치 사용`);
-          }
-        } else {
-          console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
-        }
-      } catch (v_df17d5) {
-        console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', v_df17d5);
-      }
-
-      await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_264a98));
-      await v_e84827.setItem(v_eaa10e, Date.now().toString());
-
-      const v_7dd198 = {
+      let v_7dd198 = {
         coords: {
-          latitude: v_264a98.latitude,
-          longitude: v_264a98.longitude,
+          latitude: 0,
+          longitude: 0,
         },
       };
+
+      try {
+        const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
+        if (v_d308b5 === 'granted') {
+
+          const v_f3d3c8 = 'lastGpsLocationForMapMove';
+          const v_eaa10e = 'lastGpsLocationTimestamp';
+          const v_8d9416 = 60 * 1000; 
+          const v_f41f0d = 500; 
+
+          const v_b464ed = (v_34b365, v_a36282, v_ed3911, v_5d858d): number => {
+            const v_bef3bf = 6371000; 
+            const v_32a354 = (v_ed3911 - v_34b365) * Math.PI / 180;
+            const v_84b828 = (v_5d858d - v_a36282) * Math.PI / 180;
+            const v_779914 =
+              Math.sin(v_32a354 / 2) * Math.sin(v_32a354 / 2) +
+              Math.cos(v_34b365 * Math.PI / 180) * Math.cos(v_ed3911 * Math.PI / 180) *
+              Math.sin(v_84b828 / 2) * Math.sin(v_84b828 / 2);
+            const v_3f4e2e = 2 * Math.atan2(Math.sqrt(v_779914), Math.sqrt(1 - v_779914));
+            return v_bef3bf * v_3f4e2e;
+          };
+
+          const v_4a8217 = await v_8a44cb.getCurrentPositionAsync({
+            accuracy: v_8a44cb.Accuracy.High,
+          });
+
+          const v_746c3b = {
+            latitude: v_4a8217.coords.latitude,
+            longitude: v_4a8217.coords.longitude,
+          };
+
+          let v_264a98 = v_746c3b;
+          try {
+
+            const v_05f29b = await v_e84827.getItem(v_f3d3c8);
+            const v_45b2c8 = await v_e84827.getItem(v_eaa10e);
+
+            if (v_05f29b && v_45b2c8) {
+              const v_3a14d6 = JSON.parse(v_05f29b);
+              const v_932c48 = parseInt(v_45b2c8, 10);
+              const v_5c2f9f = Date.now();
+              const v_e56026 = v_5c2f9f - v_932c48;
+
+              if (v_e56026 < v_8d9416) {
+
+                const v_926d1c = v_b464ed(
+                  v_746c3b.latitude,
+                  v_746c3b.longitude,
+                  v_3a14d6.latitude,
+                  v_3a14d6.longitude
+                );
+
+                if (v_926d1c < v_f41f0d) {
+                  v_264a98 = v_3a14d6;
+                  console.log(`📍 [AR 화면 위치 재사용] 마지막 위치 사용 (${Math.floor(v_e56026 / 1000)}초 전, ${v_926d1c.toFixed(0)}m)`);
+                } else {
+                  console.log(`📍 [AR 화면 위치 재사용] 거리 초과 (${v_926d1c.toFixed(0)}m > ${v_f41f0d}m), 새 위치 사용`);
+                }
+              } else {
+                console.log(`📍 [AR 화면 위치 재사용] 시간 초과 (${Math.floor(v_e56026 / 1000)}초 > ${v_8d9416 / 1000}초), 새 위치 사용`);
+              }
+            } else {
+              console.log('📍 [AR 화면 위치 재사용] 저장된 위치 없음, 새 위치 사용');
+            }
+          } catch (v_df17d5) {
+            console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', v_df17d5);
+          }
+
+          await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_264a98));
+          await v_e84827.setItem(v_eaa10e, Date.now().toString());
+
+          v_7dd198 = {
+            coords: {
+              latitude: v_264a98.latitude,
+              longitude: v_264a98.longitude,
+            },
+          };
+        } else {
+          console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+        }
+      } catch (v_cd6da1) {
+        console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', v_cd6da1);
+      }
 
       const v_ef7306 = await v_e84827.getItem('userData');
       if (!v_ef7306) {
@@ -2679,7 +2689,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       <Modal
         visible={v_3b0ada}
         animationType="slide"
-        presentationStyle="fullScreen"
+        presentationStyle={v_326be8.OS === 'ios' ? 'pageSheet' : 'fullScreen'}
         onRequestClose={v_3aa877}
       >
         <View style={{ flex: 1, backgroundColor: '#fff' ,
