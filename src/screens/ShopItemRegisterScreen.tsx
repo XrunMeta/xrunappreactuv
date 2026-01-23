@@ -211,7 +211,7 @@ export const v_680bee = () => {
       console.log('[상품 등록] 이미지 리사이즈 시작');
       const v_8f957a = await v_3c288d.manipulateAsync(
         v_b76cd8.uri,
-        [{ resize: { width: 64, height: 64 } }],
+        [{ resize: { width: 230 } }], 
         { compress: 0.8, format: v_3c288d.SaveFormat.JPEG }
       );
       console.log('[상품 등록] 이미지 리사이즈 완료:', v_8f957a.uri);
@@ -583,7 +583,7 @@ export const v_680bee = () => {
 
           {}
           <View style={v_d81136.section}>
-            <Text style={v_d81136.label}>아이콘 이미지 (64x64)</Text>
+            <Text style={v_d81136.label}>아이콘 이미지 (가로 230px)</Text>
             <View style={v_d81136.imageContainer}>
               {}
               <TouchableOpacity
@@ -642,7 +642,7 @@ export const v_680bee = () => {
               </TouchableOpacity>
             )}
             <Text style={v_d81136.helperText}>
-              이미지는 64x64 픽셀로 자동 리사이즈됩니다
+              이미지는 가로 230px 기준으로 자동 리사이즈됩니다
             </Text>
             {v_894371 && (
               <Text style={[v_d81136.helperText, v_d81136.uploadingHelperText]}>
