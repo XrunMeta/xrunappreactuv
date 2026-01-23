@@ -904,9 +904,9 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                 console.log('[WebView] 네비게이션:', v_b8df7f.url);
 
                 const v_a74ae7 = v_3e9bc0.current;
-                if (v_a74ae7 && v_a74ae7.includes('buzzvil.com')) {
+                if (v_a74ae7 && (v_a74ae7.includes('buzzvil.com') || v_a74ae7.includes('appsflyer.com'))) {
                   if (v_b8df7f.url && (v_b8df7f.url.startsWith('market://') || v_b8df7f.url.startsWith('intent://'))) {
-                    console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                    console.warn('[WebView] ⚠️ 광고 URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
                       originalUrl: v_a74ae7,
                       redirectedUrl: v_b8df7f.url,
                     });
@@ -918,7 +918,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                   if (v_b8df7f.url && (v_b8df7f.url.includes('play.google.com') || v_b8df7f.url.includes('apps.apple.com'))) {
 
                     if (!v_a74ae7.includes('play.google.com') && !v_a74ae7.includes('apps.apple.com')) {
-                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
+                      console.warn('[WebView] ⚠️ 광고 URL이 마켓으로 리다이렉트됨. 원래 URL로 되돌림:', {
                         originalUrl: v_a74ae7,
                         redirectedUrl: v_b8df7f.url,
                       });
@@ -968,9 +968,9 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                 console.log('[WebView] 네비게이션 요청:', v_f71b56);
 
                 const v_a74ae7 = v_3e9bc0.current;
-                if (v_a74ae7 && v_a74ae7.includes('buzzvil.com')) {
+                if (v_a74ae7 && (v_a74ae7.includes('buzzvil.com') || v_a74ae7.includes('appsflyer.com'))) {
                   if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
-                    console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                    console.warn('[WebView] ⚠️ 광고 URL이 마켓으로 리다이렉트됨. 차단:', {
                       originalUrl: v_a74ae7,
                       redirectedUrl: v_f71b56,
                     });
@@ -980,7 +980,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
                   if (v_f71b56.includes('play.google.com') || v_f71b56.includes('apps.apple.com')) {
 
                     if (!v_a74ae7.includes('play.google.com') && !v_a74ae7.includes('apps.apple.com')) {
-                      console.warn('[WebView] ⚠️ buzzvil URL이 마켓으로 리다이렉트됨. 차단:', {
+                      console.warn('[WebView] ⚠️ 광고 URL이 마켓으로 리다이렉트됨. 차단:', {
                         originalUrl: v_a74ae7,
                         redirectedUrl: v_f71b56,
                       });
