@@ -866,69 +866,6 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
         </View>
       </Dialog>
 
-      {}
-      {v_731ab4 && v_326be8.OS === 'ios' && (
-        <View style={[v_d81136.pangleTestContainer, { paddingHorizontal: v_9b1a04.large, paddingBottom: 20 }]}>
-          <TouchableOpacity
-            style={[v_d81136.pangleTestButton, { backgroundColor: v_1bfbd0.success, marginBottom: 10 }]}
-            onPress={async () => {
-              try {
-                await v_a763e6();
-              } catch (v_5e9bfe) {
-                v_889fad('네이티브 화면 표시 실패', String(v_5e9bfe));
-              }
-            }}
-          >
-            <Text style={v_d81136.pangleTestButtonText}>네이티브 화면 연결 테스트</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[v_d81136.pangleTestButton, { backgroundColor: '#FF9800', marginBottom: 10 }]}
-            disabled={v_b86921}
-            onPress={async () => {
-              try {
-                v_92f24d(true);
-                const { loadAndShowInterstitialAd: v_41a100 } = require('../services/pangle');
-                console.log('[테스트] 전면광고 원터치 시작');
-                await v_41a100();
-              } catch (v_5e9bfe) {
-                v_889fad('테스트 실패', String(v_5e9bfe));
-              } finally {
-                v_92f24d(false);
-              }
-            }}
-          >
-            {v_b86921 ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={v_d81136.pangleTestButtonText}>전면광고 원터치 테스트 (로드+노출)</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[v_d81136.pangleTestButton, { backgroundColor: '#FF5722' }]}
-            disabled={v_b86921}
-            onPress={async () => {
-              try {
-                v_92f24d(true);
-                const { loadAndShowNativeAd: v_df6735 } = require('../services/pangle');
-                console.log('[테스트] 네이티브 광고 시작');
-                await v_df6735();
-              } catch (v_5e9bfe) {
-                v_889fad('네이티브 광고 실패', String(v_5e9bfe));
-              } finally {
-                v_92f24d(false);
-              }
-            }}
-          >
-            {v_b86921 ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={v_d81136.pangleTestButtonText}>네이티브광고 보기</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
