@@ -968,7 +968,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const v_e36b07 = await v_563153(undefined, true, true); 
+      let v_e36b07 = await v_563153(undefined, true, true); 
 
       if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
         console.warn('[CameraMainScreen] TopAd5 데이터 없음');
