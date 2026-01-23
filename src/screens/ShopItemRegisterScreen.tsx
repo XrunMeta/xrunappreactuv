@@ -211,7 +211,7 @@ export const ShopItemRegisterScreen = () => {
       console.log('[상품 등록] 이미지 리사이즈 시작');
       const manipulatedImage = await ImageManipulator.manipulateAsync(
         asset.uri,
-        [{ resize: { width: 230 } }], 
+        [{ resize: { width: 250 } }], 
         { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
       );
       console.log('[상품 등록] 이미지 리사이즈 완료:', manipulatedImage.uri);
@@ -583,7 +583,7 @@ export const ShopItemRegisterScreen = () => {
 
           {}
           <View style={styles.section}>
-            <Text style={styles.label}>아이콘 이미지 (가로 230px)</Text>
+            <Text style={styles.label}>아이콘 이미지 (가로 250px)</Text>
             <View style={styles.imageContainer}>
               {}
               <TouchableOpacity
@@ -642,7 +642,7 @@ export const ShopItemRegisterScreen = () => {
               </TouchableOpacity>
             )}
             <Text style={styles.helperText}>
-              이미지는 가로 230px 기준으로 자동 리사이즈됩니다
+              이미지는 가로 250px 기준으로 자동 리사이즈됩니다
             </Text>
             {isUploadingImage && (
               <Text style={[styles.helperText, styles.uploadingHelperText]}>
