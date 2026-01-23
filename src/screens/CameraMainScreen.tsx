@@ -968,7 +968,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
-      const topAd5Response = await getTopAd5(undefined, true, true); 
+      let topAd5Response = await getTopAd5(undefined, true, true); 
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
         console.warn('[CameraMainScreen] TopAd5 데이터 없음');
