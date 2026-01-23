@@ -2699,7 +2699,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             paddingHorizontal: 16,
-            paddingTop: v_326be8.OS === 'ios' ? 60 : 40,
+            paddingTop: v_326be8.OS === 'ios' ? 20 : 40,
             paddingBottom: 12,
             borderBottomWidth: 1,
             borderBottomColor: '#e0e0e0',
