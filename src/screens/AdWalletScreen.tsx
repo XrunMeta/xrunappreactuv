@@ -1216,7 +1216,7 @@ export const AdWalletScreen = () => {
           ]}>
             {item.status}
           </Text>
-          {item.date ? (
+          {item.date && !isQuestIdOne ? (
             <Text style={[
               styles.adCardDate,
               isDisabled && { color: disabledColor }
