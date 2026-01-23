@@ -240,20 +240,27 @@ export const MyInfoScreen = () => {
             try {
 
               const userDataStr = await AsyncStorage.getItem('userData');
-              if (!userDataStr) {
-                await showAlert(t('screens.myInfo.alerts.error'), t('screens.myInfo.alerts.userDataNotFound'));
-                return;
+              let member: number | undefined = undefined;
+
+              if (userDataStr) {
+                try {
+                  const userData = JSON.parse(userDataStr);
+                  member = userData.member;
+                } catch (parseError) {
+                  console.error('[로그아웃] userData 파싱 오류:', parseError);
+                }
               }
 
-              const userData = JSON.parse(userDataStr);
-              const member = userData.member;
+              if (member) {
+                try {
+                  await logout(member, navigate);
+                } catch (logoutError) {
+                  console.error('[로그아웃] 로그아웃 API 호출 실패:', logoutError);
 
-              if (!member) {
-                await showAlert(t('screens.myInfo.alerts.error'), t('screens.myInfo.alerts.userDataNotFound'));
-                return;
+                }
+              } else {
+                console.log('[로그아웃] 사용자 정보 없음 - 로컬 데이터만 삭제하고 로그인 화면으로 이동');
               }
-
-              await logout(member, navigate);
 
               await AsyncStorage.removeItem('isLoggedIn');
               await AsyncStorage.removeItem('userEmail');
@@ -282,6 +289,13 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('userTickets');
                 await AsyncStorage.removeItem('rageProgressLastUpdate');
                 await AsyncStorage.removeItem('userSessionToken');
+
+                await AsyncStorage.removeItem('appleSignupCompleted');
+                await AsyncStorage.removeItem('appleSignupCompletedEmail');
+                await AsyncStorage.removeItem('appleSignupRequired');
+                await AsyncStorage.removeItem('appleSignupEmail');
+                await AsyncStorage.removeItem('googleSignupRequired');
+                await AsyncStorage.removeItem('googleSignupEmail');
               } catch (storageError) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
               }
