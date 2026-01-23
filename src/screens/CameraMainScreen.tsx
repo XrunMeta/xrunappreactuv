@@ -2699,7 +2699,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             paddingHorizontal: 16,
-            paddingTop: Platform.OS === 'ios' ? 60 : 40,
+            paddingTop: Platform.OS === 'ios' ? 20 : 40,
             paddingBottom: 12,
             borderBottomWidth: 1,
             borderBottomColor: '#e0e0e0',
