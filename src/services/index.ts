@@ -5447,11 +5447,6 @@ export const v_5e0191 = async (v_aa0917): Promise<void> => {
 
 export const v_563153 = async (v_c65f5d, v_9d6a91 = false, v_751f24 = false): Promise<any> => {
 
-  if (__DEV__) {
-    console.log('[App] 개발 모드 광고 0개. index.ts getTopAd5');
-    return;
-  }
-
   if (v_5281af && v_21e89f) {
     console.log('[getTopAd5] 이미 호출 중입니다. 기존 Promise 반환');
     return v_21e89f;
@@ -5711,10 +5706,27 @@ export const v_e3e9a7 = async (v_4cf0ad): Promise<any[]> => {
   const v_cf5d30 = await Promise.allSettled(
     v_a35e21.map(async (v_8c0b26) => {
       try {
+        const v_7ec08d = v_8c0b26.urlAD;
+
+        const v_d201df = v_7ec08d && typeof v_7ec08d === 'string' && (
+          v_7ec08d.includes('apps.apple.com') ||
+          v_7ec08d.startsWith('itms-apps://') ||
+          v_7ec08d.startsWith('itms://')
+        );
+
+        if (v_d201df) {
+          console.log(`[validateTopAd5Urls] iOS App Store URL 검증 건너뜀: ${v_7ec08d}`);
+          return {
+            item: v_8c0b26,
+            isValid: true,
+            errorMessage: null,
+          };
+        }
+
         const v_4fc7c7 = new AbortController();
         const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), 5000); 
 
-        const v_3393e3 = await fetch(v_8c0b26.urlAD, {
+        const v_3393e3 = await fetch(v_7ec08d, {
           method: 'HEAD',
           signal: v_4fc7c7.signal,
         });
