@@ -465,6 +465,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [showWebViewModal, setShowWebViewModal] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState('');
   const [webViewTitle, setWebViewTitle] = useState('');
+  const [webViewError, setWebViewError] = useState(false);
 
   const webViewTokenRef = useRef<TokenData | null>(null);
   const webViewAdParamsRef = useRef<any>(null);
@@ -859,9 +860,24 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       setLoading(true);
       console.log('=== CameraMainScreen 데이터 로딩 시작 ===', forceRefresh ? '(강제 새로고침)' : '');
 
-      await checkUserLoginStatus();
+      const [userData, _] = await Promise.all([
+        AsyncStorage.getItem('userData'),
+        checkUserLoginStatus(),
+      ]);
 
-      console.log('🔄 서버에서 새 데이터 가져오기');
+      if (!userData) {
+        console.log('userData가 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const parsedUserData = JSON.parse(userData);
+      const member = parsedUserData?.member?.toString() || '';
+      if (!member) {
+        console.log('userData에 member가 없습니다.');
+        setLoading(false);
+        return;
+      }
 
       let currentLocation = {
         coords: {
@@ -870,9 +886,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         },
       };
 
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
+      const locationPromise = (async () => {
+        try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status === 'granted') {
 
           const LAST_GPS_LOCATION_KEY = 'lastGpsLocationForMapMove';
           const LAST_GPS_LOCATION_TIMESTAMP_KEY = 'lastGpsLocationTimestamp';
@@ -891,8 +908,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             return R * c;
           };
 
+          const locationAccuracy = Platform.OS === 'ios' ? Location.Accuracy.Low : Location.Accuracy.High;
           const newLocation = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.High,
+            accuracy: locationAccuracy,
           });
 
           const newLocationData = {
@@ -937,38 +955,26 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', storageError);
           }
 
-          await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(locationToUse));
-          await AsyncStorage.setItem(LAST_GPS_LOCATION_TIMESTAMP_KEY, Date.now().toString());
+            await AsyncStorage.setItem(LAST_GPS_LOCATION_KEY, JSON.stringify(locationToUse));
+            await AsyncStorage.setItem(LAST_GPS_LOCATION_TIMESTAMP_KEY, Date.now().toString());
 
-          currentLocation = {
-            coords: {
-              latitude: locationToUse.latitude,
-              longitude: locationToUse.longitude,
-            },
-          };
-        } else {
-          console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+            return {
+              coords: {
+                latitude: locationToUse.latitude,
+                longitude: locationToUse.longitude,
+              },
+            };
+          } else {
+            console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+          }
+        } catch (locationError) {
+          console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', locationError);
         }
-      } catch (locationError) {
-        console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', locationError);
-      }
+        return null;
+      })();
 
-      const userData = await AsyncStorage.getItem('userData');
-      if (!userData) {
-        console.log('userData가 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      const parsedUserData = JSON.parse(userData);
-      const member = parsedUserData?.member?.toString() || '';
-      if (!member) {
-        console.log('userData에 member가 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      let topAd5Response = await getTopAd5(undefined, true, true); 
+      const useCache = !forceRefresh;
+      let topAd5Response = await getTopAd5(undefined, !useCache, true);
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
         console.warn('[CameraMainScreen] TopAd5 데이터 없음');
@@ -1373,13 +1379,59 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       }
 
       hasLoadedDataRef.current = true;
+
+      if (useCache) {
+        console.log(`[${Platform.OS} AR 화면] 캐시 사용 완료, 백그라운드에서 최신 데이터 업데이트 시작`);
+
+        getTopAd5(undefined, true, true).then((latestResponse) => {
+          if (latestResponse && Array.isArray(latestResponse) && latestResponse.length > 0) {
+            console.log(`[${Platform.OS} AR 화면] 백그라운드 업데이트 완료:`, latestResponse.length, '개 광고');
+
+            const latestMarkerData = latestResponse.map((ad: any, index: number) => ({
+              advertisement: ad.advertisement || ad.adid || ad.ad || String(ad.campid || ''),
+              campid: ad.campid || '',
+              name: ad.name || '',
+              iconurl: ad.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+              joindesc: ad.joindesc || '',
+              xrunPrice: ad.xrunPrice || 0,
+              xrunprice: ad.xrunPrice || 0,
+              distance: 0,
+              urlAD: ad.urlAD || '',
+              ad_company: ad.ad_company || '',
+              coins: ad.coins || '0',
+              thumbnail: ad.thumbnail || '',
+              brandlogo: ad.brandlogo || '',
+              adthumbnail2: ad.adthumbnail2 || '',
+              symbolimg: ad.symbolimg || '',
+            }));
+
+            if (latestMarkerData && latestMarkerData.length > 0) {
+              const validatedLatestCoinsData = latestMarkerData.map((coin: any) => ({
+                ...coin,
+                iconurl: coin.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: coin.joindesc || '',
+                name: coin.name || coin.title || coin.brand || 'Unknown coin',
+                xrunprice: coin.xrunprice || coin.xrunPrice || coin.price || coin.coins || '',
+                xrunPrice: coin.xrunPrice || coin.xrunprice || coin.price || coin.coins || 0,
+                campid: coin.campid || coin.campId || '',
+                advertisement: coin.advertisement || coin.adid || coin.ad || coin.coin || '',
+              }));
+
+              setCoinsData(validatedLatestCoinsData);
+              organizeData(validatedLatestCoinsData);
+            }
+          }
+        }).catch((updateError) => {
+          console.warn(`[${Platform.OS} AR 화면] 백그라운드 업데이트 실패 (무시):`, updateError);
+        });
+      }
     } catch (error) {
       console.error('데이터 로딩 오류:', error);
       setTokens([]);
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, organizeData]);
 
   const calculateScaleBasedOnDistance = useCallback((distance: number): number => {
     const dist = parseFloat(String(distance));
@@ -1963,6 +2015,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setWebViewUrl(urlAD);
       setWebViewTitle(token.name || '광고');
+      setWebViewError(false); 
       setShowWebViewModal(true);
 
       (async () => {
@@ -2007,6 +2060,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     console.log('[WebView] 닫기 버튼 클릭');
     setShowWebViewModal(false);
     setWebViewUrl('');
+    setWebViewError(false); 
     setWebViewTitle('');
     setShowBottomPanel(false);
     setSelectedToken(null);
@@ -2751,7 +2805,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           </View>
 
           {}
-          {webViewUrl ? (
+          {webViewUrl && !webViewError ? (
             <WebView
               key={webViewUrl}
               source={{ uri: webViewUrl }}
@@ -2904,8 +2958,76 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 const { url } = request;
                 console.log('[WebView] 네비게이션 요청:', url);
 
-                if (url.startsWith('market://') || url.startsWith('intent://')) {
-                  console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
+                if (url.startsWith('market://')) {
+                  console.warn('[WebView] market:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
+                  return false; 
+                }
+
+                if (url.startsWith('intent://')) {
+                  console.log('[WebView] intent:// 스킴 감지:', url);
+
+                  try {
+                    const schemeMatch = url.match(/scheme=([^;]+)/);
+                    const hostMatch = url.match(/intent:\/\/([^#]+)/);
+
+                    if (schemeMatch && hostMatch) {
+                      const scheme = schemeMatch[1];
+                      const host = hostMatch[1];
+                      const convertedUrl = `${scheme}://${host}`;
+
+                      console.log('[WebView] intent://를 일반 URL로 변환:', convertedUrl);
+
+                      Linking.openURL(convertedUrl).catch((err) => {
+                        console.error('[WebView] 변환된 URL 열기 실패:', err);
+
+                        Linking.openURL(url).catch((intentErr) => {
+                          console.error('[WebView] Intent URL 열기 실패:', intentErr);
+                        });
+                      });
+                    } else {
+
+                      console.log('[WebView] scheme 추출 실패, 원본 Intent URL로 열기 시도');
+                      Linking.openURL(url).catch((err) => {
+                        console.error('[WebView] Intent URL 열기 실패:', err);
+                      });
+                    }
+                  } catch (error) {
+                    console.error('[WebView] intent:// 처리 중 오류:', error);
+
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[WebView] Intent URL 열기 실패:', err);
+                    });
+                  }
+
+                  return false; 
+                }
+
+                if (url.startsWith('whale://')) {
+                  console.log('[WebView] whale:// 스킴 감지:', url);
+
+                  try {
+                    const urlMatch = url.match(/url=([^&]+)/);
+                    if (urlMatch) {
+                      const decodedUrl = decodeURIComponent(urlMatch[1]);
+                      console.log('[WebView] whale://에서 URL 추출:', decodedUrl);
+
+                      Linking.openURL(decodedUrl).catch((err) => {
+                        console.error('[WebView] 추출된 URL 열기 실패:', err);
+                      });
+                    } else {
+
+                      Linking.openURL(url).catch((err) => {
+                        console.error('[WebView] whale:// URL 열기 실패:', err);
+                      });
+                    }
+                  } catch (error) {
+                    console.error('[WebView] whale:// 처리 중 오류:', error);
+
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[WebView] whale:// URL 열기 실패:', err);
+                    });
+                  }
+
                   return false; 
                 }
 
@@ -2915,9 +3037,47 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                 return false;
               }}
-              onError={(syntheticEvent) => {
+              renderError={(errorDomain, errorCode, errorDesc) => {
+
+                return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
+              }}
+              onError={async (syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView 오류:', nativeEvent);
+
+                setWebViewError(true);
+
+                if (Platform.OS === 'ios' && nativeEvent.code === -1200) {
+                  console.error('[WebView] TLS 오류 감지 (-1200):', nativeEvent.url);
+
+                  const url = nativeEvent.url || webViewUrl;
+                  if (url) {
+                    await showAlert(
+                      '보안 연결 오류',
+                      '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
+                      [
+                        {
+                          text: '취소',
+                          style: 'cancel',
+                          onPress: () => {
+
+                            handleWebViewClose();
+                          },
+                        },
+                        {
+                          text: '외부 브라우저로 열기',
+                          onPress: () => {
+                            Linking.openURL(url).catch((err) => {
+                              console.error('[WebView] 외부 브라우저 열기 실패:', err);
+                            });
+
+                            handleWebViewClose();
+                          },
+                        },
+                      ],
+                    );
+                  }
+                }
               }}
               onHttpError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
