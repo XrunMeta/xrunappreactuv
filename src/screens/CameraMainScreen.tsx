@@ -3047,14 +3047,32 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                 setWebViewError(true);
 
-                if (Platform.OS === 'ios' && nativeEvent.code === -1200) {
-                  console.error('[WebView] TLS 오류 감지 (-1200):', nativeEvent.url);
+                if (Platform.OS === 'ios' && (nativeEvent.code === -1022 || nativeEvent.code === -1200)) {
+                  const errorType = nativeEvent.code === -1022 ? 'ATS' : 'TLS';
+                  console.error(`[WebView] ${errorType} 오류 감지 (${nativeEvent.code}):`, nativeEvent.url || webViewUrl);
 
-                  const url = nativeEvent.url || webViewUrl;
+                  let url = nativeEvent.url || webViewUrl;
+
+                  if (url && url.startsWith('http://')) {
+                    const httpsUrl = url.replace('http://', 'https://');
+                    console.log('[WebView] HTTP를 HTTPS로 변환 시도:', httpsUrl);
+
+                    try {
+                      setWebViewError(false); 
+                      setWebViewUrl(httpsUrl);
+                      return; 
+                    } catch (error) {
+                      console.error('[WebView] HTTPS 변환 후 재시도 실패:', error);
+                      url = httpsUrl; 
+                    }
+                  }
+
                   if (url) {
                     await showAlert(
-                      '보안 연결 오류',
-                      '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
+                      errorType === 'ATS' ? '보안 연결 오류' : '보안 연결 오류',
+                      errorType === 'ATS' 
+                        ? '이 페이지는 보안 연결(HTTPS)을 사용하지 않아 로드할 수 없습니다. 외부 브라우저로 열까요?'
+                        : '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
                       [
                         {
                           text: '취소',
