@@ -56,6 +56,7 @@ import {
   ShopItemRegisterScreen,
   ShowNapAdScreen,
   ShowPockAdScreen,
+  ShowWebViewScreen,
   XRUNinfoScreen,
   MyinfoShopSalesScreen,
   ReferralInputScreen,
@@ -489,6 +490,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'showPockAd') {
     return <ShowPockAdScreen />;
+  }
+
+  if (currentScreen === 'showWebView') {
+    return <ShowWebViewScreen />;
   }
 
   if (currentScreen === 'xrunInfo') {

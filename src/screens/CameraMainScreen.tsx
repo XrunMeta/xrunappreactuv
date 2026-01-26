@@ -2010,13 +2010,19 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
-      webViewTokenRef.current = token;
-      webViewAdParamsRef.current = adParams;
+      if (Platform.OS === 'ios') {
 
-      setWebViewUrl(urlAD);
-      setWebViewTitle(token.name || '광고');
-      setWebViewError(false); 
-      setShowWebViewModal(true);
+        navigate(ROUTES.showWebView);
+      } else {
+
+        webViewTokenRef.current = token;
+        webViewAdParamsRef.current = adParams;
+
+        setWebViewUrl(urlAD);
+        setWebViewTitle(token.name || '광고');
+        setWebViewError(false); 
+        setShowWebViewModal(true);
+      }
 
       (async () => {
         try {
@@ -2289,12 +2295,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
-      webViewTokenRef.current = token;
-      webViewAdParamsRef.current = adParams;
+      if (Platform.OS === 'ios') {
 
-      setWebViewUrl(urlAD);
-      setWebViewTitle(token.name || '광고');
-      setShowWebViewModal(true);
+        navigate(ROUTES.showWebView);
+      } else {
+
+        webViewTokenRef.current = token;
+        webViewAdParamsRef.current = adParams;
+
+        setWebViewUrl(urlAD);
+        setWebViewTitle(token.name || '광고');
+        setShowWebViewModal(true);
+      }
 
       (async () => {
         try {
