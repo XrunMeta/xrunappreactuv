@@ -2897,6 +2897,46 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                             console.error('[injectedJS] market:// 변환 실패:', error);
                           }
                           return false;
+                        } else if (url.startsWith('intent://')) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          try {
+                            const intentIndex = url.indexOf('#Intent');
+                            const urlParamStart = url.indexOf('url=');
+                            if (urlParamStart !== -1) {
+                              const urlValueStart = urlParamStart + 4;
+                              const urlValueEnd = intentIndex !== -1 ? intentIndex : url.length;
+                              let urlValue = url.substring(urlValueStart, urlValueEnd);
+                              const nextParamIndex = urlValue.indexOf('&');
+                              if (nextParamIndex !== -1) {
+                                urlValue = urlValue.substring(0, nextParamIndex);
+                              }
+                              if (urlValue) {
+                                let decodedUrl = decodeURIComponent(urlValue);
+                                if (decodedUrl.includes('%')) {
+                                  decodedUrl = decodeURIComponent(decodedUrl);
+                                }
+                                console.log('[injectedJS] intent://에서 url 파라미터 추출:', decodedUrl);
+                                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                                    type: 'intentUrl',
+                                    url: decodedUrl
+                                  }));
+                                }
+                                return false;
+                              }
+                            }
+                            const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                            if (idMatch) {
+                              const packageId = idMatch[1];
+                              const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                              console.log('[injectedJS] intent://에서 id 추출, Play Store URL:', playStoreUrl);
+                              window.location.href = playStoreUrl;
+                            }
+                          } catch (error) {
+                            console.error('[injectedJS] intent:// 변환 실패:', error);
+                          }
+                          return false;
                         }
                       }
                       target = target.parentElement;
@@ -2912,6 +2952,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_9390e8.packageId}`;
                     console.log('[WebView] onMessage에서 market:// 변환:', v_a1e9b4);
                     v_e60eaf(v_a1e9b4);
+                  } else if (v_9390e8.type === 'intentUrl') {
+                    console.log('[WebView] onMessage에서 intent:// url 파라미터:', v_9390e8.url);
+                    v_f2c756.openURL(v_9390e8.url).catch((v_49263d) => {
+                      console.error('[WebView] intent:// url 파라미터로 열기 실패:', v_49263d);
+                    });
                   }
                 } catch (v_5e9bfe) {
 
@@ -2934,6 +2979,50 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   }
                 } else if (v_b8df7f.url && v_b8df7f.url.startsWith('intent://')) {
                   try {
+
+                    const v_d06213 = v_b8df7f.url.indexOf('#Intent');
+                    const v_7339bb = v_b8df7f.url.indexOf('url=');
+                    if (v_7339bb !== -1) {
+
+                      const v_9e3b3e = v_7339bb + 4;
+
+                      const v_5dde79 = v_d06213 !== -1 ? v_d06213 : v_b8df7f.url.length;
+
+                      let v_08a4b2 = v_b8df7f.url.substring(v_9e3b3e, v_5dde79);
+                      const v_3dfc26 = v_08a4b2.indexOf('&');
+                      if (v_3dfc26 !== -1) {
+                        v_08a4b2 = v_08a4b2.substring(0, v_3dfc26);
+                      }
+
+                      if (v_08a4b2) {
+                        let v_6a09e6 = v_08a4b2;
+                        try {
+                          v_6a09e6 = decodeURIComponent(v_08a4b2);
+
+                          if (v_6a09e6.includes('%')) {
+                            v_6a09e6 = decodeURIComponent(v_6a09e6);
+                          }
+                        } catch (v_9e86fd) {
+
+                          v_6a09e6 = v_08a4b2;
+                        }
+
+                        console.log('[WebView] intent://에서 url 파라미터 추출 (onNavigationStateChange):', v_6a09e6);
+                        v_f2c756.openURL(v_6a09e6).catch((v_49263d) => {
+                          console.error('[WebView] url 파라미터로 열기 실패:', v_49263d);
+
+                          const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
+                          if (v_ae8a0a) {
+                            const v_77de37 = v_ae8a0a[1];
+                            const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                            console.log('[WebView] Play Store URL로 폴백:', v_a1e9b4);
+                            v_e60eaf(v_a1e9b4);
+                          }
+                        });
+                        return;
+                      }
+                    }
+
                     let v_77de37 = '';
                     const v_ae8a0a = v_b8df7f.url.match(/[?&]id=([^&?#]+)/);
                     if (v_ae8a0a) {
@@ -2967,6 +3056,54 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   console.log('[WebView] intent:// 스킴 감지:', v_f71b56);
 
                   try {
+
+                    const v_d06213 = v_f71b56.indexOf('#Intent');
+                    const v_7339bb = v_f71b56.indexOf('url=');
+                    if (v_7339bb !== -1) {
+
+                      const v_9e3b3e = v_7339bb + 4;
+
+                      const v_5dde79 = v_d06213 !== -1 ? v_d06213 : v_f71b56.length;
+
+                      let v_08a4b2 = v_f71b56.substring(v_9e3b3e, v_5dde79);
+                      const v_3dfc26 = v_08a4b2.indexOf('&');
+                      if (v_3dfc26 !== -1) {
+                        v_08a4b2 = v_08a4b2.substring(0, v_3dfc26);
+                      }
+
+                      if (v_08a4b2) {
+                        let v_6a09e6 = v_08a4b2;
+                        try {
+                          v_6a09e6 = decodeURIComponent(v_08a4b2);
+
+                          if (v_6a09e6.includes('%')) {
+                            v_6a09e6 = decodeURIComponent(v_6a09e6);
+                          }
+                        } catch (v_9e86fd) {
+
+                          v_6a09e6 = v_08a4b2;
+                        }
+
+                        console.log('[WebView] intent://에서 url 파라미터 추출:', v_6a09e6);
+
+                        v_f2c756.openURL(v_6a09e6).catch((v_49263d) => {
+                          console.error('[WebView] url 파라미터로 열기 실패:', v_49263d);
+
+                          const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
+                          if (v_ae8a0a) {
+                            const v_77de37 = v_ae8a0a[1];
+                            const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                            console.log('[WebView] Play Store URL로 폴백:', v_a1e9b4);
+                            v_f2c756.openURL(v_a1e9b4).catch((v_033f7e) => {
+                              console.error('[WebView] Play Store URL 열기 실패:', v_033f7e);
+                            });
+                          }
+                        });
+
+                        return false;
+                      }
+                    }
+
                     const v_98e017 = v_f71b56.match(/scheme=([^;]+)/);
                     const v_e6ce55 = v_f71b56.match(/intent:\/\/([^#]+)/);
 
@@ -2984,13 +3121,31 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                           console.error('[WebView] Intent URL 열기 실패:', v_8cdda4);
                         });
                       });
-                    } else {
 
-                      console.log('[WebView] scheme 추출 실패, 원본 Intent URL로 열기 시도');
-                      v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
-                        console.error('[WebView] Intent URL 열기 실패:', v_49263d);
-                      });
+                      return false;
                     }
+
+                    const v_d555bc = v_f71b56.match(/package=([^;]+)/);
+                    if (v_d555bc) {
+                      const v_548289 = v_d555bc[1];
+                      const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_548289}`;
+                      console.log('[WebView] package 파라미터로 Play Store URL 생성:', v_a1e9b4);
+
+                      v_f2c756.openURL(v_a1e9b4).catch((v_49263d) => {
+                        console.error('[WebView] Play Store URL 열기 실패:', v_49263d);
+
+                        v_f2c756.openURL(v_f71b56).catch((v_8cdda4) => {
+                          console.error('[WebView] Intent URL 열기 실패:', v_8cdda4);
+                        });
+                      });
+
+                      return false;
+                    }
+
+                    console.log('[WebView] intent:// 파싱 실패, 원본 Intent URL로 열기 시도');
+                    v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                      console.error('[WebView] Intent URL 열기 실패:', v_49263d);
+                    });
                   } catch (v_5e9bfe) {
                     console.error('[WebView] intent:// 처리 중 오류:', v_5e9bfe);
 
@@ -3044,6 +3199,68 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               onError={async (v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('WebView 오류:', v_76b943);
+
+                if (v_76b943.code === -10 && v_76b943.url) {
+                  const v_f71b56 = v_76b943.url;
+                  console.log('[WebView] ERR_UNKNOWN_URL_SCHEME 감지:', v_f71b56);
+
+                  if (v_f71b56.startsWith('intent://')) {
+                    try {
+
+                      const v_d06213 = v_f71b56.indexOf('#Intent');
+                      const v_7339bb = v_f71b56.indexOf('url=');
+                      if (v_7339bb !== -1) {
+                        const v_9e3b3e = v_7339bb + 4;
+                        const v_5dde79 = v_d06213 !== -1 ? v_d06213 : v_f71b56.length;
+                        let v_08a4b2 = v_f71b56.substring(v_9e3b3e, v_5dde79);
+                        const v_3dfc26 = v_08a4b2.indexOf('&');
+                        if (v_3dfc26 !== -1) {
+                          v_08a4b2 = v_08a4b2.substring(0, v_3dfc26);
+                        }
+                        if (v_08a4b2) {
+                          let v_6a09e6 = v_08a4b2;
+                          try {
+                            v_6a09e6 = decodeURIComponent(v_08a4b2);
+                            if (v_6a09e6.includes('%')) {
+                              v_6a09e6 = decodeURIComponent(v_6a09e6);
+                            }
+                          } catch (v_9e86fd) {
+                            v_6a09e6 = v_08a4b2;
+                          }
+                          console.log('[WebView] onError에서 intent:// url 파라미터 추출:', v_6a09e6);
+                          v_f2c756.openURL(v_6a09e6).catch((v_49263d) => {
+                            console.error('[WebView] intent:// url 파라미터로 열기 실패:', v_49263d);
+                          });
+                          return; 
+                        }
+                      }
+
+                      const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
+                      if (v_ae8a0a) {
+                        const v_77de37 = v_ae8a0a[1];
+                        const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                        console.log('[WebView] onError에서 intent:// id 추출, Play Store URL:', v_a1e9b4);
+                        v_e60eaf(v_a1e9b4);
+                        return; 
+                      }
+                    } catch (v_5e9bfe) {
+                      console.error('[WebView] onError에서 intent:// 처리 실패:', v_5e9bfe);
+                    }
+                  } else if (v_f71b56.startsWith('market://')) {
+                    try {
+                      const v_ae8a0a = v_f71b56.match(/[?&]id=([^&?#]+)/);
+                      if (v_ae8a0a) {
+                        const v_77de37 = v_ae8a0a[1];
+                        const v_a1e9b4 = `https://play.google.com/store/apps/details?id=${v_77de37}`;
+                        console.log('[WebView] onError에서 market:// 변환:', v_a1e9b4);
+                        v_e60eaf(v_a1e9b4);
+                        return; 
+                      }
+                    } catch (v_5e9bfe) {
+                      console.error('[WebView] onError에서 market:// 처리 실패:', v_5e9bfe);
+                    }
+                  }
+                }
 
                 v_8aeec2(true);
 
