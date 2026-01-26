@@ -19,7 +19,7 @@ export default {
     insufficientBalanceTitle: '잔액 부족',
     insufficientBalanceMessage: '현재 잔액: {currentBalance} XRUN\n필요한 금액: {requiredAmount} XRUN\n잔액을 충전해주세요.',
     purchaseFailed: '구매 실패',
-    purchaseFailedMessage: '구매 중 오류가 발생했습니다.',
+    purchaseFailedMessage: '전송권 구매 후에 이용 부탁드립니다.',
   },
 };
 

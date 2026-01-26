@@ -372,7 +372,7 @@ export const v_1a0a02 = () => {
       } else {
         await v_889fad(
           v_8d41d7('screens.shopBuy.alerts.purchaseFailed'),
-          v_5e9bfe.message || v_8d41d7('screens.shopBuy.alerts.purchaseFailedMessage'),
+          v_8d41d7('screens.shopBuy.alerts.purchaseFailedMessage'),
           [{ text: v_8d41d7('screens.shopBuy.confirm') }],
         );
       }
