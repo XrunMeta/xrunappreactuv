@@ -372,7 +372,7 @@ export const ShopBuyScreen = () => {
       } else {
         await showAlert(
           t('screens.shopBuy.alerts.purchaseFailed'),
-          error.message || t('screens.shopBuy.alerts.purchaseFailedMessage'),
+          t('screens.shopBuy.alerts.purchaseFailedMessage'),
           [{ text: t('screens.shopBuy.confirm') }],
         );
       }
