@@ -678,16 +678,22 @@ export const AdWalletScreen = () => {
 
     if (item.isReferralInvite || item.eventType === 'recommendation_invite') {
       console.log('[AdWallet] 추천인 이벤트 초대하기 클릭:', item.id);
+      console.log('[AdWallet] 현재 플랫폼:', Platform.OS);
+      console.log('[AdWallet] userEmail:', userEmail);
 
       if (!userEmail) {
+        console.error('[AdWallet] userEmail이 없습니다.');
         showToast('사용자 이메일 정보를 찾을 수 없습니다.');
         return;
       }
 
       try {
+        console.log('[AdWallet] shareReferralLink 호출 시작');
         await shareReferralLink(t, { email: userEmail }, showAlert, goBack);
+        console.log('[AdWallet] shareReferralLink 호출 완료');
       } catch (error) {
         console.error('[AdWallet] 공유하기 오류:', error);
+        console.error('[AdWallet] 공유하기 오류 상세:', JSON.stringify(error, null, 2));
         showToast('공유하기에 실패했습니다.');
       }
       return;
