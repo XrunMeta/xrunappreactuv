@@ -2010,13 +2010,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
-      v_62078f.current = v_21cc31;
-      v_63031f.current = v_75c344;
+      if (v_326be8.OS === 'ios') {
 
-      v_e60eaf(v_7ec08d);
-      v_cb400d(v_21cc31.name || '광고');
-      v_8aeec2(false); 
-      v_bde9a1(true);
+        v_9b57fc(v_ce4741.showWebView);
+      } else {
+
+        v_62078f.current = v_21cc31;
+        v_63031f.current = v_75c344;
+
+        v_e60eaf(v_7ec08d);
+        v_cb400d(v_21cc31.name || '광고');
+        v_8aeec2(false); 
+        v_bde9a1(true);
+      }
 
       (async () => {
         try {
@@ -2289,12 +2295,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
-      v_62078f.current = v_21cc31;
-      v_63031f.current = v_75c344;
+      if (v_326be8.OS === 'ios') {
 
-      v_e60eaf(v_7ec08d);
-      v_cb400d(v_21cc31.name || '광고');
-      v_bde9a1(true);
+        v_9b57fc(v_ce4741.showWebView);
+      } else {
+
+        v_62078f.current = v_21cc31;
+        v_63031f.current = v_75c344;
+
+        v_e60eaf(v_7ec08d);
+        v_cb400d(v_21cc31.name || '광고');
+        v_bde9a1(true);
+      }
 
       (async () => {
         try {
