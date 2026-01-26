@@ -123,6 +123,8 @@ export const v_a3bbf0 = async (
   v_c65f5d,
 ): Promise<void> => {
   try {
+    console.log('[shareReferralLink] 시작 - 플랫폼:', v_326be8.OS);
+    console.log('[shareReferralLink] 사용자 이메일:', v_412c99.email);
 
     const v_17aa0b = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
@@ -135,19 +137,43 @@ export const v_a3bbf0 = async (
 
     const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n🔗 바로가기 ${v_25f202}`;
 
-    const v_43c42e = await v_5f4661.share({ message: v_a8cd21 });
+    console.log('[shareReferralLink] 공유 메시지:', v_a8cd21);
+
+    let v_4f186c;
+
+    if (v_326be8.OS === 'ios') {
+
+      v_4f186c = {
+        message: v_a8cd21,
+        url: v_25f202,
+        title: v_b657c9,
+      };
+    } else {
+
+      v_4f186c = {
+        message: v_a8cd21,
+      };
+    }
+
+    console.log('[shareReferralLink] Share API 호출 시작:', v_4f186c);
+
+    const v_43c42e = await v_5f4661.share(v_4f186c);
+
+    console.log('[shareReferralLink] Share API 결과:', v_43c42e);
+
     if (v_43c42e.action === v_5f4661.sharedAction) {
       if (v_43c42e.activityType) {
-        console.log(`${v_43c42e.activityType}로 성공적으로 공유됨`);
+        console.log(`[shareReferralLink] ${v_43c42e.activityType}로 성공적으로 공유됨`);
       } else {
-        console.log('성공적으로 공유됨');
+        console.log('[shareReferralLink] 성공적으로 공유됨');
       }
     } else if (v_43c42e.action === v_5f4661.dismissedAction) {
-      console.log('공유가 취소됨');
+      console.log('[shareReferralLink] 공유가 취소됨');
     }
   } catch (v_5e9bfe) {
+    console.error('[shareReferralLink] Share 오류:', v_5e9bfe);
+    console.error('[shareReferralLink] 오류 상세:', JSON.stringify(v_5e9bfe, null, 2));
     await v_889fad(v_8d41d7('screens.referral.share.shareFailed'), v_5e9bfe.message || v_8d41d7('screens.referral.share.shareFailedMessage'));
-    console.log('Share error:', v_5e9bfe);
     if (v_c65f5d) {
 
     }
