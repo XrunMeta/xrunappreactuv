@@ -53,6 +53,7 @@ export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
 export { ShopItemRegisterScreen } from './ShopItemRegisterScreen';
 export { ShowNapAdScreen } from './ShowNapAdScreen';
 export { ShowPockAdScreen } from './ShowPockAdScreen';
+export { ShowWebViewScreen } from './ShowWebViewScreen';
 export { XRUNinfoScreen } from './XRUNinfo';
 export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 export { ReferralInputScreen } from './ReferralInputScreen';

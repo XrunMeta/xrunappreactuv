@@ -63,6 +63,7 @@ export const ROUTES = {
   shopItemRegister: 'shopItemRegister',
   showNapAd: 'showNapAd',
   showPockAd: 'showPockAd',
+  showWebView: 'showWebView',
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
