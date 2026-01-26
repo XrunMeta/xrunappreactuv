@@ -56,6 +56,7 @@ import {
   v_680bee,
   v_287831,
   v_540580,
+  v_858c71,
   v_f7bdb9,
   v_1cca63,
   v_0e5276,
@@ -489,6 +490,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'showPockAd') {
     return <ShowPockAdScreen />;
+  }
+
+  if (v_0f0c7b === 'showWebView') {
+    return <ShowWebViewScreen />;
   }
 
   if (v_0f0c7b === 'xrunInfo') {
