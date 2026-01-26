@@ -465,6 +465,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_3b0ada, v_bde9a1] = v_5ab095(false);
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const [v_6ced96, v_cb400d] = v_5ab095('');
+  const [v_fc9bd6, v_8aeec2] = v_5ab095(false);
 
   const v_62078f = v_e662ae<v_60c7c3 | null>(null);
   const v_63031f = v_e662ae<any>(null);
@@ -859,9 +860,24 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_34a50a(true);
       console.log('=== CameraMainScreen 데이터 로딩 시작 ===', v_9d6a91 ? '(강제 새로고침)' : '');
 
-      await v_e1f9f9();
+      const [v_ef7306, v_37eab7] = await Promise.all([
+        v_e84827.getItem('userData'),
+        v_e1f9f9(),
+      ]);
 
-      console.log('🔄 서버에서 새 데이터 가져오기');
+      if (!v_ef7306) {
+        console.log('userData가 없습니다.');
+        v_34a50a(false);
+        return;
+      }
+
+      const v_ff39bc = JSON.parse(v_ef7306);
+      const v_660822 = v_ff39bc?.member?.toString() || '';
+      if (!v_660822) {
+        console.log('userData에 member가 없습니다.');
+        v_34a50a(false);
+        return;
+      }
 
       let v_7dd198 = {
         coords: {
@@ -870,9 +886,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         },
       };
 
-      try {
-        const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
-        if (v_d308b5 === 'granted') {
+      const v_aa081f = (async () => {
+        try {
+          const { status: v_d308b5 } = await v_8a44cb.requestForegroundPermissionsAsync();
+          if (v_d308b5 === 'granted') {
 
           const v_f3d3c8 = 'lastGpsLocationForMapMove';
           const v_eaa10e = 'lastGpsLocationTimestamp';
@@ -891,8 +908,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             return v_bef3bf * v_3f4e2e;
           };
 
+          const v_c34468 = v_326be8.OS === 'ios' ? v_8a44cb.Accuracy.Low : v_8a44cb.Accuracy.High;
           const v_4a8217 = await v_8a44cb.getCurrentPositionAsync({
-            accuracy: v_8a44cb.Accuracy.High,
+            accuracy: v_c34468,
           });
 
           const v_746c3b = {
@@ -937,38 +955,26 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             console.error('📍 [AR 화면 위치 재사용] AsyncStorage 확인 실패:', v_df17d5);
           }
 
-          await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_264a98));
-          await v_e84827.setItem(v_eaa10e, Date.now().toString());
+            await v_e84827.setItem(v_f3d3c8, JSON.stringify(v_264a98));
+            await v_e84827.setItem(v_eaa10e, Date.now().toString());
 
-          v_7dd198 = {
-            coords: {
-              latitude: v_264a98.latitude,
-              longitude: v_264a98.longitude,
-            },
-          };
-        } else {
-          console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+            return {
+              coords: {
+                latitude: v_264a98.latitude,
+                longitude: v_264a98.longitude,
+              },
+            };
+          } else {
+            console.log('📍 [AR 화면] 위치 권한이 없습니다. AR 화면에서는 거리 정보가 필요 없으므로 계속 진행합니다.');
+          }
+        } catch (v_cd6da1) {
+          console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', v_cd6da1);
         }
-      } catch (v_cd6da1) {
-        console.warn('📍 [AR 화면] 위치 정보 가져오기 실패 (계속 진행):', v_cd6da1);
-      }
+        return null;
+      })();
 
-      const v_ef7306 = await v_e84827.getItem('userData');
-      if (!v_ef7306) {
-        console.log('userData가 없습니다.');
-        v_34a50a(false);
-        return;
-      }
-
-      const v_ff39bc = JSON.parse(v_ef7306);
-      const v_660822 = v_ff39bc?.member?.toString() || '';
-      if (!v_660822) {
-        console.log('userData에 member가 없습니다.');
-        v_34a50a(false);
-        return;
-      }
-
-      let v_e36b07 = await v_563153(undefined, true, true); 
+      const v_70197b = !v_9d6a91;
+      let v_e36b07 = await v_563153(undefined, !v_70197b, true);
 
       if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
         console.warn('[CameraMainScreen] TopAd5 데이터 없음');
@@ -1373,13 +1379,59 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       }
 
       v_0b2c53.current = true;
+
+      if (v_70197b) {
+        console.log(`[${v_326be8.OS} AR 화면] 캐시 사용 완료, 백그라운드에서 최신 데이터 업데이트 시작`);
+
+        v_563153(undefined, true, true).then((v_c81f26) => {
+          if (v_c81f26 && Array.isArray(v_c81f26) && v_c81f26.length > 0) {
+            console.log(`[${v_326be8.OS} AR 화면] 백그라운드 업데이트 완료:`, v_c81f26.length, '개 광고');
+
+            const v_1078ff = v_c81f26.map((v_ddcfed, v_a56041) => ({
+              advertisement: v_ddcfed.advertisement || v_ddcfed.adid || v_ddcfed.ad || String(v_ddcfed.campid || ''),
+              campid: v_ddcfed.campid || '',
+              name: v_ddcfed.name || '',
+              iconurl: v_ddcfed.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+              joindesc: v_ddcfed.joindesc || '',
+              xrunPrice: v_ddcfed.xrunPrice || 0,
+              xrunprice: v_ddcfed.xrunPrice || 0,
+              distance: 0,
+              urlAD: v_ddcfed.urlAD || '',
+              ad_company: v_ddcfed.ad_company || '',
+              coins: v_ddcfed.coins || '0',
+              thumbnail: v_ddcfed.thumbnail || '',
+              brandlogo: v_ddcfed.brandlogo || '',
+              adthumbnail2: v_ddcfed.adthumbnail2 || '',
+              symbolimg: v_ddcfed.symbolimg || '',
+            }));
+
+            if (v_1078ff && v_1078ff.length > 0) {
+              const v_81bb16 = v_1078ff.map((v_51b584) => ({
+                ...v_51b584,
+                iconurl: v_51b584.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                joindesc: v_51b584.joindesc || '',
+                name: v_51b584.name || v_51b584.title || v_51b584.brand || 'Unknown coin',
+                xrunprice: v_51b584.xrunprice || v_51b584.xrunPrice || v_51b584.price || v_51b584.coins || '',
+                xrunPrice: v_51b584.xrunPrice || v_51b584.xrunprice || v_51b584.price || v_51b584.coins || 0,
+                campid: v_51b584.campid || v_51b584.campId || '',
+                advertisement: v_51b584.advertisement || v_51b584.adid || v_51b584.ad || v_51b584.coin || '',
+              }));
+
+              v_7bb835(v_81bb16);
+              v_0a6f80(v_81bb16);
+            }
+          }
+        }).catch((v_d2651d) => {
+          console.warn(`[${v_326be8.OS} AR 화면] 백그라운드 업데이트 실패 (무시):`, v_d2651d);
+        });
+      }
     } catch (v_5e9bfe) {
       console.error('데이터 로딩 오류:', v_5e9bfe);
       v_8ce112([]);
     } finally {
       v_34a50a(false);
     }
-  }, [v_9b57fc]);
+  }, [v_9b57fc, v_0a6f80]);
 
   const v_c4aeea = v_de06a3((v_926d1c): number => {
     const v_c3ba76 = parseFloat(String(v_926d1c));
@@ -1963,6 +2015,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_e60eaf(v_7ec08d);
       v_cb400d(v_21cc31.name || '광고');
+      v_8aeec2(false); 
       v_bde9a1(true);
 
       (async () => {
@@ -2007,6 +2060,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     console.log('[WebView] 닫기 버튼 클릭');
     v_bde9a1(false);
     v_e60eaf('');
+    v_8aeec2(false); 
     v_cb400d('');
     v_6a4dcd(false);
     v_96a9ed(null);
@@ -2751,7 +2805,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           </View>
 
           {}
-          {v_b2dceb ? (
+          {v_b2dceb && !v_fc9bd6 ? (
             <WebView
               key={v_b2dceb}
               source={{ uri: v_b2dceb }}
@@ -2904,8 +2958,76 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 const { url: v_f71b56 } = v_576f5a;
                 console.log('[WebView] 네비게이션 요청:', v_f71b56);
 
-                if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
-                  console.warn('[WebView] market:// 또는 intent:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
+                if (v_f71b56.startsWith('market://')) {
+                  console.warn('[WebView] market:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
+                  return false; 
+                }
+
+                if (v_f71b56.startsWith('intent://')) {
+                  console.log('[WebView] intent:// 스킴 감지:', v_f71b56);
+
+                  try {
+                    const v_98e017 = v_f71b56.match(/scheme=([^;]+)/);
+                    const v_e6ce55 = v_f71b56.match(/intent:\/\/([^#]+)/);
+
+                    if (v_98e017 && v_e6ce55) {
+                      const v_bee33e = v_98e017[1];
+                      const v_e11752 = v_e6ce55[1];
+                      const v_de56d9 = `${v_bee33e}://${v_e11752}`;
+
+                      console.log('[WebView] intent://를 일반 URL로 변환:', v_de56d9);
+
+                      v_f2c756.openURL(v_de56d9).catch((v_49263d) => {
+                        console.error('[WebView] 변환된 URL 열기 실패:', v_49263d);
+
+                        v_f2c756.openURL(v_f71b56).catch((v_8cdda4) => {
+                          console.error('[WebView] Intent URL 열기 실패:', v_8cdda4);
+                        });
+                      });
+                    } else {
+
+                      console.log('[WebView] scheme 추출 실패, 원본 Intent URL로 열기 시도');
+                      v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                        console.error('[WebView] Intent URL 열기 실패:', v_49263d);
+                      });
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] intent:// 처리 중 오류:', v_5e9bfe);
+
+                    v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                      console.error('[WebView] Intent URL 열기 실패:', v_49263d);
+                    });
+                  }
+
+                  return false; 
+                }
+
+                if (v_f71b56.startsWith('whale://')) {
+                  console.log('[WebView] whale:// 스킴 감지:', v_f71b56);
+
+                  try {
+                    const v_cd73e9 = v_f71b56.match(/url=([^&]+)/);
+                    if (v_cd73e9) {
+                      const v_6a09e6 = decodeURIComponent(v_cd73e9[1]);
+                      console.log('[WebView] whale://에서 URL 추출:', v_6a09e6);
+
+                      v_f2c756.openURL(v_6a09e6).catch((v_49263d) => {
+                        console.error('[WebView] 추출된 URL 열기 실패:', v_49263d);
+                      });
+                    } else {
+
+                      v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                        console.error('[WebView] whale:// URL 열기 실패:', v_49263d);
+                      });
+                    }
+                  } catch (v_5e9bfe) {
+                    console.error('[WebView] whale:// 처리 중 오류:', v_5e9bfe);
+
+                    v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                      console.error('[WebView] whale:// URL 열기 실패:', v_49263d);
+                    });
+                  }
+
                   return false; 
                 }
 
@@ -2915,9 +3037,47 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                 return false;
               }}
-              onError={(v_6f3a9d) => {
+              renderError={(v_d22b54, v_7a5fef, v_49df87) => {
+
+                return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
+              }}
+              onError={async (v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('WebView 오류:', v_76b943);
+
+                v_8aeec2(true);
+
+                if (v_326be8.OS === 'ios' && v_76b943.code === -1200) {
+                  console.error('[WebView] TLS 오류 감지 (-1200):', v_76b943.url);
+
+                  const v_f71b56 = v_76b943.url || v_b2dceb;
+                  if (v_f71b56) {
+                    await v_889fad(
+                      '보안 연결 오류',
+                      '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
+                      [
+                        {
+                          text: '취소',
+                          style: 'cancel',
+                          onPress: () => {
+
+                            v_3aa877();
+                          },
+                        },
+                        {
+                          text: '외부 브라우저로 열기',
+                          onPress: () => {
+                            v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
+                              console.error('[WebView] 외부 브라우저 열기 실패:', v_49263d);
+                            });
+
+                            v_3aa877();
+                          },
+                        },
+                      ],
+                    );
+                  }
+                }
               }}
               onHttpError={(v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
