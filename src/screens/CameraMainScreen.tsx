@@ -3047,14 +3047,32 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                 v_8aeec2(true);
 
-                if (v_326be8.OS === 'ios' && v_76b943.code === -1200) {
-                  console.error('[WebView] TLS 오류 감지 (-1200):', v_76b943.url);
+                if (v_326be8.OS === 'ios' && (v_76b943.code === -1022 || v_76b943.code === -1200)) {
+                  const v_a4f1b0 = v_76b943.code === -1022 ? 'ATS' : 'TLS';
+                  console.error(`[WebView] ${v_a4f1b0} 오류 감지 (${v_76b943.code}):`, v_76b943.url || v_b2dceb);
 
-                  const v_f71b56 = v_76b943.url || v_b2dceb;
+                  let v_f71b56 = v_76b943.url || v_b2dceb;
+
+                  if (v_f71b56 && v_f71b56.startsWith('http://')) {
+                    const v_3e273a = v_f71b56.replace('http://', 'https://');
+                    console.log('[WebView] HTTP를 HTTPS로 변환 시도:', v_3e273a);
+
+                    try {
+                      v_8aeec2(false); 
+                      v_e60eaf(v_3e273a);
+                      return; 
+                    } catch (v_5e9bfe) {
+                      console.error('[WebView] HTTPS 변환 후 재시도 실패:', v_5e9bfe);
+                      v_f71b56 = v_3e273a; 
+                    }
+                  }
+
                   if (v_f71b56) {
                     await v_889fad(
-                      '보안 연결 오류',
-                      '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
+                      v_a4f1b0 === 'ATS' ? '보안 연결 오류' : '보안 연결 오류',
+                      v_a4f1b0 === 'ATS' 
+                        ? '이 페이지는 보안 연결(HTTPS)을 사용하지 않아 로드할 수 없습니다. 외부 브라우저로 열까요?'
+                        : '이 페이지는 보안 연결을 사용할 수 없습니다. 외부 브라우저로 열까요?',
                       [
                         {
                           text: '취소',
