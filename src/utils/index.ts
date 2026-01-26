@@ -123,6 +123,8 @@ export const shareReferralLink = async (
   navigation?: any,
 ): Promise<void> => {
   try {
+    console.log('[shareReferralLink] 시작 - 플랫폼:', Platform.OS);
+    console.log('[shareReferralLink] 사용자 이메일:', userDetails.email);
 
     const androidLink = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
@@ -135,19 +137,43 @@ export const shareReferralLink = async (
 
     const message = `${shareText}${userDetails.email}\n\n🔗 바로가기 ${deepLinkUrl}`;
 
-    const result = await Share.share({ message });
+    console.log('[shareReferralLink] 공유 메시지:', message);
+
+    let shareOptions: { message: string; url?: string; title?: string };
+
+    if (Platform.OS === 'ios') {
+
+      shareOptions = {
+        message,
+        url: deepLinkUrl,
+        title: shareText,
+      };
+    } else {
+
+      shareOptions = {
+        message,
+      };
+    }
+
+    console.log('[shareReferralLink] Share API 호출 시작:', shareOptions);
+
+    const result = await Share.share(shareOptions);
+
+    console.log('[shareReferralLink] Share API 결과:', result);
+
     if (result.action === Share.sharedAction) {
       if (result.activityType) {
-        console.log(`${result.activityType}로 성공적으로 공유됨`);
+        console.log(`[shareReferralLink] ${result.activityType}로 성공적으로 공유됨`);
       } else {
-        console.log('성공적으로 공유됨');
+        console.log('[shareReferralLink] 성공적으로 공유됨');
       }
     } else if (result.action === Share.dismissedAction) {
-      console.log('공유가 취소됨');
+      console.log('[shareReferralLink] 공유가 취소됨');
     }
   } catch (error: any) {
+    console.error('[shareReferralLink] Share 오류:', error);
+    console.error('[shareReferralLink] 오류 상세:', JSON.stringify(error, null, 2));
     await showAlert(t('screens.referral.share.shareFailed'), error.message || t('screens.referral.share.shareFailedMessage'));
-    console.log('Share error:', error);
     if (navigation) {
 
     }
