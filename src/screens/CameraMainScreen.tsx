@@ -2897,6 +2897,46 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                             console.error('[injectedJS] market:// 변환 실패:', error);
                           }
                           return false;
+                        } else if (url.startsWith('intent://')) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          try {
+                            const intentIndex = url.indexOf('#Intent');
+                            const urlParamStart = url.indexOf('url=');
+                            if (urlParamStart !== -1) {
+                              const urlValueStart = urlParamStart + 4;
+                              const urlValueEnd = intentIndex !== -1 ? intentIndex : url.length;
+                              let urlValue = url.substring(urlValueStart, urlValueEnd);
+                              const nextParamIndex = urlValue.indexOf('&');
+                              if (nextParamIndex !== -1) {
+                                urlValue = urlValue.substring(0, nextParamIndex);
+                              }
+                              if (urlValue) {
+                                let decodedUrl = decodeURIComponent(urlValue);
+                                if (decodedUrl.includes('%')) {
+                                  decodedUrl = decodeURIComponent(decodedUrl);
+                                }
+                                console.log('[injectedJS] intent://에서 url 파라미터 추출:', decodedUrl);
+                                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                                    type: 'intentUrl',
+                                    url: decodedUrl
+                                  }));
+                                }
+                                return false;
+                              }
+                            }
+                            const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                            if (idMatch) {
+                              const packageId = idMatch[1];
+                              const playStoreUrl = 'https://play.google.com/store/apps/details?id=' + packageId;
+                              console.log('[injectedJS] intent://에서 id 추출, Play Store URL:', playStoreUrl);
+                              window.location.href = playStoreUrl;
+                            }
+                          } catch (error) {
+                            console.error('[injectedJS] intent:// 변환 실패:', error);
+                          }
+                          return false;
                         }
                       }
                       target = target.parentElement;
@@ -2912,6 +2952,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     const playStoreUrl = `https://play.google.com/store/apps/details?id=${data.packageId}`;
                     console.log('[WebView] onMessage에서 market:// 변환:', playStoreUrl);
                     setWebViewUrl(playStoreUrl);
+                  } else if (data.type === 'intentUrl') {
+                    console.log('[WebView] onMessage에서 intent:// url 파라미터:', data.url);
+                    Linking.openURL(data.url).catch((err) => {
+                      console.error('[WebView] intent:// url 파라미터로 열기 실패:', err);
+                    });
                   }
                 } catch (error) {
 
@@ -2934,6 +2979,50 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   }
                 } else if (navState.url && navState.url.startsWith('intent://')) {
                   try {
+
+                    const intentIndex = navState.url.indexOf('#Intent');
+                    const urlParamStart = navState.url.indexOf('url=');
+                    if (urlParamStart !== -1) {
+
+                      const urlValueStart = urlParamStart + 4;
+
+                      const urlValueEnd = intentIndex !== -1 ? intentIndex : navState.url.length;
+
+                      let urlValue = navState.url.substring(urlValueStart, urlValueEnd);
+                      const nextParamIndex = urlValue.indexOf('&');
+                      if (nextParamIndex !== -1) {
+                        urlValue = urlValue.substring(0, nextParamIndex);
+                      }
+
+                      if (urlValue) {
+                        let decodedUrl = urlValue;
+                        try {
+                          decodedUrl = decodeURIComponent(urlValue);
+
+                          if (decodedUrl.includes('%')) {
+                            decodedUrl = decodeURIComponent(decodedUrl);
+                          }
+                        } catch (e) {
+
+                          decodedUrl = urlValue;
+                        }
+
+                        console.log('[WebView] intent://에서 url 파라미터 추출 (onNavigationStateChange):', decodedUrl);
+                        Linking.openURL(decodedUrl).catch((err) => {
+                          console.error('[WebView] url 파라미터로 열기 실패:', err);
+
+                          const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                            console.log('[WebView] Play Store URL로 폴백:', playStoreUrl);
+                            setWebViewUrl(playStoreUrl);
+                          }
+                        });
+                        return;
+                      }
+                    }
+
                     let packageId = '';
                     const idMatch = navState.url.match(/[?&]id=([^&?#]+)/);
                     if (idMatch) {
@@ -2967,6 +3056,54 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   console.log('[WebView] intent:// 스킴 감지:', url);
 
                   try {
+
+                    const intentIndex = url.indexOf('#Intent');
+                    const urlParamStart = url.indexOf('url=');
+                    if (urlParamStart !== -1) {
+
+                      const urlValueStart = urlParamStart + 4;
+
+                      const urlValueEnd = intentIndex !== -1 ? intentIndex : url.length;
+
+                      let urlValue = url.substring(urlValueStart, urlValueEnd);
+                      const nextParamIndex = urlValue.indexOf('&');
+                      if (nextParamIndex !== -1) {
+                        urlValue = urlValue.substring(0, nextParamIndex);
+                      }
+
+                      if (urlValue) {
+                        let decodedUrl = urlValue;
+                        try {
+                          decodedUrl = decodeURIComponent(urlValue);
+
+                          if (decodedUrl.includes('%')) {
+                            decodedUrl = decodeURIComponent(decodedUrl);
+                          }
+                        } catch (e) {
+
+                          decodedUrl = urlValue;
+                        }
+
+                        console.log('[WebView] intent://에서 url 파라미터 추출:', decodedUrl);
+
+                        Linking.openURL(decodedUrl).catch((err) => {
+                          console.error('[WebView] url 파라미터로 열기 실패:', err);
+
+                          const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                          if (idMatch) {
+                            const packageId = idMatch[1];
+                            const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                            console.log('[WebView] Play Store URL로 폴백:', playStoreUrl);
+                            Linking.openURL(playStoreUrl).catch((playStoreErr) => {
+                              console.error('[WebView] Play Store URL 열기 실패:', playStoreErr);
+                            });
+                          }
+                        });
+
+                        return false;
+                      }
+                    }
+
                     const schemeMatch = url.match(/scheme=([^;]+)/);
                     const hostMatch = url.match(/intent:\/\/([^#]+)/);
 
@@ -2984,13 +3121,31 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                           console.error('[WebView] Intent URL 열기 실패:', intentErr);
                         });
                       });
-                    } else {
 
-                      console.log('[WebView] scheme 추출 실패, 원본 Intent URL로 열기 시도');
-                      Linking.openURL(url).catch((err) => {
-                        console.error('[WebView] Intent URL 열기 실패:', err);
-                      });
+                      return false;
                     }
+
+                    const packageMatch = url.match(/package=([^;]+)/);
+                    if (packageMatch) {
+                      const packageName = packageMatch[1];
+                      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
+                      console.log('[WebView] package 파라미터로 Play Store URL 생성:', playStoreUrl);
+
+                      Linking.openURL(playStoreUrl).catch((err) => {
+                        console.error('[WebView] Play Store URL 열기 실패:', err);
+
+                        Linking.openURL(url).catch((intentErr) => {
+                          console.error('[WebView] Intent URL 열기 실패:', intentErr);
+                        });
+                      });
+
+                      return false;
+                    }
+
+                    console.log('[WebView] intent:// 파싱 실패, 원본 Intent URL로 열기 시도');
+                    Linking.openURL(url).catch((err) => {
+                      console.error('[WebView] Intent URL 열기 실패:', err);
+                    });
                   } catch (error) {
                     console.error('[WebView] intent:// 처리 중 오류:', error);
 
@@ -3044,6 +3199,68 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               onError={async (syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView 오류:', nativeEvent);
+
+                if (nativeEvent.code === -10 && nativeEvent.url) {
+                  const url = nativeEvent.url;
+                  console.log('[WebView] ERR_UNKNOWN_URL_SCHEME 감지:', url);
+
+                  if (url.startsWith('intent://')) {
+                    try {
+
+                      const intentIndex = url.indexOf('#Intent');
+                      const urlParamStart = url.indexOf('url=');
+                      if (urlParamStart !== -1) {
+                        const urlValueStart = urlParamStart + 4;
+                        const urlValueEnd = intentIndex !== -1 ? intentIndex : url.length;
+                        let urlValue = url.substring(urlValueStart, urlValueEnd);
+                        const nextParamIndex = urlValue.indexOf('&');
+                        if (nextParamIndex !== -1) {
+                          urlValue = urlValue.substring(0, nextParamIndex);
+                        }
+                        if (urlValue) {
+                          let decodedUrl = urlValue;
+                          try {
+                            decodedUrl = decodeURIComponent(urlValue);
+                            if (decodedUrl.includes('%')) {
+                              decodedUrl = decodeURIComponent(decodedUrl);
+                            }
+                          } catch (e) {
+                            decodedUrl = urlValue;
+                          }
+                          console.log('[WebView] onError에서 intent:// url 파라미터 추출:', decodedUrl);
+                          Linking.openURL(decodedUrl).catch((err) => {
+                            console.error('[WebView] intent:// url 파라미터로 열기 실패:', err);
+                          });
+                          return; 
+                        }
+                      }
+
+                      const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                      if (idMatch) {
+                        const packageId = idMatch[1];
+                        const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                        console.log('[WebView] onError에서 intent:// id 추출, Play Store URL:', playStoreUrl);
+                        setWebViewUrl(playStoreUrl);
+                        return; 
+                      }
+                    } catch (error) {
+                      console.error('[WebView] onError에서 intent:// 처리 실패:', error);
+                    }
+                  } else if (url.startsWith('market://')) {
+                    try {
+                      const idMatch = url.match(/[?&]id=([^&?#]+)/);
+                      if (idMatch) {
+                        const packageId = idMatch[1];
+                        const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageId}`;
+                        console.log('[WebView] onError에서 market:// 변환:', playStoreUrl);
+                        setWebViewUrl(playStoreUrl);
+                        return; 
+                      }
+                    } catch (error) {
+                      console.error('[WebView] onError에서 market:// 처리 실패:', error);
+                    }
+                  }
+                }
 
                 setWebViewError(true);
 
