@@ -8,17 +8,23 @@ export interface Region {
 
 export const GLOBAL_REGION: v_da1883 = {
   iso2: 'global',
-  name: '선택',
+  name: 'Global',
   dialCode: '0',
   flagEmoji: '🌐',
   countryCode: 0,
 };
+
+const v_34a9c8 = ['kr', 'jp', 'cn', 'us', 'id'];
 
 export const v_369014 = (v_cc0c7d): v_da1883[] => {
   if (!v_cc0c7d) {
     return [v_789afd];
   }
   const v_550aed = v_cc0c7d.toLowerCase();
+
+  if (!v_34a9c8.includes(v_550aed)) {
+    return [v_789afd];
+  }
 
   if (v_550aed === 'kr' || v_550aed === 'id') {
     return v_52495e.filter(
@@ -33,6 +39,7 @@ export const v_369014 = (v_cc0c7d): v_da1883[] => {
       }
     );
   }
+
   return [v_789afd];
 };
 

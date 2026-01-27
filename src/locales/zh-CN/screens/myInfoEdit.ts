@@ -13,6 +13,7 @@ export default {
   allRegions: '所有地区',
   pleaseSelect: '请选择',
   selectCountryAndRegion: '请选择国家和地区',
+  regionHelper: '将自动应用全球地区。',
   gender: '性别',
   genderMale: '男',
   genderFemale: '女',
