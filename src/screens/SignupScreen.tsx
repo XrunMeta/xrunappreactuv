@@ -180,7 +180,29 @@ export const SignupScreen = () => {
     let value = '';
     if (selectedRegion) {
 
-      value = selectedRegion.name;
+      const regionCode = selectedRegion.dialCode ? parseInt(selectedRegion.dialCode, 10) : null;
+      const countryCode = selectedCountryDialCode?.countryCode || null;
+
+      if (regionCode === 0) {
+        value = t('screens.signup.allRegions') || t('screens.myInfoEdit.allRegions') || '전체 지역';
+      } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
+        const regionKey = `regions.${countryCode}_${regionCode}`;
+        try {
+          const translated = t(regionKey);
+          if (translated && translated !== regionKey) {
+            value = translated;
+          } else {
+
+            value = selectedRegion.name;
+          }
+        } catch (error) {
+
+          value = selectedRegion.name;
+        }
+      } else {
+
+        value = selectedRegion.name;
+      }
     } else {
       value = isKoreaSelected ? '' : GLOBAL_REGION.name;
     }
@@ -196,7 +218,7 @@ export const SignupScreen = () => {
       });
     }
     return value;
-  }, [selectedRegion, isKoreaSelected, isCountryWithRegions]);
+  }, [selectedRegion, isKoreaSelected, isCountryWithRegions, selectedCountryDialCode, t, i18n.language]);
 
   React.useEffect(() => {
     const loadRegionsForCountry = async () => {
