@@ -29,6 +29,12 @@ export default {
     message: 'Please update to the latest version for a better experience.',
     update: 'Update',
     later: 'Later',
+    updateFound: 'An update has been found.',
+    pleaseUpdate: 'Please update the app.',
+  },
+  emergencyStop: {
+    title: 'Notice',
+    viewDetails: 'View Details',
   },
 };
 

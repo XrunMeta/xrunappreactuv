@@ -29,6 +29,12 @@ export default {
     message: 'より良い体験のために最新バージョンに更新してください。',
     update: '更新',
     later: '後で',
+    updateFound: 'アップデートが見つかりました。',
+    pleaseUpdate: 'アプリを更新してください。',
+  },
+  emergencyStop: {
+    title: 'お知らせ',
+    viewDetails: '詳細を見る',
   },
 };
 

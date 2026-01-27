@@ -29,6 +29,12 @@ export default {
     message: '더 나은 사용 경험을 위해 최신 버전으로 업데이트해주세요.',
     update: '업데이트',
     later: '나중에',
+    updateFound: '업데이트가 발견되었습니다.',
+    pleaseUpdate: '앱을 업데이트해주세요.',
+  },
+  emergencyStop: {
+    title: '안내',
+    viewDetails: '자세히 보기',
   },
 };
 

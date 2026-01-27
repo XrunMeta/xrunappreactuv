@@ -29,6 +29,12 @@ export default {
     message: 'Silakan update ke versi terbaru untuk pengalaman yang lebih baik.',
     update: 'Update',
     later: 'Nanti',
+    updateFound: 'Pembaruan telah ditemukan.',
+    pleaseUpdate: 'Silakan update aplikasi.',
+  },
+  emergencyStop: {
+    title: 'Pemberitahuan',
+    viewDetails: 'Lihat Detail',
   },
 };
 

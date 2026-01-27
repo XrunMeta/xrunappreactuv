@@ -8,6 +8,7 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
 import { FONTS } from '../constants';
@@ -25,6 +26,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
   link,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const { navigate } = useAppNavigation();
 
   const handleLinkPress = () => {
@@ -56,7 +58,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>안내</Text>
+          <Text style={styles.title}>{t('common.emergencyStop.title')}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -72,7 +74,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
               onPress={handleLinkPress}
               activeOpacity={0.7}
             >
-              <Text style={styles.linkText}>자세히 보기</Text>
+              <Text style={styles.linkText}>{t('common.emergencyStop.viewDetails')}</Text>
               <Ionicons name="chevron-forward" size={20} color="#4c4e55" />
             </TouchableOpacity>
           )}

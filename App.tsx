@@ -87,6 +87,7 @@ import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
 import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
+import { useTranslation } from 'react-i18next';
 
 let processedDeepLinkUrl: string | null = null;
 let isDeepLinkProcessing = false;
@@ -664,10 +665,23 @@ const PermissionRequester = ({ isAdFinished }: { isAdFinished: boolean }) => {
 };
 
 const GlobalDialogs = () => {
+  const { t } = useTranslation();
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
   const [versionUpdateVisible, setVersionUpdateVisible] = useState(false);
   const [latestVersion, setLatestVersion] = useState<string | undefined>(undefined);
   const [isServerUpdateRequired, setIsServerUpdateRequired] = useState(false); 
+
+  const translatedMessage = React.useMemo(() => {
+    if (!emergencyStop?.message) {
+      return t('common.emergencyStop.title');
+    }
+
+    if (emergencyStop.message === 'UPDATE_FOUND\nPLEASE_UPDATE') {
+      return `${t('common.versionUpdate.updateFound')}\n${t('common.versionUpdate.pleaseUpdate')}`;
+    }
+
+    return emergencyStop.message;
+  }, [emergencyStop?.message, t]);
 
   useEffect(() => {
     const checkVersion = async () => {
@@ -746,7 +760,7 @@ const GlobalDialogs = () => {
       <AddTokenDialog visible={addTokenDialogVisible} onClose={closeAddTokenDialog} />
       <EmergencyStopDialog
         visible={emergencyStop?.enabled ?? false}
-        message={emergencyStop?.message ?? '긴급 안내가 있습니다.'}
+        message={translatedMessage}
         link={emergencyStop?.link}
 
       />

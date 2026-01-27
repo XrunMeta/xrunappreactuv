@@ -29,6 +29,12 @@ export default {
     message: '请更新到最新版本以获得更好的体验。',
     update: '更新',
     later: '稍后',
+    updateFound: '发现更新。',
+    pleaseUpdate: '请更新应用。',
+  },
+  emergencyStop: {
+    title: '通知',
+    viewDetails: '查看详情',
   },
 };
 
