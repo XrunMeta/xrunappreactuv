@@ -2,6 +2,7 @@ export default {
   title: '会員退会',
   passwordLabel: 'パスワード',
   passwordPlaceholder: 'パスワードを入力してください',
+  warningText: '会員を退会すると、アプリを使用するために保存された個人情報、ウォレットキーなどの関連情報がすべて削除されます。削除後は復元できませんので、必ず確認してください。',
   helperText: '*安全なアカウント管理のため、退会時にパスワードが必要です。',
   confirmButton: '確認',
   processing: '処理中...',

@@ -114,9 +114,11 @@ export const VerificationCodeScreen = () => {
 
           const mobileCode = parseInt(pendingData.selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
           const countryCode = pendingData.selectedCountryDialCode.iso2 || 'KR';
-          const regionId = pendingData.selectedRegion
-            ? getRegionIdByIso2(pendingData.selectedRegion.iso2)
-            : parseInt(GLOBAL_REGION.dialCode, 10);
+
+          const hasRegions = pendingData.hasRegions !== false; 
+          const regionId = hasRegions && pendingData.selectedRegion
+            ? parseInt(pendingData.selectedRegion.dialCode, 10) || 0
+            : 0;
 
           const signupData = {
             email: pendingData.email,

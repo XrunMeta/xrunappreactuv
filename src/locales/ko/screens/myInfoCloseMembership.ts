@@ -2,6 +2,7 @@ export default {
   title: '회원 탈퇴',
   passwordLabel: '비밀번호',
   passwordPlaceholder: '비밀번호를 입력해주세요',
+  warningText: '회원을 탈퇴하시면, 앱을 사용하기 위해 저장된 개인정보, 지갑키 등 관련된 정보가 모두 삭제됩니다. 삭제후에는 복구가 불가능하니 반드시 확인하십시오.',
   helperText: '*안전한 계정 관리를 위해 탈퇴 시 비밀번호를 받고 있습니다.',
   confirmButton: '확인',
   processing: '처리 중...',

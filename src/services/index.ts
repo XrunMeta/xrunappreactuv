@@ -823,16 +823,26 @@ export const loginWithEmailPassword = async (
 
     return response.data;
   } catch (error) {
-    console.error('[로그인] 이메일/비밀번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+
+    if (__DEV__) {
+      if (error instanceof AxiosError) {
+
+        if (error.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 이메일/비밀번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 이메일/비밀번호 로그인 오류:', error);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 이메일/비밀번호 로그인 오류:', error);
+      }
     }
     throw error;
   }
@@ -866,16 +876,26 @@ export const loginWithPassword = async (
 
     return response.data;
   } catch (error) {
-    console.error('[로그인] 비밀번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+
+    if (__DEV__) {
+      if (error instanceof AxiosError) {
+
+        if (error.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 비밀번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 비밀번호 로그인 오류:', error);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 비밀번호 로그인 오류:', error);
+      }
     }
     throw error;
   }
@@ -1057,16 +1077,26 @@ export const loginWithMobile = async (
 
     return response.data;
   } catch (error) {
-    console.error('[로그인] 전화번호 로그인 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+
+    if (__DEV__) {
+      if (error instanceof AxiosError) {
+
+        if (error.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 전화번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 전화번호 로그인 오류:', error);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 전화번호 로그인 오류:', error);
+      }
     }
     throw error;
   }
@@ -1178,16 +1208,26 @@ export const loginWithEmailAuth = async (
 
     return response.data;
   } catch (error) {
-    console.error('[로그인] 이메일 인증 로그인 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+
+    if (__DEV__) {
+      if (error instanceof AxiosError) {
+
+        if (error.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 이메일 인증 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 이메일 인증 로그인 오류:', error);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 이메일 인증 로그인 오류:', error);
+      }
     }
     throw error;
   }
@@ -1545,19 +1585,33 @@ export const getRegionsByCountry = async (
     );
 
     console.log('[마이페이지] 지역 목록 조회 성공');
+    console.log('[마이페이지] 지역 목록 응답 데이터:', {
+      status: response.data.status,
+      has_regions: response.data.has_regions,
+      dataLength: response.data.data?.length || 0,
+      data: response.data.data,
+    });
 
     return response.data;
   } catch (error) {
-    console.error('[마이페이지] 지역 목록 조회 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[마이페이지] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+
+    if (__DEV__) {
+      console.error('[마이페이지] 지역 목록 조회 오류:', error);
+      if (error instanceof AxiosError) {
+
+        if (error.code === 'ERR_NETWORK') {
+          console.warn('[마이페이지] 지역 목록 조회 네트워크 에러 - fallback 사용');
+        } else {
+          console.error('[마이페이지] 상세 오류 정보:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message,
+          });
+        }
+      }
     }
     throw error;
   }
@@ -4510,6 +4564,19 @@ export const fetchQuestList = async (
     const response = await axiosInstance.get<QuestListResponse>(url);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', response.data.data?.length || 0, '개');
+
+    const attendanceCheckQuest = response.data.data?.find(
+      (item) => item.id === 1 || item.id === '1'
+    );
+    if (attendanceCheckQuest) {
+      console.log('[Quest] 출석체크 보상 금액 (서버 응답):', {
+        id: attendanceCheckQuest.id,
+        title: attendanceCheckQuest.title,
+        reward_amount: attendanceCheckQuest.reward_amount,
+        reward_amount_asxrun: attendanceCheckQuest.reward_amount_asxrun,
+        reward_amount_asxrun_type: typeof attendanceCheckQuest.reward_amount_asxrun,
+      });
+    }
 
     return response.data;
   } catch (error) {

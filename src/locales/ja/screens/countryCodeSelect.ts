@@ -5,6 +5,7 @@ export default {
   countrySearchPlaceholder: '国を検索',
   regionSearchPlaceholder: '地域を検索',
   noResults: '検索結果がありません',
+  selectOption: '選択',
 };
 
 

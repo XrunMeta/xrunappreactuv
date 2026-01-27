@@ -8,7 +8,7 @@ export interface Region {
 
 export const GLOBAL_REGION: CountryDialCode = {
   iso2: 'global',
-  name: 'Global',
+  name: '선택',
   dialCode: '0',
   flagEmoji: '🌐',
   countryCode: 0,

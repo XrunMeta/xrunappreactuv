@@ -93,9 +93,7 @@ export const MyInfoCloseMembershipScreen = () => {
       >
         <View style={styles.inner}>
           <Text style={styles.warningText}>
-            회원을 탈퇴하시면, 
-            앱을 사용하기 위해 저장된 개인정보, 지갑키 등 관련된 정보가 모두 삭제됩니다. 
-            삭제후에는 복구가 불가능하니 반드시 확인하십시오.
+            {t('screens.myInfoCloseMembership.warningText')}
           </Text>
         </View> 
         <View style={styles.inner}>
