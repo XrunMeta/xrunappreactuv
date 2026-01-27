@@ -180,7 +180,29 @@ export const v_f40fc5 = () => {
     let v_3b402b = '';
     if (v_2f03bc) {
 
-      v_3b402b = v_2f03bc.name;
+      const v_222917 = v_2f03bc.dialCode ? parseInt(v_2f03bc.dialCode, 10) : null;
+      const v_a4d981 = v_459d5e?.countryCode || null;
+
+      if (v_222917 === 0) {
+        v_3b402b = v_8d41d7('screens.signup.allRegions') || v_8d41d7('screens.myInfoEdit.allRegions') || '전체 지역';
+      } else if (v_a4d981 && v_222917 !== null && v_222917 !== undefined && v_222917 > 0) {
+        const v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+        try {
+          const v_6dce25 = v_8d41d7(v_b5249e);
+          if (v_6dce25 && v_6dce25 !== v_b5249e) {
+            v_3b402b = v_6dce25;
+          } else {
+
+            v_3b402b = v_2f03bc.name;
+          }
+        } catch (v_5e9bfe) {
+
+          v_3b402b = v_2f03bc.name;
+        }
+      } else {
+
+        v_3b402b = v_2f03bc.name;
+      }
     } else {
       v_3b402b = v_590486 ? '' : v_789afd.name;
     }
@@ -196,7 +218,7 @@ export const v_f40fc5 = () => {
       });
     }
     return v_3b402b;
-  }, [v_2f03bc, v_590486, v_56ad9c]);
+  }, [v_2f03bc, v_590486, v_56ad9c, v_459d5e, v_8d41d7, v_9c213b.language]);
 
   v_a3453e.useEffect(() => {
     const v_91c5e2 = async () => {
