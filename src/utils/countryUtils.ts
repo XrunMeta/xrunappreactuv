@@ -134,7 +134,7 @@ export const loadRegionsFromApi = async (
       const hasRegions = response.has_regions === true;
       const hasData = response.data && response.data.length > 0;
 
-      if (hasData) {
+      if (hasData && response.data) {
         const convertedRegions = response.data.map((region) =>
           convertRegionApiToDialCode(region, countryCode)
         );
