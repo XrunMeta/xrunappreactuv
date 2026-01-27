@@ -87,6 +87,7 @@ import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
 import { v_f16a74, v_deac27, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
+import { v_772971 } from 'jmpfvteuuztnp';
 
 let v_308260 = null;
 let v_435733 = false;
@@ -664,10 +665,23 @@ const v_512b02 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
 };
 
 const v_d0a391 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
   const [v_614e3c, v_80c653] = v_5ab095(false);
   const [v_14feb2, v_b5ebec] = v_5ab095<string | undefined>(undefined);
   const [v_2fa3d1, v_d97db8] = v_5ab095(false); 
+
+  const v_87df97 = v_a3453e.useMemo(() => {
+    if (!v_b135ca?.message) {
+      return v_8d41d7('common.emergencyStop.title');
+    }
+
+    if (v_b135ca.message === 'UPDATE_FOUND\nPLEASE_UPDATE') {
+      return `${v_8d41d7('common.versionUpdate.updateFound')}\n${v_8d41d7('common.versionUpdate.pleaseUpdate')}`;
+    }
+
+    return v_b135ca.message;
+  }, [v_b135ca?.message, v_8d41d7]);
 
   v_c4deb2(() => {
     const v_bc755f = async () => {
@@ -746,7 +760,7 @@ const v_d0a391 = () => {
       <AddTokenDialog visible={v_750b67} onClose={v_b3106e} />
       <EmergencyStopDialog
         visible={v_b135ca?.enabled ?? false}
-        message={v_b135ca?.message ?? '긴급 안내가 있습니다.'}
+        message={v_87df97}
         link={v_b135ca?.link}
 
       />
