@@ -29,10 +29,12 @@ import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_9553a4, v_6946fd, v_369014, v_789afd, v_a61db3, v_bae512, v_52495e } from '../constants';
+import { v_9553a4, v_6946fd, v_369014, v_789afd, v_a61db3, v_bae512, v_52495e, v_1bd8ad } from '../constants';
 import { v_da1883 } from '../types';
 import { v_9dd03c } from '../types';
 import { v_96abff } from '../utils';
+import { v_11e39e, v_60f557 } from '../services';
+import { v_5c7129, v_107459, v_151d5f } from '../utils/countryUtils';
 
 import {
   v_60e3a5,
@@ -58,6 +60,7 @@ export const v_f40fc5 = () => {
   const { showAlert: v_889fad } = v_4b1173();
   const {
     selectedCountryDialCode: v_459d5e,
+    setSelectedCountryDialCode: v_f693e7,
     selectedRegion: v_2f03bc,
     setSelectedRegion: v_2f2d51,
     setSelectMode: v_67ab1c,
@@ -105,6 +108,14 @@ export const v_f40fc5 = () => {
   const [v_528eae, v_f33b38] = v_5ab095<string | null>(null);
   const [v_3a64df, v_c73419] = v_5ab095(false);
   const [v_7962f1, v_6a0bf8] = v_5ab095('');
+  const [v_963133, v_24b641] = v_5ab095<v_da1883[]>(v_52495e);
+  const [v_5f1e0e, v_dad6ca] = v_5ab095<boolean>(true); 
+  const [v_0908db, v_1c41ce] = v_5ab095(false);
+
+  const [v_b67b40, v_a259be] = v_5ab095(false);
+  const [v_bd30a1, v_e03dd9] = v_5ab095('');
+  const [v_335974, v_88450b] = v_5ab095<v_da1883[]>(v_1bd8ad);
+  const [v_d6cff0, v_677cd9] = v_5ab095(false);
 
   const v_5a46cd = (clauseId: v_9dd03c) => {
     if (v_111946 === 'service') {
@@ -153,23 +164,161 @@ export const v_f40fc5 = () => {
 
   const v_590486 = v_459d5e?.iso2?.toLowerCase() === 'kr';
 
-  const v_56743f = v_2f03bc
-    ? v_2f03bc.name
-    : v_590486
-      ? ''
-      : v_789afd.name;
+  const v_56743f = v_a3453e.useMemo(() => {
+
+    if (v_2f03bc && (v_2f03bc.iso2 === 'select' || v_2f03bc.dialCode === '0')) {
+      return '';
+    }
+    let v_3b402b = '';
+    if (v_2f03bc) {
+
+      const v_f5d8ad = v_2f03bc.countryCode && v_2f03bc.dialCode
+        ? `${v_2f03bc.countryCode}_${v_2f03bc.dialCode}`
+        : null;
+      if (v_f5d8ad) {
+        const v_75aa17 = `regions.${v_f5d8ad}`;
+        try {
+
+          const v_6dce25 = v_8d41d7(v_75aa17);
+
+          if (v_6dce25 && v_6dce25 !== v_75aa17) {
+            v_3b402b = v_6dce25;
+          } else {
+            v_3b402b = v_2f03bc.name;
+          }
+        } catch (v_5e9bfe) {
+          if (__DEV__) {
+            console.warn('[회원가입] 지역 번역 오류:', v_5e9bfe);
+          }
+          v_3b402b = v_2f03bc.name;
+        }
+      } else {
+        v_3b402b = v_2f03bc.name;
+      }
+    } else {
+      v_3b402b = v_590486 ? '' : v_789afd.name;
+    }
+    if (__DEV__) {
+      console.log('[회원가입] regionDisplayValue 계산:', {
+        selectedRegion: v_2f03bc,
+        selectedRegionName: v_2f03bc?.name,
+        selectedRegionIso2: v_2f03bc?.iso2,
+        selectedRegionDialCode: v_2f03bc?.dialCode,
+        isKoreaSelected: v_590486,
+        value: v_3b402b,
+      });
+    }
+    return v_3b402b;
+  }, [v_2f03bc, v_590486, v_8d41d7]);
+
+  v_a3453e.useEffect(() => {
+    const v_91c5e2 = async () => {
+      if (!v_459d5e?.countryCode) return;
+
+      v_1c41ce(true);
+      try {
+        const result: v_107459 = await v_5c7129(
+          (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
+          v_459d5e.countryCode || 0,
+          v_369014(v_459d5e.iso2)
+        );
+        v_24b641(v_43c42e.regions);
+        v_dad6ca(v_43c42e.hasRegions);
+
+        if (v_43c42e.hasRegions && v_43c42e.regions.length > 0) {
+
+          if (v_2f03bc && v_2f03bc.dialCode !== '0' && v_2f03bc.iso2 !== 'select') {
+            const v_d2a53b = v_43c42e.regions.some(
+              (v_cb35cb) => v_cb35cb.iso2 === v_2f03bc.iso2 && v_cb35cb.dialCode === v_2f03bc.dialCode
+            );
+            if (!v_d2a53b) {
+              console.log('[회원가입] 선택된 지역이 새로운 목록에 없음, 첫 번째 지역으로 변경');
+              v_2f2d51(v_43c42e.regions[0]);
+            } else {
+              console.log('[회원가입] 선택된 지역 유지:', v_2f03bc.name);
+            }
+          } else if (!v_2f03bc || v_2f03bc.iso2 === 'select' || v_2f03bc.dialCode === '0') {
+
+            console.log('[회원가입] 지역 자동 선택 건너뜀 (사용자 선택 대기)');
+          }
+        } else {
+
+          v_2f2d51(null);
+        }
+      } catch (v_5e9bfe) {
+        console.error('[회원가입] 지역 목록 로드 실패:', v_5e9bfe);
+        const v_80d56a = v_369014(v_459d5e.iso2);
+        v_24b641(v_80d56a);
+
+        v_dad6ca(v_80d56a.length > 0 && v_80d56a[0].iso2 !== 'global');
+      } finally {
+        v_1c41ce(false);
+      }
+    };
+
+    v_91c5e2();
+
+  }, [v_459d5e, v_9b57fc]);
+
+  v_a3453e.useEffect(() => {
+    if (v_b67b40) {
+      const v_dc6060 = async () => {
+        v_677cd9(true);
+        try {
+          const v_058836 = await v_151d5f(
+            () => v_60f557(v_9b57fc),
+            v_1bd8ad
+          );
+          v_88450b(v_058836);
+        } catch (v_5e9bfe) {
+          console.error('[회원가입] 국가 목록 로드 실패:', v_5e9bfe);
+          v_88450b(v_1bd8ad);
+        } finally {
+          v_677cd9(false);
+        }
+      };
+      v_dc6060();
+    }
+  }, [v_b67b40, v_9b57fc]);
+
+  const v_daa71c = v_df9f57(() => {
+    if (!v_bd30a1.trim()) {
+      return v_335974;
+    }
+    const v_470e34 = v_bd30a1.trim().toLowerCase();
+    return v_335974.filter((v_8c0b26) => {
+      const v_cd2b74 = v_8c0b26.name.toLowerCase();
+      const v_73b9dc = v_8c0b26.iso2.toLowerCase();
+      const v_bed18d = v_8c0b26.dialCode.toLowerCase();
+      return v_cd2b74.includes(v_470e34) || v_73b9dc.includes(v_470e34) || v_bed18d.includes(v_470e34);
+    });
+  }, [v_bd30a1, v_335974]);
+
+  const v_de5bf5 = (country: v_da1883) => {
+    console.log('[회원가입] 국가 선택:', {
+      country: v_b9bbbd,
+      iso2: v_b9bbbd.iso2,
+      name: v_b9bbbd.name,
+      dialCode: v_b9bbbd.dialCode,
+      countryCode: v_b9bbbd.countryCode,
+    });
+    v_f693e7(v_b9bbbd);
+    v_a259be(false);
+    v_e03dd9('');
+  };
 
   const selectOption: v_da1883 = v_df9f57(() => ({
     iso2: 'select',
-    name: v_8d41d7('screens.signup.genderSelect') || '선택',
+    name: v_8d41d7('screens.countryCodeSelect.selectOption') || '선택',
     dialCode: '0',
     flagEmoji: '📍',
     countryCode: 0,
   }), [v_8d41d7]);
 
   const v_904f1e = v_df9f57(() => {
-    return [v_a35839, ...v_52495e];
-  }, [v_a35839]);
+
+    return v_d0472c ? [v_a35839, ...v_963133] : v_963133;
+  }, [v_a35839, v_963133, v_d0472c]);
 
   const v_4e187d = v_df9f57(() => {
     if (!v_7962f1.trim()) {
@@ -184,7 +333,21 @@ export const v_f40fc5 = () => {
   }, [v_7962f1, v_904f1e]);
 
   const v_477add = (region: v_da1883) => {
-    v_2f2d51(v_a6c30b);
+    console.log('[회원가입] 지역 선택:', {
+      region: v_a6c30b,
+      iso2: v_a6c30b.iso2,
+      name: v_a6c30b.name,
+      dialCode: v_a6c30b.dialCode,
+      countryCode: v_a6c30b.countryCode,
+    });
+
+    if (v_a6c30b.iso2 === 'select' || v_a6c30b.dialCode === '0') {
+      console.log('[회원가입] "선택" 옵션 선택 - null로 설정');
+      v_2f2d51(null);
+    } else {
+      console.log('[회원가입] 지역 선택:', v_a6c30b.name);
+      v_2f2d51(v_a6c30b);
+    }
     v_c73419(false);
     v_6a0bf8('');
   };
@@ -447,7 +610,7 @@ export const v_f40fc5 = () => {
         return;
       }
 
-      if (v_590486 && (!v_2f03bc || v_2f03bc.dialCode === '0')) {
+      if (v_5f1e0e && v_590486 && (!v_2f03bc || v_2f03bc.dialCode === '0')) {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
         return;
       }
@@ -562,9 +725,10 @@ export const v_f40fc5 = () => {
 
           const v_6c3a47 = parseInt(v_459d5e.dialCode.replace('+', ''), 10) || 82;
           const v_a4d981 = v_459d5e.iso2 || 'KR';
-          const v_94bdf5 = v_2f03bc
-            ? v_9553a4(v_2f03bc.iso2)
-            : parseInt(v_789afd.dialCode, 10);
+
+          const v_94bdf5 = v_5f1e0e && v_2f03bc
+            ? parseInt(v_2f03bc.dialCode, 10) || 0
+            : 0;
 
           const v_df7dab = {
             email: v_e0c7e8.trim(),
@@ -717,12 +881,13 @@ export const v_f40fc5 = () => {
           },
           selectedRegion: v_2f03bc
             ? {
-              iso2: v_2f03bc.iso2,
-              dialCode: v_2f03bc.dialCode,
-              flagEmoji: v_2f03bc.flagEmoji,
-              name: v_2f03bc.name,
-            }
+                iso2: v_2f03bc.iso2,
+                dialCode: v_2f03bc.dialCode,
+                flagEmoji: v_2f03bc.flagEmoji,
+                name: v_2f03bc.name,
+              }
             : null,
+          hasRegions: v_5f1e0e, 
           referralMemberId: v_65bdb1,
           gender: v_c3eac4,
           ageRange: v_f83808,
@@ -937,8 +1102,7 @@ export const v_f40fc5 = () => {
               <TouchableOpacity
                 style={v_d81136.phonePrefix}
                 onPress={() => {
-                  v_67ab1c('country');
-                  v_9b57fc('countryCodeSelect');
+                  v_a259be(true);
                 }}
                 activeOpacity={0.7}
               >
@@ -948,26 +1112,26 @@ export const v_f40fc5 = () => {
             }
           />
 
-          <View style={v_d81136.fieldContainer}>
-            <FormField
-              label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
-              placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
-              value={v_56743f}
-              editable={false}
-              showDisabledStyle={false}
-              onPress={() => {
-                if ((!v_590486 && !v_d0472c) || v_88dca2) {
-                  return;
-                }
-                v_c73419(true);
-              }}
-            />
-            {!v_590486 && (
-              <Text style={v_d81136.regionHelper}>
-                {v_8d41d7('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-              </Text>
-            )}
-          </View>
+          {}
+          {v_5f1e0e && (
+            <View style={v_d81136.fieldContainer}>
+              <FormField
+                label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
+                placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
+                value={v_56743f}
+                editable={false}
+                showDisabledStyle={false}
+                onPress={() => {
+
+                  if (!v_5f1e0e || v_88dca2) {
+                    return;
+                  }
+                  v_c73419(true);
+                }}
+              />
+
+            </View>
+          )}
 
           <View style={v_d81136.fieldContainer}>
             <Text style={v_d81136.label}>
@@ -1099,6 +1263,79 @@ export const v_f40fc5 = () => {
       <Modal
         animationType="slide"
         transparent={true}
+        visible={v_b67b40}
+        onRequestClose={() => v_a259be(false)}
+      >
+        <View style={v_d81136.modalOverlay}>
+          <TouchableOpacity
+            style={v_d81136.modalBackdrop}
+            activeOpacity={1}
+            onPress={() => {
+              v_a259be(false);
+              v_e03dd9('');
+            }}
+          />
+          <View style={v_d81136.modalContent}>
+            <View style={v_d81136.modalHeader}>
+              <Text style={v_d81136.modalTitle}>
+                {v_8d41d7('screens.countryCodeSelect.countrySelectTitle') || '국가 선택'}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  v_a259be(false);
+                  v_e03dd9('');
+                }}
+              >
+                <Text style={v_d81136.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={v_d81136.modalSearchBox}>
+              <Ionicons name="search" size={18} color="#9ca3af" />
+              <TextInput
+                style={v_d81136.modalSearchInput}
+                value={v_bd30a1}
+                onChangeText={v_e03dd9}
+                placeholder={v_8d41d7('screens.countryCodeSelect.countrySearchPlaceholder') || '국가 검색'}
+                placeholderTextColor="#c4c7d1"
+                autoCorrect={false}
+              />
+            </View>
+            {v_d6cff0 ? (
+              <View style={v_d81136.modalLoadingContainer}>
+                <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+              </View>
+            ) : (
+              <FlatList
+                data={v_daa71c}
+                keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
+                renderItem={({ item: v_8c0b26 }) => (
+                  <CountryCodeListItem
+                    country={v_8c0b26}
+                    isSelected={v_8c0b26.iso2 === v_459d5e?.iso2 && v_8c0b26.dialCode === v_459d5e?.dialCode}
+                    onPress={v_de5bf5}
+                    hideDialCode={false}
+                  />
+                )}
+                contentContainerStyle={v_d81136.modalListContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={v_d81136.modalEmptyState}>
+                    <Text style={v_d81136.modalEmptyText}>
+                      {v_8d41d7('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
+                    </Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {}
+      <Modal
+        animationType="slide"
+        transparent={true}
         visible={v_3a64df}
         onRequestClose={() => v_c73419(false)}
       >
@@ -1136,28 +1373,34 @@ export const v_f40fc5 = () => {
                 autoCorrect={false}
               />
             </View>
-            <FlatList
-              data={v_4e187d}
-              keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
-              renderItem={({ item: v_8c0b26 }) => (
-                <CountryCodeListItem
-                  country={v_8c0b26}
-                  isSelected={v_8c0b26.iso2 === v_2f03bc?.iso2 && v_8c0b26.dialCode === v_2f03bc?.dialCode}
-                  onPress={v_477add}
-                  hideDialCode={true}
-                />
-              )}
-              contentContainerStyle={v_d81136.modalListContent}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              ListEmptyComponent={
-                <View style={v_d81136.modalEmptyState}>
-                  <Text style={v_d81136.modalEmptyText}>
-                    {v_8d41d7('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
-                  </Text>
-                </View>
-              }
-            />
+            {v_0908db ? (
+              <View style={v_d81136.modalLoadingContainer}>
+                <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+              </View>
+            ) : (
+              <FlatList
+                data={v_4e187d}
+                keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
+                renderItem={({ item: v_8c0b26 }) => (
+                  <CountryCodeListItem
+                    country={v_8c0b26}
+                    isSelected={v_8c0b26.iso2 === v_2f03bc?.iso2 && v_8c0b26.dialCode === v_2f03bc?.dialCode}
+                    onPress={v_477add}
+                    hideDialCode={true}
+                  />
+                )}
+                contentContainerStyle={v_d81136.modalListContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={v_d81136.modalEmptyState}>
+                    <Text style={v_d81136.modalEmptyText}>
+                      {v_8d41d7('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
+                    </Text>
+                  </View>
+                }
+              />
+            )}
           </View>
         </View>
       </Modal>
@@ -1337,6 +1580,12 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-Regular',
     color: '#8e9bae',
+  },
+  modalLoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
   },
 });
 

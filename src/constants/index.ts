@@ -182,7 +182,7 @@ export const v_19835b = {
   minHeight: 52,
 } as const;
 
-export { COUNTRY_DIAL_CODES } from './countryDialCodes';
+export { COUNTRY_DIAL_CODES, ALLOWED_COUNTRIES } from './countryDialCodes';
 export {
   REGIONS_AS_COUNTRY_DIAL_CODES,
   getRegionIdByIso2,

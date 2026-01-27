@@ -114,9 +114,11 @@ export const v_667a00 = () => {
 
           const v_6c3a47 = parseInt(v_fad096.selectedCountryDialCode.dialCode.replace('+', ''), 10) || 82;
           const v_a4d981 = v_fad096.selectedCountryDialCode.iso2 || 'KR';
-          const v_94bdf5 = v_fad096.selectedRegion
-            ? v_9553a4(v_fad096.selectedRegion.iso2)
-            : parseInt(v_789afd.dialCode, 10);
+
+          const v_5f1e0e = v_fad096.hasRegions !== false; 
+          const v_94bdf5 = v_5f1e0e && v_fad096.selectedRegion
+            ? parseInt(v_fad096.selectedRegion.dialCode, 10) || 0
+            : 0;
 
           const v_df7dab = {
             email: v_fad096.email,

@@ -5,6 +5,7 @@ export default {
   countrySearchPlaceholder: 'Cari negara',
   regionSearchPlaceholder: 'Cari wilayah',
   noResults: 'Tidak ada hasil',
+  selectOption: 'Pilih',
 };
 
 

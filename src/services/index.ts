@@ -823,16 +823,26 @@ export const v_b699a9 = async (
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
-    console.error('[로그인] 이메일/비밀번호 로그인 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
+
+    if (__DEV__) {
+      if (v_5e9bfe instanceof v_3333d3) {
+
+        if (v_5e9bfe.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 이메일/비밀번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 이메일/비밀번호 로그인 오류:', v_5e9bfe);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: v_5e9bfe.config?.url,
+            method: v_5e9bfe.config?.method,
+            status: v_5e9bfe.response?.status,
+            statusText: v_5e9bfe.response?.statusText,
+            data: v_5e9bfe.response?.data,
+            message: v_5e9bfe.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 이메일/비밀번호 로그인 오류:', v_5e9bfe);
+      }
     }
     throw v_5e9bfe;
   }
@@ -866,16 +876,26 @@ export const v_508a17 = async (
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
-    console.error('[로그인] 비밀번호 로그인 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
+
+    if (__DEV__) {
+      if (v_5e9bfe instanceof v_3333d3) {
+
+        if (v_5e9bfe.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 비밀번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 비밀번호 로그인 오류:', v_5e9bfe);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: v_5e9bfe.config?.url,
+            method: v_5e9bfe.config?.method,
+            status: v_5e9bfe.response?.status,
+            statusText: v_5e9bfe.response?.statusText,
+            data: v_5e9bfe.response?.data,
+            message: v_5e9bfe.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 비밀번호 로그인 오류:', v_5e9bfe);
+      }
     }
     throw v_5e9bfe;
   }
@@ -1057,16 +1077,26 @@ export const v_7e0a86 = async (
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
-    console.error('[로그인] 전화번호 로그인 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
+
+    if (__DEV__) {
+      if (v_5e9bfe instanceof v_3333d3) {
+
+        if (v_5e9bfe.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 전화번호 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 전화번호 로그인 오류:', v_5e9bfe);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: v_5e9bfe.config?.url,
+            method: v_5e9bfe.config?.method,
+            status: v_5e9bfe.response?.status,
+            statusText: v_5e9bfe.response?.statusText,
+            data: v_5e9bfe.response?.data,
+            message: v_5e9bfe.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 전화번호 로그인 오류:', v_5e9bfe);
+      }
     }
     throw v_5e9bfe;
   }
@@ -1178,16 +1208,26 @@ export const v_a81308 = async (
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
-    console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[로그인] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
+
+    if (__DEV__) {
+      if (v_5e9bfe instanceof v_3333d3) {
+
+        if (v_5e9bfe.code === 'ERR_NETWORK') {
+          console.warn('[로그인] 이메일 인증 로그인 네트워크 에러');
+        } else {
+          console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
+          console.error('[로그인] 상세 오류 정보:', {
+            url: v_5e9bfe.config?.url,
+            method: v_5e9bfe.config?.method,
+            status: v_5e9bfe.response?.status,
+            statusText: v_5e9bfe.response?.statusText,
+            data: v_5e9bfe.response?.data,
+            message: v_5e9bfe.message,
+          });
+        }
+      } else {
+        console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
+      }
     }
     throw v_5e9bfe;
   }
@@ -1545,19 +1585,33 @@ export const v_11e39e = async (
     );
 
     console.log('[마이페이지] 지역 목록 조회 성공');
+    console.log('[마이페이지] 지역 목록 응답 데이터:', {
+      status: v_3393e3.data.status,
+      has_regions: v_3393e3.data.has_regions,
+      dataLength: v_3393e3.data.data?.length || 0,
+      data: v_3393e3.data.data,
+    });
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
-    console.error('[마이페이지] 지역 목록 조회 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[마이페이지] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
-      });
+
+    if (__DEV__) {
+      console.error('[마이페이지] 지역 목록 조회 오류:', v_5e9bfe);
+      if (v_5e9bfe instanceof v_3333d3) {
+
+        if (v_5e9bfe.code === 'ERR_NETWORK') {
+          console.warn('[마이페이지] 지역 목록 조회 네트워크 에러 - fallback 사용');
+        } else {
+          console.error('[마이페이지] 상세 오류 정보:', {
+            url: v_5e9bfe.config?.url,
+            method: v_5e9bfe.config?.method,
+            status: v_5e9bfe.response?.status,
+            statusText: v_5e9bfe.response?.statusText,
+            data: v_5e9bfe.response?.data,
+            message: v_5e9bfe.message,
+          });
+        }
+      }
     }
     throw v_5e9bfe;
   }
@@ -4510,6 +4564,19 @@ export const v_c1fabf = async (
     const v_3393e3 = await v_9f42a4.get<v_bae79a>(v_f71b56);
 
     console.log('[Quest] 퀘스트 리스트 조회 성공:', v_3393e3.data.data?.length || 0, '개');
+
+    const v_dbcc12 = v_3393e3.data.data?.find(
+      (v_8c0b26) => v_8c0b26.id === 1 || v_8c0b26.id === '1'
+    );
+    if (v_dbcc12) {
+      console.log('[Quest] 출석체크 보상 금액 (서버 응답):', {
+        id: v_dbcc12.id,
+        title: v_dbcc12.title,
+        reward_amount: v_dbcc12.reward_amount,
+        reward_amount_asxrun: v_dbcc12.reward_amount_asxrun,
+        reward_amount_asxrun_type: typeof v_dbcc12.reward_amount_asxrun,
+      });
+    }
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {

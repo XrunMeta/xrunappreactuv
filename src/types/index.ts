@@ -542,10 +542,12 @@ export interface GetRegionsByCountryResponse {
     country?: string;
     callnumber?: number;
     description?: string;
+    code?: number;
     subcode?: number;
     [key: string]: any;
   }>;
   status?: string;
+  has_regions?: boolean; 
   [key: string]: any;
 }
 
@@ -569,9 +571,11 @@ export interface UpdateRegionResponse {
 export interface GetCountriesResponse {
   data?: Array<{
     country?: string;
+    code?: string; 
     callnumber?: number;
     description?: string;
     subcode?: number;
+    lcode?: string; 
     [key: string]: any;
   }>;
   status?: string;

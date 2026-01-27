@@ -5,6 +5,7 @@ export default {
   countrySearchPlaceholder: 'Search country',
   regionSearchPlaceholder: 'Search region',
   noResults: 'No results found',
+  selectOption: 'Select',
 };
 
 
