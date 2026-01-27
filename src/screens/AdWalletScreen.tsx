@@ -37,6 +37,7 @@ interface AdEntry {
   adRevenueSettlementColor: string;
   title?: string; 
   description?: string; 
+  originalDescription?: string; 
   rewardDescription?: string; 
   extrastr3?: string; 
   hasAttended?: boolean; 
@@ -353,9 +354,157 @@ export const AdWalletScreen = () => {
       const expectedAdRevenueColor = isReviewStatus ? '#cccccc' : '#707070';
       const adRevenueSettlementColor = isReviewStatus ? '#cccccc' : '#343434';
 
+      const translateText = (text: string | undefined): string | undefined => {
+        if (!text) return text;
+
+        let translated = text.trim().replace(/\s+/g, ' ');
+        const originalText = text;
+
+        if (__DEV__) {
+          console.log('[AdWallet] 번역 전 텍스트:', {
+            original: originalText,
+            normalized: translated,
+            language: i18n.language,
+          });
+        }
+
+        if (translated === '초대를 받은 지인이 신규 가입을 완료하면, 초대자와 신규 가입자 두 분 모두에게 5 XRUN의 보상을 드립니다.') {
+          return t('screens.adWallet.referralInviteDescription');
+        }
+
+        if (translated === '추천인 이벤트 보상을 받으세요' || translated.includes('추천인 이벤트 보상을 받으세요')) {
+          return t('screens.adWallet.referralEventRewardReceive');
+        }
+
+        if (translated === '심사중인 추천인 이벤트입니다' || translated.includes('심사중인 추천인 이벤트입니다')) {
+          return t('screens.adWallet.referralEventUnderReview');
+        }
+
+        if (translated.includes('보상') && translated.includes('지급이') && translated.includes('완료된') && translated.includes('추천인 이벤트') && translated.includes('입니다')) {
+          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
+        }
+
+        if (translated === '보상 지급이 완료된 추천인 이벤트입니다' || translated.trim() === '보상 지급이 완료된 추천인 이벤트입니다') {
+          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
+        }
+
+        if (translated === '추천인 이벤트 보상') {
+          return t('screens.adWallet.referralEventReward');
+        }
+
+        if (translated === '로그인, 접속시에 출석 보상을 드립니다') {
+          return t('screens.adWallet.attendanceRewardOnLogin');
+        }
+
+        if (translated === '전용 레퍼럴 코드를 지인에게 공유하기') {
+          return t('screens.adWallet.exclusiveReferralCodeShare');
+        }
+
+        if (translated === '출석체크하기' || translated === '출석 체크하기') {
+          return t('screens.adWallet.attendanceCheckDo');
+        }
+
+        if (translated === '소개 이벤트 보상을 받으세요') {
+          return t('screens.adWallet.referralEventRewardTitle');
+        }
+
+        if (translated === '추천인 이벤트 보상 받기') {
+          return t('screens.adWallet.referralEventRewardTitle');
+        }
+
+        if (translated.includes('보상을 받으세요')) {
+          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
+        }
+
+        if (translated.includes('보상 받기')) {
+          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
+        }
+
+        if (translated.includes('출석보상')) {
+          translated = translated.replace(/출석보상/g, t('screens.adWallet.attendanceCheckCompletedReward'));
+        }
+
+        if (translated.includes('정산완료')) {
+          translated = translated.replace(/정산완료/g, t('screens.adWallet.settled'));
+        }
+
+        if (translated.includes('추천인 이벤트')) {
+          translated = translated.replace(/추천인 이벤트/g, t('screens.adWallet.referralEvent'));
+        }
+
+        if (translated.includes('소개 이벤트')) {
+          translated = translated.replace(/소개 이벤트/g, t('screens.adWallet.referralEvent'));
+        }
+
+        if (translated.includes('추천인초대보상')) {
+          translated = translated.replace(/추천인초대보상/g, t('screens.adWallet.referralInviteReward'));
+        }
+
+        if (translated.includes('출석체크') && !translated.includes('출석체크하기') && !translated.includes('출석 체크하기')) {
+          translated = translated.replace(/출석체크|출석 체크/g, t('screens.adWallet.attendanceCheck'));
+        }
+
+        if (translated.includes('전용 레퍼럴 코드') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
+          translated = translated.replace(/전용 레퍼럴 코드/g, t('screens.adWallet.exclusiveReferralCode'));
+        }
+
+        if (translated.includes('지인에게 공유하기') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
+          translated = translated.replace(/지인에게 공유하기/g, t('screens.adWallet.shareWithAcquaintances'));
+        }
+
+        if (translated.includes('심사중')) {
+          translated = translated.replace(/심사중/g, t('screens.adWallet.pending'));
+        }
+
+        if (translated.includes('완료된')) {
+          translated = translated.replace(/완료된/g, t('screens.adWallet.completedPast'));
+        }
+
+        if (translated.includes('완료')) {
+          translated = translated.replace(/완료/g, t('screens.adWallet.completed'));
+        }
+
+        if (translated.includes('지급이 완료된')) {
+          translated = translated.replace(/지급이 완료된/g, t('screens.adWallet.paymentCompleted'));
+        }
+
+        if (translated.includes('지급이')) {
+          translated = translated.replace(/지급이/g, t('screens.adWallet.paymentIs'));
+        }
+
+        if (translated.includes('입니다')) {
+          translated = translated.replace(/입니다/g, t('screens.adWallet.is'));
+        }
+
+        if (translated.includes('보상을 받으세요')) {
+          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
+        }
+
+        if (translated.includes('보상 받기')) {
+          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
+        }
+
+        if (translated.includes('보상') && !translated.includes('보상을 받으세요') && !translated.includes('보상 받기')) {
+          translated = translated.replace(/보상/g, t('screens.adWallet.reward'));
+        }
+
+        if (__DEV__ && originalText !== translated) {
+          console.log('[AdWallet] 번역 후 텍스트:', {
+            original: originalText,
+            translated,
+            language: i18n.language,
+          });
+        }
+
+        return translated;
+      };
+
       const displayTitle = isReferralEvent && !isReferralInvite 
-        ? '추천인 이벤트 보상 받기'
-        : item.title;
+        ? t('screens.adWallet.referralEventRewardTitle')
+        : translateText(item.title);
+
+      const displayDescription = translateText(item.description);
+      const displayRewardDescription = translateText(item.reward_description);
 
       return {
         id: item.id,
@@ -366,15 +515,16 @@ export const AdWalletScreen = () => {
         expectedAdRevenueColor,
         adRevenueSettlementColor,
         title: displayTitle,
-        description: item.description,
-        rewardDescription: item.reward_description,
+        description: displayDescription,
+        originalDescription: item.description, 
+        rewardDescription: displayRewardDescription,
         eventStatus: item.event_status,
         isReferralEvent,
         eventType,
         isReferralInvite,
       };
     },
-    [t, formatDate],
+    [t, formatDate, i18n],
   );
 
   const convertResultToAdEntry = useCallback(
@@ -472,7 +622,7 @@ export const AdWalletScreen = () => {
             return false;
           }
 
-          if (entry.description && entry.description.includes('완료')) {
+          if (entry.originalDescription && entry.originalDescription.includes('완료')) {
             return false;
           }
 
@@ -731,13 +881,13 @@ export const AdWalletScreen = () => {
       console.log('[AdWallet] 추천인 이벤트 보상 클릭:', item.id);
 
       if (item.eventStatus === 'review') {
-        showToast('추천인 이벤트 보상을 이미 완료했습니다.');
+        showToast(t('screens.adWallet.referralEventAlreadyCompleted'));
         return;
       }
 
       const rewardAmount = parseFloat(item.expectedAdRevenue.replace(' XRUN', '')) || 0;
       if (item.eventStatus !== 'pending' || rewardAmount <= 0) {
-        showToast('보상을 받을 수 없는 상태입니다.');
+        showToast(t('screens.adWallet.rewardNotAvailable'));
         return;
       }
 
@@ -770,7 +920,7 @@ export const AdWalletScreen = () => {
 
                     if (!recommendationEventId) {
                       console.error('[AdWallet] 유효하지 않은 추천인 이벤트 ID:', item.id);
-                      showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                      showToast(t('screens.adWallet.invalidReferralEventId'));
                       setIsJoiningQuest(false);
                       return;
                     }
@@ -797,7 +947,7 @@ export const AdWalletScreen = () => {
                   );
 
                   if (response.status === 'success') {
-                    showToast('추천인 이벤트 보상 완료했습니다.');
+                    showToast(t('screens.adWallet.referralEventRewardCompleted'));
 
                     if (questListRef.current) {
                       questListRef.current.reloadData();
@@ -820,7 +970,7 @@ export const AdWalletScreen = () => {
               (error) => {
 
                 console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error);
-                showToast('광고를 불러올 수 없습니다. 보상을 진행합니다.');
+                showToast(t('screens.adWallet.adLoadFailedForReward'));
 
                 (async () => {
                   try {
@@ -832,7 +982,7 @@ export const AdWalletScreen = () => {
                       recommendationEventId = match ? parseInt(match[1], 10) : null;
 
                       if (!recommendationEventId) {
-                        showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                        showToast(t('screens.adWallet.invalidReferralEventId'));
                         setIsJoiningQuest(false);
                         return;
                       }
@@ -857,7 +1007,7 @@ export const AdWalletScreen = () => {
                     );
 
                     if (response.status === 'success') {
-                      showToast('추천인 이벤트 보상 완료했습니다.');
+                      showToast(t('screens.adWallet.referralEventRewardCompleted'));
                       if (questListRef.current) {
                         questListRef.current.reloadData();
                       }
@@ -885,7 +1035,7 @@ export const AdWalletScreen = () => {
                 recommendationEventId = match ? parseInt(match[1], 10) : null;
 
                 if (!recommendationEventId) {
-                  showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                  showToast(t('screens.adWallet.invalidReferralEventId'));
                   setIsJoiningQuest(false);
                   return;
                 }
@@ -910,7 +1060,7 @@ export const AdWalletScreen = () => {
               );
 
               if (response.status === 'success') {
-                showToast('추천인 이벤트 보상 완료했습니다.');
+                showToast(t('screens.adWallet.referralEventRewardCompleted'));
                 if (questListRef.current) {
                   questListRef.current.reloadData();
                 }
@@ -935,7 +1085,7 @@ export const AdWalletScreen = () => {
               recommendationEventId = match ? parseInt(match[1], 10) : null;
 
               if (!recommendationEventId) {
-                showToast('유효하지 않은 추천인 이벤트 ID입니다.');
+                showToast(t('screens.adWallet.invalidReferralEventId'));
                 setIsJoiningQuest(false);
                 return;
               }
@@ -960,7 +1110,7 @@ export const AdWalletScreen = () => {
             );
 
             if (response.status === 'success') {
-              showToast('추천인 이벤트 보상 완료했습니다.');
+              showToast(t('screens.adWallet.referralEventRewardCompleted'));
               if (questListRef.current) {
                 questListRef.current.reloadData();
               }
@@ -1058,7 +1208,7 @@ export const AdWalletScreen = () => {
                 );
 
                 if (response.status === 'success') {
-                  showToast('출석 체크 완료했습니다.');
+                  showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
                   setAttendanceCheckVisible(false);
                   setCanReward(null);
                   setHasAttended(null);
@@ -1084,7 +1234,7 @@ export const AdWalletScreen = () => {
             (error) => {
 
               console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
-              showToast('광고를 불러올 수 없습니다. 출석체크를 진행합니다.');
+              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
 
               joinQuest(
                 {
@@ -1211,9 +1361,9 @@ export const AdWalletScreen = () => {
 
     const isReferralRewardDisabled = isReferralReward && (
       item.eventStatus === 'review' ||
-      (item.description && (
-        item.description.includes('심사중') ||
-        item.description.includes('완료')
+      (item.originalDescription && (
+        item.originalDescription.includes('심사중') ||
+        item.originalDescription.includes('완료')
       ))
     );
 
@@ -1280,7 +1430,7 @@ export const AdWalletScreen = () => {
                 styles.adCardRowLabel,
                 isDisabled && { color: disabledColor }
               ]}>
-                추천인초대보상
+                {t('screens.adWallet.referralInviteReward')}
               </Text>
               <Text style={[
                 styles.adCardRowAmount,
