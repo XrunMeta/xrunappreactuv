@@ -13,6 +13,7 @@ export default {
   allRegions: 'Semua Wilayah',
   pleaseSelect: 'Silakan Pilih',
   selectCountryAndRegion: 'Silakan pilih negara dan wilayah',
+  regionHelper: 'Wilayah Global akan otomatis diterapkan.',
   gender: 'Jenis Kelamin',
   genderMale: 'Laki-laki',
   genderFemale: 'Perempuan',
