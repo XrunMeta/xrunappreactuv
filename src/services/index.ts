@@ -326,7 +326,7 @@ export const v_495832 = async (
           console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
           v_43c42e.emergencyStop = {
             enabled: true,
-            message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
             link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
           };
         } else {
@@ -340,7 +340,7 @@ export const v_495832 = async (
           } else {
             v_43c42e.emergencyStop = {
               enabled: true,
-              message: '업데이트가 발견되었습니다. \n앱을 업데이트해주세요. \n\n App update is available. Please update the app.',
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
               link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
             };
           }

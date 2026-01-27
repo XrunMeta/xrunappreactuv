@@ -8,6 +8,7 @@ import {
   v_f2c756,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
 import { v_843035 } from '../constants';
@@ -25,6 +26,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
   link: v_8dbe00,
   onClose: v_0890f8,
 }) => {
+  const { t: v_8d41d7 } = v_772971();
   const { navigate: v_9b57fc } = v_a0daa8();
 
   const v_4c3e84 = () => {
@@ -56,7 +58,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
     >
       <View style={v_d81136.container}>
         <View style={v_d81136.header}>
-          <Text style={v_d81136.title}>안내</Text>
+          <Text style={v_d81136.title}>{v_8d41d7('common.emergencyStop.title')}</Text>
         </View>
 
         <View style={v_d81136.divider} />
@@ -72,7 +74,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
               onPress={v_4c3e84}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.linkText}>자세히 보기</Text>
+              <Text style={v_d81136.linkText}>{v_8d41d7('common.emergencyStop.viewDetails')}</Text>
               <Ionicons name="chevron-forward" size={20} color="#4c4e55" />
             </TouchableOpacity>
           )}
