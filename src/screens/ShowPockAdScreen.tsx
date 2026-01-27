@@ -1001,6 +1001,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: 'transparent',
+    width: '100%',
+    maxWidth: '100%',
   },
   modalCampaignContainer: {
     paddingTop: 20, 
@@ -1009,6 +1011,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     marginTop: 0,
     position: 'relative', 
+    width: '100%',
+    maxWidth: '100%',
   },
   loadingContainer: {
     alignItems: 'center',

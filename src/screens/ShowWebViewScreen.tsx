@@ -605,6 +605,10 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
             alignItems: 'center',
             padding: 20,
           }}>
+            <View style={{
+              width: '90%',
+              maxWidth: 400,
+            }}>
             {(() => {
               const adCompany = advertisementParams?.ad_company || 'nas';
 
@@ -624,6 +628,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
                 );
               }
             })()}
+            </View>
           </View>
         </Modal>
       )}
