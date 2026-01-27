@@ -605,6 +605,10 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
             alignItems: 'center',
             padding: 20,
           }}>
+            <View style={{
+              width: '90%',
+              maxWidth: 400,
+            }}>
             {(() => {
               const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
 
@@ -624,6 +628,7 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
                 );
               }
             })()}
+            </View>
           </View>
         </Modal>
       )}
