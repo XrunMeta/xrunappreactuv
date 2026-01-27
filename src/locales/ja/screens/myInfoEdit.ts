@@ -13,6 +13,7 @@ export default {
   allRegions: 'すべての地域',
   pleaseSelect: '選択してください',
   selectCountryAndRegion: '国と地域を選択してください',
+  regionHelper: 'グローバル地域が自動的に適用されます。',
   gender: '性別',
   genderMale: '男',
   genderFemale: '女',

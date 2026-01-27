@@ -8,17 +8,23 @@ export interface Region {
 
 export const GLOBAL_REGION: CountryDialCode = {
   iso2: 'global',
-  name: '선택',
+  name: 'Global',
   dialCode: '0',
   flagEmoji: '🌐',
   countryCode: 0,
 };
+
+const COUNTRIES_WITH_REGIONS_ISO2 = ['kr', 'jp', 'cn', 'us', 'id'];
 
 export const getRegionsByCountryIso2 = (iso2?: string): CountryDialCode[] => {
   if (!iso2) {
     return [GLOBAL_REGION];
   }
   const lowerIso2 = iso2.toLowerCase();
+
+  if (!COUNTRIES_WITH_REGIONS_ISO2.includes(lowerIso2)) {
+    return [GLOBAL_REGION];
+  }
 
   if (lowerIso2 === 'kr' || lowerIso2 === 'id') {
     return REGIONS_AS_COUNTRY_DIAL_CODES.filter(
@@ -33,6 +39,7 @@ export const getRegionsByCountryIso2 = (iso2?: string): CountryDialCode[] => {
       }
     );
   }
+
   return [GLOBAL_REGION];
 };
 

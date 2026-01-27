@@ -17,6 +17,7 @@ export default {
   allRegions: '전체 지역',
   pleaseSelect: '선택하세요',
   selectCountryAndRegion: '국가와 지역을 선택하세요',
+  regionHelper: 'Global 지역이 자동으로 적용됩니다.',
   gender: '성별',
   genderMale: '남',
   genderFemale: '여',

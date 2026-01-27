@@ -39,6 +39,40 @@ export const convertCountryApiToDialCode = (
     }
   }
 
+  if (!iso2 && apiCountry.country) {
+    const countryNameLower = apiCountry.country.toLowerCase();
+
+    let foundCountry = COUNTRY_DIAL_CODES.find(
+      (c) => c.name.toLowerCase() === countryNameLower
+    );
+
+    if (!foundCountry) {
+      foundCountry = COUNTRY_DIAL_CODES.find(
+        (c) => {
+          const countryName = c.name.toLowerCase();
+
+          return countryNameLower.includes(countryName) || 
+                 countryName.includes(countryNameLower);
+        }
+      );
+    }
+
+    if (!foundCountry && (countryNameLower.includes('korea') || countryNameLower.includes('south korea'))) {
+      foundCountry = COUNTRY_DIAL_CODES.find((c) => c.iso2 === 'kr');
+    }
+
+    if (foundCountry) {
+      iso2 = foundCountry.iso2;
+      if (__DEV__) {
+        console.log('[countryUtils] country 필드에서 ISO2 추출 성공:', {
+          country: apiCountry.country,
+          iso2,
+          matchedName: foundCountry.name,
+        });
+      }
+    }
+  }
+
   if (!iso2 && apiCountry.callnumber) {
     const foundCountry = COUNTRY_DIAL_CODES.find(
       (c) => c.dialCode === dialCode
@@ -52,11 +86,32 @@ export const convertCountryApiToDialCode = (
     iso2 = apiCountry.description?.toLowerCase().replace(/\s+/g, '') || '';
   }
 
+  if (__DEV__ && (!iso2 || iso2.length !== 2)) {
+    console.warn('[countryUtils] ISO2 추출 실패:', {
+      code: apiCountry.code,
+      lcode: apiCountry.lcode,
+      country: apiCountry.country,
+      description: apiCountry.description,
+      callnumber: apiCountry.callnumber,
+      extractedIso2: iso2,
+    });
+  }
+
+  const finalIso2 = iso2.toLowerCase();
+  if (__DEV__) {
+    console.log('[countryUtils] 국가 변환 결과:', {
+      original: apiCountry.country || apiCountry.description,
+      iso2: finalIso2,
+      dialCode,
+      countryCode: apiCountry.callnumber,
+    });
+  }
+
   return {
-    iso2: iso2.toLowerCase(),
+    iso2: finalIso2,
     name: apiCountry.country || apiCountry.description || '',
     dialCode,
-    flagEmoji: getFlagEmojiFromIso2(iso2),
+    flagEmoji: getFlagEmojiFromIso2(finalIso2),
     countryCode: apiCountry.callnumber || 0,
   };
 };
@@ -77,19 +132,19 @@ export const convertRegionApiToDialCode = (
   };
 };
 
-const COUNTRY_ORDER = ['kr', 'us', 'jp', 'cn', 'id'];
-
 export const sortCountriesByOrder = (
   countries: CountryDialCode[]
 ): CountryDialCode[] => {
-  return [...countries].sort((a, b) => {
-    const indexA = COUNTRY_ORDER.indexOf(a.iso2.toLowerCase());
-    const indexB = COUNTRY_ORDER.indexOf(b.iso2.toLowerCase());
-    if (indexA === -1 && indexB === -1) return 0;
-    if (indexA === -1) return 1;
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
+
+  const koreaIndex = countries.findIndex(c => c.iso2.toLowerCase() === 'kr');
+  if (koreaIndex === 0) {
+
+    return countries;
+  }
+
+  const korea = countries.find(c => c.iso2.toLowerCase() === 'kr');
+  const others = countries.filter(c => c.iso2.toLowerCase() !== 'kr');
+  return korea ? [korea, ...others] : countries;
 };
 
 export const loadCountriesFromApi = async (
@@ -115,11 +170,22 @@ export interface LoadRegionsResult {
   hasRegions: boolean;
 }
 
+const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62];
+
 export const loadRegionsFromApi = async (
   getRegionsByCountry: (country: number) => Promise<GetRegionsByCountryResponse>,
   countryCode: number,
   fallback: CountryDialCode[] = [GLOBAL_REGION]
 ): Promise<LoadRegionsResult> => {
+
+  if (!COUNTRIES_WITH_REGIONS.includes(countryCode)) {
+    console.log('[countryUtils] 지역 미지원 국가 - global 반환:', countryCode);
+    return {
+      regions: [GLOBAL_REGION],
+      hasRegions: false,
+    };
+  }
+
   try {
     const response = await getRegionsByCountry(countryCode);
     console.log('[countryUtils] 지역 목록 응답:', {
@@ -147,7 +213,7 @@ export const loadRegionsFromApi = async (
 
       console.log('[countryUtils] 지역 데이터 없음 - hasRegions:', hasRegions, 'dataLength:', response.data?.length || 0);
       return {
-        regions: [],
+        regions: [GLOBAL_REGION],
         hasRegions: false,
       };
     }
@@ -172,7 +238,7 @@ export const loadRegionsFromApi = async (
 
     const hasValidFallback = fallback.length > 0 && fallback[0].iso2 !== 'global' && fallback[0].iso2 !== 'select';
     return {
-      regions: hasValidFallback ? fallback : [],
+      regions: hasValidFallback ? fallback : [GLOBAL_REGION],
       hasRegions: hasValidFallback,
     };
   }

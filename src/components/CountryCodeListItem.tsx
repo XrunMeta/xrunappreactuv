@@ -26,47 +26,56 @@ export const CountryCodeListItem: React.FC<Props> = ({
   onPress,
   hideDialCode = false,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const displayName = React.useMemo(() => {
-    const translationKey = getRegionTranslationKey(country);
-    if (translationKey) {
-      const fullKey = `regions.${translationKey}`;
+
+    const regionTranslationKey = getRegionTranslationKey(country);
+    if (regionTranslationKey) {
+      return country.name;
+    }
+
+    if (country.iso2 && country.iso2 !== 'select' && country.iso2 !== 'global' && country.iso2.length === 2) {
+      const countryKey = `countries.${country.iso2.toUpperCase()}`;
       try {
+        const translated = t(countryKey);
 
-        const translated = t(fullKey);
-
-        if (translated && translated !== fullKey) {
+        if (translated && translated !== countryKey) {
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 성공:', {
-              key: fullKey,
+            console.log('[CountryCodeListItem] 국가 번역 성공:', {
+              key: countryKey,
               translated,
               original: country.name,
-              countryCode: country.countryCode,
-              dialCode: country.dialCode,
+              iso2: country.iso2,
+              language: i18n.language,
             });
           }
           return translated;
         } else {
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
-              key: fullKey,
-              translated,
+            console.warn('[CountryCodeListItem] 국가 번역 키 없음:', {
+              key: countryKey,
+              iso2: country.iso2,
               original: country.name,
-              countryCode: country.countryCode,
-              dialCode: country.dialCode,
+              translated,
+              language: i18n.language,
             });
           }
         }
       } catch (error) {
         if (__DEV__) {
-          console.warn('[CountryCodeListItem] 지역 번역 오류:', error);
+          console.warn('[CountryCodeListItem] 국가 번역 오류:', error, {
+            key: countryKey,
+            iso2: country.iso2,
+            original: country.name,
+            language: i18n.language,
+          });
         }
       }
     }
 
     return country.name;
-  }, [country, t]);
+  }, [country, t, i18n.language]);
 
   return (
     <Pressable
@@ -85,14 +94,8 @@ export const CountryCodeListItem: React.FC<Props> = ({
         {(() => {
 
           const translationKey = getRegionTranslationKey(country);
-          if (translationKey && country.name && country.name !== displayName) {
-
-            const countryCode = country.countryCode;
-            if (countryCode === 82 || countryCode === 1 || countryCode === 86 || countryCode === 62) {
-              return null;
-            }
-
-            return <Text style={styles.isoText}>{country.name}</Text>;
+          if (translationKey) {
+            return null;
           }
 
           return <Text style={styles.isoText}>{country.iso2.toUpperCase()}</Text>;

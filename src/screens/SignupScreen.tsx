@@ -164,37 +164,23 @@ export const SignupScreen = () => {
 
   const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
 
+  const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62]; 
+  const isCountryWithRegions = selectedCountryDialCode?.countryCode ? COUNTRIES_WITH_REGIONS.includes(selectedCountryDialCode.countryCode) : false;
+
   const regionDisplayValue = React.useMemo(() => {
+
+    if (!isCountryWithRegions) {
+      return GLOBAL_REGION.name;
+    }
 
     if (selectedRegion && (selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0')) {
       return '';
     }
+
     let value = '';
     if (selectedRegion) {
 
-      const translationKey = selectedRegion.countryCode && selectedRegion.dialCode
-        ? `${selectedRegion.countryCode}_${selectedRegion.dialCode}`
-        : null;
-      if (translationKey) {
-        const fullKey = `regions.${translationKey}`;
-        try {
-
-          const translated = t(fullKey);
-
-          if (translated && translated !== fullKey) {
-            value = translated;
-          } else {
-            value = selectedRegion.name;
-          }
-        } catch (error) {
-          if (__DEV__) {
-            console.warn('[회원가입] 지역 번역 오류:', error);
-          }
-          value = selectedRegion.name;
-        }
-      } else {
-        value = selectedRegion.name;
-      }
+      value = selectedRegion.name;
     } else {
       value = isKoreaSelected ? '' : GLOBAL_REGION.name;
     }
@@ -205,11 +191,12 @@ export const SignupScreen = () => {
         selectedRegionIso2: selectedRegion?.iso2,
         selectedRegionDialCode: selectedRegion?.dialCode,
         isKoreaSelected,
+        isCountryWithRegions,
         value,
       });
     }
     return value;
-  }, [selectedRegion, isKoreaSelected, t]);
+  }, [selectedRegion, isKoreaSelected, isCountryWithRegions]);
 
   React.useEffect(() => {
     const loadRegionsForCountry = async () => {
@@ -243,7 +230,7 @@ export const SignupScreen = () => {
           }
         } else {
 
-          setSelectedRegion(null);
+          setSelectedRegion(GLOBAL_REGION);
         }
       } catch (error) {
         console.error('[회원가입] 지역 목록 로드 실패:', error);
@@ -1113,25 +1100,28 @@ export const SignupScreen = () => {
           />
 
           {}
-          {hasRegions && (
-            <View style={styles.fieldContainer}>
-              <FormField
-                label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
-                placeholder={t('screens.signup.regionPlaceholder')}
-                value={regionDisplayValue}
-                editable={false}
-                showDisabledStyle={false}
-                onPress={() => {
+          <View style={styles.fieldContainer}>
+            <FormField
+              label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
+              placeholder={t('screens.signup.regionPlaceholder')}
+              value={regionDisplayValue}
+              editable={false}
+              showDisabledStyle={false}
+              onPress={() => {
 
-                  if (!hasRegions || isSubmitting) {
-                    return;
-                  }
-                  setRegionModalVisible(true);
-                }}
-              />
-
-            </View>
-          )}
+                if (!hasRegions || isSubmitting) {
+                  return;
+                }
+                setRegionModalVisible(true);
+              }}
+            />
+            {}
+            {!isCountryWithRegions && (
+              <Text style={styles.regionHelper}>
+                {t('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
+              </Text>
+            )}
+          </View>
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>

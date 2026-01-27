@@ -20,7 +20,7 @@ import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../
 
 export const CountryCodeSelectScreen = () => {
   console.log('CountryCodeSelectScreen');
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
   const {
     selectedCountryDialCode,
@@ -128,12 +128,23 @@ export const CountryCodeSelectScreen = () => {
       const numericQuery = normalizedQuery.replace(/[^0-9]/g, '');
 
       items = dataSource.filter((item) => {
+
         const searchName = item.name.toLowerCase();
+
+        let translatedName = '';
+        if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
+          const countryKey = `countries.${item.iso2.toUpperCase()}`;
+          const translated = t(countryKey);
+          if (translated && translated !== countryKey) {
+            translatedName = translated.toLowerCase();
+          }
+        }
         const searchIso = item.iso2.toLowerCase();
         const searchDial = item.dialCode.replace('+', '');
 
         return (
           searchName.includes(normalizedQuery) ||
+          (translatedName && translatedName.includes(normalizedQuery)) ||
           searchIso.includes(normalizedQuery) ||
           (numericQuery.length > 0 && searchDial.startsWith(numericQuery))
         );
@@ -157,11 +168,12 @@ export const CountryCodeSelectScreen = () => {
         itemsLength: items.length,
         firstItem: items[0],
         secondItem: items[1],
+        language: i18n.language,
       });
     }
 
     return items;
-  }, [query, dataSource, selectMode, selectOption]);
+  }, [query, dataSource, selectMode, selectOption, t, i18n.language]);
 
   const handleSelect = (item: CountryDialCode) => {
     console.log('[국가선택] handleSelect 호출:', {
@@ -206,7 +218,31 @@ export const CountryCodeSelectScreen = () => {
                 <Text style={styles.flagEmoji}>{selectedItem.flagEmoji}</Text>
               </View>
               <View style={styles.currentInfo}>
-                <Text style={styles.currentCountry}>{selectedItem.name}</Text>
+                <Text style={styles.currentCountry}>
+                  {(() => {
+
+                    const isRegion = selectedItem.countryCode && selectedItem.dialCode && selectedItem.iso2 !== 'select' && selectedItem.iso2 !== 'global';
+                    if (isRegion) {
+                      return selectedItem.name;
+                    }
+
+                    if (selectedItem.iso2 && selectedItem.iso2 !== 'select' && selectedItem.iso2 !== 'global' && selectedItem.iso2.length === 2) {
+                      const countryKey = `countries.${selectedItem.iso2.toUpperCase()}`;
+                      const translated = t(countryKey);
+                      if (__DEV__ && i18n.language === 'zh-CN') {
+                        console.log('[CountryCodeSelectScreen] 현재 선택된 국가 번역:', {
+                          iso2: selectedItem.iso2,
+                          key: countryKey,
+                          translated,
+                          original: selectedItem.name,
+                          language: i18n.language,
+                        });
+                      }
+                      return translated && translated !== countryKey ? translated : selectedItem.name;
+                    }
+                    return selectedItem.name;
+                  })()}
+                </Text>
                 {selectMode === 'country' && (
                   <Text style={styles.currentDial}>{selectedItem.dialCode}</Text>
                 )}
