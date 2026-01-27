@@ -134,7 +134,7 @@ export const v_5c7129 = async (
       const v_5f1e0e = v_3393e3.has_regions === true;
       const v_68476a = v_3393e3.data && v_3393e3.data.length > 0;
 
-      if (v_68476a) {
+      if (v_68476a && v_3393e3.data) {
         const v_a4cc88 = v_3393e3.data.map((v_a6c30b) =>
           v_18a84a(v_a6c30b, v_a4d981)
         );
