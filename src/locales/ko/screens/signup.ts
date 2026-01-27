@@ -14,6 +14,7 @@ export default {
   phoneNumberPlaceholder: '휴대폰 번호를 입력해주세요.',
   regionLabel: '지역',
   regionPlaceholder: '지역을 선택하세요',
+  regionHelper: 'Global 지역이 자동으로 적용됩니다.',
   genderLabel: '성별',
   genderMale: '남',
   genderFemale: '여',

@@ -39,6 +39,40 @@ export const v_27df20 = (
     }
   }
 
+  if (!v_cc0c7d && v_d38c53.country) {
+    const v_34c566 = v_d38c53.country.toLowerCase();
+
+    let v_f96d6d = v_202d44.find(
+      (v_3f4e2e) => v_3f4e2e.name.toLowerCase() === v_34c566
+    );
+
+    if (!v_f96d6d) {
+      v_f96d6d = v_202d44.find(
+        (v_3f4e2e) => {
+          const v_67cb9c = v_3f4e2e.name.toLowerCase();
+
+          return v_34c566.includes(v_67cb9c) || 
+                 v_67cb9c.includes(v_34c566);
+        }
+      );
+    }
+
+    if (!v_f96d6d && (v_34c566.includes('korea') || v_34c566.includes('south korea'))) {
+      v_f96d6d = v_202d44.find((v_3f4e2e) => v_3f4e2e.iso2 === 'kr');
+    }
+
+    if (v_f96d6d) {
+      v_cc0c7d = v_f96d6d.iso2;
+      if (__DEV__) {
+        console.log('[countryUtils] country 필드에서 ISO2 추출 성공:', {
+          country: v_d38c53.country,
+          iso2: v_cc0c7d,
+          matchedName: v_f96d6d.name,
+        });
+      }
+    }
+  }
+
   if (!v_cc0c7d && v_d38c53.callnumber) {
     const v_f96d6d = v_202d44.find(
       (v_3f4e2e) => v_3f4e2e.dialCode === v_146092
@@ -52,11 +86,32 @@ export const v_27df20 = (
     v_cc0c7d = v_d38c53.description?.toLowerCase().replace(/\s+/g, '') || '';
   }
 
+  if (__DEV__ && (!v_cc0c7d || v_cc0c7d.length !== 2)) {
+    console.warn('[countryUtils] ISO2 추출 실패:', {
+      code: v_d38c53.code,
+      lcode: v_d38c53.lcode,
+      country: v_d38c53.country,
+      description: v_d38c53.description,
+      callnumber: v_d38c53.callnumber,
+      extractedIso2: v_cc0c7d,
+    });
+  }
+
+  const v_9e281f = v_cc0c7d.toLowerCase();
+  if (__DEV__) {
+    console.log('[countryUtils] 국가 변환 결과:', {
+      original: v_d38c53.country || v_d38c53.description,
+      iso2: v_9e281f,
+      dialCode: v_146092,
+      countryCode: v_d38c53.callnumber,
+    });
+  }
+
   return {
-    iso2: v_cc0c7d.toLowerCase(),
+    iso2: v_9e281f,
     name: v_d38c53.country || v_d38c53.description || '',
     dialCode: v_146092,
-    flagEmoji: v_eebb85(v_cc0c7d),
+    flagEmoji: v_eebb85(v_9e281f),
     countryCode: v_d38c53.callnumber || 0,
   };
 };
@@ -77,19 +132,19 @@ export const v_18a84a = (
   };
 };
 
-const v_abb10c = ['kr', 'us', 'jp', 'cn', 'id'];
-
 export const v_fb6ba6 = (
   countries: v_da1883[]
 ): v_da1883[] => {
-  return [...v_6c7bef].sort((v_779914, v_148ff6) => {
-    const v_8a984b = v_abb10c.indexOf(v_779914.iso2.toLowerCase());
-    const v_9f575e = v_abb10c.indexOf(v_148ff6.iso2.toLowerCase());
-    if (v_8a984b === -1 && v_9f575e === -1) return 0;
-    if (v_8a984b === -1) return 1;
-    if (v_9f575e === -1) return -1;
-    return v_8a984b - v_9f575e;
-  });
+
+  const v_e8b858 = v_6c7bef.findIndex(v_3f4e2e => v_3f4e2e.iso2.toLowerCase() === 'kr');
+  if (v_e8b858 === 0) {
+
+    return v_6c7bef;
+  }
+
+  const v_621722 = v_6c7bef.find(v_3f4e2e => v_3f4e2e.iso2.toLowerCase() === 'kr');
+  const v_986d86 = v_6c7bef.filter(v_3f4e2e => v_3f4e2e.iso2.toLowerCase() !== 'kr');
+  return v_621722 ? [v_621722, ...v_986d86] : v_6c7bef;
 };
 
 export const v_151d5f = async (
@@ -115,11 +170,22 @@ export interface LoadRegionsResult {
   hasRegions: boolean;
 }
 
+const v_90ad93 = [82, 81, 86, 1, 62];
+
 export const v_5c7129 = async (
   getRegionsByCountry: (country: number) => Promise<v_7d842d>,
   v_a4d981,
   fallback: v_da1883[] = [v_789afd]
 ): Promise<LoadRegionsResult> => {
+
+  if (!v_90ad93.includes(v_a4d981)) {
+    console.log('[countryUtils] 지역 미지원 국가 - global 반환:', v_a4d981);
+    return {
+      regions: [v_789afd],
+      hasRegions: false,
+    };
+  }
+
   try {
     const v_3393e3 = await v_11e39e(v_a4d981);
     console.log('[countryUtils] 지역 목록 응답:', {
@@ -147,7 +213,7 @@ export const v_5c7129 = async (
 
       console.log('[countryUtils] 지역 데이터 없음 - hasRegions:', v_5f1e0e, 'dataLength:', v_3393e3.data?.length || 0);
       return {
-        regions: [],
+        regions: [v_789afd],
         hasRegions: false,
       };
     }
@@ -172,7 +238,7 @@ export const v_5c7129 = async (
 
     const v_05f37b = v_0debf4.length > 0 && v_0debf4[0].iso2 !== 'global' && v_0debf4[0].iso2 !== 'select';
     return {
-      regions: v_05f37b ? v_0debf4 : [],
+      regions: v_05f37b ? v_0debf4 : [v_789afd],
       hasRegions: v_05f37b,
     };
   }

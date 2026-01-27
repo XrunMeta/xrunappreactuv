@@ -13,6 +13,7 @@ export default {
   allRegions: 'All Regions',
   pleaseSelect: 'Please Select',
   selectCountryAndRegion: 'Please select country and region',
+  regionHelper: 'Global region will be automatically applied.',
   gender: 'Gender',
   genderMale: 'Male',
   genderFemale: 'Female',

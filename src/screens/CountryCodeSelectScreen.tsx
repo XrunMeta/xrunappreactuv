@@ -20,7 +20,7 @@ import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
 
 export const v_379bd1 = () => {
   console.log('CountryCodeSelectScreen');
-  const { t: v_8d41d7 } = v_772971();
+  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const {
     selectedCountryDialCode: v_459d5e,
@@ -128,12 +128,23 @@ export const v_379bd1 = () => {
       const v_5a09fa = v_470e34.replace(/[^0-9]/g, '');
 
       v_4622b9 = v_093bd4.filter((v_8c0b26) => {
+
         const v_cd2b74 = v_8c0b26.name.toLowerCase();
+
+        let v_a2493c = '';
+        if (v_8c0b26.iso2 && v_8c0b26.iso2 !== 'select' && v_8c0b26.iso2 !== 'global' && v_8c0b26.iso2.length === 2) {
+          const v_4d2349 = `countries.${v_8c0b26.iso2.toUpperCase()}`;
+          const v_6dce25 = v_8d41d7(v_4d2349);
+          if (v_6dce25 && v_6dce25 !== v_4d2349) {
+            v_a2493c = v_6dce25.toLowerCase();
+          }
+        }
         const v_73b9dc = v_8c0b26.iso2.toLowerCase();
         const v_62656e = v_8c0b26.dialCode.replace('+', '');
 
         return (
           v_cd2b74.includes(v_470e34) ||
+          (v_a2493c && v_a2493c.includes(v_470e34)) ||
           v_73b9dc.includes(v_470e34) ||
           (v_5a09fa.length > 0 && v_62656e.startsWith(v_5a09fa))
         );
@@ -157,11 +168,12 @@ export const v_379bd1 = () => {
         itemsLength: v_4622b9.length,
         firstItem: v_4622b9[0],
         secondItem: v_4622b9[1],
+        language: v_9c213b.language,
       });
     }
 
     return v_4622b9;
-  }, [v_7c5791, v_093bd4, v_479a37, v_a35839]);
+  }, [v_7c5791, v_093bd4, v_479a37, v_a35839, v_8d41d7, v_9c213b.language]);
 
   const v_6121dc = (item: v_da1883) => {
     console.log('[국가선택] handleSelect 호출:', {
@@ -206,7 +218,31 @@ export const v_379bd1 = () => {
                 <Text style={v_d81136.flagEmoji}>{v_c6e76b.flagEmoji}</Text>
               </View>
               <View style={v_d81136.currentInfo}>
-                <Text style={v_d81136.currentCountry}>{v_c6e76b.name}</Text>
+                <Text style={v_d81136.currentCountry}>
+                  {(() => {
+
+                    const v_e74520 = v_c6e76b.countryCode && v_c6e76b.dialCode && v_c6e76b.iso2 !== 'select' && v_c6e76b.iso2 !== 'global';
+                    if (v_e74520) {
+                      return v_c6e76b.name;
+                    }
+
+                    if (v_c6e76b.iso2 && v_c6e76b.iso2 !== 'select' && v_c6e76b.iso2 !== 'global' && v_c6e76b.iso2.length === 2) {
+                      const v_4d2349 = `countries.${v_c6e76b.iso2.toUpperCase()}`;
+                      const v_6dce25 = v_8d41d7(v_4d2349);
+                      if (__DEV__ && v_9c213b.language === 'zh-CN') {
+                        console.log('[CountryCodeSelectScreen] 현재 선택된 국가 번역:', {
+                          iso2: v_c6e76b.iso2,
+                          key: v_4d2349,
+                          translated: v_6dce25,
+                          original: v_c6e76b.name,
+                          language: v_9c213b.language,
+                        });
+                      }
+                      return v_6dce25 && v_6dce25 !== v_4d2349 ? v_6dce25 : v_c6e76b.name;
+                    }
+                    return v_c6e76b.name;
+                  })()}
+                </Text>
                 {v_479a37 === 'country' && (
                   <Text style={v_d81136.currentDial}>{v_c6e76b.dialCode}</Text>
                 )}

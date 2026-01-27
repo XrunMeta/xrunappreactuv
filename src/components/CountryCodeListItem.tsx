@@ -26,47 +26,56 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
   onPress: v_719eed,
   hideDialCode: v_6e9efc = false,
 }) => {
-  const { t: v_8d41d7 } = v_772971();
+  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
 
   const v_8a1355 = v_a3453e.useMemo(() => {
-    const v_f5d8ad = v_ebcf70(v_b9bbbd);
-    if (v_f5d8ad) {
-      const v_75aa17 = `regions.${v_f5d8ad}`;
+
+    const v_82170f = v_ebcf70(v_b9bbbd);
+    if (v_82170f) {
+      return v_b9bbbd.name;
+    }
+
+    if (v_b9bbbd.iso2 && v_b9bbbd.iso2 !== 'select' && v_b9bbbd.iso2 !== 'global' && v_b9bbbd.iso2.length === 2) {
+      const v_4d2349 = `countries.${v_b9bbbd.iso2.toUpperCase()}`;
       try {
+        const v_6dce25 = v_8d41d7(v_4d2349);
 
-        const v_6dce25 = v_8d41d7(v_75aa17);
-
-        if (v_6dce25 && v_6dce25 !== v_75aa17) {
+        if (v_6dce25 && v_6dce25 !== v_4d2349) {
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 성공:', {
-              key: v_75aa17,
+            console.log('[CountryCodeListItem] 국가 번역 성공:', {
+              key: v_4d2349,
               translated: v_6dce25,
               original: v_b9bbbd.name,
-              countryCode: v_b9bbbd.countryCode,
-              dialCode: v_b9bbbd.dialCode,
+              iso2: v_b9bbbd.iso2,
+              language: v_9c213b.language,
             });
           }
           return v_6dce25;
         } else {
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
-              key: v_75aa17,
-              translated: v_6dce25,
+            console.warn('[CountryCodeListItem] 국가 번역 키 없음:', {
+              key: v_4d2349,
+              iso2: v_b9bbbd.iso2,
               original: v_b9bbbd.name,
-              countryCode: v_b9bbbd.countryCode,
-              dialCode: v_b9bbbd.dialCode,
+              translated: v_6dce25,
+              language: v_9c213b.language,
             });
           }
         }
       } catch (v_5e9bfe) {
         if (__DEV__) {
-          console.warn('[CountryCodeListItem] 지역 번역 오류:', v_5e9bfe);
+          console.warn('[CountryCodeListItem] 국가 번역 오류:', v_5e9bfe, {
+            key: v_4d2349,
+            iso2: v_b9bbbd.iso2,
+            original: v_b9bbbd.name,
+            language: v_9c213b.language,
+          });
         }
       }
     }
 
     return v_b9bbbd.name;
-  }, [v_b9bbbd, v_8d41d7]);
+  }, [v_b9bbbd, v_8d41d7, v_9c213b.language]);
 
   return (
     <Pressable
@@ -85,14 +94,8 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
         {(() => {
 
           const v_f5d8ad = v_ebcf70(v_b9bbbd);
-          if (v_f5d8ad && v_b9bbbd.name && v_b9bbbd.name !== v_8a1355) {
-
-            const v_a4d981 = v_b9bbbd.countryCode;
-            if (v_a4d981 === 82 || v_a4d981 === 1 || v_a4d981 === 86 || v_a4d981 === 62) {
-              return null;
-            }
-
-            return <Text style={v_d81136.isoText}>{v_b9bbbd.name}</Text>;
+          if (v_f5d8ad) {
+            return null;
           }
 
           return <Text style={v_d81136.isoText}>{v_b9bbbd.iso2.toUpperCase()}</Text>;
