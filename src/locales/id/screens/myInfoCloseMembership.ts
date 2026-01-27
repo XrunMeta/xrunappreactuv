@@ -2,6 +2,7 @@ export default {
   title: 'Tutup Keanggotaan',
   passwordLabel: 'Kata Sandi',
   passwordPlaceholder: 'Masukkan kata sandi Anda',
+  warningText: 'Jika Anda menutup keanggotaan, semua informasi pribadi, kunci dompet, dan data terkait yang disimpan untuk penggunaan aplikasi akan dihapus. Setelah dihapus, pemulihan tidak mungkin dilakukan, jadi harap konfirmasi dengan hati-hati.',
   helperText: '*Kami memerlukan kata sandi Anda untuk manajemen akun yang aman saat menutup keanggotaan.',
   confirmButton: 'Konfirmasi',
   processing: 'Memproses...',

@@ -127,6 +127,31 @@ export const MyInfoEditScreen = () => {
   const [regionModalVisible, setRegionModalVisible] = useState(false);
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
 
+  const getTranslatedRegionName = React.useCallback((regionDesc: string, regionCode: number | null, countryCode: number | null): string => {
+
+    if (regionCode === 0) {
+      return t('screens.myInfoEdit.allRegions');
+    }
+
+    if (countryCode && regionCode !== null && regionCode > 0) {
+      const translationKey = `${countryCode}_${regionCode}`;
+      const fullKey = `regions.${translationKey}`;
+      try {
+        const translated = t(fullKey);
+
+        if (translated && translated !== fullKey) {
+          return translated;
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.warn('[정보수정] 지역 번역 오류:', error);
+        }
+      }
+    }
+
+    return regionDesc;
+  }, [t]);
+
   const [originalFirstName, setOriginalFirstName] = useState('');
   const [originalLastName, setOriginalLastName] = useState('');
   const [originalGender, setOriginalGender] = useState<'male' | 'female'>('male');
@@ -1383,11 +1408,13 @@ export const MyInfoEditScreen = () => {
 
                     if (countryName && tempRegion.rDesc && tempRegion.rDesc !== 'Please Select' && tempRegion.rCode !== null && tempRegion.rCode !== -1 && !isCountryChanged) {
 
+                      const translatedRegionName = getTranslatedRegionName(tempRegion.rDesc, tempRegion.rCode, tempCountry.cCode || countryCode);
+
                       if (tempRegion.rCode === 0) {
-                        return tempRegion.rDesc;
+                        return translatedRegionName;
                       }
 
-                      return `${countryName}, ${tempRegion.rDesc}`;
+                      return `${countryName}, ${translatedRegionName}`;
                     }
 
                     if (countryName) {
@@ -1505,7 +1532,12 @@ export const MyInfoEditScreen = () => {
                       onPress={() => handleSelectRegion(region)}
                     >
                       <Text style={styles.modalItemText}>
-                        {region.description || region.rName || 'Unknown'}
+                        {(() => {
+                          const regionDesc = region.description || region.rName || 'Unknown';
+                          const regionCode = region.subcode || region.rCode;
+                          const currentCountryCode = tempCountry.cCode || countryCode;
+                          return getTranslatedRegionName(regionDesc, regionCode || null, currentCountryCode);
+                        })()}
                       </Text>
                       {(() => {
                         const regionName = region.description || region.rName || '';

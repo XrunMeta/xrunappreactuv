@@ -5,6 +5,7 @@ export default {
   countrySearchPlaceholder: '搜索国家',
   regionSearchPlaceholder: '搜索地区',
   noResults: '没有搜索结果',
+  selectOption: '选择',
 };
 
 

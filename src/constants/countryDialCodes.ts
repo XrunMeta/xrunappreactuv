@@ -1,5 +1,13 @@
 import { CountryDialCode } from '../types';
 
+export const ALLOWED_COUNTRIES: CountryDialCode[] = [
+  { iso2: 'kr', name: 'Korea', dialCode: '+82', flagEmoji: '🇰🇷', countryCode: 82 },
+  { iso2: 'us', name: 'United States', dialCode: '+1', flagEmoji: '🇺🇸', countryCode: 1 },
+  { iso2: 'jp', name: 'Japan', dialCode: '+81', flagEmoji: '🇯🇵', countryCode: 81 },
+  { iso2: 'cn', name: 'China', dialCode: '+86', flagEmoji: '🇨🇳', countryCode: 86 },
+  { iso2: 'id', name: 'Indonesia', dialCode: '+62', flagEmoji: '🇮🇩', countryCode: 62 },
+];
+
 export const COUNTRY_DIAL_CODES: CountryDialCode[] = [
   { iso2: 'us', name: 'United States', dialCode: '+1', flagEmoji: '🇺🇸' },
   { iso2: 'ru', name: 'Russia', dialCode: '+7', flagEmoji: '🇷🇺' },

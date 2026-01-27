@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   FlatList,
   StyleSheet,
   Text,
   TextInput,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -12,13 +13,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, CountryCodeListItem, SafeScrollView, SafeView } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, FONTS } from '../constants';
+import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, FONTS, GLOBAL_REGION, getRegionsByCountryIso2, ALLOWED_COUNTRIES } from '../constants';
 import { CountryDialCode } from '../types';
+import { getCountries, getRegionsByCountry } from '../services';
+import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
 
 export const CountryCodeSelectScreen = () => {
   console.log('CountryCodeSelectScreen');
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const {
     selectedCountryDialCode,
     setSelectedCountryDialCode,
@@ -27,20 +30,93 @@ export const CountryCodeSelectScreen = () => {
     selectMode,
   } = useAppContext();
   const [query, setQuery] = useState('');
+  const [countries, setCountries] = useState<CountryDialCode[]>(ALLOWED_COUNTRIES);
+  const [regions, setRegions] = useState<CountryDialCode[]>(REGIONS_AS_COUNTRY_DIAL_CODES);
+  const [isLoading, setIsLoading] = useState(false);
 
   const selectOption: CountryDialCode = useMemo(() => ({
     iso2: 'select',
-    name: t('screens.signup.genderSelect') || '선택',
+    name: t('screens.countryCodeSelect.selectOption') || '선택',
     dialCode: '0',
     flagEmoji: '📍',
     countryCode: 0,
   }), [t]);
 
-  const baseDataSource = selectMode === 'region' ? REGIONS_AS_COUNTRY_DIAL_CODES : COUNTRY_DIAL_CODES;
+  useEffect(() => {
+    if (selectMode === 'country') {
+      const loadCountries = async () => {
+        setIsLoading(true);
+        try {
+          const loadedCountries = await loadCountriesFromApi(
+            () => getCountries(navigate),
+            ALLOWED_COUNTRIES
+          );
+          setCountries(loadedCountries);
+        } catch (error) {
+          console.error('[CountryCodeSelect] 국가 목록 로드 실패:', error);
+          setCountries(ALLOWED_COUNTRIES);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadCountries();
+    }
+  }, [selectMode, navigate]);
+
+  useEffect(() => {
+    if (selectMode === 'region' && selectedCountryDialCode?.countryCode) {
+      const loadRegions = async () => {
+        setIsLoading(true);
+        try {
+          const result: LoadRegionsResult = await loadRegionsFromApi(
+            (country: number) => getRegionsByCountry(country, navigate),
+            selectedCountryDialCode.countryCode || 0,
+            getRegionsByCountryIso2(selectedCountryDialCode.iso2)
+          );
+          console.log('[CountryCodeSelect] 지역 목록 로드 결과:', {
+            hasRegions: result.hasRegions,
+            regionsLength: result.regions.length,
+            regions: result.regions,
+          });
+
+          if (result.regions.length > 0) {
+            console.log('[CountryCodeSelect] 지역 목록 설정:', result.regions.length, '개');
+            setRegions(result.regions);
+          } else {
+            console.log('[CountryCodeSelect] 지역 없음 - "선택" 옵션만 표시');
+            setRegions([selectOption]);
+          }
+        } catch (error) {
+          console.error('[CountryCodeSelect] 지역 목록 로드 실패:', error);
+          const fallbackRegions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
+          setRegions(fallbackRegions);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadRegions();
+    } else if (selectMode === 'region') {
+
+      setRegions(REGIONS_AS_COUNTRY_DIAL_CODES);
+    }
+  }, [selectMode, selectedCountryDialCode, navigate, selectOption]);
+
+  const baseDataSource = selectMode === 'region' ? regions : countries;
 
   const dataSource = useMemo(() => {
-    return selectMode === 'region' ? [selectOption, ...baseDataSource] : baseDataSource;
-  }, [selectMode, selectOption, baseDataSource]);
+    const result = selectMode === 'region' ? [selectOption, ...baseDataSource] : baseDataSource;
+    if (__DEV__ && selectMode === 'region') {
+      console.log('[CountryCodeSelect] dataSource 계산:', {
+        selectMode,
+        regionsLength: regions.length,
+        baseDataSourceLength: baseDataSource.length,
+        resultLength: result.length,
+        firstItem: result[0],
+        secondItem: result[1],
+      });
+    }
+    return result;
+  }, [selectMode, selectOption, baseDataSource, regions]);
 
   const selectedItem = selectMode === 'region' ? selectedRegion : selectedCountryDialCode;
 
@@ -72,6 +148,16 @@ export const CountryCodeSelectScreen = () => {
       if (selectMode === 'region' && items[0]?.iso2 !== 'select') {
         items = [selectOption, ...items];
       }
+    }
+
+    if (__DEV__ && selectMode === 'region') {
+      console.log('[CountryCodeSelect] filteredItems 계산:', {
+        query,
+        dataSourceLength: dataSource.length,
+        itemsLength: items.length,
+        firstItem: items[0],
+        secondItem: items[1],
+      });
     }
 
     return items;
@@ -142,25 +228,31 @@ export const CountryCodeSelectScreen = () => {
           />
         </View>
 
-        <FlatList
-          data={filteredItems}
-          keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
-          renderItem={({ item }) => (
-            <CountryCodeListItem
-              country={item}
-              isSelected={item.iso2 === selectedItem?.iso2 && item.dialCode === selectedItem?.dialCode}
-              onPress={handleSelect}
-            />
-          )}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>{t('screens.countryCodeSelect.noResults')}</Text>
-            </View>
-          }
-        />
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+          </View>
+        ) : (
+          <FlatList
+            data={filteredItems}
+            keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
+            renderItem={({ item }) => (
+              <CountryCodeListItem
+                country={item}
+                isSelected={item.iso2 === selectedItem?.iso2 && item.dialCode === selectedItem?.dialCode}
+                onPress={handleSelect}
+              />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            ListEmptyComponent={
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>{t('screens.countryCodeSelect.noResults')}</Text>
+              </View>
+            }
+          />
+        )}
       </View>
     </SafeView>
   );
@@ -245,6 +337,12 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.lsmall,
     color: '#9ca3af',
     fontFamily: 'Roboto-Regular',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
   },
 });
 

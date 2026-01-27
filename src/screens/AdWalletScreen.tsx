@@ -151,8 +151,9 @@ export const AdWalletScreen = () => {
         if (responseData && responseData.transactions && responseData.transactions.length > 0) {
           const transaction = responseData.transactions[0];
 
-          const amountAsXrunValue = parseFloat(transaction.amountasxrun || '0').toFixed(2);
-          const amountasxrun = `${amountAsXrunValue} XRUN`;
+          const amountAsXrunNum = parseFloat(transaction.amountasxrun || '0');
+          const flooredAmount = Math.floor(amountAsXrunNum * 100) / 100;
+          const amountasxrun = `${flooredAmount.toFixed(2)} XRUN`;
 
           let krwamount = '0 KRW';
           if (gopaxPrice && transaction.amountasxrun) {
@@ -274,7 +275,10 @@ export const AdWalletScreen = () => {
       console.log('🔍 [convertEstimateToAdEntry] item:', item);
 
       const amountValue = item.amountasxrun || item.priceasXrun || '0';
-      const expectedAdRevenue = `${parseFloat(amountValue).toFixed(2)} XRUN`;
+
+      const amountNum = parseFloat(amountValue);
+      const flooredAmount = Math.floor(amountNum * 100) / 100;
+      const expectedAdRevenue = `${flooredAmount.toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const itemId = item.transaction || item.id;
@@ -307,7 +311,23 @@ export const AdWalletScreen = () => {
         ? parseFloat(originalRewardValue)
         : originalRewardValue;
 
+      const isAttendanceCheck = item.id === 1 || item.id === '1';
+      if (isAttendanceCheck) {
+        const flooredForLog = Math.floor(rewardAmount * 100) / 100;
+        console.log('[AdWallet] 출석체크 보상 변환:', {
+          id: item.id,
+          title: item.title,
+          원본값: originalRewardValue,
+          원본타입: typeof originalRewardValue,
+          변환후값: rewardAmount,
+          변환후타입: typeof rewardAmount,
+          최종표시값: `${flooredForLog.toFixed(2)} XRUN`,
+          eventStatus: item.event_status,
+        });
+      }
+
       if (isReferralEvent) {
+        const flooredForLog = Math.floor(rewardAmount * 100) / 100;
         console.log('[AdWallet] 추천인 이벤트 변환:', {
           id: item.id,
           title: item.title,
@@ -315,7 +335,7 @@ export const AdWalletScreen = () => {
           원본타입: typeof originalRewardValue,
           변환후값: rewardAmount,
           변환후타입: typeof rewardAmount,
-          최종표시값: `${rewardAmount.toFixed(2)} XRUN`,
+          최종표시값: `${flooredForLog.toFixed(2)} XRUN`,
         });
       }
 
@@ -324,7 +344,9 @@ export const AdWalletScreen = () => {
         : formatDate(item.start_date || item.created_at);
 
       const displayRewardAmount = rewardAmount;
-      const expectedAdRevenue = `${displayRewardAmount.toFixed(2)} XRUN`;
+
+      const flooredAmount = Math.floor(displayRewardAmount * 100) / 100;
+      const expectedAdRevenue = `${flooredAmount.toFixed(2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const isReviewStatus = item.event_status === 'review';
@@ -367,8 +389,9 @@ export const AdWalletScreen = () => {
 
       let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
-        const settlementValue = parseFloat(item.amountasxrun).toFixed(2);
-        adRevenueSettlement = `${settlementValue} XRUN`;
+        const settlementNum = parseFloat(item.amountasxrun);
+        const flooredSettlement = Math.floor(settlementNum * 100) / 100;
+        adRevenueSettlement = `${flooredSettlement.toFixed(2)} XRUN`;
       }
 
       const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';

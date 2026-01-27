@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { ROUTES, ScreenName } from '../navigation';
 import { ClauseId, AgreementType, CountryDialCode, ShopItem, EmergencyStopInfo, AdvertisementParams, CombinedAsset } from '../types';
-import { COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODES, getRegionsByCountryIso2, GLOBAL_REGION } from '../constants';
+import { COUNTRY_DIAL_CODES, ALLOWED_COUNTRIES, REGIONS_AS_COUNTRY_DIAL_CODES, getRegionsByCountryIso2, GLOBAL_REGION } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -53,8 +53,8 @@ type AppContextValue = {
     phoneNumber: string;
     region: string;
     referralEmail: string;
-    gender: 'male' | 'female';
-    ageRange: '10' | '20' | '30' | '40' | '50+';
+    gender: 'male' | 'female' | '0';
+    ageRange: '0' | '10' | '20' | '30' | '40' | '50+';
     termsAccepted: boolean;
   };
   setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => void;
@@ -107,7 +107,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedShopItem, setSelectedShopItem] = useState<ShopItem | undefined>(undefined);
   const [selectedReferralMember, setSelectedReferralMember] = useState<{ member: string; email: string } | undefined>(undefined);
   const [emergencyStop, setEmergencyStop] = useState<EmergencyStopInfo>(null);
-  const defaultCountry = COUNTRY_DIAL_CODES.find((country) => country.iso2 === 'kr') ?? COUNTRY_DIAL_CODES[0];
+  const defaultCountry = ALLOWED_COUNTRIES.find((country) => country.iso2 === 'kr') ?? ALLOWED_COUNTRIES[0];
   const [selectedCountryDialCode, setSelectedCountryDialCode] = useState<CountryDialCode>(defaultCountry);
 
   const initialRegion = useMemo(() => {
@@ -119,15 +119,30 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
 
-    if (selectedRegion && selectedRegion.dialCode === '0') {
+    if (selectedRegion && (selectedRegion.dialCode === '0' || selectedRegion.iso2 === 'select')) {
       return;
     }
+
     const regions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
     const isRegionValid = selectedRegion
-      ? regions.some((region) => region.iso2 === selectedRegion.iso2)
+      ? regions.some((region) => 
+          region.iso2 === selectedRegion.iso2 && 
+          region.countryCode === selectedCountryDialCode.countryCode &&
+          region.dialCode === selectedRegion.dialCode
+        )
       : false;
+
+    if (!isRegionValid && selectedRegion && selectedRegion.countryCode === selectedCountryDialCode.countryCode) {
+
+      return;
+    }
     if (!isRegionValid) {
-      setSelectedRegion(regions[0] || GLOBAL_REGION);
+
+      if (regions.length > 0 && regions[0].iso2 !== 'global') {
+        setSelectedRegion(regions[0]);
+      } else {
+        setSelectedRegion(GLOBAL_REGION);
+      }
     }
   }, [selectedCountryDialCode, selectedRegion]);
   const [signupFormData, setSignupFormDataState] = useState<AppContextValue['signupFormData']>({
