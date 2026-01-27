@@ -127,6 +127,31 @@ export const v_cdb169 = () => {
   const [v_3a64df, v_c73419] = v_5ab095(false);
   const [v_db24c7, v_a0f6fa] = v_5ab095<string | null>(null);
 
+  const v_2d5c3d = v_a3453e.useCallback((v_5a7a4f, v_222917, v_a4d981): string => {
+
+    if (v_222917 === 0) {
+      return v_8d41d7('screens.myInfoEdit.allRegions');
+    }
+
+    if (v_a4d981 && v_222917 !== null && v_222917 > 0) {
+      const v_f5d8ad = `${v_a4d981}_${v_222917}`;
+      const v_75aa17 = `regions.${v_f5d8ad}`;
+      try {
+        const v_6dce25 = v_8d41d7(v_75aa17);
+
+        if (v_6dce25 && v_6dce25 !== v_75aa17) {
+          return v_6dce25;
+        }
+      } catch (v_5e9bfe) {
+        if (__DEV__) {
+          console.warn('[정보수정] 지역 번역 오류:', v_5e9bfe);
+        }
+      }
+    }
+
+    return v_5a7a4f;
+  }, [v_8d41d7]);
+
   const [v_9d09f1, v_d0e79e] = v_5ab095('');
   const [v_b6daf3, v_c94311] = v_5ab095('');
   const [v_318eac, v_edd340] = v_5ab095<'male' | 'female'>('male');
@@ -1383,11 +1408,13 @@ export const v_cdb169 = () => {
 
                     if (v_67cb9c && v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' && v_167c8b.rCode !== null && v_167c8b.rCode !== -1 && !v_e5393e) {
 
+                      const v_6f4ea0 = v_2d5c3d(v_167c8b.rDesc, v_167c8b.rCode, v_add96c.cCode || v_a4d981);
+
                       if (v_167c8b.rCode === 0) {
-                        return v_167c8b.rDesc;
+                        return v_6f4ea0;
                       }
 
-                      return `${v_67cb9c}, ${v_167c8b.rDesc}`;
+                      return `${v_67cb9c}, ${v_6f4ea0}`;
                     }
 
                     if (v_67cb9c) {
@@ -1505,7 +1532,12 @@ export const v_cdb169 = () => {
                       onPress={() => v_477add(v_a6c30b)}
                     >
                       <Text style={v_d81136.modalItemText}>
-                        {v_a6c30b.description || v_a6c30b.rName || 'Unknown'}
+                        {(() => {
+                          const v_5a7a4f = v_a6c30b.description || v_a6c30b.rName || 'Unknown';
+                          const v_222917 = v_a6c30b.subcode || v_a6c30b.rCode;
+                          const v_ca520f = v_add96c.cCode || v_a4d981;
+                          return v_2d5c3d(v_5a7a4f, v_222917 || null, v_ca520f);
+                        })()}
                       </Text>
                       {(() => {
                         const v_638c4d = v_a6c30b.description || v_a6c30b.rName || '';

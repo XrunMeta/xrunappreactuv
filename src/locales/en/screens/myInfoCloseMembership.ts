@@ -2,6 +2,7 @@ export default {
   title: 'Close Membership',
   passwordLabel: 'Password',
   passwordPlaceholder: 'Please enter your password',
+  warningText: 'If you close your membership, all personal information, wallet keys, and related data stored for app usage will be deleted. Once deleted, recovery is not possible, so please confirm carefully.',
   helperText: '*We require your password for secure account management when closing your membership.',
   confirmButton: 'Confirm',
   processing: 'Processing...',

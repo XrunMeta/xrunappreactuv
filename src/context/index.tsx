@@ -2,7 +2,7 @@
 import v_a3453e, { v_af12cb, v_76a8a9, v_df9f57, v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_ce4741, v_01e0ec } from '../navigation';
 import { v_9dd03c, v_3ac6ea, v_da1883, v_745d71, v_ac312b, v_fa3302, v_5681b1 } from '../types';
-import { v_202d44, v_52495e, v_369014, v_789afd } from '../constants';
+import { v_202d44, v_1bd8ad, v_52495e, v_369014, v_789afd } from '../constants';
 
 type AppContextValue = {
   walletSendAddress: string;
@@ -53,8 +53,8 @@ type AppContextValue = {
     phoneNumber: string;
     region: string;
     referralEmail: string;
-    gender: 'male' | 'female';
-    ageRange: '10' | '20' | '30' | '40' | '50+';
+    gender: 'male' | 'female' | '0';
+    ageRange: '0' | '10' | '20' | '30' | '40' | '50+';
     termsAccepted: boolean;
   };
   setSignupFormData: (data: Partial<AppContextValue['signupFormData']>) => void;
@@ -107,7 +107,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const [v_dfe883, v_d0fbad] = v_5ab095<v_745d71 | undefined>(undefined);
   const [v_f87030, v_779227] = v_5ab095<{ member: string; email: string } | undefined>(undefined);
   const [v_b135ca, v_69fcdc] = v_5ab095<v_ac312b>(null);
-  const v_d7c38a = v_202d44.find((v_b9bbbd) => v_b9bbbd.iso2 === 'kr') ?? v_202d44[0];
+  const v_d7c38a = v_1bd8ad.find((v_b9bbbd) => v_b9bbbd.iso2 === 'kr') ?? v_1bd8ad[0];
   const [v_459d5e, v_f693e7] = v_5ab095<v_da1883>(v_d7c38a);
 
   const v_2a5c62 = v_df9f57(() => {
@@ -119,15 +119,30 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
 
   v_c4deb2(() => {
 
-    if (v_2f03bc && v_2f03bc.dialCode === '0') {
+    if (v_2f03bc && (v_2f03bc.dialCode === '0' || v_2f03bc.iso2 === 'select')) {
       return;
     }
+
     const v_e94fdf = v_369014(v_459d5e.iso2);
     const v_d2a53b = v_2f03bc
-      ? v_e94fdf.some((v_a6c30b) => v_a6c30b.iso2 === v_2f03bc.iso2)
+      ? v_e94fdf.some((v_a6c30b) => 
+          v_a6c30b.iso2 === v_2f03bc.iso2 && 
+          v_a6c30b.countryCode === v_459d5e.countryCode &&
+          v_a6c30b.dialCode === v_2f03bc.dialCode
+        )
       : false;
+
+    if (!v_d2a53b && v_2f03bc && v_2f03bc.countryCode === v_459d5e.countryCode) {
+
+      return;
+    }
     if (!v_d2a53b) {
-      v_2f2d51(v_e94fdf[0] || v_789afd);
+
+      if (v_e94fdf.length > 0 && v_e94fdf[0].iso2 !== 'global') {
+        v_2f2d51(v_e94fdf[0]);
+      } else {
+        v_2f2d51(v_789afd);
+      }
     }
   }, [v_459d5e, v_2f03bc]);
   const [v_8d7bc8, v_d61c3a] = v_5ab095<AppContextValue['signupFormData']>({

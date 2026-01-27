@@ -93,9 +93,7 @@ export const v_9e06f6 = () => {
       >
         <View style={v_d81136.inner}>
           <Text style={v_d81136.warningText}>
-            회원을 탈퇴하시면, 
-            앱을 사용하기 위해 저장된 개인정보, 지갑키 등 관련된 정보가 모두 삭제됩니다. 
-            삭제후에는 복구가 불가능하니 반드시 확인하십시오.
+            {v_8d41d7('screens.myInfoCloseMembership.warningText')}
           </Text>
         </View> 
         <View style={v_d81136.inner}>
