@@ -2,6 +2,11 @@ import { v_da1883 } from '../types';
 import { v_c4dd46, v_7d842d } from '../types';
 import { v_202d44, v_1bd8ad } from '../constants/countryDialCodes';
 import { v_789afd } from '../constants/regions';
+import {
+  v_e30d2f,
+  v_071875,
+  v_58c98d,
+} from './countryStateCityUtils';
 
 const v_eebb85 = (v_cc0c7d): string => {
   if (!v_cc0c7d) return '🌐';
@@ -151,6 +156,21 @@ export const v_151d5f = async (
   getCountries: () => Promise<v_c4dd46>,
   fallback: v_da1883[] = v_1bd8ad
 ): Promise<v_da1883[]> => {
+
+  try {
+    const v_24a9a4 = v_e30d2f();
+    if (v_24a9a4.length > 0) {
+      if (__DEV__) {
+        console.log('[countryUtils] 패키지에서 국가 목록 로드 성공:', v_24a9a4.length);
+      }
+      return v_24a9a4;
+    }
+  } catch (v_5e9bfe) {
+    if (__DEV__) {
+      console.warn('[countryUtils] 패키지 국가 목록 로드 실패, API fallback 시도:', v_5e9bfe);
+    }
+  }
+
   try {
     const v_3393e3 = await v_60f557();
     if (v_3393e3.status === 'success' && v_3393e3.data && v_3393e3.data.length > 0) {
@@ -175,15 +195,48 @@ const v_90ad93 = [82, 81, 86, 1, 62];
 export const v_5c7129 = async (
   getRegionsByCountry: (country: number) => Promise<v_7d842d>,
   v_a4d981,
+  v_52c475, 
   fallback: v_da1883[] = [v_789afd]
 ): Promise<LoadRegionsResult> => {
 
-  if (!v_90ad93.includes(v_a4d981)) {
-    console.log('[countryUtils] 지역 미지원 국가 - global 반환:', v_a4d981);
-    return {
-      regions: [v_789afd],
-      hasRegions: false,
-    };
+  const v_46b18e = {
+    82: 'kr', 81: 'jp', 86: 'cn', 1: 'us', 62: 'id',
+  };
+  const v_b35ebd = v_52c475 || v_46b18e[v_a4d981];
+
+  if (v_b35ebd) {
+    try {
+      const v_866d77 = v_071875(v_b35ebd, v_a4d981);
+      if (v_866d77.length > 0) {
+        if (__DEV__) {
+          console.log('[countryUtils] 패키지에서 지역 목록 로드 성공:', {
+            countryCode: v_a4d981,
+            isoCode: v_b35ebd,
+            regionCount: v_866d77.length,
+          });
+        }
+        return {
+          regions: v_866d77,
+          hasRegions: true,
+        };
+      } else {
+
+        if (__DEV__) {
+          console.log('[countryUtils] 패키지에 지역 데이터 없음:', {
+            countryCode: v_a4d981,
+            isoCode: v_b35ebd,
+          });
+        }
+        return {
+          regions: [v_789afd],
+          hasRegions: false,
+        };
+      }
+    } catch (v_5e9bfe) {
+      if (__DEV__) {
+        console.warn('[countryUtils] 패키지 지역 목록 로드 실패, API fallback 시도:', v_5e9bfe);
+      }
+    }
   }
 
   try {

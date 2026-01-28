@@ -7,6 +7,9 @@ import v_973506 from './zh-CN';
 import v_5d6728 from './en';
 import v_389afb from './id';
 import v_062521 from './ja';
+import v_3018ef from './th';
+import v_d54b9c from './hi';
+import v_3889c0 from './vi';
 
 const v_61b609 = {
   ko: { translation: v_04a966 },
@@ -14,6 +17,9 @@ const v_61b609 = {
   en: { translation: v_5d6728 },
   id: { translation: v_389afb },
   ja: { translation: v_062521 },
+  th: { translation: v_3018ef },
+  hi: { translation: v_d54b9c },
+  vi: { translation: v_3889c0 },
 };
 
 export const v_e1e9c4 = {
@@ -22,6 +28,9 @@ export const v_e1e9c4 = {
   en: 'en',
   id: 'id',
   ja: 'ja',
+  th: 'th',
+  hi: 'hi',
+  vi: 'vi',
 } as const;
 
 export type LanguageCode = keyof typeof v_e1e9c4;
