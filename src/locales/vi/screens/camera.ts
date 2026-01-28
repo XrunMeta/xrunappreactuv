@@ -1,7 +1,7 @@
 export default {
-  genderAgeRequired: 'Please enter your gender and age',
-  genderLabel: 'Gender',
-  ageLabel: 'Age',
+  genderAgeRequired: 'Vui lòng nhập giới tính và tuổi của bạn',
+  genderLabel: 'Giới tính',
+  ageLabel: 'Tuổi',
 };
 
 

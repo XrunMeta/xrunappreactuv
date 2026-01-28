@@ -1,10 +1,10 @@
 export default {
-  title: 'AD',
-  loading: 'Loading...',
-  emptyMessage: 'No settlement history.',
-  coinAcquisition: 'Coin Acquisition',
-  statusSuccess: 'Coin acquisition completed',
-  statusPending: 'Waiting for Coin Acquisition',
+  title: 'โฆษณา',
+  loading: 'กำลังโหลด...',
+  emptyMessage: 'ไม่มีประวัติการชำระเงิน',
+  coinAcquisition: 'การได้รับเหรียญ',
+  statusSuccess: 'การได้รับเหรียญเสร็จสมบูรณ์',
+  statusPending: 'รอการได้รับเหรียญ',
 };
 
 

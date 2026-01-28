@@ -1,8 +1,8 @@
 export default {
-  wallet: 'Wallet',
-  shop: 'Shop',
-  referral: 'Referral',
-  info: 'Info',
+  wallet: 'वॉलेट',
+  shop: 'दुकान',
+  referral: 'रेफरल',
+  info: 'जानकारी',
 };
 
 

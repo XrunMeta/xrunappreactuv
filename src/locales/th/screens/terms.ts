@@ -1,11 +1,11 @@
 export default {
-  title: 'Terms of Service',
-  loading: 'Loading terms...',
+  title: 'ข้อกำหนดการให้บริการ',
+  loading: 'กำลังโหลดข้อกำหนด...',
   error: {
-    title: 'Error',
-    ok: 'OK',
+    title: 'ข้อผิดพลาด',
+    ok: 'ตกลง',
   },
-  noData: 'No terms data available.',
+  noData: 'ไม่มีข้อมูลข้อกำหนด',
 };
 
 

@@ -1,6 +1,6 @@
 export default {
-  title: 'Membership Withdrawal',
-  message: 'Membership withdrawal has been completed',
-  subMessage: 'Thank you for using our service.\nWe will come back with better service.',
-  confirmButton: 'Confirm',
+  title: 'सदस्यता वापसी',
+  message: 'सदस्यता वापसी पूर्ण हो गई है',
+  subMessage: 'हमारी सेवा का उपयोग करने के लिए धन्यवाद।\nहम बेहतर सेवा के साथ वापस आएंगे।',
+  confirmButton: 'पुष्टि करें',
 };

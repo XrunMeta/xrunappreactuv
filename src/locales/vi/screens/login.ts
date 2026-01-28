@@ -1,32 +1,32 @@
 export default {
-  title: 'Login',
+  title: 'Đăng nhập',
 
   tabs: {
-    accountLogin: 'Account Login',
-    emailOtpLogin: 'Email OTP Login',
+    accountLogin: 'Đăng nhập bằng tài khoản',
+    emailOtpLogin: 'Đăng nhập bằng Email OTP',
   },
 
   emailLabel: 'Email',
-  emailPlaceholder: 'Please enter your email',
-  passwordLabel: 'Password',
-  passwordPlaceholder: 'Please enter your password',
-  xrunPasswordLabel: 'XRUN Account Password',
-  rememberMe: 'Keep me logged in',
-  loginButton: 'Login',
-  disclaimer: 'If you forgot your password, you can log in with social login or email OTP login.',
-  emailVerification: 'Email Verification',
-  orLoginWith: 'Or login in with',
+  emailPlaceholder: 'Vui lòng nhập email của bạn',
+  passwordLabel: 'Mật khẩu',
+  passwordPlaceholder: 'Vui lòng nhập mật khẩu của bạn',
+  xrunPasswordLabel: 'Mật khẩu tài khoản XRUN',
+  rememberMe: 'Giữ đăng nhập',
+  loginButton: 'Đăng nhập',
+  disclaimer: 'Nếu bạn quên mật khẩu, bạn có thể đăng nhập bằng đăng nhập xã hội hoặc đăng nhập bằng email OTP.',
+  emailVerification: 'Xác minh Email',
+  orLoginWith: 'Hoặc đăng nhập bằng',
 
   otp: {
-    rememberMe: 'Keep me logged in',
-    sendButton: 'Send',
+    rememberMe: 'Giữ đăng nhập',
+    sendButton: 'Gửi',
   },
   errors: {
-    emailRequired: 'Please enter your email',
-    passwordRequired: 'Please enter your password',
-    loginFailed: 'Email or password is incorrect',
-    userDataNotFound: 'Unable to retrieve user information',
-    loginError: 'An error occurred during login. Please try again',
+    emailRequired: 'Vui lòng nhập email của bạn',
+    passwordRequired: 'Vui lòng nhập mật khẩu của bạn',
+    loginFailed: 'Email hoặc mật khẩu không đúng',
+    userDataNotFound: 'Không thể lấy thông tin người dùng',
+    loginError: 'Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại',
   },
 };
 

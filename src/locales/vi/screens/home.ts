@@ -1,6 +1,6 @@
 export default {
-  title: 'Hello XRUN App',
-  getStartedButton: 'Get Started',
+  title: 'Xin chào Ứng dụng XRUN',
+  getStartedButton: 'Bắt đầu',
 };
 
 

@@ -1,32 +1,32 @@
 export default {
-  title: 'Login',
+  title: 'เข้าสู่ระบบ',
 
   tabs: {
-    accountLogin: 'Account Login',
-    emailOtpLogin: 'Email OTP Login',
+    accountLogin: 'เข้าสู่ระบบด้วยบัญชี',
+    emailOtpLogin: 'เข้าสู่ระบบด้วยอีเมล OTP',
   },
 
-  emailLabel: 'Email',
-  emailPlaceholder: 'Please enter your email',
-  passwordLabel: 'Password',
-  passwordPlaceholder: 'Please enter your password',
-  xrunPasswordLabel: 'XRUN Account Password',
-  rememberMe: 'Keep me logged in',
-  loginButton: 'Login',
-  disclaimer: 'If you forgot your password, you can log in with social login or email OTP login.',
-  emailVerification: 'Email Verification',
-  orLoginWith: 'Or login in with',
+  emailLabel: 'อีเมล',
+  emailPlaceholder: 'กรุณากรอกอีเมลของคุณ',
+  passwordLabel: 'รหัสผ่าน',
+  passwordPlaceholder: 'กรุณากรอกรหัสผ่านของคุณ',
+  xrunPasswordLabel: 'รหัสผ่านบัญชี XRUN',
+  rememberMe: 'ให้ฉันเข้าสู่ระบบอยู่',
+  loginButton: 'เข้าสู่ระบบ',
+  disclaimer: 'หากคุณลืมรหัสผ่าน คุณสามารถเข้าสู่ระบบด้วยการเข้าสู่ระบบผ่านโซเชียลหรือการเข้าสู่ระบบด้วยอีเมล OTP',
+  emailVerification: 'การยืนยันอีเมล',
+  orLoginWith: 'หรือเข้าสู่ระบบด้วย',
 
   otp: {
-    rememberMe: 'Keep me logged in',
-    sendButton: 'Send',
+    rememberMe: 'ให้ฉันเข้าสู่ระบบอยู่',
+    sendButton: 'ส่ง',
   },
   errors: {
-    emailRequired: 'Please enter your email',
-    passwordRequired: 'Please enter your password',
-    loginFailed: 'Email or password is incorrect',
-    userDataNotFound: 'Unable to retrieve user information',
-    loginError: 'An error occurred during login. Please try again',
+    emailRequired: 'กรุณากรอกอีเมลของคุณ',
+    passwordRequired: 'กรุณากรอกรหัสผ่านของคุณ',
+    loginFailed: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    userDataNotFound: 'ไม่สามารถดึงข้อมูลผู้ใช้ได้',
+    loginError: 'เกิดข้อผิดพลาดระหว่างการเข้าสู่ระบบ กรุณาลองอีกครั้ง',
   },
 };
 

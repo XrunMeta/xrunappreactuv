@@ -1,11 +1,11 @@
 export default {
-  adText: 'Full Screen Ad',
-  loginButton: 'Login',
-  signupButton: 'Sign Up',
-  termsText: 'To learn about the features and information usage provided by this app, please read and agree to the',
-  termsAnd: 'and',
-  termsLink: 'Terms of Service',
-  privacyLink: 'Privacy Policy',
+  adText: 'โฆษณาเต็มหน้าจอ',
+  loginButton: 'เข้าสู่ระบบ',
+  signupButton: 'สมัครสมาชิก',
+  termsText: 'เพื่อเรียนรู้เกี่ยวกับคุณสมบัติและการใช้ข้อมูลที่แอปนี้ให้บริการ กรุณาอ่านและยอมรับ',
+  termsAnd: 'และ',
+  termsLink: 'ข้อกำหนดการให้บริการ',
+  privacyLink: 'นโยบายความเป็นส่วนตัว',
   termsAgree: '.',
 };
 

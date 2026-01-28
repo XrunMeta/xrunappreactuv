@@ -1,5 +1,5 @@
 export default {
-  title: 'Privacy Policy',
+  title: 'गोपनीयता नीति',
 };
 
 

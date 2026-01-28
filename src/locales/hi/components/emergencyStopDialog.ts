@@ -1,6 +1,6 @@
 export default {
-  title: 'Notice',
-  viewDetails: 'View Details',
+  title: 'सूचना',
+  viewDetails: 'विवरण देखें',
 };
 
 
