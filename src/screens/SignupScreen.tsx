@@ -409,11 +409,33 @@ export const SignupScreen = () => {
     }
     const normalizedQuery = regionSearchQuery.trim().toLowerCase();
     return regionDataSource.filter((item) => {
+
       const searchName = item.name.toLowerCase();
+
       const searchIso = item.iso2.toLowerCase();
-      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery);
+
+      let translatedName = '';
+      if (item.countryCode && item.dialCode) {
+        const regionCode = parseInt(item.dialCode, 10);
+        if (!isNaN(regionCode) && regionCode > 0) {
+          const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+          if (COUNTRIES_WITH_MAPPING.includes(item.countryCode)) {
+            const regionKey = `regions.${item.countryCode}_${regionCode}`;
+            const translated = t(regionKey);
+            if (translated && translated !== regionKey) {
+              translatedName = translated.toLowerCase();
+            }
+          }
+        }
+      }
+
+      return (
+        searchName.includes(normalizedQuery) ||
+        translatedName.includes(normalizedQuery) ||
+        searchIso.includes(normalizedQuery)
+      );
     });
-  }, [regionSearchQuery, regionDataSource]);
+  }, [regionSearchQuery, regionDataSource, t]);
 
   const handleSelectRegion = (region: CountryDialCode) => {
     console.log('[회원가입] 지역 선택:', {
