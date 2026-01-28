@@ -336,12 +336,46 @@ export const v_f40fc5 = () => {
     }
     const v_470e34 = v_bd30a1.trim().toLowerCase();
     return v_335974.filter((v_8c0b26) => {
+
       const v_cd2b74 = v_8c0b26.name.toLowerCase();
+
       const v_73b9dc = v_8c0b26.iso2.toLowerCase();
+
       const v_bed18d = v_8c0b26.dialCode.toLowerCase();
-      return v_cd2b74.includes(v_470e34) || v_73b9dc.includes(v_470e34) || v_bed18d.includes(v_470e34);
+
+      let v_a2493c = '';
+      if (v_8c0b26.iso2 && v_8c0b26.iso2 !== 'select' && v_8c0b26.iso2 !== 'global' && v_8c0b26.iso2.length === 2) {
+        const v_4d2349 = `countries.${v_8c0b26.iso2.toUpperCase()}`;
+        const v_6dce25 = v_8d41d7(v_4d2349);
+        if (v_6dce25 && v_6dce25 !== v_4d2349) {
+          v_a2493c = v_6dce25.toLowerCase();
+        }
+      }
+
+      const v_ae5dba = v_73b9dc === v_470e34;
+
+      const v_8cb36b = v_cd2b74.includes(v_470e34);
+
+      const v_ee6e33 = v_a2493c && v_a2493c.includes(v_470e34);
+
+      let v_f2229a = false;
+      if (v_470e34.match(/^\d+$/)) {
+
+        const v_c78cbd = v_bed18d.replace(/[^0-9]/g, '');
+        v_f2229a = v_c78cbd.includes(v_470e34);
+      } else if (v_470e34.startsWith('+')) {
+
+        v_f2229a = v_bed18d.includes(v_470e34);
+      }
+
+      return (
+        v_ae5dba ||
+        v_8cb36b ||
+        v_ee6e33 ||
+        v_f2229a
+      );
     });
-  }, [v_bd30a1, v_335974]);
+  }, [v_bd30a1, v_335974, v_8d41d7]);
 
   const v_de5bf5 = (country: v_da1883) => {
     console.log('[회원가입] 국가 선택:', {
