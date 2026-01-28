@@ -73,18 +73,33 @@ export const CountryCodeListItem: React.FC<Props> = ({
         } else {
 
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
+            const currentLangData = i18n.store?.data?.[i18n.language]?.translation;
+            const regionsData = currentLangData?.regions;
+            const hasTranslation = regionsData && regionsData[regionTranslationKey];
+
+            console.warn('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
               key: regionKey,
+              translationKey: regionTranslationKey,
               translated,
               original: country.name,
               countryCode: country.countryCode,
               dialCode: country.dialCode,
               language: i18n.language,
+              hasTranslationInFile: !!hasTranslation,
+              translationValue: hasTranslation,
+              availableLanguages: Object.keys(i18n.store?.data || {}),
+              fallbackLanguage: i18n.options?.fallbackLng,
             });
           }
         }
       } catch (error) {
 
+        if (__DEV__) {
+          console.warn('[CountryCodeListItem] 지역 번역 오류:', error, {
+            key: regionKey,
+            language: i18n.language,
+          });
+        }
       }
 
       return country.name;
