@@ -1,7 +1,7 @@
 export default {
-  title: '1 Depth',
-  emptyTitle: 'This member has no sub-referrers yet.',
-  emptyDescription: "Members referred by this person's direct referrer will be displayed here.",
+  title: '1 गहराई',
+  emptyTitle: 'इस सदस्य के पास अभी तक कोई उप-रेफरल नहीं है।',
+  emptyDescription: 'इस व्यक्ति के प्रत्यक्ष रेफरल द्वारा संदर्भित सदस्य यहां प्रदर्शित किए जाएंगे।',
 };
 
 

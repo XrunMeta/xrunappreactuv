@@ -1,7 +1,7 @@
 export default {
-  title: 'Setting',
-  closeMembership: 'Close Membership',
-  languageSelect: 'Language Select',
+  title: 'सेटिंग्स',
+  closeMembership: 'सदस्यता बंद करें',
+  languageSelect: 'भाषा चुनें',
 };
 
 

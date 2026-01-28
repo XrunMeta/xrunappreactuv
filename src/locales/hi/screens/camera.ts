@@ -1,7 +1,7 @@
 export default {
-  genderAgeRequired: 'Please enter your gender and age',
-  genderLabel: 'Gender',
-  ageLabel: 'Age',
+  genderAgeRequired: 'कृपया अपना लिंग और उम्र दर्ज करें',
+  genderLabel: 'लिंग',
+  ageLabel: 'उम्र',
 };
 
 

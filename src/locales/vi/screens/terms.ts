@@ -1,11 +1,11 @@
 export default {
-  title: 'Terms of Service',
-  loading: 'Loading terms...',
+  title: 'Điều khoản dịch vụ',
+  loading: 'Đang tải điều khoản...',
   error: {
-    title: 'Error',
+    title: 'Lỗi',
     ok: 'OK',
   },
-  noData: 'No terms data available.',
+  noData: 'Không có dữ liệu điều khoản.',
 };
 
 

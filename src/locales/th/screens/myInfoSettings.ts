@@ -1,7 +1,7 @@
 export default {
-  title: 'Setting',
-  closeMembership: 'Close Membership',
-  languageSelect: 'Language Select',
+  title: 'การตั้งค่า',
+  closeMembership: 'ปิดการเป็นสมาชิก',
+  languageSelect: 'เลือกภาษา',
 };
 
 

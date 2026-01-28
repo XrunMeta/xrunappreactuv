@@ -1,11 +1,11 @@
 export default {
-  adText: 'Full Screen Ad',
-  loginButton: 'Login',
-  signupButton: 'Sign Up',
-  termsText: 'To learn about the features and information usage provided by this app, please read and agree to the',
-  termsAnd: 'and',
-  termsLink: 'Terms of Service',
-  privacyLink: 'Privacy Policy',
+  adText: 'Quảng cáo toàn màn hình',
+  loginButton: 'Đăng nhập',
+  signupButton: 'Đăng ký',
+  termsText: 'Để tìm hiểu về các tính năng và cách sử dụng thông tin do ứng dụng này cung cấp, vui lòng đọc và đồng ý với',
+  termsAnd: 'và',
+  termsLink: 'Điều khoản dịch vụ',
+  privacyLink: 'Chính sách bảo mật',
   termsAgree: '.',
 };
 

@@ -1,41 +1,41 @@
 export default {
-  title: 'FAQ',
+  title: 'Câu hỏi thường gặp',
   items: {
     exchangeSubmit: {
-      question: 'When are exchange-requested coins paid out?',
-      answer: 'Exchange-requested coins are paid out immediately upon submission of the application.',
+      question: 'Khi nào các coin yêu cầu trao đổi được thanh toán?',
+      answer: 'Các coin yêu cầu trao đổi được thanh toán ngay lập tức khi nộp đơn.',
     },
     conversionSchedule: {
-      question: 'When are conversion-requested coins paid out?',
-      answer: 'Conversion-requested coins are paid out within 3 days after the request, in the order of application.',
+      question: 'Khi nào các coin yêu cầu chuyển đổi được thanh toán?',
+      answer: 'Các coin yêu cầu chuyển đổi được thanh toán trong vòng 3 ngày sau khi yêu cầu, theo thứ tự đơn đăng ký.',
     },
     missionComplete: {
-      question: 'How do I complete a mission?',
-      answer: 'Check the mission location displayed on the main screen, then switch to AR mode at that location and capture the augmented cryptocurrency to complete the mission.',
+      question: 'Làm thế nào để hoàn thành nhiệm vụ?',
+      answer: 'Kiểm tra vị trí nhiệm vụ hiển thị trên màn hình chính, sau đó chuyển sang chế độ AR tại vị trí đó và chụp cryptocurrency tăng cường để hoàn thành nhiệm vụ.',
     },
     rewardCheck: {
-      question: 'Where can I check the coins I received as rewards?',
-      answer: 'After completing a mission, you can check the coins you received as rewards in the in-app wallet.',
+      question: 'Tôi có thể kiểm tra các coin nhận được dưới dạng phần thưởng ở đâu?',
+      answer: 'Sau khi hoàn thành nhiệm vụ, bạn có thể kiểm tra các coin nhận được dưới dạng phần thưởng trong ví trong ứng dụng.',
     },
     xrunExchange: {
-      question: 'How do I exchange other cryptocurrencies for XRUN coins?',
-      answer: 'You can exchange other cryptocurrencies for XRUN coins through coin exchange in the in-app wallet. When exchanging, enter the amount of coins to exchange and submit a request, and they will be exchanged and paid out according to the XRUN coin ratio.',
+      question: 'Làm thế nào để trao đổi các cryptocurrency khác lấy coin XRUN?',
+      answer: 'Bạn có thể trao đổi các cryptocurrency khác lấy coin XRUN thông qua trao đổi coin trong ví trong ứng dụng. Khi trao đổi, nhập số lượng coin cần trao đổi và gửi yêu cầu, chúng sẽ được trao đổi và thanh toán theo tỷ lệ coin XRUN.',
     },
     rewardUsage: {
-      question: 'How do I use the coins I received as rewards?',
-      answer: 'You can request conversion and exchange of reward coins in the in-app wallet to exchange them for real coins. Real coins can be freely sold and used on external exchanges.',
+      question: 'Làm thế nào để sử dụng các coin nhận được dưới dạng phần thưởng?',
+      answer: 'Bạn có thể yêu cầu chuyển đổi và trao đổi coin phần thưởng trong ví trong ứng dụng để trao đổi lấy coin thật. Coin thật có thể được bán và sử dụng tự do trên các sàn giao dịch bên ngoài.',
     },
     adReward: {
-      question: 'How do I receive ad rewards?',
-      answer: 'You can receive coins equal to the reward amount set in the ad by participating in AR missions and completing them.',
+      question: 'Làm thế nào để nhận phần thưởng quảng cáo?',
+      answer: 'Bạn có thể nhận coin tương đương với số tiền phần thưởng được đặt trong quảng cáo bằng cách tham gia các nhiệm vụ AR và hoàn thành chúng.',
     },
     changePasswordRequest: {
-      question: 'I want to change my password',
-      answer: 'You can change it in My Info > Edit Info > Password.',
+      question: 'Tôi muốn thay đổi mật khẩu',
+      answer: 'Bạn có thể thay đổi trong Thông tin của tôi > Chỉnh sửa thông tin > Mật khẩu.',
     },
     changePasswordHow: {
-      question: 'How do I change my password?',
-      answer: 'You can change it in My Info > Edit Info > Password. Have a great day^^!',
+      question: 'Làm thế nào để thay đổi mật khẩu?',
+      answer: 'Bạn có thể thay đổi trong Thông tin của tôi > Chỉnh sửa thông tin > Mật khẩu. Chúc bạn một ngày tốt lành^^!',
     },
   },
 };

@@ -1,6 +1,6 @@
 export default {
-  declined: 'Declined',
-  accept: 'Accept',
+  declined: 'अस्वीकार',
+  accept: 'स्वीकार करें',
 };
 
 

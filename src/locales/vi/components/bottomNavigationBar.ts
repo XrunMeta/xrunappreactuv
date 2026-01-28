@@ -1,8 +1,8 @@
 export default {
-  wallet: 'Wallet',
-  shop: 'Shop',
-  referral: 'Referral',
-  info: 'Info',
+  wallet: 'Ví',
+  shop: 'Cửa hàng',
+  referral: 'Giới thiệu',
+  info: 'Thông tin',
 };
 
 

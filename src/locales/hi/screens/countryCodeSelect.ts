@@ -1,11 +1,11 @@
 export default {
-  countrySelectTitle: 'Select Country',
-  regionSelectTitle: 'Select Region',
-  currentSelection: 'Current Selection',
-  countrySearchPlaceholder: 'Search country',
-  regionSearchPlaceholder: 'Search region',
-  noResults: 'No results found',
-  selectOption: 'Select',
+  countrySelectTitle: 'देश चुनें',
+  regionSelectTitle: 'क्षेत्र चुनें',
+  currentSelection: 'वर्तमान चयन',
+  countrySearchPlaceholder: 'देश खोजें',
+  regionSearchPlaceholder: 'क्षेत्र खोजें',
+  noResults: 'कोई परिणाम नहीं मिला',
+  selectOption: 'चुनें',
 };
 
 
