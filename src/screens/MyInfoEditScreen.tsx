@@ -11,8 +11,10 @@ import {
   InteractionManager,
   Platform,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, FormField, PrimaryButton, OptionButton, Dialog, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, GLOBAL_REGION, ALLOWED_COUNTRIES } from '../constants';
@@ -1128,9 +1130,57 @@ export const MyInfoEditScreen = () => {
     }
   };
 
+  const filteredCountries = useMemo(() => {
+    if (!countrySearchQuery.trim()) {
+      return countries;
+    }
+    const normalizedQuery = countrySearchQuery.trim().toLowerCase();
+    return countries.filter((item) => {
+
+      const searchName = item.name.toLowerCase();
+
+      const searchIso = item.iso2.toLowerCase();
+
+      const searchDialCode = item.dialCode.toLowerCase();
+
+      let translatedName = '';
+      if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
+        const countryKey = `countries.${item.iso2.toUpperCase()}`;
+        const translated = t(countryKey);
+        if (translated && translated !== countryKey) {
+          translatedName = translated.toLowerCase();
+        }
+      }
+
+      const isoExactMatch = searchIso === normalizedQuery;
+
+      const nameMatch = searchName.includes(normalizedQuery);
+
+      const translatedNameMatch = translatedName && translatedName.includes(normalizedQuery);
+
+      let dialCodeMatch = false;
+      if (normalizedQuery.match(/^\d+$/)) {
+
+        const dialCodeNumbers = searchDialCode.replace(/[^0-9]/g, '');
+        dialCodeMatch = dialCodeNumbers.includes(normalizedQuery);
+      } else if (normalizedQuery.startsWith('+')) {
+
+        dialCodeMatch = searchDialCode.includes(normalizedQuery);
+      }
+
+      return (
+        isoExactMatch ||
+        nameMatch ||
+        translatedNameMatch ||
+        dialCodeMatch
+      );
+    });
+  }, [countrySearchQuery, countries, t]);
+
   const handleSelectCountry = (country: CountryDialCode) => {
     console.log('[정보수정] 국가 선택:', country);
     setSelectedCountryDialCode(country);
+    setCountrySearchQuery('');
     setCountryModalVisible(false);
   };
 
@@ -1640,61 +1690,83 @@ export const MyInfoEditScreen = () => {
           <TouchableOpacity
             style={styles.modalBackdrop}
             activeOpacity={1}
-            onPress={() => setCountryModalVisible(false)}
+            onPress={() => {
+              setCountryModalVisible(false);
+              setCountrySearchQuery('');
+            }}
           />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 {t('screens.myInfoEdit.selectCountry')}
               </Text>
-              <TouchableOpacity onPress={() => setCountryModalVisible(false)}>
+              <TouchableOpacity onPress={() => {
+                setCountryModalVisible(false);
+                setCountrySearchQuery('');
+              }}>
                 <Text style={styles.modalCloseButton}>✕</Text>
               </TouchableOpacity>
+            </View>
+            <View style={styles.modalSearchBox}>
+              <Ionicons name="search" size={18} color="#9ca3af" />
+              <TextInput
+                style={styles.modalSearchInput}
+                value={countrySearchQuery}
+                onChangeText={setCountrySearchQuery}
+                placeholder={t('screens.countryCodeSelect.countrySearchPlaceholder') || '국가 검색'}
+                placeholderTextColor="#c4c7d1"
+                autoCorrect={false}
+              />
             </View>
             {isLoadingCountries ? (
               <View style={styles.modalLoadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
               </View>
             ) : (
-              <ScrollView style={styles.modalScrollView}>
-                {countries.length > 0 ? (
-                  countries.map((country) => (
-                    <TouchableOpacity
-                      key={country.iso2}
-                      style={[
-                        styles.modalItem,
-                        selectedCountryDialCode?.iso2 === country.iso2 && styles.modalItemSelected,
-                      ]}
-                      onPress={() => handleSelectCountry(country)}
-                    >
-                      <View style={styles.modalItemContent}>
-                        <Text style={styles.modalItemFlag}>{country.flagEmoji}</Text>
-                        <View style={styles.modalItemInfo}>
-                          <Text style={styles.modalItemText}>
-                            {(() => {
+              <FlatList
+                data={filteredCountries}
+                keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
+                renderItem={({ item: country }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.modalItem,
+                      selectedCountryDialCode?.iso2 === country.iso2 && styles.modalItemSelected,
+                    ]}
+                    onPress={() => handleSelectCountry(country)}
+                  >
+                    <View style={styles.modalItemContent}>
+                      <Text style={styles.modalItemFlag}>{country.flagEmoji}</Text>
+                      <View style={styles.modalItemInfo}>
+                        <Text style={styles.modalItemText}>
+                          {(() => {
 
-                              if (country.iso2 && country.iso2 !== 'select' && country.iso2 !== 'global' && country.iso2.length === 2) {
-                                const countryKey = `countries.${country.iso2.toUpperCase()}`;
-                                const translated = t(countryKey);
-                                return translated && translated !== countryKey ? translated : country.name;
-                              }
-                              return country.name;
-                            })()}
-                          </Text>
-                          <Text style={styles.modalItemDialCode}>{country.dialCode}</Text>
-                        </View>
+                            if (country.iso2 && country.iso2 !== 'select' && country.iso2 !== 'global' && country.iso2.length === 2) {
+                              const countryKey = `countries.${country.iso2.toUpperCase()}`;
+                              const translated = t(countryKey);
+                              return translated && translated !== countryKey ? translated : country.name;
+                            }
+                            return country.name;
+                          })()}
+                        </Text>
+                        <Text style={styles.modalItemDialCode}>{country.dialCode}</Text>
                       </View>
-                      {selectedCountryDialCode?.iso2 === country.iso2 && (
-                        <Text style={styles.checkmark}>✓</Text>
-                      )}
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>{t('screens.myInfoEdit.noCountries')}</Text>
-                  </View>
+                    </View>
+                    {selectedCountryDialCode?.iso2 === country.iso2 && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
+                  </TouchableOpacity>
                 )}
-              </ScrollView>
+                contentContainerStyle={styles.modalScrollView}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>
+                      {t('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
+                    </Text>
+                  </View>
+                }
+              />
             )}
           </View>
         </View>
@@ -2069,8 +2141,27 @@ const styles = StyleSheet.create({
     color: '#9e9e9e',
     padding: 4,
   },
+  modalSearchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9fafc',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 12,
+    height: 48,
+  },
+  modalSearchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: COLORS.headerText,
+  },
   modalScrollView: {
-    maxHeight: 400,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   modalLoadingContainer: {
     paddingVertical: 40,
