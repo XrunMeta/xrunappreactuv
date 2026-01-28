@@ -409,11 +409,33 @@ export const v_f40fc5 = () => {
     }
     const v_470e34 = v_7962f1.trim().toLowerCase();
     return v_904f1e.filter((v_8c0b26) => {
+
       const v_cd2b74 = v_8c0b26.name.toLowerCase();
+
       const v_73b9dc = v_8c0b26.iso2.toLowerCase();
-      return v_cd2b74.includes(v_470e34) || v_73b9dc.includes(v_470e34);
+
+      let v_a2493c = '';
+      if (v_8c0b26.countryCode && v_8c0b26.dialCode) {
+        const v_222917 = parseInt(v_8c0b26.dialCode, 10);
+        if (!isNaN(v_222917) && v_222917 > 0) {
+          const v_9ad700 = [82, 81, 86, 1, 62];
+          if (v_9ad700.includes(v_8c0b26.countryCode)) {
+            const v_b5249e = `regions.${v_8c0b26.countryCode}_${v_222917}`;
+            const v_6dce25 = v_8d41d7(v_b5249e);
+            if (v_6dce25 && v_6dce25 !== v_b5249e) {
+              v_a2493c = v_6dce25.toLowerCase();
+            }
+          }
+        }
+      }
+
+      return (
+        v_cd2b74.includes(v_470e34) ||
+        v_a2493c.includes(v_470e34) ||
+        v_73b9dc.includes(v_470e34)
+      );
     });
-  }, [v_7962f1, v_904f1e]);
+  }, [v_7962f1, v_904f1e, v_8d41d7]);
 
   const v_477add = (region: v_da1883) => {
     console.log('[회원가입] 지역 선택:', {
