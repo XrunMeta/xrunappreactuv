@@ -336,12 +336,46 @@ export const SignupScreen = () => {
     }
     const normalizedQuery = countrySearchQuery.trim().toLowerCase();
     return availableCountries.filter((item) => {
+
       const searchName = item.name.toLowerCase();
+
       const searchIso = item.iso2.toLowerCase();
+
       const searchDialCode = item.dialCode.toLowerCase();
-      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery) || searchDialCode.includes(normalizedQuery);
+
+      let translatedName = '';
+      if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
+        const countryKey = `countries.${item.iso2.toUpperCase()}`;
+        const translated = t(countryKey);
+        if (translated && translated !== countryKey) {
+          translatedName = translated.toLowerCase();
+        }
+      }
+
+      const isoExactMatch = searchIso === normalizedQuery;
+
+      const nameMatch = searchName.includes(normalizedQuery);
+
+      const translatedNameMatch = translatedName && translatedName.includes(normalizedQuery);
+
+      let dialCodeMatch = false;
+      if (normalizedQuery.match(/^\d+$/)) {
+
+        const dialCodeNumbers = searchDialCode.replace(/[^0-9]/g, '');
+        dialCodeMatch = dialCodeNumbers.includes(normalizedQuery);
+      } else if (normalizedQuery.startsWith('+')) {
+
+        dialCodeMatch = searchDialCode.includes(normalizedQuery);
+      }
+
+      return (
+        isoExactMatch ||
+        nameMatch ||
+        translatedNameMatch ||
+        dialCodeMatch
+      );
     });
-  }, [countrySearchQuery, availableCountries]);
+  }, [countrySearchQuery, availableCountries, t]);
 
   const handleSelectCountry = (country: CountryDialCode) => {
     console.log('[회원가입] 국가 선택:', {
