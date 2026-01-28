@@ -1,6 +1,6 @@
 export default {
-  declined: 'Declined',
-  accept: 'Accept',
+  declined: 'Từ chối',
+  accept: 'Chấp nhận',
 };
 
 

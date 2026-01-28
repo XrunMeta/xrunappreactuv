@@ -1,11 +1,11 @@
 export default {
-  title: 'Clause',
-  serviceClause: 'Service Clause',
-  locationClause: 'Clause for Personal Location Information',
-  personalClause: 'Clause for Usage/Collecting Personal Information',
-  loading: 'Loading clause content...',
-  loadFailed: 'Unable to load clause content.',
-  loadError: 'An error occurred while loading clause content.',
+  title: 'ข้อกำหนด',
+  serviceClause: 'ข้อกำหนดการให้บริการ',
+  locationClause: 'ข้อกำหนดสำหรับข้อมูลตำแหน่งส่วนบุคคล',
+  personalClause: 'ข้อกำหนดสำหรับการใช้/เก็บรวบรวมข้อมูลส่วนบุคคล',
+  loading: 'กำลังโหลดเนื้อหาข้อกำหนด...',
+  loadFailed: 'ไม่สามารถโหลดเนื้อหาข้อกำหนดได้',
+  loadError: 'เกิดข้อผิดพลาดขณะโหลดเนื้อหาข้อกำหนด',
 };
 
 

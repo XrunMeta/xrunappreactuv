@@ -1,11 +1,11 @@
 export default {
-  title: 'Terms of Service',
-  loading: 'Loading terms...',
+  title: 'सेवा नियम',
+  loading: 'नियम लोड हो रहे हैं...',
   error: {
-    title: 'Error',
-    ok: 'OK',
+    title: 'त्रुटि',
+    ok: 'ठीक',
   },
-  noData: 'No terms data available.',
+  noData: 'कोई नियम डेटा उपलब्ध नहीं।',
 };
 
 

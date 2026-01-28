@@ -1,11 +1,11 @@
 export default {
-  countrySelectTitle: 'Select Country',
-  regionSelectTitle: 'Select Region',
-  currentSelection: 'Current Selection',
-  countrySearchPlaceholder: 'Search country',
-  regionSearchPlaceholder: 'Search region',
-  noResults: 'No results found',
-  selectOption: 'Select',
+  countrySelectTitle: 'Chọn quốc gia',
+  regionSelectTitle: 'Chọn khu vực',
+  currentSelection: 'Lựa chọn hiện tại',
+  countrySearchPlaceholder: 'Tìm kiếm quốc gia',
+  regionSearchPlaceholder: 'Tìm kiếm khu vực',
+  noResults: 'Không tìm thấy kết quả',
+  selectOption: 'Chọn',
 };
 
 

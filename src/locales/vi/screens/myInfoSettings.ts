@@ -1,7 +1,7 @@
 export default {
-  title: 'Setting',
-  closeMembership: 'Close Membership',
-  languageSelect: 'Language Select',
+  title: 'Cài đặt',
+  closeMembership: 'Đóng tư cách thành viên',
+  languageSelect: 'Chọn ngôn ngữ',
 };
 
 

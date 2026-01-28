@@ -1,41 +1,41 @@
 export default {
-  title: 'FAQ',
+  title: 'अक्सर पूछे जाने वाले प्रश्न',
   items: {
     exchangeSubmit: {
-      question: 'When are exchange-requested coins paid out?',
-      answer: 'Exchange-requested coins are paid out immediately upon submission of the application.',
+      question: 'एक्सचेंज-अनुरोधित सिक्के कब भुगतान किए जाते हैं?',
+      answer: 'एक्सचेंज-अनुरोधित सिक्के आवेदन जमा करने पर तुरंत भुगतान किए जाते हैं।',
     },
     conversionSchedule: {
-      question: 'When are conversion-requested coins paid out?',
-      answer: 'Conversion-requested coins are paid out within 3 days after the request, in the order of application.',
+      question: 'रूपांतरण-अनुरोधित सिक्के कब भुगतान किए जाते हैं?',
+      answer: 'रूपांतरण-अनुरोधित सिक्के अनुरोध के 3 दिनों के भीतर, आवेदन के क्रम में भुगतान किए जाते हैं।',
     },
     missionComplete: {
-      question: 'How do I complete a mission?',
-      answer: 'Check the mission location displayed on the main screen, then switch to AR mode at that location and capture the augmented cryptocurrency to complete the mission.',
+      question: 'मैं एक मिशन कैसे पूरा करूं?',
+      answer: 'मुख्य स्क्रीन पर प्रदर्शित मिशन स्थान की जांच करें, फिर उस स्थान पर AR मोड में स्विच करें और मिशन पूरा करने के लिए संवर्धित cryptocurrency कैप्चर करें।',
     },
     rewardCheck: {
-      question: 'Where can I check the coins I received as rewards?',
-      answer: 'After completing a mission, you can check the coins you received as rewards in the in-app wallet.',
+      question: 'मैं पुरस्कार के रूप में प्राप्त सिक्कों की जांच कहां कर सकता हूं?',
+      answer: 'मिशन पूरा करने के बाद, आप ऐप-इन वॉलेट में पुरस्कार के रूप में प्राप्त सिक्कों की जांच कर सकते हैं।',
     },
     xrunExchange: {
-      question: 'How do I exchange other cryptocurrencies for XRUN coins?',
-      answer: 'You can exchange other cryptocurrencies for XRUN coins through coin exchange in the in-app wallet. When exchanging, enter the amount of coins to exchange and submit a request, and they will be exchanged and paid out according to the XRUN coin ratio.',
+      question: 'मैं अन्य cryptocurrencies को XRUN सिक्कों के लिए कैसे एक्सचेंज करूं?',
+      answer: 'आप ऐप-इन वॉलेट में सिक्का एक्सचेंज के माध्यम से अन्य cryptocurrencies को XRUN सिक्कों के लिए एक्सचेंज कर सकते हैं। एक्सचेंज करते समय, एक्सचेंज करने के लिए सिक्कों की राशि दर्ज करें और एक अनुरोध सबमिट करें, और उन्हें XRUN सिक्का अनुपात के अनुसार एक्सचेंज और भुगतान किया जाएगा।',
     },
     rewardUsage: {
-      question: 'How do I use the coins I received as rewards?',
-      answer: 'You can request conversion and exchange of reward coins in the in-app wallet to exchange them for real coins. Real coins can be freely sold and used on external exchanges.',
+      question: 'मैं पुरस्कार के रूप में प्राप्त सिक्कों का उपयोग कैसे करूं?',
+      answer: 'आप ऐप-इन वॉलेट में पुरस्कार सिक्कों के रूपांतरण और एक्सचेंज का अनुरोध कर सकते हैं ताकि उन्हें वास्तविक सिक्कों के लिए एक्सचेंज किया जा सके। वास्तविक सिक्के बाहरी एक्सचेंजों पर स्वतंत्र रूप से बेचे और उपयोग किए जा सकते हैं।',
     },
     adReward: {
-      question: 'How do I receive ad rewards?',
-      answer: 'You can receive coins equal to the reward amount set in the ad by participating in AR missions and completing them.',
+      question: 'मैं विज्ञापन पुरस्कार कैसे प्राप्त करूं?',
+      answer: 'आप AR मिशनों में भाग लेकर और उन्हें पूरा करके विज्ञापन में निर्धारित पुरस्कार राशि के बराबर सिक्के प्राप्त कर सकते हैं।',
     },
     changePasswordRequest: {
-      question: 'I want to change my password',
-      answer: 'You can change it in My Info > Edit Info > Password.',
+      question: 'मैं अपना पासवर्ड बदलना चाहता हूं',
+      answer: 'आप इसे मेरी जानकारी > जानकारी संपादित करें > पासवर्ड में बदल सकते हैं।',
     },
     changePasswordHow: {
-      question: 'How do I change my password?',
-      answer: 'You can change it in My Info > Edit Info > Password. Have a great day^^!',
+      question: 'मैं अपना पासवर्ड कैसे बदलूं?',
+      answer: 'आप इसे मेरी जानकारी > जानकारी संपादित करें > पासवर्ड में बदल सकते हैं। आपका दिन शुभ हो^^!',
     },
   },
 };
