@@ -4563,8 +4563,6 @@ export default {
 
   '886_changhua': 'Changhua',
   '886_chiayi': 'Chiayi',
-  '886_chiayi': 'Chiayi',
-  '886_hsinchu': 'Hsinchu',
   '886_hsinchu': 'Hsinchu',
   '886_hualien': 'Hualien',
   '886_kaohsiung': 'Kaohsiung',
