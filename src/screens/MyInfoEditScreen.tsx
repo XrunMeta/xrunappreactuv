@@ -16,8 +16,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, OptionButton, Dialog, SafeScrollView } from '../components';
-import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, GLOBAL_REGION, ALLOWED_COUNTRIES } from '../constants';
+import { Header, FormField, PrimaryButton, OptionButton, Dialog, SafeScrollView, CountryCodeListItem } from '../components';
+import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, GLOBAL_REGION, ALLOWED_COUNTRIES, getRegionsByCountryIso2 } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -35,6 +35,7 @@ import {
   signInWithApple,
 } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
+import { isCountryWithRegionsByCode } from '../utils/countryStateCityUtils';
 import { CountryDialCode } from '../types';
 
 const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
@@ -131,10 +132,15 @@ export const MyInfoEditScreen = () => {
 
   const [regionModalVisible, setRegionModalVisible] = useState(false);
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
+  const [regionSearchQuery, setRegionSearchQuery] = useState('');
+  const [availableRegions, setAvailableRegions] = useState<CountryDialCode[]>([]);
+  const [hasRegions, setHasRegions] = useState<boolean>(false);
+  const [selectedRegion, setSelectedRegion] = useState<CountryDialCode | null>(null);
 
   const [countryModalVisible, setCountryModalVisible] = useState(false);
   const [countries, setCountries] = useState<CountryDialCode[]>(ALLOWED_COUNTRIES);
   const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const [countrySearchQuery, setCountrySearchQuery] = useState('');
 
   const getTranslatedRegionName = React.useCallback((regionDesc: string, regionCode: number | null, countryCode: number | null): string => {
 
@@ -1325,143 +1331,101 @@ export const MyInfoEditScreen = () => {
     }
   };
 
-  const handleSelectRegion = (selectedRegion: { description?: string; subcode?: number; rCode?: number; rName?: string }) => {
-    const regionCode = selectedRegion.subcode || selectedRegion.rCode || 0;
-    const regionDesc = selectedRegion.description || selectedRegion.rName || '';
+  const filteredRegions = useMemo(() => {
+    if (!regionSearchQuery.trim()) {
+      return availableRegions;
+    }
+    const normalizedQuery = regionSearchQuery.trim().toLowerCase();
+    return availableRegions.filter((item) => {
+      const searchName = item.name.toLowerCase();
+      const searchIso = item.iso2.toLowerCase();
+      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery);
+    });
+  }, [regionSearchQuery, availableRegions]);
 
-    console.log('[정보수정] 지역 선택:', { regionCode, regionDesc, selectedRegion });
+  const handleSelectRegion = (region: CountryDialCode) => {
+    console.log('[정보수정] 지역 선택:', {
+      region,
+      iso2: region.iso2,
+      name: region.name,
+      dialCode: region.dialCode,
+      countryCode: region.countryCode,
+    });
 
-    if (!regionDesc) {
-      console.warn('[정보수정] 지역 설명이 없습니다:', selectedRegion);
-
-      const fallbackDesc = 'Unknown';
+    if (region.iso2 === 'select' || region.dialCode === '0') {
+      console.log('[정보수정] "선택" 옵션 선택 - null로 설정');
+      setSelectedRegion(null);
       setTempRegion({
-        rDesc: fallbackDesc,
+        rDesc: '',
+        rCode: null,
+      });
+      setSelectedRegionId(null);
+    } else {
+      console.log('[정보수정] 지역 선택:', region.name);
+      setSelectedRegion(region);
+      const regionCode = parseInt(region.dialCode, 10) || 0;
+      setTempRegion({
+        rDesc: region.name,
         rCode: regionCode,
       });
-      setSelectedRegionId(fallbackDesc);
-    } else {
-
-      if (regionCode === -1 || regionCode === 0) {
-        const allRegionsText = t('screens.myInfoEdit.allRegions');
-        setTempRegion({
-          rDesc: allRegionsText,
-          rCode: 0, 
-        });
-        setSelectedRegionId(allRegionsText);
-
-        setIsCountryChanged(false);
-        console.log('[정보수정] 전체 지역 선택됨 (rCode: 0):', allRegionsText);
-      } else {
-        setTempRegion({
-          rDesc: regionDesc,
-          rCode: regionCode,
-        });
-        setSelectedRegionId(regionDesc);
-
-        setIsCountryChanged(false);
-        console.log('[정보수정] 지역 선택됨:', { rDesc: regionDesc, rCode: regionCode });
-      }
+      setSelectedRegionId(region.name);
     }
-
+    setIsCountryChanged(false);
     setRegionModalVisible(false);
-
-    setTimeout(() => {
-      console.log('[정보수정] 지역 선택 후 상태 확인:', {
-        tempCountry,
-        tempRegion: { rDesc: regionDesc || 'Unknown', rCode: regionCode },
-        selectedRegionId: regionDesc || 'Unknown',
-      });
-    }, 100);
+    setRegionSearchQuery('');
   };
 
-  const handleOpenRegionModal = async () => {
-    console.log('handleOpenRegionModal');
+  React.useEffect(() => {
+    const loadRegionsForCountry = async () => {
+      if (!selectedCountryDialCode?.countryCode) return;
 
+      setIsLoadingRegions(true);
+      try {
+        const result: LoadRegionsResult = await loadRegionsFromApi(
+          (country: number) => getRegionsByCountry(country, navigate),
+          selectedCountryDialCode.countryCode || 0,
+          selectedCountryDialCode.iso2,
+          getRegionsByCountryIso2(selectedCountryDialCode.iso2)
+        );
+        setAvailableRegions(result.regions);
+        setHasRegions(result.hasRegions);
+
+        if (result.hasRegions && result.regions.length > 0 && tempRegion.rCode !== null) {
+          const matchedRegion = result.regions.find(
+            (r) => parseInt(r.dialCode, 10) === tempRegion.rCode
+          );
+          if (matchedRegion) {
+            setSelectedRegion(matchedRegion);
+            setSelectedRegionId(matchedRegion.name);
+          }
+        } else if (!result.hasRegions) {
+          setSelectedRegion(GLOBAL_REGION);
+          setSelectedRegionId(GLOBAL_REGION.name);
+        }
+      } catch (error) {
+        console.error('[정보수정] 지역 목록 로드 실패:', error);
+        const fallbackRegions = getRegionsByCountryIso2(selectedCountryDialCode.iso2);
+        setAvailableRegions(fallbackRegions);
+        setHasRegions(fallbackRegions.length > 0 && fallbackRegions[0].iso2 !== 'global');
+      } finally {
+        setIsLoadingRegions(false);
+      }
+    };
+
+    loadRegionsForCountry();
+  }, [selectedCountryDialCode, navigate]);
+
+  const handleOpenRegionModal = async () => {
     if (!selectedCountryDialCode || !selectedCountryDialCode.dialCode) {
       await showAlert(
         t('screens.myInfoEdit.alerts.error'),
         t('screens.myInfoEdit.alerts.selectCountryFirst')
       );
-
       handleCountrySelect();
       return;
     }
 
-    const countryCode = getCountryCodeFromDialCode(selectedCountryDialCode.dialCode);
-    if (!countryCode) {
-      await showAlert(
-        t('screens.myInfoEdit.alerts.error'),
-        t('screens.myInfoEdit.alerts.invalidCountryCode')
-      );
-      return;
-    }
-
-    const currentCountryCode = tempCountry.cCode;
-    if (regions.length === 0 || currentCountryCode !== countryCode) {
-      setIsLoadingRegions(true);
-      try {
-
-        const result: LoadRegionsResult = await loadRegionsFromApi(
-          (country: number) => getRegionsByCountry(country, navigate),
-          countryCode,
-          selectedCountryDialCode.iso2 
-        );
-
-        if (result.hasRegions && result.regions.length > 0) {
-
-          const convertedRegions = result.regions.map((region) => ({
-            description: region.name,
-            subcode: parseInt(region.dialCode, 10) || 0,
-            rCode: parseInt(region.dialCode, 10) || 0,
-            rName: region.name,
-          }));
-          setRegions(convertedRegions);
-        } else {
-
-          console.log('[정보수정] 패키지에 지역 데이터 없음 - Global로 설정:', { countryCode, iso2: selectedCountryDialCode.iso2 });
-          setRegions([{
-            description: GLOBAL_REGION.name,
-            subcode: 0,
-            rCode: 0,
-            rName: GLOBAL_REGION.name,
-          }]);
-        }
-
-        setTempCountry({
-          cDesc: selectedCountryDialCode.name,
-          cCode: countryCode,
-        });
-
-        if (!result.hasRegions || result.regions.length === 0) {
-          setTempRegion({
-            rDesc: GLOBAL_REGION.name,
-            rCode: 0,
-          });
-          setSelectedRegionId(GLOBAL_REGION.name);
-        }
-      } catch (error) {
-        console.error('[정보수정] 지역 목록 로드 실패:', error);
-
-        setRegions([{
-          description: GLOBAL_REGION.name,
-          subcode: 0,
-          rCode: 0,
-          rName: GLOBAL_REGION.name,
-        }]);
-
-        setTempRegion({
-          rDesc: GLOBAL_REGION.name,
-          rCode: 0,
-        });
-        setSelectedRegionId(GLOBAL_REGION.name);
-      } finally {
-        setIsLoadingRegions(false);
-      }
-    }
-
-    const hasRegionsData = regions.length > 0 && regions[0].rCode !== 0 && regions[0].description !== GLOBAL_REGION.name;
-    if (!hasRegionsData) {
+    if (!hasRegions || availableRegions.length === 0) {
       return;
     }
 
@@ -1564,55 +1528,74 @@ export const MyInfoEditScreen = () => {
             </View>
 
             {}
-              {(() => {
+            {(() => {
 
-                const hasRegionsData = regions.length > 0 && regions[0].rCode !== 0 && regions[0].description !== GLOBAL_REGION.name;
+              const countryCode = selectedCountryDialCode?.countryCode;
+              const iso2 = selectedCountryDialCode?.iso2;
+              const isCountryWithRegions = countryCode && iso2 
+                ? isCountryWithRegionsByCode(countryCode, iso2) 
+                : false;
 
-                if (!hasRegionsData) {
-                  return null;
-                }
+              return hasRegions || isCountryWithRegions;
+            })() && (
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>{t('screens.myInfoEdit.region')}</Text>
+                <TouchableOpacity
+                  style={styles.regionField}
+                  onPress={handleOpenRegionModal}
+                  activeOpacity={0.7}
+                  disabled={isSaving || isLoadingRegions}
+                >
+                  <Text style={[styles.regionValue, !selectedRegion && styles.regionPlaceholder]}>
+                    {(() => {
+                      if (!selectedRegion || selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0') {
+                        return '';
+                      }
 
-              return (
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.label}>{t('screens.myInfoEdit.region')}</Text>
-                  <TouchableOpacity
-                    style={styles.regionField}
-                    onPress={handleOpenRegionModal}
-                    activeOpacity={0.7}
-                    disabled={isSaving || isLoadingRegions}
-                  >
-                    <Text style={[styles.regionValue, ((!tempCountry.cDesc && !selectedCountryDialCode?.name) || !tempRegion.rDesc || tempRegion.rCode === null || tempRegion.rCode === -1 || isCountryChanged) && styles.regionPlaceholder]}>
-                      {(() => {
+                      const regionCode = selectedRegion.dialCode ? parseInt(selectedRegion.dialCode, 10) : null;
+                      const countryCode = selectedCountryDialCode?.countryCode || null;
 
-                        const originalCountryName = isCountryChanged && selectedCountryDialCode?.name
-                          ? selectedCountryDialCode.name
-                          : tempCountry.cDesc || selectedCountryDialCode?.name || '';
+                      if (regionCode === 0) {
+                        return t('screens.myInfoEdit.allRegions') || '전체 지역';
+                      } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
 
-                        const countryName = getTranslatedCountryName(originalCountryName, selectedCountryDialCode?.iso2);
+                        const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+                        let regionKey: string;
 
-                        if (countryName && tempRegion.rDesc && tempRegion.rDesc !== 'Please Select' && tempRegion.rCode !== null && tempRegion.rCode !== -1 && !isCountryChanged) {
+                        if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
 
-                          const translatedRegionName = getTranslatedRegionName(tempRegion.rDesc, tempRegion.rCode, tempCountry.cCode || countryCode);
+                          regionKey = `regions.${countryCode}_${regionCode}`;
+                        } else {
 
-                          if (tempRegion.rCode === 0) {
-                            return translatedRegionName;
+                          const regionNameKey = selectedRegion.name
+                            .replace(/[^a-zA-Z0-9\s]/g, '') 
+                            .replace(/\s+/g, '_') 
+                            .toLowerCase();
+                          regionKey = `regions.${countryCode}_${regionNameKey}`;
+                        }
+
+                        try {
+                          const translated = t(regionKey);
+                          if (translated && translated !== regionKey) {
+                            return translated;
+                          } else {
+
+                            return selectedRegion.name;
                           }
+                        } catch (error) {
 
-                          return `${countryName}, ${translatedRegionName}`;
+                          return selectedRegion.name;
                         }
+                      } else {
 
-                        if (countryName) {
-                          return `${countryName}, ${t('screens.myInfoEdit.pleaseSelect')}`;
-                        }
-
-                        return t('screens.myInfoEdit.selectCountryAndRegion');
-                      })()}
-                    </Text>
-                    <Text style={styles.arrow}>›</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })()}
+                        return selectedRegion.name;
+                      }
+                    })()}
+                  </Text>
+                  <Text style={styles.arrow}>›</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.gender')}</Text>
@@ -1783,59 +1766,63 @@ export const MyInfoEditScreen = () => {
           <TouchableOpacity
             style={styles.modalBackdrop}
             activeOpacity={1}
-            onPress={() => setRegionModalVisible(false)}
+            onPress={() => {
+              setRegionModalVisible(false);
+              setRegionSearchQuery('');
+            }}
           />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {tempCountry.cDesc ? `${t('screens.myInfoEdit.selectRegion')} - ${getTranslatedCountryName(tempCountry.cDesc, selectedCountryDialCode?.iso2)}` : t('screens.myInfoEdit.selectRegion')}
+                {t('screens.countryCodeSelect.regionSelectTitle') || '지역 선택'}
               </Text>
-              <TouchableOpacity onPress={() => setRegionModalVisible(false)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setRegionModalVisible(false);
+                  setRegionSearchQuery('');
+                }}
+              >
                 <Text style={styles.modalCloseButton}>✕</Text>
               </TouchableOpacity>
+            </View>
+            <View style={styles.modalSearchBox}>
+              <Ionicons name="search" size={18} color="#9ca3af" />
+              <TextInput
+                style={styles.modalSearchInput}
+                value={regionSearchQuery}
+                onChangeText={setRegionSearchQuery}
+                placeholder={t('screens.countryCodeSelect.regionSearchPlaceholder') || '지역 검색'}
+                placeholderTextColor="#c4c7d1"
+                autoCorrect={false}
+              />
             </View>
             {isLoadingRegions ? (
               <View style={styles.modalLoadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
               </View>
             ) : (
-              <ScrollView style={styles.modalScrollView}>
-                {regions.length > 0 ? (
-                  regions.map((region) => (
-                    <TouchableOpacity
-                      key={region.subcode || region.rCode || region.description}
-                      style={[
-                        styles.modalItem,
-                        selectedRegionId === (region.description || region.rName) && styles.modalItemSelected,
-                      ]}
-                      onPress={() => handleSelectRegion(region)}
-                    >
-                      <Text style={styles.modalItemText}>
-                        {(() => {
-                          const regionDesc = region.description || region.rName || 'Unknown';
-                          const regionCode = region.subcode || region.rCode;
-                          const currentCountryCode = tempCountry.cCode || countryCode;
-                          return getTranslatedRegionName(regionDesc, regionCode || null, currentCountryCode);
-                        })()}
-                      </Text>
-                      {(() => {
-                        const regionName = region.description || region.rName || '';
-                        const regionCode = region.subcode || region.rCode;
-
-                        const isSelected = regionCode === 0
-                          ? tempRegion.rCode === 0 && selectedRegionId === regionName
-                          : selectedRegionId === regionName;
-                        return isSelected && <Text style={styles.checkmark}>✓</Text>;
-                      })()}
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>{t('screens.myInfoEdit.noRegions')}</Text>
-                    <Text style={styles.emptyTextSub}>{t('screens.myInfoEdit.selectAllRegions')}</Text>
-                  </View>
+              <FlatList
+                data={filteredRegions}
+                keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
+                renderItem={({ item }) => (
+                  <CountryCodeListItem
+                    country={item}
+                    isSelected={item.iso2 === selectedRegion?.iso2 && item.dialCode === selectedRegion?.dialCode}
+                    onPress={handleSelectRegion}
+                    hideDialCode={true}
+                  />
                 )}
-              </ScrollView>
+                contentContainerStyle={styles.modalListContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={styles.modalEmptyState}>
+                    <Text style={styles.modalEmptyText}>
+                      {t('screens.countryCodeSelect.noResults') || '검색 결과가 없습니다.'}
+                    </Text>
+                  </View>
+                }
+              />
             )}
           </View>
         </View>
@@ -2160,6 +2147,23 @@ const styles = StyleSheet.create({
     color: COLORS.headerText,
   },
   modalScrollView: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  modalListContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  modalEmptyState: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  modalEmptyText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#8e9bae',
+  },
+  modalScrollViewOld: {
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
