@@ -73,18 +73,33 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
         } else {
 
           if (__DEV__) {
-            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
+            const v_2ca5ce = v_9c213b.store?.data?.[v_9c213b.language]?.translation;
+            const v_2ad8b6 = v_2ca5ce?.regions;
+            const v_7c4b22 = v_2ad8b6 && v_2ad8b6[v_82170f];
+
+            console.warn('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
               key: v_b5249e,
+              translationKey: v_82170f,
               translated: v_6dce25,
               original: v_b9bbbd.name,
               countryCode: v_b9bbbd.countryCode,
               dialCode: v_b9bbbd.dialCode,
               language: v_9c213b.language,
+              hasTranslationInFile: !!v_7c4b22,
+              translationValue: v_7c4b22,
+              availableLanguages: Object.keys(v_9c213b.store?.data || {}),
+              fallbackLanguage: v_9c213b.options?.fallbackLng,
             });
           }
         }
       } catch (v_5e9bfe) {
 
+        if (__DEV__) {
+          console.warn('[CountryCodeListItem] 지역 번역 오류:', v_5e9bfe, {
+            key: v_b5249e,
+            language: v_9c213b.language,
+          });
+        }
       }
 
       return v_b9bbbd.name;
