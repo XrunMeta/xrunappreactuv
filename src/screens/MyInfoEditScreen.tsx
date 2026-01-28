@@ -461,13 +461,14 @@ export const MyInfoEditScreen = () => {
 
                 const dialCodeStr = `+${countryCode}`;
                 const matchingDialCode = COUNTRY_DIAL_CODES.find((cd) => cd.dialCode === dialCodeStr);
+                let matchingByNumber: CountryDialCode | undefined;
                 if (matchingDialCode) {
                   setSelectedCountryDialCode(matchingDialCode);
                   console.log('[정보수정] selectedCountryDialCode 설정됨:', matchingDialCode);
                 } else {
 
                   const dialCodeNum = parseInt(countryCode.toString().replace('+', ''), 10);
-                  const matchingByNumber = COUNTRY_DIAL_CODES.find((cd) => {
+                  matchingByNumber = COUNTRY_DIAL_CODES.find((cd) => {
                     const cdNum = parseInt(cd.dialCode.replace('+', ''), 10);
                     return cdNum === dialCodeNum;
                   });
@@ -493,42 +494,111 @@ export const MyInfoEditScreen = () => {
                     console.log('[정보수정] 전체지역 설정됨 (region: 0)');
                   } else {
 
-                    try {
-                      setIsLoadingRegions(true);
-                      const regionsResponse = await getRegionsByCountry(countryCode, navigate);
-                      const regionsList = regionsResponse.data || [];
-                      setRegions(regionsList);
+                    const selectedDialCode = matchingDialCode || matchingByNumber;
+                    if (selectedDialCode) {
+                      try {
+                        setIsLoadingRegions(true);
+                        const result: LoadRegionsResult = await loadRegionsFromApi(
+                          (country: number) => getRegionsByCountry(country, navigate),
+                          countryCode,
+                          selectedDialCode.iso2 || '',
+                          getRegionsByCountryIso2(selectedDialCode.iso2 || '')
+                        );
+                        setAvailableRegions(result.regions);
+                        setHasRegions(result.hasRegions);
+                        setRegions(result.regions.map(r => ({
+                          description: r.name,
+                          subcode: parseInt(r.dialCode, 10) || 0,
+                          rCode: parseInt(r.dialCode, 10) || 0,
+                          rName: r.name
+                        })));
 
-                      const regionItem = regionsList.find((r) => {
-                        const rCode = typeof r.subcode === 'string' ? parseInt(r.subcode, 10) : r.subcode;
-                        const rCode2 = typeof r.rCode === 'string' ? parseInt(r.rCode, 10) : r.rCode;
-                        return rCode === regionNum || rCode2 === regionNum;
-                      });
+                        const matchedRegion = result.regions.find(
+                          (r) => parseInt(r.dialCode, 10) === regionNum
+                        );
 
-                      const regionName = regionItem?.description || regionItem?.rName || '';
+                        const regionName = matchedRegion?.name || '';
 
-                      loadedRegionName = regionName;
-                      loadedRegionCode = regionNum;
+                        const translatedRegionName = getTranslatedRegionName(regionName, regionNum, countryCode);
 
-                      if (regionName) {
-                        setTempRegion({ rDesc: regionName, rCode: regionNum });
-                        setSelectedRegionId(regionName);
+                        loadedRegionName = translatedRegionName;
+                        loadedRegionCode = regionNum;
 
-                        setIsCountryChanged(false);
-                        console.log('[정보수정] 초기 로드 - 지역 이름 찾음:', { rDesc: regionName, rCode: regionNum });
-                      } else {
+                        if (regionName) {
+                          setTempRegion({ rDesc: translatedRegionName, rCode: regionNum });
+                          setSelectedRegionId(translatedRegionName);
+                          if (matchedRegion) {
+                            setSelectedRegion(matchedRegion);
+                          }
+
+                          setIsCountryChanged(false);
+                          console.log('[정보수정] 초기 로드 - 지역 이름 찾음:', { rDesc: translatedRegionName, rCode: regionNum, original: regionName });
+                        } else {
+                          setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                          setSelectedRegionId(null);
+                          console.log('[정보수정] 초기 로드 - 지역 이름 없음:', { rCode: regionNum });
+                          loadedRegionName = '알 수 없음';
+                          loadedRegionCode = regionNum;
+                        }
+                        setIsLoadingRegions(false);
+                      } catch (error) {
+                        console.error('[정보수정] 초기 로드 - 지역 목록 로드 실패:', error);
                         setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
                         setSelectedRegionId(null);
-                        console.log('[정보수정] 초기 로드 - 지역 이름 없음:', { rCode: regionNum });
-                        loadedRegionName = '알 수 없음';
-                        loadedRegionCode = regionNum;
+                        setIsLoadingRegions(false);
+
+                        try {
+                          const regionsResponse = await getRegionsByCountry(countryCode, navigate);
+                          const regionsList = regionsResponse.data || [];
+                          setRegions(regionsList);
+                          const fallbackRegions = getRegionsByCountryIso2(selectedDialCode.iso2 || '');
+                          setAvailableRegions(fallbackRegions);
+                          setHasRegions(fallbackRegions.length > 0 && fallbackRegions[0].iso2 !== 'global');
+                        } catch (fallbackError) {
+                          console.error('[정보수정] 폴백 지역 목록 로드 실패:', fallbackError);
+                        }
                       }
-                      setIsLoadingRegions(false);
-                    } catch (error) {
-                      console.error('[정보수정] 초기 로드 - 지역 목록 로드 실패:', error);
-                      setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
-                      setSelectedRegionId(null);
-                      setIsLoadingRegions(false);
+                    } else {
+
+                      try {
+                        setIsLoadingRegions(true);
+                        const regionsResponse = await getRegionsByCountry(countryCode, navigate);
+                        const regionsList = regionsResponse.data || [];
+                        setRegions(regionsList);
+
+                        const regionItem = regionsList.find((r) => {
+                          const rCode = typeof r.subcode === 'string' ? parseInt(r.subcode, 10) : r.subcode;
+                          const rCode2 = typeof r.rCode === 'string' ? parseInt(r.rCode, 10) : r.rCode;
+                          return rCode === regionNum || rCode2 === regionNum;
+                        });
+
+                        const regionName = regionItem?.description || regionItem?.rName || '';
+
+                        const translatedRegionName = getTranslatedRegionName(regionName, regionNum, countryCode);
+
+                        loadedRegionName = translatedRegionName;
+                        loadedRegionCode = regionNum;
+
+                        if (regionName) {
+                          setTempRegion({ rDesc: translatedRegionName, rCode: regionNum });
+                          setSelectedRegionId(translatedRegionName);
+
+                          setIsCountryChanged(false);
+                          console.log('[정보수정] 초기 로드 - 지역 이름 찾음:', { rDesc: translatedRegionName, rCode: regionNum, original: regionName });
+                        } else {
+                          setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                          setSelectedRegionId(null);
+                          console.log('[정보수정] 초기 로드 - 지역 이름 없음:', { rCode: regionNum });
+                          loadedRegionName = '알 수 없음';
+                          loadedRegionCode = regionNum;
+                        }
+                        setIsLoadingRegions(false);
+                      } catch (error) {
+                        console.error('[정보수정] 초기 로드 - 지역 목록 로드 실패:', error);
+                        setTempRegion({ rDesc: 'Please Select', rCode: regionNum });
+                        setSelectedRegionId(null);
+                        setIsLoadingRegions(false);
+                      }
                     }
                   }
                 } else {
@@ -626,11 +696,11 @@ export const MyInfoEditScreen = () => {
 
           isMountedRef.current = true;
 
-          if (restored) {
-            console.log('[정보수정] ✅ 나라 선택 후 돌아옴 - 저장된 입력값 복원 완료');
-          } else {
-            console.log('[정보수정] ✅ 나라 선택 후 돌아옴 - 저장된 입력값 없음');
-          }
+          await loadUserInfo(false);
+
+          await restoreFormData(isCountryActuallyChanged);
+
+          console.log('[정보수정] ✅ 나라 선택 후 돌아옴 - 데이터 로드 및 입력값 복원 완료');
 
           setIsLoading(false);
           return;
@@ -666,11 +736,14 @@ export const MyInfoEditScreen = () => {
               }
             } else {
 
-              const hasSavedData = await restoreFormData();
-              if (!hasSavedData) {
+              const prevCountryIso2 = await AsyncStorage.getItem('PREV_COUNTRY_ISO2');
+              const isReturningFromCountrySelect = prevCountryIso2 !== null;
+
+              if (!isReturningFromCountrySelect) {
 
                 await loadUserInfo(false);
               }
+
             }
 
             console.log('[정보수정] ✅ loadUserInfo 완료, hasLoadedUserInfoRef = true로 설정');
@@ -1386,11 +1459,66 @@ export const MyInfoEditScreen = () => {
       console.log('[정보수정] 지역 선택:', region.name);
       setSelectedRegion(region);
       const regionCode = parseInt(region.dialCode, 10) || 0;
+
+      const countryCode = selectedCountryDialCode?.countryCode || region.countryCode || null;
+      let translatedRegionName = region.name; 
+
+      if (countryCode && regionCode > 0) {
+        const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+        let regionKey: string;
+
+        if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
+
+          regionKey = `regions.${countryCode}_${regionCode}`;
+        } else {
+
+          const regionNameKey = region.name
+            .replace(/[^a-zA-Z0-9\s]/g, '') 
+            .replace(/\s+/g, '_') 
+            .toLowerCase();
+          regionKey = `regions.${countryCode}_${regionNameKey}`;
+        }
+
+        try {
+          const translated = t(regionKey);
+          if (translated && translated !== regionKey) {
+            translatedRegionName = translated;
+            if (__DEV__) {
+              console.log('[정보수정] 지역 선택 - 번역 성공:', {
+                key: regionKey,
+                translated: translatedRegionName,
+                original: region.name,
+                countryCode,
+                regionCode,
+              });
+            }
+          } else {
+            if (__DEV__) {
+              console.warn('[정보수정] 지역 선택 - 번역 키 없음:', {
+                key: regionKey,
+                original: region.name,
+                countryCode,
+                regionCode,
+              });
+            }
+          }
+        } catch (error) {
+          if (__DEV__) {
+            console.warn('[정보수정] 지역 선택 - 번역 오류:', error, {
+              key: regionKey,
+              original: region.name,
+              countryCode,
+              regionCode,
+            });
+          }
+        }
+      }
+
       setTempRegion({
-        rDesc: region.name,
+        rDesc: translatedRegionName,
         rCode: regionCode,
       });
-      setSelectedRegionId(region.name);
+      setSelectedRegionId(translatedRegionName);
     }
     setIsCountryChanged(false);
     setRegionModalVisible(false);
@@ -1418,7 +1546,18 @@ export const MyInfoEditScreen = () => {
           );
           if (matchedRegion) {
             setSelectedRegion(matchedRegion);
-            setSelectedRegionId(matchedRegion.name);
+
+            const translatedRegionName = getTranslatedRegionName(
+              matchedRegion.name,
+              tempRegion.rCode,
+              selectedCountryDialCode?.countryCode || null
+            );
+            setSelectedRegionId(translatedRegionName);
+
+            setTempRegion({
+              rDesc: translatedRegionName,
+              rCode: tempRegion.rCode,
+            });
           }
         } else if (!result.hasRegions) {
           setSelectedRegion(GLOBAL_REGION);
@@ -1568,50 +1707,56 @@ export const MyInfoEditScreen = () => {
                   activeOpacity={0.7}
                   disabled={isSaving || isLoadingRegions}
                 >
-                  <Text style={[styles.regionValue, !selectedRegion && styles.regionPlaceholder]}>
+                  <Text style={[styles.regionValue, !tempRegion.rDesc && !selectedRegion && styles.regionPlaceholder]}>
                     {(() => {
-                      if (!selectedRegion || selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0') {
-                        return '';
+
+                      if (tempRegion.rDesc && tempRegion.rDesc !== 'Please Select') {
+                        return tempRegion.rDesc;
                       }
 
-                      const regionCode = selectedRegion.dialCode ? parseInt(selectedRegion.dialCode, 10) : null;
-                      const countryCode = selectedCountryDialCode?.countryCode || null;
+                      if (selectedRegion && selectedRegion.iso2 !== 'select' && selectedRegion.dialCode !== '0') {
 
-                      if (regionCode === 0) {
-                        return t('screens.myInfoEdit.allRegions') || '전체 지역';
-                      } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
+                        const regionCode = selectedRegion.dialCode ? parseInt(selectedRegion.dialCode, 10) : null;
+                        const countryCode = selectedCountryDialCode?.countryCode || null;
 
-                        const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
-                        let regionKey: string;
+                        if (regionCode === 0) {
+                          return t('screens.myInfoEdit.allRegions') || '전체 지역';
+                        } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
 
-                        if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
+                          const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+                          let regionKey: string;
 
-                          regionKey = `regions.${countryCode}_${regionCode}`;
-                        } else {
+                          if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
 
-                          const regionNameKey = selectedRegion.name
-                            .replace(/[^a-zA-Z0-9\s]/g, '') 
-                            .replace(/\s+/g, '_') 
-                            .toLowerCase();
-                          regionKey = `regions.${countryCode}_${regionNameKey}`;
-                        }
-
-                        try {
-                          const translated = t(regionKey);
-                          if (translated && translated !== regionKey) {
-                            return translated;
+                            regionKey = `regions.${countryCode}_${regionCode}`;
                           } else {
+
+                            const regionNameKey = selectedRegion.name
+                              .replace(/[^a-zA-Z0-9\s]/g, '') 
+                              .replace(/\s+/g, '_') 
+                              .toLowerCase();
+                            regionKey = `regions.${countryCode}_${regionNameKey}`;
+                          }
+
+                          try {
+                            const translated = t(regionKey);
+                            if (translated && translated !== regionKey) {
+                              return translated;
+                            } else {
+
+                              return selectedRegion.name;
+                            }
+                          } catch (error) {
 
                             return selectedRegion.name;
                           }
-                        } catch (error) {
+                        } else {
 
                           return selectedRegion.name;
                         }
-                      } else {
-
-                        return selectedRegion.name;
                       }
+
+                      return '';
                     })()}
                   </Text>
                   <Text style={styles.arrow}>›</Text>
@@ -2070,11 +2215,6 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
-  },
-  checkmark: {
-    fontSize: FONTS.size.mmedium,
-    color: COLORS.buttonPrimary,
-    fontFamily: 'Roboto-Bold',
   },
   disabledInput: {
     borderWidth: 1,
