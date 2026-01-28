@@ -1,11 +1,11 @@
 export default {
-  title: 'Clause',
-  serviceClause: 'Service Clause',
-  locationClause: 'Clause for Personal Location Information',
-  personalClause: 'Clause for Usage/Collecting Personal Information',
-  loading: 'Loading clause content...',
-  loadFailed: 'Unable to load clause content.',
-  loadError: 'An error occurred while loading clause content.',
+  title: 'Điều khoản',
+  serviceClause: 'Điều khoản dịch vụ',
+  locationClause: 'Điều khoản thông tin vị trí cá nhân',
+  personalClause: 'Điều khoản sử dụng/thu thập thông tin cá nhân',
+  loading: 'Đang tải nội dung điều khoản...',
+  loadFailed: 'Không thể tải nội dung điều khoản.',
+  loadError: 'Đã xảy ra lỗi khi tải nội dung điều khoản.',
 };
 
 

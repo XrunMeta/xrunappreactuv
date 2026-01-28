@@ -1,11 +1,11 @@
 export default {
-  countrySelectTitle: 'Select Country',
-  regionSelectTitle: 'Select Region',
-  currentSelection: 'Current Selection',
-  countrySearchPlaceholder: 'Search country',
-  regionSearchPlaceholder: 'Search region',
-  noResults: 'No results found',
-  selectOption: 'Select',
+  countrySelectTitle: 'เลือกประเทศ',
+  regionSelectTitle: 'เลือกภูมิภาค',
+  currentSelection: 'การเลือกปัจจุบัน',
+  countrySearchPlaceholder: 'ค้นหาประเทศ',
+  regionSearchPlaceholder: 'ค้นหาภูมิภาค',
+  noResults: 'ไม่พบผลลัพธ์',
+  selectOption: 'เลือก',
 };
 
 

@@ -1,10 +1,10 @@
 export default {
-  title: 'AD',
-  loading: 'Loading...',
-  emptyMessage: 'No settlement history.',
-  coinAcquisition: 'Coin Acquisition',
-  statusSuccess: 'Coin acquisition completed',
-  statusPending: 'Waiting for Coin Acquisition',
+  title: 'Quảng cáo',
+  loading: 'Đang tải...',
+  emptyMessage: 'Không có lịch sử thanh toán.',
+  coinAcquisition: 'Thu nhận Coin',
+  statusSuccess: 'Thu nhận coin hoàn tất',
+  statusPending: 'Đang chờ thu nhận coin',
 };
 
 

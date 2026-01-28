@@ -1,6 +1,6 @@
 export default {
-  title: 'Membership Withdrawal',
-  message: 'Membership withdrawal has been completed',
-  subMessage: 'Thank you for using our service.\nWe will come back with better service.',
-  confirmButton: 'Confirm',
+  title: 'การถอนตัวจากการเป็นสมาชิก',
+  message: 'การถอนตัวจากการเป็นสมาชิกเสร็จสมบูรณ์แล้ว',
+  subMessage: 'ขอบคุณที่ใช้บริการของเรา\nเราจะกลับมาพร้อมบริการที่ดีขึ้น',
+  confirmButton: 'ยืนยัน',
 };

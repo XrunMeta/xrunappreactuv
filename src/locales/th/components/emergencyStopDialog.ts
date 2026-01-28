@@ -1,6 +1,6 @@
 export default {
-  title: 'Notice',
-  viewDetails: 'View Details',
+  title: 'ประกาศ',
+  viewDetails: 'ดูรายละเอียด',
 };
 
 

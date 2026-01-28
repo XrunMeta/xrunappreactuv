@@ -1,7 +1,7 @@
 export default {
-  title: '1 Depth',
-  emptyTitle: 'This member has no sub-referrers yet.',
-  emptyDescription: "Members referred by this person's direct referrer will be displayed here.",
+  title: 'ความลึก 1',
+  emptyTitle: 'สมาชิกคนนี้ยังไม่มีผู้แนะนำย่อย',
+  emptyDescription: 'สมาชิกที่แนะนำโดยผู้แนะนำโดยตรงของบุคคลนี้จะแสดงที่นี่',
 };
 
 

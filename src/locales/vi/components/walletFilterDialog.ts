@@ -1,13 +1,13 @@
 export default {
-  title: 'Filter',
-  all: 'All',
-  send: 'Send',
-  receive: 'Receive',
-  days7: '7 Days',
-  days14: '14 Days',
-  days30: '30 Days',
-  reset: 'Reset',
-  confirm: 'Confirm',
+  title: 'Lọc',
+  all: 'Tất cả',
+  send: 'Gửi',
+  receive: 'Nhận',
+  days7: '7 Ngày',
+  days14: '14 Ngày',
+  days30: '30 Ngày',
+  reset: 'Đặt lại',
+  confirm: 'Xác nhận',
 };
 
 

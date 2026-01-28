@@ -1,13 +1,13 @@
 export default {
-  title: 'Filter',
-  all: 'All',
-  send: 'Send',
-  receive: 'Receive',
-  days7: '7 Days',
-  days14: '14 Days',
-  days30: '30 Days',
-  reset: 'Reset',
-  confirm: 'Confirm',
+  title: 'फ़िल्टर',
+  all: 'सभी',
+  send: 'भेजें',
+  receive: 'प्राप्त करें',
+  days7: '7 दिन',
+  days14: '14 दिन',
+  days30: '30 दिन',
+  reset: 'रीसेट करें',
+  confirm: 'पुष्टि करें',
 };
 
 
