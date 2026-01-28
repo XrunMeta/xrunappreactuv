@@ -236,13 +236,28 @@ export const getSubcodeFromPackageRegion = (
   }
 
   const regionNameWithoutSuffix = packageRegionName
-    .replace(/\s*(Province|City|State|Island|Islands|Autonomous Region|Special Administrative Region)$/i, '')
+    .replace(/\s*(Province|Prefecture|City|State|Island|Islands|Autonomous Region|Special Administrative Region)$/i, '')
     .trim();
 
   if (regionNameWithoutSuffix !== packageRegionName) {
     subcode = countryMapping[regionNameWithoutSuffix];
     if (subcode !== undefined) {
       return subcode;
+    }
+
+    const normalizedName = regionNameWithoutSuffix
+      .replace(/Ō/g, 'O')
+      .replace(/ō/g, 'o')
+      .replace(/ū/g, 'u')
+      .replace(/ē/g, 'e')
+      .replace(/ā/g, 'a')
+      .replace(/ī/g, 'i');
+
+    if (normalizedName !== regionNameWithoutSuffix) {
+      subcode = countryMapping[normalizedName];
+      if (subcode !== undefined) {
+        return subcode;
+      }
     }
   }
 
