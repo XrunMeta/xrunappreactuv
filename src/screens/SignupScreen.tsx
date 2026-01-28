@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_df9f57 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -11,6 +11,7 @@ import {
   v_aa7413,
   v_9cabcb,
   v_79c4f2,
+  v_0e1f26,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -116,6 +117,7 @@ export const v_f40fc5 = () => {
   const [v_bd30a1, v_e03dd9] = v_5ab095('');
   const [v_335974, v_88450b] = v_5ab095<v_da1883[]>(v_1bd8ad);
   const [v_d6cff0, v_677cd9] = v_5ab095(false);
+  const [v_7e4acc, v_de86c2] = v_5ab095(0);
 
   const v_5a46cd = (clauseId: v_9dd03c) => {
     if (v_111946 === 'service') {
@@ -304,6 +306,29 @@ export const v_f40fc5 = () => {
       v_dc6060();
     }
   }, [v_b67b40, v_9b57fc]);
+
+  v_c4deb2(() => {
+    if (!v_b67b40 && !v_3a64df) {
+      v_de86c2(0);
+      return;
+    }
+
+    const v_ef3bab = v_326be8.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const v_ffd7d0 = v_326be8.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const v_3d0122 = v_0e1f26.addListener(v_ef3bab, (v_d48baf) => {
+      v_de86c2(v_d48baf.endCoordinates.height);
+    });
+
+    const v_5ed003 = v_0e1f26.addListener(v_ffd7d0, () => {
+      v_de86c2(0);
+    });
+
+    return () => {
+      v_3d0122.remove();
+      v_5ed003.remove();
+    };
+  }, [v_b67b40, v_3a64df]);
 
   const v_daa71c = v_df9f57(() => {
     if (!v_bd30a1.trim()) {
@@ -1551,6 +1576,8 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: v_700696.get('window').height * 0.8,
+    minHeight: v_700696.get('window').height * 0.6,
     maxHeight: v_700696.get('window').height * 0.8,
     paddingBottom: v_326be8.OS === 'ios' ? 34 : 20,
   },
