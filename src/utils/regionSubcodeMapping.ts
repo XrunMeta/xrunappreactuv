@@ -236,13 +236,28 @@ export const v_bae0c0 = (
   }
 
   const v_63885f = v_df4689
-    .replace(/\s*(Province|City|State|Island|Islands|Autonomous Region|Special Administrative Region)$/i, '')
+    .replace(/\s*(Province|Prefecture|City|State|Island|Islands|Autonomous Region|Special Administrative Region)$/i, '')
     .trim();
 
   if (v_63885f !== v_df4689) {
     v_ad59cf = v_3be8ba[v_63885f];
     if (v_ad59cf !== undefined) {
       return v_ad59cf;
+    }
+
+    const v_d101e5 = v_63885f
+      .replace(/Ō/g, 'O')
+      .replace(/ō/g, 'o')
+      .replace(/ū/g, 'u')
+      .replace(/ē/g, 'e')
+      .replace(/ā/g, 'a')
+      .replace(/ī/g, 'i');
+
+    if (v_d101e5 !== v_63885f) {
+      v_ad59cf = v_3be8ba[v_d101e5];
+      if (v_ad59cf !== undefined) {
+        return v_ad59cf;
+      }
     }
   }
 
