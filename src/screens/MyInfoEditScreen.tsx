@@ -10,6 +10,7 @@ import {
   ScrollView,
   InteractionManager,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -2042,7 +2043,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
-    maxHeight: '80%',
+    height: Dimensions.get('window').height * 0.8,
+    minHeight: Dimensions.get('window').height * 0.6,
+    maxHeight: Dimensions.get('window').height * 0.8,
     overflow: 'hidden',
   },
   modalHeader: {
