@@ -3,6 +3,7 @@ import { v_09d0e5, v_472849, v_19b633, v_3094a2 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_da1883 } from '../types';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_496111 } from './CountryFlagImage';
 
 type Props = {
   country: v_da1883;
@@ -21,11 +22,21 @@ const v_ebcf70 = (country: v_da1883): string | null => {
     return null;
   }
 
-  const v_90ad93 = [82, 81, 86, 1, 62];
   const v_fd2c6b = parseInt(v_b9bbbd.dialCode, 10);
-  if (!isNaN(v_fd2c6b) && v_90ad93.includes(v_b9bbbd.countryCode)) {
+  if (!isNaN(v_fd2c6b) && v_fd2c6b > 0) {
 
-    return `${v_b9bbbd.countryCode}_${v_fd2c6b}`;
+    const v_9ad700 = [82, 81, 86, 1, 62];
+    if (v_9ad700.includes(v_b9bbbd.countryCode)) {
+
+      return `${v_b9bbbd.countryCode}_${v_fd2c6b}`;
+    }
+
+    const v_1581b6 = v_b9bbbd.name
+      .replace(/[^a-zA-Z0-9\s]/g, '') 
+      .replace(/\s+/g, '_') 
+      .toLowerCase();
+
+    return `${v_b9bbbd.countryCode}_${v_1581b6}`;
   }
 
   return null;
@@ -40,16 +51,6 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
   const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
 
   const v_8a1355 = v_a3453e.useMemo(() => {
-
-    if (__DEV__) {
-      console.log('[CountryCodeListItem] displayName 계산 시작:', {
-        iso2: v_b9bbbd.iso2,
-        name: v_b9bbbd.name,
-        language: v_9c213b.language,
-        countryCode: v_b9bbbd.countryCode,
-        dialCode: v_b9bbbd.dialCode,
-      });
-    }
 
     const v_82170f = v_ebcf70(v_b9bbbd);
     if (v_82170f) {
@@ -70,27 +71,10 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
           }
           return v_6dce25;
         } else {
-          if (__DEV__) {
-            console.warn('[CountryCodeListItem] 지역 번역 키 없음:', {
-              key: v_b5249e,
-              countryCode: v_b9bbbd.countryCode,
-              dialCode: v_b9bbbd.dialCode,
-              original: v_b9bbbd.name,
-              translated: v_6dce25,
-              language: v_9c213b.language,
-            });
-          }
+
         }
       } catch (v_5e9bfe) {
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 지역 번역 오류:', v_5e9bfe, {
-            key: v_b5249e,
-            countryCode: v_b9bbbd.countryCode,
-            dialCode: v_b9bbbd.dialCode,
-            original: v_b9bbbd.name,
-            language: v_9c213b.language,
-          });
-        }
+
       }
 
       return v_b9bbbd.name;
@@ -104,16 +88,7 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
         let v_6dce25 = v_8d41d7(v_4d2349);
 
         if (v_6dce25 && v_6dce25 !== v_4d2349) {
-          if (__DEV__) {
-            console.log('[CountryCodeListItem] 국가 번역 성공 (직접 키):', {
-              key: v_4d2349,
-              translated: v_6dce25,
-              original: v_b9bbbd.name,
-              iso2: v_b9bbbd.iso2,
-              iso2Upper: v_79864f,
-              language: v_9c213b.language,
-            });
-          }
+
           return v_6dce25;
         }
 
@@ -122,47 +97,16 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
           if (v_b1c827 && typeof v_b1c827 === 'object' && !Array.isArray(v_b1c827)) {
             const v_67cb9c = (v_b1c827 as Record<string, string>)[v_79864f];
             if (v_67cb9c && typeof v_67cb9c === 'string' && v_67cb9c !== v_79864f) {
-              if (__DEV__) {
-                console.log('[CountryCodeListItem] 국가 번역 성공 (객체 접근):', {
-                  key: v_4d2349,
-                  translated: v_67cb9c,
-                  original: v_b9bbbd.name,
-                  iso2: v_b9bbbd.iso2,
-                  iso2Upper: v_79864f,
-                  language: v_9c213b.language,
-                });
-              }
+
               return v_67cb9c;
             }
           }
         } catch (v_2d7a46) {
-          if (__DEV__) {
-            console.warn('[CountryCodeListItem] countries 객체 접근 실패:', v_2d7a46);
-          }
+
         }
 
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 국가 번역 실패 - 원본 사용:', {
-            key: v_4d2349,
-            iso2: v_b9bbbd.iso2,
-            iso2Upper: v_79864f,
-            original: v_b9bbbd.name,
-            translated: v_6dce25,
-            language: v_9c213b.language,
-
-            countriesObj: v_8d41d7('countries', { returnObjects: true }),
-          });
-        }
       } catch (v_5e9bfe) {
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 국가 번역 오류:', v_5e9bfe, {
-            key: v_4d2349,
-            iso2: v_b9bbbd.iso2,
-            iso2Upper: v_79864f,
-            original: v_b9bbbd.name,
-            language: v_9c213b.language,
-          });
-        }
+
       }
     }
 
@@ -179,7 +123,11 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
       onPress={() => v_719eed?.(v_b9bbbd)}
     >
       <View style={v_d81136.flagBadge}>
-        <Text style={v_d81136.flagText}>{v_b9bbbd.flagEmoji}</Text>
+        <CountryFlagImage
+          isoCode={v_b9bbbd.iso2}
+          flagEmoji={v_b9bbbd.flagEmoji}
+          size={40}
+        />
       </View>
       <View style={v_d81136.info}>
         <Text style={v_d81136.countryName}>{v_8a1355}</Text>
@@ -224,9 +172,7 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
-  },
-  flagText: {
-    fontSize: 22,
+    overflow: 'hidden',
   },
   info: {
     flex: 1,

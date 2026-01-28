@@ -31,7 +31,7 @@ import {
   v_8025d1,
   v_7af6c9,
 } from '../services';
-import { v_151d5f } from '../utils/countryUtils';
+import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
 import { v_da1883 } from '../types';
 
 const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
@@ -140,7 +140,22 @@ export const v_cdb169 = () => {
     }
 
     if (v_a4d981 && v_222917 !== null && v_222917 !== undefined && v_222917 > 0) {
-      const v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+
+      const v_9ad700 = [82, 81, 86, 1, 62];
+      let v_b5249e;
+
+      if (v_9ad700.includes(v_a4d981)) {
+
+        v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+      } else {
+
+        const v_1581b6 = v_5a7a4f
+          .replace(/[^a-zA-Z0-9\s]/g, '') 
+          .replace(/\s+/g, '_') 
+          .toLowerCase();
+        v_b5249e = `regions.${v_a4d981}_${v_1581b6}`;
+      }
+
       try {
         const v_6dce25 = v_8d41d7(v_b5249e);
 
@@ -1120,8 +1135,6 @@ export const v_cdb169 = () => {
 
   const v_f4c074 = v_a3453e.useRef<string | undefined>(undefined);
 
-  const v_90ad93 = [82, 81, 86, 1, 62];
-
   v_c4deb2(() => {
     const v_395426 = v_459d5e?.iso2;
     const v_41bf88 = v_f4c074.current;
@@ -1170,26 +1183,6 @@ export const v_cdb169 = () => {
         await v_2c39d5();
       }, 0);
 
-      if (v_459d5e?.dialCode) {
-        const v_32c8b6 = v_bec697(v_459d5e.dialCode);
-        if (v_32c8b6 && !v_90ad93.includes(v_32c8b6)) {
-          console.log('[정보수정] 지역을 지원하지 않는 국가로 변경됨. Global로 설정:', {
-            countryCode: v_32c8b6,
-            iso2: v_459d5e.iso2,
-          });
-          v_655be9({
-            rDesc: v_789afd.name,
-            rCode: 0,
-          });
-          v_a0f6fa(v_789afd.name);
-          v_59ad99([{
-            description: v_789afd.name,
-            subcode: 0,
-            rCode: 0,
-            rName: v_789afd.name,
-          }]);
-        }
-      }
     }
 
     if (v_395426) {
@@ -1353,54 +1346,48 @@ export const v_cdb169 = () => {
       return;
     }
 
-    const v_90ad93 = [82, 81, 86, 1, 62];
-    const v_56ad9c = v_90ad93.includes(v_a4d981);
-
     const v_ca520f = v_add96c.cCode;
     if (v_e94fdf.length === 0 || v_ca520f !== v_a4d981) {
       v_1c41ce(true);
       try {
 
-        if (!v_56ad9c) {
-          console.log('[정보수정] 지역을 지원하지 않는 국가입니다. Global로 설정:', { countryCode: v_a4d981, dialCode: v_459d5e.dialCode });
+        const result: v_107459 = await v_5c7129(
+          (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
+          v_a4d981,
+          v_459d5e.iso2 
+        );
+
+        if (v_43c42e.hasRegions && v_43c42e.regions.length > 0) {
+
+          const v_a4cc88 = v_43c42e.regions.map((v_a6c30b) => ({
+            description: v_a6c30b.name,
+            subcode: parseInt(v_a6c30b.dialCode, 10) || 0,
+            rCode: parseInt(v_a6c30b.dialCode, 10) || 0,
+            rName: v_a6c30b.name,
+          }));
+          v_59ad99(v_a4cc88);
+        } else {
+
+          console.log('[정보수정] 패키지에 지역 데이터 없음 - Global로 설정:', { countryCode: v_a4d981, iso2: v_459d5e.iso2 });
           v_59ad99([{
             description: v_789afd.name,
             subcode: 0,
             rCode: 0,
             rName: v_789afd.name,
           }]);
+        }
 
-          v_85a493({
-            cDesc: v_459d5e.name,
-            cCode: v_a4d981,
-          });
+        v_85a493({
+          cDesc: v_459d5e.name,
+          cCode: v_a4d981,
+        });
 
+        if (!v_43c42e.hasRegions || v_43c42e.regions.length === 0) {
           v_655be9({
             rDesc: v_789afd.name,
             rCode: 0,
           });
           v_a0f6fa(v_789afd.name);
-        } else {
-          console.log('[정보수정] 지역 목록 조회:', { countryCode: v_a4d981, dialCode: v_459d5e.dialCode });
-
-          const v_878b8c = await v_11e39e(v_a4d981, v_9b57fc);
-          const v_13de92 = v_878b8c.data || [];
-          v_59ad99(v_13de92);
-
-          v_85a493({
-            cDesc: v_459d5e.name,
-            cCode: v_a4d981,
-          });
-
-          if (v_13de92.length === 0) {
-            console.log('[정보수정] 지역 목록이 없습니다. 전체 지역을 선택할 수 있습니다.');
-            v_59ad99([{
-              description: v_8d41d7('screens.myInfoEdit.allRegions'),
-              subcode: 0,
-              rCode: 0,
-              rName: v_8d41d7('screens.myInfoEdit.allRegions'),
-            }]);
-          }
         }
       } catch (v_5e9bfe) {
         console.error('[정보수정] 지역 목록 로드 실패:', v_5e9bfe);
@@ -1422,7 +1409,8 @@ export const v_cdb169 = () => {
       }
     }
 
-    if (!v_56ad9c) {
+    const v_d85b34 = v_e94fdf.length > 0 && v_e94fdf[0].rCode !== 0 && v_e94fdf[0].description !== v_789afd.name;
+    if (!v_d85b34) {
       return;
     }
 
@@ -1525,67 +1513,55 @@ export const v_cdb169 = () => {
             </View>
 
             {}
-            <View style={v_d81136.fieldContainer}>
-              <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.region')}</Text>
-              <TouchableOpacity
-                style={v_d81136.regionField}
-                onPress={v_c0d2d4}
-                activeOpacity={0.7}
-                disabled={v_e495db || v_0908db}
-              >
-                <Text style={[v_d81136.regionValue, ((!v_add96c.cDesc && !v_459d5e?.name) || !v_167c8b.rDesc || v_167c8b.rCode === null || v_167c8b.rCode === -1 || v_e5393e) && v_d81136.regionPlaceholder]}>
-                  {(() => {
-
-                    const v_90ad93 = [82, 81, 86, 1, 62];
-                    const v_ca520f = v_add96c.cCode || (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null);
-                    const v_56ad9c = v_ca520f ? v_90ad93.includes(v_ca520f) : false;
-
-                    if (!v_56ad9c && v_459d5e) {
-                      const v_427ce3 = v_e5393e && v_459d5e?.name
-                        ? v_459d5e.name
-                        : v_add96c.cDesc || v_459d5e?.name || '';
-                      const v_67cb9c = v_e1e7b1(v_427ce3, v_459d5e?.iso2);
-                      return v_67cb9c ? `${v_67cb9c}, ${v_789afd.name}` : v_789afd.name;
-                    }
-
-                    const v_427ce3 = v_e5393e && v_459d5e?.name
-                      ? v_459d5e.name
-                      : v_add96c.cDesc || v_459d5e?.name || '';
-
-                    const v_67cb9c = v_e1e7b1(v_427ce3, v_459d5e?.iso2);
-
-                    if (v_67cb9c && v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' && v_167c8b.rCode !== null && v_167c8b.rCode !== -1 && !v_e5393e) {
-
-                      const v_6f4ea0 = v_2d5c3d(v_167c8b.rDesc, v_167c8b.rCode, v_add96c.cCode || v_a4d981);
-
-                      if (v_167c8b.rCode === 0) {
-                        return v_6f4ea0;
-                      }
-
-                      return `${v_67cb9c}, ${v_6f4ea0}`;
-                    }
-
-                    if (v_67cb9c) {
-                      return `${v_67cb9c}, ${v_8d41d7('screens.myInfoEdit.pleaseSelect')}`;
-                    }
-
-                    return v_8d41d7('screens.myInfoEdit.selectCountryAndRegion');
-                  })()}
-                </Text>
-                <Text style={v_d81136.arrow}>›</Text>
-              </TouchableOpacity>
-              {}
               {(() => {
-                const v_90ad93 = [82, 81, 86, 1, 62];
-                const v_ca520f = v_add96c.cCode || (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null);
-                const v_56ad9c = v_ca520f ? v_90ad93.includes(v_ca520f) : false;
-                return !v_56ad9c && v_459d5e ? (
-                  <Text style={v_d81136.regionHelper}>
-                    {v_8d41d7('screens.myInfoEdit.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-                  </Text>
-                ) : null;
-              })()}
-            </View>
+
+                const v_d85b34 = v_e94fdf.length > 0 && v_e94fdf[0].rCode !== 0 && v_e94fdf[0].description !== v_789afd.name;
+
+                if (!v_d85b34) {
+                  return null;
+                }
+
+              return (
+                <View style={v_d81136.fieldContainer}>
+                  <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.region')}</Text>
+                  <TouchableOpacity
+                    style={v_d81136.regionField}
+                    onPress={v_c0d2d4}
+                    activeOpacity={0.7}
+                    disabled={v_e495db || v_0908db}
+                  >
+                    <Text style={[v_d81136.regionValue, ((!v_add96c.cDesc && !v_459d5e?.name) || !v_167c8b.rDesc || v_167c8b.rCode === null || v_167c8b.rCode === -1 || v_e5393e) && v_d81136.regionPlaceholder]}>
+                      {(() => {
+
+                        const v_427ce3 = v_e5393e && v_459d5e?.name
+                          ? v_459d5e.name
+                          : v_add96c.cDesc || v_459d5e?.name || '';
+
+                        const v_67cb9c = v_e1e7b1(v_427ce3, v_459d5e?.iso2);
+
+                        if (v_67cb9c && v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select' && v_167c8b.rCode !== null && v_167c8b.rCode !== -1 && !v_e5393e) {
+
+                          const v_6f4ea0 = v_2d5c3d(v_167c8b.rDesc, v_167c8b.rCode, v_add96c.cCode || v_a4d981);
+
+                          if (v_167c8b.rCode === 0) {
+                            return v_6f4ea0;
+                          }
+
+                          return `${v_67cb9c}, ${v_6f4ea0}`;
+                        }
+
+                        if (v_67cb9c) {
+                          return `${v_67cb9c}, ${v_8d41d7('screens.myInfoEdit.pleaseSelect')}`;
+                        }
+
+                        return v_8d41d7('screens.myInfoEdit.selectCountryAndRegion');
+                      })()}
+                    </Text>
+                    <Text style={v_d81136.arrow}>›</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })()}
 
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.gender')}</Text>

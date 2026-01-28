@@ -1,0 +1,23 @@
+export default {
+  confirmTitle: 'Confirm Token Add',
+  tokenTab: 'Token',
+  contractTab: 'Contract',
+  contractPlaceholder: 'Enter contract address',
+  nextButton: 'Next',
+  contractAddress: 'Contract Address',
+  tokenName: 'Token Name',
+  tokenSymbol: 'Token Symbol',
+  tokenDecimals: 'Decimals',
+  addButton: 'Add Token',
+  alreadyOwned: 'Already Owned',
+  invalidTokenTitle: 'Invalid Token',
+  invalidTokenDesc: 'This token is not a valid ERC20 token.',
+  existTokenTitle: 'Token Already Exists',
+  existTokenDesc: 'This token is already added to your wallet.',
+  success: 'Success',
+  successMessage: 'Token added successfully.',
+  error: 'Error',
+  errorMessage: 'Failed to add token. Please try again.',
+};
+
+

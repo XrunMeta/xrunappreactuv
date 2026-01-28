@@ -164,8 +164,7 @@ export const v_f40fc5 = () => {
 
   const v_590486 = v_459d5e?.iso2?.toLowerCase() === 'kr';
 
-  const v_90ad93 = [82, 81, 86, 1, 62]; 
-  const v_56ad9c = v_459d5e?.countryCode ? v_90ad93.includes(v_459d5e.countryCode) : false;
+  const v_56ad9c = v_5f1e0e;
 
   const v_56743f = v_a3453e.useMemo(() => {
 
@@ -186,7 +185,22 @@ export const v_f40fc5 = () => {
       if (v_222917 === 0) {
         v_3b402b = v_8d41d7('screens.signup.allRegions') || v_8d41d7('screens.myInfoEdit.allRegions') || '전체 지역';
       } else if (v_a4d981 && v_222917 !== null && v_222917 !== undefined && v_222917 > 0) {
-        const v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+
+        const v_9ad700 = [82, 81, 86, 1, 62];
+        let v_b5249e;
+
+        if (v_9ad700.includes(v_a4d981)) {
+
+          v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+        } else {
+
+          const v_1581b6 = v_2f03bc.name
+            .replace(/[^a-zA-Z0-9\s]/g, '') 
+            .replace(/\s+/g, '_') 
+            .toLowerCase();
+          v_b5249e = `regions.${v_a4d981}_${v_1581b6}`;
+        }
+
         try {
           const v_6dce25 = v_8d41d7(v_b5249e);
           if (v_6dce25 && v_6dce25 !== v_b5249e) {
@@ -229,6 +243,7 @@ export const v_f40fc5 = () => {
         const result: v_107459 = await v_5c7129(
           (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
           v_459d5e.countryCode || 0,
+          v_459d5e.iso2, 
           v_369014(v_459d5e.iso2)
         );
         v_24b641(v_43c42e.regions);
@@ -1122,28 +1137,24 @@ export const v_f40fc5 = () => {
           />
 
           {}
-          <View style={v_d81136.fieldContainer}>
-            <FormField
-              label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
-              placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
-              value={v_56743f}
-              editable={false}
-              showDisabledStyle={false}
-              onPress={() => {
+          {v_56ad9c && (
+            <View style={v_d81136.fieldContainer}>
+              <FormField
+                label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
+                placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
+                value={v_56743f}
+                editable={false}
+                showDisabledStyle={false}
+                onPress={() => {
 
-                if (!v_5f1e0e || v_88dca2) {
-                  return;
-                }
-                v_c73419(true);
-              }}
-            />
-            {}
-            {!v_56ad9c && (
-              <Text style={v_d81136.regionHelper}>
-                {v_8d41d7('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-              </Text>
-            )}
-          </View>
+                  if (!v_5f1e0e || v_88dca2) {
+                    return;
+                  }
+                  v_c73419(true);
+                }}
+              />
+            </View>
+          )}
 
           <View style={v_d81136.fieldContainer}>
             <Text style={v_d81136.label}>
