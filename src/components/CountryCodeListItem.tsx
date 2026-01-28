@@ -72,6 +72,16 @@ export const CountryCodeListItem: React.FC<Props> = ({
           return translated;
         } else {
 
+          if (__DEV__) {
+            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
+              key: regionKey,
+              translated,
+              original: country.name,
+              countryCode: country.countryCode,
+              dialCode: country.dialCode,
+              language: i18n.language,
+            });
+          }
         }
       } catch (error) {
 
