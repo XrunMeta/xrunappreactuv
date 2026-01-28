@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Modal,
   FlatList,
   TextInput,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -116,6 +117,7 @@ export const SignupScreen = () => {
   const [countrySearchQuery, setCountrySearchQuery] = useState('');
   const [availableCountries, setAvailableCountries] = useState<CountryDialCode[]>(ALLOWED_COUNTRIES);
   const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const handleAgreeClause = (clauseId: ClauseId) => {
     if (clauseId === 'service') {
@@ -304,6 +306,29 @@ export const SignupScreen = () => {
       loadCountriesForModal();
     }
   }, [countryModalVisible, navigate]);
+
+  useEffect(() => {
+    if (!countryModalVisible && !regionModalVisible) {
+      setKeyboardHeight(0);
+      return;
+    }
+
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSubscription = Keyboard.addListener(showEvent, (event) => {
+      setKeyboardHeight(event.endCoordinates.height);
+    });
+
+    const hideSubscription = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, [countryModalVisible, regionModalVisible]);
 
   const filteredCountries = useMemo(() => {
     if (!countrySearchQuery.trim()) {
@@ -1551,6 +1576,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: Dimensions.get('window').height * 0.8,
+    minHeight: Dimensions.get('window').height * 0.6,
     maxHeight: Dimensions.get('window').height * 0.8,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
   },
