@@ -72,6 +72,16 @@ export const CountryCodeListItem: v_a3453e.FC<Props> = ({
           return v_6dce25;
         } else {
 
+          if (__DEV__) {
+            console.log('[CountryCodeListItem] 지역 번역 키 없음 (원본 사용):', {
+              key: v_b5249e,
+              translated: v_6dce25,
+              original: v_b9bbbd.name,
+              countryCode: v_b9bbbd.countryCode,
+              dialCode: v_b9bbbd.dialCode,
+              language: v_9c213b.language,
+            });
+          }
         }
       } catch (v_5e9bfe) {
 
