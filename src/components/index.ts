@@ -22,6 +22,7 @@ export { ShopSalesMemberRow, type ShopSalesMemberData } from './ShopSalesMemberR
 export { ShopItemCard } from './ShopItemCard';
 export { AliveService } from './AliveService'; 
 export { CountryCodeListItem } from './CountryCodeListItem';
+export { CountryFlagImage } from './CountryFlagImage';
 export { EmergencyStopDialog } from './EmergencyStopDialog';
 export { DataList } from './DataList';
 export type { DataListProps } from './DataList';

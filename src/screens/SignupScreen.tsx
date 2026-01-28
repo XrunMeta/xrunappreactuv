@@ -164,8 +164,7 @@ export const SignupScreen = () => {
 
   const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
 
-  const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62]; 
-  const isCountryWithRegions = selectedCountryDialCode?.countryCode ? COUNTRIES_WITH_REGIONS.includes(selectedCountryDialCode.countryCode) : false;
+  const isCountryWithRegions = hasRegions;
 
   const regionDisplayValue = React.useMemo(() => {
 
@@ -186,7 +185,22 @@ export const SignupScreen = () => {
       if (regionCode === 0) {
         value = t('screens.signup.allRegions') || t('screens.myInfoEdit.allRegions') || '전체 지역';
       } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
-        const regionKey = `regions.${countryCode}_${regionCode}`;
+
+        const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+        let regionKey: string;
+
+        if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
+
+          regionKey = `regions.${countryCode}_${regionCode}`;
+        } else {
+
+          const regionNameKey = selectedRegion.name
+            .replace(/[^a-zA-Z0-9\s]/g, '') 
+            .replace(/\s+/g, '_') 
+            .toLowerCase();
+          regionKey = `regions.${countryCode}_${regionNameKey}`;
+        }
+
         try {
           const translated = t(regionKey);
           if (translated && translated !== regionKey) {
@@ -229,6 +243,7 @@ export const SignupScreen = () => {
         const result: LoadRegionsResult = await loadRegionsFromApi(
           (country: number) => getRegionsByCountry(country, navigate),
           selectedCountryDialCode.countryCode || 0,
+          selectedCountryDialCode.iso2, 
           getRegionsByCountryIso2(selectedCountryDialCode.iso2)
         );
         setAvailableRegions(result.regions);
@@ -1122,28 +1137,24 @@ export const SignupScreen = () => {
           />
 
           {}
-          <View style={styles.fieldContainer}>
-            <FormField
-              label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
-              placeholder={t('screens.signup.regionPlaceholder')}
-              value={regionDisplayValue}
-              editable={false}
-              showDisabledStyle={false}
-              onPress={() => {
+          {isCountryWithRegions && (
+            <View style={styles.fieldContainer}>
+              <FormField
+                label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
+                placeholder={t('screens.signup.regionPlaceholder')}
+                value={regionDisplayValue}
+                editable={false}
+                showDisabledStyle={false}
+                onPress={() => {
 
-                if (!hasRegions || isSubmitting) {
-                  return;
-                }
-                setRegionModalVisible(true);
-              }}
-            />
-            {}
-            {!isCountryWithRegions && (
-              <Text style={styles.regionHelper}>
-                {t('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-              </Text>
-            )}
-          </View>
+                  if (!hasRegions || isSubmitting) {
+                    return;
+                  }
+                  setRegionModalVisible(true);
+                }}
+              />
+            </View>
+          )}
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>

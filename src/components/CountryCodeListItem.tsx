@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CountryDialCode } from '../types';
 import { COLORS, FONTS } from '../constants';
+import { CountryFlagImage } from './CountryFlagImage';
 
 type Props = {
   country: CountryDialCode;
@@ -21,11 +22,21 @@ const getRegionTranslationKey = (country: CountryDialCode): string | null => {
     return null;
   }
 
-  const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62];
   const dialCodeNum = parseInt(country.dialCode, 10);
-  if (!isNaN(dialCodeNum) && COUNTRIES_WITH_REGIONS.includes(country.countryCode)) {
+  if (!isNaN(dialCodeNum) && dialCodeNum > 0) {
 
-    return `${country.countryCode}_${dialCodeNum}`;
+    const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+    if (COUNTRIES_WITH_MAPPING.includes(country.countryCode)) {
+
+      return `${country.countryCode}_${dialCodeNum}`;
+    }
+
+    const regionNameKey = country.name
+      .replace(/[^a-zA-Z0-9\s]/g, '') 
+      .replace(/\s+/g, '_') 
+      .toLowerCase();
+
+    return `${country.countryCode}_${regionNameKey}`;
   }
 
   return null;
@@ -40,16 +51,6 @@ export const CountryCodeListItem: React.FC<Props> = ({
   const { t, i18n } = useTranslation();
 
   const displayName = React.useMemo(() => {
-
-    if (__DEV__) {
-      console.log('[CountryCodeListItem] displayName 계산 시작:', {
-        iso2: country.iso2,
-        name: country.name,
-        language: i18n.language,
-        countryCode: country.countryCode,
-        dialCode: country.dialCode,
-      });
-    }
 
     const regionTranslationKey = getRegionTranslationKey(country);
     if (regionTranslationKey) {
@@ -70,27 +71,10 @@ export const CountryCodeListItem: React.FC<Props> = ({
           }
           return translated;
         } else {
-          if (__DEV__) {
-            console.warn('[CountryCodeListItem] 지역 번역 키 없음:', {
-              key: regionKey,
-              countryCode: country.countryCode,
-              dialCode: country.dialCode,
-              original: country.name,
-              translated,
-              language: i18n.language,
-            });
-          }
+
         }
       } catch (error) {
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 지역 번역 오류:', error, {
-            key: regionKey,
-            countryCode: country.countryCode,
-            dialCode: country.dialCode,
-            original: country.name,
-            language: i18n.language,
-          });
-        }
+
       }
 
       return country.name;
@@ -104,16 +88,7 @@ export const CountryCodeListItem: React.FC<Props> = ({
         let translated = t(countryKey);
 
         if (translated && translated !== countryKey) {
-          if (__DEV__) {
-            console.log('[CountryCodeListItem] 국가 번역 성공 (직접 키):', {
-              key: countryKey,
-              translated,
-              original: country.name,
-              iso2: country.iso2,
-              iso2Upper,
-              language: i18n.language,
-            });
-          }
+
           return translated;
         }
 
@@ -122,47 +97,16 @@ export const CountryCodeListItem: React.FC<Props> = ({
           if (countriesObj && typeof countriesObj === 'object' && !Array.isArray(countriesObj)) {
             const countryName = (countriesObj as Record<string, string>)[iso2Upper];
             if (countryName && typeof countryName === 'string' && countryName !== iso2Upper) {
-              if (__DEV__) {
-                console.log('[CountryCodeListItem] 국가 번역 성공 (객체 접근):', {
-                  key: countryKey,
-                  translated: countryName,
-                  original: country.name,
-                  iso2: country.iso2,
-                  iso2Upper,
-                  language: i18n.language,
-                });
-              }
+
               return countryName;
             }
           }
         } catch (objError) {
-          if (__DEV__) {
-            console.warn('[CountryCodeListItem] countries 객체 접근 실패:', objError);
-          }
+
         }
 
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 국가 번역 실패 - 원본 사용:', {
-            key: countryKey,
-            iso2: country.iso2,
-            iso2Upper,
-            original: country.name,
-            translated,
-            language: i18n.language,
-
-            countriesObj: t('countries', { returnObjects: true }),
-          });
-        }
       } catch (error) {
-        if (__DEV__) {
-          console.warn('[CountryCodeListItem] 국가 번역 오류:', error, {
-            key: countryKey,
-            iso2: country.iso2,
-            iso2Upper,
-            original: country.name,
-            language: i18n.language,
-          });
-        }
+
       }
     }
 
@@ -179,7 +123,11 @@ export const CountryCodeListItem: React.FC<Props> = ({
       onPress={() => onPress?.(country)}
     >
       <View style={styles.flagBadge}>
-        <Text style={styles.flagText}>{country.flagEmoji}</Text>
+        <CountryFlagImage
+          isoCode={country.iso2}
+          flagEmoji={country.flagEmoji}
+          size={40}
+        />
       </View>
       <View style={styles.info}>
         <Text style={styles.countryName}>{displayName}</Text>
@@ -224,9 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
-  },
-  flagText: {
-    fontSize: 22,
+    overflow: 'hidden',
   },
   info: {
     flex: 1,
