@@ -10,6 +10,7 @@ import {
   v_122070,
   v_2d4718,
   v_326be8,
+  v_700696,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -2042,7 +2043,9 @@ const v_d81136 = v_472849.create({
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
-    maxHeight: '80%',
+    height: v_700696.get('window').height * 0.8,
+    minHeight: v_700696.get('window').height * 0.6,
+    maxHeight: v_700696.get('window').height * 0.8,
     overflow: 'hidden',
   },
   modalHeader: {
