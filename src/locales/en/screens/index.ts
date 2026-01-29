@@ -11,6 +11,8 @@ export { default as v_f5848d } from './wallet';
 export { default as v_2cf959 } from './walletDetail';
 export { default as v_269e04 } from './polygonWallet';
 export { default as v_0cd34d } from './xrunWallet';
+export { default as v_410f77 } from './walletPrivateKeyDisplay';
+
 export { default as v_b12e1b } from './nftWallet';
 export { default as v_8bc52c } from './adWallet';
 export { default as v_400baf } from './walletSend';
