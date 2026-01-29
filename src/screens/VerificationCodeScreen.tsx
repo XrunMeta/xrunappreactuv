@@ -425,15 +425,20 @@ export const v_667a00 = () => {
 
         console.log('[로그인] 이메일 인증 로그인 성공');
 
+        const v_5d05c9 = v_e6976c;
+        console.log('[인증] 타겟 화면으로 이동 (로그인 모드):', v_5d05c9);
         v_036f76();
-        v_487a25(v_e6976c || v_ce4741.map);
+        v_487a25(v_5d05c9 || v_ce4741.map);
       } else {
 
-        console.log('[정보수정] 인증 코드 확인 성공');
+        const v_5d05c9 = v_e6976c;
+        console.log('[인증] 타겟 화면으로 이동 (기타 모드):', v_5d05c9);
         v_036f76();
-        v_487a25(v_e6976c);
+        v_487a25(v_5d05c9 || v_ce4741.map);
       }
+
     } catch (v_5e9bfe) {
+
       console.error('[인증] 인증 코드 확인 오류:', v_5e9bfe);
 
       if (v_e6976c === v_ce4741.signup) {

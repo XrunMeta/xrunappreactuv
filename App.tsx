@@ -61,7 +61,9 @@ import {
   v_1cca63,
   v_0e5276,
   v_4a5627,
+  v_a50cad,
 } from './src/screens';
+
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
@@ -413,7 +415,12 @@ const v_c0dbdf = () => {
     return <PangleListScreen />;
   }
 
+  if (v_0f0c7b === 'walletPrivateKeyDisplay') {
+    return <WalletPrivateKeyDisplayScreen />;
+  }
+
   if (v_0f0c7b === 'myInfoCloseMembership') {
+
     return <MyInfoCloseMembershipScreen />;
   }
 
