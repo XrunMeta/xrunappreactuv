@@ -1,4 +1,6 @@
 export default {
+  cancel: 'キャンセル',
+  confirm: '確認',
   buttons: {
     submit: '送信',
     cancel: 'キャンセル',

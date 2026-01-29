@@ -310,6 +310,45 @@ export const v_495832 = async (
         };
       }
 
+      const v_4587b3 = v_650134();  
+      const v_6cd443 = Number(v_2c2f8d.data.version) || 0;
+      const v_1e5d57 = Number(v_2c2f8d.data.version_ios) || 0;
+
+      console.log('[App] 버전 확인:', {
+        currentVersion: v_4587b3,
+        serverAndroidVersion: v_6cd443,
+        serverIOSVersion: v_1e5d57,
+        platform: v_326be8.OS,
+      });
+
+      if (v_326be8.OS === 'android') {
+        if (v_4587b3 && v_6cd443 > v_4587b3) {
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
+          v_43c42e.emergencyStop = {
+            enabled: true,
+            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+          };
+        } else {
+          console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
+        }
+      } else if (v_326be8.OS === 'ios') {
+        if (v_4587b3 && v_1e5d57 > v_4587b3) {
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+          } else {
+            v_43c42e.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+            };
+          }
+        } else {
+          console.log('[App ios] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_1e5d57);
+        }
+      }
+
       return v_43c42e;
     } else {
 
@@ -401,7 +440,7 @@ export const v_7488d5 = (v_c65f5d) => {
           v_74a79c.adapter = async (v_558750) => {
             return new Promise((v_6f7712, v_bad6f3) => {
               const v_6f3521 = new XMLHttpRequest();
-              const v_f71b56 = v_558750.baseURL 
+              const v_f71b56 = v_558750.baseURL
                 ? (v_558750.baseURL.endsWith('/') && v_558750.url?.startsWith('/')
                   ? `${v_558750.baseURL.slice(0, -1)}${v_558750.url || ''}`
                   : `${v_558750.baseURL}${v_558750.url || ''}`)
@@ -5029,6 +5068,46 @@ export const v_76d832 = async (
   }
 };
 
+export const v_143c62 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<any> => {
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_4d33b2 = {
+      member: v_660822,
+    };
+
+    console.log('[지갑] 프라이빗키 조회 요청:', v_4d33b2);
+
+    const v_3393e3 = await v_12a388('/getWalletPrivateKey', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    }, v_c65f5d);
+
+    if (!v_3393e3.ok) {
+      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    }
+
+    const v_43c42e = await v_3393e3.json();
+    console.log('[지갑] 프라이빗키 조회 응답:', v_43c42e);
+
+    return v_43c42e;
+  } catch (v_5e9bfe) {
+    console.error('[지갑] 프라이빗키 조회 실패:', v_5e9bfe);
+    if (v_c65f5d) {
+      await v_e4d665(v_c65f5d);
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_4dba02 = async (
   v_4898e2,
   v_05bb19,
@@ -5431,7 +5510,7 @@ export const v_318c45 = async (v_660822, v_c65f5d, v_9d6a91 = false): Promise<Se
       try {
         const v_3c955d = Array.from(v_905ecb);
 
-        const v_f7f94d = v_3c955d.length > v_614136 
+        const v_f7f94d = v_3c955d.length > v_614136
           ? v_3c955d.slice(-v_614136) 
           : v_3c955d;
 

@@ -1,4 +1,6 @@
 export default {
+  cancel: '취소',
+  confirm: '확인',
   buttons: {
     submit: '제출',
     cancel: '취소',

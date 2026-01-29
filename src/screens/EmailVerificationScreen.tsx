@@ -87,11 +87,13 @@ export const v_a82b55 = () => {
       }
 
       v_b572c3(v_e0c7e8.trim());
-      if (!v_9d6cc7) {
-        v_8f89f3(v_ce4741.map); 
+
+      if (!v_9d6cc7 && (v_e6976c === v_ce4741.login || !v_e6976c)) {
+        v_8f89f3(v_ce4741.map);
       }
 
       v_9b57fc(v_ce4741.verificationCode);
+
     } catch (v_5e9bfe) {
       console.error('[이메일 인증] 이메일 인증 처리 중 오류:', v_5e9bfe);
 
