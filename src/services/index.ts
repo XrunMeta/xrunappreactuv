@@ -310,6 +310,45 @@ export const sendAliveSignal = async (
         };
       }
 
+      const currentVersion = getCurrentAppVersionNumber();  
+      const serverAndroidVersion = Number(serverResponse.data.version) || 0;
+      const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
+
+      console.log('[App] 버전 확인:', {
+        currentVersion,
+        serverAndroidVersion,
+        serverIOSVersion,
+        platform: Platform.OS,
+      });
+
+      if (Platform.OS === 'android') {
+        if (currentVersion && serverAndroidVersion > currentVersion) {
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
+          result.emergencyStop = {
+            enabled: true,
+            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+          };
+        } else {
+          console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
+        }
+      } else if (Platform.OS === 'ios') {
+        if (currentVersion && serverIOSVersion > currentVersion) {
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+          } else {
+            result.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+            };
+          }
+        } else {
+          console.log('[App ios] 최신 버전입니다. 현재:', currentVersion, '서버:', serverIOSVersion);
+        }
+      }
+
       return result;
     } else {
 
@@ -401,7 +440,7 @@ export const createAxiosInstance = (navigation?: any) => {
           config.adapter = async (adapterConfig) => {
             return new Promise((resolve, reject) => {
               const xhr = new XMLHttpRequest();
-              const url = adapterConfig.baseURL 
+              const url = adapterConfig.baseURL
                 ? (adapterConfig.baseURL.endsWith('/') && adapterConfig.url?.startsWith('/')
                   ? `${adapterConfig.baseURL.slice(0, -1)}${adapterConfig.url || ''}`
                   : `${adapterConfig.baseURL}${adapterConfig.url || ''}`)
@@ -5029,6 +5068,46 @@ export const postTransferNew = async (
   }
 };
 
+export const getWalletPrivateKey = async (
+  member: string | number,
+  navigation?: any,
+): Promise<any> => {
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const body = {
+      member: member,
+    };
+
+    console.log('[지갑] 프라이빗키 조회 요청:', body);
+
+    const response = await nodeGatewayRequest('/getWalletPrivateKey', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    }, navigation);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('[지갑] 프라이빗키 조회 응답:', result);
+
+    return result;
+  } catch (error) {
+    console.error('[지갑] 프라이빗키 조회 실패:', error);
+    if (navigation) {
+      await handleTimeoutError(navigation);
+    }
+    throw error;
+  }
+};
+
 export const getClauseContent = async (
   clauseType: 'service' | 'location' | 'personal',
   language: string,
@@ -5431,7 +5510,7 @@ export const getCompletedAdsSet = async (member: number | string, navigation?: a
       try {
         const cacheArray = Array.from(completedAdsSet);
 
-        const limitedArray = cacheArray.length > COMPLETED_ADS_CACHE_MAX_SIZE 
+        const limitedArray = cacheArray.length > COMPLETED_ADS_CACHE_MAX_SIZE
           ? cacheArray.slice(-COMPLETED_ADS_CACHE_MAX_SIZE) 
           : cacheArray;
 

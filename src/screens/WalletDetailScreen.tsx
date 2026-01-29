@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking, Modal, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -223,6 +223,7 @@ export const WalletDetailScreen = () => {
     setWalletReceiveAddress,
     setWalletReceiveCurrency,
     setSelectedTransactionDetails,
+    setVerificationSuccessRoute,
   } = useAppContext();
   const { showAlert } = useAlertDialog();
 
@@ -584,6 +585,33 @@ export const WalletDetailScreen = () => {
     }
   }, [publicAddress, showAlert]);
 
+  const handleDownload = useCallback(async () => {
+    const confirmed = await showAlert(
+      t('screens.walletPrivateKeyDisplay.confirmDownloadTitle'),
+      t('screens.walletPrivateKeyDisplay.confirmDownloadMessage'),
+      [
+        { text: t('common.cancel') },
+        { text: t('common.confirm') },
+      ],
+    );
+
+    if (confirmed === 1) { 
+      const emailConfirmed = await showAlert(
+        t('screens.walletPrivateKeyDisplay.warningTitle'),
+        t('screens.walletPrivateKeyDisplay.emailVerificationRequired'),
+        [
+          { text: t('common.cancel') },
+          { text: t('common.confirm') },
+        ],
+      );
+
+      if (emailConfirmed === 1) {
+        setVerificationSuccessRoute(ROUTES.walletPrivateKeyDisplay);
+        navigate(ROUTES.emailVerification);
+      }
+    }
+  }, [t, showAlert, setVerificationSuccessRoute, navigate]);
+
   const formattedBalance = useMemo(() => {
 
     if (!selectedWalletAsset?.amount) return '0';
@@ -649,6 +677,7 @@ export const WalletDetailScreen = () => {
           subValue={krwValue || ''}
           address={shortenedAddress}
           onCopy={handleCopyAddress}
+          onDownload={handleDownload}
           actions={[
             {
               label: explorerLabel,
@@ -711,8 +740,8 @@ export const WalletDetailScreen = () => {
                 amount: itemData.amount || undefined, 
                 symbol: itemData.symbol || selectedWalletAsset?.symbol || undefined, 
                 nonce: itemData.nonce || undefined,
-                gasPrice: itemData.gasPrice 
-                  ? weiToGwei(itemData.gasPrice) 
+                gasPrice: itemData.gasPrice
+                  ? weiToGwei(itemData.gasPrice)
                   : undefined,
                 usedGas: itemData.gasUsed || undefined,
                 maxGas: itemData.gas || undefined,
@@ -787,7 +816,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
-    paddingLeft: 15, 
+    paddingLeft: 15,
   },
   listWrapper: {
     flex: 1,

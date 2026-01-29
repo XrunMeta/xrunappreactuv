@@ -1,4 +1,6 @@
 export default {
+  cancel: 'Cancel',
+  confirm: 'Confirm',
   buttons: {
     submit: 'Submit',
     cancel: 'Cancel',

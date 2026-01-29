@@ -85,7 +85,7 @@ interface TokenListItemData extends CombinedAsset {
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
+  const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset, setVerificationSuccessRoute } = useAppContext();
   const { showAlert } = useAlertDialog();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +154,6 @@ export const WalletScreen = () => {
     (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number): CombinedAsset[] => {
 
       const walletAssets: CombinedAsset[] = walletData
-        .filter((item) => item.currency !== 2) 
         .map((item) => ({
           id: item.currency,
           symbol: item.symbol,
@@ -170,7 +169,6 @@ export const WalletScreen = () => {
         }));
 
       const customAssets: CombinedAsset[] = customTokens
-        .filter((token) => token.currency !== 2) 
         .map((token) => {
 
           const matchingWalletData = walletData.find(
@@ -249,7 +247,7 @@ export const WalletScreen = () => {
       }, []);
 
       const sortedAssets = uniqueAssets.sort((a, b) => {
-        const priorityOrder = [18, 16, 19, 1]; 
+        const priorityOrder = [18, 16, 19, 1, 2]; 
 
         const aPriority = priorityOrder.indexOf(a.currency);
         const bPriority = priorityOrder.indexOf(b.currency);
@@ -302,7 +300,8 @@ export const WalletScreen = () => {
               return (
                 item.subcurrency === 5000 ||
                 item.subcurrency === 5100 ||
-                item.subcurrency === 5200
+                item.subcurrency === 5200 ||
+                item.currency === 2
               );
             }
           });
@@ -384,6 +383,33 @@ export const WalletScreen = () => {
   const handleCopyAddress = () => {
     if (publicAddress) {
       copyToClipboard(publicAddress, showAlert);
+    }
+  };
+
+  const handleDownload = async () => {
+    const confirmed = await showAlert(
+      t('screens.walletPrivateKeyDisplay.confirmDownloadTitle'),
+      t('screens.walletPrivateKeyDisplay.confirmDownloadMessage'),
+      [
+        { text: t('common.cancel') },
+        { text: t('common.confirm') },
+      ],
+    );
+
+    if (confirmed === 1) { 
+      const emailConfirmed = await showAlert(
+        t('screens.walletPrivateKeyDisplay.warningTitle'),
+        t('screens.walletPrivateKeyDisplay.emailVerificationRequired'),
+        [
+          { text: t('common.cancel') },
+          { text: t('common.confirm') },
+        ],
+      );
+
+      if (emailConfirmed === 1) {
+        setVerificationSuccessRoute(ROUTES.walletPrivateKeyDisplay);
+        navigate(ROUTES.emailVerification);
+      }
     }
   };
 
@@ -538,7 +564,7 @@ export const WalletScreen = () => {
           case 1: 
             return { background: '#EFF4F5', text: '#000000' };
           case 2: 
-            return { background: '#627EEA', text: '#FFFFFF' };
+            return { background: '#EFF4F5', text: '#FFFFFF' };
           case 3: 
             return { background: '#5F59E0', text: '#FFFFFF' };
           case 16: 
@@ -669,9 +695,32 @@ export const WalletScreen = () => {
       </View>
 
       <View style={styles.content}>
-        {
-
-}
+        <View style={styles.headerCardWrapper}>
+          <WalletHeaderCard
+            title={t('screens.wallet.myWallet')}
+            cardStyle={styles.headerCard}
+            address={publicAddress || ''}
+            onCopy={handleCopyAddress}
+            onDownload={handleDownload}
+            actions={[
+              {
+                label: t('screens.wallet.polygonScan'),
+                iconImage: iconPolygonscan,
+                onPress: handlePolygonscan,
+              },
+              {
+                label: t('screens.wallet.etherscan'),
+                iconImage: iconEtherscan,
+                onPress: handleEtherscan,
+              },
+              {
+                label: t('screens.wallet.receive'),
+                icon: 'download-outline',
+                onPress: handleReceive,
+              },
+            ]}
+          />
+        </View>
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('screens.wallet.myBalance')}</Text>

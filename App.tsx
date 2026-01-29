@@ -61,7 +61,9 @@ import {
   MyinfoShopSalesScreen,
   ReferralInputScreen,
   PangleListScreen,
+  WalletPrivateKeyDisplayScreen,
 } from './src/screens';
+
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
@@ -413,7 +415,12 @@ const ScreenHost = () => {
     return <PangleListScreen />;
   }
 
+  if (currentScreen === 'walletPrivateKeyDisplay') {
+    return <WalletPrivateKeyDisplayScreen />;
+  }
+
   if (currentScreen === 'myInfoCloseMembership') {
+
     return <MyInfoCloseMembershipScreen />;
   }
 

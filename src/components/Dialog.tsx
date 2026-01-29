@@ -37,7 +37,7 @@ export const Dialog: React.FC<DialogProps> = ({
   containerStyle,
 }) => {
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose || (() => {})}>
+    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose || (() => { })}>
       <View style={styles.overlay}>
         <View style={[styles.card, containerStyle]}>
           <View style={styles.header}>
@@ -46,7 +46,7 @@ export const Dialog: React.FC<DialogProps> = ({
                 <View style={styles.closePlaceholder} />
                 <Text style={styles.title}>{title}</Text>
                 <TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP} style={styles.close}>
-                  <Ionicons name="close" size={18} color="#747474" />
+                  <Ionicons name="close" size={24} color="#747474" />
                 </TouchableOpacity>
               </>
             ) : (
@@ -92,7 +92,7 @@ export const Dialog: React.FC<DialogProps> = ({
   );
 };
 
-const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+const HIT_SLOP = { top: 15, bottom: 15, left: 15, right: 15 };
 
 const styles = StyleSheet.create({
   overlay: {
@@ -120,31 +120,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    position: 'relative',
-    minHeight: 32,
   },
   title: {
     fontSize: FONTS.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 1,
+    flex: 1,
+    marginHorizontal: 10,
   },
   close: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closePlaceholder: {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
   },
   divider: {
     height: StyleSheet.hairlineWidth,
