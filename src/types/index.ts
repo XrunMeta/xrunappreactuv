@@ -1301,6 +1301,9 @@ export interface QuestItem {
   created_at: string;
   event_status?: string; 
   event_type?: string; 
+  attendance_date?: string; 
+  is_rewarded?: boolean; 
+  attendance_id?: number; 
 }
 
 export interface QuestListResponse {
@@ -1325,7 +1328,7 @@ export interface QuestCheckUserResponse {
 }
 
 export interface QuestJoinRequest {
-  quest_id: number;
+  quest_id: number | string; 
   member: number;
   detail1?: string;
   detail2?: string;
