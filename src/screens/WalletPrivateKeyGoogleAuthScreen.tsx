@@ -99,11 +99,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
 
       if (result.data.requiresSignup) {
-        console.log('[프라이빗키 인증] 회원가입 필요 - 중단');
-        await showAlert(
-          t('common.messages.error') || '오류',
-          '현재 계정과 연동된 구글 계정으로 로그인해주세요.',
-        );
+        console.log('[프라이빗키 인증] 구글 소셜 정보 없음 - 계정 연동 팝업 표시');
+
+        const googleEmail = result.data.email || '';
+
+        setLinkingEmail(googleEmail);
+        setGoogleLoginData(result.data);
+        setLinkingPassword('');
+        setLinkingAgreed(false);
+        setLinkingDialogVisible(true);
         setIsLoading(false);
         return;
       }
@@ -111,11 +115,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const { memberId, email, name, accessToken, refreshToken, isNewUser } = result.data;
 
       if (isNewUser) {
-        console.log('[프라이빗키 인증] 신규 사용자 - 중단');
-        await showAlert(
-          t('common.messages.error') || '오류',
-          '현재 계정과 연동된 구글 계정으로 로그인해주세요.',
-        );
+        console.log('[프라이빗키 인증] 구글 소셜 정보 없음 - 계정 연동 팝업 표시');
+
+        const googleEmail = result.data.email || '';
+
+        setLinkingEmail(googleEmail);
+        setGoogleLoginData(result.data);
+        setLinkingPassword('');
+        setLinkingAgreed(false);
+        setLinkingDialogVisible(true);
         setIsLoading(false);
         return;
       }
