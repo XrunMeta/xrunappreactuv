@@ -310,7 +310,7 @@ export const v_495832 = async (
         };
       }
 
-      const v_4587b3 = v_650134();
+      const v_4587b3 = v_650134();  
       const v_6cd443 = Number(v_2c2f8d.data.version) || 0;
       const v_1e5d57 = Number(v_2c2f8d.data.version_ios) || 0;
 
@@ -323,7 +323,7 @@ export const v_495832 = async (
 
       if (v_326be8.OS === 'android') {
         if (v_4587b3 && v_6cd443 > v_4587b3) {
-          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443);
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
           v_43c42e.emergencyStop = {
             enabled: true,
             message: 'UPDATE_FOUND\nPLEASE_UPDATE',
@@ -336,7 +336,7 @@ export const v_495832 = async (
         if (v_4587b3 && v_1e5d57 > v_4587b3) {
           console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_1e5d57);
           if (__DEV__) {
-            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
           } else {
             v_43c42e.emergencyStop = {
               enabled: true,
@@ -1228,6 +1228,38 @@ export const v_a81308 = async (
       } else {
         console.error('[로그인] 이메일 인증 로그인 오류:', v_5e9bfe);
       }
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_32502f = async (
+  v_b50834,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[로그인] Google ID Token 로그인 요청');
+
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>('/login-google', {
+      idToken: v_b50834,
+    });
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] Google ID Token 로그인 성공');
+    } else {
+      console.error('[로그인] Google ID Token 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    if (__DEV__ && v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] Google ID Token 로그인 오류:', {
+        status: v_5e9bfe.response?.status,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
     }
     throw v_5e9bfe;
   }

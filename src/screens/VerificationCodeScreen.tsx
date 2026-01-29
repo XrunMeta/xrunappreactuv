@@ -25,6 +25,8 @@ import {
   v_35200c,
   v_9d2541,
   v_91bb22,
+  v_73716f,
+  v_32502f,
 } from '../services';
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
@@ -344,20 +346,75 @@ export const v_667a00 = () => {
               );
             }
           } else {
+            const v_b285bf = (v_fad096.email || '').toLowerCase().includes('@gmail.com');
+            if (v_b285bf) {
 
-            await v_889fad(
-              v_8d41d7('screens.signup.success.title') || '회원가입 완료',
-              v_8d41d7('screens.signup.success.message') || '회원가입이 완료되었습니다.',
-              [
-                {
-                  text: v_8d41d7('screens.signup.success.confirm') || '확인',
-                  onPress: () => {
-                    v_487a25(v_ce4741.authLanding);
-                    v_9b57fc(v_ce4741.login);
+              const v_354151 = (v_fad096.email || '').trim().toLowerCase();
+              while (true) {
+                const v_43c42e = await v_73716f();
+                if (!v_43c42e) {
+                  await v_889fad(
+                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
+                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
+                    [{ text: v_8d41d7('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                  );
+                  continue;
+                }
+
+                if (v_43c42e.email && v_354151 && v_43c42e.email !== v_354151) {
+                  await v_889fad(
+                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
+                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage') || '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
+                    [{ text: v_8d41d7('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                  );
+                  continue;
+                }
+                try {
+                  const v_b84499 = await v_32502f(v_43c42e.idToken, v_9b57fc);
+                  if (v_b84499.status === 'success' && v_b84499.data?.[0]) {
+                    const v_ef7306 = v_b84499.data[0];
+                    const v_9e8d12 = v_ef7306.extrastr;
+                    const v_660822 = v_ef7306.member;
+                    if (v_9e8d12 && v_660822) {
+                      const v_06cee6 = v_a5170b(v_9e8d12);
+                      await v_ea3493(v_660822, v_06cee6, v_9b57fc);
+                    }
+                    await v_e84827.removeItem('userData');
+                    await v_e84827.removeItem('userSessionToken');
+                    await v_e84827.setItem('userEmail', v_ef7306.email ?? v_fad096.email);
+                    await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+                    await v_e84827.setItem('userSessionToken', v_9e8d12 || '');
+                    await v_e84827.setItem('isLoggedIn', 'true');
+                    await v_e84827.setItem('rememberMe', 'true');
+                    await v_e84827.setItem('loginType', 'google');
+                    v_487a25(v_ce4741.map);
+                    break;
+                  }
+                } catch (v_37eab7) {
+
+                }
+                await v_889fad(
+                  v_8d41d7('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
+                  v_8d41d7('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
+                  [{ text: v_8d41d7('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                );
+              }
+            } else {
+
+              await v_889fad(
+                v_8d41d7('screens.signup.success.title') || '회원가입 완료',
+                v_8d41d7('screens.signup.success.message') || '회원가입이 완료되었습니다.',
+                [
+                  {
+                    text: v_8d41d7('screens.signup.success.confirm') || '확인',
+                    onPress: () => {
+                      v_487a25(v_ce4741.authLanding);
+                      v_9b57fc(v_ce4741.login);
+                    },
                   },
-                },
-              ],
-            );
+                ],
+              );
+            }
           }
         } catch (v_5e9bfe) {
           console.error('[회원가입] 회원가입 처리 중 오류:', v_5e9bfe);

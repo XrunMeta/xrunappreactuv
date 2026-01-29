@@ -1,0 +1,47 @@
+export default {
+  title: 'รายชื่อผู้เข้าร่วม',
+
+  productTitle: 'ตั๋วบริจาค BBS',
+  productPrice: 'ราคา',
+  participants: 'ผู้เข้าร่วม',
+  totalSales: 'ยอดขายรวม',
+  settlementInfo: 'ชำระเงินสิ้นเดือน',
+  currency: 'KRW',
+  personUnit: '',
+
+  periodSelect: 'เลือกช่วงเวลา',
+  period1Week: '1 สัปดาห์',
+  period1Month: '1 เดือน',
+  period3Months: '3 เดือน',
+  period6Months: '6 เดือน',
+  periodCustom: 'กำหนดเอง',
+  startDate: 'วันที่เริ่มต้น',
+  endDate: 'วันที่สิ้นสุด',
+
+  yearMonth: '{{month}} {{year}}',
+  weekDays: {
+    sun: 'อา',
+    mon: 'จ',
+    tue: 'อ',
+    wed: 'พ',
+    thu: 'พฤ',
+    fri: 'ศ',
+    sat: 'ส',
+  },
+  close: 'ปิด',
+  cancel: 'ยกเลิก',
+  apply: 'ใช้',
+
+  noData: 'ไม่มีข้อมูล',
+  noShopmember: 'ไม่มีข้อมูลร้านค้าลงทะเบียน',
+  noItemData: 'ไม่มีรายการที่ลงทะเบียนหรือประวัติการซื้อ',
+
+  addItem: 'เพิ่มรายการ',
+  modify: 'แก้ไข',
+  delete: 'ลบ',
+  deleteConfirm: 'คุณแน่ใจหรือไม่ว่าต้องการลบ?',
+  deleteConfirmMessage: 'รายการที่ลบจะไม่แสดงอีกต่อไป แต่บันทึกการซื้อจะยังคงอยู่',
+  deleteSuccess: 'รายการถูกลบแล้ว',
+  deleteFailed: 'การลบรายการล้มเหลว',
+};
+

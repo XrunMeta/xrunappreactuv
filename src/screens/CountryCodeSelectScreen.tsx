@@ -71,6 +71,7 @@ export const v_379bd1 = () => {
           const result: v_107459 = await v_5c7129(
             (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
             v_459d5e.countryCode || 0,
+            v_459d5e.iso2,
             v_369014(v_459d5e.iso2)
           );
           console.log('[CountryCodeSelect] 지역 목록 로드 결과:', {
@@ -132,11 +133,35 @@ export const v_379bd1 = () => {
         const v_cd2b74 = v_8c0b26.name.toLowerCase();
 
         let v_a2493c = '';
-        if (v_8c0b26.iso2 && v_8c0b26.iso2 !== 'select' && v_8c0b26.iso2 !== 'global' && v_8c0b26.iso2.length === 2) {
-          const v_4d2349 = `countries.${v_8c0b26.iso2.toUpperCase()}`;
-          const v_6dce25 = v_8d41d7(v_4d2349);
-          if (v_6dce25 && v_6dce25 !== v_4d2349) {
-            v_a2493c = v_6dce25.toLowerCase();
+        if (v_479a37 === 'region') {
+
+          const v_a4d981 = v_8c0b26.countryCode || 0;
+          const v_222917 = parseInt((v_8c0b26.dialCode || '').replace('+', ''), 10);
+          if (v_a4d981 > 0 && !isNaN(v_222917) && v_222917 > 0) {
+            const v_9ad700 = [82, 81, 86, 1, 62];
+            let v_b5249e;
+            if (v_9ad700.includes(v_a4d981)) {
+              v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+            } else {
+              const v_1581b6 = v_8c0b26.name
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .replace(/\s+/g, '_')
+                .toLowerCase();
+              v_b5249e = `regions.${v_a4d981}_${v_1581b6}`;
+            }
+            const v_6dce25 = v_8d41d7(v_b5249e);
+            if (v_6dce25 && v_6dce25 !== v_b5249e) {
+              v_a2493c = v_6dce25.toLowerCase();
+            }
+          }
+        } else {
+
+          if (v_8c0b26.iso2 && v_8c0b26.iso2 !== 'select' && v_8c0b26.iso2 !== 'global' && v_8c0b26.iso2.length === 2) {
+            const v_4d2349 = `countries.${v_8c0b26.iso2.toUpperCase()}`;
+            const v_6dce25 = v_8d41d7(v_4d2349);
+            if (v_6dce25 && v_6dce25 !== v_4d2349) {
+              v_a2493c = v_6dce25.toLowerCase();
+            }
           }
         }
         const v_73b9dc = v_8c0b26.iso2.toLowerCase();
