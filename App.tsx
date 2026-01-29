@@ -62,6 +62,7 @@ import {
   ReferralInputScreen,
   PangleListScreen,
   WalletPrivateKeyDisplayScreen,
+  WalletPrivateKeyGoogleAuthScreen,
 } from './src/screens';
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
@@ -417,6 +418,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'walletPrivateKeyDisplay') {
     return <WalletPrivateKeyDisplayScreen />;
+  }
+
+  if (currentScreen === 'walletPrivateKeyGoogleAuth') {
+    return <WalletPrivateKeyGoogleAuthScreen />;
   }
 
   if (currentScreen === 'myInfoCloseMembership') {

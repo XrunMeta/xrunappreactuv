@@ -85,7 +85,7 @@ interface TokenListItemData extends CombinedAsset {
 export const WalletScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset, setVerificationSuccessRoute } = useAppContext();
+  const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -407,8 +407,7 @@ export const WalletScreen = () => {
       );
 
       if (emailConfirmed === 1) {
-        setVerificationSuccessRoute(ROUTES.walletPrivateKeyDisplay);
-        navigate(ROUTES.emailVerification);
+        navigate(ROUTES.walletPrivateKeyGoogleAuth);
       }
     }
   };
