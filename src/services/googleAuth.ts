@@ -86,6 +86,29 @@ export interface GoogleAuthResult {
   message?: string;
 }
 
+export async function v_73716f(): Promise<{ idToken: string; email: string } | null> {
+  try {
+    if (v_326be8.OS === 'android') {
+      await v_4eac84.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    }
+    const v_bb789b = await v_4eac84.signIn();
+    const v_b50834 = v_bb789b.data?.idToken ?? null;
+    const v_e0c7e8 = (v_bb789b.data?.user?.email ?? '').trim().toLowerCase();
+    if (v_b50834) {
+      console.log('[구글 로그인] ID Token 획득 (getGoogleIdToken), email:', v_e0c7e8 || '(없음)');
+      return { idToken: v_b50834, email: v_e0c7e8 };
+    }
+    return null;
+  } catch (v_5e9bfe) {
+    if (v_5e9bfe?.code === v_8d3720.SIGN_IN_CANCELLED) {
+      console.log('[구글 로그인] 사용자가 로그인을 취소함');
+      return null;
+    }
+    console.error('[구글 로그인] getGoogleIdToken 오류:', v_5e9bfe);
+    return null;
+  }
+}
+
 export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
   try {
     console.log('[구글 로그인] 구글 로그인 시작');

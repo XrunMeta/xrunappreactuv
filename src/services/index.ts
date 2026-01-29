@@ -1194,6 +1194,38 @@ export const v_a81308 = async (
   }
 };
 
+export const v_32502f = async (
+  v_b50834,
+  v_c65f5d,
+): Promise<v_74e8fc> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[로그인] Google ID Token 로그인 요청');
+
+    const v_3393e3 = await v_9f42a4.post<v_74e8fc>('/login-google', {
+      idToken: v_b50834,
+    });
+
+    if (v_3393e3.data.status === 'success') {
+      console.log('[로그인] Google ID Token 로그인 성공');
+    } else {
+      console.error('[로그인] Google ID Token 로그인 실패:', v_3393e3.data);
+    }
+
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    if (__DEV__ && v_5e9bfe instanceof v_3333d3) {
+      console.error('[로그인] Google ID Token 로그인 오류:', {
+        status: v_5e9bfe.response?.status,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_ea3493 = async (
   v_660822,
   v_06cee6,
