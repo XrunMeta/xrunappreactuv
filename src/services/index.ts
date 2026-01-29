@@ -1194,6 +1194,38 @@ export const loginWithEmailAuth = async (
   }
 };
 
+export const loginWithGoogleIdToken = async (
+  idToken: string,
+  navigation?: any,
+): Promise<LoginResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[로그인] Google ID Token 로그인 요청');
+
+    const response = await axiosInstance.post<LoginResponse>('/login-google', {
+      idToken,
+    });
+
+    if (response.data.status === 'success') {
+      console.log('[로그인] Google ID Token 로그인 성공');
+    } else {
+      console.error('[로그인] Google ID Token 로그인 실패:', response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    if (__DEV__ && error instanceof AxiosError) {
+      console.error('[로그인] Google ID Token 로그인 오류:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const saveSession = async (
   member: number,
   ssidw: string,
