@@ -1,0 +1,16 @@
+export default {
+    title: '프라이빗 키 조회',
+    warningTitle: '보안 주의사항',
+    warningMessage: '프라이빗 키는 지갑의 모든 권한을 가집니다. 절대 타인에게 노출하지 마세요. 주변에 사람이 없는지 확인하고 안전한 장소에서 보관하시기 바랍니다.',
+    confirmDownloadTitle: '프라이빗 키를 다운로드하시겠습니까?',
+    confirmDownloadMessage: '이 작업은 보안상 위험할 수 있습니다. 계속하시겠습니까?',
+    emailVerificationRequired: '계정 보안을 위해 이메일 인증이 필요합니다.',
+    showKey: '프라이빗 키 보기',
+    maskedKeyLabel: '지갑 프라이빗 키',
+    copyKey: '프라이빗 키 복사',
+    copyConfirmTitle: '프라이빗 키 복사',
+    copyConfirmMessage: '프라이빗 키를 클립보드에 복사하시겠습니까? 복사 후 안전한 곳에 즉시 붙여넣고 클립보드를 비우는 것을 권장합니다.',
+    copySuccess: '프라이빗 키가 클립보드에 복사되었습니다.',
+    backToWallet: '지갑으로 돌아가기',
+    errorFetching: '프라이빗 키를 가져오지 못했습니다. 다시 시도해주세요.',
+};

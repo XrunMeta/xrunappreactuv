@@ -87,11 +87,13 @@ export const EmailVerificationScreen = () => {
       }
 
       setVerificationEmail(email.trim());
-      if (!isSignupMode) {
-        setVerificationSuccessRoute(ROUTES.map); 
+
+      if (!isSignupMode && (verificationSuccessRoute === ROUTES.login || !verificationSuccessRoute)) {
+        setVerificationSuccessRoute(ROUTES.map);
       }
 
       navigate(ROUTES.verificationCode);
+
     } catch (error) {
       console.error('[이메일 인증] 이메일 인증 처리 중 오류:', error);
 

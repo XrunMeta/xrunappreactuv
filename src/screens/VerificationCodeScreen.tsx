@@ -425,15 +425,20 @@ export const VerificationCodeScreen = () => {
 
         console.log('[로그인] 이메일 인증 로그인 성공');
 
+        const targetRoute = verificationSuccessRoute;
+        console.log('[인증] 타겟 화면으로 이동 (로그인 모드):', targetRoute);
         resetVerificationSuccessRoute();
-        reset(verificationSuccessRoute || ROUTES.map);
+        reset(targetRoute || ROUTES.map);
       } else {
 
-        console.log('[정보수정] 인증 코드 확인 성공');
+        const targetRoute = verificationSuccessRoute;
+        console.log('[인증] 타겟 화면으로 이동 (기타 모드):', targetRoute);
         resetVerificationSuccessRoute();
-        reset(verificationSuccessRoute);
+        reset(targetRoute || ROUTES.map);
       }
+
     } catch (error) {
+
       console.error('[인증] 인증 코드 확인 오류:', error);
 
       if (verificationSuccessRoute === ROUTES.signup) {

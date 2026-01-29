@@ -18,6 +18,7 @@ interface WalletHeaderCardProps {
   cardStyle?: StyleProp<ViewStyle>;
   onPress?: () => void;
   onCopy?: () => void;
+  onDownload?: () => void;
   actions: QuickAction[];
   mainValueLabel?: string;
   mainValue?: string;
@@ -35,6 +36,7 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
   onPress,
   cardStyle,
   onCopy,
+  onDownload,
   actions,
   mainValueLabel,
   mainValue,
@@ -63,6 +65,11 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
                 <TouchableOpacity style={styles.copyButtonInline} onPress={onCopy} activeOpacity={0.7}>
                   <Ionicons name="copy-outline" size={16} color="#ffffff" />
                 </TouchableOpacity>
+                {onDownload && (
+                  <TouchableOpacity style={styles.copyButtonInline} onPress={onDownload} activeOpacity={0.7}>
+                    <Ionicons name="download-outline" size={16} color="#ffffff" />
+                  </TouchableOpacity>
+                )}
               </View>
             ) : null}
           </View>

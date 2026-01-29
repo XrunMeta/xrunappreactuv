@@ -68,6 +68,7 @@ export const ROUTES = {
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
   webViewTest: 'webViewTest',
+  walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
