@@ -68,6 +68,7 @@ export const v_ce4741 = {
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
   webViewTest: 'webViewTest',
+  walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

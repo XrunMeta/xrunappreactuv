@@ -1,4 +1,6 @@
 export default {
+  cancel: 'Batal',
+  confirm: 'Konfirmasi',
   buttons: {
     submit: 'Kirim',
     cancel: 'Batal',

@@ -37,7 +37,7 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
   containerStyle: v_4affe9,
 }) => {
   return (
-    <Modal transparent animationType="fade" visible={v_cf55be} onRequestClose={v_0890f8 || (() => {})}>
+    <Modal transparent animationType="fade" visible={v_cf55be} onRequestClose={v_0890f8 || (() => { })}>
       <View style={v_d81136.overlay}>
         <View style={[v_d81136.card, v_4affe9]}>
           <View style={v_d81136.header}>
@@ -46,7 +46,7 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
                 <View style={v_d81136.closePlaceholder} />
                 <Text style={v_d81136.title}>{v_9f1622}</Text>
                 <TouchableOpacity onPress={v_0890f8} hitSlop={v_f72698} style={v_d81136.close}>
-                  <Ionicons name="close" size={18} color="#747474" />
+                  <Ionicons name="close" size={24} color="#747474" />
                 </TouchableOpacity>
               </>
             ) : (
@@ -92,7 +92,7 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
   );
 };
 
-const v_f72698 = { top: 8, bottom: 8, left: 8, right: 8 };
+const v_f72698 = { top: 15, bottom: 15, left: 15, right: 15 };
 
 const v_d81136 = v_472849.create({
   overlay: {
@@ -120,31 +120,24 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    position: 'relative',
-    minHeight: 32,
   },
   title: {
     fontSize: v_843035.size.large,
     fontFamily: 'Roboto-Bold',
     color: '#121212',
     textAlign: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 1,
+    flex: 1,
+    marginHorizontal: 10,
   },
   close: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closePlaceholder: {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
   },
   divider: {
     height: v_472849.hairlineWidth,

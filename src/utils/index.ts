@@ -507,3 +507,8 @@ export const v_f1ee1a = async (): Promise<{ isColdStart: boolean; elapsedSeconds
   }
 };
 
+export const v_51fb8d = (v_270351): string => {
+  if (!v_270351 || v_270351.length < 10) return v_270351;
+  return `${v_270351.substring(0, 6)}...${v_270351.substring(v_270351.length - 4)}`;
+};
+
