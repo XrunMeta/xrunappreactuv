@@ -310,7 +310,7 @@ export const sendAliveSignal = async (
         };
       }
 
-      const currentVersion = getCurrentAppVersionNumber();
+      const currentVersion = getCurrentAppVersionNumber();  
       const serverAndroidVersion = Number(serverResponse.data.version) || 0;
       const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
 
@@ -323,7 +323,7 @@ export const sendAliveSignal = async (
 
       if (Platform.OS === 'android') {
         if (currentVersion && serverAndroidVersion > currentVersion) {
-          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion);
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
           result.emergencyStop = {
             enabled: true,
             message: 'UPDATE_FOUND\nPLEASE_UPDATE',
@@ -336,7 +336,7 @@ export const sendAliveSignal = async (
         if (currentVersion && serverIOSVersion > currentVersion) {
           console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
           if (__DEV__) {
-            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
           } else {
             result.emergencyStop = {
               enabled: true,
@@ -1228,6 +1228,38 @@ export const loginWithEmailAuth = async (
       } else {
         console.error('[로그인] 이메일 인증 로그인 오류:', error);
       }
+    }
+    throw error;
+  }
+};
+
+export const loginWithGoogleIdToken = async (
+  idToken: string,
+  navigation?: any,
+): Promise<LoginResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[로그인] Google ID Token 로그인 요청');
+
+    const response = await axiosInstance.post<LoginResponse>('/login-google', {
+      idToken,
+    });
+
+    if (response.data.status === 'success') {
+      console.log('[로그인] Google ID Token 로그인 성공');
+    } else {
+      console.error('[로그인] Google ID Token 로그인 실패:', response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    if (__DEV__ && error instanceof AxiosError) {
+      console.error('[로그인] Google ID Token 로그인 오류:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
     }
     throw error;
   }

@@ -1,0 +1,26 @@
+export default {
+  title: 'Thay đổi mật khẩu',
+  currentPassword: 'Mật khẩu hiện tại',
+  currentPasswordPlaceholder: 'Nhập mật khẩu hiện tại của bạn',
+  newPassword: 'Mật khẩu mới',
+  newPasswordPlaceholder: 'Nhập mật khẩu mới của bạn',
+  confirmPassword: 'Xác nhận mật khẩu mới',
+  confirmPasswordPlaceholder: 'Nhập lại mật khẩu mới của bạn',
+  changeButton: 'Thay đổi',
+  processing: 'Đang xử lý...',
+  helperText: 'Mật khẩu phải có ít nhất 6 ký tự.',
+  alerts: {
+    error: 'Lỗi',
+    success: 'Đã thay đổi mật khẩu',
+    successMessage: 'Mật khẩu của bạn đã được thay đổi thành công.',
+    confirm: 'OK',
+    currentPasswordRequired: 'Vui lòng nhập mật khẩu hiện tại của bạn.',
+    newPasswordRequired: 'Vui lòng nhập mật khẩu mới của bạn.',
+    passwordTooShort: 'Mật khẩu phải có ít nhất 6 ký tự.',
+    passwordMismatch: 'Mật khẩu mới và mật khẩu xác nhận không khớp.',
+    samePassword: 'Mật khẩu mới phải khác với mật khẩu hiện tại.',
+    userDataNotFound: 'Không thể tải thông tin người dùng.',
+    changeFailed: 'Thay đổi mật khẩu thất bại. Vui lòng thử lại.',
+  },
+};
+

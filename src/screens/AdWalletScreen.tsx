@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
-import { Header, SegmentedControl, DataList, SafeView, Dialog } from '../components';
+import { Header, SegmentedControl, DataList, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
@@ -17,7 +17,6 @@ import {
   fetchADXRUNTopBanners,
   fetchADXRUNTopBannersSettled,
   fetchQuestList,
-  checkQuestUser,
   joinQuest,
 } from '../services';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
@@ -41,11 +40,14 @@ interface AdEntry {
   rewardDescription?: string; 
   extrastr3?: string; 
   hasAttended?: boolean; 
+  is_rewarded?: boolean; 
+  attendance_date?: string; 
   txHash?: string | null; 
   eventStatus?: string; 
   isReferralEvent?: boolean; 
   eventType?: string; 
   isReferralInvite?: boolean; 
+  originalDate?: string; 
 }
 
 export const AdWalletScreen = () => {
@@ -63,10 +65,6 @@ export const AdWalletScreen = () => {
   });
   const [topBannersLoading, setTopBannersLoading] = useState(false);
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
-  const [attendanceCheckVisible, setAttendanceCheckVisible] = useState(false);
-  const [canReward, setCanReward] = useState<boolean | null>(null);
-  const [hasAttended, setHasAttended] = useState<boolean | null>(null);
-  const [attendanceCheckLoading, setAttendanceCheckLoading] = useState(false);
   const [isJoiningQuest, setIsJoiningQuest] = useState(false);
   const [isColdStart, setIsColdStart] = useState<boolean | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -269,6 +267,56 @@ export const AdWalletScreen = () => {
     [i18n.language],
   );
 
+  const formatAttendanceDateTime = useCallback((utcString: string | undefined): string => {
+    if (!utcString) {
+      return '-';
+    }
+
+    try {
+
+      let utcDateString = utcString.trim();
+
+      const hasTimezone = utcDateString.endsWith('Z') ||
+        utcDateString.includes('+') ||
+        (utcDateString.length > 10 && utcDateString.slice(10).includes('-'));
+
+      if (!hasTimezone) {
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(utcDateString)) {
+          utcDateString = `${utcDateString}T00:00:00Z`;
+        } else if (!utcDateString.includes('T')) {
+
+          utcDateString = utcDateString.replace(' ', 'T');
+
+          if (!utcDateString.includes(':')) {
+            utcDateString += 'T00:00:00';
+          }
+          utcDateString += 'Z'; 
+        } else {
+          utcDateString += 'Z'; 
+        }
+      }
+
+      const localDate = new Date(utcDateString);
+
+      if (isNaN(localDate.getTime())) {
+        console.log('❌ 잘못된 날짜 형식(출석체크):', utcString, '변환된 형식:', utcDateString);
+        return '-';
+      }
+
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, '0');
+      const day = String(localDate.getDate()).padStart(2, '0');
+      const hours = String(localDate.getHours()).padStart(2, '0');
+      const minutes = String(localDate.getMinutes()).padStart(2, '0');
+
+      return `${year}.${month}.${day} ${hours}:${minutes}`;
+    } catch (error) {
+      console.log('❌ 날짜 파싱 오류(출석체크):', error, '원본 데이터:', utcString);
+      return '-';
+    }
+  }, []);
+
   const convertEstimateToAdEntry = useCallback(
     (item: ADXRUNEstimateItem): AdEntry => {
       const status = t('screens.adWallet.pending');
@@ -307,23 +355,26 @@ export const AdWalletScreen = () => {
       const isReferralEvent = eventType === 'recommendation' ||
         (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
 
+      const isAttendanceCheck = eventType === 'attendance' ||
+        (typeof item.id === 'string' && item.id.startsWith('attendance_'));
+
       const originalRewardValue = item.reward_amount_asxrun;
       const rewardAmount = typeof originalRewardValue === 'string'
         ? parseFloat(originalRewardValue)
         : originalRewardValue;
 
-      const isAttendanceCheck = item.id === 1 || item.id === '1';
       if (isAttendanceCheck) {
         const flooredForLog = Math.floor(rewardAmount * 100) / 100;
         console.log('[AdWallet] 출석체크 보상 변환:', {
           id: item.id,
           title: item.title,
+          attendance_date: item.attendance_date,
+          is_rewarded: item.is_rewarded,
           원본값: originalRewardValue,
           원본타입: typeof originalRewardValue,
           변환후값: rewardAmount,
           변환후타입: typeof rewardAmount,
           최종표시값: `${flooredForLog.toFixed(2)} XRUN`,
-          eventStatus: item.event_status,
         });
       }
 
@@ -342,7 +393,9 @@ export const AdWalletScreen = () => {
 
       const date = isReferralInvite 
         ? ''
-        : formatDate(item.start_date || item.created_at);
+        : isAttendanceCheck
+          ? formatAttendanceDateTime(item.created_at || item.attendance_date)
+          : formatDate(item.start_date || item.created_at);
 
       const displayRewardAmount = rewardAmount;
 
@@ -522,6 +575,14 @@ export const AdWalletScreen = () => {
         isReferralEvent,
         eventType,
         isReferralInvite,
+
+        is_rewarded: isAttendanceCheck ? item.is_rewarded : undefined,
+        attendance_date: isAttendanceCheck ? item.attendance_date : undefined,
+        extrastr3: isAttendanceCheck ? '출석보상' : undefined,
+
+        originalDate: isAttendanceCheck 
+          ? (item.created_at || item.attendance_date)
+          : (item.start_date || item.created_at),
       };
     },
     [t, formatDate, i18n],
@@ -574,38 +635,6 @@ export const AdWalletScreen = () => {
         const estimateItems = estimateResponseData.items || estimateResponseData || [];
         const pagination = estimateResponseData.pagination;
 
-        let reviewReferralEvents: AdEntry[] = [];
-        try {
-          const questResponse = await fetchQuestList(member, goBack);
-          const questItems = questResponse.data || [];
-
-          const reviewEvents = questItems.filter((item: QuestItem) => {
-            const isReferralEvent = item.event_type === 'recommendation' ||
-              (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
-
-            return isReferralEvent && item.event_status === 'review';
-          });
-
-          reviewReferralEvents = reviewEvents.map((item: QuestItem) => {
-            const adEntry = convertQuestToAdEntry(item);
-            return {
-              ...adEntry,
-              extrastr3: '추천인이벤트', 
-            };
-          });
-
-          console.log('[AdWallet] 심사중 탭 - review 상태 추천인 이벤트:', {
-            개수: reviewReferralEvents.length,
-            목록: reviewReferralEvents.map(e => ({
-              id: e.id,
-              title: e.title,
-              eventStatus: e.eventStatus,
-            })),
-          });
-        } catch (questError) {
-          console.error('[AdWallet] 심사중 탭 - 추천인 이벤트 조회 오류:', questError);
-        }
-
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
 
         const filteredEstimateAdEntries = estimateAdEntries.filter((entry) => {
@@ -616,20 +645,7 @@ export const AdWalletScreen = () => {
           return true;
         });
 
-        const filteredReviewReferralEvents = reviewReferralEvents.filter((entry) => {
-
-          if (entry.eventStatus === 'completed') {
-            return false;
-          }
-
-          if (entry.originalDescription && entry.originalDescription.includes('완료')) {
-            return false;
-          }
-
-          return entry.eventStatus === 'review';
-        });
-
-        const allAdEntries = [...filteredEstimateAdEntries, ...filteredReviewReferralEvents];
+        const allAdEntries = filteredEstimateAdEntries;
 
         let hasMore = false;
         if (pagination) {
@@ -648,7 +664,7 @@ export const AdWalletScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertEstimateToAdEntry, convertQuestToAdEntry, goBack],
+    [member, convertEstimateToAdEntry],
   );
 
   const fetchQuestData = useCallback(
@@ -659,42 +675,40 @@ export const AdWalletScreen = () => {
 
         const questItems = response.data || [];
 
-        const adEntries: AdEntry[] = questItems.map(convertQuestToAdEntry);
+        const filteredQuestItems = questItems.filter((item: QuestItem) => {
+          const eventType = item.event_type || 'quest';
+          const isReferralEvent = eventType === 'recommendation' ||
+            (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
 
-        if (member) {
-          const questIdOneEntry = adEntries.find(
-            (entry) => entry.id === 1 || entry.id === '1'
-          );
-
-          if (questIdOneEntry) {
-            try {
-              const checkResponse = await checkQuestUser(member);
-              const responseHasAttended = checkResponse.data?.hasAttended ?? false;
-              questIdOneEntry.hasAttended = responseHasAttended;
-              console.log('[AdWallet] 퀘스트 id 1 출석체크 상태:', responseHasAttended);
-            } catch (error) {
-              console.error('[AdWallet] 출석체크 상태 확인 오류:', error);
-
-            }
+          if (isReferralEvent && item.event_status === 'pending') {
+            return false;
           }
-        }
+          return true;
+        });
+
+        const adEntries: AdEntry[] = filteredQuestItems.map(convertQuestToAdEntry);
+
+        const isAttendanceQuest = (entry: AdEntry): boolean => {
+          return entry.eventType === 'attendance' ||
+            (typeof entry.id === 'string' && entry.id.startsWith('attendance_'));
+        };
 
         const sortedAdEntries = [...adEntries].sort((a, b) => {
 
-          const aIsAttendanceNotClicked = (a.id === 1 || a.id === '1') && (a.hasAttended === false || a.hasAttended === undefined);
-          const bIsAttendanceNotClicked = (b.id === 1 || b.id === '1') && (b.hasAttended === false || b.hasAttended === undefined);
-          if (aIsAttendanceNotClicked && !bIsAttendanceNotClicked) return -1;
-          if (!aIsAttendanceNotClicked && bIsAttendanceNotClicked) return 1;
-          if (aIsAttendanceNotClicked && bIsAttendanceNotClicked) {
+          if (a.isReferralInvite && !b.isReferralInvite) return -1;
+          if (!a.isReferralInvite && b.isReferralInvite) return 1;
+          if (a.isReferralInvite && b.isReferralInvite) {
 
             const dateA = new Date(a.date || '').getTime();
             const dateB = new Date(b.date || '').getTime();
             if (dateA !== dateB) return dateA - dateB;
           }
 
-          if (a.isReferralInvite && !b.isReferralInvite) return -1;
-          if (!a.isReferralInvite && b.isReferralInvite) return 1;
-          if (a.isReferralInvite && b.isReferralInvite) {
+          const aIsAttendanceNotRewarded = isAttendanceQuest(a) && (a.is_rewarded === false || a.is_rewarded === undefined);
+          const bIsAttendanceNotRewarded = isAttendanceQuest(b) && (b.is_rewarded === false || b.is_rewarded === undefined);
+          if (aIsAttendanceNotRewarded && !bIsAttendanceNotRewarded) return -1;
+          if (!aIsAttendanceNotRewarded && bIsAttendanceNotRewarded) return 1;
+          if (aIsAttendanceNotRewarded && bIsAttendanceNotRewarded) {
 
             const dateA = new Date(a.date || '').getTime();
             const dateB = new Date(b.date || '').getTime();
@@ -712,11 +726,11 @@ export const AdWalletScreen = () => {
             if (dateA !== dateB) return dateA - dateB;
           }
 
-          const aIsAttendanceClicked = (a.id === 1 || a.id === '1') && a.hasAttended === true;
-          const bIsAttendanceClicked = (b.id === 1 || b.id === '1') && b.hasAttended === true;
-          if (aIsAttendanceClicked && !bIsAttendanceClicked) return -1;
-          if (!aIsAttendanceClicked && bIsAttendanceClicked) return 1;
-          if (aIsAttendanceClicked && bIsAttendanceClicked) {
+          const aIsAttendanceRewarded = isAttendanceQuest(a) && a.is_rewarded === true;
+          const bIsAttendanceRewarded = isAttendanceQuest(b) && b.is_rewarded === true;
+          if (aIsAttendanceRewarded && !bIsAttendanceRewarded) return -1;
+          if (!aIsAttendanceRewarded && bIsAttendanceRewarded) return 1;
+          if (aIsAttendanceRewarded && bIsAttendanceRewarded) {
 
             const dateA = new Date(a.date || '').getTime();
             const dateB = new Date(b.date || '').getTime();
@@ -764,13 +778,88 @@ export const AdWalletScreen = () => {
           isReferralEvent: entry.isReferralEvent,
           isReferralInvite: entry.isReferralInvite,
           eventStatus: entry.eventStatus,
-          hasAttended: entry.hasAttended,
+          eventType: entry.eventType,
+          is_rewarded: entry.is_rewarded,
+          attendance_date: entry.attendance_date,
           date: entry.date,
         })));
 
+        const now = new Date();
+        const seventyFiveDaysAgo = new Date(now.getTime() - 75 * 24 * 60 * 60 * 1000);
+
+        const filteredByDate = sortedAdEntries.filter((entry: AdEntry) => {
+
+          const isAttendanceRewarded = isAttendanceQuest(entry) && entry.is_rewarded === true;
+
+          const isReferralReward = entry.isReferralEvent && !entry.isReferralInvite;
+          const isReferralReview = isReferralReward && (
+            entry.eventStatus === 'review' ||
+            (entry.originalDescription && (
+              entry.originalDescription.includes('심사중') ||
+              entry.originalDescription.includes('완료')
+            ))
+          );
+
+          if (isAttendanceRewarded || isReferralReview) {
+            if (!entry.originalDate) {
+
+              return true;
+            }
+
+            try {
+
+              let dateString = entry.originalDate.trim();
+              if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                  dateString = `${dateString}T00:00:00Z`;
+                } else if (!dateString.includes('T')) {
+                  dateString = dateString.replace(' ', 'T');
+                  if (!dateString.includes(':')) {
+                    dateString += 'T00:00:00';
+                  }
+                  dateString += 'Z';
+                } else {
+                  dateString += 'Z';
+                }
+              }
+
+              const entryDate = new Date(dateString);
+              if (isNaN(entryDate.getTime())) {
+
+                return true;
+              }
+
+              if (entryDate < seventyFiveDaysAgo) {
+                console.log('[AdWallet] 75일 경과 항목 필터링:', {
+                  id: entry.id,
+                  title: entry.title,
+                  originalDate: entry.originalDate,
+                  entryDate: entryDate.toISOString(),
+                  seventyFiveDaysAgo: seventyFiveDaysAgo.toISOString(),
+                  isAttendanceRewarded,
+                  isReferralReview,
+                });
+                return false;
+              }
+            } catch (error) {
+              console.error('[AdWallet] 날짜 파싱 오류 (75일 필터링):', error, entry.originalDate);
+
+              return true;
+            }
+          }
+
+          return true;
+        });
+
+        console.log('[AdWallet] 75일 필터링 결과:', {
+          필터링전: sortedAdEntries.length,
+          필터링후: filteredByDate.length,
+          제거된항목수: sortedAdEntries.length - filteredByDate.length,
+        });
+
         return {
-          data: sortedAdEntries,
-          total: sortedAdEntries.length,
+          data: filteredByDate,
+          total: filteredByDate.length,
           hasMore: false,
         };
       } catch (error: any) {
@@ -1132,57 +1221,16 @@ export const AdWalletScreen = () => {
       return;
     }
 
-    if (item.id === 1 || item.id === '1') {
+    const isAttendanceQuest = item.eventType === 'attendance' ||
+      (typeof item.id === 'string' && item.id.startsWith('attendance_'));
 
-      setAttendanceCheckLoading(true);
-      try {
-        const response = await checkQuestUser(member);
-        const responseHasAttended = response.data?.hasAttended ?? false;
-        setHasAttended(responseHasAttended);
+    if (isAttendanceQuest) {
 
-        if (responseHasAttended) {
-          setCanReward(false);
-          setAttendanceCheckVisible(true);
-        } else {
-          setCanReward(response.data?.canReward ?? false);
-          setAttendanceCheckVisible(true);
-        }
-      } catch (error) {
-        console.error('[AdWallet] 출석 체크 조회 오류:', error);
-
-        setHasAttended(false);
-        setCanReward(true);
-        setAttendanceCheckVisible(true);
-      } finally {
-        setAttendanceCheckLoading(false);
+      if (item.is_rewarded === true) {
+        showToast(t('screens.adWallet.attendanceCheckAlreadyCompleted'));
+        return;
       }
-    }
-  }, [tab, member, goBack, t, userEmail, showAlert]);
 
-  const handleDialogClose = useCallback(() => {
-
-    if (isJoiningQuest) {
-      return;
-    }
-    setAttendanceCheckVisible(false);
-    setCanReward(null);
-    setHasAttended(null);
-  }, [isJoiningQuest]);
-
-  const handleAttendanceCheckConfirm = useCallback(async () => {
-
-    if (isJoiningQuest) {
-      return;
-    }
-
-    if (hasAttended === true) {
-      setAttendanceCheckVisible(false);
-      setCanReward(null);
-      setHasAttended(null);
-      return;
-    }
-
-    if (canReward && member) {
       setIsJoiningQuest(true);
 
       if (isPangleReadySync()) {
@@ -1199,9 +1247,11 @@ export const AdWalletScreen = () => {
               console.log('[AdWallet] 출석체크 Pangle 광고 보상 수령:', reward);
 
               try {
+
+                const questId = item.id;
                 const response = await joinQuest(
                   {
-                    quest_id: 1,
+                    quest_id: questId,
                     member,
                   },
                   undefined, 
@@ -1209,15 +1259,12 @@ export const AdWalletScreen = () => {
 
                 if (response.status === 'success') {
                   showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                  setAttendanceCheckVisible(false);
-                  setCanReward(null);
-                  setHasAttended(null);
 
                   if (questListRef.current) {
                     questListRef.current.reloadData();
                   }
                 } else {
-                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                  showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
                 }
               } catch (error) {
                 console.error('[AdWallet] 출석 체크 참여 오류:', error);
@@ -1236,9 +1283,10 @@ export const AdWalletScreen = () => {
               console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
               showToast(t('screens.adWallet.adLoadFailedForAttendance'));
 
+              const questId = item.id;
               joinQuest(
                 {
-                  quest_id: 1,
+                  quest_id: questId,
                   member,
                 },
                 undefined,
@@ -1246,14 +1294,11 @@ export const AdWalletScreen = () => {
                 .then((response) => {
                   if (response.status === 'success') {
                     showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                    setAttendanceCheckVisible(false);
-                    setCanReward(null);
-                    setHasAttended(null);
                     if (questListRef.current) {
                       questListRef.current.reloadData();
                     }
                   } else {
-                    showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                    showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
                   }
                 })
                 .catch((error) => {
@@ -1269,9 +1314,10 @@ export const AdWalletScreen = () => {
           console.error('[AdWallet] 출석체크 Pangle 광고 표시 오류:', error);
 
           try {
+            const questId = item.id;
             const response = await joinQuest(
               {
-                quest_id: 1,
+                quest_id: questId,
                 member,
               },
               undefined,
@@ -1279,14 +1325,11 @@ export const AdWalletScreen = () => {
 
             if (response.status === 'success') {
               showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-              setAttendanceCheckVisible(false);
-              setCanReward(null);
-              setHasAttended(null);
               if (questListRef.current) {
                 questListRef.current.reloadData();
               }
             } else {
-              showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+              showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
             }
           } catch (questError) {
             console.error('[AdWallet] 출석 체크 참여 오류:', questError);
@@ -1298,9 +1341,10 @@ export const AdWalletScreen = () => {
       } else {
 
         try {
+          const questId = item.id;
           const response = await joinQuest(
             {
-              quest_id: 1,
+              quest_id: questId,
               member,
             },
             undefined,
@@ -1308,14 +1352,11 @@ export const AdWalletScreen = () => {
 
           if (response.status === 'success') {
             showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-            setAttendanceCheckVisible(false);
-            setCanReward(null);
-            setHasAttended(null);
             if (questListRef.current) {
               questListRef.current.reloadData();
             }
           } else {
-            showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+            showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
           }
         } catch (error) {
           console.error('[AdWallet] 출석 체크 참여 오류:', error);
@@ -1324,13 +1365,9 @@ export const AdWalletScreen = () => {
           setIsJoiningQuest(false);
         }
       }
-    } else {
-
-      setAttendanceCheckVisible(false);
-      setCanReward(null);
-      setHasAttended(null);
+      return;
     }
-  }, [canReward, hasAttended, member, t, isJoiningQuest]);
+  }, [tab, member, goBack, t, userEmail, showAlert]);
 
   const summaryLabel = useMemo(
     () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
@@ -1351,9 +1388,12 @@ export const AdWalletScreen = () => {
     const isQuest = !!item.title || item.extrastr3 === '추천인이벤트';
     const { onPress, tab: itemTab, ...itemData } = item;
 
-    const isQuestIdOne = isQuest && (item.id === 1 || item.id === '1');
+    const isAttendanceQuest = item.eventType === 'attendance' ||
+      (typeof item.id === 'string' && item.id.startsWith('attendance_'));
 
-    const questHasAttended = isQuestIdOne ? item.hasAttended : undefined;
+    const isAttendanceRewarded = isAttendanceQuest ? item.is_rewarded : undefined;
+
+    const questHasAttended = isAttendanceRewarded === true;
 
     const isReferralInvite = item.isReferralInvite || item.eventType === 'recommendation_invite';
 
@@ -1367,17 +1407,9 @@ export const AdWalletScreen = () => {
       ))
     );
 
-    const isDisabled = Boolean(!isReferralInvite && (questHasAttended === true || isReferralRewardDisabled));
+    const isDisabled = Boolean(!isReferralInvite && (isAttendanceRewarded === true || isReferralRewardDisabled));
 
-    const cardStyle = isQuestIdOne
-      ? isDisabled
-        ? styles.adCard 
-        : isColdStart === true
-          ? [styles.adCard, styles.questIdOneColdStart] 
-          : isColdStart === false
-            ? [styles.adCard, styles.questIdOneWarmStart] 
-            : [styles.adCard, styles.questIdOneColdStart] 
-      : styles.adCard;
+    const cardStyle = styles.adCard;
 
     const disabledColor = '#cccccc';
 
@@ -1395,7 +1427,7 @@ export const AdWalletScreen = () => {
           ]}>
             {item.status}
           </Text>
-          {item.date && !isQuestIdOne ? (
+          {item.date ? (
             <Text style={[
               styles.adCardDate,
               isDisabled && { color: disabledColor }
@@ -1613,39 +1645,6 @@ export const AdWalletScreen = () => {
         </View>
       </View>
 
-      <Dialog
-        visible={attendanceCheckVisible}
-        title={hasAttended === true
-          ? t('screens.adWallet.attendanceCheckCompletedTitle')
-          : t('screens.adWallet.attendanceCheckTitle')}
-        onClose={isJoiningQuest ? undefined : handleDialogClose}
-        actions={[
-          {
-            label: isJoiningQuest
-              ? t('screens.adWallet.processing')
-              : hasAttended === true
-                ? t('screens.adWallet.confirm')
-                : canReward === true
-                  ? t('screens.adWallet.attendanceCheck')
-                  : t('screens.adWallet.confirm'),
-            onPress: handleAttendanceCheckConfirm,
-            variant: 'primary',
-            disabled: isJoiningQuest,
-          },
-        ]}
-      >
-        {attendanceCheckLoading ? (
-          <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-        ) : (
-          <Text style={styles.attendanceCheckMessage}>
-            {hasAttended === true
-              ? t('screens.adWallet.attendanceCheckNotAvailable')
-              : canReward === true
-                ? t('screens.adWallet.attendanceCheckRewardMessage')
-                : t('screens.adWallet.attendanceCheckCompleted')}
-          </Text>
-        )}
-      </Dialog>
     </SafeView>
   );
 };
@@ -1874,11 +1873,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#121212',
   },
+
   questIdOneColdStart: {
     borderWidth: 2,
-    borderColor: '#ffdc04', 
+    borderColor: '#ffdc04',
   },
   questIdOneWarmStart: {
-    borderWidth: 0, 
+    borderWidth: 0,
   },
 });

@@ -1,0 +1,26 @@
+export default {
+  title: 'पासवर्ड बदलें',
+  currentPassword: 'वर्तमान पासवर्ड',
+  currentPasswordPlaceholder: 'अपना वर्तमान पासवर्ड दर्ज करें',
+  newPassword: 'नया पासवर्ड',
+  newPasswordPlaceholder: 'अपना नया पासवर्ड दर्ज करें',
+  confirmPassword: 'नया पासवर्ड की पुष्टि करें',
+  confirmPasswordPlaceholder: 'अपना नया पासवर्ड फिर से दर्ज करें',
+  changeButton: 'बदलें',
+  processing: 'प्रसंस्करण...',
+  helperText: 'पासवर्ड कम से कम 6 वर्ण का होना चाहिए।',
+  alerts: {
+    error: 'त्रुटि',
+    success: 'पासवर्ड बदल दिया गया',
+    successMessage: 'आपका पासवर्ड सफलतापूर्वक बदल दिया गया है।',
+    confirm: 'ठीक',
+    currentPasswordRequired: 'कृपया अपना वर्तमान पासवर्ड दर्ज करें।',
+    newPasswordRequired: 'कृपया अपना नया पासवर्ड दर्ज करें।',
+    passwordTooShort: 'पासवर्ड कम से कम 6 वर्ण का होना चाहिए।',
+    passwordMismatch: 'नया पासवर्ड और पुष्टिकरण पासवर्ड मेल नहीं खाते।',
+    samePassword: 'नया पासवर्ड वर्तमान पासवर्ड से अलग होना चाहिए।',
+    userDataNotFound: 'उपयोगकर्ता जानकारी लोड करने में असमर्थ।',
+    changeFailed: 'पासवर्ड बदलने में विफल। कृपया पुनः प्रयास करें।',
+  },
+};
+

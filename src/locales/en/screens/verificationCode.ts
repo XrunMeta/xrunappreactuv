@@ -24,6 +24,13 @@ export default {
     resendComplete: 'Resend Complete',
     resendFailed: 'Resend Failed',
   },
+  gmailGoogleLogin: {
+    title: 'Google Login',
+    message: 'Linking your Gmail account with Google Login allows you to sign in easily next time.',
+    button: 'Google Login',
+    emailMismatchTitle: 'Email Mismatch',
+    emailMismatchMessage: 'The Google account you use for sign-in must match the email you used to sign up.',
+  },
 };
 
 

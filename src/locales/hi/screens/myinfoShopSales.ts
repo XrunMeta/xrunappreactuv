@@ -1,0 +1,47 @@
+export default {
+  title: 'प्रतिभागी सूची',
+
+  productTitle: 'BBS दान टिकट',
+  productPrice: 'मूल्य',
+  participants: 'प्रतिभागी',
+  totalSales: 'कुल बिक्री',
+  settlementInfo: 'प्रत्येक महीने के अंत में निपटाया गया',
+  currency: 'KRW',
+  personUnit: '',
+
+  periodSelect: 'अवधि चुनें',
+  period1Week: '1 सप्ताह',
+  period1Month: '1 महीना',
+  period3Months: '3 महीने',
+  period6Months: '6 महीने',
+  periodCustom: 'कस्टम',
+  startDate: 'प्रारंभ तिथि',
+  endDate: 'समाप्ति तिथि',
+
+  yearMonth: '{{month}} {{year}}',
+  weekDays: {
+    sun: 'रवि',
+    mon: 'सोम',
+    tue: 'मंगल',
+    wed: 'बुध',
+    thu: 'गुरु',
+    fri: 'शुक्र',
+    sat: 'शनि',
+  },
+  close: 'बंद करें',
+  cancel: 'रद्द करें',
+  apply: 'लागू करें',
+
+  noData: 'कोई डेटा उपलब्ध नहीं।',
+  noShopmember: 'कोई दुकान जानकारी पंजीकृत नहीं।',
+  noItemData: 'कोई पंजीकृत आइटम या खरीद इतिहास नहीं।',
+
+  addItem: 'आइटम जोड़ें',
+  modify: 'संशोधित करें',
+  delete: 'हटाएं',
+  deleteConfirm: 'क्या आप वाकई हटाना चाहते हैं?',
+  deleteConfirmMessage: 'हटाए गए आइटम अब प्रदर्शित नहीं होंगे, लेकिन खरीद रिकॉर्ड बनाए रखे जाएंगे।',
+  deleteSuccess: 'आइटम हटा दिया गया है।',
+  deleteFailed: 'आइटम हटाने में विफल।',
+};
+

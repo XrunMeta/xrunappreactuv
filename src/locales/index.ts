@@ -7,6 +7,9 @@ import zhCN from './zh-CN';
 import en from './en';
 import id from './id';
 import ja from './ja';
+import th from './th';
+import hi from './hi';
+import vi from './vi';
 
 const resources = {
   ko: { translation: ko },
@@ -14,6 +17,9 @@ const resources = {
   en: { translation: en },
   id: { translation: id },
   ja: { translation: ja },
+  th: { translation: th },
+  hi: { translation: hi },
+  vi: { translation: vi },
 };
 
 export const LANGUAGE_CODES = {
@@ -22,6 +28,9 @@ export const LANGUAGE_CODES = {
   en: 'en',
   id: 'id',
   ja: 'ja',
+  th: 'th',
+  hi: 'hi',
+  vi: 'vi',
 } as const;
 
 export type LanguageCode = keyof typeof LANGUAGE_CODES;

@@ -15,6 +15,9 @@ const LANGUAGE_NAMES: Record<LanguageCode, string> = {
   en: 'English',
   id: 'Bahasa Indonesia',
   ja: '日本語',
+  th: 'ไทย',
+  hi: 'हिन्दी',
+  vi: 'Tiếng Việt',
 };
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ visible, onClose }) => {
