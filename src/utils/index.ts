@@ -507,3 +507,8 @@ export const getColdStartResult = async (): Promise<{ isColdStart: boolean; elap
   }
 };
 
+export const maskPrivateKey = (pk: string): string => {
+  if (!pk || pk.length < 10) return pk;
+  return `${pk.substring(0, 6)}...${pk.substring(pk.length - 4)}`;
+};
+
