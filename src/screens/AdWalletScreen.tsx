@@ -47,6 +47,7 @@ interface AdEntry {
   isReferralEvent?: boolean; 
   eventType?: string; 
   isReferralInvite?: boolean; 
+  originalDate?: string; 
 }
 
 export const AdWalletScreen = () => {
@@ -578,6 +579,10 @@ export const AdWalletScreen = () => {
         is_rewarded: isAttendanceCheck ? item.is_rewarded : undefined,
         attendance_date: isAttendanceCheck ? item.attendance_date : undefined,
         extrastr3: isAttendanceCheck ? '출석보상' : undefined,
+
+        originalDate: isAttendanceCheck 
+          ? (item.created_at || item.attendance_date)
+          : (item.start_date || item.created_at),
       };
     },
     [t, formatDate, i18n],
@@ -779,9 +784,82 @@ export const AdWalletScreen = () => {
           date: entry.date,
         })));
 
+        const now = new Date();
+        const seventyFiveDaysAgo = new Date(now.getTime() - 75 * 24 * 60 * 60 * 1000);
+
+        const filteredByDate = sortedAdEntries.filter((entry: AdEntry) => {
+
+          const isAttendanceRewarded = isAttendanceQuest(entry) && entry.is_rewarded === true;
+
+          const isReferralReward = entry.isReferralEvent && !entry.isReferralInvite;
+          const isReferralReview = isReferralReward && (
+            entry.eventStatus === 'review' ||
+            (entry.originalDescription && (
+              entry.originalDescription.includes('심사중') ||
+              entry.originalDescription.includes('완료')
+            ))
+          );
+
+          if (isAttendanceRewarded || isReferralReview) {
+            if (!entry.originalDate) {
+
+              return true;
+            }
+
+            try {
+
+              let dateString = entry.originalDate.trim();
+              if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                  dateString = `${dateString}T00:00:00Z`;
+                } else if (!dateString.includes('T')) {
+                  dateString = dateString.replace(' ', 'T');
+                  if (!dateString.includes(':')) {
+                    dateString += 'T00:00:00';
+                  }
+                  dateString += 'Z';
+                } else {
+                  dateString += 'Z';
+                }
+              }
+
+              const entryDate = new Date(dateString);
+              if (isNaN(entryDate.getTime())) {
+
+                return true;
+              }
+
+              if (entryDate < seventyFiveDaysAgo) {
+                console.log('[AdWallet] 75일 경과 항목 필터링:', {
+                  id: entry.id,
+                  title: entry.title,
+                  originalDate: entry.originalDate,
+                  entryDate: entryDate.toISOString(),
+                  seventyFiveDaysAgo: seventyFiveDaysAgo.toISOString(),
+                  isAttendanceRewarded,
+                  isReferralReview,
+                });
+                return false;
+              }
+            } catch (error) {
+              console.error('[AdWallet] 날짜 파싱 오류 (75일 필터링):', error, entry.originalDate);
+
+              return true;
+            }
+          }
+
+          return true;
+        });
+
+        console.log('[AdWallet] 75일 필터링 결과:', {
+          필터링전: sortedAdEntries.length,
+          필터링후: filteredByDate.length,
+          제거된항목수: sortedAdEntries.length - filteredByDate.length,
+        });
+
         return {
-          data: sortedAdEntries,
-          total: sortedAdEntries.length,
+          data: filteredByDate,
+          total: filteredByDate.length,
           hasMore: false,
         };
       } catch (error: any) {
