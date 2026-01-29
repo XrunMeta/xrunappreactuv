@@ -11,6 +11,8 @@ export { default as wallet } from './wallet';
 export { default as walletDetail } from './walletDetail';
 export { default as polygonWallet } from './polygonWallet';
 export { default as xrunWallet } from './xrunWallet';
+export { default as walletPrivateKeyDisplay } from './walletPrivateKeyDisplay';
+
 export { default as nftWallet } from './nftWallet';
 export { default as adWallet } from './adWallet';
 export { default as walletSend } from './walletSend';
