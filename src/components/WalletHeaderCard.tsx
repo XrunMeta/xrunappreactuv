@@ -65,7 +65,11 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
                 <TouchableOpacity style={styles.copyButtonInline} onPress={onCopy} activeOpacity={0.7}>
                   <Ionicons name="copy-outline" size={16} color="#ffffff" />
                 </TouchableOpacity>
-
+                {onDownload && (
+                  <TouchableOpacity style={styles.copyButtonInline} onPress={onDownload} activeOpacity={0.7}>
+                    <Ionicons name="download-outline" size={16} color="#ffffff" />
+                  </TouchableOpacity>
+                )}
               </View>
             ) : null}
           </View>
@@ -162,7 +166,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.small,
     color: '#f0f3ff',
     fontFamily: 'Roboto-Regular',
-    maxWidth: '80%',
+    maxWidth: '70%',
   },
   copyButtonInline: {
     marginLeft: 6,

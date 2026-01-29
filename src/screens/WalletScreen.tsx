@@ -700,7 +700,6 @@ export const WalletScreen = () => {
             cardStyle={styles.headerCard}
             address={publicAddress || ''}
             onCopy={handleCopyAddress}
-            onDownload={handleDownload}
             actions={[
               {
                 label: t('screens.wallet.polygonScan'),
