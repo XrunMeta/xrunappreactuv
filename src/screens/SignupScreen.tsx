@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_df9f57 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -11,6 +11,7 @@ import {
   v_aa7413,
   v_9cabcb,
   v_79c4f2,
+  v_0e1f26,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -116,6 +117,7 @@ export const v_f40fc5 = () => {
   const [v_bd30a1, v_e03dd9] = v_5ab095('');
   const [v_335974, v_88450b] = v_5ab095<v_da1883[]>(v_1bd8ad);
   const [v_d6cff0, v_677cd9] = v_5ab095(false);
+  const [v_7e4acc, v_de86c2] = v_5ab095(0);
 
   const v_5a46cd = (clauseId: v_9dd03c) => {
     if (v_111946 === 'service') {
@@ -164,8 +166,7 @@ export const v_f40fc5 = () => {
 
   const v_590486 = v_459d5e?.iso2?.toLowerCase() === 'kr';
 
-  const v_90ad93 = [82, 81, 86, 1, 62]; 
-  const v_56ad9c = v_459d5e?.countryCode ? v_90ad93.includes(v_459d5e.countryCode) : false;
+  const v_56ad9c = v_5f1e0e;
 
   const v_56743f = v_a3453e.useMemo(() => {
 
@@ -186,7 +187,22 @@ export const v_f40fc5 = () => {
       if (v_222917 === 0) {
         v_3b402b = v_8d41d7('screens.signup.allRegions') || v_8d41d7('screens.myInfoEdit.allRegions') || '전체 지역';
       } else if (v_a4d981 && v_222917 !== null && v_222917 !== undefined && v_222917 > 0) {
-        const v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+
+        const v_9ad700 = [82, 81, 86, 1, 62];
+        let v_b5249e;
+
+        if (v_9ad700.includes(v_a4d981)) {
+
+          v_b5249e = `regions.${v_a4d981}_${v_222917}`;
+        } else {
+
+          const v_1581b6 = v_2f03bc.name
+            .replace(/[^a-zA-Z0-9\s]/g, '') 
+            .replace(/\s+/g, '_') 
+            .toLowerCase();
+          v_b5249e = `regions.${v_a4d981}_${v_1581b6}`;
+        }
+
         try {
           const v_6dce25 = v_8d41d7(v_b5249e);
           if (v_6dce25 && v_6dce25 !== v_b5249e) {
@@ -229,6 +245,7 @@ export const v_f40fc5 = () => {
         const result: v_107459 = await v_5c7129(
           (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
           v_459d5e.countryCode || 0,
+          v_459d5e.iso2, 
           v_369014(v_459d5e.iso2)
         );
         v_24b641(v_43c42e.regions);
@@ -290,18 +307,75 @@ export const v_f40fc5 = () => {
     }
   }, [v_b67b40, v_9b57fc]);
 
+  v_c4deb2(() => {
+    if (!v_b67b40 && !v_3a64df) {
+      v_de86c2(0);
+      return;
+    }
+
+    const v_ef3bab = v_326be8.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const v_ffd7d0 = v_326be8.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const v_3d0122 = v_0e1f26.addListener(v_ef3bab, (v_d48baf) => {
+      v_de86c2(v_d48baf.endCoordinates.height);
+    });
+
+    const v_5ed003 = v_0e1f26.addListener(v_ffd7d0, () => {
+      v_de86c2(0);
+    });
+
+    return () => {
+      v_3d0122.remove();
+      v_5ed003.remove();
+    };
+  }, [v_b67b40, v_3a64df]);
+
   const v_daa71c = v_df9f57(() => {
     if (!v_bd30a1.trim()) {
       return v_335974;
     }
     const v_470e34 = v_bd30a1.trim().toLowerCase();
     return v_335974.filter((v_8c0b26) => {
+
       const v_cd2b74 = v_8c0b26.name.toLowerCase();
+
       const v_73b9dc = v_8c0b26.iso2.toLowerCase();
+
       const v_bed18d = v_8c0b26.dialCode.toLowerCase();
-      return v_cd2b74.includes(v_470e34) || v_73b9dc.includes(v_470e34) || v_bed18d.includes(v_470e34);
+
+      let v_a2493c = '';
+      if (v_8c0b26.iso2 && v_8c0b26.iso2 !== 'select' && v_8c0b26.iso2 !== 'global' && v_8c0b26.iso2.length === 2) {
+        const v_4d2349 = `countries.${v_8c0b26.iso2.toUpperCase()}`;
+        const v_6dce25 = v_8d41d7(v_4d2349);
+        if (v_6dce25 && v_6dce25 !== v_4d2349) {
+          v_a2493c = v_6dce25.toLowerCase();
+        }
+      }
+
+      const v_ae5dba = v_73b9dc === v_470e34;
+
+      const v_8cb36b = v_cd2b74.includes(v_470e34);
+
+      const v_ee6e33 = v_a2493c && v_a2493c.includes(v_470e34);
+
+      let v_f2229a = false;
+      if (v_470e34.match(/^\d+$/)) {
+
+        const v_c78cbd = v_bed18d.replace(/[^0-9]/g, '');
+        v_f2229a = v_c78cbd.includes(v_470e34);
+      } else if (v_470e34.startsWith('+')) {
+
+        v_f2229a = v_bed18d.includes(v_470e34);
+      }
+
+      return (
+        v_ae5dba ||
+        v_8cb36b ||
+        v_ee6e33 ||
+        v_f2229a
+      );
     });
-  }, [v_bd30a1, v_335974]);
+  }, [v_bd30a1, v_335974, v_8d41d7]);
 
   const v_de5bf5 = (country: v_da1883) => {
     console.log('[회원가입] 국가 선택:', {
@@ -335,11 +409,33 @@ export const v_f40fc5 = () => {
     }
     const v_470e34 = v_7962f1.trim().toLowerCase();
     return v_904f1e.filter((v_8c0b26) => {
+
       const v_cd2b74 = v_8c0b26.name.toLowerCase();
+
       const v_73b9dc = v_8c0b26.iso2.toLowerCase();
-      return v_cd2b74.includes(v_470e34) || v_73b9dc.includes(v_470e34);
+
+      let v_a2493c = '';
+      if (v_8c0b26.countryCode && v_8c0b26.dialCode) {
+        const v_222917 = parseInt(v_8c0b26.dialCode, 10);
+        if (!isNaN(v_222917) && v_222917 > 0) {
+          const v_9ad700 = [82, 81, 86, 1, 62];
+          if (v_9ad700.includes(v_8c0b26.countryCode)) {
+            const v_b5249e = `regions.${v_8c0b26.countryCode}_${v_222917}`;
+            const v_6dce25 = v_8d41d7(v_b5249e);
+            if (v_6dce25 && v_6dce25 !== v_b5249e) {
+              v_a2493c = v_6dce25.toLowerCase();
+            }
+          }
+        }
+      }
+
+      return (
+        v_cd2b74.includes(v_470e34) ||
+        v_a2493c.includes(v_470e34) ||
+        v_73b9dc.includes(v_470e34)
+      );
     });
-  }, [v_7962f1, v_904f1e]);
+  }, [v_7962f1, v_904f1e, v_8d41d7]);
 
   const v_477add = (region: v_da1883) => {
     console.log('[회원가입] 지역 선택:', {
@@ -1122,28 +1218,24 @@ export const v_f40fc5 = () => {
           />
 
           {}
-          <View style={v_d81136.fieldContainer}>
-            <FormField
-              label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
-              placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
-              value={v_56743f}
-              editable={false}
-              showDisabledStyle={false}
-              onPress={() => {
+          {v_56ad9c && (
+            <View style={v_d81136.fieldContainer}>
+              <FormField
+                label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
+                placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
+                value={v_56743f}
+                editable={false}
+                showDisabledStyle={false}
+                onPress={() => {
 
-                if (!v_5f1e0e || v_88dca2) {
-                  return;
-                }
-                v_c73419(true);
-              }}
-            />
-            {}
-            {!v_56ad9c && (
-              <Text style={v_d81136.regionHelper}>
-                {v_8d41d7('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-              </Text>
-            )}
-          </View>
+                  if (!v_5f1e0e || v_88dca2) {
+                    return;
+                  }
+                  v_c73419(true);
+                }}
+              />
+            </View>
+          )}
 
           <View style={v_d81136.fieldContainer}>
             <Text style={v_d81136.label}>
@@ -1540,6 +1632,8 @@ const v_d81136 = v_472849.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: v_700696.get('window').height * 0.8,
+    minHeight: v_700696.get('window').height * 0.6,
     maxHeight: v_700696.get('window').height * 0.8,
     paddingBottom: v_326be8.OS === 'ios' ? 34 : 20,
   },

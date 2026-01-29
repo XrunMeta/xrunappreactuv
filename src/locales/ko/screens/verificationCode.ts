@@ -24,6 +24,13 @@ export default {
     resendComplete: '재전송 완료',
     resendFailed: '재전송 실패',
   },
+  gmailGoogleLogin: {
+    title: '구글 로그인 안내',
+    message: 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
+    button: '구글 로그인',
+    emailMismatchTitle: '이메일 불일치',
+    emailMismatchMessage: '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
+  },
 };
 
 
