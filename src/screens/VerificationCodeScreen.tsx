@@ -25,6 +25,8 @@ import {
   signup,
   checkLogin,
   SignupHelpers,
+  getGoogleIdToken,
+  loginWithGoogleIdToken,
 } from '../services';
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
@@ -344,20 +346,75 @@ export const VerificationCodeScreen = () => {
               );
             }
           } else {
+            const isGmail = (pendingData.email || '').toLowerCase().includes('@gmail.com');
+            if (isGmail) {
 
-            await showAlert(
-              t('screens.signup.success.title') || '회원가입 완료',
-              t('screens.signup.success.message') || '회원가입이 완료되었습니다.',
-              [
-                {
-                  text: t('screens.signup.success.confirm') || '확인',
-                  onPress: () => {
-                    reset(ROUTES.authLanding);
-                    navigate(ROUTES.login);
+              const signupEmailLower = (pendingData.email || '').trim().toLowerCase();
+              while (true) {
+                const result = await getGoogleIdToken();
+                if (!result) {
+                  await showAlert(
+                    t('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
+                    t('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
+                    [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                  );
+                  continue;
+                }
+
+                if (result.email && signupEmailLower && result.email !== signupEmailLower) {
+                  await showAlert(
+                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
+                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage') || '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
+                    [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                  );
+                  continue;
+                }
+                try {
+                  const loginResponse = await loginWithGoogleIdToken(result.idToken, navigate);
+                  if (loginResponse.status === 'success' && loginResponse.data?.[0]) {
+                    const userData = loginResponse.data[0];
+                    const extrastr = userData.extrastr;
+                    const member = userData.member;
+                    if (extrastr && member) {
+                      const ssidw = encryptSHA256(extrastr);
+                      await saveSession(member, ssidw, navigate);
+                    }
+                    await AsyncStorage.removeItem('userData');
+                    await AsyncStorage.removeItem('userSessionToken');
+                    await AsyncStorage.setItem('userEmail', userData.email ?? pendingData.email);
+                    await AsyncStorage.setItem('userData', JSON.stringify(userData));
+                    await AsyncStorage.setItem('userSessionToken', extrastr || '');
+                    await AsyncStorage.setItem('isLoggedIn', 'true');
+                    await AsyncStorage.setItem('rememberMe', 'true');
+                    await AsyncStorage.setItem('loginType', 'google');
+                    reset(ROUTES.map);
+                    break;
+                  }
+                } catch (_) {
+
+                }
+                await showAlert(
+                  t('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
+                  t('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
+                  [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                );
+              }
+            } else {
+
+              await showAlert(
+                t('screens.signup.success.title') || '회원가입 완료',
+                t('screens.signup.success.message') || '회원가입이 완료되었습니다.',
+                [
+                  {
+                    text: t('screens.signup.success.confirm') || '확인',
+                    onPress: () => {
+                      reset(ROUTES.authLanding);
+                      navigate(ROUTES.login);
+                    },
                   },
-                },
-              ],
-            );
+                ],
+              );
+            }
           }
         } catch (error) {
           console.error('[회원가입] 회원가입 처리 중 오류:', error);

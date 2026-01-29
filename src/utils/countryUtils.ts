@@ -2,6 +2,11 @@ import { CountryDialCode } from '../types';
 import { GetCountriesResponse, GetRegionsByCountryResponse } from '../types';
 import { COUNTRY_DIAL_CODES, ALLOWED_COUNTRIES } from '../constants/countryDialCodes';
 import { GLOBAL_REGION } from '../constants/regions';
+import {
+  loadCountriesFromPackage,
+  loadRegionsFromPackage,
+  isCountryWithRegionsByCode,
+} from './countryStateCityUtils';
 
 const getFlagEmojiFromIso2 = (iso2: string): string => {
   if (!iso2) return '🌐';
@@ -151,6 +156,21 @@ export const loadCountriesFromApi = async (
   getCountries: () => Promise<GetCountriesResponse>,
   fallback: CountryDialCode[] = ALLOWED_COUNTRIES
 ): Promise<CountryDialCode[]> => {
+
+  try {
+    const packageCountries = loadCountriesFromPackage();
+    if (packageCountries.length > 0) {
+      if (__DEV__) {
+        console.log('[countryUtils] 패키지에서 국가 목록 로드 성공:', packageCountries.length);
+      }
+      return packageCountries;
+    }
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[countryUtils] 패키지 국가 목록 로드 실패, API fallback 시도:', error);
+    }
+  }
+
   try {
     const response = await getCountries();
     if (response.status === 'success' && response.data && response.data.length > 0) {
@@ -175,15 +195,48 @@ const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62];
 export const loadRegionsFromApi = async (
   getRegionsByCountry: (country: number) => Promise<GetRegionsByCountryResponse>,
   countryCode: number,
+  isoCode?: string, 
   fallback: CountryDialCode[] = [GLOBAL_REGION]
 ): Promise<LoadRegionsResult> => {
 
-  if (!COUNTRIES_WITH_REGIONS.includes(countryCode)) {
-    console.log('[countryUtils] 지역 미지원 국가 - global 반환:', countryCode);
-    return {
-      regions: [GLOBAL_REGION],
-      hasRegions: false,
-    };
+  const countryCodeToIso2: { [key: number]: string } = {
+    82: 'kr', 81: 'jp', 86: 'cn', 1: 'us', 62: 'id',
+  };
+  const foundIsoCode = isoCode || countryCodeToIso2[countryCode];
+
+  if (foundIsoCode) {
+    try {
+      const packageRegions = loadRegionsFromPackage(foundIsoCode, countryCode);
+      if (packageRegions.length > 0) {
+        if (__DEV__) {
+          console.log('[countryUtils] 패키지에서 지역 목록 로드 성공:', {
+            countryCode,
+            isoCode: foundIsoCode,
+            regionCount: packageRegions.length,
+          });
+        }
+        return {
+          regions: packageRegions,
+          hasRegions: true,
+        };
+      } else {
+
+        if (__DEV__) {
+          console.log('[countryUtils] 패키지에 지역 데이터 없음:', {
+            countryCode,
+            isoCode: foundIsoCode,
+          });
+        }
+        return {
+          regions: [GLOBAL_REGION],
+          hasRegions: false,
+        };
+      }
+    } catch (error) {
+      if (__DEV__) {
+        console.warn('[countryUtils] 패키지 지역 목록 로드 실패, API fallback 시도:', error);
+      }
+    }
   }
 
   try {

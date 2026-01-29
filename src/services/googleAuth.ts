@@ -86,6 +86,29 @@ export interface GoogleAuthResult {
   message?: string;
 }
 
+export async function getGoogleIdToken(): Promise<{ idToken: string; email: string } | null> {
+  try {
+    if (Platform.OS === 'android') {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    }
+    const userInfo = await GoogleSignin.signIn();
+    const idToken = userInfo.data?.idToken ?? null;
+    const email = (userInfo.data?.user?.email ?? '').trim().toLowerCase();
+    if (idToken) {
+      console.log('[구글 로그인] ID Token 획득 (getGoogleIdToken), email:', email || '(없음)');
+      return { idToken, email };
+    }
+    return null;
+  } catch (error: any) {
+    if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
+      console.log('[구글 로그인] 사용자가 로그인을 취소함');
+      return null;
+    }
+    console.error('[구글 로그인] getGoogleIdToken 오류:', error);
+    return null;
+  }
+}
+
 export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResult> {
   try {
     console.log('[구글 로그인] 구글 로그인 시작');

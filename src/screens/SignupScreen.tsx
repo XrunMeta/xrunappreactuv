@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Modal,
   FlatList,
   TextInput,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -116,6 +117,7 @@ export const SignupScreen = () => {
   const [countrySearchQuery, setCountrySearchQuery] = useState('');
   const [availableCountries, setAvailableCountries] = useState<CountryDialCode[]>(ALLOWED_COUNTRIES);
   const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const handleAgreeClause = (clauseId: ClauseId) => {
     if (clauseId === 'service') {
@@ -164,8 +166,7 @@ export const SignupScreen = () => {
 
   const isKoreaSelected = selectedCountryDialCode?.iso2?.toLowerCase() === 'kr';
 
-  const COUNTRIES_WITH_REGIONS = [82, 81, 86, 1, 62]; 
-  const isCountryWithRegions = selectedCountryDialCode?.countryCode ? COUNTRIES_WITH_REGIONS.includes(selectedCountryDialCode.countryCode) : false;
+  const isCountryWithRegions = hasRegions;
 
   const regionDisplayValue = React.useMemo(() => {
 
@@ -186,7 +187,22 @@ export const SignupScreen = () => {
       if (regionCode === 0) {
         value = t('screens.signup.allRegions') || t('screens.myInfoEdit.allRegions') || '전체 지역';
       } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
-        const regionKey = `regions.${countryCode}_${regionCode}`;
+
+        const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+        let regionKey: string;
+
+        if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
+
+          regionKey = `regions.${countryCode}_${regionCode}`;
+        } else {
+
+          const regionNameKey = selectedRegion.name
+            .replace(/[^a-zA-Z0-9\s]/g, '') 
+            .replace(/\s+/g, '_') 
+            .toLowerCase();
+          regionKey = `regions.${countryCode}_${regionNameKey}`;
+        }
+
         try {
           const translated = t(regionKey);
           if (translated && translated !== regionKey) {
@@ -229,6 +245,7 @@ export const SignupScreen = () => {
         const result: LoadRegionsResult = await loadRegionsFromApi(
           (country: number) => getRegionsByCountry(country, navigate),
           selectedCountryDialCode.countryCode || 0,
+          selectedCountryDialCode.iso2, 
           getRegionsByCountryIso2(selectedCountryDialCode.iso2)
         );
         setAvailableRegions(result.regions);
@@ -290,18 +307,75 @@ export const SignupScreen = () => {
     }
   }, [countryModalVisible, navigate]);
 
+  useEffect(() => {
+    if (!countryModalVisible && !regionModalVisible) {
+      setKeyboardHeight(0);
+      return;
+    }
+
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSubscription = Keyboard.addListener(showEvent, (event) => {
+      setKeyboardHeight(event.endCoordinates.height);
+    });
+
+    const hideSubscription = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, [countryModalVisible, regionModalVisible]);
+
   const filteredCountries = useMemo(() => {
     if (!countrySearchQuery.trim()) {
       return availableCountries;
     }
     const normalizedQuery = countrySearchQuery.trim().toLowerCase();
     return availableCountries.filter((item) => {
+
       const searchName = item.name.toLowerCase();
+
       const searchIso = item.iso2.toLowerCase();
+
       const searchDialCode = item.dialCode.toLowerCase();
-      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery) || searchDialCode.includes(normalizedQuery);
+
+      let translatedName = '';
+      if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
+        const countryKey = `countries.${item.iso2.toUpperCase()}`;
+        const translated = t(countryKey);
+        if (translated && translated !== countryKey) {
+          translatedName = translated.toLowerCase();
+        }
+      }
+
+      const isoExactMatch = searchIso === normalizedQuery;
+
+      const nameMatch = searchName.includes(normalizedQuery);
+
+      const translatedNameMatch = translatedName && translatedName.includes(normalizedQuery);
+
+      let dialCodeMatch = false;
+      if (normalizedQuery.match(/^\d+$/)) {
+
+        const dialCodeNumbers = searchDialCode.replace(/[^0-9]/g, '');
+        dialCodeMatch = dialCodeNumbers.includes(normalizedQuery);
+      } else if (normalizedQuery.startsWith('+')) {
+
+        dialCodeMatch = searchDialCode.includes(normalizedQuery);
+      }
+
+      return (
+        isoExactMatch ||
+        nameMatch ||
+        translatedNameMatch ||
+        dialCodeMatch
+      );
     });
-  }, [countrySearchQuery, availableCountries]);
+  }, [countrySearchQuery, availableCountries, t]);
 
   const handleSelectCountry = (country: CountryDialCode) => {
     console.log('[회원가입] 국가 선택:', {
@@ -335,11 +409,33 @@ export const SignupScreen = () => {
     }
     const normalizedQuery = regionSearchQuery.trim().toLowerCase();
     return regionDataSource.filter((item) => {
+
       const searchName = item.name.toLowerCase();
+
       const searchIso = item.iso2.toLowerCase();
-      return searchName.includes(normalizedQuery) || searchIso.includes(normalizedQuery);
+
+      let translatedName = '';
+      if (item.countryCode && item.dialCode) {
+        const regionCode = parseInt(item.dialCode, 10);
+        if (!isNaN(regionCode) && regionCode > 0) {
+          const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+          if (COUNTRIES_WITH_MAPPING.includes(item.countryCode)) {
+            const regionKey = `regions.${item.countryCode}_${regionCode}`;
+            const translated = t(regionKey);
+            if (translated && translated !== regionKey) {
+              translatedName = translated.toLowerCase();
+            }
+          }
+        }
+      }
+
+      return (
+        searchName.includes(normalizedQuery) ||
+        translatedName.includes(normalizedQuery) ||
+        searchIso.includes(normalizedQuery)
+      );
     });
-  }, [regionSearchQuery, regionDataSource]);
+  }, [regionSearchQuery, regionDataSource, t]);
 
   const handleSelectRegion = (region: CountryDialCode) => {
     console.log('[회원가입] 지역 선택:', {
@@ -1122,28 +1218,24 @@ export const SignupScreen = () => {
           />
 
           {}
-          <View style={styles.fieldContainer}>
-            <FormField
-              label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
-              placeholder={t('screens.signup.regionPlaceholder')}
-              value={regionDisplayValue}
-              editable={false}
-              showDisabledStyle={false}
-              onPress={() => {
+          {isCountryWithRegions && (
+            <View style={styles.fieldContainer}>
+              <FormField
+                label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
+                placeholder={t('screens.signup.regionPlaceholder')}
+                value={regionDisplayValue}
+                editable={false}
+                showDisabledStyle={false}
+                onPress={() => {
 
-                if (!hasRegions || isSubmitting) {
-                  return;
-                }
-                setRegionModalVisible(true);
-              }}
-            />
-            {}
-            {!isCountryWithRegions && (
-              <Text style={styles.regionHelper}>
-                {t('screens.signup.regionHelper') || 'Global 지역이 자동으로 적용됩니다.'}
-              </Text>
-            )}
-          </View>
+                  if (!hasRegions || isSubmitting) {
+                    return;
+                  }
+                  setRegionModalVisible(true);
+                }}
+              />
+            </View>
+          )}
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>
@@ -1540,6 +1632,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: Dimensions.get('window').height * 0.8,
+    minHeight: Dimensions.get('window').height * 0.6,
     maxHeight: Dimensions.get('window').height * 0.8,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
   },

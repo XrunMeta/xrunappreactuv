@@ -71,6 +71,7 @@ export const CountryCodeSelectScreen = () => {
           const result: LoadRegionsResult = await loadRegionsFromApi(
             (country: number) => getRegionsByCountry(country, navigate),
             selectedCountryDialCode.countryCode || 0,
+            selectedCountryDialCode.iso2,
             getRegionsByCountryIso2(selectedCountryDialCode.iso2)
           );
           console.log('[CountryCodeSelect] 지역 목록 로드 결과:', {
@@ -132,11 +133,35 @@ export const CountryCodeSelectScreen = () => {
         const searchName = item.name.toLowerCase();
 
         let translatedName = '';
-        if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
-          const countryKey = `countries.${item.iso2.toUpperCase()}`;
-          const translated = t(countryKey);
-          if (translated && translated !== countryKey) {
-            translatedName = translated.toLowerCase();
+        if (selectMode === 'region') {
+
+          const countryCode = item.countryCode || 0;
+          const regionCode = parseInt((item.dialCode || '').replace('+', ''), 10);
+          if (countryCode > 0 && !isNaN(regionCode) && regionCode > 0) {
+            const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
+            let regionKey: string;
+            if (COUNTRIES_WITH_MAPPING.includes(countryCode)) {
+              regionKey = `regions.${countryCode}_${regionCode}`;
+            } else {
+              const regionNameKey = item.name
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .replace(/\s+/g, '_')
+                .toLowerCase();
+              regionKey = `regions.${countryCode}_${regionNameKey}`;
+            }
+            const translated = t(regionKey);
+            if (translated && translated !== regionKey) {
+              translatedName = translated.toLowerCase();
+            }
+          }
+        } else {
+
+          if (item.iso2 && item.iso2 !== 'select' && item.iso2 !== 'global' && item.iso2.length === 2) {
+            const countryKey = `countries.${item.iso2.toUpperCase()}`;
+            const translated = t(countryKey);
+            if (translated && translated !== countryKey) {
+              translatedName = translated.toLowerCase();
+            }
           }
         }
         const searchIso = item.iso2.toLowerCase();
