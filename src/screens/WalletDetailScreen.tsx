@@ -223,7 +223,6 @@ export const WalletDetailScreen = () => {
     setWalletReceiveAddress,
     setWalletReceiveCurrency,
     setSelectedTransactionDetails,
-    setVerificationSuccessRoute,
   } = useAppContext();
   const { showAlert } = useAlertDialog();
 
@@ -606,11 +605,10 @@ export const WalletDetailScreen = () => {
       );
 
       if (emailConfirmed === 1) {
-        setVerificationSuccessRoute(ROUTES.walletPrivateKeyDisplay);
-        navigate(ROUTES.emailVerification);
+        navigate(ROUTES.walletPrivateKeyGoogleAuth);
       }
     }
-  }, [t, showAlert, setVerificationSuccessRoute, navigate]);
+  }, [t, showAlert, navigate]);
 
   const formattedBalance = useMemo(() => {
 

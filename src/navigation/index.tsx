@@ -69,6 +69,7 @@ export const ROUTES = {
   pangleList: 'pangleList',
   webViewTest: 'webViewTest',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
+  walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
