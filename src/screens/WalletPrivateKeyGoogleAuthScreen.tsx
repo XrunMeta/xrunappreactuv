@@ -88,14 +88,6 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         console.log('[프라이빗키 인증] 계정 연동 필요 - 팝업 표시');
 
         const googleEmail = result.data.email || '';
-        if (currentEmail && googleEmail && googleEmail.toLowerCase() !== currentEmail.toLowerCase()) {
-          await showAlert(
-            t('common.messages.error') || '오류',
-            '현재 계정과 연동된 구글 계정으로 로그인해주세요.',
-          );
-          setIsLoading(false);
-          return;
-        }
 
         setLinkingEmail(googleEmail);
         setGoogleLoginData(result.data);
@@ -130,16 +122,6 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
       if (memberId !== currentMemberId) {
         console.log('[프라이빗키 인증] 계정 불일치:', { memberId, currentMemberId });
-        await showAlert(
-          t('common.messages.error') || '오류',
-          '현재 계정과 일치하지 않는 구글 계정입니다. 다시 시도해주세요.',
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      if (currentEmail && email && email.toLowerCase() !== currentEmail.toLowerCase()) {
-        console.log('[프라이빗키 인증] 이메일 불일치:', { email, currentEmail });
         await showAlert(
           t('common.messages.error') || '오류',
           '현재 계정과 일치하지 않는 구글 계정입니다. 다시 시도해주세요.',
