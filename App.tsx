@@ -62,6 +62,7 @@ import {
   v_0e5276,
   v_4a5627,
   v_a50cad,
+  v_d4a78d,
 } from './src/screens';
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
@@ -417,6 +418,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'walletPrivateKeyDisplay') {
     return <WalletPrivateKeyDisplayScreen />;
+  }
+
+  if (v_0f0c7b === 'walletPrivateKeyGoogleAuth') {
+    return <WalletPrivateKeyGoogleAuthScreen />;
   }
 
   if (v_0f0c7b === 'myInfoCloseMembership') {

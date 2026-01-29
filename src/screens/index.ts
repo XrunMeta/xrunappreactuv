@@ -59,4 +59,5 @@ export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 export { ReferralInputScreen } from './ReferralInputScreen';
 export { PangleListScreen } from './PangleListScreen';
 export { WalletPrivateKeyDisplayScreen } from './WalletPrivateKeyDisplayScreen';
+export { WalletPrivateKeyGoogleAuthScreen } from './WalletPrivateKeyGoogleAuthScreen';
 
