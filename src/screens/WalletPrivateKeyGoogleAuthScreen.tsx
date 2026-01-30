@@ -7,15 +7,14 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, SafeView, PrimaryButton, SafeScrollView, FormField, FormCheckbox, Dialog } from '../components';
+import { Header, SafeView, PrimaryButton, SafeScrollView, FormField, Dialog } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
-  signInWithGoogle,
-  connectGoogleAccount,
-  encryptSHA256,
-  saveSession,
+  getGoogleIdToken,
+  googleAuthForWallet,
+  checkSocialForWallet,
 } from '../services';
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
@@ -27,16 +26,34 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [currentEmail, setCurrentEmail] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [hasGoogleSocialPrefetched, setHasGoogleSocialPrefetched] = useState<boolean | null>(null);
+
   const [linkingDialogVisible, setLinkingDialogVisible] = useState(false);
   const [linkingPassword, setLinkingPassword] = useState('');
-  const [linkingAgreed, setLinkingAgreed] = useState(false);
-  const [linkingEmail, setLinkingEmail] = useState('');
-  const [googleLoginData, setGoogleLoginData] = useState<any>(null);
+  const [passwordDialogIdToken, setPasswordDialogIdToken] = useState<string | null>(null);
   const [isLinkingLoading, setIsLinkingLoading] = useState(false);
 
   useEffect(() => {
     loadCurrentUserInfo();
   }, []);
+
+  useEffect(() => {
+    if (!currentMemberId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const checkRes = await checkSocialForWallet(currentMemberId, navigate);
+        if (!cancelled) {
+          const has = checkRes.success && checkRes.data?.hasGoogleSocial === true;
+          setHasGoogleSocialPrefetched(has);
+          console.log('[프라이빗키 인증] 소셜 연동 여부 미리 조회:', has);
+        }
+      } catch (e) {
+        if (!cancelled) setHasGoogleSocialPrefetched(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [currentMemberId]);
 
   const loadCurrentUserInfo = async () => {
     try {
@@ -72,180 +89,139 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
     setIsLoading(true);
 
+    let idToken: string | null = null;
     try {
+
+      let hasGoogleSocial = false;
+      if (hasGoogleSocialPrefetched !== null) {
+        hasGoogleSocial = hasGoogleSocialPrefetched;
+      } else {
+        try {
+          const checkRes = await checkSocialForWallet(currentMemberId, navigate);
+          hasGoogleSocial = checkRes.success && checkRes.data?.hasGoogleSocial === true;
+          console.log('[프라이빗키 인증] 구글 연동 여부:', hasGoogleSocial);
+        } catch (checkErr) {
+          console.warn('[프라이빗키 인증] check-social-for-wallet 실패, 기존 플로우로 진행:', checkErr);
+        }
+      }
+
       console.log('[프라이빗키 인증] 구글 인증 시작');
-
-      const result = await signInWithGoogle(navigate);
-
-      if (!result.success || !result.data) {
-        const errorMessage = result.message || '구글 인증에 실패했습니다.';
-        await showAlert(t('common.messages.error') || '오류', errorMessage);
-        setIsLoading(false);
-        return;
-      }
-
-      if (result.data.requiresLinking) {
-        console.log('[프라이빗키 인증] 계정 연동 필요 - 팝업 표시');
-
-        const googleEmail = result.data.email || '';
-
-        setLinkingEmail(googleEmail);
-        setGoogleLoginData(result.data);
-        setLinkingPassword('');
-        setLinkingAgreed(false);
-        setLinkingDialogVisible(true);
-        setIsLoading(false);
-        return;
-      }
-
-      if (result.data.requiresSignup) {
-        console.log('[프라이빗키 인증] 구글 소셜 정보 없음 - 계정 연동 팝업 표시');
-
-        const googleEmail = result.data.email || '';
-
-        setLinkingEmail(googleEmail);
-        setGoogleLoginData(result.data);
-        setLinkingPassword('');
-        setLinkingAgreed(false);
-        setLinkingDialogVisible(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const { memberId, email, name, accessToken, refreshToken, isNewUser } = result.data;
-
-      if (isNewUser) {
-        console.log('[프라이빗키 인증] 구글 소셜 정보 없음 - 계정 연동 팝업 표시');
-
-        const googleEmail = result.data.email || '';
-
-        setLinkingEmail(googleEmail);
-        setGoogleLoginData(result.data);
-        setLinkingPassword('');
-        setLinkingAgreed(false);
-        setLinkingDialogVisible(true);
-        setIsLoading(false);
-        return;
-      }
-
-      if (memberId !== currentMemberId) {
-        console.log('[프라이빗키 인증] 계정 불일치:', { memberId, currentMemberId });
+      const tokenResult = await getGoogleIdToken(!hasGoogleSocial);
+      if (!tokenResult?.idToken) {
         await showAlert(
           t('common.messages.error') || '오류',
-          '현재 계정과 일치하지 않는 구글 계정입니다. 다시 시도해주세요.',
+          '구글 로그인에 실패했거나 취소되었습니다.',
         );
         setIsLoading(false);
         return;
       }
+      idToken = tokenResult.idToken;
 
-      console.log('[프라이빗키 인증] 인증 성공 - 프라이빗 키 화면으로 이동');
-
-      if (accessToken && memberId) {
-        try {
-          const ssidw = encryptSHA256(accessToken);
-          await saveSession(memberId, ssidw);
-
-          await AsyncStorage.setItem('userSessionToken', accessToken || '');
-          if (refreshToken) {
-            await AsyncStorage.setItem('refreshToken', refreshToken);
-          }
-        } catch (sessionError) {
-          console.warn('[프라이빗키 인증] 세션 업데이트 실패 (계속 진행):', sessionError);
-        }
+      if (!hasGoogleSocial) {
+        console.log('[프라이빗키 인증] 소셜 없음 - 비밀번호 입력 다이얼로그 표시');
+        setPasswordDialogIdToken(idToken);
+        setLinkingPassword('');
+        setLinkingDialogVisible(true);
+        setIsLoading(false);
+        return;
       }
 
-      reset(ROUTES.walletPrivateKeyDisplay);
+      const res = await googleAuthForWallet(currentMemberId, idToken, undefined, navigate);
+      if (res.success && res.data?.canProceed) {
+        console.log('[프라이빗키 인증] 인증 성공 - 프라이빗 키 화면으로 이동');
+        reset(ROUTES.walletPrivateKeyDisplay);
+        setIsLoading(false);
+        return;
+      }
+      await showAlert(
+        t('common.messages.error') || '오류',
+        res.message || '구글 인증 처리 중 오류가 발생했습니다.',
+      );
     } catch (error: any) {
+      const status = error.response?.status;
+      const body = error.response?.data;
+      if (status === 400 && body?.data?.requirePassword === true && idToken) {
+        console.log('[프라이빗키 인증] 소셜 없음 - 비밀번호 입력 다이얼로그 표시');
+        setPasswordDialogIdToken(idToken);
+        setLinkingPassword('');
+        setLinkingDialogVisible(true);
+        setIsLoading(false);
+        return;
+      }
+      if (status === 401) {
+        await showAlert(
+          t('common.messages.error') || '오류',
+          body?.message || '비밀번호가 일치하지 않습니다.',
+        );
+        setIsLoading(false);
+        return;
+      }
+      if (status === 409) {
+        await showAlert(
+          t('common.messages.error') || '오류',
+          body?.message || '이 구글 이메일은 이미 다른 계정에 가입되어 있습니다. 다른 구글 이메일을 사용해 주세요.',
+        );
+        setIsLoading(false);
+        return;
+      }
       console.error('[프라이빗키 인증] 오류:', error);
       await showAlert(
         t('common.messages.error') || '오류',
-        error.message || '구글 인증 중 오류가 발생했습니다.',
+        body?.message || error.message || '구글 인증 중 오류가 발생했습니다.',
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLinkAccount = async () => {
+  const handlePasswordSubmit = async () => {
     if (!linkingPassword.trim()) {
       await showAlert(t('common.messages.error'), t('screens.login.errors.passwordRequired') || '비밀번호를 입력해주세요.');
       return;
     }
-
-    if (!linkingAgreed) {
-      await showAlert(t('common.messages.error'), '계정 연동에 동의해주세요.');
+    if (!passwordDialogIdToken || !currentMemberId) {
+      setLinkingDialogVisible(false);
+      setPasswordDialogIdToken(null);
       return;
     }
 
     setIsLinkingLoading(true);
-
     try {
-      console.log('[프라이빗키 인증] 계정 연동 시작:', linkingEmail);
-
-      const response = await connectGoogleAccount(
-        googleLoginData,
+      console.log('[프라이빗키 인증] 비밀번호로 구글 연동 재호출');
+      const res = await googleAuthForWallet(
+        currentMemberId,
+        passwordDialogIdToken,
         linkingPassword,
-        undefined,
-        currentMemberId ?? undefined,
+        navigate,
       );
-
-      if (!response.success || (response.code !== 200 && response.code !== '200')) {
-        const errorMessage = response.message || t('screens.login.errors.loginFailed') || '계정 연동에 실패했습니다.';
-        await showAlert(t('common.messages.error'), errorMessage);
+      if (res.success && res.data?.canProceed) {
+        console.log('[프라이빗키 인증] 연동 성공 - 프라이빗 키 화면으로 이동');
+        setLinkingDialogVisible(false);
+        setPasswordDialogIdToken(null);
+        setLinkingPassword('');
+        reset(ROUTES.walletPrivateKeyDisplay);
         setIsLinkingLoading(false);
         return;
       }
-
-      let userData: any = null;
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        userData = response.data[0];
-      } else if (response.data && typeof response.data === 'object') {
-        userData = response.data;
-      }
-
-      if (!userData) {
-        await showAlert(t('common.messages.error'), t('screens.login.errors.userDataNotFound') || '사용자 정보를 찾을 수 없습니다.');
-        setIsLinkingLoading(false);
-        return;
-      }
-
-      const linkedMemberId = userData.member || userData.memberId;
-      if (linkedMemberId !== currentMemberId) {
-        console.log('[프라이빗키 인증] 연동 후 계정 불일치:', { linkedMemberId, currentMemberId });
+      await showAlert(
+        t('common.messages.error') || '오류',
+        res.message || '구글 인증 처리 중 오류가 발생했습니다.',
+      );
+    } catch (error: any) {
+      const status = error.response?.status;
+      const body = error.response?.data;
+      if (status === 401) {
         await showAlert(
           t('common.messages.error') || '오류',
-          '현재 계정과 일치하지 않습니다. 다시 시도해주세요.',
+          body?.message || '비밀번호가 일치하지 않습니다.',
         );
-        setIsLinkingLoading(false);
-        return;
+      } else {
+        console.error('[프라이빗키 인증] 비밀번호 연동 오류:', error);
+        await showAlert(
+          t('common.messages.error') || '오류',
+          body?.message || error.message || '계정 연동 중 오류가 발생했습니다.',
+        );
       }
-
-      console.log('[프라이빗키 인증] 연동 성공 - 세션 저장 진행');
-
-      const extrastr = userData.extrastr;
-      if (extrastr && linkedMemberId) {
-        const ssidw = encryptSHA256(extrastr);
-        await saveSession(linkedMemberId, ssidw);
-      }
-
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-      const sessionToken = userData.extrastr || '';
-      await AsyncStorage.setItem('userSessionToken', sessionToken);
-      await AsyncStorage.setItem('isLoggedIn', 'true');
-      await AsyncStorage.setItem('rememberMe', 'true');
-      await AsyncStorage.setItem('loginType', 'google');
-
-      console.log('[프라이빗키 인증] 연동 완료 - 프라이빗 키 화면으로 이동');
-
-      setLinkingDialogVisible(false);
-
-      reset(ROUTES.walletPrivateKeyDisplay);
-    } catch (error) {
-      console.error('[프라이빗키 인증] 계정 연동 오류:', error);
-      await showAlert(
-        t('common.messages.error'),
-        '계정 연동 중 오류가 발생했습니다.',
-      );
     } finally {
       setIsLinkingLoading(false);
     }
@@ -284,34 +260,37 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       {}
       <Dialog
         visible={linkingDialogVisible}
-        title="계정 연결"
-        onClose={() => setLinkingDialogVisible(false)}
+        title="비밀번호 입력"
+        onClose={() => {
+          setLinkingDialogVisible(false);
+          setPasswordDialogIdToken(null);
+          setLinkingPassword('');
+        }}
         actions={[
           {
             label: t('common.buttons.cancel') || '취소',
-            onPress: () => setLinkingDialogVisible(false),
+            onPress: () => {
+              setLinkingDialogVisible(false);
+              setPasswordDialogIdToken(null);
+              setLinkingPassword('');
+            },
             variant: 'secondary',
             disabled: isLinkingLoading,
           },
           {
             label: t('common.buttons.confirm') || '확인',
-            onPress: handleLinkAccount,
+            onPress: handlePasswordSubmit,
             variant: 'primary',
-            disabled: isLinkingLoading || !linkingAgreed,
+            disabled: isLinkingLoading,
           },
         ]}
       >
         <View style={styles.linkingContainer}>
           <Text style={styles.linkingMessage}>
-            {`XRUN 계정에 Google 계정을 연결하면
-보다 간편하게 로그인할 수 있습니다.
-
-구글 계정과 xrun계정 `}
-            <Text style={styles.linkingEmail}>{linkingEmail}</Text> 와의 연결을 허용하시겠습니까?
+            현재 로그인된 계정(XRUN 계정)의 비밀번호를 입력해 주세요.
           </Text>
-
           <FormField
-            label={t('screens.login.xrunPasswordLabel') || 'XRUN 계정 비밀번호'}
+            label={t('screens.login.xrunPasswordLabel') || '현재 로그인된 계정(XRUN) 비밀번호'}
             placeholder={t('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
             secureTextEntry={true}
             value={linkingPassword}
@@ -319,15 +298,6 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             containerStyle={styles.linkingInput}
             editable={!isLinkingLoading}
           />
-
-          <View style={styles.linkingCheckbox}>
-            <FormCheckbox
-              label="동의합니다."
-              checked={linkingAgreed}
-              onToggle={() => setLinkingAgreed(!linkingAgreed)}
-              variant="square"
-            />
-          </View>
 
           {isLinkingLoading && (
             <View style={styles.linkingLoader}>
@@ -378,19 +348,17 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     lineHeight: 22,
     color: '#333333',
-    marginBottom: 20,
+    marginBottom: 8,
     marginTop: 8,
     fontFamily: 'Roboto-Regular',
   },
-  linkingEmail: {
-    fontFamily: 'Roboto-Bold',
-    color: COLORS.buttonPrimary,
+  linkingMessageSub: {
+    marginBottom: 20,
+    fontSize: FONTS.size.small,
+    color: '#666666',
   },
   linkingInput: {
     marginBottom: 16,
-  },
-  linkingCheckbox: {
-    marginBottom: 8,
   },
   linkingLoader: {
     alignItems: 'center',

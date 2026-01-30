@@ -31,6 +31,10 @@ import {
   LoginResponse,
   ConnectGoogleAccountRequest,
   ConnectGoogleAccountResponse,
+  GoogleAuthForWalletRequest,
+  GoogleAuthForWalletResponse,
+  CheckSocialForWalletRequest,
+  CheckSocialForWalletResponse,
   PhoneVerificationRequest,
   PhoneVerificationResponse,
   PhoneVerificationCodeRequest,
@@ -597,7 +601,12 @@ export const createAxiosInstance = (navigation?: any) => {
         }
       } else {
 
-        console.error('[API Error]', {
+        const status = error.response?.status;
+        const url = error.config?.url ?? '';
+        const isExpectedAuthResponse =
+          (status === 409 || status === 401 || status === 400) &&
+          url.includes('google-auth-for-wallet');
+        const logPayload = {
           url: error.config?.url,
           method: error.config?.method,
           status: error.response?.status,
@@ -605,7 +614,12 @@ export const createAxiosInstance = (navigation?: any) => {
           data: error.response?.data,
           message: error.message,
           code: error.code,
-        });
+        };
+        if (isExpectedAuthResponse) {
+          console.warn('[API] 예상된 응답 (앱에서 안내 처리):', logPayload);
+        } else {
+          console.error('[API Error]', logPayload);
+        }
       }
       return Promise.reject(error);
     },
@@ -908,11 +922,24 @@ export const connectGoogleAccount = async (
   memberId?: number,
 ): Promise<ConnectGoogleAccountResponse> => {
   try {
+    const confirmationToken =
+      googleData?.confirmationToken ??
+      googleData?.token ??
+      googleData?.connectToken ??
+      googleData?.linkToken ??
+      googleData?.authToken ??
+      '';
+    if (!confirmationToken) {
+      console.error('[계정 연동] confirmationToken 없음. googleData 키:', googleData ? Object.keys(googleData) : [], '- 백엔드에서 계정 연동용 토큰을 내려주는지 확인해 주세요.');
+      throw new Error('confirmationToken is required. 구글 로그인을 다시 시도해 주세요.');
+    }
+
     const axiosInstance = createAxiosInstance(navigation);
     const request: ConnectGoogleAccountRequest = {
       ...googleData,
       memberId: memberId || googleData.memberId,
       pin,
+      confirmationToken,
     };
 
     console.log('[계정 연동] 구글 계정 연동 요청');
@@ -937,6 +964,38 @@ export const connectGoogleAccount = async (
     }
     throw error;
   }
+};
+
+export const checkSocialForWallet = async (
+  memberId: number,
+  navigation?: any,
+): Promise<CheckSocialForWalletResponse> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const body: CheckSocialForWalletRequest = { memberId };
+  const response = await axiosInstance.post<CheckSocialForWalletResponse>(
+    '/check-social-for-wallet',
+    body,
+  );
+  return response.data;
+};
+
+export const googleAuthForWallet = async (
+  memberId: number,
+  idToken: string,
+  pin?: string,
+  navigation?: any,
+): Promise<GoogleAuthForWalletResponse> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const body: GoogleAuthForWalletRequest = { memberId, idToken };
+  if (pin !== undefined && pin !== '') {
+    body.pin = pin;
+  }
+
+  const response = await axiosInstance.post<GoogleAuthForWalletResponse>(
+    '/google-auth-for-wallet',
+    body,
+  );
+  return response.data;
 };
 
 export const connectAppleAccount = async (

@@ -86,10 +86,14 @@ export interface GoogleAuthResult {
   message?: string;
 }
 
-export async function getGoogleIdToken(): Promise<{ idToken: string; email: string } | null> {
+export async function getGoogleIdToken(forceAccountPicker?: boolean): Promise<{ idToken: string; email: string } | null> {
   try {
     if (Platform.OS === 'android') {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    }
+    if (forceAccountPicker) {
+      await GoogleSignin.signOut();
+      console.log('[구글 로그인] 계정 선택 강제 - signOut 후 signIn');
     }
     const userInfo = await GoogleSignin.signIn();
     const idToken = userInfo.data?.idToken ?? null;
@@ -199,28 +203,36 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         };
       }
 
+      const getConfirmationToken = (payload: any): string => {
+        const raw = payload?.confirmationToken ?? payload?.token ?? payload?.connectToken ?? payload?.linkToken ?? payload?.authToken ?? '';
+        return typeof raw === 'string' ? raw : '';
+      };
+
       if (data.code === 216) {
-        console.log('[구글 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
+        const confirmationToken = getConfirmationToken(data.data);
+        console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!confirmationToken, 'data.data 키:', data.data ? Object.keys(data.data) : []);
         return {
           success: true,
           data: {
             ...data.data,
             requiresLinking: true,
-            email: data.data?.email || '', 
-            confirmationToken: data.data?.confirmationToken || '', 
+            email: data.data?.email || '',
+            confirmationToken,
           },
         };
       }
 
       if (data.code === 417) {
-        console.log('[구글 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+        const confirmationToken = getConfirmationToken(data.data);
+        console.log('[구글 로그인] 회원가입 필요 (417), confirmationToken 존재:', !!confirmationToken, 'data.data 키:', data.data ? Object.keys(data.data) : []);
         return {
           success: true,
           data: {
             ...data.data,
             requiresSignup: true,
-            email: data.data?.email || userInfo.data?.user.email || '', 
+            email: data.data?.email || userInfo.data?.user.email || '',
             isSignupCompleted: false,
+            confirmationToken,
           },
         };
       }
