@@ -442,9 +442,10 @@ export const WalletScreen = () => {
       );
       return;
     }
-    console.log('[WalletScreen] receive 버튼 클릭 - currency: 1 (XRUN)');
+    console.log('[WalletScreen] receive 버튼 클릭 - currency: 18 (XRUN Polygon)');
+    setSelectedWalletAsset(null); 
     setWalletReceiveAddress(publicAddress);
-    setWalletReceiveCurrency(1); 
+    setWalletReceiveCurrency(18); 
     navigate(ROUTES.walletReceive);
   };
 
