@@ -317,6 +317,33 @@ export interface ConnectGoogleAccountResponse {
   code?: string | number; 
 }
 
+export interface GoogleAuthForWalletRequest {
+  memberId: number;
+  idToken: string;
+  pin?: string; 
+}
+
+export interface GoogleAuthForWalletResponse {
+  success: boolean;
+  code: number;
+  message?: string;
+  data?: {
+    canProceed?: boolean;
+    alreadyLinked?: boolean;
+    requirePassword?: boolean;
+  } | null;
+}
+
+export interface CheckSocialForWalletRequest {
+  memberId: number;
+}
+
+export interface CheckSocialForWalletResponse {
+  success: boolean;
+  data?: { hasGoogleSocial: boolean };
+  message?: string;
+}
+
 export interface ConnectAppleAccountRequest {
   confirmationToken: string;
   pin: string;

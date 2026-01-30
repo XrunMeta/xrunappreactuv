@@ -31,6 +31,10 @@ import {
   v_74e8fc,
   v_4228ad,
   v_264b01,
+  v_4d8e20,
+  v_ea783f,
+  v_f0adc1,
+  v_edbc8e,
   v_7ec238,
   v_c5fe19,
   v_07bb04,
@@ -597,7 +601,12 @@ export const v_7488d5 = (v_c65f5d) => {
         }
       } else {
 
-        console.error('[API Error]', {
+        const v_d308b5 = v_5e9bfe.response?.status;
+        const v_f71b56 = v_5e9bfe.config?.url ?? '';
+        const v_4eac66 =
+          (v_d308b5 === 409 || v_d308b5 === 401 || v_d308b5 === 400) &&
+          v_f71b56.includes('google-auth-for-wallet');
+        const v_88bc7e = {
           url: v_5e9bfe.config?.url,
           method: v_5e9bfe.config?.method,
           status: v_5e9bfe.response?.status,
@@ -605,7 +614,12 @@ export const v_7488d5 = (v_c65f5d) => {
           data: v_5e9bfe.response?.data,
           message: v_5e9bfe.message,
           code: v_5e9bfe.code,
-        });
+        };
+        if (v_4eac66) {
+          console.warn('[API] 예상된 응답 (앱에서 안내 처리):', v_88bc7e);
+        } else {
+          console.error('[API Error]', v_88bc7e);
+        }
       }
       return Promise.reject(v_5e9bfe);
     },
@@ -908,11 +922,24 @@ export const v_4c4126 = async (
   v_717992,
 ): Promise<v_264b01> => {
   try {
+    const v_94604b =
+      v_30a799?.confirmationToken ??
+      v_30a799?.token ??
+      v_30a799?.connectToken ??
+      v_30a799?.linkToken ??
+      v_30a799?.authToken ??
+      '';
+    if (!v_94604b) {
+      console.error('[계정 연동] confirmationToken 없음. googleData 키:', v_30a799 ? Object.keys(v_30a799) : [], '- 백엔드에서 계정 연동용 토큰을 내려주는지 확인해 주세요.');
+      throw new Error('confirmationToken is required. 구글 로그인을 다시 시도해 주세요.');
+    }
+
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const request: v_4228ad = {
       ...v_30a799,
       memberId: v_717992 || v_30a799.memberId,
       pin: v_6bee94,
+      confirmationToken: v_94604b,
     };
 
     console.log('[계정 연동] 구글 계정 연동 요청');
@@ -937,6 +964,38 @@ export const v_4c4126 = async (
     }
     throw v_5e9bfe;
   }
+};
+
+export const v_c35640 = async (
+  v_717992,
+  v_c65f5d,
+): Promise<v_edbc8e> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const body: v_f0adc1 = { memberId: v_717992 };
+  const v_3393e3 = await v_9f42a4.post<v_edbc8e>(
+    '/check-social-for-wallet',
+    v_4d33b2,
+  );
+  return v_3393e3.data;
+};
+
+export const v_faae7b = async (
+  v_717992,
+  v_b50834,
+  v_6bee94,
+  v_c65f5d,
+): Promise<v_ea783f> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const body: v_4d8e20 = { memberId: v_717992, idToken: v_b50834 };
+  if (v_6bee94 !== undefined && v_6bee94 !== '') {
+    v_4d33b2.pin = v_6bee94;
+  }
+
+  const v_3393e3 = await v_9f42a4.post<v_ea783f>(
+    '/google-auth-for-wallet',
+    v_4d33b2,
+  );
+  return v_3393e3.data;
 };
 
 export const v_1fee11 = async (
