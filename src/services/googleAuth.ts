@@ -86,10 +86,14 @@ export interface GoogleAuthResult {
   message?: string;
 }
 
-export async function v_73716f(): Promise<{ idToken: string; email: string } | null> {
+export async function v_73716f(v_5520ef): Promise<{ idToken: string; email: string } | null> {
   try {
     if (v_326be8.OS === 'android') {
       await v_4eac84.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    }
+    if (v_5520ef) {
+      await v_4eac84.signOut();
+      console.log('[구글 로그인] 계정 선택 강제 - signOut 후 signIn');
     }
     const v_bb789b = await v_4eac84.signIn();
     const v_b50834 = v_bb789b.data?.idToken ?? null;
@@ -199,28 +203,36 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         };
       }
 
+      const v_f63ca7 = (v_931bf0): string => {
+        const v_479f05 = v_931bf0?.confirmationToken ?? v_931bf0?.token ?? v_931bf0?.connectToken ?? v_931bf0?.linkToken ?? v_931bf0?.authToken ?? '';
+        return typeof v_479f05 === 'string' ? v_479f05 : '';
+      };
+
       if (v_9390e8.code === 216) {
-        console.log('[구글 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
+        const v_94604b = v_f63ca7(v_9390e8.data);
+        console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!v_94604b, 'data.data 키:', v_9390e8.data ? Object.keys(v_9390e8.data) : []);
         return {
           success: true,
           data: {
             ...v_9390e8.data,
             requiresLinking: true,
-            email: v_9390e8.data?.email || '', 
-            confirmationToken: v_9390e8.data?.confirmationToken || '', 
+            email: v_9390e8.data?.email || '',
+            confirmationToken: v_94604b,
           },
         };
       }
 
       if (v_9390e8.code === 417) {
-        console.log('[구글 로그인] 회원가입 필요 (code 417) - 이메일 수정 불가능한 회원가입 화면으로 이동');
+        const v_94604b = v_f63ca7(v_9390e8.data);
+        console.log('[구글 로그인] 회원가입 필요 (417), confirmationToken 존재:', !!v_94604b, 'data.data 키:', v_9390e8.data ? Object.keys(v_9390e8.data) : []);
         return {
           success: true,
           data: {
             ...v_9390e8.data,
             requiresSignup: true,
-            email: v_9390e8.data?.email || v_bb789b.data?.user.email || '', 
+            email: v_9390e8.data?.email || v_bb789b.data?.user.email || '',
             isSignupCompleted: false,
+            confirmationToken: v_94604b,
           },
         };
       }
