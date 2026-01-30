@@ -314,7 +314,7 @@ export interface ConnectGoogleAccountResponse {
     [key: string]: any;
   }>;
   message?: string;
-  code?: string; 
+  code?: string | number; 
 }
 
 export interface ConnectAppleAccountRequest {
@@ -332,7 +332,7 @@ export interface ConnectAppleAccountResponse {
     [key: string]: any;
   }>;
   message?: string;
-  code?: string; 
+  code?: string | number; 
 }
 
 export interface EmailPasswordLoginRequest {
