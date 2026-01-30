@@ -185,6 +185,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const response = await connectGoogleAccount(
         googleLoginData,
         linkingPassword,
+        undefined,
+        currentMemberId ?? undefined,
       );
 
       if (!response.success || (response.code !== 200 && response.code !== '200')) {

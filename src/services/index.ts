@@ -905,11 +905,13 @@ export const connectGoogleAccount = async (
   googleData: any,
   pin: string,
   navigation?: any,
+  memberId?: number,
 ): Promise<ConnectGoogleAccountResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
     const request: ConnectGoogleAccountRequest = {
       ...googleData,
+      memberId: memberId || googleData.memberId,
       pin,
     };
 
