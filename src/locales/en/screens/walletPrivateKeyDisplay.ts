@@ -4,7 +4,7 @@ export default {
     warningMessage: 'The private key has all the permissions of the wallet. Never expose it to others. Please make sure there are no one around you and keep it in a safe place.',
     confirmDownloadTitle: 'Do you want to download the private key?',
     confirmDownloadMessage: 'This action can be dangerous for security. Do you want to continue?',
-    emailVerificationRequired: 'Email verification is required for account security.',
+    emailVerificationRequired: 'Google login verification is required for account security.',
     showKey: 'Show Private Key',
     maskedKeyLabel: 'Wallet Private Key',
     copyKey: 'Copy Private Key',

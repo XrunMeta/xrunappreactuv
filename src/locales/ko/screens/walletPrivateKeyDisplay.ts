@@ -4,7 +4,7 @@ export default {
     warningMessage: '프라이빗 키는 지갑의 모든 권한을 가집니다. 절대 타인에게 노출하지 마세요. 주변에 사람이 없는지 확인하고 안전한 장소에서 보관하시기 바랍니다.',
     confirmDownloadTitle: '프라이빗 키를 다운로드하시겠습니까?',
     confirmDownloadMessage: '이 작업은 보안상 위험할 수 있습니다. 계속하시겠습니까?',
-    emailVerificationRequired: '계정 보안을 위해 이메일 인증이 필요합니다.',
+    emailVerificationRequired: '계정 보안을 위해 구글 로그인 인증이 필요합니다.',
     showKey: '프라이빗 키 보기',
     maskedKeyLabel: '지갑 프라이빗 키',
     copyKey: '프라이빗 키 복사',
