@@ -905,11 +905,13 @@ export const v_4c4126 = async (
   v_30a799,
   v_6bee94,
   v_c65f5d,
+  v_717992,
 ): Promise<v_264b01> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const request: v_4228ad = {
       ...v_30a799,
+      memberId: v_717992 || v_30a799.memberId,
       pin: v_6bee94,
     };
 
