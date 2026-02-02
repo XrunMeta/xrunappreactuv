@@ -675,16 +675,7 @@ export const AdWalletScreen = () => {
 
         const questItems = response.data || [];
 
-        const filteredQuestItems = questItems.filter((item: QuestItem) => {
-          const eventType = item.event_type || 'quest';
-          const isReferralEvent = eventType === 'recommendation' ||
-            (typeof item.id === 'string' && item.id.startsWith('recommendation_'));
-
-          if (isReferralEvent && item.event_status === 'pending') {
-            return false;
-          }
-          return true;
-        });
+        const filteredQuestItems = questItems;
 
         const adEntries: AdEntry[] = filteredQuestItems.map(convertQuestToAdEntry);
 
