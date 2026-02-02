@@ -2,7 +2,7 @@ export default {
   title: '이메일 인증',
   emailLabel: '이메일',
   emailPlaceholder: '이메일을 입력해주세요.',
-  sendButton: 'Send',
+  sendButton: '전송',
   processing: '처리 중...',
   errors: {
     emailRequired: '인증 메일을 받을 이메일을 입력해주세요.',
