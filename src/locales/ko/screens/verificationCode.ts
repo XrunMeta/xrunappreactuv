@@ -2,7 +2,7 @@ export default {
   title: '인증코드를 입력하세요',
   description: '로 보내드린 6자리 코드를 입력하세요.',
   resendCode: '코드 재전송',
-  verifyButton: 'Verify',
+  verifyButton: '확인',
   errors: {
     emailNotFound: '이메일 정보를 찾을 수 없습니다.',
     codeRequired: '6자리 인증 코드를 입력해주세요.',
