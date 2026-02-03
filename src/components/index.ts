@@ -20,7 +20,7 @@ export { ReferralStatsCard } from './ReferralStatsCard';
 export { ReferralMemberRow } from './ReferralMemberRow';
 export { ShopSalesMemberRow, type ShopSalesMemberData } from './ShopSalesMemberRow';
 export { ShopItemCard } from './ShopItemCard';
-export { AliveService } from './AliveService'; 
+export { AliveService } from './AliveService';
 export { CountryCodeListItem } from './CountryCodeListItem';
 export { CountryFlagImage } from './CountryFlagImage';
 export { EmergencyStopDialog } from './EmergencyStopDialog';
@@ -45,3 +45,4 @@ export { AddressInfoItem } from './AddressInfoItem';
 export { VersionUpdateDialog } from './VersionUpdateDialog';
 
 export { AdMobRewardedButton } from './AdMobRewardedButton';
+export { default as OTAUpdateDialog } from './OTAUpdateDialog';
