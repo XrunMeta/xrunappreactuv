@@ -1,5 +1,5 @@
-const {getDefaultConfig: v_43161e, mergeConfig: v_049b15} = require('rmglazlcjkomikgoseydfttqpj');
+const { getDefaultConfig: v_43161e } = require('hkjvostxmtbcwjuoi');
 
-const v_74a79c = {};
+const v_74a79c = v_43161e(__dirname);
 
-module.exports = v_049b15(v_43161e(__dirname), v_74a79c);
+module.exports = v_74a79c;
