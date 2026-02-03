@@ -88,3 +88,6 @@ project.xcworkspace
 # Global rules
 .cursorrules
 .cursorrules.bak
+scripts/upload-ota.js
+scripts/clear-r2.js
+scripts/upload-version.js
