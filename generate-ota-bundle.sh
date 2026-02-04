@@ -1,12 +1,27 @@
 #!/bin/bash
 
-# dist 폴더가 없으면 생성
-mkdir -p dist
+# dist 폴더가 없으면 생성, 있으면 내부 정리
+rm -rf dist
+mkdir -p dist/android
+mkdir -p dist/ios
 
 echo "🚀 Android 번들 생성 중..."
-npx react-native bundle --platform android --dev false --entry-file index.ts --bundle-output dist/index.android.bundle --assets-dest dist
+npx react-native bundle --platform android --dev false --entry-file index.ts --bundle-output dist/android/index.android.bundle --assets-dest dist/android
+
+echo "📦 Android 에셋 압축 중..."
+cd dist/android
+zip -r -q ../ota-android.zip .
+cd ../..
 
 echo "🚀 iOS 번들 생성 중..."
-npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output dist/index.ios.bundle --assets-dest dist
+npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output dist/ios/index.ios.bundle --assets-dest dist/ios
 
-echo "✅ 번들 생성 완료! dist 폴더 내의 index.android.bundle 및 index.ios.bundle 파일을 R2에 업로드하세요."
+echo "📦 iOS 에셋 압축 중..."
+cd dist/ios
+zip -r -q ../ota-ios.zip .
+cd ../..
+
+echo "✅ 번들 및 압축 완료!"
+echo "📄 Android: dist/ota-android.zip"
+echo "📄 iOS: dist/ota-ios.zip"
+echo "👉 이제 'node scripts/upload-ota.js'를 실행하세요."
