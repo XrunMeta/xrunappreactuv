@@ -108,7 +108,15 @@
           }
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "react-native-appsflyer",
+        {
+          "shouldUseStrictMode": false,
+          "shouldUsePurchaseConnector": true,
+          "preferAppsFlyerBackupRules": false
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -5,6 +5,7 @@ import { v_326be8 } from 'rcmrninabrnb';
 import { v_ce4741 } from '../navigation';
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
+import { v_843337 } from '../utils/playStoreUrl';
 
 export * from './googleAuth';
 
@@ -331,7 +332,7 @@ export const v_495832 = async (
           v_43c42e.emergencyStop = {
             enabled: true,
             message: 'UPDATE_FOUND\nPLEASE_UPDATE',
-            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            link: v_843337({ gl: 'us' }),
           };
         } else {
           console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);

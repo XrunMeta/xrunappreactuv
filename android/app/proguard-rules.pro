@@ -15,3 +15,7 @@
 
 # Pangle SDK
 -keep class com.bytedance.sdk.** { *; }
+
+# AppsFlyer SDK
+-keep class com.appsflyer.** { *; }
+-keep class kotlin.jvm.internal.** { *; }

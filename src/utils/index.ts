@@ -29,6 +29,8 @@ export const v_db97fb = async (
 
 export * from './env';
 
+export { getPlayStoreUrl, ANDROID_PACKAGE_ID } from './playStoreUrl';
+
 export * from './imageCache';
 
 export * from './input';
@@ -126,7 +128,7 @@ export const v_a3bbf0 = async (
     console.log('[shareReferralLink] 시작 - 플랫폼:', v_326be8.OS);
     console.log('[shareReferralLink] 사용자 이메일:', v_412c99.email);
 
-    const v_17aa0b = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
+    const v_17aa0b = getPlayStoreUrl({ gl: 'kr', campaignId: 'web_share' });
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
     const v_c79b94 = encodeURIComponent(v_412c99.email);
