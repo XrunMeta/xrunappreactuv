@@ -1,16 +1,17 @@
-import v_a3453e, { v_c4deb2, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_aa7413, v_472849, v_39a996, v_4623af, v_03e392 } from 'rcmrninabrnb';
+import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae } from 'bapkr';
+import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_6b5698, v_1ed974, v_39a996 } from 'rcmrninabrnb';
+import { v_772971 } from 'jmpfvteuuztnp';
+import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
 
 const v_7f5f8a = () => {
+    const { t: v_8d41d7 } = v_772971();
     const [v_cf55be, v_72f90e] = v_5ab095(false);
-    const [v_a2dcc0, v_c90ab1] = v_5ab095<v_3e029d | null>(null);
     const [v_a63fde, v_6306c3] = v_5ab095(0);
-    const [v_328f2e, v_fa9c37] = v_5ab095(false);
-
-    v_c4deb2(() => {
-        v_7e5bd3();
-    }, []);
+    const [v_5fafb0, v_0fa862] = v_5ab095(false);
+    const [v_a2dcc0, v_c90ab1] = v_5ab095<v_3e029d | null>(null);
+    const [v_3cc252, v_39ad29] = v_5ab095(false); 
+    const v_94a194 = v_e662ae(v_6b5698.currentState);
 
     const v_7e5bd3 = async () => {
         if (__DEV__) return; 
@@ -22,65 +23,122 @@ const v_7f5f8a = () => {
         }
     };
 
+    v_c4deb2(() => {
+
+        v_7e5bd3();
+
+        const v_269481 = v_6b5698.addEventListener('change', v_3b10d8 => {
+            if (
+                v_94a194.current.match(/inactive|background/) &&
+                v_3b10d8 === 'active'
+            ) {
+                v_7e5bd3();
+            }
+            v_94a194.current = v_3b10d8;
+        });
+
+        return () => {
+            v_269481.remove();
+        };
+    }, []);
+
     const v_02f61c = async () => {
         if (!v_a2dcc0) return;
 
-        v_fa9c37(true);
-        try {
-            const v_593e63 = await v_f2f2dd(v_a2dcc0.url, (v_e2a85c) => {
-                v_6306c3(v_e2a85c);
-            });
+        v_0fa862(true);
+        v_6306c3(0);
 
-            if (v_593e63) {
-                await v_8b3997(v_a2dcc0.version);
+        const v_593e63 = await v_f2f2dd(v_a2dcc0.url, (v_e2a85c) => {
+            v_6306c3(v_e2a85c);
+            console.log(`[OTA] Progress: ${v_e2a85c}`);
+        });
+
+        if (v_593e63) {
+
+            await v_8b3997(v_a2dcc0.version);
+
+            v_0fa862(false);
+            v_6306c3(1);
+
+            if (v_326be8.OS === 'android') {
                 v_03e392.alert(
-                    '업데이트 완료',
-                    '최신 버전을 적용하기 위해 앱을 재시작해 주세요.',
-                    [{
-                        text: '확인', onPress: () => {
-
-                            v_72f90e(false);
-                        }
-                    }]
+                    v_8d41d7('common.versionUpdate.updateComplete'),
+                    v_8d41d7('common.versionUpdate.restartMessage'),
+                    [
+                        {
+                            text: v_8d41d7('common.versionUpdate.confirm'), 
+                            onPress: () => {
+                                v_1ed974.exitApp(); 
+                            },
+                        },
+                    ],
+                    { cancelable: false }
                 );
             } else {
-                v_03e392.alert('오류', '업데이트 다운로드에 실패했습니다.');
-                v_fa9c37(false);
+
+                v_39ad29(true);
             }
-        } catch (v_9e86fd) {
-            console.error(v_9e86fd);
-            v_fa9c37(false);
-            v_03e392.alert('오류', '업데이트 중 오류가 발생했습니다.');
+
+        } else {
+            v_0fa862(false);
+            v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('common.versionUpdate.downloadFailed'));
         }
     };
 
-    if (!v_cf55be || !v_a2dcc0) return null;
+    if (!v_cf55be) return null;
+
+    if (v_3cc252) {
+        return (
+            <Modal visible={true} transparent={false} animationType="fade">
+                <View style={v_d81136.fullScreenContainer}>
+                    <ActivityIndicator size="large" color="#4A90E2" style={{ marginBottom: 30, transform: [{ scale: 1.5 }] }} />
+                    <Text style={v_d81136.fullScreenTitle}>{v_8d41d7('common.versionUpdate.updateComplete')}</Text>
+                    <Text style={v_d81136.fullScreenMessage}>
+                        {v_8d41d7('common.versionUpdate.restartRequired')}
+                    </Text>
+                </View>
+            </Modal>
+        );
+    }
 
     return (
-        <Modal visible={v_cf55be} transparent animationType="fade">
-            <View style={v_d81136.overlay}>
-                <View style={v_d81136.container}>
-                    <Text style={v_d81136.title}>새로운 업데이트 발견</Text>
-                    <Text style={v_d81136.message}>
-                        {v_a2dcc0.description || '앱의 성능 향상과 버그 수정을 위한 업데이트가 있습니다.'}
+        <Modal visible={v_cf55be} transparent={false} animationType="slide">
+            <View style={v_d81136.fullScreenContainer}>
+                <View style={v_d81136.contentContainer}>
+                    {}
+                    <Text style={v_d81136.fullScreenTitle}>{v_8d41d7('common.versionUpdate.title')}</Text>
+
+                    <View style={v_d81136.versionBadge}>
+                        <Text style={v_d81136.versionText}>v{v_a2dcc0?.version}</Text>
+                    </View>
+
+                    <Text style={v_d81136.fullScreenMessage}>
+                        {v_a2dcc0?.description || v_8d41d7('common.versionUpdate.message')}
                     </Text>
 
-                    {v_328f2e ? (
+                    {v_5fafb0 ? (
                         <View style={v_d81136.progressContainer}>
-                            <ActivityIndicator size="large" color="#0000ff" />
-                            <Text style={v_d81136.progressText}>{Math.round(v_a63fde * 100)}%</Text>
+                            <Text style={v_d81136.progressText}>
+                                {Math.round(v_a63fde * 100)}%
+                            </Text>
+                            <Progress.Bar
+                                progress={v_a63fde}
+                                width={250}
+                                color="#4A90E2"
+                                unfilledColor="#E0E0E0"
+                                borderWidth={0}
+                                height={10}
+                            />
+                            <Text style={v_d81136.downloadingText}>{v_8d41d7('common.messages.loading')}</Text>
                         </View>
                     ) : (
-                        <View style={v_d81136.buttonContainer}>
-                            {!v_a2dcc0.forceUpdate && (
-                                <TouchableOpacity onPress={() => v_72f90e(false)} style={v_d81136.cancelButton}>
-                                    <Text style={v_d81136.cancelText}>나중에</Text>
-                                </TouchableOpacity>
-                            )}
-                            <TouchableOpacity onPress={v_02f61c} style={v_d81136.updateButton}>
-                                <Text style={v_d81136.updateText}>업데이트</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                            style={v_d81136.mainButton}
+                            onPress={v_02f61c}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={v_d81136.mainButtonText}>{v_8d41d7('common.versionUpdate.update')}</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
             </View>
@@ -89,62 +147,71 @@ const v_7f5f8a = () => {
 };
 
 const v_d81136 = v_472849.create({
-    overlay: {
+    fullScreenContainer: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#FFFFFF', 
         justifyContent: 'center',
         alignItems: 'center',
+        padding: 30,
     },
-    container: {
-        width: '85%',
-        backgroundColor: 'white',
-        borderRadius: 15,
-        padding: 20,
+    contentContainer: {
+        width: '100%',
         alignItems: 'center',
-        elevation: 5,
     },
-    title: {
-        fontSize: 18,
+    fullScreenTitle: {
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    message: {
-        fontSize: 14,
-        color: '#666',
+        marginBottom: 20,
+        color: '#111',
         textAlign: 'center',
+    },
+    fullScreenMessage: {
+        fontSize: 16,
+        color: '#555',
+        textAlign: 'center',
+        lineHeight: 24,
+        marginBottom: 40,
+    },
+    versionBadge: {
+        backgroundColor: '#F0F4FF',
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 20,
         marginBottom: 20,
     },
+    versionText: {
+        color: '#4A90E2',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
     progressContainer: {
+        width: '100%',
         alignItems: 'center',
-        marginVertical: 10,
+        marginVertical: 20,
     },
     progressText: {
+        marginBottom: 10,
+        fontSize: 20,
+        color: '#4A90E2',
+        fontWeight: 'bold',
+    },
+    downloadingText: {
         marginTop: 10,
+        color: '#888',
         fontSize: 14,
-        color: '#007AFF',
     },
-    buttonContainer: {
-        flexDirection: 'row',
+    mainButton: {
+        backgroundColor: '#4A90E2',
         width: '100%',
-        justifyContent: 'space-around',
+        paddingVertical: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        elevation: 3,
+        marginTop: 20,
     },
-    cancelButton: {
-        padding: 10,
-    },
-    cancelText: {
-        color: '#999',
-        fontSize: 16,
-    },
-    updateButton: {
-        backgroundColor: '#007AFF',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
-    updateText: {
+    mainButtonText: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
 });
