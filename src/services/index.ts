@@ -13,6 +13,7 @@ export * from './appleAuth';
 
 export * from './pangle';
 export { sendPangleCallback } from './pangle';
+export { logRewardedAdCompleted } from './appsflyer';
 import {
   AliveResponse,
   KeepAliveServerResponse,

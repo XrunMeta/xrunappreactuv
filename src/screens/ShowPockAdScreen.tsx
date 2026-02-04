@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache } from '../services';
+import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
 import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -575,6 +575,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
           }
 
           await addToCompletedAdsCache(campid);
+          logRewardedAdCompleted('point_click');
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');

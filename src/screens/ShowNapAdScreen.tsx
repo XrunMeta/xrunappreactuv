@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache } from '../services';
+import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
@@ -684,6 +684,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
           }
 
           await addToCompletedAdsCache(campid);
+          logRewardedAdCompleted('nasmedia');
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');

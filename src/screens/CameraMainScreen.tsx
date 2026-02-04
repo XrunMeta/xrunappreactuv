@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -2048,6 +2048,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }
 
           await addToCompletedAdsCache(campid);
+          logRewardedAdCompleted(adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'point_click' : 'nasmedia');
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');
@@ -2332,6 +2333,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }
 
           await addToCompletedAdsCache(campid);
+          logRewardedAdCompleted(adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'point_click' : 'nasmedia');
 
           await AsyncStorage.setItem('isAdCompleted', 'true');
           await AsyncStorage.setItem('shouldRefreshTopAd5', 'true');

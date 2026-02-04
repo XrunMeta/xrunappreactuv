@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
-import { Platform } from 'react-native';
+import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Application from 'expo-application';
 import * as Clipboard from 'expo-clipboard';
@@ -904,19 +903,41 @@ export default function App() {
 
       try {
         const env = getEnv();
-        appsFlyer.initSdk(
-          {
-            devKey: env.APPSFLYER_DEV_KEY,
-            appId: env.APPSFLYER_APP_ID_IOS, 
-            isDebug: __DEV__,
-            onInstallConversionDataListener: true,
-            onDeepLinkListener: true,
-            timeToWaitForATTUserAuthorization: 10,
-          },
-          () => console.log('[App] AppsFlyer 초기화 성공'),
-          (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
-        );
-        console.log('[App] AppsFlyer 초기화 완료');
+        const initOptions = {
+          devKey: env.APPSFLYER_DEV_KEY,
+          appId: env.APPSFLYER_APP_ID_IOS,
+          isDebug: __DEV__,
+          onInstallConversionDataListener: true,
+          onDeepLinkListener: true,
+          timeToWaitForATTUserAuthorization: 10,
+        };
+        const maxAttempts = 12;
+        const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
+        const tryAppsFlyerInit = (attempt: number) => {
+          const RNAppsFlyer = NativeModules.RNAppsFlyer;
+          if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
+            appsFlyer.initSdk(
+              initOptions,
+              () => {
+                console.log('[App] AppsFlyer 초기화 성공');
+                if (initOptions.isDebug) {
+                  console.log('[App] AppsFlyer 디버그 모드 활성화됨');
+                }
+              },
+              (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
+            );
+            console.log('[App] AppsFlyer 초기화 완료');
+            return;
+          }
+          if (attempt < maxAttempts) {
+            const delay = delays[Math.min(attempt, delays.length - 1)];
+            console.log('[App] AppsFlyer 네이티브 모듈 대기 중,', delay, 'ms 후 재시도', attempt + 1, '/', maxAttempts);
+            setTimeout(() => tryAppsFlyerInit(attempt + 1), delay);
+          } else {
+            console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
+          }
+        };
+        tryAppsFlyerInit(0);
       } catch (error) {
         console.error('[App] AppsFlyer 초기화 실패:', error);
       }
