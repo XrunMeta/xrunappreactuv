@@ -16,7 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
+import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191, v_fda57c } from '../services';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -684,6 +684,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           }
 
           await v_5e0191(v_aa0917);
+          v_fda57c('nasmedia');
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');

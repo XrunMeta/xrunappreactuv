@@ -1,6 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b } from 'rcmrninabrnb';
-import { v_326be8 } from 'rcmrninabrnb';
+import { v_6b5698, v_c3551b, v_80fa10, v_326be8 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
@@ -904,19 +903,41 @@ export default function v_6540c3() {
 
       try {
         const v_c9c489 = v_e4a763();
-        v_1edcd1.initSdk(
-          {
-            devKey: v_c9c489.APPSFLYER_DEV_KEY,
-            appId: v_c9c489.APPSFLYER_APP_ID_IOS, 
-            isDebug: __DEV__,
-            onInstallConversionDataListener: true,
-            onDeepLinkListener: true,
-            timeToWaitForATTUserAuthorization: 10,
-          },
-          () => console.log('[App] AppsFlyer 초기화 성공'),
-          (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d),
-        );
-        console.log('[App] AppsFlyer 초기화 완료');
+        const v_280f96 = {
+          devKey: v_c9c489.APPSFLYER_DEV_KEY,
+          appId: v_c9c489.APPSFLYER_APP_ID_IOS,
+          isDebug: __DEV__,
+          onInstallConversionDataListener: true,
+          onDeepLinkListener: true,
+          timeToWaitForATTUserAuthorization: 10,
+        };
+        const v_3d627c = 12;
+        const v_c3d02b = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
+        const v_1059a9 = (v_bc21cd) => {
+          const v_5c3b18 = v_80fa10.RNAppsFlyer;
+          if (v_5c3b18 != null && typeof v_5c3b18.initSdkWithCallBack === 'function') {
+            v_1edcd1.initSdk(
+              v_280f96,
+              () => {
+                console.log('[App] AppsFlyer 초기화 성공');
+                if (v_280f96.isDebug) {
+                  console.log('[App] AppsFlyer 디버그 모드 활성화됨');
+                }
+              },
+              (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d),
+            );
+            console.log('[App] AppsFlyer 초기화 완료');
+            return;
+          }
+          if (v_bc21cd < v_3d627c) {
+            const v_4b24d2 = v_c3d02b[Math.min(v_bc21cd, v_c3d02b.length - 1)];
+            console.log('[App] AppsFlyer 네이티브 모듈 대기 중,', v_4b24d2, 'ms 후 재시도', v_bc21cd + 1, '/', v_3d627c);
+            setTimeout(() => v_1059a9(v_bc21cd + 1), v_4b24d2);
+          } else {
+            console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
+          }
+        };
+        v_1059a9(0);
       } catch (v_5e9bfe) {
         console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
       }

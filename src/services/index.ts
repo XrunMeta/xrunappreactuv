@@ -13,6 +13,7 @@ export * from './appleAuth';
 
 export * from './pangle';
 export { sendPangleCallback } from './pangle';
+export { logRewardedAdCompleted } from './appsflyer';
 import {
   v_96ef47,
   v_2fe85a,

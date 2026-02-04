@@ -18,7 +18,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_aa7dc1, v_167376, v_38f5f4, v_8cba1e, v_f4cc2d, v_563153, v_5e0191 } from '../services';
+import { v_aa7dc1, v_167376, v_38f5f4, v_8cba1e, v_f4cc2d, v_563153, v_5e0191, v_fda57c } from '../services';
 import { v_cba33f } from '../utils';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
@@ -575,6 +575,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
           }
 
           await v_5e0191(v_aa0917);
+          v_fda57c('point_click');
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
