@@ -2,7 +2,7 @@ package run.xrun.xrunapp
 
 import android.app.Application
 import android.content.res.Configuration
-
+import com.appsflyer.AppsFlyerLib
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
@@ -50,6 +50,12 @@ class MainApplication : Application(), ReactApplication {
     }
     loadReactNative(this)
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
+
+    AppsFlyerLib.getInstance().init("yKhEWc3Vnit9KBYVv9gXHn", null, this)
+    if (BuildConfig.DEBUG) {
+      AppsFlyerLib.getInstance().setDebugLog(true)
+    }
+    AppsFlyerLib.getInstance().start(this)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

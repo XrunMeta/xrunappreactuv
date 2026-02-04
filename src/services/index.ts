@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { ROUTES } from '../navigation';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
+import { getPlayStoreUrl } from '../utils/playStoreUrl';
 
 export * from './googleAuth';
 
@@ -331,7 +332,7 @@ export const sendAliveSignal = async (
           result.emergencyStop = {
             enabled: true,
             message: 'UPDATE_FOUND\nPLEASE_UPDATE',
-            link: 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp',
+            link: getPlayStoreUrl({ gl: 'us' }),
           };
         } else {
           console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);

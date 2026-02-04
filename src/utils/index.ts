@@ -29,6 +29,8 @@ export const copyToClipboard = async (
 
 export * from './env';
 
+export { getPlayStoreUrl, ANDROID_PACKAGE_ID } from './playStoreUrl';
+
 export * from './imageCache';
 
 export * from './input';
@@ -126,7 +128,7 @@ export const shareReferralLink = async (
     console.log('[shareReferralLink] 시작 - 플랫폼:', Platform.OS);
     console.log('[shareReferralLink] 사용자 이메일:', userDetails.email);
 
-    const androidLink = 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
+    const androidLink = getPlayStoreUrl({ gl: 'kr', campaignId: 'web_share' });
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
     const encodedEmail = encodeURIComponent(userDetails.email);

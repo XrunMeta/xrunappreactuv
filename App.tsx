@@ -69,8 +69,9 @@ import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
-import { loadEnv } from './src/utils/env';
+import { loadEnv, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
+import appsFlyer from 'react-native-appsflyer';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
@@ -899,6 +900,25 @@ export default function App() {
         console.log('[App] 환경 변수 로드 완료');
       } catch (error) {
         console.error('[App] 환경 변수 로드 실패:', error);
+      }
+
+      try {
+        const env = getEnv();
+        appsFlyer.initSdk(
+          {
+            devKey: env.APPSFLYER_DEV_KEY,
+            appId: env.APPSFLYER_APP_ID_IOS, 
+            isDebug: __DEV__,
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            timeToWaitForATTUserAuthorization: 10,
+          },
+          () => console.log('[App] AppsFlyer 초기화 성공'),
+          (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
+        );
+        console.log('[App] AppsFlyer 초기화 완료');
+      } catch (error) {
+        console.error('[App] AppsFlyer 초기화 실패:', error);
       }
 
       try {
