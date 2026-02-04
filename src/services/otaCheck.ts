@@ -1,29 +1,32 @@
 import { Platform, Alert } from 'react-native';
 import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { zip, unzip, unzipAssets, subscribe } from 'react-native-zip-archive';
 
 const BASE_URL = 'https://pub-291891eb932c4047b038234e214f5334.r2.dev';
 
-export const BUNDLE_FILENAME = Platform.OS === 'ios' ? 'index.ios.bundle' : 'index.android.bundle';
-export const LOCAL_BUNDLE_PATH = `${RNFS.DocumentDirectoryPath}/${BUNDLE_FILENAME}`;
-const LOCAL_VERSION_KEY = 'OTA_BUNDLE_VERSION';
+const LOCAL_ROOT_PATH = Platform.OS === 'ios' ? RNFS.DocumentDirectoryPath : RNFS.DocumentDirectoryPath;
+const LOCAL_BUNDLE_FILENAME = Platform.OS === 'ios' ? 'index.ios.bundle' : 'index.android.bundle';
+const LOCAL_BUNDLE_PATH = `${LOCAL_ROOT_PATH}/${LOCAL_BUNDLE_FILENAME}`;
+
+const VERSION_KEY = 'OTA_BUNDLE_VERSION';
 
 export interface OTAVersionInfo {
     version: number;
     url: string;
-    forceUpdate?: boolean;
-    description?: string;
+    description: string;
+    forceUpdate: boolean;
 }
 
-export interface OTAMetadata {
+interface OTAMetadata {
     android: OTAVersionInfo;
     ios: OTAVersionInfo;
 }
 
 export const getCurrentOTAVersion = async (): Promise<number> => {
     try {
-        const version = await AsyncStorage.getItem(LOCAL_VERSION_KEY);
-        return version ? parseInt(version, 10) : 0;
+        const version = await AsyncStorage.getItem(VERSION_KEY);
+        return version ? parseInt(version, 10) : 0; 
     } catch (error) {
         return 0;
     }
@@ -65,11 +68,18 @@ export const downloadBundle = async (
     onProgress?: (progress: number) => void
 ): Promise<boolean> => {
     try {
-        const tempPath = `${LOCAL_BUNDLE_PATH}.tmp`;
+
+        const zipPath = `${LOCAL_ROOT_PATH}/ota_update.zip`;
+
+        if (await RNFS.exists(zipPath)) {
+            await RNFS.unlink(zipPath);
+        }
+
+        console.log(`[OTA] Downloading ZIP to: ${zipPath}`);
 
         const ret = RNFS.downloadFile({
             fromUrl: url,
-            toFile: tempPath,
+            toFile: zipPath,
             progress: (res) => {
                 const progress = (res.bytesWritten / res.contentLength);
                 if (onProgress) onProgress(progress);
@@ -78,19 +88,34 @@ export const downloadBundle = async (
 
         const result = await ret.promise;
 
-        if (result.statusCode === 200) {
-
-            if (await RNFS.exists(LOCAL_BUNDLE_PATH)) {
-                await RNFS.unlink(LOCAL_BUNDLE_PATH);
-            }
-
-            await RNFS.moveFile(tempPath, LOCAL_BUNDLE_PATH);
-            console.log('[OTA] Download success:', LOCAL_BUNDLE_PATH);
-            return true;
-        } else {
+        if (result.statusCode !== 200) {
             console.error('[OTA] Download status code:', result.statusCode);
             return false;
         }
+
+        console.log('[OTA] ZIP Download success. Unzipping...');
+
+        try {
+            const charset = 'UTF-8';
+            const path = await unzip(zipPath, LOCAL_ROOT_PATH, charset);
+            console.log(`[OTA] Unzip completed to: ${path}`);
+
+            await RNFS.unlink(zipPath);
+
+            const bundleExists = await RNFS.exists(LOCAL_BUNDLE_PATH);
+            if (bundleExists) {
+                console.log('[OTA] Bundle file verified.');
+                return true;
+            } else {
+                console.error('[OTA] Bundle file missing after unzip.');
+                return false;
+            }
+
+        } catch (unzipError) {
+            console.error('[OTA] Unzip failed:', unzipError);
+            return false;
+        }
+
     } catch (error) {
         console.error('[OTA] Download failed:', error);
         return false;
@@ -98,5 +123,5 @@ export const downloadBundle = async (
 };
 
 export const updateLocalVersion = async (version: number) => {
-    await AsyncStorage.setItem(LOCAL_VERSION_KEY, version.toString());
+    await AsyncStorage.setItem(VERSION_KEY, version.toString());
 };
