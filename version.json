@@ -1,12 +1,12 @@
 {
     "android": {
-        "version": 4,
+        "version": 9,
         "url": "https://pub-291891eb932c4047b038234e214f5334.r2.dev/ota-android.zip",
         "description": "버그 수정 및 성능 향상",
         "forceUpdate": false
     },
     "ios": {
-        "version": 4,
+        "version": 9,
         "url": "https://pub-291891eb932c4047b038234e214f5334.r2.dev/ota-ios.zip",
         "description": "버그 수정 및 성능 향상",
         "forceUpdate": false
