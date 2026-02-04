@@ -24,4 +24,11 @@ cd ../..
 echo "✅ 번들 및 압축 완료!"
 echo "📄 Android: dist/ota-android.zip"
 echo "📄 iOS: dist/ota-ios.zip"
-echo "👉 이제 'node scripts/upload-ota.js'를 실행하세요."
+echo "업로드 시작..."
+
+node scripts/upload-ota.js
+node scripts/upload-version.js
+
+echo "업로드 완료!"
+
+

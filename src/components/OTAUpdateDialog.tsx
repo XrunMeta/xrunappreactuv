@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, AppState, BackHandler, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
 
 const OTAUpdateDialog = () => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
-    const [updateInfo, setUpdateInfo] = useState<OTAVersionInfo | null>(null);
     const [progress, setProgress] = useState(0);
-    const [isDownloading, setIsDownloading] = useState(false);
-
-    useEffect(() => {
-        checkForUpdate();
-    }, []);
+    const [downloading, setDownloading] = useState(false);
+    const [updateInfo, setUpdateInfo] = useState<OTAVersionInfo | null>(null);
+    const [waitingForRestart, setWaitingForRestart] = useState(false); 
+    const appState = useRef(AppState.currentState);
 
     const checkForUpdate = async () => {
         if (__DEV__) return; 
@@ -22,65 +23,122 @@ const OTAUpdateDialog = () => {
         }
     };
 
+    useEffect(() => {
+
+        checkForUpdate();
+
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            if (
+                appState.current.match(/inactive|background/) &&
+                nextAppState === 'active'
+            ) {
+                checkForUpdate();
+            }
+            appState.current = nextAppState;
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
     const handleUpdate = async () => {
         if (!updateInfo) return;
 
-        setIsDownloading(true);
-        try {
-            const success = await downloadBundle(updateInfo.url, (p) => {
-                setProgress(p);
-            });
+        setDownloading(true);
+        setProgress(0);
 
-            if (success) {
-                await updateLocalVersion(updateInfo.version);
+        const success = await downloadBundle(updateInfo.url, (p) => {
+            setProgress(p);
+            console.log(`[OTA] Progress: ${p}`);
+        });
+
+        if (success) {
+
+            await updateLocalVersion(updateInfo.version);
+
+            setDownloading(false);
+            setProgress(1);
+
+            if (Platform.OS === 'android') {
                 Alert.alert(
-                    '업데이트 완료',
-                    '최신 버전을 적용하기 위해 앱을 재시작해 주세요.',
-                    [{
-                        text: '확인', onPress: () => {
-
-                            setVisible(false);
-                        }
-                    }]
+                    t('common.versionUpdate.updateComplete'),
+                    t('common.versionUpdate.restartMessage'),
+                    [
+                        {
+                            text: t('common.versionUpdate.confirm'), 
+                            onPress: () => {
+                                BackHandler.exitApp(); 
+                            },
+                        },
+                    ],
+                    { cancelable: false }
                 );
             } else {
-                Alert.alert('오류', '업데이트 다운로드에 실패했습니다.');
-                setIsDownloading(false);
+
+                setWaitingForRestart(true);
             }
-        } catch (e) {
-            console.error(e);
-            setIsDownloading(false);
-            Alert.alert('오류', '업데이트 중 오류가 발생했습니다.');
+
+        } else {
+            setDownloading(false);
+            Alert.alert(t('common.messages.error'), t('common.versionUpdate.downloadFailed'));
         }
     };
 
-    if (!visible || !updateInfo) return null;
+    if (!visible) return null;
+
+    if (waitingForRestart) {
+        return (
+            <Modal visible={true} transparent={false} animationType="fade">
+                <View style={styles.fullScreenContainer}>
+                    <ActivityIndicator size="large" color="#4A90E2" style={{ marginBottom: 30, transform: [{ scale: 1.5 }] }} />
+                    <Text style={styles.fullScreenTitle}>{t('common.versionUpdate.updateComplete')}</Text>
+                    <Text style={styles.fullScreenMessage}>
+                        {t('common.versionUpdate.restartRequired')}
+                    </Text>
+                </View>
+            </Modal>
+        );
+    }
 
     return (
-        <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>새로운 업데이트 발견</Text>
-                    <Text style={styles.message}>
-                        {updateInfo.description || '앱의 성능 향상과 버그 수정을 위한 업데이트가 있습니다.'}
+        <Modal visible={visible} transparent={false} animationType="slide">
+            <View style={styles.fullScreenContainer}>
+                <View style={styles.contentContainer}>
+                    {}
+                    <Text style={styles.fullScreenTitle}>{t('common.versionUpdate.title')}</Text>
+
+                    <View style={styles.versionBadge}>
+                        <Text style={styles.versionText}>v{updateInfo?.version}</Text>
+                    </View>
+
+                    <Text style={styles.fullScreenMessage}>
+                        {updateInfo?.description || t('common.versionUpdate.message')}
                     </Text>
 
-                    {isDownloading ? (
+                    {downloading ? (
                         <View style={styles.progressContainer}>
-                            <ActivityIndicator size="large" color="#0000ff" />
-                            <Text style={styles.progressText}>{Math.round(progress * 100)}%</Text>
+                            <Text style={styles.progressText}>
+                                {Math.round(progress * 100)}%
+                            </Text>
+                            <Progress.Bar
+                                progress={progress}
+                                width={250}
+                                color="#4A90E2"
+                                unfilledColor="#E0E0E0"
+                                borderWidth={0}
+                                height={10}
+                            />
+                            <Text style={styles.downloadingText}>{t('common.messages.loading')}</Text>
                         </View>
                     ) : (
-                        <View style={styles.buttonContainer}>
-                            {!updateInfo.forceUpdate && (
-                                <TouchableOpacity onPress={() => setVisible(false)} style={styles.cancelButton}>
-                                    <Text style={styles.cancelText}>나중에</Text>
-                                </TouchableOpacity>
-                            )}
-                            <TouchableOpacity onPress={handleUpdate} style={styles.updateButton}>
-                                <Text style={styles.updateText}>업데이트</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                            style={styles.mainButton}
+                            onPress={handleUpdate}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.mainButtonText}>{t('common.versionUpdate.update')}</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
             </View>
@@ -89,62 +147,71 @@ const OTAUpdateDialog = () => {
 };
 
 const styles = StyleSheet.create({
-    overlay: {
+    fullScreenContainer: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#FFFFFF', 
         justifyContent: 'center',
         alignItems: 'center',
+        padding: 30,
     },
-    container: {
-        width: '85%',
-        backgroundColor: 'white',
-        borderRadius: 15,
-        padding: 20,
+    contentContainer: {
+        width: '100%',
         alignItems: 'center',
-        elevation: 5,
     },
-    title: {
-        fontSize: 18,
+    fullScreenTitle: {
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    message: {
-        fontSize: 14,
-        color: '#666',
+        marginBottom: 20,
+        color: '#111',
         textAlign: 'center',
+    },
+    fullScreenMessage: {
+        fontSize: 16,
+        color: '#555',
+        textAlign: 'center',
+        lineHeight: 24,
+        marginBottom: 40,
+    },
+    versionBadge: {
+        backgroundColor: '#F0F4FF',
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 20,
         marginBottom: 20,
     },
+    versionText: {
+        color: '#4A90E2',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
     progressContainer: {
+        width: '100%',
         alignItems: 'center',
-        marginVertical: 10,
+        marginVertical: 20,
     },
     progressText: {
+        marginBottom: 10,
+        fontSize: 20,
+        color: '#4A90E2',
+        fontWeight: 'bold',
+    },
+    downloadingText: {
         marginTop: 10,
+        color: '#888',
         fontSize: 14,
-        color: '#007AFF',
     },
-    buttonContainer: {
-        flexDirection: 'row',
+    mainButton: {
+        backgroundColor: '#4A90E2',
         width: '100%',
-        justifyContent: 'space-around',
+        paddingVertical: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        elevation: 3,
+        marginTop: 20,
     },
-    cancelButton: {
-        padding: 10,
-    },
-    cancelText: {
-        color: '#999',
-        fontSize: 16,
-    },
-    updateButton: {
-        backgroundColor: '#007AFF',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
-    updateText: {
+    mainButtonText: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
 });
