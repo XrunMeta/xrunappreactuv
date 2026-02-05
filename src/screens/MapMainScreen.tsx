@@ -85,6 +85,8 @@ let iconReferral: any = null;
 
 let iconUser: any = null;
 
+let iconXplay: any = null;
+
 let iconAdvertise: any = null;
 
 let iconBell: any = null;
@@ -126,6 +128,16 @@ try {
 } catch (e) {
 
   console.warn('icon_user.png not found');
+
+}
+
+try {
+
+  iconXplay = require('../../assets/images/icon_xplay.png');
+
+} catch (e) {
+
+  console.warn('icon_xplay.png not found');
 
 }
 
@@ -2591,6 +2603,12 @@ export const MapMainScreen: React.FC = () => {
 
     switch (itemId) {
 
+      case 'xplay':
+
+        navigate(ROUTES.xrunInfo);
+
+        break;
+
       case 'wallet':
 
         navigate(ROUTES.wallet);
@@ -2606,12 +2624,6 @@ export const MapMainScreen: React.FC = () => {
       case 'referral':
 
         navigate(ROUTES.referralMyGroup);
-
-        break;
-
-      case 'info':
-
-        navigate(ROUTES.myInfo);
 
         break;
 
@@ -3337,7 +3349,7 @@ export const MapMainScreen: React.FC = () => {
 
   const bottomNavItems = [
 
-    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+    { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
 
     { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
 
@@ -3345,7 +3357,7 @@ export const MapMainScreen: React.FC = () => {
 
     { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
 
-    { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
+    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
 
   ];
 
