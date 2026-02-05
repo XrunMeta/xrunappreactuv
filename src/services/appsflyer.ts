@@ -8,6 +8,14 @@ export const v_546ced = 'ad_network';
 
 export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click' | 'tapjoy';
 
+export function v_7abfce(v_5a9c46): AppsFlyerAdNetwork {
+  const v_3f4e2e = (v_5a9c46 || '').toLowerCase();
+  if (v_3f4e2e === 'tapjoy') return 'tapjoy';
+  if (v_3f4e2e === 'pock' || v_3f4e2e === 'pointclick') return 'point_click';
+  if (v_3f4e2e === 'pangle') return 'pangle';
+  return 'nasmedia';
+}
+
 function v_9d268a(): boolean {
   const v_5c3b18 = v_80fa10.RNAppsFlyer;
   return v_5c3b18 != null && typeof v_5c3b18.logEvent === 'function';
