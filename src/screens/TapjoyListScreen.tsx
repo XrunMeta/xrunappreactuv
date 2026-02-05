@@ -5,6 +5,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_82ad38 } from '../services/tapjoy';
+import { v_fda57c } from '../services/appsflyer';
 import { v_cba33f } from '../utils';
 
 export const v_f2ecfa = () => {
@@ -14,7 +15,10 @@ export const v_f2ecfa = () => {
   const v_7a33ab = v_de06a3(async () => {
     v_34a50a(true);
     try {
-      const v_43c42e = await v_82ad38();
+      const v_43c42e = await v_82ad38(undefined, () => {
+        console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
+        v_fda57c('tapjoy');
+      });
       if (v_43c42e.success) {
         v_cba33f('탭조이 광고를 불러왔습니다.');
       } else {

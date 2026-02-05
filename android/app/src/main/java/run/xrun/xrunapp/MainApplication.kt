@@ -52,9 +52,7 @@ class MainApplication : Application(), ReactApplication {
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
 
     AppsFlyerLib.getInstance().init("oth-secret", null, this)
-    if (BuildConfig.DEBUG) {
-      AppsFlyerLib.getInstance().setDebugLog(true)
-    }
+    AppsFlyerLib.getInstance().setDebugLog(true)
     AppsFlyerLib.getInstance().start(this)
   }
 

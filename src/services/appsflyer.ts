@@ -3,8 +3,7 @@
 import { v_80fa10 } from 'rcmrninabrnb';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 
-export const v_0a693a = 'rewarded_ad_completed';
-export const v_546ced = 'ad_network';
+export const v_0a693a = 'af_reward_complete';
 
 export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click' | 'tapjoy';
 
@@ -21,9 +20,18 @@ function v_9d268a(): boolean {
   return v_5c3b18 != null && typeof v_5c3b18.logEvent === 'function';
 }
 
+function v_ebf12e(v_fe6150): Record<string, number> {
+  return {
+    nasmedia: v_fe6150 === 'nasmedia' ? 1 : 0,
+    point_click: v_fe6150 === 'point_click' ? 1 : 0,
+    tapjoy: v_fe6150 === 'tapjoy' ? 1 : 0,
+    pangle: v_fe6150 === 'pangle' ? 1 : 0,
+  };
+}
+
 export function v_fda57c(v_3c76ab): void {
-  const v_c78818 = { [v_546ced]: v_3c76ab };
-  console.log('[AppsFlyer] logRewardedAdCompleted 호출:', v_3c76ab);
+  const v_c78818 = v_ebf12e(v_3c76ab);
+  console.log('[AppsFlyer] logRewardedAdCompleted 호출:', v_3c76ab, v_c78818);
   const v_8758c4 = (v_bc21cd = 0) => {
     const v_3d627c = 10;
     const v_c3d02b = [0, 150, 300, 500, 800, 1200, 1600, 2000, 2500, 3000];

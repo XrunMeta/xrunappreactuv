@@ -33,7 +33,8 @@ export const v_d5a49a = async (v_43e90c): Promise<boolean> => {
 };
 
 export const v_82ad38 = async (
-  v_7689ae
+  v_7689ae,
+  v_ca7283
 ): Promise<{ success: boolean; message?: string }> => {
   try {
     const v_1833e7 = v_7689ae || v_573fcf('TAPJOY_PLACEMENT_NAME') || 'Offerwall';
@@ -61,6 +62,12 @@ export const v_82ad38 = async (
       const v_27b002 = () => {
         v_f36218.off(v_37fb3b.REQUEST_DID_FAIL, v_0aa997);
         v_f36218.off(v_37fb3b.CONTENT_IS_READY, v_27b002);
+        if (v_ca7283) {
+          v_f36218.once(v_37fb3b.CONTENT_DID_DISAPPEAR, () => {
+            console.log('[Tapjoy] 오퍼월 닫힘 → 콜백 실행');
+            v_ca7283();
+          });
+        }
         v_f36218.showContent();
         v_6f7712({ success: true });
       };

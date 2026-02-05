@@ -911,7 +911,7 @@ export default function v_6540c3() {
         const v_280f96 = {
           devKey: v_c9c489.APPSFLYER_DEV_KEY,
           appId: v_c9c489.APPSFLYER_APP_ID_IOS,
-          isDebug: __DEV__,
+          isDebug: true, 
           onInstallConversionDataListener: true,
           onDeepLinkListener: true,
           timeToWaitForATTUserAuthorization: 10,
