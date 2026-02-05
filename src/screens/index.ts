@@ -58,6 +58,7 @@ export { XRUNinfoScreen } from './XRUNinfo';
 export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 export { ReferralInputScreen } from './ReferralInputScreen';
 export { PangleListScreen } from './PangleListScreen';
+export { TapjoyListScreen } from './TapjoyListScreen';
 export { WalletPrivateKeyDisplayScreen } from './WalletPrivateKeyDisplayScreen';
 export { WalletPrivateKeyGoogleAuthScreen } from './WalletPrivateKeyGoogleAuthScreen';
 

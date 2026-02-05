@@ -8,6 +8,14 @@ export const APPSFLYER_PARAM_AD_NETWORK = 'ad_network';
 
 export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click' | 'tapjoy';
 
+export function getAppsFlyerAdNetworkFromCompany(adCompany: string): AppsFlyerAdNetwork {
+  const c = (adCompany || '').toLowerCase();
+  if (c === 'tapjoy') return 'tapjoy';
+  if (c === 'pock' || c === 'pointclick') return 'point_click';
+  if (c === 'pangle') return 'pangle';
+  return 'nasmedia';
+}
+
 function isAppsFlyerNativeReady(): boolean {
   const RNAppsFlyer = NativeModules.RNAppsFlyer;
   return RNAppsFlyer != null && typeof RNAppsFlyer.logEvent === 'function';

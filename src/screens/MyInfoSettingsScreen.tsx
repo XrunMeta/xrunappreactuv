@@ -87,6 +87,14 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.tapjoyList)}
+          >
+            <Text style={styles.cardText}>탭조이</Text>
+          </TouchableOpacity>
+
           {}
           {versionInfo && (
             <TouchableOpacity

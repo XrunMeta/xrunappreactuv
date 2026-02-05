@@ -60,6 +60,7 @@ import {
   MyinfoShopSalesScreen,
   ReferralInputScreen,
   PangleListScreen,
+  TapjoyListScreen,
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
 } from './src/screens';
@@ -414,6 +415,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'pangleList') {
     return <PangleListScreen />;
+  }
+
+  if (currentScreen === 'tapjoyList') {
+    return <TapjoyListScreen />;
   }
 
   if (currentScreen === 'walletPrivateKeyDisplay') {

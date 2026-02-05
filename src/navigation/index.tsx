@@ -67,6 +67,7 @@ export const ROUTES = {
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
+  tapjoyList: 'tapjoyList',
   webViewTest: 'webViewTest',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
