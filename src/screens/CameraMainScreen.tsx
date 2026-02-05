@@ -384,6 +384,7 @@ let v_8daafe = null;
 let v_e96568 = null;
 let v_79011b = null;
 let v_b636c9 = null;
+let v_622956 = null;
 let v_16772f = null;
 
 try {
@@ -408,6 +409,11 @@ try {
   v_b636c9 = require('../../assets/images/icon_user.png');
 } catch (v_9e86fd) {
   console.warn('icon_user.png not found');
+}
+try {
+  v_622956 = require('../../assets/images/icon_xplay.png');
+} catch (v_9e86fd) {
+  console.warn('icon_xplay.png not found');
 }
 
 try {
@@ -1898,6 +1904,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     console.log('Navigation item pressed:', v_6e55b1);
 
     switch (v_6e55b1) {
+      case 'xplay':
+        v_9b57fc(v_ce4741.xrunInfo);
+        break;
       case 'wallet':
         v_9b57fc(v_ce4741.wallet);
         break;
@@ -1906,9 +1915,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         break;
       case 'referral':
         v_9b57fc(v_ce4741.referralSettlement);
-        break;
-      case 'info':
-        v_9b57fc(v_ce4741.myInfo);
         break;
       default:
         console.log('Unknown navigation item:', v_6e55b1);
@@ -2433,11 +2439,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, [v_794bb0]);
 
   const v_fce460 = [
-    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
     { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
-    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
+    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
   ];
 
   if (!v_d1a6bb) {

@@ -85,6 +85,8 @@ let v_79011b = null;
 
 let v_b636c9 = null;
 
+let v_622956 = null;
+
 let v_86146a = null;
 
 let v_800dd2 = null;
@@ -126,6 +128,16 @@ try {
 } catch (v_9e86fd) {
 
   console.warn('icon_user.png not found');
+
+}
+
+try {
+
+  v_622956 = require('../../assets/images/icon_xplay.png');
+
+} catch (v_9e86fd) {
+
+  console.warn('icon_xplay.png not found');
 
 }
 
@@ -2591,6 +2603,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     switch (v_6e55b1) {
 
+      case 'xplay':
+
+        v_9b57fc(v_ce4741.xrunInfo);
+
+        break;
+
       case 'wallet':
 
         v_9b57fc(v_ce4741.wallet);
@@ -2606,12 +2624,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
       case 'referral':
 
         v_9b57fc(v_ce4741.referralMyGroup);
-
-        break;
-
-      case 'info':
-
-        v_9b57fc(v_ce4741.myInfo);
 
         break;
 
@@ -3337,7 +3349,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_fce460 = [
 
-    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
 
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
 
@@ -3345,7 +3357,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
 
-    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
+    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
 
   ];
 
