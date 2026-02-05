@@ -173,6 +173,18 @@ try {
 
 }
 
+let v_119a2b = null;
+
+try {
+
+  v_119a2b = require('../../assets/images/icon_myinfo_top.png');
+
+} catch (v_9e86fd) {
+
+  console.warn('icon_myinfo_top.png not found');
+
+}
+
 let v_232839 = null;
 
 try {
@@ -3461,18 +3473,32 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         {}
 
-        {v_16772f && (
-          <Pressable
-            style={v_d81136.mapPinButton}
-            onPress={v_30b908}
-          >
-            <Image
-              source={v_16772f}
-              style={v_d81136.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <View style={v_d81136.mapPinButtonContainer}>
+          {v_119a2b && (
+            <Pressable
+              style={v_d81136.mapPinButtonTop}
+              onPress={() => v_9b57fc(v_ce4741.myInfo)}
+            >
+              <Image
+                source={v_119a2b}
+                style={v_d81136.mapPinIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          )}
+          {v_16772f && (
+            <Pressable
+              style={v_d81136.mapPinButton}
+              onPress={v_30b908}
+            >
+              <Image
+                source={v_16772f}
+                style={v_d81136.mapPinIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          )}
+        </View>
 
         {}
 
@@ -3661,19 +3687,30 @@ const v_d81136 = v_472849.create({
 
   },
 
-  mapPinButton: {
+  mapPinButtonContainer: {
     position: 'absolute',
     top: 26,
     right: 16,
-    width: 25,
-    height: 25,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  mapPinButtonTop: {
+    width: 35,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  mapPinButton: {
+    width: 35,
+    height: 35,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   mapPinIcon: {
-    width: v_700696.get('window').width / 10,
-    height: v_700696.get('window').width / 10,
+    width: 40,
+    height: 40,
   },
 
   topLogo: {
