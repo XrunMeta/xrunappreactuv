@@ -173,6 +173,18 @@ try {
 
 }
 
+let iconMyinfoTop: any = null;
+
+try {
+
+  iconMyinfoTop = require('../../assets/images/icon_myinfo_top.png');
+
+} catch (e) {
+
+  console.warn('icon_myinfo_top.png not found');
+
+}
+
 let logoTempMarker: any = null;
 
 try {
@@ -3461,18 +3473,32 @@ export const MapMainScreen: React.FC = () => {
 
         {}
 
-        {iconMapPoint && (
-          <Pressable
-            style={styles.mapPinButton}
-            onPress={goToCurrentLocation}
-          >
-            <Image
-              source={iconMapPoint}
-              style={styles.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <View style={styles.mapPinButtonContainer}>
+          {iconMyinfoTop && (
+            <Pressable
+              style={styles.mapPinButtonTop}
+              onPress={() => navigate(ROUTES.myInfo)}
+            >
+              <Image
+                source={iconMyinfoTop}
+                style={styles.mapPinIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          )}
+          {iconMapPoint && (
+            <Pressable
+              style={styles.mapPinButton}
+              onPress={goToCurrentLocation}
+            >
+              <Image
+                source={iconMapPoint}
+                style={styles.mapPinIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          )}
+        </View>
 
         {}
 
@@ -3661,19 +3687,30 @@ const styles = StyleSheet.create({
 
   },
 
-  mapPinButton: {
+  mapPinButtonContainer: {
     position: 'absolute',
     top: 26,
     right: 16,
-    width: 25,
-    height: 25,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  mapPinButtonTop: {
+    width: 35,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  mapPinButton: {
+    width: 35,
+    height: 35,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   mapPinIcon: {
-    width: Dimensions.get('window').width / 10,
-    height: Dimensions.get('window').width / 10,
+    width: 40,
+    height: 40,
   },
 
   topLogo: {
