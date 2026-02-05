@@ -33,7 +33,8 @@ export const connectTapjoy = async (userId?: string): Promise<boolean> => {
 };
 
 export const showTapjoyPlacement = async (
-  placementName?: string
+  placementName?: string,
+  onContentDismissed?: () => void
 ): Promise<{ success: boolean; message?: string }> => {
   try {
     const name = placementName || getEnvValue('TAPJOY_PLACEMENT_NAME') || 'Offerwall';
@@ -61,6 +62,12 @@ export const showTapjoyPlacement = async (
       const onContentReady = () => {
         placement.off(TJPlacement.REQUEST_DID_FAIL, onRequestFail);
         placement.off(TJPlacement.CONTENT_IS_READY, onContentReady);
+        if (onContentDismissed) {
+          placement.once(TJPlacement.CONTENT_DID_DISAPPEAR, () => {
+            console.log('[Tapjoy] 오퍼월 닫힘 → 콜백 실행');
+            onContentDismissed();
+          });
+        }
         placement.showContent();
         resolve({ success: true });
       };

@@ -3,8 +3,7 @@
 import { NativeModules } from 'react-native';
 import appsFlyer from 'react-native-appsflyer';
 
-export const APPSFLYER_EVENT_REWARDED_AD_COMPLETED = 'rewarded_ad_completed';
-export const APPSFLYER_PARAM_AD_NETWORK = 'ad_network';
+export const APPSFLYER_EVENT_REWARDED_AD_COMPLETED = 'af_reward_complete';
 
 export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click' | 'tapjoy';
 
@@ -21,9 +20,18 @@ function isAppsFlyerNativeReady(): boolean {
   return RNAppsFlyer != null && typeof RNAppsFlyer.logEvent === 'function';
 }
 
+function buildRewardEventValues(completedNetwork: AppsFlyerAdNetwork): Record<string, number> {
+  return {
+    nasmedia: completedNetwork === 'nasmedia' ? 1 : 0,
+    point_click: completedNetwork === 'point_click' ? 1 : 0,
+    tapjoy: completedNetwork === 'tapjoy' ? 1 : 0,
+    pangle: completedNetwork === 'pangle' ? 1 : 0,
+  };
+}
+
 export function logRewardedAdCompleted(adNetwork: AppsFlyerAdNetwork): void {
-  const eventValues = { [APPSFLYER_PARAM_AD_NETWORK]: adNetwork };
-  console.log('[AppsFlyer] logRewardedAdCompleted 호출:', adNetwork);
+  const eventValues = buildRewardEventValues(adNetwork);
+  console.log('[AppsFlyer] logRewardedAdCompleted 호출:', adNetwork, eventValues);
   const trySend = (attempt = 0) => {
     const maxAttempts = 10;
     const delays = [0, 150, 300, 500, 800, 1200, 1600, 2000, 2500, 3000];

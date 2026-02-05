@@ -5,6 +5,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { showTapjoyPlacement } from '../services/tapjoy';
+import { logRewardedAdCompleted } from '../services/appsflyer';
 import { showToast } from '../utils';
 
 export const TapjoyListScreen = () => {
@@ -14,7 +15,10 @@ export const TapjoyListScreen = () => {
   const handleShowAd = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await showTapjoyPlacement();
+      const result = await showTapjoyPlacement(undefined, () => {
+        console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
+        logRewardedAdCompleted('tapjoy');
+      });
       if (result.success) {
         showToast('탭조이 광고를 불러왔습니다.');
       } else {

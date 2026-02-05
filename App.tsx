@@ -911,7 +911,7 @@ export default function App() {
         const initOptions = {
           devKey: env.APPSFLYER_DEV_KEY,
           appId: env.APPSFLYER_APP_ID_IOS,
-          isDebug: __DEV__,
+          isDebug: true, 
           onInstallConversionDataListener: true,
           onDeepLinkListener: true,
           timeToWaitForATTUserAuthorization: 10,
