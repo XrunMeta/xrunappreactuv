@@ -173,18 +173,6 @@ try {
 
 }
 
-let iconMyinfoTop: any = null;
-
-try {
-
-  iconMyinfoTop = require('../../assets/images/icon_myinfo_top.png');
-
-} catch (e) {
-
-  console.warn('icon_myinfo_top.png not found');
-
-}
-
 let logoTempMarker: any = null;
 
 try {
@@ -3473,32 +3461,18 @@ export const MapMainScreen: React.FC = () => {
 
         {}
 
-        <View style={styles.mapPinButtonContainer}>
-          {iconMyinfoTop && (
-            <Pressable
-              style={styles.mapPinButtonTop}
-              onPress={() => navigate(ROUTES.myInfo)}
-            >
-              <Image
-                source={iconMyinfoTop}
-                style={styles.mapPinIcon}
-                resizeMode="contain"
-              />
-            </Pressable>
-          )}
-          {iconMapPoint && (
-            <Pressable
-              style={styles.mapPinButton}
-              onPress={goToCurrentLocation}
-            >
-              <Image
-                source={iconMapPoint}
-                style={styles.mapPinIcon}
-                resizeMode="contain"
-              />
-            </Pressable>
-          )}
-        </View>
+        {iconMapPoint && (
+          <Pressable
+            style={styles.mapPinButton}
+            onPress={goToCurrentLocation}
+          >
+            <Image
+              source={iconMapPoint}
+              style={styles.mapPinIcon}
+              resizeMode="contain"
+            />
+          </Pressable>
+        )}
 
         {}
 
@@ -3687,21 +3661,10 @@ const styles = StyleSheet.create({
 
   },
 
-  mapPinButtonContainer: {
+  mapPinButton: {
     position: 'absolute',
     top: 26,
     right: 16,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  mapPinButtonTop: {
-    width: 35,
-    height: 35,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  mapPinButton: {
     width: 35,
     height: 35,
     alignItems: 'center',
