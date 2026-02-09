@@ -2627,6 +2627,12 @@ export const MapMainScreen: React.FC = () => {
 
         break;
 
+      case 'info':
+
+        navigate(ROUTES.myInfo);
+
+        break;
+
       case 'map':
 
         console.log('📍 [하단 메뉴] 맵 클릭 - GPS 위치로 이동 및 콜아웃 숨기기');
@@ -3355,9 +3361,9 @@ export const MapMainScreen: React.FC = () => {
 
     { id: 'map', label: '' }, 
 
-    { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
-
     { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+
+    { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
 
   ];
 

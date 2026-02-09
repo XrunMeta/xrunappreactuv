@@ -1916,6 +1916,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       case 'referral':
         navigate(ROUTES.referralSettlement);
         break;
+      case 'info':
+        navigate(ROUTES.myInfo);
+        break;
       default:
         console.log('Unknown navigation item:', itemId);
     }
@@ -2442,8 +2445,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
     { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
     { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+    { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
   ];
 
   if (!permission) {
