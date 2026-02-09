@@ -1916,6 +1916,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       case 'referral':
         v_9b57fc(v_ce4741.referralSettlement);
         break;
+      case 'info':
+        v_9b57fc(v_ce4741.myInfo);
+        break;
       default:
         console.log('Unknown navigation item:', v_6e55b1);
     }
@@ -2442,8 +2445,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
     { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
   ];
 
   if (!v_d1a6bb) {

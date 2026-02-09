@@ -2627,6 +2627,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         break;
 
+      case 'info':
+
+        v_9b57fc(v_ce4741.myInfo);
+
+        break;
+
       case 'map':
 
         console.log('📍 [하단 메뉴] 맵 클릭 - GPS 위치로 이동 및 콜아웃 숨기기');
@@ -3355,9 +3361,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
     { id: 'map', label: '' }, 
 
-    { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
-
     { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+
+    { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
 
   ];
 
