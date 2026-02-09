@@ -26,6 +26,8 @@ type MenuConfig = {
   iconName: string;
   iconLibrary: 'Feather' | 'Material' | 'Ionicons' | 'MaterialCommunityIcons';
   iconColor: string;
+
+  iconImage?: number;
   route?: keyof typeof v_ce4741;
   disabled?: boolean;
 };
@@ -52,6 +54,25 @@ export const v_03a231 = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
+      },
+      {
+        id: 'referralList',
+        label: '추천',
+        subtitle: '내그룹, 그룹정산, 순위',
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#6366F1',
+        iconImage: require('../../assets/images/icon_referral_list.png'),
+        route: 'referralMyGroup',
+      },
+      {
+        id: 'referral',
+        label: v_8d41d7('screens.myInfo.referralEdit'),
+        subtitle: v_8d41d7('screens.myInfo.referralEditSubtitle'),
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#EC4899',
+        route: 'myInfoReferral',
       },
       {
         id: 'shopSales',
@@ -88,15 +109,6 @@ export const v_03a231 = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#3B82F6',
         route: 'myInfoClauses',
-      },
-      {
-        id: 'referral',
-        label: v_8d41d7('screens.myInfo.referralEdit'),
-        subtitle: v_8d41d7('screens.myInfo.referralEditSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EC4899',
-        route: 'myInfoReferral',
       },
       {
         id: 'setting',
@@ -309,6 +321,15 @@ export const v_03a231 = () => {
 
   const v_03ce49 = (v_714568) => {
     const v_6fb2d1 = 24;
+    if (v_714568.iconImage) {
+      return (
+        <Image
+          source={v_714568.iconImage}
+          style={{ width: v_6fb2d1, height: v_6fb2d1 }}
+          resizeMode="contain"
+        />
+      );
+    }
     if (v_714568.iconLibrary === 'Ionicons') {
       return <Ionicons name={v_714568.iconName as any} size={v_6fb2d1} color={v_714568.iconColor} />;
     }
