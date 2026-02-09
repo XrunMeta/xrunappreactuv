@@ -26,6 +26,8 @@ type MenuConfig = {
   iconName: string;
   iconLibrary: 'Feather' | 'Material' | 'Ionicons' | 'MaterialCommunityIcons';
   iconColor: string;
+
+  iconImage?: number;
   route?: keyof typeof ROUTES;
   disabled?: boolean;
 };
@@ -52,6 +54,25 @@ export const MyInfoScreen = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
         route: 'myInfoEmailAuth',
+      },
+      {
+        id: 'referralList',
+        label: '추천',
+        subtitle: '내그룹, 그룹정산, 순위',
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#6366F1',
+        iconImage: require('../../assets/images/icon_referral_list.png'),
+        route: 'referralMyGroup',
+      },
+      {
+        id: 'referral',
+        label: t('screens.myInfo.referralEdit'),
+        subtitle: t('screens.myInfo.referralEditSubtitle'),
+        iconName: 'people-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#EC4899',
+        route: 'myInfoReferral',
       },
       {
         id: 'shopSales',
@@ -88,15 +109,6 @@ export const MyInfoScreen = () => {
         iconLibrary: 'Ionicons',
         iconColor: '#3B82F6',
         route: 'myInfoClauses',
-      },
-      {
-        id: 'referral',
-        label: t('screens.myInfo.referralEdit'),
-        subtitle: t('screens.myInfo.referralEditSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EC4899',
-        route: 'myInfoReferral',
       },
       {
         id: 'setting',
@@ -309,6 +321,15 @@ export const MyInfoScreen = () => {
 
   const renderMenuIcon = (menu: MenuConfig) => {
     const iconSize = 24;
+    if (menu.iconImage) {
+      return (
+        <Image
+          source={menu.iconImage}
+          style={{ width: iconSize, height: iconSize }}
+          resizeMode="contain"
+        />
+      );
+    }
     if (menu.iconLibrary === 'Ionicons') {
       return <Ionicons name={menu.iconName as any} size={iconSize} color={menu.iconColor} />;
     }
