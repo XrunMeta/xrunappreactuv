@@ -23,7 +23,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
+import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_4296b8, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -523,6 +523,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_95eb72, v_6c06ae] = v_5ab095(0);
   const [v_a5ed76, v_27c4b9] = v_5ab095(false);
   const v_269c04 = '#60A5FA'; 
+
+  const [v_4394c8, v_535e5c] = v_5ab095(false);
 
   const [v_def1ae, v_643c94] = v_5ab095(false);
   const [v_2610e9, v_12be53] = v_5ab095<'male' | 'female'>('male');
@@ -1495,41 +1497,32 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const v_c3eac4 = typeof v_625c74.gender === 'string' ? parseInt(v_625c74.gender, 10) : (v_625c74.gender ?? 0);
+      const v_6e272b = typeof v_625c74.ages === 'string' ? parseInt(v_625c74.ages, 10) : (v_625c74.ages ?? 0);
+      const v_b9bbbd = v_625c74.country != null ? (typeof v_625c74.country === 'string' ? parseInt(v_625c74.country, 10) : Number(v_625c74.country)) : 0;
+      const v_a6c30b = v_625c74.region != null ? (typeof v_625c74.region === 'string' ? parseInt(v_625c74.region, 10) : Number(v_625c74.region)) : 0;
+
+      const v_963bb4 = v_c3eac4 === 0 || v_6e272b === 0 || !v_b9bbbd || v_b9bbbd === 0 || !v_a6c30b || v_a6c30b === 0;
+
       console.log('[AR 화면] 사용자 정보:', {
         gender: v_625c74.gender,
         ages: v_625c74.ages,
-        genderType: typeof v_625c74.gender,
-        agesType: typeof v_625c74.ages,
+        country: v_625c74.country,
+        region: v_625c74.region,
       });
-
-      const v_c3eac4 = typeof v_625c74.gender === 'string' ? parseInt(v_625c74.gender, 10) : (v_625c74.gender ?? 0);
-      const v_6e272b = typeof v_625c74.ages === 'string' ? parseInt(v_625c74.ages, 10) : (v_625c74.ages ?? 0);
-
-      console.log('[AR 화면] 성별/연령대 확인 결과:', {
+      console.log('[AR 화면] 성별/연령/지역 확인 결과:', {
         gender: v_c3eac4,
         ages: v_6e272b,
-        genderOriginal: v_625c74.gender,
-        agesOriginal: v_625c74.ages,
-        shouldShowDialog: v_c3eac4 === 0 || v_6e272b === 0,
+        country: v_b9bbbd,
+        region: v_a6c30b,
+        shouldShowDialog: v_963bb4,
       });
 
-      if (v_c3eac4 === 0 || v_6e272b === 0) {
-        console.log('[AR 화면] 성별/연령대가 0 - Dialog 표시');
-
-        v_12be53(v_c3eac4 === 0 ? 'male' : (v_c3eac4 === 2111 ? 'female' : 'male'));
-        const v_c3889d = {
-          2210: '10',
-          2220: '20',
-          2230: '30',
-          2240: '40',
-          2250: '50+',
-        };
-
-        v_8d44be(v_6e272b === 0 ? '10' : (v_c3889d[v_6e272b] || '10'));
-        v_643c94(true);
-        console.log('[AR 화면] Dialog 표시 완료, genderAgeDialogVisible:', true);
+      if (v_963bb4) {
+        console.log('[AR 화면] 성별/연령/지역 중 미입력 - 선택정보 안내 팝업 표시');
+        v_535e5c(true);
       } else {
-        console.log('[AR 화면] 성별/연령대가 모두 설정됨 - Dialog 표시 안 함');
+        console.log('[AR 화면] 성별/연령/지역 모두 설정됨 - 팝업 표시 안 함');
       }
     } catch (v_5e9bfe) {
       console.error('[AR 화면] 성별/연령대 확인 실패:', v_5e9bfe);
@@ -1538,7 +1531,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_8285e9 = v_de06a3(async () => {
     if (!v_717992 || !v_2610e9 || !v_10adc9) {
-      await v_889fad(v_8d41d7('common.messages.error') || '오류', '성별과 연령대를 모두 선택해주세요.');
+      await v_889fad(v_8d41d7('common.messages.error') || '오류', '성별, 연령대, 지역을 모두 선택해주세요.');
       return;
     }
 
@@ -1560,7 +1553,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       ]);
 
       v_643c94(false);
-      await v_889fad(v_8d41d7('common.messages.success') || '성공', '성별과 연령대가 업데이트되었습니다.');
+      await v_889fad(v_8d41d7('common.messages.success') || '성공', '성별, 연령대, 지역이 업데이트되었습니다.');
     } catch (v_5e9bfe) {
       console.error('[AR 화면] 성별/연령대 업데이트 실패:', v_5e9bfe);
       await v_889fad(v_8d41d7('common.messages.error') || '오류', '업데이트에 실패했습니다.');
@@ -1568,6 +1561,51 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_2af968(false);
     }
   }, [v_717992, v_2610e9, v_10adc9, v_9b57fc, v_889fad, v_8d41d7]);
+
+  const v_65d1c5 = v_de06a3(async () => {
+    let v_73ad51 = v_717992;
+    if (v_73ad51 == null) {
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_8decf8 = JSON.parse(v_f24fd5);
+          v_73ad51 = v_8decf8?.member ?? null;
+        }
+      } catch (v_37eab7) {}
+    }
+    if (v_73ad51 == null) {
+      v_535e5c(false);
+      return;
+    }
+    try {
+      const v_3393e3 = await v_a7ab3c(v_73ad51, v_9b57fc);
+      const v_625c74 = v_3393e3.data?.[0];
+      const v_c3eac4 = v_625c74?.gender != null ? (typeof v_625c74.gender === 'string' ? parseInt(v_625c74.gender, 10) : Number(v_625c74.gender)) : 0;
+      const v_6e272b = v_625c74?.ages != null ? (typeof v_625c74.ages === 'string' ? parseInt(v_625c74.ages, 10) : Number(v_625c74.ages)) : 0;
+      const v_b9bbbd = v_625c74?.country != null ? (typeof v_625c74.country === 'string' ? parseInt(v_625c74.country, 10) : Number(v_625c74.country)) : 0;
+      const v_a6c30b = v_625c74?.region != null ? (typeof v_625c74.region === 'string' ? parseInt(v_625c74.region, 10) : Number(v_625c74.region)) : 0;
+
+      const v_94927f = v_c3eac4 === 0 || isNaN(v_c3eac4);
+      const v_344f54 = v_6e272b === 0 || isNaN(v_6e272b);
+      const v_76105a = !v_b9bbbd || v_b9bbbd === 0 || !v_a6c30b || v_a6c30b === 0;
+
+      const v_e01f71 = [];
+      if (v_94927f) v_e01f71.push(v_71d37e(v_73ad51, 2110, v_9b57fc));
+      if (v_344f54) v_e01f71.push(v_07f367(v_73ad51, 2220, v_9b57fc));
+      if (v_76105a) v_e01f71.push(v_4296b8(v_73ad51, 82, 2, v_9b57fc));
+
+      await Promise.all(v_e01f71);
+
+      await v_e84827.setItem('userGenderForAd', String(v_94927f ? 2110 : v_c3eac4));
+      await v_e84827.setItem('userAgesForAd', String(v_344f54 ? 2220 : v_6e272b));
+      await v_e84827.setItem('userCountryForAd', String(v_76105a ? 82 : v_b9bbbd));
+      await v_e84827.setItem('userRegionForAd', String(v_76105a ? 2 : v_a6c30b));
+      v_535e5c(false);
+    } catch (v_5e9bfe) {
+      console.error('[AR 화면] 나중에 기본값 적용 실패:', v_5e9bfe);
+      v_535e5c(false);
+    }
+  }, [v_717992, v_9b57fc]);
 
   v_c4deb2(() => {
     const v_2ff7b8 = async () => {
@@ -3431,9 +3469,35 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       {}
       <Dialog
-        visible={v_def1ae}
-        title={v_8d41d7('screens.camera.genderAgeRequired') || '성별과 연령대를 입력해주세요'}
+        visible={v_4394c8}
+        title={v_8d41d7('screens.camera.optionalInfoTitle') || '선택정보를 입력하시면 더 많은 리워드를 얻을 수 있습니다'}
         actions={[
+          {
+            label: v_8d41d7('screens.camera.optionalInfoLater') || '나중에',
+            onPress: v_65d1c5,
+            variant: 'secondary',
+          },
+          {
+            label: v_8d41d7('screens.camera.optionalInfoInput') || '입력하기',
+            onPress: () => {
+              v_535e5c(false);
+              v_9b57fc(v_ce4741.myInfoEdit);
+            },
+            variant: 'primary',
+          },
+        ]}
+      />
+
+      {}
+      <Dialog
+        visible={v_def1ae}
+        title={v_8d41d7('screens.camera.genderAgeRegionRequired') || '성별, 연령대, 지역을 입력해주세요'}
+        actions={[
+          {
+            label: v_8d41d7('screens.camera.optionalInfoLater') || '나중에',
+            onPress: v_65d1c5,
+            variant: 'secondary',
+          },
           {
             label: v_8d41d7('common.buttons.confirm') || '확인',
             onPress: v_8285e9,

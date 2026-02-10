@@ -38,38 +38,29 @@ import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
 import { v_58c98d } from '../utils/countryStateCityUtils';
 import { v_da1883 } from '../types';
 
-const v_0c96f7 = ['10', '20', '30', '40', '50+'] as const;
+const v_0c96f7 = ['select', '10', '20', '30', '40', '50+'] as const;
+
+export type GenderOption = 'male' | 'female' | 'select';
 
 const v_a1244c = (v_c3eac4): number => {
-  return v_c3eac4 === 'male' ? 2110 : 2111;
+  if (v_c3eac4 === 'female') return 2111;
+  if (v_c3eac4 === 'select') return 2112;
+  return 2110; 
 };
 
-const v_d6877d = (v_c3eac4): 'male' | 'female' => {
-
-  if (v_c3eac4 === null || v_c3eac4 === undefined) {
-    return 'male';
-  }
-
+const v_d6877d = (v_c3eac4): GenderOption => {
+  if (v_c3eac4 === null || v_c3eac4 === undefined) return 'male';
   let v_7ac969;
-  if (typeof v_c3eac4 === 'string') {
-    v_7ac969 = parseInt(v_c3eac4, 10);
-  } else {
-    v_7ac969 = v_c3eac4;
-  }
-
-  if (isNaN(v_7ac969)) {
-    return 'male';
-  }
-
-  if (v_7ac969 === 0) {
-    return 'male';
-  }
-
-  const v_43c42e = v_7ac969 === 2111 ? 'female' : 'male';
-  return v_43c42e;
+  if (typeof v_c3eac4 === 'string') v_7ac969 = parseInt(v_c3eac4, 10);
+  else v_7ac969 = v_c3eac4;
+  if (isNaN(v_7ac969) || v_7ac969 === 0) return 'male';
+  if (v_7ac969 === 2111) return 'female';
+  if (v_7ac969 === 2112) return 'select';
+  return 'male'; 
 };
 
-const v_e9394b = (v_2694bd): number => {
+const v_e9394b = (age: (typeof v_0c96f7)[number]): number => {
+  if (v_2694bd === 'select') return 0;
   const v_c3889d = {
     '10': 2210,
     '20': 2220,
@@ -77,11 +68,11 @@ const v_e9394b = (v_2694bd): number => {
     '40': 2240,
     '50+': 2250,
   };
-  return v_c3889d[v_2694bd] || 2210; 
+  return v_c3889d[v_2694bd] ?? 2210;
 };
 
 const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
-  if (v_2694bd === 0 || v_2694bd === null || v_2694bd === undefined) return '10'; 
+  if (v_2694bd === 0 || v_2694bd === null || v_2694bd === undefined) return 'select';
   const ageMap: Record<number, (typeof v_0c96f7)[number]> = {
     2210: '10',
     2220: '20',
@@ -89,7 +80,7 @@ const v_596588 = (v_2694bd): (typeof v_0c96f7)[number] => {
     2240: '40',
     2250: '50+',
   };
-  return v_c3889d[v_2694bd] || '10'; 
+  return v_c3889d[v_2694bd] ?? 'select';
 };
 
 export const v_cdb169 = () => {
@@ -103,10 +94,19 @@ export const v_cdb169 = () => {
 
   const v_6bee17 = v_a3453e.useRef(0);
 
-  const v_798085 = [
-    { value: 'male' as const, label: v_8d41d7('screens.myInfoEdit.genderMale') },
-    { value: 'female' as const, label: v_8d41d7('screens.myInfoEdit.genderFemale') },
-  ];
+  const v_df691e = v_326be8.OS === 'ios';
+
+  const v_798085 = v_df691e
+    ? [
+        { value: 'select', label: v_8d41d7('screens.myInfoEdit.genderSelect') },
+        { value: 'male', label: v_8d41d7('screens.myInfoEdit.genderMale') },
+        { value: 'female', label: v_8d41d7('screens.myInfoEdit.genderFemale') },
+      ]
+    : [
+        { value: 'male', label: v_8d41d7('screens.myInfoEdit.genderMale') },
+        { value: 'female', label: v_8d41d7('screens.myInfoEdit.genderFemale') },
+      ];
+  const v_8b5eb1 = v_df691e ? v_0c96f7 : (['10', '20', '30', '40', '50+'] as const);
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
   const [v_05b02f, v_ef747e] = v_5ab095('');
@@ -116,7 +116,7 @@ export const v_cdb169 = () => {
   const [v_a6c30b, v_c030e3] = v_5ab095('대한민국 서울');
   const [v_222917, v_b8bf44] = v_5ab095<number | null>(null);
   const [v_a4d981, v_9b1714] = v_5ab095<number | null>(null);
-  const [v_c3eac4, v_bdc43c] = v_5ab095<'male' | 'female'>('male');
+  const [v_c3eac4, v_bdc43c] = v_5ab095<GenderOption>('male');
   const [v_2694bd, v_6e5c76] = v_5ab095<(typeof v_0c96f7)[number]>('10');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
 
@@ -227,7 +227,7 @@ export const v_cdb169 = () => {
 
   const [v_9d09f1, v_d0e79e] = v_5ab095('');
   const [v_b6daf3, v_c94311] = v_5ab095('');
-  const [v_318eac, v_edd340] = v_5ab095<'male' | 'female'>('male');
+  const [v_318eac, v_edd340] = v_5ab095<GenderOption>('male');
   const [v_30922c, v_27ff98] = v_5ab095<(typeof v_0c96f7)[number]>('10');
   const [v_b6505c, v_4a9b82] = v_5ab095<number | null>(null);
   const [v_6e1588, v_8656e3] = v_5ab095<number | null>(null);
@@ -390,6 +390,9 @@ export const v_cdb169 = () => {
             const v_df7343 = v_d6877d(v_625c74.gender);
             const v_9c69cf = v_596588(v_625c74.ages);
 
+            const v_c5dc47 = v_df691e ? v_df7343 : (v_df7343 === 'select' ? 'male' : v_df7343);
+            const v_423966 = v_df691e ? v_9c69cf : (v_9c69cf === 'select' ? '10' : v_9c69cf);
+
             v_4944f5(v_898d5f);
             v_b7613d(v_8e4db1);
 
@@ -400,23 +403,15 @@ export const v_cdb169 = () => {
 
             v_d0e79e(v_898d5f);
             v_c94311(v_8e4db1);
-            v_edd340(v_df7343);
-            v_27ff98(v_9c69cf);
+            v_edd340(v_c5dc47);
+            v_27ff98(v_423966);
 
             if (v_625c74.mobile) {
               v_fcce73(v_625c74.mobile.replace(/\s/g, ''));
             }
 
-            const v_fc3a4e = (() => {
-              const v_fbe376 = v_625c74.gender;
-              if (v_fbe376 === null || v_fbe376 === undefined) return 'male';
-              const v_7ac969 = typeof v_fbe376 === 'string' ? parseInt(v_fbe376, 10) : v_fbe376;
-              return isNaN(v_7ac969) ? 'male' : (v_7ac969 === 2111 ? 'female' : 'male');
-            })();
-
-            v_bdc43c(v_df7343);
-
-            v_6e5c76(v_9c69cf);
+            v_bdc43c(v_c5dc47);
+            v_6e5c76(v_423966);
 
             let v_af0247 = '';
             let v_551ac0 = null;
@@ -809,58 +804,28 @@ export const v_cdb169 = () => {
       return;
     }
 
-    if (!v_c3eac4) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.genderRequired'));
-      return;
-    }
-
-    if (!v_2694bd) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.ageRequired'));
-      return;
-    }
-
-    if (!v_add96c.cCode && v_add96c.cCode !== 0) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.countryRequired'));
-      return;
-    }
-
-    if (v_167c8b.rCode === null || v_167c8b.rCode === -1) {
-      await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.regionRequired'));
-      return;
-    }
-
     if (!v_717992) {
       await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
-    const v_d199d8 = v_a1244c(v_c3eac4);
-    const v_2d2cbc = v_e9394b(v_2694bd);
-
-    const v_ea02dc = [];
-
-    if (v_d199d8 === 0 || v_d199d8 === null || v_d199d8 === undefined) {
-      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
-    }
-
-    if (v_2d2cbc === 0 || v_2d2cbc === null || v_2d2cbc === undefined) {
-      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
-    }
-
-    if (v_add96c.cCode === 0 || v_add96c.cCode === null || v_add96c.cCode === undefined) {
-      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
-    }
-
-    if (v_167c8b.rCode === 0 || v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === -1) {
-      v_ea02dc.push(v_8d41d7('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
-    }
-
-    if (v_ea02dc.length > 0) {
-      await v_889fad(
-        v_8d41d7('screens.myInfoEdit.alerts.error') || '오류',
-        v_ea02dc.join('\n')
-      );
-      return;
+    if (!v_df691e) {
+      if (v_c3eac4 === 'select') {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
+        return;
+      }
+      if (v_2694bd === 'select') {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
+        return;
+      }
+      if (v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === -1) {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+        return;
+      }
+      if (v_add96c.cCode === null || v_add96c.cCode === undefined) {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
+        return;
+      }
     }
 
     v_433822(true);
@@ -995,10 +960,9 @@ export const v_cdb169 = () => {
       });
 
       if (v_add96c.cCode !== null && v_add96c.cCode !== undefined &&
-        v_167c8b.rCode !== null && v_167c8b.rCode !== undefined &&
         v_167c8b.rCode !== -1) {
         const v_ca520f = v_add96c.cCode;
-        const v_c61e4f = v_167c8b.rCode;
+        const v_c61e4f = v_167c8b.rCode === null || v_167c8b.rCode === undefined ? 0 : v_167c8b.rCode;
 
         if (!v_717992 || v_717992 === null || v_717992 === undefined) {
           console.error('[정보수정] ❌ memberId가 유효하지 않습니다:', v_717992);
@@ -1404,6 +1368,14 @@ export const v_cdb169 = () => {
     }
   };
 
+  const regionSelectOption: v_da1883 = v_df9f57(() => ({
+    iso2: 'select',
+    name: v_8d41d7('screens.myInfoEdit.regionSelect'),
+    dialCode: '0',
+    flagEmoji: '',
+    countryCode: 0,
+  }), [v_8d41d7]);
+
   const v_4e187d = v_df9f57(() => {
     if (!v_7962f1.trim()) {
       return v_963133;
@@ -1435,8 +1407,13 @@ export const v_cdb169 = () => {
         v_a2493c.includes(v_470e34) ||
         v_73b9dc.includes(v_470e34)
       );
-    });
+    }      );
   }, [v_7962f1, v_963133, v_8d41d7]);
+
+  const v_9ea51e = v_df9f57(
+    () => (v_df691e ? [v_f58a22, ...v_4e187d] : v_4e187d),
+    [v_df691e, v_f58a22, v_4e187d]
+  );
 
   const v_477add = (region: v_da1883) => {
     console.log('[정보수정] 지역 선택:', {
@@ -1455,12 +1432,15 @@ export const v_cdb169 = () => {
         rCode: null,
       });
       v_a0f6fa(null);
+      v_b8bf44(null);
     } else {
       console.log('[정보수정] 지역 선택:', v_a6c30b.name);
       v_2f2d51(v_a6c30b);
       const v_222917 = parseInt(v_a6c30b.dialCode, 10) || 0;
 
-      const v_a4d981 = v_459d5e?.countryCode || v_a6c30b.countryCode || null;
+      const v_a4d981 = (v_459d5e?.countryCode
+        ?? (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null))
+        || v_a6c30b.countryCode || null;
       let v_6f4ea0 = v_a6c30b.name; 
 
       if (v_a4d981 && v_222917 > 0) {
@@ -1527,13 +1507,15 @@ export const v_cdb169 = () => {
 
   v_a3453e.useEffect(() => {
     const v_91c5e2 = async () => {
-      if (!v_459d5e?.countryCode) return;
+      const v_a4d981 = v_459d5e?.countryCode
+        ?? (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null);
+      if (!v_a4d981 || !v_459d5e?.iso2) return;
 
       v_1c41ce(true);
       try {
         const result: v_107459 = await v_5c7129(
           (v_b9bbbd) => v_11e39e(v_b9bbbd, v_9b57fc),
-          v_459d5e.countryCode || 0,
+          v_a4d981,
           v_459d5e.iso2,
           v_369014(v_459d5e.iso2)
         );
@@ -1550,7 +1532,7 @@ export const v_cdb169 = () => {
             const v_6f4ea0 = v_2d5c3d(
               v_416db8.name,
               v_167c8b.rCode,
-              v_459d5e?.countryCode || null
+              v_a4d981
             );
             v_a0f6fa(v_6f4ea0);
 
@@ -1690,13 +1672,12 @@ export const v_cdb169 = () => {
 
             {}
             {(() => {
-
-              const v_a4d981 = v_459d5e?.countryCode;
+              const v_a4d981 = v_459d5e?.countryCode
+                ?? (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null);
               const v_cc0c7d = v_459d5e?.iso2;
-              const v_56ad9c = v_a4d981 && v_cc0c7d 
-                ? v_58c98d(v_a4d981, v_cc0c7d) 
+              const v_56ad9c = (v_a4d981 != null && v_cc0c7d)
+                ? v_58c98d(v_a4d981, v_cc0c7d)
                 : false;
-
               return v_5f1e0e || v_56ad9c;
             })() && (
               <View style={v_d81136.fieldContainer}>
@@ -1707,20 +1688,29 @@ export const v_cdb169 = () => {
                   activeOpacity={0.7}
                   disabled={v_e495db || v_0908db}
                 >
-                  <Text style={[v_d81136.regionValue, !v_167c8b.rDesc && !v_2f03bc && v_d81136.regionPlaceholder]}>
+                  <Text style={v_d81136.regionValue}>
                     {(() => {
 
+                      if (!v_2f03bc || v_167c8b.rCode === null || v_167c8b.rCode === 0) {
+                        return v_8d41d7('screens.myInfoEdit.regionSelect') || '선택';
+                      }
+
                       if (v_167c8b.rDesc && v_167c8b.rDesc !== 'Please Select') {
+                        const v_7b1417 = v_8d41d7('screens.myInfoEdit.allRegions');
+                        if (v_167c8b.rDesc === v_7b1417 || v_167c8b.rCode === 0) {
+                          return v_8d41d7('screens.myInfoEdit.regionSelect') || '선택';
+                        }
                         return v_167c8b.rDesc;
                       }
 
                       if (v_2f03bc && v_2f03bc.iso2 !== 'select' && v_2f03bc.dialCode !== '0') {
 
                         const v_222917 = v_2f03bc.dialCode ? parseInt(v_2f03bc.dialCode, 10) : null;
-                        const v_a4d981 = v_459d5e?.countryCode || null;
+                        const v_a4d981 = v_459d5e?.countryCode
+                          ?? (v_459d5e?.dialCode ? v_bec697(v_459d5e.dialCode) : null);
 
                         if (v_222917 === 0) {
-                          return v_8d41d7('screens.myInfoEdit.allRegions') || '전체 지역';
+                          return v_8d41d7('screens.myInfoEdit.regionSelect') || '선택';
                         } else if (v_a4d981 && v_222917 !== null && v_222917 !== undefined && v_222917 > 0) {
 
                           const v_9ad700 = [82, 81, 86, 1, 62];
@@ -1756,7 +1746,7 @@ export const v_cdb169 = () => {
                         }
                       }
 
-                      return '';
+                      return v_8d41d7('screens.myInfoEdit.regionSelect') || '선택';
                     })()}
                   </Text>
                   <Text style={v_d81136.arrow}>›</Text>
@@ -1795,18 +1785,16 @@ export const v_cdb169 = () => {
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.age')}</Text>
               <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
-                {v_0c96f7.map((v_0bd920, v_a56041) => {
-                  return (
-                    <OptionButton
-                      key={v_0bd920}
-                      label={v_0bd920}
-                      selected={v_2694bd === v_0bd920}
-                      onPress={() => v_6e5c76(v_0bd920)}
-                      flex={1}
-                      disabled={v_e495db}
-                    />
-                  );
-                })}
+                {v_8b5eb1.map((v_0bd920) => (
+                  <OptionButton
+                    key={v_0bd920}
+                    label={v_0bd920 === 'select' ? v_8d41d7('screens.myInfoEdit.ageSelect') : v_0bd920}
+                    selected={v_2694bd === v_0bd920}
+                    onPress={() => v_6e5c76(v_0bd920)}
+                    flex={1}
+                    disabled={v_e495db}
+                  />
+                ))}
               </View>
             </View>
           </View>
@@ -1969,12 +1957,12 @@ export const v_cdb169 = () => {
               </View>
             ) : (
               <FlatList
-                data={v_4e187d}
+                data={v_9ea51e}
                 keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
                 renderItem={({ item: v_8c0b26 }) => (
                   <CountryCodeListItem
                     country={v_8c0b26}
-                    isSelected={v_8c0b26.iso2 === v_2f03bc?.iso2 && v_8c0b26.dialCode === v_2f03bc?.dialCode}
+                    isSelected={(v_8c0b26.iso2 === 'select' && v_8c0b26.dialCode === '0' && !v_2f03bc) || (v_8c0b26.iso2 === v_2f03bc?.iso2 && v_8c0b26.dialCode === v_2f03bc?.dialCode)}
                     onPress={v_477add}
                     hideDialCode={true}
                   />

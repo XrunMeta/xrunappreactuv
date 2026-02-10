@@ -1777,44 +1777,30 @@ export const v_4296b8 = async (
       v_576f5a.mobilecode = v_b36f96.mobilecode;
     }
 
-    const v_2bb785 = {};
-    if (v_576f5a.member !== undefined) v_2bb785.member = v_576f5a.member;
-    if (v_576f5a.country !== undefined) v_2bb785.country = v_576f5a.country;
-    if (v_576f5a.region !== undefined) v_2bb785.region = v_576f5a.region;
-    if (v_576f5a.countrycode !== undefined) v_2bb785.countrycode = v_576f5a.countrycode;
-    if (v_576f5a.mobilecode !== undefined) v_2bb785.mobilecode = v_576f5a.mobilecode;
-
-    console.log('[마이페이지] 지역 수정 요청 - 최종 request 객체:', JSON.stringify(v_2bb785, null, 2));
-    console.log('[마이페이지] 지역 수정 요청 - cleanRequest 확인:', {
-      원본: v_576f5a,
-      정리됨: v_2bb785,
-      JSON문자열: JSON.stringify(v_2bb785),
-      파싱: JSON.parse(JSON.stringify(v_2bb785)),
-    });
-    console.log('[마이페이지] 지역 수정 요청 - request 상세:', {
+    const v_93e237 = (v_8839e3): any => {
+      if (v_8839e3 === undefined) return null;
+      if (v_8839e3 === null || typeof v_8839e3 !== 'object') return v_8839e3;
+      if (Array.isArray(v_8839e3)) return v_8839e3.map(v_93e237);
+      const v_8d4337 = {};
+      for (const v_0eb677 of Object.keys(v_8839e3)) {
+        const v_81e2ef = (v_8839e3 as any)[v_0eb677];
+        v_8d4337[v_0eb677] = v_81e2ef === undefined ? null : v_93e237(v_81e2ef);
+      }
+      return v_8d4337;
+    };
+    const v_2bb785 = {
       member: v_576f5a.member,
       country: v_576f5a.country,
       region: v_576f5a.region,
-      types: {
-        member: typeof v_576f5a.member,
-        country: typeof v_576f5a.country,
-        region: typeof v_576f5a.region,
-      },
-      values: {
-        memberValue: v_576f5a.member,
-        countryValue: v_576f5a.country,
-        regionValue: v_576f5a.region,
-      },
-      hasUndefined: {
-        member: v_576f5a.member === undefined,
-        country: v_576f5a.country === undefined,
-        region: v_576f5a.region === undefined,
-      },
-    });
+
+      countrycode: v_b36f96?.countrycode != null && !isNaN(v_b36f96.countrycode) ? v_b36f96.countrycode : null,
+      mobilecode: v_b36f96?.mobilecode != null && !isNaN(v_b36f96.mobilecode) ? v_b36f96.mobilecode : null,
+    };
+    const v_931bf0 = v_93e237(v_2bb785);
 
     const v_3393e3 = await v_9f42a4.post<v_9b135d>(
       '/app7190-02',
-      v_2bb785, 
+      v_931bf0,
     );
 
     console.log('[마이페이지] 지역 수정 성공');

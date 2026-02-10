@@ -91,10 +91,10 @@ export const v_f40fc5 = () => {
   const [v_d0472c, v_5d25dd] = v_5ab095(false);
 
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(
-    (v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android') ? '0' : (v_8d7bc8.gender || 'male')
+    (v_d0472c || v_326be8.OS === 'ios') ? '0' : (v_8d7bc8.gender || 'male')
   );
   const [v_f83808, v_64a312] = v_5ab095<AgeValue>(
-    (v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android') ? '0' : (v_8d7bc8.ageRange || '10')
+    (v_d0472c || v_326be8.OS === 'ios') ? '0' : (v_8d7bc8.ageRange || '10')
   );
   const [v_471e49, v_7f4d53] = v_5ab095(false);
   const [v_68a5a9, v_8e53ad] = v_5ab095(false);
@@ -168,7 +168,7 @@ export const v_f40fc5 = () => {
 
   const v_56ad9c = v_5f1e0e;
 
-  const v_600254 = v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android';
+  const v_600254 = v_d0472c || v_326be8.OS === 'ios';
 
   const v_56743f = v_a3453e.useMemo(() => {
 
@@ -406,8 +406,8 @@ export const v_f40fc5 = () => {
 
   const v_904f1e = v_df9f57(() => {
 
-    return [v_a35839, ...v_963133];
-  }, [v_a35839, v_963133]);
+    return v_600254 ? [v_a35839, ...v_963133] : v_963133;
+  }, [v_600254, v_a35839, v_963133]);
 
   const v_4e187d = v_df9f57(() => {
     if (!v_7962f1.trim()) {
@@ -738,9 +738,16 @@ export const v_f40fc5 = () => {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
         return;
       }
-
       if (v_5f1e0e && v_590486 && (!v_2f03bc || v_2f03bc.dialCode === '0')) {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
+        return;
+      }
+      if (!v_c3eac4 || v_c3eac4 === '0') {
+        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.genderRequired') || '성별을 선택해주세요.');
+        return;
+      }
+      if (!v_f83808 || v_f83808 === '0') {
+        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
     }
