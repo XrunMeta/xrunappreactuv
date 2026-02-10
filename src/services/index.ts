@@ -4172,6 +4172,82 @@ export const getXrunBuyableItems = async (
   }
 };
 
+export const getPointsBalance = async (
+  snuid: string,
+  navigation?: any,
+): Promise<{ current_p_balance: number }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = { snuid };
+
+    console.log('[포인트] 잔액 조회 요청:', { snuid });
+
+    const response = await axiosInstance.post<{ data?: { current_p_balance?: number } }>(
+      '/oth-path',
+      request,
+    );
+
+    const current_p_balance = response.data?.data?.current_p_balance ?? 0;
+    console.log('[포인트] 잔액 조회 성공:', current_p_balance);
+
+    return { current_p_balance };
+  } catch (error) {
+    console.error('[포인트] 잔액 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[포인트] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
+export interface SpendPointsParams {
+  snuid: string;
+  order_id: string;
+  item_name: string;
+  spent_amount: number;
+}
+
+export const spendPoints = async (
+  params: SpendPointsParams,
+  navigation?: any,
+): Promise<{ remaining_balance: number }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+
+    console.log('[포인트] 사용 요청:', params);
+
+    const response = await axiosInstance.post<{
+      data?: { remaining_balance?: number; message?: string };
+      message?: string;
+    }>('/oth-path', params);
+
+    const remaining_balance = response.data?.data?.remaining_balance ?? 0;
+    console.log('[포인트] 사용 성공, remaining_balance:', remaining_balance);
+
+    return { remaining_balance };
+  } catch (error) {
+    console.error('[포인트] 사용 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[포인트] 상세 오류 정보:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+    throw error;
+  }
+};
+
 export const getXrunPurchasedItems = async (
   member: string,
   navigation?: any,

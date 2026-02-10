@@ -19,10 +19,17 @@ export const connectTapjoy = async (userId?: string): Promise<boolean> => {
       console.warn('[Tapjoy] SDK Key가 설정되지 않았습니다. env의 TAPJOY_SDK_KEY_* 를 설정하세요.');
       return false;
     }
-    const { Tapjoy } = await import('tapjoy-react-native-sdk');
+    const sdk = await import('tapjoy-react-native-sdk');
+    const Tapjoy = sdk?.Tapjoy;
+    if (!Tapjoy || typeof Tapjoy.connect !== 'function') {
+      console.warn('[Tapjoy] SDK 로드 실패 (Tapjoy.connect 없음). Metro 캐시 리셋 후 재시도: npx react-native start --reset-cache');
+      return false;
+    }
     const flags: Record<string, string> = {};
     if (userId) flags.TJC_OPTION_USER_ID = userId;
     await Tapjoy.connect(sdkKey, flags);
+
+    if (typeof Tapjoy.setDebugEnabled === 'function') Tapjoy.setDebugEnabled(false);
     isTapjoyConnected = true;
     console.log('[Tapjoy] 연결 성공');
     return true;

@@ -9,7 +9,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
-import { getXRUNGopaxPrice, getXrunBuyableItems, sendInAppPurchase } from '../services';
+import { getXRUNGopaxPrice, getXrunBuyableItems, sendInAppPurchase, getPointsBalance, spendPoints } from '../services';
 import { ShopItemData } from '../types';
 import { formatXrunAmount, formatWonAmount, formatCurrency } from '../utils';
 import { cashingimages } from '../utils/imageCache';
@@ -122,7 +122,7 @@ const transformShopItem = (
 export const ShopTicketScreen = () => {
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
-  const [tab, setTab] = useState<'ticket' | 'myTicket'>('ticket');
+  const [tab, setTab] = useState<'ticket' | 'myTicket' | 'xplay'>('ticket');
   const { navigate } = useAppNavigation();
   const { setSelectedShopItem } = useAppContext();
   const [shopItems, setShopItems] = useState<(ShopItem & ShopItemData)[]>([]);
@@ -135,6 +135,10 @@ export const ShopTicketScreen = () => {
 
   const [iapProducts, setIapProducts] = useState<Record<string, any>>({});
   const [iapLoading, setIapLoading] = useState(false);
+
+  const [pointsBalance, setPointsBalance] = useState<number | null>(null);
+  const [pointsBalanceLoading, setPointsBalanceLoading] = useState(false);
+  const [pointsSpendLoading, setPointsSpendLoading] = useState(false);
 
   useEffect(() => {
 
@@ -380,6 +384,7 @@ export const ShopTicketScreen = () => {
     () => [
       { label: 'Ticket', value: 'ticket' },
       { label: 'My Ticket', value: 'myTicket' },
+      { label: 'Xplay', value: 'xplay' },
     ] as const,
     [],
   );
@@ -390,6 +395,54 @@ export const ShopTicketScreen = () => {
       navigate(ROUTES.shopMyTicket);
     }
   };
+
+  useEffect(() => {
+    if (tab !== 'xplay' || !memberId) return;
+    let cancelled = false;
+    const fetchPoints = async () => {
+      setPointsBalanceLoading(true);
+      setPointsBalance(null);
+      try {
+        const result = await getPointsBalance(memberId, navigate);
+        if (!cancelled) {
+          setPointsBalance(result.current_p_balance);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setPointsBalance(0);
+          console.error('[Xplay] 포인트 잔액 조회 실패:', e);
+        }
+      } finally {
+        if (!cancelled) setPointsBalanceLoading(false);
+      }
+    };
+    fetchPoints();
+    return () => { cancelled = true; };
+  }, [tab, memberId, navigate]);
+
+  const handleTestSpend10 = useCallback(async () => {
+    if (!memberId || pointsSpendLoading) return;
+    const current = pointsBalance ?? 0;
+    if (current < 10) {
+      showAlert('잔액 부족', '포인트가 10 이상 필요합니다.', [{ text: '확인' }]);
+      return;
+    }
+    setPointsSpendLoading(true);
+    try {
+      const order_id = `member_${memberId}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const result = await spendPoints(
+        { snuid: memberId, order_id, item_name: '테스트 결제 10P', spent_amount: 10 },
+        navigate,
+      );
+      setPointsBalance(result.remaining_balance);
+      showAlert('테스트 결제 완료', `잔액: ${result.remaining_balance.toLocaleString()} P`, [{ text: '확인' }]);
+    } catch (e) {
+      console.error('[Xplay] 테스트 결제 실패:', e);
+      showAlert('결제 실패', e instanceof Error ? e.message : '포인트 사용에 실패했습니다.', [{ text: '확인' }]);
+    } finally {
+      setPointsSpendLoading(false);
+    }
+  }, [memberId, pointsBalance, pointsSpendLoading, navigate, showAlert]);
 
   const getIapPrice = useCallback((sku: string): string | null => {
     const product = iapProducts[sku];
@@ -482,7 +535,32 @@ export const ShopTicketScreen = () => {
               </View>
             )}
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-              {tab === 'ticket' && filteredItems.length > 0
+              {tab === 'xplay'
+                ? (
+                    <View style={styles.xplayContainer}>
+                      {pointsBalanceLoading
+                        ? (
+                            <ActivityIndicator size="small" color={COLORS.buttonPrimary} style={styles.xplayLoader} />
+                          )
+                        : (
+                            <Text style={styles.xplayBalanceLabel}>
+                              {t('screens.shop.pointsBalance', '포인트 잔액')}: {pointsBalance !== null ? pointsBalance.toLocaleString() : '-'}
+                            </Text>
+                          )}
+                      <TouchableOpacity
+                        style={[styles.xplayTestButton, (pointsBalanceLoading || pointsSpendLoading || (pointsBalance !== null && pointsBalance < 10)) && styles.xplayTestButtonDisabled]}
+                        onPress={handleTestSpend10}
+                        disabled={pointsBalanceLoading || pointsSpendLoading || (pointsBalance !== null && pointsBalance < 10)}
+                      >
+                        {pointsSpendLoading ? (
+                          <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                          <Text style={styles.xplayTestButtonText}>결제하기 10 (테스트)</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  )
+                : tab === 'ticket' && filteredItems.length > 0
                 ? filteredItems.map((item) => {
 
                   const itemImage = itemImages[item.id];
@@ -586,6 +664,38 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
+  },
+  xplayContainer: {
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  xplayLoader: {
+    marginVertical: 8,
+  },
+  xplayBalanceLabel: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: COLORS.headerText,
+  },
+  xplayTestButton: {
+    marginTop: 16,
+    backgroundColor: COLORS.buttonPrimary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 160,
+  },
+  xplayTestButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
+  },
+  xplayTestButtonText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#fff',
   },
   emptyContainer: {
     paddingVertical: 40,

@@ -8,7 +8,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { ShopItemData } from '../types';
-import { getUserBalance, purchaseXrunItem, sendInAppPurchase } from '../services';
+import { getUserBalance, purchaseXrunItem, sendInAppPurchase, getPointsBalance, spendPoints } from '../services';
 import { formatCurrency, formatXrunAmount } from '../utils';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import * as IAP from 'expo-iap';
@@ -30,6 +30,9 @@ export const ShopBuyScreen = () => {
 
   const [itemImageBase64, setItemImageBase64] = useState<string | null>(null);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+
+  const [pointsBalance, setPointsBalance] = useState<number | null>(null);
+  const [pointsBalanceLoading, setPointsBalanceLoading] = useState(false);
 
   const formatXrunDisplay = (amount: string | number): string => {
     const num = typeof amount === 'string' ? Number(amount) : amount;
@@ -83,6 +86,23 @@ export const ShopBuyScreen = () => {
       checkUserBalance(memberId);
     }
   }, [memberId, checkUserBalance]);
+
+  const generateOrderId = useCallback(() => {
+    return `member_${memberId}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  }, [memberId]);
+
+  const fetchPointsBalance = useCallback(async (memberID: string) => {
+    try {
+      setPointsBalanceLoading(true);
+      const result = await getPointsBalance(memberID, navigate);
+      setPointsBalance(result.current_p_balance);
+    } catch (e) {
+      console.error('[구매] 포인트 잔액 조회 오류:', e);
+      setPointsBalance(null);
+    } finally {
+      setPointsBalanceLoading(false);
+    }
+  }, [navigate]);
 
   const fetchIapProduct = useCallback(async (sku: string) => {
     if (!sku || sku.trim() === '') {
@@ -199,6 +219,16 @@ export const ShopBuyScreen = () => {
       loadItemImage(item);
     }
   }, [selectedShopItem, loadItemImage]);
+
+  useEffect(() => {
+    const item = selectedShopItem as unknown as ShopItemData | undefined;
+    const pointPrice = item?.pointPrice ?? (item as any)?.pointPrice;
+    if (memberId && pointPrice != null && typeof pointPrice === 'number') {
+      fetchPointsBalance(memberId);
+    } else {
+      setPointsBalance(null);
+    }
+  }, [selectedShopItem, memberId, fetchPointsBalance]);
 
   const handlePurchase = async () => {
     if (!selectedShopItem || !memberId) {
@@ -381,6 +411,44 @@ export const ShopBuyScreen = () => {
     }
   };
 
+  const handlePurchaseWithPoints = async () => {
+    const item = selectedShopItem as unknown as (ShopItemData & { pointPrice?: number }) | undefined;
+    const pointPrice = item?.pointPrice ?? (item as any)?.pointPrice;
+    if (!memberId || !item || pointPrice == null || typeof pointPrice !== 'number') {
+      await showAlert(t('screens.shopBuy.alerts.error'), t('screens.shopBuy.alerts.cannotPurchase'));
+      return;
+    }
+    if (isPurchasing) return;
+    const current = pointsBalance ?? 0;
+    if (current < pointPrice) {
+      await showAlert(
+        t('screens.shopBuy.alerts.insufficientBalanceTitle'),
+        '포인트 잔액이 부족합니다.',
+        [{ text: t('screens.shopBuy.confirm') }],
+      );
+      return;
+    }
+    setIsPurchasing(true);
+    try {
+      const order_id = generateOrderId();
+      await spendPoints(
+        {
+          snuid: memberId,
+          order_id,
+          item_name: item.title || '',
+          spent_amount: pointPrice,
+        },
+        navigate,
+      );
+      navigate(ROUTES.shopSuccess);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || '포인트 사용에 실패했습니다.';
+      await showAlert(t('screens.shopBuy.alerts.purchaseFailed'), msg, [{ text: t('screens.shopBuy.confirm') }]);
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
   if (!selectedShopItem) {
     return null;
   }
@@ -407,6 +475,10 @@ export const ShopBuyScreen = () => {
   const chargeKRW = item.charge?.won || 0;
   const chargeXrun = item.charge?.coin || 0;
   const totalXrun = item.totalPrice?.coin || 0;
+
+  const pointPrice = item.pointPrice ?? (item as any).pointPrice;
+  const isPointPurchasable = pointPrice != null && typeof pointPrice === 'number';
+  const isPointsInsufficient = isPointPurchasable && pointsBalance !== null && pointsBalance < pointPrice;
 
   const isInsufficientBalance = !isIapSku && userBalance !== null && userBalance < totalXrun;
 
@@ -519,6 +591,21 @@ export const ShopBuyScreen = () => {
                 </View>
               </>
             )}
+            {}
+            {isPointPurchasable && (
+              <View style={styles.pointPaymentSection}>
+                <View style={styles.row}>
+                  <Text style={styles.label}>포인트 잔액</Text>
+                  <Text style={styles.value}>
+                    {pointsBalanceLoading ? '...' : pointsBalance !== null ? `${pointsBalance.toLocaleString()} P` : '-'}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>포인트 가격</Text>
+                  <Text style={styles.value}>{pointPrice.toLocaleString()} P</Text>
+                </View>
+              </View>
+            )}
           </View>
         </View>
 
@@ -547,6 +634,23 @@ export const ShopBuyScreen = () => {
               <Text style={styles.primaryText}>{t('screens.shopBuy.payment')}</Text>
             )}
           </TouchableOpacity>
+          {isPointPurchasable && (
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.pointsButton,
+                (isPurchasing || isPointsInsufficient || pointsBalanceLoading) && styles.disabledButton,
+              ]}
+              onPress={handlePurchaseWithPoints}
+              disabled={isPurchasing || isPointsInsufficient || pointsBalanceLoading}
+            >
+              {isPurchasing ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.primaryText}>포인트로 구매 ({pointPrice.toLocaleString()} P)</Text>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
         </View>
       </ScrollView>
@@ -650,6 +754,12 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     marginTop: 10,
   },
+  pointPaymentSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#E3E7EC',
+    paddingTop: 10,
+    marginTop: 10,
+  },
   sufficientBalance: {
     color: '#28a745',
   },
@@ -680,6 +790,9 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: COLORS.buttonPrimary,
+  },
+  pointsButton: {
+    backgroundColor: '#6c5ce7',
   },
   disabledButton: {
     backgroundColor: '#ccc',
