@@ -1911,7 +1911,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         navigate(ROUTES.wallet);
         break;
       case 'shop':
-        navigate(ROUTES.shopTicket);
+        navigate(ROUTES.shop);
         break;
       case 'referral':
         navigate(ROUTES.referralSettlement);
