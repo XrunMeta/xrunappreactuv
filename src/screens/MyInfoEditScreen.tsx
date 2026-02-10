@@ -1372,7 +1372,7 @@ export const MyInfoEditScreen = () => {
     iso2: 'select',
     name: t('screens.myInfoEdit.regionSelect'),
     dialCode: '0',
-    flagEmoji: '',
+    flagEmoji: '📍',
     countryCode: 0,
   }), [t]);
 
