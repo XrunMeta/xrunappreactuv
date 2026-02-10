@@ -3,7 +3,7 @@ import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { zip, unzip, unzipAssets, subscribe } from 'react-native-zip-archive';
 
-const BASE_URL = 'https://pub-291891eb932c4047b038234e214f5334.r2.dev';
+const BASE_URL = 'https://pub-23c0c0ee5e774a90bc4dd356ef88e11c.r2.dev';
 
 const LOCAL_ROOT_PATH = Platform.OS === 'ios' ? RNFS.DocumentDirectoryPath : RNFS.DocumentDirectoryPath;
 const LOCAL_BUNDLE_FILENAME = Platform.OS === 'ios' ? 'index.ios.bundle' : 'index.android.bundle';

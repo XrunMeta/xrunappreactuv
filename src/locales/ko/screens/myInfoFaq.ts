@@ -1,5 +1,5 @@
 export default {
-  title: '자주 묻는 질문',
+  title: '자주 묻는 질문 FAQ',
   items: {
     exchangeSubmit: {
       question: '교환 신청한 코인은 언제 지급되나요?',
