@@ -142,7 +142,6 @@ export const ShopScreen = () => {
     const renderProductCard = (product: ProductData, showPurchaseButton: boolean = false) => {
         const isEthereum = product.brand === 'Ethereum' && product.description;
         const isXrun = product.brand === 'XRUN';
-        const imageResizeMode = isEthereum || isXrun ? 'contain' : 'cover';
 
         return (
             <TouchableOpacity
@@ -152,7 +151,7 @@ export const ShopScreen = () => {
                 activeOpacity={0.8}
             >
                 <View style={styles.productImageContainer}>
-                    <Image source={product.image} style={styles.productImage} resizeMode={imageResizeMode} />
+                    <Image source={product.image} style={styles.productImage} resizeMode="contain" />
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
                             <Text style={styles.imageDescriptionText}>{product.description}</Text>
