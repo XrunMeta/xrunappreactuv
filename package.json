@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node scripts/set-local-ip.js && npx expo start",
-    "android": "node scripts/set-local-ip.js && npx expo run:android",
+    "start": "node scripts/start-with-packager-host.js",
+    "android": "node scripts/start-with-packager-host.js --android",
     "ios": "node scripts/set-local-ip.js && npx expo run:ios",
     "web": "npx expo start --web"
   },
