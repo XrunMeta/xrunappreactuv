@@ -4,7 +4,7 @@ import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5 } from '../components';
+import { v_729608, v_b34ce5, v_4c7b5d } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -272,6 +272,10 @@ export const v_10886b = () => {
                         </View>
                     )}
                 </SafeScrollView>
+            </View>
+            {}
+            <View style={v_d81136.taboolaContainer}>
+                <TaboolaBanner placementType="shop" />
             </View>
         </SafeView>
     );
@@ -547,5 +551,10 @@ const v_d81136 = v_472849.create({
         fontSize: v_843035.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#7d7e83',
+    },
+    taboolaContainer: {
+        borderWidth: 2,
+        borderColor: '#ededed',
+        marginTop: 10,
     },
 });
