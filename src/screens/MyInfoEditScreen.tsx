@@ -1372,7 +1372,7 @@ export const v_cdb169 = () => {
     iso2: 'select',
     name: v_8d41d7('screens.myInfoEdit.regionSelect'),
     dialCode: '0',
-    flagEmoji: '',
+    flagEmoji: '📍',
     countryCode: 0,
   }), [v_8d41d7]);
 
