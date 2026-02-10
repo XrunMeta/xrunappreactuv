@@ -25,7 +25,11 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "ios": {
+        "distribution": "store",
+        "image": "latest" 
+      }
     }
   },
   "submit": {
