@@ -4172,6 +4172,82 @@ export const v_81c40d = async (
   }
 };
 
+export const v_fb2e96 = async (
+  v_c7b8cc,
+  v_c65f5d,
+): Promise<{ current_p_balance: number }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = { snuid: v_c7b8cc };
+
+    console.log('[포인트] 잔액 조회 요청:', { snuid: v_c7b8cc });
+
+    const v_3393e3 = await v_9f42a4.post<{ data?: { current_p_balance?: number } }>(
+      '/oth-path',
+      v_576f5a,
+    );
+
+    const v_4b6d71 = v_3393e3.data?.data?.current_p_balance ?? 0;
+    console.log('[포인트] 잔액 조회 성공:', v_4b6d71);
+
+    return { current_p_balance: v_4b6d71 };
+  } catch (v_5e9bfe) {
+    console.error('[포인트] 잔액 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[포인트] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export interface SpendPointsParams {
+  snuid: string;
+  order_id: string;
+  item_name: string;
+  spent_amount: number;
+}
+
+export const v_f5b61a = async (
+  v_24baff,
+  v_c65f5d,
+): Promise<{ remaining_balance: number }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+
+    console.log('[포인트] 사용 요청:', v_24baff);
+
+    const v_3393e3 = await v_9f42a4.post<{
+      data?: { remaining_balance?: number; message?: string };
+      message?: string;
+    }>('/oth-path', v_24baff);
+
+    const v_2c3249 = v_3393e3.data?.data?.remaining_balance ?? 0;
+    console.log('[포인트] 사용 성공, remaining_balance:', v_2c3249);
+
+    return { remaining_balance: v_2c3249 };
+  } catch (v_5e9bfe) {
+    console.error('[포인트] 사용 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[포인트] 상세 오류 정보:', {
+        url: v_5e9bfe.config?.url,
+        method: v_5e9bfe.config?.method,
+        status: v_5e9bfe.response?.status,
+        statusText: v_5e9bfe.response?.statusText,
+        data: v_5e9bfe.response?.data,
+        message: v_5e9bfe.message,
+      });
+    }
+    throw v_5e9bfe;
+  }
+};
+
 export const v_97ad19 = async (
   v_660822,
   v_c65f5d,

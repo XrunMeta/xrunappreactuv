@@ -8,7 +8,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_20035e } from '../types';
-import { v_54d016, v_9c9f1b, v_d751d6 } from '../services';
+import { v_54d016, v_9c9f1b, v_d751d6, v_fb2e96, v_f5b61a } from '../services';
 import { v_89f939, v_35c0e0 } from '../utils';
 import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import * as v_759f4d from 'ssuyxdbb';
@@ -30,6 +30,9 @@ export const v_1a0a02 = () => {
 
   const [v_91ef82, v_13803f] = v_5ab095<string | null>(null);
   const [v_7f5811, v_0a688f] = v_5ab095(false);
+
+  const [v_19c59c, v_97ae62] = v_5ab095<number | null>(null);
+  const [v_e0d4f2, v_3ef6af] = v_5ab095(false);
 
   const v_06e3b4 = (v_f63e09): string => {
     const v_0ad8c5 = typeof v_f63e09 === 'string' ? Number(v_f63e09) : v_f63e09;
@@ -83,6 +86,23 @@ export const v_1a0a02 = () => {
       v_a018be(v_717992);
     }
   }, [v_717992, v_a018be]);
+
+  const v_c61891 = v_de06a3(() => {
+    return `member_${v_717992}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  }, [v_717992]);
+
+  const v_879c99 = v_de06a3(async (v_d6dce2) => {
+    try {
+      v_3ef6af(true);
+      const v_43c42e = await v_fb2e96(v_d6dce2, v_9b57fc);
+      v_97ae62(v_43c42e.current_p_balance);
+    } catch (v_9e86fd) {
+      console.error('[구매] 포인트 잔액 조회 오류:', v_9e86fd);
+      v_97ae62(null);
+    } finally {
+      v_3ef6af(false);
+    }
+  }, [v_9b57fc]);
 
   const v_645e19 = v_de06a3(async (v_399dbd) => {
     if (!v_399dbd || v_399dbd.trim() === '') {
@@ -199,6 +219,16 @@ export const v_1a0a02 = () => {
       v_9d32cc(v_8c0b26);
     }
   }, [v_dfe883, v_9d32cc]);
+
+  v_c4deb2(() => {
+    const v_8c0b26 = v_dfe883 as unknown as v_20035e | undefined;
+    const v_579109 = v_8c0b26?.pointPrice ?? (v_8c0b26 as any)?.pointPrice;
+    if (v_717992 && v_579109 != null && typeof v_579109 === 'number') {
+      v_879c99(v_717992);
+    } else {
+      v_97ae62(null);
+    }
+  }, [v_dfe883, v_717992, v_879c99]);
 
   const v_dfaad1 = async () => {
     if (!v_dfe883 || !v_717992) {
@@ -381,6 +411,44 @@ export const v_1a0a02 = () => {
     }
   };
 
+  const v_a31cc6 = async () => {
+    const v_8c0b26 = v_dfe883 as unknown as (v_20035e & { pointPrice?: number }) | undefined;
+    const v_579109 = v_8c0b26?.pointPrice ?? (v_8c0b26 as any)?.pointPrice;
+    if (!v_717992 || !v_8c0b26 || v_579109 == null || typeof v_579109 !== 'number') {
+      await v_889fad(v_8d41d7('screens.shopBuy.alerts.error'), v_8d41d7('screens.shopBuy.alerts.cannotPurchase'));
+      return;
+    }
+    if (v_d4bdc8) return;
+    const v_275ccd = v_19c59c ?? 0;
+    if (v_275ccd < v_579109) {
+      await v_889fad(
+        v_8d41d7('screens.shopBuy.alerts.insufficientBalanceTitle'),
+        '포인트 잔액이 부족합니다.',
+        [{ text: v_8d41d7('screens.shopBuy.confirm') }],
+      );
+      return;
+    }
+    v_72727b(true);
+    try {
+      const v_acc763 = v_c61891();
+      await v_f5b61a(
+        {
+          snuid: v_717992,
+          order_id: v_acc763,
+          item_name: v_8c0b26.title || '',
+          spent_amount: v_579109,
+        },
+        v_9b57fc,
+      );
+      v_9b57fc(v_ce4741.shopSuccess);
+    } catch (v_49263d) {
+      const v_badeaf = v_49263d?.response?.data?.message || v_49263d?.message || '포인트 사용에 실패했습니다.';
+      await v_889fad(v_8d41d7('screens.shopBuy.alerts.purchaseFailed'), v_badeaf, [{ text: v_8d41d7('screens.shopBuy.confirm') }]);
+    } finally {
+      v_72727b(false);
+    }
+  };
+
   if (!v_dfe883) {
     return null;
   }
@@ -407,6 +475,10 @@ export const v_1a0a02 = () => {
   const v_63e5c7 = v_8c0b26.charge?.won || 0;
   const v_cd7bfc = v_8c0b26.charge?.coin || 0;
   const v_284b46 = v_8c0b26.totalPrice?.coin || 0;
+
+  const v_579109 = v_8c0b26.pointPrice ?? (v_8c0b26 as any).pointPrice;
+  const v_ce7108 = v_579109 != null && typeof v_579109 === 'number';
+  const v_e6b947 = v_ce7108 && v_19c59c !== null && v_19c59c < v_579109;
 
   const v_1ee1c8 = !v_cb677f && v_bc3e72 !== null && v_bc3e72 < v_284b46;
 
@@ -519,6 +591,21 @@ export const v_1a0a02 = () => {
                 </View>
               </>
             )}
+            {}
+            {v_ce7108 && (
+              <View style={v_d81136.pointPaymentSection}>
+                <View style={v_d81136.row}>
+                  <Text style={v_d81136.label}>포인트 잔액</Text>
+                  <Text style={v_d81136.value}>
+                    {v_e0d4f2 ? '...' : v_19c59c !== null ? `${v_19c59c.toLocaleString()} P` : '-'}
+                  </Text>
+                </View>
+                <View style={v_d81136.row}>
+                  <Text style={v_d81136.label}>포인트 가격</Text>
+                  <Text style={v_d81136.value}>{v_579109.toLocaleString()} P</Text>
+                </View>
+              </View>
+            )}
           </View>
         </View>
 
@@ -547,6 +634,23 @@ export const v_1a0a02 = () => {
               <Text style={v_d81136.primaryText}>{v_8d41d7('screens.shopBuy.payment')}</Text>
             )}
           </TouchableOpacity>
+          {v_ce7108 && (
+            <TouchableOpacity
+              style={[
+                v_d81136.button,
+                v_d81136.pointsButton,
+                (v_d4bdc8 || v_e6b947 || v_e0d4f2) && v_d81136.disabledButton,
+              ]}
+              onPress={v_a31cc6}
+              disabled={v_d4bdc8 || v_e6b947 || v_e0d4f2}
+            >
+              {v_d4bdc8 ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={v_d81136.primaryText}>포인트로 구매 ({v_579109.toLocaleString()} P)</Text>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
         </View>
       </ScrollView>
@@ -650,6 +754,12 @@ const v_d81136 = v_472849.create({
     paddingTop: 10,
     marginTop: 10,
   },
+  pointPaymentSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#E3E7EC',
+    paddingTop: 10,
+    marginTop: 10,
+  },
   sufficientBalance: {
     color: '#28a745',
   },
@@ -680,6 +790,9 @@ const v_d81136 = v_472849.create({
   },
   primaryButton: {
     backgroundColor: v_1bfbd0.buttonPrimary,
+  },
+  pointsButton: {
+    backgroundColor: '#6c5ce7',
   },
   disabledButton: {
     backgroundColor: '#ccc',

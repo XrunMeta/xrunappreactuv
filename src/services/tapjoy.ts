@@ -19,10 +19,17 @@ export const v_d5a49a = async (v_43e90c): Promise<boolean> => {
       console.warn('[Tapjoy] SDK Key가 설정되지 않았습니다. env의 TAPJOY_SDK_KEY_* 를 설정하세요.');
       return false;
     }
-    const { Tapjoy: v_c35e51 } = await import('dfqcugtrmkverogwhivhhcj');
+    const v_2b9521 = await import('dfqcugtrmkverogwhivhhcj');
+    const v_c35e51 = v_2b9521?.Tapjoy;
+    if (!v_c35e51 || typeof v_c35e51.connect !== 'function') {
+      console.warn('[Tapjoy] SDK 로드 실패 (Tapjoy.connect 없음). Metro 캐시 리셋 후 재시도: npx react-native start --reset-cache');
+      return false;
+    }
     const v_5ea7ba = {};
     if (v_43e90c) v_5ea7ba.TJC_OPTION_USER_ID = v_43e90c;
     await v_c35e51.connect(v_c76e4a, v_5ea7ba);
+
+    if (typeof v_c35e51.setDebugEnabled === 'function') v_c35e51.setDebugEnabled(false);
     v_c2fc75 = true;
     console.log('[Tapjoy] 연결 성공');
     return true;

@@ -9,7 +9,7 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_745d71 } from '../types';
-import { v_dd87bc, v_81c40d, v_d751d6 } from '../services';
+import { v_dd87bc, v_81c40d, v_d751d6, v_fb2e96, v_f5b61a } from '../services';
 import { v_20035e } from '../types';
 import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
@@ -122,7 +122,7 @@ const v_3e6a6a = (
 export const v_38326c = () => {
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
-  const [v_11083e, v_94ee83] = v_5ab095<'ticket' | 'myTicket'>('ticket');
+  const [v_11083e, v_94ee83] = v_5ab095<'ticket' | 'myTicket' | 'xplay'>('ticket');
   const { navigate: v_9b57fc } = v_a0daa8();
   const { setSelectedShopItem: v_d0fbad } = v_700ef9();
   const [v_b1c029, v_9a4b0a] = v_5ab095<(v_745d71 & v_20035e)[]>([]);
@@ -135,6 +135,10 @@ export const v_38326c = () => {
 
   const [v_6cb0a1, v_019be3] = v_5ab095<Record<string, any>>({});
   const [v_c1f1a5, v_1c3217] = v_5ab095(false);
+
+  const [v_19c59c, v_97ae62] = v_5ab095<number | null>(null);
+  const [v_e0d4f2, v_3ef6af] = v_5ab095(false);
+  const [v_476f9f, v_fcfc38] = v_5ab095(false);
 
   v_c4deb2(() => {
 
@@ -380,6 +384,7 @@ export const v_38326c = () => {
     () => [
       { label: 'Ticket', value: 'ticket' },
       { label: 'My Ticket', value: 'myTicket' },
+      { label: 'Xplay', value: 'xplay' },
     ] as const,
     [],
   );
@@ -390,6 +395,54 @@ export const v_38326c = () => {
       v_9b57fc(v_ce4741.shopMyTicket);
     }
   };
+
+  v_c4deb2(() => {
+    if (v_11083e !== 'xplay' || !v_717992) return;
+    let v_2008a4 = false;
+    const v_1f93ed = async () => {
+      v_3ef6af(true);
+      v_97ae62(null);
+      try {
+        const v_43c42e = await v_fb2e96(v_717992, v_9b57fc);
+        if (!v_2008a4) {
+          v_97ae62(v_43c42e.current_p_balance);
+        }
+      } catch (v_9e86fd) {
+        if (!v_2008a4) {
+          v_97ae62(0);
+          console.error('[Xplay] 포인트 잔액 조회 실패:', v_9e86fd);
+        }
+      } finally {
+        if (!v_2008a4) v_3ef6af(false);
+      }
+    };
+    v_1f93ed();
+    return () => { v_2008a4 = true; };
+  }, [v_11083e, v_717992, v_9b57fc]);
+
+  const v_5f9181 = v_de06a3(async () => {
+    if (!v_717992 || v_476f9f) return;
+    const v_275ccd = v_19c59c ?? 0;
+    if (v_275ccd < 10) {
+      v_889fad('잔액 부족', '포인트가 10 이상 필요합니다.', [{ text: '확인' }]);
+      return;
+    }
+    v_fcfc38(true);
+    try {
+      const v_acc763 = `member_${v_717992}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const v_43c42e = await v_f5b61a(
+        { snuid: v_717992, order_id: v_acc763, item_name: '테스트 결제 10P', spent_amount: 10 },
+        v_9b57fc,
+      );
+      v_97ae62(v_43c42e.remaining_balance);
+      v_889fad('테스트 결제 완료', `잔액: ${v_43c42e.remaining_balance.toLocaleString()} P`, [{ text: '확인' }]);
+    } catch (v_9e86fd) {
+      console.error('[Xplay] 테스트 결제 실패:', v_9e86fd);
+      v_889fad('결제 실패', v_9e86fd instanceof Error ? v_9e86fd.message : '포인트 사용에 실패했습니다.', [{ text: '확인' }]);
+    } finally {
+      v_fcfc38(false);
+    }
+  }, [v_717992, v_19c59c, v_476f9f, v_9b57fc, v_889fad]);
 
   const v_c0e000 = v_de06a3((v_399dbd): string | null => {
     const v_01bee9 = v_6cb0a1[v_399dbd];
@@ -482,7 +535,32 @@ export const v_38326c = () => {
               </View>
             )}
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor='transparent'>
-              {v_11083e === 'ticket' && v_973c3e.length > 0
+              {v_11083e === 'xplay'
+                ? (
+                    <View style={v_d81136.xplayContainer}>
+                      {v_e0d4f2
+                        ? (
+                            <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} style={v_d81136.xplayLoader} />
+                          )
+                        : (
+                            <Text style={v_d81136.xplayBalanceLabel}>
+                              {v_8d41d7('screens.shop.pointsBalance', '포인트 잔액')}: {v_19c59c !== null ? v_19c59c.toLocaleString() : '-'}
+                            </Text>
+                          )}
+                      <TouchableOpacity
+                        style={[v_d81136.xplayTestButton, (v_e0d4f2 || v_476f9f || (v_19c59c !== null && v_19c59c < 10)) && v_d81136.xplayTestButtonDisabled]}
+                        onPress={v_5f9181}
+                        disabled={v_e0d4f2 || v_476f9f || (v_19c59c !== null && v_19c59c < 10)}
+                      >
+                        {v_476f9f ? (
+                          <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                          <Text style={v_d81136.xplayTestButtonText}>결제하기 10 (테스트)</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  )
+                : v_11083e === 'ticket' && v_973c3e.length > 0
                 ? v_973c3e.map((v_8c0b26) => {
 
                   const v_63070e = v_f9a2c9[v_8c0b26.id];
@@ -586,6 +664,38 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.msmall,
     fontFamily: 'Roboto-Regular',
     color: '#1a2e35',
+  },
+  xplayContainer: {
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  xplayLoader: {
+    marginVertical: 8,
+  },
+  xplayBalanceLabel: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: v_1bfbd0.headerText,
+  },
+  xplayTestButton: {
+    marginTop: 16,
+    backgroundColor: v_1bfbd0.buttonPrimary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 160,
+  },
+  xplayTestButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
+  },
+  xplayTestButtonText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#fff',
   },
   emptyContainer: {
     paddingVertical: 40,

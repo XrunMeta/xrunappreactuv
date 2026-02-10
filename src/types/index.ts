@@ -1027,6 +1027,8 @@ export interface ShopItemData {
   unit: string; 
   total_purchased?: number; 
   terms?: number; 
+
+  pointPrice?: number;
   [key: string]: any; 
 }
 
