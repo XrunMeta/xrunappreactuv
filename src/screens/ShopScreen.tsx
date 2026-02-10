@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl } from '../components';
+import { Header, SegmentedControl, TaboolaBanner } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -272,6 +272,10 @@ export const ShopScreen = () => {
                         </View>
                     )}
                 </SafeScrollView>
+            </View>
+            {}
+            <View style={styles.taboolaContainer}>
+                <TaboolaBanner placementType="shop" />
             </View>
         </SafeView>
     );
@@ -547,5 +551,10 @@ const styles = StyleSheet.create({
         fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#7d7e83',
+    },
+    taboolaContainer: {
+        borderWidth: 2,
+        borderColor: '#ededed',
+        marginTop: 10,
     },
 });
