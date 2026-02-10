@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '../components';
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
-import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
+import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, updateRegion, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -523,6 +523,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [rageProgress, setRageProgress] = useState(0);
   const [isRageMode, setIsRageMode] = useState(false);
   const rageColor = '#60A5FA'; 
+
+  const [optionalInfoPopupVisible, setOptionalInfoPopupVisible] = useState(false);
 
   const [genderAgeDialogVisible, setGenderAgeDialogVisible] = useState(false);
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
@@ -1495,41 +1497,32 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         return;
       }
 
+      const gender = typeof user.gender === 'string' ? parseInt(user.gender, 10) : (user.gender ?? 0);
+      const ages = typeof user.ages === 'string' ? parseInt(user.ages, 10) : (user.ages ?? 0);
+      const country = user.country != null ? (typeof user.country === 'string' ? parseInt(user.country, 10) : Number(user.country)) : 0;
+      const region = user.region != null ? (typeof user.region === 'string' ? parseInt(user.region, 10) : Number(user.region)) : 0;
+
+      const needsInfo = gender === 0 || ages === 0 || !country || country === 0 || !region || region === 0;
+
       console.log('[AR 화면] 사용자 정보:', {
         gender: user.gender,
         ages: user.ages,
-        genderType: typeof user.gender,
-        agesType: typeof user.ages,
+        country: user.country,
+        region: user.region,
       });
-
-      const gender = typeof user.gender === 'string' ? parseInt(user.gender, 10) : (user.gender ?? 0);
-      const ages = typeof user.ages === 'string' ? parseInt(user.ages, 10) : (user.ages ?? 0);
-
-      console.log('[AR 화면] 성별/연령대 확인 결과:', {
+      console.log('[AR 화면] 성별/연령/지역 확인 결과:', {
         gender,
         ages,
-        genderOriginal: user.gender,
-        agesOriginal: user.ages,
-        shouldShowDialog: gender === 0 || ages === 0,
+        country,
+        region,
+        shouldShowDialog: needsInfo,
       });
 
-      if (gender === 0 || ages === 0) {
-        console.log('[AR 화면] 성별/연령대가 0 - Dialog 표시');
-
-        setSelectedGender(gender === 0 ? 'male' : (gender === 2111 ? 'female' : 'male'));
-        const ageMap: Record<number, '10' | '20' | '30' | '40' | '50+'> = {
-          2210: '10',
-          2220: '20',
-          2230: '30',
-          2240: '40',
-          2250: '50+',
-        };
-
-        setSelectedAge(ages === 0 ? '10' : (ageMap[ages] || '10'));
-        setGenderAgeDialogVisible(true);
-        console.log('[AR 화면] Dialog 표시 완료, genderAgeDialogVisible:', true);
+      if (needsInfo) {
+        console.log('[AR 화면] 성별/연령/지역 중 미입력 - 선택정보 안내 팝업 표시');
+        setOptionalInfoPopupVisible(true);
       } else {
-        console.log('[AR 화면] 성별/연령대가 모두 설정됨 - Dialog 표시 안 함');
+        console.log('[AR 화면] 성별/연령/지역 모두 설정됨 - 팝업 표시 안 함');
       }
     } catch (error) {
       console.error('[AR 화면] 성별/연령대 확인 실패:', error);
@@ -1538,7 +1531,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const handleUpdateGenderAge = useCallback(async () => {
     if (!memberId || !selectedGender || !selectedAge) {
-      await showAlert(t('common.messages.error') || '오류', '성별과 연령대를 모두 선택해주세요.');
+      await showAlert(t('common.messages.error') || '오류', '성별, 연령대, 지역을 모두 선택해주세요.');
       return;
     }
 
@@ -1560,7 +1553,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       ]);
 
       setGenderAgeDialogVisible(false);
-      await showAlert(t('common.messages.success') || '성공', '성별과 연령대가 업데이트되었습니다.');
+      await showAlert(t('common.messages.success') || '성공', '성별, 연령대, 지역이 업데이트되었습니다.');
     } catch (error) {
       console.error('[AR 화면] 성별/연령대 업데이트 실패:', error);
       await showAlert(t('common.messages.error') || '오류', '업데이트에 실패했습니다.');
@@ -1568,6 +1561,51 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       setIsUpdatingGenderAge(false);
     }
   }, [memberId, selectedGender, selectedAge, navigate, showAlert, t]);
+
+  const handleOptionalInfoLater = useCallback(async () => {
+    let mid = memberId;
+    if (mid == null) {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const parsed = JSON.parse(userDataStr);
+          mid = parsed?.member ?? null;
+        }
+      } catch (_) {}
+    }
+    if (mid == null) {
+      setOptionalInfoPopupVisible(false);
+      return;
+    }
+    try {
+      const response = await getMyPageUserInfo(mid, navigate);
+      const user = response.data?.[0];
+      const gender = user?.gender != null ? (typeof user.gender === 'string' ? parseInt(user.gender, 10) : Number(user.gender)) : 0;
+      const ages = user?.ages != null ? (typeof user.ages === 'string' ? parseInt(user.ages, 10) : Number(user.ages)) : 0;
+      const country = user?.country != null ? (typeof user.country === 'string' ? parseInt(user.country, 10) : Number(user.country)) : 0;
+      const region = user?.region != null ? (typeof user.region === 'string' ? parseInt(user.region, 10) : Number(user.region)) : 0;
+
+      const needGender = gender === 0 || isNaN(gender);
+      const needAge = ages === 0 || isNaN(ages);
+      const needRegion = !country || country === 0 || !region || region === 0;
+
+      const promises: Promise<any>[] = [];
+      if (needGender) promises.push(updateGender(mid, 2110, navigate));
+      if (needAge) promises.push(updateAge(mid, 2220, navigate));
+      if (needRegion) promises.push(updateRegion(mid, 82, 2, navigate));
+
+      await Promise.all(promises);
+
+      await AsyncStorage.setItem('userGenderForAd', String(needGender ? 2110 : gender));
+      await AsyncStorage.setItem('userAgesForAd', String(needAge ? 2220 : ages));
+      await AsyncStorage.setItem('userCountryForAd', String(needRegion ? 82 : country));
+      await AsyncStorage.setItem('userRegionForAd', String(needRegion ? 2 : region));
+      setOptionalInfoPopupVisible(false);
+    } catch (error) {
+      console.error('[AR 화면] 나중에 기본값 적용 실패:', error);
+      setOptionalInfoPopupVisible(false);
+    }
+  }, [memberId, navigate]);
 
   useEffect(() => {
     const initializeData = async () => {
@@ -3431,9 +3469,35 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       {}
       <Dialog
-        visible={genderAgeDialogVisible}
-        title={t('screens.camera.genderAgeRequired') || '성별과 연령대를 입력해주세요'}
+        visible={optionalInfoPopupVisible}
+        title={t('screens.camera.optionalInfoTitle') || '선택정보를 입력하시면 더 많은 리워드를 얻을 수 있습니다'}
         actions={[
+          {
+            label: t('screens.camera.optionalInfoLater') || '나중에',
+            onPress: handleOptionalInfoLater,
+            variant: 'secondary',
+          },
+          {
+            label: t('screens.camera.optionalInfoInput') || '입력하기',
+            onPress: () => {
+              setOptionalInfoPopupVisible(false);
+              navigate(ROUTES.myInfoEdit);
+            },
+            variant: 'primary',
+          },
+        ]}
+      />
+
+      {}
+      <Dialog
+        visible={genderAgeDialogVisible}
+        title={t('screens.camera.genderAgeRegionRequired') || '성별, 연령대, 지역을 입력해주세요'}
+        actions={[
+          {
+            label: t('screens.camera.optionalInfoLater') || '나중에',
+            onPress: handleOptionalInfoLater,
+            variant: 'secondary',
+          },
           {
             label: t('common.buttons.confirm') || '확인',
             onPress: handleUpdateGenderAge,

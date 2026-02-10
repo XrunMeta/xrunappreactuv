@@ -91,10 +91,10 @@ export const SignupScreen = () => {
   const [isAppleSignupMode, setIsAppleSignupMode] = useState(false);
 
   const [gender, setGender] = useState<GenderValue>(
-    (isAppleSignupMode || Platform.OS === 'ios' || Platform.OS === 'android') ? '0' : (signupFormData.gender || 'male')
+    (isAppleSignupMode || Platform.OS === 'ios') ? '0' : (signupFormData.gender || 'male')
   );
   const [ageRange, setAgeRange] = useState<AgeValue>(
-    (isAppleSignupMode || Platform.OS === 'ios' || Platform.OS === 'android') ? '0' : (signupFormData.ageRange || '10')
+    (isAppleSignupMode || Platform.OS === 'ios') ? '0' : (signupFormData.ageRange || '10')
   );
   const [serviceTermsAccepted, setServiceTermsAccepted] = useState(false);
   const [locationTermsAccepted, setLocationTermsAccepted] = useState(false);
@@ -168,7 +168,7 @@ export const SignupScreen = () => {
 
   const isCountryWithRegions = hasRegions;
 
-  const isOptionalFields = isAppleSignupMode || Platform.OS === 'ios' || Platform.OS === 'android';
+  const isOptionalFields = isAppleSignupMode || Platform.OS === 'ios';
 
   const regionDisplayValue = React.useMemo(() => {
 
@@ -406,8 +406,8 @@ export const SignupScreen = () => {
 
   const regionDataSource = useMemo(() => {
 
-    return [selectOption, ...availableRegions];
-  }, [selectOption, availableRegions]);
+    return isOptionalFields ? [selectOption, ...availableRegions] : availableRegions;
+  }, [isOptionalFields, selectOption, availableRegions]);
 
   const filteredRegions = useMemo(() => {
     if (!regionSearchQuery.trim()) {
@@ -738,9 +738,16 @@ export const SignupScreen = () => {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
         return;
       }
-
       if (hasRegions && isKoreaSelected && (!selectedRegion || selectedRegion.dialCode === '0')) {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
+        return;
+      }
+      if (!gender || gender === '0') {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.genderRequired') || '성별을 선택해주세요.');
+        return;
+      }
+      if (!ageRange || ageRange === '0') {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
     }

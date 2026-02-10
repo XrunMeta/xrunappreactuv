@@ -38,38 +38,29 @@ import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../
 import { isCountryWithRegionsByCode } from '../utils/countryStateCityUtils';
 import { CountryDialCode } from '../types';
 
-const AGE_OPTIONS = ['10', '20', '30', '40', '50+'] as const;
+const AGE_OPTIONS = ['select', '10', '20', '30', '40', '50+'] as const;
 
-const convertGenderToApi = (gender: 'male' | 'female'): number => {
-  return gender === 'male' ? 2110 : 2111;
+export type GenderOption = 'male' | 'female' | 'select';
+
+const convertGenderToApi = (gender: GenderOption): number => {
+  if (gender === 'female') return 2111;
+  if (gender === 'select') return 2112;
+  return 2110; 
 };
 
-const convertGenderFromApi = (gender?: number | string | null): 'male' | 'female' => {
-
-  if (gender === null || gender === undefined) {
-    return 'male';
-  }
-
+const convertGenderFromApi = (gender?: number | string | null): GenderOption => {
+  if (gender === null || gender === undefined) return 'male';
   let genderNum: number;
-  if (typeof gender === 'string') {
-    genderNum = parseInt(gender, 10);
-  } else {
-    genderNum = gender;
-  }
-
-  if (isNaN(genderNum)) {
-    return 'male';
-  }
-
-  if (genderNum === 0) {
-    return 'male';
-  }
-
-  const result = genderNum === 2111 ? 'female' : 'male';
-  return result;
+  if (typeof gender === 'string') genderNum = parseInt(gender, 10);
+  else genderNum = gender;
+  if (isNaN(genderNum) || genderNum === 0) return 'male';
+  if (genderNum === 2111) return 'female';
+  if (genderNum === 2112) return 'select';
+  return 'male'; 
 };
 
-const convertAgeToApi = (age: string): number => {
+const convertAgeToApi = (age: (typeof AGE_OPTIONS)[number]): number => {
+  if (age === 'select') return 0;
   const ageMap: Record<string, number> = {
     '10': 2210,
     '20': 2220,
@@ -77,11 +68,11 @@ const convertAgeToApi = (age: string): number => {
     '40': 2240,
     '50+': 2250,
   };
-  return ageMap[age] || 2210; 
+  return ageMap[age] ?? 2210;
 };
 
 const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
-  if (age === 0 || age === null || age === undefined) return '10'; 
+  if (age === 0 || age === null || age === undefined) return 'select';
   const ageMap: Record<number, (typeof AGE_OPTIONS)[number]> = {
     2210: '10',
     2220: '20',
@@ -89,7 +80,7 @@ const convertAgeFromApi = (age?: number): (typeof AGE_OPTIONS)[number] => {
     2240: '40',
     2250: '50+',
   };
-  return ageMap[age] || '10'; 
+  return ageMap[age] ?? 'select';
 };
 
 export const MyInfoEditScreen = () => {
@@ -103,10 +94,19 @@ export const MyInfoEditScreen = () => {
 
   const renderCountRef = React.useRef(0);
 
-  const GENDER_OPTIONS = [
-    { value: 'male' as const, label: t('screens.myInfoEdit.genderMale') },
-    { value: 'female' as const, label: t('screens.myInfoEdit.genderFemale') },
-  ];
+  const isIOS = Platform.OS === 'ios';
+
+  const GENDER_OPTIONS: { value: GenderOption; label: string }[] = isIOS
+    ? [
+        { value: 'select', label: t('screens.myInfoEdit.genderSelect') },
+        { value: 'male', label: t('screens.myInfoEdit.genderMale') },
+        { value: 'female', label: t('screens.myInfoEdit.genderFemale') },
+      ]
+    : [
+        { value: 'male', label: t('screens.myInfoEdit.genderMale') },
+        { value: 'female', label: t('screens.myInfoEdit.genderFemale') },
+      ];
+  const AGE_OPTIONS_DISPLAY = isIOS ? AGE_OPTIONS : (['10', '20', '30', '40', '50+'] as const);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [fullName, setFullName] = useState('');
@@ -116,7 +116,7 @@ export const MyInfoEditScreen = () => {
   const [region, setRegion] = useState('대한민국 서울');
   const [regionCode, setRegionCode] = useState<number | null>(null);
   const [countryCode, setCountryCode] = useState<number | null>(null);
-  const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [gender, setGender] = useState<GenderOption>('male');
   const [age, setAge] = useState<(typeof AGE_OPTIONS)[number]>('10');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -227,7 +227,7 @@ export const MyInfoEditScreen = () => {
 
   const [originalFirstName, setOriginalFirstName] = useState('');
   const [originalLastName, setOriginalLastName] = useState('');
-  const [originalGender, setOriginalGender] = useState<'male' | 'female'>('male');
+  const [originalGender, setOriginalGender] = useState<GenderOption>('male');
   const [originalAge, setOriginalAge] = useState<(typeof AGE_OPTIONS)[number]>('10');
   const [originalCountryCode, setOriginalCountryCode] = useState<number | null>(null);
   const [originalRegionCode, setOriginalRegionCode] = useState<number | null>(null);
@@ -390,6 +390,9 @@ export const MyInfoEditScreen = () => {
             const loadedGender = convertGenderFromApi(user.gender);
             const loadedAge = convertAgeFromApi(user.ages);
 
+            const displayGender = isIOS ? loadedGender : (loadedGender === 'select' ? 'male' : loadedGender);
+            const displayAge = isIOS ? loadedAge : (loadedAge === 'select' ? '10' : loadedAge);
+
             setFirstName(loadedFirstName);
             setLastName(loadedLastName);
 
@@ -400,23 +403,15 @@ export const MyInfoEditScreen = () => {
 
             setOriginalFirstName(loadedFirstName);
             setOriginalLastName(loadedLastName);
-            setOriginalGender(loadedGender);
-            setOriginalAge(loadedAge);
+            setOriginalGender(displayGender);
+            setOriginalAge(displayAge);
 
             if (user.mobile) {
               setPhone(user.mobile.replace(/\s/g, ''));
             }
 
-            const expectedGenderValue = (() => {
-              const rawGender = user.gender;
-              if (rawGender === null || rawGender === undefined) return 'male';
-              const genderNum = typeof rawGender === 'string' ? parseInt(rawGender, 10) : rawGender;
-              return isNaN(genderNum) ? 'male' : (genderNum === 2111 ? 'female' : 'male');
-            })();
-
-            setGender(loadedGender);
-
-            setAge(loadedAge);
+            setGender(displayGender);
+            setAge(displayAge);
 
             let loadedCountryName = '';
             let loadedCountryCode: number | null = null;
@@ -809,58 +804,28 @@ export const MyInfoEditScreen = () => {
       return;
     }
 
-    if (!gender) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.genderRequired'));
-      return;
-    }
-
-    if (!age) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.ageRequired'));
-      return;
-    }
-
-    if (!tempCountry.cCode && tempCountry.cCode !== 0) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.countryRequired'));
-      return;
-    }
-
-    if (tempRegion.rCode === null || tempRegion.rCode === -1) {
-      await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.regionRequired'));
-      return;
-    }
-
     if (!memberId) {
       await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.userDataNotFound'));
       return;
     }
 
-    const genderCode = convertGenderToApi(gender);
-    const ageCode = convertAgeToApi(age);
-
-    const validationErrors: string[] = [];
-
-    if (genderCode === 0 || genderCode === null || genderCode === undefined) {
-      validationErrors.push(t('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
-    }
-
-    if (ageCode === 0 || ageCode === null || ageCode === undefined) {
-      validationErrors.push(t('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
-    }
-
-    if (tempCountry.cCode === 0 || tempCountry.cCode === null || tempCountry.cCode === undefined) {
-      validationErrors.push(t('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
-    }
-
-    if (tempRegion.rCode === 0 || tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === -1) {
-      validationErrors.push(t('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
-    }
-
-    if (validationErrors.length > 0) {
-      await showAlert(
-        t('screens.myInfoEdit.alerts.error') || '오류',
-        validationErrors.join('\n')
-      );
-      return;
+    if (!isIOS) {
+      if (gender === 'select') {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.genderRequired') || '성별을 선택해주세요.');
+        return;
+      }
+      if (age === 'select') {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
+        return;
+      }
+      if (tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === -1) {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+        return;
+      }
+      if (tempCountry.cCode === null || tempCountry.cCode === undefined) {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
+        return;
+      }
     }
 
     setIsSaving(true);
@@ -995,10 +960,9 @@ export const MyInfoEditScreen = () => {
       });
 
       if (tempCountry.cCode !== null && tempCountry.cCode !== undefined &&
-        tempRegion.rCode !== null && tempRegion.rCode !== undefined &&
         tempRegion.rCode !== -1) {
         const currentCountryCode = tempCountry.cCode;
-        const currentRegionCode = tempRegion.rCode;
+        const currentRegionCode = tempRegion.rCode === null || tempRegion.rCode === undefined ? 0 : tempRegion.rCode;
 
         if (!memberId || memberId === null || memberId === undefined) {
           console.error('[정보수정] ❌ memberId가 유효하지 않습니다:', memberId);
@@ -1404,6 +1368,14 @@ export const MyInfoEditScreen = () => {
     }
   };
 
+  const regionSelectOption: CountryDialCode = useMemo(() => ({
+    iso2: 'select',
+    name: t('screens.myInfoEdit.regionSelect'),
+    dialCode: '0',
+    flagEmoji: '',
+    countryCode: 0,
+  }), [t]);
+
   const filteredRegions = useMemo(() => {
     if (!regionSearchQuery.trim()) {
       return availableRegions;
@@ -1435,8 +1407,13 @@ export const MyInfoEditScreen = () => {
         translatedName.includes(normalizedQuery) ||
         searchIso.includes(normalizedQuery)
       );
-    });
+    }      );
   }, [regionSearchQuery, availableRegions, t]);
+
+  const regionsForModal = useMemo(
+    () => (isIOS ? [regionSelectOption, ...filteredRegions] : filteredRegions),
+    [isIOS, regionSelectOption, filteredRegions]
+  );
 
   const handleSelectRegion = (region: CountryDialCode) => {
     console.log('[정보수정] 지역 선택:', {
@@ -1455,12 +1432,15 @@ export const MyInfoEditScreen = () => {
         rCode: null,
       });
       setSelectedRegionId(null);
+      setRegionCode(null);
     } else {
       console.log('[정보수정] 지역 선택:', region.name);
       setSelectedRegion(region);
       const regionCode = parseInt(region.dialCode, 10) || 0;
 
-      const countryCode = selectedCountryDialCode?.countryCode || region.countryCode || null;
+      const countryCode = (selectedCountryDialCode?.countryCode
+        ?? (selectedCountryDialCode?.dialCode ? getCountryCodeFromDialCode(selectedCountryDialCode.dialCode) : null))
+        || region.countryCode || null;
       let translatedRegionName = region.name; 
 
       if (countryCode && regionCode > 0) {
@@ -1527,13 +1507,15 @@ export const MyInfoEditScreen = () => {
 
   React.useEffect(() => {
     const loadRegionsForCountry = async () => {
-      if (!selectedCountryDialCode?.countryCode) return;
+      const countryCode = selectedCountryDialCode?.countryCode
+        ?? (selectedCountryDialCode?.dialCode ? getCountryCodeFromDialCode(selectedCountryDialCode.dialCode) : null);
+      if (!countryCode || !selectedCountryDialCode?.iso2) return;
 
       setIsLoadingRegions(true);
       try {
         const result: LoadRegionsResult = await loadRegionsFromApi(
           (country: number) => getRegionsByCountry(country, navigate),
-          selectedCountryDialCode.countryCode || 0,
+          countryCode,
           selectedCountryDialCode.iso2,
           getRegionsByCountryIso2(selectedCountryDialCode.iso2)
         );
@@ -1550,7 +1532,7 @@ export const MyInfoEditScreen = () => {
             const translatedRegionName = getTranslatedRegionName(
               matchedRegion.name,
               tempRegion.rCode,
-              selectedCountryDialCode?.countryCode || null
+              countryCode
             );
             setSelectedRegionId(translatedRegionName);
 
@@ -1690,13 +1672,12 @@ export const MyInfoEditScreen = () => {
 
             {}
             {(() => {
-
-              const countryCode = selectedCountryDialCode?.countryCode;
+              const countryCode = selectedCountryDialCode?.countryCode
+                ?? (selectedCountryDialCode?.dialCode ? getCountryCodeFromDialCode(selectedCountryDialCode.dialCode) : null);
               const iso2 = selectedCountryDialCode?.iso2;
-              const isCountryWithRegions = countryCode && iso2 
-                ? isCountryWithRegionsByCode(countryCode, iso2) 
+              const isCountryWithRegions = (countryCode != null && iso2)
+                ? isCountryWithRegionsByCode(countryCode, iso2)
                 : false;
-
               return hasRegions || isCountryWithRegions;
             })() && (
               <View style={styles.fieldContainer}>
@@ -1707,20 +1688,29 @@ export const MyInfoEditScreen = () => {
                   activeOpacity={0.7}
                   disabled={isSaving || isLoadingRegions}
                 >
-                  <Text style={[styles.regionValue, !tempRegion.rDesc && !selectedRegion && styles.regionPlaceholder]}>
+                  <Text style={styles.regionValue}>
                     {(() => {
 
+                      if (!selectedRegion || tempRegion.rCode === null || tempRegion.rCode === 0) {
+                        return t('screens.myInfoEdit.regionSelect') || '선택';
+                      }
+
                       if (tempRegion.rDesc && tempRegion.rDesc !== 'Please Select') {
+                        const allRegionsLabel = t('screens.myInfoEdit.allRegions');
+                        if (tempRegion.rDesc === allRegionsLabel || tempRegion.rCode === 0) {
+                          return t('screens.myInfoEdit.regionSelect') || '선택';
+                        }
                         return tempRegion.rDesc;
                       }
 
                       if (selectedRegion && selectedRegion.iso2 !== 'select' && selectedRegion.dialCode !== '0') {
 
                         const regionCode = selectedRegion.dialCode ? parseInt(selectedRegion.dialCode, 10) : null;
-                        const countryCode = selectedCountryDialCode?.countryCode || null;
+                        const countryCode = selectedCountryDialCode?.countryCode
+                          ?? (selectedCountryDialCode?.dialCode ? getCountryCodeFromDialCode(selectedCountryDialCode.dialCode) : null);
 
                         if (regionCode === 0) {
-                          return t('screens.myInfoEdit.allRegions') || '전체 지역';
+                          return t('screens.myInfoEdit.regionSelect') || '선택';
                         } else if (countryCode && regionCode !== null && regionCode !== undefined && regionCode > 0) {
 
                           const COUNTRIES_WITH_MAPPING = [82, 81, 86, 1, 62];
@@ -1756,7 +1746,7 @@ export const MyInfoEditScreen = () => {
                         }
                       }
 
-                      return '';
+                      return t('screens.myInfoEdit.regionSelect') || '선택';
                     })()}
                   </Text>
                   <Text style={styles.arrow}>›</Text>
@@ -1795,18 +1785,16 @@ export const MyInfoEditScreen = () => {
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.age')}</Text>
               <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
-                {AGE_OPTIONS.map((option, index) => {
-                  return (
-                    <OptionButton
-                      key={option}
-                      label={option}
-                      selected={age === option}
-                      onPress={() => setAge(option)}
-                      flex={1}
-                      disabled={isSaving}
-                    />
-                  );
-                })}
+                {AGE_OPTIONS_DISPLAY.map((option) => (
+                  <OptionButton
+                    key={option}
+                    label={option === 'select' ? t('screens.myInfoEdit.ageSelect') : option}
+                    selected={age === option}
+                    onPress={() => setAge(option)}
+                    flex={1}
+                    disabled={isSaving}
+                  />
+                ))}
               </View>
             </View>
           </View>
@@ -1969,12 +1957,12 @@ export const MyInfoEditScreen = () => {
               </View>
             ) : (
               <FlatList
-                data={filteredRegions}
+                data={regionsForModal}
                 keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
                 renderItem={({ item }) => (
                   <CountryCodeListItem
                     country={item}
-                    isSelected={item.iso2 === selectedRegion?.iso2 && item.dialCode === selectedRegion?.dialCode}
+                    isSelected={(item.iso2 === 'select' && item.dialCode === '0' && !selectedRegion) || (item.iso2 === selectedRegion?.iso2 && item.dialCode === selectedRegion?.dialCode)}
                     onPress={handleSelectRegion}
                     hideDialCode={true}
                   />
