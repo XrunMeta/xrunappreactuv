@@ -150,7 +150,10 @@ export const ShopScreen = () => {
                 onPress={() => handleProductClick(product)}
                 activeOpacity={0.8}
             >
-                <View style={styles.productImageContainer}>
+                <View style={[
+                    styles.productImageContainer,
+                    isEthereum && styles.productImageContainerEthereum
+                ]}>
                     <Image source={product.image} style={styles.productImage} resizeMode="contain" />
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
@@ -445,9 +448,12 @@ const styles = StyleSheet.create({
         height: 128,
         borderBottomWidth: 1.108,
         borderBottomColor: '#e2e2e2',
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
+    },
+    productImageContainerEthereum: {
+        backgroundColor: '#f2f2f2',
     },
     productImage: {
         width: '100%',
