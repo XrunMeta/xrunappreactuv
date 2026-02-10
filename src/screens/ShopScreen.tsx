@@ -142,7 +142,6 @@ export const v_10886b = () => {
     const v_80b207 = (v_01bee9, v_80e8c0 = false) => {
         const v_2141e0 = v_01bee9.brand === 'Ethereum' && v_01bee9.description;
         const v_fa78fb = v_01bee9.brand === 'XRUN';
-        const v_4b9648 = v_2141e0 || v_fa78fb ? 'contain' : 'cover';
 
         return (
             <TouchableOpacity
@@ -152,7 +151,7 @@ export const v_10886b = () => {
                 activeOpacity={0.8}
             >
                 <View style={v_d81136.productImageContainer}>
-                    <Image source={v_01bee9.image} style={v_d81136.productImage} resizeMode={v_4b9648} />
+                    <Image source={v_01bee9.image} style={v_d81136.productImage} resizeMode="contain" />
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
                             <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
