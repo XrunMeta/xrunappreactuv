@@ -150,7 +150,10 @@ export const v_10886b = () => {
                 onPress={() => v_8d97ed(v_01bee9)}
                 activeOpacity={0.8}
             >
-                <View style={v_d81136.productImageContainer}>
+                <View style={[
+                    v_d81136.productImageContainer,
+                    v_2141e0 && v_d81136.productImageContainerEthereum
+                ]}>
                     <Image source={v_01bee9.image} style={v_d81136.productImage} resizeMode="contain" />
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
@@ -445,9 +448,12 @@ const v_d81136 = v_472849.create({
         height: 128,
         borderBottomWidth: 1.108,
         borderBottomColor: '#e2e2e2',
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
+    },
+    productImageContainerEthereum: {
+        backgroundColor: '#f2f2f2',
     },
     productImage: {
         width: '100%',
