@@ -33,6 +33,11 @@ export default {
     later: '나중에',
     updateFound: '업데이트가 발견되었습니다.',
     pleaseUpdate: '앱을 업데이트해주세요.',
+    updateComplete: '업데이트 완료',
+    restartMessage: '업데이트 적용을 위해 앱을 재시작합니다.',
+    restartRequired: '업데이트 적용을 위해 앱을 완전히 종료 후 다시 실행해 주세요.',
+    downloadFailed: '업데이트 다운로드에 실패했습니다.',
+    confirm: '확인',
   },
   emergencyStop: {
     title: '안내',

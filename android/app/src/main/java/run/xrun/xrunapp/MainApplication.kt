@@ -16,12 +16,29 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
 import android.util.Log
+import java.io.File
 
 class MainApplication : Application(), ReactApplication {
 
   override val reactNativeHost: ReactNativeHost = ReactNativeHostWrapper(
       this,
       object : DefaultReactNativeHost(this) {
+
+        override fun getJSBundleFile(): String? {
+
+            if (BuildConfig.DEBUG) {
+                return super.getJSBundleFile()
+            }
+
+            val file = File(applicationContext.filesDir, "index.android.bundle")
+            if (file.exists()) {
+                Log.d("MainApplication", "OTA Bundle loaded: " + file.absolutePath)
+                return file.absolutePath
+            }
+
+            return super.getJSBundleFile()
+        }
+
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
 
