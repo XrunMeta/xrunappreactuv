@@ -1911,7 +1911,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         v_9b57fc(v_ce4741.wallet);
         break;
       case 'shop':
-        v_9b57fc(v_ce4741.shopTicket);
+        v_9b57fc(v_ce4741.shop);
         break;
       case 'referral':
         v_9b57fc(v_ce4741.referralSettlement);

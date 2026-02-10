@@ -47,8 +47,12 @@ import {
   v_f57686,
   v_5b4c5a,
   v_8c15c4,
+  v_10886b,
   v_38326c,
   v_052a8a,
+  v_8c1d95,
+  v_1184c4,
+  v_a59951,
   v_1a0a02,
   v_8734da,
   v_a1c4a5,
@@ -478,12 +482,29 @@ const v_c0dbdf = () => {
     return <ReferralInputScreen />;
   }
 
+  if (v_0f0c7b === 'shop') {
+    console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
+    return <ShopScreen />;
+  }
+
   if (v_0f0c7b === 'shopTicket') {
     return <ShopTicketScreen />;
   }
 
   if (v_0f0c7b === 'shopMyTicket') {
     return <ShopMyTicketScreen />;
+  }
+
+  if (v_0f0c7b === 'shopMyItems') {
+    return <ShopMyItemsScreen />;
+  }
+
+  if (v_0f0c7b === 'shopMyTicketDetail') {
+    return <ShopMyTicketDetailScreen />;
+  }
+
+  if (v_0f0c7b === 'shopProductDetail') {
+    return <ShopProductDetailScreen />;
   }
 
   if (v_0f0c7b === 'shopBuy') {

@@ -2616,9 +2616,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
         break;
 
       case 'shop':
-
-        v_9b57fc(v_ce4741.shopTicket);
-
+        console.log('[MapMainScreen] shop 클릭됨, ROUTES.shop으로 이동:', v_ce4741.shop);
+        v_9b57fc(v_ce4741.shop);
         break;
 
       case 'referral':
