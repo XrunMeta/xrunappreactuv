@@ -314,7 +314,18 @@ class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
 #if DEBUG
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: ".expo/.virtual-metro-entry")
 #else
+
+    let fileManager = FileManager.default
+    if let documentsDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+        let bundleUrl = documentsDir.appendingPathComponent("index.ios.bundle")
+        if fileManager.fileExists(atPath: bundleUrl.path) {
+            print("[AppDelegate] OTA Bundle loaded: \(bundleUrl.path)")
+            return bundleUrl
+        }
+    }
+
     return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+
 #endif
   }
 }
