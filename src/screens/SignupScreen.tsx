@@ -91,10 +91,10 @@ export const v_f40fc5 = () => {
   const [v_d0472c, v_5d25dd] = v_5ab095(false);
 
   const [v_c3eac4, v_bdc43c] = v_5ab095<GenderValue>(
-    v_d0472c ? '0' : (v_8d7bc8.gender || 'male')
+    (v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android') ? '0' : (v_8d7bc8.gender || 'male')
   );
   const [v_f83808, v_64a312] = v_5ab095<AgeValue>(
-    v_d0472c ? '0' : (v_8d7bc8.ageRange || '10')
+    (v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android') ? '0' : (v_8d7bc8.ageRange || '10')
   );
   const [v_471e49, v_7f4d53] = v_5ab095(false);
   const [v_68a5a9, v_8e53ad] = v_5ab095(false);
@@ -168,14 +168,16 @@ export const v_f40fc5 = () => {
 
   const v_56ad9c = v_5f1e0e;
 
+  const v_600254 = v_d0472c || v_326be8.OS === 'ios' || v_326be8.OS === 'android';
+
   const v_56743f = v_a3453e.useMemo(() => {
 
     if (!v_56ad9c) {
       return v_789afd.name;
     }
 
-    if (v_2f03bc && (v_2f03bc.iso2 === 'select' || v_2f03bc.dialCode === '0')) {
-      return '';
+    if (!v_2f03bc || (v_2f03bc.iso2 === 'select' || v_2f03bc.dialCode === '0')) {
+      return v_8d41d7('screens.countryCodeSelect.selectOption') || '선택';
     }
 
     let v_3b402b = '';
@@ -220,7 +222,7 @@ export const v_f40fc5 = () => {
         v_3b402b = v_2f03bc.name;
       }
     } else {
-      v_3b402b = v_590486 ? '' : v_789afd.name;
+      v_3b402b = v_590486 ? (v_8d41d7('screens.countryCodeSelect.selectOption') || '선택') : v_789afd.name;
     }
     if (__DEV__) {
       console.log('[회원가입] regionDisplayValue 계산:', {
@@ -253,6 +255,8 @@ export const v_f40fc5 = () => {
 
         if (v_43c42e.hasRegions && v_43c42e.regions.length > 0) {
 
+          if (!v_b89ebc.current) {
+
           if (v_2f03bc && v_2f03bc.dialCode !== '0' && v_2f03bc.iso2 !== 'select') {
             const v_d2a53b = v_43c42e.regions.some(
               (v_cb35cb) => v_cb35cb.iso2 === v_2f03bc.iso2 && v_cb35cb.dialCode === v_2f03bc.dialCode
@@ -264,8 +268,10 @@ export const v_f40fc5 = () => {
               console.log('[회원가입] 선택된 지역 유지:', v_2f03bc.name);
             }
           } else if (!v_2f03bc || v_2f03bc.iso2 === 'select' || v_2f03bc.dialCode === '0') {
-
             console.log('[회원가입] 지역 자동 선택 건너뜀 (사용자 선택 대기)');
+          }
+          } else {
+            console.log('[회원가입] 지역 "선택" 유지 (목록 로드 후 덮어쓰지 않음)');
           }
         } else {
 
@@ -400,8 +406,8 @@ export const v_f40fc5 = () => {
 
   const v_904f1e = v_df9f57(() => {
 
-    return v_d0472c ? [v_a35839, ...v_963133] : v_963133;
-  }, [v_a35839, v_963133, v_d0472c]);
+    return [v_a35839, ...v_963133];
+  }, [v_a35839, v_963133]);
 
   const v_4e187d = v_df9f57(() => {
     if (!v_7962f1.trim()) {
@@ -451,6 +457,7 @@ export const v_f40fc5 = () => {
       v_2f2d51(null);
     } else {
       console.log('[회원가입] 지역 선택:', v_a6c30b.name);
+      v_b89ebc.current = false; 
       v_2f2d51(v_a6c30b);
     }
     v_c73419(false);
@@ -522,6 +529,11 @@ export const v_f40fc5 = () => {
             }
           }
         }
+
+        if ((v_326be8.OS === 'ios' || v_326be8.OS === 'android') && v_45c706 !== 'true') {
+          v_bdc43c('0');
+          v_64a312('0');
+        }
       } catch (v_5e9bfe) {
         console.error('[회원가입] 소셜 회원가입 모드 확인 실패:', v_5e9bfe);
       }
@@ -530,10 +542,33 @@ export const v_f40fc5 = () => {
     v_b2b2a0();
   }, [v_8d41d7]); 
 
+  const v_b89ebc = v_a3453e.useRef(false);
+
+  const v_43d5f3 = v_a3453e.useRef(false);
+  v_a3453e.useEffect(() => {
+    if (!v_2f2d51 || v_43d5f3.current) return;
+
+    const v_6faa98 =
+      !v_2f03bc ||
+      v_2f03bc.iso2 === 'select' ||
+      v_2f03bc.dialCode === '0' ||
+      (v_2f03bc.iso2 === '서울' && v_2f03bc.countryCode === 82) ||
+      v_2f03bc.iso2 === 'global';
+    if (v_6faa98) {
+      v_b89ebc.current = true;
+      v_2f2d51(v_a35839);
+    }
+    v_43d5f3.current = true;
+    return () => {
+      v_43d5f3.current = false;
+      v_b89ebc.current = false;
+    };
+  }, [v_2f03bc, v_2f2d51, v_a35839]);
+
   const v_788ac5 = v_a3453e.useRef(false);
   v_a3453e.useEffect(() => {
 
-    if (v_d0472c && v_2f2d51 && !v_788ac5.current) {
+    if (v_600254 && v_2f2d51 && !v_788ac5.current) {
 
       if (!v_2f03bc || (v_2f03bc.iso2 !== 'select' && v_2f03bc.dialCode !== '0')) {
 
@@ -544,27 +579,16 @@ export const v_f40fc5 = () => {
         );
 
         if (v_efb878 || !v_2f03bc) {
-          const v_031f8c = {
-            iso2: 'select',
-            name: v_8d41d7('screens.signup.genderSelect') || '선택',
-            dialCode: '0',
-            flagEmoji: '📍',
-            countryCode: 0,
-          };
-          v_2f2d51(v_031f8c);
+          v_2f2d51(v_a35839);
           v_788ac5.current = true;
-          console.log('[회원가입] 애플 회원가입 모드 - 지역을 "선택"으로 초기 설정');
         } else {
-
           v_788ac5.current = true;
-          console.log('[회원가입] 애플 회원가입 모드 - 이미 지역이 선택되어 있음, 유지:', v_2f03bc.name);
         }
       } else {
-
         v_788ac5.current = true;
       }
     }
-  }, [v_d0472c, v_2f03bc, v_2f2d51, v_8d41d7]); 
+  }, [v_600254, v_2f03bc, v_2f2d51, v_a35839, v_8d41d7]);
 
   v_a3453e.useEffect(() => {
     const v_c9d3c8 = async () => {
@@ -611,15 +635,15 @@ export const v_f40fc5 = () => {
       v_f768f9(v_8d7bc8.phoneNumber);
       v_fb6bbb(v_8d7bc8.referralEmail);
 
-      v_bdc43c(v_d0472c ? v_8d7bc8.gender : (v_8d7bc8.gender || 'male'));
-      v_64a312(v_d0472c ? v_8d7bc8.ageRange : (v_8d7bc8.ageRange || '10'));
+      v_bdc43c(v_600254 ? (v_8d7bc8.gender || '0') : (v_8d7bc8.gender || 'male'));
+      v_64a312(v_600254 ? (v_8d7bc8.ageRange || '0') : (v_8d7bc8.ageRange || '10'));
 
       v_7f4d53(false);
       v_8e53ad(false);
       v_f932c8(false);
       v_2ca208.current = true;
     }
-  }, [v_8d7bc8, v_47b466, v_d0472c]);
+  }, [v_8d7bc8, v_47b466, v_d0472c, v_600254]);
 
   v_a3453e.useEffect(() => {
     if (!v_2ca208.current) return;
@@ -709,7 +733,7 @@ export const v_f40fc5 = () => {
       }
     }
 
-    if (!v_d0472c) {
+    if (!v_600254) {
       if (!v_3a6ac4.trim()) {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
         return;
@@ -1198,7 +1222,7 @@ export const v_f40fc5 = () => {
 
           <FormField
             containerStyle={v_d81136.fieldContainer}
-            label={v_d0472c ? `${v_8d41d7('screens.signup.phoneNumberLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.phoneNumberLabel')}
+            label={v_600254 ? `${v_8d41d7('screens.signup.phoneNumberLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.phoneNumberLabel')}
             placeholder={v_8d41d7('screens.signup.phoneNumberPlaceholder')}
             keyboardType="phone-pad"
             value={v_3a6ac4}
@@ -1221,7 +1245,7 @@ export const v_f40fc5 = () => {
           {v_56ad9c && (
             <View style={v_d81136.fieldContainer}>
               <FormField
-                label={v_d0472c ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
+                label={v_600254 ? `${v_8d41d7('screens.signup.regionLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})` : v_8d41d7('screens.signup.regionLabel')}
                 placeholder={v_8d41d7('screens.signup.regionPlaceholder')}
                 value={v_56743f}
                 editable={false}
@@ -1239,7 +1263,7 @@ export const v_f40fc5 = () => {
 
           <View style={v_d81136.fieldContainer}>
             <Text style={v_d81136.label}>
-              {v_d0472c 
+              {v_600254 
                 ? `${v_8d41d7('screens.signup.genderLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})`
                 : v_8d41d7('screens.signup.genderLabel')}
             </Text>
@@ -1249,10 +1273,10 @@ export const v_f40fc5 = () => {
                 const v_16f845 = { value: 'male' as const, label: v_8d41d7('screens.signup.genderMale') };
                 const v_bb39f9 = { value: 'female' as const, label: v_8d41d7('screens.signup.genderFemale') };
 
-                return v_d0472c
+                return v_600254
                   ? [v_a35839, v_16f845, v_bb39f9]
                   : [v_16f845, v_bb39f9];
-              }, [v_d0472c, v_8d41d7]).map((v_0bd920) => {
+              }, [v_600254, v_8d41d7]).map((v_0bd920) => {
                 const v_26dce6 = v_c3eac4 === v_0bd920.value;
                 return (
                   <OptionButton
@@ -1268,16 +1292,16 @@ export const v_f40fc5 = () => {
 
           <View style={v_d81136.fieldContainer}>
             <Text style={v_d81136.label}>
-              {v_d0472c 
+              {v_600254 
                 ? `${v_8d41d7('screens.signup.ageLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})`
                 : v_8d41d7('screens.signup.ageLabel')}
             </Text>
             <View style={[v_d81136.inlineOptions]}>
               {v_a3453e.useMemo(() => {
-                return v_d0472c 
+                return v_600254 
                   ? v_0c96f7 
                   : v_0c96f7.filter(v_0bd920 => v_0bd920 !== '0');
-              }, [v_d0472c]).map((v_0bd920, v_a56041, v_09228c) => {
+              }, [v_600254]).map((v_0bd920, v_a56041, v_09228c) => {
                 const v_26dce6 = v_f83808 === v_0bd920;
                 const v_0d0d82 = v_a56041 === v_09228c.length - 1;
                 return (
