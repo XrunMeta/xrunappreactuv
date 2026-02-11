@@ -68,7 +68,7 @@ import {
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog } from './src/components';
 import { loadEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
@@ -782,6 +782,7 @@ const GlobalDialogs = () => {
         showLaterButton={!isServerUpdateRequired} 
         onClose={() => setVersionUpdateVisible(false)}
       />
+      <OTAUpdateDialog />
     </>
   );
 };
