@@ -8,6 +8,7 @@ export default {
   share: {
     shareText: '[XRUN Invitation: Together 5 XRUN]\n\n함께할수록 커지는 혜택, XRUN 레퍼럴 이벤트를 소개합니다.\n\n🎁 리워드 안내\n\n* 신규 가입 시 5 XRUN 지급 (초대자 & 가입자 전원)\n\n* 지인의 광고 수익을 공유받는 8단계 유니레벨 수익 구조(20%) 제공\n\n⚙️ 참여방법\n\n* Step: XRUN App 실행 ➔ 지갑 ➔ AD XRUN ➔ 퀘스트 ➔ 레퍼럴 코드 공유 ➔ 회원가입\n\n📩 추천인 이메일 ',
     download: '다운로드:',
+    linkLabel: '바로가기',
     shareFailed: '공유 실패',
     shareFailedMessage: '레퍼럴 링크를 공유하지 못했습니다.',
   },
