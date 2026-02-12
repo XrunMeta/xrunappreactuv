@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions } from 'react-native';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
@@ -9,6 +9,8 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import { getProductList } from '../services/giftishowBiz';
+import type { GiftishowProductItem } from '../services/giftishowBiz';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -70,12 +72,52 @@ const xrunStoreProducts: ProductData[] = [
     },
 ];
 
+function giftishowToProductData(item: GiftishowProductItem): ProductData {
+    return {
+        id: item.id ?? `g-${item.name ?? ''}`,
+        brand: (item as any).brandName ?? '기프티콘',
+        title: item.name ?? '-',
+        price: typeof item.price === 'number' ? item.price : 0,
+        image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
+    };
+}
+
 export const ShopScreen = () => {
     console.log('[ShopScreen] ShopScreen 컴포넌트 렌더링됨');
     const { t } = useTranslation();
     const { showAlert } = useAlertDialog();
     const { setSelectedShopItem, selectedShopItem } = useAppContext();
     const [tab, setTab] = useState<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+
+    const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
+    const [xplayLoading, setXplayLoading] = useState(false);
+    const [xplayRefreshing, setXplayRefreshing] = useState(false);
+    const [xplayError, setXplayError] = useState<string | null>(null);
+
+    const loadXplayProducts = useCallback(async () => {
+        setXplayError(null);
+        try {
+            const res = await getProductList({ start: 1, size: 50 });
+            const list = Array.isArray(res.list) ? res.list : [];
+            setXplayProductList(list);
+            if (list.length === 0 && res.resultMsg) setXplayError(res.resultMsg);
+        } catch (e) {
+            setXplayError(e instanceof Error ? e.message : '기프티콘 목록을 불러오지 못했습니다.');
+            setXplayProductList([]);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (tab === 'xplayShop') {
+            setXplayLoading(true);
+            loadXplayProducts().finally(() => setXplayLoading(false));
+        }
+    }, [tab, loadXplayProducts]);
+
+    const onXplayRefresh = useCallback(() => {
+        setXplayRefreshing(true);
+        loadXplayProducts().finally(() => setXplayRefreshing(false));
+    }, [loadXplayProducts]);
 
     useEffect(() => {
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
@@ -259,11 +301,36 @@ export const ShopScreen = () => {
                 />
 
                 {}
-                <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
+                <SafeScrollView
+                    showsVerticalScrollIndicator={false}
+                    showBottomBackground={false}
+                    backgroundColor="transparent"
+                    disableBottomPadding={true}
+                    refreshControl={
+                        tab === 'xplayShop' ? (
+                            <RefreshControl refreshing={xplayRefreshing} onRefresh={onXplayRefresh} colors={[COLORS.buttonPrimary]} />
+                        ) : undefined
+                    }
+                >
                     {tab === 'xplayShop' ? (
-                        <View style={styles.productGrid}>
-                            {sampleProducts.map((product) => renderProductCard(product, false))}
-                        </View>
+                        <>
+                            {xplayLoading && !xplayRefreshing ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+                                    <Text style={styles.loadingText}>기프티콘 목록 불러오는 중...</Text>
+                                </View>
+                            ) : xplayError ? (
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{xplayError}</Text>
+                                </View>
+                            ) : (
+                                <View style={styles.productGrid}>
+                                    {xplayProductList.map((item) =>
+                                        renderProductCard(giftishowToProductData(item), false)
+                                    )}
+                                </View>
+                            )}
+                        </>
                     ) : tab === 'xrunStore' ? (
                         <View style={styles.productGrid}>
                             {xrunStoreProducts.map((product) => renderProductCard(product, false))}
@@ -545,6 +612,27 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
+        textAlign: 'center',
+    },
+    loadingContainer: {
+        paddingVertical: 40,
+        alignItems: 'center',
+        gap: 12,
+    },
+    loadingText: {
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#6a7282',
+    },
+    errorContainer: {
+        paddingVertical: 40,
+        paddingHorizontal: 16,
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#b91c1c',
         textAlign: 'center',
     },
     emptyContainer: {
