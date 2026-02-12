@@ -320,13 +320,6 @@ export const sendAliveSignal = async (
       const serverAndroidVersion = Number(serverResponse.data.version) || 0;
       const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
 
-      console.log('[App] 버전 확인:', {
-        currentVersion,
-        serverAndroidVersion,
-        serverIOSVersion,
-        platform: Platform.OS,
-      });
-
       if (Platform.OS === 'android') {
         if (currentVersion && serverAndroidVersion > currentVersion) {
           console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
@@ -1779,44 +1772,30 @@ export const updateRegion = async (
       request.mobilecode = options.mobilecode;
     }
 
-    const cleanRequest: any = {};
-    if (request.member !== undefined) cleanRequest.member = request.member;
-    if (request.country !== undefined) cleanRequest.country = request.country;
-    if (request.region !== undefined) cleanRequest.region = request.region;
-    if (request.countrycode !== undefined) cleanRequest.countrycode = request.countrycode;
-    if (request.mobilecode !== undefined) cleanRequest.mobilecode = request.mobilecode;
-
-    console.log('[마이페이지] 지역 수정 요청 - 최종 request 객체:', JSON.stringify(cleanRequest, null, 2));
-    console.log('[마이페이지] 지역 수정 요청 - cleanRequest 확인:', {
-      원본: request,
-      정리됨: cleanRequest,
-      JSON문자열: JSON.stringify(cleanRequest),
-      파싱: JSON.parse(JSON.stringify(cleanRequest)),
-    });
-    console.log('[마이페이지] 지역 수정 요청 - request 상세:', {
+    const buildPayload = (obj: any): any => {
+      if (obj === undefined) return null;
+      if (obj === null || typeof obj !== 'object') return obj;
+      if (Array.isArray(obj)) return obj.map(buildPayload);
+      const out: any = {};
+      for (const k of Object.keys(obj)) {
+        const v = (obj as any)[k];
+        out[k] = v === undefined ? null : buildPayload(v);
+      }
+      return out;
+    };
+    const cleanRequest: any = {
       member: request.member,
       country: request.country,
       region: request.region,
-      types: {
-        member: typeof request.member,
-        country: typeof request.country,
-        region: typeof request.region,
-      },
-      values: {
-        memberValue: request.member,
-        countryValue: request.country,
-        regionValue: request.region,
-      },
-      hasUndefined: {
-        member: request.member === undefined,
-        country: request.country === undefined,
-        region: request.region === undefined,
-      },
-    });
+
+      countrycode: options?.countrycode != null && !isNaN(options.countrycode) ? options.countrycode : null,
+      mobilecode: options?.mobilecode != null && !isNaN(options.mobilecode) ? options.mobilecode : null,
+    };
+    const payload = buildPayload(cleanRequest);
 
     const response = await axiosInstance.post<UpdateRegionResponse>(
       '/app7190-02',
-      cleanRequest, 
+      payload,
     );
 
     console.log('[마이페이지] 지역 수정 성공');
