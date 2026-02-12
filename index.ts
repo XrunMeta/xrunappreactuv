@@ -1,5 +1,5 @@
 import { registerRootComponent } from 'expo';
+import { loadEnvSync } from './src/utils/env';
 
-import App from './App';
-
-registerRootComponent(App);
+loadEnvSync();
+import('./App').then((m) => registerRootComponent(m.default));
