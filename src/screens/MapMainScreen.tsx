@@ -2616,9 +2616,8 @@ export const MapMainScreen: React.FC = () => {
         break;
 
       case 'shop':
-
-        navigate(ROUTES.shopTicket);
-
+        console.log('[MapMainScreen] shop 클릭됨, ROUTES.shop으로 이동:', ROUTES.shop);
+        navigate(ROUTES.shop);
         break;
 
       case 'referral':

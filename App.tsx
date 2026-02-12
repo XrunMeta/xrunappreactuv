@@ -47,8 +47,12 @@ import {
   ReferralRankScreen,
   ReferralDepthOneScreen,
   ReferralDepthTwoScreen,
+  ShopScreen,
   ShopTicketScreen,
   ShopMyTicketScreen,
+  ShopMyItemsScreen,
+  ShopMyTicketDetailScreen,
+  ShopProductDetailScreen,
   ShopBuyScreen,
   ShopSuccessScreen,
   ShopTicketDetailScreen,
@@ -478,12 +482,29 @@ const ScreenHost = () => {
     return <ReferralInputScreen />;
   }
 
+  if (currentScreen === 'shop') {
+    console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
+    return <ShopScreen />;
+  }
+
   if (currentScreen === 'shopTicket') {
     return <ShopTicketScreen />;
   }
 
   if (currentScreen === 'shopMyTicket') {
     return <ShopMyTicketScreen />;
+  }
+
+  if (currentScreen === 'shopMyItems') {
+    return <ShopMyItemsScreen />;
+  }
+
+  if (currentScreen === 'shopMyTicketDetail') {
+    return <ShopMyTicketDetailScreen />;
+  }
+
+  if (currentScreen === 'shopProductDetail') {
+    return <ShopProductDetailScreen />;
   }
 
   if (currentScreen === 'shopBuy') {
