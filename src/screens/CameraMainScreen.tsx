@@ -23,7 +23,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
-import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191, v_fda57c, v_7abfce } from '../services';
+import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -384,7 +384,6 @@ let v_8daafe = null;
 let v_e96568 = null;
 let v_79011b = null;
 let v_b636c9 = null;
-let v_622956 = null;
 let v_16772f = null;
 
 try {
@@ -409,11 +408,6 @@ try {
   v_b636c9 = require('../../assets/images/icon_user.png');
 } catch (v_9e86fd) {
   console.warn('icon_user.png not found');
-}
-try {
-  v_622956 = require('../../assets/images/icon_xplay.png');
-} catch (v_9e86fd) {
-  console.warn('icon_xplay.png not found');
 }
 
 try {
@@ -1904,9 +1898,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     console.log('Navigation item pressed:', v_6e55b1);
 
     switch (v_6e55b1) {
-      case 'xplay':
-        v_9b57fc(v_ce4741.xrunInfo);
-        break;
       case 'wallet':
         v_9b57fc(v_ce4741.wallet);
         break;
@@ -2057,7 +2048,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           }
 
           await v_5e0191(v_aa0917);
-          v_fda57c(v_7abfce(v_5a9c46));
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
@@ -2342,7 +2332,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           }
 
           await v_5e0191(v_aa0917);
-          v_fda57c(v_7abfce(v_5a9c46));
 
           await v_e84827.setItem('isAdCompleted', 'true');
           await v_e84827.setItem('shouldRefreshTopAd5', 'true');
@@ -2442,10 +2431,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, [v_794bb0]);
 
   const v_fce460 = [
-    { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
+    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
-    { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
+    { id: 'referral', label: v_8d41d7('components.bottomNavigationBar.referral'), icon: v_79011b },
     { id: 'info', label: v_8d41d7('components.bottomNavigationBar.info'), icon: v_b636c9 },
   ];
 
