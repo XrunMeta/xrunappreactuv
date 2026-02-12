@@ -20,6 +20,7 @@ export default {
   genderSelect: 'Select',
   age: 'Age',
   ageSelect: 'Select',
+  regionSelect: 'Select',
   save: 'Save',
   cancel: 'Cancel',
   lastPasswordChangeDate: 'Last Password Change Date',

@@ -53,4 +53,5 @@ export { default as v_c36a9e } from './addToken';
 export { default as v_ebd772 } from './myinfoShopSales';
 export { default as v_ef4dc3 } from './camera';
 export { default as v_410f77 } from './walletPrivateKeyDisplay';
+export { default as v_dc9f15 } from './xrunInfo';
 
