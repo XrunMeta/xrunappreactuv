@@ -1,5 +1,5 @@
-import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696 } from 'rcmrninabrnb';
+import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62 } from 'rcmrninabrnb';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -9,6 +9,8 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
+import { v_25c73c } from '../services/giftishowBiz';
+import type { v_d62ea7 } from '../services/giftishowBiz';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -70,12 +72,52 @@ const v_7fb877 = [
     },
 ];
 
+function v_9bd735(item: v_d62ea7): ProductData {
+    return {
+        id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
+        brand: (v_8c0b26 as any).brandName ?? '기프티콘',
+        title: v_8c0b26.name ?? '-',
+        price: typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0,
+        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
+    };
+}
+
 export const v_10886b = () => {
     console.log('[ShopScreen] ShopScreen 컴포넌트 렌더링됨');
     const { t: v_8d41d7 } = v_772971();
     const { showAlert: v_889fad } = v_4b1173();
     const { setSelectedShopItem: v_d0fbad, selectedShopItem: v_dfe883 } = v_700ef9();
     const [v_11083e, v_94ee83] = v_5ab095<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+
+    const [v_50b846, v_4ff2fa] = v_5ab095<v_d62ea7[]>([]);
+    const [v_32c9b7, v_0e5971] = v_5ab095(false);
+    const [v_5605ec, v_ad5fd0] = v_5ab095(false);
+    const [v_02e6ad, v_33ec67] = v_5ab095<string | null>(null);
+
+    const v_f61b49 = v_de06a3(async () => {
+        v_33ec67(null);
+        try {
+            const v_8f00b9 = await v_25c73c({ start: 1, size: 50 });
+            const v_ef8ab1 = Array.isArray(v_8f00b9.list) ? v_8f00b9.list : [];
+            v_4ff2fa(v_ef8ab1);
+            if (v_ef8ab1.length === 0 && v_8f00b9.resultMsg) v_33ec67(v_8f00b9.resultMsg);
+        } catch (v_9e86fd) {
+            v_33ec67(v_9e86fd instanceof Error ? v_9e86fd.message : '기프티콘 목록을 불러오지 못했습니다.');
+            v_4ff2fa([]);
+        }
+    }, []);
+
+    v_c4deb2(() => {
+        if (v_11083e === 'xplayShop') {
+            v_0e5971(true);
+            v_f61b49().finally(() => v_0e5971(false));
+        }
+    }, [v_11083e, v_f61b49]);
+
+    const v_f80453 = v_de06a3(() => {
+        v_ad5fd0(true);
+        v_f61b49().finally(() => v_ad5fd0(false));
+    }, [v_f61b49]);
 
     v_c4deb2(() => {
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
@@ -259,11 +301,36 @@ export const v_10886b = () => {
                 />
 
                 {}
-                <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
+                <SafeScrollView
+                    showsVerticalScrollIndicator={false}
+                    showBottomBackground={false}
+                    backgroundColor="transparent"
+                    disableBottomPadding={true}
+                    refreshControl={
+                        v_11083e === 'xplayShop' ? (
+                            <RefreshControl refreshing={v_5605ec} onRefresh={v_f80453} colors={[v_1bfbd0.buttonPrimary]} />
+                        ) : undefined
+                    }
+                >
                     {v_11083e === 'xplayShop' ? (
-                        <View style={v_d81136.productGrid}>
-                            {v_426e67.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                        </View>
+                        <>
+                            {v_32c9b7 && !v_5605ec ? (
+                                <View style={v_d81136.loadingContainer}>
+                                    <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+                                    <Text style={v_d81136.loadingText}>기프티콘 목록 불러오는 중...</Text>
+                                </View>
+                            ) : v_02e6ad ? (
+                                <View style={v_d81136.errorContainer}>
+                                    <Text style={v_d81136.errorText}>{v_02e6ad}</Text>
+                                </View>
+                            ) : (
+                                <View style={v_d81136.productGrid}>
+                                    {v_50b846.map((v_8c0b26) =>
+                                        v_80b207(v_9bd735(v_8c0b26), false)
+                                    )}
+                                </View>
+                            )}
+                        </>
                     ) : v_11083e === 'xrunStore' ? (
                         <View style={v_d81136.productGrid}>
                             {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
@@ -545,6 +612,27 @@ const v_d81136 = v_472849.create({
         fontSize: 12,
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
+        textAlign: 'center',
+    },
+    loadingContainer: {
+        paddingVertical: 40,
+        alignItems: 'center',
+        gap: 12,
+    },
+    loadingText: {
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#6a7282',
+    },
+    errorContainer: {
+        paddingVertical: 40,
+        paddingHorizontal: 16,
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#b91c1c',
         textAlign: 'center',
     },
     emptyContainer: {
