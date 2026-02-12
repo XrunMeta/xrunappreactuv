@@ -1,23 +1,45 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeScrollView } from '../components';
 import { Header } from '../components';
-import { COMMON_STYLES, FONTS } from '../constants';
-
-let xrunRoundLogo: any = null;
-try {
-  xrunRoundLogo = require('../../assets/xrun-round-logo.png');
-} catch (e) {
-  console.warn('xrun-round-logo.png not found');
-}
+import { COMMON_STYLES, FONTS, COLORS } from '../constants';
+import { getProductList } from '../services/giftishowBiz';
+import type { GiftishowProductItem } from '../services/giftishowBiz';
+import type { GiftishowProductListResponse } from '../services/giftishowBiz';
 
 export const XRUNinfoScreen = () => {
-  const handleHomepagePress = () => {
-    const homepageUrl = 'https://www.xrun.run';
-    Linking.openURL(homepageUrl).catch((err) => {
-      console.error('홈페이지 열기 실패:', err);
-    });
-  };
+  const { t } = useTranslation();
+  const [productList, setProductList] = useState<GiftishowProductItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadGiftishowData = useCallback(async () => {
+    setError(null);
+    try {
+      const productRes = await getProductList().catch((e) => ({ list: [], resultMsg: e?.message } as GiftishowProductListResponse));
+      const productListData = productRes as GiftishowProductListResponse;
+      setProductList(Array.isArray(productListData.list) ? productListData.list : []);
+
+      if (!Array.isArray(productListData.list) || productListData.list.length === 0) {
+        const msg = productListData.resultMsg;
+        if (msg && String(msg).trim()) setError(String(msg).trim());
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '기프티쇼 비즈 연동 오류');
+    }
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    loadGiftishowData().finally(() => setLoading(false));
+  }, [loadGiftishowData]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadGiftishowData().finally(() => setRefreshing(false));
+  }, [loadGiftishowData]);
 
   return (
     <View style={styles.container}>
@@ -25,41 +47,59 @@ export const XRUNinfoScreen = () => {
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.buttonPrimary]} />
+        }
       >
         {}
-        {xrunRoundLogo && (
-          <View style={styles.logoContainer}>
-            <Image
-              source={xrunRoundLogo}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-        )}
+        {
+
+}
 
         {}
-        <Text style={styles.title}>XRUN</Text>
+        {}
 
         {}
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>
-            누구나 참여할 수 있는{'\n'}
-            에어드랍 광고 플랫폼으로 혜택을 받아보세요.{'\n'}
-            {'\n'}
-            일상에서 즐기는 AR XRUN 미션!{'\n'}
-            XRUN 광고 플랫폼은 내 주변에 노출되는 광고 미션을 수행하고{'\n'}
-            리워드를 받는 보상형 광고 플랫폼입니다.
-          </Text>
+        {
+
+}
+
+        {}
+        {
+
+}
+
+        {}
+        <View style={styles.giftishowSection}>
+          <Text style={styles.giftishowSectionTitle}>{t('screens.xrunInfo.giftishowTitle')}</Text>
+          {loading && !refreshing ? (
+            <ActivityIndicator size="small" color={COLORS.buttonPrimary} style={styles.giftishowLoader} />
+          ) : (
+            <>
+              {error ? <Text style={styles.giftishowError}>{error}</Text> : null}
+              {productList.length > 0 ? (
+                <View style={styles.giftishowList}>
+                  <Text style={styles.giftishowListTitle}>{t('screens.xrunInfo.productsCoupons')}</Text>
+                  {productList.slice(0, 20).map((item, i) => (
+                    <View key={item.id ?? `item-${i}`} style={styles.giftishowListItemRow}>
+                      {item.imageUrl ? (
+                        <Image source={{ uri: item.imageUrl }} style={styles.giftishowListItemImg} resizeMode="cover" />
+                      ) : (
+                        <View style={[styles.giftishowListItemImg, styles.giftishowListItemImgPlaceholder]} />
+                      )}
+                      <View style={styles.giftishowListItemBody}>
+                        <Text style={styles.giftishowListItemName} numberOfLines={2}>{item.name ?? item.id ?? '-'}</Text>
+                        <Text style={styles.giftishowListItemPrice}>
+                          {item.price != null ? `${Number(item.price).toLocaleString()}원` : '-'}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+            </>
+          )}
         </View>
-
-        {}
-        <TouchableOpacity
-          style={styles.homepageLink}
-          onPress={handleHomepagePress}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.homepageLinkText}>홈페이지 바로가기</Text>
-        </TouchableOpacity>
       </SafeScrollView>
     </View>
   );
@@ -115,6 +155,69 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#007AFF',
     textDecorationLine: 'underline',
+  },
+  giftishowSection: {
+    marginTop: 32,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingHorizontal: 16,
+  },
+  giftishowSectionTitle: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#121212',
+    marginBottom: 12,
+  },
+  giftishowLoader: {
+    marginVertical: 12,
+  },
+  giftishowError: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#c62828',
+    marginTop: 8,
+  },
+  giftishowList: {
+    marginTop: 16,
+  },
+  giftishowListTitle: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#121212',
+    marginBottom: 8,
+  },
+  giftishowListItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  giftishowListItemImg: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+  },
+  giftishowListItemImgPlaceholder: {
+    backgroundColor: '#e0e0e0',
+  },
+  giftishowListItemBody: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  giftishowListItemName: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#121212',
+    marginBottom: 4,
+  },
+  giftishowListItemPrice: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#666',
   },
 });
 

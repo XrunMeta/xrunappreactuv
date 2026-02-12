@@ -91,10 +91,10 @@ export const SignupScreen = () => {
   const [isAppleSignupMode, setIsAppleSignupMode] = useState(false);
 
   const [gender, setGender] = useState<GenderValue>(
-    isAppleSignupMode ? '0' : (signupFormData.gender || 'male')
+    (isAppleSignupMode || Platform.OS === 'ios') ? '0' : (signupFormData.gender || 'male')
   );
   const [ageRange, setAgeRange] = useState<AgeValue>(
-    isAppleSignupMode ? '0' : (signupFormData.ageRange || '10')
+    (isAppleSignupMode || Platform.OS === 'ios') ? '0' : (signupFormData.ageRange || '10')
   );
   const [serviceTermsAccepted, setServiceTermsAccepted] = useState(false);
   const [locationTermsAccepted, setLocationTermsAccepted] = useState(false);
@@ -168,14 +168,16 @@ export const SignupScreen = () => {
 
   const isCountryWithRegions = hasRegions;
 
+  const isOptionalFields = isAppleSignupMode || Platform.OS === 'ios';
+
   const regionDisplayValue = React.useMemo(() => {
 
     if (!isCountryWithRegions) {
       return GLOBAL_REGION.name;
     }
 
-    if (selectedRegion && (selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0')) {
-      return '';
+    if (!selectedRegion || (selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0')) {
+      return t('screens.countryCodeSelect.selectOption') || '선택';
     }
 
     let value = '';
@@ -220,7 +222,7 @@ export const SignupScreen = () => {
         value = selectedRegion.name;
       }
     } else {
-      value = isKoreaSelected ? '' : GLOBAL_REGION.name;
+      value = isKoreaSelected ? (t('screens.countryCodeSelect.selectOption') || '선택') : GLOBAL_REGION.name;
     }
     if (__DEV__) {
       console.log('[회원가입] regionDisplayValue 계산:', {
@@ -253,6 +255,8 @@ export const SignupScreen = () => {
 
         if (result.hasRegions && result.regions.length > 0) {
 
+          if (!keepRegionSelectRef.current) {
+
           if (selectedRegion && selectedRegion.dialCode !== '0' && selectedRegion.iso2 !== 'select') {
             const isRegionValid = result.regions.some(
               (r) => r.iso2 === selectedRegion.iso2 && r.dialCode === selectedRegion.dialCode
@@ -264,8 +268,10 @@ export const SignupScreen = () => {
               console.log('[회원가입] 선택된 지역 유지:', selectedRegion.name);
             }
           } else if (!selectedRegion || selectedRegion.iso2 === 'select' || selectedRegion.dialCode === '0') {
-
             console.log('[회원가입] 지역 자동 선택 건너뜀 (사용자 선택 대기)');
+          }
+          } else {
+            console.log('[회원가입] 지역 "선택" 유지 (목록 로드 후 덮어쓰지 않음)');
           }
         } else {
 
@@ -400,8 +406,8 @@ export const SignupScreen = () => {
 
   const regionDataSource = useMemo(() => {
 
-    return isAppleSignupMode ? [selectOption, ...availableRegions] : availableRegions;
-  }, [selectOption, availableRegions, isAppleSignupMode]);
+    return isOptionalFields ? [selectOption, ...availableRegions] : availableRegions;
+  }, [isOptionalFields, selectOption, availableRegions]);
 
   const filteredRegions = useMemo(() => {
     if (!regionSearchQuery.trim()) {
@@ -451,6 +457,7 @@ export const SignupScreen = () => {
       setSelectedRegion(null);
     } else {
       console.log('[회원가입] 지역 선택:', region.name);
+      keepRegionSelectRef.current = false; 
       setSelectedRegion(region);
     }
     setRegionModalVisible(false);
@@ -522,6 +529,11 @@ export const SignupScreen = () => {
             }
           }
         }
+
+        if ((Platform.OS === 'ios' || Platform.OS === 'android') && appleSignupRequired !== 'true') {
+          setGender('0');
+          setAgeRange('0');
+        }
       } catch (error) {
         console.error('[회원가입] 소셜 회원가입 모드 확인 실패:', error);
       }
@@ -530,10 +542,33 @@ export const SignupScreen = () => {
     checkSocialSignupMode();
   }, [t]); 
 
+  const keepRegionSelectRef = React.useRef(false);
+
+  const signupRegionInitializedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!setSelectedRegion || signupRegionInitializedRef.current) return;
+
+    const isDefaultRegion =
+      !selectedRegion ||
+      selectedRegion.iso2 === 'select' ||
+      selectedRegion.dialCode === '0' ||
+      (selectedRegion.iso2 === '서울' && selectedRegion.countryCode === 82) ||
+      selectedRegion.iso2 === 'global';
+    if (isDefaultRegion) {
+      keepRegionSelectRef.current = true;
+      setSelectedRegion(selectOption);
+    }
+    signupRegionInitializedRef.current = true;
+    return () => {
+      signupRegionInitializedRef.current = false;
+      keepRegionSelectRef.current = false;
+    };
+  }, [selectedRegion, setSelectedRegion, selectOption]);
+
   const appleRegionInitializedRef = React.useRef(false);
   React.useEffect(() => {
 
-    if (isAppleSignupMode && setSelectedRegion && !appleRegionInitializedRef.current) {
+    if (isOptionalFields && setSelectedRegion && !appleRegionInitializedRef.current) {
 
       if (!selectedRegion || (selectedRegion.iso2 !== 'select' && selectedRegion.dialCode !== '0')) {
 
@@ -544,27 +579,16 @@ export const SignupScreen = () => {
         );
 
         if (isContextInitialValue || !selectedRegion) {
-          const selectRegionOption = {
-            iso2: 'select',
-            name: t('screens.signup.genderSelect') || '선택',
-            dialCode: '0',
-            flagEmoji: '📍',
-            countryCode: 0,
-          };
-          setSelectedRegion(selectRegionOption);
+          setSelectedRegion(selectOption);
           appleRegionInitializedRef.current = true;
-          console.log('[회원가입] 애플 회원가입 모드 - 지역을 "선택"으로 초기 설정');
         } else {
-
           appleRegionInitializedRef.current = true;
-          console.log('[회원가입] 애플 회원가입 모드 - 이미 지역이 선택되어 있음, 유지:', selectedRegion.name);
         }
       } else {
-
         appleRegionInitializedRef.current = true;
       }
     }
-  }, [isAppleSignupMode, selectedRegion, setSelectedRegion, t]); 
+  }, [isOptionalFields, selectedRegion, setSelectedRegion, selectOption, t]);
 
   React.useEffect(() => {
     const loadReferralEmailFromStorage = async () => {
@@ -611,15 +635,15 @@ export const SignupScreen = () => {
       setPhoneNumber(signupFormData.phoneNumber);
       setReferralEmail(signupFormData.referralEmail);
 
-      setGender(isAppleSignupMode ? signupFormData.gender : (signupFormData.gender || 'male'));
-      setAgeRange(isAppleSignupMode ? signupFormData.ageRange : (signupFormData.ageRange || '10'));
+      setGender(isOptionalFields ? (signupFormData.gender || '0') : (signupFormData.gender || 'male'));
+      setAgeRange(isOptionalFields ? (signupFormData.ageRange || '0') : (signupFormData.ageRange || '10'));
 
       setServiceTermsAccepted(false);
       setLocationTermsAccepted(false);
       setPrivacyTermsAccepted(false);
       isMountedRef.current = true;
     }
-  }, [signupFormData, isGoogleSignupMode, isAppleSignupMode]);
+  }, [signupFormData, isGoogleSignupMode, isAppleSignupMode, isOptionalFields]);
 
   React.useEffect(() => {
     if (!isMountedRef.current) return;
@@ -709,14 +733,21 @@ export const SignupScreen = () => {
       }
     }
 
-    if (!isAppleSignupMode) {
+    if (!isOptionalFields) {
       if (!phoneNumber.trim()) {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
         return;
       }
-
       if (hasRegions && isKoreaSelected && (!selectedRegion || selectedRegion.dialCode === '0')) {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
+        return;
+      }
+      if (!gender || gender === '0') {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.genderRequired') || '성별을 선택해주세요.');
+        return;
+      }
+      if (!ageRange || ageRange === '0') {
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
     }
@@ -1198,7 +1229,7 @@ export const SignupScreen = () => {
 
           <FormField
             containerStyle={styles.fieldContainer}
-            label={isAppleSignupMode ? `${t('screens.signup.phoneNumberLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.phoneNumberLabel')}
+            label={isOptionalFields ? `${t('screens.signup.phoneNumberLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.phoneNumberLabel')}
             placeholder={t('screens.signup.phoneNumberPlaceholder')}
             keyboardType="phone-pad"
             value={phoneNumber}
@@ -1221,7 +1252,7 @@ export const SignupScreen = () => {
           {isCountryWithRegions && (
             <View style={styles.fieldContainer}>
               <FormField
-                label={isAppleSignupMode ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
+                label={isOptionalFields ? `${t('screens.signup.regionLabel')} (${t('screens.signup.optional') || '선택사항'})` : t('screens.signup.regionLabel')}
                 placeholder={t('screens.signup.regionPlaceholder')}
                 value={regionDisplayValue}
                 editable={false}
@@ -1239,7 +1270,7 @@ export const SignupScreen = () => {
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>
-              {isAppleSignupMode 
+              {isOptionalFields 
                 ? `${t('screens.signup.genderLabel')} (${t('screens.signup.optional') || '선택사항'})`
                 : t('screens.signup.genderLabel')}
             </Text>
@@ -1249,10 +1280,10 @@ export const SignupScreen = () => {
                 const maleOption = { value: 'male' as const, label: t('screens.signup.genderMale') };
                 const femaleOption = { value: 'female' as const, label: t('screens.signup.genderFemale') };
 
-                return isAppleSignupMode
+                return isOptionalFields
                   ? [selectOption, maleOption, femaleOption]
                   : [maleOption, femaleOption];
-              }, [isAppleSignupMode, t]).map((option) => {
+              }, [isOptionalFields, t]).map((option) => {
                 const isActive = gender === option.value;
                 return (
                   <OptionButton
@@ -1268,16 +1299,16 @@ export const SignupScreen = () => {
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>
-              {isAppleSignupMode 
+              {isOptionalFields 
                 ? `${t('screens.signup.ageLabel')} (${t('screens.signup.optional') || '선택사항'})`
                 : t('screens.signup.ageLabel')}
             </Text>
             <View style={[styles.inlineOptions]}>
               {React.useMemo(() => {
-                return isAppleSignupMode 
+                return isOptionalFields 
                   ? AGE_OPTIONS 
                   : AGE_OPTIONS.filter(option => option !== '0');
-              }, [isAppleSignupMode]).map((option, index, array) => {
+              }, [isOptionalFields]).map((option, index, array) => {
                 const isActive = ageRange === option;
                 const isLast = index === array.length - 1;
                 return (

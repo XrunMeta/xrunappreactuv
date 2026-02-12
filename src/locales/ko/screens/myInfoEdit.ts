@@ -24,6 +24,7 @@ export default {
   genderSelect: '선택',
   age: '나이',
   ageSelect: '선택',
+  regionSelect: '선택',
   save: '저장',
   cancel: '취소',
   alerts: {
