@@ -87,13 +87,32 @@ export const v_4a40b2 = () => {
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
 
+          <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.myInfoSettings.reward')}</Text>
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
           >
-            <Text style={v_d81136.cardText}>탭조이</Text>
+            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.tapjoy')}</Text>
           </TouchableOpacity>
+          {v_326be8.OS === 'android' && (
+            <>
+              <TouchableOpacity
+                style={v_d81136.card}
+                activeOpacity={0.85}
+                onPress={() => v_9b57fc(v_ce4741.ayetOffers)}
+              >
+                <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.ayet_offers')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={v_d81136.card}
+                activeOpacity={0.85}
+                onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
+              >
+                <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.ayet_offers_xplay')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
 
           {}
           {v_ea6ee8 && (
@@ -145,6 +164,14 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
+  },
+  sectionTitle: {
+    fontSize: v_843035.size.small,
+    fontFamily: v_843035.family.semibold,
+    color: '#888',
+    marginTop: v_9b1a04.medium,
+    marginBottom: v_9b1a04.small,
+    paddingHorizontal: 4,
   },
   versionContainer: {
     width: '100%',

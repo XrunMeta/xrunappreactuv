@@ -68,6 +68,7 @@ import {
   v_a50cad,
   v_d4a78d,
 } from './src/screens';
+import { v_c034ae } from './src/screens/AyetOffersScreen';
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_700ef9 } from './src/context';
@@ -423,6 +424,14 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'tapjoyList') {
     return <TapjoyListScreen />;
+  }
+
+  if (v_0f0c7b === 'ayetOffers') {
+    return <AyetOffersScreen />;
+  }
+
+  if (v_0f0c7b === 'ayetOffersXplay') {
+    return <AyetOffersScreen slotName="Xplay" />;
   }
 
   if (v_0f0c7b === 'walletPrivateKeyDisplay') {

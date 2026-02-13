@@ -18,4 +18,3 @@ class PanglePackage : ReactPackage {
         return emptyList()
     }
 }
-

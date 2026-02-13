@@ -72,6 +72,8 @@ export const v_ce4741 = {
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
   tapjoyList: 'tapjoyList',
+  ayetOffers: 'ayetOffers',
+  ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
