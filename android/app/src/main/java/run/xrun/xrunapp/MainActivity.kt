@@ -2,6 +2,7 @@ package run.xrun.xrunapp
 
 import android.os.Build
 import android.os.Bundle
+import com.ayet.sdk.AyetSdk
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -15,6 +16,8 @@ class MainActivity : ReactActivity() {
 
     setTheme(R.style.AppTheme);
     super.onCreate(null)
+
+    AyetSdk.init(this, 21960, "guest")
   }
 
   override fun getMainComponentName(): String = "main"

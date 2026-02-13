@@ -72,6 +72,8 @@ export const ROUTES = {
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
   tapjoyList: 'tapjoyList',
+  ayetOffers: 'ayetOffers',
+  ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',

@@ -45,6 +45,7 @@ class MainApplication : Application(), ReactApplication {
               Log.d("MainApplication", "=== PanglePackage 등록 시작 ===")
               add(PanglePackage())
               Log.d("MainApplication", "=== PanglePackage 등록 완료 ===")
+              add(AyetOfferwallPackage())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"

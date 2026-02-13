@@ -105,6 +105,8 @@ dependencies {
         exclude group: 'com.pangle.global', module: 'ads-sdk'
     }
 
+    implementation 'io.ayet:android-sdk-v2:1.0.2'
+
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";

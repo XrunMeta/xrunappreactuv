@@ -68,6 +68,7 @@ import {
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
 } from './src/screens';
+import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, useAppContext } from './src/context';
@@ -423,6 +424,14 @@ const ScreenHost = () => {
 
   if (currentScreen === 'tapjoyList') {
     return <TapjoyListScreen />;
+  }
+
+  if (currentScreen === 'ayetOffers') {
+    return <AyetOffersScreen />;
+  }
+
+  if (currentScreen === 'ayetOffersXplay') {
+    return <AyetOffersScreen slotName="Xplay" />;
   }
 
   if (currentScreen === 'walletPrivateKeyDisplay') {
