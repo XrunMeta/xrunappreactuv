@@ -66,9 +66,9 @@ import {
 } from './src/screens';
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
-import { AppProvider, useAppContext } from './src/context';
+import { AppProvider, useAppContext, OTAUpdateProvider } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog } from './src/components';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
 import { loadEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import { initI18n } from './src/locales';
@@ -782,7 +782,6 @@ const GlobalDialogs = () => {
         showLaterButton={!isServerUpdateRequired} 
         onClose={() => setVersionUpdateVisible(false)}
       />
-      <OTAUpdateDialog />
     </>
   );
 };
@@ -1020,8 +1019,10 @@ export default function App() {
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
-              <SplashScreen />
-              <GlobalDialogs />
+              <OTAUpdateProvider>
+                <SplashScreen />
+                <GlobalDialogs />
+              </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
         </AppProvider>
@@ -1035,10 +1036,12 @@ export default function App() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester isAdFinished={isAdFinished} />
-            <AliveService />
-            <ScreenHost />
-            <GlobalDialogs />
+            <OTAUpdateProvider>
+              <PermissionRequester isAdFinished={isAdFinished} />
+              <AliveService />
+              <ScreenHost />
+              <GlobalDialogs />
+            </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
