@@ -41,6 +41,7 @@ import { v_cc3e1f } from './CameraMainScreen';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_ba5086 } from '../context/OTAUpdateContext';
 
 import { v_f71847 } from '../types';
 
@@ -196,7 +197,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_033e14 = v_e0068c();
 
+  const { checkForUpdate: v_7e5bd3 } = v_ba5086();
+
   const v_4166d2 = v_e662ae<string | null>(null);
+
+  v_c4deb2(() => {
+    v_7e5bd3();
+  }, [v_7e5bd3]);
 
   v_c4deb2(() => {
     if (v_232839) {

@@ -66,9 +66,9 @@ import {
 } from './src/screens';
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
-import { v_4b64f4, v_700ef9 } from './src/context';
+import { v_4b64f4, v_700ef9, v_ad0e9f } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a } from './src/components';
+import { v_aabda8, v_b631a8, v_2806ef, v_6e8088 } from './src/components';
 import { v_a2474a } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import { v_757c02 } from './src/locales';
@@ -782,7 +782,6 @@ const v_d0a391 = () => {
         showLaterButton={!v_2fa3d1} 
         onClose={() => v_80c653(false)}
       />
-      <OTAUpdateDialog />
     </>
   );
 };
@@ -1020,8 +1019,10 @@ export default function v_6540c3() {
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
-              <SplashScreen />
-              <GlobalDialogs />
+              <OTAUpdateProvider>
+                <SplashScreen />
+                <GlobalDialogs />
+              </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
         </AppProvider>
@@ -1035,10 +1036,12 @@ export default function v_6540c3() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester isAdFinished={v_65941f} />
-            <AliveService />
-            <ScreenHost />
-            <GlobalDialogs />
+            <OTAUpdateProvider>
+              <PermissionRequester isAdFinished={v_65941f} />
+              <AliveService />
+              <ScreenHost />
+              <GlobalDialogs />
+            </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
