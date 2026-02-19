@@ -104,7 +104,7 @@ export const XRUNinfoScreen = () => {
           <TouchableOpacity
             style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.ayetOffersXplay)}
+            onPress={() => navigate(ROUTES.tapjoyList)}
           >
             <Image source={zone1Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
@@ -112,7 +112,7 @@ export const XRUNinfoScreen = () => {
           <TouchableOpacity
             style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.tapjoyList)}
+            onPress={() => navigate(ROUTES.ayetOffersXplay)}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
@@ -267,8 +267,7 @@ const styles = StyleSheet.create({
   },
   zoneImage: {
     width: '100%',
-    aspectRatio: 1,
-    maxHeight: 120,
+    height: 100,
     borderRadius: 12,
     marginBottom: 8,
   },
