@@ -10,6 +10,7 @@ import {
   checkServerVersion,
   openStore
 } from '../services/versionCheck';
+import { requestAutoShowTapjoy } from '../services/tapjoy';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -88,13 +89,6 @@ export const MyInfoSettingsScreen = () => {
           </TouchableOpacity>
 
           <Text style={styles.sectionTitle}>{t('screens.myInfoSettings.reward')}</Text>
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.tapjoyList)}
-          >
-            <Text style={styles.cardText}>{t('screens.myInfoSettings.tapjoy')}</Text>
-          </TouchableOpacity>
           {Platform.OS === 'android' && (
             <>
               <TouchableOpacity
@@ -113,6 +107,16 @@ export const MyInfoSettingsScreen = () => {
               </TouchableOpacity>
             </>
           )}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => {
+              requestAutoShowTapjoy();
+              navigate(ROUTES.tapjoyList);
+            }}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.tapjoy')}</Text>
+          </TouchableOpacity>
 
           {}
           {versionInfo && (

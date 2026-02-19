@@ -1,35 +1,61 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeScrollView } from '../components';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
-import { showTapjoyPlacement } from '../services/tapjoy';
+import { showTapjoyPlacement, consumeAutoShowTapjoy } from '../services/tapjoy';
 import { logRewardedAdCompleted } from '../services/appsflyer';
 import { showToast } from '../utils';
 
 export const TapjoyListScreen = () => {
   const { goBack } = useAppNavigation();
   const [loading, setLoading] = useState(false);
+  const isAutoShow = useRef(consumeAutoShowTapjoy());
 
-  const handleShowAd = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await showTapjoyPlacement(undefined, () => {
-        console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
-        logRewardedAdCompleted('tapjoy');
-      });
-      if (result.success) {
-        showToast('탭조이 광고를 불러왔습니다.');
-      } else {
-        showToast(result.message || '광고를 불러올 수 없습니다.');
+  const handleShowAd = useCallback(
+    async (onClosed?: () => void) => {
+      setLoading(true);
+      try {
+        const result = await showTapjoyPlacement(undefined, () => {
+          console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
+          logRewardedAdCompleted('tapjoy');
+          onClosed?.();
+        });
+        if (result.success) {
+          if (!isAutoShow.current) showToast('탭조이 광고를 불러왔습니다.');
+        } else {
+          showToast(result.message || '광고를 불러올 수 없습니다.');
+          if (isAutoShow.current) goBack();
+        }
+      } catch (e) {
+        showToast('오류가 발생했습니다.');
+        if (isAutoShow.current) goBack();
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      showToast('오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [goBack]
+  );
+
+  useEffect(() => {
+    if (!isAutoShow.current) return;
+    handleShowAd(() => goBack());
+  }, [handleShowAd, goBack]);
+
+  if (isAutoShow.current) {
+    return (
+      <View style={styles.container}>
+        <Header title="탭조이" onBackPress={goBack} showBackButton />
+        <View style={styles.centered}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={styles.loadingText}>
+            {loading ? '오퍼월을 불러오는 중…' : '연결 중…'}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -46,7 +72,7 @@ export const TapjoyListScreen = () => {
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             activeOpacity={0.8}
-            onPress={handleShowAd}
+            onPress={() => handleShowAd()}
             disabled={loading}
           >
             {loading ? (
@@ -64,6 +90,17 @@ export const TapjoyListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     ...COMMON_STYLES.container,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: SIZES.large,
+  },
+  loadingText: {
+    marginTop: SIZES.small,
+    fontSize: FONTS.size.medium,
+    color: COLORS.text,
   },
   scrollContent: {
     ...COMMON_STYLES.scrollContent,

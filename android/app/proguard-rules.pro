@@ -19,3 +19,7 @@
 # AppsFlyer SDK
 -keep class com.appsflyer.** { *; }
 -keep class kotlin.jvm.internal.** { *; }
+
+# Tapjoy SDK (Unity Grow Offerwall)
+-keep public class com.tapjoy.** { *; }
+-keepclassmembers public enum com.tapjoy.** { *; }
