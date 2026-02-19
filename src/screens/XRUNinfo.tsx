@@ -104,7 +104,7 @@ export const v_f7bdb9 = () => {
           <TouchableOpacity
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
+            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
           >
             <Image source={v_288e0b} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
@@ -112,7 +112,7 @@ export const v_f7bdb9 = () => {
           <TouchableOpacity
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
+            onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
@@ -267,8 +267,7 @@ const v_d81136 = v_472849.create({
   },
   zoneImage: {
     width: '100%',
-    aspectRatio: 1,
-    maxHeight: 120,
+    height: 100,
     borderRadius: 12,
     marginBottom: 8,
   },
