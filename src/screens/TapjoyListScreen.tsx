@@ -1,35 +1,61 @@
-import v_a3453e, { v_5ab095, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_de06a3, v_c4deb2, v_e662ae } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_4623af, v_39a996 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
-import { v_82ad38 } from '../services/tapjoy';
+import { v_82ad38, v_981fdd } from '../services/tapjoy';
 import { v_fda57c } from '../services/appsflyer';
 import { v_cba33f } from '../utils';
 
 export const v_f2ecfa = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
   const [v_683210, v_34a50a] = v_5ab095(false);
+  const v_7ed973 = v_e662ae(v_981fdd());
 
-  const v_7a33ab = v_de06a3(async () => {
-    v_34a50a(true);
-    try {
-      const v_43c42e = await v_82ad38(undefined, () => {
-        console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
-        v_fda57c('tapjoy');
-      });
-      if (v_43c42e.success) {
-        v_cba33f('탭조이 광고를 불러왔습니다.');
-      } else {
-        v_cba33f(v_43c42e.message || '광고를 불러올 수 없습니다.');
+  const v_7a33ab = v_de06a3(
+    async (v_afd01c) => {
+      v_34a50a(true);
+      try {
+        const v_43c42e = await v_82ad38(undefined, () => {
+          console.log('[TapjoyListScreen] 오퍼월 닫힘 → AppsFlyer tapjoy 이벤트 전송');
+          v_fda57c('tapjoy');
+          v_afd01c?.();
+        });
+        if (v_43c42e.success) {
+          if (!v_7ed973.current) v_cba33f('탭조이 광고를 불러왔습니다.');
+        } else {
+          v_cba33f(v_43c42e.message || '광고를 불러올 수 없습니다.');
+          if (v_7ed973.current) v_c7ac57();
+        }
+      } catch (v_9e86fd) {
+        v_cba33f('오류가 발생했습니다.');
+        if (v_7ed973.current) v_c7ac57();
+      } finally {
+        v_34a50a(false);
       }
-    } catch (v_9e86fd) {
-      v_cba33f('오류가 발생했습니다.');
-    } finally {
-      v_34a50a(false);
-    }
-  }, []);
+    },
+    [v_c7ac57]
+  );
+
+  v_c4deb2(() => {
+    if (!v_7ed973.current) return;
+    v_7a33ab(() => v_c7ac57());
+  }, [v_7a33ab, v_c7ac57]);
+
+  if (v_7ed973.current) {
+    return (
+      <View style={v_d81136.container}>
+        <Header title="탭조이" onBackPress={v_c7ac57} showBackButton />
+        <View style={v_d81136.centered}>
+          <ActivityIndicator size="small" color={v_1bfbd0.primary} />
+          <Text style={v_d81136.loadingText}>
+            {v_683210 ? '오퍼월을 불러오는 중…' : '연결 중…'}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={v_d81136.container}>
@@ -46,7 +72,7 @@ export const v_f2ecfa = () => {
           <TouchableOpacity
             style={[v_d81136.button, v_683210 && v_d81136.buttonDisabled]}
             activeOpacity={0.8}
-            onPress={v_7a33ab}
+            onPress={() => v_7a33ab()}
             disabled={v_683210}
           >
             {v_683210 ? (
@@ -64,6 +90,17 @@ export const v_f2ecfa = () => {
 const v_d81136 = v_472849.create({
   container: {
     ...v_a61db3.container,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: v_9b1a04.large,
+  },
+  loadingText: {
+    marginTop: v_9b1a04.small,
+    fontSize: v_843035.size.medium,
+    color: v_1bfbd0.text,
   },
   scrollContent: {
     ...v_a61db3.scrollContent,

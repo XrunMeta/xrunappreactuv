@@ -10,6 +10,7 @@ import {
   v_de7bac,
   v_4503ee
 } from '../services/versionCheck';
+import { v_592061 } from '../services/tapjoy';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -88,13 +89,6 @@ export const v_4a40b2 = () => {
           </TouchableOpacity>
 
           <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.myInfoSettings.reward')}</Text>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
-          >
-            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.tapjoy')}</Text>
-          </TouchableOpacity>
           {v_326be8.OS === 'android' && (
             <>
               <TouchableOpacity
@@ -113,6 +107,16 @@ export const v_4a40b2 = () => {
               </TouchableOpacity>
             </>
           )}
+          <TouchableOpacity
+            style={v_d81136.card}
+            activeOpacity={0.85}
+            onPress={() => {
+              v_592061();
+              v_9b57fc(v_ce4741.tapjoyList);
+            }}
+          >
+            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.tapjoy')}</Text>
+          </TouchableOpacity>
 
           {}
           {v_ea6ee8 && (
