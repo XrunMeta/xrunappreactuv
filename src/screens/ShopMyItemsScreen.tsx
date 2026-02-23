@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView, SafeView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
@@ -9,54 +10,94 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import { getMyGiftishowCoupons } from '../services';
+import type { MyGiftishowCouponItem } from '../types';
 
-const sampleStarbucks = require('../../assets/sample_starbugs.png');
-const sampleCU = require('../../assets/sample_cu.png');
-const sampleNaverPay = require('../../assets/sample_naverpay.png');
+const defaultCouponImage = require('../../assets/sample_cu.png');
 
 interface MyItemData {
     id: string;
     brand: string;
     title: string;
     image: ImageSourcePropType;
-    status: 'available' | 'used'; 
-    purchaseDate: string; 
+    status: 'available' | 'used';
+    purchaseDate: string;
+    tr_id?: string;
 }
 
-const sampleItems: MyItemData[] = [
-    {
-        id: '1',
-        brand: '스타벅스',
-        title: '아이스 카페 아메리카노T 2잔+부드러운 생크림 카스텔라 모바일쿠폰',
-        image: sampleStarbucks,
-        status: 'available',
-        purchaseDate: '2026.02.01',
-    },
-    {
-        id: '2',
-        brand: 'CU',
-        title: 'CU 편의점 5천원 기프티콘',
-        image: sampleCU,
-        status: 'used',
-        purchaseDate: '2026.01.15',
-    },
-    {
-        id: '3',
-        brand: '네이버',
-        title: '네이버페이 포인트 1만원',
-        image: sampleNaverPay,
-        status: 'available',
-        purchaseDate: '2026.01.28',
-    },
-];
+function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
+  if (pin_status === '02') return 'used'; 
+  return 'available';
+}
+
+function formatPurchaseDate(raw?: string): string {
+  if (!raw) return '-';
+  const s = String(raw).replace(/-/g, '').slice(0, 8);
+  if (s.length === 8) return `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}`;
+  return raw;
+}
+
+function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
+  const image: ImageSourcePropType = c.image_url
+    ? { uri: c.image_url }
+    : defaultCouponImage;
+  return {
+    id: c.tr_id,
+    tr_id: c.tr_id,
+    brand: c.brand_name ?? '기프티콘',
+    title: c.goods_name ?? '-',
+    image,
+    status: mapPinStatusToAvailable(c.pin_status),
+    purchaseDate: formatPurchaseDate(c.purchase_date),
+  };
+}
 
 export const ShopMyItemsScreen = () => {
     const { navigate } = useAppNavigation();
     const { t } = useTranslation();
     const { setSelectedShopItem } = useAppContext();
-    const [pointsBalance] = useState<number>(5000); 
+    const [items, setItems] = useState<MyItemData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const loadCoupons = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) {
+                setItems([]);
+                return;
+            }
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) {
+                setItems([]);
+                return;
+            }
+            const result = await getMyGiftishowCoupons(String(member), navigate);
+            if (result?.status === 'success' && Array.isArray(result.data)) {
+                setItems(result.data.map(couponToMyItemData));
+            } else {
+                setItems([]);
+            }
+        } catch {
+            setItems([]);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        setLoading(true);
+        loadCoupons();
+    }, [loadCoupons]);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        loadCoupons();
+    }, [loadCoupons]);
 
     const segmentedOptions = useMemo(
         () => [
@@ -82,7 +123,6 @@ export const ShopMyItemsScreen = () => {
     };
 
     const handleUseItem = (item: MyItemData) => {
-
         const shopItem = {
             id: item.id,
             title: item.title,
@@ -90,24 +130,22 @@ export const ShopMyItemsScreen = () => {
             image: item.image,
             detailTotal: '',
             brand: item.brand,
-            barcodeNumber: '1231 1231 1231 1231', 
+            barcodeNumber: '', 
+            tr_id: item.tr_id ?? item.id,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopMyTicketDetail);
     };
 
     const filteredItems = useMemo(() => {
-        if (!searchQuery.trim()) {
-            return sampleItems;
-        }
-
+        if (!searchQuery.trim()) return items;
         const query = searchQuery.toLowerCase().trim();
-        return sampleItems.filter((item) => {
+        return items.filter((item) => {
             const title = item.title.toLowerCase();
             const brand = item.brand.toLowerCase();
             return title.includes(query) || brand.includes(query);
         });
-    }, [searchQuery]);
+    }, [items, searchQuery]);
 
     const stats = useMemo(() => {
         const available = filteredItems.filter((item) => item.status === 'available').length;
@@ -221,15 +259,28 @@ export const ShopMyItemsScreen = () => {
                 )}
 
                 {}
-                <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
-                    {filteredItems.length > 0 ? (
+                <SafeScrollView
+                    showsVerticalScrollIndicator={false}
+                    showBottomBackground={false}
+                    backgroundColor="transparent"
+                    disableBottomPadding={true}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.buttonPrimary]} />
+                    }
+                >
+                    {loading ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+                            <Text style={styles.loadingText}>쿠폰 목록 불러오는 중...</Text>
+                        </View>
+                    ) : filteredItems.length > 0 ? (
                         <View style={styles.itemsList}>
                             {filteredItems.map((item) => renderItemCard(item))}
                         </View>
                     ) : (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>
-                                {searchQuery.trim() ? 'No search results' : '구매한 아이템이 없습니다.'}
+                                {searchQuery.trim() ? '검색 결과가 없습니다.' : '구매한 쿠폰이 없습니다.'}
                             </Text>
                         </View>
                     )}
@@ -433,6 +484,17 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'Roboto-Bold',
         color: '#ffffff',
+    },
+    loadingContainer: {
+        paddingVertical: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#7d7e83',
     },
     emptyContainer: {
         paddingVertical: 40,

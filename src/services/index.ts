@@ -156,6 +156,8 @@ import {
   GetXrunBuyableItemsResponse,
   GetXrunPurchasedItemsRequest,
   GetXrunPurchasedItemsResponse,
+  GetMyGiftishowCouponsResponse,
+  MyGiftishowCouponItem,
   PurchaseXrunItemRequest,
   PurchaseXrunItemResponse,
   SaveInappPurchaseLogRequest,
@@ -4316,6 +4318,26 @@ export const getXrunPurchasedItems = async (
         data: error.response?.data,
         message: error.message,
       });
+    }
+    throw error;
+  }
+};
+
+export const getMyGiftishowCoupons = async (
+  member: string,
+  navigation?: any,
+): Promise<GetMyGiftishowCouponsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post<GetMyGiftishowCouponsResponse>(
+      '/getMyGiftishowCoupons',
+      { member },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('[기프티쇼] 구매 쿠폰 목록 조회 오류:', error);
+    if (error instanceof AxiosError) {
+      console.error('[기프티쇼] 상세:', error.response?.status, error.response?.data);
     }
     throw error;
   }
