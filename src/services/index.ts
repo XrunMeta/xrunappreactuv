@@ -158,6 +158,8 @@ import {
   GetXrunPurchasedItemsResponse,
   GetMyGiftishowCouponsResponse,
   MyGiftishowCouponItem,
+  PurchaseGiftWithXplayPointsRequest,
+  PurchaseGiftWithXplayPointsResponse,
   PurchaseXrunItemRequest,
   PurchaseXrunItemResponse,
   SaveInappPurchaseLogRequest,
@@ -4340,6 +4342,31 @@ export const getMyGiftishowCoupons = async (
       console.error('[기프티쇼] 상세:', error.response?.status, error.response?.data);
     }
     throw error;
+  }
+};
+
+export const purchaseGiftWithXplayPoints = async (
+  params: PurchaseGiftWithXplayPointsRequest,
+  navigation?: any,
+): Promise<PurchaseGiftWithXplayPointsResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post<PurchaseGiftWithXplayPointsResponse>(
+      '/purchaseGiftWithXplayPoints',
+      params,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('[기프티쇼] Xplay 구매 오류:', error);
+    if (error instanceof AxiosError) {
+      const data = error.response?.data as any;
+      return {
+        status: 'error',
+        code: error.response?.status,
+        message: data?.message || error.message,
+      };
+    }
+    return { status: 'error', message: (error as Error).message };
   }
 };
 

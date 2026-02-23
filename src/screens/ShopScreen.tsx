@@ -30,6 +30,8 @@ interface ProductData {
     description?: string;
     price: number;
     image: ImageSourcePropType;
+
+    isXplayShop?: boolean;
 }
 
 const sampleProducts: ProductData[] = [
@@ -202,6 +204,7 @@ export const ShopScreen = () => {
             brand: product.brand,
             description: product.description,
             isXrun: product.brand === 'XRUN',
+            shopTab: product.isXplayShop ? ('xplayShop' as const) : undefined,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopProductDetail);

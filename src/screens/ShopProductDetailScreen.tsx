@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeView, SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
@@ -12,6 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { getAyetPointsBalance, purchaseGiftWithXplayPoints } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -59,6 +61,82 @@ export const ShopProductDetailScreen = () => {
     } : sampleProduct;
 
     const isExchangeProduct = product.brand === 'Ethereum' || product.title.includes('교환권');
+
+    const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
+
+    const [member, setMember] = useState<string | null>(null);
+    const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
+    const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
+    const [xplayPurchaseLoading, setXplayPurchaseLoading] = useState(false);
+    const [xplayPaymentSuccessVisible, setXplayPaymentSuccessVisible] = useState(false);
+
+    const loadXplayBalance = useCallback(async () => {
+        if (!isXplayShop) return;
+        setXplayBalanceLoading(true);
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) {
+                setMember(null);
+                setXplayBalanceState(null);
+                return;
+            }
+            const userData = JSON.parse(userDataStr);
+            const m = userData?.member;
+            if (m == null) {
+                setMember(null);
+                setXplayBalanceState(null);
+                return;
+            }
+            setMember(m);
+            const res = await getAyetPointsBalance(m, undefined);
+            const balance = res?.total_ayet_points ?? null;
+            setXplayBalanceState(balance != null ? Number(balance) : null);
+        } catch (e) {
+            console.warn('[ShopProductDetail] Xplay 잔액 조회 실패:', e);
+            setXplayBalanceState(null);
+        } finally {
+            setXplayBalanceLoading(false);
+        }
+    }, [isXplayShop]);
+
+    useEffect(() => {
+        if (isXplayShop) loadXplayBalance();
+    }, [isXplayShop, loadXplayBalance]);
+
+    const handleXplayPurchase = useCallback(async () => {
+        if (!member || xplayPurchaseLoading) return;
+        const needPrice = product.price;
+        const balance = xplayBalanceState ?? 0;
+        if (balance < needPrice) {
+            showAlert('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
+            return;
+        }
+        showAlert('구매', `${product.title}을(를) Xplay 포인트로 구매하시겠습니까?`, [
+            { text: '취소' },
+            {
+                text: '구매',
+                onPress: async () => {
+                    setXplayPurchaseLoading(true);
+                    try {
+                        const res = await purchaseGiftWithXplayPoints(
+                            { member, goods_code: product.id },
+                            undefined,
+                        );
+                        if (res?.status === 'success') {
+                            setXplayPaymentSuccessVisible(true);
+                            loadXplayBalance(); 
+                        } else {
+                            showAlert('구매 실패', res?.message ?? '구매에 실패했습니다.', [{ text: '확인' }]);
+                        }
+                    } catch (e) {
+                        showAlert('오류', (e as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
+                    } finally {
+                        setXplayPurchaseLoading(false);
+                    }
+                },
+            },
+        ]);
+    }, [member, product.id, product.title, product.price, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
@@ -205,9 +283,7 @@ export const ShopProductDetailScreen = () => {
             {
                 text: '구매',
                 onPress: () => {
-
                     console.log('구매:', product.id);
-
                     setPaymentSuccessVisible(true);
                 }
             },
@@ -216,11 +292,16 @@ export const ShopProductDetailScreen = () => {
 
     const handlePaymentSuccessClose = () => {
         setPaymentSuccessVisible(false);
+    };
 
+    const handleXplayPaymentSuccessClose = () => {
+        setXplayPaymentSuccessVisible(false);
+        navigate(ROUTES.shopMyItems);
     };
 
     const isXrun = product.isXrun || product.brand === 'XRUN';
     const coinIcon = isXrun ? xrunRoundLogo : xplaySymbol;
+    const xplayRemainingBalance = (xplayBalanceState ?? 0) - product.price;
 
     return (
         <SafeView style={styles.container} backgroundColor="#F8FAFC">
@@ -258,21 +339,49 @@ export const ShopProductDetailScreen = () => {
                             <Text style={styles.sectionTitle}>결제 정보</Text>
                         </View>
                         <View style={styles.divider} />
-                        <View style={styles.paymentRow}>
-                            <Text style={styles.paymentLabel}>결제금액</Text>
-                            <View style={styles.priceContainer}>
-                                <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
-                                <Text style={styles.paymentValue}>{product.price.toLocaleString()} XRUN</Text>
-                            </View>
-                        </View>
-                        <View style={styles.paymentRow}>
-                            <Text style={styles.paymentLabel}>내보유 XRUN</Text>
-                            <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
-                        </View>
-                        <View style={styles.paymentRowLast}>
-                            <Text style={styles.paymentLabel}>구매 후 잔여 XRUN</Text>
-                            <Text style={styles.paymentRemaining}>{remainingBalance.toLocaleString()} XRUN</Text>
-                        </View>
+                        {isXplayShop ? (
+                            <>
+                                <View style={styles.paymentRow}>
+                                    <Text style={styles.paymentLabel}>결제금액</Text>
+                                    <View style={styles.priceContainer}>
+                                        <Image source={xplaySymbol} style={styles.coinIcon} resizeMode="contain" />
+                                        <Text style={styles.paymentValue}>{product.price.toLocaleString()} Xplay</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.paymentRow}>
+                                    <Text style={styles.paymentLabel}>내 Xplay 잔액</Text>
+                                    {xplayBalanceLoading ? (
+                                        <ActivityIndicator size="small" color="#1E3A5F" />
+                                    ) : (
+                                        <Text style={styles.paymentBalance}>
+                                            {(xplayBalanceState ?? 0).toLocaleString()} Xplay
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.paymentRowLast}>
+                                    <Text style={styles.paymentLabel}>구매 후 잔여 Xplay</Text>
+                                    <Text style={styles.paymentRemaining}>{xplayRemainingBalance.toLocaleString()} Xplay</Text>
+                                </View>
+                            </>
+                        ) : (
+                            <>
+                                <View style={styles.paymentRow}>
+                                    <Text style={styles.paymentLabel}>결제금액</Text>
+                                    <View style={styles.priceContainer}>
+                                        <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
+                                        <Text style={styles.paymentValue}>{product.price.toLocaleString()} XRUN</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.paymentRow}>
+                                    <Text style={styles.paymentLabel}>내보유 XRUN</Text>
+                                    <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
+                                </View>
+                                <View style={styles.paymentRowLast}>
+                                    <Text style={styles.paymentLabel}>구매 후 잔여 XRUN</Text>
+                                    <Text style={styles.paymentRemaining}>{remainingBalance.toLocaleString()} XRUN</Text>
+                                </View>
+                            </>
+                        )}
                     </View>
 
                     {}
@@ -315,21 +424,46 @@ export const ShopProductDetailScreen = () => {
 
             {}
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
-                <TouchableOpacity
-                    style={styles.purchaseButton}
-                    onPress={handlePurchase}
-                    activeOpacity={0.8}
-                >
-                    <LinearGradient
-                        colors={['#1E3A5F', '#2D4A6F']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.purchaseButtonGradient}
+                {isXplayShop ? (
+                    <TouchableOpacity
+                        style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
+                        onPress={handleXplayPurchase}
+                        disabled={xplayPurchaseLoading || xplayBalanceLoading || member == null}
+                        activeOpacity={0.8}
                     >
-                        <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
-                        <Text style={styles.purchaseButtonText}>구매하기</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.purchaseButtonGradient}
+                        >
+                            {xplayPurchaseLoading ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} />
+                            ) : (
+                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
+                            )}
+                            <Text style={styles.purchaseButtonText}>
+                                {xplayPurchaseLoading ? '처리 중...' : 'Xplay 포인트로 구매'}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={styles.purchaseButton}
+                        onPress={handlePurchase}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.purchaseButtonGradient}
+                        >
+                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
+                            <Text style={styles.purchaseButtonText}>구매하기</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                )}
             </View>
 
             {}
@@ -341,25 +475,32 @@ export const ShopProductDetailScreen = () => {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.paymentSuccessModal}>
-                        {}
                         <View style={styles.modalLogoContainer}>
-                            <Image
-                                source={xrunRoundLogo}
-                                style={styles.modalLogo}
-                                resizeMode="contain"
-                            />
+                            <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
-
-                        {}
                         <Text style={styles.paymentSuccessMessage}>결제가 완료되었습니다</Text>
-
-                        {}
-                        <TouchableOpacity
-                            style={styles.paymentSuccessButton}
-                            onPress={handlePaymentSuccessClose}
-                            activeOpacity={0.8}
-                        >
+                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>확인</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={xplayPaymentSuccessVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleXplayPaymentSuccessClose}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.paymentSuccessModal}>
+                        <View style={styles.modalLogoContainer}>
+                            <Image source={xplaySymbol} style={styles.modalLogo} resizeMode="contain" />
+                        </View>
+                        <Text style={styles.paymentSuccessMessage}>Xplay 포인트 결제가 완료되었습니다</Text>
+                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleXplayPaymentSuccessClose} activeOpacity={0.8}>
+                            <Text style={styles.paymentSuccessButtonText}>내 기프티콘 보기</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -699,6 +840,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 6,
+    },
+    purchaseButtonDisabled: {
+        opacity: 0.7,
     },
     purchaseButtonGradient: {
         flexDirection: 'row',
