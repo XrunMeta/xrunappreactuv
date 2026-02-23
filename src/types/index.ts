@@ -1059,6 +1059,23 @@ export interface GetXrunPurchasedItemsResponse {
   message?: string;
 }
 
+export interface MyGiftishowCouponItem {
+  tr_id: string;
+  goods_code?: string;
+  goods_name?: string;
+  brand_name?: string;
+  image_url?: string;
+  purchase_date?: string; 
+  pin_status?: string; 
+  [key: string]: unknown;
+}
+
+export interface GetMyGiftishowCouponsResponse {
+  status: 'success' | 'error';
+  data?: MyGiftishowCouponItem[];
+  message?: string;
+}
+
 export interface PurchaseXrunItemRequest {
   member: string; 
   item: number; 

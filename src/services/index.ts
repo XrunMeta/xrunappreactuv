@@ -156,6 +156,8 @@ import {
   v_2380df,
   v_35daf0,
   v_ad5024,
+  v_0f638a,
+  v_a649c5,
   v_c27ee5,
   v_8321b5,
   v_97dbaa,
@@ -4316,6 +4318,26 @@ export const v_97ad19 = async (
         data: v_5e9bfe.response?.data,
         message: v_5e9bfe.message,
       });
+    }
+    throw v_5e9bfe;
+  }
+};
+
+export const v_060fa0 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_0f638a> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post<v_0f638a>(
+      '/getMyGiftishowCoupons',
+      { member: v_660822 },
+    );
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[기프티쇼] 구매 쿠폰 목록 조회 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      console.error('[기프티쇼] 상세:', v_5e9bfe.response?.status, v_5e9bfe.response?.data);
     }
     throw v_5e9bfe;
   }

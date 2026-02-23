@@ -1,5 +1,6 @@
-import v_a3453e, { v_5ab095, v_df9f57 } from 'bapkr';
-import { v_3094a2, v_472849, v_79c4f2, v_19b633, v_4623af, v_cf9c33, v_07a341 } from 'rcmrninabrnb';
+import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
+import { v_3094a2, v_472849, v_79c4f2, v_19b633, v_4623af, v_cf9c33, v_07a341, v_39a996, v_6c4f62 } from 'rcmrninabrnb';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34, v_556baf } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -9,54 +10,94 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
+import { v_060fa0 } from '../services';
+import type { v_a649c5 } from '../types';
 
-const v_e98c55 = require('../../assets/sample_starbugs.png');
-const v_b236ed = require('../../assets/sample_cu.png');
-const v_da3188 = require('../../assets/sample_naverpay.png');
+const v_818aa7 = require('../../assets/sample_cu.png');
 
 interface MyItemData {
     id: string;
     brand: string;
     title: string;
     image: v_07a341;
-    status: 'available' | 'used'; 
-    purchaseDate: string; 
+    status: 'available' | 'used';
+    purchaseDate: string;
+    tr_id?: string;
 }
 
-const v_f32c2f = [
-    {
-        id: '1',
-        brand: '스타벅스',
-        title: '아이스 카페 아메리카노T 2잔+부드러운 생크림 카스텔라 모바일쿠폰',
-        image: v_e98c55,
-        status: 'available',
-        purchaseDate: '2026.02.01',
-    },
-    {
-        id: '2',
-        brand: 'CU',
-        title: 'CU 편의점 5천원 기프티콘',
-        image: v_b236ed,
-        status: 'used',
-        purchaseDate: '2026.01.15',
-    },
-    {
-        id: '3',
-        brand: '네이버',
-        title: '네이버페이 포인트 1만원',
-        image: v_da3188,
-        status: 'available',
-        purchaseDate: '2026.01.28',
-    },
-];
+function v_52c82e(v_03cc9e): 'available' | 'used' {
+  if (v_03cc9e === '02') return 'used'; 
+  return 'available';
+}
+
+function v_b88ffe(v_479f05): string {
+  if (!v_479f05) return '-';
+  const v_fd5f43 = String(v_479f05).replace(/-/g, '').slice(0, 8);
+  if (v_fd5f43.length === 8) return `${v_fd5f43.slice(0, 4)}.${v_fd5f43.slice(4, 6)}.${v_fd5f43.slice(6, 8)}`;
+  return v_479f05;
+}
+
+function v_037021(c: v_a649c5): MyItemData {
+  const image: v_07a341 = v_3f4e2e.image_url
+    ? { uri: v_3f4e2e.image_url }
+    : v_818aa7;
+  return {
+    id: v_3f4e2e.tr_id,
+    tr_id: v_3f4e2e.tr_id,
+    brand: v_3f4e2e.brand_name ?? '기프티콘',
+    title: v_3f4e2e.goods_name ?? '-',
+    image: v_7ddb73,
+    status: v_52c82e(v_3f4e2e.pin_status),
+    purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
+  };
+}
 
 export const v_8c1d95 = () => {
     const { navigate: v_9b57fc } = v_a0daa8();
     const { t: v_8d41d7 } = v_772971();
     const { setSelectedShopItem: v_d0fbad } = v_700ef9();
-    const [v_19c59c] = v_5ab095<number>(5000); 
+    const [v_4622b9, v_fa923c] = v_5ab095<MyItemData[]>([]);
+    const [v_683210, v_34a50a] = v_5ab095(true);
+    const [v_612e9f, v_575aad] = v_5ab095(false);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
     const [v_5d756f, v_a563de] = v_5ab095<string>('');
+
+    const v_605807 = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) {
+                v_fa923c([]);
+                return;
+            }
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) {
+                v_fa923c([]);
+                return;
+            }
+            const v_43c42e = await v_060fa0(String(v_660822), v_9b57fc);
+            if (v_43c42e?.status === 'success' && Array.isArray(v_43c42e.data)) {
+                v_fa923c(v_43c42e.data.map(v_037021));
+            } else {
+                v_fa923c([]);
+            }
+        } catch {
+            v_fa923c([]);
+        } finally {
+            v_34a50a(false);
+            v_575aad(false);
+        }
+    }, [v_9b57fc]);
+
+    v_c4deb2(() => {
+        v_34a50a(true);
+        v_605807();
+    }, [v_605807]);
+
+    const v_d5345f = v_de06a3(() => {
+        v_575aad(true);
+        v_605807();
+    }, [v_605807]);
 
     const v_1c4d31 = v_df9f57(
         () => [
@@ -82,7 +123,6 @@ export const v_8c1d95 = () => {
     };
 
     const v_09c55b = (v_8c0b26) => {
-
         const v_983c87 = {
             id: v_8c0b26.id,
             title: v_8c0b26.title,
@@ -90,24 +130,22 @@ export const v_8c1d95 = () => {
             image: v_8c0b26.image,
             detailTotal: '',
             brand: v_8c0b26.brand,
-            barcodeNumber: '1231 1231 1231 1231', 
+            barcodeNumber: '', 
+            tr_id: v_8c0b26.tr_id ?? v_8c0b26.id,
         };
         v_d0fbad(v_983c87 as any);
         v_9b57fc(v_ce4741.shopMyTicketDetail);
     };
 
     const v_973c3e = v_df9f57(() => {
-        if (!v_5d756f.trim()) {
-            return v_f32c2f;
-        }
-
+        if (!v_5d756f.trim()) return v_4622b9;
         const v_7c5791 = v_5d756f.toLowerCase().trim();
-        return v_f32c2f.filter((v_8c0b26) => {
+        return v_4622b9.filter((v_8c0b26) => {
             const v_9f1622 = v_8c0b26.title.toLowerCase();
             const v_ea6cbd = v_8c0b26.brand.toLowerCase();
             return v_9f1622.includes(v_7c5791) || v_ea6cbd.includes(v_7c5791);
         });
-    }, [v_5d756f]);
+    }, [v_4622b9, v_5d756f]);
 
     const v_62676b = v_df9f57(() => {
         const v_37a1a7 = v_973c3e.filter((v_8c0b26) => v_8c0b26.status === 'available').length;
@@ -221,15 +259,28 @@ export const v_8c1d95 = () => {
                 )}
 
                 {}
-                <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
-                    {v_973c3e.length > 0 ? (
+                <SafeScrollView
+                    showsVerticalScrollIndicator={false}
+                    showBottomBackground={false}
+                    backgroundColor="transparent"
+                    disableBottomPadding={true}
+                    refreshControl={
+                        <RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} colors={[v_1bfbd0.buttonPrimary]} />
+                    }
+                >
+                    {v_683210 ? (
+                        <View style={v_d81136.loadingContainer}>
+                            <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+                            <Text style={v_d81136.loadingText}>쿠폰 목록 불러오는 중...</Text>
+                        </View>
+                    ) : v_973c3e.length > 0 ? (
                         <View style={v_d81136.itemsList}>
                             {v_973c3e.map((v_8c0b26) => v_f24e20(v_8c0b26))}
                         </View>
                     ) : (
                         <View style={v_d81136.emptyContainer}>
                             <Text style={v_d81136.emptyText}>
-                                {v_5d756f.trim() ? 'No search results' : '구매한 아이템이 없습니다.'}
+                                {v_5d756f.trim() ? '검색 결과가 없습니다.' : '구매한 쿠폰이 없습니다.'}
                             </Text>
                         </View>
                     )}
@@ -433,6 +484,17 @@ const v_d81136 = v_472849.create({
         fontSize: 12,
         fontFamily: 'Roboto-Bold',
         color: '#ffffff',
+    },
+    loadingContainer: {
+        paddingVertical: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#7d7e83',
     },
     emptyContainer: {
         paddingVertical: 40,
