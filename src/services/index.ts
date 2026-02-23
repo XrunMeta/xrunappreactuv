@@ -4195,6 +4195,98 @@ export const v_f5b61a = async (
   }
 };
 
+export interface GetAyetPointsBalanceResponse {
+  status?: string;
+  code?: number;
+  message?: string;
+  data?: {
+    member?: number;
+    total_ayet_points?: number;
+    transaction_count?: number;
+  };
+}
+
+export interface AyetPointsHistoryItem {
+  transaction?: number;
+  amount?: number;
+  datetime?: string;
+  ayet_transaction_id?: string;
+  campaign_id?: string;
+  reward_amount?: number;
+  callback_created_at?: string;
+  [key: string]: unknown;
+}
+
+export interface GetAyetPointsHistoryResponse {
+  status?: string;
+  code?: number;
+  message?: string;
+  data?: {
+    member?: number;
+    history?: AyetPointsHistoryItem[];
+    total?: number;
+    limit?: number;
+    offset?: number;
+  };
+}
+
+export const v_877de8 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<{ total_ayet_points: number; transaction_count: number }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = { member: typeof v_660822 === 'number' ? v_660822 : Number(v_660822) };
+
+    const v_3393e3 = await v_9f42a4.post<GetAyetPointsBalanceResponse>(
+      '/getAyetPointsBalance',
+      v_576f5a,
+    );
+
+    const v_9390e8 = v_3393e3.data?.data;
+    const v_78e300 = v_9390e8?.total_ayet_points ?? 0;
+    const v_39d5c0 = v_9390e8?.transaction_count ?? 0;
+    console.log('[ayeT 포인트] 잔액 조회 응답:', {
+      member: v_576f5a.member,
+      total_ayet_points: v_78e300,
+      transaction_count: v_39d5c0,
+    });
+    return { total_ayet_points: v_78e300, transaction_count: v_39d5c0 };
+  } catch (v_5e9bfe) {
+    console.error('[ayeT 포인트] 잔액 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_4c925a = async (
+  v_660822,
+  v_02be30 = 50,
+  v_3bbadf = 0,
+  v_c65f5d,
+): Promise<{ history: AyetPointsHistoryItem[]; total: number }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_576f5a = {
+      member: typeof v_660822 === 'number' ? v_660822 : Number(v_660822),
+      limit: v_02be30,
+      offset: v_3bbadf,
+    };
+
+    const v_3393e3 = await v_9f42a4.post<GetAyetPointsHistoryResponse>(
+      '/getAyetPointsHistory',
+      v_576f5a,
+    );
+
+    const v_9390e8 = v_3393e3.data?.data;
+    const v_10740d = v_9390e8?.history ?? [];
+    const v_c83285 = v_9390e8?.total ?? 0;
+    return { history: v_10740d, total: v_c83285 };
+  } catch (v_5e9bfe) {
+    console.error('[ayeT 포인트] 내역 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
 export const v_97ad19 = async (
   v_660822,
   v_c65f5d,

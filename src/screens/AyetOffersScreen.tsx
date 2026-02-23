@@ -1,5 +1,6 @@
 import v_a3453e, { v_c4deb2, v_e662ae } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -25,7 +26,15 @@ export const AyetOffersScreen: v_a3453e.FC<AyetOffersScreenProps> = ({ slotName:
       if (!v_609ab5()) return;
       v_124e9d.current = true;
       try {
-        await v_961d2c(v_b27fa5);
+        let v_717992;
+        try {
+          const v_f24fd5 = await v_e84827.getItem('userData');
+          if (v_f24fd5) {
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            if (v_ef7306.member != null) v_717992 = String(v_ef7306.member);
+          }
+        } catch (v_37eab7) {}
+        await v_961d2c(v_b27fa5, { memberId: v_717992 });
         v_c7ac57();
       } catch (v_9e86fd) {
         const v_badeaf = v_9e86fd instanceof Error ? v_9e86fd.message : v_8d41d7('screens.myInfoSettings.offers_error');

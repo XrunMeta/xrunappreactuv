@@ -14,7 +14,7 @@ import { v_556baf } from '../components';
 import { v_729608, v_4c7b5d } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
-import { v_fb2e96 } from '../services';
+import { v_877de8 } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_10a702 = require('../../assets/images/blur_yellow.png');
@@ -35,29 +35,34 @@ export const v_f7bdb9 = () => {
       if (v_f24fd5) {
         const v_ef7306 = JSON.parse(v_f24fd5);
         if (v_ef7306.member) {
-          const v_c7b8cc = String(v_ef7306.member);
-          v_9d6aeb(v_c7b8cc);
+          const v_660822 = v_ef7306.member;
+          v_9d6aeb(String(v_660822));
           v_3e37d1(true);
           try {
-            const v_43c42e = await v_fb2e96(v_c7b8cc, v_9b57fc);
-            v_97ae62(v_43c42e.current_p_balance ?? 0);
+            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
+            v_97ae62(v_43c42e.total_ayet_points ?? 0);
           } catch {
             v_97ae62(0);
           } finally {
             v_3e37d1(false);
           }
+        } else {
+          v_97ae62(null);
         }
+      } else {
+        v_97ae62(null);
       }
     } catch {
-      v_97ae62(0);
+      v_97ae62(null);
     }
-  }, []);
+  }, [v_9b57fc]);
 
   v_c4deb2(() => {
     v_fff133();
   }, [v_fff133]);
 
-  const v_ac1f2a = v_19c59c !== null ? v_19c59c : 300200000;
+  const v_ac1f2a = v_19c59c !== null ? v_19c59c : 0;
+  const v_70b2ec = v_747a87 ? '' : v_ac1f2a.toLocaleString();
 
   return (
     <SafeView style={v_d81136.container}>
@@ -80,15 +85,17 @@ export const v_f7bdb9 = () => {
             <Image source={v_10a702} style={v_d81136.balanceBlurRight} resizeMode="cover" />
             <View style={v_d81136.balanceContent}>
               <View style={v_d81136.balanceLeft}>
-                <Text style={v_d81136.balanceLabel}>내 잔액</Text>
+                <Text style={v_d81136.balanceLabel}>총 지급 금액</Text>
                 <View style={v_d81136.balanceAmountRow}>
                   <View style={v_d81136.balanceXplayIconContainer}>
                     <Image source={v_10664a} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {v_747a87 ? (
-                    <ActivityIndicator size="small" color={v_1bfbd0.text} style={v_d81136.balanceLoader} />
+                    <ActivityIndicator size="small" color="#343a5a" style={v_d81136.balanceLoader} />
                   ) : (
-                    <Text style={v_d81136.balanceAmount}>{v_ac1f2a.toLocaleString()}</Text>
+                    <Text style={v_d81136.balanceAmount} numberOfLines={1}>
+                      {v_70b2ec}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -227,8 +234,10 @@ const v_d81136 = v_472849.create({
   balanceAmount: {
     fontSize: 24,
     fontFamily: 'Roboto-SemiBold',
+    fontWeight: '600',
     color: '#343a5a',
     letterSpacing: -0.75,
+    minWidth: 60,
   },
   xplayTag: {
     backgroundColor: '#00d4ff',

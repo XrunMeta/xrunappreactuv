@@ -9,10 +9,26 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.ayet.sdk.AyetSdk
 
+private const val AYET_PLACEMENT_ID = 21960
+
 class AyetOfferwallModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
     override fun getName(): String = "AyetOfferwallModule"
+
+    @ReactMethod
+    fun setUserId(userId: String, promise: Promise) {
+        try {
+            val id = userId.takeIf { it.isNotBlank() } ?: "guest"
+            val safeId = id.take(63) 
+            Log.d(TAG, "setUserId: external_identifier=$safeId")
+            AyetSdk.init(reactApplicationContext.applicationContext, AYET_PLACEMENT_ID, safeId)
+            promise.resolve(null)
+        } catch (e: Exception) {
+            Log.e(TAG, "setUserId failed: ${e.message}", e)
+            promise.reject("AYET_SET_USER_ERROR", e.message ?: "setUserId 실패")
+        }
+    }
 
     @ReactMethod
     fun showOfferwall(adSlotName: String, promise: Promise) {

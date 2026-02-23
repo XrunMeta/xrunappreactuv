@@ -79,6 +79,7 @@ import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
+import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
@@ -104,6 +105,19 @@ let v_435733 = false;
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
   const { setSignupFormData: v_eee6b0 } = v_700ef9();
+
+  v_c4deb2(() => {
+    let v_2008a4 = false;
+    (async () => {
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_2008a4 || !v_f24fd5) return;
+        const v_ef7306 = JSON.parse(v_f24fd5);
+        if (v_ef7306?.member != null) v_e8d7c0(String(v_ef7306.member));
+      } catch (v_37eab7) {}
+    })();
+    return () => { v_2008a4 = true; };
+  }, []);
 
   v_c4deb2(() => {
 

@@ -23,6 +23,7 @@ import {
 } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_e8d7c0 } from '../services/ayet';
 import {
   v_b699a9,
   v_a5170b,
@@ -236,6 +237,7 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8.trim());
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -338,6 +340,7 @@ export const v_f4f851 = () => {
       const v_f4fb5e = v_ef7306.email || v_4c2a98;
       await v_e84827.setItem('userEmail', v_f4fb5e);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -451,6 +454,7 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
@@ -591,6 +595,7 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+      if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 

@@ -42,13 +42,21 @@ export const v_3e930b = async (
   }
 };
 
+export const v_e8d7c0 = (v_43e90c): void => {
+  if (v_326be8.OS !== 'android' || !v_1bebcf?.setUserId) return;
+  const v_389afb = (v_43e90c && v_43e90c.trim()) ? String(v_43e90c).slice(0, 63) : 'guest';
+  v_1bebcf.setUserId(v_389afb);
+};
+
 export const v_961d2c = async (
-  v_bb8cc2 = v_c8c60c
+  v_bb8cc2 = v_c8c60c,
+  v_b36f96
 ): Promise<void> => {
   if (v_326be8.OS !== 'android' || !v_1bebcf?.showOfferwall) {
     console.warn(`${v_4c1151} showAyetOfferwall skipped (not Android or module unavailable), adSlotName=${v_bb8cc2}`);
     return;
   }
+  if (v_b36f96?.memberId != null) v_e8d7c0(v_b36f96.memberId);
   await v_1bebcf.showOfferwall(v_bb8cc2);
 };
 

@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62 } from 'rcmrninabrnb';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_570c34, v_556baf } from '../components';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -11,6 +12,7 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
+import { v_877de8 } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -93,6 +95,33 @@ export const v_10886b = () => {
     const [v_32c9b7, v_0e5971] = v_5ab095(false);
     const [v_5605ec, v_ad5fd0] = v_5ab095(false);
     const [v_02e6ad, v_33ec67] = v_5ab095<string | null>(null);
+    const [v_cd398d, v_d20f1f] = v_5ab095<number | null>(null);
+    const [v_837630, v_2f87ed] = v_5ab095(false);
+    const [v_1d54f1, v_67ba02] = v_5ab095<number>(0);
+    const { navigate: v_9b57fc } = v_a0daa8();
+
+    const v_c1e7a4 = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) {
+                v_d20f1f(null);
+                return;
+            }
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) {
+                v_d20f1f(null);
+                return;
+            }
+            v_2f87ed(true);
+            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
+            v_d20f1f(v_43c42e.total_ayet_points ?? 0);
+        } catch {
+            v_d20f1f(0);
+        } finally {
+            v_2f87ed(false);
+        }
+    }, [v_9b57fc]);
 
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
@@ -116,8 +145,8 @@ export const v_10886b = () => {
 
     const v_f80453 = v_de06a3(() => {
         v_ad5fd0(true);
-        v_f61b49().finally(() => v_ad5fd0(false));
-    }, [v_f61b49]);
+        Promise.all([v_f61b49(), v_c1e7a4()]).finally(() => v_ad5fd0(false));
+    }, [v_f61b49, v_c1e7a4]);
 
     v_c4deb2(() => {
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
@@ -129,9 +158,13 @@ export const v_10886b = () => {
             }
         }
     }, [v_dfe883, v_d0fbad]);
-    const { navigate: v_9b57fc } = v_a0daa8();
-    const [v_19c59c] = v_5ab095<number>(300200000); 
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
+
+    v_c4deb2(() => {
+        if (v_11083e === 'xplayShop') {
+            v_c1e7a4();
+        }
+    }, [v_11083e, v_c1e7a4]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
@@ -274,7 +307,17 @@ export const v_10886b = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        <Text style={v_d81136.balanceAmount}>{v_19c59c.toLocaleString()}</Text>
+                                        {v_11083e === 'xplayShop' ? (
+                                            v_837630 ? (
+                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
+                                            ) : (
+                                                <Text style={v_d81136.balanceAmount}>
+                                                    {(v_cd398d ?? 0).toLocaleString()}
+                                                </Text>
+                                            )
+                                        ) : (
+                                            <Text style={v_d81136.balanceAmount}>{v_1d54f1.toLocaleString()}</Text>
+                                        )}
                                     </View>
                                 </View>
                                 {v_11083e === 'xplayShop' ? (
