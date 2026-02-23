@@ -10,8 +10,9 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import { v_060fa0 } from '../services';
+import { v_060fa0, v_97ad19 } from '../services';
 import type { v_a649c5 } from '../types';
+import type { v_029bad } from '../types';
 
 const v_818aa7 = require('../../assets/sample_cu.png');
 
@@ -23,6 +24,11 @@ interface MyItemData {
     status: 'available' | 'used';
     purchaseDate: string;
     tr_id?: string;
+
+    type: 'xrun' | 'giftishow';
+    storage?: string;
+    txID?: string;
+    item?: number;
 }
 
 function v_52c82e(v_03cc9e): 'available' | 'used' {
@@ -49,6 +55,27 @@ function v_037021(c: v_a649c5): MyItemData {
     image: v_7ddb73,
     status: v_52c82e(v_3f4e2e.pin_status),
     purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
+    type: 'giftishow',
+  };
+}
+
+function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
+  const image: v_07a341 =
+    v_e2a85c.icon && (typeof v_e2a85c.icon === 'string' && v_e2a85c.icon.startsWith('http'))
+      ? { uri: v_e2a85c.icon }
+      : v_818aa7;
+  const v_389afb = v_e2a85c.storage ? `xrun_${v_e2a85c.storage}_${v_a56041}` : `xrun_${v_e2a85c.txID}_${v_a56041}`;
+  return {
+    id: v_389afb,
+    brand: 'XRUN',
+    title: v_e2a85c.title ?? '-',
+    image: v_7ddb73,
+    status: v_e2a85c.status === 10306 ? 'available' : 'used',
+    purchaseDate: '-',
+    type: 'xrun',
+    storage: v_e2a85c.storage,
+    txID: v_e2a85c.txID,
+    item: v_e2a85c.item,
   };
 }
 
@@ -75,12 +102,20 @@ export const v_8c1d95 = () => {
                 v_fa923c([]);
                 return;
             }
-            const v_43c42e = await v_060fa0(String(v_660822), v_9b57fc);
-            if (v_43c42e?.status === 'success' && Array.isArray(v_43c42e.data)) {
-                v_fa923c(v_43c42e.data.map(v_037021));
-            } else {
-                v_fa923c([]);
-            }
+            const v_2be3e4 = String(v_660822);
+            const [v_35dda7, v_38fb16] = await Promise.all([
+                v_060fa0(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
+                v_97ad19(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
+            ]);
+            const v_63c5e6 =
+                v_35dda7?.status === 'success' && Array.isArray(v_35dda7.data)
+                    ? v_35dda7.data.map(v_037021)
+                    : [];
+            const v_04aa3c =
+                v_38fb16?.status === 'success' && Array.isArray(v_38fb16.data)
+                    ? v_38fb16.data.map((v_e2a85c, v_ebec57) => v_e9b0bb(v_e2a85c, v_ebec57))
+                    : [];
+            v_fa923c([...v_04aa3c, ...v_63c5e6]);
         } catch {
             v_fa923c([]);
         } finally {
@@ -123,6 +158,22 @@ export const v_8c1d95 = () => {
     };
 
     const v_09c55b = (v_8c0b26) => {
+        if (v_8c0b26.type === 'xrun') {
+            const v_983c87 = {
+                id: v_8c0b26.id,
+                title: v_8c0b26.title,
+                priceLabel: '',
+                image: v_8c0b26.image,
+                detailTotal: '',
+                brand: v_8c0b26.brand,
+                storage: v_8c0b26.storage,
+                txID: v_8c0b26.txID,
+                item: v_8c0b26.item,
+            };
+            v_d0fbad(v_983c87 as any);
+            v_9b57fc(v_ce4741.shopTicketDetail);
+            return;
+        }
         const v_983c87 = {
             id: v_8c0b26.id,
             title: v_8c0b26.title,
@@ -130,7 +181,7 @@ export const v_8c1d95 = () => {
             image: v_8c0b26.image,
             detailTotal: '',
             brand: v_8c0b26.brand,
-            barcodeNumber: '', 
+            barcodeNumber: '',
             tr_id: v_8c0b26.tr_id ?? v_8c0b26.id,
         };
         v_d0fbad(v_983c87 as any);
