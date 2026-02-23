@@ -10,8 +10,9 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { getMyGiftishowCoupons } from '../services';
+import { getMyGiftishowCoupons, getXrunPurchasedItems } from '../services';
 import type { MyGiftishowCouponItem } from '../types';
+import type { PurchasedItemData } from '../types';
 
 const defaultCouponImage = require('../../assets/sample_cu.png');
 
@@ -23,6 +24,11 @@ interface MyItemData {
     status: 'available' | 'used';
     purchaseDate: string;
     tr_id?: string;
+
+    type: 'xrun' | 'giftishow';
+    storage?: string;
+    txID?: string;
+    item?: number;
 }
 
 function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
@@ -49,6 +55,27 @@ function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
     image,
     status: mapPinStatusToAvailable(c.pin_status),
     purchaseDate: formatPurchaseDate(c.purchase_date),
+    type: 'giftishow',
+  };
+}
+
+function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemData {
+  const image: ImageSourcePropType =
+    p.icon && (typeof p.icon === 'string' && p.icon.startsWith('http'))
+      ? { uri: p.icon }
+      : defaultCouponImage;
+  const id = p.storage ? `xrun_${p.storage}_${index}` : `xrun_${p.txID}_${index}`;
+  return {
+    id,
+    brand: 'XRUN',
+    title: p.title ?? '-',
+    image,
+    status: p.status === 10306 ? 'available' : 'used',
+    purchaseDate: '-',
+    type: 'xrun',
+    storage: p.storage,
+    txID: p.txID,
+    item: p.item,
   };
 }
 
@@ -75,12 +102,20 @@ export const ShopMyItemsScreen = () => {
                 setItems([]);
                 return;
             }
-            const result = await getMyGiftishowCoupons(String(member), navigate);
-            if (result?.status === 'success' && Array.isArray(result.data)) {
-                setItems(result.data.map(couponToMyItemData));
-            } else {
-                setItems([]);
-            }
+            const memberStr = String(member);
+            const [giftishowRes, xrunRes] = await Promise.all([
+                getMyGiftishowCoupons(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
+                getXrunPurchasedItems(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
+            ]);
+            const giftishowList: MyItemData[] =
+                giftishowRes?.status === 'success' && Array.isArray(giftishowRes.data)
+                    ? giftishowRes.data.map(couponToMyItemData)
+                    : [];
+            const xrunList: MyItemData[] =
+                xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
+                    ? xrunRes.data.map((p, i) => xrunPurchasedToMyItemData(p, i))
+                    : [];
+            setItems([...xrunList, ...giftishowList]);
         } catch {
             setItems([]);
         } finally {
@@ -123,6 +158,22 @@ export const ShopMyItemsScreen = () => {
     };
 
     const handleUseItem = (item: MyItemData) => {
+        if (item.type === 'xrun') {
+            const shopItem = {
+                id: item.id,
+                title: item.title,
+                priceLabel: '',
+                image: item.image,
+                detailTotal: '',
+                brand: item.brand,
+                storage: item.storage,
+                txID: item.txID,
+                item: item.item,
+            };
+            setSelectedShopItem(shopItem as any);
+            navigate(ROUTES.shopTicketDetail);
+            return;
+        }
         const shopItem = {
             id: item.id,
             title: item.title,
@@ -130,7 +181,7 @@ export const ShopMyItemsScreen = () => {
             image: item.image,
             detailTotal: '',
             brand: item.brand,
-            barcodeNumber: '', 
+            barcodeNumber: '',
             tr_id: item.tr_id ?? item.id,
         };
         setSelectedShopItem(shopItem as any);
