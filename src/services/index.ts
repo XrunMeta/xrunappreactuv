@@ -4195,6 +4195,98 @@ export const spendPoints = async (
   }
 };
 
+export interface GetAyetPointsBalanceResponse {
+  status?: string;
+  code?: number;
+  message?: string;
+  data?: {
+    member?: number;
+    total_ayet_points?: number;
+    transaction_count?: number;
+  };
+}
+
+export interface AyetPointsHistoryItem {
+  transaction?: number;
+  amount?: number;
+  datetime?: string;
+  ayet_transaction_id?: string;
+  campaign_id?: string;
+  reward_amount?: number;
+  callback_created_at?: string;
+  [key: string]: unknown;
+}
+
+export interface GetAyetPointsHistoryResponse {
+  status?: string;
+  code?: number;
+  message?: string;
+  data?: {
+    member?: number;
+    history?: AyetPointsHistoryItem[];
+    total?: number;
+    limit?: number;
+    offset?: number;
+  };
+}
+
+export const getAyetPointsBalance = async (
+  member: number | string,
+  navigation?: any,
+): Promise<{ total_ayet_points: number; transaction_count: number }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = { member: typeof member === 'number' ? member : Number(member) };
+
+    const response = await axiosInstance.post<GetAyetPointsBalanceResponse>(
+      '/getAyetPointsBalance',
+      request,
+    );
+
+    const data = response.data?.data;
+    const total_ayet_points = data?.total_ayet_points ?? 0;
+    const transaction_count = data?.transaction_count ?? 0;
+    console.log('[ayeT 포인트] 잔액 조회 응답:', {
+      member: request.member,
+      total_ayet_points,
+      transaction_count,
+    });
+    return { total_ayet_points, transaction_count };
+  } catch (error) {
+    console.error('[ayeT 포인트] 잔액 조회 오류:', error);
+    throw error;
+  }
+};
+
+export const getAyetPointsHistory = async (
+  member: number | string,
+  limit: number = 50,
+  offset: number = 0,
+  navigation?: any,
+): Promise<{ history: AyetPointsHistoryItem[]; total: number }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const request = {
+      member: typeof member === 'number' ? member : Number(member),
+      limit,
+      offset,
+    };
+
+    const response = await axiosInstance.post<GetAyetPointsHistoryResponse>(
+      '/getAyetPointsHistory',
+      request,
+    );
+
+    const data = response.data?.data;
+    const history = data?.history ?? [];
+    const total = data?.total ?? 0;
+    return { history, total };
+  } catch (error) {
+    console.error('[ayeT 포인트] 내역 조회 오류:', error);
+    throw error;
+  }
+};
+
 export const getXrunPurchasedItems = async (
   member: string,
   navigation?: any,

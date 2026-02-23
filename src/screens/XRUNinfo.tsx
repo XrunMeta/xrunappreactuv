@@ -14,7 +14,7 @@ import { SafeView } from '../components';
 import { Header, TaboolaBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
-import { getPointsBalance } from '../services';
+import { getAyetPointsBalance } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const blurYellow = require('../../assets/images/blur_yellow.png');
@@ -35,29 +35,34 @@ export const XRUNinfoScreen = () => {
       if (userDataStr) {
         const userData = JSON.parse(userDataStr);
         if (userData.member) {
-          const snuid = String(userData.member);
-          setMemberId(snuid);
+          const member = userData.member;
+          setMemberId(String(member));
           setBalanceLoading(true);
           try {
-            const result = await getPointsBalance(snuid, navigate);
-            setPointsBalance(result.current_p_balance ?? 0);
+            const result = await getAyetPointsBalance(member, navigate);
+            setPointsBalance(result.total_ayet_points ?? 0);
           } catch {
             setPointsBalance(0);
           } finally {
             setBalanceLoading(false);
           }
+        } else {
+          setPointsBalance(null);
         }
+      } else {
+        setPointsBalance(null);
       }
     } catch {
-      setPointsBalance(0);
+      setPointsBalance(null);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     loadUserAndBalance();
   }, [loadUserAndBalance]);
 
-  const displayBalance = pointsBalance !== null ? pointsBalance : 300200000;
+  const displayBalance = pointsBalance !== null ? pointsBalance : 0;
+  const balanceText = balanceLoading ? '' : displayBalance.toLocaleString();
 
   return (
     <SafeView style={styles.container}>
@@ -80,15 +85,17 @@ export const XRUNinfoScreen = () => {
             <Image source={blurYellow} style={styles.balanceBlurRight} resizeMode="cover" />
             <View style={styles.balanceContent}>
               <View style={styles.balanceLeft}>
-                <Text style={styles.balanceLabel}>내 잔액</Text>
+                <Text style={styles.balanceLabel}>총 지급 금액</Text>
                 <View style={styles.balanceAmountRow}>
                   <View style={styles.balanceXplayIconContainer}>
                     <Image source={xplaySymbol} style={styles.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {balanceLoading ? (
-                    <ActivityIndicator size="small" color={COLORS.text} style={styles.balanceLoader} />
+                    <ActivityIndicator size="small" color="#343a5a" style={styles.balanceLoader} />
                   ) : (
-                    <Text style={styles.balanceAmount}>{displayBalance.toLocaleString()}</Text>
+                    <Text style={styles.balanceAmount} numberOfLines={1}>
+                      {balanceText}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -227,8 +234,10 @@ const styles = StyleSheet.create({
   balanceAmount: {
     fontSize: 24,
     fontFamily: 'Roboto-SemiBold',
+    fontWeight: '600',
     color: '#343a5a',
     letterSpacing: -0.75,
+    minWidth: 60,
   },
   xplayTag: {
     backgroundColor: '#00d4ff',

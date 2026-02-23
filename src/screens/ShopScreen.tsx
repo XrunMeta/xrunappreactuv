@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
@@ -11,6 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
+import { getAyetPointsBalance } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -93,6 +95,33 @@ export const ShopScreen = () => {
     const [xplayLoading, setXplayLoading] = useState(false);
     const [xplayRefreshing, setXplayRefreshing] = useState(false);
     const [xplayError, setXplayError] = useState<string | null>(null);
+    const [xplayBalance, setXplayBalance] = useState<number | null>(null);
+    const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
+    const [xrunBalance, setXrunBalance] = useState<number>(0);
+    const { navigate } = useAppNavigation();
+
+    const loadXplayBalance = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) {
+                setXplayBalance(null);
+                return;
+            }
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) {
+                setXplayBalance(null);
+                return;
+            }
+            setXplayBalanceLoading(true);
+            const result = await getAyetPointsBalance(member, navigate);
+            setXplayBalance(result.total_ayet_points ?? 0);
+        } catch {
+            setXplayBalance(0);
+        } finally {
+            setXplayBalanceLoading(false);
+        }
+    }, [navigate]);
 
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
@@ -116,8 +145,8 @@ export const ShopScreen = () => {
 
     const onXplayRefresh = useCallback(() => {
         setXplayRefreshing(true);
-        loadXplayProducts().finally(() => setXplayRefreshing(false));
-    }, [loadXplayProducts]);
+        Promise.all([loadXplayProducts(), loadXplayBalance()]).finally(() => setXplayRefreshing(false));
+    }, [loadXplayProducts, loadXplayBalance]);
 
     useEffect(() => {
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
@@ -129,9 +158,13 @@ export const ShopScreen = () => {
             }
         }
     }, [selectedShopItem, setSelectedShopItem]);
-    const { navigate } = useAppNavigation();
-    const [pointsBalance] = useState<number>(300200000); 
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (tab === 'xplayShop') {
+            loadXplayBalance();
+        }
+    }, [tab, loadXplayBalance]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -274,7 +307,17 @@ export const ShopScreen = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        <Text style={styles.balanceAmount}>{pointsBalance.toLocaleString()}</Text>
+                                        {tab === 'xplayShop' ? (
+                                            xplayBalanceLoading ? (
+                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
+                                            ) : (
+                                                <Text style={styles.balanceAmount}>
+                                                    {(xplayBalance ?? 0).toLocaleString()}
+                                                </Text>
+                                            )
+                                        ) : (
+                                            <Text style={styles.balanceAmount}>{xrunBalance.toLocaleString()}</Text>
+                                        )}
                                     </View>
                                 </View>
                                 {tab === 'xplayShop' ? (

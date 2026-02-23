@@ -42,13 +42,21 @@ export const getAyetOffers = async (
   }
 };
 
+export const setAyetUserId = (userId: string): void => {
+  if (Platform.OS !== 'android' || !AyetOfferwallModule?.setUserId) return;
+  const id = (userId && userId.trim()) ? String(userId).slice(0, 63) : 'guest';
+  AyetOfferwallModule.setUserId(id);
+};
+
 export const showAyetOfferwall = async (
-  adSlotName: string = AYET_AD_SLOT_NAME
+  adSlotName: string = AYET_AD_SLOT_NAME,
+  options?: { memberId?: string }
 ): Promise<void> => {
   if (Platform.OS !== 'android' || !AyetOfferwallModule?.showOfferwall) {
     console.warn(`${AYET_LOG_PREFIX} showAyetOfferwall skipped (not Android or module unavailable), adSlotName=${adSlotName}`);
     return;
   }
+  if (options?.memberId != null) setAyetUserId(options.memberId);
   await AyetOfferwallModule.showOfferwall(adSlotName);
 };
 

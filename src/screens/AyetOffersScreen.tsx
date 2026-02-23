@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,15 @@ export const AyetOffersScreen: React.FC<AyetOffersScreenProps> = ({ slotName = D
       if (!isAyetOfferwallAvailable()) return;
       openedRef.current = true;
       try {
-        await showAyetOfferwall(slotName);
+        let memberId: string | undefined;
+        try {
+          const userDataStr = await AsyncStorage.getItem('userData');
+          if (userDataStr) {
+            const userData = JSON.parse(userDataStr);
+            if (userData.member != null) memberId = String(userData.member);
+          }
+        } catch (_) {}
+        await showAyetOfferwall(slotName, { memberId });
         goBack();
       } catch (e) {
         const msg = e instanceof Error ? e.message : t('screens.myInfoSettings.offers_error');

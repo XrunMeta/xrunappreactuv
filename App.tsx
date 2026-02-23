@@ -79,6 +79,7 @@ import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
 import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
+import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
@@ -104,6 +105,19 @@ let isDeepLinkProcessing = false;
 const ScreenHost = () => {
   const { currentScreen, navigate } = useAppNavigation();
   const { setSignupFormData } = useAppContext();
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (cancelled || !userDataStr) return;
+        const userData = JSON.parse(userDataStr);
+        if (userData?.member != null) setAyetUserId(String(userData.member));
+      } catch (_) {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
 
