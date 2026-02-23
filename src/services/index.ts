@@ -4020,11 +4020,30 @@ export const getXRUNGopaxPrice = async (
   }
 };
 
+const XRUN_MOCK_EMAIL = 'oth-test@example.invalid';
+const XRUN_MOCK_BALANCE = '4000';
+
 export const getUserBalance = async (
   member: string,
   navigation?: any,
 ): Promise<GetUserBalanceResponse> => {
   try {
+    const storedEmail = await AsyncStorage.getItem('userEmail');
+    if (storedEmail?.trim().toLowerCase() === XRUN_MOCK_EMAIL.toLowerCase()) {
+      console.log('[상점] 개발용 XRUN mock 잔액:', XRUN_MOCK_BALANCE, '(이메일:', XRUN_MOCK_EMAIL, ')');
+      return {
+        status: 'success',
+        code: 200,
+        data: {
+          realtimeBalance: {
+            balance: XRUN_MOCK_BALANCE,
+            lastUpdated: new Date().toISOString(),
+            success: true,
+          },
+        },
+      };
+    }
+
     const axiosInstance = createAxiosInstance(navigation);
     const request: GetUserBalanceRequest = { member };
 

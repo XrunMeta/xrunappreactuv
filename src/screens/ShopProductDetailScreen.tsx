@@ -13,11 +13,15 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, purchaseGiftWithXplayPoints } from '../services';
+import { getAyetPointsBalance, getUserBalance, purchaseGiftWithXplayPoints } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
 const ethereumThumb = require('../../assets/images/ethereum_thumb.png');
+
+const EXCHANGE_MIN_XPLAY = 30000;
+const EXCHANGE_ETH_RATE = 3070000;
+const EXCHANGE_CRYPTO_FEE = 2000;
 
 interface ProductDetailData {
     id: string;
@@ -29,12 +33,12 @@ interface ProductDetailData {
     isXrun?: boolean;
 }
 
-const sampleProduct: ProductDetailData = {
-    id: '1',
-    brand: '스타벅스',
-    title: '스타벅스 아메리카노 Tall 2 + 카스텔라 2 EA',
-    price: 2000,
-    image: require('../../assets/sample_starbugs.png'),
+const defaultProductFallback: ProductDetailData = {
+    id: '',
+    brand: '',
+    title: '',
+    price: 0,
+    image: require('../../assets/sample_cu.png'), 
     isXrun: false,
 };
 
@@ -51,44 +55,50 @@ export const ShopProductDetailScreen = () => {
         : Math.max(navBarHeight, insets.bottom);
 
     const product: ProductDetailData = selectedShopItem ? {
-        id: selectedShopItem.id || '1',
-        brand: (selectedShopItem as any).brand || '스타벅스',
+        id: selectedShopItem.id || '',
+        brand: (selectedShopItem as any).brand ?? '',
         title: selectedShopItem.title || '',
         description: (selectedShopItem as any).description,
-        price: parseInt(selectedShopItem.priceLabel?.replace(/,/g, '') || '0'),
-        image: selectedShopItem.image || sampleProduct.image,
+        price: parseInt(selectedShopItem.priceLabel?.replace(/,/g, '') || '0', 10),
+        image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
-    } : sampleProduct;
+    } : defaultProductFallback;
 
     const isExchangeProduct = product.brand === 'Ethereum' || product.title.includes('교환권');
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
 
     const [member, setMember] = useState<string | null>(null);
+
     const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
     const [xplayPurchaseLoading, setXplayPurchaseLoading] = useState(false);
     const [xplayPaymentSuccessVisible, setXplayPaymentSuccessVisible] = useState(false);
 
+    const [xrunBalanceState, setXrunBalanceState] = useState<number | null>(null);
+    const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const userDataStr = await AsyncStorage.getItem('userData');
+                if (cancelled || !userDataStr) return;
+                const userData = JSON.parse(userDataStr);
+                const m = userData?.member;
+                if (m != null && !cancelled) setMember(String(m));
+            } catch {
+                if (!cancelled) setMember(null);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, []);
+
     const loadXplayBalance = useCallback(async () => {
-        if (!isXplayShop) return;
+        if (!member) return;
         setXplayBalanceLoading(true);
         try {
-            const userDataStr = await AsyncStorage.getItem('userData');
-            if (!userDataStr) {
-                setMember(null);
-                setXplayBalanceState(null);
-                return;
-            }
-            const userData = JSON.parse(userDataStr);
-            const m = userData?.member;
-            if (m == null) {
-                setMember(null);
-                setXplayBalanceState(null);
-                return;
-            }
-            setMember(m);
-            const res = await getAyetPointsBalance(m, undefined);
+            const res = await getAyetPointsBalance(member, undefined);
             const balance = res?.total_ayet_points ?? null;
             setXplayBalanceState(balance != null ? Number(balance) : null);
         } catch (e) {
@@ -97,11 +107,34 @@ export const ShopProductDetailScreen = () => {
         } finally {
             setXplayBalanceLoading(false);
         }
-    }, [isXplayShop]);
+    }, [member]);
 
     useEffect(() => {
-        if (isXplayShop) loadXplayBalance();
-    }, [isXplayShop, loadXplayBalance]);
+        if ((isXplayShop || isExchangeProduct) && member) loadXplayBalance();
+    }, [isXplayShop, isExchangeProduct, member, loadXplayBalance]);
+
+    const loadXrunBalance = useCallback(async () => {
+        if (!member) return;
+        setXrunBalanceLoading(true);
+        try {
+            const res = await getUserBalance(member, undefined);
+            if (res?.status === 'success' && res?.data?.realtimeBalance) {
+                const balance = parseFloat(res.data.realtimeBalance.balance);
+                setXrunBalanceState(Number.isFinite(balance) ? balance : 0);
+            } else {
+                setXrunBalanceState(0);
+            }
+        } catch (e) {
+            console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', e);
+            setXrunBalanceState(0);
+        } finally {
+            setXrunBalanceLoading(false);
+        }
+    }, [member]);
+
+    useEffect(() => {
+        if (!isXplayShop && member) loadXrunBalance();
+    }, [isXplayShop, member, loadXrunBalance]);
 
     const handleXplayPurchase = useCallback(async () => {
         if (!member || xplayPurchaseLoading) return;
@@ -140,18 +173,15 @@ export const ShopProductDetailScreen = () => {
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
-    const [xplayBalance] = useState<number>(50000); 
-    const minAmount = 30000;
-    const ethereumRate = 3070000; 
-    const cryptoFee = 2000; 
+    const exchangeXplayBalance = xplayBalanceState ?? 0;
     const withdrawalFee = 0;
 
-    const xplayToUse = xplayAmount ? parseInt(xplayAmount.replace(/,/g, '')) : 0;
-    const totalXplay = xplayToUse + cryptoFee + withdrawalFee;
-    const ethereumAmount = xplayToUse > 0 ? (xplayToUse / ethereumRate).toFixed(6) : '0';
+    const xplayToUse = xplayAmount ? parseInt(xplayAmount.replace(/,/g, ''), 10) : 0;
+    const totalXplay = xplayToUse + EXCHANGE_CRYPTO_FEE + withdrawalFee;
+    const ethereumAmount = xplayToUse > 0 ? (xplayToUse / EXCHANGE_ETH_RATE).toFixed(6) : '0';
 
     const handleMaxAmount = () => {
-        setXplayAmount(xplayBalance.toLocaleString());
+        setXplayAmount(exchangeXplayBalance.toLocaleString());
     };
 
     const handleQrScan = () => {
@@ -165,8 +195,8 @@ export const ShopProductDetailScreen = () => {
             showAlert('알림', '입금주소를 입력해주세요.', [{ text: '확인' }]);
             return;
         }
-        if (!xplayAmount || xplayToUse < minAmount) {
-            showAlert('알림', `최소 ${minAmount.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
+        if (!xplayAmount || xplayToUse < EXCHANGE_MIN_XPLAY) {
+            showAlert('알림', `최소 ${EXCHANGE_MIN_XPLAY.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
             return;
         }
         showAlert('교환', 'Ethereum으로 교환하시겠습니까?', [
@@ -190,7 +220,7 @@ export const ShopProductDetailScreen = () => {
                         {}
                         <View style={styles.infoBanner}>
                             <Text style={styles.infoBannerText}>
-                                암호화폐 출금은 전송되는 데 몇 분 정도 소요됩니다. 출금의 최소 금액은 30,000 Xplay 입니다.
+                                암호화폐 출금은 전송되는 데 몇 분 정도 소요됩니다. 출금의 최소 금액은 {EXCHANGE_MIN_XPLAY.toLocaleString()} Xplay 입니다.
                             </Text>
                         </View>
 
@@ -215,6 +245,14 @@ export const ShopProductDetailScreen = () => {
                         {}
                         <View style={styles.inputSection}>
                             <Text style={styles.inputLabel}>Xplay</Text>
+                            {xplayBalanceLoading ? (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                    <ActivityIndicator size="small" color="#1E3A5F" />
+                                    <Text style={styles.minAmountHint}>잔액 조회 중</Text>
+                                </View>
+                            ) : (
+                                <Text style={styles.minAmountHint}>보유: {exchangeXplayBalance.toLocaleString()} Xplay</Text>
+                            )}
                             <View style={styles.inputContainer}>
                                 <TextInput
                                     style={styles.input}
@@ -230,18 +268,18 @@ export const ShopProductDetailScreen = () => {
                                     <Text style={styles.maxButtonText}>최대 금액</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.minAmountHint}>최소 30,000 Xplay</Text>
+                            <Text style={styles.minAmountHint}>최소 {EXCHANGE_MIN_XPLAY.toLocaleString()} Xplay</Text>
                         </View>
 
                         {}
                         <View style={styles.summarySection}>
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>Ethereum 환율</Text>
-                                <Text style={styles.summaryValue}>{ethereumRate.toLocaleString()}</Text>
+                                <Text style={styles.summaryValue}>{EXCHANGE_ETH_RATE.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>암호화폐 수수료</Text>
-                                <Text style={styles.summaryValue}>{cryptoFee.toLocaleString()}</Text>
+                                <Text style={styles.summaryValue}>{EXCHANGE_CRYPTO_FEE.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>출금 수수료</Text>
@@ -273,7 +311,7 @@ export const ShopProductDetailScreen = () => {
         );
     }
 
-    const [xrunBalance] = useState<number>(20000);
+    const xrunBalance = xrunBalanceState ?? 0;
     const remainingBalance = xrunBalance - product.price;
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState<boolean>(false);
 
@@ -374,7 +412,11 @@ export const ShopProductDetailScreen = () => {
                                 </View>
                                 <View style={styles.paymentRow}>
                                     <Text style={styles.paymentLabel}>내보유 XRUN</Text>
-                                    <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
+                                    {xrunBalanceLoading ? (
+                                        <ActivityIndicator size="small" color="#1E3A5F" />
+                                    ) : (
+                                        <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
+                                    )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
                                     <Text style={styles.paymentLabel}>구매 후 잔여 XRUN</Text>
