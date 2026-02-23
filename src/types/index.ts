@@ -26,6 +26,8 @@ export type ShopItem = {
   detailFee?: string;
   detailTotal?: string;
   image: any;
+
+  shopTab?: 'xplayShop';
 };
 
 export { };
@@ -1073,6 +1075,19 @@ export interface MyGiftishowCouponItem {
 export interface GetMyGiftishowCouponsResponse {
   status: 'success' | 'error';
   data?: MyGiftishowCouponItem[];
+  message?: string;
+}
+
+export interface PurchaseGiftWithXplayPointsRequest {
+  member: string;
+  goods_code: string;
+  phone_no?: string;
+}
+
+export interface PurchaseGiftWithXplayPointsResponse {
+  status: 'success' | 'error';
+  code?: number;
+  data?: { tr_id?: string; message?: string };
   message?: string;
 }
 

@@ -30,6 +30,8 @@ interface ProductData {
     description?: string;
     price: number;
     image: v_07a341;
+
+    isXplayShop?: boolean;
 }
 
 const v_426e67 = [
@@ -202,6 +204,7 @@ export const v_10886b = () => {
             brand: v_01bee9.brand,
             description: v_01bee9.description,
             isXrun: v_01bee9.brand === 'XRUN',
+            shopTab: v_01bee9.isXplayShop ? ('xplayShop' as const) : undefined,
         };
         v_d0fbad(v_983c87 as any);
         v_9b57fc(v_ce4741.shopProductDetail);

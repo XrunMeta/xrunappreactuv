@@ -158,6 +158,8 @@ import {
   v_ad5024,
   v_0f638a,
   v_a649c5,
+  v_0404ef,
+  v_4517f1,
   v_c27ee5,
   v_8321b5,
   v_97dbaa,
@@ -4340,6 +4342,31 @@ export const v_060fa0 = async (
       console.error('[기프티쇼] 상세:', v_5e9bfe.response?.status, v_5e9bfe.response?.data);
     }
     throw v_5e9bfe;
+  }
+};
+
+export const v_44edcc = async (
+  params: v_0404ef,
+  v_c65f5d,
+): Promise<v_4517f1> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post<v_4517f1>(
+      '/purchaseGiftWithXplayPoints',
+      v_24baff,
+    );
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[기프티쇼] Xplay 구매 오류:', v_5e9bfe);
+    if (v_5e9bfe instanceof v_3333d3) {
+      const v_9390e8 = v_5e9bfe.response?.data as any;
+      return {
+        status: 'error',
+        code: v_5e9bfe.response?.status,
+        message: v_9390e8?.message || v_5e9bfe.message,
+      };
+    }
+    return { status: 'error', message: (v_5e9bfe as Error).message };
   }
 };
 

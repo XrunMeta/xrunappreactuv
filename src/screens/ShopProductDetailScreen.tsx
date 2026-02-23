@@ -1,5 +1,6 @@
-import v_a3453e, { v_5ab095 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413 } from 'rcmrninabrnb';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996 } from 'rcmrninabrnb';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_556baf, v_570c34 } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -12,6 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_877de8, v_44edcc } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -59,6 +61,82 @@ export const v_a59951 = () => {
     } : v_1651a8;
 
     const v_b3ea98 = v_01bee9.brand === 'Ethereum' || v_01bee9.title.includes('교환권');
+
+    const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
+
+    const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
+    const [v_b7c830, v_179642] = v_5ab095<number | null>(null);
+    const [v_837630, v_2f87ed] = v_5ab095(false);
+    const [v_18a900, v_0409f2] = v_5ab095(false);
+    const [v_809e5c, v_453192] = v_5ab095(false);
+
+    const v_c1e7a4 = v_de06a3(async () => {
+        if (!v_5db874) return;
+        v_2f87ed(true);
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) {
+                v_06fdbc(null);
+                v_179642(null);
+                return;
+            }
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_35f85c = v_ef7306?.member;
+            if (v_35f85c == null) {
+                v_06fdbc(null);
+                v_179642(null);
+                return;
+            }
+            v_06fdbc(v_35f85c);
+            const v_8f00b9 = await v_877de8(v_35f85c, undefined);
+            const v_c88e9b = v_8f00b9?.total_ayet_points ?? null;
+            v_179642(v_c88e9b != null ? Number(v_c88e9b) : null);
+        } catch (v_9e86fd) {
+            console.warn('[ShopProductDetail] Xplay 잔액 조회 실패:', v_9e86fd);
+            v_179642(null);
+        } finally {
+            v_2f87ed(false);
+        }
+    }, [v_5db874]);
+
+    v_c4deb2(() => {
+        if (v_5db874) v_c1e7a4();
+    }, [v_5db874, v_c1e7a4]);
+
+    const v_b000c1 = v_de06a3(async () => {
+        if (!v_660822 || v_18a900) return;
+        const v_c25eec = v_01bee9.price;
+        const v_c88e9b = v_b7c830 ?? 0;
+        if (v_c88e9b < v_c25eec) {
+            v_889fad('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
+            return;
+        }
+        v_889fad('구매', `${v_01bee9.title}을(를) Xplay 포인트로 구매하시겠습니까?`, [
+            { text: '취소' },
+            {
+                text: '구매',
+                onPress: async () => {
+                    v_0409f2(true);
+                    try {
+                        const v_8f00b9 = await v_44edcc(
+                            { member: v_660822, goods_code: v_01bee9.id },
+                            undefined,
+                        );
+                        if (v_8f00b9?.status === 'success') {
+                            v_453192(true);
+                            v_c1e7a4(); 
+                        } else {
+                            v_889fad('구매 실패', v_8f00b9?.message ?? '구매에 실패했습니다.', [{ text: '확인' }]);
+                        }
+                    } catch (v_9e86fd) {
+                        v_889fad('오류', (v_9e86fd as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
+                    } finally {
+                        v_0409f2(false);
+                    }
+                },
+            },
+        ]);
+    }, [v_660822, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
@@ -205,9 +283,7 @@ export const v_a59951 = () => {
             {
                 text: '구매',
                 onPress: () => {
-
                     console.log('구매:', v_01bee9.id);
-
                     v_9375ae(true);
                 }
             },
@@ -216,11 +292,16 @@ export const v_a59951 = () => {
 
     const v_184ff4 = () => {
         v_9375ae(false);
+    };
 
+    const v_48c801 = () => {
+        v_453192(false);
+        v_9b57fc(v_ce4741.shopMyItems);
     };
 
     const v_fa78fb = v_01bee9.isXrun || v_01bee9.brand === 'XRUN';
     const v_1efa5f = v_fa78fb ? v_33c40c : v_10664a;
+    const v_513fb9 = (v_b7c830 ?? 0) - v_01bee9.price;
 
     return (
         <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
@@ -258,21 +339,49 @@ export const v_a59951 = () => {
                             <Text style={v_d81136.sectionTitle}>결제 정보</Text>
                         </View>
                         <View style={v_d81136.divider} />
-                        <View style={v_d81136.paymentRow}>
-                            <Text style={v_d81136.paymentLabel}>결제금액</Text>
-                            <View style={v_d81136.priceContainer}>
-                                <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
-                                <Text style={v_d81136.paymentValue}>{v_01bee9.price.toLocaleString()} XRUN</Text>
-                            </View>
-                        </View>
-                        <View style={v_d81136.paymentRow}>
-                            <Text style={v_d81136.paymentLabel}>내보유 XRUN</Text>
-                            <Text style={v_d81136.paymentBalance}>{v_1d54f1.toLocaleString()} XRUN</Text>
-                        </View>
-                        <View style={v_d81136.paymentRowLast}>
-                            <Text style={v_d81136.paymentLabel}>구매 후 잔여 XRUN</Text>
-                            <Text style={v_d81136.paymentRemaining}>{v_512b94.toLocaleString()} XRUN</Text>
-                        </View>
+                        {v_5db874 ? (
+                            <>
+                                <View style={v_d81136.paymentRow}>
+                                    <Text style={v_d81136.paymentLabel}>결제금액</Text>
+                                    <View style={v_d81136.priceContainer}>
+                                        <Image source={v_10664a} style={v_d81136.coinIcon} resizeMode="contain" />
+                                        <Text style={v_d81136.paymentValue}>{v_01bee9.price.toLocaleString()} Xplay</Text>
+                                    </View>
+                                </View>
+                                <View style={v_d81136.paymentRow}>
+                                    <Text style={v_d81136.paymentLabel}>내 Xplay 잔액</Text>
+                                    {v_837630 ? (
+                                        <ActivityIndicator size="small" color="#1E3A5F" />
+                                    ) : (
+                                        <Text style={v_d81136.paymentBalance}>
+                                            {(v_b7c830 ?? 0).toLocaleString()} Xplay
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={v_d81136.paymentRowLast}>
+                                    <Text style={v_d81136.paymentLabel}>구매 후 잔여 Xplay</Text>
+                                    <Text style={v_d81136.paymentRemaining}>{v_513fb9.toLocaleString()} Xplay</Text>
+                                </View>
+                            </>
+                        ) : (
+                            <>
+                                <View style={v_d81136.paymentRow}>
+                                    <Text style={v_d81136.paymentLabel}>결제금액</Text>
+                                    <View style={v_d81136.priceContainer}>
+                                        <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
+                                        <Text style={v_d81136.paymentValue}>{v_01bee9.price.toLocaleString()} XRUN</Text>
+                                    </View>
+                                </View>
+                                <View style={v_d81136.paymentRow}>
+                                    <Text style={v_d81136.paymentLabel}>내보유 XRUN</Text>
+                                    <Text style={v_d81136.paymentBalance}>{v_1d54f1.toLocaleString()} XRUN</Text>
+                                </View>
+                                <View style={v_d81136.paymentRowLast}>
+                                    <Text style={v_d81136.paymentLabel}>구매 후 잔여 XRUN</Text>
+                                    <Text style={v_d81136.paymentRemaining}>{v_512b94.toLocaleString()} XRUN</Text>
+                                </View>
+                            </>
+                        )}
                     </View>
 
                     {}
@@ -315,21 +424,46 @@ export const v_a59951 = () => {
 
             {}
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
-                <TouchableOpacity
-                    style={v_d81136.purchaseButton}
-                    onPress={v_dfaad1}
-                    activeOpacity={0.8}
-                >
-                    <LinearGradient
-                        colors={['#1E3A5F', '#2D4A6F']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={v_d81136.purchaseButtonGradient}
+                {v_5db874 ? (
+                    <TouchableOpacity
+                        style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
+                        onPress={v_b000c1}
+                        disabled={v_18a900 || v_837630 || v_660822 == null}
+                        activeOpacity={0.8}
                     >
-                        <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                        <Text style={v_d81136.purchaseButtonText}>구매하기</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={v_d81136.purchaseButtonGradient}
+                        >
+                            {v_18a900 ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} />
+                            ) : (
+                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
+                            )}
+                            <Text style={v_d81136.purchaseButtonText}>
+                                {v_18a900 ? '처리 중...' : 'Xplay 포인트로 구매'}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={v_d81136.purchaseButton}
+                        onPress={v_dfaad1}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={v_d81136.purchaseButtonGradient}
+                        >
+                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
+                            <Text style={v_d81136.purchaseButtonText}>구매하기</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                )}
             </View>
 
             {}
@@ -341,25 +475,32 @@ export const v_a59951 = () => {
             >
                 <View style={v_d81136.modalOverlay}>
                     <View style={v_d81136.paymentSuccessModal}>
-                        {}
                         <View style={v_d81136.modalLogoContainer}>
-                            <Image
-                                source={v_33c40c}
-                                style={v_d81136.modalLogo}
-                                resizeMode="contain"
-                            />
+                            <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
-
-                        {}
                         <Text style={v_d81136.paymentSuccessMessage}>결제가 완료되었습니다</Text>
-
-                        {}
-                        <TouchableOpacity
-                            style={v_d81136.paymentSuccessButton}
-                            onPress={v_184ff4}
-                            activeOpacity={0.8}
-                        >
+                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>확인</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={v_809e5c}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={v_48c801}
+            >
+                <View style={v_d81136.modalOverlay}>
+                    <View style={v_d81136.paymentSuccessModal}>
+                        <View style={v_d81136.modalLogoContainer}>
+                            <Image source={v_10664a} style={v_d81136.modalLogo} resizeMode="contain" />
+                        </View>
+                        <Text style={v_d81136.paymentSuccessMessage}>Xplay 포인트 결제가 완료되었습니다</Text>
+                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_48c801} activeOpacity={0.8}>
+                            <Text style={v_d81136.paymentSuccessButtonText}>내 기프티콘 보기</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -699,6 +840,9 @@ const v_d81136 = v_472849.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 6,
+    },
+    purchaseButtonDisabled: {
+        opacity: 0.7,
     },
     purchaseButtonGradient: {
         flexDirection: 'row',
