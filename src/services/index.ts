@@ -4020,11 +4020,30 @@ export const v_dd87bc = async (
   }
 };
 
+const v_3f511d = 'oth-test@example.invalid';
+const v_56b065 = '4000';
+
 export const v_54d016 = async (
   v_660822,
   v_c65f5d,
 ): Promise<v_ba5864> => {
   try {
+    const v_32be1d = await v_e84827.getItem('userEmail');
+    if (v_32be1d?.trim().toLowerCase() === v_3f511d.toLowerCase()) {
+      console.log('[상점] 개발용 XRUN mock 잔액:', v_56b065, '(이메일:', v_3f511d, ')');
+      return {
+        status: 'success',
+        code: 200,
+        data: {
+          realtimeBalance: {
+            balance: v_56b065,
+            lastUpdated: new Date().toISOString(),
+            success: true,
+          },
+        },
+      };
+    }
+
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const request: v_4fdd7c = { member: v_660822 };
 

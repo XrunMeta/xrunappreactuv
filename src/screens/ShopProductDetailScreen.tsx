@@ -13,11 +13,15 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_44edcc } from '../services';
+import { v_877de8, v_54d016, v_44edcc } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
 const v_74bda9 = require('../../assets/images/ethereum_thumb.png');
+
+const v_4e7e53 = 30000;
+const v_1d021e = 3070000;
+const v_47de40 = 2000;
 
 interface ProductDetailData {
     id: string;
@@ -29,12 +33,12 @@ interface ProductDetailData {
     isXrun?: boolean;
 }
 
-const v_1651a8 = {
-    id: '1',
-    brand: '스타벅스',
-    title: '스타벅스 아메리카노 Tall 2 + 카스텔라 2 EA',
-    price: 2000,
-    image: require('../../assets/sample_starbugs.png'),
+const v_273f15 = {
+    id: '',
+    brand: '',
+    title: '',
+    price: 0,
+    image: require('../../assets/sample_cu.png'), 
     isXrun: false,
 };
 
@@ -51,44 +55,50 @@ export const v_a59951 = () => {
         : Math.max(v_f9771e, v_033e14.bottom);
 
     const v_01bee9 = v_dfe883 ? {
-        id: v_dfe883.id || '1',
-        brand: (v_dfe883 as any).brand || '스타벅스',
+        id: v_dfe883.id || '',
+        brand: (v_dfe883 as any).brand ?? '',
         title: v_dfe883.title || '',
         description: (v_dfe883 as any).description,
-        price: parseInt(v_dfe883.priceLabel?.replace(/,/g, '') || '0'),
-        image: v_dfe883.image || v_1651a8.image,
+        price: parseInt(v_dfe883.priceLabel?.replace(/,/g, '') || '0', 10),
+        image: v_dfe883.image || v_273f15.image,
         isXrun: (v_dfe883 as any).isXrun || false,
-    } : v_1651a8;
+    } : v_273f15;
 
     const v_b3ea98 = v_01bee9.brand === 'Ethereum' || v_01bee9.title.includes('교환권');
 
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
 
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
+
     const [v_b7c830, v_179642] = v_5ab095<number | null>(null);
     const [v_837630, v_2f87ed] = v_5ab095(false);
     const [v_18a900, v_0409f2] = v_5ab095(false);
     const [v_809e5c, v_453192] = v_5ab095(false);
 
+    const [v_a1c497, v_0ce8dd] = v_5ab095<number | null>(null);
+    const [v_19340b, v_14129c] = v_5ab095(false);
+
+    v_c4deb2(() => {
+        let v_2008a4 = false;
+        (async () => {
+            try {
+                const v_f24fd5 = await v_e84827.getItem('userData');
+                if (v_2008a4 || !v_f24fd5) return;
+                const v_ef7306 = JSON.parse(v_f24fd5);
+                const v_35f85c = v_ef7306?.member;
+                if (v_35f85c != null && !v_2008a4) v_06fdbc(String(v_35f85c));
+            } catch {
+                if (!v_2008a4) v_06fdbc(null);
+            }
+        })();
+        return () => { v_2008a4 = true; };
+    }, []);
+
     const v_c1e7a4 = v_de06a3(async () => {
-        if (!v_5db874) return;
+        if (!v_660822) return;
         v_2f87ed(true);
         try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (!v_f24fd5) {
-                v_06fdbc(null);
-                v_179642(null);
-                return;
-            }
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            const v_35f85c = v_ef7306?.member;
-            if (v_35f85c == null) {
-                v_06fdbc(null);
-                v_179642(null);
-                return;
-            }
-            v_06fdbc(v_35f85c);
-            const v_8f00b9 = await v_877de8(v_35f85c, undefined);
+            const v_8f00b9 = await v_877de8(v_660822, undefined);
             const v_c88e9b = v_8f00b9?.total_ayet_points ?? null;
             v_179642(v_c88e9b != null ? Number(v_c88e9b) : null);
         } catch (v_9e86fd) {
@@ -97,11 +107,34 @@ export const v_a59951 = () => {
         } finally {
             v_2f87ed(false);
         }
-    }, [v_5db874]);
+    }, [v_660822]);
 
     v_c4deb2(() => {
-        if (v_5db874) v_c1e7a4();
-    }, [v_5db874, v_c1e7a4]);
+        if ((v_5db874 || v_b3ea98) && v_660822) v_c1e7a4();
+    }, [v_5db874, v_b3ea98, v_660822, v_c1e7a4]);
+
+    const v_abb08d = v_de06a3(async () => {
+        if (!v_660822) return;
+        v_14129c(true);
+        try {
+            const v_8f00b9 = await v_54d016(v_660822, undefined);
+            if (v_8f00b9?.status === 'success' && v_8f00b9?.data?.realtimeBalance) {
+                const v_c88e9b = parseFloat(v_8f00b9.data.realtimeBalance.balance);
+                v_0ce8dd(Number.isFinite(v_c88e9b) ? v_c88e9b : 0);
+            } else {
+                v_0ce8dd(0);
+            }
+        } catch (v_9e86fd) {
+            console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', v_9e86fd);
+            v_0ce8dd(0);
+        } finally {
+            v_14129c(false);
+        }
+    }, [v_660822]);
+
+    v_c4deb2(() => {
+        if (!v_5db874 && v_660822) v_abb08d();
+    }, [v_5db874, v_660822, v_abb08d]);
 
     const v_b000c1 = v_de06a3(async () => {
         if (!v_660822 || v_18a900) return;
@@ -140,18 +173,15 @@ export const v_a59951 = () => {
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
-    const [v_cd398d] = v_5ab095<number>(50000); 
-    const v_4aa1fa = 30000;
-    const v_1629bc = 3070000; 
-    const v_88ccb6 = 2000; 
+    const v_87676e = v_b7c830 ?? 0;
     const v_e9e2a3 = 0;
 
-    const v_c4aec5 = v_a0d01e ? parseInt(v_a0d01e.replace(/,/g, '')) : 0;
-    const v_af2c97 = v_c4aec5 + v_88ccb6 + v_e9e2a3;
-    const v_438a3a = v_c4aec5 > 0 ? (v_c4aec5 / v_1629bc).toFixed(6) : '0';
+    const v_c4aec5 = v_a0d01e ? parseInt(v_a0d01e.replace(/,/g, ''), 10) : 0;
+    const v_af2c97 = v_c4aec5 + v_47de40 + v_e9e2a3;
+    const v_438a3a = v_c4aec5 > 0 ? (v_c4aec5 / v_1d021e).toFixed(6) : '0';
 
     const v_8b5670 = () => {
-        v_80ea24(v_cd398d.toLocaleString());
+        v_80ea24(v_87676e.toLocaleString());
     };
 
     const v_817006 = () => {
@@ -165,8 +195,8 @@ export const v_a59951 = () => {
             v_889fad('알림', '입금주소를 입력해주세요.', [{ text: '확인' }]);
             return;
         }
-        if (!v_a0d01e || v_c4aec5 < v_4aa1fa) {
-            v_889fad('알림', `최소 ${v_4aa1fa.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
+        if (!v_a0d01e || v_c4aec5 < v_4e7e53) {
+            v_889fad('알림', `최소 ${v_4e7e53.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
             return;
         }
         v_889fad('교환', 'Ethereum으로 교환하시겠습니까?', [
@@ -190,7 +220,7 @@ export const v_a59951 = () => {
                         {}
                         <View style={v_d81136.infoBanner}>
                             <Text style={v_d81136.infoBannerText}>
-                                암호화폐 출금은 전송되는 데 몇 분 정도 소요됩니다. 출금의 최소 금액은 30,000 Xplay 입니다.
+                                암호화폐 출금은 전송되는 데 몇 분 정도 소요됩니다. 출금의 최소 금액은 {v_4e7e53.toLocaleString()} Xplay 입니다.
                             </Text>
                         </View>
 
@@ -215,6 +245,14 @@ export const v_a59951 = () => {
                         {}
                         <View style={v_d81136.inputSection}>
                             <Text style={v_d81136.inputLabel}>Xplay</Text>
+                            {v_837630 ? (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                    <ActivityIndicator size="small" color="#1E3A5F" />
+                                    <Text style={v_d81136.minAmountHint}>잔액 조회 중</Text>
+                                </View>
+                            ) : (
+                                <Text style={v_d81136.minAmountHint}>보유: {v_87676e.toLocaleString()} Xplay</Text>
+                            )}
                             <View style={v_d81136.inputContainer}>
                                 <TextInput
                                     style={v_d81136.input}
@@ -230,18 +268,18 @@ export const v_a59951 = () => {
                                     <Text style={v_d81136.maxButtonText}>최대 금액</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={v_d81136.minAmountHint}>최소 30,000 Xplay</Text>
+                            <Text style={v_d81136.minAmountHint}>최소 {v_4e7e53.toLocaleString()} Xplay</Text>
                         </View>
 
                         {}
                         <View style={v_d81136.summarySection}>
                             <View style={v_d81136.summaryRow}>
                                 <Text style={v_d81136.summaryLabel}>Ethereum 환율</Text>
-                                <Text style={v_d81136.summaryValue}>{v_1629bc.toLocaleString()}</Text>
+                                <Text style={v_d81136.summaryValue}>{v_1d021e.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRow}>
                                 <Text style={v_d81136.summaryLabel}>암호화폐 수수료</Text>
-                                <Text style={v_d81136.summaryValue}>{v_88ccb6.toLocaleString()}</Text>
+                                <Text style={v_d81136.summaryValue}>{v_47de40.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRow}>
                                 <Text style={v_d81136.summaryLabel}>출금 수수료</Text>
@@ -273,7 +311,7 @@ export const v_a59951 = () => {
         );
     }
 
-    const [v_1d54f1] = v_5ab095<number>(20000);
+    const v_1d54f1 = v_a1c497 ?? 0;
     const v_512b94 = v_1d54f1 - v_01bee9.price;
     const [v_80e2be, v_9375ae] = v_5ab095<boolean>(false);
 
@@ -374,7 +412,11 @@ export const v_a59951 = () => {
                                 </View>
                                 <View style={v_d81136.paymentRow}>
                                     <Text style={v_d81136.paymentLabel}>내보유 XRUN</Text>
-                                    <Text style={v_d81136.paymentBalance}>{v_1d54f1.toLocaleString()} XRUN</Text>
+                                    {v_19340b ? (
+                                        <ActivityIndicator size="small" color="#1E3A5F" />
+                                    ) : (
+                                        <Text style={v_d81136.paymentBalance}>{v_1d54f1.toLocaleString()} XRUN</Text>
+                                    )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
                                     <Text style={v_d81136.paymentLabel}>구매 후 잔여 XRUN</Text>
