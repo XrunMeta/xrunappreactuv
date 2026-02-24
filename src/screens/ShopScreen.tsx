@@ -83,6 +83,7 @@ function giftishowToProductData(item: GiftishowProductItem): ProductData {
         title: item.name ?? '-',
         price: typeof item.price === 'number' ? item.price : 0,
         image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
+        isXplayShop: true,
     };
 }
 
@@ -131,6 +132,7 @@ export const ShopScreen = () => {
             const res = await getProductList({ start: 1, size: 50 });
             const list = Array.isArray(res.list) ? res.list : [];
             setXplayProductList(list);
+            console.log('[Xplay Shop] 상품 목록 조회:', list.length, '건', list.map((item) => ({ id: item.id, name: item.name, price: item.price })));
             if (list.length === 0 && res.resultMsg) setXplayError(res.resultMsg);
         } catch (e) {
             setXplayError(e instanceof Error ? e.message : '기프티콘 목록을 불러오지 못했습니다.');

@@ -4374,9 +4374,18 @@ export const purchaseGiftWithXplayPoints = async (
       '/purchaseGiftWithXplayPoints',
       params,
     );
-    return response.data;
+    const data = response.data;
+    if (data?.status === 'success') {
+      console.log('[기프티쇼] Xplay 구매 성공:', { member: params.member, goods_code: params.goods_code, data: data?.data });
+    } else {
+      console.warn('[기프티쇼] Xplay 구매 실패(응답):', data?.message ?? data);
+    }
+    return data;
   } catch (error) {
-    console.error('[기프티쇼] Xplay 구매 오류:', error);
+    const msg = error instanceof AxiosError
+      ? (error.response?.data as any)?.message || error.message
+      : (error as Error).message;
+    console.error('[기프티쇼] Xplay 구매 오류:', msg, error);
     if (error instanceof AxiosError) {
       const data = error.response?.data as any;
       return {

@@ -7,6 +7,8 @@ import { getEnv } from '../utils/env';
 const TIMEOUT_MS = 30000;
 
 const API_CODE_GOODS = '0101';
+
+const API_CODE_GOODS_DETAIL = '0111';
 const GOODS_API_BASE_URL = 'https://bizapi.giftishow.com';
 const GOODS_API_PATH = '/bizApi/goods';
 
@@ -130,7 +132,7 @@ interface GoodsListApiResponse {
   result?: GoodsListApiResult;
 }
 
-function getGoodsApiParams(start: number, size: number): URLSearchParams {
+function getGiftishowAuthParams(apiCode: string): URLSearchParams {
   const env = getEnv();
   const authCode = env.GIFTISHOW_BIZ_AUTH_KEY || '';
   const encryptionKey = (env.GIFTISHOW_BIZ_ENCRYPTION_KEY || '').trim();
@@ -141,10 +143,15 @@ function getGoodsApiParams(start: number, size: number): URLSearchParams {
   const devYn = (env.GIFTISHOW_BIZ_DEV_FLAG || 'Y') === 'Y' ? 'Y' : 'N';
 
   const params = new URLSearchParams();
-  params.set('api_code', API_CODE_GOODS);
+  params.set('api_code', apiCode);
   params.set('custom_auth_code', authCode);
   params.set('custom_auth_token', customAuthToken);
   params.set('dev_yn', devYn);
+  return params;
+}
+
+function getGoodsApiParams(start: number, size: number): URLSearchParams {
+  const params = getGiftishowAuthParams(API_CODE_GOODS);
   params.set('start', String(start));
   params.set('size', String(size));
   return params;
@@ -208,6 +215,82 @@ export async function getProductList(params?: { start?: number; size?: number })
       console.error('[기프티쇼비즈] 상품 리스트 조회 오류:', error.response?.status, error.response?.data);
     } else {
       console.error('[기프티쇼비즈] 상품 리스트 조회 오류:', error);
+    }
+    throw error;
+  }
+}
+
+export interface GiftishowProductDetailItem {
+  goodsCode?: string;
+  goodsNo?: number;
+  goodsName?: string;
+  brandCode?: string;
+  brandName?: string;
+  content?: string;
+  contentAddDesc?: string;
+  goodsImgS?: string;
+  goodsImgB?: string;
+  goodsDescImgWeb?: string;
+  mmsGoodsImg?: string;
+  realPrice?: number | string;
+  salePrice?: number | string;
+  discountPrice?: number | string;
+  categoryName1?: string;
+  goodsStateCd?: string;
+  limitDay?: string | number;
+  [key: string]: unknown;
+}
+
+export interface GiftishowProductDetailResponse {
+  detail?: GiftishowProductDetailItem;
+  resultCode?: string;
+  resultMsg?: string;
+}
+
+interface GoodsDetailApiResponse {
+  code?: string;
+  message?: string | null;
+  result?: { goodsDetail?: GiftishowProductDetailItem };
+}
+
+export async function getProductDetail(goodsCode: string): Promise<GiftishowProductDetailResponse> {
+  const encoded = encodeURIComponent(goodsCode);
+  const url = `${GOODS_API_BASE_URL}${GOODS_API_PATH}/${encoded}`;
+
+  try {
+    logDevRequest('POST', url);
+    const response = await axios.post<GoodsDetailApiResponse>(url, getGiftishowAuthParams(API_CODE_GOODS_DETAIL), {
+      timeout: TIMEOUT_MS,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        Accept: 'application/json',
+      },
+    });
+    logDevRequest('POST', url, response.status);
+
+    const data = response.data;
+    const code = data?.code;
+    if (code !== '0000' && code !== '000') {
+      const errMsg = getGiftishowErrorMessage(code, data?.message ?? undefined);
+      console.warn('[기프티쇼비즈] 상품 상세 응답 코드:', code, data?.message);
+      return { resultCode: code ?? undefined, resultMsg: errMsg };
+    }
+
+    const detail = data?.result?.goodsDetail;
+    if (!detail) {
+      return { resultCode: code, resultMsg: '상품 상세 없음' };
+    }
+    return { detail, resultCode: code, resultMsg: data?.message ?? undefined };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      logDevRequest('POST', url, error.response?.status, error.response?.data);
+      if (error.response?.status === 404) {
+        warn404Once('상품 상세');
+        return { resultCode: '404', resultMsg: '상품을 찾을 수 없습니다.' };
+      }
+      console.error('[기프티쇼비즈] 상품 상세 조회 오류:', error.response?.status, error.response?.data);
+    } else {
+      console.error('[기프티쇼비즈] 상품 상세 조회 오류:', error);
     }
     throw error;
   }

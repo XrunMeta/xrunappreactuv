@@ -14,6 +14,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { getAyetPointsBalance, getUserBalance, purchaseGiftWithXplayPoints } from '../services';
+import { getProductDetail } from '../services/giftishowBiz';
+import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -78,6 +80,9 @@ export const ShopProductDetailScreen = () => {
     const [xrunBalanceState, setXrunBalanceState] = useState<number | null>(null);
     const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
 
+    const [productDetail, setProductDetail] = useState<GiftishowProductDetailItem | null>(null);
+    const [productDetailLoading, setProductDetailLoading] = useState(false);
+
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -136,9 +141,31 @@ export const ShopProductDetailScreen = () => {
         if (!isXplayShop && member) loadXrunBalance();
     }, [isXplayShop, member, loadXrunBalance]);
 
+    useEffect(() => {
+        if (!isXplayShop || !product.id) return;
+        let cancelled = false;
+        setProductDetailLoading(true);
+        setProductDetail(null);
+        getProductDetail(product.id)
+            .then((res) => {
+                if (!cancelled && res.detail) setProductDetail(res.detail);
+            })
+            .catch(() => {
+                if (!cancelled) setProductDetail(null);
+            })
+            .finally(() => {
+                if (!cancelled) setProductDetailLoading(false);
+            });
+        return () => { cancelled = true; };
+    }, [isXplayShop, product.id]);
+
     const handleXplayPurchase = useCallback(async () => {
         if (!member || xplayPurchaseLoading) return;
-        const needPrice = product.price;
+        const needPrice = (productDetail && (productDetail.realPrice ?? productDetail.salePrice) != null)
+            ? (typeof (productDetail.realPrice ?? productDetail.salePrice) === 'number'
+                ? (productDetail.realPrice ?? productDetail.salePrice) as number
+                : parseInt(String(productDetail.realPrice ?? productDetail.salePrice).replace(/,/g, ''), 10) || product.price)
+            : product.price;
         const balance = xplayBalanceState ?? 0;
         if (balance < needPrice) {
             showAlert('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
@@ -156,12 +183,19 @@ export const ShopProductDetailScreen = () => {
                             undefined,
                         );
                         if (res?.status === 'success') {
+                            console.log('[Xplay 구매] 성공 — 상품:', product.id, product.title);
                             setXplayPaymentSuccessVisible(true);
                             loadXplayBalance(); 
                         } else {
-                            showAlert('구매 실패', res?.message ?? '구매에 실패했습니다.', [{ text: '확인' }]);
+                            const msg = res?.message ?? '구매에 실패했습니다.';
+                            const userMsg = msg.includes('Goods not found') || msg.includes('price not configured')
+                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                : msg;
+                            console.warn('[Xplay 구매] 실패:', msg);
+                            showAlert('구매 실패', userMsg, [{ text: '확인' }]);
                         }
                     } catch (e) {
+                        console.error('[Xplay 구매] 오류:', (e as Error).message);
                         showAlert('오류', (e as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
                     } finally {
                         setXplayPurchaseLoading(false);
@@ -169,7 +203,7 @@ export const ShopProductDetailScreen = () => {
                 },
             },
         ]);
-    }, [member, product.id, product.title, product.price, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
+    }, [member, product.id, product.title, product.price, productDetail, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
@@ -339,7 +373,18 @@ export const ShopProductDetailScreen = () => {
 
     const isXrun = product.isXrun || product.brand === 'XRUN';
     const coinIcon = isXrun ? xrunRoundLogo : xplaySymbol;
-    const xplayRemainingBalance = (xplayBalanceState ?? 0) - product.price;
+
+    const displayImage = (isXplayShop && productDetail?.goodsImgB) || (productDetail?.goodsImgS || productDetail?.mmsGoodsImg)
+        ? { uri: (productDetail?.goodsImgB || productDetail?.goodsImgS || productDetail?.mmsGoodsImg) as string }
+        : product.image;
+    const displayTitle = (isXplayShop && productDetail?.goodsName) ? productDetail.goodsName : product.title;
+    const displayBrand = (isXplayShop && productDetail?.brandName) ? productDetail.brandName : product.brand;
+    const detailPrice = productDetail?.realPrice ?? productDetail?.salePrice;
+    const displayPrice = (isXplayShop && detailPrice != null)
+        ? (typeof detailPrice === 'number' ? detailPrice : parseInt(String(detailPrice).replace(/,/g, ''), 10) || product.price)
+        : product.price;
+    const xplayRemainingBalance = (xplayBalanceState ?? 0) - displayPrice;
+    const hasDetailDescription = isXplayShop && productDetail && (productDetail.content || productDetail.contentAddDesc);
 
     return (
         <SafeView style={styles.container} backgroundColor="#F8FAFC">
@@ -353,10 +398,15 @@ export const ShopProductDetailScreen = () => {
                 <View style={styles.content}>
                     {}
                     <View style={styles.productCard}>
+                        {isXplayShop && productDetailLoading && (
+                            <View style={styles.detailLoadingWrap}>
+                                <ActivityIndicator size="small" color="#1E3A5F" />
+                            </View>
+                        )}
                         <View style={styles.productImageContainer}>
                             <View style={styles.productImageWrapper}>
                                 <Image
-                                    source={product.image}
+                                    source={displayImage}
                                     style={styles.productImage}
                                     resizeMode="contain"
                                 />
@@ -364,9 +414,14 @@ export const ShopProductDetailScreen = () => {
                         </View>
                         <View style={styles.productInfoContainer}>
                             <View style={styles.brandContainer}>
-                                <Text style={styles.brand}>{product.brand}</Text>
+                                <Text style={styles.brand}>{displayBrand}</Text>
                             </View>
-                            <Text style={styles.title}>{product.title}</Text>
+                            <Text style={styles.title}>{displayTitle}</Text>
+                            {hasDetailDescription ? (
+                                <Text style={styles.productDescription}>
+                                    {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
+                                </Text>
+                            ) : null}
                         </View>
                     </View>
 
@@ -383,7 +438,7 @@ export const ShopProductDetailScreen = () => {
                                     <Text style={styles.paymentLabel}>결제금액</Text>
                                     <View style={styles.priceContainer}>
                                         <Image source={xplaySymbol} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{product.price.toLocaleString()} Xplay</Text>
+                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
@@ -731,6 +786,20 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+    productDescription: {
+        marginTop: 12,
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
+        lineHeight: 20,
+        textAlign: 'center',
+    },
+    detailLoadingWrap: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        zIndex: 1,
     },
     paymentCard: {
         backgroundColor: '#FFFFFF',
