@@ -39,6 +39,9 @@ export const v_1184c4 = () => {
         ? v_033e14.bottom
         : Math.max(v_f9771e, v_033e14.bottom);
 
+    const v_467ee6 = (v_dfe883 as any)?.couponImgUrl;
+    const v_e47051 = typeof v_467ee6 === 'string' && v_467ee6.trim().length > 0;
+
     const v_c9c6be = v_dfe883 ? {
         id: v_dfe883.id || '1',
         brand: (v_dfe883 as any).brand || '스타벅스',
@@ -61,76 +64,53 @@ export const v_1184c4 = () => {
             />
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
                 <View style={v_d81136.content}>
-                    {}
                     <View style={v_d81136.ticketContainer}>
                         {}
-                        <View style={v_d81136.productImageContainer}>
-                            <Image
-                                source={v_c9c6be.image}
-                                style={v_d81136.productImage}
-                                resizeMode="contain"
-                            />
-                        </View>
-
-                        {}
-                        <View style={v_d81136.productInfo}>
-                            <Text style={v_d81136.brand}>{v_c9c6be.brand}</Text>
-                            <Text style={v_d81136.title}>{v_c9c6be.title}</Text>
-                        </View>
-
-                        {}
                         <View style={v_d81136.barcodeContainer}>
-                            {}
-                            <View style={v_d81136.barcodeImageContainer}>
-                                {}
-                                <View style={v_d81136.barcodePlaceholder}>
-                                    {}
-                                    {(() => {
-                                        const v_2d619f = v_c9c6be.barcodeNumber.replace(/\s/g, '');
-                                        const v_192d5d = [];
-
-                                        for (let v_ebec57 = 0; v_ebec57 < v_2d619f.length; v_ebec57++) {
-                                            const v_5f701e = parseInt(v_2d619f[v_ebec57]);
-
-                                            const v_10d904 = {
-                                                0: [2, 1, 1, 2], 
-                                                1: [2, 1, 2, 1],
-                                                2: [1, 2, 2, 1],
-                                                3: [2, 2, 1, 1],
-                                                4: [1, 1, 2, 2],
-                                                5: [2, 1, 1, 2],
-                                                6: [1, 2, 1, 2],
-                                                7: [2, 2, 1, 1],
-                                                8: [1, 1, 2, 2],
-                                                9: [2, 1, 2, 1],
-                                            };
-
-                                            const v_2b8b40 = v_10d904[v_5f701e] || v_10d904[0];
-                                            v_2b8b40.forEach((v_8e4fb6, v_e86ad8) => {
-                                                v_192d5d.push({
-                                                    width: v_8e4fb6 * 2,
-                                                    isBlack: v_e86ad8 % 2 === 0,
-                                                });
-                                            });
-                                        }
-
-                                        return v_192d5d.map((v_d54210, v_e86ad8) => (
-                                            <View
-                                                key={v_e86ad8}
-                                                style={[
-                                                    v_d81136.barcodeLine,
-                                                    {
-                                                        width: v_d54210.width,
-                                                        height: v_d54210.isBlack ? 90 : 0,
-                                                        backgroundColor: v_d54210.isBlack ? '#000000' : '#FFFFFF',
-                                                    },
-                                                ]}
-                                            />
-                                        ));
-                                    })()}
-                                </View>
+                            <View style={[v_d81136.barcodeImageContainer, v_e47051 && v_d81136.barcodeImageContainerLarge]}>
+                                {v_e47051 ? (
+                                    <Image
+                                        source={{ uri: v_467ee6!.trim() }}
+                                        style={v_d81136.couponImage}
+                                        resizeMode="contain"
+                                    />
+                                ) : (
+                                    <View style={v_d81136.barcodePlaceholder}>
+                                        {v_c9c6be.barcodeNumber ? (
+                                            (() => {
+                                                const v_2d619f = v_c9c6be.barcodeNumber.replace(/\s/g, '');
+                                                const v_192d5d = [];
+                                                const v_10d904 = {
+                                                    0: [2, 1, 1, 2], 1: [2, 1, 2, 1], 2: [1, 2, 2, 1], 3: [2, 2, 1, 1],
+                                                    4: [1, 1, 2, 2], 5: [2, 1, 1, 2], 6: [1, 2, 1, 2], 7: [2, 2, 1, 1],
+                                                    8: [1, 1, 2, 2], 9: [2, 1, 2, 1],
+                                                };
+                                                for (let v_ebec57 = 0; v_ebec57 < v_2d619f.length; v_ebec57++) {
+                                                    const v_5f701e = parseInt(v_2d619f[v_ebec57]);
+                                                    const v_2b8b40 = v_10d904[v_5f701e] ?? v_10d904[0];
+                                                    v_2b8b40.forEach((v_8e4fb6, v_e86ad8) => {
+                                                        v_192d5d.push({ width: v_8e4fb6 * 2, isBlack: v_e86ad8 % 2 === 0 });
+                                                    });
+                                                }
+                                                return v_192d5d.map((v_d54210, v_e86ad8) => (
+                                                    <View
+                                                        key={v_e86ad8}
+                                                        style={[
+                                                            v_d81136.barcodeLine,
+                                                            { width: v_d54210.width, height: v_d54210.isBlack ? 90 : 0, backgroundColor: v_d54210.isBlack ? '#000000' : '#FFFFFF' },
+                                                        ]}
+                                                    />
+                                                ));
+                                            })()
+                                        ) : (
+                                            <Text style={v_d81136.barcodeNoImageText}>바코드 이미지가 없습니다.</Text>
+                                        )}
+                                    </View>
+                                )}
                             </View>
-                            <Text style={v_d81136.barcodeNumber}>{v_c9c6be.barcodeNumber}</Text>
+                            {!v_e47051 && v_c9c6be.barcodeNumber ? (
+                                <Text style={v_d81136.barcodeNumber}>{v_c9c6be.barcodeNumber}</Text>
+                            ) : null}
                         </View>
                     </View>
                 </View>
@@ -173,47 +153,27 @@ const v_d81136 = v_472849.create({
         alignItems: 'center',
         paddingBottom: 20,
     },
-    productImageContainer: {
-        width: '100%',
-        maxWidth: 300,
-        height: 300,
-        marginBottom: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    productImage: {
-        width: '100%',
-        height: '100%',
-    },
-    productInfo: {
-        alignItems: 'center',
-        marginBottom: 32,
-    },
-    brand: {
-        fontSize: 16,
-        fontFamily: 'Roboto-Medium',
-        color: '#111827',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 16,
-        fontFamily: 'Roboto-Bold',
-        color: '#111827',
-        textAlign: 'center',
-        lineHeight: 24,
-    },
     barcodeContainer: {
         width: '100%',
         alignItems: 'center',
     },
     barcodeImageContainer: {
         width: '100%',
-        maxWidth: 280,
-        height: 120,
+        maxWidth: 340,
+        height: 280,
         marginBottom: 12,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#FFFFFF',
+    },
+    barcodeImageContainerLarge: {
+        maxWidth: 340,
+        height: 360,
+    },
+    couponImage: {
+        width: '100%',
+        height: '100%',
+        minHeight: 120,
     },
     barcodePlaceholder: {
         flexDirection: 'row',
@@ -233,6 +193,11 @@ const v_d81136 = v_472849.create({
         fontFamily: 'Roboto-Regular',
         color: '#111827',
         letterSpacing: 2,
+    },
+    barcodeNoImageText: {
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
     },
     buttonContainer: {
         position: 'absolute',

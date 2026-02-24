@@ -29,6 +29,8 @@ interface MyItemData {
     storage?: string;
     txID?: string;
     item?: number;
+
+    couponImgUrl?: string;
 }
 
 function v_52c82e(v_03cc9e): 'available' | 'used' {
@@ -44,9 +46,9 @@ function v_b88ffe(v_479f05): string {
 }
 
 function v_037021(c: v_a649c5): MyItemData {
-  const image: v_07a341 = v_3f4e2e.image_url
-    ? { uri: v_3f4e2e.image_url }
-    : v_818aa7;
+
+  const v_8a33c8 = v_3f4e2e.coupon_img_url || v_3f4e2e.image_url;
+  const image: v_07a341 = v_8a33c8 ? { uri: v_8a33c8 } : v_818aa7;
   return {
     id: v_3f4e2e.tr_id,
     tr_id: v_3f4e2e.tr_id,
@@ -56,6 +58,7 @@ function v_037021(c: v_a649c5): MyItemData {
     status: v_52c82e(v_3f4e2e.pin_status),
     purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
     type: 'giftishow',
+    couponImgUrl: v_3f4e2e.coupon_img_url || undefined,
   };
 }
 
@@ -183,6 +186,7 @@ export const v_8c1d95 = () => {
             brand: v_8c0b26.brand,
             barcodeNumber: '',
             tr_id: v_8c0b26.tr_id ?? v_8c0b26.id,
+            couponImgUrl: v_8c0b26.couponImgUrl,
         };
         v_d0fbad(v_983c87 as any);
         v_9b57fc(v_ce4741.shopMyTicketDetail);

@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_44edcc } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 
@@ -77,11 +77,20 @@ export const v_a59951 = () => {
     const [v_18a900, v_0409f2] = v_5ab095(false);
     const [v_809e5c, v_453192] = v_5ab095(false);
 
+    const [v_a71862, v_b75b27] = v_5ab095<{
+        tr_id?: string;
+        coupon_img_url?: string;
+        pin_no?: string;
+        limit_date?: string;
+    } | null>(null);
+
     const [v_a1c497, v_0ce8dd] = v_5ab095<number | null>(null);
     const [v_19340b, v_14129c] = v_5ab095(false);
 
     const [v_90e57e, v_ccda6f] = v_5ab095<v_214820 | null>(null);
     const [v_39954a, v_8df718] = v_5ab095(false);
+
+    const [v_7496db, v_5617d2] = v_5ab095<string | null>(null);
 
     v_c4deb2(() => {
         let v_2008a4 = false;
@@ -92,12 +101,31 @@ export const v_a59951 = () => {
                 const v_ef7306 = JSON.parse(v_f24fd5);
                 const v_35f85c = v_ef7306?.member;
                 if (v_35f85c != null && !v_2008a4) v_06fdbc(String(v_35f85c));
+                const v_d74a81 = v_ef7306?.mobile ? String(v_ef7306.mobile).replace(/\s/g, '') : '';
+                if (!v_2008a4) v_5617d2(v_d74a81 || null);
             } catch {
                 if (!v_2008a4) v_06fdbc(null);
+                if (!v_2008a4) v_5617d2(null);
             }
         })();
         return () => { v_2008a4 = true; };
     }, []);
+
+    v_c4deb2(() => {
+        if (!v_660822 || v_7496db !== null) return;
+        let v_2008a4 = false;
+        (async () => {
+            try {
+                const v_8f00b9 = await v_a7ab3c(Number(v_660822), undefined);
+                const v_625c74 = v_8f00b9?.data?.[0];
+                const v_d74a81 = v_625c74?.mobile ? String(v_625c74.mobile).replace(/\s/g, '') : '';
+                if (!v_2008a4 && v_d74a81) v_5617d2(v_d74a81);
+            } catch {
+                if (!v_2008a4) v_5617d2(null);
+            }
+        })();
+        return () => { v_2008a4 = true; };
+    }, [v_660822, v_7496db]);
 
     const v_c1e7a4 = v_de06a3(async () => {
         if (!v_660822) return;
@@ -161,6 +189,10 @@ export const v_a59951 = () => {
 
     const v_b000c1 = v_de06a3(async () => {
         if (!v_660822 || v_18a900) return;
+        if (!v_7496db || !v_7496db.trim()) {
+            v_889fad('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
+            return;
+        }
         const v_c25eec = (v_90e57e && (v_90e57e.realPrice ?? v_90e57e.salePrice) != null)
             ? (typeof (v_90e57e.realPrice ?? v_90e57e.salePrice) === 'number'
                 ? (v_90e57e.realPrice ?? v_90e57e.salePrice) as number
@@ -179,31 +211,49 @@ export const v_a59951 = () => {
                     v_0409f2(true);
                     try {
                         const v_8f00b9 = await v_44edcc(
-                            { member: v_660822, goods_code: v_01bee9.id },
+                            { member: v_660822, goods_code: v_01bee9.id, phone_no: v_7496db ?? undefined },
                             undefined,
                         );
                         if (v_8f00b9?.status === 'success') {
-                            console.log('[Xplay 구매] 성공 — 상품:', v_01bee9.id, v_01bee9.title);
+                            console.log('[Xplay 구매] 성공 — 상품:', v_01bee9.id, v_01bee9.title, v_8f00b9?.data);
+                            v_b75b27(v_8f00b9?.data ?? null);
                             v_453192(true);
                             v_c1e7a4(); 
                         } else {
                             const v_badeaf = v_8f00b9?.message ?? '구매에 실패했습니다.';
-                            const v_43f890 = v_badeaf.includes('Goods not found') || v_badeaf.includes('price not configured')
-                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                : v_badeaf;
-                            console.warn('[Xplay 구매] 실패:', v_badeaf);
+                            const v_c99bd2 = v_8f00b9?.code;
+
+                            const v_f942f4 = v_c99bd2 === 402 || /잔액.*부족|insufficient/i.test(v_badeaf);
+
+                            const v_ce37ad = v_c99bd2 === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(v_badeaf);
+                            const v_a2d859 = /E0010|비즈머니.*부족/i.test(v_badeaf);
+                            const v_43f890 = v_f942f4 || v_a2d859
+                                ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
+                                : v_ce37ad
+                                    ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                    : v_badeaf;
+                            console.warn('[Xplay 구매] 실패:', v_c99bd2, v_badeaf);
                             v_889fad('구매 실패', v_43f890, [{ text: '확인' }]);
                         }
                     } catch (v_9e86fd) {
-                        console.error('[Xplay 구매] 오류:', (v_9e86fd as Error).message);
-                        v_889fad('오류', (v_9e86fd as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
+                        const v_49263d = v_9e86fd as any;
+                        const v_d308b5 = v_49263d?.response?.status;
+                        const v_badeaf = v_49263d?.response?.data?.message ?? v_49263d?.message ?? '구매 처리 중 오류가 발생했습니다.';
+
+                        const v_43f890 = v_d308b5 === 402
+                            ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
+                            : v_d308b5 === 404
+                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                : v_badeaf;
+                        console.error('[Xplay 구매] 오류:', v_d308b5, v_badeaf);
+                        v_889fad('구매 실패', v_43f890, [{ text: '확인' }]);
                     } finally {
                         v_0409f2(false);
                     }
                 },
             },
         ]);
-    }, [v_660822, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_90e57e, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
+    }, [v_660822, v_7496db, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_90e57e, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
@@ -368,6 +418,7 @@ export const v_a59951 = () => {
 
     const v_48c801 = () => {
         v_453192(false);
+        v_b75b27(null);
         v_9b57fc(v_ce4741.shopMyItems);
     };
 
@@ -591,11 +642,28 @@ export const v_a59951 = () => {
                 onRequestClose={v_48c801}
             >
                 <View style={v_d81136.modalOverlay}>
-                    <View style={v_d81136.paymentSuccessModal}>
+                    <View style={[v_d81136.paymentSuccessModal, v_a71862?.coupon_img_url ? v_d81136.paymentSuccessModalWide : undefined]}>
                         <View style={v_d81136.modalLogoContainer}>
                             <Image source={v_10664a} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={v_d81136.paymentSuccessMessage}>Xplay 포인트 결제가 완료되었습니다</Text>
+                        <Text style={v_d81136.paymentSuccessMessage}>
+                            {v_a71862?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'Xplay 포인트 결제가 완료되었습니다'}
+                        </Text>
+                        {v_a71862?.coupon_img_url ? (
+                            <ScrollView style={v_d81136.couponBarcodeScroll} showsVerticalScrollIndicator={false}>
+                                <Image
+                                    source={{ uri: v_a71862.coupon_img_url }}
+                                    style={v_d81136.couponBarcodeImage}
+                                    resizeMode="contain"
+                                />
+                                {v_a71862.pin_no ? (
+                                    <Text style={v_d81136.couponPinNo}>핀번호: {v_a71862.pin_no}</Text>
+                                ) : null}
+                                {v_a71862.limit_date ? (
+                                    <Text style={v_d81136.couponLimitDate}>유효기간: ~ {v_a71862.limit_date}까지</Text>
+                                ) : null}
+                            </ScrollView>
+                        ) : null}
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_48c801} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>내 기프티콘 보기</Text>
                         </TouchableOpacity>
@@ -991,6 +1059,35 @@ const v_d81136 = v_472849.create({
         shadowOpacity: 0.25,
         shadowRadius: 12,
         elevation: 8,
+    },
+    paymentSuccessModalWide: {
+        maxWidth: 340,
+        maxHeight: '85%',
+    },
+    couponBarcodeScroll: {
+        width: '100%',
+        maxHeight: 280,
+        marginVertical: 16,
+    },
+    couponBarcodeImage: {
+        width: '100%',
+        height: 200,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 12,
+    },
+    couponPinNo: {
+        marginTop: 12,
+        fontSize: 15,
+        fontFamily: 'Roboto-Medium',
+        color: '#111827',
+        textAlign: 'center',
+    },
+    couponLimitDate: {
+        marginTop: 4,
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
+        textAlign: 'center',
     },
     modalLogoContainer: {
         marginBottom: 24,
