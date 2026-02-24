@@ -39,6 +39,9 @@ export const ShopMyTicketDetailScreen = () => {
         ? insets.bottom
         : Math.max(navBarHeight, insets.bottom);
 
+    const couponImgUrl = (selectedShopItem as any)?.couponImgUrl;
+    const hasBarcodeImageUrl = typeof couponImgUrl === 'string' && couponImgUrl.trim().length > 0;
+
     const ticket: TicketData = selectedShopItem ? {
         id: selectedShopItem.id || '1',
         brand: (selectedShopItem as any).brand || '스타벅스',
@@ -61,76 +64,53 @@ export const ShopMyTicketDetailScreen = () => {
             />
             <SafeScrollView showsVerticalScrollIndicator={false} showBottomBackground={false} backgroundColor="transparent" disableBottomPadding={true}>
                 <View style={styles.content}>
-                    {}
                     <View style={styles.ticketContainer}>
                         {}
-                        <View style={styles.productImageContainer}>
-                            <Image
-                                source={ticket.image}
-                                style={styles.productImage}
-                                resizeMode="contain"
-                            />
-                        </View>
-
-                        {}
-                        <View style={styles.productInfo}>
-                            <Text style={styles.brand}>{ticket.brand}</Text>
-                            <Text style={styles.title}>{ticket.title}</Text>
-                        </View>
-
-                        {}
                         <View style={styles.barcodeContainer}>
-                            {}
-                            <View style={styles.barcodeImageContainer}>
-                                {}
-                                <View style={styles.barcodePlaceholder}>
-                                    {}
-                                    {(() => {
-                                        const barcodeDigits = ticket.barcodeNumber.replace(/\s/g, '');
-                                        const bars: Array<{ width: number; isBlack: boolean }> = [];
-
-                                        for (let i = 0; i < barcodeDigits.length; i++) {
-                                            const digit = parseInt(barcodeDigits[i]);
-
-                                            const patterns: { [key: number]: number[] } = {
-                                                0: [2, 1, 1, 2], 
-                                                1: [2, 1, 2, 1],
-                                                2: [1, 2, 2, 1],
-                                                3: [2, 2, 1, 1],
-                                                4: [1, 1, 2, 2],
-                                                5: [2, 1, 1, 2],
-                                                6: [1, 2, 1, 2],
-                                                7: [2, 2, 1, 1],
-                                                8: [1, 1, 2, 2],
-                                                9: [2, 1, 2, 1],
-                                            };
-
-                                            const pattern = patterns[digit] || patterns[0];
-                                            pattern.forEach((width, idx) => {
-                                                bars.push({
-                                                    width: width * 2,
-                                                    isBlack: idx % 2 === 0,
-                                                });
-                                            });
-                                        }
-
-                                        return bars.map((bar, idx) => (
-                                            <View
-                                                key={idx}
-                                                style={[
-                                                    styles.barcodeLine,
-                                                    {
-                                                        width: bar.width,
-                                                        height: bar.isBlack ? 90 : 0,
-                                                        backgroundColor: bar.isBlack ? '#000000' : '#FFFFFF',
-                                                    },
-                                                ]}
-                                            />
-                                        ));
-                                    })()}
-                                </View>
+                            <View style={[styles.barcodeImageContainer, hasBarcodeImageUrl && styles.barcodeImageContainerLarge]}>
+                                {hasBarcodeImageUrl ? (
+                                    <Image
+                                        source={{ uri: couponImgUrl!.trim() }}
+                                        style={styles.couponImage}
+                                        resizeMode="contain"
+                                    />
+                                ) : (
+                                    <View style={styles.barcodePlaceholder}>
+                                        {ticket.barcodeNumber ? (
+                                            (() => {
+                                                const barcodeDigits = ticket.barcodeNumber.replace(/\s/g, '');
+                                                const bars: Array<{ width: number; isBlack: boolean }> = [];
+                                                const patterns: { [key: number]: number[] } = {
+                                                    0: [2, 1, 1, 2], 1: [2, 1, 2, 1], 2: [1, 2, 2, 1], 3: [2, 2, 1, 1],
+                                                    4: [1, 1, 2, 2], 5: [2, 1, 1, 2], 6: [1, 2, 1, 2], 7: [2, 2, 1, 1],
+                                                    8: [1, 1, 2, 2], 9: [2, 1, 2, 1],
+                                                };
+                                                for (let i = 0; i < barcodeDigits.length; i++) {
+                                                    const digit = parseInt(barcodeDigits[i]);
+                                                    const pattern = patterns[digit] ?? patterns[0];
+                                                    pattern.forEach((width, idx) => {
+                                                        bars.push({ width: width * 2, isBlack: idx % 2 === 0 });
+                                                    });
+                                                }
+                                                return bars.map((bar, idx) => (
+                                                    <View
+                                                        key={idx}
+                                                        style={[
+                                                            styles.barcodeLine,
+                                                            { width: bar.width, height: bar.isBlack ? 90 : 0, backgroundColor: bar.isBlack ? '#000000' : '#FFFFFF' },
+                                                        ]}
+                                                    />
+                                                ));
+                                            })()
+                                        ) : (
+                                            <Text style={styles.barcodeNoImageText}>바코드 이미지가 없습니다.</Text>
+                                        )}
+                                    </View>
+                                )}
                             </View>
-                            <Text style={styles.barcodeNumber}>{ticket.barcodeNumber}</Text>
+                            {!hasBarcodeImageUrl && ticket.barcodeNumber ? (
+                                <Text style={styles.barcodeNumber}>{ticket.barcodeNumber}</Text>
+                            ) : null}
                         </View>
                     </View>
                 </View>
@@ -173,47 +153,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 20,
     },
-    productImageContainer: {
-        width: '100%',
-        maxWidth: 300,
-        height: 300,
-        marginBottom: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    productImage: {
-        width: '100%',
-        height: '100%',
-    },
-    productInfo: {
-        alignItems: 'center',
-        marginBottom: 32,
-    },
-    brand: {
-        fontSize: 16,
-        fontFamily: 'Roboto-Medium',
-        color: '#111827',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 16,
-        fontFamily: 'Roboto-Bold',
-        color: '#111827',
-        textAlign: 'center',
-        lineHeight: 24,
-    },
     barcodeContainer: {
         width: '100%',
         alignItems: 'center',
     },
     barcodeImageContainer: {
         width: '100%',
-        maxWidth: 280,
-        height: 120,
+        maxWidth: 340,
+        height: 280,
         marginBottom: 12,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#FFFFFF',
+    },
+    barcodeImageContainerLarge: {
+        maxWidth: 340,
+        height: 360,
+    },
+    couponImage: {
+        width: '100%',
+        height: '100%',
+        minHeight: 120,
     },
     barcodePlaceholder: {
         flexDirection: 'row',
@@ -233,6 +193,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         color: '#111827',
         letterSpacing: 2,
+    },
+    barcodeNoImageText: {
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
     },
     buttonContainer: {
         position: 'absolute',

@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, purchaseGiftWithXplayPoints } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 
@@ -77,11 +77,20 @@ export const ShopProductDetailScreen = () => {
     const [xplayPurchaseLoading, setXplayPurchaseLoading] = useState(false);
     const [xplayPaymentSuccessVisible, setXplayPaymentSuccessVisible] = useState(false);
 
+    const [xplayPurchaseResult, setXplayPurchaseResult] = useState<{
+        tr_id?: string;
+        coupon_img_url?: string;
+        pin_no?: string;
+        limit_date?: string;
+    } | null>(null);
+
     const [xrunBalanceState, setXrunBalanceState] = useState<number | null>(null);
     const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
 
     const [productDetail, setProductDetail] = useState<GiftishowProductDetailItem | null>(null);
     const [productDetailLoading, setProductDetailLoading] = useState(false);
+
+    const [userPhone, setUserPhone] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -92,12 +101,31 @@ export const ShopProductDetailScreen = () => {
                 const userData = JSON.parse(userDataStr);
                 const m = userData?.member;
                 if (m != null && !cancelled) setMember(String(m));
+                const phone = userData?.mobile ? String(userData.mobile).replace(/\s/g, '') : '';
+                if (!cancelled) setUserPhone(phone || null);
             } catch {
                 if (!cancelled) setMember(null);
+                if (!cancelled) setUserPhone(null);
             }
         })();
         return () => { cancelled = true; };
     }, []);
+
+    useEffect(() => {
+        if (!member || userPhone !== null) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await getMyPageUserInfo(Number(member), undefined);
+                const user = res?.data?.[0];
+                const phone = user?.mobile ? String(user.mobile).replace(/\s/g, '') : '';
+                if (!cancelled && phone) setUserPhone(phone);
+            } catch {
+                if (!cancelled) setUserPhone(null);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [member, userPhone]);
 
     const loadXplayBalance = useCallback(async () => {
         if (!member) return;
@@ -161,6 +189,10 @@ export const ShopProductDetailScreen = () => {
 
     const handleXplayPurchase = useCallback(async () => {
         if (!member || xplayPurchaseLoading) return;
+        if (!userPhone || !userPhone.trim()) {
+            showAlert('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
+            return;
+        }
         const needPrice = (productDetail && (productDetail.realPrice ?? productDetail.salePrice) != null)
             ? (typeof (productDetail.realPrice ?? productDetail.salePrice) === 'number'
                 ? (productDetail.realPrice ?? productDetail.salePrice) as number
@@ -179,31 +211,49 @@ export const ShopProductDetailScreen = () => {
                     setXplayPurchaseLoading(true);
                     try {
                         const res = await purchaseGiftWithXplayPoints(
-                            { member, goods_code: product.id },
+                            { member, goods_code: product.id, phone_no: userPhone ?? undefined },
                             undefined,
                         );
                         if (res?.status === 'success') {
-                            console.log('[Xplay 구매] 성공 — 상품:', product.id, product.title);
+                            console.log('[Xplay 구매] 성공 — 상품:', product.id, product.title, res?.data);
+                            setXplayPurchaseResult(res?.data ?? null);
                             setXplayPaymentSuccessVisible(true);
                             loadXplayBalance(); 
                         } else {
                             const msg = res?.message ?? '구매에 실패했습니다.';
-                            const userMsg = msg.includes('Goods not found') || msg.includes('price not configured')
-                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                : msg;
-                            console.warn('[Xplay 구매] 실패:', msg);
+                            const code = res?.code;
+
+                            const is402 = code === 402 || /잔액.*부족|insufficient/i.test(msg);
+
+                            const is404 = code === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(msg);
+                            const isE0010 = /E0010|비즈머니.*부족/i.test(msg);
+                            const userMsg = is402 || isE0010
+                                ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
+                                : is404
+                                    ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                    : msg;
+                            console.warn('[Xplay 구매] 실패:', code, msg);
                             showAlert('구매 실패', userMsg, [{ text: '확인' }]);
                         }
                     } catch (e) {
-                        console.error('[Xplay 구매] 오류:', (e as Error).message);
-                        showAlert('오류', (e as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
+                        const err = e as any;
+                        const status = err?.response?.status;
+                        const msg = err?.response?.data?.message ?? err?.message ?? '구매 처리 중 오류가 발생했습니다.';
+
+                        const userMsg = status === 402
+                            ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
+                            : status === 404
+                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                : msg;
+                        console.error('[Xplay 구매] 오류:', status, msg);
+                        showAlert('구매 실패', userMsg, [{ text: '확인' }]);
                     } finally {
                         setXplayPurchaseLoading(false);
                     }
                 },
             },
         ]);
-    }, [member, product.id, product.title, product.price, productDetail, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
+    }, [member, userPhone, product.id, product.title, product.price, productDetail, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
@@ -368,6 +418,7 @@ export const ShopProductDetailScreen = () => {
 
     const handleXplayPaymentSuccessClose = () => {
         setXplayPaymentSuccessVisible(false);
+        setXplayPurchaseResult(null);
         navigate(ROUTES.shopMyItems);
     };
 
@@ -591,11 +642,28 @@ export const ShopProductDetailScreen = () => {
                 onRequestClose={handleXplayPaymentSuccessClose}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.paymentSuccessModal}>
+                    <View style={[styles.paymentSuccessModal, xplayPurchaseResult?.coupon_img_url ? styles.paymentSuccessModalWide : undefined]}>
                         <View style={styles.modalLogoContainer}>
                             <Image source={xplaySymbol} style={styles.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={styles.paymentSuccessMessage}>Xplay 포인트 결제가 완료되었습니다</Text>
+                        <Text style={styles.paymentSuccessMessage}>
+                            {xplayPurchaseResult?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'Xplay 포인트 결제가 완료되었습니다'}
+                        </Text>
+                        {xplayPurchaseResult?.coupon_img_url ? (
+                            <ScrollView style={styles.couponBarcodeScroll} showsVerticalScrollIndicator={false}>
+                                <Image
+                                    source={{ uri: xplayPurchaseResult.coupon_img_url }}
+                                    style={styles.couponBarcodeImage}
+                                    resizeMode="contain"
+                                />
+                                {xplayPurchaseResult.pin_no ? (
+                                    <Text style={styles.couponPinNo}>핀번호: {xplayPurchaseResult.pin_no}</Text>
+                                ) : null}
+                                {xplayPurchaseResult.limit_date ? (
+                                    <Text style={styles.couponLimitDate}>유효기간: ~ {xplayPurchaseResult.limit_date}까지</Text>
+                                ) : null}
+                            </ScrollView>
+                        ) : null}
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleXplayPaymentSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>내 기프티콘 보기</Text>
                         </TouchableOpacity>
@@ -991,6 +1059,35 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 12,
         elevation: 8,
+    },
+    paymentSuccessModalWide: {
+        maxWidth: 340,
+        maxHeight: '85%',
+    },
+    couponBarcodeScroll: {
+        width: '100%',
+        maxHeight: 280,
+        marginVertical: 16,
+    },
+    couponBarcodeImage: {
+        width: '100%',
+        height: 200,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 12,
+    },
+    couponPinNo: {
+        marginTop: 12,
+        fontSize: 15,
+        fontFamily: 'Roboto-Medium',
+        color: '#111827',
+        textAlign: 'center',
+    },
+    couponLimitDate: {
+        marginTop: 4,
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
+        textAlign: 'center',
     },
     modalLogoContainer: {
         marginBottom: 24,

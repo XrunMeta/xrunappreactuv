@@ -29,6 +29,8 @@ interface MyItemData {
     storage?: string;
     txID?: string;
     item?: number;
+
+    couponImgUrl?: string;
 }
 
 function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
@@ -44,9 +46,9 @@ function formatPurchaseDate(raw?: string): string {
 }
 
 function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
-  const image: ImageSourcePropType = c.image_url
-    ? { uri: c.image_url }
-    : defaultCouponImage;
+
+  const imageUrl = c.coupon_img_url || c.image_url;
+  const image: ImageSourcePropType = imageUrl ? { uri: imageUrl } : defaultCouponImage;
   return {
     id: c.tr_id,
     tr_id: c.tr_id,
@@ -56,6 +58,7 @@ function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
     status: mapPinStatusToAvailable(c.pin_status),
     purchaseDate: formatPurchaseDate(c.purchase_date),
     type: 'giftishow',
+    couponImgUrl: c.coupon_img_url || undefined,
   };
 }
 
@@ -183,6 +186,7 @@ export const ShopMyItemsScreen = () => {
             brand: item.brand,
             barcodeNumber: '',
             tr_id: item.tr_id ?? item.id,
+            couponImgUrl: item.couponImgUrl,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopMyTicketDetail);
