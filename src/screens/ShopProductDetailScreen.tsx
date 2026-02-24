@@ -14,6 +14,8 @@ import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_877de8, v_54d016, v_44edcc } from '../services';
+import { v_5e3aed } from '../services/giftishowBiz';
+import type { v_214820 } from '../services/giftishowBiz';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -78,6 +80,9 @@ export const v_a59951 = () => {
     const [v_a1c497, v_0ce8dd] = v_5ab095<number | null>(null);
     const [v_19340b, v_14129c] = v_5ab095(false);
 
+    const [v_90e57e, v_ccda6f] = v_5ab095<v_214820 | null>(null);
+    const [v_39954a, v_8df718] = v_5ab095(false);
+
     v_c4deb2(() => {
         let v_2008a4 = false;
         (async () => {
@@ -136,9 +141,31 @@ export const v_a59951 = () => {
         if (!v_5db874 && v_660822) v_abb08d();
     }, [v_5db874, v_660822, v_abb08d]);
 
+    v_c4deb2(() => {
+        if (!v_5db874 || !v_01bee9.id) return;
+        let v_2008a4 = false;
+        v_8df718(true);
+        v_ccda6f(null);
+        v_5e3aed(v_01bee9.id)
+            .then((v_8f00b9) => {
+                if (!v_2008a4 && v_8f00b9.detail) v_ccda6f(v_8f00b9.detail);
+            })
+            .catch(() => {
+                if (!v_2008a4) v_ccda6f(null);
+            })
+            .finally(() => {
+                if (!v_2008a4) v_8df718(false);
+            });
+        return () => { v_2008a4 = true; };
+    }, [v_5db874, v_01bee9.id]);
+
     const v_b000c1 = v_de06a3(async () => {
         if (!v_660822 || v_18a900) return;
-        const v_c25eec = v_01bee9.price;
+        const v_c25eec = (v_90e57e && (v_90e57e.realPrice ?? v_90e57e.salePrice) != null)
+            ? (typeof (v_90e57e.realPrice ?? v_90e57e.salePrice) === 'number'
+                ? (v_90e57e.realPrice ?? v_90e57e.salePrice) as number
+                : parseInt(String(v_90e57e.realPrice ?? v_90e57e.salePrice).replace(/,/g, ''), 10) || v_01bee9.price)
+            : v_01bee9.price;
         const v_c88e9b = v_b7c830 ?? 0;
         if (v_c88e9b < v_c25eec) {
             v_889fad('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
@@ -156,12 +183,19 @@ export const v_a59951 = () => {
                             undefined,
                         );
                         if (v_8f00b9?.status === 'success') {
+                            console.log('[Xplay 구매] 성공 — 상품:', v_01bee9.id, v_01bee9.title);
                             v_453192(true);
                             v_c1e7a4(); 
                         } else {
-                            v_889fad('구매 실패', v_8f00b9?.message ?? '구매에 실패했습니다.', [{ text: '확인' }]);
+                            const v_badeaf = v_8f00b9?.message ?? '구매에 실패했습니다.';
+                            const v_43f890 = v_badeaf.includes('Goods not found') || v_badeaf.includes('price not configured')
+                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                : v_badeaf;
+                            console.warn('[Xplay 구매] 실패:', v_badeaf);
+                            v_889fad('구매 실패', v_43f890, [{ text: '확인' }]);
                         }
                     } catch (v_9e86fd) {
+                        console.error('[Xplay 구매] 오류:', (v_9e86fd as Error).message);
                         v_889fad('오류', (v_9e86fd as Error).message ?? '구매 처리 중 오류가 발생했습니다.', [{ text: '확인' }]);
                     } finally {
                         v_0409f2(false);
@@ -169,7 +203,7 @@ export const v_a59951 = () => {
                 },
             },
         ]);
-    }, [v_660822, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
+    }, [v_660822, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_90e57e, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
@@ -339,7 +373,18 @@ export const v_a59951 = () => {
 
     const v_fa78fb = v_01bee9.isXrun || v_01bee9.brand === 'XRUN';
     const v_1efa5f = v_fa78fb ? v_33c40c : v_10664a;
-    const v_513fb9 = (v_b7c830 ?? 0) - v_01bee9.price;
+
+    const v_fafc7f = (v_5db874 && v_90e57e?.goodsImgB) || (v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg)
+        ? { uri: (v_90e57e?.goodsImgB || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg) as string }
+        : v_01bee9.image;
+    const v_ba7f97 = (v_5db874 && v_90e57e?.goodsName) ? v_90e57e.goodsName : v_01bee9.title;
+    const v_b034a8 = (v_5db874 && v_90e57e?.brandName) ? v_90e57e.brandName : v_01bee9.brand;
+    const v_4a4ff4 = v_90e57e?.realPrice ?? v_90e57e?.salePrice;
+    const v_e72b09 = (v_5db874 && v_4a4ff4 != null)
+        ? (typeof v_4a4ff4 === 'number' ? v_4a4ff4 : parseInt(String(v_4a4ff4).replace(/,/g, ''), 10) || v_01bee9.price)
+        : v_01bee9.price;
+    const v_513fb9 = (v_b7c830 ?? 0) - v_e72b09;
+    const v_d0206c = v_5db874 && v_90e57e && (v_90e57e.content || v_90e57e.contentAddDesc);
 
     return (
         <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
@@ -353,10 +398,15 @@ export const v_a59951 = () => {
                 <View style={v_d81136.content}>
                     {}
                     <View style={v_d81136.productCard}>
+                        {v_5db874 && v_39954a && (
+                            <View style={v_d81136.detailLoadingWrap}>
+                                <ActivityIndicator size="small" color="#1E3A5F" />
+                            </View>
+                        )}
                         <View style={v_d81136.productImageContainer}>
                             <View style={v_d81136.productImageWrapper}>
                                 <Image
-                                    source={v_01bee9.image}
+                                    source={v_fafc7f}
                                     style={v_d81136.productImage}
                                     resizeMode="contain"
                                 />
@@ -364,9 +414,14 @@ export const v_a59951 = () => {
                         </View>
                         <View style={v_d81136.productInfoContainer}>
                             <View style={v_d81136.brandContainer}>
-                                <Text style={v_d81136.brand}>{v_01bee9.brand}</Text>
+                                <Text style={v_d81136.brand}>{v_b034a8}</Text>
                             </View>
-                            <Text style={v_d81136.title}>{v_01bee9.title}</Text>
+                            <Text style={v_d81136.title}>{v_ba7f97}</Text>
+                            {v_d0206c ? (
+                                <Text style={v_d81136.productDescription}>
+                                    {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
+                                </Text>
+                            ) : null}
                         </View>
                     </View>
 
@@ -383,7 +438,7 @@ export const v_a59951 = () => {
                                     <Text style={v_d81136.paymentLabel}>결제금액</Text>
                                     <View style={v_d81136.priceContainer}>
                                         <Image source={v_10664a} style={v_d81136.coinIcon} resizeMode="contain" />
-                                        <Text style={v_d81136.paymentValue}>{v_01bee9.price.toLocaleString()} Xplay</Text>
+                                        <Text style={v_d81136.paymentValue}>{v_e72b09.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
                                 <View style={v_d81136.paymentRow}>
@@ -731,6 +786,20 @@ const v_d81136 = v_472849.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+    productDescription: {
+        marginTop: 12,
+        fontSize: 14,
+        fontFamily: 'Roboto-Regular',
+        color: '#6B7280',
+        lineHeight: 20,
+        textAlign: 'center',
+    },
+    detailLoadingWrap: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        zIndex: 1,
     },
     paymentCard: {
         backgroundColor: '#FFFFFF',

@@ -83,6 +83,7 @@ function v_9bd735(item: v_d62ea7): ProductData {
         title: v_8c0b26.name ?? '-',
         price: typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0,
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
+        isXplayShop: true,
     };
 }
 
@@ -131,6 +132,7 @@ export const v_10886b = () => {
             const v_8f00b9 = await v_25c73c({ start: 1, size: 50 });
             const v_ef8ab1 = Array.isArray(v_8f00b9.list) ? v_8f00b9.list : [];
             v_4ff2fa(v_ef8ab1);
+            console.log('[Xplay Shop] 상품 목록 조회:', v_ef8ab1.length, '건', v_ef8ab1.map((v_8c0b26) => ({ id: v_8c0b26.id, name: v_8c0b26.name, price: v_8c0b26.price })));
             if (v_ef8ab1.length === 0 && v_8f00b9.resultMsg) v_33ec67(v_8f00b9.resultMsg);
         } catch (v_9e86fd) {
             v_33ec67(v_9e86fd instanceof Error ? v_9e86fd.message : '기프티콘 목록을 불러오지 못했습니다.');

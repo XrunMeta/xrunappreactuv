@@ -4374,9 +4374,18 @@ export const v_44edcc = async (
       '/purchaseGiftWithXplayPoints',
       v_24baff,
     );
-    return v_3393e3.data;
+    const v_9390e8 = v_3393e3.data;
+    if (v_9390e8?.status === 'success') {
+      console.log('[기프티쇼] Xplay 구매 성공:', { member: v_24baff.member, goods_code: v_24baff.goods_code, data: v_9390e8?.data });
+    } else {
+      console.warn('[기프티쇼] Xplay 구매 실패(응답):', v_9390e8?.message ?? v_9390e8);
+    }
+    return v_9390e8;
   } catch (v_5e9bfe) {
-    console.error('[기프티쇼] Xplay 구매 오류:', v_5e9bfe);
+    const v_badeaf = v_5e9bfe instanceof v_3333d3
+      ? (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message
+      : (v_5e9bfe as Error).message;
+    console.error('[기프티쇼] Xplay 구매 오류:', v_badeaf, v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {
       const v_9390e8 = v_5e9bfe.response?.data as any;
       return {
