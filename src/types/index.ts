@@ -1066,7 +1066,9 @@ export interface MyGiftishowCouponItem {
   goods_code?: string;
   goods_name?: string;
   brand_name?: string;
+
   image_url?: string;
+  coupon_img_url?: string;
   purchase_date?: string; 
   pin_status?: string; 
   [key: string]: unknown;
@@ -1087,7 +1089,14 @@ export interface PurchaseGiftWithXplayPointsRequest {
 export interface PurchaseGiftWithXplayPointsResponse {
   status: 'success' | 'error';
   code?: number;
-  data?: { tr_id?: string; message?: string };
+
+  data?: {
+    tr_id?: string;
+    message?: string;
+    coupon_img_url?: string;
+    pin_no?: string;
+    limit_date?: string;
+  };
   message?: string;
 }
 
