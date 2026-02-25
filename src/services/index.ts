@@ -4369,10 +4369,18 @@ export const v_44edcc = async (
   v_c65f5d,
 ): Promise<v_4517f1> => {
   try {
+    const v_4d33b2 = {
+      member: v_24baff.member,
+      goods_code: v_24baff.goods_code,
+      phone_no: v_24baff.phone_no ?? '',
+    };
+    if (__DEV__) {
+      console.log('[기프티쇼] Xplay 구매 요청 body:', { ...v_4d33b2, phone_no: v_4d33b2.phone_no ? `${v_4d33b2.phone_no.slice(0, 3)}***` : '(없음)' });
+    }
     const v_9f42a4 = v_7488d5(v_c65f5d);
     const v_3393e3 = await v_9f42a4.post<v_4517f1>(
       '/purchaseGiftWithXplayPoints',
-      v_24baff,
+      v_4d33b2,
     );
     const v_9390e8 = v_3393e3.data;
     if (v_9390e8?.status === 'success') {
