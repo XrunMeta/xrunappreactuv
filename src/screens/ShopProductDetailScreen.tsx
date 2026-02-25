@@ -66,7 +66,7 @@ export const v_a59951 = () => {
         isXrun: (v_dfe883 as any).isXrun || false,
     } : v_273f15;
 
-    const v_b3ea98 = v_01bee9.brand === 'Ethereum' || v_01bee9.title.includes('교환권');
+    const v_b3ea98 = false;
 
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
 

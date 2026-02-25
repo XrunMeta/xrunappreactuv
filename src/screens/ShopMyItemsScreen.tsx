@@ -37,6 +37,20 @@ function v_52c82e(v_03cc9e): 'available' | 'used' {
   return v_03cc9e === '01' ? 'available' : 'used';
 }
 
+function v_2d457b(coupon: v_a649c5): boolean {
+  const v_e34f4e = new Set(['07', '12', '16', '22']); 
+  if (v_ddbb49.pin_status && v_e34f4e.has(String(v_ddbb49.pin_status))) return true;
+
+  const v_12a839 = v_ddbb49 as any;
+  const v_072545 = String(
+    v_12a839.pin_status_nm ??
+    v_12a839.pinStatusNm ??
+    v_12a839.pin_status_name ??
+    ''
+  );
+  return /취소/i.test(v_072545);
+}
+
 function v_b88ffe(v_479f05): string {
   if (!v_479f05) return '-';
   const v_fd5f43 = String(v_479f05).replace(/-/g, '').slice(0, 8);
@@ -111,7 +125,9 @@ export const v_8c1d95 = () => {
             ]);
             const v_63c5e6 =
                 v_35dda7?.status === 'success' && Array.isArray(v_35dda7.data)
-                    ? v_35dda7.data.map(v_037021)
+                    ? v_35dda7.data
+                        .filter((v_ddbb49) => !v_2d457b(v_ddbb49))
+                        .map(v_037021)
                     : [];
             const v_04aa3c =
                 v_38fb16?.status === 'success' && Array.isArray(v_38fb16.data)
