@@ -193,11 +193,8 @@ export const ShopProductDetailScreen = () => {
             showAlert('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
             return;
         }
-        const needPrice = (productDetail && (productDetail.realPrice ?? productDetail.salePrice) != null)
-            ? (typeof (productDetail.realPrice ?? productDetail.salePrice) === 'number'
-                ? (productDetail.realPrice ?? productDetail.salePrice) as number
-                : parseInt(String(productDetail.realPrice ?? productDetail.salePrice).replace(/,/g, ''), 10) || product.price)
-            : product.price;
+
+        const needPrice = product.price;
         const balance = xplayBalanceState ?? 0;
         if (balance < needPrice) {
             showAlert('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
@@ -253,7 +250,7 @@ export const ShopProductDetailScreen = () => {
                 },
             },
         ]);
-    }, [member, userPhone, product.id, product.title, product.price, productDetail, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
+    }, [member, userPhone, product.id, product.title, product.price, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
@@ -430,11 +427,9 @@ export const ShopProductDetailScreen = () => {
         : product.image;
     const displayTitle = (isXplayShop && productDetail?.goodsName) ? productDetail.goodsName : product.title;
     const displayBrand = (isXplayShop && productDetail?.brandName) ? productDetail.brandName : product.brand;
-    const detailPrice = productDetail?.realPrice ?? productDetail?.salePrice;
-    const displayPrice = (isXplayShop && detailPrice != null)
-        ? (typeof detailPrice === 'number' ? detailPrice : parseInt(String(detailPrice).replace(/,/g, ''), 10) || product.price)
-        : product.price;
-    const xplayRemainingBalance = (xplayBalanceState ?? 0) - displayPrice;
+
+    const displayPrice = product.price;
+    const xplayRemainingBalance = xplayBalanceState == null ? null : (xplayBalanceState - displayPrice);
     const hasDetailDescription = isXplayShop && productDetail && (productDetail.content || productDetail.contentAddDesc);
 
     return (
@@ -498,13 +493,15 @@ export const ShopProductDetailScreen = () => {
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={styles.paymentBalance}>
-                                            {(xplayBalanceState ?? 0).toLocaleString()} Xplay
+                                            {xplayBalanceState == null ? '-' : `${xplayBalanceState.toLocaleString()} Xplay`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
                                     <Text style={styles.paymentLabel}>구매 후 잔여 Xplay</Text>
-                                    <Text style={styles.paymentRemaining}>{xplayRemainingBalance.toLocaleString()} Xplay</Text>
+                                    <Text style={styles.paymentRemaining}>
+                                        {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} Xplay`}
+                                    </Text>
                                 </View>
                             </>
                         ) : (

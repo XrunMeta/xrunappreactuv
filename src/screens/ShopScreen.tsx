@@ -118,9 +118,10 @@ export const ShopScreen = () => {
             }
             setXplayBalanceLoading(true);
             const result = await getAyetPointsBalance(member, navigate);
-            setXplayBalance(result.total_ayet_points ?? 0);
+            setXplayBalance(result.total_ayet_points ?? null);
         } catch {
-            setXplayBalance(0);
+
+            setXplayBalance(null);
         } finally {
             setXplayBalanceLoading(false);
         }
@@ -317,7 +318,7 @@ export const ShopScreen = () => {
                                                 <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
                                             ) : (
                                                 <Text style={styles.balanceAmount}>
-                                                    {(xplayBalance ?? 0).toLocaleString()}
+                                                    {xplayBalance == null ? '-' : xplayBalance.toLocaleString()}
                                                 </Text>
                                             )
                                         ) : (

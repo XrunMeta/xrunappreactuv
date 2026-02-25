@@ -4304,10 +4304,38 @@ export const getAyetPointsBalance = async (
       '/getAyetPointsBalance',
       request,
     );
+    const raw: any = response.data;
+    const data: any = raw?.data ?? raw;
 
-    const data = response.data?.data;
-    const total_ayet_points = data?.total_ayet_points ?? 0;
-    const transaction_count = data?.transaction_count ?? 0;
+    const totalCandidates = [
+      data?.total_ayet_points,
+      raw?.total_ayet_points,
+      data?.balance,
+      raw?.balance,
+    ];
+    const txCountCandidates = [
+      data?.transaction_count,
+      raw?.transaction_count,
+      data?.count,
+      raw?.count,
+    ];
+
+    const parsedTotal = totalCandidates
+      .map((v) => (v == null ? NaN : Number(v)))
+      .find((v) => Number.isFinite(v));
+    const parsedTxCount = txCountCandidates
+      .map((v) => (v == null ? NaN : Number(v)))
+      .find((v) => Number.isFinite(v));
+
+    if (!Number.isFinite(parsedTotal as number)) {
+      if (__DEV__) {
+        console.warn('[ayeT 포인트] 응답 포맷 불일치(raw):', raw);
+      }
+      throw new Error('getAyetPointsBalance 응답 형식을 해석하지 못했습니다.');
+    }
+
+    const total_ayet_points = Number(parsedTotal);
+    const transaction_count = Number.isFinite(parsedTxCount as number) ? Number(parsedTxCount) : 0;
     console.log('[ayeT 포인트] 잔액 조회 응답:', {
       member: request.member,
       total_ayet_points,
