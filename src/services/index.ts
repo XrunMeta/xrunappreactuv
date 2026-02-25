@@ -320,6 +320,45 @@ export const sendAliveSignal = async (
         };
       }
 
+     const currentVersion = getCurrentAppVersionNumber();  
+      const serverAndroidVersion = Number(serverResponse.data.version) || 0;
+      const serverIOSVersion = Number(serverResponse.data.version_ios) || 0;
+
+      console.log('[App] 버전 확인:', {
+        currentVersion,
+        serverAndroidVersion,
+        serverIOSVersion,
+        platform: Platform.OS,
+      });
+
+      if (Platform.OS === 'android') {
+        if (currentVersion && serverAndroidVersion > currentVersion) {
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
+          result.emergencyStop = {
+            enabled: true,
+            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+            link: getPlayStoreUrl({ gl: 'us' }),
+          };
+        } else {
+          console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
+        }
+      } else if (Platform.OS === 'ios') {
+        if (currentVersion && serverIOSVersion > currentVersion) {
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverIOSVersion);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal'); 
+          } else {
+            result.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: 'https://apps.apple.com/kr/app/xrun-go/id6502924173',
+            };
+          }
+        } else {
+          console.log('[App ios] 최신 버전입니다. 현재:', currentVersion, '서버:', serverIOSVersion);
+        }
+      }
+
       return result;
     } else {
 
