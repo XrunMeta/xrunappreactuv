@@ -34,8 +34,7 @@ interface MyItemData {
 }
 
 function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
-  if (pin_status === '02') return 'used'; 
-  return 'available';
+  return pin_status === '01' ? 'available' : 'used';
 }
 
 function formatPurchaseDate(raw?: string): string {
@@ -83,7 +82,7 @@ function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemD
 }
 
 export const ShopMyItemsScreen = () => {
-    const { navigate } = useAppNavigation();
+    const { navigate, currentScreen } = useAppNavigation();
     const { t } = useTranslation();
     const { setSelectedShopItem } = useAppContext();
     const [items, setItems] = useState<MyItemData[]>([]);
@@ -131,6 +130,11 @@ export const ShopMyItemsScreen = () => {
         setLoading(true);
         loadCoupons();
     }, [loadCoupons]);
+
+    useEffect(() => {
+        if (currentScreen !== ROUTES.shopMyItems) return;
+        loadCoupons();
+    }, [currentScreen, loadCoupons]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
