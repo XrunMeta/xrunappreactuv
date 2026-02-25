@@ -6,11 +6,14 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a61db3 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
+import * as v_f38d26 from 'lbosdxgirxcherxohyvziam';
+import * as v_8682f1 from 'xfwnoqvryfjuilcdia';
 
 interface TicketData {
     id: string;
@@ -32,6 +35,7 @@ export const v_1184c4 = () => {
     const { goBack: v_c7ac57 } = v_a0daa8();
     const { t: v_8d41d7 } = v_772971();
     const { selectedShopItem: v_dfe883 } = v_700ef9();
+    const { showAlert: v_889fad } = v_4b1173();
     const v_033e14 = v_e0068c();
     const v_f9771e = v_c18c22(0);
 
@@ -50,8 +54,80 @@ export const v_1184c4 = () => {
         barcodeNumber: (v_dfe883 as any).barcodeNumber || '1231 1231 1231 1231',
     } : v_f158ec;
 
-    const v_dda6bb = () => {
+    const v_dda6bb = async () => {
+        console.warn('[내 티켓] 이미지 저장 버튼 클릭됨');
+        console.log('[내 티켓] 이미지 저장 시작');
+        if (!v_e47051) {
+            console.log('[내 티켓] 저장 중단: 바코드 이미지 URL 없음');
+            await v_889fad('알림', '저장할 바코드 이미지가 없습니다.');
+            return;
+        }
 
+        try {
+            const v_d1a6bb = await v_8682f1.requestPermissionsAsync();
+            console.log('[내 티켓] MediaLibrary 권한:', v_d1a6bb.status, {
+                canAskAgain: v_d1a6bb.canAskAgain,
+                granted: v_d1a6bb.granted,
+            });
+            if (v_d1a6bb.status !== 'granted') {
+                console.log('[내 티켓] 저장 중단: 권한 거부');
+                await v_889fad('권한 필요', '이미지를 저장하려면 사진 권한이 필요합니다.');
+                return;
+            }
+
+            const v_8a33c8 = v_467ee6!.trim();
+            console.log('[내 티켓] 저장 대상 이미지 URL:', v_8a33c8);
+            const v_d1aac0 = v_f38d26.cacheDirectory || v_f38d26.documentDirectory;
+            console.log('[내 티켓] 저장 경로 확인:', {
+                cacheDirectory: v_f38d26.cacheDirectory,
+                documentDirectory: v_f38d26.documentDirectory,
+                selected: v_d1aac0,
+            });
+            if (!v_d1aac0) {
+                throw new Error('저장 경로를 찾을 수 없습니다.');
+            }
+
+            const v_760511 = v_8a33c8.includes('.png')
+                ? 'png'
+                : v_8a33c8.includes('.webp')
+                    ? 'webp'
+                    : 'jpg';
+            const v_0c2fb2 = `${v_d1aac0}ticket_barcode_${Date.now()}.${v_760511}`;
+            console.log('[내 티켓] 다운로드 시작:', { fileUri: v_0c2fb2, extension: v_760511 });
+
+            const v_42ab49 = await v_f38d26.downloadAsync(v_8a33c8, v_0c2fb2);
+            console.log('[내 티켓] 다운로드 완료:', v_42ab49);
+
+            await v_8682f1.saveToLibraryAsync(v_42ab49.uri);
+            console.log('[내 티켓] saveToLibraryAsync 완료:', v_42ab49.uri);
+
+            try {
+                const v_b76cd8 = await v_8682f1.createAssetAsync(v_42ab49.uri);
+                console.log('[내 티켓] Asset 생성 완료:', v_b76cd8?.uri);
+                try {
+                    await v_8682f1.createAlbumAsync('XRUN', v_b76cd8, false);
+                    console.log('[내 티켓] XRUN 앨범 생성 완료');
+                } catch (v_52de11) {
+
+                    console.warn('[내 티켓] XRUN 앨범 생성 스킵:', v_52de11);
+                }
+            } catch (v_c75bfa) {
+                console.warn('[내 티켓] Asset 생성 스킵(저장은 완료):', v_c75bfa);
+            }
+
+            try {
+                await v_f38d26.deleteAsync(v_42ab49.uri, { idempotent: true });
+                console.log('[내 티켓] 임시 파일 삭제 완료:', v_42ab49.uri);
+            } catch (v_fa1679) {
+                console.warn('[내 티켓] 임시 파일 삭제 스킵:', v_fa1679);
+            }
+
+            console.log('[내 티켓] 이미지 저장 성공');
+            await v_889fad('저장 완료', '내 티켓 바코드 이미지가 저장되었습니다.\n갤러리에 없다면 내 파일 > 이미지에서 확인해 주세요.');
+        } catch (v_5e9bfe) {
+            console.error('[내 티켓] 이미지 저장 실패:', v_5e9bfe);
+            await v_889fad('저장 실패', '이미지 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        }
     };
 
     return (
@@ -118,7 +194,10 @@ export const v_1184c4 = () => {
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
                 <TouchableOpacity
                     style={v_d81136.saveButton}
-                    onPress={v_dda6bb}
+                    onPress={() => {
+                        console.warn('[내 티켓] onPress 진입');
+                        v_dda6bb();
+                    }}
                     activeOpacity={0.85}
                 >
                     <LinearGradient
