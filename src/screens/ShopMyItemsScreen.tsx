@@ -34,8 +34,7 @@ interface MyItemData {
 }
 
 function v_52c82e(v_03cc9e): 'available' | 'used' {
-  if (v_03cc9e === '02') return 'used'; 
-  return 'available';
+  return v_03cc9e === '01' ? 'available' : 'used';
 }
 
 function v_b88ffe(v_479f05): string {
@@ -83,7 +82,7 @@ function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
 }
 
 export const v_8c1d95 = () => {
-    const { navigate: v_9b57fc } = v_a0daa8();
+    const { navigate: v_9b57fc, currentScreen: v_0f0c7b } = v_a0daa8();
     const { t: v_8d41d7 } = v_772971();
     const { setSelectedShopItem: v_d0fbad } = v_700ef9();
     const [v_4622b9, v_fa923c] = v_5ab095<MyItemData[]>([]);
@@ -131,6 +130,11 @@ export const v_8c1d95 = () => {
         v_34a50a(true);
         v_605807();
     }, [v_605807]);
+
+    v_c4deb2(() => {
+        if (v_0f0c7b !== v_ce4741.shopMyItems) return;
+        v_605807();
+    }, [v_0f0c7b, v_605807]);
 
     const v_d5345f = v_de06a3(() => {
         v_575aad(true);
