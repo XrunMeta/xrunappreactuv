@@ -66,7 +66,7 @@ export const ShopProductDetailScreen = () => {
         isXrun: (selectedShopItem as any).isXrun || false,
     } : defaultProductFallback;
 
-    const isExchangeProduct = product.brand === 'Ethereum' || product.title.includes('교환권');
+    const isExchangeProduct = false;
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
 

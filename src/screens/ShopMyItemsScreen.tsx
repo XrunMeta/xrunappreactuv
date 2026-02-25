@@ -37,6 +37,20 @@ function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
   return pin_status === '01' ? 'available' : 'used';
 }
 
+function isCancelledGiftishowCoupon(coupon: MyGiftishowCouponItem): boolean {
+  const cancelledStatusSet = new Set(['07', '12', '16', '22']); 
+  if (coupon.pin_status && cancelledStatusSet.has(String(coupon.pin_status))) return true;
+
+  const anyCoupon = coupon as any;
+  const statusName = String(
+    anyCoupon.pin_status_nm ??
+    anyCoupon.pinStatusNm ??
+    anyCoupon.pin_status_name ??
+    ''
+  );
+  return /취소/i.test(statusName);
+}
+
 function formatPurchaseDate(raw?: string): string {
   if (!raw) return '-';
   const s = String(raw).replace(/-/g, '').slice(0, 8);
@@ -111,7 +125,9 @@ export const ShopMyItemsScreen = () => {
             ]);
             const giftishowList: MyItemData[] =
                 giftishowRes?.status === 'success' && Array.isArray(giftishowRes.data)
-                    ? giftishowRes.data.map(couponToMyItemData)
+                    ? giftishowRes.data
+                        .filter((coupon) => !isCancelledGiftishowCoupon(coupon))
+                        .map(couponToMyItemData)
                     : [];
             const xrunList: MyItemData[] =
                 xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
