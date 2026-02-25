@@ -10,7 +10,6 @@ import {
   checkServerVersion,
   openStore
 } from '../services/versionCheck';
-import { requestAutoShowTapjoy } from '../services/tapjoy';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -88,36 +87,6 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
 
-          <Text style={styles.sectionTitle}>{t('screens.myInfoSettings.reward')}</Text>
-          {Platform.OS === 'android' && (
-            <>
-              <TouchableOpacity
-                style={styles.card}
-                activeOpacity={0.85}
-                onPress={() => navigate(ROUTES.ayetOffers)}
-              >
-                <Text style={styles.cardText}>{t('screens.myInfoSettings.ayet_offers')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.card}
-                activeOpacity={0.85}
-                onPress={() => navigate(ROUTES.ayetOffersXplay)}
-              >
-                <Text style={styles.cardText}>{t('screens.myInfoSettings.ayet_offers_xplay')}</Text>
-              </TouchableOpacity>
-            </>
-          )}
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={() => {
-              requestAutoShowTapjoy();
-              navigate(ROUTES.tapjoyList);
-            }}
-          >
-            <Text style={styles.cardText}>{t('screens.myInfoSettings.tapjoy')}</Text>
-          </TouchableOpacity>
-
           {}
           {versionInfo && (
             <TouchableOpacity
@@ -168,14 +137,6 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
-  },
-  sectionTitle: {
-    fontSize: FONTS.size.small,
-    fontFamily: FONTS.family.semibold,
-    color: '#888',
-    marginTop: SIZES.medium,
-    marginBottom: SIZES.small,
-    paddingHorizontal: 4,
   },
   versionContainer: {
     width: '100%',
