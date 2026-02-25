@@ -6,11 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { COMMON_STYLES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as MediaLibrary from 'expo-media-library';
 
 interface TicketData {
     id: string;
@@ -32,6 +35,7 @@ export const ShopMyTicketDetailScreen = () => {
     const { goBack } = useAppNavigation();
     const { t } = useTranslation();
     const { selectedShopItem } = useAppContext();
+    const { showAlert } = useAlertDialog();
     const insets = useSafeAreaInsets();
     const navBarHeight = useAndroidNavigationBarHeight(0);
 
@@ -50,8 +54,80 @@ export const ShopMyTicketDetailScreen = () => {
         barcodeNumber: (selectedShopItem as any).barcodeNumber || '1231 1231 1231 1231',
     } : sampleTicket;
 
-    const handleSaveImage = () => {
+    const handleSaveImage = async () => {
+        console.warn('[내 티켓] 이미지 저장 버튼 클릭됨');
+        console.log('[내 티켓] 이미지 저장 시작');
+        if (!hasBarcodeImageUrl) {
+            console.log('[내 티켓] 저장 중단: 바코드 이미지 URL 없음');
+            await showAlert('알림', '저장할 바코드 이미지가 없습니다.');
+            return;
+        }
 
+        try {
+            const permission = await MediaLibrary.requestPermissionsAsync();
+            console.log('[내 티켓] MediaLibrary 권한:', permission.status, {
+                canAskAgain: permission.canAskAgain,
+                granted: permission.granted,
+            });
+            if (permission.status !== 'granted') {
+                console.log('[내 티켓] 저장 중단: 권한 거부');
+                await showAlert('권한 필요', '이미지를 저장하려면 사진 권한이 필요합니다.');
+                return;
+            }
+
+            const imageUrl = couponImgUrl!.trim();
+            console.log('[내 티켓] 저장 대상 이미지 URL:', imageUrl);
+            const cacheDir = FileSystem.cacheDirectory || FileSystem.documentDirectory;
+            console.log('[내 티켓] 저장 경로 확인:', {
+                cacheDirectory: FileSystem.cacheDirectory,
+                documentDirectory: FileSystem.documentDirectory,
+                selected: cacheDir,
+            });
+            if (!cacheDir) {
+                throw new Error('저장 경로를 찾을 수 없습니다.');
+            }
+
+            const extension = imageUrl.includes('.png')
+                ? 'png'
+                : imageUrl.includes('.webp')
+                    ? 'webp'
+                    : 'jpg';
+            const fileUri = `${cacheDir}ticket_barcode_${Date.now()}.${extension}`;
+            console.log('[내 티켓] 다운로드 시작:', { fileUri, extension });
+
+            const download = await FileSystem.downloadAsync(imageUrl, fileUri);
+            console.log('[내 티켓] 다운로드 완료:', download);
+
+            await MediaLibrary.saveToLibraryAsync(download.uri);
+            console.log('[내 티켓] saveToLibraryAsync 완료:', download.uri);
+
+            try {
+                const asset = await MediaLibrary.createAssetAsync(download.uri);
+                console.log('[내 티켓] Asset 생성 완료:', asset?.uri);
+                try {
+                    await MediaLibrary.createAlbumAsync('XRUN', asset, false);
+                    console.log('[내 티켓] XRUN 앨범 생성 완료');
+                } catch (albumError) {
+
+                    console.warn('[내 티켓] XRUN 앨범 생성 스킵:', albumError);
+                }
+            } catch (assetError) {
+                console.warn('[내 티켓] Asset 생성 스킵(저장은 완료):', assetError);
+            }
+
+            try {
+                await FileSystem.deleteAsync(download.uri, { idempotent: true });
+                console.log('[내 티켓] 임시 파일 삭제 완료:', download.uri);
+            } catch (deleteError) {
+                console.warn('[내 티켓] 임시 파일 삭제 스킵:', deleteError);
+            }
+
+            console.log('[내 티켓] 이미지 저장 성공');
+            await showAlert('저장 완료', '내 티켓 바코드 이미지가 저장되었습니다.\n갤러리에 없다면 내 파일 > 이미지에서 확인해 주세요.');
+        } catch (error) {
+            console.error('[내 티켓] 이미지 저장 실패:', error);
+            await showAlert('저장 실패', '이미지 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        }
     };
 
     return (
@@ -118,7 +194,10 @@ export const ShopMyTicketDetailScreen = () => {
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
                 <TouchableOpacity
                     style={styles.saveButton}
-                    onPress={handleSaveImage}
+                    onPress={() => {
+                        console.warn('[내 티켓] onPress 진입');
+                        handleSaveImage();
+                    }}
                     activeOpacity={0.85}
                 >
                     <LinearGradient

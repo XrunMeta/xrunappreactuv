@@ -22,6 +22,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "서비스 지점 안내, AR 기능 사용을 위해 카메라 권한이 필요합니다. We need camera access to show you service locations and provide AR features.",
         "NSPhotoLibraryUsageDescription": "선택적으로, 사용자의 이미지를 업로드 하기 위해 사진 권한이 필요합니다. You can optionally allow photo access if you'd like to upload your own images.",
+        "NSPhotoLibraryAddUsageDescription": "바코드 이미지를 사진첩에 저장하기 위해 사진 추가 권한이 필요합니다. We need permission to add images to your photo library to save ticket barcodes.",
         "NSLocationWhenInUseUsageDescription": "사용자 주변의 가까운 매장이나 서비스 지점을 찾아서 안내하기 위해 위치 정보가 사용됩니다. Your location helps us find and suggest the nearest stores or service points for you.",
         "NSUserTrackingUsageDescription": "사용자에게 최적화된 광고를 제공하기 위해 기기 정보 및 광고 활동 데이터를 사용합니다. This identifier will be used to deliver personalized ads to you.",
         "ITSAppUsesNonExemptEncryption": false,
@@ -74,6 +75,7 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -88,6 +90,7 @@
       "expo-font",
       "expo-camera",
       "expo-location",
+      "expo-media-library",
       "expo-web-browser",
       "expo-iap",
       [
