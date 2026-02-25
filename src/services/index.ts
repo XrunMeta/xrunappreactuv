@@ -4304,10 +4304,38 @@ export const v_877de8 = async (
       '/getAyetPointsBalance',
       v_576f5a,
     );
+    const v_479f05 = v_3393e3.data;
+    const v_9390e8 = v_479f05?.data ?? v_479f05;
 
-    const v_9390e8 = v_3393e3.data?.data;
-    const v_78e300 = v_9390e8?.total_ayet_points ?? 0;
-    const v_39d5c0 = v_9390e8?.transaction_count ?? 0;
+    const v_215917 = [
+      v_9390e8?.total_ayet_points,
+      v_479f05?.total_ayet_points,
+      v_9390e8?.balance,
+      v_479f05?.balance,
+    ];
+    const v_ec95c3 = [
+      v_9390e8?.transaction_count,
+      v_479f05?.transaction_count,
+      v_9390e8?.count,
+      v_479f05?.count,
+    ];
+
+    const v_393406 = v_215917
+      .map((v_81e2ef) => (v_81e2ef == null ? NaN : Number(v_81e2ef)))
+      .find((v_81e2ef) => Number.isFinite(v_81e2ef));
+    const v_b2eb05 = v_ec95c3
+      .map((v_81e2ef) => (v_81e2ef == null ? NaN : Number(v_81e2ef)))
+      .find((v_81e2ef) => Number.isFinite(v_81e2ef));
+
+    if (!Number.isFinite(v_393406 as number)) {
+      if (__DEV__) {
+        console.warn('[ayeT 포인트] 응답 포맷 불일치(raw):', v_479f05);
+      }
+      throw new Error('getAyetPointsBalance 응답 형식을 해석하지 못했습니다.');
+    }
+
+    const v_78e300 = Number(v_393406);
+    const v_39d5c0 = Number.isFinite(v_b2eb05 as number) ? Number(v_b2eb05) : 0;
     console.log('[ayeT 포인트] 잔액 조회 응답:', {
       member: v_576f5a.member,
       total_ayet_points: v_78e300,

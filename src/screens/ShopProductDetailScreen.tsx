@@ -193,11 +193,8 @@ export const v_a59951 = () => {
             v_889fad('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
             return;
         }
-        const v_c25eec = (v_90e57e && (v_90e57e.realPrice ?? v_90e57e.salePrice) != null)
-            ? (typeof (v_90e57e.realPrice ?? v_90e57e.salePrice) === 'number'
-                ? (v_90e57e.realPrice ?? v_90e57e.salePrice) as number
-                : parseInt(String(v_90e57e.realPrice ?? v_90e57e.salePrice).replace(/,/g, ''), 10) || v_01bee9.price)
-            : v_01bee9.price;
+
+        const v_c25eec = v_01bee9.price;
         const v_c88e9b = v_b7c830 ?? 0;
         if (v_c88e9b < v_c25eec) {
             v_889fad('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
@@ -253,7 +250,7 @@ export const v_a59951 = () => {
                 },
             },
         ]);
-    }, [v_660822, v_7496db, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_90e57e, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
+    }, [v_660822, v_7496db, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
@@ -430,11 +427,9 @@ export const v_a59951 = () => {
         : v_01bee9.image;
     const v_ba7f97 = (v_5db874 && v_90e57e?.goodsName) ? v_90e57e.goodsName : v_01bee9.title;
     const v_b034a8 = (v_5db874 && v_90e57e?.brandName) ? v_90e57e.brandName : v_01bee9.brand;
-    const v_4a4ff4 = v_90e57e?.realPrice ?? v_90e57e?.salePrice;
-    const v_e72b09 = (v_5db874 && v_4a4ff4 != null)
-        ? (typeof v_4a4ff4 === 'number' ? v_4a4ff4 : parseInt(String(v_4a4ff4).replace(/,/g, ''), 10) || v_01bee9.price)
-        : v_01bee9.price;
-    const v_513fb9 = (v_b7c830 ?? 0) - v_e72b09;
+
+    const v_e72b09 = v_01bee9.price;
+    const v_513fb9 = v_b7c830 == null ? null : (v_b7c830 - v_e72b09);
     const v_d0206c = v_5db874 && v_90e57e && (v_90e57e.content || v_90e57e.contentAddDesc);
 
     return (
@@ -498,13 +493,15 @@ export const v_a59951 = () => {
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={v_d81136.paymentBalance}>
-                                            {(v_b7c830 ?? 0).toLocaleString()} Xplay
+                                            {v_b7c830 == null ? '-' : `${v_b7c830.toLocaleString()} Xplay`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
                                     <Text style={v_d81136.paymentLabel}>구매 후 잔여 Xplay</Text>
-                                    <Text style={v_d81136.paymentRemaining}>{v_513fb9.toLocaleString()} Xplay</Text>
+                                    <Text style={v_d81136.paymentRemaining}>
+                                        {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} Xplay`}
+                                    </Text>
                                 </View>
                             </>
                         ) : (

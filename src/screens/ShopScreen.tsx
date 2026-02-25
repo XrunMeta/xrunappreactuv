@@ -118,9 +118,10 @@ export const v_10886b = () => {
             }
             v_2f87ed(true);
             const v_43c42e = await v_877de8(v_660822, v_9b57fc);
-            v_d20f1f(v_43c42e.total_ayet_points ?? 0);
+            v_d20f1f(v_43c42e.total_ayet_points ?? null);
         } catch {
-            v_d20f1f(0);
+
+            v_d20f1f(null);
         } finally {
             v_2f87ed(false);
         }
@@ -317,7 +318,7 @@ export const v_10886b = () => {
                                                 <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
                                             ) : (
                                                 <Text style={v_d81136.balanceAmount}>
-                                                    {(v_cd398d ?? 0).toLocaleString()}
+                                                    {v_cd398d == null ? '-' : v_cd398d.toLocaleString()}
                                                 </Text>
                                             )
                                         ) : (
