@@ -4369,10 +4369,18 @@ export const purchaseGiftWithXplayPoints = async (
   navigation?: any,
 ): Promise<PurchaseGiftWithXplayPointsResponse> => {
   try {
+    const body = {
+      member: params.member,
+      goods_code: params.goods_code,
+      phone_no: params.phone_no ?? '',
+    };
+    if (__DEV__) {
+      console.log('[기프티쇼] Xplay 구매 요청 body:', { ...body, phone_no: body.phone_no ? `${body.phone_no.slice(0, 3)}***` : '(없음)' });
+    }
     const axiosInstance = createAxiosInstance(navigation);
     const response = await axiosInstance.post<PurchaseGiftWithXplayPointsResponse>(
       '/purchaseGiftWithXplayPoints',
-      params,
+      body,
     );
     const data = response.data;
     if (data?.status === 'success') {
