@@ -1337,7 +1337,14 @@ export const MapMainScreen: React.FC = () => {
 
         isProgrammaticMoveRef.current = true;
 
-        mapRef.current.animateToRegion({
+        const map = mapRef.current;
+        if (!map || typeof map.animateToRegion !== 'function') {
+          console.warn('⚠️ [handleMapReady] animateToRegion 호출 불가: mapRef가 null이거나 메서드가 없습니다.');
+          isProgrammaticMoveRef.current = false;
+          return;
+        }
+
+        map.animateToRegion({
           latitude: targetLocation.latitude,
           longitude: targetLocation.longitude,
           latitudeDelta: 0.005,
@@ -1388,6 +1395,11 @@ export const MapMainScreen: React.FC = () => {
 
       if (mapRef.current) {
         isProgrammaticMoveRef.current = true;
+        if (typeof mapRef.current.animateToRegion !== 'function') {
+          console.warn('⚠️ [handleMapReady] fallback animateToRegion 호출 불가');
+          isProgrammaticMoveRef.current = false;
+          return;
+        }
         mapRef.current.animateToRegion({
           latitude: defaultLocation.latitude,
           longitude: defaultLocation.longitude,
