@@ -382,7 +382,7 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
 
 let iconWallet: any = null;
 let iconShop: any = null;
-let iconReferral: any = null;
+let iconXplay: any = null;
 let iconUser: any = null;
 let iconMapPoint: any = null;
 
@@ -399,9 +399,9 @@ try {
 }
 
 try {
-  iconReferral = require('../../assets/images/icon_referral.png');
+  iconXplay = require('../../assets/images/icon_xplay.png');
 } catch (e) {
-  console.warn('icon_referral.png not found');
+  console.warn('icon_xplay.png not found');
 }
 
 try {
@@ -1898,14 +1898,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     console.log('Navigation item pressed:', itemId);
 
     switch (itemId) {
+      case 'xplay':
+        navigate(ROUTES.xrunInfo);
+        break;
       case 'wallet':
         navigate(ROUTES.wallet);
         break;
       case 'shop':
         navigate(ROUTES.shop);
-        break;
-      case 'referral':
-        navigate(ROUTES.referralSettlement);
         break;
       case 'info':
         navigate(ROUTES.myInfo);
@@ -2431,10 +2431,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, [showAdInModal]);
 
   const bottomNavItems = [
-    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
+    { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
     { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
     { id: 'map', label: '' }, 
-    { id: 'referral', label: t('components.bottomNavigationBar.referral'), icon: iconReferral },
+    { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },
     { id: 'info', label: t('components.bottomNavigationBar.info'), icon: iconUser },
   ];
 

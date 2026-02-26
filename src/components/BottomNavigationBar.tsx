@@ -171,6 +171,14 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   const horizontalPadding = getHorizontalPadding();
   const centerButtonWidth = getCenterButtonWidth();
 
+  const mapIconSource = activeTab === 'Map'
+    ? (iconMap || iconMapWhite)
+    : (iconMapWhite || iconMap);
+
+  const cameraIconSource = activeTab === 'Camera'
+    ? (iconCamera || iconCameraWhite)
+    : (iconCameraWhite || iconCamera);
+
   const renderCenterItem = () => {
     return (
       <>
@@ -182,9 +190,9 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
           ]}
           onPress={() => onTabChange?.('Map')}
           activeOpacity={0.7}>
-          {iconMap && iconMapWhite ? (
+          {mapIconSource ? (
             <Image
-              source={activeTab === 'Map' ? iconMap : iconMapWhite}
+              source={mapIconSource}
               resizeMode="contain"
               style={styles.centerIcon}
             />
@@ -201,9 +209,9 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
           ]}
           onPress={() => onTabChange?.('Camera')}
           activeOpacity={0.7}>
-          {iconCamera && iconCameraWhite ? (
+          {cameraIconSource ? (
             <Image
-              source={activeTab === 'Camera' ? iconCamera : iconCameraWhite}
+              source={cameraIconSource}
               resizeMode="contain"
               style={styles.centerIcon}
             />
