@@ -71,7 +71,7 @@ import {
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
-import { v_4b64f4, v_700ef9 } from './src/context';
+import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a } from './src/components';
 import { v_a2474a, v_e4a763 } from './src/utils/env';
@@ -1110,8 +1110,10 @@ export default function v_6540c3() {
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
-              <SplashScreen />
-              <GlobalDialogs />
+              <OTAUpdateProvider>
+                <SplashScreen />
+                <GlobalDialogs />
+              </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
         </AppProvider>
@@ -1125,10 +1127,12 @@ export default function v_6540c3() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester isAdFinished={v_65941f} />
-            <AliveService />
-            <ScreenHost />
-            <GlobalDialogs />
+            <OTAUpdateProvider>
+              <PermissionRequester isAdFinished={v_65941f} />
+              <AliveService />
+              <ScreenHost />
+              <GlobalDialogs />
+            </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
