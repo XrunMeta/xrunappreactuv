@@ -12,6 +12,7 @@ import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_556baf } from '../components';
 import { v_729608, v_4c7b5d } from '../components';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_877de8 } from '../services';
@@ -25,6 +26,7 @@ const v_3d184e = require('../../assets/images/quest.png');
 
 export const v_f7bdb9 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_19c59c, v_97ae62] = v_5ab095<number | null>(null);
   const [v_747a87, v_3e37d1] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
@@ -109,9 +111,9 @@ export const v_f7bdb9 = () => {
         {}
         <View style={v_d81136.zonesRow}>
           <TouchableOpacity
-            style={v_d81136.zoneCard}
+            style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
+            onPress={() => v_889fad('안내', '오픈예정입니다')}
           >
             <Image source={v_288e0b} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
@@ -273,6 +275,9 @@ const v_d81136 = v_472849.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 3,
+  },
+  zoneCardDisabled: {
+    backgroundColor: 'rgba(128, 128, 128, 0.28)',
   },
   zoneImage: {
     width: '100%',
