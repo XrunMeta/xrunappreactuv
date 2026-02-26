@@ -294,3 +294,5 @@ export const useAppContext = () => {
 };
 
 export { useAlertDialog, AlertDialogProvider } from './AlertDialogContext';
+
+export { OTAUpdateProvider, useOTAUpdate } from './OTAUpdateContext';

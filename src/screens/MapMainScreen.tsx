@@ -41,6 +41,7 @@ import { CameraMainScreen } from './CameraMainScreen';
 import { ROUTES, useAppNavigation } from '../navigation';
 
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useOTAUpdate } from '../context/OTAUpdateContext';
 
 import { SpotData } from '../types';
 
@@ -208,7 +209,13 @@ export const MapMainScreen: React.FC = () => {
 
   const insets = useSafeAreaInsets();
 
+  const { checkForUpdate } = useOTAUpdate();
+
   const prevScreenRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    checkForUpdate();
+  }, [checkForUpdate]);
 
   useEffect(() => {
     if (logoTempMarker) {
