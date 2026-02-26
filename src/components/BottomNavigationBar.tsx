@@ -171,6 +171,14 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   const v_30e711 = v_6a3c24();
   const v_f4f953 = v_e5df55();
 
+  const v_48897b = v_ac1d22 === 'Map'
+    ? (v_4eff08 || v_f968cc)
+    : (v_f968cc || v_4eff08);
+
+  const v_ba3e9e = v_ac1d22 === 'Camera'
+    ? (v_88efd0 || v_5c635f)
+    : (v_5c635f || v_88efd0);
+
   const v_eebe9d = () => {
     return (
       <>
@@ -182,9 +190,9 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
           ]}
           onPress={() => v_d52709?.('Map')}
           activeOpacity={0.7}>
-          {v_4eff08 && v_f968cc ? (
+          {v_48897b ? (
             <Image
-              source={v_ac1d22 === 'Map' ? v_4eff08 : v_f968cc}
+              source={v_48897b}
               resizeMode="contain"
               style={v_d81136.centerIcon}
             />
@@ -201,9 +209,9 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
           ]}
           onPress={() => v_d52709?.('Camera')}
           activeOpacity={0.7}>
-          {v_88efd0 && v_5c635f ? (
+          {v_ba3e9e ? (
             <Image
-              source={v_ac1d22 === 'Camera' ? v_88efd0 : v_5c635f}
+              source={v_ba3e9e}
               resizeMode="contain"
               style={v_d81136.centerIcon}
             />
