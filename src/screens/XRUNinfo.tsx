@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeView } from '../components';
 import { Header, TaboolaBanner } from '../components';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
 import { getAyetPointsBalance } from '../services';
@@ -25,6 +26,7 @@ const questImage = require('../../assets/images/quest.png');
 
 export const XRUNinfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -109,9 +111,9 @@ export const XRUNinfoScreen = () => {
         {}
         <View style={styles.zonesRow}>
           <TouchableOpacity
-            style={styles.zoneCard}
+            style={[styles.zoneCard, styles.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.tapjoyList)}
+            onPress={() => showAlert('안내', '오픈예정입니다')}
           >
             <Image source={zone1Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
@@ -273,6 +275,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 3,
+  },
+  zoneCardDisabled: {
+    backgroundColor: 'rgba(128, 128, 128, 0.28)',
   },
   zoneImage: {
     width: '100%',
