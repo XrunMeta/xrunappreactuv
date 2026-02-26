@@ -1337,7 +1337,14 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         v_ca338a.current = true;
 
-        v_3ec640.current.animateToRegion({
+        const v_8dcb51 = v_3ec640.current;
+        if (!v_8dcb51 || typeof v_8dcb51.animateToRegion !== 'function') {
+          console.warn('⚠️ [handleMapReady] animateToRegion 호출 불가: mapRef가 null이거나 메서드가 없습니다.');
+          v_ca338a.current = false;
+          return;
+        }
+
+        v_8dcb51.animateToRegion({
           latitude: v_f18a9c.latitude,
           longitude: v_f18a9c.longitude,
           latitudeDelta: 0.005,
@@ -1388,6 +1395,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
       if (v_3ec640.current) {
         v_ca338a.current = true;
+        if (typeof v_3ec640.current.animateToRegion !== 'function') {
+          console.warn('⚠️ [handleMapReady] fallback animateToRegion 호출 불가');
+          v_ca338a.current = false;
+          return;
+        }
         v_3ec640.current.animateToRegion({
           latitude: v_3a1065.latitude,
           longitude: v_3a1065.longitude,
