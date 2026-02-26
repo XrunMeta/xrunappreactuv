@@ -71,7 +71,7 @@ import {
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
-import { AppProvider, useAppContext } from './src/context';
+import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog } from './src/components';
 import { loadEnv, getEnv } from './src/utils/env';
@@ -1110,8 +1110,10 @@ export default function App() {
         <AppProvider>
           <NavigationProvider>
             <AlertDialogProvider>
-              <SplashScreen />
-              <GlobalDialogs />
+              <OTAUpdateProvider>
+                <SplashScreen />
+                <GlobalDialogs />
+              </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
         </AppProvider>
@@ -1125,10 +1127,12 @@ export default function App() {
       <AppProvider>
         <NavigationProvider>
           <AlertDialogProvider>
-            <PermissionRequester isAdFinished={isAdFinished} />
-            <AliveService />
-            <ScreenHost />
-            <GlobalDialogs />
+            <OTAUpdateProvider>
+              <PermissionRequester isAdFinished={isAdFinished} />
+              <AliveService />
+              <ScreenHost />
+              <GlobalDialogs />
+            </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
       </AppProvider>
