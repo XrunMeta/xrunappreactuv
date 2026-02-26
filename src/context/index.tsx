@@ -294,3 +294,5 @@ export const v_700ef9 = () => {
 };
 
 export { useAlertDialog, AlertDialogProvider } from './AlertDialogContext';
+
+export { OTAUpdateProvider, useOTAUpdate } from './OTAUpdateContext';
