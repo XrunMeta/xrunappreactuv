@@ -16,6 +16,8 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_877de8 } from '../services';
+import { v_a3bbf0 } from '../utils';
+import { v_772971 } from 'jmpfvteuuztnp';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_10a702 = require('../../assets/images/blur_yellow.png');
@@ -27,15 +29,20 @@ const v_3d184e = require('../../assets/images/quest.png');
 export const v_f7bdb9 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
+  const { t: v_8d41d7 } = v_772971();
   const [v_19c59c, v_97ae62] = v_5ab095<number | null>(null);
   const [v_747a87, v_3e37d1] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
+  const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('');
 
   const v_fff133 = v_de06a3(async () => {
     try {
       const v_f24fd5 = await v_e84827.getItem('userData');
       if (v_f24fd5) {
         const v_ef7306 = JSON.parse(v_f24fd5);
+        if (v_ef7306.email) {
+          v_d9bcc7(v_ef7306.email);
+        }
         if (v_ef7306.member) {
           const v_660822 = v_ef7306.member;
           v_9d6aeb(String(v_660822));
@@ -65,6 +72,14 @@ export const v_f7bdb9 = () => {
 
   const v_ac1f2a = v_19c59c !== null ? v_19c59c : 0;
   const v_70b2ec = v_747a87 ? '' : v_ac1f2a.toLocaleString();
+
+  const v_3f9989 = v_de06a3(async () => {
+    if (!v_f4fb5e) {
+      await v_889fad('안내', '사용자 정보를 확인할 수 없습니다.');
+      return;
+    }
+    await v_a3bbf0(v_8d41d7, { email: v_f4fb5e }, v_889fad, v_9b57fc);
+  }, [v_f4fb5e, v_889fad, v_8d41d7, v_9b57fc]);
 
   return (
     <SafeView style={v_d81136.container}>
@@ -133,7 +148,7 @@ export const v_f7bdb9 = () => {
         <TouchableOpacity
           style={v_d81136.questCard}
           activeOpacity={0.9}
-          onPress={() => v_9b57fc(v_ce4741.referralMyGroup)}
+          onPress={v_3f9989}
         >
           <Image source={v_3d184e} style={v_d81136.questImage} resizeMode="cover" />
           <View style={v_d81136.questOverlay}>

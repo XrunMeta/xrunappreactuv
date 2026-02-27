@@ -2,6 +2,7 @@ import { v_5f4661, v_326be8, v_405151, v_03e392 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import * as v_a928e1 from 'yvptvjtrs';
+import { v_843337 } from './playStoreUrl';
 
 export const v_cba33f = (v_a8cd21) => {
   if (v_326be8.OS === 'android') {
@@ -29,7 +30,7 @@ export const v_db97fb = async (
 
 export * from './env';
 
-export { getPlayStoreUrl, ANDROID_PACKAGE_ID } from './playStoreUrl';
+export { v_843337, ANDROID_PACKAGE_ID } from './playStoreUrl';
 
 export * from './imageCache';
 
@@ -128,7 +129,7 @@ export const v_a3bbf0 = async (
     console.log('[shareReferralLink] 시작 - 플랫폼:', v_326be8.OS);
     console.log('[shareReferralLink] 사용자 이메일:', v_412c99.email);
 
-    const v_17aa0b = getPlayStoreUrl({ gl: 'kr', campaignId: 'web_share' });
+    const v_17aa0b = v_843337({ gl: 'kr', campaignId: 'web_share' });
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
     const v_c79b94 = encodeURIComponent(v_412c99.email);
