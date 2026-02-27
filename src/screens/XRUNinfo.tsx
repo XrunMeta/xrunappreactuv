@@ -111,17 +111,17 @@ export const XRUNinfoScreen = () => {
         {}
         <View style={styles.zonesRow}>
           <TouchableOpacity
-            style={[styles.zoneCard, styles.zoneCardDisabled]}
+            style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => showAlert('안내', '오픈예정입니다')}
+            onPress={() => navigate(ROUTES.ayetOffersXplay)}
           >
             <Image source={zone1Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.zoneCard}
+            style={[styles.zoneCard, styles.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.ayetOffersXplay)}
+            onPress={() => showAlert('안내', '오픈예정입니다')}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
@@ -277,7 +277,12 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   zoneCardDisabled: {
-    backgroundColor: 'rgba(128, 128, 128, 0.28)',
+    backgroundColor: 'rgba(128, 128, 128, 0.18)',
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(128, 128, 128, 0.35)',
   },
   zoneImage: {
     width: '100%',
