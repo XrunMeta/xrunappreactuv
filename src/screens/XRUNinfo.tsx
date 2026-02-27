@@ -111,17 +111,17 @@ export const v_f7bdb9 = () => {
         {}
         <View style={v_d81136.zonesRow}>
           <TouchableOpacity
-            style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
+            style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_889fad('안내', '오픈예정입니다')}
+            onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
           >
             <Image source={v_288e0b} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={v_d81136.zoneCard}
+            style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
+            onPress={() => v_889fad('안내', '오픈예정입니다')}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
@@ -277,7 +277,12 @@ const v_d81136 = v_472849.create({
     elevation: 3,
   },
   zoneCardDisabled: {
-    backgroundColor: 'rgba(128, 128, 128, 0.28)',
+    backgroundColor: 'rgba(128, 128, 128, 0.18)',
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(128, 128, 128, 0.35)',
   },
   zoneImage: {
     width: '100%',
