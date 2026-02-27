@@ -16,6 +16,8 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
 import { getAyetPointsBalance } from '../services';
+import { shareReferralLink } from '../utils';
+import { useTranslation } from 'react-i18next';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const blurYellow = require('../../assets/images/blur_yellow.png');
@@ -27,15 +29,20 @@ const questImage = require('../../assets/images/quest.png');
 export const XRUNinfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
+  const { t } = useTranslation();
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [memberId, setMemberId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   const loadUserAndBalance = useCallback(async () => {
     try {
       const userDataStr = await AsyncStorage.getItem('userData');
       if (userDataStr) {
         const userData = JSON.parse(userDataStr);
+        if (userData.email) {
+          setUserEmail(userData.email);
+        }
         if (userData.member) {
           const member = userData.member;
           setMemberId(String(member));
@@ -65,6 +72,14 @@ export const XRUNinfoScreen = () => {
 
   const displayBalance = pointsBalance !== null ? pointsBalance : 0;
   const balanceText = balanceLoading ? '' : displayBalance.toLocaleString();
+
+  const handleQuestShare = useCallback(async () => {
+    if (!userEmail) {
+      await showAlert('안내', '사용자 정보를 확인할 수 없습니다.');
+      return;
+    }
+    await shareReferralLink(t, { email: userEmail }, showAlert, navigate);
+  }, [userEmail, showAlert, t, navigate]);
 
   return (
     <SafeView style={styles.container}>
@@ -133,7 +148,7 @@ export const XRUNinfoScreen = () => {
         <TouchableOpacity
           style={styles.questCard}
           activeOpacity={0.9}
-          onPress={() => navigate(ROUTES.referralMyGroup)}
+          onPress={handleQuestShare}
         >
           <Image source={questImage} style={styles.questImage} resizeMode="cover" />
           <View style={styles.questOverlay}>

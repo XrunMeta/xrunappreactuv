@@ -2,6 +2,7 @@ import { Share, Platform, ToastAndroid, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as CryptoJS from 'crypto-js';
+import { getPlayStoreUrl } from './playStoreUrl';
 
 export const showToast = (message: string) => {
   if (Platform.OS === 'android') {
