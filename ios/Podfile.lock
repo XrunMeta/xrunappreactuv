@@ -1,4 +1,11 @@
 PODS:
+  - Ads-Global (7.9.0.6):
+    - Ads-Global/BUAdSDK (= 7.9.0.6)
+  - Ads-Global/BUAdSDK (7.9.0.6):
+    - Ads-Global/PangleSDK
+    - Ads-Global/TikTokBusinessSDK
+  - Ads-Global/PangleSDK (7.9.0.6)
+  - Ads-Global/TikTokBusinessSDK (7.9.0.6)
   - AppAuth (2.0.0):
     - AppAuth/Core (= 2.0.0)
     - AppAuth/ExternalUserAgent (= 2.0.0)
@@ -2996,6 +3003,7 @@ PODS:
     - ZXingObjC/Core
 
 DEPENDENCIES:
+  - Ads-Global
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXApplication (from `../node_modules/expo-application/ios`)
@@ -3119,6 +3127,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Ads-Global
     - AppAuth
     - AppCheckCore
     - AppsFlyerFramework
@@ -3380,6 +3389,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Ads-Global: fb1fa75ebbf100ab9ff216d81b71a05cf1a73675
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   AppsFlyerFramework: 63577b60d6b9fcdab60135289979e7d1c9ec79b9
@@ -3519,6 +3529,6 @@ SPEC CHECKSUMS:
   Yoga: 728df40394d49f3f471688747cf558158b3a3bd1
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 3ee26cc094380fb3148836ccc9028d265304ae78
+PODFILE CHECKSUM: 941ce8bdb3118b8584092d21da1c89a4e1cc9a34
 
 COCOAPODS: 1.16.2
