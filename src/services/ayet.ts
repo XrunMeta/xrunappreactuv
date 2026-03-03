@@ -1,6 +1,6 @@
 
 
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules } from 'react-native';
 
 const { AyetOfferwallModule } = NativeModules;
 
@@ -20,8 +20,8 @@ const AYET_LOG_PREFIX = '[ayeT]';
 export const getAyetOffers = async (
   adSlotName: string = AYET_AD_SLOT_NAME
 ): Promise<AyetOfferItem[]> => {
-  if (Platform.OS !== 'android' || !AyetOfferwallModule?.getOffers) {
-    console.warn(`${AYET_LOG_PREFIX} getAyetOffers skipped (not Android or module unavailable), adSlotName=${adSlotName}`);
+  if (!AyetOfferwallModule?.getOffers) {
+    console.warn(`${AYET_LOG_PREFIX} getAyetOffers skipped (module unavailable), adSlotName=${adSlotName}`);
     return [];
   }
   const json: string = await AyetOfferwallModule.getOffers(adSlotName);
@@ -43,7 +43,7 @@ export const getAyetOffers = async (
 };
 
 export const setAyetUserId = (userId: string): void => {
-  if (Platform.OS !== 'android' || !AyetOfferwallModule?.setUserId) return;
+  if (!AyetOfferwallModule?.setUserId) return;
   const id = (userId && userId.trim()) ? String(userId).slice(0, 63) : 'guest';
   AyetOfferwallModule.setUserId(id);
 };
@@ -52,8 +52,8 @@ export const showAyetOfferwall = async (
   adSlotName: string = AYET_AD_SLOT_NAME,
   options?: { memberId?: string }
 ): Promise<void> => {
-  if (Platform.OS !== 'android' || !AyetOfferwallModule?.showOfferwall) {
-    console.warn(`${AYET_LOG_PREFIX} showAyetOfferwall skipped (not Android or module unavailable), adSlotName=${adSlotName}`);
+  if (!AyetOfferwallModule?.showOfferwall) {
+    console.warn(`${AYET_LOG_PREFIX} showAyetOfferwall skipped (module unavailable), adSlotName=${adSlotName}`);
     return;
   }
   if (options?.memberId != null) setAyetUserId(options.memberId);
@@ -61,4 +61,4 @@ export const showAyetOfferwall = async (
 };
 
 export const isAyetOfferwallAvailable = (): boolean =>
-  Platform.OS === 'android' && !!(NativeModules.AyetOfferwallModule?.showOfferwall ?? NativeModules.AyetOfferwallModule?.getOffers);
+  !!(NativeModules.AyetOfferwallModule?.showOfferwall ?? NativeModules.AyetOfferwallModule?.getOffers);
