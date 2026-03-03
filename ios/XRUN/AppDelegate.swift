@@ -1,6 +1,8 @@
 import Expo
 import React
 import ReactAppDependencyProvider
+import PAGAdSDK
+import AyetSDK
 
 #if canImport(GoogleMaps)
 import GoogleMaps
@@ -17,6 +19,11 @@ public class AppDelegate: ExpoAppDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+
+    setupPangleSDK()
+
+    AyetSDK.shared.initialize(placementId: 22062, externalIdentifier: "guest")
+
     let delegate = ReactNativeDelegate()
     let factory = ExpoReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()

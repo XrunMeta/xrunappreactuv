@@ -13,6 +13,9 @@
 		B85A3A97B8FE47C6A7937954  = {isa = PBXBuildFile; fileRef = CE1333FD3B10CE678D3090B9 ; };
 		BB2F792D24A3F905000567C9  = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 ; };
 		F11748422D0307B40044C1D9  = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 ; };
+		F7E0C62AD8FABDD0C696A613  = {isa = PBXBuildFile; fileRef = B95EC09A1117A940512F7AD7 ; };
+		A1B2C3D4E5F60718293A4B5D1  = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C1 ; };
+		B2C3D4E5F60718293A4B5C6E1  = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6D1 ; };
 
 		13B07F961A680F5B00A75B9A  = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A  = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = XRUN/Images.xcassets; sourceTree = "<group>"; };
@@ -26,6 +29,8 @@
 		ED297162215061F000B7C4FE  = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = XRUN/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "XRUN-Bridging-Header.h"; path = "XRUN/XRUN-Bridging-Header.h"; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AyetOfferwallModule.swift; path = XRUN/AyetOfferwallModule.swift; sourceTree = "<group>"; };
+		B2C3D4E5F60718293A4B5C6D1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AyetOfferwallModule.m; path = XRUN/AyetOfferwallModule.m; sourceTree = "<group>"; };
 		FCA2BF41141EBE59AC734EE0  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = XRUN/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 
 		13B07F8C1A680F5B00A75B9A  = {
@@ -42,6 +47,8 @@
 			children = (
 				F11748412D0307B40044C1D9 ,
 				F11748442D0722820044C1D9 ,
+				A1B2C3D4E5F60718293A4B5C1 ,
+				B2C3D4E5F60718293A4B5C6D1 ,
 				BB2F792B24A3F905000567C9 ,
 				13B07FB51A68108700A75B9A ,
 				13B07FB61A68108700A75B9A ,
@@ -143,6 +150,9 @@
 			dependencies = (
 			);
 			name = XRUN;
+			packageProductDependencies = (
+				D4E5F60718293A4B5C6D7E8F1 ,
+			);
 			productName = XRUN;
 			productReference = 13B07F961A680F5B00A75B9A ;
 			productType = "com.apple.product-type.application";
@@ -167,6 +177,9 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
+			packageReferences = (
+				C3D4E5F60718293A4B5C6D7E1 ,
+			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 ;
 			projectDirPath = "";
 			projectRoot = "";
@@ -348,7 +361,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 ,
-				B85A3A97B8FE47C6A7937954 ,
+				373437363531313737646233346530346163623666636232 ,
+				656538616162306566313239343963333832353835373336 ,
+				A1B2C3D4E5F60718293A4B5D1 ,
+				B2C3D4E5F60718293A4B5C6E1 ,
+				F7E0C62AD8FABDD0C696A613 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,6 +571,21 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+
+		C3D4E5F60718293A4B5C6D7E1  = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ayetstudios/ios-sdk-v2-repo";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+
+		D4E5F60718293A4B5C6D7E8F1  = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3D4E5F60718293A4B5C6D7E1 ;
+			productName = AyetSDK;
 		};
 
 	};
