@@ -65,6 +65,21 @@ GMSServices.provideAPIKey("oth-google-api-key")
     let result = RCTLinkingManager.application(application, continue: userActivity, restorationHandler: restorationHandler)
     return super.application(application, continue: userActivity, restorationHandler: restorationHandler) || result
   }
+
+  private func setupPangleSDK() {
+    print("[AppDelegate] Pangle SDK 초기화 시작...")
+    let config = PAGConfig.share()
+    config.appID = "8901247" 
+
+    PAGSdk.start(with: config) { success, error in
+      if success {
+        print("[AppDelegate] ✅ Pangle SDK 초기화 성공")
+        print("[AppDelegate] Pangle SDK Version: \\(PAGSdk.sdkVersion())")
+      } else if let error = error {
+        print("[AppDelegate] ❌ Pangle SDK 초기화 실패: \\(error.localizedDescription)")
+      }
+    }
+  }
 }
 
 class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {

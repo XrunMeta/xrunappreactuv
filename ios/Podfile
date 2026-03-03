@@ -31,6 +31,8 @@ $RNAppsFlyerStrictMode=false
 $AppsFlyerPurchaseConnector=true
 # @generated end AppsFlyer Purchase Connector
 
+  pod 'Ads-Global'
+
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
     config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"];
   else
