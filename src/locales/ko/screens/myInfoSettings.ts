@@ -9,7 +9,7 @@ export default {
   offers_empty: '표시할 오퍼가 없습니다.',
   offers_error: '오퍼를 불러올 수 없습니다.',
   offers_loading: '오퍼 목록 불러오는 중...',
-  ayet_android_only: 'ayeT 오퍼 보기는 Android에서만 이용할 수 있습니다.',
+  ayet_android_only: '오퍼월을 사용할 수 없습니다.',
 };
 
 
