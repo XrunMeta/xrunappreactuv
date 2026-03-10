@@ -3,7 +3,6 @@ export default {
   closeMembership: 'Close Membership',
   languageSelect: 'Language Select',
   reward: 'Reward',
-  tapjoy: 'Tapjoy',
   ayet_offers: 'ayeT Offers',
   ayet_offers_xplay: 'Xplay Offers',
   offers_empty: 'No offers to display.',
