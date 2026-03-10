@@ -5,7 +5,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
-import { v_961d2c, v_609ab5, v_c8c60c } from '../services/ayet';
+import { v_961d2c, v_c8c60c } from '../services/ayet';
 import { v_cba33f } from '../utils';
 
 const v_8c7ac1 = v_c8c60c;
@@ -23,7 +23,6 @@ export const AyetOffersScreen: v_a3453e.FC<AyetOffersScreenProps> = ({ slotName:
   v_c4deb2(() => {
     if (v_124e9d.current) return;
     const v_207c31 = async () => {
-      if (!v_609ab5()) return;
       v_124e9d.current = true;
       try {
         let v_717992;
@@ -37,7 +36,10 @@ export const AyetOffersScreen: v_a3453e.FC<AyetOffersScreenProps> = ({ slotName:
         await v_961d2c(v_b27fa5, { memberId: v_717992 });
         v_c7ac57();
       } catch (v_9e86fd) {
-        const v_badeaf = v_9e86fd instanceof Error ? v_9e86fd.message : v_8d41d7('screens.myInfoSettings.offers_error');
+        const v_badeaf =
+          v_9e86fd instanceof Error && v_9e86fd.message === 'OFFERWALL_UNAVAILABLE'
+            ? v_8d41d7('screens.myInfoSettings.ayet_android_only')
+            : (v_9e86fd instanceof Error ? v_9e86fd.message : v_8d41d7('screens.myInfoSettings.offers_error'));
         v_cba33f(v_badeaf ?? '오퍼월을 열 수 없습니다.');
         v_c7ac57();
       }
@@ -49,19 +51,6 @@ export const AyetOffersScreen: v_a3453e.FC<AyetOffersScreenProps> = ({ slotName:
     v_b27fa5 === 'Xplay'
       ? 'screens.myInfoSettings.ayet_offers_xplay'
       : 'screens.myInfoSettings.ayet_offers';
-
-  if (!v_609ab5()) {
-    return (
-      <View style={v_d81136.container}>
-        <Header title={v_8d41d7(v_8667e1)} onBackPress={v_c7ac57} showBackButton />
-        <View style={v_d81136.centered}>
-          <Text style={v_d81136.unsupportedText}>
-            {v_8d41d7('screens.myInfoSettings.ayet_android_only')}
-          </Text>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={v_d81136.container}>

@@ -1,12 +1,9 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_cf9c33, v_326be8 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_85f2c8 } from '../services';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
-
-const v_c63bb8 = null; 
 
 let v_4eff08 = null;
 let v_f968cc = null;
@@ -62,78 +59,11 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 }) => {
   const { navigate: v_9b57fc } = v_a0daa8();
 
-  const v_39e4a6 = v_c63bb8 || v_326be8.OS;
-  const [v_9e28f7, v_603c21] = v_5ab095(v_39e4a6 === 'android');
-
-  v_c4deb2(() => {
-    const v_54e447 = new AbortController();
-
-    const v_da5e9c = async () => {
-
-      if (v_39e4a6 === 'ios') {
-        try {
-
-          const v_5297fb = await v_85f2c8(v_9b57fc);
-
-          v_603c21(v_5297fb);
-        } catch (v_5e9bfe) {
-          console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-          v_603c21(false);
-        }
-      } else {
-        v_603c21(true); 
-
-      }
-    };
-
-    v_da5e9c();
-
-    const v_ad1d65 = setInterval(() => {
-      v_da5e9c();
-    }, 30000); 
-
-    return () => {
-      clearInterval(v_ad1d65);
-      v_54e447.abort();
-    };
-  }, [v_9b57fc]);
-
-  const v_79cf3d = v_4622b9.map(v_8c0b26 => {
-    if (v_8c0b26.id === 'wallet') {
-
-      let v_be97ff = null;
-      try {
-        v_be97ff = require('../../assets/images/icon_xrun_black.png');
-      } catch (v_9e86fd) {
-        console.warn('icon_xrun_black.png not found');
-      }
-
-      return {
-        ...v_8c0b26,
-        label: v_9e28f7
-          ? v_8c0b26.label
-          : 'XRUN',
-        icon: v_9e28f7
-          ? v_8c0b26.icon
-          : v_be97ff,
-      };
-    }
-    return v_8c0b26;
-  });
-
   const v_8e442f = (v_6e55b1) => {
     if (v_6e55b1 === 'wallet') {
-      if (v_39e4a6 === 'android') {
-        v_9b57fc(v_ce4741.wallet);
-      } else if (v_39e4a6 === 'ios' && v_9e28f7) {
-        v_9b57fc(v_ce4741.wallet);
-      } else {
-
-        v_9b57fc(v_ce4741.xrunInfo);
-      }
+      v_9b57fc(v_ce4741.wallet);
       return;
     }
-
     v_659a80?.(v_6e55b1);
   };
 
@@ -277,7 +207,7 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
             gap: v_8e4fb6 < 360 ? 4 : v_8e4fb6 < 400 ? 6 : 8,
           }
         ]}>
-          {v_79cf3d.map((v_8c0b26, v_a56041) => {
+          {v_4622b9.map((v_8c0b26, v_a56041) => {
             if (v_8c0b26.id === 'map' || v_8c0b26.id === 'camera') {
 
               return (
