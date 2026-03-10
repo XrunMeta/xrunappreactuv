@@ -5,7 +5,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useTranslation } from 'react-i18next';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
-import { showAyetOfferwall, isAyetOfferwallAvailable, AYET_AD_SLOT_NAME } from '../services/ayet';
+import { showAyetOfferwall, AYET_AD_SLOT_NAME } from '../services/ayet';
 import { showToast } from '../utils';
 
 const DEFAULT_SLOT = AYET_AD_SLOT_NAME;
@@ -23,7 +23,6 @@ export const AyetOffersScreen: React.FC<AyetOffersScreenProps> = ({ slotName = D
   useEffect(() => {
     if (openedRef.current) return;
     const open = async () => {
-      if (!isAyetOfferwallAvailable()) return;
       openedRef.current = true;
       try {
         let memberId: string | undefined;
@@ -37,7 +36,10 @@ export const AyetOffersScreen: React.FC<AyetOffersScreenProps> = ({ slotName = D
         await showAyetOfferwall(slotName, { memberId });
         goBack();
       } catch (e) {
-        const msg = e instanceof Error ? e.message : t('screens.myInfoSettings.offers_error');
+        const msg =
+          e instanceof Error && e.message === 'OFFERWALL_UNAVAILABLE'
+            ? t('screens.myInfoSettings.ayet_android_only')
+            : (e instanceof Error ? e.message : t('screens.myInfoSettings.offers_error'));
         showToast(msg ?? '오퍼월을 열 수 없습니다.');
         goBack();
       }
@@ -49,19 +51,6 @@ export const AyetOffersScreen: React.FC<AyetOffersScreenProps> = ({ slotName = D
     slotName === 'Xplay'
       ? 'screens.myInfoSettings.ayet_offers_xplay'
       : 'screens.myInfoSettings.ayet_offers';
-
-  if (!isAyetOfferwallAvailable()) {
-    return (
-      <View style={styles.container}>
-        <Header title={t(titleKey)} onBackPress={goBack} showBackButton />
-        <View style={styles.centered}>
-          <Text style={styles.unsupportedText}>
-            {t('screens.myInfoSettings.ayet_android_only')}
-          </Text>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
