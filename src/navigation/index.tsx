@@ -71,7 +71,6 @@ export const v_ce4741 = {
   xrunInfo: 'xrunInfo',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
-  tapjoyList: 'tapjoyList',
   ayetOffers: 'ayetOffers',
   ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',

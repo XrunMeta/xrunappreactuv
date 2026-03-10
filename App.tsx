@@ -64,7 +64,6 @@ import {
   v_1cca63,
   v_0e5276,
   v_4a5627,
-  v_f2ecfa,
   v_a50cad,
   v_d4a78d,
 } from './src/screens';
@@ -434,10 +433,6 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'pangleList') {
     return <PangleListScreen />;
-  }
-
-  if (v_0f0c7b === 'tapjoyList') {
-    return <TapjoyListScreen />;
   }
 
   if (v_0f0c7b === 'ayetOffers') {

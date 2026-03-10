@@ -3,7 +3,6 @@ export default {
   closeMembership: '注销会员',
   languageSelect: '语言选择',
   reward: '奖励',
-  tapjoy: 'Tapjoy',
   ayet_offers: 'ayeT 优惠',
   ayet_offers_xplay: 'Xplay 优惠',
   offers_empty: '暂无可用优惠。',
