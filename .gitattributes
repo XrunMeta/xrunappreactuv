@@ -1,0 +1,4 @@
+# EAS iOS: LF only (CRLF can cause script "unexpected end of file")
+ios/.xcode.env text eol=lf
+ios/.xcode.env.local text eol=lf
+ios/**/*.pbxproj text eol=lf

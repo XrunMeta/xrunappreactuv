@@ -62,5 +62,17 @@ target 'XRUN' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
+    # Hermes "[CP-User] Replace Hermes..." script phase: avoid "will be run during every build" warning
+    if installer.pods_project
+      installer.pods_project.targets.each do |target|
+        target.build_phases.each do |phase|
+          next unless phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+          next unless phase.name&.start_with?('[CP')
+          next unless (phase.input_paths || []).empty? && (phase.output_paths || []).empty?
+          phase.always_out_of_date = '1'
+        end
+      end
+      installer.pods_project.save
+    end
   end
 end
