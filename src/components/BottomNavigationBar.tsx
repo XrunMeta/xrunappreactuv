@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { getIosWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
-
-const TEST_PLATFORM_OS: 'ios' | 'android' | null = null; 
 
 let iconMap: any = null;
 let iconMapWhite: any = null;
@@ -62,78 +59,11 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 }) => {
   const { navigate } = useAppNavigation();
 
-  const currentPlatformOS = TEST_PLATFORM_OS || Platform.OS;
-  const [showWallet, setShowWallet] = useState(currentPlatformOS === 'android');
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const getShowWalletStatus = async () => {
-
-      if (currentPlatformOS === 'ios') {
-        try {
-
-          const iosOnWallet = await getIosWalletShowStatus(navigate);
-
-          setShowWallet(iosOnWallet);
-        } catch (error) {
-          console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', error);
-          setShowWallet(false);
-        }
-      } else {
-        setShowWallet(true); 
-
-      }
-    };
-
-    getShowWalletStatus();
-
-    const interval = setInterval(() => {
-      getShowWalletStatus();
-    }, 30000); 
-
-    return () => {
-      clearInterval(interval);
-      abortController.abort();
-    };
-  }, [navigate]);
-
-  const processedItems = items.map(item => {
-    if (item.id === 'wallet') {
-
-      let iconXrunBlack: any = null;
-      try {
-        iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
-      } catch (e) {
-        console.warn('icon_xrun_black.png not found');
-      }
-
-      return {
-        ...item,
-        label: showWallet
-          ? item.label
-          : 'XRUN',
-        icon: showWallet
-          ? item.icon
-          : iconXrunBlack,
-      };
-    }
-    return item;
-  });
-
   const handleItemPress = (itemId: string) => {
     if (itemId === 'wallet') {
-      if (currentPlatformOS === 'android') {
-        navigate(ROUTES.wallet);
-      } else if (currentPlatformOS === 'ios' && showWallet) {
-        navigate(ROUTES.wallet);
-      } else {
-
-        navigate(ROUTES.xrunInfo);
-      }
+      navigate(ROUTES.wallet);
       return;
     }
-
     onItemPress?.(itemId);
   };
 
@@ -277,7 +207,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
             gap: width < 360 ? 4 : width < 400 ? 6 : 8,
           }
         ]}>
-          {processedItems.map((item, index) => {
+          {items.map((item, index) => {
             if (item.id === 'map' || item.id === 'camera') {
 
               return (
