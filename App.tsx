@@ -436,7 +436,7 @@ const v_c0dbdf = () => {
   }
 
   if (v_0f0c7b === 'ayetOffers') {
-    return <AyetOffersScreen />;
+    return <AyetOffersScreen slotName={v_e4a763().AYET_AD_SLOT_NAME_IOS} />;
   }
 
   if (v_0f0c7b === 'ayetOffersXplay') {

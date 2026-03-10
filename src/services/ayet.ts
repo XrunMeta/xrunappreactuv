@@ -1,10 +1,38 @@
 
 
 import { v_80fa10 } from 'rcmrninabrnb';
+import { v_e4a763 } from '../utils/env';
 
 const { AyetOfferwallModule: v_1bebcf } = v_80fa10;
 
+export const v_e18639 = 'XRun';
+
 export const v_c8c60c = 'Xplay';
+
+export const v_563627 = () => {
+  try {
+    const v_c9c489 = v_e4a763();
+    return {
+      placementIdIos: v_c9c489.AYET_PLACEMENT_ID_IOS,
+      adSlotNameIos: v_c9c489.AYET_AD_SLOT_NAME_IOS,
+      currencyId: v_c9c489.AYET_CURRENCY_ID,
+      currencyName: v_c9c489.AYET_CURRENCY_NAME,
+      currencyNamePlural: v_c9c489.AYET_CURRENCY_NAME_PLURAL,
+      conversionRate: parseInt(v_c9c489.AYET_CONVERSION_RATE || '1000', 10),
+      minPayoutUsd: parseFloat(v_c9c489.AYET_MIN_PAYOUT_USD || '10'),
+    };
+  } catch {
+    return {
+      placementIdIos: '22062',
+      adSlotNameIos: 'XRun',
+      currencyId: 'Xplay',
+      currencyName: 'Xplay',
+      currencyNamePlural: 'Xplay',
+      conversionRate: 1000,
+      minPayoutUsd: 10,
+    };
+  }
+};
 
 export interface AyetOfferItem {
   id?: string;
