@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as MediaLibrary from 'expo-media-library';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 interface TicketData {
     id: string;
@@ -98,17 +99,32 @@ export const ShopMyTicketDetailScreen = () => {
             const download = await FileSystem.downloadAsync(imageUrl, fileUri);
             console.log('[내 티켓] 다운로드 완료:', download);
 
-            await MediaLibrary.saveToLibraryAsync(download.uri);
-            console.log('[내 티켓] saveToLibraryAsync 완료:', download.uri);
+            let uriToSave = download.uri;
+            let jpegUri: string | null = null;
+            if (Platform.OS === 'ios' && (extension === 'webp' || !imageUrl.match(/\.(jpg|jpeg|png)$/i))) {
+                try {
+                    const result = await ImageManipulator.manipulateAsync(download.uri, [], {
+                        compress: 1,
+                        format: ImageManipulator.SaveFormat.JPEG,
+                    });
+                    uriToSave = result.uri;
+                    jpegUri = result.uri;
+                    console.log('[내 티켓] iOS JPEG 변환 완료:', uriToSave);
+                } catch (convertErr) {
+                    console.warn('[내 티켓] iOS JPEG 변환 실패, 원본으로 시도:', convertErr);
+                }
+            }
+
+            await MediaLibrary.saveToLibraryAsync(uriToSave);
+            console.log('[내 티켓] saveToLibraryAsync 완료:', uriToSave);
 
             try {
-                const asset = await MediaLibrary.createAssetAsync(download.uri);
+                const asset = await MediaLibrary.createAssetAsync(uriToSave);
                 console.log('[내 티켓] Asset 생성 완료:', asset?.uri);
                 try {
                     await MediaLibrary.createAlbumAsync('XRUN', asset, false);
                     console.log('[내 티켓] XRUN 앨범 생성 완료');
                 } catch (albumError) {
-
                     console.warn('[내 티켓] XRUN 앨범 생성 스킵:', albumError);
                 }
             } catch (assetError) {
@@ -120,6 +136,11 @@ export const ShopMyTicketDetailScreen = () => {
                 console.log('[내 티켓] 임시 파일 삭제 완료:', download.uri);
             } catch (deleteError) {
                 console.warn('[내 티켓] 임시 파일 삭제 스킵:', deleteError);
+            }
+            if (jpegUri && jpegUri !== download.uri) {
+                try {
+                    await FileSystem.deleteAsync(jpegUri, { idempotent: true });
+                } catch (_) {}
             }
 
             console.log('[내 티켓] 이미지 저장 성공');
