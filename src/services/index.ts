@@ -391,10 +391,10 @@ export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
     }
 
     const v_9390e8 = await v_3393e3.json();
-    return v_9390e8?.data?.iosOnWallet ?? false;
+    return v_9390e8?.data?.iosOnWallet ?? true;
   } catch (v_5e9bfe) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-    return false; 
+    return true; 
   }
 };
 
