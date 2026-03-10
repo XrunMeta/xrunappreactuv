@@ -1,10 +1,38 @@
 
 
 import { NativeModules } from 'react-native';
+import { getEnv } from '../utils/env';
 
 const { AyetOfferwallModule } = NativeModules;
 
+export const AYET_AD_SLOT_NAME_IOS = 'XRun';
+
 export const AYET_AD_SLOT_NAME = 'Xplay';
+
+export const getAyetRewardConfig = () => {
+  try {
+    const env = getEnv();
+    return {
+      placementIdIos: env.AYET_PLACEMENT_ID_IOS,
+      adSlotNameIos: env.AYET_AD_SLOT_NAME_IOS,
+      currencyId: env.AYET_CURRENCY_ID,
+      currencyName: env.AYET_CURRENCY_NAME,
+      currencyNamePlural: env.AYET_CURRENCY_NAME_PLURAL,
+      conversionRate: parseInt(env.AYET_CONVERSION_RATE || '1000', 10),
+      minPayoutUsd: parseFloat(env.AYET_MIN_PAYOUT_USD || '10'),
+    };
+  } catch {
+    return {
+      placementIdIos: '22062',
+      adSlotNameIos: 'XRun',
+      currencyId: 'Xplay',
+      currencyName: 'Xplay',
+      currencyNamePlural: 'Xplay',
+      conversionRate: 1000,
+      minPayoutUsd: 10,
+    };
+  }
+};
 
 export interface AyetOfferItem {
   id?: string;

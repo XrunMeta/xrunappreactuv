@@ -436,7 +436,7 @@ const ScreenHost = () => {
   }
 
   if (currentScreen === 'ayetOffers') {
-    return <AyetOffersScreen />;
+    return <AyetOffersScreen slotName={getEnv().AYET_AD_SLOT_NAME_IOS} />;
   }
 
   if (currentScreen === 'ayetOffersXplay') {
