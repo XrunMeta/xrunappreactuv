@@ -391,10 +391,10 @@ export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean>
     }
 
     const data = await response.json();
-    return data?.data?.iosOnWallet ?? true;
+    return data?.data?.iosOnWallet ?? false;
   } catch (error) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
-    return true; 
+    return false; 
   }
 };
 

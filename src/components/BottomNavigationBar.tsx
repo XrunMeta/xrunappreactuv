@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { getIosWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
 
@@ -58,10 +59,51 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onTabChange,
 }) => {
   const { navigate } = useAppNavigation();
+  const [showWallet, setShowWallet] = useState(Platform.OS === 'android');
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') {
+      setShowWallet(true);
+      return;
+    }
+    const fetchStatus = async () => {
+      try {
+        const iosOnWallet = await getIosWalletShowStatus(navigate);
+        setShowWallet(iosOnWallet);
+      } catch (error) {
+        console.error('[BottomNavigationBar] iOS 지갑 표시 상태 오류:', error);
+        setShowWallet(false);
+      }
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
+  }, [navigate]);
+
+  let iconXrunBlack: any = null;
+  try {
+    iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
+  } catch (_) {}
+  const processedItems = items.map(item => {
+    if (item.id === 'wallet') {
+      return {
+        ...item,
+        label: showWallet ? item.label : 'XRUN',
+        icon: showWallet ? item.icon : iconXrunBlack,
+      };
+    }
+    return item;
+  });
 
   const handleItemPress = (itemId: string) => {
     if (itemId === 'wallet') {
-      navigate(ROUTES.wallet);
+      if (Platform.OS === 'android') {
+        navigate(ROUTES.wallet);
+      } else if (showWallet) {
+        navigate(ROUTES.wallet);
+      } else {
+        navigate(ROUTES.xrunInfo);
+      }
       return;
     }
     onItemPress?.(itemId);
@@ -207,7 +249,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
             gap: width < 360 ? 4 : width < 400 ? 6 : 8,
           }
         ]}>
-          {items.map((item, index) => {
+          {processedItems.map((item, index) => {
             if (item.id === 'map' || item.id === 'camera') {
 
               return (

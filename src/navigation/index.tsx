@@ -69,6 +69,7 @@ export const ROUTES = {
   showPockAd: 'showPockAd',
   showWebView: 'showWebView',
   xrunInfo: 'xrunInfo',
+  xrunWalletDescription: 'xrunWalletDescription',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
   ayetOffers: 'ayetOffers',
