@@ -142,7 +142,16 @@ const v_c0dbdf = () => {
 
         console.log('parsed.queryParams:', v_8decf8.queryParams);
 
-        const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
+        const v_f4c253 = v_8decf8.queryParams?.referral as string | undefined;
+        const v_fc7051 = v_f4c253
+          ? (() => {
+              try {
+                return decodeURIComponent(v_f4c253);
+              } catch {
+                return v_f4c253;
+              }
+            })()
+          : undefined;
 
         if (v_fc7051) {
           console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
@@ -263,47 +272,47 @@ const v_c0dbdf = () => {
 
   v_c4deb2(() => {
     const v_350d39 = async () => {
-
       if (v_326be8.OS !== 'ios') {
         return;
       }
 
-      return;
-
       try {
-
         const v_46a232 = await v_fba5a0.getStringAsync();
-        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', v_46a232);
+        console.log('[iOS Clipboard] 클립보드 확인');
 
-        if (v_46a232 && v_46a232.startsWith('XRUN_REFERRAL:')) {
-          const v_9bf12c = v_46a232.replace('XRUN_REFERRAL:', '').trim();
-          console.log('[iOS Clipboard] 추천인 이메일:', v_9bf12c);
-
-          if (v_9bf12c) {
-
-            const v_eee9fe = await v_e84827.getItem('processed_clipboard_referral');
-            if (v_eee9fe === v_46a232) {
-              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
-              return;
-            }
-
-            await v_e84827.setItem('processed_clipboard_referral', v_46a232);
-
-            await v_fba5a0.setStringAsync('');
-
-            v_eee6b0({ referralEmail: decodeURIComponent(v_9bf12c) });
-
-            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
-            v_9b57fc('signup');
-          }
+        if (!v_46a232 || !v_46a232.startsWith('XRUN_REFERRAL:')) {
+          return;
         }
+
+        const v_479f05 = v_46a232.replace('XRUN_REFERRAL:', '').trim();
+        if (!v_479f05) return;
+
+        let v_9bf12c;
+        try {
+          v_9bf12c = decodeURIComponent(v_479f05);
+        } catch {
+          v_9bf12c = v_479f05;
+        }
+        console.log('[iOS Clipboard] 추천인 이메일:', v_9bf12c);
+
+        const v_eee9fe = await v_e84827.getItem('processed_clipboard_referral');
+        if (v_eee9fe === v_46a232) {
+          console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+          return;
+        }
+
+        await v_e84827.setItem('processed_clipboard_referral', v_46a232);
+        await v_fba5a0.setStringAsync('');
+
+        v_eee6b0({ referralEmail: v_9bf12c });
+        console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+        v_9b57fc('signup');
       } catch (v_5e9bfe) {
         console.error('[iOS Clipboard] 처리 실패:', v_5e9bfe);
       }
     };
 
     const v_cb36b1 = setTimeout(v_350d39, 3000);
-
     return () => clearTimeout(v_cb36b1);
   }, [v_eee6b0, v_9b57fc]);
 

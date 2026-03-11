@@ -227,7 +227,7 @@
 
             try {
 
-                const clipboardData = `XRUN_REFERRAL:${referral}`;
+                const clipboardData = `XRUN_REFERRAL:${decodedReferral}`;
                 await navigator.clipboard.writeText(clipboardData);
                 console.log('[iOS] 클립보드에 추천인 정보 저장:', clipboardData);
             } catch (error) {
