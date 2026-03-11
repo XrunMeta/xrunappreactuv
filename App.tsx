@@ -84,7 +84,6 @@ import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
-import { v_dc21b6 } from './src/services/otaCheck';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
@@ -1064,15 +1063,9 @@ export default function v_6540c3() {
         try {
           await v_f095b0();
           console.log('[App] Pangle 초기화 완료');
-
-          const v_3c68ba = await v_dc21b6();
-          if (v_3c68ba) {
-            console.log('[App] OTA 업데이트 있음 → 앱 오프닝 광고 생략');
-          } else {
-            console.log('[App] 앱 오프닝 광고 표시 시작');
-            await v_e55270();
-            console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
-          }
+          console.log('[App] 앱 오프닝 광고 표시 시작');
+          await v_e55270();
+          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
         } catch (v_5e9bfe) {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
