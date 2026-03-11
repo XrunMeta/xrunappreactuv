@@ -30,7 +30,8 @@ const OTAUpdateDialog: React.FC<OTAUpdateDialogProps> = ({ isAdFinished = true }
         if (!isAdFinished) return;
         if (hasCheckedAfterAd.current) return;
         hasCheckedAfterAd.current = true;
-        checkForUpdate();
+        const t = setTimeout(() => checkForUpdate(), 800);
+        return () => clearTimeout(t);
     }, [isAdFinished]);
 
     useEffect(() => {

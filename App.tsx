@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
+import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Application from 'expo-application';
 import * as Clipboard from 'expo-clipboard';
@@ -1069,8 +1069,13 @@ export default function App() {
         } catch (error) {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
-          setIsAdFinished(true);
-          setIsLoading(false); 
+
+          InteractionManager.runAfterInteractions(() => {
+            setTimeout(() => {
+              setIsAdFinished(true);
+              setIsLoading(false);
+            }, 400);
+          });
         }
       }, 1000);
 
