@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 
