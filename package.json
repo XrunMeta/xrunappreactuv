@@ -7,7 +7,7 @@
     "android": "node scripts/start-with-packager-host.js --android",
     "ios": "node scripts/set-local-ip.js && npx expo run:ios",
     "web": "npx expo start --web",
-    "ota:ios": "bash generate-ota-ios.sh"
+    "ota:ios": "node scripts/build-ota-ios.js"
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.4.1",
@@ -67,6 +67,7 @@
     }
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "@aws-sdk/client-s3": "^3.981.0",
     "@react-native-community/cli": "^20.0.2",
     "@react-native/metro-config": "^0.83.1",
