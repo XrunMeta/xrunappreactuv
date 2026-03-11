@@ -75,7 +75,8 @@ import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog } from './src/components';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
+import OTAUpdateDialog from './src/components/OTAUpdateDialog';
 import { loadEnv, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
@@ -745,7 +746,7 @@ const PermissionRequester = ({ isAdFinished }: { isAdFinished: boolean }) => {
   return null;
 };
 
-const GlobalDialogs = () => {
+const GlobalDialogs = ({ isAdFinished }: { isAdFinished: boolean }) => {
   const { t } = useTranslation();
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
   const [versionUpdateVisible, setVersionUpdateVisible] = useState(false);
@@ -851,7 +852,7 @@ const GlobalDialogs = () => {
         showLaterButton={!isServerUpdateRequired} 
         onClose={() => setVersionUpdateVisible(false)}
       />
-      <OTAUpdateDialog />
+      <OTAUpdateDialog isAdFinished={isAdFinished} />
     </>
   );
 };
@@ -1136,7 +1137,7 @@ export default function App() {
             <AlertDialogProvider>
               <OTAUpdateProvider>
                 <SplashScreen />
-                <GlobalDialogs />
+                <GlobalDialogs isAdFinished={isAdFinished} />
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1155,7 +1156,7 @@ export default function App() {
               <PermissionRequester isAdFinished={isAdFinished} />
               <AliveService />
               <ScreenHost />
-              <GlobalDialogs />
+              <GlobalDialogs isAdFinished={isAdFinished} />
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
