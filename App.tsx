@@ -1077,6 +1077,7 @@ export default function App() {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
           setIsAdFinished(true);
+          setIsLoading(false); 
         }
       }, 1000);
 
@@ -1121,11 +1122,6 @@ export default function App() {
 
     initializeApp();
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   if (!fontsLoaded || isLoading) {
