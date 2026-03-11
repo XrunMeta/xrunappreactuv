@@ -3,6 +3,8 @@ import v_e23cc8 from 'leepezcsdonqtat';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_b4f924, v_16a625, v_b01dc0, v_03e013 } from 'zymsaqwdccswrjlzyfswgwse';
 
+const v_a58534 = false;
+
 const v_110ec6 = 'https://assets.example.invalid';
 
 const v_7005d3 = v_326be8.OS === 'ios' ? v_e23cc8.DocumentDirectoryPath : v_e23cc8.DocumentDirectoryPath;
@@ -33,6 +35,8 @@ export const v_bb787c = async (): Promise<number> => {
 };
 
 export const v_dc21b6 = async (): Promise<OTAVersionInfo | null> => {
+    if (!v_a58534) return null;
+
     try {
         const v_3393e3 = await fetch(`${v_110ec6}/version.json?t=${new Date().getTime()}`, {
             headers: {
