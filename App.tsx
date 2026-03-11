@@ -75,7 +75,8 @@ import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a } from './src/components';
+import { v_aabda8, v_b631a8, v_2806ef, v_6e8088 } from './src/components';
+import v_7f5f8a from './src/components/OTAUpdateDialog';
 import { v_a2474a, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
@@ -745,7 +746,7 @@ const v_512b02 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
   return null;
 };
 
-const v_d0a391 = () => {
+const v_d0a391 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
   const { t: v_8d41d7 } = v_772971();
   const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
   const [v_614e3c, v_80c653] = v_5ab095(false);
@@ -851,7 +852,7 @@ const v_d0a391 = () => {
         showLaterButton={!v_2fa3d1} 
         onClose={() => v_80c653(false)}
       />
-      <OTAUpdateDialog />
+      <OTAUpdateDialog isAdFinished={v_65941f} />
     </>
   );
 };
@@ -1136,7 +1137,7 @@ export default function v_6540c3() {
             <AlertDialogProvider>
               <OTAUpdateProvider>
                 <SplashScreen />
-                <GlobalDialogs />
+                <GlobalDialogs isAdFinished={v_65941f} />
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1155,7 +1156,7 @@ export default function v_6540c3() {
               <PermissionRequester isAdFinished={v_65941f} />
               <AliveService />
               <ScreenHost />
-              <GlobalDialogs />
+              <GlobalDialogs isAdFinished={v_65941f} />
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>

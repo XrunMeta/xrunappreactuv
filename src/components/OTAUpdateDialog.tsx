@@ -1,10 +1,12 @@
-import v_a3453e, { v_c4deb2, v_5ab095, v_e662ae } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_e662ae, v_5ab095 } from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_6b5698, v_1ed974, v_39a996 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
 
-const v_7f5f8a = () => {
+export type OTAUpdateDialogProps = { isAdFinished?: boolean };
+
+const OTAUpdateDialog: v_a3453e.FC<OTAUpdateDialogProps> = ({ isAdFinished: v_65941f = true }) => {
     const { t: v_8d41d7 } = v_772971();
     const [v_cf55be, v_72f90e] = v_5ab095(false);
     const [v_a63fde, v_6306c3] = v_5ab095(0);
@@ -12,6 +14,7 @@ const v_7f5f8a = () => {
     const [v_a2dcc0, v_c90ab1] = v_5ab095<v_3e029d | null>(null);
     const [v_3cc252, v_39ad29] = v_5ab095(false); 
     const v_94a194 = v_e662ae(v_6b5698.currentState);
+    const v_151543 = v_e662ae(false);
 
     const v_7e5bd3 = async () => {
         if (__DEV__) return; 
@@ -24,9 +27,13 @@ const v_7f5f8a = () => {
     };
 
     v_c4deb2(() => {
-
+        if (!v_65941f) return;
+        if (v_151543.current) return;
+        v_151543.current = true;
         v_7e5bd3();
+    }, [v_65941f]);
 
+    v_c4deb2(() => {
         const v_269481 = v_6b5698.addEventListener('change', v_3b10d8 => {
             if (
                 v_94a194.current.match(/inactive|background/) &&
