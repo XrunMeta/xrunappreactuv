@@ -1077,6 +1077,7 @@ export default function v_6540c3() {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
           v_c355f2(true);
+          v_deef62(false); 
         }
       }, 1000);
 
@@ -1121,11 +1122,6 @@ export default function v_6540c3() {
 
     v_139fe0();
 
-    const v_cb36b1 = setTimeout(() => {
-      v_deef62(false);
-    }, 2000);
-
-    return () => clearTimeout(v_cb36b1);
   }, []);
 
   if (!v_43f571 || v_cd31a8) {
