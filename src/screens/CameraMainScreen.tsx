@@ -1899,7 +1899,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
     switch (itemId) {
       case 'xplay':
-        navigate(ROUTES.xrunInfo);
+        navigate(ROUTES.xplayZone);
         break;
       case 'wallet':
         navigate(ROUTES.wallet);

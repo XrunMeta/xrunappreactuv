@@ -2623,9 +2623,7 @@ export const MapMainScreen: React.FC = () => {
     switch (itemId) {
 
       case 'xplay':
-
-        navigate(ROUTES.xrunInfo);
-
+        navigate(ROUTES.xplayZone);
         break;
 
       case 'wallet':
