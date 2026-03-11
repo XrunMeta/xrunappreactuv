@@ -2638,10 +2638,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         v_9b57fc(v_ce4741.xplayInfo);
         break;
 
-      case 'xrun':
-        v_9b57fc(v_ce4741.xrunInfo);
-        break;
-
       case 'wallet':
 
         v_9b57fc(v_ce4741.wallet);
@@ -3388,8 +3384,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_fce460 = [
 
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
-
-    { id: 'xrun', label: v_8d41d7('components.bottomNavigationBar.xrun'), icon: v_ee9562 },
 
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
 

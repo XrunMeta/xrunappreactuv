@@ -13,16 +13,21 @@ function v_d9b231(v_10dec2, v_328259 = {}) {
   v_62db1b(v_10dec2, { stdio: 'inherit', cwd: v_601c83, ...v_328259 });
 }
 
-if (!v_9d3c52.existsSync(v_9fe22d.join(v_601c83, 'dist'))) {
-  v_9d3c52.mkdirSync(v_9fe22d.join(v_601c83, 'dist'), { recursive: true });
+const v_eb94e1 = v_9fe22d.join(v_601c83, 'dist');
+if (!v_9d3c52.existsSync(v_eb94e1)) {
+  v_9d3c52.mkdirSync(v_eb94e1, { recursive: true });
 }
 if (!v_9d3c52.existsSync(v_ecd756)) {
   v_9d3c52.mkdirSync(v_ecd756, { recursive: true });
 }
 
+const v_2ae83f = v_9fe22d.join(v_ecd756, 'index.ios.bundle');
+const v_b11fc6 = v_2ae83f.replace(/\\/g, '/');
+const v_4a7a6a = v_ecd756.replace(/\\/g, '/');
+
 console.log('🚀 iOS 번들 생성 중...');
 v_d9b231(
-  'npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output dist/ios/index.ios.bundle --assets-dest dist/ios'
+  `npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output "${v_b11fc6}" --assets-dest "${v_4a7a6a}"`
 );
 
 console.log('📦 iOS 에셋 압축 중... (Node archiver 사용)');

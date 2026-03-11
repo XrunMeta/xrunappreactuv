@@ -1908,9 +1908,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       case 'xplay':
         v_9b57fc(v_ce4741.xplayInfo);
         break;
-      case 'xrun':
-        v_9b57fc(v_ce4741.xrunInfo);
-        break;
       case 'wallet':
         v_9b57fc(v_ce4741.wallet);
         break;
@@ -2442,7 +2439,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_fce460 = [
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
-    { id: 'xrun', label: v_8d41d7('components.bottomNavigationBar.xrun'), icon: v_ee9562 },
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
     { id: 'map', label: '' }, 
     { id: 'wallet', label: v_8d41d7('components.bottomNavigationBar.wallet'), icon: v_8daafe },
