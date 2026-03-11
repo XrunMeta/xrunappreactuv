@@ -61,6 +61,7 @@ import {
   v_540580,
   v_858c71,
   v_f7bdb9,
+  v_30e759,
   v_1cca63,
   v_0e5276,
   v_4a5627,
@@ -555,6 +556,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (v_0f0c7b === 'xrunWalletDescription') {
+    return <XRUNWalletDescriptionScreen />;
   }
 
   if (v_0f0c7b === 'myinfoShopSales') {
