@@ -13,16 +13,21 @@ function run(cmd, opts = {}) {
   execSync(cmd, { stdio: 'inherit', cwd: projectRoot, ...opts });
 }
 
-if (!fs.existsSync(path.join(projectRoot, 'dist'))) {
-  fs.mkdirSync(path.join(projectRoot, 'dist'), { recursive: true });
+const distDir = path.join(projectRoot, 'dist');
+if (!fs.existsSync(distDir)) {
+  fs.mkdirSync(distDir, { recursive: true });
 }
 if (!fs.existsSync(distIos)) {
   fs.mkdirSync(distIos, { recursive: true });
 }
 
+const bundleOutputPath = path.join(distIos, 'index.ios.bundle');
+const bundleOutputArg = bundleOutputPath.replace(/\\/g, '/');
+const assetsDestArg = distIos.replace(/\\/g, '/');
+
 console.log('🚀 iOS 번들 생성 중...');
 run(
-  'npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output dist/ios/index.ios.bundle --assets-dest dist/ios'
+  `npx react-native bundle --platform ios --dev false --entry-file index.ts --bundle-output "${bundleOutputArg}" --assets-dest "${assetsDestArg}"`
 );
 
 console.log('📦 iOS 에셋 압축 중... (Node archiver 사용)');

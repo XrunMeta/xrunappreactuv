@@ -1908,9 +1908,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       case 'xplay':
         navigate(ROUTES.xplayInfo);
         break;
-      case 'xrun':
-        navigate(ROUTES.xrunInfo);
-        break;
       case 'wallet':
         navigate(ROUTES.wallet);
         break;
@@ -2442,7 +2439,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const bottomNavItems = [
     { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
-    { id: 'xrun', label: t('components.bottomNavigationBar.xrun'), icon: iconXrun },
     { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
     { id: 'map', label: '' }, 
     { id: 'wallet', label: t('components.bottomNavigationBar.wallet'), icon: iconWallet },

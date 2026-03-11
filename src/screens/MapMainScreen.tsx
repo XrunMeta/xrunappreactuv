@@ -2638,10 +2638,6 @@ export const MapMainScreen: React.FC = () => {
         navigate(ROUTES.xplayInfo);
         break;
 
-      case 'xrun':
-        navigate(ROUTES.xrunInfo);
-        break;
-
       case 'wallet':
 
         navigate(ROUTES.wallet);
@@ -3388,8 +3384,6 @@ export const MapMainScreen: React.FC = () => {
   const bottomNavItems = [
 
     { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
-
-    { id: 'xrun', label: t('components.bottomNavigationBar.xrun'), icon: iconXrun },
 
     { id: 'shop', label: t('components.bottomNavigationBar.shop'), icon: iconShop },
 
