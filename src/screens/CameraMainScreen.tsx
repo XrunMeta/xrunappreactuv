@@ -1899,7 +1899,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
     switch (v_6e55b1) {
       case 'xplay':
-        v_9b57fc(v_ce4741.xrunInfo);
+        v_9b57fc(v_ce4741.xplayZone);
         break;
       case 'wallet':
         v_9b57fc(v_ce4741.wallet);

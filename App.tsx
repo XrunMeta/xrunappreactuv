@@ -61,6 +61,7 @@ import {
   v_540580,
   v_858c71,
   v_f7bdb9,
+  v_26fe4c,
   v_30e759,
   v_1cca63,
   v_0e5276,
@@ -565,6 +566,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (v_0f0c7b === 'xplayZone') {
+    return <XplayZoneScreen />;
   }
 
   if (v_0f0c7b === 'xrunWalletDescription') {
