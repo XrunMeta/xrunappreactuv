@@ -330,27 +330,47 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
 
       console.log('[Pangle] iOS 앱 오프닝 광고 로드 및 노출 시작:', finalAdUnitId);
 
+      const adStartTime = Date.now();
+      const MIN_WAIT_MS = 2500; 
+
+      type Sub = { remove: () => void } | undefined;
+      const doResolve = (done: () => void, timeoutId: ReturnType<typeof setTimeout>, closeSub: Sub, errorSub: Sub) => {
+        const elapsed = Date.now() - adStartTime;
+        const delay = Math.max(0, MIN_WAIT_MS - elapsed);
+        const cleanup = () => {
+          closeSub?.remove();
+          errorSub?.remove();
+          clearTimeout(timeoutId);
+          done();
+        };
+        if (delay > 0) setTimeout(cleanup, delay);
+        else cleanup();
+      };
+
       return new Promise((resolve) => {
         let isResolved = false;
+        const resolveOnce = () => {
+          if (!isResolved) {
+            isResolved = true;
+            resolve();
+          }
+        };
 
         const timeout = setTimeout(() => {
           if (!isResolved) {
             console.log('[Pangle] iOS 앱 오프닝 광고 대기 타임아웃');
             isResolved = true;
+            closeSubscription?.remove();
+            errorSubscription?.remove();
             resolve();
           }
-        }, 15000); 
+        }, 15000);
 
         const closeSubscription = pangleEventEmitter?.addListener(
           'onAppOpenAdClose',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 닫힘 이벤트 수신');
-            if (!isResolved) {
-              isResolved = true;
-              clearTimeout(timeout);
-              closeSubscription?.remove();
-              resolve();
-            }
+            if (!isResolved) doResolve(resolveOnce, timeout, closeSubscription, errorSubscription);
           }
         );
 
@@ -358,13 +378,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
           'onAppOpenAdLoadError',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 에러 이벤트 수신');
-            if (!isResolved) {
-              isResolved = true;
-              clearTimeout(timeout);
-              closeSubscription?.remove();
-              errorSubscription?.remove();
-              resolve();
-            }
+            if (!isResolved) doResolve(resolveOnce, timeout, closeSubscription, errorSubscription);
           }
         );
 
@@ -372,9 +386,9 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
           console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', error);
           if (!isResolved) {
             isResolved = true;
-            clearTimeout(timeout);
             closeSubscription?.remove();
             errorSubscription?.remove();
+            clearTimeout(timeout);
             resolve();
           }
         });

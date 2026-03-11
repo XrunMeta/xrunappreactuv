@@ -1070,11 +1070,12 @@ export default function App() {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
 
+          const transitionDelayMs = Platform.OS === 'ios' ? 700 : 400;
           InteractionManager.runAfterInteractions(() => {
             setTimeout(() => {
               setIsAdFinished(true);
               setIsLoading(false);
-            }, 400);
+            }, transitionDelayMs);
           });
         }
       }, 1000);
