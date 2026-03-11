@@ -30,7 +30,8 @@ const OTAUpdateDialog: v_a3453e.FC<OTAUpdateDialogProps> = ({ isAdFinished: v_65
         if (!v_65941f) return;
         if (v_151543.current) return;
         v_151543.current = true;
-        v_7e5bd3();
+        const v_8d41d7 = setTimeout(() => v_7e5bd3(), 800);
+        return () => clearTimeout(v_8d41d7);
     }, [v_65941f]);
 
     v_c4deb2(() => {

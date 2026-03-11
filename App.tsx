@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b, v_80fa10, v_326be8 } from 'rcmrninabrnb';
+import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
@@ -1069,8 +1069,13 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
-          v_c355f2(true);
-          v_deef62(false); 
+
+          v_2d4718.runAfterInteractions(() => {
+            setTimeout(() => {
+              v_c355f2(true);
+              v_deef62(false);
+            }, 400);
+          });
         }
       }, 1000);
 
