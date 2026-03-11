@@ -69,6 +69,7 @@ export const v_ce4741 = {
   showPockAd: 'showPockAd',
   showWebView: 'showWebView',
   xrunInfo: 'xrunInfo',
+  xplayInfo: 'xplayInfo',
   xplayZone: 'xplayZone',
   xrunWalletDescription: 'xrunWalletDescription',
   myinfoShopSales: 'myinfoShopSales',

@@ -88,6 +88,8 @@ let v_b636c9 = null;
 
 let v_622956 = null;
 
+let v_ee9562 = null;
+
 let v_86146a = null;
 
 let v_800dd2 = null;
@@ -139,6 +141,16 @@ try {
 } catch (v_9e86fd) {
 
   console.warn('icon_xplay.png not found');
+
+}
+
+try {
+
+  v_ee9562 = require('../../assets/images/icon_xrun_black.png');
+
+} catch (v_9e86fd) {
+
+  console.warn('icon_xrun_black.png not found');
 
 }
 
@@ -2623,7 +2635,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
     switch (v_6e55b1) {
 
       case 'xplay':
-        v_9b57fc(v_ce4741.xplayZone);
+        v_9b57fc(v_ce4741.xplayInfo);
+        break;
+
+      case 'xrun':
+        v_9b57fc(v_ce4741.xrunInfo);
         break;
 
       case 'wallet':
@@ -3372,6 +3388,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const v_fce460 = [
 
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
+
+    { id: 'xrun', label: v_8d41d7('components.bottomNavigationBar.xrun'), icon: v_ee9562 },
 
     { id: 'shop', label: v_8d41d7('components.bottomNavigationBar.shop'), icon: v_e96568 },
 
