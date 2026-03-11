@@ -1070,11 +1070,12 @@ export default function v_6540c3() {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
 
+          const v_9179bc = v_326be8.OS === 'ios' ? 700 : 400;
           v_2d4718.runAfterInteractions(() => {
             setTimeout(() => {
               v_c355f2(true);
               v_deef62(false);
-            }, 400);
+            }, v_9179bc);
           });
         }
       }, 1000);

@@ -330,27 +330,47 @@ export const v_e55270 = async (): Promise<void> => {
 
       console.log('[Pangle] iOS 앱 오프닝 광고 로드 및 노출 시작:', v_819f69);
 
+      const v_9b56e4 = Date.now();
+      const v_7b2c86 = 2500; 
+
+      type Sub = { remove: () => void } | undefined;
+      const v_6387de = (v_2fb8cc, v_3894d5, v_8d364c, v_88b0a9) => {
+        const v_e56026 = Date.now() - v_9b56e4;
+        const v_4b24d2 = Math.max(0, v_7b2c86 - v_e56026);
+        const v_a983d4 = () => {
+          v_8d364c?.remove();
+          v_88b0a9?.remove();
+          clearTimeout(v_3894d5);
+          v_2fb8cc();
+        };
+        if (v_4b24d2 > 0) setTimeout(v_a983d4, v_4b24d2);
+        else v_a983d4();
+      };
+
       return new Promise((v_6f7712) => {
         let v_695d96 = false;
+        const v_10d76d = () => {
+          if (!v_695d96) {
+            v_695d96 = true;
+            v_6f7712();
+          }
+        };
 
         const v_ea0359 = setTimeout(() => {
           if (!v_695d96) {
             console.log('[Pangle] iOS 앱 오프닝 광고 대기 타임아웃');
             v_695d96 = true;
+            v_e6ceb8?.remove();
+            v_30c524?.remove();
             v_6f7712();
           }
-        }, 15000); 
+        }, 15000);
 
         const v_e6ceb8 = v_1619e5?.addListener(
           'onAppOpenAdClose',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 닫힘 이벤트 수신');
-            if (!v_695d96) {
-              v_695d96 = true;
-              clearTimeout(v_ea0359);
-              v_e6ceb8?.remove();
-              v_6f7712();
-            }
+            if (!v_695d96) v_6387de(v_10d76d, v_ea0359, v_e6ceb8, v_30c524);
           }
         );
 
@@ -358,13 +378,7 @@ export const v_e55270 = async (): Promise<void> => {
           'onAppOpenAdLoadError',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 에러 이벤트 수신');
-            if (!v_695d96) {
-              v_695d96 = true;
-              clearTimeout(v_ea0359);
-              v_e6ceb8?.remove();
-              v_30c524?.remove();
-              v_6f7712();
-            }
+            if (!v_695d96) v_6387de(v_10d76d, v_ea0359, v_e6ceb8, v_30c524);
           }
         );
 
@@ -372,9 +386,9 @@ export const v_e55270 = async (): Promise<void> => {
           console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_5e9bfe);
           if (!v_695d96) {
             v_695d96 = true;
-            clearTimeout(v_ea0359);
             v_e6ceb8?.remove();
             v_30c524?.remove();
+            clearTimeout(v_ea0359);
             v_6f7712();
           }
         });
