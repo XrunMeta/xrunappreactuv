@@ -142,7 +142,16 @@ const ScreenHost = () => {
 
         console.log('parsed.queryParams:', parsed.queryParams);
 
-        const referral = parsed.queryParams?.referral as string | undefined;
+        const referralRaw = parsed.queryParams?.referral as string | undefined;
+        const referral = referralRaw
+          ? (() => {
+              try {
+                return decodeURIComponent(referralRaw);
+              } catch {
+                return referralRaw;
+              }
+            })()
+          : undefined;
 
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
@@ -263,47 +272,47 @@ const ScreenHost = () => {
 
   useEffect(() => {
     const checkClipboardReferral = async () => {
-
       if (Platform.OS !== 'ios') {
         return;
       }
 
-      return;
-
       try {
-
         const clipboardContent = await Clipboard.getStringAsync();
-        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', clipboardContent);
+        console.log('[iOS Clipboard] 클립보드 확인');
 
-        if (clipboardContent && clipboardContent.startsWith('XRUN_REFERRAL:')) {
-          const referralEmail = clipboardContent.replace('XRUN_REFERRAL:', '').trim();
-          console.log('[iOS Clipboard] 추천인 이메일:', referralEmail);
-
-          if (referralEmail) {
-
-            const processedClipboard = await AsyncStorage.getItem('processed_clipboard_referral');
-            if (processedClipboard === clipboardContent) {
-              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
-              return;
-            }
-
-            await AsyncStorage.setItem('processed_clipboard_referral', clipboardContent);
-
-            await Clipboard.setStringAsync('');
-
-            setSignupFormData({ referralEmail: decodeURIComponent(referralEmail) });
-
-            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
-            navigate('signup');
-          }
+        if (!clipboardContent || !clipboardContent.startsWith('XRUN_REFERRAL:')) {
+          return;
         }
+
+        const raw = clipboardContent.replace('XRUN_REFERRAL:', '').trim();
+        if (!raw) return;
+
+        let referralEmail: string;
+        try {
+          referralEmail = decodeURIComponent(raw);
+        } catch {
+          referralEmail = raw;
+        }
+        console.log('[iOS Clipboard] 추천인 이메일:', referralEmail);
+
+        const processedClipboard = await AsyncStorage.getItem('processed_clipboard_referral');
+        if (processedClipboard === clipboardContent) {
+          console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+          return;
+        }
+
+        await AsyncStorage.setItem('processed_clipboard_referral', clipboardContent);
+        await Clipboard.setStringAsync('');
+
+        setSignupFormData({ referralEmail });
+        console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+        navigate('signup');
       } catch (error) {
         console.error('[iOS Clipboard] 처리 실패:', error);
       }
     };
 
     const timer = setTimeout(checkClipboardReferral, 3000);
-
     return () => clearTimeout(timer);
   }, [setSignupFormData, navigate]);
 
