@@ -84,7 +84,6 @@ import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
-import { checkOTAVersion } from './src/services/otaCheck';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -1064,15 +1063,9 @@ export default function App() {
         try {
           await initializePangle();
           console.log('[App] Pangle 초기화 완료');
-
-          const otaUpdateAvailable = await checkOTAVersion();
-          if (otaUpdateAvailable) {
-            console.log('[App] OTA 업데이트 있음 → 앱 오프닝 광고 생략');
-          } else {
-            console.log('[App] 앱 오프닝 광고 표시 시작');
-            await loadAndShowAppOpenAd();
-            console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
-          }
+          console.log('[App] 앱 오프닝 광고 표시 시작');
+          await loadAndShowAppOpenAd();
+          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
         } catch (error) {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
