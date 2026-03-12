@@ -12,7 +12,7 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8 } from '../services';
+import { v_877de8, v_885e03 } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -100,8 +100,27 @@ export const v_10886b = () => {
     const [v_02e6ad, v_33ec67] = v_5ab095<string | null>(null);
     const [v_cd398d, v_d20f1f] = v_5ab095<number | null>(null);
     const [v_837630, v_2f87ed] = v_5ab095(false);
-    const [v_1d54f1, v_67ba02] = v_5ab095<number>(0);
+    const [v_1d54f1, v_67ba02] = v_5ab095<number | null>(null);
+    const [v_19340b, v_14129c] = v_5ab095(false);
     const { navigate: v_9b57fc } = v_a0daa8();
+
+    const v_abb08d = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) return;
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) return;
+            v_14129c(true);
+            const v_43c42e = await v_885e03(v_660822, v_9b57fc);
+            const v_8decf8 = parseFloat(v_43c42e.formatted);
+            v_67ba02(Number.isFinite(v_8decf8) ? v_8decf8 : null);
+        } catch {
+            v_67ba02(null);
+        } finally {
+            v_14129c(false);
+        }
+    }, [v_9b57fc]);
 
     const v_c1e7a4 = v_de06a3(async () => {
         try {
@@ -168,8 +187,10 @@ export const v_10886b = () => {
     v_c4deb2(() => {
         if (v_11083e === 'xplayShop') {
             v_c1e7a4();
+        } else if (v_11083e === 'xrunStore') {
+            v_abb08d();
         }
-    }, [v_11083e, v_c1e7a4]);
+    }, [v_11083e, v_c1e7a4, v_abb08d]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
@@ -322,7 +343,7 @@ export const v_10886b = () => {
                                                 </Text>
                                             )
                                         ) : (
-                                            <Text style={v_d81136.balanceAmount}>{v_1d54f1.toLocaleString()}</Text>
+                                            <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
                                         )}
                                     </View>
                                 </View>
