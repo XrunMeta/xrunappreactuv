@@ -4394,6 +4394,30 @@ export const v_877de8 = async (
   }
 };
 
+export const v_885e03 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<{ balance: string; formatted: string; symbol: string }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post('/getXrunWalletBalance', {
+      member: typeof v_660822 === 'number' ? v_660822 : Number(v_660822),
+    });
+    const v_479f05 = v_3393e3.data;
+    if (v_479f05?.status !== 'success' || !v_479f05?.data) {
+      throw new Error(v_479f05?.message ?? 'getXrunWalletBalance 응답 오류');
+    }
+    return {
+      balance: v_479f05.data.balance ?? '0',
+      formatted: v_479f05.data.formatted ?? '0',
+      symbol: v_479f05.data.symbol ?? 'XRUN',
+    };
+  } catch (v_5e9bfe) {
+    console.error('[XRUN 잔액] 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
 export const v_4c925a = async (
   v_660822,
   v_02be30 = 50,
