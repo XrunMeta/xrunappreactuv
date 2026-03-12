@@ -75,6 +75,28 @@ export const setStoredLanguage = async (language: LanguageCode): Promise<void> =
   }
 };
 
+export const initI18nSync = (): typeof i18n => {
+  i18n.use(initReactI18next).init({
+    resources: { ko: { translation: ko }, en: { translation: en } },
+    lng: 'ko',
+    fallbackLng: 'ko',
+    interpolation: { escapeValue: false },
+    compatibilityJSON: 'v3',
+  });
+  return i18n;
+};
+
+export const applyStoredLanguageAsync = (): void => {
+  getStoredLanguage()
+    .then((lng) => {
+      if (lng === 'ko') return;
+      if (lng === 'en') return i18n.changeLanguage('en');
+      return loadLanguage(lng).then(() => i18n.changeLanguage(lng));
+    })
+    .then(() => console.log('[App] i18n 저장 언어 적용 완료'))
+    .catch((e) => console.warn('[i18n] 저장 언어 적용 실패:', e));
+};
+
 export const initI18n = async () => {
   const defaultLanguage = await getStoredLanguage();
   if (defaultLanguage !== 'ko' && defaultLanguage !== 'en') {

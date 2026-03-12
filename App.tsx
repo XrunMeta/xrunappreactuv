@@ -75,10 +75,10 @@ import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
-import { loadEnv, getEnv } from './src/utils/env';
+import { loadEnvSync, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
-import { initI18n } from './src/locales';
+import { initI18nSync, applyStoredLanguageAsync } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
@@ -962,12 +962,14 @@ export default function App() {
 
       try {
         devBoot?.recordBootStep('start');
-        await Promise.all([loadEnv(), initI18n()]);
-        devBoot?.recordBootStep('env_i18n');
-        console.log('[App] 환경 변수·i18n 초기화 완료');
+        loadEnvSync();
+        initI18nSync();
+        console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (error) {
         console.error('[App] 초기화 실패:', error);
       }
+
+      applyStoredLanguageAsync();
 
       const runBackground = () => {
         try {
@@ -1034,12 +1036,29 @@ export default function App() {
       }
       setTimeout(runBackground, 1500);
 
+      const _tsMain = Date.now();
+      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:boot_main_scheduled', message: 'main_ready_scheduled', data: { at: _tsMain }, timestamp: _tsMain, hypothesisId: 'H3' }) }).catch(() => {});
+
       setTimeout(() => {
+
+        const t = Date.now();
+        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:main_ready_run', message: 'main_ready_run', data: { at: t }, timestamp: t, hypothesisId: 'H2' }) }).catch(() => {});
+
         setIsAdFinished(true);
         setIsLoading(false);
+
+        if (__DEV__) {
+          try {
+            require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+          } catch (_) {}
+        }
       }, 0);
 
       setTimeout(() => {
+
+        const t = Date.now();
+        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_cb_entered', message: 'pangle_cb_entered', data: { at: t }, timestamp: t, hypothesisId: 'H2' }) }).catch(() => {});
+
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         devBoot?.recordBootStep('pangle_start');
         initializePangle()
@@ -1050,8 +1069,12 @@ export default function App() {
           .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
           .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
           .finally(() => {
+
+            const t = Date.now();
+            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_finally', message: 'pangle_finally', data: { at: t }, timestamp: t, hypothesisId: 'H1' }) }).catch(() => {});
+
             devBoot?.recordBootStep('pangle_done');
-            devBoot?.recordBootTotal();
+
           });
       }, 0);
     };
