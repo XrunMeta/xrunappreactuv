@@ -15,6 +15,17 @@
         "simulator": false
       }
     },
+    "develop": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "android": {
+        "image": "latest",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
     "internal": {
       "distribution": "internal",
       "ios": {

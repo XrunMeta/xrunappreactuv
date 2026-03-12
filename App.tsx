@@ -61,6 +61,8 @@ import {
   ShowPockAdScreen,
   ShowWebViewScreen,
   XRUNinfoScreen,
+  XplayInfoScreen,
+  XplayZoneScreen,
   MyinfoShopSalesScreen,
   ReferralInputScreen,
   PangleListScreen,
@@ -555,6 +557,14 @@ const ScreenHost = () => {
 
   if (currentScreen === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (currentScreen === 'xplayInfo') {
+    return <XplayInfoScreen />;
+  }
+
+  if (currentScreen === 'xplayZone') {
+    return <XplayZoneScreen />;
   }
 
   if (currentScreen === 'myinfoShopSales') {
