@@ -612,7 +612,7 @@ export const v_680bee = () => {
                   {v_4d0f89 ? (
                     <View style={v_d81136.currentImageLoader}>
                       <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                      <Text style={v_d81136.currentImageLoaderText}>로딩 중...</Text>
+                      <Text style={v_d81136.currentImageLoaderText}>{v_8d41d7('common.messages.loading')}</Text>
                     </View>
                   ) : v_d4cc36 ? (
                     <>

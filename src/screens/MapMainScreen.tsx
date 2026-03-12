@@ -3622,7 +3622,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
             <ActivityIndicator size="large" color="#343a5a" />
 
-            <Text style={v_d81136.loadingText}>로딩중...</Text>
+            <Text style={v_d81136.loadingText}>{v_8d41d7('common.messages.loading')}</Text>
 
           </View>
 
