@@ -1034,32 +1034,32 @@ export default function App() {
       }
       setTimeout(runBackground, 1500);
 
-      setTimeout(async () => {
+      setTimeout(() => {
+        setIsAdFinished(true);
+        setIsLoading(false);
+      }, 0);
+
+      setTimeout(() => {
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
-        try {
-          devBoot?.recordBootStep('pangle_start');
-          await initializePangle();
-          console.log('[App] Pangle 초기화 완료');
-          console.log('[App] 앱 오프닝 광고 표시 시작');
-          await loadAndShowAppOpenAd();
-          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
-        } catch (error) {
-          console.error('[App] Pangle 프로세스 실패:', error);
-        } finally {
-          devBoot?.recordBootStep('pangle_done');
-          devBoot?.recordBootTotal();
-          InteractionManager.runAfterInteractions(() => {
-            setIsAdFinished(true);
-            setIsLoading(false);
+        devBoot?.recordBootStep('pangle_start');
+        initializePangle()
+          .then(() => {
+            console.log('[App] Pangle 초기화 완료');
+            return loadAndShowAppOpenAd();
+          })
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
+          .finally(() => {
+            devBoot?.recordBootStep('pangle_done');
+            devBoot?.recordBootTotal();
           });
-        }
       }, 0);
     };
 
     initializeApp();
   }, []);
 
-  if (!fontsLoaded || isLoading) {
+  if (isLoading) {
     return (
       <SafeAreaProvider>
         <StatusBar style="dark" />

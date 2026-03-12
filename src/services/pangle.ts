@@ -311,15 +311,11 @@ export const loadAndShowRewardedAd = async (
   }
 };
 
-const APP_OPEN_AD_TIMEOUT_MS = 5000;
+const APP_OPEN_AD_TIMEOUT_MS = 3000;
 
 let appOpenAdLoaded = false;
 
 export const loadAndShowAppOpenAd = async (): Promise<void> => {
-
-  const _t0 = Date.now();
-  fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:loadAndShowAppOpenAd:entry',message:'entry',data:{platform:Platform.OS,isPangleAvailable,t0:_t0},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
   try {
 
     if (Platform.OS === 'ios') {
@@ -407,9 +403,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
     }
 
     if (!isPangleAvailable) {
-
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!isPangleAvailable',data:{elapsedMs:Date.now()-_t0},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
       console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
       return;
     }
@@ -417,9 +410,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
     const finalAdUnitId = getPangleAppOpeningAdUnitId();
 
     if (!finalAdUnitId) {
-
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!finalAdUnitId',data:{elapsedMs:Date.now()-_t0},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
       console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
       return;
     }
@@ -432,20 +422,11 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         if (!isResolved) {
           isResolved = true;
           subscriptions.forEach(unsubscribe => unsubscribe());
-
-          const elapsed = Date.now() - _t0;
-          fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:cleanup',message:'resolve',data:{exitReason:reason,elapsedMs:elapsed},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
-
           resolve();
         }
       };
 
-      const timeout = setTimeout(() => {
-
-        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:timeout',message:'timeout fired',data:{elapsedMs:Date.now()-_t0},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-
-        cleanup('timeout');
-      }, APP_OPEN_AD_TIMEOUT_MS);
+      const timeout = setTimeout(() => cleanup('timeout'), APP_OPEN_AD_TIMEOUT_MS);
 
       const subscriptions: Array<() => void> = [];
       let errorHandledByEvent = false;
@@ -455,9 +436,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
           'onAppOpenAdLoaded',
           (event: { adUnitId: string }) => {
             if (event.adUnitId === finalAdUnitId && !appOpenAdLoaded) {
-
-              fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdLoaded',message:'ad loaded',data:{elapsedMs:Date.now()-_t0,adUnitId:event.adUnitId},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
-
               console.log('[Pangle] 앱 오프닝 광고 로드 완료');
               appOpenAdLoaded = true;
               if (PangleModule?.showAppOpenAd) {
@@ -474,9 +452,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         const closeSubscription = pangleEventEmitter.addListener(
           'onAppOpenAdClose',
           (event: { adUnitId: string }) => {
-
-            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdClose',message:'close event',data:{elapsedMs:Date.now()-_t0,eventAdUnitId:event?.adUnitId,finalAdUnitId,matches:event?.adUnitId===finalAdUnitId},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-
             if (event.adUnitId === finalAdUnitId) {
               console.log('[Pangle] 앱 오프닝 광고 닫힘');
               appOpenAdLoaded = false;
