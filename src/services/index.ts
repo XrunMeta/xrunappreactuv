@@ -428,6 +428,12 @@ export const createAxiosInstance = (navigation?: any) => {
       console.log(`[API Request] baseURL: ${config.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${finalUrl}`);
 
+      if (__DEV__ && typeof (config as any)._devDebugStart === 'undefined') {
+        (config as any)._devDebugStart = Date.now();
+        (config as any)._devDebugUrl = finalUrl;
+        (config as any)._devDebugMethod = config.method || 'GET';
+      }
+
       if (config.data instanceof FormData) {
         console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
         console.log('[API Request] FormData 타입 확인:', config.data instanceof FormData);
@@ -572,9 +578,27 @@ export const createAxiosInstance = (navigation?: any) => {
   instance.interceptors.response.use(
     (response) => {
       console.log(`[API Response] ${response.config.url}`, response.status);
+      if (__DEV__ && response.config) {
+        const c = response.config as any;
+        if (c._devDebugStart != null) {
+          try {
+            const { devDebugStore } = require('../utils/devDebugStore');
+            devDebugStore.addApi(c._devDebugUrl || response.config.url, c._devDebugMethod || 'GET', Date.now() - c._devDebugStart, response.status);
+          } catch (_) {}
+        }
+      }
       return response;
     },
     async (error: AxiosError) => {
+      if (__DEV__ && error.config) {
+        const c = error.config as any;
+        if (c._devDebugStart != null) {
+          try {
+            const { devDebugStore } = require('../utils/devDebugStore');
+            devDebugStore.addApi(c._devDebugUrl || error.config!.url, c._devDebugMethod || 'GET', Date.now() - c._devDebugStart, error.response?.status);
+          } catch (_) {}
+        }
+      }
 
       if (error.config?.data instanceof FormData) {
         console.error('[API Error] ========== FormData 요청 오류 ==========');

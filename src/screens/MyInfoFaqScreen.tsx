@@ -1,11 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import {
   LayoutAnimation,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
-  UIManager,
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -13,10 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES, FONTS } from '../constants';
-
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 type FaqItem = {
   id: string;

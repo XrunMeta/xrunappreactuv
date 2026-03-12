@@ -61,9 +61,6 @@ import {
   ShowPockAdScreen,
   ShowWebViewScreen,
   XRUNinfoScreen,
-  XplayInfoScreen,
-  XplayZoneScreen,
-  XRUNWalletDescriptionScreen,
   MyinfoShopSalesScreen,
   ReferralInputScreen,
   PangleListScreen,
@@ -75,8 +72,7 @@ import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog } from './src/components';
-import OTAUpdateDialog from './src/components/OTAUpdateDialog';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
 import { loadEnv, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
@@ -84,7 +80,7 @@ import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
-import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2, getDeferredReferral } from './src/services';
+import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
   useFonts,
@@ -145,16 +141,7 @@ const ScreenHost = () => {
 
         console.log('parsed.queryParams:', parsed.queryParams);
 
-        const referralRaw = parsed.queryParams?.referral as string | undefined;
-        const referral = referralRaw
-          ? (() => {
-              try {
-                return decodeURIComponent(referralRaw);
-              } catch {
-                return referralRaw;
-              }
-            })()
-          : undefined;
+        const referral = parsed.queryParams?.referral as string | undefined;
 
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
@@ -275,70 +262,47 @@ const ScreenHost = () => {
 
   useEffect(() => {
     const checkClipboardReferral = async () => {
+
       if (Platform.OS !== 'ios') {
         return;
       }
 
+      return;
+
       try {
+
         const clipboardContent = await Clipboard.getStringAsync();
-        console.log('[iOS Clipboard] 클립보드 확인');
+        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', clipboardContent);
 
-        if (!clipboardContent || !clipboardContent.startsWith('XRUN_REFERRAL:')) {
-          return;
+        if (clipboardContent && clipboardContent.startsWith('XRUN_REFERRAL:')) {
+          const referralEmail = clipboardContent.replace('XRUN_REFERRAL:', '').trim();
+          console.log('[iOS Clipboard] 추천인 이메일:', referralEmail);
+
+          if (referralEmail) {
+
+            const processedClipboard = await AsyncStorage.getItem('processed_clipboard_referral');
+            if (processedClipboard === clipboardContent) {
+              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+              return;
+            }
+
+            await AsyncStorage.setItem('processed_clipboard_referral', clipboardContent);
+
+            await Clipboard.setStringAsync('');
+
+            setSignupFormData({ referralEmail: decodeURIComponent(referralEmail) });
+
+            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+            navigate('signup');
+          }
         }
-
-        const raw = clipboardContent.replace('XRUN_REFERRAL:', '').trim();
-        if (!raw) return;
-
-        let referralEmail: string;
-        try {
-          referralEmail = decodeURIComponent(raw);
-        } catch {
-          referralEmail = raw;
-        }
-        console.log('[iOS Clipboard] 추천인 이메일:', referralEmail);
-
-        const processedClipboard = await AsyncStorage.getItem('processed_clipboard_referral');
-        if (processedClipboard === clipboardContent) {
-          console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
-          return;
-        }
-
-        await AsyncStorage.setItem('processed_clipboard_referral', clipboardContent);
-        await Clipboard.setStringAsync('');
-
-        setSignupFormData({ referralEmail });
-        console.log('[iOS Clipboard] 회원가입 화면으로 이동');
-        navigate('signup');
       } catch (error) {
         console.error('[iOS Clipboard] 처리 실패:', error);
       }
     };
 
     const timer = setTimeout(checkClipboardReferral, 3000);
-    return () => clearTimeout(timer);
-  }, [setSignupFormData, navigate]);
 
-  useEffect(() => {
-    const checkDeferredReferral = async () => {
-      try {
-        const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          try {
-            const userData = JSON.parse(userDataStr);
-            if (userData?.member) return; 
-          } catch (_) {}
-        }
-        const result = await getDeferredReferral();
-        if (result?.referral_email) {
-          setSignupFormData({ referralEmail: result.referral_email });
-          navigate('signup');
-        }
-      } catch (e) {
-        console.warn('[디퍼드 딥링크] 조회 실패:', e);
-      }
-    };
-    const timer = setTimeout(checkDeferredReferral, 3500);
     return () => clearTimeout(timer);
   }, [setSignupFormData, navigate]);
 
@@ -472,7 +436,7 @@ const ScreenHost = () => {
   }
 
   if (currentScreen === 'ayetOffers') {
-    return <AyetOffersScreen slotName={getEnv().AYET_AD_SLOT_NAME_IOS} />;
+    return <AyetOffersScreen />;
   }
 
   if (currentScreen === 'ayetOffersXplay') {
@@ -591,18 +555,6 @@ const ScreenHost = () => {
 
   if (currentScreen === 'xrunInfo') {
     return <XRUNinfoScreen />;
-  }
-
-  if (currentScreen === 'xplayInfo') {
-    return <XplayInfoScreen />;
-  }
-
-  if (currentScreen === 'xplayZone') {
-    return <XplayZoneScreen />;
-  }
-
-  if (currentScreen === 'xrunWalletDescription') {
-    return <XRUNWalletDescriptionScreen />;
   }
 
   if (currentScreen === 'myinfoShopSales') {
@@ -768,7 +720,7 @@ const PermissionRequester = ({ isAdFinished }: { isAdFinished: boolean }) => {
   return null;
 };
 
-const GlobalDialogs = ({ isAdFinished }: { isAdFinished: boolean }) => {
+const GlobalDialogs = () => {
   const { t } = useTranslation();
   const { addTokenDialogVisible, closeAddTokenDialog, emergencyStop } = useAppContext();
   const [versionUpdateVisible, setVersionUpdateVisible] = useState(false);
@@ -866,7 +818,7 @@ const GlobalDialogs = ({ isAdFinished }: { isAdFinished: boolean }) => {
         visible={emergencyStop?.enabled ?? false}
         message={translatedMessage}
         link={emergencyStop?.link}
-        linkButtonText={emergencyStop?.message === 'UPDATE_FOUND\nPLEASE_UPDATE' ? t('common.versionUpdate.update') : undefined}
+
       />
       <VersionUpdateDialog
         visible={versionUpdateVisible}
@@ -874,7 +826,7 @@ const GlobalDialogs = ({ isAdFinished }: { isAdFinished: boolean }) => {
         showLaterButton={!isServerUpdateRequired} 
         onClose={() => setVersionUpdateVisible(false)}
       />
-      <OTAUpdateDialog isAdFinished={isAdFinished} />
+      <OTAUpdateDialog />
     </>
   );
 };
@@ -889,6 +841,7 @@ export default function App() {
     'Roboto-Bold': Roboto_700Bold,
   });
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const appInitDoneRef = useRef(false);
 
   useEffect(() => {
     const initializeAppState = async () => {
@@ -983,71 +936,50 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (appInitDoneRef.current) return;
+    appInitDoneRef.current = true;
+
+    if (__DEV__) {
+      try {
+        require('./src/utils/devDebugStore').devDebugStore.init();
+      } catch (_) {}
+    }
 
     initGoogleSignIn();
 
     const initializeApp = async () => {
-      try {
-        await loadEnv();
-        console.log('[App] 환경 변수 로드 완료');
-      } catch (error) {
-        console.error('[App] 환경 변수 로드 실패:', error);
-      }
+      const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
 
       try {
-        await initI18n();
-        console.log('[App] i18n 초기화 완료');
+        devBoot?.recordBootStep('start');
+        await Promise.all([loadEnv(), initI18n()]);
+        devBoot?.recordBootStep('env_i18n');
+        console.log('[App] 환경 변수·i18n 초기화 완료');
       } catch (error) {
-        console.error('[App] i18n 초기화 실패:', error);
+        console.error('[App] 초기화 실패:', error);
       }
 
-      AsyncStorage.getItem('cached_AD')
-        .then((cachedAdStr) => {
-          if (!cachedAdStr) return;
-          const cachedAd = JSON.parse(cachedAdStr);
-          let hasMarketUrl = false;
-          const cleanedCache: any = {};
-          Object.keys(cachedAd).forEach((campid) => {
-            const urlAD = cachedAd[campid]?.urlAD;
-            if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) {
-              hasMarketUrl = true;
-            } else {
-              cleanedCache[campid] = cachedAd[campid];
-            }
-          });
-          if (hasMarketUrl) return AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
-        })
-        .then(() => console.log('[App] 캐시 클리어 완료'))
-        .catch((cacheError) => console.warn('[App] 캐시 클리어 실패:', cacheError));
-
-      (() => {
+      const runBackground = () => {
         try {
           const env = getEnv();
           const initOptions = {
-          devKey: env.APPSFLYER_DEV_KEY,
-          appId: env.APPSFLYER_APP_ID_IOS,
-          isDebug: true, 
-          onInstallConversionDataListener: true,
-          onDeepLinkListener: true,
-          timeToWaitForATTUserAuthorization: 10,
+            devKey: env.APPSFLYER_DEV_KEY,
+            appId: env.APPSFLYER_APP_ID_IOS,
+            isDebug: true,
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            timeToWaitForATTUserAuthorization: 10,
           };
           const maxAttempts = 12;
           const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
           const tryAppsFlyerInit = (attempt: number) => {
             const RNAppsFlyer = NativeModules.RNAppsFlyer;
             if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
-              appsFlyer.initSdk(
-                initOptions,
-                () => console.log('[App] AppsFlyer 초기화 성공'),
-                (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
-              );
+              appsFlyer.initSdk(initOptions, () => console.log('[App] AppsFlyer 초기화 성공'), (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err));
               return;
             }
-            if (attempt < maxAttempts) {
-              setTimeout(() => tryAppsFlyerInit(attempt + 1), delays[Math.min(attempt, delays.length - 1)]);
-            } else {
-              console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
-            }
+            if (attempt < maxAttempts) setTimeout(() => tryAppsFlyerInit(attempt + 1), delays[Math.min(attempt, delays.length - 1)]);
+            else console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
           };
           tryAppsFlyerInit(0);
         } catch (error) {
@@ -1069,11 +1001,33 @@ export default function App() {
             } catch (_) {}
           })
           .catch(() => {});
-      })();
+        AsyncStorage.getItem('cached_AD')
+          .then((cachedAdStr) => {
+            if (!cachedAdStr) return;
+            const cachedAd = JSON.parse(cachedAdStr);
+            let hasMarketUrl = false;
+            const cleanedCache: any = {};
+            Object.keys(cachedAd).forEach((campid) => {
+              const urlAD = cachedAd[campid]?.urlAD;
+              if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) hasMarketUrl = true;
+              else cleanedCache[campid] = cachedAd[campid];
+            });
+            if (hasMarketUrl) return AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
+          })
+          .catch(() => {});
+      };
 
-      const adStartDelayMs = Platform.OS === 'android' ? 400 : 1000;
-      setTimeout(async () => {
+      if (__DEV__) {
         try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
+        } catch (_) {}
+      }
+      setTimeout(runBackground, 1500);
+
+      setTimeout(async () => {
+        const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+        try {
+          devBoot?.recordBootStep('pangle_start');
           await initializePangle();
           console.log('[App] Pangle 초기화 완료');
           console.log('[App] 앱 오프닝 광고 표시 시작');
@@ -1082,19 +1036,17 @@ export default function App() {
         } catch (error) {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
-          const transitionDelayMs = Platform.OS === 'ios' ? 700 : 200;
+          devBoot?.recordBootStep('pangle_done');
+          devBoot?.recordBootTotal();
           InteractionManager.runAfterInteractions(() => {
-            setTimeout(() => {
-              setIsAdFinished(true);
-              setIsLoading(false);
-            }, transitionDelayMs);
+            setIsAdFinished(true);
+            setIsLoading(false);
           });
         }
-      }, adStartDelayMs);
+      }, 0);
     };
 
     initializeApp();
-
   }, []);
 
   if (!fontsLoaded || isLoading) {
@@ -1106,7 +1058,8 @@ export default function App() {
             <AlertDialogProvider>
               <OTAUpdateProvider>
                 <SplashScreen />
-                <GlobalDialogs isAdFinished={isAdFinished} />
+                <GlobalDialogs />
+                {__DEV__ && <DevDebugPanel />}
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1125,7 +1078,8 @@ export default function App() {
               <PermissionRequester isAdFinished={isAdFinished} />
               <AliveService />
               <ScreenHost />
-              <GlobalDialogs isAdFinished={isAdFinished} />
+              <GlobalDialogs />
+              {__DEV__ && <DevDebugPanel />}
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
@@ -1133,4 +1087,3 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-

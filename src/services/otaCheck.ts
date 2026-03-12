@@ -3,8 +3,6 @@ import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { zip, unzip, unzipAssets, subscribe } from 'react-native-zip-archive';
 
-const OTA_UPDATES_ENABLED = true;
-
 const BASE_URL = 'https://pub-23c0c0ee5e774a90bc4dd356ef88e11c.r2.dev';
 
 const LOCAL_ROOT_PATH = Platform.OS === 'ios' ? RNFS.DocumentDirectoryPath : RNFS.DocumentDirectoryPath;
@@ -35,8 +33,6 @@ export const getCurrentOTAVersion = async (): Promise<number> => {
 };
 
 export const checkOTAVersion = async (): Promise<OTAVersionInfo | null> => {
-    if (!OTA_UPDATES_ENABLED) return null;
-
     try {
         const response = await fetch(`${BASE_URL}/version.json?t=${new Date().getTime()}`, {
             headers: {
