@@ -47,7 +47,7 @@ export const XplayInfoScreen = () => {
           setMemberId(String(member));
           setBalanceLoading(true);
           try {
-            const result = await getAyetPointsBalance(member, navigate);
+            const result = await getAyetPointsBalance(member, undefined);
             setPointsBalance(result.total_ayet_points ?? 0);
           } catch {
             setPointsBalance(0);
@@ -63,7 +63,7 @@ export const XplayInfoScreen = () => {
     } catch {
       setPointsBalance(null);
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     loadUserAndBalance();

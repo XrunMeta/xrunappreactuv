@@ -171,7 +171,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
-  const reset = useCallback((screen: ScreenName) => {
+  const reset = useCallback((screenOrPayload: ScreenName | { index?: number; routes?: { name: string }[] }) => {
+    const screen: ScreenName =
+      typeof screenOrPayload === 'string'
+        ? screenOrPayload
+        : (screenOrPayload?.routes?.[0]?.name as ScreenName) ?? ROUTES.map;
     const newStack = [screen];
     stackRef.current = newStack; 
     setStack(newStack);
