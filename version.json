@@ -1,6 +1,6 @@
 {
     "android": {
-        "version": 21,
+        "version": 23,
         "url": "https://assets.example.invalid/ota-android.zip",
         "description": "버그 수정 및 성능 향상",
         "forceUpdate": false
