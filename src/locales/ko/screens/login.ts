@@ -21,6 +21,8 @@ export default {
     rememberMe: '로그인 상태 유지하기',
     sendButton: '전송',
   },
+  accountLink: '계정 연결',
+  linkComplete: '연동 완료',
   errors: {
     emailRequired: '이메일을 입력해주세요.',
     passwordRequired: '비밀번호를 입력해주세요.',

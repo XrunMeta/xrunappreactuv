@@ -61,7 +61,7 @@ export const v_4a5627 = () => {
       v_4480f6(v_5c15a0);
     } catch (v_5e9bfe) {
       console.error('[PangleListScreen] 팽글 광고 로드 실패:', v_5e9bfe);
-      v_cba33f('팽글 광고를 불러오는데 실패했습니다.');
+      v_cba33f(v_8d41d7('screens.pangleList.loadFailed'));
     } finally {
       v_34a50a(false);
     }
@@ -137,13 +137,13 @@ export const v_4a5627 = () => {
       }
     } catch (v_5e9bfe) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', v_5e9bfe);
-      v_cba33f('오류가 발생했습니다.');
+      v_cba33f(v_8d41d7('screens.pangleList.errorOccurred'));
     }
   }, []);
 
   return (
     <View style={v_d81136.container}>
-      <Header title="팽글 광고" onBackPress={v_c7ac57} showBackButton />
+      <Header title={v_8d41d7('screens.pangleList.title')} onBackPress={v_c7ac57} showBackButton />
       <SafeScrollView
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -151,11 +151,11 @@ export const v_4a5627 = () => {
         {v_683210 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.primary} />
-            <Text style={v_d81136.loadingText}>팽글 광고를 불러오는 중...</Text>
+            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.pangleList.loading')}</Text>
           </View>
         ) : v_e90e69.length === 0 ? (
           <View style={v_d81136.emptyContainer}>
-            <Text style={v_d81136.emptyText}>표시할 팽글 광고가 없습니다.</Text>
+            <Text style={v_d81136.emptyText}>{v_8d41d7('screens.pangleList.empty')}</Text>
           </View>
         ) : (
           <View style={v_d81136.listContainer}>
@@ -174,16 +174,16 @@ export const v_4a5627 = () => {
                   />
                 ) : (
                   <View style={v_d81136.adImagePlaceholder}>
-                    <Text style={v_d81136.adImagePlaceholderText}>이미지 없음</Text>
+                    <Text style={v_d81136.adImagePlaceholderText}>{v_8d41d7('screens.pangleList.noImage')}</Text>
                   </View>
                 )}
                 <View style={v_d81136.adContent}>
                   <Text style={v_d81136.adName} numberOfLines={2}>
-                    {v_ddcfed.name || '팽글 광고'}
+                    {v_ddcfed.name || v_8d41d7('screens.pangleList.adNameFallback')}
                   </Text>
                   <View style={v_d81136.adReward}>
                     <Text style={v_d81136.adRewardText}>
-                      보상: {v_ddcfed.xrunPrice?.toFixed(4) || v_ddcfed.coins || '0'} XRUN
+                      {v_8d41d7('screens.pangleList.reward')}: {v_ddcfed.xrunPrice?.toFixed(4) || v_ddcfed.coins || '0'} XRUN
                     </Text>
                   </View>
                   {v_ddcfed.joindesc && (

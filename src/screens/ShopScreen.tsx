@@ -214,9 +214,9 @@ export const v_10886b = () => {
     };
 
     const v_dfaad1 = (v_01bee9) => {
-        v_889fad('구매', `${v_01bee9.title}을(를) 구매하시겠습니까?`, [
-            { text: '취소' },
-            { text: '구매', onPress: () => console.log('구매:', v_01bee9.id) },
+        v_889fad(v_8d41d7('screens.shop.purchaseConfirmTitle'), v_8d41d7('screens.shop.purchaseConfirmMessage', { title: v_01bee9.title }), [
+            { text: v_8d41d7('screens.shop.cancel') },
+            { text: v_8d41d7('screens.shop.purchase'), onPress: () => console.log('구매:', v_01bee9.id) },
         ]);
     };
 
@@ -264,7 +264,7 @@ export const v_10886b = () => {
                                 onPress={() => v_dfaad1(v_01bee9)}
                                 activeOpacity={0.8}
                             >
-                                <Text style={v_d81136.purchaseButtonText}>구매</Text>
+                                <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shop.purchase')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -301,7 +301,7 @@ export const v_10886b = () => {
                             <Image source={v_10a702} style={v_d81136.balanceBlurRight} resizeMode="cover" />
                             <View style={v_d81136.balanceContent}>
                                 <View style={v_d81136.balanceLeft}>
-                                    <Text style={v_d81136.balanceLabel}>내 잔액</Text>
+                                    <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.shop.myBalance')}</Text>
                                     <View style={v_d81136.balanceAmountRow}>
                                         <View style={[
                                             v_d81136.balanceXplayIconContainer,
@@ -366,7 +366,7 @@ export const v_10886b = () => {
                             {v_32c9b7 && !v_5605ec ? (
                                 <View style={v_d81136.loadingContainer}>
                                     <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                                    <Text style={v_d81136.loadingText}>기프티콘 목록 불러오는 중...</Text>
+                                    <Text style={v_d81136.loadingText}>{v_8d41d7('screens.shop.loadingGiftList')}</Text>
                                 </View>
                             ) : v_02e6ad ? (
                                 <View style={v_d81136.errorContainer}>

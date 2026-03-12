@@ -884,7 +884,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
               onPress={v_3aa877}
               style={v_d81136.webViewCloseButton}
             >
-              <Text style={v_d81136.webViewCloseText}>닫기</Text>
+              <Text style={v_d81136.webViewCloseText}>{v_8d41d7('common.buttons.close')}</Text>
             </TouchableOpacity>
             <Text 
               style={v_d81136.webViewTitle}

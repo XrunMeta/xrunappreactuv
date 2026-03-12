@@ -10,6 +10,8 @@ export default {
   termsSubtitle: '服务条款、隐私政策',
   settings: '设置',
   settingsSubtitle: '应用设置、语言设置',
+  referral: '推荐',
+  referralSubtitle: '我的群组、群组结算、排名',
   referralEdit: '修改推荐',
   referralEditSubtitle: '推荐人管理',
   shopSales: 'Shop 销售额',

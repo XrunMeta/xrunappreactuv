@@ -21,6 +21,8 @@ export default {
     rememberMe: 'मुझे लॉग इन रखें',
     sendButton: 'भेजें',
   },
+  accountLink: 'खाता लिंक करें',
+  linkComplete: 'लिंक पूर्ण',
   errors: {
     emailRequired: 'कृपया अपना ईमेल दर्ज करें',
     passwordRequired: 'कृपया अपना पासवर्ड दर्ज करें',

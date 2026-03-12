@@ -5,6 +5,8 @@ export default {
   fee: 'Biaya',
   total: 'Total',
   myBalance: 'Saldo Saya',
+  pointBalance: 'Saldo Poin',
+  pointPrice: 'Harga Poin',
   checking: 'Memeriksa...',
   checkFailed: 'Pemeriksaan Gagal',
   insufficientBalance: 'Saldo tidak mencukupi. Silakan isi ulang saldo Anda.',
@@ -20,6 +22,12 @@ export default {
     insufficientBalanceMessage: 'Saldo Saat Ini: {currentBalance} XRUN\nJumlah yang Diperlukan: {requiredAmount} XRUN\nSilakan isi ulang saldo Anda.',
     purchaseFailed: 'Pembelian Gagal',
     purchaseFailedMessage: 'Terjadi kesalahan saat pembelian.',
+    loadShopItemsFailed: 'Gagal memuat item toko.',
+    insufficientPointsMessage: 'Minimal 10 poin diperlukan.',
+    testPaymentComplete: 'Pembayaran tes selesai',
+    testPaymentBalance: 'Saldo: {{balance}} P',
+    paymentFailed: 'Pembayaran gagal',
+    pointUseFailed: 'Gagal menggunakan poin.',
   },
 };
 

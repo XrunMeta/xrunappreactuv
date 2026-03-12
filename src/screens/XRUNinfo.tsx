@@ -1,5 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_cf9c33, v_4623af, v_f2c756 } from 'rcmrninabrnb';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
 import { v_a61db3, v_843035 } from '../constants';
@@ -12,6 +13,7 @@ try {
 }
 
 export const v_f7bdb9 = () => {
+  const { t: v_8d41d7 } = v_772971();
   const v_b4b37e = () => {
     v_f2c756.openURL('https://www.xrun.run').catch((v_49263d) => {
       console.error('홈페이지 연결 실패:', v_49263d);
@@ -42,12 +44,12 @@ export const v_f7bdb9 = () => {
         {}
         <View style={v_d81136.descriptionContainer}>
           <Text style={v_d81136.description}>
-            누구나 참여할 수 있는{'\n'}
-            에어드랍 광고 플랫폼으로 혜택을 받아보세요.{'\n'}
+            {v_8d41d7('screens.xrunInfo.intro1')}{'\n'}
+            {v_8d41d7('screens.xrunInfo.intro2')}{'\n'}
             {'\n'}
-            일상에서 즐기는 AR XRUN 미션!{'\n'}
-            XRUN 광고 플랫폼은 내 주변에 노출되는 광고 미션을 수행하고{'\n'}
-            리워드를 받는 보상형 광고 플랫폼입니다.
+            {v_8d41d7('screens.xrunInfo.intro3')}{'\n'}
+            {v_8d41d7('screens.xrunInfo.intro4')}{'\n'}
+            {v_8d41d7('screens.xrunInfo.intro5')}
           </Text>
         </View>
 
@@ -57,7 +59,7 @@ export const v_f7bdb9 = () => {
           onPress={v_b4b37e}
           activeOpacity={0.7}
         >
-          <Text style={v_d81136.homepageLinkText}>홈페이지 바로가기</Text>
+          <Text style={v_d81136.homepageLinkText}>{v_8d41d7('screens.xrunInfo.homepageLink')}</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>

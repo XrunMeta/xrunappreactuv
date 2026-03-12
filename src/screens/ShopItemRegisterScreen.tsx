@@ -193,7 +193,7 @@ export const v_680bee = () => {
     try {
       const { status: v_d308b5 } = await v_d05ab5.requestMediaLibraryPermissionsAsync();
       if (v_d308b5 !== 'granted') {
-        v_03e392.alert('권한 필요', '이미지를 선택하려면 갤러리 접근 권한이 필요합니다.');
+        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.permissionRequired'), v_8d41d7('screens.shopItemRegister.alerts.permissionMessage'));
         return;
       }
       const v_43c42e = await v_d05ab5.launchImageLibraryAsync({
@@ -226,16 +226,16 @@ export const v_680bee = () => {
         console.log('[상품 등록] 이미지 업로드 완료, 파일 ID:', v_aea053);
       } else {
         v_03e392.alert(
-          '업로드 실패', 
-          '이미지 업로드에 실패했습니다.\n네트워크 연결을 확인하거나 다시 시도해주세요.'
+          v_8d41d7('screens.shopItemRegister.alerts.uploadFailed'),
+          v_8d41d7('screens.shopItemRegister.alerts.uploadFailedMessage')
         );
         v_3456cd(null);
         v_6f0c3f(null);
       }
     } catch (v_5e9bfe) {
       console.error('[상품 등록] 이미지 선택/업로드 오류:', v_5e9bfe);
-      const v_1744b9 = v_5e9bfe?.message || '이미지 처리 중 오류가 발생했습니다.';
-      v_03e392.alert('오류', v_1744b9);
+      const v_1744b9 = v_5e9bfe?.message || v_8d41d7('screens.shopItemRegister.alerts.imageProcessingError');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_1744b9);
       v_3456cd(null);
       v_6f0c3f(null);
     } finally {
@@ -336,12 +336,12 @@ export const v_680bee = () => {
 
   const v_585b02 = async () => {
     if (!v_9f1622.trim()) {
-      v_03e392.alert('오류', '상품명을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.productNameRequired'));
       return;
     }
 
     if (!v_717992) {
-      v_03e392.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.userInfoLoadFailed'));
       return;
     }
 
@@ -349,17 +349,17 @@ export const v_680bee = () => {
     const v_e921e1 = parseFloat(v_318e8b) || 0;
 
     if (v_d55c14 <= 0 && v_e921e1 <= 0) {
-      v_03e392.alert('오류', '가격을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceRequired'));
       return;
     }
 
     if (v_d55c14 <= 0) {
-      v_03e392.alert('오류', 'KRW 가격을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceKRWRequired'));
       return;
     }
 
     if (v_e921e1 <= 0) {
-      v_03e392.alert('오류', 'XRUN 가격을 입력해주세요.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceXrunRequired'));
       return;
     }
 
@@ -368,13 +368,13 @@ export const v_680bee = () => {
       if (v_6d6ad9) {
         v_2b9521 = v_6d6ad9;
       } else {
-        v_03e392.alert('오류', 'SDK 정보를 찾을 수 없습니다.');
+        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.sdkNotFound'));
         return;
       }
     } else {
       v_2b9521 = v_071275();
       if (!v_2b9521) {
-        v_03e392.alert('오류', 'SDK를 생성할 수 없습니다. 이메일 정보를 확인해주세요.');
+        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.sdkGenerateFailed'));
         return;
       }
     }
@@ -402,18 +402,18 @@ export const v_680bee = () => {
       const v_3393e3 = await v_5027e2(v_576f5a);
 
       if (v_3393e3.status === 'success') {
-        v_03e392.alert('성공', v_1b9174 ? '상품이 수정되었습니다.' : '상품이 등록되었습니다.', [
+        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.success'), v_1b9174 ? v_8d41d7('screens.shopItemRegister.alerts.productUpdated') : v_8d41d7('screens.shopItemRegister.alerts.productRegistered'), [
           {
             text: '확인',
             onPress: () => v_c7ac57(),
           },
         ]);
       } else {
-        v_03e392.alert('오류', v_3393e3.message || (v_1b9174 ? '상품 수정에 실패했습니다.' : '상품 등록에 실패했습니다.'));
+        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_3393e3.message || (v_1b9174 ? v_8d41d7('screens.shopItemRegister.alerts.editFailed') : v_8d41d7('screens.shopItemRegister.alerts.registerFailed')));
       }
     } catch (v_5e9bfe) {
       console.error('[상품 등록] 오류:', v_5e9bfe);
-      v_03e392.alert('오류', '상품 등록 중 오류가 발생했습니다.');
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.errorDuringRegister'));
     } finally {
       v_e33ec0(false);
     }
@@ -491,7 +491,7 @@ export const v_680bee = () => {
     return (
       <SafeView style={v_d81136.container}>
         <Header 
-          title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} 
+          title={v_1b9174 ? v_8d41d7('screens.shopItemRegister.editTitle') : v_8d41d7('screens.shopItemRegister.title')} 
           onBackPress={v_c7ac57}
           rightComponent={v_a37640()}
         />
@@ -505,7 +505,7 @@ export const v_680bee = () => {
   return (
     <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
       <Header 
-        title={v_1b9174 ? '상품 수정' : v_8d41d7('screens.shopItemRegister.title')} 
+        title={v_1b9174 ? v_8d41d7('screens.shopItemRegister.editTitle') : v_8d41d7('screens.shopItemRegister.title')} 
         onBackPress={v_c7ac57}
         rightComponent={v_a37640()}
       />
@@ -526,19 +526,19 @@ export const v_680bee = () => {
               style={v_d81136.input}
               value={v_9f1622}
               onChangeText={v_73c0df}
-              placeholder="상품명을 입력하세요"
+              placeholder={v_8d41d7('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
             />
           </View>
 
           {}
           <View style={v_d81136.section}>
-            <Text style={v_d81136.label}>설명</Text>
+            <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.description')}</Text>
             <TextInput
               style={[v_d81136.input, v_d81136.textArea]}
               value={v_6856a9}
               onChangeText={v_b7e174}
-              placeholder="상품 설명을 입력하세요"
+              placeholder={v_8d41d7('screens.shopItemRegister.placeholders.description')}
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
@@ -570,7 +570,7 @@ export const v_680bee = () => {
 
           {}
           <View style={v_d81136.section}>
-            <Text style={v_d81136.label}>최대 구매 수량</Text>
+            <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.maxPurchaseQty')}</Text>
             <TextInput
               style={v_d81136.input}
               value={v_e0f1a6}
@@ -601,7 +601,7 @@ export const v_680bee = () => {
                   <Image source={{ uri: v_ee89db }} style={v_d81136.imagePreview} />
                 ) : (
                   <View style={v_d81136.imagePlaceholder}>
-                    <Text style={v_d81136.imagePlaceholderText}>이미지 선택</Text>
+                    <Text style={v_d81136.imagePlaceholderText}>{v_8d41d7('screens.shopItemRegister.imageSelect')}</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -616,7 +616,7 @@ export const v_680bee = () => {
                     </View>
                   ) : v_d4cc36 ? (
                     <>
-                      <Text style={v_d81136.currentImageLabel}>현재 이미지</Text>
+                      <Text style={v_d81136.currentImageLabel}>{v_8d41d7('screens.shopItemRegister.currentImage')}</Text>
                       <Image
                         source={{ uri: `data:image/png;base64,${v_d4cc36}` }}
                         style={v_d81136.currentImagePreview}
@@ -638,7 +638,7 @@ export const v_680bee = () => {
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={v_d81136.removeImageText}>이미지 제거</Text>
+                <Text style={v_d81136.removeImageText}>{v_8d41d7('screens.shopItemRegister.removeImage')}</Text>
               </TouchableOpacity>
             )}
             <Text style={v_d81136.helperText}>
@@ -659,7 +659,7 @@ export const v_680bee = () => {
                 style={[v_d81136.input, v_d81136.readOnlyInput]}
                 value={v_071275()}
                 editable={false}
-                placeholder="자동 생성됩니다"
+                placeholder={v_8d41d7('screens.shopItemRegister.placeholders.autoGenerated')}
                 placeholderTextColor="#999"
               />
               <Text style={v_d81136.helperText}>
@@ -678,7 +678,7 @@ export const v_680bee = () => {
             {v_88dca2 ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={v_d81136.submitButtonText}>{v_1b9174 ? '수정하기' : '등록하기'}</Text>
+              <Text style={v_d81136.submitButtonText}>{v_1b9174 ? v_8d41d7('screens.shopItemRegister.editButton') : v_8d41d7('screens.shopItemRegister.registerButton')}</Text>
             )}
           </TouchableOpacity>
         </ScrollView>

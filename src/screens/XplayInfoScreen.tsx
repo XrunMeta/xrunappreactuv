@@ -74,7 +74,7 @@ export const v_305be8 = () => {
 
   const v_3f9989 = v_de06a3(async () => {
     if (!v_f4fb5e) {
-      await v_889fad('안내', '사용자 정보를 확인할 수 없습니다.');
+      await v_889fad(v_8d41d7('screens.xplayInfo.alerts.notification'), v_8d41d7('screens.xplayInfo.alerts.userInfoUnavailable'));
       return;
     }
     await v_a3bbf0(v_8d41d7, { email: v_f4fb5e }, v_889fad, v_9b57fc);
@@ -101,7 +101,7 @@ export const v_305be8 = () => {
             <Image source={v_10a702} style={v_d81136.balanceBlurRight} resizeMode="cover" />
             <View style={v_d81136.balanceContent}>
               <View style={v_d81136.balanceLeft}>
-                <Text style={v_d81136.balanceLabel}>총 지급 금액</Text>
+                <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={v_d81136.balanceAmountRow}>
                   <View style={v_d81136.balanceXplayIconContainer}>
                     <Image source={v_10664a} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
@@ -135,7 +135,7 @@ export const v_305be8 = () => {
           <TouchableOpacity
             style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => v_889fad('안내', '오픈예정입니다')}
+            onPress={() => v_889fad(v_8d41d7('screens.xplayInfo.alerts.notification'), v_8d41d7('screens.xplayInfo.alerts.comingSoon'))}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
@@ -143,7 +143,7 @@ export const v_305be8 = () => {
         </View>
 
         {}
-        <Text style={v_d81136.questSectionTitle}>퀘스트</Text>
+        <Text style={v_d81136.questSectionTitle}>{v_8d41d7('screens.xplayInfo.quest')}</Text>
         <TouchableOpacity
           style={v_d81136.questCard}
           activeOpacity={0.9}
@@ -151,7 +151,7 @@ export const v_305be8 = () => {
         >
           <Image source={v_3d184e} style={v_d81136.questImage} resizeMode="cover" />
           <View style={v_d81136.questOverlay}>
-            <Text style={v_d81136.questCta}>친구를 초대하고 5 XRUN 씩 받자!</Text>
+            <Text style={v_d81136.questCta}>{v_8d41d7('screens.xplayInfo.inviteCta')}</Text>
           </View>
         </TouchableOpacity>
 

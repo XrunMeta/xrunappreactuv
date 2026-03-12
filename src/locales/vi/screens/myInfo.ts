@@ -10,6 +10,8 @@ export default {
   termsSubtitle: 'Điều khoản dịch vụ, Chính sách bảo mật',
   settings: 'Cài đặt',
   settingsSubtitle: 'Cài đặt ứng dụng, Ngôn ngữ',
+  referral: 'Giới thiệu',
+  referralSubtitle: 'Nhóm của tôi, Thanh toán nhóm, Xếp hạng',
   referralEdit: 'Chỉnh sửa giới thiệu',
   referralEditSubtitle: 'Quản lý giới thiệu',
   shopSales: 'Bán hàng cửa hàng',

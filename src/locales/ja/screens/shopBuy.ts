@@ -5,6 +5,8 @@ export default {
   fee: '手数料',
   total: '合計',
   myBalance: '残高',
+  pointBalance: 'ポイント残高',
+  pointPrice: 'ポイント価格',
   checking: '確認中...',
   checkFailed: '確認失敗',
   insufficientBalance: '残高が不足しています。残高をチャージしてください。',
@@ -20,6 +22,12 @@ export default {
     insufficientBalanceMessage: '現在の残高：{currentBalance} XRUN\n必要金額：{requiredAmount} XRUN\n残高をチャージしてください。',
     purchaseFailed: '購入失敗',
     purchaseFailedMessage: '購入中にエラーが発生しました。',
+    loadShopItemsFailed: 'ショップアイテムの読み込みに失敗しました。',
+    insufficientPointsMessage: '10ポイント以上必要です。',
+    testPaymentComplete: 'テスト決済完了',
+    testPaymentBalance: '残高: {{balance}} P',
+    paymentFailed: '決済失敗',
+    pointUseFailed: 'ポイントの使用に失敗しました。',
   },
 };
 

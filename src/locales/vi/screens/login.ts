@@ -21,6 +21,8 @@ export default {
     rememberMe: 'Giữ đăng nhập',
     sendButton: 'Gửi',
   },
+  accountLink: 'Liên kết tài khoản',
+  linkComplete: 'Liên kết hoàn tất',
   errors: {
     emailRequired: 'Vui lòng nhập email của bạn',
     passwordRequired: 'Vui lòng nhập mật khẩu của bạn',
