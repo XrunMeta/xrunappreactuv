@@ -311,9 +311,15 @@ export const v_18f201 = async (
   }
 };
 
+const v_2751c9 = 5000;
+
 let v_8e7548 = false;
 
 export const v_e55270 = async (): Promise<void> => {
+
+  const v_09e7a6 = Date.now();
+  fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:loadAndShowAppOpenAd:entry',message:'entry',data:{platform:v_326be8.OS,isPangleAvailable: v_d0574b,t0:v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+
   try {
 
     if (v_326be8.OS === 'ios') {
@@ -364,7 +370,7 @@ export const v_e55270 = async (): Promise<void> => {
             v_30c524?.remove();
             v_6f7712();
           }
-        }, 15000);
+        }, v_2751c9);
 
         const v_e6ceb8 = v_1619e5?.addListener(
           'onAppOpenAdClose',
@@ -401,6 +407,9 @@ export const v_e55270 = async (): Promise<void> => {
     }
 
     if (!v_d0574b) {
+
+      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!isPangleAvailable',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+
       console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
       return;
     }
@@ -408,6 +417,9 @@ export const v_e55270 = async (): Promise<void> => {
     const v_819f69 = v_7522a9();
 
     if (!v_819f69) {
+
+      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!finalAdUnitId',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+
       console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
       return;
     }
@@ -416,15 +428,24 @@ export const v_e55270 = async (): Promise<void> => {
 
     return new Promise<void>((v_6f7712) => {
       let v_695d96 = false;
-      const v_a983d4 = () => {
+      const v_a983d4 = (v_58ca36) => {
         if (!v_695d96) {
           v_695d96 = true;
           v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
+
+          const v_e56026 = Date.now() - v_09e7a6;
+          fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:cleanup',message:'resolve',data:{exitReason:v_58ca36,elapsedMs:v_e56026},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
+
           v_6f7712();
         }
       };
 
-      const v_ea0359 = setTimeout(v_a983d4, 15000);
+      const v_ea0359 = setTimeout(() => {
+
+        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:timeout',message:'timeout fired',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
+
+        v_a983d4('timeout');
+      }, v_2751c9);
 
       const v_60a14d = [];
       let v_1fc80e = false;
@@ -434,12 +455,15 @@ export const v_e55270 = async (): Promise<void> => {
           'onAppOpenAdLoaded',
           (v_d48baf) => {
             if (v_d48baf.adUnitId === v_819f69 && !v_8e7548) {
+
+              fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdLoaded',message:'ad loaded',data:{elapsedMs:Date.now()-v_09e7a6,adUnitId:v_d48baf.adUnitId},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+
               console.log('[Pangle] 앱 오프닝 광고 로드 완료');
               v_8e7548 = true;
               if (v_dae2ac?.showAppOpenAd) {
                 v_dae2ac.showAppOpenAd(v_819f69).catch((v_5e9bfe) => {
                   console.error('[Pangle] 앱 오프닝 광고 표시 실패:', v_5e9bfe);
-                  v_a983d4();
+                  v_a983d4('load_reject');
                 });
               }
             }
@@ -450,11 +474,14 @@ export const v_e55270 = async (): Promise<void> => {
         const v_e6ceb8 = v_1619e5.addListener(
           'onAppOpenAdClose',
           (v_d48baf) => {
+
+            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdClose',message:'close event',data:{elapsedMs:Date.now()-v_09e7a6,eventAdUnitId:v_d48baf?.adUnitId,finalAdUnitId: v_819f69,matches:v_d48baf?.adUnitId===v_819f69},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+
             if (v_d48baf.adUnitId === v_819f69) {
               console.log('[Pangle] 앱 오프닝 광고 닫힘');
               v_8e7548 = false;
               clearTimeout(v_ea0359);
-              v_a983d4();
+              v_a983d4('close');
             }
           },
         );
@@ -476,7 +503,7 @@ export const v_e55270 = async (): Promise<void> => {
               }
 
               clearTimeout(v_ea0359);
-              v_a983d4();
+              v_a983d4('error');
             }
           },
         );
@@ -485,7 +512,7 @@ export const v_e55270 = async (): Promise<void> => {
 
       if (!v_dae2ac || !v_dae2ac.loadAppOpenAd) {
         console.log('[Pangle] 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
-        v_a983d4();
+        v_a983d4('error');
         return;
       }
 
@@ -493,10 +520,10 @@ export const v_e55270 = async (): Promise<void> => {
         const v_1744b9 = v_95616f instanceof Error ? v_95616f.message : String(v_95616f);
         console.warn('[Pangle] 앱 오프닝 광고 로드 호출 실패:', v_1744b9);
         if (!v_1fc80e) {
-
-          v_a983d4();
+          v_a983d4('load_reject');
         }
       });
+
     });
   } catch (v_5e9bfe) {
     v_8e7548 = false;

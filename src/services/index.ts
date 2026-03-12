@@ -428,6 +428,12 @@ export const v_7488d5 = (v_c65f5d) => {
       console.log(`[API Request] baseURL: ${v_74a79c.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${v_f409eb}`);
 
+      if (__DEV__ && typeof (v_74a79c as any)._devDebugStart === 'undefined') {
+        (v_74a79c as any)._devDebugStart = Date.now();
+        (v_74a79c as any)._devDebugUrl = v_f409eb;
+        (v_74a79c as any)._devDebugMethod = v_74a79c.method || 'GET';
+      }
+
       if (v_74a79c.data instanceof FormData) {
         console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
         console.log('[API Request] FormData 타입 확인:', v_74a79c.data instanceof FormData);
@@ -572,9 +578,27 @@ export const v_7488d5 = (v_c65f5d) => {
   v_0c3a5b.interceptors.response.use(
     (v_3393e3) => {
       console.log(`[API Response] ${v_3393e3.config.url}`, v_3393e3.status);
+      if (__DEV__ && v_3393e3.config) {
+        const v_3f4e2e = v_3393e3.config as any;
+        if (v_3f4e2e._devDebugStart != null) {
+          try {
+            const { devDebugStore: v_92d279 } = require('../utils/devDebugStore');
+            v_92d279.addApi(v_3f4e2e._devDebugUrl || v_3393e3.config.url, v_3f4e2e._devDebugMethod || 'GET', Date.now() - v_3f4e2e._devDebugStart, v_3393e3.status);
+          } catch (v_37eab7) {}
+        }
+      }
       return v_3393e3;
     },
     async (error: v_3333d3) => {
+      if (__DEV__ && v_5e9bfe.config) {
+        const v_3f4e2e = v_5e9bfe.config as any;
+        if (v_3f4e2e._devDebugStart != null) {
+          try {
+            const { devDebugStore: v_92d279 } = require('../utils/devDebugStore');
+            v_92d279.addApi(v_3f4e2e._devDebugUrl || v_5e9bfe.config!.url, v_3f4e2e._devDebugMethod || 'GET', Date.now() - v_3f4e2e._devDebugStart, v_5e9bfe.response?.status);
+          } catch (v_37eab7) {}
+        }
+      }
 
       if (v_5e9bfe.config?.data instanceof FormData) {
         console.error('[API Error] ========== FormData 요청 오류 ==========');

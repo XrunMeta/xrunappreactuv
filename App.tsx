@@ -61,9 +61,6 @@ import {
   v_540580,
   v_858c71,
   v_f7bdb9,
-  v_305be8,
-  v_26fe4c,
-  v_30e759,
   v_1cca63,
   v_0e5276,
   v_4a5627,
@@ -75,8 +72,7 @@ import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef, v_6e8088 } from './src/components';
-import v_7f5f8a from './src/components/OTAUpdateDialog';
+import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
 import { v_a2474a, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
@@ -84,7 +80,7 @@ import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
-import { v_563153, v_dd87bc, v_8ee299, v_370eda } from './src/services';
+import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
   v_c06f2c,
@@ -145,16 +141,7 @@ const v_c0dbdf = () => {
 
         console.log('parsed.queryParams:', v_8decf8.queryParams);
 
-        const v_f4c253 = v_8decf8.queryParams?.referral as string | undefined;
-        const v_fc7051 = v_f4c253
-          ? (() => {
-              try {
-                return decodeURIComponent(v_f4c253);
-              } catch {
-                return v_f4c253;
-              }
-            })()
-          : undefined;
+        const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
 
         if (v_fc7051) {
           console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
@@ -275,70 +262,47 @@ const v_c0dbdf = () => {
 
   v_c4deb2(() => {
     const v_350d39 = async () => {
+
       if (v_326be8.OS !== 'ios') {
         return;
       }
 
+      return;
+
       try {
+
         const v_46a232 = await v_fba5a0.getStringAsync();
-        console.log('[iOS Clipboard] 클립보드 확인');
+        console.log('[iOS Clipboard] 👀👀👀 클립보드 내용:', v_46a232);
 
-        if (!v_46a232 || !v_46a232.startsWith('XRUN_REFERRAL:')) {
-          return;
+        if (v_46a232 && v_46a232.startsWith('XRUN_REFERRAL:')) {
+          const v_9bf12c = v_46a232.replace('XRUN_REFERRAL:', '').trim();
+          console.log('[iOS Clipboard] 추천인 이메일:', v_9bf12c);
+
+          if (v_9bf12c) {
+
+            const v_eee9fe = await v_e84827.getItem('processed_clipboard_referral');
+            if (v_eee9fe === v_46a232) {
+              console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
+              return;
+            }
+
+            await v_e84827.setItem('processed_clipboard_referral', v_46a232);
+
+            await v_fba5a0.setStringAsync('');
+
+            v_eee6b0({ referralEmail: decodeURIComponent(v_9bf12c) });
+
+            console.log('[iOS Clipboard] 회원가입 화면으로 이동');
+            v_9b57fc('signup');
+          }
         }
-
-        const v_479f05 = v_46a232.replace('XRUN_REFERRAL:', '').trim();
-        if (!v_479f05) return;
-
-        let v_9bf12c;
-        try {
-          v_9bf12c = decodeURIComponent(v_479f05);
-        } catch {
-          v_9bf12c = v_479f05;
-        }
-        console.log('[iOS Clipboard] 추천인 이메일:', v_9bf12c);
-
-        const v_eee9fe = await v_e84827.getItem('processed_clipboard_referral');
-        if (v_eee9fe === v_46a232) {
-          console.log('[iOS Clipboard] 이미 처리된 클립보드, 건너뛰기');
-          return;
-        }
-
-        await v_e84827.setItem('processed_clipboard_referral', v_46a232);
-        await v_fba5a0.setStringAsync('');
-
-        v_eee6b0({ referralEmail: v_9bf12c });
-        console.log('[iOS Clipboard] 회원가입 화면으로 이동');
-        v_9b57fc('signup');
       } catch (v_5e9bfe) {
         console.error('[iOS Clipboard] 처리 실패:', v_5e9bfe);
       }
     };
 
     const v_cb36b1 = setTimeout(v_350d39, 3000);
-    return () => clearTimeout(v_cb36b1);
-  }, [v_eee6b0, v_9b57fc]);
 
-  v_c4deb2(() => {
-    const v_a25bcf = async () => {
-      try {
-        const v_f24fd5 = await v_e84827.getItem('userData');
-        if (v_f24fd5) {
-          try {
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            if (v_ef7306?.member) return; 
-          } catch (v_37eab7) {}
-        }
-        const v_43c42e = await v_370eda();
-        if (v_43c42e?.referral_email) {
-          v_eee6b0({ referralEmail: v_43c42e.referral_email });
-          v_9b57fc('signup');
-        }
-      } catch (v_9e86fd) {
-        console.warn('[디퍼드 딥링크] 조회 실패:', v_9e86fd);
-      }
-    };
-    const v_cb36b1 = setTimeout(v_a25bcf, 3500);
     return () => clearTimeout(v_cb36b1);
   }, [v_eee6b0, v_9b57fc]);
 
@@ -472,7 +436,7 @@ const v_c0dbdf = () => {
   }
 
   if (v_0f0c7b === 'ayetOffers') {
-    return <AyetOffersScreen slotName={v_e4a763().AYET_AD_SLOT_NAME_IOS} />;
+    return <AyetOffersScreen />;
   }
 
   if (v_0f0c7b === 'ayetOffersXplay') {
@@ -591,18 +555,6 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xrunInfo') {
     return <XRUNinfoScreen />;
-  }
-
-  if (v_0f0c7b === 'xplayInfo') {
-    return <XplayInfoScreen />;
-  }
-
-  if (v_0f0c7b === 'xplayZone') {
-    return <XplayZoneScreen />;
-  }
-
-  if (v_0f0c7b === 'xrunWalletDescription') {
-    return <XRUNWalletDescriptionScreen />;
   }
 
   if (v_0f0c7b === 'myinfoShopSales') {
@@ -768,7 +720,7 @@ const v_512b02 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
   return null;
 };
 
-const v_d0a391 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
+const v_d0a391 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { addTokenDialogVisible: v_750b67, closeAddTokenDialog: v_b3106e, emergencyStop: v_b135ca } = v_700ef9();
   const [v_614e3c, v_80c653] = v_5ab095(false);
@@ -866,7 +818,7 @@ const v_d0a391 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
         visible={v_b135ca?.enabled ?? false}
         message={v_87df97}
         link={v_b135ca?.link}
-        linkButtonText={v_b135ca?.message === 'UPDATE_FOUND\nPLEASE_UPDATE' ? v_8d41d7('common.versionUpdate.update') : undefined}
+
       />
       <VersionUpdateDialog
         visible={v_614e3c}
@@ -874,7 +826,7 @@ const v_d0a391 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
         showLaterButton={!v_2fa3d1} 
         onClose={() => v_80c653(false)}
       />
-      <OTAUpdateDialog isAdFinished={v_65941f} />
+      <OTAUpdateDialog />
     </>
   );
 };
@@ -889,6 +841,7 @@ export default function v_6540c3() {
     'Roboto-Bold': v_567640,
   });
   const v_1b7402 = v_e662ae<v_c3551b>(v_6b5698.currentState);
+  const v_8c82fd = v_e662ae(false);
 
   v_c4deb2(() => {
     const v_6c5111 = async () => {
@@ -983,71 +936,50 @@ export default function v_6540c3() {
   }, []);
 
   v_c4deb2(() => {
+    if (v_8c82fd.current) return;
+    v_8c82fd.current = true;
+
+    if (__DEV__) {
+      try {
+        require('./src/utils/devDebugStore').devDebugStore.init();
+      } catch (v_37eab7) {}
+    }
 
     v_83e499();
 
     const v_139fe0 = async () => {
-      try {
-        await v_a2474a();
-        console.log('[App] 환경 변수 로드 완료');
-      } catch (v_5e9bfe) {
-        console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
-      }
+      const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
 
       try {
-        await v_757c02();
-        console.log('[App] i18n 초기화 완료');
+        v_cbd24a?.recordBootStep('start');
+        await Promise.all([v_a2474a(), v_757c02()]);
+        v_cbd24a?.recordBootStep('env_i18n');
+        console.log('[App] 환경 변수·i18n 초기화 완료');
       } catch (v_5e9bfe) {
-        console.error('[App] i18n 초기화 실패:', v_5e9bfe);
+        console.error('[App] 초기화 실패:', v_5e9bfe);
       }
 
-      v_e84827.getItem('cached_AD')
-        .then((v_90e1d7) => {
-          if (!v_90e1d7) return;
-          const v_4fc87f = JSON.parse(v_90e1d7);
-          let v_7306f6 = false;
-          const v_8fb936 = {};
-          Object.keys(v_4fc87f).forEach((v_aa0917) => {
-            const v_7ec08d = v_4fc87f[v_aa0917]?.urlAD;
-            if (v_7ec08d && (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://'))) {
-              v_7306f6 = true;
-            } else {
-              v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
-            }
-          });
-          if (v_7306f6) return v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
-        })
-        .then(() => console.log('[App] 캐시 클리어 완료'))
-        .catch((v_2bf859) => console.warn('[App] 캐시 클리어 실패:', v_2bf859));
-
-      (() => {
+      const v_9aae4b = () => {
         try {
           const v_c9c489 = v_e4a763();
           const v_280f96 = {
-          devKey: v_c9c489.APPSFLYER_DEV_KEY,
-          appId: v_c9c489.APPSFLYER_APP_ID_IOS,
-          isDebug: true, 
-          onInstallConversionDataListener: true,
-          onDeepLinkListener: true,
-          timeToWaitForATTUserAuthorization: 10,
+            devKey: v_c9c489.APPSFLYER_DEV_KEY,
+            appId: v_c9c489.APPSFLYER_APP_ID_IOS,
+            isDebug: true,
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            timeToWaitForATTUserAuthorization: 10,
           };
           const v_3d627c = 12;
           const v_c3d02b = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
           const v_1059a9 = (v_bc21cd) => {
             const v_5c3b18 = v_80fa10.RNAppsFlyer;
             if (v_5c3b18 != null && typeof v_5c3b18.initSdkWithCallBack === 'function') {
-              v_1edcd1.initSdk(
-                v_280f96,
-                () => console.log('[App] AppsFlyer 초기화 성공'),
-                (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d),
-              );
+              v_1edcd1.initSdk(v_280f96, () => console.log('[App] AppsFlyer 초기화 성공'), (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d));
               return;
             }
-            if (v_bc21cd < v_3d627c) {
-              setTimeout(() => v_1059a9(v_bc21cd + 1), v_c3d02b[Math.min(v_bc21cd, v_c3d02b.length - 1)]);
-            } else {
-              console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
-            }
+            if (v_bc21cd < v_3d627c) setTimeout(() => v_1059a9(v_bc21cd + 1), v_c3d02b[Math.min(v_bc21cd, v_c3d02b.length - 1)]);
+            else console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
           };
           v_1059a9(0);
         } catch (v_5e9bfe) {
@@ -1069,11 +1001,33 @@ export default function v_6540c3() {
             } catch (v_37eab7) {}
           })
           .catch(() => {});
-      })();
+        v_e84827.getItem('cached_AD')
+          .then((v_90e1d7) => {
+            if (!v_90e1d7) return;
+            const v_4fc87f = JSON.parse(v_90e1d7);
+            let v_7306f6 = false;
+            const v_8fb936 = {};
+            Object.keys(v_4fc87f).forEach((v_aa0917) => {
+              const v_7ec08d = v_4fc87f[v_aa0917]?.urlAD;
+              if (v_7ec08d && (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://'))) v_7306f6 = true;
+              else v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
+            });
+            if (v_7306f6) return v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
+          })
+          .catch(() => {});
+      };
 
-      const v_cdc4cf = v_326be8.OS === 'android' ? 400 : 1000;
-      setTimeout(async () => {
+      if (__DEV__) {
         try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
+        } catch (v_37eab7) {}
+      }
+      setTimeout(v_9aae4b, 1500);
+
+      setTimeout(async () => {
+        const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+        try {
+          v_cbd24a?.recordBootStep('pangle_start');
           await v_f095b0();
           console.log('[App] Pangle 초기화 완료');
           console.log('[App] 앱 오프닝 광고 표시 시작');
@@ -1082,19 +1036,17 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
-          const v_9179bc = v_326be8.OS === 'ios' ? 700 : 200;
+          v_cbd24a?.recordBootStep('pangle_done');
+          v_cbd24a?.recordBootTotal();
           v_2d4718.runAfterInteractions(() => {
-            setTimeout(() => {
-              v_c355f2(true);
-              v_deef62(false);
-            }, v_9179bc);
+            v_c355f2(true);
+            v_deef62(false);
           });
         }
-      }, v_cdc4cf);
+      }, 0);
     };
 
     v_139fe0();
-
   }, []);
 
   if (!v_43f571 || v_cd31a8) {
@@ -1106,7 +1058,8 @@ export default function v_6540c3() {
             <AlertDialogProvider>
               <OTAUpdateProvider>
                 <SplashScreen />
-                <GlobalDialogs isAdFinished={v_65941f} />
+                <GlobalDialogs />
+                {__DEV__ && <DevDebugPanel />}
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1125,7 +1078,8 @@ export default function v_6540c3() {
               <PermissionRequester isAdFinished={v_65941f} />
               <AliveService />
               <ScreenHost />
-              <GlobalDialogs isAdFinished={v_65941f} />
+              <GlobalDialogs />
+              {__DEV__ && <DevDebugPanel />}
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
@@ -1133,4 +1087,3 @@ export default function v_6540c3() {
     </SafeAreaProvider>
   );
 }
-
