@@ -3,23 +3,11 @@ import { v_788479 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 
 import v_04a966 from './ko';
-import v_973506 from './zh-CN';
 import v_5d6728 from './en';
-import v_389afb from './id';
-import v_062521 from './ja';
-import v_3018ef from './th';
-import v_d54b9c from './hi';
-import v_3889c0 from './vi';
 
-const v_61b609 = {
+const resources: Record<string, { translation: typeof v_04a966 }> = {
   ko: { translation: v_04a966 },
-  'zh-CN': { translation: v_973506 },
   en: { translation: v_5d6728 },
-  id: { translation: v_389afb },
-  ja: { translation: v_062521 },
-  th: { translation: v_3018ef },
-  hi: { translation: v_d54b9c },
-  vi: { translation: v_3889c0 },
 };
 
 export const v_e1e9c4 = {
@@ -34,6 +22,34 @@ export const v_e1e9c4 = {
 } as const;
 
 export type LanguageCode = keyof typeof v_e1e9c4;
+
+const LANGUAGE_LOADERS: Record<Exclude<LanguageCode, 'ko' | 'en'>, () => Promise<{ default: typeof v_04a966 }>> = {
+  'zh-CN': () => import('./zh-CN'),
+  id: () => import('./id'),
+  ja: () => import('./ja'),
+  th: () => import('./th'),
+  hi: () => import('./hi'),
+  vi: () => import('./vi'),
+};
+
+let v_f9ab9a = new Set<LanguageCode>(['ko', 'en']);
+
+export function v_2e2e00(v_c87b30): boolean {
+  return v_f9ab9a.has(v_c87b30);
+}
+
+export const v_0e4b58 = async (v_05bb19): Promise<void> => {
+  if (v_f9ab9a.has(v_05bb19)) return;
+  const v_b3a075 = v_661f58[v_05bb19 as Exclude<LanguageCode, 'ko' | 'en'>];
+  if (!v_b3a075) return;
+  try {
+    const { default: v_9390e8 } = await v_b3a075();
+    v_9c213b.addResourceBundle(v_05bb19, 'translation', v_9390e8);
+    v_f9ab9a.add(v_05bb19);
+  } catch (v_9e86fd) {
+    console.warn('[i18n] 언어 로드 실패:', v_05bb19, v_9e86fd);
+  }
+};
 
 const v_201aab = 'app_language';
 
@@ -51,6 +67,7 @@ const v_cc2596 = async (): Promise<LanguageCode> => {
 
 export const v_0e4a4f = async (v_05bb19): Promise<void> => {
   try {
+    await v_0e4b58(v_05bb19);
     await v_e84827.setItem(v_201aab, v_05bb19);
     await v_9c213b.changeLanguage(v_05bb19);
   } catch (v_5e9bfe) {
@@ -60,6 +77,18 @@ export const v_0e4a4f = async (v_05bb19): Promise<void> => {
 
 export const v_757c02 = async () => {
   const v_b3c050 = await v_cc2596();
+  if (v_b3c050 !== 'ko' && v_b3c050 !== 'en') {
+    const v_b3a075 = v_661f58[v_b3c050 as Exclude<LanguageCode, 'ko' | 'en'>];
+    if (v_b3a075) {
+      try {
+        const { default: v_9390e8 } = await v_b3a075();
+        v_61b609[v_b3c050] = { translation: v_9390e8 };
+        v_f9ab9a.add(v_b3c050);
+      } catch (v_9e86fd) {
+        console.warn('[i18n] 초기 언어 로드 실패, ko fallback:', v_b3c050, v_9e86fd);
+      }
+    }
+  }
 
   v_9c213b
     .use(v_788479)
