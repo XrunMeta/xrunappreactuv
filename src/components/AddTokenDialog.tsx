@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Dialog } from './Dialog';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { FONTS } from '../constants';
@@ -50,6 +51,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
   visible,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const [step, setStep] = useState<Step>(0);
   const [selectedToken, setSelectedToken] = useState<TokenOption | null>(null);
@@ -73,7 +75,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
   const handlePrimaryAction = async () => {
     if (step === 0) {
       if (!selectedToken) {
-        await showAlert('토큰 선택', '추가할 토큰을 선택해주세요.');
+        await showAlert(t('components.addTokenDialog.alerts.tokenSelect'), t('components.addTokenDialog.errors.tokenRequired'));
         return;
       }
       setStep(1);
@@ -83,14 +85,14 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
 
     if (step === 1) {
       if (!contractValue) {
-        await showAlert('주소 필요', '컨트랙트 주소를 입력해주세요.');
+        await showAlert(t('components.addTokenDialog.alerts.addressRequired'), t('components.addTokenDialog.errors.addressRequired'));
         return;
       }
       setStep(2);
       return;
     }
 
-    await showAlert('토큰 추가', '해당 토큰은 곧 지갑에 추가될 예정입니다.');
+    await showAlert(t('components.addTokenDialog.alerts.tokenAdd'), t('components.addTokenDialog.success.tokenAdded'));
     onClose();
   };
 

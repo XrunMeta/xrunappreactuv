@@ -214,9 +214,9 @@ export const ShopScreen = () => {
     };
 
     const handlePurchase = (product: ProductData) => {
-        showAlert('구매', `${product.title}을(를) 구매하시겠습니까?`, [
-            { text: '취소' },
-            { text: '구매', onPress: () => console.log('구매:', product.id) },
+        showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
+            { text: t('screens.shop.cancel') },
+            { text: t('screens.shop.purchase'), onPress: () => console.log('구매:', product.id) },
         ]);
     };
 
@@ -264,7 +264,7 @@ export const ShopScreen = () => {
                                 onPress={() => handlePurchase(product)}
                                 activeOpacity={0.8}
                             >
-                                <Text style={styles.purchaseButtonText}>구매</Text>
+                                <Text style={styles.purchaseButtonText}>{t('screens.shop.purchase')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -301,7 +301,7 @@ export const ShopScreen = () => {
                             <Image source={blurYellow} style={styles.balanceBlurRight} resizeMode="cover" />
                             <View style={styles.balanceContent}>
                                 <View style={styles.balanceLeft}>
-                                    <Text style={styles.balanceLabel}>내 잔액</Text>
+                                    <Text style={styles.balanceLabel}>{t('screens.shop.myBalance')}</Text>
                                     <View style={styles.balanceAmountRow}>
                                         <View style={[
                                             styles.balanceXplayIconContainer,
@@ -366,7 +366,7 @@ export const ShopScreen = () => {
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
                                     <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                                    <Text style={styles.loadingText}>기프티콘 목록 불러오는 중...</Text>
+                                    <Text style={styles.loadingText}>{t('screens.shop.loadingGiftList')}</Text>
                                 </View>
                             ) : xplayError ? (
                                 <View style={styles.errorContainer}>

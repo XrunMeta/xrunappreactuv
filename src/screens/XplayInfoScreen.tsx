@@ -74,7 +74,7 @@ export const XplayInfoScreen = () => {
 
   const handleQuestShare = useCallback(async () => {
     if (!userEmail) {
-      await showAlert('안내', '사용자 정보를 확인할 수 없습니다.');
+      await showAlert(t('screens.xplayInfo.alerts.notification'), t('screens.xplayInfo.alerts.userInfoUnavailable'));
       return;
     }
     await shareReferralLink(t, { email: userEmail }, showAlert, navigate);
@@ -101,7 +101,7 @@ export const XplayInfoScreen = () => {
             <Image source={blurYellow} style={styles.balanceBlurRight} resizeMode="cover" />
             <View style={styles.balanceContent}>
               <View style={styles.balanceLeft}>
-                <Text style={styles.balanceLabel}>총 지급 금액</Text>
+                <Text style={styles.balanceLabel}>{t('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={styles.balanceAmountRow}>
                   <View style={styles.balanceXplayIconContainer}>
                     <Image source={xplaySymbol} style={styles.balanceXplayIcon} resizeMode="contain" />
@@ -135,7 +135,7 @@ export const XplayInfoScreen = () => {
           <TouchableOpacity
             style={[styles.zoneCard, styles.zoneCardDisabled]}
             activeOpacity={0.85}
-            onPress={() => showAlert('안내', '오픈예정입니다')}
+            onPress={() => showAlert(t('screens.xplayInfo.alerts.notification'), t('screens.xplayInfo.alerts.comingSoon'))}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
@@ -143,7 +143,7 @@ export const XplayInfoScreen = () => {
         </View>
 
         {}
-        <Text style={styles.questSectionTitle}>퀘스트</Text>
+        <Text style={styles.questSectionTitle}>{t('screens.xplayInfo.quest')}</Text>
         <TouchableOpacity
           style={styles.questCard}
           activeOpacity={0.9}
@@ -151,7 +151,7 @@ export const XplayInfoScreen = () => {
         >
           <Image source={questImage} style={styles.questImage} resizeMode="cover" />
           <View style={styles.questOverlay}>
-            <Text style={styles.questCta}>친구를 초대하고 5 XRUN 씩 받자!</Text>
+            <Text style={styles.questCta}>{t('screens.xplayInfo.inviteCta')}</Text>
           </View>
         </TouchableOpacity>
 

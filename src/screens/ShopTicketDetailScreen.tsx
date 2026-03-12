@@ -182,12 +182,12 @@ export const ShopTicketDetailScreen = () => {
     const currentTicketNumber = ticketData?.txID || ticketData?.txid || ticketData?.transaction || txID || ticketNumber;
 
     if (!currentTicketNumber) {
-      await showAlert('오류', '복사할 티켓 번호가 없습니다.');
+      await showAlert(t('screens.shopTicketDetail.alerts.error'), t('screens.shopTicketDetail.alerts.noTicketNumber'));
       return;
     }
 
     await Clipboard.setStringAsync(currentTicketNumber);
-    await showAlert('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
+    await showAlert(t('screens.shopTicketDetail.alerts.copied'), t('screens.shopTicketDetail.alerts.copySuccess'));
   };
 
   const handleShareQR = async () => {
@@ -269,14 +269,14 @@ export const ShopTicketDetailScreen = () => {
     console.log('[티켓 상세] ================');
 
     if (!memberId || !currentStorageId) {
-      await showAlert('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${memberId || '없음'}\nstorageId: ${currentStorageId || '없음'}`);
+      await showAlert(t('screens.shopTicketDetail.alerts.error'), `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${memberId || '없음'}\nstorageId: ${currentStorageId || '없음'}`);
       return;
     }
 
-    await showAlert('삭제', '티켓을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
+    await showAlert(t('screens.shopTicketDetail.alerts.deleteTitle'), t('screens.shopTicketDetail.alerts.deleteConfirm'), [
+      { text: t('screens.shopTicketDetail.alerts.cancel'), style: 'cancel' },
       {
-        text: '삭제',
+        text: t('screens.shopTicketDetail.alerts.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -292,9 +292,9 @@ export const ShopTicketDetailScreen = () => {
 
             if (result.status === 'success') {
               console.log('[티켓 상세] 삭제 성공');
-              await showAlert('삭제 완료', '티켓이 삭제되었습니다.', [
+              await showAlert(t('screens.shopTicketDetail.alerts.deleteSuccessTitle'), t('screens.shopTicketDetail.alerts.deleteSuccessMessage'), [
                 {
-                  text: '확인',
+                  text: t('screens.shopTicketDetail.alerts.confirm'),
                   onPress: () => {
 
                     navigate(ROUTES.shopMyTicket);
@@ -303,7 +303,7 @@ export const ShopTicketDetailScreen = () => {
               ]);
             } else {
               console.log('[티켓 상세] 삭제 실패:', result.message);
-              await showAlert('삭제 실패', result.message || '티켓 삭제에 실패했습니다.');
+              await showAlert(t('screens.shopTicketDetail.alerts.deleteFailedTitle'), result.message || t('screens.shopTicketDetail.alerts.deleteFailedMessage'));
             }
           } catch (error: any) {
             console.error('[티켓 상세] === 티켓 삭제 오류 ===');
@@ -315,7 +315,7 @@ export const ShopTicketDetailScreen = () => {
               console.error('[티켓 상세] 응답 데이터:', error.response.data);
             }
             console.error('[티켓 상세] ====================');
-            await showAlert('오류', `티켓 삭제 중 오류가 발생했습니다.\n${error?.message || '알 수 없는 오류'}`);
+            await showAlert(t('screens.shopTicketDetail.alerts.error'), `${t('screens.shopTicketDetail.alerts.errorDeleteMessage')}\n${error?.message || '알 수 없는 오류'}`);
           } finally {
             setIsLoading(false);
           }

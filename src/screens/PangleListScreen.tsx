@@ -61,7 +61,7 @@ export const PangleListScreen = () => {
       setPangleAds(virtualPangleAds);
     } catch (error) {
       console.error('[PangleListScreen] 팽글 광고 로드 실패:', error);
-      showToast('팽글 광고를 불러오는데 실패했습니다.');
+      showToast(t('screens.pangleList.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -137,13 +137,13 @@ export const PangleListScreen = () => {
       }
     } catch (error) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', error);
-      showToast('오류가 발생했습니다.');
+      showToast(t('screens.pangleList.errorOccurred'));
     }
   }, []);
 
   return (
     <View style={styles.container}>
-      <Header title="팽글 광고" onBackPress={goBack} showBackButton />
+      <Header title={t('screens.pangleList.title')} onBackPress={goBack} showBackButton />
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -151,11 +151,11 @@ export const PangleListScreen = () => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loadingText}>팽글 광고를 불러오는 중...</Text>
+            <Text style={styles.loadingText}>{t('screens.pangleList.loading')}</Text>
           </View>
         ) : pangleAds.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>표시할 팽글 광고가 없습니다.</Text>
+            <Text style={styles.emptyText}>{t('screens.pangleList.empty')}</Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
@@ -174,16 +174,16 @@ export const PangleListScreen = () => {
                   />
                 ) : (
                   <View style={styles.adImagePlaceholder}>
-                    <Text style={styles.adImagePlaceholderText}>이미지 없음</Text>
+                    <Text style={styles.adImagePlaceholderText}>{t('screens.pangleList.noImage')}</Text>
                   </View>
                 )}
                 <View style={styles.adContent}>
                   <Text style={styles.adName} numberOfLines={2}>
-                    {ad.name || '팽글 광고'}
+                    {ad.name || t('screens.pangleList.adNameFallback')}
                   </Text>
                   <View style={styles.adReward}>
                     <Text style={styles.adRewardText}>
-                      보상: {ad.xrunPrice?.toFixed(4) || ad.coins || '0'} XRUN
+                      {t('screens.pangleList.reward')}: {ad.xrunPrice?.toFixed(4) || ad.coins || '0'} XRUN
                     </Text>
                   </View>
                   {ad.joindesc && (

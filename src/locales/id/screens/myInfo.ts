@@ -10,6 +10,8 @@ export default {
   termsSubtitle: 'Ketentuan layanan, Kebijakan privasi',
   settings: 'Pengaturan',
   settingsSubtitle: 'Pengaturan aplikasi, Bahasa',
+  referral: 'Referral',
+  referralSubtitle: 'Grup Saya, Penyelesaian Grup, Peringkat',
   referralEdit: 'Edit Referral',
   referralEditSubtitle: 'Kelola referral',
   shopSales: 'Penjualan Shop',

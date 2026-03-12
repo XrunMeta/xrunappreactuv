@@ -46,10 +46,15 @@ export { default as shopBuy } from './shopBuy';
 export { default as shopSuccess } from './shopSuccess';
 export { default as shopTicketDetail } from './shopTicketDetail';
 export { default as shopItemRegister } from './shopItemRegister';
+export { default as shopProductDetail } from './shopProductDetail';
 export { default as showNapAd } from './showNapAd';
 export { default as advertiseScreen } from './advertiseScreen';
 export { default as addToken } from './addToken';
 export { default as myinfoShopSales } from './myinfoShopSales';
 export { default as camera } from './camera';
+export { default as xrunInfo } from './xrunInfo';
+export { default as xplayInfo } from './xplayInfo';
+export { default as pangleList } from './pangleList';
+export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleAuth';
 
 

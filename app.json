@@ -54,7 +54,8 @@
       "bundleIdentifier": "run.xrun.xrunapps",
       "associatedDomains": [
         "applinks:www.xrun.run"
-      ]
+      ],
+      "buildNumber": "2"
     },
     "android": {
       "package": "run.xrun.xrunapp",

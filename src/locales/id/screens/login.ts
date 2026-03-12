@@ -21,6 +21,8 @@ export default {
     rememberMe: 'Tetap masuk',
     sendButton: 'Kirim',
   },
+  accountLink: 'Tautkan Akun',
+  linkComplete: 'Tautan Selesai',
   errors: {
     emailRequired: 'Masukkan email Anda',
     passwordRequired: 'Masukkan kata sandi Anda',

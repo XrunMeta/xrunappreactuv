@@ -193,7 +193,7 @@ export const ShopItemRegisterScreen = () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('권한 필요', '이미지를 선택하려면 갤러리 접근 권한이 필요합니다.');
+        Alert.alert(t('screens.shopItemRegister.alerts.permissionRequired'), t('screens.shopItemRegister.alerts.permissionMessage'));
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -226,16 +226,16 @@ export const ShopItemRegisterScreen = () => {
         console.log('[상품 등록] 이미지 업로드 완료, 파일 ID:', uploadResult);
       } else {
         Alert.alert(
-          '업로드 실패', 
-          '이미지 업로드에 실패했습니다.\n네트워크 연결을 확인하거나 다시 시도해주세요.'
+          t('screens.shopItemRegister.alerts.uploadFailed'),
+          t('screens.shopItemRegister.alerts.uploadFailedMessage')
         );
         setImageUri(null);
         setImageFileId(null);
       }
     } catch (error: any) {
       console.error('[상품 등록] 이미지 선택/업로드 오류:', error);
-      const errorMessage = error?.message || '이미지 처리 중 오류가 발생했습니다.';
-      Alert.alert('오류', errorMessage);
+      const errorMessage = error?.message || t('screens.shopItemRegister.alerts.imageProcessingError');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), errorMessage);
       setImageUri(null);
       setImageFileId(null);
     } finally {
@@ -336,12 +336,12 @@ export const ShopItemRegisterScreen = () => {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      Alert.alert('오류', '상품명을 입력해주세요.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.productNameRequired'));
       return;
     }
 
     if (!memberId) {
-      Alert.alert('오류', '사용자 정보를 불러올 수 없습니다.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.userInfoLoadFailed'));
       return;
     }
 
@@ -349,17 +349,17 @@ export const ShopItemRegisterScreen = () => {
     const finalPriceXrun = parseFloat(priceXrun) || 0;
 
     if (finalPriceKRW <= 0 && finalPriceXrun <= 0) {
-      Alert.alert('오류', '가격을 입력해주세요.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceRequired'));
       return;
     }
 
     if (finalPriceKRW <= 0) {
-      Alert.alert('오류', 'KRW 가격을 입력해주세요.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceKRWRequired'));
       return;
     }
 
     if (finalPriceXrun <= 0) {
-      Alert.alert('오류', 'XRUN 가격을 입력해주세요.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceXrunRequired'));
       return;
     }
 
@@ -368,13 +368,13 @@ export const ShopItemRegisterScreen = () => {
       if (editSdk) {
         sdk = editSdk;
       } else {
-        Alert.alert('오류', 'SDK 정보를 찾을 수 없습니다.');
+        Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkNotFound'));
         return;
       }
     } else {
       sdk = generateSDK();
       if (!sdk) {
-        Alert.alert('오류', 'SDK를 생성할 수 없습니다. 이메일 정보를 확인해주세요.');
+        Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkGenerateFailed'));
         return;
       }
     }
@@ -402,18 +402,18 @@ export const ShopItemRegisterScreen = () => {
       const response = await createItemFromApp(request);
 
       if (response.status === 'success') {
-        Alert.alert('성공', isEditMode ? '상품이 수정되었습니다.' : '상품이 등록되었습니다.', [
+        Alert.alert(t('screens.shopItemRegister.alerts.success'), isEditMode ? t('screens.shopItemRegister.alerts.productUpdated') : t('screens.shopItemRegister.alerts.productRegistered'), [
           {
             text: '확인',
             onPress: () => goBack(),
           },
         ]);
       } else {
-        Alert.alert('오류', response.message || (isEditMode ? '상품 수정에 실패했습니다.' : '상품 등록에 실패했습니다.'));
+        Alert.alert(t('screens.shopItemRegister.alerts.error'), response.message || (isEditMode ? t('screens.shopItemRegister.alerts.editFailed') : t('screens.shopItemRegister.alerts.registerFailed')));
       }
     } catch (error) {
       console.error('[상품 등록] 오류:', error);
-      Alert.alert('오류', '상품 등록 중 오류가 발생했습니다.');
+      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.errorDuringRegister'));
     } finally {
       setIsSubmitting(false);
     }
@@ -491,7 +491,7 @@ export const ShopItemRegisterScreen = () => {
     return (
       <SafeView style={styles.container}>
         <Header 
-          title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} 
+          title={isEditMode ? t('screens.shopItemRegister.editTitle') : t('screens.shopItemRegister.title')} 
           onBackPress={goBack}
           rightComponent={renderHeaderRight()}
         />
@@ -505,7 +505,7 @@ export const ShopItemRegisterScreen = () => {
   return (
     <SafeView style={styles.container} backgroundColor="#F8FAFC">
       <Header 
-        title={isEditMode ? '상품 수정' : t('screens.shopItemRegister.title')} 
+        title={isEditMode ? t('screens.shopItemRegister.editTitle') : t('screens.shopItemRegister.title')} 
         onBackPress={goBack}
         rightComponent={renderHeaderRight()}
       />
@@ -526,19 +526,19 @@ export const ShopItemRegisterScreen = () => {
               style={styles.input}
               value={title}
               onChangeText={setTitle}
-              placeholder="상품명을 입력하세요"
+              placeholder={t('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
             />
           </View>
 
           {}
           <View style={styles.section}>
-            <Text style={styles.label}>설명</Text>
+            <Text style={styles.label}>{t('screens.shopItemRegister.description')}</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
               value={description}
               onChangeText={setDescription}
-              placeholder="상품 설명을 입력하세요"
+              placeholder={t('screens.shopItemRegister.placeholders.description')}
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
@@ -570,7 +570,7 @@ export const ShopItemRegisterScreen = () => {
 
           {}
           <View style={styles.section}>
-            <Text style={styles.label}>최대 구매 수량</Text>
+            <Text style={styles.label}>{t('screens.shopItemRegister.maxPurchaseQty')}</Text>
             <TextInput
               style={styles.input}
               value={maxpurchase}
@@ -601,7 +601,7 @@ export const ShopItemRegisterScreen = () => {
                   <Image source={{ uri: imageUri }} style={styles.imagePreview} />
                 ) : (
                   <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>이미지 선택</Text>
+                    <Text style={styles.imagePlaceholderText}>{t('screens.shopItemRegister.imageSelect')}</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -616,7 +616,7 @@ export const ShopItemRegisterScreen = () => {
                     </View>
                   ) : currentImageBase64 ? (
                     <>
-                      <Text style={styles.currentImageLabel}>현재 이미지</Text>
+                      <Text style={styles.currentImageLabel}>{t('screens.shopItemRegister.currentImage')}</Text>
                       <Image
                         source={{ uri: `data:image/png;base64,${currentImageBase64}` }}
                         style={styles.currentImagePreview}
@@ -638,7 +638,7 @@ export const ShopItemRegisterScreen = () => {
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={styles.removeImageText}>이미지 제거</Text>
+                <Text style={styles.removeImageText}>{t('screens.shopItemRegister.removeImage')}</Text>
               </TouchableOpacity>
             )}
             <Text style={styles.helperText}>
@@ -659,7 +659,7 @@ export const ShopItemRegisterScreen = () => {
                 style={[styles.input, styles.readOnlyInput]}
                 value={generateSDK()}
                 editable={false}
-                placeholder="자동 생성됩니다"
+                placeholder={t('screens.shopItemRegister.placeholders.autoGenerated')}
                 placeholderTextColor="#999"
               />
               <Text style={styles.helperText}>
@@ -678,7 +678,7 @@ export const ShopItemRegisterScreen = () => {
             {isSubmitting ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.submitButtonText}>{isEditMode ? '수정하기' : '등록하기'}</Text>
+              <Text style={styles.submitButtonText}>{isEditMode ? t('screens.shopItemRegister.editButton') : t('screens.shopItemRegister.registerButton')}</Text>
             )}
           </TouchableOpacity>
         </ScrollView>

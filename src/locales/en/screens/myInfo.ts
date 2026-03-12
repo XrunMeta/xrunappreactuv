@@ -10,6 +10,8 @@ export default {
   termsSubtitle: 'Terms of service, Privacy policy',
   settings: 'Settings',
   settingsSubtitle: 'App settings, Language',
+  referral: 'Referral',
+  referralSubtitle: 'My Group, Group Settlement, Ranking',
   referralEdit: 'Edit Referral',
   referralEditSubtitle: 'Manage referrals',
   shopSales: 'Shop Sales',

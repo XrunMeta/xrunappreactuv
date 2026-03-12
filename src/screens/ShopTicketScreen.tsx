@@ -354,12 +354,12 @@ export const ShopTicketScreen = () => {
         await loadItemImages(result.data);
       } else {
         console.log('[상점] 상점 아이템 가져오기 실패:', result);
-        await showAlert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+        await showAlert(t('screens.shopBuy.alerts.error'), t('screens.shopBuy.alerts.loadShopItemsFailed'));
         setShopItems([]);
       }
     } catch (error) {
       console.error('[상점] 상점 아이템 가져오기 오류:', error);
-      await showAlert('Error', '상점 아이템을 불러오는데 실패했습니다.');
+      await showAlert(t('screens.shopBuy.alerts.error'), t('screens.shopBuy.alerts.loadShopItemsFailed'));
       setShopItems([]);
     } finally {
       setLoading(false);
@@ -424,7 +424,7 @@ export const ShopTicketScreen = () => {
     if (!memberId || pointsSpendLoading) return;
     const current = pointsBalance ?? 0;
     if (current < 10) {
-      showAlert('잔액 부족', '포인트가 10 이상 필요합니다.', [{ text: '확인' }]);
+      showAlert(t('screens.shopBuy.alerts.insufficientBalanceTitle'), t('screens.shopBuy.alerts.insufficientPointsMessage'), [{ text: t('screens.shopBuy.confirm') }]);
       return;
     }
     setPointsSpendLoading(true);
@@ -435,10 +435,10 @@ export const ShopTicketScreen = () => {
         navigate,
       );
       setPointsBalance(result.remaining_balance);
-      showAlert('테스트 결제 완료', `잔액: ${result.remaining_balance.toLocaleString()} P`, [{ text: '확인' }]);
+      showAlert(t('screens.shopBuy.alerts.testPaymentComplete'), t('screens.shopBuy.alerts.testPaymentBalance', { balance: result.remaining_balance.toLocaleString() }), [{ text: t('screens.shopBuy.confirm') }]);
     } catch (e) {
       console.error('[Xplay] 테스트 결제 실패:', e);
-      showAlert('결제 실패', e instanceof Error ? e.message : '포인트 사용에 실패했습니다.', [{ text: '확인' }]);
+      showAlert(t('screens.shopBuy.alerts.paymentFailed'), e instanceof Error ? e.message : t('screens.shopBuy.alerts.pointUseFailed'), [{ text: t('screens.shopBuy.confirm') }]);
     } finally {
       setPointsSpendLoading(false);
     }

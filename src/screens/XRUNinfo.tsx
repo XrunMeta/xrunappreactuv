@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeScrollView } from '../components';
 import { Header } from '../components';
 import { COMMON_STYLES, FONTS } from '../constants';
@@ -12,6 +13,7 @@ try {
 }
 
 export const XRUNinfoScreen = () => {
+  const { t } = useTranslation();
   const handleHomepagePress = () => {
     Linking.openURL('https://www.xrun.run').catch((err) => {
       console.error('홈페이지 연결 실패:', err);
@@ -42,12 +44,12 @@ export const XRUNinfoScreen = () => {
         {}
         <View style={styles.descriptionContainer}>
           <Text style={styles.description}>
-            누구나 참여할 수 있는{'\n'}
-            에어드랍 광고 플랫폼으로 혜택을 받아보세요.{'\n'}
+            {t('screens.xrunInfo.intro1')}{'\n'}
+            {t('screens.xrunInfo.intro2')}{'\n'}
             {'\n'}
-            일상에서 즐기는 AR XRUN 미션!{'\n'}
-            XRUN 광고 플랫폼은 내 주변에 노출되는 광고 미션을 수행하고{'\n'}
-            리워드를 받는 보상형 광고 플랫폼입니다.
+            {t('screens.xrunInfo.intro3')}{'\n'}
+            {t('screens.xrunInfo.intro4')}{'\n'}
+            {t('screens.xrunInfo.intro5')}
           </Text>
         </View>
 
@@ -57,7 +59,7 @@ export const XRUNinfoScreen = () => {
           onPress={handleHomepagePress}
           activeOpacity={0.7}
         >
-          <Text style={styles.homepageLinkText}>홈페이지 바로가기</Text>
+          <Text style={styles.homepageLinkText}>{t('screens.xrunInfo.homepageLink')}</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>

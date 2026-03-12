@@ -793,7 +793,7 @@ export const LoginScreen = () => {
       {}
       <Dialog
         visible={linkingDialogVisible}
-        title="계정 연결"
+        title={t('screens.login.accountLink')}
         onClose={() => setLinkingDialogVisible(false)}
         actions={[
           {
@@ -848,7 +848,7 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       {}
       <Dialog
         visible={successDialogVisible}
-        title="연동 완료"
+        title={t('screens.login.linkComplete')}
         onClose={() => {
           setSuccessDialogVisible(false);
           navigate(ROUTES.map);

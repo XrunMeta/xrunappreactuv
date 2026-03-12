@@ -335,17 +335,17 @@ export const WalletSendScreen = () => {
 
   const handleSaveAddress = useCallback(async () => {
     if (!modalName.trim()) {
-      await showAlert('오류', '이름을 입력해주세요.');
+      await showAlert(t('screens.walletSend.alerts.error'), t('screens.walletSend.alerts.nameRequired'));
       return;
     }
 
     if (!modalAddress.trim()) {
-      await showAlert('오류', '주소를 입력해주세요.');
+      await showAlert(t('screens.walletSend.alerts.error'), t('screens.walletSend.alerts.addressRequiredMessage'));
       return;
     }
 
     if (!modalAddress.trim().match(/^0x[a-fA-F0-9]{40}$/)) {
-      await showAlert('오류', '유효한 주소를 입력해주세요. (0x로 시작하는 42자)');
+      await showAlert(t('screens.walletSend.alerts.error'), t('screens.walletSend.alerts.validAddressRequired'));
       return;
     }
 
@@ -368,7 +368,7 @@ export const WalletSendScreen = () => {
             : item
         );
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
-        await showAlert('성공', '주소가 수정되었습니다.');
+        await showAlert(t('screens.walletSend.alerts.success'), t('screens.walletSend.alerts.editSuccess'));
       } else {
 
         const newItem: AddressBookItem = {
@@ -380,14 +380,14 @@ export const WalletSendScreen = () => {
         };
         const updatedAddresses = [...existingAddresses, newItem];
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAddresses));
-        await showAlert('성공', '주소가 추가되었습니다.');
+        await showAlert(t('screens.walletSend.alerts.success'), t('screens.walletSend.alerts.addSuccess'));
       }
 
       loadAddressBook();
       handleCloseModal();
     } catch (error) {
       console.error('[주소록] 저장 실패:', error);
-      await showAlert('오류', '저장에 실패했습니다.');
+      await showAlert(t('screens.walletSend.alerts.error'), t('screens.walletSend.alerts.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -403,10 +403,10 @@ export const WalletSendScreen = () => {
       delete swipeAnimations.current[itemId];
 
       loadAddressBook();
-      await showAlert('성공', '주소가 삭제되었습니다.');
+      await showAlert(t('screens.walletSend.alerts.success'), t('screens.walletSend.alerts.deleteSuccess'));
     } catch (error) {
       console.error('[주소록] 삭제 실패:', error);
-      await showAlert('오류', '삭제에 실패했습니다.');
+      await showAlert(t('screens.walletSend.alerts.error'), t('screens.walletSend.alerts.deleteFailed'));
     }
   }, [showAlert, loadAddressBook]);
 
@@ -728,14 +728,14 @@ export const WalletSendScreen = () => {
                           onPress={() => handleEditAddress(item)}
                         >
                           <Ionicons name="pencil-outline" size={20} color="#ffffff" />
-                          <Text style={styles.swipeableButtonText}>수정</Text>
+                          <Text style={styles.swipeableButtonText}>{t('common.buttons.edit')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.swipeableButton, styles.deleteButton]}
                           onPress={() => handleDeleteAddress(item.id)}
                         >
                           <Ionicons name="trash-outline" size={20} color="#ffffff" />
-                          <Text style={styles.swipeableButtonText}>삭제</Text>
+                          <Text style={styles.swipeableButtonText}>{t('common.buttons.delete')}</Text>
                         </TouchableOpacity>
                       </View>
 
@@ -796,7 +796,7 @@ export const WalletSendScreen = () => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editingItem ? '주소 수정' : '주소 추가'}
+                {editingItem ? t('screens.walletSend.addressEdit') : t('screens.walletSend.addressAdd')}
               </Text>
               <TouchableOpacity onPress={handleCloseModal} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color={COLORS.headerText} />
@@ -806,12 +806,12 @@ export const WalletSendScreen = () => {
             <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
               {}
               <View style={styles.modalInputGroup}>
-                <Text style={styles.modalInputLabel}>이름</Text>
+                <Text style={styles.modalInputLabel}>{t('screens.walletSend.nameLabel')}</Text>
                 <View style={styles.modalInputContainer}>
                   <Ionicons name="person-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
                   <TextInput
                     style={styles.modalInput}
-                    placeholder="이름을 입력하세요"
+                    placeholder={t('screens.walletSend.namePlaceholder')}
                     placeholderTextColor="#999"
                     value={modalName}
                     onChangeText={setModalName}
@@ -821,7 +821,7 @@ export const WalletSendScreen = () => {
 
               {}
               <View style={styles.modalInputGroup}>
-                <Text style={styles.modalInputLabel}>네트워크</Text>
+                <Text style={styles.modalInputLabel}>{t('screens.walletSend.networkLabel')}</Text>
                 <TouchableOpacity
                   style={styles.modalSelectContainer}
                   onPress={() => setShowNetworkPicker(true)}
@@ -839,12 +839,12 @@ export const WalletSendScreen = () => {
 
               {}
               <View style={styles.modalInputGroup}>
-                <Text style={styles.modalInputLabel}>주소</Text>
+                <Text style={styles.modalInputLabel}>{t('screens.walletSend.addressLabel')}</Text>
                 <View style={styles.modalInputContainer}>
                   <Ionicons name="wallet-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
                   <TextInput
                     style={styles.modalInput}
-                    placeholder="주소를 입력하세요"
+                    placeholder={t('screens.walletSend.addressPlaceholder')}
                     placeholderTextColor="#999"
                     value={modalAddress}
                     onChangeText={setModalAddress}
@@ -865,7 +865,7 @@ export const WalletSendScreen = () => {
             {}
             <View style={styles.modalButtonContainer}>
               <PrimaryButton
-                title={isSaving ? '저장 중...' : editingItem ? '수정' : '저장'}
+                title={isSaving ? t('screens.walletSend.saving') : editingItem ? t('common.buttons.edit') : t('screens.walletSend.save')}
                 onPress={handleSaveAddress}
                 disabled={isSaving}
                 fullWidth
@@ -887,7 +887,7 @@ export const WalletSendScreen = () => {
             onPress={() => setShowNetworkPicker(false)}
           >
             <View style={styles.networkModalContent}>
-              <Text style={styles.networkModalTitle}>네트워크 선택</Text>
+              <Text style={styles.networkModalTitle}>{t('screens.walletSend.networkSelectTitle')}</Text>
               <FlatList
                 data={NETWORK_OPTIONS}
                 keyExtractor={(item) => item.value}

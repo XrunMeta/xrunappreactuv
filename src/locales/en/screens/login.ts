@@ -21,6 +21,8 @@ export default {
     rememberMe: 'Keep me logged in',
     sendButton: 'Send',
   },
+  accountLink: 'Link Account',
+  linkComplete: 'Link Complete',
   errors: {
     emailRequired: 'Please enter your email',
     passwordRequired: 'Please enter your password',

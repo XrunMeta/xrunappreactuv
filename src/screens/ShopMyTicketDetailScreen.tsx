@@ -60,7 +60,7 @@ export const ShopMyTicketDetailScreen = () => {
         console.log('[내 티켓] 이미지 저장 시작');
         if (!hasBarcodeImageUrl) {
             console.log('[내 티켓] 저장 중단: 바코드 이미지 URL 없음');
-            await showAlert('알림', '저장할 바코드 이미지가 없습니다.');
+            await showAlert(t('screens.shopMyTicket.alerts.notification'), t('screens.shopMyTicket.alerts.noBarcodeImage'));
             return;
         }
 
@@ -72,7 +72,7 @@ export const ShopMyTicketDetailScreen = () => {
             });
             if (permission.status !== 'granted') {
                 console.log('[내 티켓] 저장 중단: 권한 거부');
-                await showAlert('권한 필요', '이미지를 저장하려면 사진 권한이 필요합니다.');
+                await showAlert(t('screens.shopMyTicket.alerts.permissionTitle'), t('screens.shopMyTicket.alerts.permissionRequired'));
                 return;
             }
 
@@ -144,10 +144,10 @@ export const ShopMyTicketDetailScreen = () => {
             }
 
             console.log('[내 티켓] 이미지 저장 성공');
-            await showAlert('저장 완료', '내 티켓 바코드 이미지가 저장되었습니다.\n갤러리에 없다면 내 파일 > 이미지에서 확인해 주세요.');
+            await showAlert(t('screens.shopMyTicket.alerts.saveSuccessTitle'), t('screens.shopMyTicket.alerts.saveSuccess'));
         } catch (error) {
             console.error('[내 티켓] 이미지 저장 실패:', error);
-            await showAlert('저장 실패', '이미지 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+            await showAlert(t('screens.shopMyTicket.alerts.saveFailedTitle'), t('screens.shopMyTicket.alerts.saveFailed'));
         }
     };
 
@@ -155,7 +155,7 @@ export const ShopMyTicketDetailScreen = () => {
         <SafeView style={styles.container} backgroundColor="#FFFFFF">
             <StatusBar style="dark" />
             <Header
-                title="내 티켓"
+                title={t('screens.shopMyTicket.title')}
                 onBackPress={goBack}
                 showBackButton
             />
@@ -228,7 +228,7 @@ export const ShopMyTicketDetailScreen = () => {
                         style={styles.saveButtonGradient}
                     >
                         <Feather name="download" size={20} color="#FFFFFF" />
-                        <Text style={styles.saveButtonText}>이미지 저장하기</Text>
+                        <Text style={styles.saveButtonText}>{t('screens.shopMyTicket.saveImage')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
             </View>
