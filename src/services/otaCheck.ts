@@ -32,7 +32,10 @@ export const getCurrentOTAVersion = async (): Promise<number> => {
     }
 };
 
+const OTA_ENABLED = false;
+
 export const checkOTAVersion = async (): Promise<OTAVersionInfo | null> => {
+    if (!OTA_ENABLED) return null;
     try {
         const response = await fetch(`${BASE_URL}/version.json?t=${new Date().getTime()}`, {
             headers: {
