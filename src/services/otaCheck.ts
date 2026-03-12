@@ -32,7 +32,10 @@ export const v_bb787c = async (): Promise<number> => {
     }
 };
 
+const v_838bb3 = false;
+
 export const v_dc21b6 = async (): Promise<OTAVersionInfo | null> => {
+    if (!v_838bb3) return null;
     try {
         const v_3393e3 = await fetch(`${v_110ec6}/version.json?t=${new Date().getTime()}`, {
             headers: {
