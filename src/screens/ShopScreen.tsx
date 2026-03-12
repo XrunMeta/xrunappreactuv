@@ -12,7 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -100,8 +100,27 @@ export const ShopScreen = () => {
     const [xplayError, setXplayError] = useState<string | null>(null);
     const [xplayBalance, setXplayBalance] = useState<number | null>(null);
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
-    const [xrunBalance, setXrunBalance] = useState<number>(0);
+    const [xrunBalance, setXrunBalance] = useState<number | null>(null);
+    const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
     const { navigate } = useAppNavigation();
+
+    const loadXrunBalance = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            setXrunBalanceLoading(true);
+            const result = await getXrunWalletBalance(member, navigate);
+            const parsed = parseFloat(result.formatted);
+            setXrunBalance(Number.isFinite(parsed) ? parsed : null);
+        } catch {
+            setXrunBalance(null);
+        } finally {
+            setXrunBalanceLoading(false);
+        }
+    }, [navigate]);
 
     const loadXplayBalance = useCallback(async () => {
         try {
@@ -168,8 +187,10 @@ export const ShopScreen = () => {
     useEffect(() => {
         if (tab === 'xplayShop') {
             loadXplayBalance();
+        } else if (tab === 'xrunStore') {
+            loadXrunBalance();
         }
-    }, [tab, loadXplayBalance]);
+    }, [tab, loadXplayBalance, loadXrunBalance]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -322,7 +343,7 @@ export const ShopScreen = () => {
                                                 </Text>
                                             )
                                         ) : (
-                                            <Text style={styles.balanceAmount}>{xrunBalance.toLocaleString()}</Text>
+                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                         )}
                                     </View>
                                 </View>

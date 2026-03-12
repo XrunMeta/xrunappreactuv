@@ -4394,6 +4394,30 @@ export const getAyetPointsBalance = async (
   }
 };
 
+export const getXrunWalletBalance = async (
+  member: number | string,
+  navigation?: any,
+): Promise<{ balance: string; formatted: string; symbol: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/getXrunWalletBalance', {
+      member: typeof member === 'number' ? member : Number(member),
+    });
+    const raw: any = response.data;
+    if (raw?.status !== 'success' || !raw?.data) {
+      throw new Error(raw?.message ?? 'getXrunWalletBalance 응답 오류');
+    }
+    return {
+      balance: raw.data.balance ?? '0',
+      formatted: raw.data.formatted ?? '0',
+      symbol: raw.data.symbol ?? 'XRUN',
+    };
+  } catch (error) {
+    console.error('[XRUN 잔액] 조회 오류:', error);
+    throw error;
+  }
+};
+
 export const getAyetPointsHistory = async (
   member: number | string,
   limit: number = 50,
