@@ -866,7 +866,7 @@ const GlobalDialogs = ({ isAdFinished }: { isAdFinished: boolean }) => {
         visible={emergencyStop?.enabled ?? false}
         message={translatedMessage}
         link={emergencyStop?.link}
-
+        linkButtonText={emergencyStop?.message === 'UPDATE_FOUND\nPLEASE_UPDATE' ? t('common.versionUpdate.update') : undefined}
       />
       <VersionUpdateDialog
         visible={versionUpdateVisible}
