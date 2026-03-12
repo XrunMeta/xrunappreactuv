@@ -866,7 +866,7 @@ const v_d0a391 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
         visible={v_b135ca?.enabled ?? false}
         message={v_87df97}
         link={v_b135ca?.link}
-
+        linkButtonText={v_b135ca?.message === 'UPDATE_FOUND\nPLEASE_UPDATE' ? v_8d41d7('common.versionUpdate.update') : undefined}
       />
       <VersionUpdateDialog
         visible={v_614e3c}
