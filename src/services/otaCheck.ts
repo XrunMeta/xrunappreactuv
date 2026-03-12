@@ -19,8 +19,8 @@ export interface OTAVersionInfo {
 }
 
 interface OTAMetadata {
-    android: OTAVersionInfo;
-    ios: OTAVersionInfo;
+    android?: OTAVersionInfo;
+    ios?: OTAVersionInfo;
 }
 
 export const getCurrentOTAVersion = async (): Promise<number> => {
@@ -46,7 +46,11 @@ export const checkOTAVersion = async (): Promise<OTAVersionInfo | null> => {
         }
 
         const data: OTAMetadata = await response.json();
-        const serverInfo = Platform.OS === 'ios' ? data.ios : data.android;
+
+        if (Platform.OS !== 'android' || !data.android) {
+            return null;
+        }
+        const serverInfo = data.android;
 
         const currentVersion = await getCurrentOTAVersion();
 
