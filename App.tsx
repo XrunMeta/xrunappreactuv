@@ -1001,9 +1001,9 @@ export default function App() {
         console.error('[App] i18n 초기화 실패:', error);
       }
 
-      try {
-        const cachedAdStr = await AsyncStorage.getItem('cached_AD');
-        if (cachedAdStr) {
+      AsyncStorage.getItem('cached_AD')
+        .then((cachedAdStr) => {
+          if (!cachedAdStr) return;
           const cachedAd = JSON.parse(cachedAdStr);
           let hasMarketUrl = false;
           const cleanedCache: any = {};
@@ -1015,14 +1015,10 @@ export default function App() {
               cleanedCache[campid] = cachedAd[campid];
             }
           });
-          if (hasMarketUrl) {
-            await AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
-            console.log('[App] 캐시 클리어 완료');
-          }
-        }
-      } catch (cacheError) {
-        console.warn('[App] 캐시 클리어 실패:', cacheError);
-      }
+          if (hasMarketUrl) return AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
+        })
+        .then(() => console.log('[App] 캐시 클리어 완료'))
+        .catch((cacheError) => console.warn('[App] 캐시 클리어 실패:', cacheError));
 
       (() => {
         try {
@@ -1075,6 +1071,7 @@ export default function App() {
           .catch(() => {});
       })();
 
+      const adStartDelayMs = Platform.OS === 'android' ? 400 : 1000;
       setTimeout(async () => {
         try {
           await initializePangle();
@@ -1085,8 +1082,7 @@ export default function App() {
         } catch (error) {
           console.error('[App] Pangle 프로세스 실패:', error);
         } finally {
-
-          const transitionDelayMs = Platform.OS === 'ios' ? 700 : 400;
+          const transitionDelayMs = Platform.OS === 'ios' ? 700 : 200;
           InteractionManager.runAfterInteractions(() => {
             setTimeout(() => {
               setIsAdFinished(true);
@@ -1094,7 +1090,7 @@ export default function App() {
             }, transitionDelayMs);
           });
         }
-      }, 1000);
+      }, adStartDelayMs);
     };
 
     initializeApp();
