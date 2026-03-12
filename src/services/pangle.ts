@@ -311,15 +311,11 @@ export const v_18f201 = async (
   }
 };
 
-const v_2751c9 = 5000;
+const v_2751c9 = 3000;
 
 let v_8e7548 = false;
 
 export const v_e55270 = async (): Promise<void> => {
-
-  const v_09e7a6 = Date.now();
-  fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:loadAndShowAppOpenAd:entry',message:'entry',data:{platform:v_326be8.OS,isPangleAvailable: v_d0574b,t0:v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
   try {
 
     if (v_326be8.OS === 'ios') {
@@ -407,9 +403,6 @@ export const v_e55270 = async (): Promise<void> => {
     }
 
     if (!v_d0574b) {
-
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!isPangleAvailable',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
       console.warn('[Pangle] Pangle이 사용 불가능합니다. 앱 오프닝 광고를 표시할 수 없습니다.');
       return;
     }
@@ -417,9 +410,6 @@ export const v_e55270 = async (): Promise<void> => {
     const v_819f69 = v_7522a9();
 
     if (!v_819f69) {
-
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:earlyReturn',message:'!finalAdUnitId',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-
       console.warn('[Pangle] 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
       return;
     }
@@ -432,20 +422,11 @@ export const v_e55270 = async (): Promise<void> => {
         if (!v_695d96) {
           v_695d96 = true;
           v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
-
-          const v_e56026 = Date.now() - v_09e7a6;
-          fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:cleanup',message:'resolve',data:{exitReason:v_58ca36,elapsedMs:v_e56026},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
-
           v_6f7712();
         }
       };
 
-      const v_ea0359 = setTimeout(() => {
-
-        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:timeout',message:'timeout fired',data:{elapsedMs:Date.now()-v_09e7a6},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-
-        v_a983d4('timeout');
-      }, v_2751c9);
+      const v_ea0359 = setTimeout(() => v_a983d4('timeout'), v_2751c9);
 
       const v_60a14d = [];
       let v_1fc80e = false;
@@ -455,9 +436,6 @@ export const v_e55270 = async (): Promise<void> => {
           'onAppOpenAdLoaded',
           (v_d48baf) => {
             if (v_d48baf.adUnitId === v_819f69 && !v_8e7548) {
-
-              fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdLoaded',message:'ad loaded',data:{elapsedMs:Date.now()-v_09e7a6,adUnitId:v_d48baf.adUnitId},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
-
               console.log('[Pangle] 앱 오프닝 광고 로드 완료');
               v_8e7548 = true;
               if (v_dae2ac?.showAppOpenAd) {
@@ -474,9 +452,6 @@ export const v_e55270 = async (): Promise<void> => {
         const v_e6ceb8 = v_1619e5.addListener(
           'onAppOpenAdClose',
           (v_d48baf) => {
-
-            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'308260'},body:JSON.stringify({sessionId:'308260',location:'pangle.ts:Android:onAppOpenAdClose',message:'close event',data:{elapsedMs:Date.now()-v_09e7a6,eventAdUnitId:v_d48baf?.adUnitId,finalAdUnitId: v_819f69,matches:v_d48baf?.adUnitId===v_819f69},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-
             if (v_d48baf.adUnitId === v_819f69) {
               console.log('[Pangle] 앱 오프닝 광고 닫힘');
               v_8e7548 = false;

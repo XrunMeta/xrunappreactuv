@@ -1034,32 +1034,32 @@ export default function v_6540c3() {
       }
       setTimeout(v_9aae4b, 1500);
 
-      setTimeout(async () => {
+      setTimeout(() => {
+        v_c355f2(true);
+        v_deef62(false);
+      }, 0);
+
+      setTimeout(() => {
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
-        try {
-          v_cbd24a?.recordBootStep('pangle_start');
-          await v_f095b0();
-          console.log('[App] Pangle 초기화 완료');
-          console.log('[App] 앱 오프닝 광고 표시 시작');
-          await v_e55270();
-          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
-        } catch (v_5e9bfe) {
-          console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
-        } finally {
-          v_cbd24a?.recordBootStep('pangle_done');
-          v_cbd24a?.recordBootTotal();
-          v_2d4718.runAfterInteractions(() => {
-            v_c355f2(true);
-            v_deef62(false);
+        v_cbd24a?.recordBootStep('pangle_start');
+        v_f095b0()
+          .then(() => {
+            console.log('[App] Pangle 초기화 완료');
+            return v_e55270();
+          })
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
+          .finally(() => {
+            v_cbd24a?.recordBootStep('pangle_done');
+            v_cbd24a?.recordBootTotal();
           });
-        }
       }, 0);
     };
 
     v_139fe0();
   }, []);
 
-  if (!v_43f571 || v_cd31a8) {
+  if (v_cd31a8) {
     return (
       <SafeAreaProvider>
         <StatusBar style="dark" />
