@@ -612,7 +612,7 @@ export const ShopItemRegisterScreen = () => {
                   {isLoadingCurrentImage ? (
                     <View style={styles.currentImageLoader}>
                       <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                      <Text style={styles.currentImageLoaderText}>로딩 중...</Text>
+                      <Text style={styles.currentImageLoaderText}>{t('common.messages.loading')}</Text>
                     </View>
                   ) : currentImageBase64 ? (
                     <>

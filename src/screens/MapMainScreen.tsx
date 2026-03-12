@@ -3622,7 +3622,7 @@ export const MapMainScreen: React.FC = () => {
 
             <ActivityIndicator size="large" color="#343a5a" />
 
-            <Text style={styles.loadingText}>로딩중...</Text>
+            <Text style={styles.loadingText}>{t('common.messages.loading')}</Text>
 
           </View>
 
