@@ -3290,6 +3290,28 @@ export const gatewayNodeJS = async (
   }
 };
 
+export const getDeferredReferral = async (): Promise<{ referral_email: string | null } | null> => {
+  try {
+    const { collectDeviceInfo } = require('../utils/napApiUtils');
+    const deviceInfo = await collectDeviceInfo();
+    const requestBody = {
+      adid: deviceInfo.adid || undefined,
+      ip: deviceInfo.ipAddress || undefined,
+      user_agent: deviceInfo.userAgent || undefined,
+      device_model: deviceInfo.model || undefined,
+    };
+    const response = await gatewayNodeJS('gateway/deferred-deeplink/lookup', 'POST', requestBody);
+    const email = response?.referrer_email ?? response?.referral_email ?? response?.data?.referrer_email ?? null;
+    if (email) {
+      console.log('[getDeferredReferral] 추천인 이메일 복원:', email);
+    }
+    return { referral_email: email };
+  } catch (error) {
+    console.warn('[getDeferredReferral] 조회 실패 (무시 가능):', error);
+    return null;
+  }
+};
+
 export const getCryptoPricesInKRW = async (
   navigation?: any,
 ): Promise<any> => {

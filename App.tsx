@@ -84,7 +84,7 @@ import { initI18n } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
-import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
+import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2, getDeferredReferral } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
   useFonts,
@@ -316,6 +316,29 @@ const ScreenHost = () => {
     };
 
     const timer = setTimeout(checkClipboardReferral, 3000);
+    return () => clearTimeout(timer);
+  }, [setSignupFormData, navigate]);
+
+  useEffect(() => {
+    const checkDeferredReferral = async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          try {
+            const userData = JSON.parse(userDataStr);
+            if (userData?.member) return; 
+          } catch (_) {}
+        }
+        const result = await getDeferredReferral();
+        if (result?.referral_email) {
+          setSignupFormData({ referralEmail: result.referral_email });
+          navigate('signup');
+        }
+      } catch (e) {
+        console.warn('[디퍼드 딥링크] 조회 실패:', e);
+      }
+    };
+    const timer = setTimeout(checkDeferredReferral, 3500);
     return () => clearTimeout(timer);
   }, [setSignupFormData, navigate]);
 
