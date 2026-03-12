@@ -75,10 +75,10 @@ import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
-import { v_a2474a, v_e4a763 } from './src/utils/env';
+import { v_8ecf08, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
-import { v_757c02 } from './src/locales';
+import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
@@ -962,12 +962,14 @@ export default function v_6540c3() {
 
       try {
         v_cbd24a?.recordBootStep('start');
-        await Promise.all([v_a2474a(), v_757c02()]);
-        v_cbd24a?.recordBootStep('env_i18n');
-        console.log('[App] 환경 변수·i18n 초기화 완료');
+        v_8ecf08();
+        v_116c93();
+        console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (v_5e9bfe) {
         console.error('[App] 초기화 실패:', v_5e9bfe);
       }
+
+      v_1f4a13();
 
       const v_9aae4b = () => {
         try {
@@ -1034,12 +1036,29 @@ export default function v_6540c3() {
       }
       setTimeout(v_9aae4b, 1500);
 
+      const v_6dde1a = Date.now();
+      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:boot_main_scheduled', message: 'main_ready_scheduled', data: { at: v_6dde1a }, timestamp: v_6dde1a, hypothesisId: 'H3' }) }).catch(() => {});
+
       setTimeout(() => {
+
+        const v_8d41d7 = Date.now();
+        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:main_ready_run', message: 'main_ready_run', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H2' }) }).catch(() => {});
+
         v_c355f2(true);
         v_deef62(false);
+
+        if (__DEV__) {
+          try {
+            require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+          } catch (v_37eab7) {}
+        }
       }, 0);
 
       setTimeout(() => {
+
+        const v_8d41d7 = Date.now();
+        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_cb_entered', message: 'pangle_cb_entered', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H2' }) }).catch(() => {});
+
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         v_cbd24a?.recordBootStep('pangle_start');
         v_f095b0()
@@ -1050,8 +1069,12 @@ export default function v_6540c3() {
           .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
           .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
           .finally(() => {
+
+            const v_8d41d7 = Date.now();
+            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_finally', message: 'pangle_finally', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H1' }) }).catch(() => {});
+
             v_cbd24a?.recordBootStep('pangle_done');
-            v_cbd24a?.recordBootTotal();
+
           });
       }, 0);
     };

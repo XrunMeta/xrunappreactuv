@@ -75,6 +75,28 @@ export const v_0e4a4f = async (v_05bb19): Promise<void> => {
   }
 };
 
+export const v_116c93 = (): typeof v_9c213b => {
+  v_9c213b.use(v_788479).init({
+    resources: { ko: { translation: v_04a966 }, en: { translation: v_5d6728 } },
+    lng: 'ko',
+    fallbackLng: 'ko',
+    interpolation: { escapeValue: false },
+    compatibilityJSON: 'v3',
+  });
+  return v_9c213b;
+};
+
+export const v_1f4a13 = (): void => {
+  v_cc2596()
+    .then((v_c87b30) => {
+      if (v_c87b30 === 'ko') return;
+      if (v_c87b30 === 'en') return v_9c213b.changeLanguage('en');
+      return v_0e4b58(v_c87b30).then(() => v_9c213b.changeLanguage(v_c87b30));
+    })
+    .then(() => console.log('[App] i18n 저장 언어 적용 완료'))
+    .catch((v_9e86fd) => console.warn('[i18n] 저장 언어 적용 실패:', v_9e86fd));
+};
+
 export const v_757c02 = async () => {
   const v_b3c050 = await v_cc2596();
   if (v_b3c050 !== 'ko' && v_b3c050 !== 'en') {
