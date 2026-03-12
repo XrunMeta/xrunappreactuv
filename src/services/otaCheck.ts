@@ -3,7 +3,7 @@ import v_e23cc8 from 'leepezcsdonqtat';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_b4f924, v_16a625, v_b01dc0, v_03e013 } from 'zymsaqwdccswrjlzyfswgwse';
 
-const v_a58534 = false;
+const v_a58534 = true;
 
 const v_110ec6 = 'https://assets.example.invalid';
 
