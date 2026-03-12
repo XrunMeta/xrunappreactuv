@@ -171,7 +171,11 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
     });
   }, []);
 
-  const v_487a25 = v_de06a3((v_53746a) => {
+  const v_487a25 = v_de06a3((v_1505cb) => {
+    const v_53746a =
+      typeof v_1505cb === 'string'
+        ? v_1505cb
+        : (v_1505cb?.routes?.[0]?.name as ScreenName) ?? v_ce4741.map;
     const v_0be3f3 = [v_53746a];
     v_cf6dc2.current = v_0be3f3; 
     v_768005(v_0be3f3);

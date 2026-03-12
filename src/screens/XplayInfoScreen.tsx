@@ -47,7 +47,7 @@ export const v_305be8 = () => {
           v_9d6aeb(String(v_660822));
           v_3e37d1(true);
           try {
-            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
+            const v_43c42e = await v_877de8(v_660822, undefined);
             v_97ae62(v_43c42e.total_ayet_points ?? 0);
           } catch {
             v_97ae62(0);
@@ -63,7 +63,7 @@ export const v_305be8 = () => {
     } catch {
       v_97ae62(null);
     }
-  }, [v_9b57fc]);
+  }, []);
 
   v_c4deb2(() => {
     v_fff133();
