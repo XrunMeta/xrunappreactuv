@@ -995,47 +995,6 @@ export default function App() {
       }
 
       try {
-        const env = getEnv();
-        const initOptions = {
-          devKey: env.APPSFLYER_DEV_KEY,
-          appId: env.APPSFLYER_APP_ID_IOS,
-          isDebug: true, 
-          onInstallConversionDataListener: true,
-          onDeepLinkListener: true,
-          timeToWaitForATTUserAuthorization: 10,
-        };
-        const maxAttempts = 12;
-        const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
-        const tryAppsFlyerInit = (attempt: number) => {
-          const RNAppsFlyer = NativeModules.RNAppsFlyer;
-          if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
-            appsFlyer.initSdk(
-              initOptions,
-              () => {
-                console.log('[App] AppsFlyer 초기화 성공');
-                if (initOptions.isDebug) {
-                  console.log('[App] AppsFlyer 디버그 모드 활성화됨');
-                }
-              },
-              (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
-            );
-            console.log('[App] AppsFlyer 초기화 완료');
-            return;
-          }
-          if (attempt < maxAttempts) {
-            const delay = delays[Math.min(attempt, delays.length - 1)];
-            console.log('[App] AppsFlyer 네이티브 모듈 대기 중,', delay, 'ms 후 재시도', attempt + 1, '/', maxAttempts);
-            setTimeout(() => tryAppsFlyerInit(attempt + 1), delay);
-          } else {
-            console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
-          }
-        };
-        tryAppsFlyerInit(0);
-      } catch (error) {
-        console.error('[App] AppsFlyer 초기화 실패:', error);
-      }
-
-      try {
         await initI18n();
         console.log('[App] i18n 초기화 완료');
       } catch (error) {
@@ -1048,39 +1007,73 @@ export default function App() {
           const cachedAd = JSON.parse(cachedAdStr);
           let hasMarketUrl = false;
           const cleanedCache: any = {};
-
           Object.keys(cachedAd).forEach((campid) => {
             const urlAD = cachedAd[campid]?.urlAD;
             if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) {
-              console.log(`[App] 캐시에서 market:// 또는 intent:// 제거: ${campid}`);
               hasMarketUrl = true;
             } else {
               cleanedCache[campid] = cachedAd[campid];
             }
           });
-
           if (hasMarketUrl) {
             await AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
-            console.log('[App] 캐시 클리어 완료 (market:// 및 intent:// 제거)');
+            console.log('[App] 캐시 클리어 완료');
           }
         }
       } catch (cacheError) {
         console.warn('[App] 캐시 클리어 실패:', cacheError);
       }
 
-      try {
-        await loadEnv();
-        console.log('[App] 환경 변수 로드 완료');
-      } catch (error) {
-        console.error('[App] 환경 변수 로드 실패:', error);
-      }
-
-      try {
-        await initializeTaboola();
-        console.log('[App] Taboola 초기화 완료');
-      } catch (error) {
-        console.error('[App] Taboola 초기화 실패:', error);
-      }
+      (() => {
+        try {
+          const env = getEnv();
+          const initOptions = {
+          devKey: env.APPSFLYER_DEV_KEY,
+          appId: env.APPSFLYER_APP_ID_IOS,
+          isDebug: true, 
+          onInstallConversionDataListener: true,
+          onDeepLinkListener: true,
+          timeToWaitForATTUserAuthorization: 10,
+          };
+          const maxAttempts = 12;
+          const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
+          const tryAppsFlyerInit = (attempt: number) => {
+            const RNAppsFlyer = NativeModules.RNAppsFlyer;
+            if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
+              appsFlyer.initSdk(
+                initOptions,
+                () => console.log('[App] AppsFlyer 초기화 성공'),
+                (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
+              );
+              return;
+            }
+            if (attempt < maxAttempts) {
+              setTimeout(() => tryAppsFlyerInit(attempt + 1), delays[Math.min(attempt, delays.length - 1)]);
+            } else {
+              console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
+            }
+          };
+          tryAppsFlyerInit(0);
+        } catch (error) {
+          console.error('[App] AppsFlyer 초기화 실패:', error);
+        }
+        initializeTaboola().then(() => console.log('[App] Taboola 초기화 완료')).catch((e) => console.error('[App] Taboola 초기화 실패:', e));
+        getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
+        getXRUNGopaxPrice()
+          .then((priceResponse) => AsyncStorage.setItem('xrungopaxprice', JSON.stringify(priceResponse)))
+          .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))
+          .catch((e) => console.error('[App] 고팍스 XRUN 가격 조회 실패:', e));
+        AsyncStorage.getItem('userData')
+          .then((userDataStr) => {
+            if (!userDataStr) return;
+            try {
+              const userData = JSON.parse(userDataStr);
+              const member = userData?.member;
+              if (member) getUsersBalanceUpdateV2(String(member)).catch((e) => console.error('[App] 사용자 잔액 업데이트 V2 실패:', e));
+            } catch (_) {}
+          })
+          .catch(() => {});
+      })();
 
       setTimeout(async () => {
         try {
@@ -1102,44 +1095,6 @@ export default function App() {
           });
         }
       }, 1000);
-
-      try {
-        console.log('[App] TopAd5 광고 캐시 시작');
-        await getTopAd5();
-        console.log('[App] TopAd5 광고 캐시 완료');
-      } catch (error) {
-        console.error('[App] TopAd5 광고 캐시 실패:', error);
-
-      }
-
-      try {
-        console.log('[App] 고팍스 XRUN 가격 조회 시작');
-        const priceResponse = await getXRUNGopaxPrice();
-        const priceData = JSON.stringify(priceResponse);
-        await AsyncStorage.setItem('xrungopaxprice', priceData);
-        console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', priceResponse.data?.gopaxPrice);
-      } catch (error) {
-        console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', error);
-
-      }
-
-      try {
-        const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          const member = userData?.member;
-          if (member) {
-            console.log('[App] 사용자 잔액 업데이트 V2 호출 시작');
-            getUsersBalanceUpdateV2(String(member)).catch((error) => {
-              console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
-            });
-          }
-        }
-      } catch (error) {
-        console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
-
-      }
-
     };
 
     initializeApp();
