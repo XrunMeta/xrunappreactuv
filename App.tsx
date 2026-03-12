@@ -84,7 +84,7 @@ import { v_757c02 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
-import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
+import { v_563153, v_dd87bc, v_8ee299, v_370eda } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
   v_c06f2c,
@@ -316,6 +316,29 @@ const v_c0dbdf = () => {
     };
 
     const v_cb36b1 = setTimeout(v_350d39, 3000);
+    return () => clearTimeout(v_cb36b1);
+  }, [v_eee6b0, v_9b57fc]);
+
+  v_c4deb2(() => {
+    const v_a25bcf = async () => {
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          try {
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            if (v_ef7306?.member) return; 
+          } catch (v_37eab7) {}
+        }
+        const v_43c42e = await v_370eda();
+        if (v_43c42e?.referral_email) {
+          v_eee6b0({ referralEmail: v_43c42e.referral_email });
+          v_9b57fc('signup');
+        }
+      } catch (v_9e86fd) {
+        console.warn('[디퍼드 딥링크] 조회 실패:', v_9e86fd);
+      }
+    };
+    const v_cb36b1 = setTimeout(v_a25bcf, 3500);
     return () => clearTimeout(v_cb36b1);
   }, [v_eee6b0, v_9b57fc]);
 

@@ -3290,6 +3290,28 @@ export const v_c07360 = async (
   }
 };
 
+export const v_370eda = async (): Promise<{ referral_email: string | null } | null> => {
+  try {
+    const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
+    const v_e7f87b = await v_f3de6d();
+    const v_cd6a57 = {
+      adid: v_e7f87b.adid || undefined,
+      ip: v_e7f87b.ipAddress || undefined,
+      user_agent: v_e7f87b.userAgent || undefined,
+      device_model: v_e7f87b.model || undefined,
+    };
+    const v_3393e3 = await v_c07360('gateway/deferred-deeplink/lookup', 'POST', v_cd6a57);
+    const v_e0c7e8 = v_3393e3?.referrer_email ?? v_3393e3?.referral_email ?? v_3393e3?.data?.referrer_email ?? null;
+    if (v_e0c7e8) {
+      console.log('[getDeferredReferral] 추천인 이메일 복원:', v_e0c7e8);
+    }
+    return { referral_email: v_e0c7e8 };
+  } catch (v_5e9bfe) {
+    console.warn('[getDeferredReferral] 조회 실패 (무시 가능):', v_5e9bfe);
+    return null;
+  }
+};
+
 export const v_f7d3be = async (
   v_c65f5d,
 ): Promise<any> => {
