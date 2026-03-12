@@ -3,7 +3,7 @@ import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { zip, unzip, unzipAssets, subscribe } from 'react-native-zip-archive';
 
-const OTA_UPDATES_ENABLED = false;
+const OTA_UPDATES_ENABLED = true;
 
 const BASE_URL = 'https://pub-23c0c0ee5e774a90bc4dd356ef88e11c.r2.dev';
 
