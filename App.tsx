@@ -1001,9 +1001,9 @@ export default function v_6540c3() {
         console.error('[App] i18n 초기화 실패:', v_5e9bfe);
       }
 
-      try {
-        const v_90e1d7 = await v_e84827.getItem('cached_AD');
-        if (v_90e1d7) {
+      v_e84827.getItem('cached_AD')
+        .then((v_90e1d7) => {
+          if (!v_90e1d7) return;
           const v_4fc87f = JSON.parse(v_90e1d7);
           let v_7306f6 = false;
           const v_8fb936 = {};
@@ -1015,14 +1015,10 @@ export default function v_6540c3() {
               v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
             }
           });
-          if (v_7306f6) {
-            await v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
-            console.log('[App] 캐시 클리어 완료');
-          }
-        }
-      } catch (v_2bf859) {
-        console.warn('[App] 캐시 클리어 실패:', v_2bf859);
-      }
+          if (v_7306f6) return v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
+        })
+        .then(() => console.log('[App] 캐시 클리어 완료'))
+        .catch((v_2bf859) => console.warn('[App] 캐시 클리어 실패:', v_2bf859));
 
       (() => {
         try {
@@ -1075,6 +1071,7 @@ export default function v_6540c3() {
           .catch(() => {});
       })();
 
+      const v_cdc4cf = v_326be8.OS === 'android' ? 400 : 1000;
       setTimeout(async () => {
         try {
           await v_f095b0();
@@ -1085,8 +1082,7 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
         } finally {
-
-          const v_9179bc = v_326be8.OS === 'ios' ? 700 : 400;
+          const v_9179bc = v_326be8.OS === 'ios' ? 700 : 200;
           v_2d4718.runAfterInteractions(() => {
             setTimeout(() => {
               v_c355f2(true);
@@ -1094,7 +1090,7 @@ export default function v_6540c3() {
             }, v_9179bc);
           });
         }
-      }, 1000);
+      }, v_cdc4cf);
     };
 
     v_139fe0();
