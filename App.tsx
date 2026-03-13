@@ -81,7 +81,7 @@ import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
-import { v_f095b0 } from './src/services/pangle';
+import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
@@ -1057,8 +1057,9 @@ export default function v_6540c3() {
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         v_cbd24a?.recordBootStep('pangle_start');
         v_f095b0()
-          .then(() => console.log('[App] Pangle 초기화 완료'))
-          .catch((v_5e9bfe) => console.error('[App] Pangle 초기화 실패:', v_5e9bfe))
+          .then(() => v_e55270())
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
           .finally(() => v_cbd24a?.recordBootStep('pangle_done'));
       }, 0);
     };
