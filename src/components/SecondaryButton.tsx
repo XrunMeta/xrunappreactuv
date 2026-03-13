@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ViewStyle } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 interface SecondaryButtonProps extends TouchableOpacityProps {
   title: string;
@@ -34,7 +34,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: COLORS.buttonSecondary,
     borderRadius: 16,
     alignItems: 'center',
@@ -48,10 +48,11 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#000000',
-    fontSize: 16,
+    fontSize: FONTS.size.medium,
     fontWeight: '500',
     lineHeight: 24,
     fontFamily: 'Roboto-Medium', 
   },
+
 });
 

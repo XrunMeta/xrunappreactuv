@@ -1,0 +1,21 @@
+export default {
+  title: '수수료 예상',
+  amount: '보내는 금액',
+  balance: '잔액',
+  from: '보내는 주소',
+  to: '받는 주소',
+  networkFee: '네트워크 수수료',
+  speed: '속도',
+  speedNormal: '일반 <15초',
+  loading: '로딩 중...',
+  loadingGas: '가스 데이터 로딩 중...',
+  error: '오류',
+  estimation: '갱신까지',
+  seconds: '초',
+  confirm: '확인',
+  receiverAddressPlaceholder: '받는 주소를 입력해주세요',
+  alerts: {
+    error: '오류',
+    gasNotReady: '가스 수수료 예상이 준비되지 않았습니다. 잠시만 기다려주세요...',
+  },
+};

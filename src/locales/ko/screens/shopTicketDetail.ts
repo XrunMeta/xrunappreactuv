@@ -1,0 +1,31 @@
+export default {
+  title: '티켓 상세',
+  share: {
+    noQrCode: '공유할 QR 코드가 없습니다.',
+    ticketNumber: '티켓 번호:',
+    qrCodeUrl: 'QR 코드 URL:',
+    qrCodeTitle: '티켓 QR 코드',
+    shareFailed: 'QR 코드 공유에 실패했습니다.',
+    copyTicketNumber: 'Copy Ticket Number',
+    shareQrImage: 'Share QR Image',
+    delete: 'Delete',
+    copiedToClipboard: '클립보드에 복사되었습니다.',
+  },
+  alerts: {
+    error: '오류',
+    noTicketNumber: '복사할 티켓 번호가 없습니다.',
+    copied: '복사됨',
+    copySuccess: '티켓 번호가 클립보드에 복사되었습니다.',
+    deleteTitle: '삭제',
+    deleteConfirm: '티켓을 삭제하시겠습니까?',
+    cancel: '취소',
+    delete: '삭제',
+    deleteSuccessTitle: '삭제 완료',
+    deleteSuccessMessage: '티켓이 삭제되었습니다.',
+    deleteFailedTitle: '삭제 실패',
+    deleteFailedMessage: '티켓 삭제에 실패했습니다.',
+    errorDeleteMessage: '티켓 삭제 중 오류가 발생했습니다.',
+    confirm: '확인',
+  },
+};
+

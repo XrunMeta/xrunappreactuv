@@ -1,0 +1,21 @@
+export default {
+  title: 'Perkiraan Biaya',
+  amount: 'Jumlah Kirim',
+  balance: 'Saldo',
+  from: 'Dari',
+  to: 'Ke',
+  networkFee: 'Biaya Jaringan',
+  speed: 'Kecepatan',
+  speedNormal: 'Normal <15s',
+  loading: 'Memuat...',
+  loadingGas: 'Memuat data gas...',
+  error: 'Kesalahan',
+  estimation: 'Memperbarui dalam',
+  seconds: 'detik',
+  confirm: 'Konfirmasi',
+  receiverAddressPlaceholder: 'Masukkan alamat penerima',
+  alerts: {
+    error: 'Kesalahan',
+    gasNotReady: 'Perkiraan gas belum siap. Harap tunggu...',
+  },
+};

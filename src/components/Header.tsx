@@ -1,39 +1,87 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
-
-const { width } = Dimensions.get('window');
+import { useHeaderDimensions } from '../hooks';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { FONTS } from '../constants';
 
 interface HeaderProps {
   title: string;
   onBackPress?: () => void;
   showBackButton?: boolean;
+  rightComponent?: React.ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
 }
-
-const BackIcon = () => (
-  <View style={styles.iconContainer}>
-    <Text style={styles.iconText}>‹</Text>
-  </View>
-);
 
 export const Header: React.FC<HeaderProps> = ({
   title,
   onBackPress,
   showBackButton = true,
+  rightComponent,
+  containerStyle,
 }) => {
+  const { goBack, reset, canGoBack, currentScreen } = useAppNavigation();
+  const shouldShowBackButton = showBackButton;
+
+  const { topPadding, headerHeight } = useHeaderDimensions();
+
+  const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+      return;
+    }
+
+    const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
+
+    const isMyInfoScreen = currentScreen?.startsWith('myInfo');
+
+    const isShopScreen = currentScreen?.startsWith('shop');
+
+    const isReferralScreen = currentScreen?.startsWith('referral');
+
+    if (isWalletScreen || isMyInfoScreen) {
+
+      if (canGoBack) {
+        goBack();
+      } else {
+
+        reset(ROUTES.map);
+      }
+    } else if (isShopScreen || isReferralScreen) {
+
+      reset(ROUTES.map);
+    } else {
+
+      reset(ROUTES.map);
+    }
+  };
+
+  const renderBackArea = () =>
+    shouldShowBackButton ? (
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={handleBackPress}
+        activeOpacity={0.7}
+      >
+        <Feather name="arrow-left" size={20} color={COLORS.headerText} />
+      </TouchableOpacity>
+    ) : (
+      <View style={styles.backButtonPlaceholder} />
+    );
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: headerHeight + 10, paddingTop: topPadding }, containerStyle]}>
       <View style={styles.content}>
-        {showBackButton && (
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={onBackPress}
-            activeOpacity={0.7}
-          >
-            <BackIcon />
-          </TouchableOpacity>
+        {renderBackArea()}
+        <View style={styles.titleWrapper} pointerEvents="none">
+          <Text style={styles.title}>{title}</Text>
+        </View>
+        {rightComponent ? (
+          <View style={styles.rightComponent}>{rightComponent}</View>
+        ) : (
+          <View style={styles.backButtonPlaceholder} />
         )}
-        <Text style={styles.title}>{title}</Text>
       </View>
     </View>
   );
@@ -41,57 +89,56 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 62,
-    width: width,
+    width: '100%',
+
     backgroundColor: COLORS.background,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 2,
     },
-    shadowOpacity: 0.09,
-    shadowRadius: 3,
-    elevation: 3, 
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5, 
     justifyContent: 'center',
+    zIndex: 10, 
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 25,
     height: '100%',
+    justifyContent: 'space-between',
   },
   backButton: {
     width: 40,
     height: 40,
     backgroundColor: COLORS.headerIconBg,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconText: {
-    fontSize: 32,
-    color: COLORS.headerText,
-    fontWeight: '300',
-    lineHeight: 24,
+  backButtonPlaceholder: {
+    width: 40,
+    height: 40,
+  },
+  rightComponent: {
+    minWidth: 40,
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  titleWrapper: {
+    flex: 1,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: FONTS.size.mmedium,
     fontWeight: '700',
-    lineHeight: 24,
+    lineHeight: 22,
     color: COLORS.headerText,
     fontFamily: 'Roboto-Bold', 
-    flex: 1,
     textAlign: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
   },
 });
 

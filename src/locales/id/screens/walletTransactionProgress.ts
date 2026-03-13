@@ -1,0 +1,23 @@
+export default {
+  title: 'Proses Transaksi',
+  amount: 'Jumlah Kirim',
+  balance: 'Saldo',
+  from: 'Dari',
+  to: 'Ke',
+  gasPrice: 'Harga Gas',
+  inProgress: 'Sedang Berlangsung . . .',
+  listPage: 'Halaman Daftar',
+  processing: 'Memproses transaksi...',
+  checkingTicket: 'Memeriksa tiket transfer...',
+  executingTransfer: 'Menjalankan transfer blockchain...',
+  transferCompleted: 'Transfer berhasil diselesaikan!',
+  transferFailed: 'Transfer gagal',
+  noTxHash: 'Tidak ada hash transaksi',
+  loading: 'Memuat...',
+  calculating: 'Menghitung...',
+  alerts: {
+    transferFailed: 'Transfer Gagal',
+    transferFailedMessage: 'Koneksi blockchain sedang tertunda. Silakan coba lagi nanti.',
+    confirm: 'OK',
+  },
+};

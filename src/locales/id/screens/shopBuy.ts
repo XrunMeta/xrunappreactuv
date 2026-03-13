@@ -1,0 +1,35 @@
+export default {
+  title: 'Toko',
+  price: 'Harga',
+  inAppPurchaseComingSoon: 'Pembelian Dalam Aplikasi (Segera Hadir)',
+  fee: 'Biaya',
+  total: 'Total',
+  myBalance: 'Saldo Saya',
+  pointBalance: 'Saldo Poin',
+  pointPrice: 'Harga Poin',
+  checking: 'Memeriksa...',
+  checkFailed: 'Pemeriksaan Gagal',
+  insufficientBalance: 'Saldo tidak mencukupi. Silakan isi ulang saldo Anda.',
+  cancel: 'Batal',
+  payment: 'Pembayaran',
+  confirm: 'Konfirmasi',
+  alerts: {
+    error: 'Kesalahan',
+    cannotPurchase: 'Tidak dapat membeli.',
+    notification: 'Notifikasi',
+    inAppPurchaseComingSoon: 'Fitur pembelian dalam aplikasi akan segera hadir.',
+    insufficientBalanceTitle: 'Saldo Tidak Mencukupi',
+    insufficientBalanceMessage: 'Saldo Saat Ini: {currentBalance} XRUN\nJumlah yang Diperlukan: {requiredAmount} XRUN\nSilakan isi ulang saldo Anda.',
+    purchaseFailed: 'Pembelian Gagal',
+    purchaseFailedMessage: 'Terjadi kesalahan saat pembelian.',
+    loadShopItemsFailed: 'Gagal memuat item toko.',
+    insufficientPointsMessage: 'Minimal 10 poin diperlukan.',
+    testPaymentComplete: 'Pembayaran tes selesai',
+    testPaymentBalance: 'Saldo: {{balance}} P',
+    paymentFailed: 'Pembayaran gagal',
+    pointUseFailed: 'Gagal menggunakan poin.',
+  },
+};
+
+
+

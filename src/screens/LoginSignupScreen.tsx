@@ -1,162 +1,188 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Platform,
-} from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { PrimaryButton, SecondaryButton } from '../components';
-import { COLORS } from '../constants';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PrimaryButton, SecondaryButton, SafeView } from '../components';
+import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
+import { ROUTES, useAppNavigation } from '../navigation';
+import { TaboolaBanner } from '../components/TaboolaBanner';
+
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+
+interface TutorialItem {
+  id: number;
+  text: string;
+  image: any;
+}
+
+const tutorialData: TutorialItem[] = [
+  {
+    id: 1,
+    text: '광고에 참여하고 XRUN 리워드를 받아보세요',
+    image: require('../../assets/title2.png'),
+  },
+  {
+    id: 2,
+    text: '획득한 XRUN으로 Shop을 이용할 수 있어요',
+    image: require('../../assets/title3.png'),
+  },
+  {
+    id: 3,
+    text: '레퍼럴 코드 공유로 XRUN 리워드 20%를 더 획득하세요',
+    image: require('../../assets/title1.png'),
+  },
+];
 
 export const LoginSignupScreen = () => {
-  const handleLogin = () => {
-    console.log('Login pressed');
+  const { navigate } = useAppNavigation();
+  const { t } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
 
+  const handleLogin = () => navigate(ROUTES.login);
+  const handleSignUp = async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        'googleSignupRequired',
+        'googleSignupEmail',
+        'appleSignupRequired',
+        'appleSignupEmail',
+      ]);
+    } catch (error) {
+      console.error('[회원가입] 소셜 회원가입 플래그 제거 실패:', error);
+    }
+    navigate(ROUTES.signup);
   };
 
-  const handleSignUp = () => {
-    console.log('Sign up pressed');
-
+  const handlePageChange = (event: any) => {
+    const page = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+    setCurrentPage(page);
   };
 
-  const handleTermsOfService = () => {
-
-    console.log('Terms of Service pressed');
-  };
-
-  const handlePrivacyPolicy = () => {
-
-    console.log('Privacy Policy pressed');
-  };
+  const renderTutorialItem = ({ item }: { item: TutorialItem }) => (
+    <View style={styles.tutorialItem}>
+      <Text style={styles.tutorialText}>{item.text}</Text>
+      <Image source={item.image} style={styles.tutorialImage} resizeMode="contain" />
+    </View>
+  );
 
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container}>
       <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {}
-        <View style={styles.adContainer}>
-          <Text style={styles.adText}>전면 광고</Text>
-        </View>
-
-        {}
-        <View style={styles.buttonContainer}>
-          <PrimaryButton
-            title="Login"
-            onPress={handleLogin}
-            fullWidth={true}
-            style={styles.loginButton}
-          />
-          <SecondaryButton
-            title="회원가입"
-            onPress={handleSignUp}
-            fullWidth={true}
-          />
-        </View>
-
-        {}
-        <View style={styles.termsContainer}>
-          <Text style={styles.termsText}>
-            이 앱에서 제공하는 기능과 정보 이용 방식에 대해 알아보려면{'\n'}
-            아래의{' '}
-            <Text style={styles.linkText} onPress={handleTermsOfService}>
-              이용약관
-            </Text>
-            {' '}과{' '}
-            <Text style={styles.linkText} onPress={handlePrivacyPolicy}>
-              개인정보 처리방침
-            </Text>
-            을 읽고 동의해주세요.
-          </Text>
-        </View>
-      </ScrollView>
 
       {}
-      {Platform.OS === 'ios' && (
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
+      <View style={styles.tutorialContainer}>
+        <FlatList
+          ref={flatListRef}
+          data={tutorialData}
+          renderItem={renderTutorialItem}
+          keyExtractor={(item) => `tutorial-${item.id}`}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handlePageChange}
+          style={styles.tutorialFlatList}
+        />
+
+        {}
+        <View style={styles.paginationContainer}>
+          {tutorialData.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.paginationDot,
+                index === currentPage && styles.paginationDotActive,
+              ]}
+            />
+          ))}
         </View>
-      )}
-    </View>
+      </View>
+
+      {}
+      <View style={styles.buttonContainer}>
+        <PrimaryButton
+          title={t('screens.loginSignup.loginButton')}
+          onPress={handleLogin}
+          fullWidth
+        />
+        <SecondaryButton
+          title={t('screens.loginSignup.signupButton')}
+          onPress={handleSignUp}
+          fullWidth
+        />
+      </View>
+
+      {}
+      <View style={styles.taboolaContainer}>
+        <TaboolaBanner placementType="shop" />
+      </View>
+    </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...COMMON_STYLES.container,
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 58, 
-    paddingBottom: 34,
-  },
-  adContainer: {
-    width: 327,
-    height: 393,
-    backgroundColor: '#d9d9d9',
-    borderRadius: 10,
-    alignItems: 'center',
+  tutorialContainer: {
+    flex: 1,
     justifyContent: 'center',
-    marginTop: 44, 
-    alignSelf: 'center',
+    paddingTop: SIZES.xlarge,
+    paddingBottom: SIZES.small,
   },
-  adText: {
-    fontSize: 30,
-    fontWeight: '500',
-    color: COLORS.text,
-    fontFamily: 'Roboto-Medium',
-  },
-  buttonContainer: {
-    width: 327,
-    marginTop: 48, 
-    gap: 15,
-    alignSelf: 'center',
-  },
-  loginButton: {
-    marginBottom: 0,
-  },
-  termsContainer: {
-    width: 317,
-    marginTop: 97, 
-    alignSelf: 'center',
-  },
-  termsText: {
-    fontSize: 12,
-    lineHeight: 15,
-    color: '#4c4e55',
-    fontFamily: 'Roboto-Regular',
-    textAlign: 'left',
-    letterSpacing: 0.06,
-  },
-  linkText: {
-    fontSize: 12,
-    lineHeight: 15,
-    color: '#4c4e55',
-    fontFamily: 'Roboto-Bold',
-    fontWeight: 'bold',
-    letterSpacing: 0.06,
-  },
-  homeIndicator: {
-    height: 34,
+  tutorialFlatList: {
     width: '100%',
+  },
+  tutorialItem: {
+    width: SCREEN_WIDTH,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingBottom: 9,
+    paddingHorizontal: SIZES.large,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
-  homeIndicatorBar: {
-    width: 134,
-    height: 5,
-    backgroundColor: '#10192d',
-    borderRadius: 100,
-    marginBottom: 9,
+  tutorialText: {
+    fontSize: FONTS.size.xlarge,
+    fontFamily: 'Roboto-Bold',
+    color: '#333333',
+    textAlign: 'center',
+    marginBottom: SIZES.large,
+    paddingHorizontal: SIZES.large,
+    lineHeight: FONTS.size.xlarge * 1.4,
+  },
+  tutorialImage: {
+    width: '100%',
+    height: SCREEN_HEIGHT * 0.38,
+    maxWidth: SCREEN_WIDTH - SIZES.large * 2,
+    marginBottom: 0,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: SIZES.small,
+    gap: SIZES.small,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#CCCCCC',
+  },
+  paginationDotActive: {
+    backgroundColor: '#1E3A8A',
+  },
+  buttonContainer: {
+    width: '100%',
+    gap: SIZES.medium,
+    paddingHorizontal: SIZES.large,
+    paddingTop: SIZES.large,
+    paddingBottom: SIZES.medium,
+  },
+  taboolaContainer: {
+    borderWidth: 2,
+    borderColor: '#ededed',
   },
 });
-

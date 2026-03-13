@@ -1,0 +1,21 @@
+export default {
+  title: '手数料見積',
+  amount: '送金額',
+  balance: '残高',
+  from: '送信元',
+  to: '送信先',
+  networkFee: 'ネットワーク手数料',
+  speed: '速度',
+  speedNormal: '通常 <15秒',
+  loading: '読み込み中...',
+  loadingGas: 'ガスデータを読み込み中...',
+  error: 'エラー',
+  estimation: '更新まで',
+  seconds: '秒',
+  confirm: '確認',
+  receiverAddressPlaceholder: '受信アドレスを入力してください',
+  alerts: {
+    error: 'エラー',
+    gasNotReady: 'ガス見積もりが準備できていません。しばらくお待ちください...',
+  },
+};

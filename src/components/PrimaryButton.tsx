@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ViewStyle, TextStyle } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, FONTS } from '../constants';
 
 interface PrimaryButtonProps extends TouchableOpacityProps {
   title: string;
@@ -34,7 +34,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: COLORS.buttonPrimary,
     borderRadius: 16,
     alignItems: 'center',
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: FONTS.size.medium,
     fontWeight: '500',
     lineHeight: 24,
     fontFamily: 'Roboto-Medium', 

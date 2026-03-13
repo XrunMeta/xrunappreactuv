@@ -1,0 +1,15 @@
+export default {
+    title: 'Download Private Key',
+    warningTitle: 'Security Warning',
+    warningMessage: 'The private key has all the permissions of the wallet. Never expose it to others. Please make sure there are no one around you and keep it in a safe place.',
+    confirmDownloadTitle: 'Do you want to download the private key?',
+    confirmDownloadMessage: 'This action can be dangerous for security. Do you want to continue?',
+    emailVerificationRequired: 'Google login verification is required for account security.',
+    showKey: 'Show Private Key',
+    maskedKeyLabel: 'Wallet Private Key',
+    copyKey: 'Copy Private Key',
+    copyConfirmTitle: 'Copy Private Key',
+    copyConfirmMessage: 'Do you want to copy the private key to the clipboard? It is recommended to paste it immediately in a safe place and empty the clipboard.',
+    copySuccess: 'Private key copied to clipboard.',
+    backToWallet: 'Back to Wallet',
+};

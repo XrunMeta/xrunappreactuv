@@ -1,0 +1,49 @@
+{
+  "cli": {
+    "version": ">= 16.20.1",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "android": {
+        "image": "latest",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "develop": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "android": {
+        "image": "latest",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "internal": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "distribution": "store",
+        "image": "latest" 
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

@@ -1,0 +1,164 @@
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { SafeScrollView } from '../components';
+import { useTranslation } from 'react-i18next';
+import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Header, FormField, PrimaryButton } from '../components';
+import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { closeMembership } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
+
+export const MyInfoCloseMembershipScreen = () => {
+  const { t } = useTranslation();
+  const { goBack, navigate } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
+  const [password, setPassword] = useState('');
+  const [secure, setSecure] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+
+    if (!password.trim()) {
+      await showAlert(t('screens.myInfoCloseMembership.alerts.passwordRequired'), t('screens.myInfoCloseMembership.alerts.passwordRequiredMessage'));
+      return;
+    }
+
+    await showAlert(
+      t('screens.myInfoCloseMembership.alerts.closeMembership'),
+      t('screens.myInfoCloseMembership.alerts.closeMembershipMessage'),
+      [
+        {
+          text: t('screens.myInfoCloseMembership.alerts.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('screens.myInfoCloseMembership.alerts.confirm'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsSubmitting(true);
+
+              const userDataStr = await AsyncStorage.getItem('userData');
+              if (!userDataStr) {
+                await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
+                setIsSubmitting(false);
+                return;
+              }
+
+              const userData = JSON.parse(userDataStr);
+              const member = userData.member;
+
+              if (!member) {
+                await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.errorMessage'));
+                setIsSubmitting(false);
+                return;
+              }
+
+              const success = await closeMembership(
+                member,
+                password,
+                '',
+                0,
+                navigate,
+              );
+
+              if (!success) {
+                await showAlert(t('screens.myInfoCloseMembership.alerts.closeFailed'), t('screens.myInfoCloseMembership.alerts.closeFailedMessage'));
+                setIsSubmitting(false);
+                return;
+              }
+
+              navigate(ROUTES.myInfoCloseMembershipSuccess);
+            } catch (error) {
+              console.error('[회원 탈퇴] 탈퇴 처리 중 오류:', error);
+              await showAlert(t('screens.myInfoCloseMembership.alerts.error'), t('screens.myInfoCloseMembership.alerts.closeError'));
+              setIsSubmitting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header title={t('screens.myInfoCloseMembership.title')} onBackPress={goBack} showBackButton />
+      <SafeScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        autoAdjustKeyboardPadding={true}
+      >
+        <View style={styles.inner}>
+          <Text style={styles.warningText}>
+            {t('screens.myInfoCloseMembership.warningText')}
+          </Text>
+        </View> 
+        <View style={styles.inner}>
+          <FormField
+            label={t('screens.myInfoCloseMembership.passwordLabel')}
+            placeholder={t('screens.myInfoCloseMembership.passwordPlaceholder')}
+            secureTextEntry={secure}
+            value={password}
+            onChangeText={setPassword}
+            rightAccessory={
+              <TouchableOpacity onPress={() => setSecure((prev) => !prev)}>
+                <Feather name={secure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
+              </TouchableOpacity>
+            }
+          />
+          <Text style={styles.helperText}>
+            {t('screens.myInfoCloseMembership.helperText')}
+          </Text>
+        </View>
+
+        <View style={styles.bottomSection}>
+          <PrimaryButton
+            title={isSubmitting ? t('screens.myInfoCloseMembership.processing') : t('screens.myInfoCloseMembership.confirmButton')}
+            fullWidth
+            onPress={handleSubmit}
+            style={styles.primaryButton}
+            disabled={isSubmitting}
+          />
+        </View>
+      </SafeScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    ...COMMON_STYLES.container,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
+  },
+  inner: {
+    ...LIST_STYLES.small,
+  },
+  helperText: {
+    marginTop: 8,
+    fontSize: FONTS.size.small,
+    lineHeight: 15,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
+  },
+  warningText: {
+    marginTop: 8,
+    marginBottom: 24,
+    fontSize: FONTS.size.medium,
+    lineHeight: 24,
+    color: '#aa0000',
+    fontFamily: 'Roboto-Regular',
+  },
+  bottomSection: {
+    ...COMMON_STYLES.bottomButtonContainer,
+  },
+  primaryButton: {
+    width: '100%',
+  },
+});
+

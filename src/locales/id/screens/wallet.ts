@@ -1,0 +1,16 @@
+export default {
+  title: 'Dompet',
+  myWallet: 'Dompet Saya',
+  myBalance: 'Saldo Saya',
+  addToken: 'tambah token',
+  polygonScan: 'PolygonScan',
+  etherscan: 'Etherscan',
+  receive: 'Terima',
+  send: 'Kirim',
+  preparing: 'Mempersiapkan',
+  preparingMessage: 'Fitur ini sedang dipersiapkan',
+  loading: 'Memuat...',
+  error: 'Kesalahan',
+  missingInfo: 'Informasi yang diperlukan tidak ada.',
+  addressNotLoaded: 'Alamat dompet belum dimuat. Harap tunggu sebentar dan coba lagi.',
+};

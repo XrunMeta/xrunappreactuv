@@ -1,0 +1,35 @@
+export default {
+  title: 'Info Saya',
+  editInfo: 'Edit Info',
+  editInfoSubtitle: 'Ubah email, kata sandi',
+  notify: 'Notifikasi',
+  notifySubtitle: 'Pengaturan notifikasi, riwayat',
+  faq: 'FAQ',
+  faqSubtitle: 'Pertanyaan yang sering diajukan',
+  terms: 'Ketentuan',
+  termsSubtitle: 'Ketentuan layanan, Kebijakan privasi',
+  settings: 'Pengaturan',
+  settingsSubtitle: 'Pengaturan aplikasi, Bahasa',
+  referral: 'Referral',
+  referralSubtitle: 'Grup Saya, Penyelesaian Grup, Peringkat',
+  referralEdit: 'Edit Referral',
+  referralEditSubtitle: 'Kelola referral',
+  shopSales: 'Penjualan Shop',
+  shopSalesSubtitle: 'Kelola status penjualan',
+  logout: 'Keluar',
+  shareReferral: 'Bagikan Tautan Referral',
+  logoutConfirm: 'Apakah Anda ingin keluar?',
+  logoutSuccess: 'Telah keluar',
+  alerts: {
+    logout: 'Keluar',
+    logoutMessage: 'Apakah Anda ingin keluar?',
+    cancel: 'Batal',
+    error: 'Kesalahan',
+    userDataNotFound: 'Informasi pengguna tidak ditemukan.',
+    shareFailed: 'Berbagi Gagal',
+    shareFailedMessage: 'Informasi email pengguna tidak ditemukan.',
+  },
+};
+
+
+

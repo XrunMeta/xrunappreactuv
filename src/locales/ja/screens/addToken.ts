@@ -1,0 +1,22 @@
+export default {
+  confirmTitle: 'トークン追加の確認',
+  tokenTab: 'トークン',
+  contractTab: 'コントラクト',
+  contractPlaceholder: 'コントラクトアドレスを入力',
+  nextButton: '次へ',
+  contractAddress: 'コントラクトアドレス',
+  tokenName: 'トークン名',
+  tokenSymbol: 'トークンシンボル',
+  tokenDecimals: '小数点桁数',
+  addButton: 'トークンを追加',
+  alreadyOwned: '既に所有',
+  invalidTokenTitle: '無効なトークン',
+  invalidTokenDesc: 'このトークンは有効なERC20トークンではありません。',
+  existTokenTitle: 'トークンが既に存在',
+  existTokenDesc: 'このトークンは既にウォレットに追加されています。',
+  success: '成功',
+  successMessage: 'トークンが正常に追加されました。',
+  error: 'エラー',
+  errorMessage: 'トークンの追加に失敗しました。もう一度お試しください。',
+};
+
