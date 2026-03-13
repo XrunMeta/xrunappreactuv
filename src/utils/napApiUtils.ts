@@ -48,7 +48,14 @@ async function storeAdvertisingId(adId: string): Promise<void> {
   }
 }
 
+const IP_CACHE_MS = 5 * 60 * 1000; 
+let ipCache: { ip: string; at: number } | null = null;
+
 async function getRealIPAddress(): Promise<string> {
+  const now = Date.now();
+  if (ipCache && now - ipCache.at < IP_CACHE_MS) {
+    return ipCache.ip;
+  }
   try {
     console.log('=== 실제 IP 주소 가져오기 시작 ===');
 
@@ -64,7 +71,7 @@ async function getRealIPAddress(): Promise<string> {
         console.log(`IP 서비스 시도: ${service}`);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
 
         const response = await fetch(service, {
           method: 'GET',
@@ -87,6 +94,7 @@ async function getRealIPAddress(): Promise<string> {
 
           if (ipAddress && isValidIPAddress(ipAddress)) {
             console.log(`✅ 실제 IP 주소 가져오기 성공: ${ipAddress}`);
+            ipCache = { ip: ipAddress, at: Date.now() };
             return ipAddress;
           }
         }
@@ -248,6 +256,43 @@ async function clearStoredAdvertisingId(): Promise<void> {
   } catch (error) {
     console.error('저장된 광고 식별자 삭제 실패:', error);
   }
+}
+
+export async function getMinimalDeviceInfo(): Promise<DeviceInfo> {
+  const modelName = Device.modelName || 'unknown';
+  const brand = Device.brand || 'unknown';
+  const deviceName = Device.deviceName || 'unknown';
+  const deviceId = `${brand}-${modelName}-${deviceName}`;
+  const adid = (await getStoredAdvertisingId()) || '';
+  const osVersion = Device.osVersion || 'unknown';
+  const deviceInfo: DeviceInfo = {
+    deviceId,
+    adid,
+    ipAddress: '',
+    model: modelName,
+    manufacturer: brand,
+    osVersion,
+    carrier: null,
+    appVersion: Device.osVersion || 'unknown',
+    buildNumber: Device.osBuildId || 'unknown',
+    bundleId: Device.osInternalBuildId || 'unknown',
+    deviceName,
+    userAgent: `${Platform.OS}/${osVersion}`,
+    isTablet: Device.deviceType === Device.DeviceType.TABLET,
+    isLocationEnabled: true,
+    timestamp: Math.floor(Date.now() / 1000),
+    os: Platform.OS,
+  };
+  deviceInfo.networkType = 'CELLULAR';
+  deviceInfo.isConnected = true;
+  deviceInfo.isInternetReachable = true;
+  deviceInfo.cellularGeneration = '4g';
+  deviceInfo.carrierName = null;
+  deviceInfo.ssid = null;
+  deviceInfo.bssid = null;
+  deviceInfo.mnetwork = '4';
+  deviceInfo.carrierCode = '1';
+  return deviceInfo;
 }
 
 export async function collectDeviceInfo(): Promise<DeviceInfo> {

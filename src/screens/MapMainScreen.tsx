@@ -51,7 +51,7 @@ import { preloadTaboolaHTML } from '../services/taboola';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
-import { collectDeviceInfo } from '../utils/napApiUtils';
+import { collectDeviceInfo, getMinimalDeviceInfo } from '../utils/napApiUtils';
 import { showToast } from '../utils';
 
 interface LocationData {
@@ -783,12 +783,15 @@ export const MapMainScreen: React.FC = () => {
       console.log('=== 맵 마커 데이터 가져오기 시작 ===');
       console.log('위치:', targetLocation.latitude, targetLocation.longitude);
 
-      const deviceInfoData = await collectDeviceInfo();
+      const deviceInfoData = await Promise.race([
+        collectDeviceInfo(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('collectDeviceInfo timeout')), 2500)),
+      ]).catch(() => getMinimalDeviceInfo());
 
-      console.log('🚀 [loadMarkersForLocation] API 병렬 호출 시작');
-      const [markerDataRaw, virtualCoinResponse, nasPriceResponse] = await Promise.allSettled([
-
-        fetchMapMarkerData(
+      console.log('🚀 [loadMarkersForLocation] app2000-01 호출 시작 (마커 선표시)');
+      let markerData: any[] = [];
+      try {
+        markerData = await fetchMapMarkerData(
           targetLocation.latitude,
           targetLocation.longitude,
           member,
@@ -803,76 +806,107 @@ export const MapMainScreen: React.FC = () => {
             mnetwork: deviceInfoData.mnetwork,
             carrier: deviceInfoData.carrier
           }
-        ),
+        ) || [];
+      } catch (markerError) {
+        console.warn('❌ [loadMarkersForLocation] app2000-01 실패:', markerError);
+      }
+      console.log('✅ [loadMarkersForLocation] app2000-01 완료, 마커 개수:', markerData.length);
 
-        fetchVirtualCoin(
-          member,
-          targetLocation.latitude,
-          targetLocation.longitude,
-          navigate,
-        ).catch((error) => {
-          console.warn('❌ [loadMarkersForLocation] virtualCoin API 호출 실패, 빈 데이터 사용:', error);
+      Promise.allSettled([
+        fetchVirtualCoin(member, targetLocation.latitude, targetLocation.longitude, navigate).catch((e) => {
+          console.warn('❌ [loadMarkersForLocation] virtualCoin 실패:', e);
           return { data: [] };
         }),
-
-        getCoinNasPrice(navigate).catch((error) => {
-          console.warn('❌ [loadMarkersForLocation] getCoinNasPrice API 호출 실패, 기본값 사용:', error);
+        getCoinNasPrice(navigate).catch((e) => {
+          console.warn('❌ [loadMarkersForLocation] getCoinNasPrice 실패:', e);
           return { data: { coins: 0 } };
         }),
-      ]);
-
-      const markerData = markerDataRaw.status === 'fulfilled' ? markerDataRaw.value : [];
-      const virtualCoin = virtualCoinResponse.status === 'fulfilled' ? virtualCoinResponse.value : { data: [] };
-      const nasPrice = nasPriceResponse.status === 'fulfilled' ? nasPriceResponse.value : { data: { coins: 0 } };
-
-      console.log('✅ [loadMarkersForLocation] API 병렬 호출 완료');
-      console.log('마커 개수:', markerData.length);
-
-      const calculatedNasPrice = nasPrice?.data?.coins || 0;
-
-      const coinsDataVt = virtualCoin?.data && Array.isArray(virtualCoin.data)
-        ? virtualCoin.data
-          .slice(0, Math.random() < 0.5 ? 1 : 2)
-          .map((item: any, index: number, array: any[]) => {
-
-            if (array.length === 2 && index === 1) {
+      ]).then(([virtualCoinResponse, nasPriceResponse]) => {
+        const virtualCoin = virtualCoinResponse.status === 'fulfilled' ? virtualCoinResponse.value : { data: [] };
+        const nasPrice = nasPriceResponse.status === 'fulfilled' ? nasPriceResponse.value : { data: { coins: 0 } };
+        const calculatedNasPrice = nasPrice?.data?.coins || 0;
+        const coinsDataVt = virtualCoin?.data && Array.isArray(virtualCoin.data)
+          ? virtualCoin.data
+            .slice(0, Math.random() < 0.5 ? 1 : 2)
+            .map((item: any, index: number, array: any[]) => {
+              if (array.length === 2 && index === 1) {
+                return {
+                  ...item,
+                  coin: 1,
+                  lat: 0,
+                  lng: 0,
+                  title: item.title,
+                  distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
+                  advertisement: item.advertisement,
+                  coins: item.coins,
+                  iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
+                  joindesc: item.joindesc || '가상 코인 설명',
+                  name: item.name || item.title || item.brand,
+                  campid: item.campid || item.campId || '',
+                  xrunPrice: item.xrunPrice || item.xrunprice || 0,
+                };
+              }
               return {
                 ...item,
-                coin: 1,
+                currency: 18,
                 lat: 0,
                 lng: 0,
                 title: item.title,
                 distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-                advertisement: item.advertisement,
-                coins: item.coins,
+                coins: calculatedNasPrice,
+                advertisement: 672,
                 iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-                joindesc: item.joindesc || '가상 코인 설명',
+                joindesc: item.joindesc || 'Virtual coin description',
                 name: item.name || item.title || item.brand,
                 campid: item.campid || item.campId || '',
                 xrunPrice: item.xrunPrice || item.xrunprice || 0,
               };
-            }
-            return {
-              ...item,
-              currency: 18,
-              lat: 0,
-              lng: 0,
-              title: item.title,
-              distance: (Math.random() * (10 - 0.1) + 0.1).toFixed(2),
-              coins: calculatedNasPrice,
-              advertisement: 672,
-              iconurl: item.iconurl || 'https://www.xrun.run/assets/images/logo_visual_black.png',
-              joindesc: item.joindesc || 'Virtual coin description',
-              name: item.name || item.title || item.brand,
-              campid: item.campid || item.campId || '',
-              xrunPrice: item.xrunPrice || item.xrunprice || 0,
-            };
-          })
-        : [];
-
-      const combinedCoinsData = [...coinsDataVt, ...markerData];
-      console.log('=== 결합된 토큰 데이터 ===');
-      console.log('combinedCoinsData length:', combinedCoinsData.length);
+            })
+          : [];
+        const combinedCoinsData = [...coinsDataVt, ...markerData];
+        const uniqueFileIds: (string | number)[] = [];
+        combinedCoinsData.forEach((item) => {
+          const it = item as any;
+          if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
+          if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
+          if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
+        });
+        if (uniqueFileIds.length > 0) {
+          const envForCache = getEnv();
+          cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS)
+            .then(() => console.log('✅ 이미지 캐싱 완료 (백그라운드)'))
+            .catch((imageCacheError) => console.error('이미지 캐싱 오류:', imageCacheError));
+        }
+        if (combinedCoinsData.length > 0) {
+          const sortedCoinsData = combinedCoinsData
+            .map((coin: any) => {
+              const lat = coin.latitude || coin.lat;
+              const lng = coin.longitude || coin.lng;
+              if (lat && lng) {
+                return { ...coin, distance: calculateDistance(targetLocation.latitude, targetLocation.longitude, lat, lng) };
+              }
+              return { ...coin, distance: coin.distance || Infinity };
+            })
+            .sort((a: any, b: any) => (a.distance || Infinity) - (b.distance || Infinity));
+          AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsData))
+            .then(() => console.log('✅ astorCoinsData AsyncStorage 저장 완료 (virtualCoin 반영):', sortedCoinsData.length))
+            .catch((storageError) => console.error('AsyncStorage 저장 오류:', storageError));
+        } else if (coinsDataVt.length > 0) {
+          const sortedCoinsDataVt = coinsDataVt
+            .map((coin: any) => {
+              const lat = coin.latitude || coin.lat;
+              const lng = coin.longitude || coin.lng;
+              if (lat && lng) {
+                return { ...coin, distance: calculateDistance(targetLocation.latitude, targetLocation.longitude, lat, lng) };
+              }
+              return { ...coin, distance: coin.distance || Infinity };
+            })
+            .sort((a: any, b: any) => (a.distance || Infinity) - (b.distance || Infinity));
+          AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsDataVt))
+            .then(() => console.log('✅ astorCoinsData AsyncStorage 저장 (coinsDataVt):', sortedCoinsDataVt.length))
+            .catch((storageError) => console.error('AsyncStorage 저장 오류:', storageError));
+        }
+      });
 
       const uniqueMarkers = markerData.reduce((acc: any[], current: any) => {
 
@@ -899,23 +933,18 @@ export const MapMainScreen: React.FC = () => {
         제거된개수: markerData.length - uniqueMarkers.length,
       });
 
-      const uniqueFileIds: (string | number)[] = [];
-      combinedCoinsData.forEach((item) => {
+      const markerFileIds: (string | number)[] = [];
+      uniqueMarkers.forEach((item) => {
         const it = item as any;
-        if (it.brandlogo_file) uniqueFileIds.push(it.brandlogo_file);
-        if (it.adthumbnail2_file) uniqueFileIds.push(it.adthumbnail2_file);
-        if (it.symbolimg_file) uniqueFileIds.push(it.symbolimg_file);
+        if (it.brandlogo_file) markerFileIds.push(it.brandlogo_file);
+        if (it.adthumbnail2_file) markerFileIds.push(it.adthumbnail2_file);
+        if (it.symbolimg_file) markerFileIds.push(it.symbolimg_file);
       });
-
-      if (uniqueFileIds.length > 0) {
+      if (markerFileIds.length > 0) {
         const envForCache = getEnv();
-        cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS)
-          .then(() => {
-            console.log('✅ 이미지 캐싱 완료 (백그라운드)');
-          })
-          .catch((imageCacheError) => {
-            console.error('이미지 캐싱 오류 (백그라운드):', imageCacheError);
-          });
+        cashingimages.downloadMultipleImages(markerFileIds, envForCache.GATEWAY_NODEJS)
+          .then(() => console.log('✅ 마커 이미지 캐싱 완료 (백그라운드)'))
+          .catch((imageCacheError) => console.error('이미지 캐싱 오류:', imageCacheError));
       }
 
       uniqueMarkers.slice(0, 5).forEach((marker: any, idx: number) => {
@@ -999,87 +1028,6 @@ export const MapMainScreen: React.FC = () => {
         setTimeout(() => {
           isProgrammaticMoveRef.current = false;
         }, 600);
-      }
-
-      if (combinedCoinsData.length > 0) {
-        try {
-
-          const sortedCoinsData = combinedCoinsData
-            .map((coin: any) => {
-              const lat = coin.latitude || coin.lat;
-              const lng = coin.longitude || coin.lng;
-
-              if (lat && lng) {
-                const distance = calculateDistance(
-                  targetLocation.latitude,
-                  targetLocation.longitude,
-                  lat,
-                  lng
-                );
-                return {
-                  ...coin,
-                  distance: distance, 
-                };
-              } else {
-
-                return {
-                  ...coin,
-                  distance: coin.distance || Infinity,
-                };
-              }
-            })
-            .sort((a: any, b: any) => {
-
-              return (a.distance || Infinity) - (b.distance || Infinity);
-            });
-
-          await AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsData));
-          console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (거리순 정렬됨)');
-          console.log('astorCoinsData -> ' + sortedCoinsData.length);
-        } catch (storageError) {
-
-          console.error('AsyncStorage 저장 오류:', storageError);
-
-        }
-
-      } else {
-
-        if (coinsDataVt.length > 0) {
-          try {
-
-            const sortedCoinsDataVt = coinsDataVt
-              .map((coin: any) => {
-                const lat = coin.latitude || coin.lat;
-                const lng = coin.longitude || coin.lng;
-
-                if (lat && lng) {
-                  const distance = calculateDistance(
-                    targetLocation.latitude,
-                    targetLocation.longitude,
-                    lat,
-                    lng
-                  );
-                  return {
-                    ...coin,
-                    distance: distance,
-                  };
-                } else {
-                  return {
-                    ...coin,
-                    distance: coin.distance || Infinity,
-                  };
-                }
-              })
-              .sort((a: any, b: any) => {
-                return (a.distance || Infinity) - (b.distance || Infinity);
-              });
-
-            await AsyncStorage.setItem('astorCoinsData', JSON.stringify(sortedCoinsDataVt));
-            console.log('✅ astorCoinsData AsyncStorage에 저장 완료 (coinsDataVt 거리순 정렬됨:', sortedCoinsDataVt.length, '개)');
-          } catch (storageError) {
-            console.error('AsyncStorage 저장 오류:', storageError);
-          }
-        }
       }
 
     } catch (error) {
