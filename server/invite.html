@@ -201,7 +201,21 @@
 
         const params = new URLSearchParams(window.location.search);
         const referral = params.get('referral') || '';
-        const decodedReferral = decodeURIComponent(referral);
+        const decodedReferral = referral ? decodeURIComponent(referral) : '';
+
+        if (decodedReferral) {
+            var clickUrl = '/oth-path';
+            var clickBody = JSON.stringify({
+                referrer_email: decodedReferral,
+                user_agent: navigator.userAgent || ''
+            });
+            fetch(clickUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: clickBody
+            }).then(function () { }).catch(function () { });
+        }
 
         document.getElementById('referralEmail').textContent = decodedReferral || '없음';
 
@@ -227,7 +241,7 @@
 
             try {
 
-                const clipboardData = `XRUN_REFERRAL:${referral}`;
+                const clipboardData = `XRUN_REFERRAL:${decodedReferral}`;
                 await navigator.clipboard.writeText(clipboardData);
                 console.log('[iOS] 클립보드에 추천인 정보 저장:', clipboardData);
             } catch (error) {

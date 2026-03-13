@@ -1,10 +1,21 @@
 {
   "cli": {
     "version": ">= 16.20.1",
-    "appVersionSource": "remote"
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "android": {
+        "image": "latest",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "develop": {
       "distribution": "internal",
       "developmentClient": true,
       "android": {
@@ -33,6 +44,10 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6502924173"
+      }
+    }
   }
 }

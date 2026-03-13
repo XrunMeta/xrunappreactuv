@@ -18,6 +18,8 @@ interface EmergencyStopDialogProps {
   message: string;
   link?: string;
   onClose?: () => void;
+
+  linkButtonText?: string;
 }
 
 export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
@@ -25,9 +27,11 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
   message,
   link,
   onClose,
+  linkButtonText,
 }) => {
   const { t } = useTranslation();
   const { navigate } = useAppNavigation();
+  const linkLabel = linkButtonText ?? t('common.emergencyStop.viewDetails');
 
   const handleLinkPress = () => {
     if (!link) return;
@@ -74,7 +78,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
               onPress={handleLinkPress}
               activeOpacity={0.7}
             >
-              <Text style={styles.linkText}>{t('common.emergencyStop.viewDetails')}</Text>
+              <Text style={styles.linkText}>{linkLabel}</Text>
               <Ionicons name="chevron-forward" size={20} color="#4c4e55" />
             </TouchableOpacity>
           )}

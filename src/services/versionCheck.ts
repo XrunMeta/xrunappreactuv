@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import * as Application from 'expo-application';
 import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
-import { gatewayNodeJS } from './index';
+import { getEnv } from '../utils/env';
 
 const IOS_BUNDLE_ID = 'run.xrun.xrunapps';
 
@@ -14,7 +14,8 @@ interface ServerCheckResponse {
   message: string;
   data: {
     id: number;
-    iosOnWallet: boolean;
+    iosOnWallet: boolean | number; 
+    androidOnWallet?: number; 
     created_at: string;
     updated_at: string;
     isTransferAble: number;
@@ -24,17 +25,29 @@ interface ServerCheckResponse {
   };
 }
 
+const SERVERCHECK_CACHE_MS = 30000; 
+let servercheckCache: { result: ServerCheckResponse; at: number } | null = null;
+
 export const checkServerVersion = async (): Promise<ServerCheckResponse | null> => {
+  const now = Date.now();
+  if (servercheckCache && now - servercheckCache.at < SERVERCHECK_CACHE_MS) {
+    return servercheckCache.result;
+  }
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
-    const response = await gatewayNodeJS('servercheck', 'GET', {});
-
+    const env = getEnv();
+    const url = `${env.GATEWAY_NODEJS}/servercheck`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}` },
+    });
+    if (!res.ok) return null;
+    const response = await res.json();
     if (response && response.status === 'success' && response.data) {
       console.log('[VersionCheck] 서버 버전 확인 성공:', response.data);
-      return response as ServerCheckResponse;
+      servercheckCache = { result: response as ServerCheckResponse, at: Date.now() };
+      return servercheckCache.result;
     }
-
-    console.log('[VersionCheck] 서버 버전 확인 실패: 응답 형식 오류');
     return null;
   } catch (error) {
     console.error('[VersionCheck] 서버 버전 확인 실패:', error);

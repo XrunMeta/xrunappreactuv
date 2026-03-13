@@ -311,6 +311,8 @@ export const loadAndShowRewardedAd = async (
   }
 };
 
+const APP_OPEN_AD_TIMEOUT_MS = 2000;
+
 let appOpenAdLoaded = false;
 
 export const loadAndShowAppOpenAd = async (): Promise<void> => {
@@ -330,27 +332,47 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
 
       console.log('[Pangle] iOS 앱 오프닝 광고 로드 및 노출 시작:', finalAdUnitId);
 
+      const adStartTime = Date.now();
+      const MIN_WAIT_MS = 2500; 
+
+      type Sub = { remove: () => void } | undefined;
+      const doResolve = (done: () => void, timeoutId: ReturnType<typeof setTimeout>, closeSub: Sub, errorSub: Sub) => {
+        const elapsed = Date.now() - adStartTime;
+        const delay = Math.max(0, MIN_WAIT_MS - elapsed);
+        const cleanup = () => {
+          closeSub?.remove();
+          errorSub?.remove();
+          clearTimeout(timeoutId);
+          done();
+        };
+        if (delay > 0) setTimeout(cleanup, delay);
+        else cleanup();
+      };
+
       return new Promise((resolve) => {
         let isResolved = false;
+        const resolveOnce = () => {
+          if (!isResolved) {
+            isResolved = true;
+            resolve();
+          }
+        };
 
         const timeout = setTimeout(() => {
           if (!isResolved) {
             console.log('[Pangle] iOS 앱 오프닝 광고 대기 타임아웃');
             isResolved = true;
+            closeSubscription?.remove();
+            errorSubscription?.remove();
             resolve();
           }
-        }, 15000); 
+        }, APP_OPEN_AD_TIMEOUT_MS);
 
         const closeSubscription = pangleEventEmitter?.addListener(
           'onAppOpenAdClose',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 닫힘 이벤트 수신');
-            if (!isResolved) {
-              isResolved = true;
-              clearTimeout(timeout);
-              closeSubscription?.remove();
-              resolve();
-            }
+            if (!isResolved) doResolve(resolveOnce, timeout, closeSubscription, errorSubscription);
           }
         );
 
@@ -358,13 +380,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
           'onAppOpenAdLoadError',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 에러 이벤트 수신');
-            if (!isResolved) {
-              isResolved = true;
-              clearTimeout(timeout);
-              closeSubscription?.remove();
-              errorSubscription?.remove();
-              resolve();
-            }
+            if (!isResolved) doResolve(resolveOnce, timeout, closeSubscription, errorSubscription);
           }
         );
 
@@ -372,9 +388,9 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
           console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', error);
           if (!isResolved) {
             isResolved = true;
-            clearTimeout(timeout);
             closeSubscription?.remove();
             errorSubscription?.remove();
+            clearTimeout(timeout);
             resolve();
           }
         });
@@ -402,7 +418,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
 
     return new Promise<void>((resolve) => {
       let isResolved = false;
-      const cleanup = () => {
+      const cleanup = (reason: 'timeout' | 'close' | 'error' | 'load_reject') => {
         if (!isResolved) {
           isResolved = true;
           subscriptions.forEach(unsubscribe => unsubscribe());
@@ -410,7 +426,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         }
       };
 
-      const timeout = setTimeout(cleanup, 15000);
+      const timeout = setTimeout(() => cleanup('timeout'), APP_OPEN_AD_TIMEOUT_MS);
 
       const subscriptions: Array<() => void> = [];
       let errorHandledByEvent = false;
@@ -425,7 +441,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
               if (PangleModule?.showAppOpenAd) {
                 PangleModule.showAppOpenAd(finalAdUnitId).catch((error: Error) => {
                   console.error('[Pangle] 앱 오프닝 광고 표시 실패:', error);
-                  cleanup();
+                  cleanup('load_reject');
                 });
               }
             }
@@ -440,7 +456,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
               console.log('[Pangle] 앱 오프닝 광고 닫힘');
               appOpenAdLoaded = false;
               clearTimeout(timeout);
-              cleanup();
+              cleanup('close');
             }
           },
         );
@@ -462,7 +478,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
               }
 
               clearTimeout(timeout);
-              cleanup();
+              cleanup('error');
             }
           },
         );
@@ -471,7 +487,7 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
 
       if (!PangleModule || !PangleModule.loadAppOpenAd) {
         console.log('[Pangle] 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
-        cleanup();
+        cleanup('error');
         return;
       }
 
@@ -479,10 +495,10 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
         console.warn('[Pangle] 앱 오프닝 광고 로드 호출 실패:', errorMessage);
         if (!errorHandledByEvent) {
-
-          cleanup();
+          cleanup('load_reject');
         }
       });
+
     });
   } catch (error) {
     appOpenAdLoaded = false;

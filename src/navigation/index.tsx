@@ -69,9 +69,11 @@ export const ROUTES = {
   showPockAd: 'showPockAd',
   showWebView: 'showWebView',
   xrunInfo: 'xrunInfo',
+  xplayInfo: 'xplayInfo',
+  xplayZone: 'xplayZone',
+  xrunWalletDescription: 'xrunWalletDescription',
   myinfoShopSales: 'myinfoShopSales',
   pangleList: 'pangleList',
-  tapjoyList: 'tapjoyList',
   ayetOffers: 'ayetOffers',
   ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',
@@ -169,7 +171,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
-  const reset = useCallback((screen: ScreenName) => {
+  const reset = useCallback((screenOrPayload: ScreenName | { index?: number; routes?: { name: string }[] }) => {
+    const screen: ScreenName =
+      typeof screenOrPayload === 'string'
+        ? screenOrPayload
+        : (screenOrPayload?.routes?.[0]?.name as ScreenName) ?? ROUTES.map;
     const newStack = [screen];
     stackRef.current = newStack; 
     setStack(newStack);

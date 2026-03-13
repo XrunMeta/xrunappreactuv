@@ -21,7 +21,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>4.7.9</string>
+    <string>4.10.0</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -29,6 +29,8 @@
       <dict>
         <key>CFBundleTypeRole</key>
         <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>run.xrun.xrunapps</string>
         <key>CFBundleURLSchemes</key>
         <array>
           <string>xrungoApp</string>
@@ -36,8 +38,6 @@
           <string>com.googleusercontent.apps.1003094533748-ht43iomt62g0h1dmiii3huav334pqiie</string>
           <string>com.googleusercontent.apps.1003094533748-2g87114p66dfq8v0f7imi67r9h5on6g4</string>
         </array>
-        <key>CFBundleURLName</key>
-        <string>run.xrun.xrunapps</string>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
@@ -47,7 +47,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>8</string>
     <key>GIDClientID</key>
     <string>oth-client.googleusercontent.invalid</string>
     <key>GMSApiKey</key>
@@ -67,13 +67,13 @@
       <string>telegram</string>
     </array>
     <key>LSMinimumSystemVersion</key>
-    <string>12.0</string>
+    <string>26.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
-      <false/>
+      <true/>
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
@@ -87,14 +87,33 @@
     <string>사용자 주변의 가까운 매장이나 서비스 지점을 찾아서 안내하기 위해 위치 정보가 사용됩니다. Your location helps us find and suggest the nearest stores or service points for you.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>바코드 이미지를 사진첩에 저장하기 위해 사진 추가 권한이 필요합니다. We need permission to add images to your photo library to save ticket barcodes.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>선택적으로, 사용자의 이미지를 업로드 하기 위해 사진 권한이 필요합니다. You can optionally allow photo access if you'd like to upload your own images.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>바코드 이미지를 사진첩에 저장하기 위해 사진 추가 권한이 필요합니다. We need permission to add images to your photo library to save ticket barcodes.</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>사용자에게 최적화된 광고를 제공하기 위해 기기 정보 및 광고 활동 데이터를 사용합니다. This identifier will be used to deliver personalized ads to you.</string>
     <key>RCTNewArchEnabled</key>
     <true/>
+    <key>SKAdNetworkItems</key>
+    <array>
+      <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>238da69tyc.skadnetwork</string>
+      </dict>
+      <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>22mmun2rn5.skadnetwork</string>
+      </dict>
+      <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>9rd848q2bz.skadnetwork</string>
+      </dict>
+      <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>5a6flpkh64.skadnetwork</string>
+      </dict>
+    </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

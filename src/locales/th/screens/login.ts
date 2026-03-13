@@ -21,6 +21,8 @@ export default {
     rememberMe: 'ให้ฉันเข้าสู่ระบบอยู่',
     sendButton: 'ส่ง',
   },
+  accountLink: 'เชื่อมต่อบัญชี',
+  linkComplete: 'เชื่อมต่อเสร็จสิ้น',
   errors: {
     emailRequired: 'กรุณากรอกอีเมลของคุณ',
     passwordRequired: 'กรุณากรอกรหัสผ่านของคุณ',

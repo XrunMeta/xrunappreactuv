@@ -12,7 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -100,8 +100,27 @@ export const ShopScreen = () => {
     const [xplayError, setXplayError] = useState<string | null>(null);
     const [xplayBalance, setXplayBalance] = useState<number | null>(null);
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
-    const [xrunBalance, setXrunBalance] = useState<number>(0);
+    const [xrunBalance, setXrunBalance] = useState<number | null>(null);
+    const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
     const { navigate } = useAppNavigation();
+
+    const loadXrunBalance = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            setXrunBalanceLoading(true);
+            const result = await getXrunWalletBalance(member, navigate);
+            const parsed = parseFloat(result.formatted);
+            setXrunBalance(Number.isFinite(parsed) ? parsed : null);
+        } catch {
+            setXrunBalance(null);
+        } finally {
+            setXrunBalanceLoading(false);
+        }
+    }, [navigate]);
 
     const loadXplayBalance = useCallback(async () => {
         try {
@@ -168,8 +187,10 @@ export const ShopScreen = () => {
     useEffect(() => {
         if (tab === 'xplayShop') {
             loadXplayBalance();
+        } else if (tab === 'xrunStore') {
+            loadXrunBalance();
         }
-    }, [tab, loadXplayBalance]);
+    }, [tab, loadXplayBalance, loadXrunBalance]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -214,9 +235,9 @@ export const ShopScreen = () => {
     };
 
     const handlePurchase = (product: ProductData) => {
-        showAlert('구매', `${product.title}을(를) 구매하시겠습니까?`, [
-            { text: '취소' },
-            { text: '구매', onPress: () => console.log('구매:', product.id) },
+        showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
+            { text: t('screens.shop.cancel') },
+            { text: t('screens.shop.purchase'), onPress: () => console.log('구매:', product.id) },
         ]);
     };
 
@@ -264,7 +285,7 @@ export const ShopScreen = () => {
                                 onPress={() => handlePurchase(product)}
                                 activeOpacity={0.8}
                             >
-                                <Text style={styles.purchaseButtonText}>구매</Text>
+                                <Text style={styles.purchaseButtonText}>{t('screens.shop.purchase')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -301,7 +322,7 @@ export const ShopScreen = () => {
                             <Image source={blurYellow} style={styles.balanceBlurRight} resizeMode="cover" />
                             <View style={styles.balanceContent}>
                                 <View style={styles.balanceLeft}>
-                                    <Text style={styles.balanceLabel}>내 잔액</Text>
+                                    <Text style={styles.balanceLabel}>{t('screens.shop.myBalance')}</Text>
                                     <View style={styles.balanceAmountRow}>
                                         <View style={[
                                             styles.balanceXplayIconContainer,
@@ -322,7 +343,7 @@ export const ShopScreen = () => {
                                                 </Text>
                                             )
                                         ) : (
-                                            <Text style={styles.balanceAmount}>{xrunBalance.toLocaleString()}</Text>
+                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                         )}
                                     </View>
                                 </View>
@@ -366,7 +387,7 @@ export const ShopScreen = () => {
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
                                     <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                                    <Text style={styles.loadingText}>기프티콘 목록 불러오는 중...</Text>
+                                    <Text style={styles.loadingText}>{t('screens.shop.loadingGiftList')}</Text>
                                 </View>
                             ) : xplayError ? (
                                 <View style={styles.errorContainer}>

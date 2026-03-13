@@ -784,7 +784,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
               onPress={handleWebViewClose}
               style={styles.webViewCloseButton}
             >
-              <Text style={styles.webViewCloseText}>닫기</Text>
+              <Text style={styles.webViewCloseText}>{t('common.buttons.close')}</Text>
             </TouchableOpacity>
             <Text
               style={styles.webViewTitle}

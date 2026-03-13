@@ -3,23 +3,11 @@ import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ko from './ko';
-import zhCN from './zh-CN';
 import en from './en';
-import id from './id';
-import ja from './ja';
-import th from './th';
-import hi from './hi';
-import vi from './vi';
 
-const resources = {
+const resources: Record<string, { translation: typeof ko }> = {
   ko: { translation: ko },
-  'zh-CN': { translation: zhCN },
   en: { translation: en },
-  id: { translation: id },
-  ja: { translation: ja },
-  th: { translation: th },
-  hi: { translation: hi },
-  vi: { translation: vi },
 };
 
 export const LANGUAGE_CODES = {
@@ -34,6 +22,34 @@ export const LANGUAGE_CODES = {
 } as const;
 
 export type LanguageCode = keyof typeof LANGUAGE_CODES;
+
+const LANGUAGE_LOADERS: Record<Exclude<LanguageCode, 'ko' | 'en'>, () => Promise<{ default: typeof ko }>> = {
+  'zh-CN': () => import('./zh-CN'),
+  id: () => import('./id'),
+  ja: () => import('./ja'),
+  th: () => import('./th'),
+  hi: () => import('./hi'),
+  vi: () => import('./vi'),
+};
+
+let languagesLoaded = new Set<LanguageCode>(['ko', 'en']);
+
+export function isLanguageLoaded(lng: LanguageCode): boolean {
+  return languagesLoaded.has(lng);
+}
+
+export const loadLanguage = async (language: LanguageCode): Promise<void> => {
+  if (languagesLoaded.has(language)) return;
+  const loader = LANGUAGE_LOADERS[language as Exclude<LanguageCode, 'ko' | 'en'>];
+  if (!loader) return;
+  try {
+    const { default: data } = await loader();
+    i18n.addResourceBundle(language, 'translation', data);
+    languagesLoaded.add(language);
+  } catch (e) {
+    console.warn('[i18n] 언어 로드 실패:', language, e);
+  }
+};
 
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
@@ -51,6 +67,7 @@ const getStoredLanguage = async (): Promise<LanguageCode> => {
 
 export const setStoredLanguage = async (language: LanguageCode): Promise<void> => {
   try {
+    await loadLanguage(language);
     await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     await i18n.changeLanguage(language);
   } catch (error) {
@@ -58,8 +75,42 @@ export const setStoredLanguage = async (language: LanguageCode): Promise<void> =
   }
 };
 
+export const initI18nSync = (): typeof i18n => {
+  i18n.use(initReactI18next).init({
+    resources: { ko: { translation: ko }, en: { translation: en } },
+    lng: 'ko',
+    fallbackLng: 'ko',
+    interpolation: { escapeValue: false },
+    compatibilityJSON: 'v3',
+  });
+  return i18n;
+};
+
+export const applyStoredLanguageAsync = (): void => {
+  getStoredLanguage()
+    .then((lng) => {
+      if (lng === 'ko') return;
+      if (lng === 'en') return i18n.changeLanguage('en');
+      return loadLanguage(lng).then(() => i18n.changeLanguage(lng));
+    })
+    .then(() => console.log('[App] i18n 저장 언어 적용 완료'))
+    .catch((e) => console.warn('[i18n] 저장 언어 적용 실패:', e));
+};
+
 export const initI18n = async () => {
   const defaultLanguage = await getStoredLanguage();
+  if (defaultLanguage !== 'ko' && defaultLanguage !== 'en') {
+    const loader = LANGUAGE_LOADERS[defaultLanguage as Exclude<LanguageCode, 'ko' | 'en'>];
+    if (loader) {
+      try {
+        const { default: data } = await loader();
+        resources[defaultLanguage] = { translation: data };
+        languagesLoaded.add(defaultLanguage);
+      } catch (e) {
+        console.warn('[i18n] 초기 언어 로드 실패, ko fallback:', defaultLanguage, e);
+      }
+    }
+  }
 
   i18n
     .use(initReactI18next)

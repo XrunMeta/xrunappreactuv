@@ -279,7 +279,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-XRUN/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nif [[ -f \"${SRCROOT}/.xcode.env\" ]]; then source \"${SRCROOT}/.xcode.env\"; fi\nif [[ -f \"${SRCROOT}/.xcode.env.local\" ]]; then source \"${SRCROOT}/.xcode.env.local\"; fi\ncd \"${SRCROOT}\" && bash \"${SRCROOT}/Pods/Target Support Files/Pods-XRUN/expo-configure-project.sh\"\n";
 		};
 		800E24972A6A228C8D4807E9  = {
 			isa = PBXShellScriptBuildPhase;

@@ -595,13 +595,13 @@ export const ShopBuyScreen = () => {
             {isPointPurchasable && (
               <View style={styles.pointPaymentSection}>
                 <View style={styles.row}>
-                  <Text style={styles.label}>포인트 잔액</Text>
+                  <Text style={styles.label}>{t('screens.shopBuy.pointBalance')}</Text>
                   <Text style={styles.value}>
                     {pointsBalanceLoading ? '...' : pointsBalance !== null ? `${pointsBalance.toLocaleString()} P` : '-'}
                   </Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.label}>포인트 가격</Text>
+                  <Text style={styles.label}>{t('screens.shopBuy.pointPrice')}</Text>
                   <Text style={styles.value}>{pointPrice.toLocaleString()} P</Text>
                 </View>
               </View>

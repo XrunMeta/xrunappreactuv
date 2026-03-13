@@ -1,3 +1,4 @@
+
 import { Share, Platform, ToastAndroid, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -234,10 +235,11 @@ export const loadCustomTokens = async (
 export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedSeconds: number } | null> => {
   try {
 
-    const coldStartChecked = await AsyncStorage.getItem('coldStartChecked');
-    const lastBackgroundTimestamp = await AsyncStorage.getItem('app_last_background_timestamp');
-    const checkedTimestamp = await AsyncStorage.getItem('checkedTimestamp');
-
+    const [[, coldStartChecked], [, lastBackgroundTimestamp], [, checkedTimestamp]] = await AsyncStorage.multiGet([
+      'coldStartChecked',
+      'app_last_background_timestamp',
+      'checkedTimestamp',
+    ]);
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
     console.log('[Utils] checkColdStart 시작:', {
@@ -352,20 +354,11 @@ export const checkColdStart = async (): Promise<{ isColdStart: boolean; elapsedS
       });
 
       if (!isNaN(checkedTimestampNum) && checkedTimestampNum > 0 && backgroundTimestamp <= checkedTimestampNum) {
-        const savedIsColdStart = await AsyncStorage.getItem('isColdStart');
-        const savedElapsedSecondsStr = await AsyncStorage.getItem('elapsedSeconds');
-        const savedElapsedSeconds = savedElapsedSecondsStr ? parseInt(savedElapsedSecondsStr, 10) : 0;
-        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 기존 결과 반환:', {
-          savedIsColdStart,
-          savedElapsedSeconds,
+        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 재계산값 반환:', {
           calculatedElapsedSeconds: elapsedSeconds,
-          backgroundTimestamp,
-          checkedTimestampNum,
+          calculatedIsColdStart: isColdStart,
         });
-        return {
-          isColdStart: savedIsColdStart === 'true',
-          elapsedSeconds: savedElapsedSeconds,
-        };
+        return { isColdStart, elapsedSeconds };
       }
 
       await AsyncStorage.setItem('isColdStart', isColdStart ? 'true' : 'false');
@@ -514,4 +507,3 @@ export const maskPrivateKey = (pk: string): string => {
   if (!pk || pk.length < 10) return pk;
   return `${pk.substring(0, 6)}...${pk.substring(pk.length - 4)}`;
 };
-

@@ -230,14 +230,14 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   return (
     <SafeView style={styles.container}>
       <Header
-        title="구글 인증"
+        title={t('screens.walletPrivateKeyGoogleAuth.title')}
         onBackPress={goBack}
         showBackButton
       />
       <SafeScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.descriptionContainer}>
           <Text style={styles.description}>
-            프라이빗 키를 다운로드하기 위해 구글 계정으로 인증이 필요합니다.
+            {t('screens.walletPrivateKeyGoogleAuth.description')}
           </Text>
         </View>
 
@@ -248,7 +248,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             </View>
           ) : (
             <PrimaryButton
-              title="구글로 인증하기"
+              title={t('screens.walletPrivateKeyGoogleAuth.authButton')}
               onPress={handleGoogleAuth}
               fullWidth
               disabled={isLoading}
@@ -260,7 +260,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       {}
       <Dialog
         visible={linkingDialogVisible}
-        title="비밀번호 입력"
+        title={t('screens.walletPrivateKeyGoogleAuth.passwordDialogTitle')}
         onClose={() => {
           setLinkingDialogVisible(false);
           setPasswordDialogIdToken(null);

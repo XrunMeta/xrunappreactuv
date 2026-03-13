@@ -57,8 +57,8 @@ export const MyInfoScreen = () => {
       },
       {
         id: 'referralList',
-        label: '추천',
-        subtitle: '내그룹, 그룹정산, 순위',
+        label: t('screens.myInfo.referral'),
+        subtitle: t('screens.myInfo.referralSubtitle'),
         iconName: 'people-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',

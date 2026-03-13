@@ -247,7 +247,7 @@ export const ShopMyItemsScreen = () => {
                                 <Text style={styles.itemBrand}>{item.brand}</Text>
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : styles.statusTagTextUsed]}>
-                                        {isAvailable ? '사용가능' : '사용완료'}
+                                        {isAvailable ? t('screens.shop.availableShort') : t('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -256,14 +256,14 @@ export const ShopMyItemsScreen = () => {
                             </Text>
                         </View>
                     </View>
-                    <Text style={styles.purchaseDate}>구매일: {item.purchaseDate}</Text>
+                    <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
                     {isAvailable && (
                         <TouchableOpacity
                             style={styles.useButton}
                             onPress={() => handleUseItem(item)}
                             activeOpacity={0.8}
                         >
-                            <Text style={styles.useButtonText}>사용하기 &gt;</Text>
+                            <Text style={styles.useButtonText}>{t('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -298,12 +298,12 @@ export const ShopMyItemsScreen = () => {
                     >
                         <View style={styles.statsContent}>
                             <View style={styles.statItem}>
-                                <Text style={styles.statLabel}>사용 가능</Text>
+                                <Text style={styles.statLabel}>{t('screens.shop.available')}</Text>
                                 <Text style={styles.statValue}>{stats.available}</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={styles.statLabel}>사용완료</Text>
+                                <Text style={styles.statLabel}>{t('screens.shop.used')}</Text>
                                 <Text style={[styles.statValue, styles.statValueUsed]}>{stats.used}</Text>
                             </View>
                         </View>
@@ -346,7 +346,7 @@ export const ShopMyItemsScreen = () => {
                     {loading ? (
                         <View style={styles.loadingContainer}>
                             <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                            <Text style={styles.loadingText}>쿠폰 목록 불러오는 중...</Text>
+                            <Text style={styles.loadingText}>{t('screens.shop.loadingCouponList')}</Text>
                         </View>
                     ) : filteredItems.length > 0 ? (
                         <View style={styles.itemsList}>
@@ -355,7 +355,7 @@ export const ShopMyItemsScreen = () => {
                     ) : (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>
-                                {searchQuery.trim() ? '검색 결과가 없습니다.' : '구매한 쿠폰이 없습니다.'}
+                                {searchQuery.trim() ? t('screens.shop.noSearchResults') : t('screens.shop.noPurchasedCoupons')}
                             </Text>
                         </View>
                     )}

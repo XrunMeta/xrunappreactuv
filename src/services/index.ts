@@ -177,7 +177,12 @@ import {
   DeleteShopItemResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
-import { checkLatestVersion, getCurrentAppVersion, getCurrentAppVersionNumber } from './versionCheck';
+import {
+  checkLatestVersion,
+  checkServerVersion,
+  getCurrentAppVersion,
+  getCurrentAppVersionNumber,
+} from './versionCheck';
 
 const API_TIMEOUT = 20000;
 
@@ -274,9 +279,16 @@ export const nodeGatewayRequest = async (
   return apiRequest(url, options, navigation);
 };
 
+const KEEPALIVE_CACHE_MS = 15000; 
+let keepaliveCache: { result: AliveResponse; at: number } | null = null;
+
 export const sendAliveSignal = async (
   navigation?: any,
 ): Promise<AliveResponse> => {
+  const now = Date.now();
+  if (keepaliveCache && now - keepaliveCache.at < KEEPALIVE_CACHE_MS) {
+    return keepaliveCache.result;
+  }
   try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
@@ -359,6 +371,7 @@ export const sendAliveSignal = async (
         }
       }
 
+      keepaliveCache = { result, at: Date.now() };
       return result;
     } else {
 
@@ -375,9 +388,14 @@ export const sendAliveSignal = async (
 
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
   try {
+    const server = await checkServerVersion();
+    if (server?.data && server.data.iosOnWallet !== undefined) {
+      return server.data.iosOnWallet === 1 || server.data.iosOnWallet === true;
+    }
+  } catch (_) {}
+  try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
-
     const response = await nodeGatewayRequest('/app-config/ios-onwallet', {
       method: 'GET',
       headers: {
@@ -385,16 +403,38 @@ export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean>
         Authorization: `Bearer ${authCode}`,
       },
     }, navigation);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
-    return data?.data?.iosOnWallet ?? false;
+    return data?.data?.iosOnWallet === 1;
   } catch (error) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
-    return false; 
+    return false;
+  }
+};
+
+export const getAndroidWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && server.data.androidOnWallet !== undefined) {
+      return server.data.androidOnWallet === 1;
+    }
+  } catch (_) {}
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+    const response = await nodeGatewayRequest('/app-config/android-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.data?.androidOnWallet === 1;
+  } catch (error) {
+    console.error('Android 지갑 표시 상태 가져오기 오류:', error);
+    return false;
   }
 };
 
@@ -427,6 +467,12 @@ export const createAxiosInstance = (navigation?: any) => {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
       console.log(`[API Request] baseURL: ${config.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${finalUrl}`);
+
+      if (__DEV__ && typeof (config as any)._devDebugStart === 'undefined') {
+        (config as any)._devDebugStart = Date.now();
+        (config as any)._devDebugUrl = finalUrl;
+        (config as any)._devDebugMethod = config.method || 'GET';
+      }
 
       if (config.data instanceof FormData) {
         console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
@@ -572,9 +618,27 @@ export const createAxiosInstance = (navigation?: any) => {
   instance.interceptors.response.use(
     (response) => {
       console.log(`[API Response] ${response.config.url}`, response.status);
+      if (__DEV__ && response.config) {
+        const c = response.config as any;
+        if (c._devDebugStart != null) {
+          try {
+            const { devDebugStore } = require('../utils/devDebugStore');
+            devDebugStore.addApi(c._devDebugUrl || response.config.url, c._devDebugMethod || 'GET', Date.now() - c._devDebugStart, response.status);
+          } catch (_) {}
+        }
+      }
       return response;
     },
     async (error: AxiosError) => {
+      if (__DEV__ && error.config) {
+        const c = error.config as any;
+        if (c._devDebugStart != null) {
+          try {
+            const { devDebugStore } = require('../utils/devDebugStore');
+            devDebugStore.addApi(c._devDebugUrl || error.config!.url, c._devDebugMethod || 'GET', Date.now() - c._devDebugStart, error.response?.status);
+          } catch (_) {}
+        }
+      }
 
       if (error.config?.data instanceof FormData) {
         console.error('[API Error] ========== FormData 요청 오류 ==========');
@@ -3290,6 +3354,28 @@ export const gatewayNodeJS = async (
   }
 };
 
+export const getDeferredReferral = async (): Promise<{ referral_email: string | null } | null> => {
+  try {
+    const { collectDeviceInfo } = require('../utils/napApiUtils');
+    const deviceInfo = await collectDeviceInfo();
+    const requestBody = {
+      adid: deviceInfo.adid || undefined,
+      ip: deviceInfo.ipAddress || undefined,
+      user_agent: deviceInfo.userAgent || undefined,
+      device_model: deviceInfo.model || undefined,
+    };
+    const response = await gatewayNodeJS('gateway/deferred-deeplink/lookup', 'POST', requestBody);
+    const email = response?.referrer_email ?? response?.referral_email ?? response?.data?.referrer_email ?? null;
+    if (email) {
+      console.log('[getDeferredReferral] 추천인 이메일 복원:', email);
+    }
+    return { referral_email: email };
+  } catch (error) {
+    console.warn('[getDeferredReferral] 조회 실패 (무시 가능):', error);
+    return null;
+  }
+};
+
 export const getCryptoPricesInKRW = async (
   navigation?: any,
 ): Promise<any> => {
@@ -4344,6 +4430,30 @@ export const getAyetPointsBalance = async (
     return { total_ayet_points, transaction_count };
   } catch (error) {
     console.error('[ayeT 포인트] 잔액 조회 오류:', error);
+    throw error;
+  }
+};
+
+export const getXrunWalletBalance = async (
+  member: number | string,
+  navigation?: any,
+): Promise<{ balance: string; formatted: string; symbol: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/getXrunWalletBalance', {
+      member: typeof member === 'number' ? member : Number(member),
+    });
+    const raw: any = response.data;
+    if (raw?.status !== 'success' || !raw?.data) {
+      throw new Error(raw?.message ?? 'getXrunWalletBalance 응답 오류');
+    }
+    return {
+      balance: raw.data.balance ?? '0',
+      formatted: raw.data.formatted ?? '0',
+      symbol: raw.data.symbol ?? 'XRUN',
+    };
+  } catch (error) {
+    console.error('[XRUN 잔액] 조회 오류:', error);
     throw error;
   }
 };

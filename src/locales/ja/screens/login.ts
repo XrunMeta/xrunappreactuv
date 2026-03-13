@@ -21,6 +21,8 @@ export default {
     rememberMe: 'ログイン状態を維持する',
     sendButton: '送信',
   },
+  accountLink: 'アカウント連携',
+  linkComplete: '連携完了',
   errors: {
     emailRequired: 'メールアドレスを入力してください',
     passwordRequired: 'パスワードを入力してください',

@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, AppState, BackHandler, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
 
-const OTAUpdateDialog = () => {
+export type OTAUpdateDialogProps = { isAdFinished?: boolean };
+
+const OTAUpdateDialog: React.FC<OTAUpdateDialogProps> = ({ isAdFinished = true }) => {
     const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -12,6 +14,7 @@ const OTAUpdateDialog = () => {
     const [updateInfo, setUpdateInfo] = useState<OTAVersionInfo | null>(null);
     const [waitingForRestart, setWaitingForRestart] = useState(false); 
     const appState = useRef(AppState.currentState);
+    const hasCheckedAfterAd = useRef(false);
 
     const checkForUpdate = async () => {
         if (__DEV__) return; 
@@ -24,9 +27,14 @@ const OTAUpdateDialog = () => {
     };
 
     useEffect(() => {
+        if (!isAdFinished) return;
+        if (hasCheckedAfterAd.current) return;
+        hasCheckedAfterAd.current = true;
+        const t = setTimeout(() => checkForUpdate(), 800);
+        return () => clearTimeout(t);
+    }, [isAdFinished]);
 
-        checkForUpdate();
-
+    useEffect(() => {
         const subscription = AppState.addEventListener('change', nextAppState => {
             if (
                 appState.current.match(/inactive|background/) &&

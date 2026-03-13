@@ -60,6 +60,9 @@ export const TaboolaNativeView: React.FC<TaboolaNativeViewProps> = ({
   );
 };
 
+const USE_WEBVIEW_ONLY = true;
+
 export const isTaboolaNativeViewAvailable = (): boolean => {
+  if (USE_WEBVIEW_ONLY) return false;
   return TaboolaNativeViewNative !== null;
 };

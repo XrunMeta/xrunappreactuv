@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
+import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Application from 'expo-application';
 import * as Clipboard from 'expo-clipboard';
@@ -61,10 +61,11 @@ import {
   ShowPockAdScreen,
   ShowWebViewScreen,
   XRUNinfoScreen,
+  XplayInfoScreen,
+  XplayZoneScreen,
   MyinfoShopSalesScreen,
   ReferralInputScreen,
   PangleListScreen,
-  TapjoyListScreen,
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
 } from './src/screens';
@@ -73,11 +74,11 @@ import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog } from './src/components';
-import { loadEnv, getEnv } from './src/utils/env';
+import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
+import { loadEnvSync, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
-import { initI18n } from './src/locales';
+import { initI18nSync, applyStoredLanguageAsync } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
@@ -268,8 +269,6 @@ const ScreenHost = () => {
         return;
       }
 
-      return;
-
       try {
 
         const clipboardContent = await Clipboard.getStringAsync();
@@ -436,10 +435,6 @@ const ScreenHost = () => {
     return <PangleListScreen />;
   }
 
-  if (currentScreen === 'tapjoyList') {
-    return <TapjoyListScreen />;
-  }
-
   if (currentScreen === 'ayetOffers') {
     return <AyetOffersScreen />;
   }
@@ -560,6 +555,14 @@ const ScreenHost = () => {
 
   if (currentScreen === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (currentScreen === 'xplayInfo') {
+    return <XplayInfoScreen />;
+  }
+
+  if (currentScreen === 'xplayZone') {
+    return <XplayZoneScreen />;
   }
 
   if (currentScreen === 'myinfoShopSales') {
@@ -846,6 +849,7 @@ export default function App() {
     'Roboto-Bold': Roboto_700Bold,
   });
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const appInitDoneRef = useRef(false);
 
   useEffect(() => {
     const initializeAppState = async () => {
@@ -940,170 +944,120 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (appInitDoneRef.current) return;
+    appInitDoneRef.current = true;
+
+    if (__DEV__) {
+      try {
+        require('./src/utils/devDebugStore').devDebugStore.init();
+      } catch (_) {}
+    }
 
     initGoogleSignIn();
 
     const initializeApp = async () => {
+      const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+
       try {
-        await loadEnv();
-        console.log('[App] 환경 변수 로드 완료');
+        devBoot?.recordBootStep('start');
+        loadEnvSync();
+        initI18nSync();
+        console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (error) {
-        console.error('[App] 환경 변수 로드 실패:', error);
+        console.error('[App] 초기화 실패:', error);
       }
 
-      try {
-        const env = getEnv();
-        const initOptions = {
-          devKey: env.APPSFLYER_DEV_KEY,
-          appId: env.APPSFLYER_APP_ID_IOS,
-          isDebug: true, 
-          onInstallConversionDataListener: true,
-          onDeepLinkListener: true,
-          timeToWaitForATTUserAuthorization: 10,
-        };
-        const maxAttempts = 12;
-        const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
-        const tryAppsFlyerInit = (attempt: number) => {
-          const RNAppsFlyer = NativeModules.RNAppsFlyer;
-          if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
-            appsFlyer.initSdk(
-              initOptions,
-              () => {
-                console.log('[App] AppsFlyer 초기화 성공');
-                if (initOptions.isDebug) {
-                  console.log('[App] AppsFlyer 디버그 모드 활성화됨');
-                }
-              },
-              (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err),
-            );
-            console.log('[App] AppsFlyer 초기화 완료');
-            return;
-          }
-          if (attempt < maxAttempts) {
-            const delay = delays[Math.min(attempt, delays.length - 1)];
-            console.log('[App] AppsFlyer 네이티브 모듈 대기 중,', delay, 'ms 후 재시도', attempt + 1, '/', maxAttempts);
-            setTimeout(() => tryAppsFlyerInit(attempt + 1), delay);
-          } else {
-            console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
-          }
-        };
-        tryAppsFlyerInit(0);
-      } catch (error) {
-        console.error('[App] AppsFlyer 초기화 실패:', error);
-      }
-
-      try {
-        await initI18n();
-        console.log('[App] i18n 초기화 완료');
-      } catch (error) {
-        console.error('[App] i18n 초기화 실패:', error);
-      }
-
-      try {
-        const cachedAdStr = await AsyncStorage.getItem('cached_AD');
-        if (cachedAdStr) {
-          const cachedAd = JSON.parse(cachedAdStr);
-          let hasMarketUrl = false;
-          const cleanedCache: any = {};
-
-          Object.keys(cachedAd).forEach((campid) => {
-            const urlAD = cachedAd[campid]?.urlAD;
-            if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) {
-              console.log(`[App] 캐시에서 market:// 또는 intent:// 제거: ${campid}`);
-              hasMarketUrl = true;
-            } else {
-              cleanedCache[campid] = cachedAd[campid];
-            }
-          });
-
-          if (hasMarketUrl) {
-            await AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
-            console.log('[App] 캐시 클리어 완료 (market:// 및 intent:// 제거)');
-          }
-        }
-      } catch (cacheError) {
-        console.warn('[App] 캐시 클리어 실패:', cacheError);
-      }
-
-      try {
-        await loadEnv();
-        console.log('[App] 환경 변수 로드 완료');
-      } catch (error) {
-        console.error('[App] 환경 변수 로드 실패:', error);
-      }
-
-      try {
-        await initializeTaboola();
-        console.log('[App] Taboola 초기화 완료');
-      } catch (error) {
-        console.error('[App] Taboola 초기화 실패:', error);
-      }
-
-      setTimeout(async () => {
+      setIsAdFinished(true);
+      setIsLoading(false);
+      if (__DEV__) {
         try {
-          await initializePangle();
-          console.log('[App] Pangle 초기화 완료');
+          require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+        } catch (_) {}
+      }
 
-          console.log('[App] 앱 오프닝 광고 표시 시작');
-          await loadAndShowAppOpenAd();
-          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
+      applyStoredLanguageAsync();
+
+      const runBackground = () => {
+        try {
+          const env = getEnv();
+          const initOptions = {
+            devKey: env.APPSFLYER_DEV_KEY,
+            appId: env.APPSFLYER_APP_ID_IOS,
+            isDebug: true,
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            timeToWaitForATTUserAuthorization: 10,
+          };
+          const maxAttempts = 12;
+          const delays = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
+          const tryAppsFlyerInit = (attempt: number) => {
+            const RNAppsFlyer = NativeModules.RNAppsFlyer;
+            if (RNAppsFlyer != null && typeof RNAppsFlyer.initSdkWithCallBack === 'function') {
+              appsFlyer.initSdk(initOptions, () => console.log('[App] AppsFlyer 초기화 성공'), (err: any) => console.warn('[App] AppsFlyer 초기화 경고/실패:', err));
+              return;
+            }
+            if (attempt < maxAttempts) setTimeout(() => tryAppsFlyerInit(attempt + 1), delays[Math.min(attempt, delays.length - 1)]);
+            else console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
+          };
+          tryAppsFlyerInit(0);
         } catch (error) {
-          console.error('[App] Pangle 프로세스 실패:', error);
-        } finally {
-
-          setIsAdFinished(true);
+          console.error('[App] AppsFlyer 초기화 실패:', error);
         }
-      }, 1000);
-
-      try {
-        console.log('[App] TopAd5 광고 캐시 시작');
-        await getTopAd5();
-        console.log('[App] TopAd5 광고 캐시 완료');
-      } catch (error) {
-        console.error('[App] TopAd5 광고 캐시 실패:', error);
-
-      }
-
-      try {
-        console.log('[App] 고팍스 XRUN 가격 조회 시작');
-        const priceResponse = await getXRUNGopaxPrice();
-        const priceData = JSON.stringify(priceResponse);
-        await AsyncStorage.setItem('xrungopaxprice', priceData);
-        console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', priceResponse.data?.gopaxPrice);
-      } catch (error) {
-        console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', error);
-
-      }
-
-      try {
-        const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          const member = userData?.member;
-          if (member) {
-            console.log('[App] 사용자 잔액 업데이트 V2 호출 시작');
-            getUsersBalanceUpdateV2(String(member)).catch((error) => {
-              console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
+        initializeTaboola().then(() => console.log('[App] Taboola 초기화 완료')).catch((e) => console.error('[App] Taboola 초기화 실패:', e));
+        getXRUNGopaxPrice()
+          .then((priceResponse) => AsyncStorage.setItem('xrungopaxprice', JSON.stringify(priceResponse)))
+          .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))
+          .catch((e) => console.error('[App] 고팍스 XRUN 가격 조회 실패:', e));
+        AsyncStorage.getItem('userData')
+          .then((userDataStr) => {
+            if (!userDataStr) return;
+            try {
+              const userData = JSON.parse(userDataStr);
+              const member = userData?.member;
+              if (member) getUsersBalanceUpdateV2(String(member)).catch((e) => console.error('[App] 사용자 잔액 업데이트 V2 실패:', e));
+            } catch (_) {}
+          })
+          .catch(() => {});
+        AsyncStorage.getItem('cached_AD')
+          .then((cachedAdStr) => {
+            if (!cachedAdStr) return;
+            const cachedAd = JSON.parse(cachedAdStr);
+            let hasMarketUrl = false;
+            const cleanedCache: any = {};
+            Object.keys(cachedAd).forEach((campid) => {
+              const urlAD = cachedAd[campid]?.urlAD;
+              if (urlAD && (urlAD.startsWith('market://') || urlAD.startsWith('intent://'))) hasMarketUrl = true;
+              else cleanedCache[campid] = cachedAd[campid];
             });
-          }
-        }
-      } catch (error) {
-        console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', error);
+            if (hasMarketUrl) return AsyncStorage.setItem('cached_AD', JSON.stringify(cleanedCache));
+          })
+          .catch(() => {});
+      };
 
+      if (__DEV__) {
+        try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
+        } catch (_) {}
       }
 
+      getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
+      setTimeout(runBackground, 1500);
+
+      setTimeout(() => {
+        const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+        devBoot?.recordBootStep('pangle_start');
+        initializePangle()
+          .then(() => loadAndShowAppOpenAd())
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
+          .finally(() => devBoot?.recordBootStep('pangle_done'));
+      }, 0);
     };
 
     initializeApp();
-
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
   }, []);
 
-  if (!fontsLoaded || isLoading) {
+  if (isLoading) {
     return (
       <SafeAreaProvider>
         <StatusBar style="dark" />
@@ -1113,6 +1067,7 @@ export default function App() {
               <OTAUpdateProvider>
                 <SplashScreen />
                 <GlobalDialogs />
+                {__DEV__ && <DevDebugPanel />}
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1132,6 +1087,7 @@ export default function App() {
               <AliveService />
               <ScreenHost />
               <GlobalDialogs />
+              {__DEV__ && <DevDebugPanel />}
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
@@ -1139,4 +1095,3 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-

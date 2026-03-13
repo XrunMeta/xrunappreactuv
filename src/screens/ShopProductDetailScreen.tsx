@@ -190,20 +190,20 @@ export const ShopProductDetailScreen = () => {
     const handleXplayPurchase = useCallback(async () => {
         if (!member || xplayPurchaseLoading) return;
         if (!userPhone || !userPhone.trim()) {
-            showAlert('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.phoneNotRegistered'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
 
         const needPrice = product.price;
         const balance = xplayBalanceState ?? 0;
         if (balance < needPrice) {
-            showAlert('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
-        showAlert('구매', `${product.title}을(를) Xplay 포인트로 구매하시겠습니까?`, [
-            { text: '취소' },
+        showAlert(t('screens.shopProductDetail.alerts.purchaseConfirmTitle'), t('screens.shopProductDetail.alerts.purchaseConfirmMessageXplay', { title: product.title }), [
+            { text: t('screens.shopProductDetail.alerts.cancel') },
             {
-                text: '구매',
+                text: t('screens.shopProductDetail.alerts.purchase'),
                 onPress: async () => {
                     setXplayPurchaseLoading(true);
                     try {
@@ -230,7 +230,7 @@ export const ShopProductDetailScreen = () => {
                                     ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : msg;
                             console.warn('[Xplay 구매] 실패:', code, msg);
-                            showAlert('구매 실패', userMsg, [{ text: '확인' }]);
+                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                         }
                     } catch (e) {
                         const err = e as any;
@@ -243,7 +243,7 @@ export const ShopProductDetailScreen = () => {
                                 ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : msg;
                         console.error('[Xplay 구매] 오류:', status, msg);
-                        showAlert('구매 실패', userMsg, [{ text: '확인' }]);
+                        showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                     } finally {
                         setXplayPurchaseLoading(false);
                     }
@@ -273,16 +273,16 @@ export const ShopProductDetailScreen = () => {
 
     const handleExchange = () => {
         if (!depositAddress.trim()) {
-            showAlert('알림', '입금주소를 입력해주세요.', [{ text: '확인' }]);
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.enterDepositAddress'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
         if (!xplayAmount || xplayToUse < EXCHANGE_MIN_XPLAY) {
-            showAlert('알림', `최소 ${EXCHANGE_MIN_XPLAY.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.minXplayRequired', { min: EXCHANGE_MIN_XPLAY.toLocaleString() }), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
-        showAlert('교환', 'Ethereum으로 교환하시겠습니까?', [
-            { text: '취소' },
-            { text: '교환', onPress: () => console.log('교환:', { depositAddress, xplayAmount }) },
+        showAlert(t('screens.shopProductDetail.alerts.exchangeTitle'), t('screens.shopProductDetail.alerts.exchangeConfirm'), [
+            { text: t('screens.shopProductDetail.alerts.cancel') },
+            { text: t('screens.shopProductDetail.alerts.exchange'), onPress: () => console.log('교환:', { depositAddress, xplayAmount }) },
         ]);
     };
 
@@ -307,7 +307,7 @@ export const ShopProductDetailScreen = () => {
 
                         {}
                         <View style={styles.inputSection}>
-                            <Text style={styles.inputLabel}>입금주소</Text>
+                            <Text style={styles.inputLabel}>{t('screens.shopProductDetail.depositAddress')}</Text>
                             <View style={styles.inputContainer}>
                                 <TextInput
                                     style={styles.input}
@@ -329,10 +329,10 @@ export const ShopProductDetailScreen = () => {
                             {xplayBalanceLoading ? (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                                     <ActivityIndicator size="small" color="#1E3A5F" />
-                                    <Text style={styles.minAmountHint}>잔액 조회 중</Text>
+                                    <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.checkingBalance')}</Text>
                                 </View>
                             ) : (
-                                <Text style={styles.minAmountHint}>보유: {exchangeXplayBalance.toLocaleString()} Xplay</Text>
+                                <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.balanceHold', { amount: exchangeXplayBalance.toLocaleString() })}</Text>
                             )}
                             <View style={styles.inputContainer}>
                                 <TextInput
@@ -346,32 +346,32 @@ export const ShopProductDetailScreen = () => {
                                     keyboardType="numeric"
                                 />
                                 <TouchableOpacity onPress={handleMaxAmount} style={styles.maxButton}>
-                                    <Text style={styles.maxButtonText}>최대 금액</Text>
+                                    <Text style={styles.maxButtonText}>{t('screens.shopProductDetail.maxAmount')}</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.minAmountHint}>최소 {EXCHANGE_MIN_XPLAY.toLocaleString()} Xplay</Text>
+                            <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.minXplay', { min: EXCHANGE_MIN_XPLAY.toLocaleString() })}</Text>
                         </View>
 
                         {}
                         <View style={styles.summarySection}>
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Ethereum 환율</Text>
+                                <Text style={styles.summaryLabel}>{t('screens.shopProductDetail.ethRate')}</Text>
                                 <Text style={styles.summaryValue}>{EXCHANGE_ETH_RATE.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>암호화폐 수수료</Text>
+                                <Text style={styles.summaryLabel}>{t('screens.shopProductDetail.cryptoFee')}</Text>
                                 <Text style={styles.summaryValue}>{EXCHANGE_CRYPTO_FEE.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>출금 수수료</Text>
+                                <Text style={styles.summaryLabel}>{t('screens.shopProductDetail.withdrawalFee')}</Text>
                                 <Text style={styles.summaryValue}>{withdrawalFee.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>사용할 Xplay</Text>
+                                <Text style={styles.summaryLabel}>{t('screens.shopProductDetail.xplayToUse')}</Text>
                                 <Text style={styles.summaryValue}>{xplayToUse.toLocaleString()}</Text>
                             </View>
                             <View style={styles.summaryRowLast}>
-                                <Text style={styles.summaryLabel}>받으실 금액(Ethereum)</Text>
+                                <Text style={styles.summaryLabel}>{t('screens.shopProductDetail.receiveAmountEth')}</Text>
                                 <Text style={styles.summaryValueBold}>{ethereumAmount}</Text>
                             </View>
                         </View>
@@ -385,7 +385,7 @@ export const ShopProductDetailScreen = () => {
                         onPress={handleExchange}
                         activeOpacity={0.8}
                     >
-                        <Text style={styles.exchangeButtonText}>교환하기</Text>
+                        <Text style={styles.exchangeButtonText}>{t('screens.shopProductDetail.exchange')}</Text>
                     </TouchableOpacity>
                 </View>
             </SafeView>
@@ -397,10 +397,10 @@ export const ShopProductDetailScreen = () => {
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState<boolean>(false);
 
     const handlePurchase = () => {
-        showAlert('구매', `${product.title}을(를) 구매하시겠습니까?`, [
-            { text: '취소' },
+        showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
+            { text: t('screens.shop.cancel') },
             {
-                text: '구매',
+                text: t('screens.shop.purchase'),
                 onPress: () => {
                     console.log('구매:', product.id);
                     setPaymentSuccessVisible(true);
@@ -436,7 +436,7 @@ export const ShopProductDetailScreen = () => {
         <SafeView style={styles.container} backgroundColor="#F8FAFC">
             <StatusBar style="dark" />
             <Header
-                title="상품정보"
+                title={t('screens.shopProductDetail.productInfo')}
                 onBackPress={goBack}
                 showBackButton
             />
@@ -475,20 +475,20 @@ export const ShopProductDetailScreen = () => {
                     <View style={styles.paymentCard}>
                         <View style={styles.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>결제 정보</Text>
+                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.paymentInfo')}</Text>
                         </View>
                         <View style={styles.divider} />
                         {isXplayShop ? (
                             <>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>결제금액</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={styles.priceContainer}>
                                         <Image source={xplaySymbol} style={styles.coinIcon} resizeMode="contain" />
                                         <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>내 Xplay 잔액</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXplayBalance')}</Text>
                                     {xplayBalanceLoading ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -498,7 +498,7 @@ export const ShopProductDetailScreen = () => {
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>구매 후 잔여 Xplay</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXplay')}</Text>
                                     <Text style={styles.paymentRemaining}>
                                         {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} Xplay`}
                                     </Text>
@@ -507,14 +507,14 @@ export const ShopProductDetailScreen = () => {
                         ) : (
                             <>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>결제금액</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={styles.priceContainer}>
                                         <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
                                         <Text style={styles.paymentValue}>{product.price.toLocaleString()} XRUN</Text>
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>내보유 XRUN</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXrunBalance')}</Text>
                                     {xrunBalanceLoading ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -522,7 +522,7 @@ export const ShopProductDetailScreen = () => {
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>구매 후 잔여 XRUN</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXrun')}</Text>
                                     <Text style={styles.paymentRemaining}>{remainingBalance.toLocaleString()} XRUN</Text>
                                 </View>
                             </>
@@ -533,7 +533,7 @@ export const ShopProductDetailScreen = () => {
                     <View style={styles.guideCard}>
                         <View style={styles.sectionHeader}>
                             <Feather name="info" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>이용 안내</Text>
+                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.guide')}</Text>
                         </View>
                         <View style={styles.divider} />
 
@@ -542,7 +542,7 @@ export const ShopProductDetailScreen = () => {
                                 <View style={styles.guideNumber}>
                                     <Text style={styles.guideNumberText}>1</Text>
                                 </View>
-                                <Text style={styles.guideSubtitle}>취소 및 환불 규정</Text>
+                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.cancelRefund')}</Text>
                             </View>
                             <View style={styles.guideTextContainer}>
                                 <Text style={styles.guideText}>• 본 상품은 구매 즉시 발송되는 디지털 쿠폰(모바일 쿠폰/바코드)입니다.</Text>
@@ -556,7 +556,7 @@ export const ShopProductDetailScreen = () => {
                                 <View style={styles.guideNumber}>
                                     <Text style={styles.guideNumberText}>2</Text>
                                 </View>
-                                <Text style={styles.guideSubtitle}>이용 안내</Text>
+                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.guideSubtitle')}</Text>
                             </View>
                             <View style={styles.guideTextContainer}>
                                 <Text style={styles.guideText}>• 전국 교환처(해당 브랜드 매장)에서 결제 시 모바일 쿠폰을 제시해 주세요.</Text>
@@ -588,7 +588,7 @@ export const ShopProductDetailScreen = () => {
                                 <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             )}
                             <Text style={styles.purchaseButtonText}>
-                                {xplayPurchaseLoading ? '처리 중...' : 'Xplay 포인트로 구매'}
+                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXplay')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -605,7 +605,7 @@ export const ShopProductDetailScreen = () => {
                             style={styles.purchaseButtonGradient}
                         >
                             <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
-                            <Text style={styles.purchaseButtonText}>구매하기</Text>
+                            <Text style={styles.purchaseButtonText}>{t('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
@@ -623,9 +623,9 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.modalLogoContainer}>
                             <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={styles.paymentSuccessMessage}>결제가 완료되었습니다</Text>
+                        <Text style={styles.paymentSuccessMessage}>{t('screens.shopProductDetail.paymentComplete')}</Text>
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
-                            <Text style={styles.paymentSuccessButtonText}>확인</Text>
+                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -662,7 +662,7 @@ export const ShopProductDetailScreen = () => {
                             </ScrollView>
                         ) : null}
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleXplayPaymentSuccessClose} activeOpacity={0.8}>
-                            <Text style={styles.paymentSuccessButtonText}>내 기프티콘 보기</Text>
+                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.viewMyGift')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

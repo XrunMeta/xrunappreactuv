@@ -10,6 +10,8 @@ export default {
   termsSubtitle: '이용약관, 개인정보처리방침',
   settings: '설정',
   settingsSubtitle: '앱 설정, 언어 설정',
+  referral: '추천',
+  referralSubtitle: '내그룹, 그룹정산, 순위',
   referralEdit: '레퍼럴 수정',
   referralEditSubtitle: '추천인 관리',
   shopSales: 'Shop 매출',

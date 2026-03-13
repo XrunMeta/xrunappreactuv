@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { getIosWalletShowStatus } from '../services';
+import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
-
-const TEST_PLATFORM_OS: 'ios' | 'android' | null = null; 
 
 let iconMap: any = null;
 let iconMapWhite: any = null;
@@ -62,60 +60,38 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 }) => {
   const { navigate } = useAppNavigation();
 
-  const currentPlatformOS = TEST_PLATFORM_OS || Platform.OS;
-  const [showWallet, setShowWallet] = useState(currentPlatformOS === 'android');
+  const [showWallet, setShowWallet] = useState(false);
 
   useEffect(() => {
-    const abortController = new AbortController();
-
-    const getShowWalletStatus = async () => {
-
-      if (currentPlatformOS === 'ios') {
-        try {
-
+    const fetchStatus = async () => {
+      try {
+        if (Platform.OS === 'ios') {
           const iosOnWallet = await getIosWalletShowStatus(navigate);
-
           setShowWallet(iosOnWallet);
-        } catch (error) {
-          console.error('[BottomNavigationBar] 지갑 표시 상태 가져오기 오류:', error);
-          setShowWallet(false);
+        } else {
+          const androidOnWallet = await getAndroidWalletShowStatus(navigate);
+          setShowWallet(androidOnWallet);
         }
-      } else {
-        setShowWallet(true); 
-
+      } catch (error) {
+        console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', error);
+        setShowWallet(false);
       }
     };
-
-    getShowWalletStatus();
-
-    const interval = setInterval(() => {
-      getShowWalletStatus();
-    }, 30000); 
-
-    return () => {
-      clearInterval(interval);
-      abortController.abort();
-    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
   }, [navigate]);
 
+  let iconXrunBlack: any = null;
+  try {
+    iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
+  } catch (_) {}
   const processedItems = items.map(item => {
     if (item.id === 'wallet') {
-
-      let iconXrunBlack: any = null;
-      try {
-        iconXrunBlack = require('../../assets/images/icon_xrun_black.png');
-      } catch (e) {
-        console.warn('icon_xrun_black.png not found');
-      }
-
       return {
         ...item,
-        label: showWallet
-          ? item.label
-          : 'XRUN',
-        icon: showWallet
-          ? item.icon
-          : iconXrunBlack,
+        label: showWallet ? item.label : 'XRUN',
+        icon: showWallet ? item.icon : iconXrunBlack,
       };
     }
     return item;
@@ -123,17 +99,13 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   const handleItemPress = (itemId: string) => {
     if (itemId === 'wallet') {
-      if (currentPlatformOS === 'android') {
-        navigate(ROUTES.wallet);
-      } else if (currentPlatformOS === 'ios' && showWallet) {
+      if (showWallet) {
         navigate(ROUTES.wallet);
       } else {
-
         navigate(ROUTES.xrunInfo);
       }
       return;
     }
-
     onItemPress?.(itemId);
   };
 
