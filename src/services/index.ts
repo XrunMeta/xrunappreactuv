@@ -177,7 +177,12 @@ import {
   DeleteShopItemResponse,
 } from '../types';
 import * as CryptoJS from 'crypto-js';
-import { checkLatestVersion, getCurrentAppVersion, getCurrentAppVersionNumber } from './versionCheck';
+import {
+  checkLatestVersion,
+  checkServerVersion,
+  getCurrentAppVersion,
+  getCurrentAppVersionNumber,
+} from './versionCheck';
 
 const API_TIMEOUT = 20000;
 
@@ -375,9 +380,14 @@ export const sendAliveSignal = async (
 
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
   try {
+    const server = await checkServerVersion();
+    if (server?.data && server.data.iosOnWallet !== undefined) {
+      return server.data.iosOnWallet === 1 || server.data.iosOnWallet === true;
+    }
+  } catch (_) {}
+  try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
-
     const response = await nodeGatewayRequest('/app-config/ios-onwallet', {
       method: 'GET',
       headers: {
@@ -385,16 +395,38 @@ export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean>
         Authorization: `Bearer ${authCode}`,
       },
     }, navigation);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
-    return data?.data?.iosOnWallet ?? false;
+    return data?.data?.iosOnWallet === 1;
   } catch (error) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
-    return false; 
+    return false;
+  }
+};
+
+export const getAndroidWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && server.data.androidOnWallet !== undefined) {
+      return server.data.androidOnWallet === 1;
+    }
+  } catch (_) {}
+  try {
+    const env = getEnv();
+    const authCode = env.GATEWAY_AUTH_CODE;
+    const response = await nodeGatewayRequest('/app-config/android-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+    }, navigation);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.data?.androidOnWallet === 1;
+  } catch (error) {
+    console.error('Android 지갑 표시 상태 가져오기 오류:', error);
+    return false;
   }
 };
 
