@@ -59,7 +59,7 @@
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 246,
+      "versionCode": 247,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
