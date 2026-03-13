@@ -793,7 +793,7 @@ export const v_f4f851 = () => {
       {}
       <Dialog
         visible={v_6f4eac}
-        title="계정 연결"
+        title={v_8d41d7('screens.login.accountLink')}
         onClose={() => v_29378d(false)}
         actions={[
           {
@@ -848,7 +848,7 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       {}
       <Dialog
         visible={v_381ed1}
-        title="연동 완료"
+        title={v_8d41d7('screens.login.linkComplete')}
         onClose={() => {
           v_361e20(false);
           v_9b57fc(v_ce4741.map);

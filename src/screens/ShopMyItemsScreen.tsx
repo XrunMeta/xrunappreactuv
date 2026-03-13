@@ -247,7 +247,7 @@ export const v_8c1d95 = () => {
                                 <Text style={v_d81136.itemBrand}>{v_8c0b26.brand}</Text>
                                 <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_d81136.statusTagUsed]}>
                                     <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_d81136.statusTagTextUsed]}>
-                                        {v_2911e0 ? '사용가능' : '사용완료'}
+                                        {v_2911e0 ? v_8d41d7('screens.shop.availableShort') : v_8d41d7('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -256,14 +256,14 @@ export const v_8c1d95 = () => {
                             </Text>
                         </View>
                     </View>
-                    <Text style={v_d81136.purchaseDate}>구매일: {v_8c0b26.purchaseDate}</Text>
+                    <Text style={v_d81136.purchaseDate}>{v_8d41d7('screens.shop.purchaseDateLabel')}: {v_8c0b26.purchaseDate}</Text>
                     {v_2911e0 && (
                         <TouchableOpacity
                             style={v_d81136.useButton}
                             onPress={() => v_09c55b(v_8c0b26)}
                             activeOpacity={0.8}
                         >
-                            <Text style={v_d81136.useButtonText}>사용하기 &gt;</Text>
+                            <Text style={v_d81136.useButtonText}>{v_8d41d7('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -298,12 +298,12 @@ export const v_8c1d95 = () => {
                     >
                         <View style={v_d81136.statsContent}>
                             <View style={v_d81136.statItem}>
-                                <Text style={v_d81136.statLabel}>사용 가능</Text>
+                                <Text style={v_d81136.statLabel}>{v_8d41d7('screens.shop.available')}</Text>
                                 <Text style={v_d81136.statValue}>{v_62676b.available}</Text>
                             </View>
                             <View style={v_d81136.statDivider} />
                             <View style={v_d81136.statItem}>
-                                <Text style={v_d81136.statLabel}>사용완료</Text>
+                                <Text style={v_d81136.statLabel}>{v_8d41d7('screens.shop.used')}</Text>
                                 <Text style={[v_d81136.statValue, v_d81136.statValueUsed]}>{v_62676b.used}</Text>
                             </View>
                         </View>
@@ -346,7 +346,7 @@ export const v_8c1d95 = () => {
                     {v_683210 ? (
                         <View style={v_d81136.loadingContainer}>
                             <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                            <Text style={v_d81136.loadingText}>쿠폰 목록 불러오는 중...</Text>
+                            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.shop.loadingCouponList')}</Text>
                         </View>
                     ) : v_973c3e.length > 0 ? (
                         <View style={v_d81136.itemsList}>
@@ -355,7 +355,7 @@ export const v_8c1d95 = () => {
                     ) : (
                         <View style={v_d81136.emptyContainer}>
                             <Text style={v_d81136.emptyText}>
-                                {v_5d756f.trim() ? '검색 결과가 없습니다.' : '구매한 쿠폰이 없습니다.'}
+                                {v_5d756f.trim() ? v_8d41d7('screens.shop.noSearchResults') : v_8d41d7('screens.shop.noPurchasedCoupons')}
                             </Text>
                         </View>
                     )}

@@ -47,11 +47,15 @@ export { default as v_02dbe7 } from './shopBuy';
 export { default as v_294db5 } from './shopSuccess';
 export { default as v_adab30 } from './shopTicketDetail';
 export { default as v_0ec349 } from './shopItemRegister';
+export { default as v_f4e7e2 } from './shopProductDetail';
 export { default as v_f7c780 } from './showNapAd';
 export { default as v_400626 } from './advertiseScreen';
 export { default as v_c36a9e } from './addToken';
 export { default as v_ebd772 } from './myinfoShopSales';
 export { default as v_ef4dc3 } from './camera';
 export { default as v_410f77 } from './walletPrivateKeyDisplay';
+export { default as v_53f3c7 } from './walletPrivateKeyGoogleAuth';
 export { default as v_dc9f15 } from './xrunInfo';
+export { default as v_37b2d1 } from './xplayInfo';
+export { default as v_fe1952 } from './pangleList';
 

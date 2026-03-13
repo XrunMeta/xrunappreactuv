@@ -3,7 +3,6 @@ export default {
   closeMembership: '退会',
   languageSelect: '言語選択',
   reward: 'リワード',
-  tapjoy: 'Tapjoy',
   ayet_offers: 'ayeTオファーを見る',
   ayet_offers_xplay: 'Xplayオファーを見る',
   offers_empty: '表示するオファーがありません。',

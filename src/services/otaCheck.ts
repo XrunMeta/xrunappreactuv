@@ -19,8 +19,8 @@ export interface OTAVersionInfo {
 }
 
 interface OTAMetadata {
-    android: OTAVersionInfo;
-    ios: OTAVersionInfo;
+    android?: OTAVersionInfo;
+    ios?: OTAVersionInfo;
 }
 
 export const v_bb787c = async (): Promise<number> => {
@@ -32,7 +32,10 @@ export const v_bb787c = async (): Promise<number> => {
     }
 };
 
+const v_838bb3 = false;
+
 export const v_dc21b6 = async (): Promise<OTAVersionInfo | null> => {
+    if (!v_838bb3) return null;
     try {
         const v_3393e3 = await fetch(`${v_110ec6}/version.json?t=${new Date().getTime()}`, {
             headers: {
@@ -46,7 +49,11 @@ export const v_dc21b6 = async (): Promise<OTAVersionInfo | null> => {
         }
 
         const v_9390e8 = await v_3393e3.json();
-        const v_f3e4c6 = v_326be8.OS === 'ios' ? v_9390e8.ios : v_9390e8.android;
+
+        if (v_326be8.OS !== 'android' || !v_9390e8.android) {
+            return null;
+        }
+        const v_f3e4c6 = v_9390e8.android;
 
         const v_4587b3 = await v_bb787c();
 

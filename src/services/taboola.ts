@@ -155,8 +155,14 @@ export const v_ce593f = (): boolean => {
   return v_b02f3c !== null && typeof v_b02f3c.init === 'function';
 };
 
+const v_8b45a4 = true;
+
 export const v_0b0acf = async (): Promise<void> => {
   try {
+    if (v_8b45a4) {
+      console.log('[Taboola] WebView 전용 모드입니다. 네이티브 초기화를 건너뜁니다.');
+      return;
+    }
 
     if (!v_ce593f()) {
       console.log('[Taboola] 네이티브 모듈이 없습니다. WebView 방식으로 폴백합니다.');

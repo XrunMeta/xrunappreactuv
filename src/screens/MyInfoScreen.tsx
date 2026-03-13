@@ -57,8 +57,8 @@ export const v_03a231 = () => {
       },
       {
         id: 'referralList',
-        label: '추천',
-        subtitle: '내그룹, 그룹정산, 순위',
+        label: v_8d41d7('screens.myInfo.referral'),
+        subtitle: v_8d41d7('screens.myInfo.referralSubtitle'),
         iconName: 'people-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',

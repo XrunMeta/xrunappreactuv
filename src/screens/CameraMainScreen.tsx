@@ -383,6 +383,7 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
 let v_8daafe = null;
 let v_e96568 = null;
 let v_622956 = null;
+let v_ee9562 = null;
 let v_b636c9 = null;
 let v_16772f = null;
 
@@ -402,6 +403,12 @@ try {
   v_622956 = require('../../assets/images/icon_xplay.png');
 } catch (v_9e86fd) {
   console.warn('icon_xplay.png not found');
+}
+
+try {
+  v_ee9562 = require('../../assets/images/icon_xrun_black.png');
+} catch (v_9e86fd) {
+  console.warn('icon_xrun_black.png not found');
 }
 
 try {
@@ -1899,7 +1906,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
     switch (v_6e55b1) {
       case 'xplay':
-        v_9b57fc(v_ce4741.xrunInfo);
+        v_9b57fc(v_ce4741.xplayInfo);
         break;
       case 'wallet':
         v_9b57fc(v_ce4741.wallet);

@@ -354,12 +354,12 @@ export const v_38326c = () => {
         await v_a7da97(v_43c42e.data);
       } else {
         console.log('[상점] 상점 아이템 가져오기 실패:', v_43c42e);
-        await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
+        await v_889fad(v_8d41d7('screens.shopBuy.alerts.error'), v_8d41d7('screens.shopBuy.alerts.loadShopItemsFailed'));
         v_9a4b0a([]);
       }
     } catch (v_5e9bfe) {
       console.error('[상점] 상점 아이템 가져오기 오류:', v_5e9bfe);
-      await v_889fad('Error', '상점 아이템을 불러오는데 실패했습니다.');
+      await v_889fad(v_8d41d7('screens.shopBuy.alerts.error'), v_8d41d7('screens.shopBuy.alerts.loadShopItemsFailed'));
       v_9a4b0a([]);
     } finally {
       v_34a50a(false);
@@ -424,7 +424,7 @@ export const v_38326c = () => {
     if (!v_717992 || v_476f9f) return;
     const v_275ccd = v_19c59c ?? 0;
     if (v_275ccd < 10) {
-      v_889fad('잔액 부족', '포인트가 10 이상 필요합니다.', [{ text: '확인' }]);
+      v_889fad(v_8d41d7('screens.shopBuy.alerts.insufficientBalanceTitle'), v_8d41d7('screens.shopBuy.alerts.insufficientPointsMessage'), [{ text: v_8d41d7('screens.shopBuy.confirm') }]);
       return;
     }
     v_fcfc38(true);
@@ -435,10 +435,10 @@ export const v_38326c = () => {
         v_9b57fc,
       );
       v_97ae62(v_43c42e.remaining_balance);
-      v_889fad('테스트 결제 완료', `잔액: ${v_43c42e.remaining_balance.toLocaleString()} P`, [{ text: '확인' }]);
+      v_889fad(v_8d41d7('screens.shopBuy.alerts.testPaymentComplete'), v_8d41d7('screens.shopBuy.alerts.testPaymentBalance', { balance: v_43c42e.remaining_balance.toLocaleString() }), [{ text: v_8d41d7('screens.shopBuy.confirm') }]);
     } catch (v_9e86fd) {
       console.error('[Xplay] 테스트 결제 실패:', v_9e86fd);
-      v_889fad('결제 실패', v_9e86fd instanceof Error ? v_9e86fd.message : '포인트 사용에 실패했습니다.', [{ text: '확인' }]);
+      v_889fad(v_8d41d7('screens.shopBuy.alerts.paymentFailed'), v_9e86fd instanceof Error ? v_9e86fd.message : v_8d41d7('screens.shopBuy.alerts.pointUseFailed'), [{ text: v_8d41d7('screens.shopBuy.confirm') }]);
     } finally {
       v_fcfc38(false);
     }

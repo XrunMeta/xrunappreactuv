@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b, v_80fa10, v_326be8 } from 'rcmrninabrnb';
+import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
@@ -61,10 +61,11 @@ import {
   v_540580,
   v_858c71,
   v_f7bdb9,
+  v_305be8,
+  v_26fe4c,
   v_1cca63,
   v_0e5276,
   v_4a5627,
-  v_f2ecfa,
   v_a50cad,
   v_d4a78d,
 } from './src/screens';
@@ -73,11 +74,11 @@ import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a } from './src/components';
-import { v_a2474a, v_e4a763 } from './src/utils/env';
+import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
+import { v_8ecf08, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
-import { v_757c02 } from './src/locales';
+import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
@@ -268,8 +269,6 @@ const v_c0dbdf = () => {
         return;
       }
 
-      return;
-
       try {
 
         const v_46a232 = await v_fba5a0.getStringAsync();
@@ -436,10 +435,6 @@ const v_c0dbdf = () => {
     return <PangleListScreen />;
   }
 
-  if (v_0f0c7b === 'tapjoyList') {
-    return <TapjoyListScreen />;
-  }
-
   if (v_0f0c7b === 'ayetOffers') {
     return <AyetOffersScreen />;
   }
@@ -560,6 +555,14 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xrunInfo') {
     return <XRUNinfoScreen />;
+  }
+
+  if (v_0f0c7b === 'xplayInfo') {
+    return <XplayInfoScreen />;
+  }
+
+  if (v_0f0c7b === 'xplayZone') {
+    return <XplayZoneScreen />;
   }
 
   if (v_0f0c7b === 'myinfoShopSales') {
@@ -846,6 +849,7 @@ export default function v_6540c3() {
     'Roboto-Bold': v_567640,
   });
   const v_1b7402 = v_e662ae<v_c3551b>(v_6b5698.currentState);
+  const v_8c82fd = v_e662ae(false);
 
   v_c4deb2(() => {
     const v_6c5111 = async () => {
@@ -940,170 +944,120 @@ export default function v_6540c3() {
   }, []);
 
   v_c4deb2(() => {
+    if (v_8c82fd.current) return;
+    v_8c82fd.current = true;
+
+    if (__DEV__) {
+      try {
+        require('./src/utils/devDebugStore').devDebugStore.init();
+      } catch (v_37eab7) {}
+    }
 
     v_83e499();
 
     const v_139fe0 = async () => {
+      const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+
       try {
-        await v_a2474a();
-        console.log('[App] 환경 변수 로드 완료');
+        v_cbd24a?.recordBootStep('start');
+        v_8ecf08();
+        v_116c93();
+        console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (v_5e9bfe) {
-        console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
+        console.error('[App] 초기화 실패:', v_5e9bfe);
       }
 
-      try {
-        const v_c9c489 = v_e4a763();
-        const v_280f96 = {
-          devKey: v_c9c489.APPSFLYER_DEV_KEY,
-          appId: v_c9c489.APPSFLYER_APP_ID_IOS,
-          isDebug: true, 
-          onInstallConversionDataListener: true,
-          onDeepLinkListener: true,
-          timeToWaitForATTUserAuthorization: 10,
-        };
-        const v_3d627c = 12;
-        const v_c3d02b = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
-        const v_1059a9 = (v_bc21cd) => {
-          const v_5c3b18 = v_80fa10.RNAppsFlyer;
-          if (v_5c3b18 != null && typeof v_5c3b18.initSdkWithCallBack === 'function') {
-            v_1edcd1.initSdk(
-              v_280f96,
-              () => {
-                console.log('[App] AppsFlyer 초기화 성공');
-                if (v_280f96.isDebug) {
-                  console.log('[App] AppsFlyer 디버그 모드 활성화됨');
-                }
-              },
-              (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d),
-            );
-            console.log('[App] AppsFlyer 초기화 완료');
-            return;
-          }
-          if (v_bc21cd < v_3d627c) {
-            const v_4b24d2 = v_c3d02b[Math.min(v_bc21cd, v_c3d02b.length - 1)];
-            console.log('[App] AppsFlyer 네이티브 모듈 대기 중,', v_4b24d2, 'ms 후 재시도', v_bc21cd + 1, '/', v_3d627c);
-            setTimeout(() => v_1059a9(v_bc21cd + 1), v_4b24d2);
-          } else {
-            console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
-          }
-        };
-        v_1059a9(0);
-      } catch (v_5e9bfe) {
-        console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
-      }
-
-      try {
-        await v_757c02();
-        console.log('[App] i18n 초기화 완료');
-      } catch (v_5e9bfe) {
-        console.error('[App] i18n 초기화 실패:', v_5e9bfe);
-      }
-
-      try {
-        const v_90e1d7 = await v_e84827.getItem('cached_AD');
-        if (v_90e1d7) {
-          const v_4fc87f = JSON.parse(v_90e1d7);
-          let v_7306f6 = false;
-          const v_8fb936 = {};
-
-          Object.keys(v_4fc87f).forEach((v_aa0917) => {
-            const v_7ec08d = v_4fc87f[v_aa0917]?.urlAD;
-            if (v_7ec08d && (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://'))) {
-              console.log(`[App] 캐시에서 market:// 또는 intent:// 제거: ${v_aa0917}`);
-              v_7306f6 = true;
-            } else {
-              v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
-            }
-          });
-
-          if (v_7306f6) {
-            await v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
-            console.log('[App] 캐시 클리어 완료 (market:// 및 intent:// 제거)');
-          }
-        }
-      } catch (v_2bf859) {
-        console.warn('[App] 캐시 클리어 실패:', v_2bf859);
-      }
-
-      try {
-        await v_a2474a();
-        console.log('[App] 환경 변수 로드 완료');
-      } catch (v_5e9bfe) {
-        console.error('[App] 환경 변수 로드 실패:', v_5e9bfe);
-      }
-
-      try {
-        await v_0b0acf();
-        console.log('[App] Taboola 초기화 완료');
-      } catch (v_5e9bfe) {
-        console.error('[App] Taboola 초기화 실패:', v_5e9bfe);
-      }
-
-      setTimeout(async () => {
+      v_c355f2(true);
+      v_deef62(false);
+      if (__DEV__) {
         try {
-          await v_f095b0();
-          console.log('[App] Pangle 초기화 완료');
+          require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+        } catch (v_37eab7) {}
+      }
 
-          console.log('[App] 앱 오프닝 광고 표시 시작');
-          await v_e55270();
-          console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)');
+      v_1f4a13();
+
+      const v_9aae4b = () => {
+        try {
+          const v_c9c489 = v_e4a763();
+          const v_280f96 = {
+            devKey: v_c9c489.APPSFLYER_DEV_KEY,
+            appId: v_c9c489.APPSFLYER_APP_ID_IOS,
+            isDebug: true,
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            timeToWaitForATTUserAuthorization: 10,
+          };
+          const v_3d627c = 12;
+          const v_c3d02b = [0, 200, 400, 600, 900, 1200, 1600, 2000, 2500, 3000, 3500, 4000];
+          const v_1059a9 = (v_bc21cd) => {
+            const v_5c3b18 = v_80fa10.RNAppsFlyer;
+            if (v_5c3b18 != null && typeof v_5c3b18.initSdkWithCallBack === 'function') {
+              v_1edcd1.initSdk(v_280f96, () => console.log('[App] AppsFlyer 초기화 성공'), (v_49263d) => console.warn('[App] AppsFlyer 초기화 경고/실패:', v_49263d));
+              return;
+            }
+            if (v_bc21cd < v_3d627c) setTimeout(() => v_1059a9(v_bc21cd + 1), v_c3d02b[Math.min(v_bc21cd, v_c3d02b.length - 1)]);
+            else console.warn('[App] AppsFlyer 네이티브 모듈을 찾을 수 없어 초기화를 건너뜁니다.');
+          };
+          v_1059a9(0);
         } catch (v_5e9bfe) {
-          console.error('[App] Pangle 프로세스 실패:', v_5e9bfe);
-        } finally {
-
-          v_c355f2(true);
+          console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
         }
-      }, 1000);
-
-      try {
-        console.log('[App] TopAd5 광고 캐시 시작');
-        await v_563153();
-        console.log('[App] TopAd5 광고 캐시 완료');
-      } catch (v_5e9bfe) {
-        console.error('[App] TopAd5 광고 캐시 실패:', v_5e9bfe);
-
-      }
-
-      try {
-        console.log('[App] 고팍스 XRUN 가격 조회 시작');
-        const v_d9a946 = await v_dd87bc();
-        const v_300a65 = JSON.stringify(v_d9a946);
-        await v_e84827.setItem('xrungopaxprice', v_300a65);
-        console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료:', v_d9a946.data?.gopaxPrice);
-      } catch (v_5e9bfe) {
-        console.error('[App] 고팍스 XRUN 가격 조회 및 저장 실패:', v_5e9bfe);
-
-      }
-
-      try {
-        const v_f24fd5 = await v_e84827.getItem('userData');
-        if (v_f24fd5) {
-          const v_ef7306 = JSON.parse(v_f24fd5);
-          const v_660822 = v_ef7306?.member;
-          if (v_660822) {
-            console.log('[App] 사용자 잔액 업데이트 V2 호출 시작');
-            v_8ee299(String(v_660822)).catch((v_5e9bfe) => {
-              console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', v_5e9bfe);
+        v_0b0acf().then(() => console.log('[App] Taboola 초기화 완료')).catch((v_9e86fd) => console.error('[App] Taboola 초기화 실패:', v_9e86fd));
+        v_dd87bc()
+          .then((v_d9a946) => v_e84827.setItem('xrungopaxprice', JSON.stringify(v_d9a946)))
+          .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))
+          .catch((v_9e86fd) => console.error('[App] 고팍스 XRUN 가격 조회 실패:', v_9e86fd));
+        v_e84827.getItem('userData')
+          .then((v_f24fd5) => {
+            if (!v_f24fd5) return;
+            try {
+              const v_ef7306 = JSON.parse(v_f24fd5);
+              const v_660822 = v_ef7306?.member;
+              if (v_660822) v_8ee299(String(v_660822)).catch((v_9e86fd) => console.error('[App] 사용자 잔액 업데이트 V2 실패:', v_9e86fd));
+            } catch (v_37eab7) {}
+          })
+          .catch(() => {});
+        v_e84827.getItem('cached_AD')
+          .then((v_90e1d7) => {
+            if (!v_90e1d7) return;
+            const v_4fc87f = JSON.parse(v_90e1d7);
+            let v_7306f6 = false;
+            const v_8fb936 = {};
+            Object.keys(v_4fc87f).forEach((v_aa0917) => {
+              const v_7ec08d = v_4fc87f[v_aa0917]?.urlAD;
+              if (v_7ec08d && (v_7ec08d.startsWith('market://') || v_7ec08d.startsWith('intent://'))) v_7306f6 = true;
+              else v_8fb936[v_aa0917] = v_4fc87f[v_aa0917];
             });
-          }
-        }
-      } catch (v_5e9bfe) {
-        console.error('[App] 사용자 잔액 업데이트 V2 호출 실패:', v_5e9bfe);
+            if (v_7306f6) return v_e84827.setItem('cached_AD', JSON.stringify(v_8fb936));
+          })
+          .catch(() => {});
+      };
 
+      if (__DEV__) {
+        try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
+        } catch (v_37eab7) {}
       }
 
+      v_563153().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((v_9e86fd) => console.error('[App] TopAd5 광고 캐시 실패:', v_9e86fd));
+      setTimeout(v_9aae4b, 1500);
+
+      setTimeout(() => {
+        const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
+        v_cbd24a?.recordBootStep('pangle_start');
+        v_f095b0()
+          .then(() => v_e55270())
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
+          .finally(() => v_cbd24a?.recordBootStep('pangle_done'));
+      }, 0);
     };
 
     v_139fe0();
-
-    const v_cb36b1 = setTimeout(() => {
-      v_deef62(false);
-    }, 2000);
-
-    return () => clearTimeout(v_cb36b1);
   }, []);
 
-  if (!v_43f571 || v_cd31a8) {
+  if (v_cd31a8) {
     return (
       <SafeAreaProvider>
         <StatusBar style="dark" />
@@ -1113,6 +1067,7 @@ export default function v_6540c3() {
               <OTAUpdateProvider>
                 <SplashScreen />
                 <GlobalDialogs />
+                {__DEV__ && <DevDebugPanel />}
               </OTAUpdateProvider>
             </AlertDialogProvider>
           </NavigationProvider>
@@ -1132,6 +1087,7 @@ export default function v_6540c3() {
               <AliveService />
               <ScreenHost />
               <GlobalDialogs />
+              {__DEV__ && <DevDebugPanel />}
             </OTAUpdateProvider>
           </AlertDialogProvider>
         </NavigationProvider>
@@ -1139,4 +1095,3 @@ export default function v_6540c3() {
     </SafeAreaProvider>
   );
 }
-

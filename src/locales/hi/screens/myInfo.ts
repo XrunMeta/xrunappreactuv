@@ -10,6 +10,8 @@ export default {
   termsSubtitle: 'सेवा नियम, गोपनीयता नीति',
   settings: 'सेटिंग्स',
   settingsSubtitle: 'ऐप सेटिंग्स, भाषा',
+  referral: 'रेफरल',
+  referralSubtitle: 'मेरा समूह, समूह निपटान, रैंकिंग',
   referralEdit: 'रेफरल संपादित करें',
   referralEditSubtitle: 'रेफरल प्रबंधित करें',
   shopSales: 'दुकान बिक्री',

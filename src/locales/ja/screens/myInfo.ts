@@ -10,6 +10,8 @@ export default {
   termsSubtitle: '利用規約、プライバシーポリシー',
   settings: '設定',
   settingsSubtitle: 'アプリ設定、言語設定',
+  referral: '紹介',
+  referralSubtitle: 'マイグループ、グループ精算、ランキング',
   referralEdit: '紹介編集',
   referralEditSubtitle: '紹介者管理',
   shopSales: 'Shop 売上',

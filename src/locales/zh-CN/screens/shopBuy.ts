@@ -5,6 +5,8 @@ export default {
   fee: '手续费',
   total: '总计',
   myBalance: '我的余额',
+  pointBalance: '积分余额',
+  pointPrice: '积分价格',
   checking: '查询中...',
   checkFailed: '查询失败',
   insufficientBalance: '余额不足。请充值。',
@@ -20,6 +22,12 @@ export default {
     insufficientBalanceMessage: '当前余额：{currentBalance} XRUN\n所需金额：{requiredAmount} XRUN\n请充值。',
     purchaseFailed: '购买失败',
     purchaseFailedMessage: '购买过程中发生错误。',
+    loadShopItemsFailed: '加载商店商品失败。',
+    insufficientPointsMessage: '至少需要10积分。',
+    testPaymentComplete: '测试支付完成',
+    testPaymentBalance: '余额：{{balance}} P',
+    paymentFailed: '支付失败',
+    pointUseFailed: '积分使用失败。',
   },
 };
 

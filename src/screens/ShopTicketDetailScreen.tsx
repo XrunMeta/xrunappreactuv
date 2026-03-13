@@ -182,12 +182,12 @@ export const v_a1c4a5 = () => {
     const v_281520 = v_c811e3?.txID || v_c811e3?.txid || v_c811e3?.transaction || v_cd1db8 || v_a94bd8;
 
     if (!v_281520) {
-      await v_889fad('오류', '복사할 티켓 번호가 없습니다.');
+      await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.error'), v_8d41d7('screens.shopTicketDetail.alerts.noTicketNumber'));
       return;
     }
 
     await v_fba5a0.setStringAsync(v_281520);
-    await v_889fad('복사됨', '티켓 번호가 클립보드에 복사되었습니다.');
+    await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.copied'), v_8d41d7('screens.shopTicketDetail.alerts.copySuccess'));
   };
 
   const v_434673 = async () => {
@@ -269,14 +269,14 @@ export const v_a1c4a5 = () => {
     console.log('[티켓 상세] ================');
 
     if (!v_717992 || !v_26c75d) {
-      await v_889fad('오류', `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${v_717992 || '없음'}\nstorageId: ${v_26c75d || '없음'}`);
+      await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.error'), `삭제할 수 없습니다. 필요한 정보가 없습니다.\nmemberId: ${v_717992 || '없음'}\nstorageId: ${v_26c75d || '없음'}`);
       return;
     }
 
-    await v_889fad('삭제', '티켓을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
+    await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.deleteTitle'), v_8d41d7('screens.shopTicketDetail.alerts.deleteConfirm'), [
+      { text: v_8d41d7('screens.shopTicketDetail.alerts.cancel'), style: 'cancel' },
       {
-        text: '삭제',
+        text: v_8d41d7('screens.shopTicketDetail.alerts.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -292,9 +292,9 @@ export const v_a1c4a5 = () => {
 
             if (v_43c42e.status === 'success') {
               console.log('[티켓 상세] 삭제 성공');
-              await v_889fad('삭제 완료', '티켓이 삭제되었습니다.', [
+              await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.deleteSuccessTitle'), v_8d41d7('screens.shopTicketDetail.alerts.deleteSuccessMessage'), [
                 {
-                  text: '확인',
+                  text: v_8d41d7('screens.shopTicketDetail.alerts.confirm'),
                   onPress: () => {
 
                     v_9b57fc(v_ce4741.shopMyTicket);
@@ -303,7 +303,7 @@ export const v_a1c4a5 = () => {
               ]);
             } else {
               console.log('[티켓 상세] 삭제 실패:', v_43c42e.message);
-              await v_889fad('삭제 실패', v_43c42e.message || '티켓 삭제에 실패했습니다.');
+              await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.deleteFailedTitle'), v_43c42e.message || v_8d41d7('screens.shopTicketDetail.alerts.deleteFailedMessage'));
             }
           } catch (v_5e9bfe) {
             console.error('[티켓 상세] === 티켓 삭제 오류 ===');
@@ -315,7 +315,7 @@ export const v_a1c4a5 = () => {
               console.error('[티켓 상세] 응답 데이터:', v_5e9bfe.response.data);
             }
             console.error('[티켓 상세] ====================');
-            await v_889fad('오류', `티켓 삭제 중 오류가 발생했습니다.\n${v_5e9bfe?.message || '알 수 없는 오류'}`);
+            await v_889fad(v_8d41d7('screens.shopTicketDetail.alerts.error'), `${v_8d41d7('screens.shopTicketDetail.alerts.errorDeleteMessage')}\n${v_5e9bfe?.message || '알 수 없는 오류'}`);
           } finally {
             v_deef62(false);
           }

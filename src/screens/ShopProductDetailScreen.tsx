@@ -190,20 +190,20 @@ export const v_a59951 = () => {
     const v_b000c1 = v_de06a3(async () => {
         if (!v_660822 || v_18a900) return;
         if (!v_7496db || !v_7496db.trim()) {
-            v_889fad('알림', '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.phoneNotRegistered'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
 
         const v_c25eec = v_01bee9.price;
         const v_c88e9b = v_b7c830 ?? 0;
         if (v_c88e9b < v_c25eec) {
-            v_889fad('알림', 'Xplay 잔액이 부족합니다.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
-        v_889fad('구매', `${v_01bee9.title}을(를) Xplay 포인트로 구매하시겠습니까?`, [
-            { text: '취소' },
+        v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseConfirmTitle'), v_8d41d7('screens.shopProductDetail.alerts.purchaseConfirmMessageXplay', { title: v_01bee9.title }), [
+            { text: v_8d41d7('screens.shopProductDetail.alerts.cancel') },
             {
-                text: '구매',
+                text: v_8d41d7('screens.shopProductDetail.alerts.purchase'),
                 onPress: async () => {
                     v_0409f2(true);
                     try {
@@ -230,7 +230,7 @@ export const v_a59951 = () => {
                                     ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : v_badeaf;
                             console.warn('[Xplay 구매] 실패:', v_c99bd2, v_badeaf);
-                            v_889fad('구매 실패', v_43f890, [{ text: '확인' }]);
+                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                         }
                     } catch (v_9e86fd) {
                         const v_49263d = v_9e86fd as any;
@@ -243,7 +243,7 @@ export const v_a59951 = () => {
                                 ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : v_badeaf;
                         console.error('[Xplay 구매] 오류:', v_d308b5, v_badeaf);
-                        v_889fad('구매 실패', v_43f890, [{ text: '확인' }]);
+                        v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                     } finally {
                         v_0409f2(false);
                     }
@@ -273,16 +273,16 @@ export const v_a59951 = () => {
 
     const v_735f3a = () => {
         if (!v_b36076.trim()) {
-            v_889fad('알림', '입금주소를 입력해주세요.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.enterDepositAddress'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
         if (!v_a0d01e || v_c4aec5 < v_4e7e53) {
-            v_889fad('알림', `최소 ${v_4e7e53.toLocaleString()} Xplay 이상 입력해주세요.`, [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.minXplayRequired', { min: v_4e7e53.toLocaleString() }), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
-        v_889fad('교환', 'Ethereum으로 교환하시겠습니까?', [
-            { text: '취소' },
-            { text: '교환', onPress: () => console.log('교환:', { depositAddress: v_b36076, xplayAmount: v_a0d01e }) },
+        v_889fad(v_8d41d7('screens.shopProductDetail.alerts.exchangeTitle'), v_8d41d7('screens.shopProductDetail.alerts.exchangeConfirm'), [
+            { text: v_8d41d7('screens.shopProductDetail.alerts.cancel') },
+            { text: v_8d41d7('screens.shopProductDetail.alerts.exchange'), onPress: () => console.log('교환:', { depositAddress: v_b36076, xplayAmount: v_a0d01e }) },
         ]);
     };
 
@@ -307,7 +307,7 @@ export const v_a59951 = () => {
 
                         {}
                         <View style={v_d81136.inputSection}>
-                            <Text style={v_d81136.inputLabel}>입금주소</Text>
+                            <Text style={v_d81136.inputLabel}>{v_8d41d7('screens.shopProductDetail.depositAddress')}</Text>
                             <View style={v_d81136.inputContainer}>
                                 <TextInput
                                     style={v_d81136.input}
@@ -329,10 +329,10 @@ export const v_a59951 = () => {
                             {v_837630 ? (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                                     <ActivityIndicator size="small" color="#1E3A5F" />
-                                    <Text style={v_d81136.minAmountHint}>잔액 조회 중</Text>
+                                    <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.checkingBalance')}</Text>
                                 </View>
                             ) : (
-                                <Text style={v_d81136.minAmountHint}>보유: {v_87676e.toLocaleString()} Xplay</Text>
+                                <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.balanceHold', { amount: v_87676e.toLocaleString() })}</Text>
                             )}
                             <View style={v_d81136.inputContainer}>
                                 <TextInput
@@ -346,32 +346,32 @@ export const v_a59951 = () => {
                                     keyboardType="numeric"
                                 />
                                 <TouchableOpacity onPress={v_8b5670} style={v_d81136.maxButton}>
-                                    <Text style={v_d81136.maxButtonText}>최대 금액</Text>
+                                    <Text style={v_d81136.maxButtonText}>{v_8d41d7('screens.shopProductDetail.maxAmount')}</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={v_d81136.minAmountHint}>최소 {v_4e7e53.toLocaleString()} Xplay</Text>
+                            <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.minXplay', { min: v_4e7e53.toLocaleString() })}</Text>
                         </View>
 
                         {}
                         <View style={v_d81136.summarySection}>
                             <View style={v_d81136.summaryRow}>
-                                <Text style={v_d81136.summaryLabel}>Ethereum 환율</Text>
+                                <Text style={v_d81136.summaryLabel}>{v_8d41d7('screens.shopProductDetail.ethRate')}</Text>
                                 <Text style={v_d81136.summaryValue}>{v_1d021e.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRow}>
-                                <Text style={v_d81136.summaryLabel}>암호화폐 수수료</Text>
+                                <Text style={v_d81136.summaryLabel}>{v_8d41d7('screens.shopProductDetail.cryptoFee')}</Text>
                                 <Text style={v_d81136.summaryValue}>{v_47de40.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRow}>
-                                <Text style={v_d81136.summaryLabel}>출금 수수료</Text>
+                                <Text style={v_d81136.summaryLabel}>{v_8d41d7('screens.shopProductDetail.withdrawalFee')}</Text>
                                 <Text style={v_d81136.summaryValue}>{v_e9e2a3.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRow}>
-                                <Text style={v_d81136.summaryLabel}>사용할 Xplay</Text>
+                                <Text style={v_d81136.summaryLabel}>{v_8d41d7('screens.shopProductDetail.xplayToUse')}</Text>
                                 <Text style={v_d81136.summaryValue}>{v_c4aec5.toLocaleString()}</Text>
                             </View>
                             <View style={v_d81136.summaryRowLast}>
-                                <Text style={v_d81136.summaryLabel}>받으실 금액(Ethereum)</Text>
+                                <Text style={v_d81136.summaryLabel}>{v_8d41d7('screens.shopProductDetail.receiveAmountEth')}</Text>
                                 <Text style={v_d81136.summaryValueBold}>{v_438a3a}</Text>
                             </View>
                         </View>
@@ -385,7 +385,7 @@ export const v_a59951 = () => {
                         onPress={v_735f3a}
                         activeOpacity={0.8}
                     >
-                        <Text style={v_d81136.exchangeButtonText}>교환하기</Text>
+                        <Text style={v_d81136.exchangeButtonText}>{v_8d41d7('screens.shopProductDetail.exchange')}</Text>
                     </TouchableOpacity>
                 </View>
             </SafeView>
@@ -397,10 +397,10 @@ export const v_a59951 = () => {
     const [v_80e2be, v_9375ae] = v_5ab095<boolean>(false);
 
     const v_dfaad1 = () => {
-        v_889fad('구매', `${v_01bee9.title}을(를) 구매하시겠습니까?`, [
-            { text: '취소' },
+        v_889fad(v_8d41d7('screens.shop.purchaseConfirmTitle'), v_8d41d7('screens.shop.purchaseConfirmMessage', { title: v_01bee9.title }), [
+            { text: v_8d41d7('screens.shop.cancel') },
             {
-                text: '구매',
+                text: v_8d41d7('screens.shop.purchase'),
                 onPress: () => {
                     console.log('구매:', v_01bee9.id);
                     v_9375ae(true);
@@ -436,7 +436,7 @@ export const v_a59951 = () => {
         <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
             <StatusBar style="dark" />
             <Header
-                title="상품정보"
+                title={v_8d41d7('screens.shopProductDetail.productInfo')}
                 onBackPress={v_c7ac57}
                 showBackButton
             />
@@ -475,20 +475,20 @@ export const v_a59951 = () => {
                     <View style={v_d81136.paymentCard}>
                         <View style={v_d81136.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
-                            <Text style={v_d81136.sectionTitle}>결제 정보</Text>
+                            <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.shopProductDetail.paymentInfo')}</Text>
                         </View>
                         <View style={v_d81136.divider} />
                         {v_5db874 ? (
                             <>
                                 <View style={v_d81136.paymentRow}>
-                                    <Text style={v_d81136.paymentLabel}>결제금액</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={v_d81136.priceContainer}>
                                         <Image source={v_10664a} style={v_d81136.coinIcon} resizeMode="contain" />
                                         <Text style={v_d81136.paymentValue}>{v_e72b09.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
                                 <View style={v_d81136.paymentRow}>
-                                    <Text style={v_d81136.paymentLabel}>내 Xplay 잔액</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.myXplayBalance')}</Text>
                                     {v_837630 ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -498,7 +498,7 @@ export const v_a59951 = () => {
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
-                                    <Text style={v_d81136.paymentLabel}>구매 후 잔여 Xplay</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXplay')}</Text>
                                     <Text style={v_d81136.paymentRemaining}>
                                         {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} Xplay`}
                                     </Text>
@@ -507,14 +507,14 @@ export const v_a59951 = () => {
                         ) : (
                             <>
                                 <View style={v_d81136.paymentRow}>
-                                    <Text style={v_d81136.paymentLabel}>결제금액</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={v_d81136.priceContainer}>
                                         <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
                                         <Text style={v_d81136.paymentValue}>{v_01bee9.price.toLocaleString()} XRUN</Text>
                                     </View>
                                 </View>
                                 <View style={v_d81136.paymentRow}>
-                                    <Text style={v_d81136.paymentLabel}>내보유 XRUN</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.myXrunBalance')}</Text>
                                     {v_19340b ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -522,7 +522,7 @@ export const v_a59951 = () => {
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
-                                    <Text style={v_d81136.paymentLabel}>구매 후 잔여 XRUN</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXrun')}</Text>
                                     <Text style={v_d81136.paymentRemaining}>{v_512b94.toLocaleString()} XRUN</Text>
                                 </View>
                             </>
@@ -533,7 +533,7 @@ export const v_a59951 = () => {
                     <View style={v_d81136.guideCard}>
                         <View style={v_d81136.sectionHeader}>
                             <Feather name="info" size={18} color="#1E3A5F" />
-                            <Text style={v_d81136.sectionTitle}>이용 안내</Text>
+                            <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.shopProductDetail.guide')}</Text>
                         </View>
                         <View style={v_d81136.divider} />
 
@@ -542,7 +542,7 @@ export const v_a59951 = () => {
                                 <View style={v_d81136.guideNumber}>
                                     <Text style={v_d81136.guideNumberText}>1</Text>
                                 </View>
-                                <Text style={v_d81136.guideSubtitle}>취소 및 환불 규정</Text>
+                                <Text style={v_d81136.guideSubtitle}>{v_8d41d7('screens.shopProductDetail.cancelRefund')}</Text>
                             </View>
                             <View style={v_d81136.guideTextContainer}>
                                 <Text style={v_d81136.guideText}>• 본 상품은 구매 즉시 발송되는 디지털 쿠폰(모바일 쿠폰/바코드)입니다.</Text>
@@ -556,7 +556,7 @@ export const v_a59951 = () => {
                                 <View style={v_d81136.guideNumber}>
                                     <Text style={v_d81136.guideNumberText}>2</Text>
                                 </View>
-                                <Text style={v_d81136.guideSubtitle}>이용 안내</Text>
+                                <Text style={v_d81136.guideSubtitle}>{v_8d41d7('screens.shopProductDetail.guideSubtitle')}</Text>
                             </View>
                             <View style={v_d81136.guideTextContainer}>
                                 <Text style={v_d81136.guideText}>• 전국 교환처(해당 브랜드 매장)에서 결제 시 모바일 쿠폰을 제시해 주세요.</Text>
@@ -588,7 +588,7 @@ export const v_a59951 = () => {
                                 <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
                             )}
                             <Text style={v_d81136.purchaseButtonText}>
-                                {v_18a900 ? '처리 중...' : 'Xplay 포인트로 구매'}
+                                {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXplay')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -605,7 +605,7 @@ export const v_a59951 = () => {
                             style={v_d81136.purchaseButtonGradient}
                         >
                             <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                            <Text style={v_d81136.purchaseButtonText}>구매하기</Text>
+                            <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
@@ -623,9 +623,9 @@ export const v_a59951 = () => {
                         <View style={v_d81136.modalLogoContainer}>
                             <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={v_d81136.paymentSuccessMessage}>결제가 완료되었습니다</Text>
+                        <Text style={v_d81136.paymentSuccessMessage}>{v_8d41d7('screens.shopProductDetail.paymentComplete')}</Text>
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
-                            <Text style={v_d81136.paymentSuccessButtonText}>확인</Text>
+                            <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -662,7 +662,7 @@ export const v_a59951 = () => {
                             </ScrollView>
                         ) : null}
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_48c801} activeOpacity={0.8}>
-                            <Text style={v_d81136.paymentSuccessButtonText}>내 기프티콘 보기</Text>
+                            <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.viewMyGift')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

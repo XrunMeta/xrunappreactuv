@@ -10,6 +10,8 @@ export default {
   termsSubtitle: 'ข้อกำหนดการให้บริการ นโยบายความเป็นส่วนตัว',
   settings: 'การตั้งค่า',
   settingsSubtitle: 'การตั้งค่าแอป ภาษา',
+  referral: 'การแนะนำ',
+  referralSubtitle: 'กลุ่มของฉัน, การชำระกลุ่ม, อันดับ',
   referralEdit: 'แก้ไขการแนะนำ',
   referralEditSubtitle: 'จัดการการแนะนำ',
   shopSales: 'ยอดขายร้านค้า',

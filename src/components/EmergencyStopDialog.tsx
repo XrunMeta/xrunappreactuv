@@ -18,6 +18,8 @@ interface EmergencyStopDialogProps {
   message: string;
   link?: string;
   onClose?: () => void;
+
+  linkButtonText?: string;
 }
 
 export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
@@ -25,9 +27,11 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
   message: v_a8cd21,
   link: v_8dbe00,
   onClose: v_0890f8,
+  linkButtonText: v_1038af,
 }) => {
   const { t: v_8d41d7 } = v_772971();
   const { navigate: v_9b57fc } = v_a0daa8();
+  const v_8d1ab0 = v_1038af ?? v_8d41d7('common.emergencyStop.viewDetails');
 
   const v_4c3e84 = () => {
     if (!v_8dbe00) return;
@@ -74,7 +78,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
               onPress={v_4c3e84}
               activeOpacity={0.7}
             >
-              <Text style={v_d81136.linkText}>{v_8d41d7('common.emergencyStop.viewDetails')}</Text>
+              <Text style={v_d81136.linkText}>{v_8d1ab0}</Text>
               <Ionicons name="chevron-forward" size={20} color="#4c4e55" />
             </TouchableOpacity>
           )}

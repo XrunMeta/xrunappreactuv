@@ -311,6 +311,8 @@ export const v_18f201 = async (
   }
 };
 
+const v_2751c9 = 2000;
+
 let v_8e7548 = false;
 
 export const v_e55270 = async (): Promise<void> => {
@@ -330,27 +332,47 @@ export const v_e55270 = async (): Promise<void> => {
 
       console.log('[Pangle] iOS 앱 오프닝 광고 로드 및 노출 시작:', v_819f69);
 
+      const v_9b56e4 = Date.now();
+      const v_7b2c86 = 2500; 
+
+      type Sub = { remove: () => void } | undefined;
+      const v_6387de = (v_2fb8cc, v_3894d5, v_8d364c, v_88b0a9) => {
+        const v_e56026 = Date.now() - v_9b56e4;
+        const v_4b24d2 = Math.max(0, v_7b2c86 - v_e56026);
+        const v_a983d4 = () => {
+          v_8d364c?.remove();
+          v_88b0a9?.remove();
+          clearTimeout(v_3894d5);
+          v_2fb8cc();
+        };
+        if (v_4b24d2 > 0) setTimeout(v_a983d4, v_4b24d2);
+        else v_a983d4();
+      };
+
       return new Promise((v_6f7712) => {
         let v_695d96 = false;
+        const v_10d76d = () => {
+          if (!v_695d96) {
+            v_695d96 = true;
+            v_6f7712();
+          }
+        };
 
         const v_ea0359 = setTimeout(() => {
           if (!v_695d96) {
             console.log('[Pangle] iOS 앱 오프닝 광고 대기 타임아웃');
             v_695d96 = true;
+            v_e6ceb8?.remove();
+            v_30c524?.remove();
             v_6f7712();
           }
-        }, 15000); 
+        }, v_2751c9);
 
         const v_e6ceb8 = v_1619e5?.addListener(
           'onAppOpenAdClose',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 닫힘 이벤트 수신');
-            if (!v_695d96) {
-              v_695d96 = true;
-              clearTimeout(v_ea0359);
-              v_e6ceb8?.remove();
-              v_6f7712();
-            }
+            if (!v_695d96) v_6387de(v_10d76d, v_ea0359, v_e6ceb8, v_30c524);
           }
         );
 
@@ -358,13 +380,7 @@ export const v_e55270 = async (): Promise<void> => {
           'onAppOpenAdLoadError',
           () => {
             console.log('[Pangle] iOS 앱 오프닝 광고 에러 이벤트 수신');
-            if (!v_695d96) {
-              v_695d96 = true;
-              clearTimeout(v_ea0359);
-              v_e6ceb8?.remove();
-              v_30c524?.remove();
-              v_6f7712();
-            }
+            if (!v_695d96) v_6387de(v_10d76d, v_ea0359, v_e6ceb8, v_30c524);
           }
         );
 
@@ -372,9 +388,9 @@ export const v_e55270 = async (): Promise<void> => {
           console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_5e9bfe);
           if (!v_695d96) {
             v_695d96 = true;
-            clearTimeout(v_ea0359);
             v_e6ceb8?.remove();
             v_30c524?.remove();
+            clearTimeout(v_ea0359);
             v_6f7712();
           }
         });
@@ -402,7 +418,7 @@ export const v_e55270 = async (): Promise<void> => {
 
     return new Promise<void>((v_6f7712) => {
       let v_695d96 = false;
-      const v_a983d4 = () => {
+      const v_a983d4 = (v_58ca36) => {
         if (!v_695d96) {
           v_695d96 = true;
           v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
@@ -410,7 +426,7 @@ export const v_e55270 = async (): Promise<void> => {
         }
       };
 
-      const v_ea0359 = setTimeout(v_a983d4, 15000);
+      const v_ea0359 = setTimeout(() => v_a983d4('timeout'), v_2751c9);
 
       const v_60a14d = [];
       let v_1fc80e = false;
@@ -425,7 +441,7 @@ export const v_e55270 = async (): Promise<void> => {
               if (v_dae2ac?.showAppOpenAd) {
                 v_dae2ac.showAppOpenAd(v_819f69).catch((v_5e9bfe) => {
                   console.error('[Pangle] 앱 오프닝 광고 표시 실패:', v_5e9bfe);
-                  v_a983d4();
+                  v_a983d4('load_reject');
                 });
               }
             }
@@ -440,7 +456,7 @@ export const v_e55270 = async (): Promise<void> => {
               console.log('[Pangle] 앱 오프닝 광고 닫힘');
               v_8e7548 = false;
               clearTimeout(v_ea0359);
-              v_a983d4();
+              v_a983d4('close');
             }
           },
         );
@@ -462,7 +478,7 @@ export const v_e55270 = async (): Promise<void> => {
               }
 
               clearTimeout(v_ea0359);
-              v_a983d4();
+              v_a983d4('error');
             }
           },
         );
@@ -471,7 +487,7 @@ export const v_e55270 = async (): Promise<void> => {
 
       if (!v_dae2ac || !v_dae2ac.loadAppOpenAd) {
         console.log('[Pangle] 네이티브 모듈을 사용할 수 없습니다. Android에서는 Google Ad Manager 미디에이션을 사용하세요.');
-        v_a983d4();
+        v_a983d4('error');
         return;
       }
 
@@ -479,10 +495,10 @@ export const v_e55270 = async (): Promise<void> => {
         const v_1744b9 = v_95616f instanceof Error ? v_95616f.message : String(v_95616f);
         console.warn('[Pangle] 앱 오프닝 광고 로드 호출 실패:', v_1744b9);
         if (!v_1fc80e) {
-
-          v_a983d4();
+          v_a983d4('load_reject');
         }
       });
+
     });
   } catch (v_5e9bfe) {
     v_8e7548 = false;

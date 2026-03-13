@@ -21,6 +21,8 @@ export default {
     rememberMe: '保持登录状态',
     sendButton: '发送',
   },
+  accountLink: '关联账户',
+  linkComplete: '关联完成',
   errors: {
     emailRequired: '请输入邮箱',
     passwordRequired: '请输入密码',

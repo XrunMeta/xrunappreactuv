@@ -595,13 +595,13 @@ export const v_1a0a02 = () => {
             {v_ce7108 && (
               <View style={v_d81136.pointPaymentSection}>
                 <View style={v_d81136.row}>
-                  <Text style={v_d81136.label}>포인트 잔액</Text>
+                  <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.pointBalance')}</Text>
                   <Text style={v_d81136.value}>
                     {v_e0d4f2 ? '...' : v_19c59c !== null ? `${v_19c59c.toLocaleString()} P` : '-'}
                   </Text>
                 </View>
                 <View style={v_d81136.row}>
-                  <Text style={v_d81136.label}>포인트 가격</Text>
+                  <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.pointPrice')}</Text>
                   <Text style={v_d81136.value}>{v_579109.toLocaleString()} P</Text>
                 </View>
               </View>

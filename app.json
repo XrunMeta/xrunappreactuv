@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.7.9",
+    "version": "4.10.0",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -54,11 +54,12 @@
       "bundleIdentifier": "run.xrun.xrunapps",
       "associatedDomains": [
         "applinks:www.xrun.run"
-      ]
+      ],
+      "buildNumber": "8"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 242,
+      "versionCode": 248,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -107,7 +108,7 @@
             "buildReactNativeFromSource": true
           },
           "android": {
-            "minSdkVersion": 24,
+            "minSdkVersion": 23,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35
           }

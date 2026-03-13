@@ -7,6 +7,7 @@ import {
   v_4623af,
   v_3094a2,
 } from 'rcmrninabrnb';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_c2fdd1 } from './Dialog';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_843035 } from '../constants';
@@ -50,6 +51,7 @@ export const AddTokenDialog: v_a3453e.FC<AddTokenDialogProps> = ({
   visible: v_cf55be,
   onClose: v_0890f8,
 }) => {
+  const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const [v_729796, v_fd7d1f] = v_5ab095<Step>(0);
   const [v_04cb77, v_96a9ed] = v_5ab095<TokenOption | null>(null);
@@ -73,7 +75,7 @@ export const AddTokenDialog: v_a3453e.FC<AddTokenDialogProps> = ({
   const v_b6f01b = async () => {
     if (v_729796 === 0) {
       if (!v_04cb77) {
-        await v_889fad('토큰 선택', '추가할 토큰을 선택해주세요.');
+        await v_889fad(v_8d41d7('components.addTokenDialog.alerts.tokenSelect'), v_8d41d7('components.addTokenDialog.errors.tokenRequired'));
         return;
       }
       v_fd7d1f(1);
@@ -83,14 +85,14 @@ export const AddTokenDialog: v_a3453e.FC<AddTokenDialogProps> = ({
 
     if (v_729796 === 1) {
       if (!v_91f0db) {
-        await v_889fad('주소 필요', '컨트랙트 주소를 입력해주세요.');
+        await v_889fad(v_8d41d7('components.addTokenDialog.alerts.addressRequired'), v_8d41d7('components.addTokenDialog.errors.addressRequired'));
         return;
       }
       v_fd7d1f(2);
       return;
     }
 
-    await v_889fad('토큰 추가', '해당 토큰은 곧 지갑에 추가될 예정입니다.');
+    await v_889fad(v_8d41d7('components.addTokenDialog.alerts.tokenAdd'), v_8d41d7('components.addTokenDialog.success.tokenAdded'));
     v_0890f8();
   };
 

@@ -177,7 +177,12 @@ import {
   v_0ecd34,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
-import { v_f16a74, v_deac27, v_650134 } from './versionCheck';
+import {
+  v_f16a74,
+  v_de7bac,
+  v_deac27,
+  v_650134,
+} from './versionCheck';
 
 const v_8a74cb = 20000;
 
@@ -274,9 +279,16 @@ export const v_12a388 = async (
   return v_d61bb8(v_f71b56, v_b36f96, v_c65f5d);
 };
 
+const v_f8bdc4 = 15000; 
+let keepaliveCache: { result: v_96ef47; at: number } | null = null;
+
 export const v_495832 = async (
   v_c65f5d,
 ): Promise<v_96ef47> => {
+  const v_5c2f9f = Date.now();
+  if (v_4bd83d && v_5c2f9f - v_4bd83d.at < v_f8bdc4) {
+    return v_4bd83d.result;
+  }
   try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
@@ -359,6 +371,7 @@ export const v_495832 = async (
         }
       }
 
+      v_4bd83d = { result: v_43c42e, at: Date.now() };
       return v_43c42e;
     } else {
 
@@ -375,9 +388,14 @@ export const v_495832 = async (
 
 export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
   try {
+    const v_88781f = await v_de7bac();
+    if (v_88781f?.data && v_88781f.data.iosOnWallet !== undefined) {
+      return v_88781f.data.iosOnWallet === 1 || v_88781f.data.iosOnWallet === true;
+    }
+  } catch (v_37eab7) {}
+  try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-
     const v_3393e3 = await v_12a388('/app-config/ios-onwallet', {
       method: 'GET',
       headers: {
@@ -385,16 +403,38 @@ export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
         Authorization: `Bearer ${v_36dd9e}`,
       },
     }, v_c65f5d);
-
-    if (!v_3393e3.ok) {
-      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
-    }
-
+    if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     const v_9390e8 = await v_3393e3.json();
-    return v_9390e8?.data?.iosOnWallet ?? false;
+    return v_9390e8?.data?.iosOnWallet === 1;
   } catch (v_5e9bfe) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-    return false; 
+    return false;
+  }
+};
+
+export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
+  try {
+    const v_88781f = await v_de7bac();
+    if (v_88781f?.data && v_88781f.data.androidOnWallet !== undefined) {
+      return v_88781f.data.androidOnWallet === 1;
+    }
+  } catch (v_37eab7) {}
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_3393e3 = await v_12a388('/app-config/android-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+    }, v_c65f5d);
+    if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    const v_9390e8 = await v_3393e3.json();
+    return v_9390e8?.data?.androidOnWallet === 1;
+  } catch (v_5e9bfe) {
+    console.error('Android 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
+    return false;
   }
 };
 
@@ -427,6 +467,12 @@ export const v_7488d5 = (v_c65f5d) => {
       console.log(`[API Request] ${v_74a79c.method?.toUpperCase()} ${v_74a79c.url}`);
       console.log(`[API Request] baseURL: ${v_74a79c.baseURL}`);
       console.log(`[API Request] 최종 요청 URL: ${v_f409eb}`);
+
+      if (__DEV__ && typeof (v_74a79c as any)._devDebugStart === 'undefined') {
+        (v_74a79c as any)._devDebugStart = Date.now();
+        (v_74a79c as any)._devDebugUrl = v_f409eb;
+        (v_74a79c as any)._devDebugMethod = v_74a79c.method || 'GET';
+      }
 
       if (v_74a79c.data instanceof FormData) {
         console.log('[API Request] ========== FormData 요청 처리 시작 ==========');
@@ -572,9 +618,27 @@ export const v_7488d5 = (v_c65f5d) => {
   v_0c3a5b.interceptors.response.use(
     (v_3393e3) => {
       console.log(`[API Response] ${v_3393e3.config.url}`, v_3393e3.status);
+      if (__DEV__ && v_3393e3.config) {
+        const v_3f4e2e = v_3393e3.config as any;
+        if (v_3f4e2e._devDebugStart != null) {
+          try {
+            const { devDebugStore: v_92d279 } = require('../utils/devDebugStore');
+            v_92d279.addApi(v_3f4e2e._devDebugUrl || v_3393e3.config.url, v_3f4e2e._devDebugMethod || 'GET', Date.now() - v_3f4e2e._devDebugStart, v_3393e3.status);
+          } catch (v_37eab7) {}
+        }
+      }
       return v_3393e3;
     },
     async (error: v_3333d3) => {
+      if (__DEV__ && v_5e9bfe.config) {
+        const v_3f4e2e = v_5e9bfe.config as any;
+        if (v_3f4e2e._devDebugStart != null) {
+          try {
+            const { devDebugStore: v_92d279 } = require('../utils/devDebugStore');
+            v_92d279.addApi(v_3f4e2e._devDebugUrl || v_5e9bfe.config!.url, v_3f4e2e._devDebugMethod || 'GET', Date.now() - v_3f4e2e._devDebugStart, v_5e9bfe.response?.status);
+          } catch (v_37eab7) {}
+        }
+      }
 
       if (v_5e9bfe.config?.data instanceof FormData) {
         console.error('[API Error] ========== FormData 요청 오류 ==========');
@@ -3290,6 +3354,28 @@ export const v_c07360 = async (
   }
 };
 
+export const v_370eda = async (): Promise<{ referral_email: string | null } | null> => {
+  try {
+    const { collectDeviceInfo: v_f3de6d } = require('../utils/napApiUtils');
+    const v_e7f87b = await v_f3de6d();
+    const v_cd6a57 = {
+      adid: v_e7f87b.adid || undefined,
+      ip: v_e7f87b.ipAddress || undefined,
+      user_agent: v_e7f87b.userAgent || undefined,
+      device_model: v_e7f87b.model || undefined,
+    };
+    const v_3393e3 = await v_c07360('gateway/deferred-deeplink/lookup', 'POST', v_cd6a57);
+    const v_e0c7e8 = v_3393e3?.referrer_email ?? v_3393e3?.referral_email ?? v_3393e3?.data?.referrer_email ?? null;
+    if (v_e0c7e8) {
+      console.log('[getDeferredReferral] 추천인 이메일 복원:', v_e0c7e8);
+    }
+    return { referral_email: v_e0c7e8 };
+  } catch (v_5e9bfe) {
+    console.warn('[getDeferredReferral] 조회 실패 (무시 가능):', v_5e9bfe);
+    return null;
+  }
+};
+
 export const v_f7d3be = async (
   v_c65f5d,
 ): Promise<any> => {
@@ -4344,6 +4430,30 @@ export const v_877de8 = async (
     return { total_ayet_points: v_78e300, transaction_count: v_39d5c0 };
   } catch (v_5e9bfe) {
     console.error('[ayeT 포인트] 잔액 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
+export const v_885e03 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<{ balance: string; formatted: string; symbol: string }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post('/getXrunWalletBalance', {
+      member: typeof v_660822 === 'number' ? v_660822 : Number(v_660822),
+    });
+    const v_479f05 = v_3393e3.data;
+    if (v_479f05?.status !== 'success' || !v_479f05?.data) {
+      throw new Error(v_479f05?.message ?? 'getXrunWalletBalance 응답 오류');
+    }
+    return {
+      balance: v_479f05.data.balance ?? '0',
+      formatted: v_479f05.data.formatted ?? '0',
+      symbol: v_479f05.data.symbol ?? 'XRUN',
+    };
+  } catch (v_5e9bfe) {
+    console.error('[XRUN 잔액] 조회 오류:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };

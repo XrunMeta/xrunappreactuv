@@ -1,3 +1,4 @@
+
 import { v_5f4661, v_326be8, v_405151, v_03e392 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -234,10 +235,11 @@ export const v_506ca9 = async (
 export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds: number } | null> => {
   try {
 
-    const v_48b589 = await v_e84827.getItem('coldStartChecked');
-    const v_1809fa = await v_e84827.getItem('app_last_background_timestamp');
-    const v_b10cff = await v_e84827.getItem('checkedTimestamp');
-
+    const [[, v_48b589], [, v_1809fa], [, v_b10cff]] = await v_e84827.multiGet([
+      'coldStartChecked',
+      'app_last_background_timestamp',
+      'checkedTimestamp',
+    ]);
     const v_3a7b16 = Math.floor(Date.now() / 1000);
 
     console.log('[Utils] checkColdStart 시작:', {
@@ -352,20 +354,11 @@ export const v_bebb2d = async (): Promise<{ isColdStart: boolean; elapsedSeconds
       });
 
       if (!isNaN(v_93b8e4) && v_93b8e4 > 0 && v_3d8bda <= v_93b8e4) {
-        const v_9e6dda = await v_e84827.getItem('isColdStart');
-        const v_fd28ae = await v_e84827.getItem('elapsedSeconds');
-        const v_c2ebad = v_fd28ae ? parseInt(v_fd28ae, 10) : 0;
-        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 기존 결과 반환:', {
-          savedIsColdStart: v_9e6dda,
-          savedElapsedSeconds: v_c2ebad,
+        console.log('[Utils] 백그라운드 시간이 체크 시간 이전 - 재계산값 반환:', {
           calculatedElapsedSeconds: v_79cdcd,
-          backgroundTimestamp: v_3d8bda,
-          checkedTimestampNum: v_93b8e4,
+          calculatedIsColdStart: v_3281b5,
         });
-        return {
-          isColdStart: v_9e6dda === 'true',
-          elapsedSeconds: v_c2ebad,
-        };
+        return { isColdStart: v_3281b5, elapsedSeconds: v_79cdcd };
       }
 
       await v_e84827.setItem('isColdStart', v_3281b5 ? 'true' : 'false');
@@ -514,4 +507,3 @@ export const v_51fb8d = (v_270351): string => {
   if (!v_270351 || v_270351.length < 10) return v_270351;
   return `${v_270351.substring(0, 6)}...${v_270351.substring(v_270351.length - 4)}`;
 };
-

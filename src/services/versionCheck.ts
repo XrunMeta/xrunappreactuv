@@ -2,7 +2,7 @@ import { v_326be8 } from 'rcmrninabrnb';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_f2c756 from 'rddjsfilumpz';
 import v_c9be60 from 'qfrscldecidiqs';
-import { v_c07360 } from './index';
+import { v_e4a763 } from '../utils/env';
 
 const v_d929eb = 'run.xrun.xrunapps';
 
@@ -14,7 +14,8 @@ interface ServerCheckResponse {
   message: string;
   data: {
     id: number;
-    iosOnWallet: boolean;
+    iosOnWallet: boolean | number; 
+    androidOnWallet?: number; 
     created_at: string;
     updated_at: string;
     isTransferAble: number;
@@ -24,17 +25,29 @@ interface ServerCheckResponse {
   };
 }
 
+const v_1e9518 = 30000; 
+let v_7a1893 = null;
+
 export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
+  const v_5c2f9f = Date.now();
+  if (v_7a1893 && v_5c2f9f - v_7a1893.at < v_1e9518) {
+    return v_7a1893.result;
+  }
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
-    const v_3393e3 = await v_c07360('servercheck', 'GET', {});
-
+    const v_c9c489 = v_e4a763();
+    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/servercheck`;
+    const v_8f00b9 = await fetch(v_f71b56, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}` },
+    });
+    if (!v_8f00b9.ok) return null;
+    const v_3393e3 = await v_8f00b9.json();
     if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data) {
       console.log('[VersionCheck] 서버 버전 확인 성공:', v_3393e3.data);
-      return v_3393e3 as ServerCheckResponse;
+      v_7a1893 = { result: v_3393e3 as ServerCheckResponse, at: Date.now() };
+      return v_7a1893.result;
     }
-
-    console.log('[VersionCheck] 서버 버전 확인 실패: 응답 형식 오류');
     return null;
   } catch (v_5e9bfe) {
     console.error('[VersionCheck] 서버 버전 확인 실패:', v_5e9bfe);

@@ -33,8 +33,8 @@ android {
         applicationId 'run.xrun.xrunapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 242
-        versionName "4.7.9"
+        versionCode 248
+        versionName "4.10.0"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }

@@ -48,7 +48,14 @@ async function v_7ecd61(v_36e78d): Promise<void> {
   }
 }
 
+const v_312c59 = 5 * 60 * 1000; 
+let v_4b75b8 = null;
+
 async function v_285ae6(): Promise<string> {
+  const v_5c2f9f = Date.now();
+  if (v_4b75b8 && v_5c2f9f - v_4b75b8.at < v_312c59) {
+    return v_4b75b8.ip;
+  }
   try {
     console.log('=== 실제 IP 주소 가져오기 시작 ===');
 
@@ -64,7 +71,7 @@ async function v_285ae6(): Promise<string> {
         console.log(`IP 서비스 시도: ${v_273dc4}`);
 
         const v_4fc7c7 = new AbortController();
-        const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), 5000);
+        const v_3894d5 = setTimeout(() => v_4fc7c7.abort(), 2500);
 
         const v_3393e3 = await fetch(v_273dc4, {
           method: 'GET',
@@ -87,6 +94,7 @@ async function v_285ae6(): Promise<string> {
 
           if (v_b8cf29 && v_101757(v_b8cf29)) {
             console.log(`✅ 실제 IP 주소 가져오기 성공: ${v_b8cf29}`);
+            v_4b75b8 = { ip: v_b8cf29, at: Date.now() };
             return v_b8cf29;
           }
         }
@@ -248,6 +256,43 @@ async function v_264aa2(): Promise<void> {
   } catch (v_5e9bfe) {
     console.error('저장된 광고 식별자 삭제 실패:', v_5e9bfe);
   }
+}
+
+export async function v_a4e2ac(): Promise<v_719e34> {
+  const v_b6fcfe = v_a06ea0.modelName || 'unknown';
+  const v_ea6cbd = v_a06ea0.brand || 'unknown';
+  const v_6ba929 = v_a06ea0.deviceName || 'unknown';
+  const v_929b58 = `${v_ea6cbd}-${v_b6fcfe}-${v_6ba929}`;
+  const v_a4f17b = (await v_7f7612()) || '';
+  const v_e69562 = v_a06ea0.osVersion || 'unknown';
+  const deviceInfo: v_719e34 = {
+    deviceId: v_929b58,
+    adid: v_a4f17b,
+    ipAddress: '',
+    model: v_b6fcfe,
+    manufacturer: v_ea6cbd,
+    osVersion: v_e69562,
+    carrier: null,
+    appVersion: v_a06ea0.osVersion || 'unknown',
+    buildNumber: v_a06ea0.osBuildId || 'unknown',
+    bundleId: v_a06ea0.osInternalBuildId || 'unknown',
+    deviceName: v_6ba929,
+    userAgent: `${v_326be8.OS}/${v_e69562}`,
+    isTablet: v_a06ea0.deviceType === v_a06ea0.DeviceType.TABLET,
+    isLocationEnabled: true,
+    timestamp: Math.floor(Date.now() / 1000),
+    os: v_326be8.OS,
+  };
+  v_e7f87b.networkType = 'CELLULAR';
+  v_e7f87b.isConnected = true;
+  v_e7f87b.isInternetReachable = true;
+  v_e7f87b.cellularGeneration = '4g';
+  v_e7f87b.carrierName = null;
+  v_e7f87b.ssid = null;
+  v_e7f87b.bssid = null;
+  v_e7f87b.mnetwork = '4';
+  v_e7f87b.carrierCode = '1';
+  return v_e7f87b;
 }
 
 export async function v_f3de6d(): Promise<v_719e34> {
