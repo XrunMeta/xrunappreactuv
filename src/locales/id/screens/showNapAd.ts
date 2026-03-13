@@ -1,0 +1,20 @@
+export default {
+  loading: 'Memuat iklan. Hadiah akan diproses setelah iklan selesai. Akan ada sedikit penundaan setelah selesai',
+  processingReward: 'Memproses hadiah Anda...',
+  checkingAd: 'Memeriksa iklan',
+  back: 'Kembali',
+  alternativeAd: 'Lihat Iklan Lain',
+  campaignInfo: 'Info Kampanye',
+  reward: 'hadiah',
+  campaignDesc: 'Deskripsi Kampanye',
+  joinMethod: 'Cara Berpartisipasi',
+  watchAd: 'Tonton Iklan',
+  cancel: 'Batal',
+  confirm: 'Konfirmasi',
+  adCallFailed: 'Gagal memuat iklan',
+  adCallFailedSub: 'Gagal memuat iklan setelah beberapa kali percobaan. Kembali ke halaman sebelumnya.',
+  unsupportedUrl: 'URL tidak didukung.',
+  noAdUrl: 'Tidak ada URL iklan.',
+  goToMap: 'Ke Peta',
+};
+

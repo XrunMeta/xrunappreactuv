@@ -1,0 +1,35 @@
+export default {
+  title: '我的信息',
+  editInfo: '修改信息',
+  editInfoSubtitle: '更改邮箱、密码',
+  notify: '通知',
+  notifySubtitle: '通知设置、通知记录',
+  faq: '常见问题',
+  faqSubtitle: '常见问题解答',
+  terms: '服务条款',
+  termsSubtitle: '服务条款、隐私政策',
+  settings: '设置',
+  settingsSubtitle: '应用设置、语言设置',
+  referral: '推荐',
+  referralSubtitle: '我的群组、群组结算、排名',
+  referralEdit: '修改推荐',
+  referralEditSubtitle: '推荐人管理',
+  shopSales: 'Shop 销售额',
+  shopSalesSubtitle: '管理销售状态',
+  logout: '登出',
+  shareReferral: '分享推荐链接',
+  logoutConfirm: '确定要登出吗？',
+  logoutSuccess: '已登出',
+  alerts: {
+    logout: '登出',
+    logoutMessage: '确定要登出吗？',
+    cancel: '取消',
+    error: '错误',
+    userDataNotFound: '找不到用户信息。',
+    shareFailed: '分享失败',
+    shareFailedMessage: '找不到用户邮箱信息。',
+  },
+};
+
+
+

@@ -1,0 +1,35 @@
+export default {
+  title: 'Shop',
+  price: '가격',
+  inAppPurchaseComingSoon: '인앱 구매 (준비 중)',
+  fee: '수수료',
+  total: '총액',
+  myBalance: '내 잔액',
+  pointBalance: '포인트 잔액',
+  pointPrice: '포인트 가격',
+  checking: '조회 중...',
+  checkFailed: '조회 실패',
+  insufficientBalance: '잔액이 부족합니다. 잔액을 충전해주세요.',
+  cancel: '취소',
+  payment: '결제',
+  confirm: '확인',
+  alerts: {
+    error: '오류',
+    cannotPurchase: '구매할 수 없습니다.',
+    notification: '알림',
+    inAppPurchaseComingSoon: '인앱 구매 기능은 준비 중입니다.',
+    insufficientBalanceTitle: '잔액 부족',
+    insufficientBalanceMessage: '현재 잔액: {currentBalance} XRUN\n필요한 금액: {requiredAmount} XRUN\n잔액을 충전해주세요.',
+    purchaseFailed: '구매 실패',
+    purchaseFailedMessage: '전송권 구매 후에 이용 부탁드립니다.',
+    loadShopItemsFailed: '상점 아이템을 불러오는데 실패했습니다.',
+    insufficientPointsMessage: '포인트가 10 이상 필요합니다.',
+    testPaymentComplete: '테스트 결제 완료',
+    testPaymentBalance: '잔액: {{balance}} P',
+    paymentFailed: '결제 실패',
+    pointUseFailed: '포인트 사용에 실패했습니다.',
+  },
+};
+
+
+

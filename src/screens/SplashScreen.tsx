@@ -1,33 +1,29 @@
-import v_a3453e from 'bapkr';
-import { v_3094a2, v_cf9c33, v_472849, v_700696 } from 'rcmrninabrnb';
+import v_a3453e, { v_c4deb2 } from 'bapkr';
+import { v_3094a2, v_472849 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_1bfbd0 } from '../constants';
-
-const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
-
-const v_4f9e99 = 'https://www.figma.com/oth-path';
-const v_34a8ff = 'https://www.figma.com/oth-path';
+import { v_bebb2d } from '../utils';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_6b5698 } from 'rcmrninabrnb';
 
 export const v_7c6176 = () => {
+  v_c4deb2(() => {
+
+    const v_a08492 = async () => {
+      const v_43c42e = await v_bebb2d();
+      if (v_43c42e) {
+        console.log(`[SplashScreen] 콜드스타트 체크 완료: ${v_43c42e.isColdStart ? '콜드스타트' : '웜스타트'} (경과 시간: ${v_43c42e.elapsedSeconds}초)`);
+      }
+
+      await v_e84827.setItem('app_last_state', v_6b5698.currentState);
+    };
+
+    v_a08492();
+  }, []);
+
   return (
     <View style={v_d81136.container}>
       <StatusBar style="dark" />
-      {}
-      <View style={v_d81136.centerLogoContainer}>
-        <Image
-          source={{ uri: v_4f9e99 }}
-          style={v_d81136.centerLogo}
-          resizeMode="contain"
-        />
-      </View>
-      {}
-      <View style={v_d81136.bottomLogoContainer}>
-        <Image
-          source={{ uri: v_34a8ff }}
-          style={v_d81136.bottomLogo}
-          resizeMode="contain"
-        />
-      </View>
     </View>
   );
 };
@@ -35,31 +31,8 @@ export const v_7c6176 = () => {
 const v_d81136 = v_472849.create({
   container: {
     flex: 1,
-    backgroundColor: v_1bfbd0.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerLogoContainer: {
-    position: 'absolute',
-    top: v_c86e33 / 2 - 57.5, 
-    left: v_8e4fb6 / 2 - 56.5, 
-    width: 113,
-    height: 115,
-  },
-  centerLogo: {
     width: '100%',
-    height: '100%',
-  },
-  bottomLogoContainer: {
-    position: 'absolute',
-    bottom: 100,
-    left: v_8e4fb6 / 2 - 100, 
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottomLogo: {
-    width: 200,
-    height: 60,
+    backgroundColor: v_1bfbd0.background,
   },
 });
 

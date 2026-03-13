@@ -1,6 +1,6 @@
 import v_a3453e from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_629153, v_7e4944 } from 'rcmrninabrnb';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035 } from '../constants';
 
 interface SecondaryButtonProps extends v_629153 {
   title: string;
@@ -34,7 +34,7 @@ export const SecondaryButton: v_a3453e.FC<SecondaryButtonProps> = ({
 const v_d81136 = v_472849.create({
   button: {
     height: 56,
-    width: 327,
+    width: 780,
     backgroundColor: v_1bfbd0.buttonSecondary,
     borderRadius: 16,
     alignItems: 'center',
@@ -48,10 +48,11 @@ const v_d81136 = v_472849.create({
   },
   text: {
     color: '#000000',
-    fontSize: 16,
+    fontSize: v_843035.size.medium,
     fontWeight: '500',
     lineHeight: 24,
     fontFamily: 'Roboto-Medium', 
   },
+
 });
 

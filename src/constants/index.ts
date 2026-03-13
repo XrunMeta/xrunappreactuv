@@ -1,11 +1,15 @@
+import { v_326be8 } from 'rcmrninabrnb';
+import { v_1afb63 } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 export const v_1bfbd0 = {
   primary: '#007AFF',
   secondary: '#5856D6',
   background: '#FFFFFF',
+  white: '#FFFFFF',
   text: '#000000',
   error: '#FF3B30',
   success: '#34C759',
+  info: '#7243d1',
 
   buttonPrimary: '#343a5a',
   buttonSecondary: '#ffdc04',
@@ -15,9 +19,176 @@ export const v_1bfbd0 = {
 };
 
 export const v_9b1a04 = {
+  xsmall: 8,
   small: 12,
   medium: 16,
   large: 20,
   xlarge: 24,
 };
+
+export const v_843035 = {
+  family: {
+  regular: 'Roboto-Regular',
+    medium: 'Roboto-Medium',
+    semibold: 'Roboto-SemiBold',
+    bold: 'Roboto-Bold',
+    black: 'Roboto-Black',
+  },
+  size: {
+    xxsmall: 10,   
+    xsmall: 12,   
+    small: 12,
+    ssmall: 14,
+    msmall: 14,
+    lsmall: 16,
+    medium: 16,
+    mmedium: 18,
+    large: 20,
+    xlarge: 24,
+    xxlarge: 28,
+    xxxlarge: 32,
+
+  },
+  buttonText: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16, 
+    fontWeight: '500',
+    lineHeight: 24,
+    white:{color: '#ffffff'},
+    black:{color: '#000000'},
+    gray:{color: '#808080'},
+    red:{color: '#FF0000'},
+    green:{color: '#00FF00'},
+    blue:{color: '#0000FF'},
+    yellow:{color: '#FFFF00'},
+    purple:{color: '#800080'},
+    orange:{color: '#FFA500'},
+  },
+};    
+
+export const v_731ab4 = __DEV__;
+
+export const v_4922a9 = {
+  referral: {
+    settlement: {
+      list: {
+        desc: '추천 광고 수익 정산',
+      },
+    },
+    card: {
+      income: '총수익',
+      myRank: '내 순위',
+    },
+  },
+  wallet: {
+    adxrun: {
+      settlementIn45Days: '75일후 정산완료됨',
+    },
+  },
+  screen_info: {
+    button: {
+      share: 'XRUN 레퍼럴을 참여하시면 광고수익이 유니레벨방식으로 8단계까지 20%씩 올라와요.\n추천해주세요!\n\n가입후에 아래의 이메일을 추천인으로 반드시 입력하세요. \n\n 👉추천인 이메일: \n',
+    },
+  },
+} as const;
+
+export const v_a61db3 = {
+  container: {
+    flex: 1,
+    width: '100%' as const,
+    maxWidth: 780,
+  },
+
+  bottomSection: {
+    alignSelf: 'center' as const,
+    marginTop: 'auto' as const,
+    paddingTop: v_9b1a04.medium, 
+    marginBottom: v_9b1a04.large, 
+  },
+  bottomButtonContainer: {
+    paddingTop: v_9b1a04.large, 
+    marginBottom: v_9b1a04.large,
+    width: '100%' as const,
+    marginTop: 'auto' as const,
+  },
+  listSamllTermsContainer: {
+    width: '100%',
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    justifyContent: 'flex-start' as const,
+    gap: v_9b1a04.small,
+  },
+  getScreenStyle: () => ({
+    flex: 1,
+    backgroundColor: v_1bfbd0.background,
+    paddingBottom: v_326be8.OS === 'ios' ? 0 : 50, 
+  }),
+  scrollContent: {
+    paddingHorizontal: v_9b1a04.xlarge,
+    paddingVertical: v_9b1a04.xlarge,
+  },
+  contentContainer: {
+    paddingHorizontal: v_9b1a04.xlarge,
+    paddingVertical: v_9b1a04.xlarge,
+  },
+};
+
+export const v_704d15 = {
+  width: '100%',
+  display: 'flex' as const,
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start' as const,
+  justifyContent: 'flex-start' as const,
+  gap: v_9b1a04.small,
+  small: {
+    gap: v_9b1a04.small,   
+  },
+  medium: {
+    gap: v_9b1a04.medium,
+  },
+  large: {
+    gap: v_9b1a04.large,
+  },
+  xlarge: {
+    gap: v_9b1a04.xlarge,
+  },
+};
+
+export const v_bae512 = {
+  fieldContainer: {
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    gap: v_9b1a04.large,
+  },
+  label: {
+    fontSize: v_843035.size.medium,
+    lineHeight: 24,
+    color: '#2a2727',
+    fontFamily: 'Roboto-Medium',
+    marginBottom: 8,
+  },
+}  as const;
+
+export const v_963c2c = {
+  background: '#ffffff',
+  bottomBackground: '#ffffff',
+};
+
+export const v_19835b = {
+
+  contentHeight: 52,
+
+  minHeight: 52,
+} as const;
+
+export { COUNTRY_DIAL_CODES, ALLOWED_COUNTRIES } from './countryDialCodes';
+export {
+  REGIONS_AS_COUNTRY_DIAL_CODES,
+  getRegionIdByIso2,
+  getIso2ByRegionId,
+  getRegionNameById,
+  getRegionsByCountryIso2,
+  GLOBAL_REGION,
+} from './regions';
 

@@ -1,0 +1,22 @@
+export default {
+  confirmTitle: '确认添加代币',
+  tokenTab: '代币',
+  contractTab: '合约',
+  contractPlaceholder: '输入合约地址',
+  nextButton: '下一步',
+  contractAddress: '合约地址',
+  tokenName: '代币名称',
+  tokenSymbol: '代币符号',
+  tokenDecimals: '小数位数',
+  addButton: '添加代币',
+  alreadyOwned: '已拥有',
+  invalidTokenTitle: '无效代币',
+  invalidTokenDesc: '此代币不是有效的ERC20代币。',
+  existTokenTitle: '代币已存在',
+  existTokenDesc: '此代币已添加到您的钱包。',
+  success: '成功',
+  successMessage: '代币添加成功。',
+  error: '错误',
+  errorMessage: '添加代币失败。请重试。',
+};
+

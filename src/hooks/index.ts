@@ -1,3 +1,3 @@
 
-export {};
+export { useHeaderDimensions } from './useHeaderDimensions';
 
