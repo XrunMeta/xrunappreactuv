@@ -155,8 +155,14 @@ export const isTaboolaNativeModuleAvailable = (): boolean => {
   return Taboola !== null && typeof Taboola.init === 'function';
 };
 
+const USE_WEBVIEW_ONLY = true;
+
 export const initializeTaboola = async (): Promise<void> => {
   try {
+    if (USE_WEBVIEW_ONLY) {
+      console.log('[Taboola] WebView 전용 모드입니다. 네이티브 초기화를 건너뜁니다.');
+      return;
+    }
 
     if (!isTaboolaNativeModuleAvailable()) {
       console.log('[Taboola] 네이티브 모듈이 없습니다. WebView 방식으로 폴백합니다.');

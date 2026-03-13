@@ -14,7 +14,8 @@ interface ServerCheckResponse {
   message: string;
   data: {
     id: number;
-    iosOnWallet: boolean;
+    iosOnWallet: boolean | number; 
+    androidOnWallet?: number; 
     created_at: string;
     updated_at: string;
     isTransferAble: number;
@@ -24,7 +25,14 @@ interface ServerCheckResponse {
   };
 }
 
+const SERVERCHECK_CACHE_MS = 30000; 
+let servercheckCache: { result: ServerCheckResponse; at: number } | null = null;
+
 export const checkServerVersion = async (): Promise<ServerCheckResponse | null> => {
+  const now = Date.now();
+  if (servercheckCache && now - servercheckCache.at < SERVERCHECK_CACHE_MS) {
+    return servercheckCache.result;
+  }
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
     const env = getEnv();
@@ -37,7 +45,8 @@ export const checkServerVersion = async (): Promise<ServerCheckResponse | null> 
     const response = await res.json();
     if (response && response.status === 'success' && response.data) {
       console.log('[VersionCheck] 서버 버전 확인 성공:', response.data);
-      return response as ServerCheckResponse;
+      servercheckCache = { result: response as ServerCheckResponse, at: Date.now() };
+      return servercheckCache.result;
     }
     return null;
   } catch (error) {
