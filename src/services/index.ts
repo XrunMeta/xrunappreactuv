@@ -279,9 +279,16 @@ export const v_12a388 = async (
   return v_d61bb8(v_f71b56, v_b36f96, v_c65f5d);
 };
 
+const v_f8bdc4 = 15000; 
+let keepaliveCache: { result: v_96ef47; at: number } | null = null;
+
 export const v_495832 = async (
   v_c65f5d,
 ): Promise<v_96ef47> => {
+  const v_5c2f9f = Date.now();
+  if (v_4bd83d && v_5c2f9f - v_4bd83d.at < v_f8bdc4) {
+    return v_4bd83d.result;
+  }
   try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
@@ -364,6 +371,7 @@ export const v_495832 = async (
         }
       }
 
+      v_4bd83d = { result: v_43c42e, at: Date.now() };
       return v_43c42e;
     } else {
 
