@@ -269,8 +269,6 @@ const ScreenHost = () => {
         return;
       }
 
-      return;
-
       try {
 
         const clipboardContent = await Clipboard.getStringAsync();
