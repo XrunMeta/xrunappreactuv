@@ -60,6 +60,9 @@ export const TaboolaNativeView: v_a3453e.FC<TaboolaNativeViewProps> = ({
   );
 };
 
+const v_8b45a4 = true;
+
 export const v_27ace7 = (): boolean => {
+  if (v_8b45a4) return false;
   return v_9b2058 !== null;
 };

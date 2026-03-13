@@ -967,6 +967,14 @@ export default function v_6540c3() {
         console.error('[App] 초기화 실패:', v_5e9bfe);
       }
 
+      v_c355f2(true);
+      v_deef62(false);
+      if (__DEV__) {
+        try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+        } catch (v_37eab7) {}
+      }
+
       v_1f4a13();
 
       const v_9aae4b = () => {
@@ -1035,46 +1043,14 @@ export default function v_6540c3() {
       v_563153().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((v_9e86fd) => console.error('[App] TopAd5 광고 캐시 실패:', v_9e86fd));
       setTimeout(v_9aae4b, 1500);
 
-      const v_6dde1a = Date.now();
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:boot_main_scheduled', message: 'main_ready_scheduled', data: { at: v_6dde1a }, timestamp: v_6dde1a, hypothesisId: 'H3' }) }).catch(() => {});
-
       setTimeout(() => {
-
-        const v_8d41d7 = Date.now();
-        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:main_ready_run', message: 'main_ready_run', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H2' }) }).catch(() => {});
-
-        v_c355f2(true);
-        v_deef62(false);
-
-        if (__DEV__) {
-          try {
-            require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
-          } catch (v_37eab7) {}
-        }
-      }, 0);
-
-      setTimeout(() => {
-
-        const v_8d41d7 = Date.now();
-        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_cb_entered', message: 'pangle_cb_entered', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H2' }) }).catch(() => {});
-
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         v_cbd24a?.recordBootStep('pangle_start');
         v_f095b0()
-          .then(() => {
-            console.log('[App] Pangle 초기화 완료');
-            return v_e55270();
-          })
+          .then(() => v_e55270())
           .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
           .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
-          .finally(() => {
-
-            const v_8d41d7 = Date.now();
-            fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:pangle_finally', message: 'pangle_finally', data: { at: v_8d41d7 }, timestamp: v_8d41d7, hypothesisId: 'H1' }) }).catch(() => {});
-
-            v_cbd24a?.recordBootStep('pangle_done');
-
-          });
+          .finally(() => v_cbd24a?.recordBootStep('pangle_done'));
       }, 0);
     };
 

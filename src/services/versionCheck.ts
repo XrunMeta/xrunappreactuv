@@ -14,7 +14,8 @@ interface ServerCheckResponse {
   message: string;
   data: {
     id: number;
-    iosOnWallet: boolean;
+    iosOnWallet: boolean | number; 
+    androidOnWallet?: number; 
     created_at: string;
     updated_at: string;
     isTransferAble: number;
@@ -24,7 +25,14 @@ interface ServerCheckResponse {
   };
 }
 
+const v_1e9518 = 30000; 
+let v_7a1893 = null;
+
 export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
+  const v_5c2f9f = Date.now();
+  if (v_7a1893 && v_5c2f9f - v_7a1893.at < v_1e9518) {
+    return v_7a1893.result;
+  }
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
     const v_c9c489 = v_e4a763();
@@ -37,7 +45,8 @@ export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
     const v_3393e3 = await v_8f00b9.json();
     if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data) {
       console.log('[VersionCheck] 서버 버전 확인 성공:', v_3393e3.data);
-      return v_3393e3 as ServerCheckResponse;
+      v_7a1893 = { result: v_3393e3 as ServerCheckResponse, at: Date.now() };
+      return v_7a1893.result;
     }
     return null;
   } catch (v_5e9bfe) {
