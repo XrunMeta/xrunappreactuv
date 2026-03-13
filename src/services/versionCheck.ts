@@ -14,7 +14,8 @@ interface ServerCheckResponse {
   message: string;
   data: {
     id: number;
-    iosOnWallet: boolean;
+    iosOnWallet: boolean | number; 
+    androidOnWallet?: number; 
     created_at: string;
     updated_at: string;
     isTransferAble: number;
