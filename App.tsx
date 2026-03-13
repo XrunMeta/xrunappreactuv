@@ -967,6 +967,14 @@ export default function App() {
         console.error('[App] 초기화 실패:', error);
       }
 
+      setIsAdFinished(true);
+      setIsLoading(false);
+      if (__DEV__) {
+        try {
+          require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
+        } catch (_) {}
+      }
+
       applyStoredLanguageAsync();
 
       const runBackground = () => {
@@ -1034,24 +1042,6 @@ export default function App() {
 
       getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
       setTimeout(runBackground, 1500);
-
-      const _tsMain = Date.now();
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:boot_main_scheduled', message: 'main_ready_scheduled', data: { at: _tsMain }, timestamp: _tsMain, hypothesisId: 'H3' }) }).catch(() => {});
-
-      setTimeout(() => {
-
-        const t = Date.now();
-        fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'App.tsx:main_ready_run', message: 'main_ready_run', data: { at: t }, timestamp: t, hypothesisId: 'H2' }) }).catch(() => {});
-
-        setIsAdFinished(true);
-        setIsLoading(false);
-
-        if (__DEV__) {
-          try {
-            require('./src/utils/devDebugStore').devDebugStore.recordBootTotal();
-          } catch (_) {}
-        }
-      }, 0);
 
       setTimeout(() => {
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
