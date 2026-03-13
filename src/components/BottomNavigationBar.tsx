@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
-import { getIosWalletShowStatus } from '../services';
+import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
 
 const { width } = Dimensions.get('window');
 
@@ -59,19 +59,21 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onTabChange,
 }) => {
   const { navigate } = useAppNavigation();
-  const [showWallet, setShowWallet] = useState(Platform.OS === 'android');
+
+  const [showWallet, setShowWallet] = useState(false);
 
   useEffect(() => {
-    if (Platform.OS !== 'ios') {
-      setShowWallet(true);
-      return;
-    }
     const fetchStatus = async () => {
       try {
-        const iosOnWallet = await getIosWalletShowStatus(navigate);
-        setShowWallet(iosOnWallet);
+        if (Platform.OS === 'ios') {
+          const iosOnWallet = await getIosWalletShowStatus(navigate);
+          setShowWallet(iosOnWallet);
+        } else {
+          const androidOnWallet = await getAndroidWalletShowStatus(navigate);
+          setShowWallet(androidOnWallet);
+        }
       } catch (error) {
-        console.error('[BottomNavigationBar] iOS 지갑 표시 상태 오류:', error);
+        console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', error);
         setShowWallet(false);
       }
     };
@@ -97,9 +99,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
   const handleItemPress = (itemId: string) => {
     if (itemId === 'wallet') {
-      if (Platform.OS === 'android') {
-        navigate(ROUTES.wallet);
-      } else if (showWallet) {
+      if (showWallet) {
         navigate(ROUTES.wallet);
       } else {
         navigate(ROUTES.xrunInfo);

@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { BackHandler, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
 
 export const ROUTES = {
   authLanding: 'authLanding',
@@ -127,8 +128,19 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (remember === 'true' && loggedIn === 'true') {
 
-          console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
-          setStack([ROUTES.map]);
+          let openWalletOnLaunch = false;
+          try {
+            if (Platform.OS === 'ios') {
+              openWalletOnLaunch = await getIosWalletShowStatus();
+            } else {
+              openWalletOnLaunch = await getAndroidWalletShowStatus();
+            }
+          } catch (_) {
+
+          }
+          const initialScreen = openWalletOnLaunch ? ROUTES.wallet : ROUTES.map;
+          console.log('[Navigation] 자동 로그인 확인:', openWalletOnLaunch ? '지갑 화면으로 이동' : 'MapMainScreen으로 이동');
+          setStack([initialScreen]);
           setIsInitialized(true);
           return;
         }

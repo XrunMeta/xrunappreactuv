@@ -996,7 +996,6 @@ export default function App() {
           console.error('[App] AppsFlyer 초기화 실패:', error);
         }
         initializeTaboola().then(() => console.log('[App] Taboola 초기화 완료')).catch((e) => console.error('[App] Taboola 초기화 실패:', e));
-        getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
         getXRUNGopaxPrice()
           .then((priceResponse) => AsyncStorage.setItem('xrungopaxprice', JSON.stringify(priceResponse)))
           .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))
@@ -1032,6 +1031,8 @@ export default function App() {
           require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
         } catch (_) {}
       }
+
+      getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
       setTimeout(runBackground, 1500);
 
       const _tsMain = Date.now();

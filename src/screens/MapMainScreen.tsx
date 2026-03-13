@@ -1641,13 +1641,20 @@ export const MapMainScreen: React.FC = () => {
         }
       }
 
-      console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
+      const storedTopAd5 = await getStoredTopAd5();
+      if (storedTopAd5 && Array.isArray(storedTopAd5) && storedTopAd5.length > 0) {
+        setTopAd5Data(storedTopAd5);
+        topAd5DataRef.current = storedTopAd5;
+        console.log('[MapMainScreen] 캐시된 TopAd5 먼저 표시:', storedTopAd5.length, '개 (API 응답 대기)');
+      }
+
+      console.log('[MapMainScreen] 1단계: TopAd5 API 호출 시작');
       let topAd5Response: any[] | null = null;
 
       topAd5Response = await getTopAd5(undefined, forceRefresh);
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
+        console.warn('[MapMainScreen] TopAd5 API 데이터가 없습니다. 캐시 유지.');
         return;
       }
 
