@@ -269,8 +269,6 @@ const v_c0dbdf = () => {
         return;
       }
 
-      return;
-
       try {
 
         const v_46a232 = await v_fba5a0.getStringAsync();
