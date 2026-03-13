@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.9.8",
+    "version": "4.9.9",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -59,7 +59,7 @@
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 244,
+      "versionCode": 246,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
