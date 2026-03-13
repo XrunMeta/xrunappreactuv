@@ -19,10 +19,6 @@ export const isPangleNativeModuleAvailable = (): boolean => {
 };
 
 export const initializePangle = async (): Promise<void> => {
-
-  const _t0 = Date.now();
-  fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'pangle.ts:initializePangle_enter', message: 'initPangle_enter', data: { at: _t0 }, timestamp: _t0, hypothesisId: 'H4' }) }).catch(() => {});
-
   try {
 
     if (isPangleInitialized) {
@@ -335,8 +331,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
       }
 
       console.log('[Pangle] iOS 앱 오프닝 광고 로드 및 노출 시작:', finalAdUnitId);
-
-      fetch('http://127.0.0.1:7595/ingest/d7b3d29a-f8b9-48f3-b7b3-2e9c13c3cb98', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '308260' }, body: JSON.stringify({ sessionId: '308260', location: 'pangle.ts:loadAndShowAppOpenAd_iOS', message: 'app_open_ad_wait_start', data: { at: Date.now() }, timestamp: Date.now(), hypothesisId: 'H4' }) }).catch(() => {});
 
       const adStartTime = Date.now();
       const MIN_WAIT_MS = 2500; 
