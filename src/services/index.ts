@@ -177,7 +177,12 @@ import {
   v_0ecd34,
 } from '../types';
 import * as v_a928e1 from 'yvptvjtrs';
-import { v_f16a74, v_deac27, v_650134 } from './versionCheck';
+import {
+  v_f16a74,
+  v_de7bac,
+  v_deac27,
+  v_650134,
+} from './versionCheck';
 
 const v_8a74cb = 20000;
 
@@ -375,9 +380,14 @@ export const v_495832 = async (
 
 export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
   try {
+    const v_88781f = await v_de7bac();
+    if (v_88781f?.data && v_88781f.data.iosOnWallet !== undefined) {
+      return v_88781f.data.iosOnWallet === 1 || v_88781f.data.iosOnWallet === true;
+    }
+  } catch (v_37eab7) {}
+  try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-
     const v_3393e3 = await v_12a388('/app-config/ios-onwallet', {
       method: 'GET',
       headers: {
@@ -385,16 +395,38 @@ export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
         Authorization: `Bearer ${v_36dd9e}`,
       },
     }, v_c65f5d);
-
-    if (!v_3393e3.ok) {
-      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
-    }
-
+    if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     const v_9390e8 = await v_3393e3.json();
-    return v_9390e8?.data?.iosOnWallet ?? false;
+    return v_9390e8?.data?.iosOnWallet === 1;
   } catch (v_5e9bfe) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-    return false; 
+    return false;
+  }
+};
+
+export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
+  try {
+    const v_88781f = await v_de7bac();
+    if (v_88781f?.data && v_88781f.data.androidOnWallet !== undefined) {
+      return v_88781f.data.androidOnWallet === 1;
+    }
+  } catch (v_37eab7) {}
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_3393e3 = await v_12a388('/app-config/android-onwallet', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+    }, v_c65f5d);
+    if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
+    const v_9390e8 = await v_3393e3.json();
+    return v_9390e8?.data?.androidOnWallet === 1;
+  } catch (v_5e9bfe) {
+    console.error('Android 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
+    return false;
   }
 };
 
