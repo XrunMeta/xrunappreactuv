@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, Platform, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { COLORS, SIZES } from '../constants';
@@ -9,7 +9,6 @@ import {
   generateTaboolaHTML,
   TaboolaPlacement,
 } from '../services/taboola';
-import { TaboolaNativeView, isTaboolaNativeViewAvailable } from './TaboolaNativeView';
 
 interface TaboolaBannerCoreProps {
 
@@ -37,14 +36,11 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
   const finalPageUrl = pageUrl || getTaboolaPageUrl();
   const publisherId = getTaboolaPublisherId();
 
-  const isNativeAvailable = isTaboolaNativeViewAvailable();
-
-  console.log('[TaboolaBannerCore] 렌더링:', {
+  console.log('[TaboolaBannerCore] 렌더링 (WebView 전용):', {
     placementType,
     placement,
     publisherId,
     finalPageUrl,
-    isNativeAvailable,
     configExists: !!config,
   });
 
@@ -56,29 +52,6 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
   if (!publisherId || publisherId.trim() === '') {
     console.warn('[TaboolaBannerCore] Publisher ID가 없습니다. Taboola 광고를 표시할 수 없습니다.');
     return null;
-  }
-
-  useEffect(() => {
-    if (isNativeAvailable && onLoadingChange) {
-
-      onLoadingChange(false);
-    }
-  }, [isNativeAvailable, onLoadingChange]);
-
-  if (isNativeAvailable) {
-    return (
-      <View style={[styles.container, containerStyle, style]}>
-        <TaboolaNativeView
-          publisherId={getTaboolaPublisherId()}
-          placement={config.placement}
-          mode={config.mode}
-          pageUrl={finalPageUrl}
-          pageType={config.pageType}
-          targetType={config.targetType}
-          style={styles.webView}
-        />
-      </View>
-    );
   }
 
   let htmlContent = generateTaboolaHTML(
