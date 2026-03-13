@@ -9,7 +9,6 @@ import v_a3453e, {
 } from 'bapkr';
 import { v_1ed974, v_326be8 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_85f2c8, v_3ca33e } from '../services';
 
 export const v_ce4741 = {
   authLanding: 'authLanding',
@@ -128,19 +127,8 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
 
         if (v_efe339 === 'true' && v_0fd7ed === 'true') {
 
-          let v_567fea = false;
-          try {
-            if (v_326be8.OS === 'ios') {
-              v_567fea = await v_85f2c8();
-            } else {
-              v_567fea = await v_3ca33e();
-            }
-          } catch (v_37eab7) {
-
-          }
-          const v_b5e5c7 = v_567fea ? v_ce4741.wallet : v_ce4741.map;
-          console.log('[Navigation] 자동 로그인 확인:', v_567fea ? '지갑 화면으로 이동' : 'MapMainScreen으로 이동');
-          v_768005([v_b5e5c7]);
+          console.log('[Navigation] 자동 로그인 확인: MapMainScreen으로 이동');
+          v_768005([v_ce4741.map]);
           v_da6fbe(true);
           return;
         }
