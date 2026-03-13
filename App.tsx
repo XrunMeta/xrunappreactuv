@@ -996,7 +996,6 @@ export default function v_6540c3() {
           console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
         }
         v_0b0acf().then(() => console.log('[App] Taboola 초기화 완료')).catch((v_9e86fd) => console.error('[App] Taboola 초기화 실패:', v_9e86fd));
-        v_563153().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((v_9e86fd) => console.error('[App] TopAd5 광고 캐시 실패:', v_9e86fd));
         v_dd87bc()
           .then((v_d9a946) => v_e84827.setItem('xrungopaxprice', JSON.stringify(v_d9a946)))
           .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))
@@ -1032,6 +1031,8 @@ export default function v_6540c3() {
           require('./src/utils/devDebugStore').devDebugStore.recordBootStep('before_background');
         } catch (v_37eab7) {}
       }
+
+      v_563153().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((v_9e86fd) => console.error('[App] TopAd5 광고 캐시 실패:', v_9e86fd));
       setTimeout(v_9aae4b, 1500);
 
       const v_6dde1a = Date.now();

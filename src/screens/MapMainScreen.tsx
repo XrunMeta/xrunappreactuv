@@ -1641,13 +1641,20 @@ export const MapMainScreen: v_a3453e.FC = () => {
         }
       }
 
-      console.log('[MapMainScreen] 1단계: TopAd5 데이터 확인 시작');
+      const v_92ed2d = await v_5d7ca4();
+      if (v_92ed2d && Array.isArray(v_92ed2d) && v_92ed2d.length > 0) {
+        v_6549d0(v_92ed2d);
+        v_0302dd.current = v_92ed2d;
+        console.log('[MapMainScreen] 캐시된 TopAd5 먼저 표시:', v_92ed2d.length, '개 (API 응답 대기)');
+      }
+
+      console.log('[MapMainScreen] 1단계: TopAd5 API 호출 시작');
       let v_e36b07 = null;
 
       v_e36b07 = await v_563153(undefined, v_9d6a91);
 
       if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
-        console.warn('[MapMainScreen] TopAd5 데이터가 없습니다.');
+        console.warn('[MapMainScreen] TopAd5 API 데이터가 없습니다. 캐시 유지.');
         return;
       }
 

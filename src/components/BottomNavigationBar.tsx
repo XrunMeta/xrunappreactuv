@@ -2,7 +2,7 @@ import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_cf9c33, v_326be8 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_85f2c8 } from '../services';
+import { v_85f2c8, v_3ca33e } from '../services';
 
 const { width: v_8e4fb6 } = v_700696.get('window');
 
@@ -59,19 +59,21 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   onTabChange: v_d52709,
 }) => {
   const { navigate: v_9b57fc } = v_a0daa8();
-  const [v_9e28f7, v_603c21] = v_5ab095(v_326be8.OS === 'android');
+
+  const [v_9e28f7, v_603c21] = v_5ab095(false);
 
   v_c4deb2(() => {
-    if (v_326be8.OS !== 'ios') {
-      v_603c21(true);
-      return;
-    }
     const v_b7726a = async () => {
       try {
-        const v_5297fb = await v_85f2c8(v_9b57fc);
-        v_603c21(v_5297fb);
+        if (v_326be8.OS === 'ios') {
+          const v_5297fb = await v_85f2c8(v_9b57fc);
+          v_603c21(v_5297fb);
+        } else {
+          const v_4e84ea = await v_3ca33e(v_9b57fc);
+          v_603c21(v_4e84ea);
+        }
       } catch (v_5e9bfe) {
-        console.error('[BottomNavigationBar] iOS 지갑 표시 상태 오류:', v_5e9bfe);
+        console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', v_5e9bfe);
         v_603c21(false);
       }
     };
@@ -97,9 +99,7 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
   const v_8e442f = (v_6e55b1) => {
     if (v_6e55b1 === 'wallet') {
-      if (v_326be8.OS === 'android') {
-        v_9b57fc(v_ce4741.wallet);
-      } else if (v_9e28f7) {
+      if (v_9e28f7) {
         v_9b57fc(v_ce4741.wallet);
       } else {
         v_9b57fc(v_ce4741.xrunInfo);
