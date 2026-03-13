@@ -81,7 +81,7 @@ import appsFlyer from 'react-native-appsflyer';
 import { initI18nSync, applyStoredLanguageAsync } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
-import { initializePangle } from './src/services/pangle';
+import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -1057,8 +1057,9 @@ export default function App() {
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         devBoot?.recordBootStep('pangle_start');
         initializePangle()
-          .then(() => console.log('[App] Pangle 초기화 완료'))
-          .catch((error) => console.error('[App] Pangle 초기화 실패:', error))
+          .then(() => loadAndShowAppOpenAd())
+          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
+          .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
           .finally(() => devBoot?.recordBootStep('pangle_done'));
       }, 0);
     };
