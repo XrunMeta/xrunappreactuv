@@ -279,9 +279,16 @@ export const nodeGatewayRequest = async (
   return apiRequest(url, options, navigation);
 };
 
+const KEEPALIVE_CACHE_MS = 15000; 
+let keepaliveCache: { result: AliveResponse; at: number } | null = null;
+
 export const sendAliveSignal = async (
   navigation?: any,
 ): Promise<AliveResponse> => {
+  const now = Date.now();
+  if (keepaliveCache && now - keepaliveCache.at < KEEPALIVE_CACHE_MS) {
+    return keepaliveCache.result;
+  }
   try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
@@ -364,6 +371,7 @@ export const sendAliveSignal = async (
         }
       }
 
+      keepaliveCache = { result, at: Date.now() };
       return result;
     } else {
 
