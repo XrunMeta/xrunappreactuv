@@ -1,4 +1,4 @@
-import v_a3453e, { v_c4deb2 } from 'bapkr';
+import v_a3453e from 'bapkr';
 import { v_3094a2, v_472849, v_326be8, v_f2c756 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_1bfbd0, v_9b1a04 } from '../constants';
@@ -9,7 +9,6 @@ import {
   v_0433f6,
   v_80493f,
 } from '../services/taboola';
-import { v_c436cb, v_27ace7 } from './TaboolaNativeView';
 
 interface TaboolaBannerCoreProps {
 
@@ -37,14 +36,11 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
   const v_40f839 = v_cdfaaa || v_33aee4();
   const v_26f42c = v_995f93();
 
-  const v_d2b80a = v_27ace7();
-
-  console.log('[TaboolaBannerCore] 렌더링:', {
+  console.log('[TaboolaBannerCore] 렌더링 (WebView 전용):', {
     placementType: v_bb5e8c,
     placement: v_f36218,
     publisherId: v_26f42c,
     finalPageUrl: v_40f839,
-    isNativeAvailable: v_d2b80a,
     configExists: !!v_74a79c,
   });
 
@@ -56,29 +52,6 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
   if (!v_26f42c || v_26f42c.trim() === '') {
     console.warn('[TaboolaBannerCore] Publisher ID가 없습니다. Taboola 광고를 표시할 수 없습니다.');
     return null;
-  }
-
-  v_c4deb2(() => {
-    if (v_d2b80a && v_c83407) {
-
-      v_c83407(false);
-    }
-  }, [v_d2b80a, v_c83407]);
-
-  if (v_d2b80a) {
-    return (
-      <View style={[v_d81136.container, v_4affe9, v_7fa4e4]}>
-        <TaboolaNativeView
-          publisherId={v_995f93()}
-          placement={v_74a79c.placement}
-          mode={v_74a79c.mode}
-          pageUrl={v_40f839}
-          pageType={v_74a79c.pageType}
-          targetType={v_74a79c.targetType}
-          style={v_d81136.webView}
-        />
-      </View>
-    );
   }
 
   let v_6d4549 = v_0433f6(
