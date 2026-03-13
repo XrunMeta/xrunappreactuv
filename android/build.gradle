@@ -14,8 +14,8 @@ buildscript {
 }
 
 ext {
-  buildToolsVersion = "34.0.0"
-  minSdkVersion = 23
+  buildToolsVersion = "35.0.0"
+  minSdkVersion = 24
   compileSdkVersion = 35
   targetSdkVersion = 35
   kotlinVersion = "2.1.20"
@@ -27,6 +27,7 @@ allprojects {
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
+    maven { url 'https://artifact.bytedance.com/repository/pangle' }
   }
 }
 

@@ -15,6 +15,20 @@ public class AppDelegate: ExpoAppDelegate {
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
+  private func setupPangleSDK() {
+    let config = PAGConfig.share()
+    config.appID = "8747761"
+    config.debugLog = true
+    print("[Pangle] SDK 초기화 시도 - AppID: \(config.appID ?? "nil"), SDKVersion: \(PAGSdk.sdkVersion)")
+    PAGSdk.start(with: config) { success, error in
+      if success {
+        print("Pangle SDK initialized successfully")
+      } else {
+        print("Pangle SDK initialization failed: \(error?.localizedDescription ?? "unknown error")")
+      }
+    }
+  }
+
   public override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
