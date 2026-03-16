@@ -9,8 +9,8 @@ dist/
 web-build/
 expo-env.d.ts
 
-# env 설정 (민감 정보 포함 — 히스토리에서 제거 후 무시)
-src/utils/env.ts
+# env 로컬 덮어쓰기 (민감 정보용, 저장소에 올리지 않음)
+src/utils/env.local.ts
 
 # 민감/키 파일 (저장소에서 제거 후 무시)
 credentials.json
