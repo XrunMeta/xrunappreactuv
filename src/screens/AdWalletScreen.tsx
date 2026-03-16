@@ -20,6 +20,7 @@ import {
   joinQuest,
 } from '../services';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
+import { loadAndShowRewardedAd as loadAndShowRewardedAdAdMob, isAdMobReady } from '../services/admob';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
@@ -974,18 +975,15 @@ export const AdWalletScreen = () => {
       try {
         setIsJoiningQuest(true);
 
-        if (isPangleReadySync()) {
+        const canShowAdRef = Platform.OS === 'android' ? isAdMobReady() : isPangleReadySync();
+        if (canShowAdRef) {
           try {
-            console.log('[AdWallet] Pangle 광고 준비 완료 (Platform:', Platform.OS, ')');
-
+            console.log('[AdWallet] 추천인 이벤트 광고 준비 완료 (Platform:', Platform.OS, ')');
             const deviceInfo = await collectDeviceInfo();
+            const memberStr = member.toString();
 
-            await loadAndShowRewardedAd(
-              getPangleRewardedAdUnitId(),
-              member.toString(),
-              deviceInfo,
-              async (reward) => {
-                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 보상 수령:', reward);
+            const onRewardedRef = async (reward: { type: string; amount: number }) => {
+                console.log('[AdWallet] 추천인 이벤트 광고 보상 수령:', reward);
 
                 try {
 
@@ -1041,17 +1039,16 @@ export const AdWalletScreen = () => {
                 } finally {
                   setIsJoiningQuest(false);
                 }
-              },
-              () => {
+            };
 
-                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 닫힘 (시청 미완료)');
+            const onAdClosedRef = () => {
+                console.log('[AdWallet] 추천인 이벤트 광고 닫힘 (시청 미완료)');
                 setIsJoiningQuest(false);
-              },
-              (error) => {
+            };
 
-                console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error);
+            const onAdFailedRef = (error: Error) => {
+                console.error('[AdWallet] 추천인 이벤트 광고 로드 실패:', error);
                 showToast(t('screens.adWallet.adLoadFailedForReward'));
-
                 (async () => {
                   try {
                     let questId: number;
@@ -1094,17 +1091,22 @@ export const AdWalletScreen = () => {
                     } else {
                       showToast(response.message || '처리에 실패했습니다.');
                     }
-                  } catch (error) {
-                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
+                  } catch (err) {
+                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', err);
                     showToast('처리에 실패했습니다. 다시 시도해주세요.');
                   } finally {
                     setIsJoiningQuest(false);
                   }
                 })();
-              }
-            );
+            };
+
+            if (Platform.OS === 'android') {
+              await loadAndShowRewardedAdAdMob(undefined, memberStr, deviceInfo, onRewardedRef, onAdClosedRef, onAdFailedRef);
+            } else {
+              await loadAndShowRewardedAd(getPangleRewardedAdUnitId(), memberStr, deviceInfo, onRewardedRef, onAdClosedRef, onAdFailedRef);
+            }
           } catch (error) {
-            console.error('[AdWallet] 추천인 이벤트 Pangle 광고 표시 오류:', error);
+            console.error('[AdWallet] 추천인 이벤트 광고 표시 오류:', error);
 
             try {
               let questId: number;
@@ -1224,85 +1226,72 @@ export const AdWalletScreen = () => {
 
       setIsJoiningQuest(true);
 
-      if (isPangleReadySync()) {
+      const canShowAd = Platform.OS === 'android' ? isAdMobReady() : isPangleReadySync();
+      if (canShowAd) {
         try {
-          console.log('[AdWallet] 출석체크 Pangle 광고 준비 완료 (Platform:', Platform.OS, ')');
-
+          console.log('[AdWallet] 출석체크 광고 준비 완료 (Platform:', Platform.OS, ')');
           const deviceInfo = await collectDeviceInfo();
+          const memberStr = member.toString();
 
-          await loadAndShowRewardedAd(
-            getPangleRewardedAdUnitId(),
-            member.toString(),
-            deviceInfo,
-            async (reward) => {
-              console.log('[AdWallet] 출석체크 Pangle 광고 보상 수령:', reward);
+          const onRewarded = async (reward: { type: string; amount: number }) => {
+            console.log('[AdWallet] 출석체크 광고 보상 수령:', reward);
+            try {
+              const response = await joinQuest(
+                { quest_id: item.id, member },
+                undefined,
+              );
+              if (response.status === 'success') {
+                showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+                if (questListRef.current) questListRef.current.reloadData();
+              } else {
+                showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
+              }
+            } catch (error) {
+              console.error('[AdWallet] 출석 체크 참여 오류:', error);
+              showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+            } finally {
+              setIsJoiningQuest(false);
+            }
+          };
 
-              try {
+          const onAdClosed = () => {
+            console.log('[AdWallet] 출석체크 광고 닫힘 (시청 미완료)');
+            setIsJoiningQuest(false);
+          };
 
-                const questId = item.id;
-                const response = await joinQuest(
-                  {
-                    quest_id: questId,
-                    member,
-                  },
-                  undefined, 
-                );
-
+          const onAdFailed = (error: Error) => {
+            console.error('[AdWallet] 출석체크 광고 로드 실패:', error);
+            showToast(t('screens.adWallet.adLoadFailedForAttendance'));
+            joinQuest({ quest_id: item.id, member }, undefined)
+              .then((response) => {
                 if (response.status === 'success') {
                   showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-
-                  if (questListRef.current) {
-                    questListRef.current.reloadData();
-                  }
+                  if (questListRef.current) questListRef.current.reloadData();
                 } else {
                   showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
                 }
-              } catch (error) {
-                console.error('[AdWallet] 출석 체크 참여 오류:', error);
+              })
+              .catch((e) => {
+                console.error('[AdWallet] 출석 체크 참여 오류:', e);
                 showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-              } finally {
-                setIsJoiningQuest(false);
-              }
-            },
-            () => {
+              })
+              .finally(() => setIsJoiningQuest(false));
+          };
 
-              console.log('[AdWallet] 출석체크 Pangle 광고 닫힘 (시청 미완료)');
-              setIsJoiningQuest(false);
-            },
-            (error) => {
-
-              console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
-              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
-
-              const questId = item.id;
-              joinQuest(
-                {
-                  quest_id: questId,
-                  member,
-                },
-                undefined,
-              )
-                .then((response) => {
-                  if (response.status === 'success') {
-                    showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                    if (questListRef.current) {
-                      questListRef.current.reloadData();
-                    }
-                  } else {
-                    showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
-                  }
-                })
-                .catch((error) => {
-                  console.error('[AdWallet] 출석 체크 참여 오류:', error);
-                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-                })
-                .finally(() => {
-                  setIsJoiningQuest(false);
-                });
-            }
-          );
+          if (Platform.OS === 'android') {
+            await loadAndShowRewardedAdAdMob(undefined, memberStr, deviceInfo, onRewarded, onAdClosed, onAdFailed);
+          } else {
+            await loadAndShowRewardedAd(
+              getPangleRewardedAdUnitId(),
+              memberStr,
+              deviceInfo,
+              onRewarded,
+              onAdClosed,
+              onAdFailed,
+            );
+          }
         } catch (error) {
-          console.error('[AdWallet] 출석체크 Pangle 광고 표시 오류:', error);
+          console.error('[AdWallet] 출석체크 광고 표시 오류:', error);
 
           try {
             const questId = item.id;
