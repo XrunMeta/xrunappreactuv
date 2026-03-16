@@ -11,4 +11,7 @@
 -keep class com.swmansion.reanimated.** { *; }
 -keep class com.facebook.react.turbomodule.** { *; }
 
+# ayeT SDK (Offerwall)
+-keep class com.ayet.sdk.** { *; }
+
 # Add any project specific keep options here:

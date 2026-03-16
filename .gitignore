@@ -12,6 +12,12 @@ expo-env.d.ts
 # env 설정 (민감 정보 포함 — 히스토리에서 제거 후 무시)
 src/utils/env.ts
 
+# 민감/키 파일 (저장소에서 제거 후 무시)
+credentials.json
+google-services.json
+xrunKey
+*.keystore
+
 # 시스템 자동추가 파일 (Mac OS)
 ._*
 .env
