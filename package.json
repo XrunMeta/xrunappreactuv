@@ -51,6 +51,7 @@
     "react-native-appsflyer": "6.17.8",
     "react-native-compass-heading": "^2.0.2",
     "react-native-fs": "^2.20.0",
+    "react-native-google-mobile-ads": "^16.2.3",
     "react-native-maps": "1.20.1",
     "react-native-navigation-bar-height": "^0.2.0",
     "react-native-progress": "^5.0.1",
@@ -68,12 +69,12 @@
     }
   },
   "devDependencies": {
-    "archiver": "^7.0.1",
     "@aws-sdk/client-s3": "^3.981.0",
     "@react-native-community/cli": "^20.0.2",
     "@react-native/metro-config": "^0.83.1",
     "@types/react": "~19.1.0",
     "@types/validator": "^13.15.10",
+    "archiver": "^7.0.1",
     "mime-types": "^3.0.2",
     "typescript": "~5.9.2"
   },

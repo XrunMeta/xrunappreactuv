@@ -7,17 +7,11 @@ import { v_2ccc13, v_2b25f9 } from '../services/admob';
 import { v_1bfbd0 } from '../constants';
 
 interface AdMobBannerProps {
-
   adUnitId?: string;
-
   size?: v_dce6da;
-
   containerStyle?: v_7e4944;
-
   onAdLoaded?: () => void;
-
   onAdFailedToLoad?: (error: Error) => void;
-
   testMode?: boolean;
 }
 
@@ -33,23 +27,19 @@ export const AdMobBanner: v_a3453e.FC<AdMobBannerProps> = ({
   const [v_819f69, v_e0cd3a] = v_5ab095<string | null>(null);
 
   v_c4deb2(() => {
-
     if (!v_2b25f9()) {
       console.warn('[AdMobBanner] AdMob이 초기화되지 않았습니다.');
       return;
     }
 
     if (v_53fadb) {
-
       v_e0cd3a(v_54fae1.BANNER);
     } else if (v_61418d) {
-
       v_e0cd3a(v_61418d);
     } else {
-
       try {
         const v_3e6f2b = v_2ccc13();
-        v_e0cd3a(v_3e6f2b);
+        v_e0cd3a(v_3e6f2b || null);
       } catch (v_5e9bfe) {
         console.error('[AdMobBanner] 광고 단위 ID를 가져올 수 없습니다:', v_5e9bfe);
         return;
@@ -73,15 +63,11 @@ export const AdMobBanner: v_a3453e.FC<AdMobBannerProps> = ({
         }}
         onAdLoaded={() => {
           console.log('[AdMobBanner] 광고 로드 완료');
-          if (v_428f6c) {
-            v_428f6c();
-          }
+          if (v_428f6c) v_428f6c();
         }}
         onAdFailedToLoad={(v_5e9bfe) => {
           console.error('[AdMobBanner] 광고 로드 실패:', v_5e9bfe);
-          if (v_0721a3) {
-            v_0721a3(v_5e9bfe);
-          }
+          if (v_0721a3) v_0721a3(v_5e9bfe);
         }}
       />
     </View>
@@ -95,4 +81,3 @@ const v_d81136 = v_472849.create({
     backgroundColor: v_1bfbd0.background,
   },
 });
-

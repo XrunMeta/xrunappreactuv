@@ -3,31 +3,22 @@
 import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_39a996, v_7e4944, v_5e8657 } from 'rcmrninabrnb';
 import { v_18f201, v_3dc1fd, v_8c8ab6 } from '../services/pangle';
+import { v_18f201 as v_9813f8, v_2b25f9, v_84fca1 } from '../services/admob';
 import { v_f3de6d } from '../utils/napApiUtils';
-import { v_719e34 } from '../types';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
+import { v_326be8 } from 'rcmrninabrnb';
 
 interface AdMobRewardedButtonProps {
-
   title?: string;
-
   member?: string;
-
   adUnitId?: string;
-
   onRewarded?: (reward: { type: string; amount: number }) => void;
-
   onAdClosed?: () => void;
-
   onAdFailedToLoad?: (error: Error) => void;
-
   buttonStyle?: v_7e4944;
-
   textStyle?: v_5e8657;
-
   disabled?: boolean;
-
   testMode?: boolean;
 }
 
@@ -45,10 +36,10 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
 }) => {
   const [v_cd31a8, v_deef62] = v_5ab095(false);
 
+  const v_bca9ac = v_326be8.OS === 'android' ? v_2b25f9() : v_8c8ab6();
+
   const v_5ba0f2 = async () => {
-    if (v_4a6533 || v_cd31a8 || !v_8c8ab6()) {
-      return;
-    }
+    if (v_4a6533 || v_cd31a8 || !v_bca9ac) return;
 
     try {
       v_deef62(true);
@@ -68,40 +59,49 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
 
       const v_e7f87b = await v_f3de6d();
 
-      const v_819f69 = v_61418d || v_3dc1fd();
-
-      await v_18f201(
-        v_819f69,
-        v_14079b,
-        v_e7f87b,
-        (v_36c043) => {
-          console.log('[AdMobRewardedButton] 보상 수령:', v_36c043);
-          v_deef62(false);
-          if (v_6ae10d) {
-            v_6ae10d(v_36c043);
-          }
-        },
-        () => {
-          console.log('[AdMobRewardedButton] 광고 닫힘');
-          v_deef62(false);
-          if (v_ecd42e) {
-            v_ecd42e();
-          }
-        },
-        (v_5e9bfe) => {
-          console.error('[AdMobRewardedButton] 광고 로드 실패:', v_5e9bfe);
-          v_deef62(false);
-          if (v_0721a3) {
-            v_0721a3(v_5e9bfe);
-          }
-        },
-      );
+      if (v_326be8.OS === 'android') {
+        const v_819f69 = v_61418d || v_84fca1() || v_3dc1fd() || undefined;
+        await v_9813f8(
+          v_819f69,
+          v_14079b,
+          v_e7f87b,
+          (v_36c043) => {
+            v_deef62(false);
+            if (v_6ae10d) v_6ae10d(v_36c043);
+          },
+          () => {
+            v_deef62(false);
+            if (v_ecd42e) v_ecd42e();
+          },
+          (v_5e9bfe) => {
+            v_deef62(false);
+            if (v_0721a3) v_0721a3(v_5e9bfe);
+          },
+        );
+      } else {
+        const v_819f69 = v_61418d || v_3dc1fd();
+        await v_18f201(
+          v_819f69,
+          v_14079b,
+          v_e7f87b,
+          (v_36c043) => {
+            v_deef62(false);
+            if (v_6ae10d) v_6ae10d(v_36c043);
+          },
+          () => {
+            v_deef62(false);
+            if (v_ecd42e) v_ecd42e();
+          },
+          (v_5e9bfe) => {
+            v_deef62(false);
+            if (v_0721a3) v_0721a3(v_5e9bfe);
+          },
+        );
+      }
     } catch (v_5e9bfe) {
       console.error('[AdMobRewardedButton] 오류:', v_5e9bfe);
       v_deef62(false);
-      if (v_0721a3) {
-        v_0721a3(v_5e9bfe as Error);
-      }
+      if (v_0721a3) v_0721a3(v_5e9bfe as Error);
     }
   };
 
@@ -110,18 +110,16 @@ export const AdMobRewardedButton: v_a3453e.FC<AdMobRewardedButtonProps> = ({
       style={[
         v_d81136.button,
         v_91b9f8,
-        (v_4a6533 || v_cd31a8 || !isAdMobReady()) && v_d81136.buttonDisabled,
+        (v_4a6533 || v_cd31a8 || !v_bca9ac) && v_d81136.buttonDisabled,
       ]}
       onPress={v_5ba0f2}
-      disabled={v_4a6533 || v_cd31a8 || !isPangleReady()}
+      disabled={v_4a6533 || v_cd31a8 || !v_bca9ac}
       activeOpacity={0.7}
     >
       {v_cd31a8 ? (
         <ActivityIndicator color={v_1bfbd0.text} size="small" />
       ) : (
-        <Text style={[v_d81136.buttonText, v_197d6e]}>
-          {v_9f1622}
-        </Text>
+        <Text style={[v_d81136.buttonText, v_197d6e]}>{v_9f1622}</Text>
       )}
     </TouchableOpacity>
   );
@@ -146,4 +144,3 @@ const v_d81136 = v_472849.create({
     color: v_1bfbd0.text,
   },
 });
-
