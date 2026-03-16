@@ -11,7 +11,9 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
   const [v_679b8a, v_3c92ee] = v_5ab095<string | null>('Loading...');
 
   v_c4deb2(() => {
+    const v_8a5f7b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const v_79caf4 = async () => {
+      const v_b66f2c = Date.now();
       try {
         const v_ef7306 = await v_e84827.getItem('userData');
         if (!v_ef7306) {
@@ -26,8 +28,9 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
           return;
         }
 
-        console.log('[LevelNotification] 사용자 레벨 정보 조회 시작:', v_660822);
+        console.log(v_8a5f7b, 'LevelNotification 레벨 정보 API 조회 시작:', v_660822);
         const v_3393e3 = await v_dedaa7(Number(v_660822), v_c65f5d);
+        console.log(v_8a5f7b, 'LevelNotification 레벨 정보 API 완료', `${Date.now() - v_b66f2c}ms`);
 
         if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data && v_3393e3.data.lv !== undefined) {
           const v_fbe91e = v_3393e3.data.lv;
@@ -37,7 +40,7 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
           console.warn('[LevelNotification] 레벨 정보 응답 형식이 올바르지 않습니다:', v_3393e3);
         }
       } catch (v_5e9bfe) {
-        console.error('[LevelNotification] 사용자 레벨 정보 조회 실패:', v_5e9bfe);
+        console.error(v_8a5f7b, 'LevelNotification 레벨 정보 조회 실패', `${Date.now() - v_b66f2c}ms`, v_5e9bfe);
 
       }
     };

@@ -1,75 +1,75 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8 } from 'rcmrninabrnb';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae, v_7f1e37, v_35e34b } from 'bapkr';
+import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8, v_3094a2, v_39a996 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
-import {
-  v_083aa7,
-  v_379bd1,
-  v_a82b55,
-  v_f4f851,
-  v_54d331,
-  v_f40fc5,
-  v_7c6176,
-  v_d3f135,
-  v_086cde,
-  v_667a00,
-  v_952e24,
-  v_f87488,
-  v_94455f,
-  v_ab7114,
-  v_7c7410,
-  v_7e9335,
-  v_5ea6a6,
-  v_59ff6e,
-  v_20d2c7,
-  v_5b640b,
-  v_2ba37d,
-  v_a91257,
-  v_31216c,
-  v_1cd2a2,
-  v_a023f9,
-  v_f39418,
-  v_03a231,
-  v_dec378,
-  v_cdb169,
-  v_e14579,
-  v_18d397,
-  v_4a40b2,
-  v_9e06f6,
-  v_865e57,
-  v_41dfd5,
-  v_5fdcb2,
-  v_386af2,
-  v_6086b6,
-  v_58584a,
-  v_08aac3,
-  v_f57686,
-  v_5b4c5a,
-  v_8c15c4,
-  v_10886b,
-  v_38326c,
-  v_052a8a,
-  v_8c1d95,
-  v_1184c4,
-  v_a59951,
-  v_1a0a02,
-  v_8734da,
-  v_a1c4a5,
-  v_680bee,
-  v_287831,
-  v_540580,
-  v_858c71,
-  v_f7bdb9,
-  v_305be8,
-  v_26fe4c,
-  v_1cca63,
-  v_0e5276,
-  v_4a5627,
-  v_a50cad,
-  v_d4a78d,
-} from './src/screens';
-import { v_c034ae } from './src/screens/AyetOffersScreen';
+
+import { v_7c6176 } from './src/screens/SplashScreen';
+import { v_f4f851 } from './src/screens/LoginScreen';
+import { v_54d331 } from './src/screens/LoginSignupScreen';
+import { v_f40fc5 } from './src/screens/SignupScreen';
+import { v_20d2c7 } from './src/screens/MapMainScreen';
+
+const v_083aa7 = v_7f1e37(() => import('./src/screens/MyInfoFaqScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoFaqScreen })));
+const v_379bd1 = v_7f1e37(() => import('./src/screens/CountryCodeSelectScreen').then((v_35f85c) => ({ default: v_35f85c.CountryCodeSelectScreen })));
+const v_a82b55 = v_7f1e37(() => import('./src/screens/EmailVerificationScreen').then((v_35f85c) => ({ default: v_35f85c.EmailVerificationScreen })));
+const v_667a00 = v_7f1e37(() => import('./src/screens/VerificationCodeScreen').then((v_35f85c) => ({ default: v_35f85c.VerificationCodeScreen })));
+const v_d3f135 = v_7f1e37(() => import('./src/screens/TermsScreen').then((v_35f85c) => ({ default: v_35f85c.TermsScreen })));
+const v_086cde = v_7f1e37(() => import('./src/screens/PrivacyPolicyScreen').then((v_35f85c) => ({ default: v_35f85c.PrivacyPolicyScreen })));
+const v_952e24 = v_7f1e37(() => import('./src/screens/WalletScreen').then((v_35f85c) => ({ default: v_35f85c.WalletScreen })));
+const v_f87488 = v_7f1e37(() => import('./src/screens/WalletDetailScreen').then((v_35f85c) => ({ default: v_35f85c.WalletDetailScreen })));
+const v_94455f = v_7f1e37(() => import('./src/screens/PolygonWalletScreen').then((v_35f85c) => ({ default: v_35f85c.PolygonWalletScreen })));
+const v_ab7114 = v_7f1e37(() => import('./src/screens/XrunWalletScreen').then((v_35f85c) => ({ default: v_35f85c.XrunWalletScreen })));
+const v_7c7410 = v_7f1e37(() => import('./src/screens/NftWalletScreen').then((v_35f85c) => ({ default: v_35f85c.NftWalletScreen })));
+const v_7e9335 = v_7f1e37(() => import('./src/screens/XrunWalletScreen2').then((v_35f85c) => ({ default: v_35f85c.XrunWalletScreen2 })));
+const v_5ea6a6 = v_7f1e37(() => import('./src/screens/AdWalletScreen').then((v_35f85c) => ({ default: v_35f85c.AdWalletScreen })));
+const v_59ff6e = v_7f1e37(() => import('./src/screens/TransactionDetailsScreen').then((v_35f85c) => ({ default: v_35f85c.TransactionDetailsScreen })));
+const v_5b640b = v_7f1e37(() => import('./src/screens/WalletSendScreen').then((v_35f85c) => ({ default: v_35f85c.WalletSendScreen })));
+const v_2ba37d = v_7f1e37(() => import('./src/screens/WalletQrScanScreen').then((v_35f85c) => ({ default: v_35f85c.WalletQrScanScreen })));
+const v_a91257 = v_7f1e37(() => import('./src/screens/WalletEstimateFeeScreen').then((v_35f85c) => ({ default: v_35f85c.WalletEstimateFeeScreen })));
+const v_31216c = v_7f1e37(() => import('./src/screens/WalletTransactionProgressScreen').then((v_35f85c) => ({ default: v_35f85c.WalletTransactionProgressScreen })));
+const v_1cd2a2 = v_7f1e37(() => import('./src/screens/WalletTransactionResultScreen').then((v_35f85c) => ({ default: v_35f85c.WalletTransactionResultScreen })));
+const v_a023f9 = v_7f1e37(() => import('./src/screens/WalletReceiveScreen').then((v_35f85c) => ({ default: v_35f85c.WalletReceiveScreen })));
+const v_f39418 = v_7f1e37(() => import('./src/screens/AddWalletAddressScreen').then((v_35f85c) => ({ default: v_35f85c.AddWalletAddressScreen })));
+const v_03a231 = v_7f1e37(() => import('./src/screens/MyInfoScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoScreen })));
+const v_dec378 = v_7f1e37(() => import('./src/screens/MyInfoEmailAuthScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoEmailAuthScreen })));
+const v_cdb169 = v_7f1e37(() => import('./src/screens/MyInfoEditScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoEditScreen })));
+const v_e14579 = v_7f1e37(() => import('./src/screens/PhoneEditScreen').then((v_35f85c) => ({ default: v_35f85c.PhoneEditScreen })));
+const v_18d397 = v_7f1e37(() => import('./src/screens/ChangePasswordScreen').then((v_35f85c) => ({ default: v_35f85c.ChangePasswordScreen })));
+const v_4a40b2 = v_7f1e37(() => import('./src/screens/MyInfoSettingsScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoSettingsScreen })));
+const v_9e06f6 = v_7f1e37(() => import('./src/screens/MyInfoCloseMembershipScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoCloseMembershipScreen })));
+const v_865e57 = v_7f1e37(() => import('./src/screens/MyInfoCloseMembershipSuccessScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoCloseMembershipSuccessScreen })));
+const v_41dfd5 = v_7f1e37(() => import('./src/screens/MyInfoClausesScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoClausesScreen })));
+const v_5fdcb2 = v_7f1e37(() => import('./src/screens/ClauseDetailScreen').then((v_35f85c) => ({ default: v_35f85c.ClauseDetailScreen })));
+const v_386af2 = v_7f1e37(() => import('./src/screens/MyInfoNotifyScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoNotifyScreen })));
+const v_6086b6 = v_7f1e37(() => import('./src/screens/MyInfoReferralScreen').then((v_35f85c) => ({ default: v_35f85c.MyInfoReferralScreen })));
+const v_58584a = v_7f1e37(() => import('./src/screens/ReferralMyGroupScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralMyGroupScreen })));
+const v_08aac3 = v_7f1e37(() => import('./src/screens/ReferralSettlementScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralSettlementScreen })));
+const v_f57686 = v_7f1e37(() => import('./src/screens/ReferralRankScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralRankScreen })));
+const v_5b4c5a = v_7f1e37(() => import('./src/screens/ReferralDepthOneScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralDepthOneScreen })));
+const v_8c15c4 = v_7f1e37(() => import('./src/screens/ReferralDepthTwoScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralDepthTwoScreen })));
+const v_0e5276 = v_7f1e37(() => import('./src/screens/ReferralInputScreen').then((v_35f85c) => ({ default: v_35f85c.ReferralInputScreen })));
+const v_10886b = v_7f1e37(() => import('./src/screens/ShopScreen').then((v_35f85c) => ({ default: v_35f85c.ShopScreen })));
+const v_38326c = v_7f1e37(() => import('./src/screens/ShopTicketScreen').then((v_35f85c) => ({ default: v_35f85c.ShopTicketScreen })));
+const v_052a8a = v_7f1e37(() => import('./src/screens/ShopMyTicketScreen').then((v_35f85c) => ({ default: v_35f85c.ShopMyTicketScreen })));
+const v_8c1d95 = v_7f1e37(() => import('./src/screens/ShopMyItemsScreen').then((v_35f85c) => ({ default: v_35f85c.ShopMyItemsScreen })));
+const v_1184c4 = v_7f1e37(() => import('./src/screens/ShopMyTicketDetailScreen').then((v_35f85c) => ({ default: v_35f85c.ShopMyTicketDetailScreen })));
+const v_a59951 = v_7f1e37(() => import('./src/screens/ShopProductDetailScreen').then((v_35f85c) => ({ default: v_35f85c.ShopProductDetailScreen })));
+const v_1a0a02 = v_7f1e37(() => import('./src/screens/ShopBuyScreen').then((v_35f85c) => ({ default: v_35f85c.ShopBuyScreen })));
+const v_8734da = v_7f1e37(() => import('./src/screens/ShopSuccessScreen').then((v_35f85c) => ({ default: v_35f85c.ShopSuccessScreen })));
+const v_a1c4a5 = v_7f1e37(() => import('./src/screens/ShopTicketDetailScreen').then((v_35f85c) => ({ default: v_35f85c.ShopTicketDetailScreen })));
+const v_680bee = v_7f1e37(() => import('./src/screens/ShopItemRegisterScreen').then((v_35f85c) => ({ default: v_35f85c.ShopItemRegisterScreen })));
+const v_287831 = v_7f1e37(() => import('./src/screens/ShowNapAdScreen').then((v_35f85c) => ({ default: v_35f85c.ShowNapAdScreen })));
+const v_540580 = v_7f1e37(() => import('./src/screens/ShowPockAdScreen').then((v_35f85c) => ({ default: v_35f85c.ShowPockAdScreen })));
+const v_858c71 = v_7f1e37(() => import('./src/screens/ShowWebViewScreen').then((v_35f85c) => ({ default: v_35f85c.ShowWebViewScreen })));
+const v_f7bdb9 = v_7f1e37(() => import('./src/screens/XRUNinfo').then((v_35f85c) => ({ default: v_35f85c.XRUNinfoScreen })));
+const v_305be8 = v_7f1e37(() => import('./src/screens/XplayInfoScreen').then((v_35f85c) => ({ default: v_35f85c.XplayInfoScreen })));
+const v_26fe4c = v_7f1e37(() => import('./src/screens/XplayZoneScreen').then((v_35f85c) => ({ default: v_35f85c.XplayZoneScreen })));
+const v_1cca63 = v_7f1e37(() => import('./src/screens/MyinfoShopSalesScreen').then((v_35f85c) => ({ default: v_35f85c.MyinfoShopSalesScreen })));
+const v_4a5627 = v_7f1e37(() => import('./src/screens/PangleListScreen').then((v_35f85c) => ({ default: v_35f85c.PangleListScreen })));
+const v_c034ae = v_7f1e37(() => import('./src/screens/AyetOffersScreen').then((v_35f85c) => ({ default: v_35f85c.AyetOffersScreen })));
+const v_a50cad = v_7f1e37(() => import('./src/screens/WalletPrivateKeyDisplayScreen').then((v_35f85c) => ({ default: v_35f85c.WalletPrivateKeyDisplayScreen })));
+const v_d4a78d = v_7f1e37(() => import('./src/screens/WalletPrivateKeyGoogleAuthScreen').then((v_35f85c) => ({ default: v_35f85c.WalletPrivateKeyGoogleAuthScreen })));
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
@@ -99,6 +99,9 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
 import { v_f16a74, v_deac27, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 import { v_772971 } from 'jmpfvteuuztnp';
+
+const v_e76fa9 = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+console.log(v_e76fa9, '5. App.tsx 모듈 로드 완료 (import 체인 평가 끝, 컴포넌트 마운트 전)');
 
 let v_308260 = null;
 let v_435733 = false;
@@ -311,265 +314,77 @@ const v_c0dbdf = () => {
 
   }, [v_0f0c7b]);
 
-  if (v_0f0c7b === 'login') {
-    return <LoginScreen />;
-  }
-
-  if (v_0f0c7b === 'signup') {
-    return <SignupScreen />;
-  }
-
-  if (v_0f0c7b === 'countryCodeSelect') {
-    return <CountryCodeSelectScreen />;
-  }
-
-  if (v_0f0c7b === 'emailVerification') {
-    return <EmailVerificationScreen />;
-  }
-
-  if (v_0f0c7b === 'verificationCode') {
-    return <VerificationCodeScreen />;
-  }
-
-  if (v_0f0c7b === 'terms') {
-    return <TermsScreen />;
-  }
-
-  if (v_0f0c7b === 'privacy') {
-    return <PrivacyPolicyScreen />;
-  }
-
-  if (v_0f0c7b === 'wallet') {
-    return <WalletScreen />;
-  }
-
-  if (v_0f0c7b === 'polygonHistory') {
-    return <PolygonWalletScreen />;
-  }
-
-  if (v_0f0c7b === 'xrunHistory') {
-    return <XrunWalletScreen />;
-  }
-
-  if (v_0f0c7b === 'nftHistory') {
-    return <NftWalletScreen />;
-  }
-
-  if (v_0f0c7b === 'xrunHistory2') {
-    return <XrunWalletScreen2 />;
-  }
-
-  if (v_0f0c7b === 'adHistory') {
-    return <AdWalletScreen />;
-  }
-
-  if (v_0f0c7b === 'walletDetail') {
-    return <WalletDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'transactionDetails') {
-    return <TransactionDetailsScreen />;
-  }
-
-  if (v_0f0c7b === 'map') {
-    return <MapMainScreen />;
-  }
-
-  if (v_0f0c7b === 'walletSend') {
-    return <WalletSendScreen />;
-  }
-
-  if (v_0f0c7b === 'walletQrScan') {
-    return <WalletQrScanScreen />;
-  }
-
-  if (v_0f0c7b === 'walletEstimate') {
-    return <WalletEstimateFeeScreen />;
-  }
-
-  if (v_0f0c7b === 'walletTransactionProgress') {
-    return <WalletTransactionProgressScreen />;
-  }
-
-  if (v_0f0c7b === 'walletTransactionResult') {
-    return <WalletTransactionResultScreen />;
-  }
-
-  if (v_0f0c7b === 'walletReceive') {
-    return <WalletReceiveScreen />;
-  }
-
-  if (v_0f0c7b === 'addWalletAddress') {
-    return <AddWalletAddressScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfo') {
-    return <MyInfoScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoEmailAuth') {
-    return <MyInfoEmailAuthScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoFaq') {
-    return <MyInfoFaqScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoEdit') {
-    return <MyInfoEditScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoPhoneEdit') {
-    return <PhoneEditScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoChangePassword') {
-    return <ChangePasswordScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoSettings') {
-    return <MyInfoSettingsScreen />;
-  }
-
-  if (v_0f0c7b === 'pangleList') {
-    return <PangleListScreen />;
-  }
-
-  if (v_0f0c7b === 'ayetOffers') {
-    return <AyetOffersScreen />;
-  }
-
-  if (v_0f0c7b === 'ayetOffersXplay') {
-    return <AyetOffersScreen slotName="Xplay" />;
-  }
-
-  if (v_0f0c7b === 'walletPrivateKeyDisplay') {
-    return <WalletPrivateKeyDisplayScreen />;
-  }
-
-  if (v_0f0c7b === 'walletPrivateKeyGoogleAuth') {
-    return <WalletPrivateKeyGoogleAuthScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoCloseMembership') {
-
-    return <MyInfoCloseMembershipScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoCloseMembershipSuccess') {
-    return <MyInfoCloseMembershipSuccessScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoClauses') {
-    return <MyInfoClausesScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoClauseDetail') {
-    return <ClauseDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoNotify') {
-    return <MyInfoNotifyScreen />;
-  }
-
-  if (v_0f0c7b === 'myInfoReferral') {
-    return <MyInfoReferralScreen />;
-  }
-
-  if (v_0f0c7b === 'referralMyGroup') {
-    return <ReferralMyGroupScreen />;
-  }
-
-  if (v_0f0c7b === 'referralSettlement') {
-    return <ReferralSettlementScreen />;
-  }
-
-  if (v_0f0c7b === 'referralRank') {
-    return <ReferralRankScreen />;
-  }
-
-  if (v_0f0c7b === 'referralDepthOne') {
-    return <ReferralDepthOneScreen />;
-  }
-
-  if (v_0f0c7b === 'referralDepthTwo') {
-    return <ReferralDepthTwoScreen />;
-  }
-
-  if (v_0f0c7b === 'referralInput') {
-    return <ReferralInputScreen />;
-  }
-
-  if (v_0f0c7b === 'shop') {
+  const v_a41813 = <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#007aff" /></View>;
+  let screen: v_a3453e.ReactNode;
+  if (v_0f0c7b === 'login') v_53746a = <LoginScreen />;
+  else if (v_0f0c7b === 'signup') v_53746a = <SignupScreen />;
+  else if (v_0f0c7b === 'countryCodeSelect') v_53746a = <CountryCodeSelectScreen />;
+  else if (v_0f0c7b === 'emailVerification') v_53746a = <EmailVerificationScreen />;
+  else if (v_0f0c7b === 'verificationCode') v_53746a = <VerificationCodeScreen />;
+  else if (v_0f0c7b === 'terms') v_53746a = <TermsScreen />;
+  else if (v_0f0c7b === 'privacy') v_53746a = <PrivacyPolicyScreen />;
+  else if (v_0f0c7b === 'wallet') v_53746a = <WalletScreen />;
+  else if (v_0f0c7b === 'polygonHistory') v_53746a = <PolygonWalletScreen />;
+  else if (v_0f0c7b === 'xrunHistory') v_53746a = <XrunWalletScreen />;
+  else if (v_0f0c7b === 'nftHistory') v_53746a = <NftWalletScreen />;
+  else if (v_0f0c7b === 'xrunHistory2') v_53746a = <XrunWalletScreen2 />;
+  else if (v_0f0c7b === 'adHistory') v_53746a = <AdWalletScreen />;
+  else if (v_0f0c7b === 'walletDetail') v_53746a = <WalletDetailScreen />;
+  else if (v_0f0c7b === 'transactionDetails') v_53746a = <TransactionDetailsScreen />;
+  else if (v_0f0c7b === 'map') v_53746a = <MapMainScreen />;
+  else if (v_0f0c7b === 'walletSend') v_53746a = <WalletSendScreen />;
+  else if (v_0f0c7b === 'walletQrScan') v_53746a = <WalletQrScanScreen />;
+  else if (v_0f0c7b === 'walletEstimate') v_53746a = <WalletEstimateFeeScreen />;
+  else if (v_0f0c7b === 'walletTransactionProgress') v_53746a = <WalletTransactionProgressScreen />;
+  else if (v_0f0c7b === 'walletTransactionResult') v_53746a = <WalletTransactionResultScreen />;
+  else if (v_0f0c7b === 'walletReceive') v_53746a = <WalletReceiveScreen />;
+  else if (v_0f0c7b === 'addWalletAddress') v_53746a = <AddWalletAddressScreen />;
+  else if (v_0f0c7b === 'myInfo') v_53746a = <MyInfoScreen />;
+  else if (v_0f0c7b === 'myInfoEmailAuth') v_53746a = <MyInfoEmailAuthScreen />;
+  else if (v_0f0c7b === 'myInfoFaq') v_53746a = <MyInfoFaqScreen />;
+  else if (v_0f0c7b === 'myInfoEdit') v_53746a = <MyInfoEditScreen />;
+  else if (v_0f0c7b === 'myInfoPhoneEdit') v_53746a = <PhoneEditScreen />;
+  else if (v_0f0c7b === 'myInfoChangePassword') v_53746a = <ChangePasswordScreen />;
+  else if (v_0f0c7b === 'myInfoSettings') v_53746a = <MyInfoSettingsScreen />;
+  else if (v_0f0c7b === 'pangleList') v_53746a = <PangleListScreen />;
+  else if (v_0f0c7b === 'ayetOffers') v_53746a = <AyetOffersScreen />;
+  else if (v_0f0c7b === 'ayetOffersXplay') v_53746a = <AyetOffersScreen slotName="Xplay" />;
+  else if (v_0f0c7b === 'walletPrivateKeyDisplay') v_53746a = <WalletPrivateKeyDisplayScreen />;
+  else if (v_0f0c7b === 'walletPrivateKeyGoogleAuth') v_53746a = <WalletPrivateKeyGoogleAuthScreen />;
+  else if (v_0f0c7b === 'myInfoCloseMembership') v_53746a = <MyInfoCloseMembershipScreen />;
+  else if (v_0f0c7b === 'myInfoCloseMembershipSuccess') v_53746a = <MyInfoCloseMembershipSuccessScreen />;
+  else if (v_0f0c7b === 'myInfoClauses') v_53746a = <MyInfoClausesScreen />;
+  else if (v_0f0c7b === 'myInfoClauseDetail') v_53746a = <ClauseDetailScreen />;
+  else if (v_0f0c7b === 'myInfoNotify') v_53746a = <MyInfoNotifyScreen />;
+  else if (v_0f0c7b === 'myInfoReferral') v_53746a = <MyInfoReferralScreen />;
+  else if (v_0f0c7b === 'referralMyGroup') v_53746a = <ReferralMyGroupScreen />;
+  else if (v_0f0c7b === 'referralSettlement') v_53746a = <ReferralSettlementScreen />;
+  else if (v_0f0c7b === 'referralRank') v_53746a = <ReferralRankScreen />;
+  else if (v_0f0c7b === 'referralDepthOne') v_53746a = <ReferralDepthOneScreen />;
+  else if (v_0f0c7b === 'referralDepthTwo') v_53746a = <ReferralDepthTwoScreen />;
+  else if (v_0f0c7b === 'referralInput') v_53746a = <ReferralInputScreen />;
+  else if (v_0f0c7b === 'shop') {
     console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
-    return <ShopScreen />;
+    v_53746a = <ShopScreen />;
   }
-
-  if (v_0f0c7b === 'shopTicket') {
-    return <ShopTicketScreen />;
-  }
-
-  if (v_0f0c7b === 'shopMyTicket') {
-    return <ShopMyTicketScreen />;
-  }
-
-  if (v_0f0c7b === 'shopMyItems') {
-    return <ShopMyItemsScreen />;
-  }
-
-  if (v_0f0c7b === 'shopMyTicketDetail') {
-    return <ShopMyTicketDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'shopProductDetail') {
-    return <ShopProductDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'shopBuy') {
-    return <ShopBuyScreen />;
-  }
-
-  if (v_0f0c7b === 'shopSuccess') {
-    return <ShopSuccessScreen />;
-  }
-
-  if (v_0f0c7b === 'shopTicketDetail') {
-    return <ShopTicketDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'shopItemRegister') {
-    return <ShopItemRegisterScreen />;
-  }
-
-  if (v_0f0c7b === 'showNapAd') {
-    return <ShowNapAdScreen />;
-  }
-
-  if (v_0f0c7b === 'showPockAd') {
-    return <ShowPockAdScreen />;
-  }
-
-  if (v_0f0c7b === 'showWebView') {
-    return <ShowWebViewScreen />;
-  }
-
-  if (v_0f0c7b === 'xrunInfo') {
-    return <XRUNinfoScreen />;
-  }
-
-  if (v_0f0c7b === 'xplayInfo') {
-    return <XplayInfoScreen />;
-  }
-
-  if (v_0f0c7b === 'xplayZone') {
-    return <XplayZoneScreen />;
-  }
-
-  if (v_0f0c7b === 'myinfoShopSales') {
-    return <MyinfoShopSalesScreen />;
-  }
-
-  return <LoginSignupScreen />;
+  else if (v_0f0c7b === 'shopTicket') v_53746a = <ShopTicketScreen />;
+  else if (v_0f0c7b === 'shopMyTicket') v_53746a = <ShopMyTicketScreen />;
+  else if (v_0f0c7b === 'shopMyItems') v_53746a = <ShopMyItemsScreen />;
+  else if (v_0f0c7b === 'shopMyTicketDetail') v_53746a = <ShopMyTicketDetailScreen />;
+  else if (v_0f0c7b === 'shopProductDetail') v_53746a = <ShopProductDetailScreen />;
+  else if (v_0f0c7b === 'shopBuy') v_53746a = <ShopBuyScreen />;
+  else if (v_0f0c7b === 'shopSuccess') v_53746a = <ShopSuccessScreen />;
+  else if (v_0f0c7b === 'shopTicketDetail') v_53746a = <ShopTicketDetailScreen />;
+  else if (v_0f0c7b === 'shopItemRegister') v_53746a = <ShopItemRegisterScreen />;
+  else if (v_0f0c7b === 'showNapAd') v_53746a = <ShowNapAdScreen />;
+  else if (v_0f0c7b === 'showPockAd') v_53746a = <ShowPockAdScreen />;
+  else if (v_0f0c7b === 'showWebView') v_53746a = <ShowWebViewScreen />;
+  else if (v_0f0c7b === 'xrunInfo') v_53746a = <XRUNinfoScreen />;
+  else if (v_0f0c7b === 'xplayInfo') v_53746a = <XplayInfoScreen />;
+  else if (v_0f0c7b === 'xplayZone') v_53746a = <XplayZoneScreen />;
+  else if (v_0f0c7b === 'myinfoShopSales') v_53746a = <MyinfoShopSalesScreen />;
+  else v_53746a = <LoginSignupScreen />;
+  return <Suspense fallback={v_a41813}>{v_53746a}</Suspense>;
 };
 
 const v_512b02 = ({ isAdFinished: v_65941f }: { isAdFinished: boolean }) => {
@@ -944,8 +759,11 @@ export default function v_6540c3() {
   }, []);
 
   v_c4deb2(() => {
+    const v_8a5f7b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     if (v_8c82fd.current) return;
     v_8c82fd.current = true;
+    const v_cf7eba = Date.now();
+    console.log(v_8a5f7b, '6. 부팅 시작 (initializeApp useEffect 진입)');
 
     if (__DEV__) {
       try {
@@ -953,20 +771,29 @@ export default function v_6540c3() {
       } catch (v_37eab7) {}
     }
 
+    console.log(v_8a5f7b, 'initGoogleSignIn 시작');
     v_83e499();
+    console.log(v_8a5f7b, 'initGoogleSignIn 호출 완료 (동기)', `${Date.now() - v_cf7eba}ms`);
 
     const v_139fe0 = async () => {
       const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
 
       try {
         v_cbd24a?.recordBootStep('start');
+        let v_8d41d7 = Date.now();
+        console.log(v_8a5f7b, 'loadEnvSync 시작');
         v_8ecf08();
+        console.log(v_8a5f7b, 'loadEnvSync 완료', `${Date.now() - v_8d41d7}ms`);
+        v_8d41d7 = Date.now();
+        console.log(v_8a5f7b, 'initI18nSync 시작');
         v_116c93();
+        console.log(v_8a5f7b, 'initI18nSync 완료', `${Date.now() - v_8d41d7}ms`);
         console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (v_5e9bfe) {
-        console.error('[App] 초기화 실패:', v_5e9bfe);
+        console.error(v_8a5f7b, '초기화 실패:', v_5e9bfe);
       }
 
+      console.log(v_8a5f7b, '첫 화면 표시 가능 (setIsLoading false)', `${Date.now() - v_cf7eba}ms 경과`);
       v_c355f2(true);
       v_deef62(false);
       if (__DEV__) {
@@ -1040,16 +867,22 @@ export default function v_6540c3() {
         } catch (v_37eab7) {}
       }
 
-      v_563153().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((v_9e86fd) => console.error('[App] TopAd5 광고 캐시 실패:', v_9e86fd));
+      console.log(v_8a5f7b, 'getTopAd5 호출 시작 (비동기)');
+      v_563153()
+        .then(() => console.log(v_8a5f7b, 'getTopAd5 광고 캐시 완료', `${Date.now() - v_cf7eba}ms 경과`))
+        .catch((v_9e86fd) => console.error(v_8a5f7b, 'getTopAd5 광고 캐시 실패:', v_9e86fd));
+      console.log(v_8a5f7b, 'runBackground 1.5초 후 예약 (Taboola/AppsFlyer/고팍스 등)');
       setTimeout(v_9aae4b, 1500);
 
+      console.log(v_8a5f7b, '앱 오프닝 광고 setTimeout(0) 예약');
       setTimeout(() => {
+        console.log(v_8a5f7b, '앱 오프닝 광고 실행 시작', `${Date.now() - v_cf7eba}ms 경과`);
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         v_cbd24a?.recordBootStep('pangle_start');
         v_f095b0()
           .then(() => v_e55270())
-          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
-          .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
+          .then(() => console.log(v_8a5f7b, '앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)', `${Date.now() - v_cf7eba}ms 경과`))
+          .catch((v_5e9bfe) => console.error(v_8a5f7b, '앱 오프닝 광고 실패:', v_5e9bfe))
           .finally(() => v_cbd24a?.recordBootStep('pangle_done'));
       }, 0);
     };

@@ -112,11 +112,15 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   }, [v_8d490a]);
 
   v_c4deb2(() => {
+    const v_8a5f7b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const v_d0a230 = async () => {
+      const v_b66f2c = Date.now();
+      console.log(v_8a5f7b, '자동 로그인 확인(AsyncStorage) 시작');
       try {
 
         const v_efe339 = await v_e84827.getItem('rememberMe');
         const v_0fd7ed = await v_e84827.getItem('isLoggedIn');
+        console.log(v_8a5f7b, '자동 로그인 확인 완료', `${Date.now() - v_b66f2c}ms`, { remember: v_efe339, loggedIn: v_0fd7ed });
 
         console.log('[Navigation] 자동 로그인 확인:', {
           remember: v_efe339,
@@ -140,9 +144,10 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
           loggedInCheck: v_0fd7ed === 'true',
         });
       } catch (v_5e9bfe) {
-        console.error('[Navigation] 로그인 상태 확인 실패:', v_5e9bfe);
+        console.error(v_8a5f7b, '로그인 상태 확인 실패:', v_5e9bfe);
       } finally {
         v_da6fbe(true);
+        console.log(v_8a5f7b, 'Navigation 초기화 완료 (첫 화면 결정됨)', `${Date.now() - v_b66f2c}ms`);
       }
     };
 

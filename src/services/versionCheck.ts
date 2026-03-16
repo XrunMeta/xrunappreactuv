@@ -33,8 +33,10 @@ export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
   if (v_7a1893 && v_5c2f9f - v_7a1893.at < v_1e9518) {
     return v_7a1893.result;
   }
+  const v_8a5f7b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+  const v_b66f2c = Date.now();
   try {
-    console.log('[VersionCheck] 서버 버전 확인 시작');
+    console.log(v_8a5f7b, '[VersionCheck] 서버 버전 확인 시작');
     const v_c9c489 = v_e4a763();
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/servercheck`;
     const v_8f00b9 = await fetch(v_f71b56, {
@@ -44,13 +46,13 @@ export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
     if (!v_8f00b9.ok) return null;
     const v_3393e3 = await v_8f00b9.json();
     if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data) {
-      console.log('[VersionCheck] 서버 버전 확인 성공:', v_3393e3.data);
+      console.log(v_8a5f7b, '[VersionCheck] 서버 버전 확인 완료', `${Date.now() - v_b66f2c}ms`, v_3393e3.data);
       v_7a1893 = { result: v_3393e3 as ServerCheckResponse, at: Date.now() };
       return v_7a1893.result;
     }
     return null;
   } catch (v_5e9bfe) {
-    console.error('[VersionCheck] 서버 버전 확인 실패:', v_5e9bfe);
+    console.error(v_8a5f7b, '[VersionCheck] 서버 버전 확인 실패', `${Date.now() - v_b66f2c}ms`, v_5e9bfe);
     return null;
   }
 };
