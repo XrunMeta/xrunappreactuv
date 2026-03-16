@@ -11,7 +11,9 @@ export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation
   const [notifitext, setNotifitext] = useState<string | null>('Loading...');
 
   useEffect(() => {
+    const BOOT_SLOW_LOG = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const loadUserLevelInfo = async () => {
+      const t0 = Date.now();
       try {
         const userData = await AsyncStorage.getItem('userData');
         if (!userData) {
@@ -26,8 +28,9 @@ export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation
           return;
         }
 
-        console.log('[LevelNotification] 사용자 레벨 정보 조회 시작:', member);
+        console.log(BOOT_SLOW_LOG, 'LevelNotification 레벨 정보 API 조회 시작:', member);
         const response = await getMembersLevelInfo(Number(member), navigation);
+        console.log(BOOT_SLOW_LOG, 'LevelNotification 레벨 정보 API 완료', `${Date.now() - t0}ms`);
 
         if (response && response.status === 'success' && response.data && response.data.lv !== undefined) {
           const level = response.data.lv;
@@ -37,7 +40,7 @@ export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation
           console.warn('[LevelNotification] 레벨 정보 응답 형식이 올바르지 않습니다:', response);
         }
       } catch (error) {
-        console.error('[LevelNotification] 사용자 레벨 정보 조회 실패:', error);
+        console.error(BOOT_SLOW_LOG, 'LevelNotification 레벨 정보 조회 실패', `${Date.now() - t0}ms`, error);
 
       }
     };

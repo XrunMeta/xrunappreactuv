@@ -112,11 +112,15 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [stack]);
 
   useEffect(() => {
+    const BOOT_SLOW_LOG = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const checkLoginStatus = async () => {
+      const t0 = Date.now();
+      console.log(BOOT_SLOW_LOG, '자동 로그인 확인(AsyncStorage) 시작');
       try {
 
         const remember = await AsyncStorage.getItem('rememberMe');
         const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+        console.log(BOOT_SLOW_LOG, '자동 로그인 확인 완료', `${Date.now() - t0}ms`, { remember, loggedIn });
 
         console.log('[Navigation] 자동 로그인 확인:', {
           remember,
@@ -140,9 +144,10 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
           loggedInCheck: loggedIn === 'true',
         });
       } catch (error) {
-        console.error('[Navigation] 로그인 상태 확인 실패:', error);
+        console.error(BOOT_SLOW_LOG, '로그인 상태 확인 실패:', error);
       } finally {
         setIsInitialized(true);
+        console.log(BOOT_SLOW_LOG, 'Navigation 초기화 완료 (첫 화면 결정됨)', `${Date.now() - t0}ms`);
       }
     };
 

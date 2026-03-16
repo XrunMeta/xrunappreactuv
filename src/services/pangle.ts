@@ -29,7 +29,7 @@ export const initializePangle = async (): Promise<void> => {
     if (!isPangleNativeModuleAvailable()) {
 
       if (Platform.OS === 'android') {
-        console.log('[Pangle] Android에서는 Google Ad Manager 미디에이션을 통해 Pangle을 사용합니다.');
+        console.log('[Pangle] Android: Pangle 네이티브 모듈이 없습니다. 앱 오프닝 광고는 iOS에서만 표시됩니다. (Android 연동 시 네이티브 모듈 추가 필요)');
         isPangleAvailable = false;
         return;
       }

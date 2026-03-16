@@ -1,75 +1,75 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform, View, ActivityIndicator } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Application from 'expo-application';
 import * as Clipboard from 'expo-clipboard';
-import {
-  MyInfoFaqScreen,
-  CountryCodeSelectScreen,
-  EmailVerificationScreen,
-  LoginScreen,
-  LoginSignupScreen,
-  SignupScreen,
-  SplashScreen,
-  TermsScreen,
-  PrivacyPolicyScreen,
-  VerificationCodeScreen,
-  WalletScreen,
-  WalletDetailScreen,
-  PolygonWalletScreen,
-  XrunWalletScreen,
-  NftWalletScreen,
-  XrunWalletScreen2,
-  AdWalletScreen,
-  TransactionDetailsScreen,
-  MapMainScreen,
-  WalletSendScreen,
-  WalletQrScanScreen,
-  WalletEstimateFeeScreen,
-  WalletTransactionProgressScreen,
-  WalletTransactionResultScreen,
-  WalletReceiveScreen,
-  AddWalletAddressScreen,
-  MyInfoScreen,
-  MyInfoEmailAuthScreen,
-  MyInfoEditScreen,
-  PhoneEditScreen,
-  ChangePasswordScreen,
-  MyInfoSettingsScreen,
-  MyInfoCloseMembershipScreen,
-  MyInfoCloseMembershipSuccessScreen,
-  MyInfoClausesScreen,
-  ClauseDetailScreen,
-  MyInfoNotifyScreen,
-  MyInfoReferralScreen,
-  ReferralMyGroupScreen,
-  ReferralSettlementScreen,
-  ReferralRankScreen,
-  ReferralDepthOneScreen,
-  ReferralDepthTwoScreen,
-  ShopScreen,
-  ShopTicketScreen,
-  ShopMyTicketScreen,
-  ShopMyItemsScreen,
-  ShopMyTicketDetailScreen,
-  ShopProductDetailScreen,
-  ShopBuyScreen,
-  ShopSuccessScreen,
-  ShopTicketDetailScreen,
-  ShopItemRegisterScreen,
-  ShowNapAdScreen,
-  ShowPockAdScreen,
-  ShowWebViewScreen,
-  XRUNinfoScreen,
-  XplayInfoScreen,
-  XplayZoneScreen,
-  MyinfoShopSalesScreen,
-  ReferralInputScreen,
-  PangleListScreen,
-  WalletPrivateKeyDisplayScreen,
-  WalletPrivateKeyGoogleAuthScreen,
-} from './src/screens';
-import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
+
+import { SplashScreen } from './src/screens/SplashScreen';
+import { LoginScreen } from './src/screens/LoginScreen';
+import { LoginSignupScreen } from './src/screens/LoginSignupScreen';
+import { SignupScreen } from './src/screens/SignupScreen';
+import { MapMainScreen } from './src/screens/MapMainScreen';
+
+const MyInfoFaqScreen = lazy(() => import('./src/screens/MyInfoFaqScreen').then((m) => ({ default: m.MyInfoFaqScreen })));
+const CountryCodeSelectScreen = lazy(() => import('./src/screens/CountryCodeSelectScreen').then((m) => ({ default: m.CountryCodeSelectScreen })));
+const EmailVerificationScreen = lazy(() => import('./src/screens/EmailVerificationScreen').then((m) => ({ default: m.EmailVerificationScreen })));
+const VerificationCodeScreen = lazy(() => import('./src/screens/VerificationCodeScreen').then((m) => ({ default: m.VerificationCodeScreen })));
+const TermsScreen = lazy(() => import('./src/screens/TermsScreen').then((m) => ({ default: m.TermsScreen })));
+const PrivacyPolicyScreen = lazy(() => import('./src/screens/PrivacyPolicyScreen').then((m) => ({ default: m.PrivacyPolicyScreen })));
+const WalletScreen = lazy(() => import('./src/screens/WalletScreen').then((m) => ({ default: m.WalletScreen })));
+const WalletDetailScreen = lazy(() => import('./src/screens/WalletDetailScreen').then((m) => ({ default: m.WalletDetailScreen })));
+const PolygonWalletScreen = lazy(() => import('./src/screens/PolygonWalletScreen').then((m) => ({ default: m.PolygonWalletScreen })));
+const XrunWalletScreen = lazy(() => import('./src/screens/XrunWalletScreen').then((m) => ({ default: m.XrunWalletScreen })));
+const NftWalletScreen = lazy(() => import('./src/screens/NftWalletScreen').then((m) => ({ default: m.NftWalletScreen })));
+const XrunWalletScreen2 = lazy(() => import('./src/screens/XrunWalletScreen2').then((m) => ({ default: m.XrunWalletScreen2 })));
+const AdWalletScreen = lazy(() => import('./src/screens/AdWalletScreen').then((m) => ({ default: m.AdWalletScreen })));
+const TransactionDetailsScreen = lazy(() => import('./src/screens/TransactionDetailsScreen').then((m) => ({ default: m.TransactionDetailsScreen })));
+const WalletSendScreen = lazy(() => import('./src/screens/WalletSendScreen').then((m) => ({ default: m.WalletSendScreen })));
+const WalletQrScanScreen = lazy(() => import('./src/screens/WalletQrScanScreen').then((m) => ({ default: m.WalletQrScanScreen })));
+const WalletEstimateFeeScreen = lazy(() => import('./src/screens/WalletEstimateFeeScreen').then((m) => ({ default: m.WalletEstimateFeeScreen })));
+const WalletTransactionProgressScreen = lazy(() => import('./src/screens/WalletTransactionProgressScreen').then((m) => ({ default: m.WalletTransactionProgressScreen })));
+const WalletTransactionResultScreen = lazy(() => import('./src/screens/WalletTransactionResultScreen').then((m) => ({ default: m.WalletTransactionResultScreen })));
+const WalletReceiveScreen = lazy(() => import('./src/screens/WalletReceiveScreen').then((m) => ({ default: m.WalletReceiveScreen })));
+const AddWalletAddressScreen = lazy(() => import('./src/screens/AddWalletAddressScreen').then((m) => ({ default: m.AddWalletAddressScreen })));
+const MyInfoScreen = lazy(() => import('./src/screens/MyInfoScreen').then((m) => ({ default: m.MyInfoScreen })));
+const MyInfoEmailAuthScreen = lazy(() => import('./src/screens/MyInfoEmailAuthScreen').then((m) => ({ default: m.MyInfoEmailAuthScreen })));
+const MyInfoEditScreen = lazy(() => import('./src/screens/MyInfoEditScreen').then((m) => ({ default: m.MyInfoEditScreen })));
+const PhoneEditScreen = lazy(() => import('./src/screens/PhoneEditScreen').then((m) => ({ default: m.PhoneEditScreen })));
+const ChangePasswordScreen = lazy(() => import('./src/screens/ChangePasswordScreen').then((m) => ({ default: m.ChangePasswordScreen })));
+const MyInfoSettingsScreen = lazy(() => import('./src/screens/MyInfoSettingsScreen').then((m) => ({ default: m.MyInfoSettingsScreen })));
+const MyInfoCloseMembershipScreen = lazy(() => import('./src/screens/MyInfoCloseMembershipScreen').then((m) => ({ default: m.MyInfoCloseMembershipScreen })));
+const MyInfoCloseMembershipSuccessScreen = lazy(() => import('./src/screens/MyInfoCloseMembershipSuccessScreen').then((m) => ({ default: m.MyInfoCloseMembershipSuccessScreen })));
+const MyInfoClausesScreen = lazy(() => import('./src/screens/MyInfoClausesScreen').then((m) => ({ default: m.MyInfoClausesScreen })));
+const ClauseDetailScreen = lazy(() => import('./src/screens/ClauseDetailScreen').then((m) => ({ default: m.ClauseDetailScreen })));
+const MyInfoNotifyScreen = lazy(() => import('./src/screens/MyInfoNotifyScreen').then((m) => ({ default: m.MyInfoNotifyScreen })));
+const MyInfoReferralScreen = lazy(() => import('./src/screens/MyInfoReferralScreen').then((m) => ({ default: m.MyInfoReferralScreen })));
+const ReferralMyGroupScreen = lazy(() => import('./src/screens/ReferralMyGroupScreen').then((m) => ({ default: m.ReferralMyGroupScreen })));
+const ReferralSettlementScreen = lazy(() => import('./src/screens/ReferralSettlementScreen').then((m) => ({ default: m.ReferralSettlementScreen })));
+const ReferralRankScreen = lazy(() => import('./src/screens/ReferralRankScreen').then((m) => ({ default: m.ReferralRankScreen })));
+const ReferralDepthOneScreen = lazy(() => import('./src/screens/ReferralDepthOneScreen').then((m) => ({ default: m.ReferralDepthOneScreen })));
+const ReferralDepthTwoScreen = lazy(() => import('./src/screens/ReferralDepthTwoScreen').then((m) => ({ default: m.ReferralDepthTwoScreen })));
+const ReferralInputScreen = lazy(() => import('./src/screens/ReferralInputScreen').then((m) => ({ default: m.ReferralInputScreen })));
+const ShopScreen = lazy(() => import('./src/screens/ShopScreen').then((m) => ({ default: m.ShopScreen })));
+const ShopTicketScreen = lazy(() => import('./src/screens/ShopTicketScreen').then((m) => ({ default: m.ShopTicketScreen })));
+const ShopMyTicketScreen = lazy(() => import('./src/screens/ShopMyTicketScreen').then((m) => ({ default: m.ShopMyTicketScreen })));
+const ShopMyItemsScreen = lazy(() => import('./src/screens/ShopMyItemsScreen').then((m) => ({ default: m.ShopMyItemsScreen })));
+const ShopMyTicketDetailScreen = lazy(() => import('./src/screens/ShopMyTicketDetailScreen').then((m) => ({ default: m.ShopMyTicketDetailScreen })));
+const ShopProductDetailScreen = lazy(() => import('./src/screens/ShopProductDetailScreen').then((m) => ({ default: m.ShopProductDetailScreen })));
+const ShopBuyScreen = lazy(() => import('./src/screens/ShopBuyScreen').then((m) => ({ default: m.ShopBuyScreen })));
+const ShopSuccessScreen = lazy(() => import('./src/screens/ShopSuccessScreen').then((m) => ({ default: m.ShopSuccessScreen })));
+const ShopTicketDetailScreen = lazy(() => import('./src/screens/ShopTicketDetailScreen').then((m) => ({ default: m.ShopTicketDetailScreen })));
+const ShopItemRegisterScreen = lazy(() => import('./src/screens/ShopItemRegisterScreen').then((m) => ({ default: m.ShopItemRegisterScreen })));
+const ShowNapAdScreen = lazy(() => import('./src/screens/ShowNapAdScreen').then((m) => ({ default: m.ShowNapAdScreen })));
+const ShowPockAdScreen = lazy(() => import('./src/screens/ShowPockAdScreen').then((m) => ({ default: m.ShowPockAdScreen })));
+const ShowWebViewScreen = lazy(() => import('./src/screens/ShowWebViewScreen').then((m) => ({ default: m.ShowWebViewScreen })));
+const XRUNinfoScreen = lazy(() => import('./src/screens/XRUNinfo').then((m) => ({ default: m.XRUNinfoScreen })));
+const XplayInfoScreen = lazy(() => import('./src/screens/XplayInfoScreen').then((m) => ({ default: m.XplayInfoScreen })));
+const XplayZoneScreen = lazy(() => import('./src/screens/XplayZoneScreen').then((m) => ({ default: m.XplayZoneScreen })));
+const MyinfoShopSalesScreen = lazy(() => import('./src/screens/MyinfoShopSalesScreen').then((m) => ({ default: m.MyinfoShopSalesScreen })));
+const PangleListScreen = lazy(() => import('./src/screens/PangleListScreen').then((m) => ({ default: m.PangleListScreen })));
+const AyetOffersScreen = lazy(() => import('./src/screens/AyetOffersScreen').then((m) => ({ default: m.AyetOffersScreen })));
+const WalletPrivateKeyDisplayScreen = lazy(() => import('./src/screens/WalletPrivateKeyDisplayScreen').then((m) => ({ default: m.WalletPrivateKeyDisplayScreen })));
+const WalletPrivateKeyGoogleAuthScreen = lazy(() => import('./src/screens/WalletPrivateKeyGoogleAuthScreen').then((m) => ({ default: m.WalletPrivateKeyGoogleAuthScreen })));
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
@@ -99,6 +99,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
 import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
 import { useTranslation } from 'react-i18next';
+
+const _bootSlowLogAppModule = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+console.log(_bootSlowLogAppModule, '5. App.tsx 모듈 로드 완료 (import 체인 평가 끝, 컴포넌트 마운트 전)');
 
 let processedDeepLinkUrl: string | null = null;
 let isDeepLinkProcessing = false;
@@ -311,265 +314,77 @@ const ScreenHost = () => {
 
   }, [currentScreen]);
 
-  if (currentScreen === 'login') {
-    return <LoginScreen />;
-  }
-
-  if (currentScreen === 'signup') {
-    return <SignupScreen />;
-  }
-
-  if (currentScreen === 'countryCodeSelect') {
-    return <CountryCodeSelectScreen />;
-  }
-
-  if (currentScreen === 'emailVerification') {
-    return <EmailVerificationScreen />;
-  }
-
-  if (currentScreen === 'verificationCode') {
-    return <VerificationCodeScreen />;
-  }
-
-  if (currentScreen === 'terms') {
-    return <TermsScreen />;
-  }
-
-  if (currentScreen === 'privacy') {
-    return <PrivacyPolicyScreen />;
-  }
-
-  if (currentScreen === 'wallet') {
-    return <WalletScreen />;
-  }
-
-  if (currentScreen === 'polygonHistory') {
-    return <PolygonWalletScreen />;
-  }
-
-  if (currentScreen === 'xrunHistory') {
-    return <XrunWalletScreen />;
-  }
-
-  if (currentScreen === 'nftHistory') {
-    return <NftWalletScreen />;
-  }
-
-  if (currentScreen === 'xrunHistory2') {
-    return <XrunWalletScreen2 />;
-  }
-
-  if (currentScreen === 'adHistory') {
-    return <AdWalletScreen />;
-  }
-
-  if (currentScreen === 'walletDetail') {
-    return <WalletDetailScreen />;
-  }
-
-  if (currentScreen === 'transactionDetails') {
-    return <TransactionDetailsScreen />;
-  }
-
-  if (currentScreen === 'map') {
-    return <MapMainScreen />;
-  }
-
-  if (currentScreen === 'walletSend') {
-    return <WalletSendScreen />;
-  }
-
-  if (currentScreen === 'walletQrScan') {
-    return <WalletQrScanScreen />;
-  }
-
-  if (currentScreen === 'walletEstimate') {
-    return <WalletEstimateFeeScreen />;
-  }
-
-  if (currentScreen === 'walletTransactionProgress') {
-    return <WalletTransactionProgressScreen />;
-  }
-
-  if (currentScreen === 'walletTransactionResult') {
-    return <WalletTransactionResultScreen />;
-  }
-
-  if (currentScreen === 'walletReceive') {
-    return <WalletReceiveScreen />;
-  }
-
-  if (currentScreen === 'addWalletAddress') {
-    return <AddWalletAddressScreen />;
-  }
-
-  if (currentScreen === 'myInfo') {
-    return <MyInfoScreen />;
-  }
-
-  if (currentScreen === 'myInfoEmailAuth') {
-    return <MyInfoEmailAuthScreen />;
-  }
-
-  if (currentScreen === 'myInfoFaq') {
-    return <MyInfoFaqScreen />;
-  }
-
-  if (currentScreen === 'myInfoEdit') {
-    return <MyInfoEditScreen />;
-  }
-
-  if (currentScreen === 'myInfoPhoneEdit') {
-    return <PhoneEditScreen />;
-  }
-
-  if (currentScreen === 'myInfoChangePassword') {
-    return <ChangePasswordScreen />;
-  }
-
-  if (currentScreen === 'myInfoSettings') {
-    return <MyInfoSettingsScreen />;
-  }
-
-  if (currentScreen === 'pangleList') {
-    return <PangleListScreen />;
-  }
-
-  if (currentScreen === 'ayetOffers') {
-    return <AyetOffersScreen />;
-  }
-
-  if (currentScreen === 'ayetOffersXplay') {
-    return <AyetOffersScreen slotName="Xplay" />;
-  }
-
-  if (currentScreen === 'walletPrivateKeyDisplay') {
-    return <WalletPrivateKeyDisplayScreen />;
-  }
-
-  if (currentScreen === 'walletPrivateKeyGoogleAuth') {
-    return <WalletPrivateKeyGoogleAuthScreen />;
-  }
-
-  if (currentScreen === 'myInfoCloseMembership') {
-
-    return <MyInfoCloseMembershipScreen />;
-  }
-
-  if (currentScreen === 'myInfoCloseMembershipSuccess') {
-    return <MyInfoCloseMembershipSuccessScreen />;
-  }
-
-  if (currentScreen === 'myInfoClauses') {
-    return <MyInfoClausesScreen />;
-  }
-
-  if (currentScreen === 'myInfoClauseDetail') {
-    return <ClauseDetailScreen />;
-  }
-
-  if (currentScreen === 'myInfoNotify') {
-    return <MyInfoNotifyScreen />;
-  }
-
-  if (currentScreen === 'myInfoReferral') {
-    return <MyInfoReferralScreen />;
-  }
-
-  if (currentScreen === 'referralMyGroup') {
-    return <ReferralMyGroupScreen />;
-  }
-
-  if (currentScreen === 'referralSettlement') {
-    return <ReferralSettlementScreen />;
-  }
-
-  if (currentScreen === 'referralRank') {
-    return <ReferralRankScreen />;
-  }
-
-  if (currentScreen === 'referralDepthOne') {
-    return <ReferralDepthOneScreen />;
-  }
-
-  if (currentScreen === 'referralDepthTwo') {
-    return <ReferralDepthTwoScreen />;
-  }
-
-  if (currentScreen === 'referralInput') {
-    return <ReferralInputScreen />;
-  }
-
-  if (currentScreen === 'shop') {
+  const screenFallback = <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#007aff" /></View>;
+  let screen: React.ReactNode;
+  if (currentScreen === 'login') screen = <LoginScreen />;
+  else if (currentScreen === 'signup') screen = <SignupScreen />;
+  else if (currentScreen === 'countryCodeSelect') screen = <CountryCodeSelectScreen />;
+  else if (currentScreen === 'emailVerification') screen = <EmailVerificationScreen />;
+  else if (currentScreen === 'verificationCode') screen = <VerificationCodeScreen />;
+  else if (currentScreen === 'terms') screen = <TermsScreen />;
+  else if (currentScreen === 'privacy') screen = <PrivacyPolicyScreen />;
+  else if (currentScreen === 'wallet') screen = <WalletScreen />;
+  else if (currentScreen === 'polygonHistory') screen = <PolygonWalletScreen />;
+  else if (currentScreen === 'xrunHistory') screen = <XrunWalletScreen />;
+  else if (currentScreen === 'nftHistory') screen = <NftWalletScreen />;
+  else if (currentScreen === 'xrunHistory2') screen = <XrunWalletScreen2 />;
+  else if (currentScreen === 'adHistory') screen = <AdWalletScreen />;
+  else if (currentScreen === 'walletDetail') screen = <WalletDetailScreen />;
+  else if (currentScreen === 'transactionDetails') screen = <TransactionDetailsScreen />;
+  else if (currentScreen === 'map') screen = <MapMainScreen />;
+  else if (currentScreen === 'walletSend') screen = <WalletSendScreen />;
+  else if (currentScreen === 'walletQrScan') screen = <WalletQrScanScreen />;
+  else if (currentScreen === 'walletEstimate') screen = <WalletEstimateFeeScreen />;
+  else if (currentScreen === 'walletTransactionProgress') screen = <WalletTransactionProgressScreen />;
+  else if (currentScreen === 'walletTransactionResult') screen = <WalletTransactionResultScreen />;
+  else if (currentScreen === 'walletReceive') screen = <WalletReceiveScreen />;
+  else if (currentScreen === 'addWalletAddress') screen = <AddWalletAddressScreen />;
+  else if (currentScreen === 'myInfo') screen = <MyInfoScreen />;
+  else if (currentScreen === 'myInfoEmailAuth') screen = <MyInfoEmailAuthScreen />;
+  else if (currentScreen === 'myInfoFaq') screen = <MyInfoFaqScreen />;
+  else if (currentScreen === 'myInfoEdit') screen = <MyInfoEditScreen />;
+  else if (currentScreen === 'myInfoPhoneEdit') screen = <PhoneEditScreen />;
+  else if (currentScreen === 'myInfoChangePassword') screen = <ChangePasswordScreen />;
+  else if (currentScreen === 'myInfoSettings') screen = <MyInfoSettingsScreen />;
+  else if (currentScreen === 'pangleList') screen = <PangleListScreen />;
+  else if (currentScreen === 'ayetOffers') screen = <AyetOffersScreen />;
+  else if (currentScreen === 'ayetOffersXplay') screen = <AyetOffersScreen slotName="Xplay" />;
+  else if (currentScreen === 'walletPrivateKeyDisplay') screen = <WalletPrivateKeyDisplayScreen />;
+  else if (currentScreen === 'walletPrivateKeyGoogleAuth') screen = <WalletPrivateKeyGoogleAuthScreen />;
+  else if (currentScreen === 'myInfoCloseMembership') screen = <MyInfoCloseMembershipScreen />;
+  else if (currentScreen === 'myInfoCloseMembershipSuccess') screen = <MyInfoCloseMembershipSuccessScreen />;
+  else if (currentScreen === 'myInfoClauses') screen = <MyInfoClausesScreen />;
+  else if (currentScreen === 'myInfoClauseDetail') screen = <ClauseDetailScreen />;
+  else if (currentScreen === 'myInfoNotify') screen = <MyInfoNotifyScreen />;
+  else if (currentScreen === 'myInfoReferral') screen = <MyInfoReferralScreen />;
+  else if (currentScreen === 'referralMyGroup') screen = <ReferralMyGroupScreen />;
+  else if (currentScreen === 'referralSettlement') screen = <ReferralSettlementScreen />;
+  else if (currentScreen === 'referralRank') screen = <ReferralRankScreen />;
+  else if (currentScreen === 'referralDepthOne') screen = <ReferralDepthOneScreen />;
+  else if (currentScreen === 'referralDepthTwo') screen = <ReferralDepthTwoScreen />;
+  else if (currentScreen === 'referralInput') screen = <ReferralInputScreen />;
+  else if (currentScreen === 'shop') {
     console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
-    return <ShopScreen />;
+    screen = <ShopScreen />;
   }
-
-  if (currentScreen === 'shopTicket') {
-    return <ShopTicketScreen />;
-  }
-
-  if (currentScreen === 'shopMyTicket') {
-    return <ShopMyTicketScreen />;
-  }
-
-  if (currentScreen === 'shopMyItems') {
-    return <ShopMyItemsScreen />;
-  }
-
-  if (currentScreen === 'shopMyTicketDetail') {
-    return <ShopMyTicketDetailScreen />;
-  }
-
-  if (currentScreen === 'shopProductDetail') {
-    return <ShopProductDetailScreen />;
-  }
-
-  if (currentScreen === 'shopBuy') {
-    return <ShopBuyScreen />;
-  }
-
-  if (currentScreen === 'shopSuccess') {
-    return <ShopSuccessScreen />;
-  }
-
-  if (currentScreen === 'shopTicketDetail') {
-    return <ShopTicketDetailScreen />;
-  }
-
-  if (currentScreen === 'shopItemRegister') {
-    return <ShopItemRegisterScreen />;
-  }
-
-  if (currentScreen === 'showNapAd') {
-    return <ShowNapAdScreen />;
-  }
-
-  if (currentScreen === 'showPockAd') {
-    return <ShowPockAdScreen />;
-  }
-
-  if (currentScreen === 'showWebView') {
-    return <ShowWebViewScreen />;
-  }
-
-  if (currentScreen === 'xrunInfo') {
-    return <XRUNinfoScreen />;
-  }
-
-  if (currentScreen === 'xplayInfo') {
-    return <XplayInfoScreen />;
-  }
-
-  if (currentScreen === 'xplayZone') {
-    return <XplayZoneScreen />;
-  }
-
-  if (currentScreen === 'myinfoShopSales') {
-    return <MyinfoShopSalesScreen />;
-  }
-
-  return <LoginSignupScreen />;
+  else if (currentScreen === 'shopTicket') screen = <ShopTicketScreen />;
+  else if (currentScreen === 'shopMyTicket') screen = <ShopMyTicketScreen />;
+  else if (currentScreen === 'shopMyItems') screen = <ShopMyItemsScreen />;
+  else if (currentScreen === 'shopMyTicketDetail') screen = <ShopMyTicketDetailScreen />;
+  else if (currentScreen === 'shopProductDetail') screen = <ShopProductDetailScreen />;
+  else if (currentScreen === 'shopBuy') screen = <ShopBuyScreen />;
+  else if (currentScreen === 'shopSuccess') screen = <ShopSuccessScreen />;
+  else if (currentScreen === 'shopTicketDetail') screen = <ShopTicketDetailScreen />;
+  else if (currentScreen === 'shopItemRegister') screen = <ShopItemRegisterScreen />;
+  else if (currentScreen === 'showNapAd') screen = <ShowNapAdScreen />;
+  else if (currentScreen === 'showPockAd') screen = <ShowPockAdScreen />;
+  else if (currentScreen === 'showWebView') screen = <ShowWebViewScreen />;
+  else if (currentScreen === 'xrunInfo') screen = <XRUNinfoScreen />;
+  else if (currentScreen === 'xplayInfo') screen = <XplayInfoScreen />;
+  else if (currentScreen === 'xplayZone') screen = <XplayZoneScreen />;
+  else if (currentScreen === 'myinfoShopSales') screen = <MyinfoShopSalesScreen />;
+  else screen = <LoginSignupScreen />;
+  return <Suspense fallback={screenFallback}>{screen}</Suspense>;
 };
 
 const PermissionRequester = ({ isAdFinished }: { isAdFinished: boolean }) => {
@@ -944,8 +759,11 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const BOOT_SLOW_LOG = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     if (appInitDoneRef.current) return;
     appInitDoneRef.current = true;
+    const bootStartAt = Date.now();
+    console.log(BOOT_SLOW_LOG, '6. 부팅 시작 (initializeApp useEffect 진입)');
 
     if (__DEV__) {
       try {
@@ -953,20 +771,29 @@ export default function App() {
       } catch (_) {}
     }
 
+    console.log(BOOT_SLOW_LOG, 'initGoogleSignIn 시작');
     initGoogleSignIn();
+    console.log(BOOT_SLOW_LOG, 'initGoogleSignIn 호출 완료 (동기)', `${Date.now() - bootStartAt}ms`);
 
     const initializeApp = async () => {
       const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
 
       try {
         devBoot?.recordBootStep('start');
+        let t = Date.now();
+        console.log(BOOT_SLOW_LOG, 'loadEnvSync 시작');
         loadEnvSync();
+        console.log(BOOT_SLOW_LOG, 'loadEnvSync 완료', `${Date.now() - t}ms`);
+        t = Date.now();
+        console.log(BOOT_SLOW_LOG, 'initI18nSync 시작');
         initI18nSync();
+        console.log(BOOT_SLOW_LOG, 'initI18nSync 완료', `${Date.now() - t}ms`);
         console.log('[App] 환경 변수·i18n 동기 초기화 완료 (저장 언어는 백그라운드 적용)');
       } catch (error) {
-        console.error('[App] 초기화 실패:', error);
+        console.error(BOOT_SLOW_LOG, '초기화 실패:', error);
       }
 
+      console.log(BOOT_SLOW_LOG, '첫 화면 표시 가능 (setIsLoading false)', `${Date.now() - bootStartAt}ms 경과`);
       setIsAdFinished(true);
       setIsLoading(false);
       if (__DEV__) {
@@ -1040,16 +867,22 @@ export default function App() {
         } catch (_) {}
       }
 
-      getTopAd5().then(() => console.log('[App] TopAd5 광고 캐시 완료')).catch((e) => console.error('[App] TopAd5 광고 캐시 실패:', e));
+      console.log(BOOT_SLOW_LOG, 'getTopAd5 호출 시작 (비동기)');
+      getTopAd5()
+        .then(() => console.log(BOOT_SLOW_LOG, 'getTopAd5 광고 캐시 완료', `${Date.now() - bootStartAt}ms 경과`))
+        .catch((e) => console.error(BOOT_SLOW_LOG, 'getTopAd5 광고 캐시 실패:', e));
+      console.log(BOOT_SLOW_LOG, 'runBackground 1.5초 후 예약 (Taboola/AppsFlyer/고팍스 등)');
       setTimeout(runBackground, 1500);
 
+      console.log(BOOT_SLOW_LOG, '앱 오프닝 광고 setTimeout(0) 예약');
       setTimeout(() => {
+        console.log(BOOT_SLOW_LOG, '앱 오프닝 광고 실행 시작', `${Date.now() - bootStartAt}ms 경과`);
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         devBoot?.recordBootStep('pangle_start');
         initializePangle()
           .then(() => loadAndShowAppOpenAd())
-          .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
-          .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
+          .then(() => console.log(BOOT_SLOW_LOG, '앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)', `${Date.now() - bootStartAt}ms 경과`))
+          .catch((error) => console.error(BOOT_SLOW_LOG, '앱 오프닝 광고 실패:', error))
           .finally(() => devBoot?.recordBootStep('pangle_done'));
       }, 0);
     };

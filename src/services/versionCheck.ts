@@ -33,8 +33,10 @@ export const checkServerVersion = async (): Promise<ServerCheckResponse | null> 
   if (servercheckCache && now - servercheckCache.at < SERVERCHECK_CACHE_MS) {
     return servercheckCache.result;
   }
+  const BOOT_SLOW_LOG = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+  const t0 = Date.now();
   try {
-    console.log('[VersionCheck] 서버 버전 확인 시작');
+    console.log(BOOT_SLOW_LOG, '[VersionCheck] 서버 버전 확인 시작');
     const env = getEnv();
     const url = `${env.GATEWAY_NODEJS}/servercheck`;
     const res = await fetch(url, {
@@ -44,13 +46,13 @@ export const checkServerVersion = async (): Promise<ServerCheckResponse | null> 
     if (!res.ok) return null;
     const response = await res.json();
     if (response && response.status === 'success' && response.data) {
-      console.log('[VersionCheck] 서버 버전 확인 성공:', response.data);
+      console.log(BOOT_SLOW_LOG, '[VersionCheck] 서버 버전 확인 완료', `${Date.now() - t0}ms`, response.data);
       servercheckCache = { result: response as ServerCheckResponse, at: Date.now() };
       return servercheckCache.result;
     }
     return null;
   } catch (error) {
-    console.error('[VersionCheck] 서버 버전 확인 실패:', error);
+    console.error(BOOT_SLOW_LOG, '[VersionCheck] 서버 버전 확인 실패', `${Date.now() - t0}ms`, error);
     return null;
   }
 };
