@@ -82,6 +82,7 @@ import { initI18nSync, applyStoredLanguageAsync } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
+import { initializeAdMob, loadAndShowAppOpenAd as loadAndShowAppOpenAdAdMob } from './src/services/admob';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
 import {
@@ -879,8 +880,12 @@ export default function App() {
         console.log(BOOT_SLOW_LOG, '앱 오프닝 광고 실행 시작', `${Date.now() - bootStartAt}ms 경과`);
         const devBoot = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         devBoot?.recordBootStep('pangle_start');
+        const runAppOpenAd = () =>
+          Platform.OS === 'android'
+            ? initializeAdMob().then(() => loadAndShowAppOpenAdAdMob())
+            : loadAndShowAppOpenAd();
         initializePangle()
-          .then(() => loadAndShowAppOpenAd())
+          .then(() => runAppOpenAd())
           .then(() => console.log(BOOT_SLOW_LOG, '앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)', `${Date.now() - bootStartAt}ms 경과`))
           .catch((error) => console.error(BOOT_SLOW_LOG, '앱 오프닝 광고 실패:', error))
           .finally(() => devBoot?.recordBootStep('pangle_done'));

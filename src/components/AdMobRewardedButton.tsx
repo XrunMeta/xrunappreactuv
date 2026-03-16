@@ -3,31 +3,22 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
+import { loadAndShowRewardedAd as loadAndShowRewardedAdAdMob, isAdMobReady, getAdMobMediationGroupId } from '../services/admob';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { DeviceInfo } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, SIZES, FONTS } from '../constants';
+import { Platform } from 'react-native';
 
 interface AdMobRewardedButtonProps {
-
   title?: string;
-
   member?: string;
-
   adUnitId?: string;
-
   onRewarded?: (reward: { type: string; amount: number }) => void;
-
   onAdClosed?: () => void;
-
   onAdFailedToLoad?: (error: Error) => void;
-
   buttonStyle?: ViewStyle;
-
   textStyle?: TextStyle;
-
   disabled?: boolean;
-
   testMode?: boolean;
 }
 
@@ -45,10 +36,10 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
+  const canShow = Platform.OS === 'android' ? isAdMobReady() : isPangleReadySync();
+
   const handlePress = async () => {
-    if (disabled || isLoading || !isPangleReadySync()) {
-      return;
-    }
+    if (disabled || isLoading || !canShow) return;
 
     try {
       setIsLoading(true);
@@ -68,40 +59,49 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
 
       const deviceInfo = await collectDeviceInfo();
 
-      const finalAdUnitId = adUnitId || getPangleRewardedAdUnitId();
-
-      await loadAndShowRewardedAd(
-        finalAdUnitId,
-        finalMember,
-        deviceInfo,
-        (reward) => {
-          console.log('[AdMobRewardedButton] 보상 수령:', reward);
-          setIsLoading(false);
-          if (onRewarded) {
-            onRewarded(reward);
-          }
-        },
-        () => {
-          console.log('[AdMobRewardedButton] 광고 닫힘');
-          setIsLoading(false);
-          if (onAdClosed) {
-            onAdClosed();
-          }
-        },
-        (error) => {
-          console.error('[AdMobRewardedButton] 광고 로드 실패:', error);
-          setIsLoading(false);
-          if (onAdFailedToLoad) {
-            onAdFailedToLoad(error);
-          }
-        },
-      );
+      if (Platform.OS === 'android') {
+        const finalAdUnitId = adUnitId || getAdMobMediationGroupId() || getPangleRewardedAdUnitId() || undefined;
+        await loadAndShowRewardedAdAdMob(
+          finalAdUnitId,
+          finalMember,
+          deviceInfo,
+          (reward) => {
+            setIsLoading(false);
+            if (onRewarded) onRewarded(reward);
+          },
+          () => {
+            setIsLoading(false);
+            if (onAdClosed) onAdClosed();
+          },
+          (error) => {
+            setIsLoading(false);
+            if (onAdFailedToLoad) onAdFailedToLoad(error);
+          },
+        );
+      } else {
+        const finalAdUnitId = adUnitId || getPangleRewardedAdUnitId();
+        await loadAndShowRewardedAd(
+          finalAdUnitId,
+          finalMember,
+          deviceInfo,
+          (reward) => {
+            setIsLoading(false);
+            if (onRewarded) onRewarded(reward);
+          },
+          () => {
+            setIsLoading(false);
+            if (onAdClosed) onAdClosed();
+          },
+          (error) => {
+            setIsLoading(false);
+            if (onAdFailedToLoad) onAdFailedToLoad(error);
+          },
+        );
+      }
     } catch (error) {
       console.error('[AdMobRewardedButton] 오류:', error);
       setIsLoading(false);
-      if (onAdFailedToLoad) {
-        onAdFailedToLoad(error as Error);
-      }
+      if (onAdFailedToLoad) onAdFailedToLoad(error as Error);
     }
   };
 
@@ -110,18 +110,16 @@ export const AdMobRewardedButton: React.FC<AdMobRewardedButtonProps> = ({
       style={[
         styles.button,
         buttonStyle,
-        (disabled || isLoading || !isAdMobReady()) && styles.buttonDisabled,
+        (disabled || isLoading || !canShow) && styles.buttonDisabled,
       ]}
       onPress={handlePress}
-      disabled={disabled || isLoading || !isPangleReady()}
+      disabled={disabled || isLoading || !canShow}
       activeOpacity={0.7}
     >
       {isLoading ? (
         <ActivityIndicator color={COLORS.text} size="small" />
       ) : (
-        <Text style={[styles.buttonText, textStyle]}>
-          {title}
-        </Text>
+        <Text style={[styles.buttonText, textStyle]}>{title}</Text>
       )}
     </TouchableOpacity>
   );
@@ -146,4 +144,3 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
 });
-
