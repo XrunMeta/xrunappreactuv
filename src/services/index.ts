@@ -291,13 +291,14 @@ export const sendAliveSignal = async (
   }
   try {
     const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
+
+    const authHeader = `Bearer ${env.GATEWAY_AUTH_CODE}`;
 
     const response = await nodeGatewayRequest('/keepalive', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authCode}`,
+        Authorization: authHeader,
       },
     }, navigation);
 
@@ -456,7 +457,9 @@ export const createAxiosInstance = (navigation?: any) => {
   });
 
   instance.interceptors.request.use(
-    (config) => {
+    async (config) => {
+      config.headers = config.headers || {};
+      config.headers['Authorization'] = `Bearer ${authCode}`;
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -3304,6 +3307,8 @@ export const gatewayNodeJS = async (
     const env = getEnv();
     const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
 
+    const authHeader = `Bearer ${env.GATEWAY_AUTH_CODE}`;
+
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
       console.log(`🌐 [gatewayNodeJS] endpoint: ${endpoint}`);
@@ -3316,7 +3321,7 @@ export const gatewayNodeJS = async (
       method: method,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
+        Authorization: authHeader,
       },
     };
 
