@@ -81,8 +81,7 @@ import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
-import { v_f095b0, v_e55270 } from './src/services/pangle';
-import { v_b357c3, v_e55270 as v_7fad65 } from './src/services/admob';
+
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
 import {
@@ -880,12 +879,15 @@ export default function v_6540c3() {
         console.log(v_8a5f7b, '앱 오프닝 광고 실행 시작', `${Date.now() - v_cf7eba}ms 경과`);
         const v_cbd24a = __DEV__ ? require('./src/utils/devDebugStore').devDebugStore : null;
         v_cbd24a?.recordBootStep('pangle_start');
-        const v_86ac56 = () =>
-          v_326be8.OS === 'android'
-            ? v_b357c3().then(() => v_7fad65())
-            : v_e55270();
-        v_f095b0()
-          .then(() => v_86ac56())
+        const v_86ac56 = () => {
+          if (v_326be8.OS === 'android') {
+            const v_3c9bd6 = require('./src/services/admob');
+            return v_3c9bd6.initializeAdMob().then(() => v_3c9bd6.loadAndShowAppOpenAd());
+          }
+          const v_8b4fd0 = require('./src/services/pangle');
+          return v_8b4fd0.initializePangle().then(() => v_8b4fd0.loadAndShowAppOpenAd());
+        };
+        v_86ac56()
           .then(() => console.log(v_8a5f7b, '앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)', `${Date.now() - v_cf7eba}ms 경과`))
           .catch((v_5e9bfe) => console.error(v_8a5f7b, '앱 오프닝 광고 실패:', v_5e9bfe))
           .finally(() => v_cbd24a?.recordBootStep('pangle_done'));

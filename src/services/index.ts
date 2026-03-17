@@ -291,13 +291,14 @@ export const v_495832 = async (
   }
   try {
     const v_c9c489 = v_e4a763();
-    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+
+    const v_5c1e3a = `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
 
     const v_3393e3 = await v_12a388('/keepalive', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_36dd9e}`,
+        Authorization: v_5c1e3a,
       },
     }, v_c65f5d);
 
@@ -456,7 +457,9 @@ export const v_7488d5 = (v_c65f5d) => {
   });
 
   v_0c3a5b.interceptors.request.use(
-    (v_74a79c) => {
+    async (v_74a79c) => {
+      v_74a79c.headers = v_74a79c.headers || {};
+      v_74a79c.headers['Authorization'] = `Bearer ${v_36dd9e}`;
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -3304,6 +3307,8 @@ export const v_c07360 = async (
     const v_c9c489 = v_e4a763();
     const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
 
+    const v_5c1e3a = `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
       console.log(`🌐 [gatewayNodeJS] endpoint: ${v_09dafd}`);
@@ -3316,7 +3321,7 @@ export const v_c07360 = async (
       method: v_bfe9b9,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
+        Authorization: v_5c1e3a,
       },
     };
 

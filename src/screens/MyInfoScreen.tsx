@@ -130,13 +130,18 @@ export const v_03a231 = () => {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (v_f24fd5) {
           const v_ef7306 = JSON.parse(v_f24fd5);
-          const v_660822 = v_ef7306.member;
+          if (v_ef7306 == null || typeof v_ef7306 !== 'object') {
+            v_deef62(false);
+            return;
+          }
+          const v_660822 = v_ef7306.member != null ? Number(v_ef7306.member) : undefined;
 
           if (v_660822) {
             const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
-            const v_625c74 = v_3393e3.data[0];
+            const v_9390e8 = v_3393e3?.data;
+            const v_625c74 = v_9390e8 == null ? null : Array.isArray(v_9390e8) ? v_9390e8[0] : v_9390e8;
 
-            if (v_625c74) {
+            if (v_625c74 != null && typeof v_625c74 === 'object') {
               const v_a32a50 = v_625c74.firstname || '';
               const v_328bb4 = v_625c74.lastname || '';
               const v_05b02f = `${v_328bb4} ${v_a32a50}`.trim() || '사용자';

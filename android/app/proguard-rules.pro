@@ -14,4 +14,13 @@
 # ayeT SDK (Offerwall)
 -keep class com.ayet.sdk.** { *; }
 
+# Google Mobile Ads (AdMob) - AAB/릴리스에서 광고 미노출 방지
+-keep class com.google.android.gms.ads.** { *; }
+-dontwarn com.google.android.gms.ads.**
+
+# Pangle (bytedance) 미디에이션 - AAB에서 팽글 광고 노출을 위해 유지
+-keep class com.bytedance.sdk.openadsdk.** { *; }
+-keep interface com.bytedance.sdk.openadsdk.** { *; }
+-dontwarn com.bytedance.sdk.**
+
 # Add any project specific keep options here:
