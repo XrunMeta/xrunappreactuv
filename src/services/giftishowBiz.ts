@@ -47,6 +47,8 @@ export const GIFTISHOW_BIZ_ERROR_CODES: Record<string, string> = {
   E0012: '토큰키가 없습니다',
   E0013: '테스트 YN 값이 없습니다',
   E9999: '오류가 발생했습니다',
+
+  REQUIRED_VALUE_MISSING: '필수 인증 정보가 없습니다. GIFTISHOW_BIZ_AUTH_KEY, GIFTISHOW_BIZ_TOKEN_KEY(또는 ENCRYPTION_KEY)를 .env 또는 env.embedded.json에 설정해 주세요.',
   ERR0217: 'MMS 번호 변경 불가',
   E0002: 'API 코드가 존재하지 않습니다',
   ERR0800: '비즈포인트 조회 오류',
@@ -69,10 +71,13 @@ export const GIFTISHOW_BIZ_ERROR_CODES: Record<string, string> = {
 };
 
 export function getGiftishowErrorMessage(resCode: string | undefined, resMsg?: string | null): string {
-  if (!resCode) return resMsg && resMsg.trim() ? resMsg : '알 수 없는 오류';
+  const msg = (resMsg && resMsg.trim()) || '';
+  if (msg.toLowerCase().includes('required value is missing') || msg.toLowerCase().includes('required value'))
+    return GIFTISHOW_BIZ_ERROR_CODES.REQUIRED_VALUE_MISSING;
+  if (!resCode) return msg || '알 수 없는 오류';
   const desc = GIFTISHOW_BIZ_ERROR_CODES[resCode];
-  if (desc) return resMsg && resMsg.trim() ? `${desc} (${resMsg})` : desc;
-  return resMsg && resMsg.trim() ? resMsg : `오류: ${resCode}`;
+  if (desc) return msg ? `${desc} (${resMsg})` : desc;
+  return msg || `오류: ${resCode}`;
 }
 
 const warned404Paths = new Set<string>();
@@ -141,6 +146,13 @@ function getGiftishowAuthParams(apiCode: string): URLSearchParams {
       ? encryptAuthKey(authCode, encryptionKey)
       : (env.GIFTISHOW_BIZ_TOKEN_KEY || '');
   const devYn = (env.GIFTISHOW_BIZ_DEV_FLAG || 'Y') === 'Y' ? 'Y' : 'N';
+
+  if (__DEV__ && (!authCode.trim() || !customAuthToken.trim())) {
+    console.warn(
+      '[기프티쇼비즈] 인증 값이 비어 있습니다. "required value is missing" 오류가 나올 수 있습니다. ' +
+        'GIFTISHOW_BIZ_AUTH_KEY, GIFTISHOW_BIZ_TOKEN_KEY(또는 GIFTISHOW_BIZ_ENCRYPTION_KEY)를 .env 또는 env.embedded.json에 설정하세요.',
+    );
+  }
 
   const params = new URLSearchParams();
   params.set('api_code', apiCode);

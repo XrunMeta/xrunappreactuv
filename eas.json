@@ -36,10 +36,14 @@
       "distribution": "internal"
     },
     "production": {
+      "distribution": "store",
       "autoIncrement": true,
       "ios": {
         "distribution": "store",
-        "image": "latest" 
+        "image": "latest"
+      },
+      "android": {
+        "distribution": "store"
       }
     }
   },
