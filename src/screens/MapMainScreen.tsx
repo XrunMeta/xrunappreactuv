@@ -3449,19 +3449,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
 }
 
         {}
-
-        {v_16772f && (
-          <Pressable
-            style={v_d81136.mapPinButton}
-            onPress={v_30b908}
-          >
-            <Image
-              source={v_16772f}
-              style={v_d81136.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <Pressable
+          style={v_d81136.mapPinButton}
+          onPress={v_30b908}
+        >
+          <Image
+            source={require('../../assets/images/locationpin2.png')}
+            style={v_d81136.mapPinIcon}
+            resizeMode="contain"
+          />
+        </Pressable>
 
         {}
 

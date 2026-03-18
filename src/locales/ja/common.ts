@@ -28,6 +28,7 @@ export default {
   versionUpdate: {
     title: '新しいバージョンがあります',
     latestVersion: '最新バージョン',
+    slowNotice: '動作が遅い場合は、設定 - アプリ - XRUN - ストレージ - データ削除＋キャッシュ削除の後に進めてください。',
     message: 'より良い体験のために最新バージョンに更新してください。',
     update: '更新',
     later: '後で',

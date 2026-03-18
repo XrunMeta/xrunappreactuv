@@ -97,7 +97,7 @@ import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_f84ef5 } from './src/services';
-import { v_f16a74, v_deac27, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
+import { v_f16a74, v_deac27, v_763f0d, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 import { v_772971 } from 'jmpfvteuuztnp';
 
 let v_308260 = null;
@@ -790,25 +790,34 @@ const v_d0a391 = () => {
     return () => clearTimeout(v_cb36b1);
   }, []);
 
+  const v_9aae33 = v_e662ae<v_c3551b>(v_6b5698.currentState);
   v_c4deb2(() => {
     const v_7a424f = async (nextAppState: v_c3551b) => {
-      if (v_3b10d8 === 'active') {
+      const v_0221a3 = v_9aae33.current;
+      v_9aae33.current = v_3b10d8;
 
-        try {
-          const v_4587b3 = v_deac27();
-          const v_1300ee = await v_f16a74();
+      const v_53d7c7 = (v_0221a3 === 'background' || v_0221a3 === 'inactive') && v_3b10d8 === 'active';
+      if (!v_53d7c7) return;
 
-          if (v_1300ee && v_790b4f(v_4587b3, v_1300ee)) {
+      try {
+        v_763f0d();
+        const v_090f7c = await v_5ee4ec();
+        const v_4587b3 = v_deac27();
+        const v_1300ee = await v_f16a74();
+        const v_50893c = v_1300ee ? v_790b4f(v_4587b3, v_1300ee) : false;
 
-            if (!v_614e3c) {
-              v_b5ebec(v_1300ee);
-              v_d97db8(false); 
-              v_80c653(true);
-            }
+        if (v_090f7c || v_50893c) {
+          if (!v_614e3c) {
+            v_b5ebec(v_1300ee ?? v_4587b3);
+            v_d97db8(v_090f7c);
+            v_80c653(true);
           }
-        } catch (v_5e9bfe) {
-          console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', v_5e9bfe);
+        } else {
+
+          v_80c653(false);
         }
+      } catch (v_5e9bfe) {
+        console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', v_5e9bfe);
       }
     };
 

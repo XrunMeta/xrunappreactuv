@@ -28,6 +28,10 @@ interface ServerCheckResponse {
 const v_1e9518 = 30000; 
 let v_7a1893 = null;
 
+export const v_763f0d = (): void => {
+  v_7a1893 = null;
+};
+
 export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
   const v_5c2f9f = Date.now();
   if (v_7a1893 && v_5c2f9f - v_7a1893.at < v_1e9518) {
