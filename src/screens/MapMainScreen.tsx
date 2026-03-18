@@ -3449,19 +3449,16 @@ export const MapMainScreen: React.FC = () => {
 }
 
         {}
-
-        {iconMapPoint && (
-          <Pressable
-            style={styles.mapPinButton}
-            onPress={goToCurrentLocation}
-          >
-            <Image
-              source={iconMapPoint}
-              style={styles.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <Pressable
+          style={styles.mapPinButton}
+          onPress={goToCurrentLocation}
+        >
+          <Image
+            source={require('../../assets/images/locationpin2.png')}
+            style={styles.mapPinIcon}
+            resizeMode="contain"
+          />
+        </Pressable>
 
         {}
 

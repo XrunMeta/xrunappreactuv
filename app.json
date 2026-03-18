@@ -55,11 +55,11 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "19"
+      "buildNumber": "20"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 278,
+      "versionCode": 279,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {

@@ -28,6 +28,10 @@ interface ServerCheckResponse {
 const SERVERCHECK_CACHE_MS = 30000; 
 let servercheckCache: { result: ServerCheckResponse; at: number } | null = null;
 
+export const invalidateServerVersionCache = (): void => {
+  servercheckCache = null;
+};
+
 export const checkServerVersion = async (): Promise<ServerCheckResponse | null> => {
   const now = Date.now();
   if (servercheckCache && now - servercheckCache.at < SERVERCHECK_CACHE_MS) {
