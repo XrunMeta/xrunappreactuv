@@ -3885,13 +3885,14 @@ export const v_5bb1ab = async (
 };
 
 export const v_4a38fa = async (
+  v_660822,
   v_c65f5d,
 ): Promise<v_f77e47> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_caa41f = {};
+    const request: v_caa41f = { member: v_660822 };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member: v_660822 });
 
     const v_3393e3 = await v_9f42a4.post<v_f77e47>(
       '/getRank',
