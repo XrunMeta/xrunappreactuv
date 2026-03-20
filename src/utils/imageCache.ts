@@ -105,7 +105,7 @@ export const cashingimages = {
         }
       }
 
-      let apiAddress = gatewayApiAddress || env.GATEWAY_NODEJS;
+      let apiAddress = gatewayApiAddress || (env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS);
 
       console.log('[이미지 캐시] URL_API_NODEJS (gatewayApiAddress):', apiAddress);
 

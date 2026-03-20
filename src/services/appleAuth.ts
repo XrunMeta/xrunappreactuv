@@ -36,12 +36,11 @@ const handleTimeoutError = async (navigation: any) => {
 
 const getApiBaseUrl = (): string => {
   const env = getEnv();
-  const baseUrl = env.GATEWAY_NODEJS;
+  const baseUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
 
   if (baseUrl.endsWith('/oth-path')) {
-    return baseUrl; 
+    return baseUrl;
   }
-
   return baseUrl;
 };
 
