@@ -125,8 +125,8 @@ export const ShopTicketDetailScreen = () => {
 
     const encodedStorageId = base64Encode(storageId.toString());
     const env = getEnv();
-    const apiUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
-    const baseUrl = apiUrl.replace('/oth-path', '');
+    const gatewayUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+    const baseUrl = gatewayUrl.replace('/oth-path', '');
     const apiUrl = `${baseUrl}/page/allreave/${encodedStorageId}`;
 
     console.log('[티켓 상세] === QR 코드 주소 생성 ===');

@@ -3885,13 +3885,14 @@ export const getSettlementAmount = async (
 };
 
 export const getRank = async (
+  member: number,
   navigation?: any,
 ): Promise<GetRankResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: GetRankRequest = {};
+    const request: GetRankRequest = { member };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member });
 
     const response = await axiosInstance.post<GetRankResponse>(
       '/getRank',
