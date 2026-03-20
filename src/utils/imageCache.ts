@@ -105,7 +105,7 @@ export const v_858bfa = {
         }
       }
 
-      let v_361e65 = v_feeeb6 || v_c9c489.GATEWAY_NODEJS;
+      let v_361e65 = v_feeeb6 || (v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS);
 
       console.log('[이미지 캐시] URL_API_NODEJS (gatewayApiAddress):', v_361e65);
 

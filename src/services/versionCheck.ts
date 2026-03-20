@@ -40,7 +40,8 @@ export const v_de7bac = async (): Promise<ServerCheckResponse | null> => {
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/servercheck`;
+    const v_c01615 = v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+    const v_f71b56 = `${v_c01615}/servercheck`;
     const v_8f00b9 = await fetch(v_f71b56, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}` },
