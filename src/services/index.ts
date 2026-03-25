@@ -7,6 +7,11 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_843337 } from '../utils/playStoreUrl';
 
+export const v_755eb9 = (): string => {
+  const v_c9c489 = v_e4a763();
+  return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+};
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -271,7 +276,7 @@ export const v_12a388 = async (
   v_c65f5d,
 ): Promise<Response> => {
   const v_c9c489 = v_e4a763();
-  const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+  const v_c01615 = v_755eb9();
   const v_f71b56 = v_09dafd.startsWith('/')
     ? `${v_c01615}${v_09dafd}`
     : `${v_c01615}/${v_09dafd}`;
@@ -440,10 +445,10 @@ export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
 
 export const v_7488d5 = (v_c65f5d) => {
   const v_c9c489 = v_e4a763();
-  const v_fed274 = v_c9c489.GATEWAY_NODEJS;
+  const v_fed274 = v_755eb9();
   const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] GATEWAY_NODEJS:', v_fed274);
+  console.log('[createAxiosInstance] API baseURL:', v_fed274);
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const v_0c3a5b = v_b5030f.create({
@@ -1899,7 +1904,7 @@ export const v_d7d5a2 = async (
   try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_c01615 = v_755eb9();
     const v_f71b56 = `${v_c01615}/logout-9705`;
 
     console.log('[로그아웃] 로그아웃 요청:', { member: v_660822 });
@@ -2385,7 +2390,7 @@ export const v_91d5e4 = async (
 
     try {
       const v_c9c489 = v_e4a763();
-      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/virtualCoin`;
+      const v_f71b56 = `${v_755eb9()}/virtualCoin`;
 
       const v_cd6a57 = {
         member: v_660822,
@@ -2465,7 +2470,7 @@ export const v_965f93 = async (
 
     try {
       const v_c9c489 = v_e4a763();
-      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getCoinNasPrice`;
+      const v_f71b56 = `${v_755eb9()}/getCoinNasPrice`;
 
       console.log('=== getCoinNasPrice API 호출 ===');
 
@@ -2830,7 +2835,7 @@ export const v_1c4683 = async (
 ): Promise<v_649123> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
+    const v_f71b56 = `${v_755eb9()}/getNasmobAds`;
 
     const v_df691e = v_326be8.OS === 'ios' ||
       v_e7f87b.manufacturer === 'Apple' ||
@@ -2980,7 +2985,7 @@ export const v_aa7dc1 = async (
 ): Promise<v_6b63f9> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPockAds`;
+    const v_f71b56 = `${v_755eb9()}/getPockAds`;
 
     let v_eed089;
     let v_66fa3f;
@@ -3126,7 +3131,7 @@ export const v_167376 = async (
 ): Promise<v_6b63f9> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPointClickAds`;
+    const v_f71b56 = `${v_755eb9()}/getPointClickAds`;
 
     let v_66fa3f;
 
@@ -3269,7 +3274,7 @@ export const v_7a6f92 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/callbackNasmob`;
+    const v_f71b56 = `${v_755eb9()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', v_d8bcf0);
 
@@ -3302,7 +3307,7 @@ export const v_c07360 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
+    const v_f71b56 = `${v_755eb9()}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
@@ -3381,7 +3386,7 @@ export const v_f7d3be = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+    const v_f71b56 = `${v_755eb9()}/cryptoPricesInKRW`;
 
     console.log('=== cryptoPricesInKRW API 호출 ===');
 
@@ -3417,7 +3422,7 @@ export const v_893ed2 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/memberLimits`;
+    const v_f71b56 = `${v_755eb9()}/memberLimits`;
 
     const v_cd6a57 = {
       member: v_660822,
@@ -3503,7 +3508,7 @@ export const v_38f5f4 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/processAdReward`;
+    const v_f71b56 = `${v_755eb9()}/processAdReward`;
 
     const v_cd6a57 = {
       member: typeof v_660822 === 'number' ? v_660822 : parseInt(String(v_660822), 10),
@@ -3880,13 +3885,14 @@ export const v_5bb1ab = async (
 };
 
 export const v_4a38fa = async (
+  v_660822,
   v_c65f5d,
 ): Promise<v_f77e47> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_caa41f = {};
+    const request: v_caa41f = { member: v_660822 };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member: v_660822 });
 
     const v_3393e3 = await v_9f42a4.post<v_f77e47>(
       '/getRank',
@@ -5563,7 +5569,7 @@ export const v_4dba02 = async (
   try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_c01615 = v_755eb9();
 
     const v_8adf57 = v_74cb95[v_4898e2];
     const v_09dafd = `/agreements?type=${v_8adf57}`;

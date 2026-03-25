@@ -58,6 +58,9 @@ export const VersionUpdateDialog: v_a3453e.FC<VersionUpdateDialogProps> = ({
                 {v_8d41d7('common.versionUpdate.latestVersion')}: {v_14feb2}
               </Text>
             )}
+            <Text style={v_d81136.slowNotice}>
+              {v_8d41d7('common.versionUpdate.slowNotice')}
+            </Text>
           </View>
 
           <View style={v_d81136.body}>
@@ -128,6 +131,15 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     textAlign: 'center',
+  },
+  slowNotice: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#888888',
+    textAlign: 'center',
+    marginTop: 12,
+    paddingHorizontal: 8,
+    lineHeight: 18,
   },
   body: {
     marginBottom: 24,

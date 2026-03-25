@@ -31,7 +31,6 @@ import {
   v_60f557,
   v_11e39e,
   v_4296b8,
-  v_8025d1,
   v_7af6c9,
 } from '../services';
 import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
@@ -340,6 +339,7 @@ export const v_cdb169 = () => {
   const v_306e20 = async () => {
     try {
       await v_e84827.removeItem(v_c7a4de);
+      await v_e84827.removeItem('PREV_COUNTRY_ISO2');
     } catch (v_5e9bfe) {
       console.error('[정보수정] 입력값 삭제 실패:', v_5e9bfe);
     }
@@ -454,7 +454,9 @@ export const v_cdb169 = () => {
                 v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: v_67cb9c, cCode: v_a4d981 });
 
-                const v_66dc00 = `+${v_a4d981}`;
+                const v_639818 = v_625c74.mobilecode ? String(v_625c74.mobilecode).replace('+', '') : '';
+                const v_66dc00 = v_639818 ? `+${v_639818}` : `+${v_a4d981}`;
+                console.log('[정보수정] dialCode 매칭 시도:', { mobilecode: v_639818, countryCode: v_a4d981, dialCodeStr: v_66dc00 });
                 const v_21ec18 = v_202d44.find((v_fb6f45) => v_fb6f45.dialCode === v_66dc00);
                 let matchingByNumber: v_da1883 | undefined;
                 if (v_21ec18) {
@@ -462,7 +464,7 @@ export const v_cdb169 = () => {
                   console.log('[정보수정] selectedCountryDialCode 설정됨:', v_21ec18);
                 } else {
 
-                  const v_fd2c6b = parseInt(v_a4d981.toString().replace('+', ''), 10);
+                  const v_fd2c6b = parseInt(v_639818 || v_a4d981.toString().replace('+', ''), 10);
                   v_93a7da = v_202d44.find((v_fb6f45) => {
                     const v_32ca78 = parseInt(v_fb6f45.dialCode.replace('+', ''), 10);
                     return v_32ca78 === v_fd2c6b;
@@ -887,32 +889,34 @@ export const v_cdb169 = () => {
       const v_e01f71 = [];
       const v_57285d = [];
 
-      if (v_f8f949.trim() !== v_9d09f1.trim()) {
-        const v_576f5a = { member: v_717992, firstname: v_f8f949.trim() };
-        v_57285d.push({ name: '이름', request: v_576f5a });
-        v_e01f71.push(v_152d53(v_717992, v_f8f949.trim(), v_9b57fc).then(v_3393e3 => {
-          console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
-          return v_3393e3;
-        }));
+      const v_6dd5fa = v_f8f949.trim() !== v_9d09f1.trim();
+      const v_ac3974 = v_480d4b.trim() !== v_b6daf3.trim();
+
+      if (v_6dd5fa || v_ac3974) {
+
+        if (v_6dd5fa) {
+          const v_576f5a = { member: v_717992, firstname: v_f8f949.trim() };
+          v_57285d.push({ name: '이름', request: v_576f5a });
+          v_e01f71.push(v_152d53(v_717992, v_f8f949.trim(), v_9b57fc).then(v_3393e3 => {
+            console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
+            return v_3393e3;
+          }));
+        }
+
+        if (v_ac3974) {
+          const v_576f5a = { member: v_717992, lastname: v_480d4b.trim() };
+          v_57285d.push({ name: '성', request: v_576f5a });
+          v_e01f71.push(v_7f8c9e(v_717992, v_480d4b.trim(), v_9b57fc).then(v_3393e3 => {
+            console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
+            return v_3393e3;
+          }));
+        }
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
-          원본: v_9d09f1,
-          현재: v_f8f949.trim()
-        });
-      }
-
-      if (v_480d4b.trim() !== v_b6daf3.trim()) {
-        const v_576f5a = { member: v_717992, lastname: v_480d4b.trim() };
-
-        v_57285d.push({ name: '성', request: v_576f5a });
-        v_e01f71.push(v_7f8c9e(v_717992, v_480d4b.trim(), v_9b57fc).then(v_3393e3 => {
-          console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
-          return v_3393e3;
-        }));
-      } else {
-        console.log('[정보수정] ❌ 성 변경 없음:', {
-          원본: v_b6daf3,
-          현재: v_480d4b.trim()
+          원본FirstName: v_9d09f1,
+          현재FirstName: v_f8f949.trim(),
+          원본LastName: v_b6daf3,
+          현재LastName: v_480d4b.trim()
         });
       }
 
@@ -1220,11 +1224,13 @@ export const v_cdb169 = () => {
     });
   }, [v_bd30a1, v_6c7bef, v_8d41d7]);
 
-  const v_de5bf5 = (country: v_da1883) => {
+  const v_de5bf5 = async (country: v_da1883) => {
     console.log('[정보수정] 국가 선택:', v_b9bbbd);
     v_f693e7(v_b9bbbd);
     v_e03dd9('');
     v_a259be(false);
+
+    await v_e84827.removeItem('PREV_COUNTRY_ISO2');
   };
 
   const v_f4c074 = v_a3453e.useRef<string | undefined>(undefined);
@@ -1318,41 +1324,8 @@ export const v_cdb169 = () => {
         return;
       }
 
-      try {
-
-        const v_b97179 = async () => {
-          try {
-            return await v_8025d1(v_e0c7e8, v_9b57fc);
-          } catch (v_5e9bfe) {
-            console.error('[정보수정] 이메일 인증 코드 발송 오류:', v_5e9bfe);
-            return false;
-          }
-        };
-
-        const v_43c42e = await Promise.race([
-          v_b97179(),
-          new Promise<boolean>((v_6f7712) => setTimeout(() => v_6f7712(false), 5000)),
-        ]);
-
-        if (v_43c42e) {
-
-          v_b572c3(v_e0c7e8);
-          v_8f89f3(v_ce4741.myInfoPhoneEdit); 
-          v_9b57fc(v_ce4741.verificationCode);
-        } else {
-          await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailSendFailed'), [
-            {
-              text: v_8d41d7('screens.myInfoEdit.alerts.confirm'),
-              onPress: () => {
-
-              },
-            },
-          ]);
-        }
-      } catch (v_5e9bfe) {
-        console.error('[정보수정] 전화번호 수정 인증 오류:', v_5e9bfe);
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
-      }
+      console.log('[정보수정] 이메일 인증 건너뛰고 전화번호 수정 화면으로 이동');
+      v_9b57fc(v_ce4741.myInfoPhoneEdit);
     }
   };
 

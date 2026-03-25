@@ -178,8 +178,8 @@ export const v_05fa9c = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-
-    const v_f71b56 = v_c9c489.PANGLE_CALLBACK_URL || `${v_c9c489.GATEWAY_NODEJS}/callbackPangle`;
+    const v_e9a15d = v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+    const v_f71b56 = v_c9c489.PANGLE_CALLBACK_URL || `${v_e9a15d}/callbackPangle`;
     const v_fc569c = v_c9c489.PANGLE_SECURITY_KEY;
 
     const v_d8bcf0 = {

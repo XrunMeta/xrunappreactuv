@@ -38,7 +38,6 @@ export const v_ce4741 = {
   walletAddressBook: 'walletAddressBook',
   addWalletAddress: 'addWalletAddress',
   myInfo: 'myInfo',
-  myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoEdit: 'myInfoEdit',
   myInfoPhoneEdit: 'myInfoPhoneEdit',
   myInfoChangePassword: 'myInfoChangePassword',

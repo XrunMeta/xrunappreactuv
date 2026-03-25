@@ -9,9 +9,6 @@ dist/
 web-build/
 expo-env.d.ts
 
-# env 설정 (민감 정보 포함 — 히스토리에서 제거 후 무시)
-src/utils/env.ts
-
 # 시스템 자동추가 파일 (Mac OS)
 ._*
 .env

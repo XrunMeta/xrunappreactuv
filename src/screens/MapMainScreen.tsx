@@ -45,7 +45,7 @@ import { v_ba5086 } from '../context/OTAUpdateContext';
 
 import { v_f71847 } from '../types';
 
-import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45 } from '../services';
+import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -873,7 +873,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
         });
         if (v_bf588a.length > 0) {
           const v_1a30c4 = v_e4a763();
-          v_858bfa.downloadMultipleImages(v_bf588a, v_1a30c4.GATEWAY_NODEJS)
+          v_858bfa.downloadMultipleImages(v_bf588a, v_755eb9())
             .then(() => console.log('✅ 이미지 캐싱 완료 (백그라운드)'))
             .catch((v_67ab2b) => console.error('이미지 캐싱 오류:', v_67ab2b));
         }
@@ -942,7 +942,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
       });
       if (v_a8712d.length > 0) {
         const v_1a30c4 = v_e4a763();
-        v_858bfa.downloadMultipleImages(v_a8712d, v_1a30c4.GATEWAY_NODEJS)
+        v_858bfa.downloadMultipleImages(v_a8712d, v_755eb9())
           .then(() => console.log('✅ 마커 이미지 캐싱 완료 (백그라운드)'))
           .catch((v_67ab2b) => console.error('이미지 캐싱 오류:', v_67ab2b));
       }
@@ -3449,19 +3449,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
 }
 
         {}
-
-        {v_16772f && (
-          <Pressable
-            style={v_d81136.mapPinButton}
-            onPress={v_30b908}
-          >
-            <Image
-              source={v_16772f}
-              style={v_d81136.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <Pressable
+          style={v_d81136.mapPinButton}
+          onPress={v_30b908}
+        >
+          <Image
+            source={require('../../assets/images/locationpin2.png')}
+            style={v_d81136.mapPinIcon}
+            resizeMode="contain"
+          />
+        </Pressable>
 
         {}
 

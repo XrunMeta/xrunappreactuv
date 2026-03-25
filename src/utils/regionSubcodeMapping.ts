@@ -1,6 +1,6 @@
 
 
-const v_4dea03 = {
+const KR_MAPPING: { [key: string]: number } = {
   'Seoul': 2,
   'Gyeonggi Province': 31,
   'Incheon': 32,
@@ -20,7 +20,7 @@ const v_4dea03 = {
   'Jeju': 64,
 };
 
-const v_82f74c = {
+const JP_MAPPING: { [key: string]: number } = {
   'Hokkaido': 1,
   'Aomori': 2,
   'Iwate': 3,
@@ -70,7 +70,7 @@ const v_82f74c = {
   'Okinawa': 47,
 };
 
-const v_102134 = {
+const CN_MAPPING: { [key: string]: number } = {
   'Beijing': 1,
   'Tianjin': 2,
   'Hebei': 3,
@@ -105,9 +105,15 @@ const v_102134 = {
   'Hong Kong': 32,
   'Macau': 33,
   'Taiwan': 34,
+
+  'Guangxi Zhuang': 20,   
+  'Hong Kong SAR': 32,    
+  'Macau SAR': 33,        
+  'Ningxia Huizu': 30,    
+  'Xizang': 26,           
 };
 
-const v_8e7d8f = {
+const US_MAPPING: { [key: string]: number } = {
   'Alabama': 1,
   'Alaska': 2,
   'Arizona': 3,
@@ -161,7 +167,7 @@ const v_8e7d8f = {
   'District of Columbia': 51,
 };
 
-const v_1e997c = {
+const ID_MAPPING: { [key: string]: number } = {
   'Aceh': 1,
   'Bali': 2,
   'Banten': 3,
@@ -203,49 +209,49 @@ const v_1e997c = {
   'North Jakarta': 39,
 };
 
-const v_f6a609 = {
-  82: v_4dea03,
-  81: v_82f74c,
-  86: v_102134,
-  1: v_8e7d8f,
-  62: v_1e997c,
+const REGION_SUBCODE_MAPPING: { [countryCode: number]: { [regionName: string]: number } } = {
+  82: KR_MAPPING,
+  81: JP_MAPPING,
+  86: CN_MAPPING,
+  1: US_MAPPING,
+  62: ID_MAPPING,
 };
 
-export const v_bae0c0 = (
-  v_a4d981,
-  v_df4689
+export const getSubcodeFromPackageRegion = (
+  countryCode: number,
+  packageRegionName: string
 ): number | null => {
-  const v_3be8ba = v_f6a609[v_a4d981];
-  if (!v_3be8ba) {
+  const countryMapping = REGION_SUBCODE_MAPPING[countryCode];
+  if (!countryMapping) {
     if (__DEV__) {
-      console.warn('[regionSubcodeMapping] 지원하지 않는 국가 코드:', v_a4d981);
+      console.warn('[regionSubcodeMapping] 지원하지 않는 국가 코드:', countryCode);
     }
     return null;
   }
 
-  let v_ad59cf = v_3be8ba[v_df4689];
-  if (v_ad59cf !== undefined) {
-    return v_ad59cf;
+  let subcode = countryMapping[packageRegionName];
+  if (subcode !== undefined) {
+    return subcode;
   }
 
-  const v_ca826e = v_df4689.toLowerCase();
-  for (const [v_b24339, v_3b402b] of Object.entries(v_3be8ba)) {
-    if (v_b24339.toLowerCase() === v_ca826e) {
-      return v_3b402b;
+  const lowerRegionName = packageRegionName.toLowerCase();
+  for (const [key, value] of Object.entries(countryMapping)) {
+    if (key.toLowerCase() === lowerRegionName) {
+      return value;
     }
   }
 
-  const v_63885f = v_df4689
+  const regionNameWithoutSuffix = packageRegionName
     .replace(/\s*(Province|Prefecture|City|State|Island|Islands|Autonomous Region|Special Administrative Region)$/i, '')
     .trim();
 
-  if (v_63885f !== v_df4689) {
-    v_ad59cf = v_3be8ba[v_63885f];
-    if (v_ad59cf !== undefined) {
-      return v_ad59cf;
+  if (regionNameWithoutSuffix !== packageRegionName) {
+    subcode = countryMapping[regionNameWithoutSuffix];
+    if (subcode !== undefined) {
+      return subcode;
     }
 
-    const v_d101e5 = v_63885f
+    const normalizedName = regionNameWithoutSuffix
       .replace(/Ō/g, 'O')
       .replace(/ō/g, 'o')
       .replace(/ū/g, 'u')
@@ -253,38 +259,38 @@ export const v_bae0c0 = (
       .replace(/ā/g, 'a')
       .replace(/ī/g, 'i');
 
-    if (v_d101e5 !== v_63885f) {
-      v_ad59cf = v_3be8ba[v_d101e5];
-      if (v_ad59cf !== undefined) {
-        return v_ad59cf;
+    if (normalizedName !== regionNameWithoutSuffix) {
+      subcode = countryMapping[normalizedName];
+      if (subcode !== undefined) {
+        return subcode;
       }
     }
   }
 
   if (__DEV__) {
     console.warn('[regionSubcodeMapping] 지역명 매핑 실패:', {
-      countryCode: v_a4d981,
-      packageRegionName: v_df4689,
-      regionNameWithoutSuffix: v_63885f,
-      availableRegions: Object.keys(v_3be8ba),
+      countryCode,
+      packageRegionName,
+      regionNameWithoutSuffix,
+      availableRegions: Object.keys(countryMapping),
     });
   }
 
   return null;
 };
 
-export const v_2c02e8 = (
-  v_a4d981,
-  v_ad59cf
+export const getPackageRegionNameFromSubcode = (
+  countryCode: number,
+  subcode: number
 ): string | null => {
-  const v_3be8ba = v_f6a609[v_a4d981];
-  if (!v_3be8ba) {
+  const countryMapping = REGION_SUBCODE_MAPPING[countryCode];
+  if (!countryMapping) {
     return null;
   }
 
-  for (const [v_638c4d, v_d8da2e] of Object.entries(v_3be8ba)) {
-    if (v_d8da2e === v_ad59cf) {
-      return v_638c4d;
+  for (const [regionName, mappedSubcode] of Object.entries(countryMapping)) {
+    if (mappedSubcode === subcode) {
+      return regionName;
     }
   }
 

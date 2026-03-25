@@ -93,7 +93,7 @@ export const v_f57686 = () => {
       v_34a50a(true);
 
       const [v_c3d24b, v_209f2c] = await Promise.all([
-        v_4a38fa(v_9b57fc),
+        v_4a38fa(v_660822, v_9b57fc),
         v_6a034c(v_660822, v_9b57fc),
       ]);
 
