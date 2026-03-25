@@ -28,6 +28,7 @@ export default {
   versionUpdate: {
     title: 'New Version Available',
     latestVersion: 'Latest Version',
+    slowNotice: 'If the app feels slow, go to Settings - Apps - XRUN - Storage - clear Data + Cache, then proceed.',
     message: 'Please update to the latest version for a better experience.',
     update: 'Update',
     later: 'Later',

@@ -178,8 +178,8 @@ export const sendPangleCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-
-    const url = env.PANGLE_CALLBACK_URL || `${env.GATEWAY_NODEJS}/callbackPangle`;
+    const apiBaseUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+    const url = env.PANGLE_CALLBACK_URL || `${apiBaseUrl}/callbackPangle`;
     const securityKey = env.PANGLE_SECURITY_KEY;
 
     const callbackData = {

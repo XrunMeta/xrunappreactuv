@@ -53,7 +53,7 @@ export const MyInfoScreen = () => {
         iconName: 'person-outline',
         iconLibrary: 'Ionicons',
         iconColor: '#6366F1',
-        route: 'myInfoEmailAuth',
+        route: 'myInfoEdit',
       },
       {
         id: 'referralList',
@@ -216,17 +216,8 @@ export const MyInfoScreen = () => {
         const loginType = await AsyncStorage.getItem('loginType');
         const isAppleLogin = loginType === 'apple';
 
-        if (isAppleLogin) {
-
-          console.log('[내 정보] 애플 로그인 사용자 - 정보 수정 화면으로 직접 이동');
-          navigate(ROUTES.myInfoEdit);
-        } else {
-
-          if (userInfo?.email) {
-            setVerificationEmail(userInfo.email);
-          }
-          navigate(ROUTES.myInfoEmailAuth);
-        }
+        console.log('[내 정보] 이메일 인증 건너뛰고 정보 수정 화면으로 직접 이동');
+        navigate(ROUTES.myInfoEdit);
       } else {
         navigate(ROUTES[menu.route]);
       }

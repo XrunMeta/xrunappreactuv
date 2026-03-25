@@ -58,6 +58,9 @@ export const VersionUpdateDialog: React.FC<VersionUpdateDialogProps> = ({
                 {t('common.versionUpdate.latestVersion')}: {latestVersion}
               </Text>
             )}
+            <Text style={styles.slowNotice}>
+              {t('common.versionUpdate.slowNotice')}
+            </Text>
           </View>
 
           <View style={styles.body}>
@@ -128,6 +131,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#747474',
     textAlign: 'center',
+  },
+  slowNotice: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#888888',
+    textAlign: 'center',
+    marginTop: 12,
+    paddingHorizontal: 8,
+    lineHeight: 18,
   },
   body: {
     marginBottom: 24,

@@ -31,7 +31,6 @@ import {
   getCountries,
   getRegionsByCountry,
   updateRegion,
-  sendEmailVerificationCode,
   signInWithApple,
 } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
@@ -340,6 +339,7 @@ export const MyInfoEditScreen = () => {
   const clearFormData = async () => {
     try {
       await AsyncStorage.removeItem(FORM_DATA_KEY);
+      await AsyncStorage.removeItem('PREV_COUNTRY_ISO2');
     } catch (error) {
       console.error('[정보수정] 입력값 삭제 실패:', error);
     }
@@ -454,7 +454,9 @@ export const MyInfoEditScreen = () => {
                 setTempCountry({ cDesc: countryName, cCode: countryCode });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: countryName, cCode: countryCode });
 
-                const dialCodeStr = `+${countryCode}`;
+                const userMobileCode = user.mobilecode ? String(user.mobilecode).replace('+', '') : '';
+                const dialCodeStr = userMobileCode ? `+${userMobileCode}` : `+${countryCode}`;
+                console.log('[정보수정] dialCode 매칭 시도:', { mobilecode: userMobileCode, countryCode, dialCodeStr });
                 const matchingDialCode = COUNTRY_DIAL_CODES.find((cd) => cd.dialCode === dialCodeStr);
                 let matchingByNumber: CountryDialCode | undefined;
                 if (matchingDialCode) {
@@ -462,7 +464,7 @@ export const MyInfoEditScreen = () => {
                   console.log('[정보수정] selectedCountryDialCode 설정됨:', matchingDialCode);
                 } else {
 
-                  const dialCodeNum = parseInt(countryCode.toString().replace('+', ''), 10);
+                  const dialCodeNum = parseInt(userMobileCode || countryCode.toString().replace('+', ''), 10);
                   matchingByNumber = COUNTRY_DIAL_CODES.find((cd) => {
                     const cdNum = parseInt(cd.dialCode.replace('+', ''), 10);
                     return cdNum === dialCodeNum;
@@ -887,32 +889,34 @@ export const MyInfoEditScreen = () => {
       const promises = [];
       const apiCalls: Array<{ name: string; request: any }> = [];
 
-      if (parsedFirstName.trim() !== originalFirstName.trim()) {
-        const request = { member: memberId, firstname: parsedFirstName.trim() };
-        apiCalls.push({ name: '이름', request });
-        promises.push(updateName(memberId, parsedFirstName.trim(), navigate).then(response => {
-          console.log('[정보수정] 📥 이름 수정 API 응답:', response);
-          return response;
-        }));
+      const firstNameChanged = parsedFirstName.trim() !== originalFirstName.trim();
+      const lastNameChanged = parsedLastName.trim() !== originalLastName.trim();
+
+      if (firstNameChanged || lastNameChanged) {
+
+        if (firstNameChanged) {
+          const request = { member: memberId, firstname: parsedFirstName.trim() };
+          apiCalls.push({ name: '이름', request });
+          promises.push(updateName(memberId, parsedFirstName.trim(), navigate).then(response => {
+            console.log('[정보수정] 📥 이름 수정 API 응답:', response);
+            return response;
+          }));
+        }
+
+        if (lastNameChanged) {
+          const request = { member: memberId, lastname: parsedLastName.trim() };
+          apiCalls.push({ name: '성', request });
+          promises.push(updateLastName(memberId, parsedLastName.trim(), navigate).then(response => {
+            console.log('[정보수정] 📥 성 수정 API 응답:', response);
+            return response;
+          }));
+        }
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
-          원본: originalFirstName,
-          현재: parsedFirstName.trim()
-        });
-      }
-
-      if (parsedLastName.trim() !== originalLastName.trim()) {
-        const request = { member: memberId, lastname: parsedLastName.trim() };
-
-        apiCalls.push({ name: '성', request });
-        promises.push(updateLastName(memberId, parsedLastName.trim(), navigate).then(response => {
-          console.log('[정보수정] 📥 성 수정 API 응답:', response);
-          return response;
-        }));
-      } else {
-        console.log('[정보수정] ❌ 성 변경 없음:', {
-          원본: originalLastName,
-          현재: parsedLastName.trim()
+          원본FirstName: originalFirstName,
+          현재FirstName: parsedFirstName.trim(),
+          원본LastName: originalLastName,
+          현재LastName: parsedLastName.trim()
         });
       }
 
@@ -1220,11 +1224,13 @@ export const MyInfoEditScreen = () => {
     });
   }, [countrySearchQuery, countries, t]);
 
-  const handleSelectCountry = (country: CountryDialCode) => {
+  const handleSelectCountry = async (country: CountryDialCode) => {
     console.log('[정보수정] 국가 선택:', country);
     setSelectedCountryDialCode(country);
     setCountrySearchQuery('');
     setCountryModalVisible(false);
+
+    await AsyncStorage.removeItem('PREV_COUNTRY_ISO2');
   };
 
   const prevCountryDialCodeRef = React.useRef<string | undefined>(undefined);
@@ -1318,41 +1324,8 @@ export const MyInfoEditScreen = () => {
         return;
       }
 
-      try {
-
-        const waitForResponse = async () => {
-          try {
-            return await sendEmailVerificationCode(email, navigate);
-          } catch (error) {
-            console.error('[정보수정] 이메일 인증 코드 발송 오류:', error);
-            return false;
-          }
-        };
-
-        const result = await Promise.race([
-          waitForResponse(),
-          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
-        ]);
-
-        if (result) {
-
-          setVerificationEmail(email);
-          setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
-          navigate(ROUTES.verificationCode);
-        } else {
-          await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
-            {
-              text: t('screens.myInfoEdit.alerts.confirm'),
-              onPress: () => {
-
-              },
-            },
-          ]);
-        }
-      } catch (error) {
-        console.error('[정보수정] 전화번호 수정 인증 오류:', error);
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
-      }
+      console.log('[정보수정] 이메일 인증 건너뛰고 전화번호 수정 화면으로 이동');
+      navigate(ROUTES.myInfoPhoneEdit);
     }
   };
 

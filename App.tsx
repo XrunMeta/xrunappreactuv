@@ -97,7 +97,7 @@ import * as Location from 'expo-location';
 import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMapMarkerData } from './src/services';
-import { checkLatestVersion, getCurrentAppVersion, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
+import { checkLatestVersion, getCurrentAppVersion, invalidateServerVersionCache, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
 import { useTranslation } from 'react-i18next';
 
 const _bootSlowLogAppModule = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
@@ -605,25 +605,34 @@ const GlobalDialogs = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const versionCheckAppStateRef = useRef<AppStateStatus>(AppState.currentState);
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') {
+      const prevState = versionCheckAppStateRef.current;
+      versionCheckAppStateRef.current = nextAppState;
 
-        try {
-          const currentVersion = getCurrentAppVersion();
-          const latest = await checkLatestVersion();
+      const isReturningFromBackground = (prevState === 'background' || prevState === 'inactive') && nextAppState === 'active';
+      if (!isReturningFromBackground) return;
 
-          if (latest && isNewVersionAvailable(currentVersion, latest)) {
+      try {
+        invalidateServerVersionCache();
+        const needsServerUpdate = await isServerVersionUpdateRequired();
+        const currentVersion = getCurrentAppVersion();
+        const latest = await checkLatestVersion();
+        const hasNewStoreVersion = latest ? isNewVersionAvailable(currentVersion, latest) : false;
 
-            if (!versionUpdateVisible) {
-              setLatestVersion(latest);
-              setIsServerUpdateRequired(false); 
-              setVersionUpdateVisible(true);
-            }
+        if (needsServerUpdate || hasNewStoreVersion) {
+          if (!versionUpdateVisible) {
+            setLatestVersion(latest ?? currentVersion);
+            setIsServerUpdateRequired(needsServerUpdate);
+            setVersionUpdateVisible(true);
           }
-        } catch (error) {
-          console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', error);
+        } else {
+
+          setVersionUpdateVisible(false);
         }
+      } catch (error) {
+        console.error('[App] 포그라운드 복귀 시 버전 확인 실패:', error);
       }
     };
 

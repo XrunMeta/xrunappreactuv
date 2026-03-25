@@ -93,7 +93,7 @@ export const ReferralRankScreen = () => {
       setLoading(true);
 
       const [resultRank, resultMyRank] = await Promise.all([
-        getRank(navigate),
+        getRank(member, navigate),
         getRankSpesific(member, navigate),
       ]);
 
