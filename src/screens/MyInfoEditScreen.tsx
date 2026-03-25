@@ -31,7 +31,6 @@ import {
   getCountries,
   getRegionsByCountry,
   updateRegion,
-  sendEmailVerificationCode,
   signInWithApple,
 } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
@@ -1318,41 +1317,8 @@ export const MyInfoEditScreen = () => {
         return;
       }
 
-      try {
-
-        const waitForResponse = async () => {
-          try {
-            return await sendEmailVerificationCode(email, navigate);
-          } catch (error) {
-            console.error('[정보수정] 이메일 인증 코드 발송 오류:', error);
-            return false;
-          }
-        };
-
-        const result = await Promise.race([
-          waitForResponse(),
-          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
-        ]);
-
-        if (result) {
-
-          setVerificationEmail(email);
-          setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit); 
-          navigate(ROUTES.verificationCode);
-        } else {
-          await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailSendFailed'), [
-            {
-              text: t('screens.myInfoEdit.alerts.confirm'),
-              onPress: () => {
-
-              },
-            },
-          ]);
-        }
-      } catch (error) {
-        console.error('[정보수정] 전화번호 수정 인증 오류:', error);
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
-      }
+      console.log('[정보수정] 이메일 인증 건너뛰고 전화번호 수정 화면으로 이동');
+      navigate(ROUTES.myInfoPhoneEdit);
     }
   };
 
