@@ -123,7 +123,8 @@ export const v_386af2 = () => {
       const v_c9c489 = v_e4a763();
       const v_bb51e2 = String(v_433c46);
 
-      let v_c01615 = v_c9c489.GATEWAY_NODEJS.replace('/oth-path', '');
+      const v_8a32c8 = v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+      let v_c01615 = v_8a32c8.replace('/oth-path', '');
       return `${v_c01615}/files/${v_bb51e2}`;
     } catch (v_5e9bfe) {
       console.error('[알림] 이미지 URL 생성 실패:', v_5e9bfe);

@@ -125,7 +125,8 @@ export const v_a1c4a5 = () => {
 
     const v_e3a04d = v_222d64(v_6b1b52.toString());
     const v_c9c489 = v_e4a763();
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS.replace('/oth-path', '');
+    const v_7dac96 = v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+    const v_c01615 = v_7dac96.replace('/oth-path', '');
     const v_8a32c8 = `${v_c01615}/page/allreave/${v_e3a04d}`;
 
     console.log('[티켓 상세] === QR 코드 주소 생성 ===');

@@ -47,6 +47,8 @@ export const v_1dd595 = {
   E0012: '토큰키가 없습니다',
   E0013: '테스트 YN 값이 없습니다',
   E9999: '오류가 발생했습니다',
+
+  REQUIRED_VALUE_MISSING: '필수 인증 정보가 없습니다. GIFTISHOW_BIZ_AUTH_KEY, GIFTISHOW_BIZ_TOKEN_KEY(또는 ENCRYPTION_KEY)를 .env 또는 env.embedded.json에 설정해 주세요.',
   ERR0217: 'MMS 번호 변경 불가',
   E0002: 'API 코드가 존재하지 않습니다',
   ERR0800: '비즈포인트 조회 오류',
@@ -69,10 +71,13 @@ export const v_1dd595 = {
 };
 
 export function v_62a286(v_679b9e, v_2ac426): string {
-  if (!v_679b9e) return v_2ac426 && v_2ac426.trim() ? v_2ac426 : '알 수 없는 오류';
+  const v_badeaf = (v_2ac426 && v_2ac426.trim()) || '';
+  if (v_badeaf.toLowerCase().includes('required value is missing') || v_badeaf.toLowerCase().includes('required value'))
+    return v_1dd595.REQUIRED_VALUE_MISSING;
+  if (!v_679b9e) return v_badeaf || '알 수 없는 오류';
   const v_41b99d = v_1dd595[v_679b9e];
-  if (v_41b99d) return v_2ac426 && v_2ac426.trim() ? `${v_41b99d} (${v_2ac426})` : v_41b99d;
-  return v_2ac426 && v_2ac426.trim() ? v_2ac426 : `오류: ${v_679b9e}`;
+  if (v_41b99d) return v_badeaf ? `${v_41b99d} (${v_2ac426})` : v_41b99d;
+  return v_badeaf || `오류: ${v_679b9e}`;
 }
 
 const v_e5c427 = new Set<string>();
@@ -141,6 +146,13 @@ function v_5f4b77(v_e60742): URLSearchParams {
       ? v_6c9e22(v_36dd9e, v_989fef)
       : (v_c9c489.GIFTISHOW_BIZ_TOKEN_KEY || '');
   const v_9bc4e7 = (v_c9c489.GIFTISHOW_BIZ_DEV_FLAG || 'Y') === 'Y' ? 'Y' : 'N';
+
+  if (__DEV__ && (!v_36dd9e.trim() || !v_91fce6.trim())) {
+    console.warn(
+      '[기프티쇼비즈] 인증 값이 비어 있습니다. "required value is missing" 오류가 나올 수 있습니다. ' +
+        'GIFTISHOW_BIZ_AUTH_KEY, GIFTISHOW_BIZ_TOKEN_KEY(또는 GIFTISHOW_BIZ_ENCRYPTION_KEY)를 .env 또는 env.embedded.json에 설정하세요.',
+    );
+  }
 
   const v_24baff = new URLSearchParams();
   v_24baff.set('api_code', v_e60742);
