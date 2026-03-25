@@ -4396,7 +4396,8 @@ export const getAyetPointsBalance = async (
       request,
     );
     const raw: any = response.data;
-    const data: any = raw?.data ?? raw;
+    const rawData = raw?.data ?? raw;
+    const data: any = Array.isArray(rawData) ? rawData[0] : rawData;
 
     const totalCandidates = [
       data?.total_ayet_points,
