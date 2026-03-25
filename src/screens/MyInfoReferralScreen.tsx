@@ -167,6 +167,13 @@ export const v_6086b6 = () => {
         return;
       }
 
+      const v_c2a031 = Array.isArray(v_fd95d1.data) ? v_fd95d1.data[0] : v_fd95d1.data;
+      if (v_c2a031 && v_c2a031.canSet === false) {
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.alreadyHasRecommender'));
+        v_dbca5e(false);
+        return;
+      }
+
       console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', v_35edd0);
       const v_47323f = await v_794a74(v_660822, v_35edd0.trim(), v_9b57fc);
 
