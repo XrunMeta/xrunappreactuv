@@ -1003,28 +1003,31 @@ export const SignupScreen = () => {
 
       try {
 
+        const os = Platform.OS === 'android' ? 3112 : 3113;
         const signupResponse = await signup({
           email: email.trim(),
-          password: password,
+          pin: password,
           firstname: parsedGivenName.trim(),
           lastname: parsedFamilyName.trim(),
-          phonenumber: phoneNumber.trim(),
-          dialCode: selectedCountryDialCode?.dialCode || '+1',
+          gender: gender, 
+          mobile: phoneNumber.trim(),
+          mobilecode: 82, 
           countrycode: selectedCountryDialCode?.iso2 || 'US',
-          region: selectedRegion?.iso2 || '',
-          gender: gender,
-          agerange: ageRange,
-          recommend: referralMemberId || 0,
+          country: 9001, 
+          region: 0, 
+          age: ageRange, 
+          recommand: referralMemberId || 0, 
+          os: os, 
         });
 
-        if (signupResponse.status === 'success') {
+        if (signupResponse === true) {
           console.log('[회원가입] 회원가입 성공');
           await AsyncStorage.removeItem('pendingSignupData');
           setIsSubmitting(false);
           navigate(ROUTES.login);
         } else {
-          console.error('[회원가입] 회원가입 실패:', signupResponse.message);
-          await showAlert(t('screens.signup.alerts.error'), signupResponse.message || '회원가입에 실패했습니다.');
+          console.error('[회원가입] 회원가입 실패');
+          await showAlert(t('screens.signup.alerts.error'), '회원가입에 실패했습니다.');
           setIsSubmitting(false);
         }
       } catch (storageError) {
