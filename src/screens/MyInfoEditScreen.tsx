@@ -817,10 +817,7 @@ export const MyInfoEditScreen = () => {
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
-      if (tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === -1) {
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
-        return;
-      }
+
       if (tempCountry.cCode === null || tempCountry.cCode === undefined) {
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
         return;
@@ -886,32 +883,34 @@ export const MyInfoEditScreen = () => {
       const promises = [];
       const apiCalls: Array<{ name: string; request: any }> = [];
 
-      if (parsedFirstName.trim() !== originalFirstName.trim()) {
-        const request = { member: memberId, firstname: parsedFirstName.trim() };
-        apiCalls.push({ name: '이름', request });
-        promises.push(updateName(memberId, parsedFirstName.trim(), navigate).then(response => {
-          console.log('[정보수정] 📥 이름 수정 API 응답:', response);
-          return response;
-        }));
+      const firstNameChanged = parsedFirstName.trim() !== originalFirstName.trim();
+      const lastNameChanged = parsedLastName.trim() !== originalLastName.trim();
+
+      if (firstNameChanged || lastNameChanged) {
+
+        if (firstNameChanged) {
+          const request = { member: memberId, firstname: parsedFirstName.trim() };
+          apiCalls.push({ name: '이름', request });
+          promises.push(updateName(memberId, parsedFirstName.trim(), navigate).then(response => {
+            console.log('[정보수정] 📥 이름 수정 API 응답:', response);
+            return response;
+          }));
+        }
+
+        if (lastNameChanged) {
+          const request = { member: memberId, lastname: parsedLastName.trim() };
+          apiCalls.push({ name: '성', request });
+          promises.push(updateLastName(memberId, parsedLastName.trim(), navigate).then(response => {
+            console.log('[정보수정] 📥 성 수정 API 응답:', response);
+            return response;
+          }));
+        }
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
-          원본: originalFirstName,
-          현재: parsedFirstName.trim()
-        });
-      }
-
-      if (parsedLastName.trim() !== originalLastName.trim()) {
-        const request = { member: memberId, lastname: parsedLastName.trim() };
-
-        apiCalls.push({ name: '성', request });
-        promises.push(updateLastName(memberId, parsedLastName.trim(), navigate).then(response => {
-          console.log('[정보수정] 📥 성 수정 API 응답:', response);
-          return response;
-        }));
-      } else {
-        console.log('[정보수정] ❌ 성 변경 없음:', {
-          원본: originalLastName,
-          현재: parsedLastName.trim()
+          원본FirstName: originalFirstName,
+          현재FirstName: parsedFirstName.trim(),
+          원본LastName: originalLastName,
+          현재LastName: parsedLastName.trim()
         });
       }
 
