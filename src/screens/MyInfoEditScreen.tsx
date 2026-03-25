@@ -339,6 +339,7 @@ export const v_cdb169 = () => {
   const v_306e20 = async () => {
     try {
       await v_e84827.removeItem(v_c7a4de);
+      await v_e84827.removeItem('PREV_COUNTRY_ISO2');
     } catch (v_5e9bfe) {
       console.error('[정보수정] 입력값 삭제 실패:', v_5e9bfe);
     }
@@ -1223,11 +1224,13 @@ export const v_cdb169 = () => {
     });
   }, [v_bd30a1, v_6c7bef, v_8d41d7]);
 
-  const v_de5bf5 = (country: v_da1883) => {
+  const v_de5bf5 = async (country: v_da1883) => {
     console.log('[정보수정] 국가 선택:', v_b9bbbd);
     v_f693e7(v_b9bbbd);
     v_e03dd9('');
     v_a259be(false);
+
+    await v_e84827.removeItem('PREV_COUNTRY_ISO2');
   };
 
   const v_f4c074 = v_a3453e.useRef<string | undefined>(undefined);
