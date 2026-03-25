@@ -1004,6 +1004,10 @@ export const v_f40fc5 = () => {
       try {
 
         const v_e16099 = v_326be8.OS === 'android' ? 3112 : 3113;
+        const v_6c3a47 = parseInt(v_459d5e?.dialCode?.replace('+', '') || '82', 10) || 82;
+        const v_94bdf5 = v_5f1e0e && v_2f03bc
+          ? parseInt(v_2f03bc.dialCode, 10) || 0
+          : 0;
         const v_6582f8 = await v_35200c({
           email: v_e0c7e8.trim(),
           pin: v_adc076,
@@ -1011,10 +1015,10 @@ export const v_f40fc5 = () => {
           lastname: v_eb8dd4.trim(),
           gender: v_c3eac4, 
           mobile: v_3a6ac4.trim(),
-          mobilecode: 82, 
-          countrycode: v_459d5e?.iso2 || 'US',
-          country: 9001, 
-          region: 0, 
+          mobilecode: v_6c3a47,
+          countrycode: v_459d5e?.iso2 || 'KR',
+          country: v_6c3a47,
+          region: v_94bdf5,
           age: v_f83808, 
           recommand: v_65bdb1 || 0, 
           os: v_e16099, 

@@ -44,6 +44,5 @@ export { LevelNotification } from './LevelNotification';
 export { AddressInfoItem } from './AddressInfoItem';
 export { VersionUpdateDialog } from './VersionUpdateDialog';
 
-export { AdMobRewardedButton } from './AdMobRewardedButton';
 export { default as OTAUpdateDialog } from './OTAUpdateDialog';
 export { DevDebugPanel } from './DevDebugPanel';
