@@ -105,6 +105,12 @@ const CN_MAPPING: { [key: string]: number } = {
   'Hong Kong': 32,
   'Macau': 33,
   'Taiwan': 34,
+
+  'Guangxi Zhuang': 20,   
+  'Hong Kong SAR': 32,    
+  'Macau SAR': 33,        
+  'Ningxia Huizu': 30,    
+  'Xizang': 26,           
 };
 
 const US_MAPPING: { [key: string]: number } = {
