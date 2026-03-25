@@ -453,7 +453,9 @@ export const MyInfoEditScreen = () => {
                 setTempCountry({ cDesc: countryName, cCode: countryCode });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: countryName, cCode: countryCode });
 
-                const dialCodeStr = `+${countryCode}`;
+                const userMobileCode = user.mobilecode ? String(user.mobilecode).replace('+', '') : '';
+                const dialCodeStr = userMobileCode ? `+${userMobileCode}` : `+${countryCode}`;
+                console.log('[정보수정] dialCode 매칭 시도:', { mobilecode: userMobileCode, countryCode, dialCodeStr });
                 const matchingDialCode = COUNTRY_DIAL_CODES.find((cd) => cd.dialCode === dialCodeStr);
                 let matchingByNumber: CountryDialCode | undefined;
                 if (matchingDialCode) {
@@ -461,7 +463,7 @@ export const MyInfoEditScreen = () => {
                   console.log('[정보수정] selectedCountryDialCode 설정됨:', matchingDialCode);
                 } else {
 
-                  const dialCodeNum = parseInt(countryCode.toString().replace('+', ''), 10);
+                  const dialCodeNum = parseInt(userMobileCode || countryCode.toString().replace('+', ''), 10);
                   matchingByNumber = COUNTRY_DIAL_CODES.find((cd) => {
                     const cdNum = parseInt(cd.dialCode.replace('+', ''), 10);
                     return cdNum === dialCodeNum;
@@ -817,7 +819,10 @@ export const MyInfoEditScreen = () => {
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
-
+      if (tempRegion.rCode === null || tempRegion.rCode === undefined || tempRegion.rCode === -1) {
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+        return;
+      }
       if (tempCountry.cCode === null || tempCountry.cCode === undefined) {
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
         return;
