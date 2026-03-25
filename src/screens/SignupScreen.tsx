@@ -999,45 +999,34 @@ export const SignupScreen = () => {
         }
       }
 
-      console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
+      console.log('[회원가입] 3단계: 이메일 인증 건너뛰고 바로 회원가입 진행');
 
       try {
 
-        const pendingSignupData = {
+        const signupResponse = await signup({
           email: email.trim(),
           password: password,
-          familyName: parsedFamilyName.trim(),
-          givenName: parsedGivenName.trim(),
-          phoneNumber: phoneNumber.trim(),
-          selectedCountryDialCode: {
-            iso2: selectedCountryDialCode.iso2,
-            dialCode: selectedCountryDialCode.dialCode,
-            flagEmoji: selectedCountryDialCode.flagEmoji,
-            name: selectedCountryDialCode.name,
-          },
-          selectedRegion: selectedRegion
-            ? {
-                iso2: selectedRegion.iso2,
-                dialCode: selectedRegion.dialCode,
-                flagEmoji: selectedRegion.flagEmoji,
-                name: selectedRegion.name,
-              }
-            : null,
-          hasRegions: hasRegions, 
-          referralMemberId: referralMemberId,
+          firstname: parsedGivenName.trim(),
+          lastname: parsedFamilyName.trim(),
+          phonenumber: phoneNumber.trim(),
+          dialCode: selectedCountryDialCode?.dialCode || '+1',
+          countrycode: selectedCountryDialCode?.iso2 || 'US',
+          region: selectedRegion?.iso2 || '',
           gender: gender,
-          ageRange: ageRange,
-          isAppleSignupMode: false,
-        };
+          agerange: ageRange,
+          recommend: referralMemberId || 0,
+        });
 
-        await AsyncStorage.setItem('pendingSignupData', JSON.stringify(pendingSignupData));
-        console.log('[회원가입] AsyncStorage에 회원가입 데이터 저장 완료');
-
-        setVerificationEmail(email.trim());
-        setVerificationSuccessRoute(ROUTES.signup); 
-
-        setIsSubmitting(false);
-        navigate(ROUTES.emailVerification);
+        if (signupResponse.status === 'success') {
+          console.log('[회원가입] 회원가입 성공');
+          await AsyncStorage.removeItem('pendingSignupData');
+          setIsSubmitting(false);
+          navigate(ROUTES.login);
+        } else {
+          console.error('[회원가입] 회원가입 실패:', signupResponse.message);
+          await showAlert(t('screens.signup.alerts.error'), signupResponse.message || '회원가입에 실패했습니다.');
+          setIsSubmitting(false);
+        }
       } catch (storageError) {
         console.error('[회원가입] AsyncStorage 저장 실패:', storageError);
         await showAlert(
