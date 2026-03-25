@@ -1004,6 +1004,10 @@ export const SignupScreen = () => {
       try {
 
         const os = Platform.OS === 'android' ? 3112 : 3113;
+        const mobileCode = parseInt(selectedCountryDialCode?.dialCode?.replace('+', '') || '82', 10) || 82;
+        const regionId = hasRegions && selectedRegion
+          ? parseInt(selectedRegion.dialCode, 10) || 0
+          : 0;
         const signupResponse = await signup({
           email: email.trim(),
           pin: password,
@@ -1011,10 +1015,10 @@ export const SignupScreen = () => {
           lastname: parsedFamilyName.trim(),
           gender: gender, 
           mobile: phoneNumber.trim(),
-          mobilecode: 82, 
-          countrycode: selectedCountryDialCode?.iso2 || 'US',
-          country: 9001, 
-          region: 0, 
+          mobilecode: mobileCode,
+          countrycode: selectedCountryDialCode?.iso2 || 'KR',
+          country: mobileCode,
+          region: regionId,
           age: ageRange, 
           recommand: referralMemberId || 0, 
           os: os, 
