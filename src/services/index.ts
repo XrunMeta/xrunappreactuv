@@ -4396,7 +4396,8 @@ export const v_877de8 = async (
       v_576f5a,
     );
     const v_479f05 = v_3393e3.data;
-    const v_9390e8 = v_479f05?.data ?? v_479f05;
+    const v_9740cd = v_479f05?.data ?? v_479f05;
+    const v_9390e8 = Array.isArray(v_9740cd) ? v_9740cd[0] : v_9740cd;
 
     const v_215917 = [
       v_9390e8?.total_ayet_points,
