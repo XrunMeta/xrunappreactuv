@@ -339,6 +339,7 @@ export const MyInfoEditScreen = () => {
   const clearFormData = async () => {
     try {
       await AsyncStorage.removeItem(FORM_DATA_KEY);
+      await AsyncStorage.removeItem('PREV_COUNTRY_ISO2');
     } catch (error) {
       console.error('[정보수정] 입력값 삭제 실패:', error);
     }
@@ -1223,11 +1224,13 @@ export const MyInfoEditScreen = () => {
     });
   }, [countrySearchQuery, countries, t]);
 
-  const handleSelectCountry = (country: CountryDialCode) => {
+  const handleSelectCountry = async (country: CountryDialCode) => {
     console.log('[정보수정] 국가 선택:', country);
     setSelectedCountryDialCode(country);
     setCountrySearchQuery('');
     setCountryModalVisible(false);
+
+    await AsyncStorage.removeItem('PREV_COUNTRY_ISO2');
   };
 
   const prevCountryDialCodeRef = React.useRef<string | undefined>(undefined);
