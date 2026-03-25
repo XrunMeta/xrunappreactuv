@@ -453,7 +453,9 @@ export const v_cdb169 = () => {
                 v_85a493({ cDesc: v_67cb9c, cCode: v_a4d981 });
                 console.log('[정보수정] tempCountry 설정됨:', { cDesc: v_67cb9c, cCode: v_a4d981 });
 
-                const v_66dc00 = `+${v_a4d981}`;
+                const v_639818 = v_625c74.mobilecode ? String(v_625c74.mobilecode).replace('+', '') : '';
+                const v_66dc00 = v_639818 ? `+${v_639818}` : `+${v_a4d981}`;
+                console.log('[정보수정] dialCode 매칭 시도:', { mobilecode: v_639818, countryCode: v_a4d981, dialCodeStr: v_66dc00 });
                 const v_21ec18 = v_202d44.find((v_fb6f45) => v_fb6f45.dialCode === v_66dc00);
                 let matchingByNumber: v_da1883 | undefined;
                 if (v_21ec18) {
@@ -461,7 +463,7 @@ export const v_cdb169 = () => {
                   console.log('[정보수정] selectedCountryDialCode 설정됨:', v_21ec18);
                 } else {
 
-                  const v_fd2c6b = parseInt(v_a4d981.toString().replace('+', ''), 10);
+                  const v_fd2c6b = parseInt(v_639818 || v_a4d981.toString().replace('+', ''), 10);
                   v_93a7da = v_202d44.find((v_fb6f45) => {
                     const v_32ca78 = parseInt(v_fb6f45.dialCode.replace('+', ''), 10);
                     return v_32ca78 === v_fd2c6b;
@@ -817,7 +819,10 @@ export const v_cdb169 = () => {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
-
+      if (v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === -1) {
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
+        return;
+      }
       if (v_add96c.cCode === null || v_add96c.cCode === undefined) {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
         return;
