@@ -1003,28 +1003,31 @@ export const v_f40fc5 = () => {
 
       try {
 
+        const v_e16099 = v_326be8.OS === 'android' ? 3112 : 3113;
         const v_6582f8 = await v_35200c({
           email: v_e0c7e8.trim(),
-          password: v_adc076,
+          pin: v_adc076,
           firstname: v_c0da8d.trim(),
           lastname: v_eb8dd4.trim(),
-          phonenumber: v_3a6ac4.trim(),
-          dialCode: v_459d5e?.dialCode || '+1',
+          gender: v_c3eac4, 
+          mobile: v_3a6ac4.trim(),
+          mobilecode: 82, 
           countrycode: v_459d5e?.iso2 || 'US',
-          region: v_2f03bc?.iso2 || '',
-          gender: v_c3eac4,
-          agerange: v_f83808,
-          recommend: v_65bdb1 || 0,
+          country: 9001, 
+          region: 0, 
+          age: v_f83808, 
+          recommand: v_65bdb1 || 0, 
+          os: v_e16099, 
         });
 
-        if (v_6582f8.status === 'success') {
+        if (v_6582f8 === true) {
           console.log('[회원가입] 회원가입 성공');
           await v_e84827.removeItem('pendingSignupData');
           v_e33ec0(false);
           v_9b57fc(v_ce4741.login);
         } else {
-          console.error('[회원가입] 회원가입 실패:', v_6582f8.message);
-          await v_889fad(v_8d41d7('screens.signup.alerts.error'), v_6582f8.message || '회원가입에 실패했습니다.');
+          console.error('[회원가입] 회원가입 실패');
+          await v_889fad(v_8d41d7('screens.signup.alerts.error'), '회원가입에 실패했습니다.');
           v_e33ec0(false);
         }
       } catch (v_df17d5) {
