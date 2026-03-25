@@ -46,21 +46,28 @@ export const MyInfoReferralScreen = () => {
 
         console.log('[레퍼럴 수정] getMyRecommender 응답:', result);
 
-        if (result && result.status === 'success' && result.data) {
+        if (result && result.status === 'success') {
 
-          const recommender = result.data;
-          const displayEmail = recommender.masked_email || recommender.email || '';
-          const displayName =
-            recommender.firstname && recommender.lastname
-              ? `${recommender.firstname}${recommender.lastname}`
-              : '';
+          const rawData = result.data;
+          const recommender = Array.isArray(rawData) ? rawData[0] : rawData;
 
-          setCurrentRefEmail(displayEmail);
-          setCurrentRefName(displayName);
-        } else if (result && result.status === 'success' && !result.data) {
+          if (recommender && recommender.email) {
 
-          setCurrentRefEmail('');
-          setCurrentRefName('');
+            const displayEmail = recommender.masked_email || recommender.email || '';
+            const displayName =
+              recommender.email
+                ? (recommender.firstname || recommender.lastname
+                    ? `${recommender.firstname || ''}${recommender.lastname || ''}`
+                    : recommender.email)
+                : '';
+
+            setCurrentRefEmail(displayEmail);
+            setCurrentRefName(displayName);
+          } else {
+
+            setCurrentRefEmail('');
+            setCurrentRefName('');
+          }
         } else {
 
           console.error('[레퍼럴 수정] 레퍼럴 조회 오류:', result?.message);
@@ -156,6 +163,13 @@ export const MyInfoReferralScreen = () => {
 
       if (responseCode !== 200) {
         await showAlert(t('screens.myInfoReferral.alerts.failed'), t('screens.myInfoReferral.alerts.cannotSet'));
+        setIsDisable(false);
+        return;
+      }
+
+      const checkData = Array.isArray(checkResult.data) ? checkResult.data[0] : checkResult.data;
+      if (checkData && checkData.canSet === false) {
+        await showAlert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.alreadyHasRecommender'));
         setIsDisable(false);
         return;
       }
