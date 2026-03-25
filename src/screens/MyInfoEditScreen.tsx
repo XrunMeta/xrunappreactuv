@@ -817,10 +817,7 @@ export const v_cdb169 = () => {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.ageRequired') || '연령대를 선택해주세요.');
         return;
       }
-      if (v_167c8b.rCode === null || v_167c8b.rCode === undefined || v_167c8b.rCode === -1) {
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.regionRequired') || '지역을 선택해주세요.');
-        return;
-      }
+
       if (v_add96c.cCode === null || v_add96c.cCode === undefined) {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.countryRequired') || '국가를 선택해주세요.');
         return;
@@ -886,32 +883,34 @@ export const v_cdb169 = () => {
       const v_e01f71 = [];
       const v_57285d = [];
 
-      if (v_f8f949.trim() !== v_9d09f1.trim()) {
-        const v_576f5a = { member: v_717992, firstname: v_f8f949.trim() };
-        v_57285d.push({ name: '이름', request: v_576f5a });
-        v_e01f71.push(v_152d53(v_717992, v_f8f949.trim(), v_9b57fc).then(v_3393e3 => {
-          console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
-          return v_3393e3;
-        }));
+      const v_6dd5fa = v_f8f949.trim() !== v_9d09f1.trim();
+      const v_ac3974 = v_480d4b.trim() !== v_b6daf3.trim();
+
+      if (v_6dd5fa || v_ac3974) {
+
+        if (v_6dd5fa) {
+          const v_576f5a = { member: v_717992, firstname: v_f8f949.trim() };
+          v_57285d.push({ name: '이름', request: v_576f5a });
+          v_e01f71.push(v_152d53(v_717992, v_f8f949.trim(), v_9b57fc).then(v_3393e3 => {
+            console.log('[정보수정] 📥 이름 수정 API 응답:', v_3393e3);
+            return v_3393e3;
+          }));
+        }
+
+        if (v_ac3974) {
+          const v_576f5a = { member: v_717992, lastname: v_480d4b.trim() };
+          v_57285d.push({ name: '성', request: v_576f5a });
+          v_e01f71.push(v_7f8c9e(v_717992, v_480d4b.trim(), v_9b57fc).then(v_3393e3 => {
+            console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
+            return v_3393e3;
+          }));
+        }
       } else {
         console.log('[정보수정] ❌ 이름 변경 없음:', {
-          원본: v_9d09f1,
-          현재: v_f8f949.trim()
-        });
-      }
-
-      if (v_480d4b.trim() !== v_b6daf3.trim()) {
-        const v_576f5a = { member: v_717992, lastname: v_480d4b.trim() };
-
-        v_57285d.push({ name: '성', request: v_576f5a });
-        v_e01f71.push(v_7f8c9e(v_717992, v_480d4b.trim(), v_9b57fc).then(v_3393e3 => {
-          console.log('[정보수정] 📥 성 수정 API 응답:', v_3393e3);
-          return v_3393e3;
-        }));
-      } else {
-        console.log('[정보수정] ❌ 성 변경 없음:', {
-          원본: v_b6daf3,
-          현재: v_480d4b.trim()
+          원본FirstName: v_9d09f1,
+          현재FirstName: v_f8f949.trim(),
+          원본LastName: v_b6daf3,
+          현재LastName: v_480d4b.trim()
         });
       }
 
