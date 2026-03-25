@@ -167,6 +167,13 @@ export const MyInfoReferralScreen = () => {
         return;
       }
 
+      const checkData = Array.isArray(checkResult.data) ? checkResult.data[0] : checkResult.data;
+      if (checkData && checkData.canSet === false) {
+        await showAlert(t('screens.myInfoReferral.alerts.warning'), t('screens.myInfoReferral.alerts.alreadyHasRecommender'));
+        setIsDisable(false);
+        return;
+      }
+
       console.log('[레퍼럴 수정] 레퍼럴 설정 요청:', newRefEmail);
       const setResult = await setRecommender(member, newRefEmail.trim(), navigate);
 
