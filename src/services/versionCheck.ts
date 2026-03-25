@@ -28,6 +28,10 @@ interface ServerCheckResponse {
 const SERVERCHECK_CACHE_MS = 30000; 
 let servercheckCache: { result: ServerCheckResponse; at: number } | null = null;
 
+export const invalidateServerVersionCache = (): void => {
+  servercheckCache = null;
+};
+
 export const checkServerVersion = async (): Promise<ServerCheckResponse | null> => {
   const now = Date.now();
   if (servercheckCache && now - servercheckCache.at < SERVERCHECK_CACHE_MS) {
@@ -36,7 +40,8 @@ export const checkServerVersion = async (): Promise<ServerCheckResponse | null> 
   try {
     console.log('[VersionCheck] 서버 버전 확인 시작');
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/servercheck`;
+    const baseUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+    const url = `${baseUrl}/servercheck`;
     const res = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}` },

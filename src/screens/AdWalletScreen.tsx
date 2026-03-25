@@ -19,7 +19,7 @@ import {
   fetchQuestList,
   joinQuest,
 } from '../services';
-import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
+import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync, isPangleReady, initializePangle } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
@@ -1216,17 +1216,22 @@ export const AdWalletScreen = () => {
       (typeof item.id === 'string' && item.id.startsWith('attendance_'));
 
     if (isAttendanceQuest) {
+      console.log('[AdWallet] 출석체크 클릭', { id: item.id, eventType: item.eventType, is_rewarded: item.is_rewarded });
 
       if (item.is_rewarded === true) {
+        console.log('[AdWallet] 출석체크 이미 수령 완료 → 클릭 무시');
         showToast(t('screens.adWallet.attendanceCheckAlreadyCompleted'));
         return;
       }
 
       setIsJoiningQuest(true);
 
-      if (isPangleReadySync()) {
+      const pangleReady = isPangleReadySync();
+      console.log('[AdWallet] 출석체크 isPangleReadySync():', pangleReady, 'Platform:', Platform.OS);
+
+      if (pangleReady) {
         try {
-          console.log('[AdWallet] 출석체크 Pangle 광고 준비 완료 (Platform:', Platform.OS, ')');
+          console.log('[AdWallet] 출석체크 Pangle 광고 표시 시도 (loadAndShowRewardedAd 호출 직전)');
 
           const deviceInfo = await collectDeviceInfo();
 

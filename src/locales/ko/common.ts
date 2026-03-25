@@ -28,6 +28,7 @@ export default {
   versionUpdate: {
     title: '새 버전이 있습니다',
     latestVersion: '최신 버전',
+    slowNotice: '느려짐 현상이 있다면 설정 - 애플리케이션 - XRUN - 저장공간 - 데이터 삭제 + 캐시 삭제 후에 진행해주세요.',
     message: '더 나은 사용 경험을 위해 최신 버전으로 업데이트해주세요.',
     update: '업데이트',
     later: '나중에',

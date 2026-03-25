@@ -123,7 +123,8 @@ export const MyInfoNotifyScreen = () => {
       const env = getEnv();
       const fileIdStr = String(fileId);
 
-      let baseUrl = env.GATEWAY_NODEJS.replace('/oth-path', '');
+      const apiUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+      let baseUrl = apiUrl.replace('/oth-path', '');
       return `${baseUrl}/files/${fileIdStr}`;
     } catch (error) {
       console.error('[알림] 이미지 URL 생성 실패:', error);

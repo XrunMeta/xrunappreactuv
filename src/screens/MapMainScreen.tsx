@@ -45,7 +45,7 @@ import { useOTAUpdate } from '../context/OTAUpdateContext';
 
 import { SpotData } from '../types';
 
-import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet } from '../services';
+import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -873,7 +873,7 @@ export const MapMainScreen: React.FC = () => {
         });
         if (uniqueFileIds.length > 0) {
           const envForCache = getEnv();
-          cashingimages.downloadMultipleImages(uniqueFileIds, envForCache.GATEWAY_NODEJS)
+          cashingimages.downloadMultipleImages(uniqueFileIds, getApiBaseUrl())
             .then(() => console.log('✅ 이미지 캐싱 완료 (백그라운드)'))
             .catch((imageCacheError) => console.error('이미지 캐싱 오류:', imageCacheError));
         }
@@ -942,7 +942,7 @@ export const MapMainScreen: React.FC = () => {
       });
       if (markerFileIds.length > 0) {
         const envForCache = getEnv();
-        cashingimages.downloadMultipleImages(markerFileIds, envForCache.GATEWAY_NODEJS)
+        cashingimages.downloadMultipleImages(markerFileIds, getApiBaseUrl())
           .then(() => console.log('✅ 마커 이미지 캐싱 완료 (백그라운드)'))
           .catch((imageCacheError) => console.error('이미지 캐싱 오류:', imageCacheError));
       }
@@ -3449,19 +3449,16 @@ export const MapMainScreen: React.FC = () => {
 }
 
         {}
-
-        {iconMapPoint && (
-          <Pressable
-            style={styles.mapPinButton}
-            onPress={goToCurrentLocation}
-          >
-            <Image
-              source={iconMapPoint}
-              style={styles.mapPinIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
-        )}
+        <Pressable
+          style={styles.mapPinButton}
+          onPress={goToCurrentLocation}
+        >
+          <Image
+            source={require('../../assets/images/locationpin2.png')}
+            style={styles.mapPinIcon}
+            resizeMode="contain"
+          />
+        </Pressable>
 
         {}
 

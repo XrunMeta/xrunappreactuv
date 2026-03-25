@@ -12,3 +12,28 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # Add any project specific keep options here:
+
+# Pangle SDK (ByteDance / PAG API 전부 유지)
+-keep class com.bytedance.sdk.** { *; }
+-keep class com.pgl.** { *; }
+-keep class com.bytedance.sdk.openadsdk.api.** { *; }
+-keepattributes Signature, InnerClasses, EnclosingMethod, Annotation
+
+# Pangle 네이티브 모듈 (AAB 릴리즈에서 R8 제거/난독화 방지)
+-keep class run.xrun.xrunapp.PangleModule { *; }
+-keep class run.xrun.xrunapp.PanglePackage { *; }
+-keepclassmembers class run.xrun.xrunapp.PangleModule { *; }
+-keepclassmembers class run.xrun.xrunapp.PanglePackage { *; }
+
+
+# AppsFlyer SDK
+-keep class com.appsflyer.** { *; }
+-keep class kotlin.jvm.internal.** { *; }
+
+# Tapjoy SDK (Unity Grow Offerwall)
+-keep public class com.tapjoy.** { *; }
+-keepclassmembers public enum com.tapjoy.** { *; }
+
+# ayeT-Studios Offerwall SDK (Android SDK v2)
+-keep class com.ayet.sdk.** { *; }
+-keep public class com.ayet.sdk.AyetSdk { public *; }

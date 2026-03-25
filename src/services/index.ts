@@ -7,6 +7,11 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { getPlayStoreUrl } from '../utils/playStoreUrl';
 
+export const getApiBaseUrl = (): string => {
+  const env = getEnv();
+  return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+};
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -271,7 +276,7 @@ export const nodeGatewayRequest = async (
   navigation?: any,
 ): Promise<Response> => {
   const env = getEnv();
-  const baseUrl = env.GATEWAY_NODEJS;
+  const baseUrl = getApiBaseUrl();
   const url = endpoint.startsWith('/')
     ? `${baseUrl}${endpoint}`
     : `${baseUrl}/${endpoint}`;
@@ -440,10 +445,10 @@ export const getAndroidWalletShowStatus = async (navigation?: any): Promise<bool
 
 export const createAxiosInstance = (navigation?: any) => {
   const env = getEnv();
-  const baseURL = env.GATEWAY_NODEJS;
+  const baseURL = getApiBaseUrl();
   const authCode = env.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] GATEWAY_NODEJS:', baseURL);
+  console.log('[createAxiosInstance] API baseURL:', baseURL);
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const instance = axios.create({
@@ -1899,7 +1904,7 @@ export const logout = async (
   try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = env.GATEWAY_NODEJS;
+    const baseUrl = getApiBaseUrl();
     const url = `${baseUrl}/logout-9705`;
 
     console.log('[로그아웃] 로그아웃 요청:', { member });
@@ -2385,7 +2390,7 @@ export const fetchVirtualCoin = async (
 
     try {
       const env = getEnv();
-      const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
+      const url = `${getApiBaseUrl()}/virtualCoin`;
 
       const requestBody = {
         member: member,
@@ -2465,7 +2470,7 @@ export const getCoinNasPrice = async (
 
     try {
       const env = getEnv();
-      const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
+      const url = `${getApiBaseUrl()}/getCoinNasPrice`;
 
       console.log('=== getCoinNasPrice API 호출 ===');
 
@@ -2830,7 +2835,7 @@ export const getNasmobAds = async (
 ): Promise<NasmobAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getNasmobAds`;
+    const url = `${getApiBaseUrl()}/getNasmobAds`;
 
     const isIOS = Platform.OS === 'ios' ||
       deviceInfo.manufacturer === 'Apple' ||
@@ -2980,7 +2985,7 @@ export const getPockAds = async (
 ): Promise<PockAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getPockAds`;
+    const url = `${getApiBaseUrl()}/getPockAds`;
 
     let osType: number;
     let osTypeString: string;
@@ -3126,7 +3131,7 @@ export const getPointClickAds = async (
 ): Promise<PockAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getPointClickAds`;
+    const url = `${getApiBaseUrl()}/getPointClickAds`;
 
     let osTypeString: string;
 
@@ -3269,7 +3274,7 @@ export const sendNasmobCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/callbackNasmob`;
+    const url = `${getApiBaseUrl()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', callbackData);
 
@@ -3302,7 +3307,7 @@ export const gatewayNodeJS = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
+    const url = `${getApiBaseUrl()}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
@@ -3381,7 +3386,7 @@ export const getCryptoPricesInKRW = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+    const url = `${getApiBaseUrl()}/cryptoPricesInKRW`;
 
     console.log('=== cryptoPricesInKRW API 호출 ===');
 
@@ -3417,7 +3422,7 @@ export const getMemberLimits = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/memberLimits`;
+    const url = `${getApiBaseUrl()}/memberLimits`;
 
     const requestBody = {
       member: member,
@@ -3503,7 +3508,7 @@ export const processAdReward = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/processAdReward`;
+    const url = `${getApiBaseUrl()}/processAdReward`;
 
     const requestBody = {
       member: typeof member === 'number' ? member : parseInt(String(member), 10),
@@ -3880,13 +3885,14 @@ export const getSettlementAmount = async (
 };
 
 export const getRank = async (
+  member: number,
   navigation?: any,
 ): Promise<GetRankResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: GetRankRequest = {};
+    const request: GetRankRequest = { member };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member });
 
     const response = await axiosInstance.post<GetRankResponse>(
       '/getRank',
@@ -5563,7 +5569,7 @@ export const getClauseContent = async (
   try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = env.GATEWAY_NODEJS;
+    const baseUrl = getApiBaseUrl();
 
     const typeNumber = typeMap[clauseType];
     const endpoint = `/agreements?type=${typeNumber}`;
