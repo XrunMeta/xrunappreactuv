@@ -46,21 +46,28 @@ export const v_6086b6 = () => {
 
         console.log('[레퍼럴 수정] getMyRecommender 응답:', v_43c42e);
 
-        if (v_43c42e && v_43c42e.status === 'success' && v_43c42e.data) {
+        if (v_43c42e && v_43c42e.status === 'success') {
 
-          const v_10ede1 = v_43c42e.data;
-          const v_b43178 = v_10ede1.masked_email || v_10ede1.email || '';
-          const v_8a1355 =
-            v_10ede1.firstname && v_10ede1.lastname
-              ? `${v_10ede1.firstname}${v_10ede1.lastname}`
-              : '';
+          const v_9740cd = v_43c42e.data;
+          const v_10ede1 = Array.isArray(v_9740cd) ? v_9740cd[0] : v_9740cd;
 
-          v_77b468(v_b43178);
-          v_addc15(v_8a1355);
-        } else if (v_43c42e && v_43c42e.status === 'success' && !v_43c42e.data) {
+          if (v_10ede1 && v_10ede1.email) {
 
-          v_77b468('');
-          v_addc15('');
+            const v_b43178 = v_10ede1.masked_email || v_10ede1.email || '';
+            const v_8a1355 =
+              v_10ede1.email
+                ? (v_10ede1.firstname || v_10ede1.lastname
+                    ? `${v_10ede1.firstname || ''}${v_10ede1.lastname || ''}`
+                    : v_10ede1.email)
+                : '';
+
+            v_77b468(v_b43178);
+            v_addc15(v_8a1355);
+          } else {
+
+            v_77b468('');
+            v_addc15('');
+          }
         } else {
 
           console.error('[레퍼럴 수정] 레퍼럴 조회 오류:', v_43c42e?.message);
@@ -156,6 +163,13 @@ export const v_6086b6 = () => {
 
       if (v_f1a123 !== 200) {
         await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.failed'), v_8d41d7('screens.myInfoReferral.alerts.cannotSet'));
+        v_dbca5e(false);
+        return;
+      }
+
+      const v_c2a031 = Array.isArray(v_fd95d1.data) ? v_fd95d1.data[0] : v_fd95d1.data;
+      if (v_c2a031 && v_c2a031.canSet === false) {
+        await v_889fad(v_8d41d7('screens.myInfoReferral.alerts.warning'), v_8d41d7('screens.myInfoReferral.alerts.alreadyHasRecommender'));
         v_dbca5e(false);
         return;
       }
