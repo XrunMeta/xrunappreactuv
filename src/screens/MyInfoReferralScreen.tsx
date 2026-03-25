@@ -46,21 +46,28 @@ export const MyInfoReferralScreen = () => {
 
         console.log('[레퍼럴 수정] getMyRecommender 응답:', result);
 
-        if (result && result.status === 'success' && result.data) {
+        if (result && result.status === 'success') {
 
-          const recommender = result.data;
-          const displayEmail = recommender.masked_email || recommender.email || '';
-          const displayName =
-            recommender.firstname && recommender.lastname
-              ? `${recommender.firstname}${recommender.lastname}`
-              : '';
+          const rawData = result.data;
+          const recommender = Array.isArray(rawData) ? rawData[0] : rawData;
 
-          setCurrentRefEmail(displayEmail);
-          setCurrentRefName(displayName);
-        } else if (result && result.status === 'success' && !result.data) {
+          if (recommender && recommender.email) {
 
-          setCurrentRefEmail('');
-          setCurrentRefName('');
+            const displayEmail = recommender.masked_email || recommender.email || '';
+            const displayName =
+              recommender.email
+                ? (recommender.firstname || recommender.lastname
+                    ? `${recommender.firstname || ''}${recommender.lastname || ''}`
+                    : recommender.email)
+                : '';
+
+            setCurrentRefEmail(displayEmail);
+            setCurrentRefName(displayName);
+          } else {
+
+            setCurrentRefEmail('');
+            setCurrentRefName('');
+          }
         } else {
 
           console.error('[레퍼럴 수정] 레퍼럴 조회 오류:', result?.message);
