@@ -7,6 +7,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { cancelGiftishowCoupon } from '../services';
 import { COMMON_STYLES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
@@ -46,6 +47,9 @@ export const ShopMyTicketDetailScreen = () => {
 
     const couponImgUrl = (selectedShopItem as any)?.couponImgUrl;
     const hasBarcodeImageUrl = typeof couponImgUrl === 'string' && couponImgUrl.trim().length > 0;
+    const trId = (selectedShopItem as any)?.trId || (selectedShopItem as any)?.tr_id;
+    const memberId = (selectedShopItem as any)?.memberId || (selectedShopItem as any)?.member;
+    const [isCancelling, setIsCancelling] = React.useState(false);
 
     const ticket: TicketData = selectedShopItem ? {
         id: selectedShopItem.id || '1',
@@ -151,6 +155,37 @@ export const ShopMyTicketDetailScreen = () => {
         }
     };
 
+    const handleCancelCoupon = async () => {
+        if (!trId || !memberId) {
+            await showAlert(t('screens.shopMyTicket.alerts.notification'), t('screens.shopMyTicket.alerts.cancelNoInfo'));
+            return;
+        }
+        const buttonIndex = await showAlert(
+            t('screens.shopMyTicket.alerts.cancelTitle'),
+            t('screens.shopMyTicket.alerts.cancelConfirm'),
+            [
+                { text: t('screens.shopMyTicket.alerts.cancelNo') },
+                { text: t('screens.shopMyTicket.alerts.cancelYes') },
+            ],
+        );
+        if (buttonIndex !== 1) return;
+
+        setIsCancelling(true);
+        try {
+            const res = await cancelGiftishowCoupon(String(memberId), trId);
+            if (res.status === 'success') {
+                await showAlert(t('screens.shopMyTicket.alerts.notification'), t('screens.shopMyTicket.alerts.cancelSuccess'));
+                goBack();
+            } else {
+                await showAlert(t('screens.shopMyTicket.alerts.cancelFailedTitle'), res.message || t('screens.shopMyTicket.alerts.cancelFailed'));
+            }
+        } catch (e: any) {
+            await showAlert(t('screens.shopMyTicket.alerts.cancelFailedTitle'), t('screens.shopMyTicket.alerts.cancelFailed'));
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
     return (
         <SafeView style={styles.container} backgroundColor="#FFFFFF">
             <StatusBar style="dark" />
@@ -231,6 +266,22 @@ export const ShopMyTicketDetailScreen = () => {
                         <Text style={styles.saveButtonText}>{t('screens.shopMyTicket.saveImage')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
+
+                {trId && (
+                    <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={handleCancelCoupon}
+                        activeOpacity={0.85}
+                        disabled={isCancelling}
+                    >
+                        <View style={styles.cancelButtonInner}>
+                            <Feather name="trash-2" size={20} color="#DC2626" />
+                            <Text style={styles.cancelButtonText}>
+                                {isCancelling ? '취소 중...' : t('screens.shopMyTicket.cancelCoupon')}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeView>
     );
@@ -329,6 +380,27 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontFamily: 'Roboto-Bold',
         color: '#FFFFFF',
+        letterSpacing: 0.3,
+    },
+    cancelButton: {
+        marginTop: 10,
+        borderRadius: 14,
+        overflow: 'hidden',
+        borderWidth: 1.5,
+        borderColor: '#DC2626',
+    },
+    cancelButtonInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+        gap: 10,
+        backgroundColor: '#FFFFFF',
+    },
+    cancelButtonText: {
+        fontSize: 17,
+        fontFamily: 'Roboto-Bold',
+        color: '#DC2626',
         letterSpacing: 0.3,
     },
 });

@@ -7,6 +7,7 @@ export default {
   transferTicketDescription: '티켓 구매시 최소 3회 이상의 폴리곤네트워크 전송(외부지갑)이 가능하게 됩니다. Withdraw the XRUN network to the Polygon network in your wallet.',
   noPurchasedItems: '구매한 아이템이 없습니다.',
   saveImage: '이미지 저장하기',
+  cancelCoupon: '쿠폰 삭제하기',
   alerts: {
     noBarcodeImage: '저장할 바코드 이미지가 없습니다.',
     permissionRequired: '이미지를 저장하려면 사진 권한이 필요합니다.',
@@ -16,6 +17,14 @@ export default {
     permissionTitle: '권한 필요',
     saveSuccessTitle: '저장 완료',
     saveFailedTitle: '저장 실패',
+    cancelTitle: '쿠폰 삭제',
+    cancelConfirm: '이 쿠폰을 삭제하시겠습니까?\n기프티쇼에서 취소되고 Xplay 포인트가 환불됩니다.',
+    cancelYes: '삭제',
+    cancelNo: '취소',
+    cancelSuccess: '쿠폰이 삭제되고 포인트가 환불되었습니다.',
+    cancelFailed: '쿠폰 삭제 중 오류가 발생했습니다.',
+    cancelFailedTitle: '삭제 실패',
+    cancelNoInfo: '쿠폰 정보를 찾을 수 없습니다.',
   },
 };
 

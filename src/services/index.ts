@@ -4590,6 +4590,31 @@ export const purchaseGiftWithXplayPoints = async (
   }
 };
 
+export const cancelGiftishowCoupon = async (
+  member: string,
+  tr_id: string,
+  navigation?: any,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/cancelGiftishowCoupon', { member, tr_id });
+    return response.data;
+  } catch (error) {
+    const msg = error instanceof AxiosError
+      ? (error.response?.data as any)?.message || error.message
+      : (error as Error).message;
+    console.error('[기프티쇼] 쿠폰 취소 오류:', msg);
+    if (error instanceof AxiosError) {
+      return {
+        status: 'error',
+        code: error.response?.status,
+        message: (error.response?.data as any)?.message || error.message,
+      };
+    }
+    return { status: 'error', message: (error as Error).message };
+  }
+};
+
 export const purchaseXrunItem = async (
   member: string,
   item: number,
