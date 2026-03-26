@@ -11,6 +11,7 @@ import { useAppContext } from '../context';
 import { TransactionDetails, TransactionDetailsScreen } from './TransactionDetailsScreen';
 import {
   fetchEtherscanTransactions,
+  getXRUNGopaxPrice,
 } from '../services';
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
@@ -278,15 +279,22 @@ export const WalletDetailScreen = () => {
       }
 
       try {
-        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
-        if (priceDataStr) {
-          const priceData = JSON.parse(priceDataStr);
-          const price = priceData?.data?.gopaxPrice || null;
+        const result = await getXRUNGopaxPrice();
+        const price = result?.data?.gopaxPrice || null;
+        if (price) {
           setGopaxPrice(price);
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
           console.log('[WalletDetail] 고팍스 XRUN 가격 로드:', price);
         }
       } catch (error) {
-        console.error('[WalletDetail] 고팍스 XRUN 가격 로드 오류:', error);
+        console.error('[WalletDetail] 고팍스 XRUN 가격 API 오류, fallback:', error);
+        try {
+          const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+          if (priceDataStr) {
+            const priceData = JSON.parse(priceDataStr);
+            setGopaxPrice(priceData?.data?.gopaxPrice || null);
+          }
+        } catch {}
       }
     };
 

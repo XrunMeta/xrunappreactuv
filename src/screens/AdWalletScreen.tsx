@@ -18,6 +18,7 @@ import {
   fetchADXRUNTopBannersSettled,
   fetchQuestList,
   joinQuest,
+  getXRUNGopaxPrice,
 } from '../services';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync, isPangleReady, initializePangle } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
@@ -117,15 +118,25 @@ export const AdWalletScreen = () => {
   useEffect(() => {
     const loadGopaxPrice = async () => {
       try {
-        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
-        if (priceDataStr) {
-          const priceData = JSON.parse(priceDataStr);
-          const price = priceData?.data?.gopaxPrice || null;
+        const result = await getXRUNGopaxPrice();
+        const price = result?.data?.gopaxPrice || null;
+        if (price) {
           setGopaxPrice(price);
+
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
           console.log('[AdWallet] 고팍스 XRUN 가격 로드:', price);
         }
       } catch (error) {
-        console.error('[AdWallet] 고팍스 XRUN 가격 로드 오류:', error);
+        console.error('[AdWallet] 고팍스 XRUN 가격 API 오류, AsyncStorage fallback 시도:', error);
+
+        try {
+          const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+          if (priceDataStr) {
+            const priceData = JSON.parse(priceDataStr);
+            const price = priceData?.data?.gopaxPrice || null;
+            setGopaxPrice(price);
+          }
+        } catch {}
       }
     };
 
