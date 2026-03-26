@@ -7,6 +7,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_47cccc } from '../services';
 import { v_a61db3 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
@@ -46,6 +47,9 @@ export const v_1184c4 = () => {
 
     const v_467ee6 = (v_dfe883 as any)?.couponImgUrl;
     const v_e47051 = typeof v_467ee6 === 'string' && v_467ee6.trim().length > 0;
+    const v_02e0f3 = (v_dfe883 as any)?.trId || (v_dfe883 as any)?.tr_id;
+    const v_717992 = (v_dfe883 as any)?.memberId || (v_dfe883 as any)?.member;
+    const [v_4592c9, v_c3172e] = v_a3453e.useState(false);
 
     const v_c9c6be = v_dfe883 ? {
         id: v_dfe883.id || '1',
@@ -151,6 +155,37 @@ export const v_1184c4 = () => {
         }
     };
 
+    const v_df2aa2 = async () => {
+        if (!v_02e0f3 || !v_717992) {
+            await v_889fad(v_8d41d7('screens.shopMyTicket.alerts.notification'), v_8d41d7('screens.shopMyTicket.alerts.cancelNoInfo'));
+            return;
+        }
+        const v_af3e48 = await v_889fad(
+            v_8d41d7('screens.shopMyTicket.alerts.cancelTitle'),
+            v_8d41d7('screens.shopMyTicket.alerts.cancelConfirm'),
+            [
+                { text: v_8d41d7('screens.shopMyTicket.alerts.cancelNo') },
+                { text: v_8d41d7('screens.shopMyTicket.alerts.cancelYes') },
+            ],
+        );
+        if (v_af3e48 !== 1) return;
+
+        v_c3172e(true);
+        try {
+            const v_8f00b9 = await v_47cccc(String(v_717992), v_02e0f3);
+            if (v_8f00b9.status === 'success') {
+                await v_889fad(v_8d41d7('screens.shopMyTicket.alerts.notification'), v_8d41d7('screens.shopMyTicket.alerts.cancelSuccess'));
+                v_c7ac57();
+            } else {
+                await v_889fad(v_8d41d7('screens.shopMyTicket.alerts.cancelFailedTitle'), v_8f00b9.message || v_8d41d7('screens.shopMyTicket.alerts.cancelFailed'));
+            }
+        } catch (v_9e86fd) {
+            await v_889fad(v_8d41d7('screens.shopMyTicket.alerts.cancelFailedTitle'), v_8d41d7('screens.shopMyTicket.alerts.cancelFailed'));
+        } finally {
+            v_c3172e(false);
+        }
+    };
+
     return (
         <SafeView style={v_d81136.container} backgroundColor="#FFFFFF">
             <StatusBar style="dark" />
@@ -231,6 +266,22 @@ export const v_1184c4 = () => {
                         <Text style={v_d81136.saveButtonText}>{v_8d41d7('screens.shopMyTicket.saveImage')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
+
+                {v_02e0f3 && (
+                    <TouchableOpacity
+                        style={v_d81136.cancelButton}
+                        onPress={v_df2aa2}
+                        activeOpacity={0.85}
+                        disabled={v_4592c9}
+                    >
+                        <View style={v_d81136.cancelButtonInner}>
+                            <Feather name="trash-2" size={20} color="#DC2626" />
+                            <Text style={v_d81136.cancelButtonText}>
+                                {v_4592c9 ? '취소 중...' : v_8d41d7('screens.shopMyTicket.cancelCoupon')}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeView>
     );
@@ -329,6 +380,27 @@ const v_d81136 = v_472849.create({
         fontSize: 17,
         fontFamily: 'Roboto-Bold',
         color: '#FFFFFF',
+        letterSpacing: 0.3,
+    },
+    cancelButton: {
+        marginTop: 10,
+        borderRadius: 14,
+        overflow: 'hidden',
+        borderWidth: 1.5,
+        borderColor: '#DC2626',
+    },
+    cancelButtonInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+        gap: 10,
+        backgroundColor: '#FFFFFF',
+    },
+    cancelButtonText: {
+        fontSize: 17,
+        fontFamily: 'Roboto-Bold',
+        color: '#DC2626',
         letterSpacing: 0.3,
     },
 });

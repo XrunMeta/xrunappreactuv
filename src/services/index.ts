@@ -4590,6 +4590,31 @@ export const v_44edcc = async (
   }
 };
 
+export const v_47cccc = async (
+  v_660822,
+  v_b9de1d,
+  v_c65f5d,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post('/cancelGiftishowCoupon', { member: v_660822, tr_id: v_b9de1d });
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    const v_badeaf = v_5e9bfe instanceof v_3333d3
+      ? (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message
+      : (v_5e9bfe as Error).message;
+    console.error('[기프티쇼] 쿠폰 취소 오류:', v_badeaf);
+    if (v_5e9bfe instanceof v_3333d3) {
+      return {
+        status: 'error',
+        code: v_5e9bfe.response?.status,
+        message: (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message,
+      };
+    }
+    return { status: 'error', message: (v_5e9bfe as Error).message };
+  }
+};
+
 export const v_9c9f1b = async (
   v_660822,
   v_8c0b26,
