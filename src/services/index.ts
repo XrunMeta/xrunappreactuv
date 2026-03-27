@@ -6079,7 +6079,11 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false, v_751f24 = false): Pr
               console.log(`[getTopAd5] 캐시 사용 (${Math.floor(v_e56026 / 1000)}초 전 저장, ${Math.floor((v_887583 - v_e56026) / 1000)}초 남음)`);
               return v_fe7102;
             } else {
-              console.log(`[getTopAd5] 캐시 만료 (${Math.floor(v_e56026 / 1000)}초 경과, 10분 초과)`);
+
+              console.log(`[getTopAd5] 캐시 만료 but 즉시 반환 (${Math.floor(v_e56026 / 1000)}초 경과) → 백그라운드 갱신`);
+
+              setTimeout(() => { v_563153(v_c65f5d, true, false).catch(() => {}); }, 100);
+              return v_fe7102;
             }
           }
         } catch (v_e6e506) {
