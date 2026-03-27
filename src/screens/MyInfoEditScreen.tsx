@@ -32,6 +32,7 @@ import {
   getRegionsByCountry,
   updateRegion,
   signInWithApple,
+  sendEmailVerificationCode,
 } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
 import { isCountryWithRegionsByCode } from '../utils/countryStateCityUtils';
@@ -1324,8 +1325,20 @@ export const MyInfoEditScreen = () => {
         return;
       }
 
-      console.log('[정보수정] 이메일 인증 건너뛰고 전화번호 수정 화면으로 이동');
-      navigate(ROUTES.myInfoPhoneEdit);
+      try {
+        console.log('[정보수정] 이메일 인증 코드 발송 요청:', email);
+        const success = await sendEmailVerificationCode(email, navigate);
+        if (success) {
+          setVerificationEmail(email);
+          setVerificationSuccessRoute(ROUTES.myInfoPhoneEdit);
+          navigate(ROUTES.verificationCode);
+        } else {
+          await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError') || '인증 코드 발송에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('[정보수정] 이메일 인증 오류:', error);
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError') || '인증 오류가 발생했습니다.');
+      }
     }
   };
 

@@ -6079,7 +6079,11 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false,
               console.log(`[getTopAd5] 캐시 사용 (${Math.floor(elapsed / 1000)}초 전 저장, ${Math.floor((TOP_AD5_REFRESH_INTERVAL - elapsed) / 1000)}초 남음)`);
               return storedData;
             } else {
-              console.log(`[getTopAd5] 캐시 만료 (${Math.floor(elapsed / 1000)}초 경과, 10분 초과)`);
+
+              console.log(`[getTopAd5] 캐시 만료 but 즉시 반환 (${Math.floor(elapsed / 1000)}초 경과) → 백그라운드 갱신`);
+
+              setTimeout(() => { getTopAd5(navigation, true, false).catch(() => {}); }, 100);
+              return storedData;
             }
           }
         } catch (timestampError) {

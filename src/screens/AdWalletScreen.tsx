@@ -648,16 +648,6 @@ export const AdWalletScreen = () => {
 
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
 
-        const filteredEstimateAdEntries = estimateAdEntries.filter((entry) => {
-
-          if (entry.title) {
-            return false;
-          }
-          return true;
-        });
-
-        const allAdEntries = filteredEstimateAdEntries;
-
         let hasMore = false;
         if (pagination) {
           hasMore = pagination.hasNextPage || false;
@@ -666,8 +656,8 @@ export const AdWalletScreen = () => {
         }
 
         return {
-          data: allAdEntries,
-          total: allAdEntries.length,
+          data: estimateAdEntries,
+          total: estimateAdEntries.length,
           hasMore,
         };
       } catch (error: any) {
@@ -1016,7 +1006,7 @@ export const AdWalletScreen = () => {
                       return;
                     }
 
-                    questId = recommendationEventId;
+                    questId = `recommendation_${recommendationEventId}` as any;
                   } else {
                     questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                     if (isNaN(questId) || questId === 0) {
@@ -1078,7 +1068,7 @@ export const AdWalletScreen = () => {
                         return;
                       }
 
-                      questId = recommendationEventId;
+                      questId = `recommendation_${recommendationEventId}` as any;
                     } else {
                       questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                       if (isNaN(questId) || questId === 0) {
@@ -1131,7 +1121,7 @@ export const AdWalletScreen = () => {
                   return;
                 }
 
-                questId = recommendationEventId;
+                questId = `recommendation_${recommendationEventId}` as any;
               } else {
                 questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                 if (isNaN(questId) || questId === 0) {
@@ -1181,7 +1171,7 @@ export const AdWalletScreen = () => {
                 return;
               }
 
-              questId = recommendationEventId;
+              questId = `recommendation_${recommendationEventId}` as any;
             } else {
               questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
               if (isNaN(questId) || questId === 0) {

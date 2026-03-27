@@ -211,8 +211,18 @@ export const MyInfoScreen = () => {
         const loginType = await AsyncStorage.getItem('loginType');
         const isAppleLogin = loginType === 'apple';
 
-        console.log('[내 정보] 이메일 인증 건너뛰고 정보 수정 화면으로 직접 이동');
-        navigate(ROUTES.myInfoEdit);
+        if (isAppleLogin) {
+
+          console.log('[내 정보] 애플 로그인 → 정보 수정 화면으로 직접 이동');
+          navigate(ROUTES.myInfoEdit);
+        } else {
+
+          console.log('[내 정보] 일반 로그인 → 이메일 인증 화면으로 이동');
+          if (userInfo?.email) {
+            setVerificationEmail(userInfo.email);
+          }
+          navigate(ROUTES.myInfoEmailAuth);
+        }
       } else {
         navigate(ROUTES[menu.route]);
       }
