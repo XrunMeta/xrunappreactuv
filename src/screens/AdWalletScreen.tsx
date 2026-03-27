@@ -1382,7 +1382,7 @@ export const AdWalletScreen = () => {
 
   const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
-    const isQuest = !!item.title || item.extrastr3 === '추천인이벤트';
+    const isQuest = itemTab === 'pending' ? false : (!!item.title || item.extrastr3 === '추천인이벤트');
     const { onPress, tab: itemTab, ...itemData } = item;
 
     const isAttendanceQuest = item.eventType === 'attendance' ||
@@ -1487,7 +1487,7 @@ export const AdWalletScreen = () => {
               </Text>
             </View>
           )
-        ) : item.extrastr3 === '출석보상' ? (
+        ) : (itemTab !== 'pending' && item.extrastr3 === '출석보상') ? (
           <View style={styles.adCardRow}>
             <Text style={[
               styles.adCardRowLabel,
@@ -1503,8 +1503,7 @@ export const AdWalletScreen = () => {
               {item.expectedAdRevenue}
             </Text>
           </View>
-        ) : item.extrastr3 === '추천인이벤트' ? (
-
+        ) : (itemTab !== 'pending' && item.extrastr3 === '추천인이벤트') ? (
           <View style={styles.adCardRow}>
             <Text style={[
               styles.adCardRowLabel,
