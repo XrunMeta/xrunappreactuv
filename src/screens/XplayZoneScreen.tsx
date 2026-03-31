@@ -6,6 +6,7 @@ import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
+import { v_592061 } from '../services/tapjoy';
 
 let v_10664a = null;
 try {
@@ -24,6 +25,7 @@ export const v_26fe4c = () => {
   };
 
   const v_7c70b9 = () => {
+    v_592061();
     v_9b57fc(v_ce4741.tapjoyList);
   };
 

@@ -17,6 +17,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_877de8 } from '../services';
 import { v_a3bbf0 } from '../utils';
+import { v_592061 } from '../services/tapjoy';
 import { v_772971 } from 'jmpfvteuuztnp';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
@@ -135,7 +136,10 @@ export const v_305be8 = () => {
           <TouchableOpacity
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
+            onPress={() => {
+              v_592061();
+              v_9b57fc(v_ce4741.tapjoyList);
+            }}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
