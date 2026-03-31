@@ -24,7 +24,7 @@ export const v_26fe4c = () => {
   };
 
   const v_7c70b9 = () => {
-    v_9b57fc(v_ce4741.ayetOffersXplay);
+    v_9b57fc(v_ce4741.tapjoyList);
   };
 
   return (
@@ -57,7 +57,7 @@ export const v_26fe4c = () => {
           onPress={v_7c70b9}
         >
           <Text style={v_d81136.zoneTitle}>Xplay Zone 2</Text>
-          <Text style={v_d81136.zoneDescription}>오퍼월 · 리워드 적립</Text>
+          <Text style={v_d81136.zoneDescription}>탭조이 오퍼월 · 리워드 적립</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>
