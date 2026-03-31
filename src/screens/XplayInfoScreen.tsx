@@ -133,9 +133,9 @@ export const v_305be8 = () => {
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
+            style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_889fad(v_8d41d7('screens.xplayInfo.alerts.notification'), v_8d41d7('screens.xplayInfo.alerts.comingSoon'))}
+            onPress={() => v_9b57fc(v_ce4741.tapjoyList)}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
