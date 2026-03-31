@@ -133,9 +133,9 @@ export const XplayInfoScreen = () => {
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.zoneCard, styles.zoneCardDisabled]}
+            style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => showAlert(t('screens.xplayInfo.alerts.notification'), t('screens.xplayInfo.alerts.comingSoon'))}
+            onPress={() => navigate(ROUTES.tapjoyList)}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
