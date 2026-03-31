@@ -6,6 +6,7 @@ import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
+import { requestAutoShowTapjoy } from '../services/tapjoy';
 
 let xplaySymbol: any = null;
 try {
@@ -24,6 +25,7 @@ export const XplayZoneScreen = () => {
   };
 
   const onZone2Press = () => {
+    requestAutoShowTapjoy();
     navigate(ROUTES.tapjoyList);
   };
 
