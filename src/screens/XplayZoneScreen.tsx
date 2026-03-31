@@ -24,7 +24,7 @@ export const XplayZoneScreen = () => {
   };
 
   const onZone2Press = () => {
-    navigate(ROUTES.ayetOffersXplay);
+    navigate(ROUTES.tapjoyList);
   };
 
   return (
@@ -57,7 +57,7 @@ export const XplayZoneScreen = () => {
           onPress={onZone2Press}
         >
           <Text style={styles.zoneTitle}>Xplay Zone 2</Text>
-          <Text style={styles.zoneDescription}>오퍼월 · 리워드 적립</Text>
+          <Text style={styles.zoneDescription}>탭조이 오퍼월 · 리워드 적립</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>
