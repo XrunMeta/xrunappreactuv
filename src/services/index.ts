@@ -350,12 +350,16 @@ export const sendAliveSignal = async (
 
       if (Platform.OS === 'android') {
         if (currentVersion && serverAndroidVersion > currentVersion) {
-          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
-          result.emergencyStop = {
-            enabled: true,
-            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
-            link: getPlayStoreUrl({ gl: 'us' }),
-          };
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+          } else {
+            result.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: getPlayStoreUrl({ gl: 'us' }),
+            };
+          }
         } else {
           console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
         }
@@ -2177,41 +2181,59 @@ export const deleteAllNotifications = async (
   }
 };
 
-export const registerFCMToken = async (
-  pushkey: string,
+export const registerPushToken = async (
   member: number,
   navigation?: any,
-): Promise<FCMTokenRegisterResponse> => {
+): Promise<void> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: FCMTokenRegisterRequest = {
-      pushkey,
-      member,
-    };
+    const Notifications = require('expo-notifications');
+    const Device = require('expo-device');
+    const Constants = require('expo-constants');
+    const { Platform } = require('react-native');
 
-    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+    if (!Device.isDevice) {
+      console.log('[푸시] 에뮬레이터에서는 푸시 토큰 등록을 건너뜁니다.');
+      return;
+    }
 
-    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
-      '/login-pushkeyreg',
-      request,
-    );
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      console.log('[푸시] 알림 권한이 거부되었습니다.');
+      return;
+    }
 
-    console.log('[알림] FCM 토큰 등록 성공');
-
-    return response.data;
-  } catch (error) {
-    console.error('[알림] FCM 토큰 등록 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
       });
     }
-    throw error;
+
+    const projectId = Constants.default?.expoConfig?.extra?.eas?.projectId;
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId || '98780521-4749-4507-8e3a-62a2b3a80783',
+    });
+    const pushToken = tokenData.data; 
+
+    console.log('[푸시] Expo Push Token:', pushToken.substring(0, 30) + '...');
+
+    const axiosInstance = createAxiosInstance(navigation);
+    await axiosInstance.post('/login-pushkeyreg', {
+      pushkey: pushToken,
+      member,
+    });
+
+    console.log('[푸시] 토큰 서버 등록 성공');
+  } catch (error) {
+    console.error('[푸시] 토큰 등록 오류:', error);
+
   }
 };
 
@@ -5585,147 +5607,24 @@ export const getClauseContent = async (
   language: string,
   navigation?: any,
 ): Promise<string> => {
-
   const typeMap: Record<'service' | 'location' | 'personal', number> = {
     service: 1,
     location: 2,
     personal: 3,
   };
+  const typeNumber = typeMap[clauseType];
 
   try {
-    const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = getApiBaseUrl();
+    const resp = await fetch(`https://edge.example.invalid/agreements?type=${typeNumber}`);
+    const data = await resp.json() as any;
 
-    const typeNumber = typeMap[clauseType];
-    const endpoint = `/agreements?type=${typeNumber}`;
-    const fullUrl = endpoint.startsWith('/')
-      ? `${baseUrl}${endpoint}`
-      : `${baseUrl}/${endpoint}`;
-
-    console.log('[약관] 약관 내용 요청:', {
-      clauseType,
-      typeNumber,
-      endpoint,
-      fullUrl,
-      language,
-      baseUrl,
-    });
-
-    let response: Response;
-    try {
-      response = await nodeGatewayRequest(endpoint, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authCode}`,
-        },
-      }, navigation);
-    } catch (networkError) {
-      console.error('[약관] 네트워크 요청 실패:', {
-        clauseType,
-        typeNumber,
-        endpoint,
-        fullUrl,
-        error: networkError,
-        errorType: networkError instanceof Error ? networkError.constructor.name : typeof networkError,
-        errorMessage: networkError instanceof Error ? networkError.message : String(networkError),
-        errorStack: networkError instanceof Error ? networkError.stack : undefined,
-      });
-      throw networkError;
-    }
-
-    console.log('[약관] HTTP 응답 상태:', {
-      ok: response.ok,
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] HTTP 에러 응답:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorText,
-      });
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-    }
-
-    let data: any;
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      const responseText = await response.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] JSON 파싱 실패:', {
-        clauseType,
-        typeNumber,
-        responseText,
-        error: jsonError,
-      });
-      throw new Error(`JSON 파싱 실패: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
-    }
-
-    console.log('[약관] API 응답 데이터:', JSON.stringify(data, null, 2));
-    console.log('[약관] 응답 구조 분석:', {
-      code: data.code,
-      hasData: !!data.data,
-      dataType: Array.isArray(data.data) ? 'array' : typeof data.data,
-      dataLength: Array.isArray(data.data) ? data.data.length : 'N/A',
-      dataKeys: data.data && typeof data.data === 'object' && !Array.isArray(data.data)
-        ? Object.keys(data.data)
-        : 'N/A',
-    });
-
-    if (data.code !== 200 || !data.data) {
-      console.error('[약관] 응답 데이터 검증 실패:', {
-        code: data.code,
-        hasData: !!data.data,
-        fullResponse: data,
-      });
+    if (data.code !== 200 || !data.data?.content) {
       throw new Error('약관 데이터를 가져올 수 없습니다.');
     }
 
-    const agreementData = data.data;
-
-    if (!agreementData.content) {
-      console.error('[약관] 약관 내용이 없습니다:', {
-        agreementData,
-        hasContent: !!agreementData.content,
-      });
-      throw new Error('약관 내용이 없습니다.');
-    }
-
-    console.log('[약관] 약관 내용 로드 성공:', {
-      clauseType,
-      typeNumber,
-      language,
-      contentLength: agreementData.content.length
-    });
-
-    return agreementData.content;
+    return data.data.content;
   } catch (error) {
     console.error('[약관] 약관 내용 로드 실패:', error);
-    if (error instanceof Error) {
-      console.error('[약관] 상세 오류 정보:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        clauseType,
-        typeNumber: typeMap[clauseType],
-        language,
-        endpoint: `/oth-path?type=${typeMap[clauseType]}`,
-      });
-    } else {
-      console.error('[약관] 알 수 없는 에러:', {
-        error,
-        errorType: typeof error,
-        clauseType,
-        typeNumber: typeMap[clauseType],
-        language,
-      });
-    }
-
     throw error;
   }
 };
@@ -5734,45 +5633,23 @@ export const getAgreementByType = async (
   type?: 'service' | 'location' | 'personal',
   navigation?: any,
 ): Promise<AgreementResponse> => {
+  const typeMap: Record<'service' | 'location' | 'personal', number> = {
+    service: 1,
+    location: 2,
+    personal: 3,
+  };
+
   try {
-    const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
+    const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
+    const resp = await fetch(`https://edge.example.invalid/agreements${typeParam}`);
+    const data = await resp.json() as any;
 
-    const typeMap: Record<'service' | 'location' | 'personal', number> = {
-      service: 1,
-      location: 2,
-      personal: 3,
-    };
-
-    const endpoint = type
-      ? `/oth-path?type=${typeMap[type]}`
-      : '/oth-path';
-
-    console.log('[약관] 약관 데이터 요청:', { type, typeNumber: type ? typeMap[type] : undefined, endpoint });
-
-    const response = await nodeGatewayRequest(endpoint, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authCode}`,
-      },
-    }, navigation);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: AgreementResponse = await response.json();
-
-    console.log('[약관] 약관 데이터 로드 성공:', { type, hasData: !!data.data });
-
-    return data;
+    return {
+      success: data.code === 200,
+      data: data.data,
+    } as AgreementResponse;
   } catch (error) {
     console.error('[약관] 약관 데이터 로드 실패:', error);
-    if (error instanceof Error && error.message === 'API request timeout') {
-
-      throw error;
-    }
     throw error;
   }
 };
