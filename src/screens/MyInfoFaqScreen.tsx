@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   LayoutAnimation,
   StyleSheet,
   Text,
@@ -12,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES, FONTS } from '../constants';
 
+const FAQ_API = 'https://edge.example.invalid/oth-path';
+
 type FaqItem = {
   id: string;
   question: string;
@@ -21,6 +24,28 @@ type FaqItem = {
 export const MyInfoFaqScreen = () => {
   const { t } = useTranslation();
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
+  const [items, setItems] = useState<FaqItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(FAQ_API);
+        const json = await resp.json();
+        if (json.success && Array.isArray(json.data)) {
+          setItems(json.data.map((item: any) => ({
+            id: `db-${item.id}`,
+            question: item.question || '',
+            answer: item.answer || '',
+          })));
+        }
+      } catch (e) {
+        console.warn('[FAQ] API 로드 실패:', e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const toggleItem = (id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -28,32 +53,6 @@ export const MyInfoFaqScreen = () => {
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
     );
   };
-
-  const items = useMemo(() => {
-    const faqItems = t('screens.myInfoFaq.items', { returnObjects: true }) as any;
-    return [ 
-      {
-        id: 'mission-complete',
-        question: faqItems?.missionComplete?.question || '',
-        answer: faqItems?.missionComplete?.answer || '',
-      },
-      {
-        id: 'reward-check',
-        question: faqItems?.rewardCheck?.question || '',
-        answer: faqItems?.rewardCheck?.answer || '',
-      },  
-      {
-        id: 'ad-reward',
-        question: faqItems?.adReward?.question || '',
-        answer: faqItems?.adReward?.answer || '',
-      },
-      {
-        id: 'change-password-request',
-        question: faqItems?.changePasswordRequest?.question || '',
-        answer: faqItems?.changePasswordRequest?.answer || '',
-      }, 
-    ];
-  }, [t]);
 
   return (
     <View style={styles.container}>
@@ -63,6 +62,9 @@ export const MyInfoFaqScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {loading && (
+          <ActivityIndicator size="small" color={COLORS.primary} style={{ marginTop: 20 }} />
+        )}
         <View style={styles.list}>
           {items.map((item) => {
             const expanded = expandedIds.includes(item.id);

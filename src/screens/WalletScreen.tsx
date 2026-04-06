@@ -288,16 +288,33 @@ export const WalletScreen = () => {
     const fetchWalletDataAsync = async () => {
       try {
 
+        console.log('[WalletScreen] fetchWalletData 호출 시작, member:', member);
         const walletResponse = await fetchWalletData(member, 7, navigate);
+
+        console.log('[WalletScreen] walletResponse:', JSON.stringify({
+          hasData: !!walletResponse?.data,
+          dataLength: walletResponse?.data?.length,
+          status: walletResponse?.status,
+          code: walletResponse?.code,
+        }));
 
         if (walletResponse && walletResponse.data) {
 
+          console.log('[WalletScreen] 원본 데이터:', walletResponse.data.map((item: any) => ({
+            currency: item.currency,
+            subcurrency: item.subcurrency,
+            address: item.address ? item.address.substring(0, 10) + '...' : 'NONE',
+            symbol: item.symbol,
+          })));
+
+          console.log('[WalletScreen] statusOtherChain:', statusOtherChain);
           const filteredData = walletResponse.data.filter((item) => {
             if (statusOtherChain === 'on') {
               return true; 
             } else {
 
               return (
+                item.currency === 1 ||
                 item.subcurrency === 5000 ||
                 item.subcurrency === 5100 ||
                 item.subcurrency === 5200 ||
@@ -305,6 +322,13 @@ export const WalletScreen = () => {
               );
             }
           });
+
+          console.log('[WalletScreen] 필터 후 데이터:', filteredData.map((item: any) => ({
+            currency: item.currency,
+            subcurrency: item.subcurrency,
+            address: item.address ? item.address.substring(0, 10) + '...' : 'NONE',
+            symbol: item.symbol,
+          })));
 
           const sortedData = filteredData.sort((a, b) => {
             if (a.currency === 1) return -1; 
@@ -321,16 +345,27 @@ export const WalletScreen = () => {
           setCardsData(sortedData);
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
+          console.log('[WalletScreen] xrunWallet 찾기:', xrunWallet ? {
+            currency: xrunWallet.currency,
+            address: xrunWallet.address,
+            subcurrency: xrunWallet.subcurrency,
+          } : 'NOT FOUND');
 
           if (xrunWallet) {
             setPublicAddress(xrunWallet.address);
+            console.log('[WalletScreen] publicAddress 설정:', xrunWallet.address);
+          } else {
+            console.warn('[WalletScreen] ⚠️ currency=1 지갑을 찾을 수 없음! sortedData currencies:', sortedData.map((d: any) => d.currency));
           }
 
+          setIsLoading(false);
+        } else {
+          console.warn('[WalletScreen] ⚠️ walletResponse에 data 없음:', walletResponse);
           setIsLoading(false);
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          console.error('Failed to fetch wallet data:', error);
+          console.error('[WalletScreen] ❌ fetchWalletData 실패:', error?.message || error);
           setIsLoading(false);
         }
       }

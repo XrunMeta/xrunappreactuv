@@ -2232,7 +2232,7 @@ export const registerPushToken = async (
 
     console.log('[푸시] 토큰 서버 등록 성공');
   } catch (error) {
-    console.error('[푸시] 토큰 등록 오류:', error);
+    console.warn('[푸시] 토큰 등록 오류:', error);
 
   }
 };

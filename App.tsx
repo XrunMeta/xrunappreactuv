@@ -69,6 +69,7 @@ import {
   TapjoyListScreen,
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
+  MyChipsOfferwallScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 
@@ -97,9 +98,18 @@ import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import { useAlertDialog } from './src/context/AlertDialogContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchMapMarkerData } from './src/services';
+import { fetchMapMarkerData, registerPushToken } from './src/services';
 import { checkLatestVersion, getCurrentAppVersion, invalidateServerVersionCache, isNewVersionAvailable, isServerVersionUpdateRequired } from './src/services/versionCheck';
 import { useTranslation } from 'react-i18next';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 let processedDeepLinkUrl: string | null = null;
 let isDeepLinkProcessing = false;
@@ -115,7 +125,11 @@ const ScreenHost = () => {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (cancelled || !userDataStr) return;
         const userData = JSON.parse(userDataStr);
-        if (userData?.member != null) setAyetUserId(String(userData.member));
+        if (userData?.member != null) {
+          setAyetUserId(String(userData.member));
+
+          registerPushToken(userData.member).catch(() => {});
+        }
       } catch (_) {}
     })();
     return () => { cancelled = true; };
@@ -568,6 +582,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'xplayZone') {
     return <XplayZoneScreen />;
+  }
+
+  if (currentScreen === 'myChipsOfferwall') {
+    return <MyChipsOfferwallScreen />;
   }
 
   if (currentScreen === 'myinfoShopSales') {
@@ -1063,7 +1081,7 @@ export default function App() {
         initializePangle()
           .then(() => loadAndShowAppOpenAd())
           .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
-          .catch((error) => console.error('[App] Pangle 프로세스 실패:', error))
+          .catch((error) => console.warn('[App] Pangle 프로세스 실패:', error))
           .finally(() => devBoot?.recordBootStep('pangle_done'));
       }, 0);
     };

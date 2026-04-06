@@ -473,6 +473,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const [webViewUrl, setWebViewUrl] = useState('');
   const [webViewTitle, setWebViewTitle] = useState('');
   const [webViewError, setWebViewError] = useState(false);
+  const [webViewCanGoBack, setWebViewCanGoBack] = useState(false);
+  const webViewModalRef = useRef<WebView>(null);
 
   const webViewTokenRef = useRef<TokenData | null>(null);
   const webViewAdParamsRef = useRef<any>(null);
@@ -2025,10 +2027,28 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         webViewTokenRef.current = token;
         webViewAdParamsRef.current = adParams;
 
-        setWebViewUrl(urlAD);
         setWebViewTitle(token.name || '광고');
-        setWebViewError(false); 
+        setWebViewError(false);
+        setWebViewCanGoBack(false);
         setShowWebViewModal(true);
+
+        (async () => {
+          try {
+            const resp = await fetch(urlAD, { method: 'GET' });
+            const contentType = resp.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              const json = await resp.json();
+              if (json.lurl) {
+                console.log('[WebView Modal] JSON lurl 추출:', json.lurl);
+                setWebViewUrl(json.lurl);
+                return;
+              }
+            }
+          } catch {
+
+          }
+          setWebViewUrl(urlAD);
+        })();
       }
 
       (async () => {
@@ -2779,17 +2799,26 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             backgroundColor: '#fff',
           }}>
             {}
-            <TouchableOpacity
-              onPress={handleWebViewClose}
-              style={{
-                flex: 2,
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                marginLeft: 8,
-              }}
-            >
-              <Ionicons name="close" size={24} color="#000" />
-            </TouchableOpacity>
+            <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (webViewCanGoBack && webViewModalRef.current) {
+                    webViewModalRef.current.goBack();
+                  } else {
+                    handleWebViewClose();
+                  }
+                }}
+                style={{ padding: 4 }}
+              >
+                <Ionicons name="chevron-back" size={24} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleWebViewClose}
+                style={{ padding: 4, marginLeft: 4 }}
+              >
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
 
             {}
             <Text 
@@ -2826,6 +2855,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           {}
           {webViewUrl && !webViewError ? (
             <WebView
+              ref={webViewModalRef}
               key={webViewUrl}
               source={{ uri: webViewUrl }}
               style={{ flex: 1 }}
@@ -2982,6 +3012,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                 }
               }}
               onNavigationStateChange={(navState) => {
+                setWebViewCanGoBack(navState.canGoBack);
                 console.log('[WebView] 네비게이션:', navState.url);
 
                 if (navState.url && navState.url.startsWith('market://')) {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Linking,
   Platform,
   Modal,
+  BackHandler,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { StatusBar } from 'expo-status-bar';
@@ -30,11 +31,43 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
   const { navigate, reset, goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
 
-  const [webViewUrl, setWebViewUrl] = useState(advertisementParams?.urlAD || '');
+  const [webViewUrl, setWebViewUrl] = useState('');
   const [webViewTitle, setWebViewTitle] = useState(advertisementParams?.name || '광고');
   const [webViewError, setWebViewError] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const webViewRef = useRef<WebView>(null);
   const [showAdDetailModal, setShowAdDetailModal] = useState(false); 
+
+  useEffect(() => {
+    const resolveUrl = async () => {
+      const rawUrl = advertisementParams?.urlAD || '';
+      if (!rawUrl) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const resp = await fetch(rawUrl, { method: 'GET' });
+        const contentType = resp.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json = await resp.json();
+          if (json.lurl) {
+            console.log('[ShowWebView] JSON lurl 추출:', json.lurl);
+            setWebViewUrl(json.lurl);
+          } else {
+            setWebViewUrl(rawUrl);
+          }
+        } else {
+          setWebViewUrl(rawUrl);
+        }
+      } catch {
+
+        setWebViewUrl(rawUrl);
+      }
+      setIsLoading(false);
+    };
+    resolveUrl();
+  }, [advertisementParams?.urlAD]);
 
   const handleClose = useCallback(() => {
     resetAdvertisementParams();
@@ -53,6 +86,26 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
     }
   }, [onClose, resetAdvertisementParams, reset, navigate]);
 
+  const handleGoBack = useCallback(() => {
+    if (canGoBack && webViewRef.current) {
+      webViewRef.current.goBack();
+    } else {
+      handleClose();
+    }
+  }, [canGoBack, handleClose]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (canGoBack && webViewRef.current) {
+        webViewRef.current.goBack();
+        return true;
+      }
+      handleClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [canGoBack, handleClose]);
+
   const handleInfoIconPress = useCallback(() => {
 
     if (Platform.OS === 'ios') {
@@ -66,15 +119,23 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       {}
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'ios' ? 20 : 40) }]}>
         {}
-        <TouchableOpacity
-          onPress={handleClose}
-          style={styles.closeButton}
-        >
-          <Ionicons name="close" size={24} color="#000" />
-        </TouchableOpacity>
+        <View style={styles.leftButtons}>
+          <TouchableOpacity
+            onPress={handleGoBack}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.closeButton}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
 
         {}
-        <Text 
+        <Text
           style={styles.title}
           numberOfLines={1}
           ellipsizeMode="tail"
@@ -92,7 +153,11 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       </View>
 
       {}
-      {webViewUrl && !webViewError ? (
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#888' }}>로딩 중...</Text>
+        </View>
+      ) : webViewUrl && !webViewError ? (
         <WebView
           ref={webViewRef}
           key={webViewUrl}
@@ -252,6 +317,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           }}
           onNavigationStateChange={(navState) => {
             console.log('[WebView] 네비게이션:', navState.url);
+            setCanGoBack(navState.canGoBack);
 
             if (navState.url && navState.url.startsWith('market://')) {
               try {
@@ -650,11 +716,17 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
     backgroundColor: '#fff',
   },
-  closeButton: {
+  leftButtons: {
     flex: 2,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 4,
+  },
+  closeButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   title: {
     fontSize: 18,

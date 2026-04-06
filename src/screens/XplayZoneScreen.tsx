@@ -6,7 +6,6 @@ import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
-import { requestAutoShowTapjoy } from '../services/tapjoy';
 
 let xplaySymbol: any = null;
 try {
@@ -25,8 +24,7 @@ export const XplayZoneScreen = () => {
   };
 
   const onZone2Press = () => {
-    requestAutoShowTapjoy();
-    navigate(ROUTES.tapjoyList);
+    navigate(ROUTES.myChipsOfferwall);
   };
 
   return (
@@ -59,7 +57,7 @@ export const XplayZoneScreen = () => {
           onPress={onZone2Press}
         >
           <Text style={styles.zoneTitle}>Xplay Zone 2</Text>
-          <Text style={styles.zoneDescription}>탭조이 오퍼월 · 리워드 적립</Text>
+          <Text style={styles.zoneDescription}>게임 오퍼월 · 리워드 적립</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>

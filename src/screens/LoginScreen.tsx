@@ -35,6 +35,7 @@ import {
   signInWithApple,
   connectAppleAccount,
   showNativeScreen,
+  registerPushToken,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -261,6 +262,10 @@ export const LoginScreen = () => {
 
       console.log('[로그인] 로그인 성공');
 
+      if (userData.member) {
+        registerPushToken(userData.member, navigate).catch(() => {});
+      }
+
       navigate(ROUTES.map);
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
@@ -463,6 +468,10 @@ export const LoginScreen = () => {
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
 
+      if (memberId) {
+        registerPushToken(memberId, navigate).catch(() => {});
+      }
+
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
       navigate(ROUTES.map);
     } catch (error: any) {
@@ -605,6 +614,10 @@ export const LoginScreen = () => {
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      if (memberId) {
+        registerPushToken(memberId, navigate).catch(() => {});
+      }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
       navigate(ROUTES.map);

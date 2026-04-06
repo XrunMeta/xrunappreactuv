@@ -1820,7 +1820,7 @@ export const MapMainScreen: React.FC = () => {
 
             hasCheckedMarkersOnEnterRef.current = false;
           } catch (locationError) {
-            console.error('❌ [MapMainScreen] 위치 정보 가져오기 실패:', locationError);
+            console.warn('⚠️ [MapMainScreen] 위치 정보 가져오기 실패:', locationError);
             setShowLoadingOverlay(false);
             return;
           }

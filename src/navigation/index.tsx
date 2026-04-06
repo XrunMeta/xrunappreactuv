@@ -80,6 +80,7 @@ export const ROUTES = {
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   myInfoEmailAuth: 'myInfoEmailAuth',
+  myChipsOfferwall: 'myChipsOfferwall',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

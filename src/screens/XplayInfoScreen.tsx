@@ -17,7 +17,6 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
 import { getAyetPointsBalance } from '../services';
 import { shareReferralLink } from '../utils';
-import { requestAutoShowTapjoy } from '../services/tapjoy';
 import { useTranslation } from 'react-i18next';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
@@ -136,10 +135,7 @@ export const XplayInfoScreen = () => {
           <TouchableOpacity
             style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => {
-              requestAutoShowTapjoy();
-              navigate(ROUTES.tapjoyList);
-            }}
+            onPress={() => navigate(ROUTES.myChipsOfferwall)}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>

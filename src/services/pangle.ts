@@ -324,6 +324,11 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         return;
       }
 
+      if (typeof PangleModule.loadAndShowAppOpenAd !== 'function') {
+        console.warn('[Pangle] iOS loadAndShowAppOpenAd 메서드가 아직 네이티브에 없습니다. 스킵합니다.');
+        return;
+      }
+
       const finalAdUnitId = getPangleAppOpeningAdUnitId();
       if (!finalAdUnitId) {
         console.warn('[Pangle] iOS 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');

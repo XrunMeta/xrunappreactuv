@@ -418,157 +418,51 @@ export const AdWalletScreen = () => {
       const expectedAdRevenueColor = isReviewStatus ? '#cccccc' : '#707070';
       const adRevenueSettlementColor = isReviewStatus ? '#cccccc' : '#343434';
 
-      const translateText = (text: string | undefined): string | undefined => {
-        if (!text) return text;
-
-        let translated = text.trim().replace(/\s+/g, ' ');
-        const originalText = text;
-
-        if (__DEV__) {
-          console.log('[AdWallet] 번역 전 텍스트:', {
-            original: originalText,
-            normalized: translated,
-            language: i18n.language,
-          });
+      const getQuestTitle = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+            return t('screens.adWallet.exclusiveReferralCodeShare') || item.title || '';
+          case 'recommendation':
+            return t('screens.adWallet.referralEventRewardTitle') || item.title || '';
+          case 'attendance':
+            return t('screens.adWallet.attendanceCheck') || item.title || '';
+          default:
+            return item.title || '';
         }
-
-        if (translated === '초대를 받은 지인이 신규 가입을 완료하면, 초대자와 신규 가입자 두 분 모두에게 5 XRUN의 보상을 드립니다.') {
-          return t('screens.adWallet.referralInviteDescription');
-        }
-
-        if (translated === '추천인 이벤트 보상을 받으세요' || translated.includes('추천인 이벤트 보상을 받으세요')) {
-          return t('screens.adWallet.referralEventRewardReceive');
-        }
-
-        if (translated === '심사중인 추천인 이벤트입니다' || translated.includes('심사중인 추천인 이벤트입니다')) {
-          return t('screens.adWallet.referralEventUnderReview');
-        }
-
-        if (translated.includes('보상') && translated.includes('지급이') && translated.includes('완료된') && translated.includes('추천인 이벤트') && translated.includes('입니다')) {
-          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
-        }
-
-        if (translated === '보상 지급이 완료된 추천인 이벤트입니다' || translated.trim() === '보상 지급이 완료된 추천인 이벤트입니다') {
-          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
-        }
-
-        if (translated === '추천인 이벤트 보상') {
-          return t('screens.adWallet.referralEventReward');
-        }
-
-        if (translated === '로그인, 접속시에 출석 보상을 드립니다') {
-          return t('screens.adWallet.attendanceRewardOnLogin');
-        }
-
-        if (translated === '전용 레퍼럴 코드를 지인에게 공유하기') {
-          return t('screens.adWallet.exclusiveReferralCodeShare');
-        }
-
-        if (translated === '출석체크하기' || translated === '출석 체크하기') {
-          return t('screens.adWallet.attendanceCheckDo');
-        }
-
-        if (translated === '소개 이벤트 보상을 받으세요') {
-          return t('screens.adWallet.referralEventRewardTitle');
-        }
-
-        if (translated === '추천인 이벤트 보상 받기') {
-          return t('screens.adWallet.referralEventRewardTitle');
-        }
-
-        if (translated.includes('보상을 받으세요')) {
-          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상 받기')) {
-          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('출석보상')) {
-          translated = translated.replace(/출석보상/g, t('screens.adWallet.attendanceCheckCompletedReward'));
-        }
-
-        if (translated.includes('정산완료')) {
-          translated = translated.replace(/정산완료/g, t('screens.adWallet.settled'));
-        }
-
-        if (translated.includes('추천인 이벤트')) {
-          translated = translated.replace(/추천인 이벤트/g, t('screens.adWallet.referralEvent'));
-        }
-
-        if (translated.includes('소개 이벤트')) {
-          translated = translated.replace(/소개 이벤트/g, t('screens.adWallet.referralEvent'));
-        }
-
-        if (translated.includes('추천인초대보상')) {
-          translated = translated.replace(/추천인초대보상/g, t('screens.adWallet.referralInviteReward'));
-        }
-
-        if (translated.includes('출석체크') && !translated.includes('출석체크하기') && !translated.includes('출석 체크하기')) {
-          translated = translated.replace(/출석체크|출석 체크/g, t('screens.adWallet.attendanceCheck'));
-        }
-
-        if (translated.includes('전용 레퍼럴 코드') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
-          translated = translated.replace(/전용 레퍼럴 코드/g, t('screens.adWallet.exclusiveReferralCode'));
-        }
-
-        if (translated.includes('지인에게 공유하기') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
-          translated = translated.replace(/지인에게 공유하기/g, t('screens.adWallet.shareWithAcquaintances'));
-        }
-
-        if (translated.includes('심사중')) {
-          translated = translated.replace(/심사중/g, t('screens.adWallet.pending'));
-        }
-
-        if (translated.includes('완료된')) {
-          translated = translated.replace(/완료된/g, t('screens.adWallet.completedPast'));
-        }
-
-        if (translated.includes('완료')) {
-          translated = translated.replace(/완료/g, t('screens.adWallet.completed'));
-        }
-
-        if (translated.includes('지급이 완료된')) {
-          translated = translated.replace(/지급이 완료된/g, t('screens.adWallet.paymentCompleted'));
-        }
-
-        if (translated.includes('지급이')) {
-          translated = translated.replace(/지급이/g, t('screens.adWallet.paymentIs'));
-        }
-
-        if (translated.includes('입니다')) {
-          translated = translated.replace(/입니다/g, t('screens.adWallet.is'));
-        }
-
-        if (translated.includes('보상을 받으세요')) {
-          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상 받기')) {
-          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상') && !translated.includes('보상을 받으세요') && !translated.includes('보상 받기')) {
-          translated = translated.replace(/보상/g, t('screens.adWallet.reward'));
-        }
-
-        if (__DEV__ && originalText !== translated) {
-          console.log('[AdWallet] 번역 후 텍스트:', {
-            original: originalText,
-            translated,
-            language: i18n.language,
-          });
-        }
-
-        return translated;
       };
 
-      const displayTitle = isReferralEvent && !isReferralInvite 
-        ? t('screens.adWallet.referralEventRewardTitle')
-        : translateText(item.title);
+      const getQuestDescription = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+            return t('screens.adWallet.referralInviteDescription') || item.description || '';
+          case 'recommendation':
+            if (item.event_status === 'review' && (Number(item.reward_amount) || 0) === 0)
+              return t('screens.adWallet.referralEventUnderReview') || item.description || '';
+            return item.description || t('screens.adWallet.referralEventReward') || '';
+          case 'attendance':
+            if (item.is_rewarded)
+              return item.description || '';
+            return t('screens.adWallet.attendanceRewardOnLogin') || item.description || '';
+          default:
+            return item.description || '';
+        }
+      };
 
-      const displayDescription = translateText(item.description);
-      const displayRewardDescription = translateText(item.reward_description);
+      const getQuestRewardDesc = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+          case 'recommendation':
+            return t('screens.adWallet.referralEvent') || item.reward_description || '';
+          case 'attendance':
+            return t('screens.adWallet.attendanceCheckCompletedReward') || item.reward_description || '';
+          default:
+            return item.reward_description || '';
+        }
+      };
+
+      const displayTitle = getQuestTitle();
+      const displayDescription = getQuestDescription();
+      const displayRewardDescription = getQuestRewardDesc();
 
       return {
         id: item.id,

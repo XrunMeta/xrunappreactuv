@@ -12,7 +12,8 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance, getXrunBuyableItems } from '../services';
+import type { ShopItemData } from '../types';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -66,15 +67,19 @@ const sampleProducts: ProductData[] = [
     },
 ];
 
-const xrunStoreProducts: ProductData[] = [
-    {
-        id: 'xrun-1',
+function shopItemToProductData(item: ShopItemData): ProductData {
+
+    const imgSrc = item.thumbnail || item.image;
+    const imgUri = typeof imgSrc === 'string' && imgSrc.startsWith('http') ? imgSrc : null;
+    return {
+        id: String(item.item),
         brand: 'XRUN',
-        title: 'Polygon 전송티켓',
-        price: 10,
-        image: xrunHorizontalLogo,
-    },
-];
+        title: item.title || '-',
+        description: item.description || undefined,
+        price: Number(item.priceXrun) || 0,
+        image: imgUri ? { uri: imgUri } : xrunHorizontalLogo,
+    };
+}
 
 function giftishowToProductData(item: GiftishowProductItem): ProductData {
     return {
@@ -102,6 +107,8 @@ export const ShopScreen = () => {
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
     const [xrunBalance, setXrunBalance] = useState<number | null>(null);
     const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
+    const [xrunStoreProducts, setXrunStoreProducts] = useState<ProductData[]>([]);
+    const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
     const { navigate } = useAppNavigation();
 
     const loadXrunBalance = useCallback(async () => {
@@ -184,13 +191,34 @@ export const ShopScreen = () => {
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
+    const loadXrunStoreProducts = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            setXrunStoreLoading(true);
+            const res = await getXrunBuyableItems(String(member));
+            if (res.status === 'success' && res.data) {
+                console.log('[ShopScreen] XRUN Store 원본 데이터:', JSON.stringify(res.data.map((d: any) => ({ item: d.item, title: d.title, image: d.image, thumbnail: d.thumbnail }))));
+                setXrunStoreProducts(res.data.map(shopItemToProductData));
+            }
+        } catch (err) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', err);
+        } finally {
+            setXrunStoreLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (tab === 'xplayShop') {
             loadXplayBalance();
         } else if (tab === 'xrunStore') {
             loadXrunBalance();
+            loadXrunStoreProducts();
         }
-    }, [tab, loadXplayBalance, loadXrunBalance]);
+    }, [tab, loadXplayBalance, loadXrunBalance, loadXrunStoreProducts]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -241,9 +269,15 @@ export const ShopScreen = () => {
         ]);
     };
 
+    const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
     const renderProductCard = (product: ProductData, showPurchaseButton: boolean = false) => {
         const isEthereum = product.brand === 'Ethereum' && product.description;
         const isXrun = product.brand === 'XRUN';
+
+        const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
+        const imgFailed = isRemote && failedImages.has(product.id);
+        const displayImage = imgFailed ? xrunHorizontalLogo : product.image;
 
         return (
             <TouchableOpacity
@@ -256,7 +290,16 @@ export const ShopScreen = () => {
                     styles.productImageContainer,
                     isEthereum && styles.productImageContainerEthereum
                 ]}>
-                    <Image source={product.image} style={styles.productImage} resizeMode="contain" />
+                    <Image
+                        source={displayImage}
+                        style={styles.productImage}
+                        resizeMode="contain"
+                        onError={() => {
+                            if (isRemote) {
+                                setFailedImages(prev => new Set(prev).add(product.id));
+                            }
+                        }}
+                    />
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
                             <Text style={styles.imageDescriptionText}>{product.description}</Text>
@@ -402,9 +445,19 @@ export const ShopScreen = () => {
                             )}
                         </>
                     ) : tab === 'xrunStore' ? (
-                        <View style={styles.productGrid}>
-                            {xrunStoreProducts.map((product) => renderProductCard(product, false))}
-                        </View>
+                        xrunStoreLoading ? (
+                            <View style={styles.emptyContainer}>
+                                <ActivityIndicator size="large" color={COLORS.primary} />
+                            </View>
+                        ) : xrunStoreProducts.length === 0 ? (
+                            <View style={styles.emptyContainer}>
+                                <Text style={styles.emptyText}>{t('screens.shop.noProducts') || '등록된 상품이 없습니다.'}</Text>
+                            </View>
+                        ) : (
+                            <View style={styles.productGrid}>
+                                {xrunStoreProducts.map((product) => renderProductCard(product, false))}
+                            </View>
+                        )
                     ) : (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
