@@ -126,12 +126,6 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
           >
             <Ionicons name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={v_7f2e65}
-            style={v_d81136.closeButton}
-          >
-            <Ionicons name="close" size={24} color="#000" />
-          </TouchableOpacity>
         </View>
 
         {}
