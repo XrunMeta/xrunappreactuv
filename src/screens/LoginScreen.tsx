@@ -35,6 +35,7 @@ import {
   v_7af6c9,
   v_1fee11,
   v_a763e6,
+  v_cec605,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -261,6 +262,10 @@ export const v_f4f851 = () => {
 
       console.log('[로그인] 로그인 성공');
 
+      if (v_ef7306.member) {
+        v_cec605(v_ef7306.member, v_9b57fc).catch(() => {});
+      }
+
       v_9b57fc(v_ce4741.map);
     } catch (v_5e9bfe) {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
@@ -463,6 +468,10 @@ export const v_f4f851 = () => {
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
 
+      if (v_717992) {
+        v_cec605(v_717992, v_9b57fc).catch(() => {});
+      }
+
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
       v_9b57fc(v_ce4741.map);
     } catch (v_5e9bfe) {
@@ -605,6 +614,10 @@ export const v_f4f851 = () => {
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      if (v_717992) {
+        v_cec605(v_717992, v_9b57fc).catch(() => {});
+      }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
       v_9b57fc(v_ce4741.map);

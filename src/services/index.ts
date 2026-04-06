@@ -2232,7 +2232,7 @@ export const v_cec605 = async (
 
     console.log('[푸시] 토큰 서버 등록 성공');
   } catch (v_5e9bfe) {
-    console.error('[푸시] 토큰 등록 오류:', v_5e9bfe);
+    console.warn('[푸시] 토큰 등록 오류:', v_5e9bfe);
 
   }
 };

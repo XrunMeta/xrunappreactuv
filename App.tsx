@@ -69,6 +69,7 @@ import {
   v_f2ecfa,
   v_a50cad,
   v_d4a78d,
+  v_0ca15f,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 
@@ -97,9 +98,18 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import * as v_8a44cb from 'zryrlwvgokjhz';
 import { v_4b1173 } from './src/context/AlertDialogContext';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_f84ef5 } from './src/services';
+import { v_f84ef5, v_cec605 } from './src/services';
 import { v_f16a74, v_deac27, v_763f0d, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 import { v_772971 } from 'jmpfvteuuztnp';
+import * as v_2b7a17 from 'bpebbcghaffswkrsep';
+
+v_2b7a17.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 let v_308260 = null;
 let v_435733 = false;
@@ -115,7 +125,11 @@ const v_c0dbdf = () => {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (v_2008a4 || !v_f24fd5) return;
         const v_ef7306 = JSON.parse(v_f24fd5);
-        if (v_ef7306?.member != null) v_e8d7c0(String(v_ef7306.member));
+        if (v_ef7306?.member != null) {
+          v_e8d7c0(String(v_ef7306.member));
+
+          v_cec605(v_ef7306.member).catch(() => {});
+        }
       } catch (v_37eab7) {}
     })();
     return () => { v_2008a4 = true; };
@@ -568,6 +582,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'xplayZone') {
     return <XplayZoneScreen />;
+  }
+
+  if (v_0f0c7b === 'myChipsOfferwall') {
+    return <MyChipsOfferwallScreen />;
   }
 
   if (v_0f0c7b === 'myinfoShopSales') {
@@ -1063,7 +1081,7 @@ export default function v_6540c3() {
         v_f095b0()
           .then(() => v_e55270())
           .then(() => console.log('[App] 앱 오프닝 광고 프로세스 종료 (표시 완료 또는 실패)'))
-          .catch((v_5e9bfe) => console.error('[App] Pangle 프로세스 실패:', v_5e9bfe))
+          .catch((v_5e9bfe) => console.warn('[App] Pangle 프로세스 실패:', v_5e9bfe))
           .finally(() => v_cbd24a?.recordBootStep('pangle_done'));
       }, 0);
     };

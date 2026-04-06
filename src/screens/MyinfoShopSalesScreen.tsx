@@ -24,6 +24,7 @@ export const v_1cca63 = () => {
     item: string | null;
     title: string | null;
     price: number;
+    priceKRW: number;
     priceXrun: number;
     participantCount: number;
     totalSales: number;
@@ -37,6 +38,7 @@ export const v_1cca63 = () => {
     item: null,
     title: null,
     price: 0,
+    priceKRW: 0,
     priceXrun: 0,
     participantCount: 0,
     totalSales: 0,
@@ -134,21 +136,23 @@ export const v_1cca63 = () => {
         v_deef62(true);
         const v_3393e3 = await v_9509e3(v_c5bd46, v_9b57fc);
 
-        if (v_3393e3.status === 'success' && v_3393e3.data) {
-          const v_f19f64 = v_3393e3.data.title;
+        const v_741623 = Array.isArray(v_3393e3.data) ? v_3393e3.data[0] : v_3393e3.data;
+        if (v_3393e3.status === 'success' && v_741623) {
+          const v_f19f64 = v_741623.title;
           v_67c452({
-            item: v_3393e3.data.item || null,
+            item: v_741623.item || null,
             title: v_f19f64 && v_f19f64.trim() ? v_f19f64 : null,
-            price: v_3393e3.data.price || 0,
-            priceXrun: v_3393e3.data.priceXrun || 0,
-            participantCount: v_3393e3.data.participantCount || 0,
-            totalSales: v_3393e3.data.totalSales || 0,
-            totalSalesXrun: v_3393e3.data.totalSalesXrun || 0,
-            description: v_3393e3.data.description,
-            maxpurchase: v_3393e3.data.maxpurchase,
-            image: v_3393e3.data.image || null,
-            thumbnail: v_3393e3.data.thumbnail || null,
-            sdk: v_3393e3.data.sdk || null,
+            price: v_741623.price || 0,
+            priceKRW: v_741623.priceKRW || 0,
+            priceXrun: v_741623.priceXrun || 0,
+            participantCount: v_741623.participantCount || 0,
+            totalSales: v_741623.totalSales || 0,
+            totalSalesXrun: v_741623.totalSalesXrun || 0,
+            description: v_741623.description,
+            maxpurchase: v_741623.maxpurchase,
+            image: v_741623.image || null,
+            thumbnail: v_741623.thumbnail || null,
+            sdk: v_741623.sdk || null,
           });
         } else {
 
@@ -156,6 +160,7 @@ export const v_1cca63 = () => {
             item: null,
             title: null,
             price: 0,
+            priceKRW: 0,
             priceXrun: 0,
             participantCount: 0,
             totalSales: 0,
@@ -168,6 +173,7 @@ export const v_1cca63 = () => {
           item: null,
           title: null,
           price: 0,
+          priceKRW: 0,
           priceXrun: 0,
           participantCount: 0,
           totalSales: 0,
@@ -261,6 +267,7 @@ export const v_1cca63 = () => {
         item: v_d20ab2.item,
         title: v_d20ab2.title,
         price: v_d20ab2.price,
+        priceKRW: v_d20ab2.priceKRW,
         priceXrun: v_d20ab2.priceXrun,
         description: v_d20ab2.description || '',
         maxpurchase: v_d20ab2.maxpurchase || 1,

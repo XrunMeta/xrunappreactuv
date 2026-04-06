@@ -1,5 +1,6 @@
-import v_a3453e, { v_df9f57, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_5ab095 } from 'bapkr';
 import {
+  v_39a996,
   v_94c965,
   v_472849,
   v_19b633,
@@ -12,6 +13,8 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_570c34 } from '../components';
 import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04, v_843035 } from '../constants';
 
+const v_0e6e65 = 'https://oth-path-d2a757.example.invalid/oth-path';
+
 type FaqItem = {
   id: string;
   question: string;
@@ -21,6 +24,28 @@ type FaqItem = {
 export const v_083aa7 = () => {
   const { t: v_8d41d7 } = v_772971();
   const [v_c2c485, v_d24017] = v_5ab095<string[]>([]);
+  const [v_4622b9, v_fa923c] = v_5ab095<FaqItem[]>([]);
+  const [v_683210, v_34a50a] = v_5ab095(true);
+
+  v_c4deb2(() => {
+    (async () => {
+      try {
+        const v_eb792a = await fetch(v_0e6e65);
+        const v_7ecfd1 = await v_eb792a.json();
+        if (v_7ecfd1.success && Array.isArray(v_7ecfd1.data)) {
+          v_fa923c(v_7ecfd1.data.map((v_8c0b26) => ({
+            id: `db-${v_8c0b26.id}`,
+            question: v_8c0b26.question || '',
+            answer: v_8c0b26.answer || '',
+          })));
+        }
+      } catch (v_9e86fd) {
+        console.warn('[FAQ] API 로드 실패:', v_9e86fd);
+      } finally {
+        v_34a50a(false);
+      }
+    })();
+  }, []);
 
   const v_0ab8c5 = (v_389afb) => {
     v_94c965.configureNext(v_94c965.Presets.easeInEaseOut);
@@ -28,32 +53,6 @@ export const v_083aa7 = () => {
       v_ba2215.includes(v_389afb) ? v_ba2215.filter((v_6e55b1) => v_6e55b1 !== v_389afb) : [...v_ba2215, v_389afb],
     );
   };
-
-  const v_4622b9 = v_df9f57(() => {
-    const v_a7a4ae = v_8d41d7('screens.myInfoFaq.items', { returnObjects: true }) as any;
-    return [ 
-      {
-        id: 'mission-complete',
-        question: v_a7a4ae?.missionComplete?.question || '',
-        answer: v_a7a4ae?.missionComplete?.answer || '',
-      },
-      {
-        id: 'reward-check',
-        question: v_a7a4ae?.rewardCheck?.question || '',
-        answer: v_a7a4ae?.rewardCheck?.answer || '',
-      },  
-      {
-        id: 'ad-reward',
-        question: v_a7a4ae?.adReward?.question || '',
-        answer: v_a7a4ae?.adReward?.answer || '',
-      },
-      {
-        id: 'change-password-request',
-        question: v_a7a4ae?.changePasswordRequest?.question || '',
-        answer: v_a7a4ae?.changePasswordRequest?.answer || '',
-      }, 
-    ];
-  }, [v_8d41d7]);
 
   return (
     <View style={v_d81136.container}>
@@ -63,6 +62,9 @@ export const v_083aa7 = () => {
         contentContainerStyle={v_d81136.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {v_683210 && (
+          <ActivityIndicator size="small" color={v_1bfbd0.primary} style={{ marginTop: 20 }} />
+        )}
         <View style={v_d81136.list}>
           {v_4622b9.map((v_8c0b26) => {
             const v_ebda8f = v_c2c485.includes(v_8c0b26.id);

@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_e662ae, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_e662ae, v_de06a3, v_c4deb2 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -7,6 +7,7 @@ import {
   v_f2c756,
   v_326be8,
   v_aa7413,
+  v_1ed974,
 } from 'rcmrninabrnb';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -30,11 +31,43 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
   const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
 
-  const [v_b2dceb, v_e60eaf] = v_5ab095(v_d0b6d4?.urlAD || '');
+  const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const [v_6ced96, v_cb400d] = v_5ab095(v_d0b6d4?.name || '광고');
   const [v_fc9bd6, v_8aeec2] = v_5ab095(false);
+  const [v_7e32fb, v_bc7d44] = v_5ab095(false);
+  const [v_cd31a8, v_deef62] = v_5ab095(true);
   const v_35f830 = v_e662ae<v_2694e4>(null);
   const [v_46b261, v_d35a1d] = v_5ab095(false); 
+
+  v_c4deb2(() => {
+    const v_573fd3 = async () => {
+      const v_b37174 = v_d0b6d4?.urlAD || '';
+      if (!v_b37174) {
+        v_deef62(false);
+        return;
+      }
+      try {
+        const v_eb792a = await fetch(v_b37174, { method: 'GET' });
+        const v_c0c2d5 = v_eb792a.headers.get('content-type') || '';
+        if (v_c0c2d5.includes('application/json')) {
+          const v_7ecfd1 = await v_eb792a.json();
+          if (v_7ecfd1.lurl) {
+            console.log('[ShowWebView] JSON lurl 추출:', v_7ecfd1.lurl);
+            v_e60eaf(v_7ecfd1.lurl);
+          } else {
+            v_e60eaf(v_b37174);
+          }
+        } else {
+          v_e60eaf(v_b37174);
+        }
+      } catch {
+
+        v_e60eaf(v_b37174);
+      }
+      v_deef62(false);
+    };
+    v_573fd3();
+  }, [v_d0b6d4?.urlAD]);
 
   const v_7f2e65 = v_de06a3(() => {
     v_e10ff9();
@@ -53,6 +86,26 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
     }
   }, [v_0890f8, v_e10ff9, v_487a25, v_9b57fc]);
 
+  const v_ed2f14 = v_de06a3(() => {
+    if (v_7e32fb && v_35f830.current) {
+      v_35f830.current.goBack();
+    } else {
+      v_7f2e65();
+    }
+  }, [v_7e32fb, v_7f2e65]);
+
+  v_c4deb2(() => {
+    const v_d9821c = v_1ed974.addEventListener('hardwareBackPress', () => {
+      if (v_7e32fb && v_35f830.current) {
+        v_35f830.current.goBack();
+        return true;
+      }
+      v_7f2e65();
+      return true;
+    });
+    return () => v_d9821c.remove();
+  }, [v_7e32fb, v_7f2e65]);
+
   const v_d59c80 = v_de06a3(() => {
 
     if (v_326be8.OS === 'ios') {
@@ -66,15 +119,23 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
       {}
       <View style={[v_d81136.header, { paddingTop: v_033e14.top + (v_326be8.OS === 'ios' ? 20 : 40) }]}>
         {}
-        <TouchableOpacity
-          onPress={v_7f2e65}
-          style={v_d81136.closeButton}
-        >
-          <Ionicons name="close" size={24} color="#000" />
-        </TouchableOpacity>
+        <View style={v_d81136.leftButtons}>
+          <TouchableOpacity
+            onPress={v_ed2f14}
+            style={v_d81136.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={v_7f2e65}
+            style={v_d81136.closeButton}
+          >
+            <Ionicons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
 
         {}
-        <Text 
+        <Text
           style={v_d81136.title}
           numberOfLines={1}
           ellipsizeMode="tail"
@@ -92,7 +153,11 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
       </View>
 
       {}
-      {v_b2dceb && !v_fc9bd6 ? (
+      {v_cd31a8 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#888' }}>로딩 중...</Text>
+        </View>
+      ) : v_b2dceb && !v_fc9bd6 ? (
         <WebView
           ref={v_35f830}
           key={v_b2dceb}
@@ -252,6 +317,7 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
           }}
           onNavigationStateChange={(v_b8df7f) => {
             console.log('[WebView] 네비게이션:', v_b8df7f.url);
+            v_bc7d44(v_b8df7f.canGoBack);
 
             if (v_b8df7f.url && v_b8df7f.url.startsWith('market://')) {
               try {
@@ -650,11 +716,17 @@ const v_d81136 = v_472849.create({
     borderBottomColor: '#e0e0e0',
     backgroundColor: '#fff',
   },
-  closeButton: {
+  leftButtons: {
     flex: 2,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 4,
+  },
+  closeButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   title: {
     fontSize: 18,

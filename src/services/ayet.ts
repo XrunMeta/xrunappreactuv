@@ -7,6 +7,28 @@ const { AyetOfferwallModule: v_1bebcf } = v_80fa10;
 
 export const v_c8c60c = 'Xplay';
 
+let v_dba0c9 = false;
+
+export const v_eefa9d = async (v_717992): Promise<boolean> => {
+  if (v_dba0c9) return true;
+  if (v_326be8.OS !== 'android' || !v_1bebcf?.initialize) return false;
+  try {
+    const v_c9c489 = v_e4a763();
+    const v_0773c4 = parseInt(v_c9c489.AYET_PLACEMENT_ID_ANDROID || '0', 10);
+    if (!v_0773c4) {
+      console.warn('[ayeT] AYET_PLACEMENT_ID_ANDROID가 설정되지 않았습니다.');
+      return false;
+    }
+    await v_1bebcf.initialize(v_0773c4, v_717992 || 'guest');
+    v_dba0c9 = true;
+    console.log('[ayeT] SDK 초기화 완료');
+    return true;
+  } catch (v_9e86fd) {
+    console.error('[ayeT] SDK 초기화 실패:', v_9e86fd.message);
+    return false;
+  }
+};
+
 const v_ddd026 = (): string =>
   v_326be8.OS === 'ios' ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || 'XRun') : v_c8c60c;
 
@@ -92,6 +114,10 @@ export const v_961d2c = async (
     const v_badeaf = 'OFFERWALL_UNAVAILABLE';
     console.warn(`${v_4c1151} showAyetOfferwall skipped (module unavailable), adSlotName=${v_b27fa5}. Run with development build: npx expo run:ios`);
     throw new Error(v_badeaf);
+  }
+
+  if (v_326be8.OS === 'android' && !v_dba0c9 && v_b36f96?.memberId) {
+    await v_eefa9d(v_b36f96.memberId);
   }
   if (v_b36f96?.memberId != null) v_e8d7c0(v_b36f96.memberId);
   await v_1bebcf.showOfferwall(v_b27fa5);

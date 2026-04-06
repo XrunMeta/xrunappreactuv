@@ -80,6 +80,7 @@ export const v_ce4741 = {
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   myInfoEmailAuth: 'myInfoEmailAuth',
+  myChipsOfferwall: 'myChipsOfferwall',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

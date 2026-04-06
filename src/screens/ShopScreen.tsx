@@ -12,7 +12,8 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03 } from '../services';
+import { v_877de8, v_885e03, v_81c40d } from '../services';
+import type { v_20035e } from '../types';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -66,15 +67,19 @@ const v_426e67 = [
     },
 ];
 
-const v_7fb877 = [
-    {
-        id: 'xrun-1',
+function v_02c692(item: v_20035e): ProductData {
+
+    const v_0622fe = v_8c0b26.thumbnail || v_8c0b26.image;
+    const v_74f4a3 = typeof v_0622fe === 'string' && v_0622fe.startsWith('http') ? v_0622fe : null;
+    return {
+        id: String(v_8c0b26.item),
         brand: 'XRUN',
-        title: 'Polygon 전송티켓',
-        price: 10,
-        image: v_47af4d,
-    },
-];
+        title: v_8c0b26.title || '-',
+        description: v_8c0b26.description || undefined,
+        price: Number(v_8c0b26.priceXrun) || 0,
+        image: v_74f4a3 ? { uri: v_74f4a3 } : v_47af4d,
+    };
+}
 
 function v_9bd735(item: v_d62ea7): ProductData {
     return {
@@ -102,6 +107,8 @@ export const v_10886b = () => {
     const [v_837630, v_2f87ed] = v_5ab095(false);
     const [v_1d54f1, v_67ba02] = v_5ab095<number | null>(null);
     const [v_19340b, v_14129c] = v_5ab095(false);
+    const [v_7fb877, v_d816a6] = v_5ab095<ProductData[]>([]);
+    const [v_a502c3, v_77037a] = v_5ab095(false);
     const { navigate: v_9b57fc } = v_a0daa8();
 
     const v_abb08d = v_de06a3(async () => {
@@ -184,13 +191,34 @@ export const v_10886b = () => {
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
 
+    const v_734b9d = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) return;
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) return;
+            v_77037a(true);
+            const v_8f00b9 = await v_81c40d(String(v_660822));
+            if (v_8f00b9.status === 'success' && v_8f00b9.data) {
+                console.log('[ShopScreen] XRUN Store 원본 데이터:', JSON.stringify(v_8f00b9.data.map((v_d5dda0) => ({ item: v_d5dda0.item, title: v_d5dda0.title, image: v_d5dda0.image, thumbnail: v_d5dda0.thumbnail }))));
+                v_d816a6(v_8f00b9.data.map(v_02c692));
+            }
+        } catch (v_49263d) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', v_49263d);
+        } finally {
+            v_77037a(false);
+        }
+    }, []);
+
     v_c4deb2(() => {
         if (v_11083e === 'xplayShop') {
             v_c1e7a4();
         } else if (v_11083e === 'xrunStore') {
             v_abb08d();
+            v_734b9d();
         }
-    }, [v_11083e, v_c1e7a4, v_abb08d]);
+    }, [v_11083e, v_c1e7a4, v_abb08d, v_734b9d]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
@@ -241,9 +269,15 @@ export const v_10886b = () => {
         ]);
     };
 
+    const [v_23faa2, v_689f28] = v_5ab095<Set<string>>(new Set());
+
     const v_80b207 = (v_01bee9, v_80e8c0 = false) => {
         const v_2141e0 = v_01bee9.brand === 'Ethereum' && v_01bee9.description;
         const v_fa78fb = v_01bee9.brand === 'XRUN';
+
+        const v_419eb6 = v_01bee9.image && typeof v_01bee9.image === 'object' && 'uri' in v_01bee9.image;
+        const v_f3e29a = v_419eb6 && v_23faa2.has(v_01bee9.id);
+        const v_fafc7f = v_f3e29a ? v_47af4d : v_01bee9.image;
 
         return (
             <TouchableOpacity
@@ -256,7 +290,16 @@ export const v_10886b = () => {
                     v_d81136.productImageContainer,
                     v_2141e0 && v_d81136.productImageContainerEthereum
                 ]}>
-                    <Image source={v_01bee9.image} style={v_d81136.productImage} resizeMode="contain" />
+                    <Image
+                        source={v_fafc7f}
+                        style={v_d81136.productImage}
+                        resizeMode="contain"
+                        onError={() => {
+                            if (v_419eb6) {
+                                v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
+                            }
+                        }}
+                    />
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
                             <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
@@ -402,9 +445,19 @@ export const v_10886b = () => {
                             )}
                         </>
                     ) : v_11083e === 'xrunStore' ? (
-                        <View style={v_d81136.productGrid}>
-                            {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                        </View>
+                        v_a502c3 ? (
+                            <View style={v_d81136.emptyContainer}>
+                                <ActivityIndicator size="large" color={v_1bfbd0.primary} />
+                            </View>
+                        ) : v_7fb877.length === 0 ? (
+                            <View style={v_d81136.emptyContainer}>
+                                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.shop.noProducts') || '등록된 상품이 없습니다.'}</Text>
+                            </View>
+                        ) : (
+                            <View style={v_d81136.productGrid}>
+                                {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
+                            </View>
+                        )
                     ) : (
                         <View style={v_d81136.emptyContainer}>
                             <Text style={v_d81136.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
