@@ -35,6 +35,7 @@ import {
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { TaboolaBanner } from '../components/TaboolaBanner';
+import { getTokenIcon } from '../constants/tokenMeta';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan.png');
@@ -69,6 +70,61 @@ const shortenAddress = (address: string, frontChars: number, backChars: number):
   )}`;
 };
 
+const WALLET_LIST_DARK_DISKS = new Set(['#000000', '#111111', '#25292C', '#8347E6']);
+
+function getWalletListDiskBackground(asset: CombinedAsset): string {
+  const sym = (asset.symbol || '').toUpperCase();
+  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
+  if (sym === 'XRUN' && sub.includes('ethereum')) {
+    return '#FFFFFF';
+  }
+  switch (asset.currency) {
+    case 1:
+      return '#000000';
+    case 2:
+      return '#EFF4F5';
+    case 11:
+      return '#EFF4F5';
+    case 16:
+      return '#8347E6';
+    case 18:
+      return '#111111';
+    case 19:
+      return '#25292C';
+    default:
+      return '#EFF4F5';
+  }
+}
+
+function resolveWalletListIconSource(asset: CombinedAsset): any | null {
+  const sym = (asset.symbol || '').toUpperCase();
+  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
+
+  if (asset.currency === 19 || sub.includes('ad xrun')) {
+    return require('../../assets/ad-round-logo.png');
+  }
+  if (sym === 'ETH' || asset.currency === 2) {
+    if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
+      return { uri: asset.icon.trim() };
+    }
+    return require('../../assets/images/ethereum_thumb.png');
+  }
+  if (sym === 'POL' || asset.currency === 16) {
+    return getTokenIcon('POL');
+  }
+  if (sym === 'XRUN') {
+    if (sub.includes('ethereum')) {
+      return getTokenIcon('XRUN', 'Ethereum');
+    }
+    return require('../../assets/xrun-round-logo.png');
+  }
+
+  if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
+    return { uri: asset.icon.trim() };
+  }
+  return null;
+}
+
 interface TokenListItemData extends CombinedAsset {
   title: string;
   subtitle: string;
@@ -80,6 +136,8 @@ interface TokenListItemData extends CombinedAsset {
     background: string;
     text: string;
   };
+
+  listIndex?: number;
 }
 
 export const WalletScreen = () => {
@@ -160,7 +218,7 @@ export const WalletScreen = () => {
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
           amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
-          icon: `data:image/png;base64,${item.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`,
+          icon: item.file || '',
           currency: item.currency,
           isCustom: false,
           contractAddress: item.address,
@@ -168,9 +226,22 @@ export const WalletScreen = () => {
           originalData: item,
         }));
 
+      const primaryPolygonAddr =
+        walletAssets.find((w) => Number(w.currency) === 1)?.contractAddress?.trim() || '';
+      if (primaryPolygonAddr) {
+        walletAssets.forEach((a) => {
+          if (![16, 18].includes(Number(a.currency))) return;
+          const cur = (a.contractAddress || '').trim();
+          if (cur) return;
+          a.contractAddress = primaryPolygonAddr;
+          if (a.originalData && typeof a.originalData === 'object') {
+            a.originalData = { ...a.originalData, address: primaryPolygonAddr };
+          }
+        });
+      }
+
       const customAssets: CombinedAsset[] = customTokens
         .map((token) => {
-
           const matchingWalletData = walletData.find(
             (wallet) => wallet.currency === token.currency,
           );
@@ -181,10 +252,7 @@ export const WalletScreen = () => {
             name: token.name,
             amount: new BigNumber(token.amount || '0').toFixed(2),
             icon: matchingWalletData
-              ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(
-                /(\r\n|\n|\r)/gm,
-                '',
-              ) || ''}`
+              ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`
               : 'https://via.placeholder.com/24',
             currency: token.currency,
             subCurrencyName: token.subCurrencyName,
@@ -202,7 +270,7 @@ export const WalletScreen = () => {
         id: 19,
         symbol: 'XRUN',
         name: 'AD XRUN',
-        amount: new BigNumber(adXrunAmount || '0').toFixed(2),
+        amount: new BigNumber(adXrunAmount || 0).toFixed(2),
         icon: require('../../assets/ad-round-logo.png'),
         currency: 19,
         isCustom: false,
@@ -211,7 +279,6 @@ export const WalletScreen = () => {
         subcurrency: undefined,
         originalData: undefined,
       };
-
       allAssets.push(adXrunItem);
 
       const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
@@ -594,36 +661,9 @@ export const WalletScreen = () => {
 
   const convertAssetToTokenListItem = useCallback(
     (asset: CombinedAsset): TokenListItemData => {
-      const getIconColor = (currency: number): { background: string; text: string } => {
-        switch (currency) {
-          case 1: 
-            return { background: '#EFF4F5', text: '#000000' };
-          case 2: 
-            return { background: '#EFF4F5', text: '#FFFFFF' };
-          case 3: 
-            return { background: '#5F59E0', text: '#FFFFFF' };
-          case 16: 
-            return { background: '#8347E6', text: '#FFFFFF' };
-          case 18: 
-            return { background: '#1e1e1e', text: '#FFFFFF' };
-          case 19: 
-            return { background: '#25292C', text: '#FFFFFF' };
-          default:
-            return { background: '#EDEDED', text: '#343434' };
-        }
-      };
-
-      const iconColors = getIconColor(asset.currency);
-
-      let iconSource: any = null;
-      if (typeof asset.icon === 'string' && asset.icon.startsWith('data:image')) {
-        const base64Part = asset.icon.split(',')[1] || '';
-        if (base64Part.length > 0) {
-          iconSource = { uri: asset.icon };
-        }
-      } else if (asset.icon) {
-        iconSource = asset.icon;
-      }
+      const diskBg = getWalletListDiskBackground(asset);
+      const iconSource = resolveWalletListIconSource(asset);
+      const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
 
       return {
         ...asset,
@@ -637,7 +677,10 @@ export const WalletScreen = () => {
         suffix: asset.symbol,
         iconSource,
         fallbackLabel: asset.symbol.slice(0, 2).toUpperCase(),
-        fallbackColors: iconColors,
+        fallbackColors: {
+          background: diskBg,
+          text: textOnDisk,
+        },
       };
     },
     [],
@@ -645,8 +688,28 @@ export const WalletScreen = () => {
 
   const fetchTokenListData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<TokenListItemData>> => {
+      let tokenListData = combinedAssets.map((asset, index) => ({
+        ...convertAssetToTokenListItem(asset),
+        listIndex: index,
+      }));
 
-      const tokenListData = combinedAssets.map(convertAssetToTokenListItem);
+      const fifthAsset = combinedAssets[4];
+      if (fifthAsset && tokenListData[3]) {
+        const diskBg = getWalletListDiskBackground(fifthAsset);
+        const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
+        tokenListData = tokenListData.map((row, i) =>
+          i === 3
+            ? {
+                ...row,
+                fallbackColors: {
+                  ...row.fallbackColors,
+                  background: diskBg,
+                  text: textOnDisk,
+                },
+              }
+            : row,
+        );
+      }
 
       return {
         data: tokenListData,
@@ -674,11 +737,26 @@ export const WalletScreen = () => {
   );
 
   const TokenListItemComponent: React.FC<TokenListItemData & { onPress?: () => void }> = (props) => {
-    const { title, subtitle, amount, suffix, iconSource, fallbackLabel, fallbackColors, currency, onPress } =
-      props;
+    const {
+      title,
+      subtitle,
+      amount,
+      suffix,
+      iconSource,
+      fallbackLabel,
+      fallbackColors,
+      currency,
+      listIndex,
+      onPress,
+    } = props;
 
-    const iconSize = currency === 2 ? 28 : 22;
+    const iconSize =
+      listIndex === 0 ? 36 : typeof listIndex === 'number' && listIndex < 3 ? 24 : 30;
     const [imgError, setImgError] = useState(false);
+
+    useEffect(() => {
+      setImgError(false);
+    }, [iconSource, currency, listIndex]);
 
     return (
       <TouchableOpacity
@@ -690,26 +768,33 @@ export const WalletScreen = () => {
           <View
             style={[
               styles.tokenIconWrapper,
-              { backgroundColor: fallbackColors?.background || '#EDEDED' },
+              { backgroundColor: fallbackColors?.background || '#EFF4F5' },
             ]}
           >
-            {iconSource && !imgError ? (
-              <Image
-                source={iconSource}
-                style={[styles.tokenIconImage, { width: iconSize, height: iconSize }]}
-                resizeMode="contain"
-                onError={() => setImgError(true)}
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.tokenIconText,
-                  { color: fallbackColors?.text || '#343434' },
-                ]}
-              >
-                {fallbackLabel?.slice(0, 2).toUpperCase() || '??'}
-              </Text>
-            )}
+            <View style={[styles.tokenIconInner, { width: iconSize, height: iconSize }]}>
+              {iconSource && !imgError ? (
+                <Image
+                  source={iconSource}
+                  style={{ width: iconSize, height: iconSize }}
+                  resizeMode="contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.tokenIconText,
+                    typeof listIndex === 'number' &&
+                      listIndex > 0 &&
+                      listIndex < 3 &&
+                      styles.tokenIconTextCompact,
+                    { color: fallbackColors?.text || '#343434' },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {fallbackLabel?.slice(0, 2).toUpperCase() || '??'}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
         <View style={styles.tokenItemMiddle}>
@@ -892,18 +977,22 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0,
     boxSizing: 'border-box',
   },
-  tokenIconImage: {
-    width: 28,
-    height: 28,
+  tokenIconInner: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tokenIconText: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
+  },
+  tokenIconTextCompact: {
+    fontSize: FONTS.size.small,
   },
   tokenItemMiddle: {
     flex: 1,

@@ -1165,6 +1165,7 @@ export interface WalletData {
   subCurrencyName?: string; 
   symbol: string; 
   symbolimg: string; 
+  file?: string; 
   address: string; 
   amount: string; 
   Wamount: string; 
