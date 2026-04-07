@@ -8,7 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, SegmentedControl, DataList, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppContext } from '../context';
 import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
@@ -53,7 +54,16 @@ interface AdEntry {
 
 export const AdWalletScreen = () => {
   const { t, i18n } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
+  const { setSelectedShopItem } = useAppContext();
+
+  const onZone1Press = () => {
+    setSelectedShopItem({ shopTab: 'xplayShop' } as any);
+    navigate(ROUTES.shop);
+  };
+  const onZone2Press = () => {
+    navigate(ROUTES.myChipsOfferwall);
+  };
   const { showAlert } = useAlertDialog();
   const [tab, setTab] = useState<TabValue>('pending');
   const [member, setMember] = useState<number | null>(null);
@@ -1491,6 +1501,17 @@ export const AdWalletScreen = () => {
           </LinearGradient>
         </View>
 
+        <View style={styles.zoneRow}>
+          <TouchableOpacity style={styles.zoneButton} activeOpacity={0.85} onPress={onZone1Press}>
+            <Ionicons name="gift" size={18} color="#1E40AF" />
+            <Text style={styles.zoneButtonText}>Xplay Shop</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.zoneButton} activeOpacity={0.85} onPress={onZone2Press}>
+            <Ionicons name="game-controller" size={18} color="#1E40AF" />
+            <Text style={styles.zoneButtonText}>게임 보상</Text>
+          </TouchableOpacity>
+        </View>
+
         <SegmentedControl
           options={tabs}
           value={tab}
@@ -1547,6 +1568,28 @@ const styles = StyleSheet.create({
     flex: 1,
     ...COMMON_STYLES.scrollContent,
     paddingBottom: 0,
+  },
+  zoneRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 12,
+  },
+  zoneButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 12,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  zoneButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E40AF',
   },
   summaryCard: {
     borderRadius: SIZES.medium,
