@@ -8,7 +8,6 @@ class PangleModule: RCTEventEmitter {
 
   private var isInitialized = false
   private var rewardedAd: PAGRewardedAd?
-  private var appOpenAd: PAGAppOpenAd?
   private var hasListeners = false
 
   @objc
@@ -126,51 +125,7 @@ class PangleModule: RCTEventEmitter {
 
   @objc
   func loadAndShowAppOpenAd(_ adUnitId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-    guard isInitialized else {
-      reject("NOT_INITIALIZED", "Pangle SDK not initialized", nil)
-      return
-    }
-
-    DispatchQueue.main.async {
-      let request = PAGAppOpenRequest()
-      request.timeout = 3.0
-
-      PAGAppOpenAd.load(withSlotID: adUnitId, request: request) { [weak self] ad, error in
-        guard let self = self else { return }
-
-        if let error = error {
-          print("[PangleModule] 앱 오프닝 광고 로드 실패: \(error.localizedDescription)")
-          self.sendAppEvent("onAppOpenAdLoadError", body: [
-            "adUnitId": adUnitId,
-            "errorMsg": error.localizedDescription
-          ])
-          reject("LOAD_ERROR", error.localizedDescription, error)
-          return
-        }
-
-        guard let ad = ad else {
-          self.sendAppEvent("onAppOpenAdLoadError", body: [
-            "adUnitId": adUnitId,
-            "errorMsg": "Ad object is nil"
-          ])
-          reject("LOAD_ERROR", "Ad object is nil", nil)
-          return
-        }
-
-        print("[PangleModule] 앱 오프닝 광고 로드 완료: \(adUnitId)")
-        self.appOpenAd = ad
-        self.sendAppEvent("onAppOpenAdLoaded", body: ["adUnitId": adUnitId])
-
-        ad.delegate = self
-
-        guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
-          reject("NO_ACTIVITY", "No root view controller", nil)
-          return
-        }
-        ad.present(fromRootViewController: rootVC)
-        resolve(true)
-      }
-    }
+    reject("UNSUPPORTED", "App Open Ad not supported in current Pangle SDK version", nil)
   }
 }
 
@@ -202,19 +157,3 @@ extension PangleModule: PAGRewardedAdDelegate {
   }
 }
 
-extension PangleModule: PAGAppOpenAdDelegate {
-  func adDidShow(_ ad: PAGAppOpenAd) {
-    print("[PangleModule] 앱 오프닝 광고 표시됨")
-  }
-
-  func adDidClick(_ ad: PAGAppOpenAd) {
-    print("[PangleModule] 앱 오프닝 광고 클릭됨")
-  }
-
-  func adDidDismiss(_ ad: PAGAppOpenAd) {
-    print("[PangleModule] 앱 오프닝 광고 닫힘")
-    sendAppEvent("onAppOpenAdClose", body: nil)
-    sendAppEvent("onAppOpenAdClosed", body: nil)
-    appOpenAd = nil
-  }
-}
