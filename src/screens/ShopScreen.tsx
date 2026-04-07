@@ -12,7 +12,7 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03, v_81c40d } from '../services';
+import { v_877de8, v_885e03, v_81c40d, v_4d25ff } from '../services';
 import type { v_20035e } from '../types';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
@@ -143,8 +143,12 @@ export const v_10886b = () => {
                 return;
             }
             v_2f87ed(true);
-            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
-            v_d20f1f(v_43c42e.total_ayet_points ?? null);
+
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_74dfb8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            v_d20f1f(Number.isFinite(v_74dfb8) ? v_74dfb8 : 0);
         } catch {
 
             v_d20f1f(null);
@@ -392,7 +396,7 @@ export const v_10886b = () => {
                                 </View>
                                 {v_11083e === 'xplayShop' ? (
                                     <View style={v_d81136.xplayTag}>
-                                        <Text style={v_d81136.xplayTagText}>Xplay</Text>
+                                        <Text style={v_d81136.xplayTagText}>XRUN</Text>
                                     </View>
                                 ) : (
                                     <View style={v_d81136.xrunTag}>

@@ -120,7 +120,7 @@ export const v_305be8 = () => {
                 </View>
               </View>
               <View style={v_d81136.xplayTag}>
-                <Text style={v_d81136.xplayTagText}>Xplay</Text>
+                <Text style={v_d81136.xplayTagText}>XRUN</Text>
               </View>
             </View>
           </LinearGradient>
