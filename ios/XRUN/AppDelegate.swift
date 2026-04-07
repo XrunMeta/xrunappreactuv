@@ -36,6 +36,9 @@ public class AppDelegate: ExpoAppDelegate {
 
     setupPangleSDK()
 
+    #if DEBUG
+    AyetSDK.shared.setDebug(true)
+    #endif
     AyetSDK.shared.initialize(placementId: 22062, externalIdentifier: "guest")
 
     let delegate = ReactNativeDelegate()

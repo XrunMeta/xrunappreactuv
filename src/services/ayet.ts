@@ -99,10 +99,14 @@ export const getAyetOffers = async (
   }
 };
 
-export const setAyetUserId = (userId: string): void => {
+export const setAyetUserIdAsync = async (userId: string): Promise<void> => {
   if (!AyetOfferwallModule?.setUserId) return;
-  const id = (userId && userId.trim()) ? String(userId).slice(0, 63) : 'guest';
-  AyetOfferwallModule.setUserId(id);
+  const id = userId && userId.trim() ? String(userId).slice(0, 63) : 'guest';
+  await AyetOfferwallModule.setUserId(id);
+};
+
+export const setAyetUserId = (userId: string): void => {
+  void setAyetUserIdAsync(userId);
 };
 
 export const showAyetOfferwall = async (
@@ -119,7 +123,9 @@ export const showAyetOfferwall = async (
   if (Platform.OS === 'android' && !ayetInitialized && options?.memberId) {
     await initAyetSdk(options.memberId);
   }
-  if (options?.memberId != null) setAyetUserId(options.memberId);
+  if (options?.memberId != null && String(options.memberId).trim() !== '') {
+    await setAyetUserIdAsync(String(options.memberId));
+  }
   await AyetOfferwallModule.showOfferwall(slotName);
 };
 
