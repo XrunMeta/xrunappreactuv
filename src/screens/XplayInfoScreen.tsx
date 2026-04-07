@@ -11,7 +11,7 @@ import {
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_556baf } from '../components';
-import { v_729608, v_4c7b5d } from '../components';
+import { v_729608 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
@@ -161,11 +161,6 @@ export const v_305be8 = () => {
 
         <View style={v_d81136.bottomSpacer} />
       </ScrollView>
-
-      {}
-      <View style={v_d81136.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
-      </View>
     </SafeView>
   );
 };
@@ -347,9 +342,5 @@ const v_d81136 = v_472849.create({
   },
   bottomSpacer: {
     height: 16,
-  },
-  taboolaContainer: {
-    minHeight: 80,
-    backgroundColor: '#F5F5F5',
   },
 });

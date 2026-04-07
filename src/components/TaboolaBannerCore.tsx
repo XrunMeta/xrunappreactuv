@@ -212,10 +212,14 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
         injectedJavaScript={v_24913e}
         onShouldStartLoadWithRequest={(v_576f5a) => {
-          const { url: v_f71b56 } = v_576f5a;
-          console.log('[TaboolaBannerCore] 네비게이션 요청:', v_f71b56);
+          const { url: v_f71b56, isTopFrame: v_ba1341 } = v_576f5a as { url: string; isTopFrame?: boolean };
+          console.log('[TaboolaBannerCore] 네비게이션 요청:', v_f71b56, { isTopFrame: v_ba1341 });
 
           if (v_f71b56 === 'about:blank' || v_f71b56.startsWith('data:')) {
+            return true;
+          }
+
+          if (v_ba1341 === false) {
             return true;
           }
 
@@ -223,7 +227,7 @@ export const TaboolaBannerCore: v_a3453e.FC<TaboolaBannerCoreProps> = ({
             v_f2c756.openURL(v_f71b56).catch((v_49263d) => {
               console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', v_49263d);
             });
-            return false; 
+            return false;
           }
 
           return false;

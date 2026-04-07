@@ -4,7 +4,6 @@ import { v_570c34 } from '../components';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
-import { v_700ef9 } from '../context';
 import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
 
 let v_10664a = null;
@@ -16,11 +15,9 @@ try {
 
 export const v_26fe4c = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
-  const { setSelectedShopItem: v_d0fbad } = v_700ef9();
 
   const v_41672c = () => {
-    v_d0fbad({ shopTab: 'xplayShop' } as any);
-    v_9b57fc(v_ce4741.shop);
+    v_9b57fc(v_ce4741.ayetOffersXplay);
   };
 
   const v_7c70b9 = () => {
@@ -48,7 +45,7 @@ export const v_26fe4c = () => {
           onPress={v_41672c}
         >
           <Text style={v_d81136.zoneTitle}>Xplay Zone 1</Text>
-          <Text style={v_d81136.zoneDescription}>Xplay Shop · 리워드 상품</Text>
+          <Text style={v_d81136.zoneDescription}>ayeT 오퍼 · Xplay 적립</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

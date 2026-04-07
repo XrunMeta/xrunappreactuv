@@ -81,12 +81,15 @@ function v_02c692(item: v_20035e): ProductData {
     };
 }
 
+const v_0e96fb = 70;
 function v_9bd735(item: v_d62ea7): ProductData {
+    const v_72648c = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
+    const v_7be02f = Math.ceil(v_72648c / v_0e96fb);
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
         brand: (v_8c0b26 as any).brandName ?? '기프티콘',
         title: v_8c0b26.name ?? '-',
-        price: typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0,
+        price: v_7be02f,
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
         isXplayShop: true,
     };
@@ -277,7 +280,8 @@ export const v_10886b = () => {
 
     const v_80b207 = (v_01bee9, v_80e8c0 = false) => {
         const v_2141e0 = v_01bee9.brand === 'Ethereum' && v_01bee9.description;
-        const v_fa78fb = v_01bee9.brand === 'XRUN';
+
+        const v_fa78fb = v_01bee9.brand === 'XRUN' || v_01bee9.isXplayShop === true;
 
         const v_419eb6 = v_01bee9.image && typeof v_01bee9.image === 'object' && 'uri' in v_01bee9.image;
         const v_f3e29a = v_419eb6 && v_23faa2.has(v_01bee9.id);
@@ -470,9 +474,11 @@ export const v_10886b = () => {
                 </SafeScrollView>
             </View>
             {}
-            <View style={v_d81136.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
-            </View>
+            {v_11083e !== 'xplayShop' ? (
+                <View style={v_d81136.taboolaContainer}>
+                    <TaboolaBanner placementType="shop" />
+                </View>
+            ) : null}
         </SafeView>
     );
 };
