@@ -120,7 +120,7 @@ export const XplayInfoScreen = () => {
                 </View>
               </View>
               <View style={styles.xplayTag}>
-                <Text style={styles.xplayTagText}>Xplay</Text>
+                <Text style={styles.xplayTagText}>XRUN</Text>
               </View>
             </View>
           </LinearGradient>

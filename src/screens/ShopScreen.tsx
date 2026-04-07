@@ -12,7 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance, getXrunBuyableItems } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance, getXrunBuyableItems, fetchWalletData } from '../services';
 import type { ShopItemData } from '../types';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
@@ -143,8 +143,12 @@ export const ShopScreen = () => {
                 return;
             }
             setXplayBalanceLoading(true);
-            const result = await getAyetPointsBalance(member, navigate);
-            setXplayBalance(result.total_ayet_points ?? null);
+
+            const res: any = await fetchWalletData(Number(member), 7, navigate);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const amt = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            setXplayBalance(Number.isFinite(amt) ? amt : 0);
         } catch {
 
             setXplayBalance(null);
@@ -392,7 +396,7 @@ export const ShopScreen = () => {
                                 </View>
                                 {tab === 'xplayShop' ? (
                                     <View style={styles.xplayTag}>
-                                        <Text style={styles.xplayTagText}>Xplay</Text>
+                                        <Text style={styles.xplayTagText}>XRUN</Text>
                                     </View>
                                 ) : (
                                     <View style={styles.xrunTag}>
