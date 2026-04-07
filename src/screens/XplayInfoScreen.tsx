@@ -15,7 +15,7 @@ import { v_729608, v_4c7b5d } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
-import { v_877de8 } from '../services';
+import { v_4d25ff } from '../services';
 import { v_a3bbf0 } from '../utils';
 import { v_772971 } from 'jmpfvteuuztnp';
 
@@ -47,8 +47,12 @@ export const v_305be8 = () => {
           v_9d6aeb(String(v_660822));
           v_3e37d1(true);
           try {
-            const v_43c42e = await v_877de8(v_660822, undefined);
-            v_97ae62(v_43c42e.total_ayet_points ?? 0);
+
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, undefined);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_74dfb8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            v_97ae62(Number.isFinite(v_74dfb8) ? v_74dfb8 : 0);
           } catch {
             v_97ae62(0);
           } finally {
