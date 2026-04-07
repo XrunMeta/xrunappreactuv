@@ -78,12 +78,12 @@ class AyetOfferwallModule: NSObject {
   private static func waitForAyetInitialized(timeoutSeconds: TimeInterval) async -> Bool {
     let deadline = Date().addingTimeInterval(timeoutSeconds)
     while Date() < deadline {
-      if AyetSDK.shared.checkIsInitialized() {
+      if await AyetSDK.shared.checkIsInitialized() {
         return true
       }
       try? await Task.sleep(nanoseconds: 100_000_000)
     }
-    return AyetSDK.shared.checkIsInitialized()
+    return await AyetSDK.shared.checkIsInitialized()
   }
 
   private static func offerwallAdSlotIdReflect(named name: String) -> Int? {
