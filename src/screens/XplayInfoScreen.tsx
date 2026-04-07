@@ -15,7 +15,7 @@ import { Header, TaboolaBanner } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
-import { getAyetPointsBalance } from '../services';
+import { fetchWalletData } from '../services';
 import { shareReferralLink } from '../utils';
 import { useTranslation } from 'react-i18next';
 
@@ -47,8 +47,12 @@ export const XplayInfoScreen = () => {
           setMemberId(String(member));
           setBalanceLoading(true);
           try {
-            const result = await getAyetPointsBalance(member, undefined);
-            setPointsBalance(result.total_ayet_points ?? 0);
+
+            const res: any = await fetchWalletData(Number(member), 7, undefined);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const amt = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            setPointsBalance(Number.isFinite(amt) ? amt : 0);
           } catch {
             setPointsBalance(0);
           } finally {
