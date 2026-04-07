@@ -99,10 +99,14 @@ export const v_3e930b = async (
   }
 };
 
-export const v_e8d7c0 = (v_43e90c): void => {
+export const v_5e4f0b = async (v_43e90c): Promise<void> => {
   if (!v_1bebcf?.setUserId) return;
-  const v_389afb = (v_43e90c && v_43e90c.trim()) ? String(v_43e90c).slice(0, 63) : 'guest';
-  v_1bebcf.setUserId(v_389afb);
+  const v_389afb = v_43e90c && v_43e90c.trim() ? String(v_43e90c).slice(0, 63) : 'guest';
+  await v_1bebcf.setUserId(v_389afb);
+};
+
+export const v_e8d7c0 = (v_43e90c): void => {
+  void v_5e4f0b(v_43e90c);
 };
 
 export const v_961d2c = async (
@@ -119,7 +123,9 @@ export const v_961d2c = async (
   if (v_326be8.OS === 'android' && !v_dba0c9 && v_b36f96?.memberId) {
     await v_eefa9d(v_b36f96.memberId);
   }
-  if (v_b36f96?.memberId != null) v_e8d7c0(v_b36f96.memberId);
+  if (v_b36f96?.memberId != null && String(v_b36f96.memberId).trim() !== '') {
+    await v_5e4f0b(String(v_b36f96.memberId));
+  }
   await v_1bebcf.showOfferwall(v_b27fa5);
 };
 

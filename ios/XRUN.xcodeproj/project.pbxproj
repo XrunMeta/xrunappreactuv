@@ -17,6 +17,7 @@
 		F7E0C62AD8FABDD0C696A613  = {isa = PBXBuildFile; fileRef = B95EC09A1117A940512F7AD7 ; };
 		A1B2C3D4E5F60718293A4B5D1  = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C1 ; };
 		B2C3D4E5F60718293A4B5C6E1  = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6D1 ; };
+		C1D2E3F405162738495A5B6C7  = {isa = PBXBuildFile; fileRef = C1D2E3F405162738495A5B6D7 ; };
 
 		13B07F961A680F5B00A75B9A  = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A  = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = XRUN/Images.xcassets; sourceTree = "<group>"; };
@@ -35,6 +36,7 @@
 		F11748442D0722820044C1D9  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "XRUN-Bridging-Header.h"; path = "XRUN/XRUN-Bridging-Header.h"; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5C1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AyetOfferwallModule.swift; path = XRUN/AyetOfferwallModule.swift; sourceTree = "<group>"; };
 		B2C3D4E5F60718293A4B5C6D1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AyetOfferwallModule.m; path = XRUN/AyetOfferwallModule.m; sourceTree = "<group>"; };
+		C1D2E3F405162738495A5B6D7  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = XRUNAyetOfferwallPresenter.swift; path = XRUN/XRUNAyetOfferwallPresenter.swift; sourceTree = "<group>"; };
 
 		13B07F8C1A680F5B00A75B9A  = {
 			isa = PBXFrameworksBuildPhase;
@@ -54,6 +56,7 @@
 				F11748442D0722820044C1D9 ,
 				A1B2C3D4E5F60718293A4B5C1 ,
 				B2C3D4E5F60718293A4B5C6D1 ,
+				C1D2E3F405162738495A5B6D7 ,
 				BB2F792B24A3F905000567C9 ,
 				13B07FB51A68108700A75B9A ,
 				13B07FB61A68108700A75B9A ,
@@ -368,6 +371,7 @@
 				656538616162306566313239343963333832353835373336 ,
 				A1B2C3D4E5F60718293A4B5D1 ,
 				B2C3D4E5F60718293A4B5C6E1 ,
+				C1D2E3F405162738495A5B6C7 ,
 				F7E0C62AD8FABDD0C696A613 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
