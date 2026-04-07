@@ -872,7 +872,14 @@ export const AdWalletScreen = () => {
       try {
         setIsJoiningQuest(true);
 
-        if (isPangleReadySync()) {
+        let pangleReadyForReferral = isPangleReadySync();
+        if (!pangleReadyForReferral) {
+          console.log('[AdWallet] 추천인 이벤트: Pangle 즉시 준비 아님 → initializePangle 후 재확인');
+          await initializePangle();
+          pangleReadyForReferral = await isPangleReady();
+        }
+
+        if (pangleReadyForReferral) {
           try {
             console.log('[AdWallet] Pangle 광고 준비 완료 (Platform:', Platform.OS, ')');
 
@@ -1124,8 +1131,13 @@ export const AdWalletScreen = () => {
 
       setIsJoiningQuest(true);
 
-      const pangleReady = isPangleReadySync();
-      console.log('[AdWallet] 출석체크 isPangleReadySync():', pangleReady, 'Platform:', Platform.OS);
+      let pangleReady = isPangleReadySync();
+      if (!pangleReady) {
+        console.log('[AdWallet] 출석체크: Pangle 즉시 준비 아님 → initializePangle 후 재확인');
+        await initializePangle();
+        pangleReady = await isPangleReady();
+      }
+      console.log('[AdWallet] 출석체크 Pangle 준비:', pangleReady, 'Platform:', Platform.OS);
 
       if (pangleReady) {
         try {

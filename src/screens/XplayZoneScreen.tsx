@@ -4,7 +4,6 @@ import { SafeScrollView } from '../components';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
-import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
 
 let xplaySymbol: any = null;
@@ -16,11 +15,9 @@ try {
 
 export const XplayZoneScreen = () => {
   const { goBack, navigate } = useAppNavigation();
-  const { setSelectedShopItem } = useAppContext();
 
   const onZone1Press = () => {
-    setSelectedShopItem({ shopTab: 'xplayShop' } as any);
-    navigate(ROUTES.shop);
+    navigate(ROUTES.ayetOffersXplay);
   };
 
   const onZone2Press = () => {
@@ -48,7 +45,7 @@ export const XplayZoneScreen = () => {
           onPress={onZone1Press}
         >
           <Text style={styles.zoneTitle}>Xplay Zone 1</Text>
-          <Text style={styles.zoneDescription}>Xplay Shop · 리워드 상품</Text>
+          <Text style={styles.zoneDescription}>ayeT 오퍼 · Xplay 적립</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

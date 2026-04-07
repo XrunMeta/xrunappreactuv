@@ -5,13 +5,15 @@ import { Dialog } from './Dialog';
 import { OptionButton } from './OptionButton';
 
 export type WalletFilterType = 'all' | 'send' | 'receive';
+
 export type WalletFilterRange = '7d' | '14d' | '30d';
 
 interface WalletFilterDialogProps {
   visible: boolean;
   onClose: () => void;
-  onApply?: (selection: { type: WalletFilterType; range: WalletFilterRange }) => void;
+  onApply?: (selection: { type: WalletFilterType; range?: WalletFilterRange }) => void;
   defaultType?: WalletFilterType;
+
   defaultRange?: WalletFilterRange;
 }
 
@@ -20,26 +22,22 @@ export const WalletFilterDialog: React.FC<WalletFilterDialogProps> = ({
   onClose,
   onApply,
   defaultType = 'all',
-  defaultRange = '7d',
 }) => {
   const { t } = useTranslation();
   const [type, setType] = useState<WalletFilterType>(defaultType);
-  const [range, setRange] = useState<WalletFilterRange>(defaultRange);
 
   useEffect(() => {
     setType(defaultType);
-    setRange(defaultRange);
-  }, [defaultType, defaultRange, visible]);
+  }, [defaultType, visible]);
 
   const handleReset = () => {
     setType('all');
-    setRange('7d');
     onApply?.({ type: 'all', range: '7d' });
     onClose();
   };
 
   const handleConfirm = () => {
-    onApply?.({ type, range });
+    onApply?.({ type, range: '7d' });
     onClose();
   };
 
@@ -47,12 +45,6 @@ export const WalletFilterDialog: React.FC<WalletFilterDialogProps> = ({
     { label: t('components.walletFilterDialog.all'), value: 'all' as const },
     { label: t('components.walletFilterDialog.send'), value: 'send' as const },
     { label: t('components.walletFilterDialog.receive'), value: 'receive' as const },
-  ];
-
-  const RANGE_OPTIONS = [
-    { label: t('components.walletFilterDialog.days7'), value: '7d' as const },
-    { label: t('components.walletFilterDialog.days14'), value: '14d' as const },
-    { label: t('components.walletFilterDialog.days30'), value: '30d' as const },
   ];
 
   return (
@@ -73,19 +65,6 @@ export const WalletFilterDialog: React.FC<WalletFilterDialogProps> = ({
             label={option.label}
             selected={type === option.value}
             onPress={() => setType(option.value)}
-            flex={1}
-            style={styles.optionButton}
-          />
-        ))}
-      </View>
-
-      <View style={styles.group}>
-        {RANGE_OPTIONS.map((option) => (
-          <OptionButton
-            key={option.value}
-            label={option.label}
-            selected={range === option.value}
-            onPress={() => setRange(option.value)}
             flex={1}
             style={styles.optionButton}
           />

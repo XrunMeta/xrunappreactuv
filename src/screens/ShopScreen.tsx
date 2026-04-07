@@ -81,12 +81,15 @@ function shopItemToProductData(item: ShopItemData): ProductData {
     };
 }
 
+const KRW_PER_XRUN = 70;
 function giftishowToProductData(item: GiftishowProductItem): ProductData {
+    const krw = typeof item.price === 'number' ? item.price : 0;
+    const xrunPrice = Math.ceil(krw / KRW_PER_XRUN);
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
         brand: (item as any).brandName ?? '기프티콘',
         title: item.name ?? '-',
-        price: typeof item.price === 'number' ? item.price : 0,
+        price: xrunPrice,
         image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
         isXplayShop: true,
     };
@@ -277,7 +280,8 @@ export const ShopScreen = () => {
 
     const renderProductCard = (product: ProductData, showPurchaseButton: boolean = false) => {
         const isEthereum = product.brand === 'Ethereum' && product.description;
-        const isXrun = product.brand === 'XRUN';
+
+        const isXrun = product.brand === 'XRUN' || product.isXplayShop === true;
 
         const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
         const imgFailed = isRemote && failedImages.has(product.id);
@@ -470,9 +474,11 @@ export const ShopScreen = () => {
                 </SafeScrollView>
             </View>
             {}
-            <View style={styles.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
-            </View>
+            {tab !== 'xplayShop' ? (
+                <View style={styles.taboolaContainer}>
+                    <TaboolaBanner placementType="shop" />
+                </View>
+            ) : null}
         </SafeView>
     );
 };

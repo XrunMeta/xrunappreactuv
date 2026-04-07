@@ -233,7 +233,6 @@ export const WalletDetailScreen = () => {
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'send' | 'receive'>('all');
-  const [selectedRange, setSelectedRange] = useState<'7d' | '14d' | '30d'>('7d');
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
@@ -309,28 +308,14 @@ export const WalletDetailScreen = () => {
   }, [selectedWalletAsset, goBack, resetSelectedWalletAsset]);
 
   const handleFilterApply = useCallback(
-    (selection: { type: 'all' | 'send' | 'receive'; range: '7d' | '14d' | '30d' }) => {
+    (selection: { type: 'all' | 'send' | 'receive' }) => {
       setSelectedType(selection.type);
-      setSelectedRange(selection.range);
 
       setCachedTransactionData(null);
       setCacheKey('');
     },
     [],
   );
-
-  const getDaysBefore = useCallback((range: '7d' | '14d' | '30d'): number => {
-    switch (range) {
-      case '7d':
-        return 7;
-      case '14d':
-        return 14;
-      case '30d':
-        return 30;
-      default:
-        return 7;
-    }
-  }, []);
 
   const createFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -343,7 +328,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
 
-      const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}-${selectedRange}`;
+      const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}`;
 
       if (params.page === 1 && cachedTransactionData && cacheKey === currentCacheKey) {
         console.log('[WalletDetail] 캐시된 데이터 사용:', {
@@ -450,16 +435,7 @@ export const WalletDetailScreen = () => {
           return timestampB - timestampA;
         });
 
-        const now = new Date();
-        const daysAgo = getDaysBefore(selectedRange);
-        const cutoffTimestamp = Math.floor((now.getTime() - daysAgo * 24 * 60 * 60 * 1000) / 1000); 
-        const dateFilteredItems = items.filter((item) => {
-          if (item.timeStamp) {
-            const itemTimestamp = parseInt(item.timeStamp, 10);
-            return itemTimestamp >= cutoffTimestamp;
-          }
-          return true; 
-        });
+        const dateFilteredItems = items;
 
         const hasMore = dateFilteredItems.length >= params.pageSize;
 
@@ -487,7 +463,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, publicAddress, selectedType, selectedRange, t, cachedTransactionData, cacheKey, getDaysBefore]);
+  }, [member, selectedWalletAsset, publicAddress, selectedType, t, cachedTransactionData, cacheKey]);
 
   const createSendFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -774,7 +750,6 @@ export const WalletDetailScreen = () => {
         onClose={() => setFilterVisible(false)}
         onApply={handleFilterApply}
         defaultType={selectedType}
-        defaultRange={selectedRange}
       />
 
       <Modal

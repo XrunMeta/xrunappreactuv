@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeView } from '../components';
-import { Header, TaboolaBanner } from '../components';
+import { Header } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
@@ -161,11 +161,6 @@ export const XplayInfoScreen = () => {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-
-      {}
-      <View style={styles.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
-      </View>
     </SafeView>
   );
 };
@@ -347,9 +342,5 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 16,
-  },
-  taboolaContainer: {
-    minHeight: 80,
-    backgroundColor: '#F5F5F5',
   },
 });

@@ -212,10 +212,14 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
         injectedJavaScript={injectedJavaScript}
         onShouldStartLoadWithRequest={(request) => {
-          const { url } = request;
-          console.log('[TaboolaBannerCore] 네비게이션 요청:', url);
+          const { url, isTopFrame } = request as { url: string; isTopFrame?: boolean };
+          console.log('[TaboolaBannerCore] 네비게이션 요청:', url, { isTopFrame });
 
           if (url === 'about:blank' || url.startsWith('data:')) {
+            return true;
+          }
+
+          if (isTopFrame === false) {
             return true;
           }
 
@@ -223,7 +227,7 @@ export const TaboolaBannerCore: React.FC<TaboolaBannerCoreProps> = ({
             Linking.openURL(url).catch((err) => {
               console.error('[TaboolaBannerCore] 외부 링크 열기 실패:', err);
             });
-            return false; 
+            return false;
           }
 
           return false;
