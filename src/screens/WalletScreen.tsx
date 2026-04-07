@@ -614,10 +614,16 @@ export const WalletScreen = () => {
       };
 
       const iconColors = getIconColor(asset.currency);
-      const iconSource =
-        typeof asset.icon === 'string' && asset.icon.startsWith('data:image')
-          ? { uri: asset.icon }
-          : asset.icon;
+
+      let iconSource: any = null;
+      if (typeof asset.icon === 'string' && asset.icon.startsWith('data:image')) {
+        const base64Part = asset.icon.split(',')[1] || '';
+        if (base64Part.length > 0) {
+          iconSource = { uri: asset.icon };
+        }
+      } else if (asset.icon) {
+        iconSource = asset.icon;
+      }
 
       return {
         ...asset,
@@ -672,6 +678,7 @@ export const WalletScreen = () => {
       props;
 
     const iconSize = currency === 2 ? 28 : 22;
+    const [imgError, setImgError] = useState(false);
 
     return (
       <TouchableOpacity
@@ -686,11 +693,12 @@ export const WalletScreen = () => {
               { backgroundColor: fallbackColors?.background || '#EDEDED' },
             ]}
           >
-            {iconSource ? (
+            {iconSource && !imgError ? (
               <Image
                 source={iconSource}
                 style={[styles.tokenIconImage, { width: iconSize, height: iconSize }]}
                 resizeMode="contain"
+                onError={() => setImgError(true)}
               />
             ) : (
               <Text
