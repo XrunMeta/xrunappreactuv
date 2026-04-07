@@ -22,7 +22,11 @@ class PangleModule: RCTEventEmitter {
       "onAppOpenAdError",
       "onAppOpenAdLoadError",
       "onAppOpenAdClose",
-      "onAppOpenAdClosed"
+      "onAppOpenAdClosed",
+      "onRewardedAdLoaded",
+      "onRewardedAdReward",
+      "onRewardedAdClose",
+      "onRewardedAdLoadError",
     ]
   }
 
@@ -84,10 +88,21 @@ class PangleModule: RCTEventEmitter {
       let request = PAGRewardedRequest()
       PAGRewardedAd.load(withSlotID: adUnitId, request: request) { ad, error in
         if let error = error {
+          self.sendEvent(withName: "onRewardedAdLoadError", body: [
+            "errorMsg": error.localizedDescription
+          ])
           reject("LOAD_ERROR", error.localizedDescription, error)
           return
         }
+        guard let ad = ad else {
+          let msg = "Rewarded ad object is nil"
+          self.sendEvent(withName: "onRewardedAdLoadError", body: ["errorMsg": msg])
+          reject("LOAD_ERROR", msg, nil)
+          return
+        }
+        ad.delegate = self        
         self.rewardedAd = ad
+        self.sendEvent(withName: "onRewardedAdLoaded", body: ["adUnitId": adUnitId])
         resolve(true)
       }
     }
@@ -156,6 +171,34 @@ class PangleModule: RCTEventEmitter {
         resolve(true)
       }
     }
+  }
+}
+
+extension PangleModule: PAGRewardedAdDelegate {
+  func adDidShow(_ ad: PAGRewardedAd) {}
+
+  func adDidClick(_ ad: PAGRewardedAd) {}
+
+  func adDidDismiss(_ ad: PAGRewardedAd) {
+    sendEvent(withName: "onRewardedAdClose", body: nil)
+    if rewardedAd === ad {
+      rewardedAd = nil
+    }
+  }
+
+  func rewardedAd(_ rewardedAd: PAGRewardedAd, userDidEarnReward rewardModel: PAGRewardModel) {
+    let rewardType = rewardModel.rewardName ?? "reward"
+    let rewardAmount = rewardModel.rewardAmount
+    sendEvent(withName: "onRewardedAdReward", body: [
+      "rewardType": rewardType,
+      "rewardAmount": rewardAmount
+    ])
+  }
+
+  func rewardedAd(_ rewardedAd: PAGRewardedAd, userEarnRewardFailWithError error: Error) {
+    sendEvent(withName: "onRewardedAdLoadError", body: [
+      "errorMsg": error.localizedDescription
+    ])
   }
 }
 
