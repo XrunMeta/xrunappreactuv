@@ -12,7 +12,7 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff } from '../services';
+import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff, v_dd87bc } from '../services';
 import type { v_20035e } from '../types';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
@@ -81,10 +81,12 @@ function v_02c692(item: v_20035e): ProductData {
     };
 }
 
-const v_0e96fb = 70;
-function v_9bd735(item: v_d62ea7): ProductData {
+const v_4994d5 = 70;
+
+function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
     const v_72648c = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
-    const v_7be02f = Math.ceil(v_72648c / v_0e96fb);
+    const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
+    const v_7be02f = Math.ceil(v_72648c / v_b7ffba);
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
         brand: (v_8c0b26 as any).brandName ?? '기프티콘',
@@ -112,6 +114,8 @@ export const v_10886b = () => {
     const [v_19340b, v_14129c] = v_5ab095(false);
     const [v_7fb877, v_d816a6] = v_5ab095<ProductData[]>([]);
     const [v_a502c3, v_77037a] = v_5ab095(false);
+
+    const [v_ca7424, v_c235bc] = v_5ab095<number>(v_4994d5);
     const { navigate: v_9b57fc } = v_a0daa8();
 
     const v_5536d4 = 'shop:xrunBalance';
@@ -129,12 +133,10 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_14129c(true);
                 return v_ba2215;
             });
-            console.log('[ShopScreen] fetchWalletData(Polygon currency=18) 호출 member=', v_660822);
-            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
-            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
-            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
-            const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
-            console.log('[ShopScreen] XRUN Polygon 잔액:', v_8decf8);
+            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', v_660822);
+            const v_43c42e = await v_885e03(v_660822, v_9b57fc);
+            console.log('[ShopScreen] getXrunWalletBalance 결과:', v_43c42e);
+            const v_8decf8 = parseFloat(v_43c42e?.balance ?? '0');
             const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
             v_67ba02(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
@@ -206,15 +208,13 @@ export const v_10886b = () => {
                 } catch {}
 
                 const v_38fb16 = await Promise.allSettled([
-                    v_4d25ff(Number(v_660822), 7, undefined),
+                    v_885e03(v_660822, undefined),
                 ]);
                 if (v_2008a4) return;
                 if (v_38fb16[0].status === 'fulfilled') {
-                    const v_ef8ab1 = Array.isArray((v_38fb16[0].value as any)?.data) ? (v_38fb16[0].value as any).data : [];
-                    const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
-                    const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+                    const v_8decf8 = parseFloat((v_38fb16[0].value as any)?.balance ?? '0');
                     const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
-                    console.log('[ShopScreen] XRUN Polygon 잔액:', v_81e2ef);
+                    console.log('[ShopScreen] XRUN Wallet 잔액:', v_81e2ef);
                     v_67ba02(v_81e2ef);
                     v_d20f1f(v_81e2ef);
                     v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
@@ -248,17 +248,55 @@ export const v_10886b = () => {
         }
     }, []);
 
+    const v_d0991f = v_de06a3(async () => {
+        try {
+            const v_e2a6a6 = await v_e84827.getItem('xrungopaxprice');
+            if (v_e2a6a6) {
+                const v_8decf8 = JSON.parse(v_e2a6a6) as { data?: { gopaxPrice?: number } };
+                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
+                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) v_c235bc(v_e2a85c);
+            }
+        } catch {
+
+        }
+        try {
+            const v_43c42e = await v_dd87bc(v_9b57fc);
+            const v_e2a85c = v_43c42e?.data?.gopaxPrice;
+            if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
+                v_c235bc(v_e2a85c);
+                await v_e84827.setItem('xrungopaxprice', JSON.stringify(v_43c42e));
+                return;
+            }
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', v_9e86fd);
+        }
+        try {
+            const v_fd5f43 = await v_e84827.getItem('xrungopaxprice');
+            if (v_fd5f43) {
+                const v_8decf8 = JSON.parse(v_fd5f43) as { data?: { gopaxPrice?: number } };
+                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
+                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
+                    v_c235bc(v_e2a85c);
+                    return;
+                }
+            }
+        } catch {
+
+        }
+    }, [v_9b57fc]);
+
     v_c4deb2(() => {
         if (v_11083e === 'xrunStore') {
             v_0e5971(true);
+            void v_d0991f();
             v_f61b49().finally(() => v_0e5971(false));
         }
-    }, [v_11083e, v_f61b49]);
+    }, [v_11083e, v_f61b49, v_d0991f]);
 
     const v_f80453 = v_de06a3(() => {
         v_ad5fd0(true);
-        Promise.all([v_f61b49(), v_c1e7a4()]).finally(() => v_ad5fd0(false));
-    }, [v_f61b49, v_c1e7a4]);
+        Promise.all([v_f61b49(), v_c1e7a4(), v_d0991f()]).finally(() => v_ad5fd0(false));
+    }, [v_f61b49, v_c1e7a4, v_d0991f]);
 
     v_c4deb2(() => {
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
@@ -298,6 +336,11 @@ export const v_10886b = () => {
         const v_2f5c5c = v_bcfa24 - v_d409bb * 2;
         return (v_2f5c5c - v_3c3231) / 2;
     }, [v_bcfa24]);
+
+    const v_f523cd = v_df9f57(
+        () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424)),
+        [v_50b846, v_ca7424],
+    );
 
     const v_1c4d31 = v_df9f57(
         () => [
@@ -491,9 +534,7 @@ export const v_10886b = () => {
                             ) : (
                                 <View style={v_d81136.productGrid}>
                                     {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                                    {v_50b846.map((v_8c0b26) =>
-                                        v_80b207(v_9bd735(v_8c0b26), false)
-                                    )}
+                                    {v_f523cd.map((v_01bee9) => v_80b207(v_01bee9, false))}
                                 </View>
                             )}
                         </>
