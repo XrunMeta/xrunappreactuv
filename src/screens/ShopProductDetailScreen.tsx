@@ -483,7 +483,7 @@ export const ShopProductDetailScreen = () => {
                                 <View style={styles.paymentRow}>
                                     <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={styles.priceContainer}>
-                                        <Image source={xplaySymbol} style={styles.coinIcon} resizeMode="contain" />
+                                        <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
                                         <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
