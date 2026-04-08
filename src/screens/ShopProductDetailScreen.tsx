@@ -484,7 +484,7 @@ export const ShopProductDetailScreen = () => {
                                     <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={styles.priceContainer}>
                                         <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} Xplay</Text>
+                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} XRUN</Text>
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
@@ -493,14 +493,14 @@ export const ShopProductDetailScreen = () => {
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={styles.paymentBalance}>
-                                            {xplayBalanceState == null ? '-' : `${xplayBalanceState.toLocaleString()} Xplay`}
+                                            {xplayBalanceState == null ? '-' : `${xplayBalanceState.toLocaleString()} XRUN`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
                                     <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXplay')}</Text>
                                     <Text style={styles.paymentRemaining}>
-                                        {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} Xplay`}
+                                        {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} XRUN`}
                                     </Text>
                                 </View>
                             </>
@@ -641,10 +641,10 @@ export const ShopProductDetailScreen = () => {
                 <View style={styles.modalOverlay}>
                     <View style={[styles.paymentSuccessModal, xplayPurchaseResult?.coupon_img_url ? styles.paymentSuccessModalWide : undefined]}>
                         <View style={styles.modalLogoContainer}>
-                            <Image source={xplaySymbol} style={styles.modalLogo} resizeMode="contain" />
+                            <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={styles.paymentSuccessMessage}>
-                            {xplayPurchaseResult?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'Xplay 포인트 결제가 완료되었습니다'}
+                            {xplayPurchaseResult?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'XRUN 결제가 완료되었습니다'}
                         </Text>
                         {xplayPurchaseResult?.coupon_img_url ? (
                             <ScrollView style={styles.couponBarcodeScroll} showsVerticalScrollIndicator={false}>
