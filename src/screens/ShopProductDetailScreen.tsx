@@ -483,7 +483,7 @@ export const v_a59951 = () => {
                                 <View style={v_d81136.paymentRow}>
                                     <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={v_d81136.priceContainer}>
-                                        <Image source={v_10664a} style={v_d81136.coinIcon} resizeMode="contain" />
+                                        <Image source={v_33c40c} style={v_d81136.coinIcon} resizeMode="contain" />
                                         <Text style={v_d81136.paymentValue}>{v_e72b09.toLocaleString()} Xplay</Text>
                                     </View>
                                 </View>
