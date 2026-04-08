@@ -114,6 +114,9 @@ export const ShopScreen = () => {
     const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
     const { navigate } = useAppNavigation();
 
+    const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
+    const XPLAY_BALANCE_CACHE_KEY = 'shop:xplayBalance';
+
     const loadXrunBalance = useCallback(async () => {
         try {
             const userDataStr = await AsyncStorage.getItem('userData');
@@ -121,12 +124,18 @@ export const ShopScreen = () => {
             const userData = JSON.parse(userDataStr);
             const member = userData?.member;
             if (member == null) return;
-            setXrunBalanceLoading(true);
+
+            setXrunBalance((prev) => {
+                if (prev == null) setXrunBalanceLoading(true);
+                return prev;
+            });
             const result = await getXrunWalletBalance(member, navigate);
             const parsed = parseFloat(result.formatted);
-            setXrunBalance(Number.isFinite(parsed) ? parsed : null);
+            const value = Number.isFinite(parsed) ? parsed : null;
+            setXrunBalance(value);
+            if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
         } catch {
-            setXrunBalance(null);
+
         } finally {
             setXrunBalanceLoading(false);
         }
@@ -145,20 +154,44 @@ export const ShopScreen = () => {
                 setXplayBalance(null);
                 return;
             }
-            setXplayBalanceLoading(true);
-
-            const res: any = await fetchWalletData(Number(member), 7, navigate);
-            const list: any[] = Array.isArray(res?.data) ? res.data : [];
-            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
-            const amt = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
-            setXplayBalance(Number.isFinite(amt) ? amt : 0);
+            setXplayBalance((prev) => {
+                if (prev == null) setXplayBalanceLoading(true);
+                return prev;
+            });
+            const result = await getAyetPointsBalance(member, navigate);
+            const value = result.total_ayet_points ?? null;
+            setXplayBalance(value);
+            if (value != null) AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(value)).catch(() => {});
         } catch {
 
-            setXplayBalance(null);
         } finally {
             setXplayBalanceLoading(false);
         }
     }, [navigate]);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const [cachedXrun, cachedXplay] = await Promise.all([
+                    AsyncStorage.getItem(XRUN_BALANCE_CACHE_KEY),
+                    AsyncStorage.getItem(XPLAY_BALANCE_CACHE_KEY),
+                ]);
+                if (cancelled) return;
+                if (cachedXrun != null) {
+                    const n = parseFloat(cachedXrun);
+                    if (Number.isFinite(n)) setXrunBalance(n);
+                }
+                if (cachedXplay != null) {
+                    const n = parseFloat(cachedXplay);
+                    if (Number.isFinite(n)) setXplayBalance(n);
+                }
+            } catch {}
+
+            Promise.all([loadXplayBalance(), loadXrunBalance()]).catch(() => {});
+        })();
+        return () => { cancelled = true; };
+    }, [loadXplayBalance, loadXrunBalance]);
 
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
@@ -197,26 +230,6 @@ export const ShopScreen = () => {
         }
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
-
-    const loadXrunStoreProducts = useCallback(async () => {
-        try {
-            const userDataStr = await AsyncStorage.getItem('userData');
-            if (!userDataStr) return;
-            const userData = JSON.parse(userDataStr);
-            const member = userData?.member;
-            if (member == null) return;
-            setXrunStoreLoading(true);
-            const res = await getXrunBuyableItems(String(member));
-            if (res.status === 'success' && res.data) {
-                console.log('[ShopScreen] XRUN Store 원본 데이터:', JSON.stringify(res.data.map((d: any) => ({ item: d.item, title: d.title, image: d.image, thumbnail: d.thumbnail }))));
-                setXrunStoreProducts(res.data.map(shopItemToProductData));
-            }
-        } catch (err) {
-            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', err);
-        } finally {
-            setXrunStoreLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
         if (tab === 'xplayShop') {
