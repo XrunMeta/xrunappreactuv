@@ -108,7 +108,7 @@ export const v_305be8 = () => {
                 <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={v_d81136.balanceAmountRow}>
                   <View style={v_d81136.balanceXplayIconContainer}>
-                    <Image source={v_10664a} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/xrun-round-logo.png')} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {v_747a87 ? (
                     <ActivityIndicator size="small" color="#343a5a" style={v_d81136.balanceLoader} />

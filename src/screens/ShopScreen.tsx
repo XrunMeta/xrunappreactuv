@@ -323,7 +323,7 @@ export const v_10886b = () => {
                         <View style={v_d81136.priceContainer}>
                             <View style={v_d81136.xplayIconContainer}>
                                 <Image
-                                    source={v_fa78fb ? v_33c40c : v_10664a}
+                                    source={v_33c40c}
                                     style={v_fa78fb ? v_d81136.xrunIcon : v_d81136.xplayIcon}
                                     resizeMode="contain"
                                 />
@@ -380,7 +380,7 @@ export const v_10886b = () => {
                                             v_11083e === 'xrunStore' && v_d81136.balanceXrunIconContainer
                                         ]}>
                                             <Image
-                                                source={v_11083e === 'xrunStore' ? v_33c40c : v_10664a}
+                                                source={v_33c40c}
                                                 style={v_d81136.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />

@@ -33,7 +33,7 @@ export const v_26fe4c = () => {
       >
         {v_10664a && (
           <View style={v_d81136.logoContainer}>
-            <Image source={v_10664a} style={v_d81136.logo} resizeMode="contain" />
+            <Image source={require('../../assets/xrun-round-logo.png')} style={v_d81136.logo} resizeMode="contain" />
           </View>
         )}
         <Text style={v_d81136.title}>Xplay Zone</Text>
