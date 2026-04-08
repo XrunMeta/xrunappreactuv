@@ -5,7 +5,7 @@ import { v_e4a763, v_573fcf } from '../utils/env';
 
 const { AyetOfferwallModule: v_1bebcf } = v_80fa10;
 
-export const v_c8c60c = 'Xplay';
+export const v_c8c60c = 'XRUN';
 
 let v_dba0c9 = false;
 
@@ -30,11 +30,11 @@ export const v_eefa9d = async (v_717992): Promise<boolean> => {
 };
 
 const v_ddd026 = (): string =>
-  v_326be8.OS === 'ios' ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || 'XRun') : v_c8c60c;
+  v_326be8.OS === 'ios' ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || '25755') : v_c8c60c;
 
 const v_78a093 = (v_bb8cc2): string =>
   v_326be8.OS === 'ios' && v_bb8cc2 === 'Xplay'
-    ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || 'XRun')
+    ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || '25755')
     : v_bb8cc2;
 
 export const v_563627 = () => {
@@ -52,7 +52,7 @@ export const v_563627 = () => {
   } catch {
     return {
       placementIdIos: '22062',
-      adSlotNameIos: 'XRun',
+      adSlotNameIos: '25755',
       currencyId: 'Xplay',
       currencyName: 'Xplay',
       currencyNamePlural: 'Xplay',
