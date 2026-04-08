@@ -670,6 +670,8 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
             <View style={{
               width: '90%',
               maxWidth: 400,
+              height: '80%',
+              maxHeight: 600,
             }}>
             {(() => {
               const v_5a9c46 = v_d0b6d4?.ad_company || 'nas';
