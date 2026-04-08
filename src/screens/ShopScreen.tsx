@@ -178,29 +178,63 @@ export const v_10886b = () => {
     v_c4deb2(() => {
         let v_2008a4 = false;
         (async () => {
+            console.log('[ShopScreen] 잔액 마운트 fetch 시작');
             try {
-                const [v_be8dbe, v_ebcf3f] = await Promise.all([
-                    v_e84827.getItem(v_5536d4),
-                    v_e84827.getItem(v_fc87c6),
+                const v_f24fd5 = await v_e84827.getItem('userData');
+                if (!v_f24fd5) return;
+                const v_ef7306 = JSON.parse(v_f24fd5);
+                const v_660822 = v_ef7306?.member;
+                if (v_660822 == null) return;
+
+                try {
+                    const [v_be8dbe, v_ebcf3f] = await Promise.all([
+                        v_e84827.getItem(v_5536d4),
+                        v_e84827.getItem(v_fc87c6),
+                    ]);
+                    if (!v_2008a4) {
+                        if (v_be8dbe != null) {
+                            const v_f4e98d = parseFloat(v_be8dbe);
+                            if (Number.isFinite(v_f4e98d)) v_67ba02(v_f4e98d);
+                        }
+                        if (v_ebcf3f != null) {
+                            const v_f4e98d = parseFloat(v_ebcf3f);
+                            if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
+                        }
+                    }
+                } catch {}
+
+                const [v_0275c4, v_38fb16] = await Promise.allSettled([
+                    v_877de8(v_660822, undefined),
+                    v_885e03(v_660822, undefined),
                 ]);
                 if (v_2008a4) return;
-                if (v_be8dbe != null) {
-                    const v_f4e98d = parseFloat(v_be8dbe);
-                    if (Number.isFinite(v_f4e98d)) v_67ba02(v_f4e98d);
+                if (v_0275c4.status === 'fulfilled') {
+                    const v_81e2ef = v_0275c4.value?.total_ayet_points ?? 0;
+                    console.log('[ShopScreen] xplay 잔액:', v_81e2ef);
+                    v_d20f1f(v_81e2ef);
+                    v_e84827.setItem(v_fc87c6, String(v_81e2ef)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] xplay 잔액 실패:', v_0275c4.reason);
                 }
-                if (v_ebcf3f != null) {
-                    const v_f4e98d = parseFloat(v_ebcf3f);
-                    if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
+                if (v_38fb16.status === 'fulfilled') {
+                    const v_8decf8 = parseFloat(v_38fb16.value?.formatted ?? '0');
+                    const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
+                    console.log('[ShopScreen] xrun 잔액:', v_81e2ef);
+                    v_67ba02(v_81e2ef);
+                    v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] xrun 잔액 실패:', v_38fb16.reason);
                 }
-            } catch {}
-            console.log('[ShopScreen] 잔액 백그라운드 새로고침 시작');
-
-            Promise.all([v_c1e7a4(), v_abb08d()])
-                .then(() => console.log('[ShopScreen] 잔액 새로고침 완료'))
-                .catch((v_9e86fd) => console.warn('[ShopScreen] 잔액 새로고침 실패:', v_9e86fd));
+            } catch (v_9e86fd) {
+                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', v_9e86fd);
+            } finally {
+                if (!v_2008a4) {
+                    v_2f87ed(false);
+                    v_14129c(false);
+                }
+            }
         })();
         return () => { v_2008a4 = true; };
-
     }, []);
 
     const v_f61b49 = v_de06a3(async () => {
@@ -408,7 +442,17 @@ export const v_10886b = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
+                                        {v_11083e === 'xplayShop' ? (
+                                            v_837630 ? (
+                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
+                                            ) : (
+                                                <Text style={v_d81136.balanceAmount}>
+                                                    {(v_cd398d ?? 0).toLocaleString()}
+                                                </Text>
+                                            )
+                                        ) : (
+                                            <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
+                                        )}
                                     </View>
                                 </View>
                                 {v_11083e === 'xplayShop' ? (
