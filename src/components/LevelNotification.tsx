@@ -29,8 +29,9 @@ export const LevelNotification: v_a3453e.FC<LevelNotificationProps> = ({ navigat
         console.log('[LevelNotification] 사용자 레벨 정보 조회 시작:', v_660822);
         const v_3393e3 = await v_dedaa7(Number(v_660822), v_c65f5d);
 
-        if (v_3393e3 && v_3393e3.status === 'success' && v_3393e3.data && v_3393e3.data.lv !== undefined) {
-          const v_fbe91e = v_3393e3.data.lv;
+        const v_a34953 = Array.isArray(v_3393e3?.data) ? v_3393e3.data[0] : v_3393e3?.data;
+        if (v_3393e3 && v_3393e3.status === 'success' && v_a34953 && v_a34953.lv !== undefined) {
+          const v_fbe91e = v_a34953.lv;
           v_3c92ee(`Level ${v_fbe91e}`);
           console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `Level ${v_fbe91e}`);
         } else {

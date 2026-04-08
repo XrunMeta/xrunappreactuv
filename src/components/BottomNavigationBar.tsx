@@ -293,7 +293,7 @@ const v_d81136 = v_472849.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingTop: 4,
     paddingBottom: 20,
     minHeight: 80,
