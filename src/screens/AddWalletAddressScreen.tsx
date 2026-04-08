@@ -36,7 +36,7 @@ interface NetworkOption {
 }
 
 const NETWORK_OPTIONS: NetworkOption[] = [
-    { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan.png') },
+    { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan_color.png') },
     { value: 'Ethereum', label: 'Ethereum', icon: 'diamond-outline' },
 ];
 

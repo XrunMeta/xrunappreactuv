@@ -38,7 +38,8 @@ import { TaboolaBanner } from '../components/TaboolaBanner';
 import { getTokenIcon } from '../constants/tokenMeta';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
-const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+
+const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
 const iconSend = require('../../assets/icon-send.png');
 const iconReceive = require('../../assets/icon-receive.png');
 
@@ -750,8 +751,7 @@ export const WalletScreen = () => {
       onPress,
     } = props;
 
-    const iconSize =
-      listIndex === 0 ? 36 : typeof listIndex === 'number' && listIndex < 3 ? 24 : 30;
+    const iconSize = listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5) : listIndex === 4 ? Math.round(48 * 0.8) : Math.round(48 * 0.9);
     const [imgError, setImgError] = useState(false);
 
     useEffect(() => {
@@ -977,7 +977,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0,

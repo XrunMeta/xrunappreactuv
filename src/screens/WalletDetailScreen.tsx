@@ -19,7 +19,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
-const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
 
 interface EtherscanTransactionItem {
   blockNumber: string;

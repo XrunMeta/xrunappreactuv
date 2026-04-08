@@ -52,7 +52,7 @@ const predefinedTokens: PredefinedToken[] = [
     currency: 18,
     subcurrency: 5200,
     name: 'Polygon',
-    icon: require('../../assets/pol-round-logo.png'),
+    icon: require('../../assets/icon_polyganscan_color.png'),
   },
   {
     symbol: 'XRUN',

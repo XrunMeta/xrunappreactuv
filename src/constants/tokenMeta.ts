@@ -1,7 +1,7 @@
 import { ImageSourcePropType } from 'react-native';
 
 const icons = {
-  pol: require('../../assets/pol-round-logo.png'),
+  pol: require('../../assets/icon_polyganscan.png'),
   xrun: require('../../assets/xrun-round-logo.png'),
   xrunEth: require('../../assets/xrun2-round-logo.png'),
   adXrun: require('../../assets/ad-round-logo.png'),

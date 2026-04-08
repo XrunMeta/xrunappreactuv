@@ -28,7 +28,7 @@ const TOKEN_OPTIONS: TokenOption[] = [
     contract: '0x54B81270257a7987F94056F313B92c92B3A1E878',
     symbol: 'POL',
     decimals: 18,
-    icon: require('../../assets/pol-round-logo.png'),
+    icon: require('../../assets/icon_polyganscan_color.png'),
   },
   {
     id: 'xrun',
