@@ -32,10 +32,11 @@ export const v_eefa9d = async (v_717992): Promise<boolean> => {
 const v_ddd026 = (): string =>
   v_326be8.OS === 'ios' ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || '25755') : v_c8c60c;
 
-const v_78a093 = (v_bb8cc2): string =>
-  v_326be8.OS === 'ios' && v_bb8cc2 === 'Xplay'
-    ? (v_573fcf('AYET_AD_SLOT_NAME_IOS') || '25755')
-    : v_bb8cc2;
+const v_78a093 = (v_bb8cc2): string => {
+  if (v_bb8cc2 !== 'Xplay') return v_bb8cc2;
+  if (v_326be8.OS === 'ios') return v_573fcf('AYET_AD_SLOT_NAME_IOS') || '25755';
+  return v_c8c60c; 
+};
 
 export const v_563627 = () => {
   try {
