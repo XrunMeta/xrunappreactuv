@@ -385,17 +385,7 @@ export const v_10886b = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {v_11083e === 'xplayShop' ? (
-                                            v_837630 ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={v_d81136.balanceAmount}>
-                                                    {v_cd398d == null ? '-' : v_cd398d.toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
                                     </View>
                                 </View>
                                 {v_11083e === 'xplayShop' ? (
