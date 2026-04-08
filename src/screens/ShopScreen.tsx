@@ -133,10 +133,12 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_14129c(true);
                 return v_ba2215;
             });
-            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', v_660822);
-            const v_43c42e = await v_885e03(v_660822, v_9b57fc);
-            console.log('[ShopScreen] getXrunWalletBalance 결과:', v_43c42e);
-            const v_8decf8 = parseFloat(v_43c42e?.balance ?? '0');
+            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', v_660822);
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', v_8decf8);
             const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
             v_67ba02(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
@@ -208,13 +210,15 @@ export const v_10886b = () => {
                 } catch {}
 
                 const v_38fb16 = await Promise.allSettled([
-                    v_885e03(v_660822, undefined),
+                    v_4d25ff(Number(v_660822), 7, undefined),
                 ]);
                 if (v_2008a4) return;
                 if (v_38fb16[0].status === 'fulfilled') {
-                    const v_8decf8 = parseFloat((v_38fb16[0].value as any)?.balance ?? '0');
+                    const v_ef8ab1 = Array.isArray((v_38fb16[0].value as any)?.data) ? (v_38fb16[0].value as any).data : [];
+                    const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+                    const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
                     const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
-                    console.log('[ShopScreen] XRUN Wallet 잔액:', v_81e2ef);
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v_81e2ef);
                     v_67ba02(v_81e2ef);
                     v_d20f1f(v_81e2ef);
                     v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
