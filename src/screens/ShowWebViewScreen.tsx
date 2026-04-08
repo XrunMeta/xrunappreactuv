@@ -670,6 +670,8 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
             <View style={{
               width: '90%',
               maxWidth: 400,
+              height: '80%',
+              maxHeight: 600,
             }}>
             {(() => {
               const adCompany = advertisementParams?.ad_company || 'nas';
