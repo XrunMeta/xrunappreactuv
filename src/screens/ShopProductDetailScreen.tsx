@@ -488,7 +488,7 @@ export const ShopProductDetailScreen = () => {
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXplayBalance')}</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXRUNBalance')}</Text>
                                     {xplayBalanceLoading ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -498,7 +498,7 @@ export const ShopProductDetailScreen = () => {
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXplay')}</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXRUN')}</Text>
                                     <Text style={styles.paymentRemaining}>
                                         {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} XRUN`}
                                     </Text>
@@ -588,7 +588,7 @@ export const ShopProductDetailScreen = () => {
                                 <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             )}
                             <Text style={styles.purchaseButtonText}>
-                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXplay')}
+                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>

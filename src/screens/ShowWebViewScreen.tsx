@@ -128,12 +128,6 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           >
             <Ionicons name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleClose}
-            style={styles.closeButton}
-          >
-            <Ionicons name="close" size={24} color="#000" />
-          </TouchableOpacity>
         </View>
 
         {}

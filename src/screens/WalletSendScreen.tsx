@@ -13,6 +13,8 @@ import {
   FlatList,
   Image,
   ImageSourcePropType,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +65,7 @@ const STORAGE_KEY = 'wallet_address_book';
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
   const [sendAmount, setSendAmount] = useState('0');
   const [receiverAddress, setReceiverAddress] = useState('');
@@ -161,12 +163,17 @@ export const WalletSendScreen = () => {
   }, [receiverAddress, t, showAlert]);
 
   useEffect(() => {
-    setSendAmount('0');
+
+    setSendAmount(walletSendAmount && walletSendAmount !== '0' ? walletSendAmount : '0');
     setReceiverAddress('');
     setAddressError(null);
     prevAddressRef.current = '';
     amountInputRef.current?.blur();
   }, []);
+
+  useEffect(() => {
+    setWalletSendAmount(sendAmount);
+  }, [sendAmount, setWalletSendAmount]);
 
   useEffect(() => {
     loadAddressBook();
@@ -519,6 +526,7 @@ export const WalletSendScreen = () => {
       <StatusBar style="dark" />
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.contentContainer}>
         <Text style={styles.amountLabel}>{t('screens.walletSend.amount')}</Text>
         <View style={styles.amountContainer}>
@@ -784,6 +792,7 @@ export const WalletSendScreen = () => {
           />
         </View>
       </View>
+      </TouchableWithoutFeedback>
 
       {}
       <Modal

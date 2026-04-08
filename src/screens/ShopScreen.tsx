@@ -12,7 +12,8 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData } from '../services';
+import type { ShopItemData } from '../types';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -128,10 +129,12 @@ export const ShopScreen = () => {
                 if (prev == null) setXrunBalanceLoading(true);
                 return prev;
             });
-            console.log('[ShopScreen] getUserBalance 호출 member=', member);
-            const result = await getUserBalance(String(member), navigate);
-            console.log('[ShopScreen] getUserBalance 결과:', result);
-            const parsed = parseFloat(result?.data?.realtimeBalance?.balance ?? '0');
+            console.log('[ShopScreen] fetchWalletData(Polygon currency=18) 호출 member=', member);
+            const res: any = await fetchWalletData(Number(member), 7, navigate);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', parsed);
             const value = Number.isFinite(parsed) ? parsed : null;
             setXrunBalance(value);
             if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
@@ -202,27 +205,22 @@ export const ShopScreen = () => {
                     }
                 } catch {}
 
-                const [xplayRes, xrunRes] = await Promise.allSettled([
-                    getAyetPointsBalance(member, undefined),
-                    getUserBalance(String(member), undefined),
+                const xrunRes = await Promise.allSettled([
+                    fetchWalletData(Number(member), 7, undefined),
                 ]);
                 if (cancelled) return;
-                if (xplayRes.status === 'fulfilled') {
-                    const v = xplayRes.value?.total_ayet_points ?? 0;
-                    console.log('[ShopScreen] xplay 잔액:', v);
+                if (xrunRes[0].status === 'fulfilled') {
+                    const list: any[] = Array.isArray((xrunRes[0].value as any)?.data) ? (xrunRes[0].value as any).data : [];
+                    const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+                    const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+                    const v = Number.isFinite(parsed) ? parsed : 0;
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v);
+                    setXrunBalance(v);
                     setXplayBalance(v);
+                    AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
                     AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(v)).catch(() => {});
                 } else {
-                    console.warn('[ShopScreen] xplay 잔액 실패:', xplayRes.reason);
-                }
-                if (xrunRes.status === 'fulfilled') {
-                    const parsed = parseFloat(xrunRes.value?.data?.realtimeBalance?.balance ?? '0');
-                    const v = Number.isFinite(parsed) ? parsed : 0;
-                    console.log('[ShopScreen] xrun 잔액:', v);
-                    setXrunBalance(v);
-                    AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
-                } else {
-                    console.warn('[ShopScreen] xrun 잔액 실패:', xrunRes.reason);
+                    console.warn('[ShopScreen] Polygon 잔액 실패:', xrunRes[0].reason);
                 }
             } catch (e) {
                 console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', e);
@@ -270,12 +268,28 @@ export const ShopScreen = () => {
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
+    const loadXrunStoreProducts = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            const res = await getXrunBuyableItems(String(member));
+            if (res.status === 'success' && res.data) {
+                setXrunStoreProducts(res.data.map(shopItemToProductData));
+            }
+        } catch (err) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', err);
+        }
+    }, []);
+
     useEffect(() => {
         if (tab === 'xrunStore') {
             loadXrunBalance();
             loadXrunStoreProducts();
         }
-    }, [tab, loadXrunBalance]);
+    }, [tab, loadXrunBalance, loadXrunStoreProducts]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {

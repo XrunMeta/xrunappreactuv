@@ -161,7 +161,6 @@ export const ShopMyItemsScreen = () => {
 
     const segmentedOptions = useMemo(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -169,7 +168,7 @@ export const ShopMyItemsScreen = () => {
     );
 
     const handleTabChange = (value: typeof segmentedOptions[number]['value']) => {
-        if (value === 'xplayShop' || value === 'xrunStore') {
+        if (value === 'xrunStore') {
 
             setSelectedShopItem({
                 id: '',
