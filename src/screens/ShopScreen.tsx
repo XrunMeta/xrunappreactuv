@@ -129,12 +129,15 @@ export const ShopScreen = () => {
                 if (prev == null) setXrunBalanceLoading(true);
                 return prev;
             });
+            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', member);
             const result = await getXrunWalletBalance(member, navigate);
+            console.log('[ShopScreen] getXrunWalletBalance 결과:', result);
             const parsed = parseFloat(result.formatted);
             const value = Number.isFinite(parsed) ? parsed : null;
             setXrunBalance(value);
             if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
-        } catch {
+        } catch (e) {
+            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', e);
 
         } finally {
             setXrunBalanceLoading(false);
@@ -158,11 +161,14 @@ export const ShopScreen = () => {
                 if (prev == null) setXplayBalanceLoading(true);
                 return prev;
             });
+            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', member);
             const result = await getAyetPointsBalance(member, navigate);
+            console.log('[ShopScreen] getAyetPointsBalance 결과:', result);
             const value = result.total_ayet_points ?? null;
             setXplayBalance(value);
             if (value != null) AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(value)).catch(() => {});
-        } catch {
+        } catch (e) {
+            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', e);
 
         } finally {
             setXplayBalanceLoading(false);
@@ -187,11 +193,15 @@ export const ShopScreen = () => {
                     if (Number.isFinite(n)) setXplayBalance(n);
                 }
             } catch {}
+            console.log('[ShopScreen] 잔액 백그라운드 새로고침 시작');
 
-            Promise.all([loadXplayBalance(), loadXrunBalance()]).catch(() => {});
+            Promise.all([loadXplayBalance(), loadXrunBalance()])
+                .then(() => console.log('[ShopScreen] 잔액 새로고침 완료'))
+                .catch((e) => console.warn('[ShopScreen] 잔액 새로고침 실패:', e));
         })();
         return () => { cancelled = true; };
-    }, [loadXplayBalance, loadXrunBalance]);
+
+    }, []);
 
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
