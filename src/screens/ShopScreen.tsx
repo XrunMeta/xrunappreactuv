@@ -114,6 +114,9 @@ export const v_10886b = () => {
     const [v_a502c3, v_77037a] = v_5ab095(false);
     const { navigate: v_9b57fc } = v_a0daa8();
 
+    const v_5536d4 = 'shop:xrunBalance';
+    const v_fc87c6 = 'shop:xplayBalance';
+
     const v_abb08d = v_de06a3(async () => {
         try {
             const v_f24fd5 = await v_e84827.getItem('userData');
@@ -121,12 +124,18 @@ export const v_10886b = () => {
             const v_ef7306 = JSON.parse(v_f24fd5);
             const v_660822 = v_ef7306?.member;
             if (v_660822 == null) return;
-            v_14129c(true);
+
+            v_67ba02((v_ba2215) => {
+                if (v_ba2215 == null) v_14129c(true);
+                return v_ba2215;
+            });
             const v_43c42e = await v_885e03(v_660822, v_9b57fc);
             const v_8decf8 = parseFloat(v_43c42e.formatted);
-            v_67ba02(Number.isFinite(v_8decf8) ? v_8decf8 : null);
+            const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
+            v_67ba02(v_3b402b);
+            if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
         } catch {
-            v_67ba02(null);
+
         } finally {
             v_14129c(false);
         }
@@ -145,20 +154,44 @@ export const v_10886b = () => {
                 v_d20f1f(null);
                 return;
             }
-            v_2f87ed(true);
-
-            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
-            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
-            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
-            const v_74dfb8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
-            v_d20f1f(Number.isFinite(v_74dfb8) ? v_74dfb8 : 0);
+            v_d20f1f((v_ba2215) => {
+                if (v_ba2215 == null) v_2f87ed(true);
+                return v_ba2215;
+            });
+            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
+            const v_3b402b = v_43c42e.total_ayet_points ?? null;
+            v_d20f1f(v_3b402b);
+            if (v_3b402b != null) v_e84827.setItem(v_fc87c6, String(v_3b402b)).catch(() => {});
         } catch {
 
-            v_d20f1f(null);
         } finally {
             v_2f87ed(false);
         }
     }, [v_9b57fc]);
+
+    v_c4deb2(() => {
+        let v_2008a4 = false;
+        (async () => {
+            try {
+                const [v_be8dbe, v_ebcf3f] = await Promise.all([
+                    v_e84827.getItem(v_5536d4),
+                    v_e84827.getItem(v_fc87c6),
+                ]);
+                if (v_2008a4) return;
+                if (v_be8dbe != null) {
+                    const v_f4e98d = parseFloat(v_be8dbe);
+                    if (Number.isFinite(v_f4e98d)) v_67ba02(v_f4e98d);
+                }
+                if (v_ebcf3f != null) {
+                    const v_f4e98d = parseFloat(v_ebcf3f);
+                    if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
+                }
+            } catch {}
+
+            Promise.all([v_c1e7a4(), v_abb08d()]).catch(() => {});
+        })();
+        return () => { v_2008a4 = true; };
+    }, [v_c1e7a4, v_abb08d]);
 
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
@@ -198,34 +231,14 @@ export const v_10886b = () => {
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
 
-    const v_734b9d = v_de06a3(async () => {
-        try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (!v_f24fd5) return;
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            const v_660822 = v_ef7306?.member;
-            if (v_660822 == null) return;
-            v_77037a(true);
-            const v_8f00b9 = await v_81c40d(String(v_660822));
-            if (v_8f00b9.status === 'success' && v_8f00b9.data) {
-                console.log('[ShopScreen] XRUN Store 원본 데이터:', JSON.stringify(v_8f00b9.data.map((v_d5dda0) => ({ item: v_d5dda0.item, title: v_d5dda0.title, image: v_d5dda0.image, thumbnail: v_d5dda0.thumbnail }))));
-                v_d816a6(v_8f00b9.data.map(v_02c692));
-            }
-        } catch (v_49263d) {
-            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', v_49263d);
-        } finally {
-            v_77037a(false);
-        }
-    }, []);
-
     v_c4deb2(() => {
         if (v_11083e === 'xplayShop') {
             v_c1e7a4();
         } else if (v_11083e === 'xrunStore') {
             v_abb08d();
-            v_734b9d();
+            loadXrunStoreProducts();
         }
-    }, [v_11083e, v_c1e7a4, v_abb08d, v_734b9d]);
+    }, [v_11083e, v_c1e7a4, v_abb08d, loadXrunStoreProducts]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
