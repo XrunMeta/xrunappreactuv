@@ -12,8 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance, getXrunBuyableItems, fetchWalletData } from '../services';
-import type { ShopItemData } from '../types';
+import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance } from '../services';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -47,7 +46,7 @@ const sampleProducts: ProductData[] = [
         id: '2',
         brand: 'Ethereum',
         title: 'Ethereum 교환권',
-        description: '최소 30,000 Xplay 이상 교환가능',
+        description: '최소 30,000 XRUN 이상 교환가능',
         price: 30000,
         image: ethereumThumb,
     },
@@ -100,7 +99,7 @@ export const ShopScreen = () => {
     const { t } = useTranslation();
     const { showAlert } = useAlertDialog();
     const { setSelectedShopItem, selectedShopItem } = useAppContext();
-    const [tab, setTab] = useState<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+    const [tab, setTab] = useState<'xrunStore' | 'myItems'>('xrunStore');
 
     const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
     const [xplayLoading, setXplayLoading] = useState(false);
@@ -129,10 +128,10 @@ export const ShopScreen = () => {
                 if (prev == null) setXrunBalanceLoading(true);
                 return prev;
             });
-            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', member);
-            const result = await getXrunWalletBalance(member, navigate);
-            console.log('[ShopScreen] getXrunWalletBalance 결과:', result);
-            const parsed = parseFloat(result.formatted);
+            console.log('[ShopScreen] getUserBalance 호출 member=', member);
+            const result = await getUserBalance(String(member), navigate);
+            console.log('[ShopScreen] getUserBalance 결과:', result);
+            const parsed = parseFloat(result?.data?.realtimeBalance?.balance ?? '0');
             const value = Number.isFinite(parsed) ? parsed : null;
             setXrunBalance(value);
             if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
@@ -205,7 +204,7 @@ export const ShopScreen = () => {
 
                 const [xplayRes, xrunRes] = await Promise.allSettled([
                     getAyetPointsBalance(member, undefined),
-                    getXrunWalletBalance(member, undefined),
+                    getUserBalance(String(member), undefined),
                 ]);
                 if (cancelled) return;
                 if (xplayRes.status === 'fulfilled') {
@@ -217,7 +216,7 @@ export const ShopScreen = () => {
                     console.warn('[ShopScreen] xplay 잔액 실패:', xplayRes.reason);
                 }
                 if (xrunRes.status === 'fulfilled') {
-                    const parsed = parseFloat(xrunRes.value?.formatted ?? '0');
+                    const parsed = parseFloat(xrunRes.value?.data?.realtimeBalance?.balance ?? '0');
                     const v = Number.isFinite(parsed) ? parsed : 0;
                     console.log('[ShopScreen] xrun 잔액:', v);
                     setXrunBalance(v);
@@ -252,7 +251,7 @@ export const ShopScreen = () => {
     }, []);
 
     useEffect(() => {
-        if (tab === 'xplayShop') {
+        if (tab === 'xrunStore') {
             setXplayLoading(true);
             loadXplayProducts().finally(() => setXplayLoading(false));
         }
@@ -265,24 +264,18 @@ export const ShopScreen = () => {
 
     useEffect(() => {
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
-            const shopTab = (selectedShopItem as any).shopTab;
-            if (shopTab === 'xplayShop' || shopTab === 'xrunStore') {
-                setTab(shopTab);
-
-                setSelectedShopItem(undefined);
-            }
+            setTab('xrunStore');
+            setSelectedShopItem(undefined);
         }
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
     useEffect(() => {
-        if (tab === 'xplayShop') {
-            loadXplayBalance();
-        } else if (tab === 'xrunStore') {
+        if (tab === 'xrunStore') {
             loadXrunBalance();
             loadXrunStoreProducts();
         }
-    }, [tab, loadXplayBalance, loadXrunBalance, loadXrunStoreProducts]);
+    }, [tab, loadXrunBalance]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -294,7 +287,6 @@ export const ShopScreen = () => {
 
     const segmentedOptions = useMemo(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -381,7 +373,7 @@ export const ShopScreen = () => {
                             <View style={styles.xplayIconContainer}>
                                 <Image
                                     source={xrunRoundLogo}
-                                    style={isXrun ? styles.xrunIcon : styles.xplayIcon}
+                                    style={styles.xrunIcon}
                                     resizeMode="contain"
                                 />
                             </View>
@@ -418,7 +410,7 @@ export const ShopScreen = () => {
             />
             <View style={styles.contentContainer}>
                 {}
-                {(tab === 'xplayShop' || tab === 'xrunStore') && (
+                {tab === 'xrunStore' && (
                     <View style={styles.balanceCardWrapper}>
                         <LinearGradient
                             colors={['#FFFFFF', '#F9FAFB', '#FFFFFF']}
@@ -432,38 +424,19 @@ export const ShopScreen = () => {
                                 <View style={styles.balanceLeft}>
                                     <Text style={styles.balanceLabel}>{t('screens.shop.myBalance')}</Text>
                                     <View style={styles.balanceAmountRow}>
-                                        <View style={[
-                                            styles.balanceXplayIconContainer,
-                                            tab === 'xrunStore' && styles.balanceXrunIconContainer
-                                        ]}>
+                                        <View style={[styles.balanceXplayIconContainer, styles.balanceXrunIconContainer]}>
                                             <Image
                                                 source={xrunRoundLogo}
                                                 style={styles.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {tab === 'xplayShop' ? (
-                                            xplayBalanceLoading ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={styles.balanceAmount}>
-                                                    {(xplayBalance ?? 0).toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                     </View>
                                 </View>
-                                {tab === 'xplayShop' ? (
-                                    <View style={styles.xplayTag}>
-                                        <Text style={styles.xplayTagText}>XRUN</Text>
-                                    </View>
-                                ) : (
-                                    <View style={styles.xrunTag}>
-                                        <Text style={styles.xrunTagText}>XRUN</Text>
-                                    </View>
-                                )}
+                                <View style={styles.xrunTag}>
+                                    <Text style={styles.xrunTagText}>XRUN</Text>
+                                </View>
                             </View>
                         </LinearGradient>
                     </View>
@@ -485,12 +458,12 @@ export const ShopScreen = () => {
                     backgroundColor="transparent"
                     disableBottomPadding={true}
                     refreshControl={
-                        tab === 'xplayShop' ? (
+                        tab === 'xrunStore' ? (
                             <RefreshControl refreshing={xplayRefreshing} onRefresh={onXplayRefresh} colors={[COLORS.buttonPrimary]} />
                         ) : undefined
                     }
                 >
-                    {tab === 'xplayShop' ? (
+                    {tab === 'xrunStore' ? (
                         <>
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
@@ -503,26 +476,13 @@ export const ShopScreen = () => {
                                 </View>
                             ) : (
                                 <View style={styles.productGrid}>
+                                    {xrunStoreProducts.map((product) => renderProductCard(product, false))}
                                     {xplayProductList.map((item) =>
                                         renderProductCard(giftishowToProductData(item), false)
                                     )}
                                 </View>
                             )}
                         </>
-                    ) : tab === 'xrunStore' ? (
-                        xrunStoreLoading ? (
-                            <View style={styles.emptyContainer}>
-                                <ActivityIndicator size="large" color={COLORS.primary} />
-                            </View>
-                        ) : xrunStoreProducts.length === 0 ? (
-                            <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>{t('screens.shop.noProducts') || '등록된 상품이 없습니다.'}</Text>
-                            </View>
-                        ) : (
-                            <View style={styles.productGrid}>
-                                {xrunStoreProducts.map((product) => renderProductCard(product, false))}
-                            </View>
-                        )
                     ) : (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>

@@ -18,7 +18,7 @@ import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
-const xrunRoundLogo = require('../../assets/ad-round-logo.png');
+const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
 const ethereumThumb = require('../../assets/images/ethereum_thumb.png');
 
 const EXCHANGE_MIN_XPLAY = 30000;
