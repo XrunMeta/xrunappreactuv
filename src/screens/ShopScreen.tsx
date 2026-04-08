@@ -178,29 +178,63 @@ export const ShopScreen = () => {
     useEffect(() => {
         let cancelled = false;
         (async () => {
+            console.log('[ShopScreen] 잔액 마운트 fetch 시작');
             try {
-                const [cachedXrun, cachedXplay] = await Promise.all([
-                    AsyncStorage.getItem(XRUN_BALANCE_CACHE_KEY),
-                    AsyncStorage.getItem(XPLAY_BALANCE_CACHE_KEY),
+                const userDataStr = await AsyncStorage.getItem('userData');
+                if (!userDataStr) return;
+                const userData = JSON.parse(userDataStr);
+                const member = userData?.member;
+                if (member == null) return;
+
+                try {
+                    const [cachedXrun, cachedXplay] = await Promise.all([
+                        AsyncStorage.getItem(XRUN_BALANCE_CACHE_KEY),
+                        AsyncStorage.getItem(XPLAY_BALANCE_CACHE_KEY),
+                    ]);
+                    if (!cancelled) {
+                        if (cachedXrun != null) {
+                            const n = parseFloat(cachedXrun);
+                            if (Number.isFinite(n)) setXrunBalance(n);
+                        }
+                        if (cachedXplay != null) {
+                            const n = parseFloat(cachedXplay);
+                            if (Number.isFinite(n)) setXplayBalance(n);
+                        }
+                    }
+                } catch {}
+
+                const [xplayRes, xrunRes] = await Promise.allSettled([
+                    getAyetPointsBalance(member, undefined),
+                    getXrunWalletBalance(member, undefined),
                 ]);
                 if (cancelled) return;
-                if (cachedXrun != null) {
-                    const n = parseFloat(cachedXrun);
-                    if (Number.isFinite(n)) setXrunBalance(n);
+                if (xplayRes.status === 'fulfilled') {
+                    const v = xplayRes.value?.total_ayet_points ?? 0;
+                    console.log('[ShopScreen] xplay 잔액:', v);
+                    setXplayBalance(v);
+                    AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(v)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] xplay 잔액 실패:', xplayRes.reason);
                 }
-                if (cachedXplay != null) {
-                    const n = parseFloat(cachedXplay);
-                    if (Number.isFinite(n)) setXplayBalance(n);
+                if (xrunRes.status === 'fulfilled') {
+                    const parsed = parseFloat(xrunRes.value?.formatted ?? '0');
+                    const v = Number.isFinite(parsed) ? parsed : 0;
+                    console.log('[ShopScreen] xrun 잔액:', v);
+                    setXrunBalance(v);
+                    AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] xrun 잔액 실패:', xrunRes.reason);
                 }
-            } catch {}
-            console.log('[ShopScreen] 잔액 백그라운드 새로고침 시작');
-
-            Promise.all([loadXplayBalance(), loadXrunBalance()])
-                .then(() => console.log('[ShopScreen] 잔액 새로고침 완료'))
-                .catch((e) => console.warn('[ShopScreen] 잔액 새로고침 실패:', e));
+            } catch (e) {
+                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', e);
+            } finally {
+                if (!cancelled) {
+                    setXplayBalanceLoading(false);
+                    setXrunBalanceLoading(false);
+                }
+            }
         })();
         return () => { cancelled = true; };
-
     }, []);
 
     const loadXplayProducts = useCallback(async () => {
@@ -408,7 +442,17 @@ export const ShopScreen = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
+                                        {tab === 'xplayShop' ? (
+                                            xplayBalanceLoading ? (
+                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
+                                            ) : (
+                                                <Text style={styles.balanceAmount}>
+                                                    {(xplayBalance ?? 0).toLocaleString()}
+                                                </Text>
+                                            )
+                                        ) : (
+                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
+                                        )}
                                     </View>
                                 </View>
                                 {tab === 'xplayShop' ? (
