@@ -342,10 +342,6 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
   try {
 
     if (Platform.OS === 'ios') {
-
-      console.log('[Pangle] iOS App Open Ad는 현재 SDK 버전에서 미지원입니다. 스킵합니다.');
-      return;
-
       if (!isPangleNativeModuleAvailable()) {
         console.warn('[Pangle] iOS 네이티브 모듈을 사용할 수 없습니다.');
         return;
