@@ -420,7 +420,7 @@ export const v_a59951 = () => {
     };
 
     const v_fa78fb = v_01bee9.isXrun || v_01bee9.brand === 'XRUN';
-    const v_1efa5f = v_fa78fb ? v_33c40c : v_10664a;
+    const v_1efa5f = v_33c40c;
 
     const v_fafc7f = (v_5db874 && v_90e57e?.goodsImgB) || (v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg)
         ? { uri: (v_90e57e?.goodsImgB || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg) as string }
