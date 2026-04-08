@@ -107,11 +107,13 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
   }, [canGoBack, handleClose]);
 
   const handleInfoIconPress = useCallback(() => {
-
-    if (Platform.OS === 'ios') {
-      setShowAdDetailModal(true);
-    }
-  }, []);
+    console.log('[ShowWebView] i 아이콘 클릭됨', {
+      platform: Platform.OS,
+      hasAdParams: !!advertisementParams,
+      adCompany: advertisementParams?.ad_company,
+    });
+    setShowAdDetailModal(true);
+  }, [advertisementParams]);
 
   return (
     <View style={styles.container}>
@@ -650,7 +652,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       ) : null}
 
       {}
-      {Platform.OS === 'ios' && (
+      {true && (
         <Modal
           visible={showAdDetailModal}
           transparent={true}
