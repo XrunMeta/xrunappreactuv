@@ -420,7 +420,7 @@ export const ShopProductDetailScreen = () => {
     };
 
     const isXrun = product.isXrun || product.brand === 'XRUN';
-    const coinIcon = isXrun ? xrunRoundLogo : xplaySymbol;
+    const coinIcon = xrunRoundLogo;
 
     const displayImage = (isXplayShop && productDetail?.goodsImgB) || (productDetail?.goodsImgS || productDetail?.mmsGoodsImg)
         ? { uri: (productDetail?.goodsImgB || productDetail?.goodsImgS || productDetail?.mmsGoodsImg) as string }
