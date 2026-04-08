@@ -5,7 +5,7 @@ import { getEnv, getEnvValue } from '../utils/env';
 
 const { AyetOfferwallModule } = NativeModules;
 
-export const AYET_AD_SLOT_NAME = 'Xplay';
+export const AYET_AD_SLOT_NAME = 'XRUN';
 
 let ayetInitialized = false;
 
@@ -30,11 +30,11 @@ export const initAyetSdk = async (memberId: string): Promise<boolean> => {
 };
 
 const getDefaultAdSlotName = (): string =>
-  Platform.OS === 'ios' ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || 'XRun') : AYET_AD_SLOT_NAME;
+  Platform.OS === 'ios' ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || '25755') : AYET_AD_SLOT_NAME;
 
 const resolveAdSlotName = (adSlotName: string): string =>
   Platform.OS === 'ios' && adSlotName === 'Xplay'
-    ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || 'XRun')
+    ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || '25755')
     : adSlotName;
 
 export const getAyetRewardConfig = () => {
@@ -52,7 +52,7 @@ export const getAyetRewardConfig = () => {
   } catch {
     return {
       placementIdIos: '22062',
-      adSlotNameIos: 'XRun',
+      adSlotNameIos: '25755',
       currencyId: 'Xplay',
       currencyName: 'Xplay',
       currencyNamePlural: 'Xplay',
