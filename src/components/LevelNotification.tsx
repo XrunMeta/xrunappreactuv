@@ -29,8 +29,9 @@ export const LevelNotification: React.FC<LevelNotificationProps> = ({ navigation
         console.log('[LevelNotification] 사용자 레벨 정보 조회 시작:', member);
         const response = await getMembersLevelInfo(Number(member), navigation);
 
-        if (response && response.status === 'success' && response.data && response.data.lv !== undefined) {
-          const level = response.data.lv;
+        const levelData = Array.isArray(response?.data) ? response.data[0] : response?.data;
+        if (response && response.status === 'success' && levelData && levelData.lv !== undefined) {
+          const level = levelData.lv;
           setNotifitext(`Level ${level}`);
           console.log('[LevelNotification] 사용자 레벨 정보 업데이트 완료:', `Level ${level}`);
         } else {
