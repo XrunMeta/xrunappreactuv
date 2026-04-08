@@ -12,7 +12,7 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData, getXRUNGopaxPrice } from '../services';
 import type { ShopItemData } from '../types';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
@@ -81,10 +81,12 @@ function shopItemToProductData(item: ShopItemData): ProductData {
     };
 }
 
-const KRW_PER_XRUN = 70;
-function giftishowToProductData(item: GiftishowProductItem): ProductData {
+const FALLBACK_KRW_PER_XRUN = 70;
+
+function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number): ProductData {
     const krw = typeof item.price === 'number' ? item.price : 0;
-    const xrunPrice = Math.ceil(krw / KRW_PER_XRUN);
+    const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
+    const xrunPrice = Math.ceil(krw / divisor);
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
         brand: (item as any).brandName ?? '기프티콘',
@@ -112,6 +114,8 @@ export const ShopScreen = () => {
     const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
     const [xrunStoreProducts, setXrunStoreProducts] = useState<ProductData[]>([]);
     const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
+
+    const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
     const { navigate } = useAppNavigation();
 
     const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
@@ -129,12 +133,10 @@ export const ShopScreen = () => {
                 if (prev == null) setXrunBalanceLoading(true);
                 return prev;
             });
-            console.log('[ShopScreen] fetchWalletData(Polygon currency=18) 호출 member=', member);
-            const res: any = await fetchWalletData(Number(member), 7, navigate);
-            const list: any[] = Array.isArray(res?.data) ? res.data : [];
-            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
-            const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
-            console.log('[ShopScreen] XRUN Polygon 잔액:', parsed);
+            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', member);
+            const result = await getXrunWalletBalance(member, navigate);
+            console.log('[ShopScreen] getXrunWalletBalance 결과:', result);
+            const parsed = parseFloat(result?.balance ?? '0');
             const value = Number.isFinite(parsed) ? parsed : null;
             setXrunBalance(value);
             if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
@@ -206,15 +208,13 @@ export const ShopScreen = () => {
                 } catch {}
 
                 const xrunRes = await Promise.allSettled([
-                    fetchWalletData(Number(member), 7, undefined),
+                    getXrunWalletBalance(member, undefined),
                 ]);
                 if (cancelled) return;
                 if (xrunRes[0].status === 'fulfilled') {
-                    const list: any[] = Array.isArray((xrunRes[0].value as any)?.data) ? (xrunRes[0].value as any).data : [];
-                    const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
-                    const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+                    const parsed = parseFloat((xrunRes[0].value as any)?.balance ?? '0');
                     const v = Number.isFinite(parsed) ? parsed : 0;
-                    console.log('[ShopScreen] XRUN Polygon 잔액:', v);
+                    console.log('[ShopScreen] XRUN Wallet 잔액:', v);
                     setXrunBalance(v);
                     setXplayBalance(v);
                     AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
@@ -248,17 +248,55 @@ export const ShopScreen = () => {
         }
     }, []);
 
+    const loadGopaxKrwPerXrun = useCallback(async () => {
+        try {
+            const cached = await AsyncStorage.getItem('xrungopaxprice');
+            if (cached) {
+                const parsed = JSON.parse(cached) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) setGopaxKrwPerXrun(p);
+            }
+        } catch {
+
+        }
+        try {
+            const result = await getXRUNGopaxPrice(navigate);
+            const p = result?.data?.gopaxPrice;
+            if (typeof p === 'number' && p > 0) {
+                setGopaxKrwPerXrun(p);
+                await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
+                return;
+            }
+        } catch (e) {
+            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', e);
+        }
+        try {
+            const s = await AsyncStorage.getItem('xrungopaxprice');
+            if (s) {
+                const parsed = JSON.parse(s) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) {
+                    setGopaxKrwPerXrun(p);
+                    return;
+                }
+            }
+        } catch {
+
+        }
+    }, [navigate]);
+
     useEffect(() => {
         if (tab === 'xrunStore') {
             setXplayLoading(true);
+            void loadGopaxKrwPerXrun();
             loadXplayProducts().finally(() => setXplayLoading(false));
         }
-    }, [tab, loadXplayProducts]);
+    }, [tab, loadXplayProducts, loadGopaxKrwPerXrun]);
 
     const onXplayRefresh = useCallback(() => {
         setXplayRefreshing(true);
-        Promise.all([loadXplayProducts(), loadXplayBalance()]).finally(() => setXplayRefreshing(false));
-    }, [loadXplayProducts, loadXplayBalance]);
+        Promise.all([loadXplayProducts(), loadXplayBalance(), loadGopaxKrwPerXrun()]).finally(() => setXplayRefreshing(false));
+    }, [loadXplayProducts, loadXplayBalance, loadGopaxKrwPerXrun]);
 
     useEffect(() => {
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
@@ -298,6 +336,11 @@ export const ShopScreen = () => {
         const availableWidth = screenWidth - paddingHorizontal * 2;
         return (availableWidth - gap) / 2;
     }, [screenWidth]);
+
+    const xplayProductsAsCards = useMemo(
+        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun)),
+        [xplayProductList, gopaxKrwPerXrun],
+    );
 
     const segmentedOptions = useMemo(
         () => [
@@ -491,9 +534,7 @@ export const ShopScreen = () => {
                             ) : (
                                 <View style={styles.productGrid}>
                                     {xrunStoreProducts.map((product) => renderProductCard(product, false))}
-                                    {xplayProductList.map((item) =>
-                                        renderProductCard(giftishowToProductData(item), false)
-                                    )}
+                                    {xplayProductsAsCards.map((product) => renderProductCard(product, false))}
                                 </View>
                             )}
                         </>

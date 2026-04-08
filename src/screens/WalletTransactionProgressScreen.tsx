@@ -110,7 +110,11 @@ export const WalletTransactionProgressScreen = () => {
           return;
         }
 
-        if (transferResult.status !== 'success' || !transferResult.data?.txHash) {
+        const transferData = Array.isArray(transferResult.data)
+          ? transferResult.data[0]
+          : transferResult.data;
+
+        if (transferResult.status !== 'success' || !transferData?.txHash) {
           throw new Error(
             (t('screens.walletTransactionProgress.transferFailed') || 'Transfer failed') +
             ': ' +
@@ -118,7 +122,7 @@ export const WalletTransactionProgressScreen = () => {
           );
         }
 
-        const resultTxHash = transferResult.data.txHash;
+        const resultTxHash = transferData.txHash;
         setTxHash(resultTxHash);
         setIsSuccess(true);
         setIsProcessing(false);
