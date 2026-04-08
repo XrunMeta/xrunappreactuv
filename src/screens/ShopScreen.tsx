@@ -323,7 +323,7 @@ export const ShopScreen = () => {
                         <View style={styles.priceContainer}>
                             <View style={styles.xplayIconContainer}>
                                 <Image
-                                    source={isXrun ? xrunRoundLogo : xplaySymbol}
+                                    source={xrunRoundLogo}
                                     style={isXrun ? styles.xrunIcon : styles.xplayIcon}
                                     resizeMode="contain"
                                 />
@@ -380,7 +380,7 @@ export const ShopScreen = () => {
                                             tab === 'xrunStore' && styles.balanceXrunIconContainer
                                         ]}>
                                             <Image
-                                                source={tab === 'xrunStore' ? xrunRoundLogo : xplaySymbol}
+                                                source={xrunRoundLogo}
                                                 style={styles.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />

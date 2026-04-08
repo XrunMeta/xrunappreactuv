@@ -33,7 +33,7 @@ export const XplayZoneScreen = () => {
       >
         {xplaySymbol && (
           <View style={styles.logoContainer}>
-            <Image source={xplaySymbol} style={styles.logo} resizeMode="contain" />
+            <Image source={require('../../assets/xrun-round-logo.png')} style={styles.logo} resizeMode="contain" />
           </View>
         )}
         <Text style={styles.title}>Xplay Zone</Text>

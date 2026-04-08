@@ -108,7 +108,7 @@ export const XplayInfoScreen = () => {
                 <Text style={styles.balanceLabel}>{t('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={styles.balanceAmountRow}>
                   <View style={styles.balanceXplayIconContainer}>
-                    <Image source={xplaySymbol} style={styles.balanceXplayIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/xrun-round-logo.png')} style={styles.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {balanceLoading ? (
                     <ActivityIndicator size="small" color="#343a5a" style={styles.balanceLoader} />
