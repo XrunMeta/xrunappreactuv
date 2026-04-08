@@ -129,12 +129,15 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_14129c(true);
                 return v_ba2215;
             });
+            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', v_660822);
             const v_43c42e = await v_885e03(v_660822, v_9b57fc);
+            console.log('[ShopScreen] getXrunWalletBalance 결과:', v_43c42e);
             const v_8decf8 = parseFloat(v_43c42e.formatted);
             const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
             v_67ba02(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
-        } catch {
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', v_9e86fd);
 
         } finally {
             v_14129c(false);
@@ -158,11 +161,14 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_2f87ed(true);
                 return v_ba2215;
             });
+            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', v_660822);
             const v_43c42e = await v_877de8(v_660822, v_9b57fc);
+            console.log('[ShopScreen] getAyetPointsBalance 결과:', v_43c42e);
             const v_3b402b = v_43c42e.total_ayet_points ?? null;
             v_d20f1f(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_fc87c6, String(v_3b402b)).catch(() => {});
-        } catch {
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', v_9e86fd);
 
         } finally {
             v_2f87ed(false);
@@ -187,11 +193,15 @@ export const v_10886b = () => {
                     if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
                 }
             } catch {}
+            console.log('[ShopScreen] 잔액 백그라운드 새로고침 시작');
 
-            Promise.all([v_c1e7a4(), v_abb08d()]).catch(() => {});
+            Promise.all([v_c1e7a4(), v_abb08d()])
+                .then(() => console.log('[ShopScreen] 잔액 새로고침 완료'))
+                .catch((v_9e86fd) => console.warn('[ShopScreen] 잔액 새로고침 실패:', v_9e86fd));
         })();
         return () => { v_2008a4 = true; };
-    }, [v_c1e7a4, v_abb08d]);
+
+    }, []);
 
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
