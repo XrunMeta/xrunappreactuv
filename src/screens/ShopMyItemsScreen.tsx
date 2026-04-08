@@ -161,7 +161,6 @@ export const v_8c1d95 = () => {
 
     const v_1c4d31 = v_df9f57(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -169,7 +168,7 @@ export const v_8c1d95 = () => {
     );
 
     const v_42b5ed = (value: typeof v_1c4d31[number]['value']) => {
-        if (v_3b402b === 'xplayShop' || v_3b402b === 'xrunStore') {
+        if (v_3b402b === 'xrunStore') {
 
             v_d0fbad({
                 id: '',

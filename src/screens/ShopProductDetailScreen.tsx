@@ -488,7 +488,7 @@ export const v_a59951 = () => {
                                     </View>
                                 </View>
                                 <View style={v_d81136.paymentRow}>
-                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.myXplayBalance')}</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.myXRUNBalance')}</Text>
                                     {v_837630 ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
@@ -498,7 +498,7 @@ export const v_a59951 = () => {
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
-                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXplay')}</Text>
+                                    <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXRUN')}</Text>
                                     <Text style={v_d81136.paymentRemaining}>
                                         {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} XRUN`}
                                     </Text>
@@ -588,7 +588,7 @@ export const v_a59951 = () => {
                                 <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
                             )}
                             <Text style={v_d81136.purchaseButtonText}>
-                                {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXplay')}
+                                {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>

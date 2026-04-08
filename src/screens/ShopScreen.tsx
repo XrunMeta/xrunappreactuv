@@ -12,7 +12,8 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03, v_54d016 } from '../services';
+import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff } from '../services';
+import type { v_20035e } from '../types';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -66,7 +67,7 @@ const v_426e67 = [
     },
 ];
 
-function v_02c692(v_8c0b26): ProductData {
+function v_02c692(item: v_20035e): ProductData {
 
     const v_0622fe = v_8c0b26.thumbnail || v_8c0b26.image;
     const v_74f4a3 = typeof v_0622fe === 'string' && v_0622fe.startsWith('http') ? v_0622fe : null;
@@ -128,10 +129,12 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_14129c(true);
                 return v_ba2215;
             });
-            console.log('[ShopScreen] getUserBalance 호출 member=', v_660822);
-            const v_43c42e = await v_54d016(String(v_660822), v_9b57fc);
-            console.log('[ShopScreen] getUserBalance 결과:', v_43c42e);
-            const v_8decf8 = parseFloat(v_43c42e?.data?.realtimeBalance?.balance ?? '0');
+            console.log('[ShopScreen] fetchWalletData(Polygon currency=18) 호출 member=', v_660822);
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', v_8decf8);
             const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
             v_67ba02(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
@@ -202,27 +205,22 @@ export const v_10886b = () => {
                     }
                 } catch {}
 
-                const [v_0275c4, v_38fb16] = await Promise.allSettled([
-                    v_877de8(v_660822, undefined),
-                    v_54d016(String(v_660822), undefined),
+                const v_38fb16 = await Promise.allSettled([
+                    v_4d25ff(Number(v_660822), 7, undefined),
                 ]);
                 if (v_2008a4) return;
-                if (v_0275c4.status === 'fulfilled') {
-                    const v_81e2ef = v_0275c4.value?.total_ayet_points ?? 0;
-                    console.log('[ShopScreen] xplay 잔액:', v_81e2ef);
+                if (v_38fb16[0].status === 'fulfilled') {
+                    const v_ef8ab1 = Array.isArray((v_38fb16[0].value as any)?.data) ? (v_38fb16[0].value as any).data : [];
+                    const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+                    const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+                    const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v_81e2ef);
+                    v_67ba02(v_81e2ef);
                     v_d20f1f(v_81e2ef);
+                    v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
                     v_e84827.setItem(v_fc87c6, String(v_81e2ef)).catch(() => {});
                 } else {
-                    console.warn('[ShopScreen] xplay 잔액 실패:', v_0275c4.reason);
-                }
-                if (v_38fb16.status === 'fulfilled') {
-                    const v_8decf8 = parseFloat(v_38fb16.value?.data?.realtimeBalance?.balance ?? '0');
-                    const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
-                    console.log('[ShopScreen] xrun 잔액:', v_81e2ef);
-                    v_67ba02(v_81e2ef);
-                    v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
-                } else {
-                    console.warn('[ShopScreen] xrun 잔액 실패:', v_38fb16.reason);
+                    console.warn('[ShopScreen] Polygon 잔액 실패:', v_38fb16[0].reason);
                 }
             } catch (v_9e86fd) {
                 console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', v_9e86fd);
@@ -270,12 +268,28 @@ export const v_10886b = () => {
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
 
+    const v_734b9d = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) return;
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) return;
+            const v_8f00b9 = await v_81c40d(String(v_660822));
+            if (v_8f00b9.status === 'success' && v_8f00b9.data) {
+                v_d816a6(v_8f00b9.data.map(v_02c692));
+            }
+        } catch (v_49263d) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', v_49263d);
+        }
+    }, []);
+
     v_c4deb2(() => {
         if (v_11083e === 'xrunStore') {
             v_abb08d();
-            loadXrunStoreProducts();
+            v_734b9d();
         }
-    }, [v_11083e, v_abb08d]);
+    }, [v_11083e, v_abb08d, v_734b9d]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
