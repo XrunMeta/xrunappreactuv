@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
-
-const { width } = Dimensions.get('window');
 
 let iconMap: any = null;
 let iconMapWhite: any = null;
@@ -58,6 +57,8 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   onItemPress,
   onTabChange,
 }) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { navigate } = useAppNavigation();
 
   const [showWallet, setShowWallet] = useState(false);
@@ -109,39 +110,20 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     onItemPress?.(itemId);
   };
 
-  const getItemPadding = () => {
-    const basePadding = width * 0.04; 
-    const minPadding = 8;
-    const maxPadding = 20;
-    return Math.max(minPadding, Math.min(maxPadding, basePadding));
-  };
+  const centerButtonWidth = windowWidth < 360 ? 92 : windowWidth < 400 ? 98 : 104;
 
-  const getHorizontalPadding = () => {
-    if (width < 360) {
+  const baseHorizontalPad = windowWidth < 360 ? 4 : windowWidth < 400 ? 6 : 4;
 
-      return 4;
-    } else if (width < 400) {
+  const padLeft = Math.max(baseHorizontalPad, insets.left);
+  const padRight = Math.max(baseHorizontalPad, insets.right);
 
-      return 8;
-    } else {
+  const itemById = (id: string) => processedItems.find((i) => i.id === id);
 
-      return 10;
-    }
-  };
+  const rowInnerWidth = windowWidth - padLeft - padRight;
 
-  const getCenterButtonWidth = () => {
-    if (width < 360) {
-      return 90; 
-    } else if (width < 400) {
-      return 95;
-    } else {
-      return 100;
-    }
-  };
-
-  const itemPadding = getItemPadding();
-  const horizontalPadding = getHorizontalPadding();
-  const centerButtonWidth = getCenterButtonWidth();
+  const centerShadowBleed = Platform.OS === 'ios' ? 14 : 10;
+  const centerSlotWidth = centerButtonWidth + centerShadowBleed;
+  const tabColumnWidth = Math.max(40, (rowInnerWidth - centerSlotWidth) / 4);
 
   const mapIconSource = activeTab === 'Map'
     ? (iconMap || iconMapWhite)
@@ -201,19 +183,15 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     }
 
     const isActive = activeItemId === item.id;
-
     const iconSource = item.icon;
+    const isXplay = item.id === 'xplay';
 
     return (
       <TouchableOpacity
-        key={item.id}
-        style={[
-          styles.navItem,
-          { minWidth: width < 360 ? 50 : 55 }
-        ]}
+        style={[styles.navItem, isXplay && styles.navItemXplayNudge]}
         onPress={() => handleItemPress(item.id)}
         activeOpacity={0.7}>
-        <View style={styles.iconContainer}>
+        <View style={[styles.iconContainer, isXplay && styles.iconContainerXplayNudge]}>
           {iconSource ? (
             <Image
               source={iconSource}
@@ -228,7 +206,10 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
           style={[
             styles.label,
             isActive && styles.labelActive,
-            { fontSize: width < 360 ? 12 : 14 }
+            {
+              fontSize: windowWidth < 360 ? 11 : 13,
+              ...(Platform.OS === 'android' ? { includeFontPadding: false } : {}),
+            },
           ]}
           numberOfLines={1}
           ellipsizeMode="tail">
@@ -242,32 +223,37 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     <View style={styles.container}>
       {}
       <View style={styles.bottomSection}>
-        <View style={[
-          styles.content,
-          {
-            paddingHorizontal: horizontalPadding,
-            gap: width < 360 ? 4 : width < 400 ? 6 : 8,
-          }
-        ]}>
-          {processedItems.map((item, index) => {
-            if (item.id === 'map' || item.id === 'camera') {
-
-              return (
-                <React.Fragment key="center-buttons">
-                  <View style={[
-                    styles.centerButtonContainer,
-                    {
-                      width: centerButtonWidth,
-                      marginHorizontal: width < 360 ? -2 : -3,
-                    }
-                  ]}>
-                    {renderCenterItem()}
-                  </View>
-                </React.Fragment>
-              );
-            }
-            return renderRegularItem(item);
-          })}
+        <View
+          style={[
+            styles.content,
+            {
+              paddingLeft: padLeft,
+              paddingRight: padRight,
+            },
+          ]}>
+          <View style={styles.navRowInner}>
+            {(['xplay', 'shop'] as const).map((id) => {
+              const item = itemById(id);
+              return item ? (
+                <View key={id} style={[styles.navColumn, { width: tabColumnWidth }]}>
+                  {renderRegularItem(item)}
+                </View>
+              ) : null;
+            })}
+            <View style={[styles.navColumnCenter, { width: centerSlotWidth }]}>
+              <View style={[styles.centerButtonContainer, { width: centerButtonWidth }]}>
+                {renderCenterItem()}
+              </View>
+            </View>
+            {(['wallet', 'info'] as const).map((id) => {
+              const item = itemById(id);
+              return item ? (
+                <View key={id} style={[styles.navColumn, { width: tabColumnWidth }]}>
+                  {renderRegularItem(item)}
+                </View>
+              ) : null;
+            })}
+          </View>
         </View>
       </View>
       {}
@@ -289,23 +275,52 @@ const styles = StyleSheet.create({
   bottomSection: {
     backgroundColor: '#FFFFFF',
     paddingBottom: 18,
+    width: '100%',
+    alignSelf: 'stretch',
+    overflow: 'visible',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
     paddingTop: 4,
     paddingBottom: 20,
     minHeight: 80,
     width: '100%',
+    alignSelf: 'stretch',
+    overflow: 'visible',
+  },
+  navRowInner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    minWidth: 0,
+    overflow: 'visible',
+  },
+  navColumn: {
+    flexGrow: 0,
+    flexShrink: 0,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    overflow: 'hidden',
+  },
+  navColumnCenter: {
+    flexGrow: 0,
+    flexShrink: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
   },
   navItem: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     paddingVertical: 5,
-    flexShrink: 1,
     paddingHorizontal: 2,
+  },
+
+  navItemXplayNudge: {
+    paddingVertical: 4,
   },
   iconContainer: {
     width: 24,
@@ -313,6 +328,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
+  },
+  iconContainerXplayNudge: {
+    marginBottom: 3,
   },
   navIcon: {
     width: 20,
@@ -333,8 +352,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#4C4E55',
     textAlign: 'center',
+    alignSelf: 'center',
+    width: '100%',
     letterSpacing: 0.06,
-    maxWidth: '100%',
     overflow: 'hidden',
   },
   labelActive: {
