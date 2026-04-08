@@ -107,11 +107,13 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
   }, [v_7e32fb, v_7f2e65]);
 
   const v_d59c80 = v_de06a3(() => {
-
-    if (v_326be8.OS === 'ios') {
-      v_d35a1d(true);
-    }
-  }, []);
+    console.log('[ShowWebView] i 아이콘 클릭됨', {
+      platform: v_326be8.OS,
+      hasAdParams: !!v_d0b6d4,
+      adCompany: v_d0b6d4?.ad_company,
+    });
+    v_d35a1d(true);
+  }, [v_d0b6d4]);
 
   return (
     <View style={v_d81136.container}>
@@ -650,7 +652,7 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
       ) : null}
 
       {}
-      {v_326be8.OS === 'ios' && (
+      {true && (
         <Modal
           visible={v_46b261}
           transparent={true}
