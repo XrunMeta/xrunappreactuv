@@ -385,17 +385,7 @@ export const ShopScreen = () => {
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {tab === 'xplayShop' ? (
-                                            xplayBalanceLoading ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={styles.balanceAmount}>
-                                                    {xplayBalance == null ? '-' : xplayBalance.toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                     </View>
                                 </View>
                                 {tab === 'xplayShop' ? (
