@@ -714,28 +714,6 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
       {!isModal && <StatusBar style="dark" />}
 
       {}
-      {!isModal && (
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingHorizontal: 16,
-          paddingTop: insets.top + 12,
-          paddingBottom: 12,
-          borderBottomWidth: 1,
-          borderBottomColor: '#e0e0e0',
-          backgroundColor: '#fff',
-        }}>
-          <TouchableOpacity
-            onPress={handleClose}
-            style={{
-              padding: 8,
-            }}
-          >
-            <Ionicons name="close" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
-      )}
 
       {}
       {(isLoading || isProcessing || waitingForWebSocketResponse) && (

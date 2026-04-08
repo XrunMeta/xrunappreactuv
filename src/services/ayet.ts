@@ -32,10 +32,11 @@ export const initAyetSdk = async (memberId: string): Promise<boolean> => {
 const getDefaultAdSlotName = (): string =>
   Platform.OS === 'ios' ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || '25755') : AYET_AD_SLOT_NAME;
 
-const resolveAdSlotName = (adSlotName: string): string =>
-  Platform.OS === 'ios' && adSlotName === 'Xplay'
-    ? (getEnvValue('AYET_AD_SLOT_NAME_IOS') || '25755')
-    : adSlotName;
+const resolveAdSlotName = (adSlotName: string): string => {
+  if (adSlotName !== 'Xplay') return adSlotName;
+  if (Platform.OS === 'ios') return getEnvValue('AYET_AD_SLOT_NAME_IOS') || '25755';
+  return AYET_AD_SLOT_NAME; 
+};
 
 export const getAyetRewardConfig = () => {
   try {
