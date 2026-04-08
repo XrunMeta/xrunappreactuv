@@ -12,8 +12,7 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03, v_81c40d, v_4d25ff } from '../services';
-import type { v_20035e } from '../types';
+import { v_877de8, v_885e03, v_54d016 } from '../services';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -47,7 +46,7 @@ const v_426e67 = [
         id: '2',
         brand: 'Ethereum',
         title: 'Ethereum 교환권',
-        description: '최소 30,000 Xplay 이상 교환가능',
+        description: '최소 30,000 XRUN 이상 교환가능',
         price: 30000,
         image: v_74bda9,
     },
@@ -67,7 +66,7 @@ const v_426e67 = [
     },
 ];
 
-function v_02c692(item: v_20035e): ProductData {
+function v_02c692(v_8c0b26): ProductData {
 
     const v_0622fe = v_8c0b26.thumbnail || v_8c0b26.image;
     const v_74f4a3 = typeof v_0622fe === 'string' && v_0622fe.startsWith('http') ? v_0622fe : null;
@@ -100,7 +99,7 @@ export const v_10886b = () => {
     const { t: v_8d41d7 } = v_772971();
     const { showAlert: v_889fad } = v_4b1173();
     const { setSelectedShopItem: v_d0fbad, selectedShopItem: v_dfe883 } = v_700ef9();
-    const [v_11083e, v_94ee83] = v_5ab095<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+    const [v_11083e, v_94ee83] = v_5ab095<'xrunStore' | 'myItems'>('xrunStore');
 
     const [v_50b846, v_4ff2fa] = v_5ab095<v_d62ea7[]>([]);
     const [v_32c9b7, v_0e5971] = v_5ab095(false);
@@ -129,10 +128,10 @@ export const v_10886b = () => {
                 if (v_ba2215 == null) v_14129c(true);
                 return v_ba2215;
             });
-            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', v_660822);
-            const v_43c42e = await v_885e03(v_660822, v_9b57fc);
-            console.log('[ShopScreen] getXrunWalletBalance 결과:', v_43c42e);
-            const v_8decf8 = parseFloat(v_43c42e.formatted);
+            console.log('[ShopScreen] getUserBalance 호출 member=', v_660822);
+            const v_43c42e = await v_54d016(String(v_660822), v_9b57fc);
+            console.log('[ShopScreen] getUserBalance 결과:', v_43c42e);
+            const v_8decf8 = parseFloat(v_43c42e?.data?.realtimeBalance?.balance ?? '0');
             const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
             v_67ba02(v_3b402b);
             if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
@@ -205,7 +204,7 @@ export const v_10886b = () => {
 
                 const [v_0275c4, v_38fb16] = await Promise.allSettled([
                     v_877de8(v_660822, undefined),
-                    v_885e03(v_660822, undefined),
+                    v_54d016(String(v_660822), undefined),
                 ]);
                 if (v_2008a4) return;
                 if (v_0275c4.status === 'fulfilled') {
@@ -217,7 +216,7 @@ export const v_10886b = () => {
                     console.warn('[ShopScreen] xplay 잔액 실패:', v_0275c4.reason);
                 }
                 if (v_38fb16.status === 'fulfilled') {
-                    const v_8decf8 = parseFloat(v_38fb16.value?.formatted ?? '0');
+                    const v_8decf8 = parseFloat(v_38fb16.value?.data?.realtimeBalance?.balance ?? '0');
                     const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
                     console.log('[ShopScreen] xrun 잔액:', v_81e2ef);
                     v_67ba02(v_81e2ef);
@@ -252,7 +251,7 @@ export const v_10886b = () => {
     }, []);
 
     v_c4deb2(() => {
-        if (v_11083e === 'xplayShop') {
+        if (v_11083e === 'xrunStore') {
             v_0e5971(true);
             v_f61b49().finally(() => v_0e5971(false));
         }
@@ -265,24 +264,18 @@ export const v_10886b = () => {
 
     v_c4deb2(() => {
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
-            const v_378bd8 = (v_dfe883 as any).shopTab;
-            if (v_378bd8 === 'xplayShop' || v_378bd8 === 'xrunStore') {
-                v_94ee83(v_378bd8);
-
-                v_d0fbad(undefined);
-            }
+            v_94ee83('xrunStore');
+            v_d0fbad(undefined);
         }
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
 
     v_c4deb2(() => {
-        if (v_11083e === 'xplayShop') {
-            v_c1e7a4();
-        } else if (v_11083e === 'xrunStore') {
+        if (v_11083e === 'xrunStore') {
             v_abb08d();
             loadXrunStoreProducts();
         }
-    }, [v_11083e, v_c1e7a4, v_abb08d, loadXrunStoreProducts]);
+    }, [v_11083e, v_abb08d]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
@@ -294,7 +287,6 @@ export const v_10886b = () => {
 
     const v_1c4d31 = v_df9f57(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -381,7 +373,7 @@ export const v_10886b = () => {
                             <View style={v_d81136.xplayIconContainer}>
                                 <Image
                                     source={v_33c40c}
-                                    style={v_fa78fb ? v_d81136.xrunIcon : v_d81136.xplayIcon}
+                                    style={v_d81136.xrunIcon}
                                     resizeMode="contain"
                                 />
                             </View>
@@ -418,7 +410,7 @@ export const v_10886b = () => {
             />
             <View style={v_d81136.contentContainer}>
                 {}
-                {(v_11083e === 'xplayShop' || v_11083e === 'xrunStore') && (
+                {v_11083e === 'xrunStore' && (
                     <View style={v_d81136.balanceCardWrapper}>
                         <LinearGradient
                             colors={['#FFFFFF', '#F9FAFB', '#FFFFFF']}
@@ -432,38 +424,19 @@ export const v_10886b = () => {
                                 <View style={v_d81136.balanceLeft}>
                                     <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.shop.myBalance')}</Text>
                                     <View style={v_d81136.balanceAmountRow}>
-                                        <View style={[
-                                            v_d81136.balanceXplayIconContainer,
-                                            v_11083e === 'xrunStore' && v_d81136.balanceXrunIconContainer
-                                        ]}>
+                                        <View style={[v_d81136.balanceXplayIconContainer, v_d81136.balanceXrunIconContainer]}>
                                             <Image
                                                 source={v_33c40c}
                                                 style={v_d81136.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {v_11083e === 'xplayShop' ? (
-                                            v_837630 ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={v_d81136.balanceAmount}>
-                                                    {(v_cd398d ?? 0).toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
                                     </View>
                                 </View>
-                                {v_11083e === 'xplayShop' ? (
-                                    <View style={v_d81136.xplayTag}>
-                                        <Text style={v_d81136.xplayTagText}>XRUN</Text>
-                                    </View>
-                                ) : (
-                                    <View style={v_d81136.xrunTag}>
-                                        <Text style={v_d81136.xrunTagText}>XRUN</Text>
-                                    </View>
-                                )}
+                                <View style={v_d81136.xrunTag}>
+                                    <Text style={v_d81136.xrunTagText}>XRUN</Text>
+                                </View>
                             </View>
                         </LinearGradient>
                     </View>
@@ -485,12 +458,12 @@ export const v_10886b = () => {
                     backgroundColor="transparent"
                     disableBottomPadding={true}
                     refreshControl={
-                        v_11083e === 'xplayShop' ? (
+                        v_11083e === 'xrunStore' ? (
                             <RefreshControl refreshing={v_5605ec} onRefresh={v_f80453} colors={[v_1bfbd0.buttonPrimary]} />
                         ) : undefined
                     }
                 >
-                    {v_11083e === 'xplayShop' ? (
+                    {v_11083e === 'xrunStore' ? (
                         <>
                             {v_32c9b7 && !v_5605ec ? (
                                 <View style={v_d81136.loadingContainer}>
@@ -503,26 +476,13 @@ export const v_10886b = () => {
                                 </View>
                             ) : (
                                 <View style={v_d81136.productGrid}>
+                                    {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
                                     {v_50b846.map((v_8c0b26) =>
                                         v_80b207(v_9bd735(v_8c0b26), false)
                                     )}
                                 </View>
                             )}
                         </>
-                    ) : v_11083e === 'xrunStore' ? (
-                        v_a502c3 ? (
-                            <View style={v_d81136.emptyContainer}>
-                                <ActivityIndicator size="large" color={v_1bfbd0.primary} />
-                            </View>
-                        ) : v_7fb877.length === 0 ? (
-                            <View style={v_d81136.emptyContainer}>
-                                <Text style={v_d81136.emptyText}>{v_8d41d7('screens.shop.noProducts') || '등록된 상품이 없습니다.'}</Text>
-                            </View>
-                        ) : (
-                            <View style={v_d81136.productGrid}>
-                                {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                            </View>
-                        )
                     ) : (
                         <View style={v_d81136.emptyContainer}>
                             <Text style={v_d81136.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>

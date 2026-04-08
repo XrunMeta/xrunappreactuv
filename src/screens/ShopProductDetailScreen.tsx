@@ -18,7 +18,7 @@ import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
-const v_33c40c = require('../../assets/ad-round-logo.png');
+const v_33c40c = require('../../assets/xrun-round-logo.png');
 const v_74bda9 = require('../../assets/images/ethereum_thumb.png');
 
 const v_4e7e53 = 30000;
