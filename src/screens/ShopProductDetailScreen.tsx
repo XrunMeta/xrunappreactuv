@@ -484,7 +484,7 @@ export const v_a59951 = () => {
                                     <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={v_d81136.priceContainer}>
                                         <Image source={v_33c40c} style={v_d81136.coinIcon} resizeMode="contain" />
-                                        <Text style={v_d81136.paymentValue}>{v_e72b09.toLocaleString()} Xplay</Text>
+                                        <Text style={v_d81136.paymentValue}>{v_e72b09.toLocaleString()} XRUN</Text>
                                     </View>
                                 </View>
                                 <View style={v_d81136.paymentRow}>
@@ -493,14 +493,14 @@ export const v_a59951 = () => {
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={v_d81136.paymentBalance}>
-                                            {v_b7c830 == null ? '-' : `${v_b7c830.toLocaleString()} Xplay`}
+                                            {v_b7c830 == null ? '-' : `${v_b7c830.toLocaleString()} XRUN`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
                                     <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXplay')}</Text>
                                     <Text style={v_d81136.paymentRemaining}>
-                                        {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} Xplay`}
+                                        {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} XRUN`}
                                     </Text>
                                 </View>
                             </>
@@ -641,10 +641,10 @@ export const v_a59951 = () => {
                 <View style={v_d81136.modalOverlay}>
                     <View style={[v_d81136.paymentSuccessModal, v_a71862?.coupon_img_url ? v_d81136.paymentSuccessModalWide : undefined]}>
                         <View style={v_d81136.modalLogoContainer}>
-                            <Image source={v_10664a} style={v_d81136.modalLogo} resizeMode="contain" />
+                            <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={v_d81136.paymentSuccessMessage}>
-                            {v_a71862?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'Xplay 포인트 결제가 완료되었습니다'}
+                            {v_a71862?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'XRUN 결제가 완료되었습니다'}
                         </Text>
                         {v_a71862?.coupon_img_url ? (
                             <ScrollView style={v_d81136.couponBarcodeScroll} showsVerticalScrollIndicator={false}>
