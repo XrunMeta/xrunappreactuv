@@ -133,10 +133,12 @@ export const ShopScreen = () => {
                 if (prev == null) setXrunBalanceLoading(true);
                 return prev;
             });
-            console.log('[ShopScreen] getXrunWalletBalance 호출 member=', member);
-            const result = await getXrunWalletBalance(member, navigate);
-            console.log('[ShopScreen] getXrunWalletBalance 결과:', result);
-            const parsed = parseFloat(result?.balance ?? '0');
+            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', member);
+            const res: any = await fetchWalletData(Number(member), 7, navigate);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', parsed);
             const value = Number.isFinite(parsed) ? parsed : null;
             setXrunBalance(value);
             if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
@@ -208,13 +210,15 @@ export const ShopScreen = () => {
                 } catch {}
 
                 const xrunRes = await Promise.allSettled([
-                    getXrunWalletBalance(member, undefined),
+                    fetchWalletData(Number(member), 7, undefined),
                 ]);
                 if (cancelled) return;
                 if (xrunRes[0].status === 'fulfilled') {
-                    const parsed = parseFloat((xrunRes[0].value as any)?.balance ?? '0');
+                    const list: any[] = Array.isArray((xrunRes[0].value as any)?.data) ? (xrunRes[0].value as any).data : [];
+                    const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+                    const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
                     const v = Number.isFinite(parsed) ? parsed : 0;
-                    console.log('[ShopScreen] XRUN Wallet 잔액:', v);
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v);
                     setXrunBalance(v);
                     setXplayBalance(v);
                     AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
