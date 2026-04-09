@@ -2812,12 +2812,6 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               >
                 <Ionicons name="chevron-back" size={24} color="#000" />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleWebViewClose}
-                style={{ padding: 4, marginLeft: 4 }}
-              >
-                <Ionicons name="close" size={24} color="#000" />
-              </TouchableOpacity>
             </View>
 
             {}
