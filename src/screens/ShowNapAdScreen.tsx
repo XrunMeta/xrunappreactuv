@@ -858,20 +858,13 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         <View style={styles.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
-            <TouchableOpacity
-              onPress={handleWebViewClose}
-              style={styles.webViewCloseButton}
-            >
-              <Text style={styles.webViewCloseText}>{t('common.buttons.close')}</Text>
-            </TouchableOpacity>
-            <Text 
+            <Text
               style={styles.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
               {campaignData?.name || advertisementParams?.name || '광고 보기'}
             </Text>
-            <View style={styles.webViewCloseButton} />
           </View>
           {webViewUrl ? (
             <View style={styles.webViewWrapper}>
