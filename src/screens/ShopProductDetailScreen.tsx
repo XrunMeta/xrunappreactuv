@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 
@@ -404,15 +404,60 @@ export const ShopProductDetailScreen = () => {
     const xrunBalance = xrunBalanceState ?? 0;
     const remainingBalance = xrunBalance - product.price;
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState<boolean>(false);
+    const [xrunPurchaseLoading, setXrunPurchaseLoading] = useState<boolean>(false);
 
     const handlePurchase = () => {
+        if (xrunPurchaseLoading) return;
+        if (!member) {
+            showAlert(t('screens.shopProductDetail.alerts.notification'), '로그인이 필요합니다.', [{ text: t('screens.shopProductDetail.confirm') }]);
+            return;
+        }
+        if (xrunBalance < product.price) {
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXRUN'), [{ text: t('screens.shopProductDetail.confirm') }]);
+            return;
+        }
         showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
             { text: t('screens.shop.cancel') },
             {
                 text: t('screens.shop.purchase'),
-                onPress: () => {
-                    console.log('구매:', product.id);
-                    setPaymentSuccessVisible(true);
+                onPress: async () => {
+                    setXrunPurchaseLoading(true);
+                    try {
+                        const itemId = parseInt(String(product.id), 10);
+                        const res = await purchaseXrunItem(member, itemId, String(product.price), navigate);
+                        if (res?.status === 'success' && Number(res.code) === 200) {
+                            console.log('[XRUN 구매] 성공:', product.id);
+                            loadXrunBalance();
+                            setPaymentSuccessVisible(true);
+                        } else {
+                            const code = Number(res?.code);
+                            const rawMsg = res?.message || '';
+                            console.warn('[XRUN 구매] 실패:', code, rawMsg);
+                            let userMsg: string;
+                            if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
+                                userMsg = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (code === 404 || /not found/i.test(rawMsg)) {
+                                userMsg = '상품을 찾을 수 없습니다.';
+                            } else if (code === 400) {
+                                userMsg = '요청 정보가 올바르지 않습니다.';
+                            } else {
+                                const isEnglish = /^[\x00-\x7F\s]+$/.test(rawMsg);
+                                userMsg = isEnglish || !rawMsg ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : rawMsg;
+                            }
+                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
+                        }
+                    } catch (e: any) {
+                        console.error('[XRUN 구매] 오류:', e);
+                        const msg = e?.response?.data?.message ?? e?.message ?? '구매 처리 중 오류가 발생했습니다.';
+                        const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
+                        showAlert(
+                            t('screens.shopProductDetail.alerts.purchaseFailed'),
+                            isEnglish ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' : msg,
+                            [{ text: t('screens.shopProductDetail.confirm') }],
+                        );
+                    } finally {
+                        setXrunPurchaseLoading(false);
+                    }
                 }
             },
         ]);

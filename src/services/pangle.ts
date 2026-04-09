@@ -413,7 +413,13 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         );
 
         PangleModule.loadAndShowAppOpenAd(finalAdUnitId).catch((error: any) => {
-          console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', error);
+          const msg = String(error?.message ?? error ?? '');
+
+          if (/not supported|unsupported|unavailable/i.test(msg)) {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 미지원 — 스킵:', msg);
+          } else {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 호출 실패:', msg);
+          }
           if (!isResolved) {
             isResolved = true;
             closeSubscription?.remove();
