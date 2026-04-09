@@ -13,12 +13,13 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
+const v_47af4d = require('../../assets/xrun-horizontal-logo.png');
 const v_74bda9 = require('../../assets/images/ethereum_thumb.png');
 
 const v_4e7e53 = 30000;
@@ -89,6 +90,7 @@ export const v_a59951 = () => {
 
     const [v_90e57e, v_ccda6f] = v_5ab095<v_214820 | null>(null);
     const [v_39954a, v_8df718] = v_5ab095(false);
+    const [v_ca5e50, v_aad6d1] = v_5ab095<boolean>(false);
 
     const [v_7496db, v_5617d2] = v_5ab095<string | null>(null);
 
@@ -150,13 +152,12 @@ export const v_a59951 = () => {
         if (!v_660822) return;
         v_14129c(true);
         try {
-            const v_8f00b9 = await v_54d016(v_660822, undefined);
-            if (v_8f00b9?.status === 'success' && v_8f00b9?.data?.realtimeBalance) {
-                const v_c88e9b = parseFloat(v_8f00b9.data.realtimeBalance.balance);
-                v_0ce8dd(Number.isFinite(v_c88e9b) ? v_c88e9b : 0);
-            } else {
-                v_0ce8dd(0);
-            }
+
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, undefined);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_c88e9b = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            v_0ce8dd(Number.isFinite(v_c88e9b) ? v_c88e9b : 0);
         } catch (v_9e86fd) {
             console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', v_9e86fd);
             v_0ce8dd(0);
@@ -166,8 +167,8 @@ export const v_a59951 = () => {
     }, [v_660822]);
 
     v_c4deb2(() => {
-        if (!v_5db874 && v_660822) v_abb08d();
-    }, [v_5db874, v_660822, v_abb08d]);
+        if (v_660822) v_abb08d();
+    }, [v_660822, v_abb08d]);
 
     v_c4deb2(() => {
         if (!v_5db874 || !v_01bee9.id) return;
@@ -186,6 +187,8 @@ export const v_a59951 = () => {
             });
         return () => { v_2008a4 = true; };
     }, [v_5db874, v_01bee9.id]);
+
+    v_c4deb2(() => { v_aad6d1(false); }, [v_01bee9.id]);
 
     const v_b000c1 = v_de06a3(async () => {
         if (!v_660822 || v_18a900) return;
@@ -224,11 +227,14 @@ export const v_a59951 = () => {
 
                             const v_ce37ad = v_c99bd2 === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(v_badeaf);
                             const v_a2d859 = /E0010|비즈머니.*부족/i.test(v_badeaf);
+                            const v_d6be1a = /^[\x00-\x7F\s]+$/.test(v_badeaf);
                             const v_43f890 = v_f942f4 || v_a2d859
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : v_ce37ad
                                     ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                    : v_badeaf;
+                                    : v_d6be1a
+                                        ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+                                        : v_badeaf;
                             console.warn('[Xplay 구매] 실패:', v_c99bd2, v_badeaf);
                             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                         }
@@ -237,11 +243,14 @@ export const v_a59951 = () => {
                         const v_d308b5 = v_49263d?.response?.status;
                         const v_badeaf = v_49263d?.response?.data?.message ?? v_49263d?.message ?? '구매 처리 중 오류가 발생했습니다.';
 
+                        const v_d6be1a = typeof v_badeaf === 'string' && /^[\x00-\x7F\s]+$/.test(v_badeaf);
                         const v_43f890 = v_d308b5 === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : v_d308b5 === 404
                                 ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                : v_badeaf;
+                                : v_d6be1a
+                                    ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+                                    : v_badeaf;
                         console.error('[Xplay 구매] 오류:', v_d308b5, v_badeaf);
                         v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                     } finally {
@@ -422,9 +431,10 @@ export const v_a59951 = () => {
     const v_fa78fb = v_01bee9.isXrun || v_01bee9.brand === 'XRUN';
     const v_1efa5f = v_33c40c;
 
-    const v_fafc7f = (v_5db874 && v_90e57e?.goodsImgB) || (v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg)
-        ? { uri: (v_90e57e?.goodsImgB || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg) as string }
-        : v_01bee9.image;
+    const v_a7bcbf = (v_5db874 && v_90e57e?.goodsImgB) || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg || '';
+    const v_6ef3ee = v_a7bcbf ? { uri: v_a7bcbf } : v_01bee9.image;
+    const v_a12826 = v_ca5e50 || !v_6ef3ee;
+    console.log('[ShopProductDetail] 이미지 소스:', { remoteUri: v_a7bcbf, hasProductImage: !!v_01bee9.image, imageLoadFailed: v_ca5e50, usingFallback: !v_a7bcbf || v_ca5e50 });
     const v_ba7f97 = (v_5db874 && v_90e57e?.goodsName) ? v_90e57e.goodsName : v_01bee9.title;
     const v_b034a8 = (v_5db874 && v_90e57e?.brandName) ? v_90e57e.brandName : v_01bee9.brand;
 
@@ -452,9 +462,10 @@ export const v_a59951 = () => {
                         <View style={v_d81136.productImageContainer}>
                             <View style={v_d81136.productImageWrapper}>
                                 <Image
-                                    source={v_fafc7f}
+                                    source={v_a12826 ? v_47af4d : v_6ef3ee}
                                     style={v_d81136.productImage}
                                     resizeMode="contain"
+                                    onError={() => v_aad6d1(true)}
                                 />
                             </View>
                         </View>
@@ -489,18 +500,18 @@ export const v_a59951 = () => {
                                 </View>
                                 <View style={v_d81136.paymentRow}>
                                     <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.myXRUNBalance')}</Text>
-                                    {v_837630 ? (
+                                    {v_19340b ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={v_d81136.paymentBalance}>
-                                            {v_b7c830 == null ? '-' : `${v_b7c830.toLocaleString()} XRUN`}
+                                            {v_a1c497 == null ? '-' : `${v_a1c497.toLocaleString()} XRUN`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={v_d81136.paymentRowLast}>
                                     <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.remainingXRUN')}</Text>
                                     <Text style={v_d81136.paymentRemaining}>
-                                        {v_513fb9 == null ? '-' : `${v_513fb9.toLocaleString()} XRUN`}
+                                        {v_a1c497 == null ? '-' : `${(v_a1c497 - v_e72b09).toLocaleString()} XRUN`}
                                     </Text>
                                 </View>
                             </>
