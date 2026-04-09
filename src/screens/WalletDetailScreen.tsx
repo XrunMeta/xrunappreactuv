@@ -362,6 +362,20 @@ export const WalletDetailScreen = () => {
           return { data: [], total: 0, hasMore: false };
         }
 
+        const XRUN_POLYGON_CONTRACT = '0xda7cdea482b4e5f3d5b41aa286811d111f066b6b';
+        const expectedContract =
+          selectedWalletAsset.currency === 18
+            ? XRUN_POLYGON_CONTRACT.toLowerCase()
+            : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
+        const expectedSymbol = (selectedWalletAsset.symbol || '').toUpperCase();
+        response.data = response.data.filter((item: any) => {
+          const c = (item.contractAddress || '').toLowerCase();
+          const s = (item.tokenSymbol || '').toUpperCase();
+          if (expectedContract) return c === expectedContract;
+
+          return !s || s === expectedSymbol;
+        });
+
         const myAddressLower = publicAddress.toLowerCase();
 
         const userAddress = '0xc3769f23e0b94d5d36f558c8f79e81d589ea119f';

@@ -115,10 +115,19 @@ export const WalletTransactionProgressScreen = () => {
           : transferResult.data;
 
         if (transferResult.status !== 'success' || !transferData?.txHash) {
+          const rawMsg = transferResult.message || t('screens.walletTransactionProgress.noTxHash') || 'No transaction hash';
+          let krMsg = rawMsg;
+          if (/amount is zero|Required fields missing/i.test(rawMsg)) {
+            krMsg = '전송 금액이 0이거나 필수 정보가 누락되었습니다.';
+          } else if (/limit exceeded|transfer limit/i.test(rawMsg)) {
+            krMsg = '전송 가능 금액이 초과되었습니다.';
+          } else if (/insufficient/i.test(rawMsg)) {
+            krMsg = '잔액이 부족합니다.';
+          } else if (/^[\x00-\x7F\s]+$/.test(rawMsg)) {
+            krMsg = '전송 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+          }
           throw new Error(
-            (t('screens.walletTransactionProgress.transferFailed') || 'Transfer failed') +
-            ': ' +
-            (transferResult.message || t('screens.walletTransactionProgress.noTxHash') || 'No transaction hash')
+            (t('screens.walletTransactionProgress.transferFailed') || '전송 실패') + ': ' + krMsg
           );
         }
 
