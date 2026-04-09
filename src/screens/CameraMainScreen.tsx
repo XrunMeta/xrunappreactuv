@@ -2812,12 +2812,6 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               >
                 <Ionicons name="chevron-back" size={24} color="#000" />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={v_3aa877}
-                style={{ padding: 4, marginLeft: 4 }}
-              >
-                <Ionicons name="close" size={24} color="#000" />
-              </TouchableOpacity>
             </View>
 
             {}
