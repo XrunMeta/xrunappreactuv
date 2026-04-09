@@ -938,6 +938,7 @@ export interface GetMyGroupResponse {
   status: 'success' | 'error';
   data: MyGroupItem[];
   message?: string;
+  total8Depth?: number;
 }
 
 export interface GetMyRecommenderRequest {

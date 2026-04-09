@@ -72,7 +72,7 @@ const v_d81136 = v_472849.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 0,
     marginBottom: 16,
   },
   logo: {
