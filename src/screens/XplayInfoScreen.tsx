@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   balanceAmountRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: 8,
   },
   balanceXplayIconContainer: {
@@ -255,6 +255,8 @@ const styles = StyleSheet.create({
     minWidth: 60,
   },
   xplayTag: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
     backgroundColor: '#00d4ff',
     paddingHorizontal: 8,
     paddingVertical: 5,
