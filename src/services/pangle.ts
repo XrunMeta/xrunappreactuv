@@ -413,7 +413,13 @@ export const v_e55270 = async (): Promise<void> => {
         );
 
         v_dae2ac.loadAndShowAppOpenAd(v_819f69).catch((v_5e9bfe) => {
-          console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_5e9bfe);
+          const v_badeaf = String(v_5e9bfe?.message ?? v_5e9bfe ?? '');
+
+          if (/not supported|unsupported|unavailable/i.test(v_badeaf)) {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 미지원 — 스킵:', v_badeaf);
+          } else {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_badeaf);
+          }
           if (!v_695d96) {
             v_695d96 = true;
             v_e6ceb8?.remove();

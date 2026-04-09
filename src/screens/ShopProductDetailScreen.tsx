@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 
@@ -404,15 +404,60 @@ export const v_a59951 = () => {
     const v_1d54f1 = v_a1c497 ?? 0;
     const v_512b94 = v_1d54f1 - v_01bee9.price;
     const [v_80e2be, v_9375ae] = v_5ab095<boolean>(false);
+    const [v_03c827, v_e94938] = v_5ab095<boolean>(false);
 
     const v_dfaad1 = () => {
+        if (v_03c827) return;
+        if (!v_660822) {
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), '로그인이 필요합니다.', [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+            return;
+        }
+        if (v_1d54f1 < v_01bee9.price) {
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.insufficientXRUN'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+            return;
+        }
         v_889fad(v_8d41d7('screens.shop.purchaseConfirmTitle'), v_8d41d7('screens.shop.purchaseConfirmMessage', { title: v_01bee9.title }), [
             { text: v_8d41d7('screens.shop.cancel') },
             {
                 text: v_8d41d7('screens.shop.purchase'),
-                onPress: () => {
-                    console.log('구매:', v_01bee9.id);
-                    v_9375ae(true);
+                onPress: async () => {
+                    v_e94938(true);
+                    try {
+                        const v_6e55b1 = parseInt(String(v_01bee9.id), 10);
+                        const v_8f00b9 = await v_9c9f1b(v_660822, v_6e55b1, String(v_01bee9.price), v_9b57fc);
+                        if (v_8f00b9?.status === 'success' && Number(v_8f00b9.code) === 200) {
+                            console.log('[XRUN 구매] 성공:', v_01bee9.id);
+                            v_abb08d();
+                            v_9375ae(true);
+                        } else {
+                            const v_c99bd2 = Number(v_8f00b9?.code);
+                            const v_44854f = v_8f00b9?.message || '';
+                            console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f);
+                            let v_43f890;
+                            if (v_c99bd2 === 409 || /max purchase|limit reached/i.test(v_44854f)) {
+                                v_43f890 = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (v_c99bd2 === 404 || /not found/i.test(v_44854f)) {
+                                v_43f890 = '상품을 찾을 수 없습니다.';
+                            } else if (v_c99bd2 === 400) {
+                                v_43f890 = '요청 정보가 올바르지 않습니다.';
+                            } else {
+                                const v_d6be1a = /^[\x00-\x7F\s]+$/.test(v_44854f);
+                                v_43f890 = v_d6be1a || !v_44854f ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : v_44854f;
+                            }
+                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+                        }
+                    } catch (v_9e86fd) {
+                        console.error('[XRUN 구매] 오류:', v_9e86fd);
+                        const v_badeaf = v_9e86fd?.response?.data?.message ?? v_9e86fd?.message ?? '구매 처리 중 오류가 발생했습니다.';
+                        const v_d6be1a = typeof v_badeaf === 'string' && /^[\x00-\x7F\s]+$/.test(v_badeaf);
+                        v_889fad(
+                            v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'),
+                            v_d6be1a ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' : v_badeaf,
+                            [{ text: v_8d41d7('screens.shopProductDetail.confirm') }],
+                        );
+                    } finally {
+                        v_e94938(false);
+                    }
                 }
             },
         ]);
