@@ -221,7 +221,7 @@ const v_d81136 = v_472849.create({
   },
   balanceAmountRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
   },
   balanceXplayIconContainer: {
@@ -230,7 +230,7 @@ const v_d81136 = v_472849.create({
     borderRadius: 17,
     borderWidth: 1.108,
     borderColor: '#e5e7eb',
-    backgroundColor: '#171c2d',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
