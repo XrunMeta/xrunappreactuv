@@ -12,6 +12,8 @@ export const v_755eb9 = (): string => {
   return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
 };
 
+export const v_a57efd = (): string => v_e4a763().GATEWAY_NODEJS;
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -447,12 +449,21 @@ export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
   }
 };
 
-export const v_7488d5 = (v_c65f5d) => {
+export type CreateAxiosInstanceOptions = {
+
+  baseURL?: string;
+};
+
+export const v_7488d5 = (v_c65f5d, v_b36f96) => {
   const v_c9c489 = v_e4a763();
-  const v_fed274 = v_755eb9();
+  const v_fed274 = v_b36f96?.baseURL ?? v_755eb9();
   const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] API baseURL:', v_fed274);
+  console.log(
+    '[createAxiosInstance] API baseURL:',
+    v_fed274,
+    v_b36f96?.baseURL ? '(override: 이메일 인증 등)' : '',
+  );
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const v_0c3a5b = v_b5030f.create({
@@ -1247,7 +1258,9 @@ export const v_8025d1 = async (
   v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_897bd3 = {
       email: v_e0c7e8,
     };
@@ -1286,7 +1299,9 @@ export const v_415628 = async (
   v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_b2dc50 = {
       email: v_e0c7e8,
       code: v_c99bd2,
@@ -1328,7 +1343,9 @@ export const v_a81308 = async (
   v_c65f5d,
 ): Promise<v_2ff10f> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_5060a1 = {
       email: v_e0c7e8,
     };

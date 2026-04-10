@@ -53,16 +53,16 @@ export const v_dec378 = () => {
     try {
       v_10837f(true);
       console.log('[정보수정] 이메일 인증 코드 발송 요청:', v_e0c7e8.trim());
-
       const v_593e63 = await v_8025d1(v_e0c7e8.trim(), v_9b57fc);
-
       if (v_593e63) {
-
         v_b572c3(v_e0c7e8.trim());
         v_8f89f3(v_ce4741.myInfoEdit);
         v_9b57fc(v_ce4741.verificationCode);
       } else {
-        await v_889fad(v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'), v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
+        await v_889fad(
+          v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailed'),
+          v_8d41d7('screens.myInfoEmailAuth.alerts.sendFailedMessage'),
+        );
       }
     } catch (v_5e9bfe) {
       console.error('[정보수정] 이메일 전송 오류:', v_5e9bfe);

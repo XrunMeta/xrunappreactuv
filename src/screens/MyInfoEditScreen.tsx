@@ -87,7 +87,7 @@ export const v_cdb169 = () => {
   const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
   const { reset: v_487a25, canGoBack: v_7e32fb, goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
-  const { selectedCountryDialCode: v_459d5e, setSelectedCountryDialCode: v_f693e7, setVerificationEmail: v_b572c3, setVerificationSuccessRoute: v_8f89f3, setSelectMode: v_67ab1c } = v_700ef9();
+  const { selectedCountryDialCode: v_459d5e, setSelectedCountryDialCode: v_f693e7, setSelectMode: v_67ab1c } = v_700ef9();
 
   const v_00d52a = v_a3453e.useRef(false);
   const v_2ca208 = v_a3453e.useRef(false);
@@ -1319,25 +1319,29 @@ export const v_cdb169 = () => {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
       }
     } else {
-
       if (!v_e0c7e8) {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
         return;
       }
-
       try {
         console.log('[정보수정] 이메일 인증 코드 발송 요청:', v_e0c7e8);
         const v_593e63 = await v_8025d1(v_e0c7e8, v_9b57fc);
         if (v_593e63) {
-          v_b572c3(v_e0c7e8);
-          v_8f89f3(v_ce4741.myInfoPhoneEdit);
+          setVerificationEmail(v_e0c7e8);
+          setVerificationSuccessRoute(v_ce4741.myInfoPhoneEdit);
           v_9b57fc(v_ce4741.verificationCode);
         } else {
-          await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증 코드 발송에 실패했습니다.');
+          await v_889fad(
+            v_8d41d7('screens.myInfoEdit.alerts.error'),
+            v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증 코드 발송에 실패했습니다.',
+          );
         }
       } catch (v_5e9bfe) {
         console.error('[정보수정] 이메일 인증 오류:', v_5e9bfe);
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증 오류가 발생했습니다.');
+        await v_889fad(
+          v_8d41d7('screens.myInfoEdit.alerts.error'),
+          v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증 오류가 발생했습니다.',
+        );
       }
     }
   };

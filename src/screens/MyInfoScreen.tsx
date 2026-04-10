@@ -212,11 +212,9 @@ export const v_03a231 = () => {
         const v_1fa4eb = v_861648 === 'apple';
 
         if (v_1fa4eb) {
-
           console.log('[내 정보] 애플 로그인 → 정보 수정 화면으로 직접 이동');
           v_9b57fc(v_ce4741.myInfoEdit);
         } else {
-
           console.log('[내 정보] 일반 로그인 → 이메일 인증 화면으로 이동');
           if (v_bb789b?.email) {
             v_b572c3(v_bb789b.email);
