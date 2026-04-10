@@ -12,6 +12,8 @@ export const getApiBaseUrl = (): string => {
   return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
 };
 
+export const getEmailAuthApiBaseUrl = (): string => getEnv().GATEWAY_NODEJS;
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -447,12 +449,21 @@ export const getAndroidWalletShowStatus = async (navigation?: any): Promise<bool
   }
 };
 
-export const createAxiosInstance = (navigation?: any) => {
+export type CreateAxiosInstanceOptions = {
+
+  baseURL?: string;
+};
+
+export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInstanceOptions) => {
   const env = getEnv();
-  const baseURL = getApiBaseUrl();
+  const baseURL = options?.baseURL ?? getApiBaseUrl();
   const authCode = env.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] API baseURL:', baseURL);
+  console.log(
+    '[createAxiosInstance] API baseURL:',
+    baseURL,
+    options?.baseURL ? '(override: 이메일 인증 등)' : '',
+  );
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const instance = axios.create({
@@ -1247,7 +1258,9 @@ export const sendEmailVerificationCode = async (
   navigation?: any,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailVerificationRequest = {
       email,
     };
@@ -1286,7 +1299,9 @@ export const verifyEmailCode = async (
   navigation?: any,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailVerificationCodeRequest = {
       email,
       code,
@@ -1328,7 +1343,9 @@ export const loginWithEmailAuth = async (
   navigation?: any,
 ): Promise<EmailAuthLoginResponse> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailAuthLoginRequest = {
       email,
     };

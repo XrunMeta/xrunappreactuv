@@ -53,16 +53,16 @@ export const MyInfoEmailAuthScreen = () => {
     try {
       setSending(true);
       console.log('[정보수정] 이메일 인증 코드 발송 요청:', email.trim());
-
       const success = await sendEmailVerificationCode(email.trim(), navigate);
-
       if (success) {
-
         setVerificationEmail(email.trim());
         setVerificationSuccessRoute(ROUTES.myInfoEdit);
         navigate(ROUTES.verificationCode);
       } else {
-        await showAlert(t('screens.myInfoEmailAuth.alerts.sendFailed'), t('screens.myInfoEmailAuth.alerts.sendFailedMessage'));
+        await showAlert(
+          t('screens.myInfoEmailAuth.alerts.sendFailed'),
+          t('screens.myInfoEmailAuth.alerts.sendFailedMessage'),
+        );
       }
     } catch (error) {
       console.error('[정보수정] 이메일 전송 오류:', error);

@@ -41,7 +41,6 @@ import {
   checkEmailAvailability,
   checkReferralEmail,
   signup,
-  checkLogin,
   SignupHelpers,
   getClauseContent,
   encryptSHA256,
@@ -1002,7 +1001,6 @@ export const SignupScreen = () => {
       console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
 
       try {
-
         const pendingSignupData = {
           email: email.trim(),
           password: password,
