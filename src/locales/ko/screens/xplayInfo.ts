@@ -1,5 +1,5 @@
 export default {
-  totalPaidAmount: '총 지급 금액',
+  totalPaidAmount: '내 잔액',
   quest: '퀘스트',
   inviteCta: '친구를 초대하고 5 XRUN 씩 받자!',
   alerts: {
