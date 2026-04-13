@@ -13,7 +13,7 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_570c34 } from '../components';
 import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04, v_843035 } from '../constants';
 
-const v_0e6e65 = 'https://oth-path-d2a757.example.invalid/oth-path';
+const v_0e6e65 = 'https://oth-path-f0013c.example.invalid/oth-path';
 
 type FaqItem = {
   id: string;

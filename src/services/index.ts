@@ -5632,7 +5632,7 @@ export const v_4dba02 = async (
   const v_8adf57 = v_74cb95[v_4898e2];
 
   try {
-    const v_eb792a = await fetch(`https://oth-path-d2a757.example.invalid/agreements?type=${v_8adf57}`);
+    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements?type=${v_8adf57}`);
     const v_9390e8 = await v_eb792a.json() as any;
 
     if (v_9390e8.code !== 200 || !v_9390e8.data?.content) {
@@ -5658,7 +5658,7 @@ export const v_519669 = async (
 
   try {
     const v_b67de5 = v_3b27d9 ? `?type=${v_74cb95[v_3b27d9]}` : '?type=1';
-    const v_eb792a = await fetch(`https://oth-path-d2a757.example.invalid/agreements${v_b67de5}`);
+    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements${v_b67de5}`);
     const v_9390e8 = await v_eb792a.json() as any;
 
     return {

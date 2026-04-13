@@ -623,7 +623,7 @@ export const v_680bee = () => {
                     <>
                       <Text style={v_d81136.currentImageLabel}>{v_8d41d7('screens.shopItemRegister.currentImage')}</Text>
                       <Image
-                        source={{ uri: `https://oth-path-d2a757.example.invalid/files/${v_373157}?raw=1` }}
+                        source={{ uri: `https://oth-path-f0013c.example.invalid/files/${v_373157}?raw=1` }}
                         style={v_d81136.currentImagePreview}
                       />
                     </>
