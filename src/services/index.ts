@@ -5632,7 +5632,7 @@ export const getClauseContent = async (
   const typeNumber = typeMap[clauseType];
 
   try {
-    const resp = await fetch(`https://edge.example.invalid/agreements?type=${typeNumber}`);
+    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements?type=${typeNumber}`);
     const data = await resp.json() as any;
 
     if (data.code !== 200 || !data.data?.content) {
@@ -5658,7 +5658,7 @@ export const getAgreementByType = async (
 
   try {
     const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
-    const resp = await fetch(`https://edge.example.invalid/agreements${typeParam}`);
+    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements${typeParam}`);
     const data = await resp.json() as any;
 
     return {

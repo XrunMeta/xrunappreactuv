@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES, FONTS } from '../constants';
 
-const FAQ_API = 'https://edge.example.invalid/oth-path';
+const FAQ_API = 'https://oth-path-gw.example.invalid/oth-path';
 
 type FaqItem = {
   id: string;

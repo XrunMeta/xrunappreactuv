@@ -623,7 +623,7 @@ export const ShopItemRegisterScreen = () => {
                     <>
                       <Text style={styles.currentImageLabel}>{t('screens.shopItemRegister.currentImage')}</Text>
                       <Image
-                        source={{ uri: `https://edge.example.invalid/files/${imageFileId}?raw=1` }}
+                        source={{ uri: `https://oth-path-gw.example.invalid/files/${imageFileId}?raw=1` }}
                         style={styles.currentImagePreview}
                       />
                     </>
