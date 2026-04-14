@@ -12,7 +12,7 @@ export const getApiBaseUrl = (): string => {
   return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
 };
 
-export const getEmailAuthApiBaseUrl = (): string => getEnv().GATEWAY_NODEJS;
+export const getEmailAuthApiBaseUrl = (): string => getApiBaseUrl();
 
 export * from './googleAuth';
 

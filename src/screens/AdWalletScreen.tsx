@@ -41,6 +41,8 @@ interface AdEntry {
   originalDescription?: string; 
   rewardDescription?: string; 
   extrastr3?: string; 
+  extrastr4?: string; 
+  adName?: string; 
   hasAttended?: boolean; 
   is_rewarded?: boolean; 
   attendance_date?: string; 
@@ -150,10 +152,26 @@ export const AdWalletScreen = () => {
     if (!member) return;
 
     const loadTopBanners = async () => {
+
+      if (tab === 'pending') {
+
+        setTimeout(() => {
+          const totalXrun = pendingBannerRef.current.totalXrun;
+          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          let krwamount = '0 KRW';
+          if (gopaxPrice && totalXrun > 0) {
+            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
+            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            krwamount = `KRW ${formatted}`;
+          }
+          setTopBannersData({ krwamount, amountasxrun });
+        }, 500);
+        return;
+      }
       setTopBannersLoading(true);
       try {
         let response;
-        if (tab === 'pending' || tab === 'quest') {
+        if (tab === 'quest') {
           response = await fetchADXRUNTopBanners(member);
         } else {
           response = await fetchADXRUNTopBannersSettled(member);
@@ -165,8 +183,7 @@ export const AdWalletScreen = () => {
           const transaction = responseData.transactions[0];
 
           const amountAsXrunNum = parseFloat(transaction.amountasxrun || '0');
-          const flooredAmount = Math.floor(amountAsXrunNum * 100) / 100;
-          const amountasxrun = `${flooredAmount.toFixed(2)} XRUN`;
+          const amountasxrun = `${amountAsXrunNum.toFixed(2)} XRUN`;
 
           let krwamount = '0 KRW';
           if (gopaxPrice && transaction.amountasxrun) {
@@ -355,6 +372,7 @@ export const AdWalletScreen = () => {
         expectedAdRevenueColor: '#707070',
         adRevenueSettlementColor: '#343434',
         extrastr3: item.extrastr3,
+        adName: (item as any).adName || undefined,
       };
     },
     [t, formatDate],
@@ -503,32 +521,48 @@ export const AdWalletScreen = () => {
         item.action === 3304 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
       const date = formatDate(item.datetime);
 
-      let expectedAdRevenue = '0 XRUN';
-      expectedAdRevenue = `${item.expected} XRUN`;
+      const extrastr3 = (item as any).extrastr3 || null;
+      let typeLabel = '';
+      if (extrastr3 === '출석보상') typeLabel = '출석체크';
+      else if (extrastr3 === '추천인이벤트') typeLabel = '추천인보상';
+      else if (extrastr3 === 'zone1-instant') typeLabel = 'PLAY ZONE1 보상';
+      else if (extrastr3 === 'zone2-instant') typeLabel = 'PLAY ZONE2 보상';
 
       let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
         const settlementNum = parseFloat(item.amountasxrun);
-        const flooredSettlement = Math.floor(settlementNum * 100) / 100;
-        adRevenueSettlement = `${flooredSettlement.toFixed(2)} XRUN`;
+        const flooredSettlement = Math.floor(settlementNum * 10000) / 10000;
+
+        const formatted = flooredSettlement % 1 === 0 || Math.round(flooredSettlement * 100) / 100 === flooredSettlement
+          ? flooredSettlement.toFixed(2)
+          : parseFloat(flooredSettlement.toFixed(4)).toString();
+        adRevenueSettlement = `${formatted} XRUN`;
       }
+
+      let expectedAdRevenue = '0 XRUN';
+      expectedAdRevenue = typeLabel ? `${typeLabel}` : `${item.expected} XRUN`;
 
       const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';
       const adRevenueSettlementColor =
         status === t('screens.adWallet.settled') ? '#111111' : '#343434';
 
       return {
-        id: item.id,
+        id: item.id || item.transaction,
         status,
         date,
         expectedAdRevenue,
         adRevenueSettlement,
         expectedAdRevenueColor,
         adRevenueSettlementColor,
+        extrastr3,
+        extrastr4: (item as any).extrastr4 || undefined,
       };
     },
     [t, formatDate],
   );
+
+  const pendingTotalRef = useRef<number>(0);
+  const pendingBannerRef = useRef<{ totalXrun: number; updated: boolean }>({ totalXrun: 0, updated: false });
 
   const fetchPendingData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
@@ -544,6 +578,19 @@ export const AdWalletScreen = () => {
         const pagination = estimateResponseData.pagination;
 
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
+
+        const pageSum = estimateItems.reduce((sum: number, item: any) => {
+          const val = parseFloat(item.amountasxrun || '0');
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
+
+        if (params.page === 1) {
+          pendingTotalRef.current = pageSum;
+        } else {
+          pendingTotalRef.current += pageSum;
+        }
+
+        pendingBannerRef.current = { totalXrun: pendingTotalRef.current, updated: true };
 
         let hasMore = false;
         if (pagination) {
@@ -767,35 +814,18 @@ export const AdWalletScreen = () => {
 
       try {
         const response = await fetchADXRUNResultList(member, params.page);
-
         const responseData = response.data || response;
         const items = responseData.items || responseData || [];
         const pagination = responseData.pagination;
-
-        console.log('🔍 [fetchSettledData] responseData:', responseData);
-
         const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
-
-        let hasMore = false;
-        if (pagination) {
-          hasMore = pagination.hasNextPage || false;
-        } else {
-          hasMore = items.length > 0 && items.length >= params.pageSize;
-        }
-
-        console.log('🔍 [fetchSettledData] adEntries:', response);
-
-        return {
-          data: adEntries,
-          total: adEntries.length,
-          hasMore,
-        };
+        const hasMore = pagination ? (pagination.hasNextPage || false) : (items.length > 0 && items.length >= params.pageSize);
+        return { data: adEntries, total: adEntries.length, hasMore };
       } catch (error: any) {
         console.error('Failed to fetch settled data:', error);
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertResultToAdEntry],
+    [member, convertResultToAdEntry, t],
   );
 
   const handleTabChange = useCallback((value: TabValue) => {
@@ -1291,8 +1321,8 @@ export const AdWalletScreen = () => {
 
   const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
-    const isQuest = itemTab === 'pending' ? false : (!!item.title || item.extrastr3 === '추천인이벤트');
     const { onPress, tab: itemTab, ...itemData } = item;
+    const isQuest = (itemTab === 'pending' || itemTab === 'settled') ? false : (!!item.title || item.extrastr3 === '추천인이벤트');
 
     const isAttendanceQuest = item.eventType === 'attendance' ||
       (typeof item.id === 'string' && item.id.startsWith('attendance_'));
@@ -1396,6 +1426,13 @@ export const AdWalletScreen = () => {
               </Text>
             </View>
           )
+        ) : (itemTab === 'settled' && item.extrastr3 === '출석보상') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>출석체크</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
         ) : (itemTab !== 'pending' && item.extrastr3 === '출석보상') ? (
           <View style={styles.adCardRow}>
             <Text style={[
@@ -1410,6 +1447,27 @@ export const AdWalletScreen = () => {
               questHasAttended === true && { color: disabledColor }
             ]}>
               {item.expectedAdRevenue}
+            </Text>
+          </View>
+        ) : (itemTab === 'settled' && item.extrastr3 === '추천인이벤트') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>{item.extrastr4 || '추천인보상'}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab === 'settled' && item.extrastr3 === 'zone1-instant') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>PLAY ZONE1 보상</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab === 'settled' && item.extrastr3 === 'zone2-instant') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>PLAY ZONE2 보상</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
             </Text>
           </View>
         ) : (itemTab !== 'pending' && item.extrastr3 === '추천인이벤트') ? (
@@ -1430,6 +1488,12 @@ export const AdWalletScreen = () => {
           </View>
         ) : (
           <>
+            {}
+            {itemTab === 'pending' && item.adName && (
+              <Text style={[styles.adCardRowLabel, { maxWidth: '70%', marginBottom: 4 }]} numberOfLines={1} ellipsizeMode="tail">
+                {item.adName}
+              </Text>
+            )}
             {}
             {itemTab !== 'settled' && (
               <View style={styles.adCardRow}>
@@ -1452,7 +1516,7 @@ export const AdWalletScreen = () => {
                 </Text>
               </View>
             )}
-            {!isQuest && item.extrastr3 !== '출석보상' && (
+            {!isQuest && item.extrastr3 !== '출석보상' && itemTab === 'settled' && (
               <View style={styles.adCardRow}>
                 <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
                 <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
