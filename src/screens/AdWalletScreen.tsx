@@ -1482,7 +1482,7 @@ export const AdWalletScreen = () => {
           </View>
         ) : (itemTab === 'settled' && item.extrastr3 === '추천인이벤트') ? (
           <View style={styles.adCardRow}>
-            <Text style={styles.adCardRowLabel}>{item.extrastr4 || '추천인보상'}</Text>
+            <Text style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? `추천인보상(${item.extrastr4})` : '추천인보상'}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
