@@ -168,14 +168,25 @@ export const AdWalletScreen = () => {
         }, 500);
         return;
       }
+
+      if (tab === 'quest') {
+        setTimeout(() => {
+          const totalXrun = questBannerRef.current.totalXrun;
+          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          let krwamount = '0 KRW';
+          if (gopaxPrice && totalXrun > 0) {
+            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
+            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            krwamount = `KRW ${formatted}`;
+          }
+          setTopBannersData({ krwamount, amountasxrun });
+        }, 500);
+        return;
+      }
       setTopBannersLoading(true);
       try {
         let response;
-        if (tab === 'quest') {
-          response = await fetchADXRUNTopBanners(member);
-        } else {
-          response = await fetchADXRUNTopBannersSettled(member);
-        }
+        response = await fetchADXRUNTopBannersSettled(member);
 
         const responseData = response.data || response;
 
@@ -564,6 +575,8 @@ export const AdWalletScreen = () => {
   const pendingTotalRef = useRef<number>(0);
   const pendingBannerRef = useRef<{ totalXrun: number; updated: boolean }>({ totalXrun: 0, updated: false });
 
+  const questBannerRef = useRef<{ totalXrun: number; updated: boolean }>({ totalXrun: 0, updated: false });
+
   const fetchPendingData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
       if (!member) {
@@ -581,7 +594,8 @@ export const AdWalletScreen = () => {
 
         const pageSum = estimateItems.reduce((sum: number, item: any) => {
           const val = parseFloat(item.amountasxrun || '0');
-          return sum + (isNaN(val) ? 0 : val);
+          const floored = Math.floor(val * 100) / 100;
+          return sum + (isNaN(floored) ? 0 : floored);
         }, 0);
 
         if (params.page === 1) {
@@ -792,6 +806,19 @@ export const AdWalletScreen = () => {
           필터링후: filteredByDate.length,
           제거된항목수: sortedAdEntries.length - filteredByDate.length,
         });
+
+        const availableSum = filteredByDate.reduce((sum: number, entry: AdEntry) => {
+
+          const isAttRewarded = isAttendanceQuest(entry) && entry.is_rewarded === true;
+
+          const isRefReview = entry.isReferralEvent && !entry.isReferralInvite && entry.eventStatus === 'review';
+
+          if (entry.isReferralInvite) return sum;
+          if (isAttRewarded || isRefReview) return sum;
+          const val = parseFloat(entry.expectedAdRevenue || '0');
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
+        questBannerRef.current = { totalXrun: availableSum, updated: true };
 
         return {
           data: filteredByDate,
@@ -1306,7 +1333,11 @@ export const AdWalletScreen = () => {
   }, [tab, member, goBack, t, userEmail, showAlert]);
 
   const summaryLabel = useMemo(
-    () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
+    () => {
+      if (tab === 'quest') return '획득가능 금액';
+      if (tab === 'pending') return t('screens.adWallet.expectedAmount');
+      return t('screens.adWallet.confirmedAmount');
+    },
     [tab, t],
   );
 
@@ -1558,7 +1589,7 @@ export const AdWalletScreen = () => {
                   </View>
                   <Text style={styles.summaryLabel}>{summaryLabel}</Text>
                 </View>
-                <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>
+                {tab === 'pending' && <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>}
               </View>
               <Text style={styles.summaryValue}>
                 {topBannersLoading ? '...' : topBannersData.amountasxrun}
