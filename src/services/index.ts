@@ -12,7 +12,7 @@ export const v_755eb9 = (): string => {
   return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
 };
 
-export const v_a57efd = (): string => v_e4a763().GATEWAY_NODEJS;
+export const v_a57efd = (): string => v_755eb9();
 
 export * from './googleAuth';
 
