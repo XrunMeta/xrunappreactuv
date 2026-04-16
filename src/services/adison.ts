@@ -33,7 +33,17 @@ const isAvailable = (): boolean => !!AdisonModule;
 
 const getAppKey = (): string => {
   const env = getEnv();
-  return Platform.OS === 'ios' ? env.ADISON_APP_KEY_IOS : env.ADISON_APP_KEY_ANDROID;
+  const isDev = (env.ADISON_SERVER || 'production').toLowerCase() === 'development';
+  if (Platform.OS === 'ios') {
+    return isDev ? env.ADISON_APP_KEY_IOS_DEV : env.ADISON_APP_KEY_IOS_PRD;
+  }
+  return isDev ? env.ADISON_APP_KEY_ANDROID_DEV : env.ADISON_APP_KEY_ANDROID_PRD;
+};
+
+export const getAdisonCallbackUrl = (): string => {
+  const env = getEnv();
+  const isDev = (env.ADISON_SERVER || 'production').toLowerCase() === 'development';
+  return isDev ? env.ADISON_CALLBACK_URL_DEV : env.ADISON_CALLBACK_URL_PRD;
 };
 
 export const buildAdisonUid = (memberId: string | number): string => {
@@ -51,7 +61,14 @@ export const initAdison = async (): Promise<boolean> => {
   if (initialized) return true;
   try {
     const env = getEnv();
-    await AdisonModule!.initialize(getAppKey(), env.ADISON_SERVER || 'production');
+    const appKey = getAppKey();
+    if (!appKey) {
+      console.warn(
+        `[adison] 매체 앱 키가 비어 있습니다. ADISON_SERVER=${env.ADISON_SERVER}. DEV 전환이라면 env.ts 에 ADISON_APP_KEY_*_DEV 를 채워주세요.`
+      );
+      return false;
+    }
+    await AdisonModule!.initialize(appKey, env.ADISON_SERVER || 'production');
     AdisonModule!.setConfig(env.ADISON_OFFERWALL_TITLE || '바로 적립 받기', 'LIST', 'Light');
     initialized = true;
     return true;
