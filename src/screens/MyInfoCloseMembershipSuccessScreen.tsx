@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { logout } from '../services';
+import { unbindAdisonUid } from '../services/adison';
 import { COMMON_STYLES, FONTS } from '../constants';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
@@ -32,6 +33,8 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
           }
         }
       }
+
+      try { unbindAdisonUid(); } catch (_) {}
 
       await AsyncStorage.removeItem('isLoggedIn');
       await AsyncStorage.removeItem('userEmail');

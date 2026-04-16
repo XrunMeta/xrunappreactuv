@@ -14,6 +14,7 @@ import { Header, TaboolaBanner } from '../components';
 import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
+import { unbindAdisonUid } from '../services/adison';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -272,6 +273,8 @@ export const MyInfoScreen = () => {
               } else {
                 console.log('[로그아웃] 사용자 정보 없음 - 로컬 데이터만 삭제하고 로그인 화면으로 이동');
               }
+
+              try { unbindAdisonUid(); } catch (_) {}
 
               await AsyncStorage.removeItem('isLoggedIn');
               await AsyncStorage.removeItem('userEmail');

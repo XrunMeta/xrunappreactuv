@@ -24,6 +24,7 @@ import {
 import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { setAyetUserId } from '../services/ayet';
+import { bindAdisonUid } from '../services/adison';
 import {
   loginWithEmailPassword,
   encryptSHA256,
@@ -239,6 +240,7 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email.trim());
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) bindAdisonUid(userData.member);
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -346,6 +348,7 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', userEmail);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) bindAdisonUid(userData.member);
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -460,6 +463,7 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) bindAdisonUid(userData.member);
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
@@ -605,6 +609,7 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) bindAdisonUid(userData.member);
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
