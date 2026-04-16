@@ -14,13 +14,11 @@ const { AdisonModule: v_37118b } = v_80fa10 as {
     setTargeting: (birthYear: number, gender: string | null) => void;
     showOfferwall: () => Promise<boolean>;
     showOfferwallAd: (adId: number, keepParent: boolean) => Promise<boolean>;
-    availableReward: () => Promise<{ name: string; unit: string; points: number }>;
+    availableReward: () => Promise<{ points: number }>;
   };
 };
 
 export interface AdisonReward {
-  name: string;
-  unit: string;
   points: number;
 }
 

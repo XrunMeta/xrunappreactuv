@@ -5,8 +5,8 @@ import co.adison.offerwall.Adison
 import co.adison.offerwall.AdisonConfig
 import co.adison.offerwall.AdisonListType
 import co.adison.offerwall.AdisonThemeMode
-import co.adison.offerwall.Gender
-import co.adison.offerwall.Server
+import co.adison.offerwall.model.AdisonServer
+import co.adison.offerwall.model.enums.AOGender
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -29,8 +29,8 @@ class AdisonModule(reactContext: ReactApplicationContext) :
             val context = reactApplicationContext.applicationContext
             Adison.initialize(context, appKey)
             Adison.setServer(
-                if (server.equals("development", ignoreCase = true)) Server.DEVELOPMENT
-                else Server.PRODUCTION
+                if (server.equals("development", ignoreCase = true)) AdisonServer.DEVELOPMENT
+                else AdisonServer.PRODUCTION
             )
             isInitialized = true
             Log.d("AdisonModule", "initialize ok: server=$server")
@@ -93,9 +93,9 @@ class AdisonModule(reactContext: ReactApplicationContext) :
                 Adison.setBirthYear(birthYear)
             }
             when (gender?.uppercase()) {
-                "M" -> Adison.setGender(Gender.MALE)
-                "F" -> Adison.setGender(Gender.FEMALE)
-                else -> Adison.setGender(Gender.UNKNOWN)
+                "M" -> Adison.setGender(AOGender.MALE)
+                "F" -> Adison.setGender(AOGender.FEMALE)
+                else -> Adison.setGender(AOGender.UNKNOWN)
             }
         } catch (e: Exception) {
             Log.w("AdisonModule", "setTargeting failed: ${e.message}")
@@ -105,10 +105,8 @@ class AdisonModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun availableReward(promise: Promise) {
         try {
-            Adison.availableReward { name, unit, points ->
+            Adison.availableRewards { points ->
                 val result = com.facebook.react.bridge.Arguments.createMap().apply {
-                    putString("name", name)
-                    putString("unit", unit)
                     putInt("points", points)
                 }
                 promise.resolve(result)

@@ -32,8 +32,8 @@ android {
         applicationId 'run.xrun.xrunapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 281
-        versionName "4.10.4"
+        versionCode 283
+        versionName "4.10.5"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -107,7 +107,7 @@ dependencies {
 
     implementation 'io.ayet:android-sdk-v2:1.0.2'
 
-    implementation('co.adison:adison-offerwall-sdk:+') {
+    implementation('co.adison:adison-offerwall-sdk:5.2.0') {
         transitive = true
     }
 
