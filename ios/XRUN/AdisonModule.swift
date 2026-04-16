@@ -53,6 +53,12 @@ class AdisonModule: NSObject {
       default:       config.themeMode = .light
       }
       Adison.shared.config = config
+
+      let colorScheme = AdisonColorScheme()
+      colorScheme.primaryColor = UIColor(red: 52/255, green: 58/255, blue: 90/255, alpha: 1)       
+      colorScheme.primaryColorVariant = UIColor(red: 37/255, green: 42/255, blue: 66/255, alpha: 1) 
+      colorScheme.onPrimaryColor = UIColor.white
+      Adison.shared.colorScheme = colorScheme
     }
   }
 
