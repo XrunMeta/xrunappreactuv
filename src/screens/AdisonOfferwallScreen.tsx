@@ -41,7 +41,10 @@ export const AdisonOfferwallScreen: React.FC = () => {
           if (userDataStr) {
             const userData = JSON.parse(userDataStr);
             if (userData?.member != null) {
-              bindAdisonUid(userData.member);
+              bindAdisonUid(userData.member, {
+                gender: userData.gender,
+                age: userData.age,
+              });
             }
           }
         } catch (_) {

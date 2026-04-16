@@ -240,7 +240,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email.trim());
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
-      if (userData.member != null) bindAdisonUid(userData.member);
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -348,7 +354,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', userEmail);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
-      if (userData.member != null) bindAdisonUid(userData.member);
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -463,7 +475,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
-      if (userData.member != null) bindAdisonUid(userData.member);
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
@@ -609,7 +627,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
-      if (userData.member != null) bindAdisonUid(userData.member);
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 

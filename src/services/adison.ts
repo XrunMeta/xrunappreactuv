@@ -91,7 +91,40 @@ export const setAdisonConfig = (
   }
 };
 
-export const bindAdisonUid = (memberId: string | number): string | null => {
+const xrunGenderToAdison = (code?: number | string | null): 'M' | 'F' | null => {
+  const n = typeof code === 'string' ? parseInt(code, 10) : code;
+  if (n === 2110) return 'M';
+  if (n === 2111) return 'F';
+  return null;
+};
+
+const xrunAgeToBirthYear = (code?: number | string | null): number => {
+  const n = typeof code === 'string' ? parseInt(code, 10) : code;
+  const currentYear = new Date().getFullYear();
+
+  switch (n) {
+    case 2210: return currentYear - 15; 
+    case 2220: return currentYear - 25; 
+    case 2230: return currentYear - 35; 
+    case 2240: return currentYear - 45; 
+    case 2250: return currentYear - 55; 
+    default: return 0;
+  }
+};
+
+export interface AdisonBindUserDataInput {
+
+  gender?: number | string | null;
+
+  age?: number | string | null;
+
+  birthYear?: number | null;
+}
+
+export const bindAdisonUid = (
+  memberId: string | number,
+  userData?: AdisonBindUserDataInput,
+): string | null => {
   if (!isAvailable()) return null;
   const uid = buildAdisonUid(memberId);
   try {
@@ -99,6 +132,22 @@ export const bindAdisonUid = (memberId: string | number): string | null => {
   } catch (e: any) {
     console.warn('[adison] setUid failed', e?.message ?? e);
   }
+
+  if (userData) {
+    const gender = xrunGenderToAdison(userData.gender);
+    const birthYear =
+      userData.birthYear && userData.birthYear > 0
+        ? userData.birthYear
+        : xrunAgeToBirthYear(userData.age);
+    if (gender || birthYear > 0) {
+      try {
+        AdisonModule!.setTargeting(birthYear, gender);
+      } catch (e: any) {
+        console.warn('[adison] setTargeting failed', e?.message ?? e);
+      }
+    }
+  }
+
   return uid;
 };
 
