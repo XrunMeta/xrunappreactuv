@@ -14,8 +14,15 @@ const { AdisonModule } = NativeModules as {
     setTargeting: (birthYear: number, gender: string | null) => void;
     showOfferwall: () => Promise<boolean>;
     showOfferwallAd: (adId: number, keepParent: boolean) => Promise<boolean>;
+    availableReward: () => Promise<{ name: string; unit: string; points: number }>;
   };
 };
+
+export interface AdisonReward {
+  name: string;
+  unit: string;
+  points: number;
+}
 
 export type AdisonListType = 'LIST' | 'FEED';
 export type AdisonTheme = 'Light' | 'Dark' | 'System';
@@ -126,6 +133,17 @@ export const showAdisonOfferwallAd = async (
   } catch (e: any) {
     console.warn('[adison] showOfferwallAd failed', e?.message ?? e);
     return false;
+  }
+};
+
+export const getAdisonAvailableReward = async (): Promise<AdisonReward | null> => {
+  if (!isAvailable()) return null;
+  try {
+    const result = await AdisonModule!.availableReward();
+    return result;
+  } catch (e: any) {
+    console.warn('[adison] availableReward failed', e?.message ?? e);
+    return null;
   }
 };
 

@@ -26,4 +26,7 @@ RCT_EXTERN_METHOD(showOfferwallAd:(nonnull NSNumber *)adId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(availableReward:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
 @end

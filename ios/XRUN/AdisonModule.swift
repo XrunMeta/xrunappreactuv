@@ -125,4 +125,20 @@ class AdisonModule: NSObject {
       resolve(true)
     }
   }
+
+  @objc
+  func availableReward(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      Adison.shared.availableReward { name, unit, points in
+        resolve([
+          "name": name ?? "",
+          "unit": unit ?? "",
+          "points": points,
+        ])
+      }
+    }
+  }
 }
