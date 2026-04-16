@@ -23,6 +23,7 @@ const v_10664a = require('../../assets/xplay_symbol.png');
 const v_10a702 = require('../../assets/images/blur_yellow.png');
 const v_288e0b = require('../../assets/images/zone1.png');
 const v_3ce185 = require('../../assets/images/zone2.png');
+const v_d80408 = require('../../assets/images/zone3.png');
 const v_3d184e = require('../../assets/images/quest.png');
 
 export const v_305be8 = () => {
@@ -144,13 +145,12 @@ export const v_305be8 = () => {
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
-          {}
           <TouchableOpacity
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
           >
-            <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
+            <Image source={v_d80408} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 3</Text>
           </TouchableOpacity>
         </View>
