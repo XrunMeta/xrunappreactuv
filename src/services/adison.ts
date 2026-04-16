@@ -119,6 +119,27 @@ export interface AdisonBindUserDataInput {
   birthYear?: number | null;
 }
 
+const registerAdisonUidOnServer = (memberId: string | number, uid: string): void => {
+  const env = getEnv();
+  const base = (env.GATEWAY_WORKERS || '').replace(/\/oth-path\/?$/, '').replace(/\/$/, '');
+  if (!base) return;
+  const url = `${base}/registerAdisonUid`;
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ member: Number(memberId), uid }),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        console.warn('[adison] registerAdisonUid non-OK', res.status, t);
+      }
+    })
+    .catch((e: any) => {
+      console.warn('[adison] registerAdisonUid failed', e?.message ?? e);
+    });
+};
+
 export const bindAdisonUid = (
   memberId: string | number,
   userData?: AdisonBindUserDataInput,
@@ -130,6 +151,8 @@ export const bindAdisonUid = (
   } catch (e: any) {
     console.warn('[adison] setUid failed', e?.message ?? e);
   }
+
+  registerAdisonUidOnServer(memberId, uid);
 
   if (userData) {
     const gender = xrunGenderToAdison(userData.gender);
