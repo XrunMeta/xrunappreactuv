@@ -144,6 +144,15 @@ export const v_305be8 = () => {
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
+          {}
+          <TouchableOpacity
+            style={v_d81136.zoneCard}
+            activeOpacity={0.85}
+            onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
+          >
+            <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
+            <Text style={v_d81136.zoneCardTitle}>Xplay Zone 3</Text>
+          </TouchableOpacity>
         </View>
 
         {}

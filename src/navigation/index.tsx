@@ -81,6 +81,7 @@ export const v_ce4741 = {
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myChipsOfferwall: 'myChipsOfferwall',
+  adisonOfferwall: 'adisonOfferwall',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

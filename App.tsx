@@ -72,6 +72,7 @@ import {
   v_0ca15f,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
+import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
 
 import { v_00e8f9, v_a0daa8 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
@@ -586,6 +587,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myChipsOfferwall') {
     return <MyChipsOfferwallScreen />;
+  }
+
+  if (v_0f0c7b === 'adisonOfferwall') {
+    return <AdisonOfferwallScreen />;
   }
 
   if (v_0f0c7b === 'myinfoShopSales') {

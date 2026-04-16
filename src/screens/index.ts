@@ -70,4 +70,5 @@ export { WalletPrivateKeyDisplayScreen } from './WalletPrivateKeyDisplayScreen';
 export { WalletPrivateKeyGoogleAuthScreen } from './WalletPrivateKeyGoogleAuthScreen';
 export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
 export { MyChipsOfferwallScreen } from './MyChipsOfferwallScreen';
+export { AdisonOfferwallScreen } from './AdisonOfferwallScreen';
 
