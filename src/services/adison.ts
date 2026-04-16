@@ -119,6 +119,27 @@ export interface AdisonBindUserDataInput {
   birthYear?: number | null;
 }
 
+const v_328503 = (v_717992, v_0c8987): void => {
+  const v_c9c489 = v_e4a763();
+  const v_694b25 = (v_c9c489.GATEWAY_WORKERS || '').replace(/\/oth-path\/?$/, '').replace(/\/$/, '');
+  if (!v_694b25) return;
+  const v_f71b56 = `${v_694b25}/registerAdisonUid`;
+  fetch(v_f71b56, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ member: Number(v_717992), uid: v_0c8987 }),
+  })
+    .then(async (v_8f00b9) => {
+      if (!v_8f00b9.ok) {
+        const v_8d41d7 = await v_8f00b9.text().catch(() => '');
+        console.warn('[adison] registerAdisonUid non-OK', v_8f00b9.status, v_8d41d7);
+      }
+    })
+    .catch((v_9e86fd) => {
+      console.warn('[adison] registerAdisonUid failed', v_9e86fd?.message ?? v_9e86fd);
+    });
+};
+
 export const v_627d09 = (
   v_717992,
   v_ef7306,
@@ -130,6 +151,8 @@ export const v_627d09 = (
   } catch (v_9e86fd) {
     console.warn('[adison] setUid failed', v_9e86fd?.message ?? v_9e86fd);
   }
+
+  v_328503(v_717992, v_0c8987);
 
   if (v_ef7306) {
     const v_c3eac4 = v_dc137f(v_ef7306.gender);
