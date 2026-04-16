@@ -14,6 +14,7 @@ import { v_729608, v_4c7b5d } from '../components';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
+import { v_21ef1f } from '../services/adison';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -272,6 +273,8 @@ export const v_03a231 = () => {
               } else {
                 console.log('[로그아웃] 사용자 정보 없음 - 로컬 데이터만 삭제하고 로그인 화면으로 이동');
               }
+
+              try { v_21ef1f(); } catch (v_37eab7) {}
 
               await v_e84827.removeItem('isLoggedIn');
               await v_e84827.removeItem('userEmail');

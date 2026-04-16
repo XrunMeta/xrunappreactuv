@@ -107,6 +107,10 @@ dependencies {
 
     implementation 'io.ayet:android-sdk-v2:1.0.2'
 
+    implementation('co.adison:adison-offerwall-sdk:+') {
+        transitive = true
+    }
+
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";

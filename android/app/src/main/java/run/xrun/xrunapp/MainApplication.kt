@@ -26,6 +26,7 @@ class MainApplication : Application(), ReactApplication {
 
               add(PanglePackage())
               add(AyetOfferwallPackage())
+              add(AdisonPackage())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"

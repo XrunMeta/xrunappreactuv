@@ -29,6 +29,7 @@ allprojects {
     maven { url 'https://www.jitpack.io' }
     maven { url 'https://artifact.bytedance.com/repository/pangle' }
     maven { url 'https://sdk.tapjoy.com/' }
+    maven { url 'https://repo.nbt.com/repository/adison-ads-android' }
   }
 }
 
