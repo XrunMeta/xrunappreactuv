@@ -41,7 +41,10 @@ export const AdisonOfferwallScreen: v_a3453e.FC = () => {
           if (v_f24fd5) {
             const v_ef7306 = JSON.parse(v_f24fd5);
             if (v_ef7306?.member != null) {
-              v_627d09(v_ef7306.member);
+              v_627d09(v_ef7306.member, {
+                gender: v_ef7306.gender,
+                age: v_ef7306.age,
+              });
             }
           }
         } catch (v_37eab7) {

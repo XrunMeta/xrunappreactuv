@@ -240,7 +240,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8.trim());
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
-      if (v_ef7306.member != null) v_627d09(v_ef7306.member);
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -348,7 +354,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_f4fb5e);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
-      if (v_ef7306.member != null) v_627d09(v_ef7306.member);
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -463,7 +475,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
-      if (v_ef7306.member != null) v_627d09(v_ef7306.member);
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
@@ -609,7 +627,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
-      if (v_ef7306.member != null) v_627d09(v_ef7306.member);
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 

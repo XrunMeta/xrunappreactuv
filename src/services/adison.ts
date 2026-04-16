@@ -91,7 +91,40 @@ export const v_09cded = (
   }
 };
 
-export const v_627d09 = (v_717992): string | null => {
+const v_dc137f = (v_c99bd2): 'M' | 'F' | null => {
+  const v_f4e98d = typeof v_c99bd2 === 'string' ? parseInt(v_c99bd2, 10) : v_c99bd2;
+  if (v_f4e98d === 2110) return 'M';
+  if (v_f4e98d === 2111) return 'F';
+  return null;
+};
+
+const v_950423 = (v_c99bd2): number => {
+  const v_f4e98d = typeof v_c99bd2 === 'string' ? parseInt(v_c99bd2, 10) : v_c99bd2;
+  const v_7d8cc0 = new Date().getFullYear();
+
+  switch (v_f4e98d) {
+    case 2210: return v_7d8cc0 - 15; 
+    case 2220: return v_7d8cc0 - 25; 
+    case 2230: return v_7d8cc0 - 35; 
+    case 2240: return v_7d8cc0 - 45; 
+    case 2250: return v_7d8cc0 - 55; 
+    default: return 0;
+  }
+};
+
+export interface AdisonBindUserDataInput {
+
+  gender?: number | string | null;
+
+  age?: number | string | null;
+
+  birthYear?: number | null;
+}
+
+export const v_627d09 = (
+  v_717992,
+  v_ef7306,
+): string | null => {
   if (!v_2911e0()) return null;
   const v_0c8987 = v_3847b5(v_717992);
   try {
@@ -99,6 +132,22 @@ export const v_627d09 = (v_717992): string | null => {
   } catch (v_9e86fd) {
     console.warn('[adison] setUid failed', v_9e86fd?.message ?? v_9e86fd);
   }
+
+  if (v_ef7306) {
+    const v_c3eac4 = v_dc137f(v_ef7306.gender);
+    const v_a95e84 =
+      v_ef7306.birthYear && v_ef7306.birthYear > 0
+        ? v_ef7306.birthYear
+        : v_950423(v_ef7306.age);
+    if (v_c3eac4 || v_a95e84 > 0) {
+      try {
+        v_37118b!.setTargeting(v_a95e84, v_c3eac4);
+      } catch (v_9e86fd) {
+        console.warn('[adison] setTargeting failed', v_9e86fd?.message ?? v_9e86fd);
+      }
+    }
+  }
+
   return v_0c8987;
 };
 
