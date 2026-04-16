@@ -72,6 +72,7 @@ import {
   MyChipsOfferwallScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
+import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
 
 import { NavigationProvider, useAppNavigation } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
@@ -586,6 +587,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myChipsOfferwall') {
     return <MyChipsOfferwallScreen />;
+  }
+
+  if (currentScreen === 'adisonOfferwall') {
+    return <AdisonOfferwallScreen />;
   }
 
   if (currentScreen === 'myinfoShopSales') {

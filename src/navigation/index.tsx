@@ -81,6 +81,7 @@ export const ROUTES = {
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myChipsOfferwall: 'myChipsOfferwall',
+  adisonOfferwall: 'adisonOfferwall',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
