@@ -14,8 +14,15 @@ const { AdisonModule: v_37118b } = v_80fa10 as {
     setTargeting: (birthYear: number, gender: string | null) => void;
     showOfferwall: () => Promise<boolean>;
     showOfferwallAd: (adId: number, keepParent: boolean) => Promise<boolean>;
+    availableReward: () => Promise<{ name: string; unit: string; points: number }>;
   };
 };
+
+export interface AdisonReward {
+  name: string;
+  unit: string;
+  points: number;
+}
 
 export type AdisonListType = 'LIST' | 'FEED';
 export type AdisonTheme = 'Light' | 'Dark' | 'System';
@@ -126,6 +133,17 @@ export const v_0c65b4 = async (
   } catch (v_9e86fd) {
     console.warn('[adison] showOfferwallAd failed', v_9e86fd?.message ?? v_9e86fd);
     return false;
+  }
+};
+
+export const v_b91aa3 = async (): Promise<AdisonReward | null> => {
+  if (!v_2911e0()) return null;
+  try {
+    const v_43c42e = await v_37118b!.availableReward();
+    return v_43c42e;
+  } catch (v_9e86fd) {
+    console.warn('[adison] availableReward failed', v_9e86fd?.message ?? v_9e86fd);
+    return null;
   }
 };
 

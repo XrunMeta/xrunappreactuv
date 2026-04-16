@@ -5,6 +5,7 @@ import co.adison.offerwall.Adison
 import co.adison.offerwall.AdisonConfig
 import co.adison.offerwall.AdisonListType
 import co.adison.offerwall.AdisonThemeMode
+import co.adison.offerwall.Gender
 import co.adison.offerwall.Server
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -78,8 +79,7 @@ class AdisonModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun unsetUid() {
         try {
-
-            Adison.setUid("")
+            Adison.setUid(null)
             Log.d("AdisonModule", "unsetUid ok")
         } catch (e: Exception) {
             Log.e("AdisonModule", "unsetUid failed", e)
@@ -90,20 +90,32 @@ class AdisonModule(reactContext: ReactApplicationContext) :
     fun setTargeting(birthYear: Int, gender: String?) {
         try {
             if (birthYear > 0) {
-
-                Adison::class.java.getMethod("setBirthYear", Int::class.java)
-                    .invoke(null, birthYear)
+                Adison.setBirthYear(birthYear)
             }
             when (gender?.uppercase()) {
-                "M" -> Adison::class.java.getMethod("setGender", String::class.java)
-                    .invoke(null, "MALE")
-                "F" -> Adison::class.java.getMethod("setGender", String::class.java)
-                    .invoke(null, "FEMALE")
-                else -> {}
+                "M" -> Adison.setGender(Gender.MALE)
+                "F" -> Adison.setGender(Gender.FEMALE)
+                else -> Adison.setGender(Gender.UNKNOWN)
             }
         } catch (e: Exception) {
+            Log.w("AdisonModule", "setTargeting failed: ${e.message}")
+        }
+    }
 
-            Log.w("AdisonModule", "setTargeting skipped: ${e.message}")
+    @ReactMethod
+    fun availableReward(promise: Promise) {
+        try {
+            Adison.availableReward { name, unit, points ->
+                val result = com.facebook.react.bridge.Arguments.createMap().apply {
+                    putString("name", name)
+                    putString("unit", unit)
+                    putInt("points", points)
+                }
+                promise.resolve(result)
+            }
+        } catch (e: Exception) {
+            Log.e("AdisonModule", "availableReward failed", e)
+            promise.reject("REWARD_ERROR", e.message ?: "Unknown error")
         }
     }
 
