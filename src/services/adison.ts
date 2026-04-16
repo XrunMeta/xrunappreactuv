@@ -33,7 +33,17 @@ const v_2911e0 = (): boolean => !!v_37118b;
 
 const v_a7ca60 = (): string => {
   const v_c9c489 = v_e4a763();
-  return v_326be8.OS === 'ios' ? v_c9c489.ADISON_APP_KEY_IOS : v_c9c489.ADISON_APP_KEY_ANDROID;
+  const v_77aea7 = (v_c9c489.ADISON_SERVER || 'production').toLowerCase() === 'development';
+  if (v_326be8.OS === 'ios') {
+    return v_77aea7 ? v_c9c489.ADISON_APP_KEY_IOS_DEV : v_c9c489.ADISON_APP_KEY_IOS_PRD;
+  }
+  return v_77aea7 ? v_c9c489.ADISON_APP_KEY_ANDROID_DEV : v_c9c489.ADISON_APP_KEY_ANDROID_PRD;
+};
+
+export const v_ca9f5e = (): string => {
+  const v_c9c489 = v_e4a763();
+  const v_77aea7 = (v_c9c489.ADISON_SERVER || 'production').toLowerCase() === 'development';
+  return v_77aea7 ? v_c9c489.ADISON_CALLBACK_URL_DEV : v_c9c489.ADISON_CALLBACK_URL_PRD;
 };
 
 export const v_3847b5 = (v_717992): string => {
@@ -51,7 +61,14 @@ export const v_14739d = async (): Promise<boolean> => {
   if (v_c9f274) return true;
   try {
     const v_c9c489 = v_e4a763();
-    await v_37118b!.initialize(v_a7ca60(), v_c9c489.ADISON_SERVER || 'production');
+    const v_eb1151 = v_a7ca60();
+    if (!v_eb1151) {
+      console.warn(
+        `[adison] 매체 앱 키가 비어 있습니다. ADISON_SERVER=${v_c9c489.ADISON_SERVER}. DEV 전환이라면 env.ts 에 ADISON_APP_KEY_*_DEV 를 채워주세요.`
+      );
+      return false;
+    }
+    await v_37118b!.initialize(v_eb1151, v_c9c489.ADISON_SERVER || 'production');
     v_37118b!.setConfig(v_c9c489.ADISON_OFFERWALL_TITLE || '바로 적립 받기', 'LIST', 'Light');
     v_c9f274 = true;
     return true;
