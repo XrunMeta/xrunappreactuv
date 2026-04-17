@@ -26,6 +26,8 @@ const zone2Image = require('../../assets/images/zone2.png');
 const zone3Image = require('../../assets/images/zone3.png');
 const questImage = require('../../assets/images/quest.png');
 
+const SHOW_ZONE3 = false;
+
 export const XplayInfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
@@ -145,14 +147,16 @@ export const XplayInfoScreen = () => {
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.zoneCard}
-            activeOpacity={0.85}
-            onPress={() => navigate(ROUTES.adisonOfferwall)}
-          >
-            <Image source={zone3Image} style={styles.zoneImage} resizeMode="contain" />
-            <Text style={styles.zoneCardTitle}>Xplay Zone 3</Text>
-          </TouchableOpacity>
+          {SHOW_ZONE3 && (
+            <TouchableOpacity
+              style={styles.zoneCard}
+              activeOpacity={0.85}
+              onPress={() => navigate(ROUTES.adisonOfferwall)}
+            >
+              <Image source={zone3Image} style={styles.zoneImage} resizeMode="contain" />
+              <Text style={styles.zoneCardTitle}>Xplay Zone 3</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {}
