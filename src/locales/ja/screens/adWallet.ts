@@ -51,5 +51,10 @@ export default {
   referralEventRewardReceive: '紹介イベント報酬を受け取ってください',
   referralEventUnderReview: '審査中の紹介イベントです',
   referralEventReward: '紹介イベント報酬',
+  attendanceCheckLabel: '出席チェック',
+  referralRewardLabel: '紹介報酬',
+  referralRewardWithName: '紹介報酬({{name}})',
+  playZone1Reward: 'PLAY ZONE1 報酬',
+  playZone2Reward: 'PLAY ZONE2 報酬',
 };
 

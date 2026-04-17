@@ -50,5 +50,10 @@ export default {
   referralEventRewardReceive: '추천인 이벤트 보상을 받으세요',
   referralEventUnderReview: '심사중인 추천인 이벤트입니다',
   referralEventReward: '추천인 이벤트 보상',
+  attendanceCheckLabel: '출석체크',
+  referralRewardLabel: '추천인보상',
+  referralRewardWithName: '추천인보상({{name}})',
+  playZone1Reward: 'PLAY ZONE1 보상',
+  playZone2Reward: 'PLAY ZONE2 보상',
 };
 

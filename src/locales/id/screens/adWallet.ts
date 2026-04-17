@@ -50,5 +50,10 @@ export default {
   referralEventRewardReceive: 'Silakan terima hadiah acara referral',
   referralEventUnderReview: 'Ini adalah acara referral yang sedang ditinjau',
   referralEventReward: 'Hadiah Acara Referral',
+  attendanceCheckLabel: 'Absensi',
+  referralRewardLabel: 'Hadiah Referral',
+  referralRewardWithName: 'Hadiah Referral ({{name}})',
+  playZone1Reward: 'Hadiah PLAY ZONE1',
+  playZone2Reward: 'Hadiah PLAY ZONE2',
 };
 

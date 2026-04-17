@@ -534,10 +534,10 @@ export const AdWalletScreen = () => {
 
       const extrastr3 = (item as any).extrastr3 || null;
       let typeLabel = '';
-      if (extrastr3 === '출석보상') typeLabel = '출석체크';
-      else if (extrastr3 === '추천인이벤트') typeLabel = '추천인보상';
-      else if (extrastr3 === 'zone1-instant') typeLabel = 'PLAY ZONE1 보상';
-      else if (extrastr3 === 'zone2-instant') typeLabel = 'PLAY ZONE2 보상';
+      if (extrastr3 === '출석보상') typeLabel = t('screens.adWallet.attendanceCheckLabel');
+      else if (extrastr3 === '추천인이벤트') typeLabel = t('screens.adWallet.referralRewardLabel');
+      else if (extrastr3 === 'zone1-instant') typeLabel = t('screens.adWallet.playZone1Reward');
+      else if (extrastr3 === 'zone2-instant') typeLabel = t('screens.adWallet.playZone2Reward');
 
       let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
@@ -1459,7 +1459,7 @@ export const AdWalletScreen = () => {
           )
         ) : (itemTab === 'settled' && item.extrastr3 === '출석보상') ? (
           <View style={styles.adCardRow}>
-            <Text style={styles.adCardRowLabel}>출석체크</Text>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.attendanceCheckLabel')}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
@@ -1482,21 +1482,21 @@ export const AdWalletScreen = () => {
           </View>
         ) : (itemTab === 'settled' && item.extrastr3 === '추천인이벤트') ? (
           <View style={styles.adCardRow}>
-            <Text style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? `추천인보상(${item.extrastr4})` : '추천인보상'}</Text>
+            <Text style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? t('screens.adWallet.referralRewardWithName', { name: item.extrastr4 }) : t('screens.adWallet.referralRewardLabel')}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
           </View>
         ) : (itemTab === 'settled' && item.extrastr3 === 'zone1-instant') ? (
           <View style={styles.adCardRow}>
-            <Text style={styles.adCardRowLabel}>PLAY ZONE1 보상</Text>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.playZone1Reward')}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
           </View>
         ) : (itemTab === 'settled' && item.extrastr3 === 'zone2-instant') ? (
           <View style={styles.adCardRow}>
-            <Text style={styles.adCardRowLabel}>PLAY ZONE2 보상</Text>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.playZone2Reward')}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
@@ -1507,7 +1507,7 @@ export const AdWalletScreen = () => {
               styles.adCardRowLabel,
               isDisabled && { color: disabledColor }
             ]}>
-              추천인초대보상
+              {t('screens.adWallet.referralInviteReward')}
             </Text>
             <Text style={[
               styles.adCardRowAmount,

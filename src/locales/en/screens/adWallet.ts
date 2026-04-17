@@ -50,5 +50,10 @@ export default {
   referralEventRewardReceive: 'Please receive the referral event reward',
   referralEventUnderReview: 'This is a referral event under review',
   referralEventReward: 'Referral Event Reward',
+  attendanceCheckLabel: 'Attendance Check',
+  referralRewardLabel: 'Referral Reward',
+  referralRewardWithName: 'Referral Reward ({{name}})',
+  playZone1Reward: 'PLAY ZONE1 Reward',
+  playZone2Reward: 'PLAY ZONE2 Reward',
 };
 
