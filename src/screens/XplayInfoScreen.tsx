@@ -26,6 +26,8 @@ const v_3ce185 = require('../../assets/images/zone2.png');
 const v_d80408 = require('../../assets/images/zone3.png');
 const v_3d184e = require('../../assets/images/quest.png');
 
+const v_06e388 = false;
+
 export const v_305be8 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
@@ -145,14 +147,16 @@ export const v_305be8 = () => {
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.zoneCard}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
-          >
-            <Image source={v_d80408} style={v_d81136.zoneImage} resizeMode="contain" />
-            <Text style={v_d81136.zoneCardTitle}>Xplay Zone 3</Text>
-          </TouchableOpacity>
+          {v_06e388 && (
+            <TouchableOpacity
+              style={v_d81136.zoneCard}
+              activeOpacity={0.85}
+              onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
+            >
+              <Image source={v_d80408} style={v_d81136.zoneImage} resizeMode="contain" />
+              <Text style={v_d81136.zoneCardTitle}>Xplay Zone 3</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {}
