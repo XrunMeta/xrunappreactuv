@@ -55,5 +55,7 @@ export default {
   referralRewardWithName: 'Hadiah Referral ({{name}})',
   playZone1Reward: 'Hadiah PLAY ZONE1',
   playZone2Reward: 'Hadiah PLAY ZONE2',
+  obtainableAmount: 'Jumlah yang Bisa Didapat',
+  attendanceRewardCompleted: 'Hadiah Absensi Sudah Dibayar',
 };
 

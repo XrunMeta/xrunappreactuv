@@ -55,6 +55,8 @@ export default {
   referralRewardWithName: 'रेफरल पुरस्कार ({{name}})',
   playZone1Reward: 'PLAY ZONE1 पुरस्कार',
   playZone2Reward: 'PLAY ZONE2 पुरस्कार',
+  obtainableAmount: 'प्राप्य राशि',
+  attendanceRewardCompleted: 'उपस्थिति पुरस्कार भुगतान पूर्ण',
 };
 
 

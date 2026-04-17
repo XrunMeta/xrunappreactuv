@@ -55,6 +55,8 @@ export default {
   referralRewardWithName: 'รางวัลแนะนำ ({{name}})',
   playZone1Reward: 'รางวัล PLAY ZONE1',
   playZone2Reward: 'รางวัล PLAY ZONE2',
+  obtainableAmount: 'จำนวนเงินที่ได้รับ',
+  attendanceRewardCompleted: 'จ่ายรางวัลเช็คอินแล้ว',
 };
 
 

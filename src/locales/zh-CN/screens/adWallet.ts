@@ -56,5 +56,7 @@ export default {
   referralRewardWithName: '推荐奖励({{name}})',
   playZone1Reward: 'PLAY ZONE1 奖励',
   playZone2Reward: 'PLAY ZONE2 奖励',
+  obtainableAmount: '可获得金额',
+  attendanceRewardCompleted: '签到奖励已发放',
 };
 

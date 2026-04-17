@@ -473,7 +473,7 @@ export const AdWalletScreen = () => {
             return item.description || t('screens.adWallet.referralEventReward') || '';
           case 'attendance':
             if (item.is_rewarded)
-              return item.description || '';
+              return t('screens.adWallet.attendanceRewardCompleted') || item.description || '';
             return t('screens.adWallet.attendanceRewardOnLogin') || item.description || '';
           default:
             return item.description || '';
@@ -1334,7 +1334,7 @@ export const AdWalletScreen = () => {
 
   const summaryLabel = useMemo(
     () => {
-      if (tab === 'quest') return '획득가능 금액';
+      if (tab === 'quest') return t('screens.adWallet.obtainableAmount');
       if (tab === 'pending') return t('screens.adWallet.expectedAmount');
       return t('screens.adWallet.confirmedAmount');
     },

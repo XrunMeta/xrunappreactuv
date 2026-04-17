@@ -55,5 +55,7 @@ export default {
   referralRewardWithName: 'Referral Reward ({{name}})',
   playZone1Reward: 'PLAY ZONE1 Reward',
   playZone2Reward: 'PLAY ZONE2 Reward',
+  obtainableAmount: 'Obtainable Amount',
+  attendanceRewardCompleted: 'Attendance Check Reward Paid',
 };
 

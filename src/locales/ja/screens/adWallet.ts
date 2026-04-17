@@ -56,5 +56,7 @@ export default {
   referralRewardWithName: '紹介報酬({{name}})',
   playZone1Reward: 'PLAY ZONE1 報酬',
   playZone2Reward: 'PLAY ZONE2 報酬',
+  obtainableAmount: '獲得可能金額',
+  attendanceRewardCompleted: '出席チェック報酬支給完了',
 };
 

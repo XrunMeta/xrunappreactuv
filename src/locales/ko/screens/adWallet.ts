@@ -55,5 +55,7 @@ export default {
   referralRewardWithName: '추천인보상({{name}})',
   playZone1Reward: 'PLAY ZONE1 보상',
   playZone2Reward: 'PLAY ZONE2 보상',
+  obtainableAmount: '획득가능 금액',
+  attendanceRewardCompleted: '출석체크 보상 지급 완료',
 };
 
