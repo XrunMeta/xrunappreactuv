@@ -82,6 +82,7 @@ export const ROUTES = {
   myInfoEmailAuth: 'myInfoEmailAuth',
   myChipsOfferwall: 'myChipsOfferwall',
   adisonOfferwall: 'adisonOfferwall',
+  adisonTest: 'adisonTest',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

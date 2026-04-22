@@ -172,6 +172,15 @@ export const XplayInfoScreen = () => {
           </View>
         </TouchableOpacity>
 
+        {}
+        <TouchableOpacity
+          style={styles.devTestBtn}
+          activeOpacity={0.8}
+          onPress={() => navigate(ROUTES.adisonTest)}
+        >
+          <Text style={styles.devTestBtnText}>🧪 Adison 적립 테스트 (5 케이스)</Text>
+        </TouchableOpacity>
+
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeView>
@@ -357,5 +366,20 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 16,
+  },
+  devTestBtn: {
+    marginTop: SIZES.medium,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  devTestBtnText: {
+    fontSize: 13,
+    fontFamily: FONTS.family.semibold,
+    color: '#6B7280',
   },
 });
