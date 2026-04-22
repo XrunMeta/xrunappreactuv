@@ -82,6 +82,7 @@ export const v_ce4741 = {
   myInfoEmailAuth: 'myInfoEmailAuth',
   myChipsOfferwall: 'myChipsOfferwall',
   adisonOfferwall: 'adisonOfferwall',
+  adisonTest: 'adisonTest',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

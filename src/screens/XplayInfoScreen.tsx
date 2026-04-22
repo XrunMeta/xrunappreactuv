@@ -172,6 +172,15 @@ export const v_305be8 = () => {
           </View>
         </TouchableOpacity>
 
+        {}
+        <TouchableOpacity
+          style={v_d81136.devTestBtn}
+          activeOpacity={0.8}
+          onPress={() => v_9b57fc(v_ce4741.adisonTest)}
+        >
+          <Text style={v_d81136.devTestBtnText}>🧪 Adison 적립 테스트 (5 케이스)</Text>
+        </TouchableOpacity>
+
         <View style={v_d81136.bottomSpacer} />
       </ScrollView>
     </SafeView>
@@ -357,5 +366,20 @@ const v_d81136 = v_472849.create({
   },
   bottomSpacer: {
     height: 16,
+  },
+  devTestBtn: {
+    marginTop: v_9b1a04.medium,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  devTestBtnText: {
+    fontSize: 13,
+    fontFamily: v_843035.family.semibold,
+    color: '#6B7280',
   },
 });
