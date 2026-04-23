@@ -821,12 +821,13 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       return;
     }
 
-    for (let i = 0; i < targetSize; i++) {
+    const fillCount = Math.min(targetSize, validData.length);
+    for (let i = 0; i < fillCount; i++) {
       const index = (currentIndexRef.current + i) % validData.length;
       nextData.push(validData[index]);
     }
 
-    currentIndexRef.current = (currentIndexRef.current + targetSize) % validData.length;
+    currentIndexRef.current = (currentIndexRef.current + fillCount) % validData.length;
 
     const newOrganizedData = nextData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
