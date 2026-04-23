@@ -173,13 +173,9 @@ export const v_305be8 = () => {
         </TouchableOpacity>
 
         {}
-        <TouchableOpacity
-          style={v_d81136.devTestBtn}
-          activeOpacity={0.8}
-          onPress={() => v_9b57fc(v_ce4741.adisonTest)}
-        >
-          <Text style={v_d81136.devTestBtnText}>🧪 Adison 적립 테스트 (5 케이스)</Text>
-        </TouchableOpacity>
+        {
+
+}
 
         <View style={v_d81136.bottomSpacer} />
       </ScrollView>
