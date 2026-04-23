@@ -821,12 +821,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       return;
     }
 
-    for (let v_ebec57 = 0; v_ebec57 < v_f64b05; v_ebec57++) {
+    const v_30c4ef = Math.min(v_f64b05, v_908496.length);
+    for (let v_ebec57 = 0; v_ebec57 < v_30c4ef; v_ebec57++) {
       const v_a56041 = (v_a96760.current + v_ebec57) % v_908496.length;
       v_2e375c.push(v_908496[v_a56041]);
     }
 
-    v_a96760.current = (v_a96760.current + v_f64b05) % v_908496.length;
+    v_a96760.current = (v_a96760.current + v_30c4ef) % v_908496.length;
 
     const v_368ba7 = v_2e375c.map((v_9390e8, v_a56041) => {
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
