@@ -23,6 +23,10 @@ export const AyetOffersScreen: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [webViewKey, setWebViewKey] = useState(0);
+
+  const wentExternalRef = useRef(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -63,9 +67,10 @@ export const AyetOffersScreen: React.FC = () => {
   useEffect(() => {
     let lastState = AppState.currentState;
     const sub = AppState.addEventListener('change', (next) => {
-      if (lastState !== 'active' && next === 'active') {
-        console.log('[ayeT WebView] 포그라운드 복귀 → reload');
-        webViewRef.current?.reload();
+      if (lastState !== 'active' && next === 'active' && wentExternalRef.current) {
+        console.log('[ayeT WebView] 외부앱 복귀 → WebView remount');
+        wentExternalRef.current = false;
+        setWebViewKey((k) => k + 1);
       }
       lastState = next;
     });
@@ -89,6 +94,7 @@ export const AyetOffersScreen: React.FC = () => {
     <View style={styles.container}>
       <Header title="Xplay" onBackPress={goBack} showBackButton />
       <WebView
+        key={webViewKey}
         ref={webViewRef}
         source={{ uri: offerwallUrl }}
         style={styles.webView}
@@ -109,14 +115,17 @@ export const AyetOffersScreen: React.FC = () => {
 
           const externalSchemes = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
           if (externalSchemes.some((s) => url.startsWith(s))) {
+            wentExternalRef.current = true;
             Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] 외부 URL open 실패:', e));
             return false;
           }
           if (url.startsWith('https://apps.apple.com') || url.startsWith('https://itunes.apple.com')) {
+            wentExternalRef.current = true;
             Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] App Store open 실패:', e));
             return false;
           }
           if (url.startsWith('market://') || url.startsWith('intent://')) {
+            wentExternalRef.current = true;
             Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] Play Store/Intent open 실패:', e));
             return false;
           }
