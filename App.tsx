@@ -88,6 +88,7 @@ import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
+import * as TrackingTransparency from 'expo-tracking-transparency';
 import {
   useFonts,
   Roboto_400Regular,
@@ -1019,7 +1020,21 @@ export default function App() {
 
       applyStoredLanguageAsync();
 
-      const runBackground = () => {
+      const runBackground = async () => {
+
+        if (Platform.OS === 'ios') {
+          try {
+            const current = await TrackingTransparency.getTrackingPermissionsAsync();
+            console.log('[App] 현재 ATT 상태:', current.status);
+            if (current.status === 'undetermined') {
+              const res = await TrackingTransparency.requestTrackingPermissionsAsync();
+              console.log('[App] ATT 요청 결과:', res.status);
+            }
+          } catch (e) {
+            console.warn('[App] ATT 요청 실패:', e);
+          }
+        }
+
         try {
           const env = getEnv();
           const initOptions = {
