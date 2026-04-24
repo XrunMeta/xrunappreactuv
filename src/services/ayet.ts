@@ -101,10 +101,20 @@ export const v_3e930b = async (
 };
 
 export const v_5e4f0b = async (v_43e90c): Promise<void> => {
-  console.log(`${v_4c1151} setAyetUserIdAsync 호출 | userId=${v_43e90c} | platform=${v_326be8.OS}`);
-  if (!v_1bebcf?.setUserId) return;
+  console.log(`${v_4c1151} setAyetUserIdAsync 호출 | userId=${v_43e90c} | platform=${v_326be8.OS} | moduleExists=${!!v_1bebcf} | hasSetUserId=${!!v_1bebcf?.setUserId}`);
+  const v_b66f2c = Date.now();
+  if (!v_1bebcf?.setUserId) {
+    console.warn(`${v_4c1151} setUserId 네이티브 메서드 없음 — skip`);
+    return;
+  }
   const v_389afb = v_43e90c && v_43e90c.trim() ? String(v_43e90c).slice(0, 63) : 'guest';
-  await v_1bebcf.setUserId(v_389afb);
+  try {
+    await v_1bebcf.setUserId(v_389afb);
+    console.log(`${v_4c1151} setUserId 완료 (${Date.now() - v_b66f2c}ms)`);
+  } catch (v_9e86fd) {
+    console.error(`${v_4c1151} setUserId 실패 (${Date.now() - v_b66f2c}ms):`, v_9e86fd?.message ?? v_9e86fd);
+    throw v_9e86fd;
+  }
 };
 
 export const v_e8d7c0 = (v_43e90c): void => {

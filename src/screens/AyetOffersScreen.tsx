@@ -87,7 +87,11 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
         setSupportMultipleWindows={false}
+        onLoadStart={() => console.log(`[ayeT WebView] onLoadStart url=${v_6da94b}`)}
+        onLoadEnd={() => console.log('[ayeT WebView] onLoadEnd')}
+        onHttpError={(v_9e86fd) => console.warn('[ayeT WebView] HTTP 오류:', v_9e86fd.nativeEvent.statusCode, v_9e86fd.nativeEvent.url)}
         onShouldStartLoadWithRequest={(v_576f5a) => {
+          console.log('[ayeT WebView] 네비게이션 요청:', v_576f5a.url);
           const { url: v_f71b56 } = v_576f5a;
 
           const v_1ed546 = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
