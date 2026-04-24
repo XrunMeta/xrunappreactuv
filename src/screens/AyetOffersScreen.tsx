@@ -23,7 +23,7 @@ export const AyetOffersScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
+    (async () => {
       try {
         const resUserData = await AsyncStorage.getItem('userData');
         let memberId = '';
@@ -32,20 +32,18 @@ export const AyetOffersScreen: React.FC = () => {
           if (parsed?.member != null) memberId = String(parsed.member);
         }
         setUserId(memberId);
+        setIsLoading(false);
 
         if (memberId) {
-          try {
-            await setAyetUserIdAsync(memberId);
-          } catch (e) {
-            console.warn('[ayeT] setAyetUserIdAsync 실패:', e);
-          }
+          setAyetUserIdAsync(memberId).catch((e) => {
+            console.warn('[ayeT] setAyetUserIdAsync 실패(백그라운드):', e);
+          });
         }
       } catch (e) {
         console.warn('[ayeT] userData 로드 실패:', e);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    };
-    load();
+    })();
   }, []);
 
   useEffect(() => {
