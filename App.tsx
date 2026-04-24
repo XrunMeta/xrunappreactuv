@@ -88,7 +88,13 @@ import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
-import * as TrackingTransparency from 'expo-tracking-transparency';
+
+let TrackingTransparency: any = null;
+try {
+  TrackingTransparency = require('expo-tracking-transparency');
+} catch (e) {
+  console.warn('[App] expo-tracking-transparency 모듈 없음 (구 빌드) — ATT 스킵');
+}
 import {
   useFonts,
   Roboto_400Regular,
@@ -1022,7 +1028,7 @@ export default function App() {
 
       const runBackground = async () => {
 
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === 'ios' && TrackingTransparency) {
           try {
             const current = await TrackingTransparency.getTrackingPermissionsAsync();
             console.log('[App] 현재 ATT 상태:', current.status);
