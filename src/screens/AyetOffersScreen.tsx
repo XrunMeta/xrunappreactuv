@@ -23,7 +23,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   const [v_cd31a8, v_deef62] = v_5ab095(true);
 
   v_c4deb2(() => {
-    const v_f6f5de = async () => {
+    (async () => {
       try {
         const v_e5066f = await v_e84827.getItem('userData');
         let v_717992 = '';
@@ -32,20 +32,18 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
           if (v_8decf8?.member != null) v_717992 = String(v_8decf8.member);
         }
         v_688dd2(v_717992);
+        v_deef62(false);
 
         if (v_717992) {
-          try {
-            await v_5e4f0b(v_717992);
-          } catch (v_9e86fd) {
-            console.warn('[ayeT] setAyetUserIdAsync 실패:', v_9e86fd);
-          }
+          v_5e4f0b(v_717992).catch((v_9e86fd) => {
+            console.warn('[ayeT] setAyetUserIdAsync 실패(백그라운드):', v_9e86fd);
+          });
         }
       } catch (v_9e86fd) {
         console.warn('[ayeT] userData 로드 실패:', v_9e86fd);
+        v_deef62(false);
       }
-      v_deef62(false);
-    };
-    v_f6f5de();
+    })();
   }, []);
 
   v_c4deb2(() => {
