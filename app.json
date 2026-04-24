@@ -122,7 +122,8 @@
           "shouldUsePurchaseConnector": true,
           "preferAppsFlyerBackupRules": false
         }
-      ]
+      ],
+      "expo-tracking-transparency"
     ],
     "extra": {
       "eas": {

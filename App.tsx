@@ -88,6 +88,7 @@ import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
+import * as v_09243c from 'ofabzpktputyqctfpfyntwdjou';
 import {
   v_c06f2c,
   v_259807,
@@ -1019,7 +1020,21 @@ export default function v_6540c3() {
 
       v_1f4a13();
 
-      const v_9aae4b = () => {
+      const v_9aae4b = async () => {
+
+        if (v_326be8.OS === 'ios') {
+          try {
+            const v_275ccd = await v_09243c.getTrackingPermissionsAsync();
+            console.log('[App] 현재 ATT 상태:', v_275ccd.status);
+            if (v_275ccd.status === 'undetermined') {
+              const v_8f00b9 = await v_09243c.requestTrackingPermissionsAsync();
+              console.log('[App] ATT 요청 결과:', v_8f00b9.status);
+            }
+          } catch (v_9e86fd) {
+            console.warn('[App] ATT 요청 실패:', v_9e86fd);
+          }
+        }
+
         try {
           const v_c9c489 = v_e4a763();
           const v_280f96 = {
