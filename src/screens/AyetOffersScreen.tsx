@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  AppState,
   BackHandler,
   Linking,
   Platform,
@@ -56,6 +57,18 @@ export const AyetOffersScreen: React.FC = () => {
       return false;
     };
     const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    let lastState = AppState.currentState;
+    const sub = AppState.addEventListener('change', (next) => {
+      if (lastState !== 'active' && next === 'active') {
+        console.log('[ayeT WebView] 포그라운드 복귀 → reload');
+        webViewRef.current?.reload();
+      }
+      lastState = next;
+    });
     return () => sub.remove();
   }, []);
 
