@@ -367,7 +367,9 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
                 const v_6bbb57 = v_21cc31?.xrunPrice || 0;
                 const v_123554 = parseFloat(String(v_6bbb57));
 
-                return isNaN(v_123554) ? '0.00' : v_123554.toFixed(2);
+                if (isNaN(v_123554)) return '0.00';
+                const v_ccc3be = Math.floor(v_123554 * 100) / 100;
+                return v_ccc3be.toFixed(2);
               })()}
             </Text>
             <Text style={v_d81136.tokenDistanceText}>
