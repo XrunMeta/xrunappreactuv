@@ -101,10 +101,20 @@ export const getAyetOffers = async (
 };
 
 export const setAyetUserIdAsync = async (userId: string): Promise<void> => {
-  console.log(`${AYET_LOG_PREFIX} setAyetUserIdAsync 호출 | userId=${userId} | platform=${Platform.OS}`);
-  if (!AyetOfferwallModule?.setUserId) return;
+  console.log(`${AYET_LOG_PREFIX} setAyetUserIdAsync 호출 | userId=${userId} | platform=${Platform.OS} | moduleExists=${!!AyetOfferwallModule} | hasSetUserId=${!!AyetOfferwallModule?.setUserId}`);
+  const t0 = Date.now();
+  if (!AyetOfferwallModule?.setUserId) {
+    console.warn(`${AYET_LOG_PREFIX} setUserId 네이티브 메서드 없음 — skip`);
+    return;
+  }
   const id = userId && userId.trim() ? String(userId).slice(0, 63) : 'guest';
-  await AyetOfferwallModule.setUserId(id);
+  try {
+    await AyetOfferwallModule.setUserId(id);
+    console.log(`${AYET_LOG_PREFIX} setUserId 완료 (${Date.now() - t0}ms)`);
+  } catch (e: any) {
+    console.error(`${AYET_LOG_PREFIX} setUserId 실패 (${Date.now() - t0}ms):`, e?.message ?? e);
+    throw e;
+  }
 };
 
 export const setAyetUserId = (userId: string): void => {

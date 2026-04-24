@@ -87,7 +87,11 @@ export const AyetOffersScreen: React.FC = () => {
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
         setSupportMultipleWindows={false}
+        onLoadStart={() => console.log(`[ayeT WebView] onLoadStart url=${offerwallUrl}`)}
+        onLoadEnd={() => console.log('[ayeT WebView] onLoadEnd')}
+        onHttpError={(e) => console.warn('[ayeT WebView] HTTP 오류:', e.nativeEvent.statusCode, e.nativeEvent.url)}
         onShouldStartLoadWithRequest={(request) => {
+          console.log('[ayeT WebView] 네비게이션 요청:', request.url);
           const { url } = request;
 
           const externalSchemes = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
