@@ -101,6 +101,7 @@ export const getAyetOffers = async (
 };
 
 export const setAyetUserIdAsync = async (userId: string): Promise<void> => {
+  console.log(`${AYET_LOG_PREFIX} setAyetUserIdAsync 호출 | userId=${userId} | platform=${Platform.OS}`);
   if (!AyetOfferwallModule?.setUserId) return;
   const id = userId && userId.trim() ? String(userId).slice(0, 63) : 'guest';
   await AyetOfferwallModule.setUserId(id);
@@ -115,6 +116,13 @@ export const showAyetOfferwall = async (
   options?: { memberId?: string }
 ): Promise<void> => {
   const slotName = resolveAdSlotName(adSlotName);
+  console.log(`${AYET_LOG_PREFIX} showAyetOfferwall 진입 | platform=${Platform.OS} | adSlotName=${adSlotName} | slotName=${slotName} | memberId=${options?.memberId ?? '(없음)'}`);
+  console.log(`${AYET_LOG_PREFIX} AyetOfferwallModule 상태:`, {
+    moduleExists: !!AyetOfferwallModule,
+    hasShowOfferwall: !!AyetOfferwallModule?.showOfferwall,
+    hasSetUserId: !!AyetOfferwallModule?.setUserId,
+    hasGetOffers: !!AyetOfferwallModule?.getOffers,
+  });
   if (!AyetOfferwallModule?.showOfferwall) {
     const msg = 'OFFERWALL_UNAVAILABLE';
     console.warn(`${AYET_LOG_PREFIX} showAyetOfferwall skipped (module unavailable), adSlotName=${slotName}. Run with development build: npx expo run:ios`);
@@ -122,12 +130,24 @@ export const showAyetOfferwall = async (
   }
 
   if (Platform.OS === 'android' && !ayetInitialized && options?.memberId) {
+    console.log(`${AYET_LOG_PREFIX} Android 초기화 시작`);
     await initAyetSdk(options.memberId);
   }
   if (options?.memberId != null && String(options.memberId).trim() !== '') {
+    console.log(`${AYET_LOG_PREFIX} setUserId 호출 (member=${options.memberId})`);
     await setAyetUserIdAsync(String(options.memberId));
+    console.log(`${AYET_LOG_PREFIX} setUserId 완료`);
+  } else {
+    console.warn(`${AYET_LOG_PREFIX} memberId 가 비어있음! 로그인 상태 확인 필요`);
   }
-  await AyetOfferwallModule.showOfferwall(slotName);
+  console.log(`${AYET_LOG_PREFIX} native showOfferwall(${slotName}) 호출 시작 (최대 25초 대기)`);
+  try {
+    await AyetOfferwallModule.showOfferwall(slotName);
+    console.log(`${AYET_LOG_PREFIX} showOfferwall 호출 완료 (오퍼월 창 열림)`);
+  } catch (e: any) {
+    console.error(`${AYET_LOG_PREFIX} showOfferwall 실패:`, e?.code ?? '(no code)', e?.message ?? e);
+    throw e;
+  }
 };
 
 export const isAyetOfferwallAvailable = (): boolean =>
