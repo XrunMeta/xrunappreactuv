@@ -1031,31 +1031,14 @@ export default function App() {
         if (Platform.OS === 'ios' && TrackingTransparency) {
           try {
             const current = await TrackingTransparency.getTrackingPermissionsAsync();
-            const statusToLabel = (s: string) => {
-              switch (s) {
-                case 'granted': return '✅ 허용됨';
-                case 'denied': return '🚫 거부됨';
-                case 'restricted': return '⛔ 제한됨';
-                case 'undetermined': return '❓ 미결정';
-                default: return s;
-              }
-            };
-            console.log('[ATT] 현재 상태:', current.status, statusToLabel(current.status));
-            try { showToast(`추적허용: ${statusToLabel(current.status)} (${current.status})`); } catch {}
-
+            console.log('[ATT] 현재 상태:', current.status);
             if (current.status === 'undetermined') {
-              console.log('[ATT] 프롬프트 표시 시도...');
               const res = await TrackingTransparency.requestTrackingPermissionsAsync();
-              console.log('[ATT] 요청 결과:', res.status, statusToLabel(res.status));
-              try { showToast(`추적허용 응답: ${statusToLabel(res.status)}`); } catch {}
+              console.log('[ATT] 요청 결과:', res.status);
             }
           } catch (e: any) {
             console.warn('[ATT] 요청 실패:', e);
-            try { showToast(`추적허용 에러: ${e?.message || e}`); } catch {}
           }
-        } else if (Platform.OS === 'ios') {
-          console.warn('[ATT] expo-tracking-transparency 모듈 없음 (구 빌드)');
-          try { showToast('추적허용 모듈 없음 — 새 빌드 필요'); } catch {}
         }
 
         try {
