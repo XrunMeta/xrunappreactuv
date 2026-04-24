@@ -56,7 +56,7 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "28"
+      "buildNumber": "29"
     },
     "android": {
       "package": "run.xrun.xrunapp",
