@@ -17,23 +17,29 @@ class AyetOfferwallModule: NSObject {
   func setUserId(_ userId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     let id = (userId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "guest" : userId)
     let safeId = String(id.prefix(63))
+    NSLog("[ayeT] setUserId called id=%{public}@ placement=%{public}d", safeId, AYET_PLACEMENT_ID_IOS)
     DispatchQueue.main.async {
       AyetSDK.shared.initialize(placementId: AYET_PLACEMENT_ID_IOS, externalIdentifier: safeId)
+      NSLog("[ayeT] AyetSDK.shared.initialize dispatched (placement=%{public}d, id=%{public}@)", AYET_PLACEMENT_ID_IOS, safeId)
       resolve(NSNull())
     }
   }
 
   @objc
   func showOfferwall(_ adSlotName: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    NSLog("[ayeT] showOfferwall called with adSlotName=%{public}@", adSlotName)
     Task { @MainActor in
       let ready = await Self.waitForAyetInitialized(timeoutSeconds: 25)
+      NSLog("[ayeT] waitForAyetInitialized returned ready=%{public}d", ready ? 1 : 0)
       if !ready {
+        NSLog("[ayeT] E_AYET_INIT — SDK 초기화 25s 타임아웃")
         reject("E_AYET_INIT", "ayeT SDK 초기화 실패 또는 시간 초과. 네트워크·placement(22062)·앱 키를 확인하세요.", nil)
         return
       }
 
       let slotId = Int(adSlotName) ?? Self.offerwallAdSlotIdReflect(named: adSlotName)
       guard let adSlot = slotId else {
+        NSLog("[ayeT] E_AYET_SLOT — adSlotName=%{public}@ 에 해당하는 slot id 없음", adSlotName)
         reject(
           "E_AYET_SLOT",
           "Offerwall AdSlot '\(adSlotName)' 없음. 대시보드에서 이름(예: XRun)·타입 offerwall·iOS placement를 확인하세요.",
@@ -43,6 +49,7 @@ class AyetOfferwallModule: NSObject {
       }
 
       guard let ext = AyetSDK.shared.getExternalIdentifier(), !ext.isEmpty else {
+        NSLog("[ayeT] E_AYET_EXT — external_identifier 비어 있음")
         reject("E_AYET_EXT", "external_identifier가 비어 있습니다. 로그인 후 다시 시도하세요.", nil)
         return
       }
@@ -54,11 +61,12 @@ class AyetOfferwallModule: NSObject {
         URLQueryItem(name: "iosSdk", value: "true"),
       ]
       guard let url = comp?.url else {
+        NSLog("[ayeT] E_AYET_URL — URL 조립 실패")
         reject("E_AYET_URL", "오퍼월 URL을 만들 수 없습니다.", nil)
         return
       }
 
-      NSLog("[ayeT] XRUN showOfferwall adSlot=%d name=%@ url=%@", adSlot, adSlotName, url.absoluteString)
+      NSLog("[ayeT] XRUN showOfferwall adSlot=%{public}d name=%{public}@ url=%{public}@", adSlot, adSlotName, url.absoluteString)
       XRUNAyetOfferwallPresenter.present(url: url, userAgent: nil)
       resolve(NSNull())
     }
