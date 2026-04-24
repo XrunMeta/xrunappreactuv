@@ -1,16 +1,21 @@
 import UIKit
 import WebKit
+import Foundation
 
 enum XRUNAyetOfferwallPresenter {
   @MainActor
   static func present(url: URL, userAgent: String?) {
+    NSLog("[ayeT] XRUNPresenter.present 호출 url=%{public}@", url.absoluteString)
     guard let host = topPresenter() else {
-      NSLog("[ayeT] XRUN: topPresenter() nil — cannot show offerwall")
+      NSLog("[ayeT] ❌ topPresenter() nil — 오퍼월 표시 불가. window/scene 구조 확인 필요")
       return
     }
+    NSLog("[ayeT] topPresenter found: %{public}@", String(describing: type(of: host)))
     let vc = XRUNAyetOfferwallHostViewController(url: url, userAgent: userAgent)
     vc.modalPresentationStyle = .fullScreen
-    host.present(vc, animated: true)
+    host.present(vc, animated: true) {
+      NSLog("[ayeT] ✅ offerwall VC present 완료")
+    }
   }
 
   @MainActor
@@ -44,7 +49,7 @@ enum XRUNAyetOfferwallPresenter {
 }
 
 @MainActor
-private final class XRUNAyetOfferwallHostViewController: UIViewController {
+private final class XRUNAyetOfferwallHostViewController: UIViewController, WKNavigationDelegate {
   private let requestUrl: URL
   private let customUserAgent: String?
   private var webView: WKWebView!
@@ -61,6 +66,7 @@ private final class XRUNAyetOfferwallHostViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    NSLog("[ayeT] HostVC viewDidLoad — loading url=%{public}@", requestUrl.absoluteString)
     view.backgroundColor = .systemBackground
 
     let closeBtn = UIButton(type: .system)
@@ -73,6 +79,7 @@ private final class XRUNAyetOfferwallHostViewController: UIViewController {
     let cfg = WKWebViewConfiguration()
     cfg.defaultWebpagePreferences.allowsContentJavaScript = true
     webView = WKWebView(frame: .zero, configuration: cfg)
+    webView.navigationDelegate = self
     webView.translatesAutoresizingMaskIntoConstraints = false
     if let ua = customUserAgent, !ua.isEmpty {
       webView.customUserAgent = ua
@@ -92,6 +99,20 @@ private final class XRUNAyetOfferwallHostViewController: UIViewController {
   }
 
   @objc private func closeTapped() {
+    NSLog("[ayeT] 사용자가 닫기 버튼 탭")
     dismiss(animated: true)
+  }
+
+  nonisolated func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    NSLog("[ayeT] WebView didStartProvisionalNavigation url=%{public}@", webView.url?.absoluteString ?? "(nil)")
+  }
+  nonisolated func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    NSLog("[ayeT] ✅ WebView didFinish url=%{public}@ title=%{public}@", webView.url?.absoluteString ?? "(nil)", webView.title ?? "(no title)")
+  }
+  nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    NSLog("[ayeT] ❌ WebView didFail error=%{public}@", error.localizedDescription)
+  }
+  nonisolated func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    NSLog("[ayeT] ❌ WebView didFailProvisionalNavigation error=%{public}@", error.localizedDescription)
   }
 }
