@@ -103,7 +103,8 @@
             "entitlements": {
               "com.apple.developer.applesignin": [
                 "Default"
-              ]
+              ],
+              "aps-environment": "production"
             },
             "deploymentTarget": "26.0"
           },
