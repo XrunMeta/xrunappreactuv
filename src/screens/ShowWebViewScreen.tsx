@@ -17,6 +17,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_843035 } from '../constants';
+import { v_cba33f } from '../utils';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
 
@@ -391,6 +392,14 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
           onShouldStartLoadWithRequest={(v_576f5a) => {
             const { url: v_f71b56 } = v_576f5a;
             console.log('[WebView] 네비게이션 요청:', v_f71b56);
+
+            if (v_f71b56.includes('myappfree.com') || v_f71b56.includes('go.myappfree')) {
+              console.warn('[WebView] MAF 도메인 리다이렉트 감지 - 차단 후 뒤로가기:', v_f71b56);
+
+              try { v_cba33f('이 광고는 현재 참여할 수 없습니다.'); } catch {}
+              v_7f2e65();
+              return false;
+            }
 
             if (v_f71b56.startsWith('market://')) {
               console.warn('[WebView] market:// 스킴 감지 - 백엔드에서 변환되어야 함:', v_f71b56);
