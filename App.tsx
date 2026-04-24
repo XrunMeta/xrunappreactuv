@@ -88,7 +88,13 @@ import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
-import * as v_09243c from 'ofabzpktputyqctfpfyntwdjou';
+
+let v_09243c = null;
+try {
+  v_09243c = require('ofabzpktputyqctfpfyntwdjou');
+} catch (v_9e86fd) {
+  console.warn('[App] expo-tracking-transparency 모듈 없음 (구 빌드) — ATT 스킵');
+}
 import {
   v_c06f2c,
   v_259807,
@@ -1022,7 +1028,7 @@ export default function v_6540c3() {
 
       const v_9aae4b = async () => {
 
-        if (v_326be8.OS === 'ios') {
+        if (v_326be8.OS === 'ios' && v_09243c) {
           try {
             const v_275ccd = await v_09243c.getTrackingPermissionsAsync();
             console.log('[App] 현재 ATT 상태:', v_275ccd.status);
