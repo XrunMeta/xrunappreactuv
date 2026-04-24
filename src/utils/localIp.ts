@@ -1,2 +1,2 @@
 
-export const v_ecef77 = '203.0.113.30';
+export const v_ecef77 = '203.0.113.10';

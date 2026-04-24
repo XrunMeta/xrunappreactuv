@@ -101,6 +101,7 @@ export const v_3e930b = async (
 };
 
 export const v_5e4f0b = async (v_43e90c): Promise<void> => {
+  console.log(`${v_4c1151} setAyetUserIdAsync 호출 | userId=${v_43e90c} | platform=${v_326be8.OS}`);
   if (!v_1bebcf?.setUserId) return;
   const v_389afb = v_43e90c && v_43e90c.trim() ? String(v_43e90c).slice(0, 63) : 'guest';
   await v_1bebcf.setUserId(v_389afb);
@@ -115,6 +116,13 @@ export const v_961d2c = async (
   v_b36f96
 ): Promise<void> => {
   const v_b27fa5 = v_78a093(v_bb8cc2);
+  console.log(`${v_4c1151} showAyetOfferwall 진입 | platform=${v_326be8.OS} | adSlotName=${v_bb8cc2} | slotName=${v_b27fa5} | memberId=${v_b36f96?.memberId ?? '(없음)'}`);
+  console.log(`${v_4c1151} AyetOfferwallModule 상태:`, {
+    moduleExists: !!v_1bebcf,
+    hasShowOfferwall: !!v_1bebcf?.showOfferwall,
+    hasSetUserId: !!v_1bebcf?.setUserId,
+    hasGetOffers: !!v_1bebcf?.getOffers,
+  });
   if (!v_1bebcf?.showOfferwall) {
     const v_badeaf = 'OFFERWALL_UNAVAILABLE';
     console.warn(`${v_4c1151} showAyetOfferwall skipped (module unavailable), adSlotName=${v_b27fa5}. Run with development build: npx expo run:ios`);
@@ -122,12 +130,24 @@ export const v_961d2c = async (
   }
 
   if (v_326be8.OS === 'android' && !v_dba0c9 && v_b36f96?.memberId) {
+    console.log(`${v_4c1151} Android 초기화 시작`);
     await v_eefa9d(v_b36f96.memberId);
   }
   if (v_b36f96?.memberId != null && String(v_b36f96.memberId).trim() !== '') {
+    console.log(`${v_4c1151} setUserId 호출 (member=${v_b36f96.memberId})`);
     await v_5e4f0b(String(v_b36f96.memberId));
+    console.log(`${v_4c1151} setUserId 완료`);
+  } else {
+    console.warn(`${v_4c1151} memberId 가 비어있음! 로그인 상태 확인 필요`);
   }
-  await v_1bebcf.showOfferwall(v_b27fa5);
+  console.log(`${v_4c1151} native showOfferwall(${v_b27fa5}) 호출 시작 (최대 25초 대기)`);
+  try {
+    await v_1bebcf.showOfferwall(v_b27fa5);
+    console.log(`${v_4c1151} showOfferwall 호출 완료 (오퍼월 창 열림)`);
+  } catch (v_9e86fd) {
+    console.error(`${v_4c1151} showOfferwall 실패:`, v_9e86fd?.code ?? '(no code)', v_9e86fd?.message ?? v_9e86fd);
+    throw v_9e86fd;
+  }
 };
 
 export const v_609ab5 = (): boolean =>
