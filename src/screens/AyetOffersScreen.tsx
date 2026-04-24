@@ -3,6 +3,7 @@ import {
   v_3094a2,
   v_472849,
   v_39a996,
+  v_6b5698,
   v_1ed974,
   v_f2c756,
   v_326be8,
@@ -56,6 +57,18 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
       return false;
     };
     const v_1ae212 = v_1ed974.addEventListener('hardwareBackPress', v_f442f6);
+    return () => v_1ae212.remove();
+  }, []);
+
+  v_c4deb2(() => {
+    let v_5c3267 = v_6b5698.currentState;
+    const v_1ae212 = v_6b5698.addEventListener('change', (v_a448ad) => {
+      if (v_5c3267 !== 'active' && v_a448ad === 'active') {
+        console.log('[ayeT WebView] 포그라운드 복귀 → reload');
+        v_35f830.current?.reload();
+      }
+      v_5c3267 = v_a448ad;
+    });
     return () => v_1ae212.remove();
   }, []);
 
