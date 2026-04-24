@@ -115,4 +115,45 @@ private final class XRUNAyetOfferwallHostViewController: UIViewController, WKNav
   nonisolated func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
     NSLog("[ayeT] ❌ WebView didFailProvisionalNavigation error=%{public}@", error.localizedDescription)
   }
+
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+  ) {
+    guard let url = navigationAction.request.url else {
+      decisionHandler(.allow); return
+    }
+    let scheme = url.scheme?.lowercased() ?? ""
+    NSLog("[ayeT] decidePolicyFor url=%{public}@ scheme=%{public}@", url.absoluteString, scheme)
+
+    let externalSchemes: Set<String> = [
+      "itms-apps", "itms-appss", "itms-services",
+      "tel", "sms", "mailto", "facetime", "facetime-audio",
+      "intent",  
+    ]
+
+    if externalSchemes.contains(scheme) {
+      NSLog("[ayeT] 외부 스킴 감지 → UIApplication.open")
+      UIApplication.shared.open(url, options: [:]) { ok in
+        NSLog("[ayeT] UIApplication.open 결과 %{public}d url=%{public}@", ok ? 1 : 0, url.absoluteString)
+      }
+      decisionHandler(.cancel)
+      return
+    }
+
+    if scheme == "https" || scheme == "http" {
+      let host = url.host?.lowercased() ?? ""
+      if host == "apps.apple.com" || host == "itunes.apple.com" {
+        NSLog("[ayeT] apps.apple.com 링크 → UIApplication.open")
+        UIApplication.shared.open(url, options: [:]) { ok in
+          NSLog("[ayeT] App Store open 결과 %{public}d", ok ? 1 : 0)
+        }
+        decisionHandler(.cancel)
+        return
+      }
+    }
+
+    decisionHandler(.allow)
+  }
 }
