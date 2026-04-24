@@ -1031,14 +1031,31 @@ export default function v_6540c3() {
         if (v_326be8.OS === 'ios' && v_09243c) {
           try {
             const v_275ccd = await v_09243c.getTrackingPermissionsAsync();
-            console.log('[App] 현재 ATT 상태:', v_275ccd.status);
+            const v_f7abdf = (v_fd5f43) => {
+              switch (v_fd5f43) {
+                case 'granted': return '✅ 허용됨';
+                case 'denied': return '🚫 거부됨';
+                case 'restricted': return '⛔ 제한됨';
+                case 'undetermined': return '❓ 미결정';
+                default: return v_fd5f43;
+              }
+            };
+            console.log('[ATT] 현재 상태:', v_275ccd.status, v_f7abdf(v_275ccd.status));
+            try { v_cba33f(`추적허용: ${v_f7abdf(v_275ccd.status)} (${v_275ccd.status})`); } catch {}
+
             if (v_275ccd.status === 'undetermined') {
+              console.log('[ATT] 프롬프트 표시 시도...');
               const v_8f00b9 = await v_09243c.requestTrackingPermissionsAsync();
-              console.log('[App] ATT 요청 결과:', v_8f00b9.status);
+              console.log('[ATT] 요청 결과:', v_8f00b9.status, v_f7abdf(v_8f00b9.status));
+              try { v_cba33f(`추적허용 응답: ${v_f7abdf(v_8f00b9.status)}`); } catch {}
             }
           } catch (v_9e86fd) {
-            console.warn('[App] ATT 요청 실패:', v_9e86fd);
+            console.warn('[ATT] 요청 실패:', v_9e86fd);
+            try { v_cba33f(`추적허용 에러: ${v_9e86fd?.message || v_9e86fd}`); } catch {}
           }
+        } else if (v_326be8.OS === 'ios') {
+          console.warn('[ATT] expo-tracking-transparency 모듈 없음 (구 빌드)');
+          try { v_cba33f('추적허용 모듈 없음 — 새 빌드 필요'); } catch {}
         }
 
         try {
