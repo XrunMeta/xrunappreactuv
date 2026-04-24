@@ -23,6 +23,10 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   const [v_43e90c, v_688dd2] = v_5ab095<string>('');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
 
+  const [v_a039ac, v_af9c21] = v_5ab095(0);
+
+  const v_eb8c24 = v_e662ae(false);
+
   v_c4deb2(() => {
     (async () => {
       try {
@@ -63,9 +67,10 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   v_c4deb2(() => {
     let v_5c3267 = v_6b5698.currentState;
     const v_1ae212 = v_6b5698.addEventListener('change', (v_a448ad) => {
-      if (v_5c3267 !== 'active' && v_a448ad === 'active') {
-        console.log('[ayeT WebView] 포그라운드 복귀 → reload');
-        v_35f830.current?.reload();
+      if (v_5c3267 !== 'active' && v_a448ad === 'active' && v_eb8c24.current) {
+        console.log('[ayeT WebView] 외부앱 복귀 → WebView remount');
+        v_eb8c24.current = false;
+        v_af9c21((v_0eb677) => v_0eb677 + 1);
       }
       v_5c3267 = v_a448ad;
     });
@@ -89,6 +94,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
     <View style={v_d81136.container}>
       <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
       <WebView
+        key={v_a039ac}
         ref={v_35f830}
         source={{ uri: v_6da94b }}
         style={v_d81136.webView}
@@ -109,14 +115,17 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
 
           const v_1ed546 = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
           if (v_1ed546.some((v_fd5f43) => v_f71b56.startsWith(v_fd5f43))) {
+            v_eb8c24.current = true;
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] 외부 URL open 실패:', v_9e86fd));
             return false;
           }
           if (v_f71b56.startsWith('https://apps.apple.com') || v_f71b56.startsWith('https://itunes.apple.com')) {
+            v_eb8c24.current = true;
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] App Store open 실패:', v_9e86fd));
             return false;
           }
           if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+            v_eb8c24.current = true;
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] Play Store/Intent open 실패:', v_9e86fd));
             return false;
           }
