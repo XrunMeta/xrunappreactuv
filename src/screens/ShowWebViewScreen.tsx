@@ -17,6 +17,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
+import { showToast } from '../utils';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 
@@ -391,6 +392,14 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           onShouldStartLoadWithRequest={(request) => {
             const { url } = request;
             console.log('[WebView] 네비게이션 요청:', url);
+
+            if (url.includes('myappfree.com') || url.includes('go.myappfree')) {
+              console.warn('[WebView] MAF 도메인 리다이렉트 감지 - 차단 후 뒤로가기:', url);
+
+              try { showToast('이 광고는 현재 참여할 수 없습니다.'); } catch {}
+              handleClose();
+              return false;
+            }
 
             if (url.startsWith('market://')) {
               console.warn('[WebView] market:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
