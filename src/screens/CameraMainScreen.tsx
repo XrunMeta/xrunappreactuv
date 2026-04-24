@@ -367,7 +367,9 @@ const TokenComponent: React.FC<TokenComponentProps> = ({
                 const price = token?.xrunPrice || 0;
                 const priceValue = parseFloat(String(price));
 
-                return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
+                if (isNaN(priceValue)) return '0.00';
+                const truncated = Math.floor(priceValue * 100) / 100;
+                return truncated.toFixed(2);
               })()}
             </Text>
             <Text style={styles.tokenDistanceText}>
