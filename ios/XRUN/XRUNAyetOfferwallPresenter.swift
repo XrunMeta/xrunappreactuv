@@ -128,7 +128,7 @@ private final class XRUNAyetOfferwallHostViewController: UIViewController, WKNav
     NSLog("[ayeT] decidePolicyFor url=%{public}@ scheme=%{public}@", url.absoluteString, scheme)
 
     let externalSchemes: Set<String> = [
-      "itms-apps", "itms-appss", "itms-services",
+      "itms-apps", "itms-appss",
       "tel", "sms", "mailto", "facetime", "facetime-audio",
       "intent",  
     ]

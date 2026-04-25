@@ -113,7 +113,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
           console.log('[ayeT WebView] 네비게이션 요청:', v_576f5a.url);
           const { url: v_f71b56 } = v_576f5a;
 
-          const v_1ed546 = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
+          const v_1ed546 = ['itms-apps://', 'itms-appss://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
           if (v_1ed546.some((v_fd5f43) => v_f71b56.startsWith(v_fd5f43))) {
             v_eb8c24.current = true;
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] 외부 URL open 실패:', v_9e86fd));
