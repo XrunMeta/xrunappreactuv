@@ -113,7 +113,7 @@ export const AyetOffersScreen: React.FC = () => {
           console.log('[ayeT WebView] 네비게이션 요청:', request.url);
           const { url } = request;
 
-          const externalSchemes = ['itms-apps://', 'itms-appss://', 'itms-services://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
+          const externalSchemes = ['itms-apps://', 'itms-appss://', 'tel:', 'sms:', 'mailto:', 'facetime:'];
           if (externalSchemes.some((s) => url.startsWith(s))) {
             wentExternalRef.current = true;
             Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] 외부 URL open 실패:', e));
