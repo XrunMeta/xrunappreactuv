@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: '추천인 관리',
   shopSales: 'Shop 매출',
   shopSalesSubtitle: '판매 현황 관리',
+  paymentPin: '결제 비밀번호 설정하기',
+  paymentPinSubtitle: '결제용 6자리 비밀번호 등록/변경',
   logout: '로그아웃',
   shareReferral: '레퍼럴 링크 공유',
   logoutConfirm: '로그아웃 하시겠습니까?',

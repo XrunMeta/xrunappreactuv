@@ -85,6 +85,15 @@ export const v_03a231 = () => {
         route: 'myinfoShopSales',
       },
       {
+        id: 'paymentPin',
+        label: v_8d41d7('screens.myInfo.paymentPin'),
+        subtitle: v_8d41d7('screens.myInfo.paymentPinSubtitle'),
+        iconName: 'lock-closed-outline',
+        iconLibrary: 'Ionicons',
+        iconColor: '#EF4444',
+        route: 'myInfoPaymentPin',
+      },
+      {
         id: 'notify',
         label: v_8d41d7('screens.myInfo.notify'),
         subtitle: v_8d41d7('screens.myInfo.notifySubtitle'),
