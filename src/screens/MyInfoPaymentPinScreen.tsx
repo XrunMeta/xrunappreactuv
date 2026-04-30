@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,11 +13,13 @@ import { useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { nodeGatewayRequest } from '../services';
 import { getEnv } from '../utils/env';
+import { useAlertDialog } from '../context';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
 export const MyInfoPaymentPinScreen: React.FC = () => {
   const { goBack } = useAppNavigation();
+  const { showAlert } = useAlertDialog();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [hasPin, setHasPin] = useState<boolean | null>(null);
   const [step, setStep] = useState<Step>('enter-new');
@@ -33,14 +34,14 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
       try {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (!userDataStr) {
-          Alert.alert('오류', '로그인 정보를 찾을 수 없습니다.');
+          await showAlert('오류', '로그인 정보를 찾을 수 없습니다.');
           goBack();
           return;
         }
         const userData = JSON.parse(userDataStr);
         const m = Number(userData?.member);
         if (!m) {
-          Alert.alert('오류', '회원 번호를 찾을 수 없습니다.');
+          await showAlert('오류', '회원 번호를 찾을 수 없습니다.');
           goBack();
           return;
         }
@@ -60,6 +61,7 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
         setStep('enter-new');
       }
     })();
+
   }, [goBack]);
 
   const currentInput = step === 'enter-old' ? oldPin : step === 'enter-new' ? newPin : confirmPin;
@@ -118,7 +120,7 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
       });
       const json = (await res.json().catch(() => ({}))) as { status?: string; code?: number; message?: string };
       if (json.status === 'success') {
-        Alert.alert('완료', '결제 비밀번호가 저장되었습니다.', [
+        await showAlert('완료', '결제 비밀번호가 저장되었습니다.', [
           { text: '확인', onPress: () => goBack() },
         ]);
       } else {
