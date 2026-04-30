@@ -13,6 +13,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { nodeGatewayRequest } from '../services';
+import { getEnv } from '../utils/env';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
@@ -44,7 +45,11 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
           return;
         }
         setMemberId(m);
-        const res = await nodeGatewayRequest(`/hasPaymentPin?member=${m}`, { method: 'GET' });
+        const authCode = getEnv().GATEWAY_AUTH_CODE;
+        const res = await nodeGatewayRequest(`/hasPaymentPin?member=${m}`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${authCode}` },
+        });
         const json = await res.json().catch(() => ({})) as { data?: { hasPin?: boolean }[] };
         const has = !!json?.data?.[0]?.hasPin;
         setHasPin(has);
@@ -102,9 +107,13 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
     try {
       const body: Record<string, unknown> = { member: memberId, pin: newPin };
       if (hasPin) body.oldPin = oldPin;
+      const authCode = getEnv().GATEWAY_AUTH_CODE;
       const res = await nodeGatewayRequest('/setPaymentPin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authCode}`,
+        },
         body: JSON.stringify(body),
       });
       const json = (await res.json().catch(() => ({}))) as { status?: string; code?: number; message?: string };
