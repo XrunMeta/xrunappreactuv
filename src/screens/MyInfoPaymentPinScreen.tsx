@@ -5,7 +5,6 @@ import {
   v_472849,
   v_4623af,
   v_39a996,
-  v_03e392,
   v_326be8,
 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -14,11 +13,13 @@ import { v_a0daa8 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_12a388 } from '../services';
 import { v_e4a763 } from '../utils/env';
+import { v_4b1173 } from '../context';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
 export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_1cc7e7, v_2a7a8f] = v_5ab095<boolean | null>(null);
   const [v_729796, v_fd7d1f] = v_5ab095<Step>('enter-new');
@@ -33,14 +34,14 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
       try {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (!v_f24fd5) {
-          v_03e392.alert('오류', '로그인 정보를 찾을 수 없습니다.');
+          await v_889fad('오류', '로그인 정보를 찾을 수 없습니다.');
           v_c7ac57();
           return;
         }
         const v_ef7306 = JSON.parse(v_f24fd5);
         const v_35f85c = Number(v_ef7306?.member);
         if (!v_35f85c) {
-          v_03e392.alert('오류', '회원 번호를 찾을 수 없습니다.');
+          await v_889fad('오류', '회원 번호를 찾을 수 없습니다.');
           v_c7ac57();
           return;
         }
@@ -60,6 +61,7 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
         v_fd7d1f('enter-new');
       }
     })();
+
   }, [v_c7ac57]);
 
   const v_bdc450 = v_729796 === 'enter-old' ? v_0ef310 : v_729796 === 'enter-new' ? v_a85523 : v_45b3eb;
@@ -118,7 +120,7 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
       });
       const v_7ecfd1 = (await v_8f00b9.json().catch(() => ({}))) as { status?: string; code?: number; message?: string };
       if (v_7ecfd1.status === 'success') {
-        v_03e392.alert('완료', '결제 비밀번호가 저장되었습니다.', [
+        await v_889fad('완료', '결제 비밀번호가 저장되었습니다.', [
           { text: '확인', onPress: () => v_c7ac57() },
         ]);
       } else {
