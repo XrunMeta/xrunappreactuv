@@ -80,6 +80,7 @@ export const v_ce4741 = {
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   myInfoEmailAuth: 'myInfoEmailAuth',
+  myInfoPaymentPin: 'myInfoPaymentPin',
   myChipsOfferwall: 'myChipsOfferwall',
   adisonOfferwall: 'adisonOfferwall',
   adisonTest: 'adisonTest',

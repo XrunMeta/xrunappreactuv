@@ -32,6 +32,7 @@ import {
   v_f39418,
   v_03a231,
   v_dec378,
+  v_99fdc0,
   v_cdb169,
   v_e14579,
   v_18d397,
@@ -433,6 +434,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'myInfoEmailAuth') {
     return <MyInfoEmailAuthScreen />;
+  }
+
+  if (v_0f0c7b === 'myInfoPaymentPin') {
+    return <MyInfoPaymentPinScreen />;
   }
 
   if (v_0f0c7b === 'myInfoFaq') {
