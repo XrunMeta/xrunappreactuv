@@ -13,6 +13,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_12a388 } from '../services';
+import { v_e4a763 } from '../utils/env';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
@@ -44,7 +45,11 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
           return;
         }
         v_9d6aeb(v_35f85c);
-        const v_8f00b9 = await v_12a388(`/hasPaymentPin?member=${v_35f85c}`, { method: 'GET' });
+        const v_36dd9e = v_e4a763().GATEWAY_AUTH_CODE;
+        const v_8f00b9 = await v_12a388(`/hasPaymentPin?member=${v_35f85c}`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${v_36dd9e}` },
+        });
         const v_7ecfd1 = await v_8f00b9.json().catch(() => ({})) as { data?: { hasPin?: boolean }[] };
         const v_4982f8 = !!v_7ecfd1?.data?.[0]?.hasPin;
         v_2a7a8f(v_4982f8);
@@ -102,9 +107,13 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
     try {
       const v_4d33b2 = { member: v_717992, pin: v_a85523 };
       if (v_1cc7e7) v_4d33b2.oldPin = v_0ef310;
+      const v_36dd9e = v_e4a763().GATEWAY_AUTH_CODE;
       const v_8f00b9 = await v_12a388('/setPaymentPin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${v_36dd9e}`,
+        },
         body: JSON.stringify(v_4d33b2),
       });
       const v_7ecfd1 = (await v_8f00b9.json().catch(() => ({}))) as { status?: string; code?: number; message?: string };
