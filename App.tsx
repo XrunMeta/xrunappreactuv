@@ -170,6 +170,18 @@ const ScreenHost = () => {
 
         const referral = parsed.queryParams?.referral as string | undefined;
 
+        const prefillEmail = parsed.queryParams?.email as string | undefined;
+        const fromApp = parsed.queryParams?.from as string | undefined;
+
+        if (prefillEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(prefillEmail)) {
+          console.log('[딥링크] 외부 앱 email 자동 입력:', prefillEmail, 'from:', fromApp);
+          try {
+            await AsyncStorage.setItem('pendingPrefillEmail', prefillEmail);
+          } catch (storageErr) {
+            console.warn('[딥링크] prefill email 저장 실패:', storageErr);
+          }
+        }
+
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
 
@@ -179,6 +191,11 @@ const ScreenHost = () => {
 
           console.log('[딥링크] 회원가입 화면으로 이동');
           navigate('signup');
+        } else if (prefillEmail) {
+
+          processedDeepLinkUrl = url;
+          console.log('[딥링크] 로그인 화면으로 이동 (email 자동 입력)');
+          navigate('login');
         } else {
           console.log('[딥링크] referral 파라미터가 없습니다.');
         }

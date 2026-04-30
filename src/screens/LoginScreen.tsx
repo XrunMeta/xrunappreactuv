@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Clipboard from 'expo-clipboard';
 import { useTranslation } from 'react-i18next';
 import {
   FormCheckbox,
@@ -100,29 +101,62 @@ export const LoginScreen = () => {
   };
 
   useEffect(() => {
-    const loadRememberedEmail = async () => {
+    const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+
+    const loadInitialEmail = async () => {
+      let prefilled = '';
+
       try {
         const remembered = await AsyncStorage.getItem('rememberMe');
         if (remembered === 'true') {
           const savedEmail = await AsyncStorage.getItem('userEmail');
           if (savedEmail) {
+            prefilled = savedEmail;
             setEmail(savedEmail);
             setRememberMe(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
           }
         } else {
-
           setRememberMe(true);
           setOtpRememberMe(true);
         }
       } catch (error) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', error);
-
         setRememberMe(true);
         setOtpRememberMe(true);
       }
+
+      if (!prefilled) {
+        try {
+          const pending = await AsyncStorage.getItem('pendingPrefillEmail');
+          if (pending && isValidEmail(pending)) {
+            prefilled = pending;
+            setEmail(pending);
+            setOtpEmail(pending);
+            console.log('[로그인] 딥링크 prefillEmail 적용:', pending);
+          }
+          await AsyncStorage.removeItem('pendingPrefillEmail');
+        } catch (err) {
+          console.warn('[로그인] pendingPrefillEmail 읽기 실패:', err);
+        }
+      }
+
+      if (!prefilled) {
+        try {
+          const clip = await Clipboard.getStringAsync();
+          const trimmed = clip?.trim() ?? '';
+          if (trimmed && isValidEmail(trimmed)) {
+            prefilled = trimmed;
+            setEmail(trimmed);
+            setOtpEmail(trimmed);
+            console.log('[로그인] 클립보드 이메일 자동 입력:', trimmed);
+          }
+        } catch (err) {
+          console.warn('[로그인] 클립보드 읽기 실패:', err);
+        }
+      }
     };
-    loadRememberedEmail();
+    loadInitialEmail();
   }, []);
 
   const toggleRememberMe = () => {
