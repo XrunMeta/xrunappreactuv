@@ -32,6 +32,7 @@ import {
   AddWalletAddressScreen,
   MyInfoScreen,
   MyInfoEmailAuthScreen,
+  MyInfoPaymentPinScreen,
   MyInfoEditScreen,
   PhoneEditScreen,
   ChangePasswordScreen,
@@ -433,6 +434,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'myInfoEmailAuth') {
     return <MyInfoEmailAuthScreen />;
+  }
+
+  if (currentScreen === 'myInfoPaymentPin') {
+    return <MyInfoPaymentPinScreen />;
   }
 
   if (currentScreen === 'myInfoFaq') {
