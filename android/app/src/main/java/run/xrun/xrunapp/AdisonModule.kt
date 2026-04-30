@@ -27,11 +27,12 @@ class AdisonModule(reactContext: ReactApplicationContext) :
                 return
             }
             val context = reactApplicationContext.applicationContext
-            Adison.initialize(context, appKey)
+
             Adison.setServer(
                 if (server.equals("development", ignoreCase = true)) AdisonServer.Development
                 else AdisonServer.Production
             )
+            Adison.initialize(context, appKey)
             isInitialized = true
             Log.d("AdisonModule", "initialize ok: server=$server")
             promise.resolve(true)

@@ -24,12 +24,12 @@ class AdisonModule: NSObject {
         return
       }
 
-      Adison.shared.initialize(appId: appKey)
       if server.lowercased() == "development" {
         Adison.shared.setServer(.development)
       } else {
         Adison.shared.setServer(.production)
       }
+      Adison.shared.initialize(appId: appKey)
       self.isInitialized = true
       NSLog("[Adison] initialize ok: server=%@", server)
       resolve(true)
