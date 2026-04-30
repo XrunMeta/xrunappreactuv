@@ -11,6 +11,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b6a872 } from 'vpztcxjmsfanunln';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import * as v_fba5a0 from 'hfxxehldoiokdq';
 import { v_772971 } from 'jmpfvteuuztnp';
 import {
   v_fa3feb,
@@ -100,29 +101,62 @@ export const v_f4f851 = () => {
   };
 
   v_c4deb2(() => {
-    const v_2a6af5 = async () => {
+    const v_0e461e = (v_fd5f43) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_fd5f43);
+
+    const v_71b8e8 = async () => {
+      let v_a28fef = '';
+
       try {
         const v_05155e = await v_e84827.getItem('rememberMe');
         if (v_05155e === 'true') {
           const v_60fc43 = await v_e84827.getItem('userEmail');
           if (v_60fc43) {
+            v_a28fef = v_60fc43;
             v_fedf34(v_60fc43);
             v_99916a(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
           }
         } else {
-
           v_99916a(true);
           v_24b225(true);
         }
       } catch (v_5e9bfe) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', v_5e9bfe);
-
         v_99916a(true);
         v_24b225(true);
       }
+
+      if (!v_a28fef) {
+        try {
+          const v_483de2 = await v_e84827.getItem('pendingPrefillEmail');
+          if (v_483de2 && v_0e461e(v_483de2)) {
+            v_a28fef = v_483de2;
+            v_fedf34(v_483de2);
+            v_e61149(v_483de2);
+            console.log('[로그인] 딥링크 prefillEmail 적용:', v_483de2);
+          }
+          await v_e84827.removeItem('pendingPrefillEmail');
+        } catch (v_49263d) {
+          console.warn('[로그인] pendingPrefillEmail 읽기 실패:', v_49263d);
+        }
+      }
+
+      if (!v_a28fef) {
+        try {
+          const v_e76aeb = await v_fba5a0.getStringAsync();
+          const v_2f361a = v_e76aeb?.trim() ?? '';
+          if (v_2f361a && v_0e461e(v_2f361a)) {
+            v_a28fef = v_2f361a;
+            v_fedf34(v_2f361a);
+            v_e61149(v_2f361a);
+            console.log('[로그인] 클립보드 이메일 자동 입력:', v_2f361a);
+          }
+        } catch (v_49263d) {
+          console.warn('[로그인] 클립보드 읽기 실패:', v_49263d);
+        }
+      }
     };
-    v_2a6af5();
+    v_71b8e8();
   }, []);
 
   const v_8f2c24 = () => {
