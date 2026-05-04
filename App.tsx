@@ -175,11 +175,9 @@ const ScreenHost = () => {
 
         if (prefillEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(prefillEmail)) {
           console.log('[딥링크] 외부 앱 email 자동 입력:', prefillEmail, 'from:', fromApp);
-          try {
-            await AsyncStorage.setItem('pendingPrefillEmail', prefillEmail);
-          } catch (storageErr) {
+          AsyncStorage.setItem('pendingPrefillEmail', prefillEmail).catch((storageErr) => {
             console.warn('[딥링크] prefill email 저장 실패:', storageErr);
-          }
+          });
         }
 
         if (referral) {
