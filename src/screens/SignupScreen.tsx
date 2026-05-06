@@ -645,6 +645,14 @@ export const SignupScreen = () => {
   }, [signupFormData, isGoogleSignupMode, isAppleSignupMode, isOptionalFields]);
 
   React.useEffect(() => {
+    if (signupFormData.referralEmail && signupFormData.referralEmail !== referralEmail) {
+      console.log('[회원가입] Context referralEmail 업데이트 감지:', signupFormData.referralEmail);
+      setReferralEmail(signupFormData.referralEmail);
+    }
+
+  }, [signupFormData.referralEmail]);
+
+  React.useEffect(() => {
     if (!isMountedRef.current) return;
 
     setSignupFormData({
