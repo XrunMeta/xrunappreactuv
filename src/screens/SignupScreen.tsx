@@ -645,6 +645,14 @@ export const v_f40fc5 = () => {
   }, [v_8d7bc8, v_47b466, v_d0472c, v_600254]);
 
   v_a3453e.useEffect(() => {
+    if (v_8d7bc8.referralEmail && v_8d7bc8.referralEmail !== v_9bf12c) {
+      console.log('[회원가입] Context referralEmail 업데이트 감지:', v_8d7bc8.referralEmail);
+      v_fb6bbb(v_8d7bc8.referralEmail);
+    }
+
+  }, [v_8d7bc8.referralEmail]);
+
+  v_a3453e.useEffect(() => {
     if (!v_2ca208.current) return;
 
     v_eee6b0({
