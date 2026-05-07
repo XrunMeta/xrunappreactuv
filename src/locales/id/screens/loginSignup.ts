@@ -1,4 +1,7 @@
 export default {
+  tutorial1: 'Ikuti iklan dan dapatkan hadiah XRUN',
+  tutorial2: 'Gunakan XRUN yang didapat di Shop',
+  tutorial3: 'Bagikan kode referal untuk mendapat tambahan 20% hadiah XRUN',
   adText: 'Iklan Layar Penuh',
   loginButton: 'Masuk',
   signupButton: 'Daftar',
