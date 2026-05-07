@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeModules, Platform } from 'react-native';
 
 import ko from './ko';
 import en from './en';
@@ -53,16 +54,51 @@ export const loadLanguage = async (language: LanguageCode): Promise<void> => {
 
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
+const getDeviceLocale = (): string => {
+  try {
+    if (Platform.OS === 'ios') {
+      const settings = NativeModules.SettingsManager?.settings;
+      const raw =
+        settings?.AppleLocale ||
+        (Array.isArray(settings?.AppleLanguages) ? settings.AppleLanguages[0] : '') ||
+        '';
+      return String(raw);
+    }
+    return String(NativeModules.I18nManager?.localeIdentifier || '');
+  } catch {
+    return '';
+  }
+};
+
+const normalizeLocaleToLanguage = (locale: string): LanguageCode => {
+  if (!locale) return 'en';
+  const normalized = locale.toLowerCase().replace('_', '-'); 
+  const primary = normalized.split('-')[0];                  
+
+  if (primary === 'zh') return 'zh-CN';
+
+  if ((primary as LanguageCode) in LANGUAGE_CODES) {
+    return primary as LanguageCode;
+  }
+
+  return 'en'; 
+};
+
 const getStoredLanguage = async (): Promise<LanguageCode> => {
   try {
     const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (stored && stored in LANGUAGE_CODES) {
       return stored as LanguageCode;
     }
+
+    const deviceLocale = getDeviceLocale();
+    const auto = normalizeLocaleToLanguage(deviceLocale);
+    console.log('[i18n] 기기 언어 자동 감지:', deviceLocale, '→', auto);
+    return auto;
   } catch (error) {
     console.error('언어 설정 불러오기 실패:', error);
   }
-  return 'ko'; 
+  return 'en'; 
 };
 
 export const setStoredLanguage = async (language: LanguageCode): Promise<void> => {
