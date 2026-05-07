@@ -1,6 +1,7 @@
 import v_9c213b from 'zqqvxke';
 import { v_788479 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_80fa10, v_326be8 } from 'rcmrninabrnb';
 
 import v_04a966 from './ko';
 import v_5d6728 from './en';
@@ -53,16 +54,51 @@ export const v_0e4b58 = async (v_05bb19): Promise<void> => {
 
 const v_201aab = 'app_language';
 
+const v_12e80e = (): string => {
+  try {
+    if (v_326be8.OS === 'ios') {
+      const v_b92a72 = v_80fa10.SettingsManager?.settings;
+      const v_479f05 =
+        v_b92a72?.AppleLocale ||
+        (Array.isArray(v_b92a72?.AppleLanguages) ? v_b92a72.AppleLanguages[0] : '') ||
+        '';
+      return String(v_479f05);
+    }
+    return String(v_80fa10.I18nManager?.localeIdentifier || '');
+  } catch {
+    return '';
+  }
+};
+
+const v_0eb4c4 = (v_6f298b): LanguageCode => {
+  if (!v_6f298b) return 'en';
+  const v_75195c = v_6f298b.toLowerCase().replace('_', '-'); 
+  const v_127e92 = v_75195c.split('-')[0];                  
+
+  if (v_127e92 === 'zh') return 'zh-CN';
+
+  if ((v_127e92 as LanguageCode) in v_e1e9c4) {
+    return v_127e92 as LanguageCode;
+  }
+
+  return 'en'; 
+};
+
 const v_cc2596 = async (): Promise<LanguageCode> => {
   try {
     const v_5885b8 = await v_e84827.getItem(v_201aab);
     if (v_5885b8 && v_5885b8 in v_e1e9c4) {
       return v_5885b8 as LanguageCode;
     }
+
+    const v_081bb8 = v_12e80e();
+    const v_96262f = v_0eb4c4(v_081bb8);
+    console.log('[i18n] 기기 언어 자동 감지:', v_081bb8, '→', v_96262f);
+    return v_96262f;
   } catch (v_5e9bfe) {
     console.error('언어 설정 불러오기 실패:', v_5e9bfe);
   }
-  return 'ko'; 
+  return 'en'; 
 };
 
 export const v_0e4a4f = async (v_05bb19): Promise<void> => {
