@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: 'Manage referrals',
   shopSales: 'Shop Sales',
   shopSalesSubtitle: 'Manage sales status',
+  paymentPin: 'Set Payment PIN',
+  paymentPinSubtitle: 'Register/change 6-digit PIN for payments',
   logout: 'Logout',
   shareReferral: 'Share Referral Link',
   logoutConfirm: 'Do you want to logout?',
