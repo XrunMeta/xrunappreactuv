@@ -1,4 +1,7 @@
 export default {
+  tutorial1: 'विज्ञापनों में भाग लें और XRUN इनाम पाएं',
+  tutorial2: 'अर्जित XRUN का उपयोग Shop में करें',
+  tutorial3: 'रेफ़रल कोड साझा करें और 20% अतिरिक्त XRUN इनाम पाएं',
   adText: 'पूर्ण स्क्रीन विज्ञापन',
   loginButton: 'लॉगिन',
   signupButton: 'साइन अप',
