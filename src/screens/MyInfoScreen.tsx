@@ -84,15 +84,7 @@ export const MyInfoScreen = () => {
         iconColor: '#7ca6e8',
         route: 'myinfoShopSales',
       },
-      {
-        id: 'paymentPin',
-        label: t('screens.myInfo.paymentPin'),
-        subtitle: t('screens.myInfo.paymentPinSubtitle'),
-        iconName: 'lock-closed-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EF4444',
-        route: 'myInfoPaymentPin',
-      },
+
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),

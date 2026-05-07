@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: 'จัดการการแนะนำ',
   shopSales: 'ยอดขายร้านค้า',
   shopSalesSubtitle: 'จัดการสถานะการขาย',
+  paymentPin: 'ตั้งรหัส PIN ชำระเงิน',
+  paymentPinSubtitle: 'ลงทะเบียน/เปลี่ยนรหัส PIN 6 หลัก',
   logout: 'ออกจากระบบ',
   shareReferral: 'แชร์ลิงก์แนะนำ',
   logoutConfirm: 'คุณต้องการออกจากระบบหรือไม่?',

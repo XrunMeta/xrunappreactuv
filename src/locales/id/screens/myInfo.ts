@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: 'Kelola referral',
   shopSales: 'Penjualan Shop',
   shopSalesSubtitle: 'Kelola status penjualan',
+  paymentPin: 'Atur PIN Pembayaran',
+  paymentPinSubtitle: 'Daftar/ubah PIN 6 digit untuk pembayaran',
   logout: 'Keluar',
   shareReferral: 'Bagikan Tautan Referral',
   logoutConfirm: 'Apakah Anda ingin keluar?',
