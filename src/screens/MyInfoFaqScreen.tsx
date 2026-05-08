@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header, SafeScrollView } from '../components';
 import { COLORS, COMMON_STYLES, LIST_STYLES, SIZES, FONTS } from '../constants';
 
-const FAQ_API = 'https://oth-path-gw.example.invalid/oth-path';
+const FAQ_API_BASE = 'https://oth-path-gw.example.invalid/oth-path';
 
 type FaqItem = {
   id: string;
@@ -22,7 +22,7 @@ type FaqItem = {
 };
 
 export const MyInfoFaqScreen = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const [items, setItems] = useState<FaqItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,9 @@ export const MyInfoFaqScreen = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(FAQ_API);
+
+        const lng = i18n.language || 'ko';
+        const resp = await fetch(`${FAQ_API_BASE}?language=${encodeURIComponent(lng)}`);
         const json = await resp.json();
         if (json.success && Array.isArray(json.data)) {
           setItems(json.data.map((item: any) => ({
