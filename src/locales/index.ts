@@ -55,6 +55,16 @@ export const v_0e4b58 = async (v_05bb19): Promise<void> => {
 const v_201aab = 'app_language';
 
 const v_12e80e = (): string => {
+
+  try {
+    const v_bf11b0 = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale;
+    if (v_bf11b0 && typeof v_bf11b0 === 'string' && v_bf11b0.length >= 2) {
+      return v_bf11b0;
+    }
+  } catch {
+
+  }
+
   try {
     if (v_326be8.OS === 'ios') {
       const v_b92a72 = v_80fa10.SettingsManager?.settings;
@@ -64,6 +74,7 @@ const v_12e80e = (): string => {
         '';
       return String(v_479f05);
     }
+
     return String(v_80fa10.I18nManager?.localeIdentifier || '');
   } catch {
     return '';
