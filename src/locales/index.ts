@@ -55,31 +55,49 @@ export const loadLanguage = async (language: LanguageCode): Promise<void> => {
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
 const getDeviceLocale = (): string => {
+  const candidates: { source: string; value: string }[] = []
 
   try {
-    const intlLocale = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale;
-    if (intlLocale && typeof intlLocale === 'string' && intlLocale.length >= 2) {
-      return intlLocale;
-    }
-  } catch {
-
-  }
+    const v = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale
+    if (v) candidates.push({ source: 'Intl', value: String(v) })
+  } catch {}
 
   try {
     if (Platform.OS === 'ios') {
-      const settings = NativeModules.SettingsManager?.settings;
-      const raw =
-        settings?.AppleLocale ||
-        (Array.isArray(settings?.AppleLanguages) ? settings.AppleLanguages[0] : '') ||
-        '';
-      return String(raw);
+      const settings = NativeModules.SettingsManager?.settings
+      if (settings?.AppleLocale) {
+        candidates.push({ source: 'AppleLocale', value: String(settings.AppleLocale) })
+      }
+      if (Array.isArray(settings?.AppleLanguages) && settings.AppleLanguages[0]) {
+        candidates.push({ source: 'AppleLanguages[0]', value: String(settings.AppleLanguages[0]) })
+      }
     }
+  } catch {}
 
-    return String(NativeModules.I18nManager?.localeIdentifier || '');
-  } catch {
-    return '';
+  try {
+    const ident = NativeModules.I18nManager?.localeIdentifier
+    if (ident) candidates.push({ source: 'I18nManager.localeIdentifier', value: String(ident) })
+    const c2 = NativeModules.I18nManager?.constants?.localeIdentifier
+    if (c2) candidates.push({ source: 'I18nManager.constants.localeIdentifier', value: String(c2) })
+  } catch {}
+
+  try {
+    const pc = (NativeModules as any).PlatformConstants?.localeIdentifier
+    if (pc) candidates.push({ source: 'PlatformConstants', value: String(pc) })
+  } catch {}
+
+  console.log('[i18n] 기기 언어 후보:', candidates)
+
+  const nonDefault = candidates.find(
+    (c) => c.value && c.value.toLowerCase() !== 'en-us' && c.value.toLowerCase() !== 'en_us'
+  )
+  if (nonDefault) {
+    console.log('[i18n] 선택된 후보:', nonDefault)
+    return nonDefault.value
   }
-};
+
+  return candidates[0]?.value || ''
+}
 
 const normalizeLocaleToLanguage = (locale: string): LanguageCode => {
   if (!locale) return 'en';
