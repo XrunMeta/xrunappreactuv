@@ -13,7 +13,7 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_729608, v_570c34 } from '../components';
 import { v_1bfbd0, v_a61db3, v_704d15, v_9b1a04, v_843035 } from '../constants';
 
-const v_0e6e65 = 'https://oth-path-f0013c.example.invalid/oth-path';
+const v_fb6568 = 'https://oth-path-f0013c.example.invalid/oth-path';
 
 type FaqItem = {
   id: string;
@@ -22,7 +22,7 @@ type FaqItem = {
 };
 
 export const v_083aa7 = () => {
-  const { t: v_8d41d7 } = v_772971();
+  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
   const [v_c2c485, v_d24017] = v_5ab095<string[]>([]);
   const [v_4622b9, v_fa923c] = v_5ab095<FaqItem[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
@@ -30,7 +30,9 @@ export const v_083aa7 = () => {
   v_c4deb2(() => {
     (async () => {
       try {
-        const v_eb792a = await fetch(v_0e6e65);
+
+        const v_c87b30 = v_9c213b.language || 'ko';
+        const v_eb792a = await fetch(`${v_fb6568}?language=${encodeURIComponent(v_c87b30)}`);
         const v_7ecfd1 = await v_eb792a.json();
         if (v_7ecfd1.success && Array.isArray(v_7ecfd1.data)) {
           v_fa923c(v_7ecfd1.data.map((v_8c0b26) => ({
