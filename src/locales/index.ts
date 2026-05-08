@@ -55,31 +55,49 @@ export const v_0e4b58 = async (v_05bb19): Promise<void> => {
 const v_201aab = 'app_language';
 
 const v_12e80e = (): string => {
+  const v_6f7c85 = []
 
   try {
-    const v_bf11b0 = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale;
-    if (v_bf11b0 && typeof v_bf11b0 === 'string' && v_bf11b0.length >= 2) {
-      return v_bf11b0;
-    }
-  } catch {
-
-  }
+    const v_81e2ef = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale
+    if (v_81e2ef) v_6f7c85.push({ source: 'Intl', value: String(v_81e2ef) })
+  } catch {}
 
   try {
     if (v_326be8.OS === 'ios') {
-      const v_b92a72 = v_80fa10.SettingsManager?.settings;
-      const v_479f05 =
-        v_b92a72?.AppleLocale ||
-        (Array.isArray(v_b92a72?.AppleLanguages) ? v_b92a72.AppleLanguages[0] : '') ||
-        '';
-      return String(v_479f05);
+      const v_b92a72 = v_80fa10.SettingsManager?.settings
+      if (v_b92a72?.AppleLocale) {
+        v_6f7c85.push({ source: 'AppleLocale', value: String(v_b92a72.AppleLocale) })
+      }
+      if (Array.isArray(v_b92a72?.AppleLanguages) && v_b92a72.AppleLanguages[0]) {
+        v_6f7c85.push({ source: 'AppleLanguages[0]', value: String(v_b92a72.AppleLanguages[0]) })
+      }
     }
+  } catch {}
 
-    return String(v_80fa10.I18nManager?.localeIdentifier || '');
-  } catch {
-    return '';
+  try {
+    const v_22ee42 = v_80fa10.I18nManager?.localeIdentifier
+    if (v_22ee42) v_6f7c85.push({ source: 'I18nManager.localeIdentifier', value: String(v_22ee42) })
+    const v_c8af91 = v_80fa10.I18nManager?.constants?.localeIdentifier
+    if (v_c8af91) v_6f7c85.push({ source: 'I18nManager.constants.localeIdentifier', value: String(v_c8af91) })
+  } catch {}
+
+  try {
+    const v_12cd99 = (v_80fa10 as any).PlatformConstants?.localeIdentifier
+    if (v_12cd99) v_6f7c85.push({ source: 'PlatformConstants', value: String(v_12cd99) })
+  } catch {}
+
+  console.log('[i18n] 기기 언어 후보:', v_6f7c85)
+
+  const v_4cc6df = v_6f7c85.find(
+    (v_3f4e2e) => v_3f4e2e.value && v_3f4e2e.value.toLowerCase() !== 'en-us' && v_3f4e2e.value.toLowerCase() !== 'en_us'
+  )
+  if (v_4cc6df) {
+    console.log('[i18n] 선택된 후보:', v_4cc6df)
+    return v_4cc6df.value
   }
-};
+
+  return v_6f7c85[0]?.value || ''
+}
 
 const v_0eb4c4 = (v_6f298b): LanguageCode => {
   if (!v_6f298b) return 'en';
