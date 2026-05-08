@@ -141,10 +141,22 @@ export const v_0e4a4f = async (v_05bb19): Promise<void> => {
 };
 
 export const v_116c93 = (): typeof v_9c213b => {
+
+  let v_94d22b = 'en'
+  try {
+    const v_081bb8 = v_12e80e()
+    const v_2df143 = v_0eb4c4(v_081bb8)
+    if (v_2df143 === 'ko') v_94d22b = 'ko'
+    else if (v_2df143 === 'en') v_94d22b = 'en'
+    else v_94d22b = 'en'  
+  } catch {
+    v_94d22b = 'en'
+  }
+
   v_9c213b.use(v_788479).init({
     resources: { ko: { translation: v_04a966 }, en: { translation: v_5d6728 } },
-    lng: 'ko',
-    fallbackLng: 'ko',
+    lng: v_94d22b,
+    fallbackLng: 'en',
     interpolation: { escapeValue: false },
     compatibilityJSON: 'v3',
   });
@@ -153,12 +165,20 @@ export const v_116c93 = (): typeof v_9c213b => {
 
 export const v_1f4a13 = (): void => {
   v_cc2596()
-    .then((v_c87b30) => {
-      if (v_c87b30 === 'ko') return;
-      if (v_c87b30 === 'en') return v_9c213b.changeLanguage('en');
-      return v_0e4b58(v_c87b30).then(() => v_9c213b.changeLanguage(v_c87b30));
+    .then(async (v_c87b30) => {
+      console.log('[i18n] 적용 대상 언어:', v_c87b30, '(현재:', v_9c213b.language, ')');
+      if (v_c87b30 === v_9c213b.language) {
+        console.log('[i18n] 이미 적용됨 — skip');
+        return;
+      }
+      if (v_c87b30 === 'ko' || v_c87b30 === 'en') {
+        await v_9c213b.changeLanguage(v_c87b30);
+        return;
+      }
+      await v_0e4b58(v_c87b30);
+      await v_9c213b.changeLanguage(v_c87b30);
     })
-    .then(() => console.log('[App] i18n 저장 언어 적용 완료'))
+    .then(() => console.log('[App] i18n 저장 언어 적용 완료, 현재 언어:', v_9c213b.language))
     .catch((v_9e86fd) => console.warn('[i18n] 저장 언어 적용 실패:', v_9e86fd));
 };
 
