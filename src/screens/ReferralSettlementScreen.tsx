@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     gap: 4,
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   refTypeText: {
     fontSize: FONTS.size.small,
