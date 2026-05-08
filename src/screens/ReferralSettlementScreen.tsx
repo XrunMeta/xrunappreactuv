@@ -366,7 +366,7 @@ const v_d81136 = v_472849.create({
     flex: 1,
     flexDirection: 'column',
     gap: 4,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   refTypeText: {
     fontSize: v_843035.size.small,
