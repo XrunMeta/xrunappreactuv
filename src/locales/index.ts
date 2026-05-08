@@ -141,10 +141,22 @@ export const setStoredLanguage = async (language: LanguageCode): Promise<void> =
 };
 
 export const initI18nSync = (): typeof i18n => {
+
+  let initialLng: 'ko' | 'en' = 'en'
+  try {
+    const deviceLocale = getDeviceLocale()
+    const detected = normalizeLocaleToLanguage(deviceLocale)
+    if (detected === 'ko') initialLng = 'ko'
+    else if (detected === 'en') initialLng = 'en'
+    else initialLng = 'en'  
+  } catch {
+    initialLng = 'en'
+  }
+
   i18n.use(initReactI18next).init({
     resources: { ko: { translation: ko }, en: { translation: en } },
-    lng: 'ko',
-    fallbackLng: 'ko',
+    lng: initialLng,
+    fallbackLng: 'en',
     interpolation: { escapeValue: false },
     compatibilityJSON: 'v3',
   });
@@ -153,12 +165,20 @@ export const initI18nSync = (): typeof i18n => {
 
 export const applyStoredLanguageAsync = (): void => {
   getStoredLanguage()
-    .then((lng) => {
-      if (lng === 'ko') return;
-      if (lng === 'en') return i18n.changeLanguage('en');
-      return loadLanguage(lng).then(() => i18n.changeLanguage(lng));
+    .then(async (lng) => {
+      console.log('[i18n] 적용 대상 언어:', lng, '(현재:', i18n.language, ')');
+      if (lng === i18n.language) {
+        console.log('[i18n] 이미 적용됨 — skip');
+        return;
+      }
+      if (lng === 'ko' || lng === 'en') {
+        await i18n.changeLanguage(lng);
+        return;
+      }
+      await loadLanguage(lng);
+      await i18n.changeLanguage(lng);
     })
-    .then(() => console.log('[App] i18n 저장 언어 적용 완료'))
+    .then(() => console.log('[App] i18n 저장 언어 적용 완료, 현재 언어:', i18n.language))
     .catch((e) => console.warn('[i18n] 저장 언어 적용 실패:', e));
 };
 
