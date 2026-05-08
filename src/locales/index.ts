@@ -55,6 +55,16 @@ export const loadLanguage = async (language: LanguageCode): Promise<void> => {
 const LANGUAGE_STORAGE_KEY = 'app_language';
 
 const getDeviceLocale = (): string => {
+
+  try {
+    const intlLocale = Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.locale;
+    if (intlLocale && typeof intlLocale === 'string' && intlLocale.length >= 2) {
+      return intlLocale;
+    }
+  } catch {
+
+  }
+
   try {
     if (Platform.OS === 'ios') {
       const settings = NativeModules.SettingsManager?.settings;
@@ -64,6 +74,7 @@ const getDeviceLocale = (): string => {
         '';
       return String(raw);
     }
+
     return String(NativeModules.I18nManager?.localeIdentifier || '');
   } catch {
     return '';
