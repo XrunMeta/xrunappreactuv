@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, PaymentPinGate } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -86,6 +86,8 @@ export const WalletSendScreen = () => {
 
   const [memberId, setMemberId] = useState<string | null>(null);
   const [memberLimit, setMemberLimit] = useState<number | null>(null);
+
+  const [pinUnlocked, setPinUnlocked] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -525,6 +527,15 @@ export const WalletSendScreen = () => {
     <SafeView style={styles.container} showBottomBackground={true}>
       <StatusBar style="dark" />
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
+
+      {}
+      {!pinUnlocked && (
+        <PaymentPinGate
+          memberId={memberId}
+          onSuccess={() => setPinUnlocked(true)}
+          onCancel={handleBackPress}
+        />
+      )}
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.contentContainer}>
