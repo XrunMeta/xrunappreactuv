@@ -26,6 +26,24 @@
         "simulator": false
       }
     },
+    "development-ios": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "ios": {
+        "simulator": false,
+        "image": "latest"
+      },
+      "channel": "development"
+    },
+    "development-ios-simulator": {
+      "distribution": "internal",
+      "developmentClient": true,
+      "ios": {
+        "simulator": true,
+        "image": "latest"
+      },
+      "channel": "development"
+    },
     "internal": {
       "distribution": "internal",
       "ios": {
@@ -36,14 +54,16 @@
       "distribution": "internal"
     },
     "production": {
-      "distribution": "store",
       "autoIncrement": true,
       "ios": {
         "distribution": "store",
         "image": "latest"
       },
+    },
+    "production-apk": {
+      "extends": "production",
       "android": {
-        "distribution": "store"
+        "buildType": "apk"
       }
     }
   },

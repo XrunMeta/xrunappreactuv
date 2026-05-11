@@ -1535,6 +1535,9 @@ export const MapMainScreen: React.FC = () => {
     }
 
     isFetchingTopAd5Ref.current = true;
+    const bootSlowLog = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+    const refreshStartAt = Date.now();
+    console.log(bootSlowLog, '[MapMainScreen] refreshTopAd5AndMapMarkers 시작 (마커+TopAd5 로드)');
     try {
 
       let completedAdsSet = new Set<string>();
@@ -1596,10 +1599,12 @@ export const MapMainScreen: React.FC = () => {
         console.log('[MapMainScreen] 캐시된 TopAd5 먼저 표시:', storedTopAd5.length, '개 (API 응답 대기)');
       }
 
-      console.log('[MapMainScreen] 1단계: TopAd5 API 호출 시작');
+      const topAd5StartAt = Date.now();
+      console.log(bootSlowLog, '[MapMainScreen] 1단계: TopAd5 API 호출 시작');
       let topAd5Response: any[] | null = null;
 
       topAd5Response = await getTopAd5(undefined, forceRefresh);
+      console.log(bootSlowLog, '[MapMainScreen] 1단계: TopAd5 API 호출 완료', `${Date.now() - topAd5StartAt}ms`);
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
         console.warn('[MapMainScreen] TopAd5 API 데이터가 없습니다. 캐시 유지.');

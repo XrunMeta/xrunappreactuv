@@ -132,13 +132,18 @@ export const MyInfoScreen = () => {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (userDataStr) {
           const userData = JSON.parse(userDataStr);
-          const member = userData.member;
+          if (userData == null || typeof userData !== 'object') {
+            setIsLoading(false);
+            return;
+          }
+          const member = userData.member != null ? Number(userData.member) : undefined;
 
           if (member) {
             const response = await getMyPageUserInfo(member, navigate);
-            const user = response.data[0];
+            const data = response?.data;
+            const user = data == null ? null : Array.isArray(data) ? data[0] : data;
 
-            if (user) {
+            if (user != null && typeof user === 'object') {
               const firstName = user.firstname || '';
               const lastName = user.lastname || '';
               const fullName = `${lastName} ${firstName}`.trim() || '사용자';
