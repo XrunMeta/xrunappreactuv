@@ -29,6 +29,8 @@ export default {
     loginFailed: 'Email atau kata sandi tidak benar',
     userDataNotFound: 'Tidak dapat mengambil informasi pengguna',
     loginError: 'Terjadi kesalahan saat masuk. Silakan coba lagi',
+    idTokenMissing: 'Gagal menerima token ID. Silakan coba lagi.',
+    identityTokenMissing: 'Gagal menerima token Identity. Silakan coba lagi.',
   },
 };
 

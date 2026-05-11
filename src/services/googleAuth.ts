@@ -132,10 +132,12 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
 
     const v_b50834 = v_bb789b.data?.idToken;
     if (!v_b50834) {
+
+      const v_9c213b = require('zqqvxke').default;
       return {
         success: false,
         code: 'ID_TOKEN_MISSING',
-        message: 'ID 토큰을 받지 못했습니다.',
+        message: v_9c213b.t('screens.login.errors.idTokenMissing') || 'Failed to receive ID token. Please try again.',
       };
     }
 

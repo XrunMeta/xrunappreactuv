@@ -29,6 +29,8 @@ export default {
     loginFailed: 'メールアドレスまたはパスワードが正しくありません',
     userDataNotFound: 'ユーザー情報を取得できません',
     loginError: 'ログイン中にエラーが発生しました。もう一度お試しください',
+    idTokenMissing: 'IDトークンを受信できませんでした。もう一度お試しください。',
+    identityTokenMissing: 'Identityトークンを受信できませんでした。もう一度お試しください。',
   },
 };
 

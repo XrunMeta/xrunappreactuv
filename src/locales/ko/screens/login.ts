@@ -29,6 +29,8 @@ export default {
     loginFailed: '이메일 또는 비밀번호가 올바르지 않습니다.',
     userDataNotFound: '사용자 정보를 가져올 수 없습니다.',
     loginError: '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+    idTokenMissing: 'ID 토큰을 받지 못했습니다. 다시 시도해주세요.',
+    identityTokenMissing: 'Identity 토큰을 받지 못했습니다. 다시 시도해주세요.',
   },
 };
 
