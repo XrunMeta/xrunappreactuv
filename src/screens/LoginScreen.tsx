@@ -11,6 +11,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b6a872 } from 'vpztcxjmsfanunln';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import * as v_fba5a0 from 'hfxxehldoiokdq';
 import { v_772971 } from 'jmpfvteuuztnp';
 import {
   v_fa3feb,
@@ -24,6 +25,7 @@ import {
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_e8d7c0 } from '../services/ayet';
+import { v_627d09 } from '../services/adison';
 import {
   v_b699a9,
   v_a5170b,
@@ -35,6 +37,7 @@ import {
   v_7af6c9,
   v_1fee11,
   v_a763e6,
+  v_cec605,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -98,29 +101,62 @@ export const v_f4f851 = () => {
   };
 
   v_c4deb2(() => {
-    const v_2a6af5 = async () => {
+    const v_0e461e = (v_fd5f43) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_fd5f43);
+
+    const v_71b8e8 = async () => {
+      let v_a28fef = '';
+
       try {
         const v_05155e = await v_e84827.getItem('rememberMe');
         if (v_05155e === 'true') {
           const v_60fc43 = await v_e84827.getItem('userEmail');
           if (v_60fc43) {
+            v_a28fef = v_60fc43;
             v_fedf34(v_60fc43);
             v_99916a(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', v_60fc43);
           }
         } else {
-
           v_99916a(true);
           v_24b225(true);
         }
       } catch (v_5e9bfe) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', v_5e9bfe);
-
         v_99916a(true);
         v_24b225(true);
       }
+
+      if (!v_a28fef) {
+        try {
+          const v_483de2 = await v_e84827.getItem('pendingPrefillEmail');
+          if (v_483de2 && v_0e461e(v_483de2)) {
+            v_a28fef = v_483de2;
+            v_fedf34(v_483de2);
+            v_e61149(v_483de2);
+            console.log('[로그인] 딥링크 prefillEmail 적용:', v_483de2);
+          }
+          await v_e84827.removeItem('pendingPrefillEmail');
+        } catch (v_49263d) {
+          console.warn('[로그인] pendingPrefillEmail 읽기 실패:', v_49263d);
+        }
+      }
+
+      if (!v_a28fef) {
+        try {
+          const v_e76aeb = await v_fba5a0.getStringAsync();
+          const v_2f361a = v_e76aeb?.trim() ?? '';
+          if (v_2f361a && v_0e461e(v_2f361a)) {
+            v_a28fef = v_2f361a;
+            v_fedf34(v_2f361a);
+            v_e61149(v_2f361a);
+            console.log('[로그인] 클립보드 이메일 자동 입력:', v_2f361a);
+          }
+        } catch (v_49263d) {
+          console.warn('[로그인] 클립보드 읽기 실패:', v_49263d);
+        }
+      }
     };
-    v_2a6af5();
+    v_71b8e8();
   }, []);
 
   const v_8f2c24 = () => {
@@ -238,6 +274,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8.trim());
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -260,6 +303,10 @@ export const v_f4f851 = () => {
       }
 
       console.log('[로그인] 로그인 성공');
+
+      if (v_ef7306.member) {
+        v_cec605(v_ef7306.member, v_9b57fc).catch(() => {});
+      }
 
       v_9b57fc(v_ce4741.map);
     } catch (v_5e9bfe) {
@@ -341,6 +388,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_f4fb5e);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
 
       const v_00b91e = v_ef7306.extrastr || '';
       await v_e84827.setItem('userSessionToken', v_00b91e);
@@ -455,6 +509,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
@@ -462,6 +523,10 @@ export const v_f4f851 = () => {
       console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
+
+      if (v_717992) {
+        v_cec605(v_717992, v_9b57fc).catch(() => {});
+      }
 
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
       v_9b57fc(v_ce4741.map);
@@ -596,6 +661,13 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
+      if (v_ef7306.member != null) {
+
+        v_627d09(v_ef7306.member, {
+          gender: (v_ef7306 as any).gender,
+          age: (v_ef7306 as any).age,
+        });
+      }
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
@@ -605,6 +677,10 @@ export const v_f4f851 = () => {
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      if (v_717992) {
+        v_cec605(v_717992, v_9b57fc).catch(() => {});
+      }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
       v_9b57fc(v_ce4741.map);

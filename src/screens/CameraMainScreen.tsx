@@ -367,7 +367,9 @@ const TokenComponent: v_a3453e.FC<TokenComponentProps> = ({
                 const v_6bbb57 = v_21cc31?.xrunPrice || 0;
                 const v_123554 = parseFloat(String(v_6bbb57));
 
-                return isNaN(v_123554) ? '0.00' : v_123554.toFixed(2);
+                if (isNaN(v_123554)) return '0.00';
+                const v_ccc3be = Math.floor(v_123554 * 100) / 100;
+                return v_ccc3be.toFixed(2);
               })()}
             </Text>
             <Text style={v_d81136.tokenDistanceText}>
@@ -473,6 +475,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const [v_6ced96, v_cb400d] = v_5ab095('');
   const [v_fc9bd6, v_8aeec2] = v_5ab095(false);
+  const [v_f72439, v_59e1cb] = v_5ab095(false);
+  const v_ad144f = v_e662ae<v_2694e4>(null);
 
   const v_62078f = v_e662ae<v_60c7c3 | null>(null);
   const v_63031f = v_e662ae<any>(null);
@@ -819,12 +823,13 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       return;
     }
 
-    for (let v_ebec57 = 0; v_ebec57 < v_f64b05; v_ebec57++) {
+    const v_30c4ef = Math.min(v_f64b05, v_908496.length);
+    for (let v_ebec57 = 0; v_ebec57 < v_30c4ef; v_ebec57++) {
       const v_a56041 = (v_a96760.current + v_ebec57) % v_908496.length;
       v_2e375c.push(v_908496[v_a56041]);
     }
 
-    v_a96760.current = (v_a96760.current + v_f64b05) % v_908496.length;
+    v_a96760.current = (v_a96760.current + v_30c4ef) % v_908496.length;
 
     const v_368ba7 = v_2e375c.map((v_9390e8, v_a56041) => {
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
@@ -2025,10 +2030,28 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         v_62078f.current = v_21cc31;
         v_63031f.current = v_75c344;
 
-        v_e60eaf(v_7ec08d);
         v_cb400d(v_21cc31.name || '광고');
-        v_8aeec2(false); 
+        v_8aeec2(false);
+        v_59e1cb(false);
         v_bde9a1(true);
+
+        (async () => {
+          try {
+            const v_eb792a = await fetch(v_7ec08d, { method: 'GET' });
+            const v_c0c2d5 = v_eb792a.headers.get('content-type') || '';
+            if (v_c0c2d5.includes('application/json')) {
+              const v_7ecfd1 = await v_eb792a.json();
+              if (v_7ecfd1.lurl) {
+                console.log('[WebView Modal] JSON lurl 추출:', v_7ecfd1.lurl);
+                v_e60eaf(v_7ecfd1.lurl);
+                return;
+              }
+            }
+          } catch {
+
+          }
+          v_e60eaf(v_7ec08d);
+        })();
       }
 
       (async () => {
@@ -2779,17 +2802,20 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             backgroundColor: '#fff',
           }}>
             {}
-            <TouchableOpacity
-              onPress={v_3aa877}
-              style={{
-                flex: 2,
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                marginLeft: 8,
-              }}
-            >
-              <Ionicons name="close" size={24} color="#000" />
-            </TouchableOpacity>
+            <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (v_f72439 && v_ad144f.current) {
+                    v_ad144f.current.goBack();
+                  } else {
+                    v_3aa877();
+                  }
+                }}
+                style={{ padding: 4 }}
+              >
+                <Ionicons name="chevron-back" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
 
             {}
             <Text 
@@ -2826,6 +2852,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           {}
           {v_b2dceb && !v_fc9bd6 ? (
             <WebView
+              ref={v_ad144f}
               key={v_b2dceb}
               source={{ uri: v_b2dceb }}
               style={{ flex: 1 }}
@@ -2982,6 +3009,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                 }
               }}
               onNavigationStateChange={(v_b8df7f) => {
+                v_59e1cb(v_b8df7f.canGoBack);
                 console.log('[WebView] 네비게이션:', v_b8df7f.url);
 
                 if (v_b8df7f.url && v_b8df7f.url.startsWith('market://')) {

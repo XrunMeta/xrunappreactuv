@@ -59,3 +59,5 @@ export { default as v_dc9f15 } from './xrunInfo';
 export { default as v_37b2d1 } from './xplayInfo';
 export { default as v_fe1952 } from './pangleList';
 
+export { default as v_0b8942 } from './paymentPin';
+export { default as v_987588 } from './emailOtp';

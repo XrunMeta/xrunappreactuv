@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: 'रेफरल प्रबंधित करें',
   shopSales: 'दुकान बिक्री',
   shopSalesSubtitle: 'बिक्री स्थिति प्रबंधित करें',
+  paymentPin: 'भुगतान PIN सेट करें',
+  paymentPinSubtitle: 'भुगतान के लिए 6 अंकों का PIN पंजीकरण/बदलें',
   logout: 'लॉगआउट',
   shareReferral: 'रेफरल लिंक साझा करें',
   logoutConfirm: 'क्या आप लॉगआउट करना चाहते हैं?',

@@ -112,7 +112,8 @@ export const v_58584a = () => {
 
             v_61b66e.current = v_8673d6;
             v_8d99ff(v_8673d6);
-            v_e2e8ad(v_8673d6.length);
+
+            v_e2e8ad((v_3393e3 as any).total8Depth ?? v_8673d6.length);
             v_58d2fc.current = true;
             v_deef62(false);
           } else {

@@ -138,8 +138,9 @@ export const v_a3bbf0 = async (
 
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');
+    const v_8d1ab0 = v_8d41d7('screens.referral.share.linkLabel') || 'Link';
 
-    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n🔗 바로가기 ${v_25f202}`;
+    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n🔗 ${v_8d1ab0} ${v_25f202}`;
 
     console.log('[shareReferralLink] 공유 메시지:', v_a8cd21);
 

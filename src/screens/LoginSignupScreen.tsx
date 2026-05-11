@@ -16,22 +16,11 @@ interface TutorialItem {
   image: any;
 }
 
-const v_03112b = [
-  {
-    id: 1,
-    text: '광고에 참여하고 XRUN 리워드를 받아보세요',
-    image: require('../../assets/title2.png'),
-  },
-  {
-    id: 2,
-    text: '획득한 XRUN으로 Shop을 이용할 수 있어요',
-    image: require('../../assets/title3.png'),
-  },
-  {
-    id: 3,
-    text: '레퍼럴 코드 공유로 XRUN 리워드 20%를 더 획득하세요',
-    image: require('../../assets/title1.png'),
-  },
+const v_5f5d0e = ['tutorial1', 'tutorial2', 'tutorial3'] as const;
+const v_e142e4 = [
+  require('../../assets/title2.png'),
+  require('../../assets/title3.png'),
+  require('../../assets/title1.png'),
 ];
 
 export const v_54d331 = () => {
@@ -59,6 +48,12 @@ export const v_54d331 = () => {
     const v_2365e9 = Math.round(v_d48baf.nativeEvent.contentOffset.x / v_0d9f50);
     v_be9dba(v_2365e9);
   };
+
+  const v_03112b = v_5f5d0e.map((v_b24339, v_e86ad8) => ({
+    id: v_e86ad8 + 1,
+    text: v_8d41d7(`screens.loginSignup.${v_b24339}`),
+    image: v_e142e4[v_e86ad8],
+  }));
 
   const v_c57acf = ({ item: v_8c0b26 }: { item: TutorialItem }) => (
     <View style={v_d81136.tutorialItem}>

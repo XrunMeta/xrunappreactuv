@@ -714,28 +714,6 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
       {!v_bf1005 && <StatusBar style="dark" />}
 
       {}
-      {!v_bf1005 && (
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingHorizontal: 16,
-          paddingTop: v_033e14.top + 12,
-          paddingBottom: 12,
-          borderBottomWidth: 1,
-          borderBottomColor: '#e0e0e0',
-          backgroundColor: '#fff',
-        }}>
-          <TouchableOpacity
-            onPress={v_7f2e65}
-            style={{
-              padding: 8,
-            }}
-          >
-            <Ionicons name="close" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
-      )}
 
       {}
       {(v_cd31a8 || v_915a6b || v_7a79cf) && (
@@ -880,20 +858,13 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         <View style={v_d81136.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[v_d81136.webViewHeader, { paddingTop: v_033e14.top + 12 }]}>
-            <TouchableOpacity
-              onPress={v_3aa877}
-              style={v_d81136.webViewCloseButton}
-            >
-              <Text style={v_d81136.webViewCloseText}>{v_8d41d7('common.buttons.close')}</Text>
-            </TouchableOpacity>
-            <Text 
+            <Text
               style={v_d81136.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
               {v_3aedd0?.name || v_d0b6d4?.name || '광고 보기'}
             </Text>
-            <View style={v_d81136.webViewCloseButton} />
           </View>
           {v_b2dceb ? (
             <View style={v_d81136.webViewWrapper}>

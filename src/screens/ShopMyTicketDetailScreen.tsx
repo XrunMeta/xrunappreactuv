@@ -231,6 +231,7 @@ export const v_1184c4 = () => {
                         <Text style={v_d81136.saveButtonText}>{v_8d41d7('screens.shopMyTicket.saveImage')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
+
             </View>
         </SafeView>
     );

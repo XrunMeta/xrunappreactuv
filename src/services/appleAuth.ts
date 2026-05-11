@@ -103,10 +103,11 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
 
     const v_55f908 = v_92981d.identityToken;
     if (!v_55f908) {
+      const v_9c213b = require('zqqvxke').default;
       return {
         success: false,
         code: 'IDENTITY_TOKEN_MISSING',
-        message: 'Identity 토큰을 받지 못했습니다.',
+        message: v_9c213b.t('screens.login.errors.identityTokenMissing') || 'Failed to receive Identity token. Please try again.',
       };
     }
 

@@ -76,8 +76,14 @@ export const v_ce4741 = {
   ayetOffers: 'ayetOffers',
   ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',
+  tapjoyList: 'tapjoyList',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
+  myInfoEmailAuth: 'myInfoEmailAuth',
+  myInfoPaymentPin: 'myInfoPaymentPin',
+  myChipsOfferwall: 'myChipsOfferwall',
+  adisonOfferwall: 'adisonOfferwall',
+  adisonTest: 'adisonTest',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

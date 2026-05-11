@@ -72,7 +72,8 @@ export const v_680bee = () => {
               v_b655bf(true);
               v_94539c(v_4a9819.item);
             if (v_4a9819.title) v_73c0df(v_4a9819.title);
-            if (v_4a9819.price) v_1eb7da(v_4a9819.price.toString());
+            if (v_4a9819.priceKRW) v_1eb7da(v_4a9819.priceKRW.toString());
+            else if (v_4a9819.price) v_1eb7da(v_4a9819.price.toString());
             if (v_4a9819.priceXrun) v_5f29a4(v_4a9819.priceXrun.toString());
             if (v_4a9819.description) v_b7e174(v_4a9819.description);
             if (v_4a9819.maxpurchase) v_a06ef2(v_4a9819.maxpurchase.toString());
@@ -290,15 +291,11 @@ export const v_680bee = () => {
       console.log('[상품 등록] 응답 데이터:', v_3393e3.data);
 
       if (v_3393e3.data) {
+        const v_25f721 = v_3393e3.data.data;
+        if ((v_3393e3.data.success || v_3393e3.data.status === 'success') && Array.isArray(v_25f721) && v_25f721.length > 0) {
+          const v_8c0b26 = v_25f721[0];
 
-        if (v_3393e3.data.success && v_3393e3.data.data && Array.isArray(v_3393e3.data.data) && v_3393e3.data.data.length > 0) {
-          const v_433c46 = v_3393e3.data.data[0];
-          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', v_433c46);
-          return v_433c46;
-        }
-
-        if (v_3393e3.data.status === 'success' && v_3393e3.data.data && Array.isArray(v_3393e3.data.data) && v_3393e3.data.data.length > 0) {
-          const v_433c46 = v_3393e3.data.data[0];
+          const v_433c46 = typeof v_8c0b26 === 'object' && v_8c0b26.fileId ? v_8c0b26.fileId : v_8c0b26;
           console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', v_433c46);
           return v_433c46;
         }
@@ -442,21 +439,21 @@ export const v_680bee = () => {
                 v_e33ec0(true);
                 const v_3393e3 = await v_d33616(v_717992, v_7b46e6, v_9b57fc);
 
-                if (v_3393e3.status === 'success' && v_3393e3.data.affectedRows > 0) {
-                  await v_889fad(v_8d41d7('screens.myinfoShopSales.deleteSuccess'));
+                if (v_3393e3.status === 'success') {
+                  await v_889fad('알림', v_8d41d7('screens.myinfoShopSales.deleteSuccess'));
 
                   v_c7ac57();
                 } else {
                   await v_889fad(
+                    '알림',
                     v_8d41d7('screens.myinfoShopSales.deleteFailed'),
-                    v_3393e3.message || v_8d41d7('screens.myinfoShopSales.deleteFailed'),
                   );
                 }
               } catch (v_5e9bfe) {
                 console.error('[상품 등록] 상품 삭제 오류:', v_5e9bfe);
                 await v_889fad(
+                  '알림',
                   v_8d41d7('screens.myinfoShopSales.deleteFailed'),
-                  v_5e9bfe instanceof Error ? v_5e9bfe.message : v_8d41d7('screens.myinfoShopSales.deleteFailed'),
                 );
               } finally {
                 v_e33ec0(false);
@@ -619,6 +616,14 @@ export const v_680bee = () => {
                       <Text style={v_d81136.currentImageLabel}>{v_8d41d7('screens.shopItemRegister.currentImage')}</Text>
                       <Image
                         source={{ uri: `data:image/png;base64,${v_d4cc36}` }}
+                        style={v_d81136.currentImagePreview}
+                      />
+                    </>
+                  ) : v_373157 ? (
+                    <>
+                      <Text style={v_d81136.currentImageLabel}>{v_8d41d7('screens.shopItemRegister.currentImage')}</Text>
+                      <Image
+                        source={{ uri: `https://oth-path-f0013c.example.invalid/files/${v_373157}?raw=1` }}
                         style={v_d81136.currentImagePreview}
                       />
                     </>

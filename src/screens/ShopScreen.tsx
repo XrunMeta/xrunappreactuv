@@ -12,7 +12,8 @@ import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03 } from '../services';
+import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff, v_dd87bc } from '../services';
+import type { v_20035e } from '../types';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -46,7 +47,7 @@ const v_426e67 = [
         id: '2',
         brand: 'Ethereum',
         title: 'Ethereum 교환권',
-        description: '최소 30,000 Xplay 이상 교환가능',
+        description: '최소 30,000 XRUN 이상 교환가능',
         price: 30000,
         image: v_74bda9,
     },
@@ -66,22 +67,31 @@ const v_426e67 = [
     },
 ];
 
-const v_7fb877 = [
-    {
-        id: 'xrun-1',
-        brand: 'XRUN',
-        title: 'Polygon 전송티켓',
-        price: 10,
-        image: v_47af4d,
-    },
-];
+function v_02c692(item: v_20035e): ProductData {
 
-function v_9bd735(item: v_d62ea7): ProductData {
+    const v_0622fe = v_8c0b26.thumbnail || v_8c0b26.image;
+    const v_74f4a3 = typeof v_0622fe === 'string' && v_0622fe.startsWith('http') ? v_0622fe : null;
+    return {
+        id: String(v_8c0b26.item),
+        brand: 'XRUN',
+        title: v_8c0b26.title || '-',
+        description: v_8c0b26.description || undefined,
+        price: Number(v_8c0b26.priceXrun) || 0,
+        image: v_74f4a3 ? { uri: v_74f4a3 } : v_47af4d,
+    };
+}
+
+const v_4994d5 = 70;
+
+function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
+    const v_72648c = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
+    const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
+    const v_7be02f = Math.ceil(v_72648c / v_b7ffba);
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
         brand: (v_8c0b26 as any).brandName ?? '기프티콘',
         title: v_8c0b26.name ?? '-',
-        price: typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0,
+        price: v_7be02f,
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
         isXplayShop: true,
     };
@@ -92,7 +102,7 @@ export const v_10886b = () => {
     const { t: v_8d41d7 } = v_772971();
     const { showAlert: v_889fad } = v_4b1173();
     const { setSelectedShopItem: v_d0fbad, selectedShopItem: v_dfe883 } = v_700ef9();
-    const [v_11083e, v_94ee83] = v_5ab095<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+    const [v_11083e, v_94ee83] = v_5ab095<'xrunStore' | 'myItems'>('xrunStore');
 
     const [v_50b846, v_4ff2fa] = v_5ab095<v_d62ea7[]>([]);
     const [v_32c9b7, v_0e5971] = v_5ab095(false);
@@ -102,7 +112,14 @@ export const v_10886b = () => {
     const [v_837630, v_2f87ed] = v_5ab095(false);
     const [v_1d54f1, v_67ba02] = v_5ab095<number | null>(null);
     const [v_19340b, v_14129c] = v_5ab095(false);
+    const [v_7fb877, v_d816a6] = v_5ab095<ProductData[]>([]);
+    const [v_a502c3, v_77037a] = v_5ab095(false);
+
+    const [v_ca7424, v_c235bc] = v_5ab095<number>(v_4994d5);
     const { navigate: v_9b57fc } = v_a0daa8();
+
+    const v_5536d4 = 'shop:xrunBalance';
+    const v_fc87c6 = 'shop:xplayBalance';
 
     const v_abb08d = v_de06a3(async () => {
         try {
@@ -111,12 +128,23 @@ export const v_10886b = () => {
             const v_ef7306 = JSON.parse(v_f24fd5);
             const v_660822 = v_ef7306?.member;
             if (v_660822 == null) return;
-            v_14129c(true);
-            const v_43c42e = await v_885e03(v_660822, v_9b57fc);
-            const v_8decf8 = parseFloat(v_43c42e.formatted);
-            v_67ba02(Number.isFinite(v_8decf8) ? v_8decf8 : null);
-        } catch {
-            v_67ba02(null);
+
+            v_67ba02((v_ba2215) => {
+                if (v_ba2215 == null) v_14129c(true);
+                return v_ba2215;
+            });
+            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', v_660822);
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', v_8decf8);
+            const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
+            v_67ba02(v_3b402b);
+            if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', v_9e86fd);
+
         } finally {
             v_14129c(false);
         }
@@ -135,16 +163,80 @@ export const v_10886b = () => {
                 v_d20f1f(null);
                 return;
             }
-            v_2f87ed(true);
+            v_d20f1f((v_ba2215) => {
+                if (v_ba2215 == null) v_2f87ed(true);
+                return v_ba2215;
+            });
+            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', v_660822);
             const v_43c42e = await v_877de8(v_660822, v_9b57fc);
-            v_d20f1f(v_43c42e.total_ayet_points ?? null);
-        } catch {
+            console.log('[ShopScreen] getAyetPointsBalance 결과:', v_43c42e);
+            const v_3b402b = v_43c42e.total_ayet_points ?? null;
+            v_d20f1f(v_3b402b);
+            if (v_3b402b != null) v_e84827.setItem(v_fc87c6, String(v_3b402b)).catch(() => {});
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', v_9e86fd);
 
-            v_d20f1f(null);
         } finally {
             v_2f87ed(false);
         }
     }, [v_9b57fc]);
+
+    v_c4deb2(() => {
+        let v_2008a4 = false;
+        (async () => {
+            console.log('[ShopScreen] 잔액 마운트 fetch 시작');
+            try {
+                const v_f24fd5 = await v_e84827.getItem('userData');
+                if (!v_f24fd5) return;
+                const v_ef7306 = JSON.parse(v_f24fd5);
+                const v_660822 = v_ef7306?.member;
+                if (v_660822 == null) return;
+
+                try {
+                    const [v_be8dbe, v_ebcf3f] = await Promise.all([
+                        v_e84827.getItem(v_5536d4),
+                        v_e84827.getItem(v_fc87c6),
+                    ]);
+                    if (!v_2008a4) {
+                        if (v_be8dbe != null) {
+                            const v_f4e98d = parseFloat(v_be8dbe);
+                            if (Number.isFinite(v_f4e98d)) v_67ba02(v_f4e98d);
+                        }
+                        if (v_ebcf3f != null) {
+                            const v_f4e98d = parseFloat(v_ebcf3f);
+                            if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
+                        }
+                    }
+                } catch {}
+
+                const v_38fb16 = await Promise.allSettled([
+                    v_4d25ff(Number(v_660822), 7, undefined),
+                ]);
+                if (v_2008a4) return;
+                if (v_38fb16[0].status === 'fulfilled') {
+                    const v_ef8ab1 = Array.isArray((v_38fb16[0].value as any)?.data) ? (v_38fb16[0].value as any).data : [];
+                    const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+                    const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+                    const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v_81e2ef);
+                    v_67ba02(v_81e2ef);
+                    v_d20f1f(v_81e2ef);
+                    v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
+                    v_e84827.setItem(v_fc87c6, String(v_81e2ef)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] Polygon 잔액 실패:', v_38fb16[0].reason);
+                }
+            } catch (v_9e86fd) {
+                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', v_9e86fd);
+            } finally {
+                if (!v_2008a4) {
+                    v_2f87ed(false);
+                    v_14129c(false);
+                }
+            }
+        })();
+        return () => { v_2008a4 = true; };
+    }, []);
 
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
@@ -160,37 +252,86 @@ export const v_10886b = () => {
         }
     }, []);
 
+    const v_d0991f = v_de06a3(async () => {
+        try {
+            const v_e2a6a6 = await v_e84827.getItem('xrungopaxprice');
+            if (v_e2a6a6) {
+                const v_8decf8 = JSON.parse(v_e2a6a6) as { data?: { gopaxPrice?: number } };
+                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
+                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) v_c235bc(v_e2a85c);
+            }
+        } catch {
+
+        }
+        try {
+            const v_43c42e = await v_dd87bc(v_9b57fc);
+            const v_e2a85c = v_43c42e?.data?.gopaxPrice;
+            if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
+                v_c235bc(v_e2a85c);
+                await v_e84827.setItem('xrungopaxprice', JSON.stringify(v_43c42e));
+                return;
+            }
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', v_9e86fd);
+        }
+        try {
+            const v_fd5f43 = await v_e84827.getItem('xrungopaxprice');
+            if (v_fd5f43) {
+                const v_8decf8 = JSON.parse(v_fd5f43) as { data?: { gopaxPrice?: number } };
+                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
+                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
+                    v_c235bc(v_e2a85c);
+                    return;
+                }
+            }
+        } catch {
+
+        }
+    }, [v_9b57fc]);
+
     v_c4deb2(() => {
-        if (v_11083e === 'xplayShop') {
+        if (v_11083e === 'xrunStore') {
             v_0e5971(true);
+            void v_d0991f();
             v_f61b49().finally(() => v_0e5971(false));
         }
-    }, [v_11083e, v_f61b49]);
+    }, [v_11083e, v_f61b49, v_d0991f]);
 
     const v_f80453 = v_de06a3(() => {
         v_ad5fd0(true);
-        Promise.all([v_f61b49(), v_c1e7a4()]).finally(() => v_ad5fd0(false));
-    }, [v_f61b49, v_c1e7a4]);
+        Promise.all([v_f61b49(), v_c1e7a4(), v_d0991f()]).finally(() => v_ad5fd0(false));
+    }, [v_f61b49, v_c1e7a4, v_d0991f]);
 
     v_c4deb2(() => {
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
-            const v_378bd8 = (v_dfe883 as any).shopTab;
-            if (v_378bd8 === 'xplayShop' || v_378bd8 === 'xrunStore') {
-                v_94ee83(v_378bd8);
-
-                v_d0fbad(undefined);
-            }
+            v_94ee83('xrunStore');
+            v_d0fbad(undefined);
         }
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
 
-    v_c4deb2(() => {
-        if (v_11083e === 'xplayShop') {
-            v_c1e7a4();
-        } else if (v_11083e === 'xrunStore') {
-            v_abb08d();
+    const v_734b9d = v_de06a3(async () => {
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (!v_f24fd5) return;
+            const v_ef7306 = JSON.parse(v_f24fd5);
+            const v_660822 = v_ef7306?.member;
+            if (v_660822 == null) return;
+            const v_8f00b9 = await v_81c40d(String(v_660822));
+            if (v_8f00b9.status === 'success' && v_8f00b9.data) {
+                v_d816a6(v_8f00b9.data.map(v_02c692));
+            }
+        } catch (v_49263d) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', v_49263d);
         }
-    }, [v_11083e, v_c1e7a4, v_abb08d]);
+    }, []);
+
+    v_c4deb2(() => {
+        if (v_11083e === 'xrunStore') {
+            v_abb08d();
+            v_734b9d();
+        }
+    }, [v_11083e, v_abb08d, v_734b9d]);
 
     const v_bcfa24 = v_700696.get('window').width;
     const v_3af450 = v_df9f57(() => {
@@ -200,9 +341,13 @@ export const v_10886b = () => {
         return (v_2f5c5c - v_3c3231) / 2;
     }, [v_bcfa24]);
 
+    const v_f523cd = v_df9f57(
+        () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424)),
+        [v_50b846, v_ca7424],
+    );
+
     const v_1c4d31 = v_df9f57(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -241,9 +386,16 @@ export const v_10886b = () => {
         ]);
     };
 
+    const [v_23faa2, v_689f28] = v_5ab095<Set<string>>(new Set());
+
     const v_80b207 = (v_01bee9, v_80e8c0 = false) => {
         const v_2141e0 = v_01bee9.brand === 'Ethereum' && v_01bee9.description;
-        const v_fa78fb = v_01bee9.brand === 'XRUN';
+
+        const v_fa78fb = v_01bee9.brand === 'XRUN' || v_01bee9.isXplayShop === true;
+
+        const v_419eb6 = v_01bee9.image && typeof v_01bee9.image === 'object' && 'uri' in v_01bee9.image;
+        const v_f3e29a = v_419eb6 && v_23faa2.has(v_01bee9.id);
+        const v_fafc7f = v_f3e29a ? v_47af4d : v_01bee9.image;
 
         return (
             <TouchableOpacity
@@ -256,7 +408,16 @@ export const v_10886b = () => {
                     v_d81136.productImageContainer,
                     v_2141e0 && v_d81136.productImageContainerEthereum
                 ]}>
-                    <Image source={v_01bee9.image} style={v_d81136.productImage} resizeMode="contain" />
+                    <Image
+                        source={v_fafc7f}
+                        style={v_d81136.productImage}
+                        resizeMode="contain"
+                        onError={() => {
+                            if (v_419eb6) {
+                                v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
+                            }
+                        }}
+                    />
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
                             <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
@@ -272,8 +433,8 @@ export const v_10886b = () => {
                         <View style={v_d81136.priceContainer}>
                             <View style={v_d81136.xplayIconContainer}>
                                 <Image
-                                    source={v_fa78fb ? v_33c40c : v_10664a}
-                                    style={v_fa78fb ? v_d81136.xrunIcon : v_d81136.xplayIcon}
+                                    source={v_33c40c}
+                                    style={v_d81136.xrunIcon}
                                     resizeMode="contain"
                                 />
                             </View>
@@ -310,7 +471,7 @@ export const v_10886b = () => {
             />
             <View style={v_d81136.contentContainer}>
                 {}
-                {(v_11083e === 'xplayShop' || v_11083e === 'xrunStore') && (
+                {v_11083e === 'xrunStore' && (
                     <View style={v_d81136.balanceCardWrapper}>
                         <LinearGradient
                             colors={['#FFFFFF', '#F9FAFB', '#FFFFFF']}
@@ -324,38 +485,19 @@ export const v_10886b = () => {
                                 <View style={v_d81136.balanceLeft}>
                                     <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.shop.myBalance')}</Text>
                                     <View style={v_d81136.balanceAmountRow}>
-                                        <View style={[
-                                            v_d81136.balanceXplayIconContainer,
-                                            v_11083e === 'xrunStore' && v_d81136.balanceXrunIconContainer
-                                        ]}>
+                                        <View style={[v_d81136.balanceXplayIconContainer, v_d81136.balanceXrunIconContainer]}>
                                             <Image
-                                                source={v_11083e === 'xrunStore' ? v_33c40c : v_10664a}
+                                                source={v_33c40c}
                                                 style={v_d81136.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {v_11083e === 'xplayShop' ? (
-                                            v_837630 ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={v_d81136.balanceAmount}>
-                                                    {v_cd398d == null ? '-' : v_cd398d.toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
                                     </View>
                                 </View>
-                                {v_11083e === 'xplayShop' ? (
-                                    <View style={v_d81136.xplayTag}>
-                                        <Text style={v_d81136.xplayTagText}>Xplay</Text>
-                                    </View>
-                                ) : (
-                                    <View style={v_d81136.xrunTag}>
-                                        <Text style={v_d81136.xrunTagText}>XRUN</Text>
-                                    </View>
-                                )}
+                                <View style={v_d81136.xrunTag}>
+                                    <Text style={v_d81136.xrunTagText}>XRUN</Text>
+                                </View>
                             </View>
                         </LinearGradient>
                     </View>
@@ -377,12 +519,12 @@ export const v_10886b = () => {
                     backgroundColor="transparent"
                     disableBottomPadding={true}
                     refreshControl={
-                        v_11083e === 'xplayShop' ? (
+                        v_11083e === 'xrunStore' ? (
                             <RefreshControl refreshing={v_5605ec} onRefresh={v_f80453} colors={[v_1bfbd0.buttonPrimary]} />
                         ) : undefined
                     }
                 >
-                    {v_11083e === 'xplayShop' ? (
+                    {v_11083e === 'xrunStore' ? (
                         <>
                             {v_32c9b7 && !v_5605ec ? (
                                 <View style={v_d81136.loadingContainer}>
@@ -395,16 +537,11 @@ export const v_10886b = () => {
                                 </View>
                             ) : (
                                 <View style={v_d81136.productGrid}>
-                                    {v_50b846.map((v_8c0b26) =>
-                                        v_80b207(v_9bd735(v_8c0b26), false)
-                                    )}
+                                    {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
+                                    {v_f523cd.map((v_01bee9) => v_80b207(v_01bee9, false))}
                                 </View>
                             )}
                         </>
-                    ) : v_11083e === 'xrunStore' ? (
-                        <View style={v_d81136.productGrid}>
-                            {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                        </View>
                     ) : (
                         <View style={v_d81136.emptyContainer}>
                             <Text style={v_d81136.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
@@ -413,9 +550,11 @@ export const v_10886b = () => {
                 </SafeScrollView>
             </View>
             {}
-            <View style={v_d81136.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
-            </View>
+            {v_11083e !== 'xplayShop' ? (
+                <View style={v_d81136.taboolaContainer}>
+                    <TaboolaBanner placementType="shop" />
+                </View>
+            ) : null}
         </SafeView>
     );
 };

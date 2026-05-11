@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: '紹介者管理',
   shopSales: 'Shop 売上',
   shopSalesSubtitle: '販売状況管理',
+  paymentPin: '決済パスワード設定',
+  paymentPinSubtitle: '決済用6桁パスワード登録/変更',
   logout: 'ログアウト',
   shareReferral: '紹介リンクを共有',
   logoutConfirm: 'ログアウトしますか？',

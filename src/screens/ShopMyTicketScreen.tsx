@@ -30,12 +30,25 @@ const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
       ? `txID_${v_2deff5}_item_${v_3b701b}_idx_${v_a56041}`
       : `item_${v_3b701b}_idx_${v_a56041}`;
 
+  const v_e46046 = (v_8c0b26 as any).datetime || (v_8c0b26 as any).dateupdate;
+  let v_8f73ab = '';
+  if (v_e46046) {
+    const v_d5dda0 = new Date(String(v_e46046).replace(' ', 'T') + 'Z');
+    if (!isNaN(v_d5dda0.getTime())) {
+      const v_3ee5fb = (v_f4e98d) => String(v_f4e98d).padStart(2, '0');
+      v_8f73ab = `${v_d5dda0.getFullYear()}-${v_3ee5fb(v_d5dda0.getMonth() + 1)}-${v_3ee5fb(v_d5dda0.getDate())} ${v_3ee5fb(v_d5dda0.getHours())}:${v_3ee5fb(v_d5dda0.getMinutes())}`;
+    } else {
+      v_8f73ab = String(v_e46046);
+    }
+  }
+
   return {
 
     ...v_8c0b26,
 
     id: v_6c35f6,
     title: v_8c0b26.title || '',
+    subtitle: v_8f73ab,
     priceLabel: '', 
     detailTotal: v_63f02c,
     image: v_c322f7,
@@ -265,6 +278,7 @@ export const v_052a8a = () => {
                   <ShopItemCard
                     key={v_8c0b26.id}
                     title={v_8c0b26.title}
+                    subtitle={(v_8c0b26 as any).subtitle}
                     priceLabel={v_8c0b26.priceLabel}
                     imageSource={v_c322f7}
                     quantityLabel={v_8c0b26.detailTotal}

@@ -1,10 +1,9 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_4623af, v_472849, v_700696, v_cf9c33, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_4623af, v_472849, v_cf9c33, v_326be8, v_e45a99 } from 'rcmrninabrnb';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_85f2c8, v_3ca33e } from '../services';
-
-const { width: v_8e4fb6 } = v_700696.get('window');
 
 let v_4eff08 = null;
 let v_f968cc = null;
@@ -58,6 +57,8 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   onItemPress: v_659a80,
   onTabChange: v_d52709,
 }) => {
+  const { width: v_06db8f } = v_e45a99();
+  const v_033e14 = v_e0068c();
   const { navigate: v_9b57fc } = v_a0daa8();
 
   const [v_9e28f7, v_603c21] = v_5ab095(false);
@@ -109,39 +110,20 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     v_659a80?.(v_6e55b1);
   };
 
-  const v_6d2a86 = () => {
-    const v_2e3fba = v_8e4fb6 * 0.04; 
-    const v_46d0e7 = 8;
-    const v_382137 = 20;
-    return Math.max(v_46d0e7, Math.min(v_382137, v_2e3fba));
-  };
+  const v_f4f953 = v_06db8f < 360 ? 92 : v_06db8f < 400 ? 98 : 104;
 
-  const v_6a3c24 = () => {
-    if (v_8e4fb6 < 360) {
+  const v_dabc6e = v_06db8f < 360 ? 4 : v_06db8f < 400 ? 6 : 4;
 
-      return 4;
-    } else if (v_8e4fb6 < 400) {
+  const v_734fdc = Math.max(v_dabc6e, v_033e14.left);
+  const v_ad18a8 = Math.max(v_dabc6e, v_033e14.right);
 
-      return 8;
-    } else {
+  const v_921fc1 = (v_389afb) => v_79cf3d.find((v_ebec57) => v_ebec57.id === v_389afb);
 
-      return 10;
-    }
-  };
+  const v_7ab0f6 = v_06db8f - v_734fdc - v_ad18a8;
 
-  const v_e5df55 = () => {
-    if (v_8e4fb6 < 360) {
-      return 90; 
-    } else if (v_8e4fb6 < 400) {
-      return 95;
-    } else {
-      return 100;
-    }
-  };
-
-  const v_397b6d = v_6d2a86();
-  const v_30e711 = v_6a3c24();
-  const v_f4f953 = v_e5df55();
+  const v_fb4fea = v_326be8.OS === 'ios' ? 14 : 10;
+  const v_3f7eb3 = v_f4f953 + v_fb4fea;
+  const v_a1f81c = Math.max(40, (v_7ab0f6 - v_3f7eb3) / 4);
 
   const v_48897b = v_ac1d22 === 'Map'
     ? (v_4eff08 || v_f968cc)
@@ -201,19 +183,15 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     }
 
     const v_26dce6 = v_8ccd46 === v_8c0b26.id;
-
     const v_c1dd95 = v_8c0b26.icon;
+    const v_2457bf = v_8c0b26.id === 'xplay';
 
     return (
       <TouchableOpacity
-        key={v_8c0b26.id}
-        style={[
-          v_d81136.navItem,
-          { minWidth: v_8e4fb6 < 360 ? 50 : 55 }
-        ]}
+        style={[v_d81136.navItem, v_2457bf && v_d81136.navItemXplayNudge]}
         onPress={() => v_8e442f(v_8c0b26.id)}
         activeOpacity={0.7}>
-        <View style={v_d81136.iconContainer}>
+        <View style={[v_d81136.iconContainer, v_2457bf && v_d81136.iconContainerXplayNudge]}>
           {v_c1dd95 ? (
             <Image
               source={v_c1dd95}
@@ -228,7 +206,10 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
           style={[
             v_d81136.label,
             v_26dce6 && v_d81136.labelActive,
-            { fontSize: v_8e4fb6 < 360 ? 12 : 14 }
+            {
+              fontSize: v_06db8f < 360 ? 11 : 13,
+              ...(v_326be8.OS === 'android' ? { includeFontPadding: false } : {}),
+            },
           ]}
           numberOfLines={1}
           ellipsizeMode="tail">
@@ -242,32 +223,37 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     <View style={v_d81136.container}>
       {}
       <View style={v_d81136.bottomSection}>
-        <View style={[
-          v_d81136.content,
-          {
-            paddingHorizontal: v_30e711,
-            gap: v_8e4fb6 < 360 ? 4 : v_8e4fb6 < 400 ? 6 : 8,
-          }
-        ]}>
-          {v_79cf3d.map((v_8c0b26, v_a56041) => {
-            if (v_8c0b26.id === 'map' || v_8c0b26.id === 'camera') {
-
-              return (
-                <React.Fragment key="center-buttons">
-                  <View style={[
-                    v_d81136.centerButtonContainer,
-                    {
-                      width: v_f4f953,
-                      marginHorizontal: v_8e4fb6 < 360 ? -2 : -3,
-                    }
-                  ]}>
-                    {v_eebe9d()}
-                  </View>
-                </React.Fragment>
-              );
-            }
-            return v_9eb59f(v_8c0b26);
-          })}
+        <View
+          style={[
+            v_d81136.content,
+            {
+              paddingLeft: v_734fdc,
+              paddingRight: v_ad18a8,
+            },
+          ]}>
+          <View style={v_d81136.navRowInner}>
+            {(['xplay', 'shop'] as const).map((v_389afb) => {
+              const v_8c0b26 = v_921fc1(v_389afb);
+              return v_8c0b26 ? (
+                <View key={v_389afb} style={[v_d81136.navColumn, { width: v_a1f81c }]}>
+                  {v_9eb59f(v_8c0b26)}
+                </View>
+              ) : null;
+            })}
+            <View style={[v_d81136.navColumnCenter, { width: v_3f7eb3 }]}>
+              <View style={[v_d81136.centerButtonContainer, { width: v_f4f953 }]}>
+                {v_eebe9d()}
+              </View>
+            </View>
+            {(['wallet', 'info'] as const).map((v_389afb) => {
+              const v_8c0b26 = v_921fc1(v_389afb);
+              return v_8c0b26 ? (
+                <View key={v_389afb} style={[v_d81136.navColumn, { width: v_a1f81c }]}>
+                  {v_9eb59f(v_8c0b26)}
+                </View>
+              ) : null;
+            })}
+          </View>
         </View>
       </View>
       {}
@@ -289,23 +275,52 @@ const v_d81136 = v_472849.create({
   bottomSection: {
     backgroundColor: '#FFFFFF',
     paddingBottom: 18,
+    width: '100%',
+    alignSelf: 'stretch',
+    overflow: 'visible',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingTop: 4,
     paddingBottom: 20,
     minHeight: 80,
     width: '100%',
+    alignSelf: 'stretch',
+    overflow: 'visible',
+  },
+  navRowInner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    minWidth: 0,
+    overflow: 'visible',
+  },
+  navColumn: {
+    flexGrow: 0,
+    flexShrink: 0,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    overflow: 'hidden',
+  },
+  navColumnCenter: {
+    flexGrow: 0,
+    flexShrink: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
   },
   navItem: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     paddingVertical: 5,
-    flexShrink: 1,
     paddingHorizontal: 2,
+  },
+
+  navItemXplayNudge: {
+    paddingVertical: 4,
   },
   iconContainer: {
     width: 24,
@@ -313,6 +328,10 @@ const v_d81136 = v_472849.create({
     marginBottom: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
+  },
+  iconContainerXplayNudge: {
+    marginBottom: 3,
   },
   navIcon: {
     width: 20,
@@ -333,8 +352,9 @@ const v_d81136 = v_472849.create({
     fontWeight: '500',
     color: '#4C4E55',
     textAlign: 'center',
+    alignSelf: 'center',
+    width: '100%',
     letterSpacing: 0.06,
-    maxWidth: '100%',
     overflow: 'hidden',
   },
   labelActive: {

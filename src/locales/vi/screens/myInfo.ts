@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: 'Quản lý giới thiệu',
   shopSales: 'Bán hàng cửa hàng',
   shopSalesSubtitle: 'Quản lý trạng thái bán hàng',
+  paymentPin: 'Đặt mã PIN thanh toán',
+  paymentPinSubtitle: 'Đăng ký/đổi mã PIN 6 chữ số',
   logout: 'Đăng xuất',
   shareReferral: 'Chia sẻ liên kết giới thiệu',
   logoutConfirm: 'Bạn có muốn đăng xuất?',

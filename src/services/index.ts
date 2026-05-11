@@ -7,6 +7,13 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_843337 } from '../utils/playStoreUrl';
 
+export const v_755eb9 = (): string => {
+  const v_c9c489 = v_e4a763();
+  return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+};
+
+export const v_a57efd = (): string => v_755eb9();
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -271,7 +278,7 @@ export const v_12a388 = async (
   v_c65f5d,
 ): Promise<Response> => {
   const v_c9c489 = v_e4a763();
-  const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+  const v_c01615 = v_755eb9();
   const v_f71b56 = v_09dafd.startsWith('/')
     ? `${v_c01615}${v_09dafd}`
     : `${v_c01615}/${v_09dafd}`;
@@ -291,14 +298,13 @@ export const v_495832 = async (
   }
   try {
     const v_c9c489 = v_e4a763();
-
-    const v_5c1e3a = `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
     const v_3393e3 = await v_12a388('/keepalive', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: v_5c1e3a,
+        Authorization: `Bearer ${v_36dd9e}`,
       },
     }, v_c65f5d);
 
@@ -346,12 +352,16 @@ export const v_495832 = async (
 
       if (v_326be8.OS === 'android') {
         if (v_4587b3 && v_6cd443 > v_4587b3) {
-          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443); 
-          v_43c42e.emergencyStop = {
-            enabled: true,
-            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
-            link: v_843337({ gl: 'us' }),
-          };
+          console.log('[App] 새 버전 발견 - 현재:', v_4587b3, '서버:', v_6cd443);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+          } else {
+            v_43c42e.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: v_843337({ gl: 'us' }),
+            };
+          }
         } else {
           console.log('[App android] 최신 버전입니다. 현재:', v_4587b3, '서버:', v_6cd443);
         }
@@ -439,12 +449,21 @@ export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
   }
 };
 
-export const v_7488d5 = (v_c65f5d) => {
+export type CreateAxiosInstanceOptions = {
+
+  baseURL?: string;
+};
+
+export const v_7488d5 = (v_c65f5d, v_b36f96) => {
   const v_c9c489 = v_e4a763();
-  const v_fed274 = v_c9c489.GATEWAY_NODEJS;
+  const v_fed274 = v_b36f96?.baseURL ?? v_755eb9();
   const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] GATEWAY_NODEJS:', v_fed274);
+  console.log(
+    '[createAxiosInstance] API baseURL:',
+    v_fed274,
+    v_b36f96?.baseURL ? '(override: 이메일 인증 등)' : '',
+  );
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const v_0c3a5b = v_b5030f.create({
@@ -457,9 +476,7 @@ export const v_7488d5 = (v_c65f5d) => {
   });
 
   v_0c3a5b.interceptors.request.use(
-    async (v_74a79c) => {
-      v_74a79c.headers = v_74a79c.headers || {};
-      v_74a79c.headers['Authorization'] = `Bearer ${v_36dd9e}`;
+    (v_74a79c) => {
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -1241,7 +1258,9 @@ export const v_8025d1 = async (
   v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_897bd3 = {
       email: v_e0c7e8,
     };
@@ -1280,7 +1299,9 @@ export const v_415628 = async (
   v_c65f5d,
 ): Promise<boolean> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_b2dc50 = {
       email: v_e0c7e8,
       code: v_c99bd2,
@@ -1322,7 +1343,9 @@ export const v_a81308 = async (
   v_c65f5d,
 ): Promise<v_2ff10f> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_9f42a4 = v_7488d5(v_c65f5d, {
+      baseURL: v_a57efd(),
+    });
     const request: v_5060a1 = {
       email: v_e0c7e8,
     };
@@ -1902,7 +1925,7 @@ export const v_d7d5a2 = async (
   try {
     const v_c9c489 = v_e4a763();
     const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_c01615 = v_755eb9();
     const v_f71b56 = `${v_c01615}/logout-9705`;
 
     console.log('[로그아웃] 로그아웃 요청:', { member: v_660822 });
@@ -2175,41 +2198,59 @@ export const v_3e4cca = async (
   }
 };
 
-export const v_903861 = async (
-  v_4c1edc,
+export const v_cec605 = async (
   v_660822,
   v_c65f5d,
-): Promise<v_ed2980> => {
+): Promise<void> => {
   try {
-    const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_0671ef = {
-      pushkey: v_4c1edc,
-      member: v_660822,
-    };
+    const v_2b7a17 = require('bpebbcghaffswkrsep');
+    const v_a06ea0 = require('wtbgvqvuebu');
+    const v_c9be60 = require('qfrscldecidiqs');
+    const { Platform: v_326be8 } = require('rcmrninabrnb');
 
-    console.log('[알림] FCM 토큰 등록 요청:', { member: v_660822, pushkey: v_4c1edc.substring(0, 20) + '...' });
+    if (!v_a06ea0.isDevice) {
+      console.log('[푸시] 에뮬레이터에서는 푸시 토큰 등록을 건너뜁니다.');
+      return;
+    }
 
-    const v_3393e3 = await v_9f42a4.post<v_ed2980>(
-      '/login-pushkeyreg',
-      v_576f5a,
-    );
+    const { status: v_3967ed } = await v_2b7a17.getPermissionsAsync();
+    let v_54ff15 = v_3967ed;
+    if (v_3967ed !== 'granted') {
+      const { status: v_d308b5 } = await v_2b7a17.requestPermissionsAsync();
+      v_54ff15 = v_d308b5;
+    }
+    if (v_54ff15 !== 'granted') {
+      console.log('[푸시] 알림 권한이 거부되었습니다.');
+      return;
+    }
 
-    console.log('[알림] FCM 토큰 등록 성공');
-
-    return v_3393e3.data;
-  } catch (v_5e9bfe) {
-    console.error('[알림] FCM 토큰 등록 오류:', v_5e9bfe);
-    if (v_5e9bfe instanceof v_3333d3) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: v_5e9bfe.config?.url,
-        method: v_5e9bfe.config?.method,
-        status: v_5e9bfe.response?.status,
-        statusText: v_5e9bfe.response?.statusText,
-        data: v_5e9bfe.response?.data,
-        message: v_5e9bfe.message,
+    if (v_326be8.OS === 'android') {
+      await v_2b7a17.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: v_2b7a17.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
       });
     }
-    throw v_5e9bfe;
+
+    const v_06e736 = v_c9be60.default?.expoConfig?.extra?.eas?.projectId;
+    const v_fb7579 = await v_2b7a17.getExpoPushTokenAsync({
+      projectId: v_06e736 || '98780521-4749-4507-8e3a-62a2b3a80783',
+    });
+    const v_1a29d0 = v_fb7579.data; 
+
+    console.log('[푸시] Expo Push Token:', v_1a29d0.substring(0, 30) + '...');
+
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    await v_9f42a4.post('/login-pushkeyreg', {
+      pushkey: v_1a29d0,
+      member: v_660822,
+    });
+
+    console.log('[푸시] 토큰 서버 등록 성공');
+  } catch (v_5e9bfe) {
+    console.warn('[푸시] 토큰 등록 오류:', v_5e9bfe);
+
   }
 };
 
@@ -2388,7 +2429,7 @@ export const v_91d5e4 = async (
 
     try {
       const v_c9c489 = v_e4a763();
-      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/virtualCoin`;
+      const v_f71b56 = `${v_755eb9()}/virtualCoin`;
 
       const v_cd6a57 = {
         member: v_660822,
@@ -2468,7 +2509,7 @@ export const v_965f93 = async (
 
     try {
       const v_c9c489 = v_e4a763();
-      const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getCoinNasPrice`;
+      const v_f71b56 = `${v_755eb9()}/getCoinNasPrice`;
 
       console.log('=== getCoinNasPrice API 호출 ===');
 
@@ -2833,7 +2874,7 @@ export const v_1c4683 = async (
 ): Promise<v_649123> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getNasmobAds`;
+    const v_f71b56 = `${v_755eb9()}/getNasmobAds`;
 
     const v_df691e = v_326be8.OS === 'ios' ||
       v_e7f87b.manufacturer === 'Apple' ||
@@ -2983,7 +3024,7 @@ export const v_aa7dc1 = async (
 ): Promise<v_6b63f9> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPockAds`;
+    const v_f71b56 = `${v_755eb9()}/getPockAds`;
 
     let v_eed089;
     let v_66fa3f;
@@ -3129,7 +3170,7 @@ export const v_167376 = async (
 ): Promise<v_6b63f9> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/getPointClickAds`;
+    const v_f71b56 = `${v_755eb9()}/getPointClickAds`;
 
     let v_66fa3f;
 
@@ -3272,7 +3313,7 @@ export const v_7a6f92 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/callbackNasmob`;
+    const v_f71b56 = `${v_755eb9()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', v_d8bcf0);
 
@@ -3305,9 +3346,7 @@ export const v_c07360 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/${v_09dafd}`;
-
-    const v_5c1e3a = `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+    const v_f71b56 = `${v_755eb9()}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
@@ -3321,7 +3360,7 @@ export const v_c07360 = async (
       method: v_bfe9b9,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: v_5c1e3a,
+        Authorization: `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`,
       },
     };
 
@@ -3386,7 +3425,7 @@ export const v_f7d3be = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+    const v_f71b56 = `${v_755eb9()}/cryptoPricesInKRW`;
 
     console.log('=== cryptoPricesInKRW API 호출 ===');
 
@@ -3422,7 +3461,7 @@ export const v_893ed2 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/memberLimits`;
+    const v_f71b56 = `${v_755eb9()}/memberLimits`;
 
     const v_cd6a57 = {
       member: v_660822,
@@ -3508,7 +3547,7 @@ export const v_38f5f4 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_c9c489.GATEWAY_NODEJS}/processAdReward`;
+    const v_f71b56 = `${v_755eb9()}/processAdReward`;
 
     const v_cd6a57 = {
       member: typeof v_660822 === 'number' ? v_660822 : parseInt(String(v_660822), 10),
@@ -3885,13 +3924,14 @@ export const v_5bb1ab = async (
 };
 
 export const v_4a38fa = async (
+  v_660822,
   v_c65f5d,
 ): Promise<v_f77e47> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_caa41f = {};
+    const request: v_caa41f = { member: v_660822 };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member: v_660822 });
 
     const v_3393e3 = await v_9f42a4.post<v_f77e47>(
       '/getRank',
@@ -4583,6 +4623,31 @@ export const v_44edcc = async (
         status: 'error',
         code: v_5e9bfe.response?.status,
         message: v_9390e8?.message || v_5e9bfe.message,
+      };
+    }
+    return { status: 'error', message: (v_5e9bfe as Error).message };
+  }
+};
+
+export const v_47cccc = async (
+  v_660822,
+  v_b9de1d,
+  v_c65f5d,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post('/cancelGiftishowCoupon', { member: v_660822, tr_id: v_b9de1d });
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    const v_badeaf = v_5e9bfe instanceof v_3333d3
+      ? (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message
+      : (v_5e9bfe as Error).message;
+    console.error('[기프티쇼] 쿠폰 취소 오류:', v_badeaf);
+    if (v_5e9bfe instanceof v_3333d3) {
+      return {
+        status: 'error',
+        code: v_5e9bfe.response?.status,
+        message: (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message,
       };
     }
     return { status: 'error', message: (v_5e9bfe as Error).message };
@@ -5559,147 +5624,25 @@ export const v_4dba02 = async (
   v_05bb19,
   v_c65f5d,
 ): Promise<string> => {
-
   const v_74cb95 = {
     service: 1,
     location: 2,
     personal: 3,
   };
+  const v_8adf57 = v_74cb95[v_4898e2];
 
   try {
-    const v_c9c489 = v_e4a763();
-    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
-    const v_c01615 = v_c9c489.GATEWAY_NODEJS;
+    const v_c87c7a = v_05bb19 ? `&language=${encodeURIComponent(v_05bb19)}` : '';
+    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements?type=${v_8adf57}${v_c87c7a}`);
+    const v_9390e8 = await v_eb792a.json() as any;
 
-    const v_8adf57 = v_74cb95[v_4898e2];
-    const v_09dafd = `/agreements?type=${v_8adf57}`;
-    const v_b958f2 = v_09dafd.startsWith('/')
-      ? `${v_c01615}${v_09dafd}`
-      : `${v_c01615}/${v_09dafd}`;
-
-    console.log('[약관] 약관 내용 요청:', {
-      clauseType: v_4898e2,
-      typeNumber: v_8adf57,
-      endpoint: v_09dafd,
-      fullUrl: v_b958f2,
-      language: v_05bb19,
-      baseUrl: v_c01615,
-    });
-
-    let v_3393e3;
-    try {
-      v_3393e3 = await v_12a388(v_09dafd, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${v_36dd9e}`,
-        },
-      }, v_c65f5d);
-    } catch (v_66148a) {
-      console.error('[약관] 네트워크 요청 실패:', {
-        clauseType: v_4898e2,
-        typeNumber: v_8adf57,
-        endpoint: v_09dafd,
-        fullUrl: v_b958f2,
-        error: v_66148a,
-        errorType: v_66148a instanceof Error ? v_66148a.constructor.name : typeof v_66148a,
-        errorMessage: v_66148a instanceof Error ? v_66148a.message : String(v_66148a),
-        errorStack: v_66148a instanceof Error ? v_66148a.stack : undefined,
-      });
-      throw v_66148a;
-    }
-
-    console.log('[약관] HTTP 응답 상태:', {
-      ok: v_3393e3.ok,
-      status: v_3393e3.status,
-      statusText: v_3393e3.statusText,
-      headers: Object.fromEntries(v_3393e3.headers.entries()),
-    });
-
-    if (!v_3393e3.ok) {
-      const v_74dc8b = await v_3393e3.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] HTTP 에러 응답:', {
-        status: v_3393e3.status,
-        statusText: v_3393e3.statusText,
-        errorText: v_74dc8b,
-      });
-      throw new Error(`HTTP error! status: ${v_3393e3.status}, message: ${v_74dc8b}`);
-    }
-
-    let v_9390e8;
-    try {
-      v_9390e8 = await v_3393e3.json();
-    } catch (v_b1d67e) {
-      const v_1e99f6 = await v_3393e3.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] JSON 파싱 실패:', {
-        clauseType: v_4898e2,
-        typeNumber: v_8adf57,
-        responseText: v_1e99f6,
-        error: v_b1d67e,
-      });
-      throw new Error(`JSON 파싱 실패: ${v_b1d67e instanceof Error ? v_b1d67e.message : String(v_b1d67e)}`);
-    }
-
-    console.log('[약관] API 응답 데이터:', JSON.stringify(v_9390e8, null, 2));
-    console.log('[약관] 응답 구조 분석:', {
-      code: v_9390e8.code,
-      hasData: !!v_9390e8.data,
-      dataType: Array.isArray(v_9390e8.data) ? 'array' : typeof v_9390e8.data,
-      dataLength: Array.isArray(v_9390e8.data) ? v_9390e8.data.length : 'N/A',
-      dataKeys: v_9390e8.data && typeof v_9390e8.data === 'object' && !Array.isArray(v_9390e8.data)
-        ? Object.keys(v_9390e8.data)
-        : 'N/A',
-    });
-
-    if (v_9390e8.code !== 200 || !v_9390e8.data) {
-      console.error('[약관] 응답 데이터 검증 실패:', {
-        code: v_9390e8.code,
-        hasData: !!v_9390e8.data,
-        fullResponse: v_9390e8,
-      });
+    if (v_9390e8.code !== 200 || !v_9390e8.data?.content) {
       throw new Error('약관 데이터를 가져올 수 없습니다.');
     }
 
-    const v_926463 = v_9390e8.data;
-
-    if (!v_926463.content) {
-      console.error('[약관] 약관 내용이 없습니다:', {
-        agreementData: v_926463,
-        hasContent: !!v_926463.content,
-      });
-      throw new Error('약관 내용이 없습니다.');
-    }
-
-    console.log('[약관] 약관 내용 로드 성공:', {
-      clauseType: v_4898e2,
-      typeNumber: v_8adf57,
-      language: v_05bb19,
-      contentLength: v_926463.content.length
-    });
-
-    return v_926463.content;
+    return v_9390e8.data.content;
   } catch (v_5e9bfe) {
     console.error('[약관] 약관 내용 로드 실패:', v_5e9bfe);
-    if (v_5e9bfe instanceof Error) {
-      console.error('[약관] 상세 오류 정보:', {
-        message: v_5e9bfe.message,
-        name: v_5e9bfe.name,
-        stack: v_5e9bfe.stack,
-        clauseType: v_4898e2,
-        typeNumber: v_74cb95[v_4898e2],
-        language: v_05bb19,
-        endpoint: `/oth-path?type=${v_74cb95[v_4898e2]}`,
-      });
-    } else {
-      console.error('[약관] 알 수 없는 에러:', {
-        error: v_5e9bfe,
-        errorType: typeof v_5e9bfe,
-        clauseType: v_4898e2,
-        typeNumber: v_74cb95[v_4898e2],
-        language: v_05bb19,
-      });
-    }
-
     throw v_5e9bfe;
   }
 };
@@ -5708,45 +5651,23 @@ export const v_519669 = async (
   v_3b27d9,
   v_c65f5d,
 ): Promise<v_250fc3> => {
+  const v_74cb95 = {
+    service: 1,
+    location: 2,
+    personal: 3,
+  };
+
   try {
-    const v_c9c489 = v_e4a763();
-    const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+    const v_b67de5 = v_3b27d9 ? `?type=${v_74cb95[v_3b27d9]}` : '?type=1';
+    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements${v_b67de5}`);
+    const v_9390e8 = await v_eb792a.json() as any;
 
-    const v_74cb95 = {
-      service: 1,
-      location: 2,
-      personal: 3,
-    };
-
-    const v_09dafd = v_3b27d9
-      ? `/oth-path?type=${v_74cb95[v_3b27d9]}`
-      : '/oth-path';
-
-    console.log('[약관] 약관 데이터 요청:', { type: v_3b27d9, typeNumber: v_3b27d9 ? v_74cb95[v_3b27d9] : undefined, endpoint: v_09dafd });
-
-    const v_3393e3 = await v_12a388(v_09dafd, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_36dd9e}`,
-      },
-    }, v_c65f5d);
-
-    if (!v_3393e3.ok) {
-      throw new Error(`HTTP error! status: ${v_3393e3.status}`);
-    }
-
-    const data: v_250fc3 = await v_3393e3.json();
-
-    console.log('[약관] 약관 데이터 로드 성공:', { type: v_3b27d9, hasData: !!v_9390e8.data });
-
-    return v_9390e8;
+    return {
+      success: v_9390e8.code === 200,
+      data: v_9390e8.data,
+    } as v_250fc3;
   } catch (v_5e9bfe) {
     console.error('[약관] 약관 데이터 로드 실패:', v_5e9bfe);
-    if (v_5e9bfe instanceof Error && v_5e9bfe.message === 'API request timeout') {
-
-      throw v_5e9bfe;
-    }
     throw v_5e9bfe;
   }
 };
@@ -6053,7 +5974,11 @@ export const v_563153 = async (v_c65f5d, v_9d6a91 = false, v_751f24 = false): Pr
               console.log(`[getTopAd5] 캐시 사용 (${Math.floor(v_e56026 / 1000)}초 전 저장, ${Math.floor((v_887583 - v_e56026) / 1000)}초 남음)`);
               return v_fe7102;
             } else {
-              console.log(`[getTopAd5] 캐시 만료 (${Math.floor(v_e56026 / 1000)}초 경과, 10분 초과)`);
+
+              console.log(`[getTopAd5] 캐시 만료 but 즉시 반환 (${Math.floor(v_e56026 / 1000)}초 경과) → 백그라운드 갱신`);
+
+              setTimeout(() => { v_563153(v_c65f5d, true, false).catch(() => {}); }, 100);
+              return v_fe7102;
             }
           }
         } catch (v_e6e506) {

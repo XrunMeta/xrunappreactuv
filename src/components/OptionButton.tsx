@@ -39,7 +39,12 @@ export const OptionButton: v_a3453e.FC<OptionButtonProps> = ({
       activeOpacity={0.8}
       disabled={v_4a6533}
     >
-      <Text style={[v_d81136.label, v_587413 && v_d81136.labelSelected, v_4a6533 && v_d81136.labelDisabled]}>
+      <Text
+        style={[v_d81136.label, v_587413 && v_d81136.labelSelected, v_4a6533 && v_d81136.labelDisabled]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
         {v_2869c1}
       </Text>
     </TouchableOpacity>

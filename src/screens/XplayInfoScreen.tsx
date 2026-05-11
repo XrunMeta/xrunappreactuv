@@ -11,11 +11,11 @@ import {
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_556baf } from '../components';
-import { v_729608, v_4c7b5d } from '../components';
+import { v_729608 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
-import { v_877de8 } from '../services';
+import { v_4d25ff } from '../services';
 import { v_a3bbf0 } from '../utils';
 import { v_772971 } from 'jmpfvteuuztnp';
 
@@ -23,7 +23,10 @@ const v_10664a = require('../../assets/xplay_symbol.png');
 const v_10a702 = require('../../assets/images/blur_yellow.png');
 const v_288e0b = require('../../assets/images/zone1.png');
 const v_3ce185 = require('../../assets/images/zone2.png');
+const v_d80408 = require('../../assets/images/zone3.png');
 const v_3d184e = require('../../assets/images/quest.png');
+
+const v_06e388 = false;
 
 export const v_305be8 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -47,8 +50,12 @@ export const v_305be8 = () => {
           v_9d6aeb(String(v_660822));
           v_3e37d1(true);
           try {
-            const v_43c42e = await v_877de8(v_660822, undefined);
-            v_97ae62(v_43c42e.total_ayet_points ?? 0);
+
+            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, undefined);
+            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
+            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
+            const v_74dfb8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            v_97ae62(Number.isFinite(v_74dfb8) ? v_74dfb8 : 0);
           } catch {
             v_97ae62(0);
           } finally {
@@ -104,7 +111,7 @@ export const v_305be8 = () => {
                 <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={v_d81136.balanceAmountRow}>
                   <View style={v_d81136.balanceXplayIconContainer}>
-                    <Image source={v_10664a} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/xrun-round-logo.png')} style={v_d81136.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {v_747a87 ? (
                     <ActivityIndicator size="small" color="#343a5a" style={v_d81136.balanceLoader} />
@@ -116,7 +123,7 @@ export const v_305be8 = () => {
                 </View>
               </View>
               <View style={v_d81136.xplayTag}>
-                <Text style={v_d81136.xplayTagText}>Xplay</Text>
+                <Text style={v_d81136.xplayTagText}>XRUN</Text>
               </View>
             </View>
           </LinearGradient>
@@ -133,13 +140,23 @@ export const v_305be8 = () => {
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[v_d81136.zoneCard, v_d81136.zoneCardDisabled]}
+            style={v_d81136.zoneCard}
             activeOpacity={0.85}
-            onPress={() => v_889fad(v_8d41d7('screens.xplayInfo.alerts.notification'), v_8d41d7('screens.xplayInfo.alerts.comingSoon'))}
+            onPress={() => v_9b57fc(v_ce4741.myChipsOfferwall)}
           >
             <Image source={v_3ce185} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
+          {v_06e388 && (
+            <TouchableOpacity
+              style={v_d81136.zoneCard}
+              activeOpacity={0.85}
+              onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
+            >
+              <Image source={v_d80408} style={v_d81136.zoneImage} resizeMode="contain" />
+              <Text style={v_d81136.zoneCardTitle}>Xplay Zone 3</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {}
@@ -155,13 +172,13 @@ export const v_305be8 = () => {
           </View>
         </TouchableOpacity>
 
+        {}
+        {
+
+}
+
         <View style={v_d81136.bottomSpacer} />
       </ScrollView>
-
-      {}
-      <View style={v_d81136.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
-      </View>
     </SafeView>
   );
 };
@@ -256,6 +273,8 @@ const v_d81136 = v_472849.create({
     minWidth: 60,
   },
   xplayTag: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
     backgroundColor: '#00d4ff',
     paddingHorizontal: 8,
     paddingVertical: 5,
@@ -344,8 +363,19 @@ const v_d81136 = v_472849.create({
   bottomSpacer: {
     height: 16,
   },
-  taboolaContainer: {
-    minHeight: 80,
-    backgroundColor: '#F5F5F5',
+  devTestBtn: {
+    marginTop: v_9b1a04.medium,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  devTestBtnText: {
+    fontSize: 13,
+    fontFamily: v_843035.family.semibold,
+    color: '#6B7280',
   },
 });

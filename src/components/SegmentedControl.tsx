@@ -79,6 +79,7 @@ const v_d81136 = v_472849.create({
   optionLabel: {
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
+    textAlign: 'center',
   },
   optionLabelActive: {
     color: '#111111',

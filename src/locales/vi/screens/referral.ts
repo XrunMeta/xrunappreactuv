@@ -6,9 +6,9 @@ export default {
   shareReferral: 'Share Referral Link',
   noResults: 'No results found',
   share: {
-    shareText: '[XRUN Invitation: Together 5 XRUN]\n\nExperience growing benefits with the XRUN Referral Program.\n\n?�� Reward Details\n\n* 5 XRUN Reward: Issued to both the Inviter and the New Member upon sign-up.\n\n* 8-Tier Revenue Sharing: Earn 20% of your friends\' ad revenue through our Uni-level system, extending up to 8 tiers.\n\n?�️ How to Participate\n\n* Step: Launch XRUN App ??Wallet ??AD XRUN ??Quest ??Share Referral Code ??Sign-up Completed\n\n?�� Referral Email ',
-    download: 'Download:',
-    linkLabel: 'Li�n k?t',
+    shareText: '[Lời mời XRUN: Cùng nhau 5 XRUN]\n\nTrải nghiệm những lợi ích ngày càng tăng với Chương trình Giới thiệu XRUN.\n\n🎁 Chi tiết Phần thưởng\n\n* Phần thưởng 5 XRUN: Cấp cho cả Người mời và Thành viên mới khi đăng ký.\n\n* Chia sẻ Doanh thu 8 Cấp: Kiếm 20% doanh thu quảng cáo của bạn bè thông qua hệ thống Uni-level lên đến 8 cấp.\n\n⚙️ Cách Tham gia\n\n* Bước: Mở ứng dụng XRUN ➔ Ví ➔ AD XRUN ➔ Nhiệm vụ ➔ Chia sẻ mã giới thiệu ➔ Hoàn tất đăng ký\n\n📩 Email giới thiệu ',
+    download: 'Tải xuống:',
+    linkLabel: 'Liên kết',
     shareFailed: 'Share Failed',
     shareFailedMessage: 'Failed to share referral link.',
   },

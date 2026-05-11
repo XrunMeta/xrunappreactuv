@@ -1825,7 +1825,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
             v_ceef35.current = false;
           } catch (v_cd6da1) {
-            console.error('❌ [MapMainScreen] 위치 정보 가져오기 실패:', v_cd6da1);
+            console.warn('⚠️ [MapMainScreen] 위치 정보 가져오기 실패:', v_cd6da1);
             v_9cd9d5(false);
             return;
           }

@@ -21,9 +21,23 @@ export const v_986693 = (): boolean => {
 export const v_f095b0 = async (): Promise<void> => {
   try {
 
-    if (v_8f0d89) {
-      console.log('[Pangle] 이미 초기화되었습니다.');
-      return;
+    if (v_8f0d89 && v_d0574b) {
+      if (v_986693() && typeof v_dae2ac?.isReady === 'function') {
+        try {
+          const v_be47b8 = await v_dae2ac.isReady();
+          if (v_be47b8 === true) {
+            console.log('[Pangle] 이미 초기화되었습니다.');
+            return;
+          }
+        } catch (v_9e86fd) {
+          console.warn('[Pangle] 네이티브 준비 상태 확인 실패, 재초기화합니다.', v_9e86fd);
+        }
+        v_8f0d89 = false;
+        v_d0574b = false;
+      } else {
+        console.log('[Pangle] 이미 초기화되었습니다.');
+        return;
+      }
     }
 
     if (!v_986693()) {
@@ -45,7 +59,7 @@ export const v_f095b0 = async (): Promise<void> => {
     });
 
     try {
-      if (v_326be8.OS === 'android') {
+      if (v_326be8.OS === 'android' || v_326be8.OS === 'ios') {
         const v_e1fe95 = v_dae2ac.initialize();
         const v_06d9af = new Promise<never>((v_37eab7, v_bad6f3) =>
           setTimeout(() => v_bad6f3(new Error('Pangle 초기화 타임아웃')), 10000)
@@ -189,7 +203,16 @@ export const v_18f201 = async (
       );
       if (v_30c524) v_60a14d.push(() => v_30c524.remove());
 
-      await v_dae2ac.loadAndShowRewardedAd(v_819f69);
+      try {
+        await v_dae2ac.loadRewardedAd(v_819f69);
+        await v_dae2ac.showRewardedAd(v_819f69);
+      } catch (v_d13e45) {
+        v_60a14d.forEach(v_f3c3f1 => v_f3c3f1());
+        const v_badeaf =
+          v_d13e45 instanceof Error ? v_d13e45.message : String(v_d13e45);
+        console.error('[Pangle] iOS 보상형 로드/표시 실패:', v_badeaf);
+        if (v_0721a3) v_0721a3(v_d13e45 as Error);
+      }
       return;
     }
 
@@ -324,6 +347,11 @@ export const v_e55270 = async (): Promise<void> => {
         return;
       }
 
+      if (typeof v_dae2ac.loadAndShowAppOpenAd !== 'function') {
+        console.warn('[Pangle] iOS loadAndShowAppOpenAd 메서드가 아직 네이티브에 없습니다. 스킵합니다.');
+        return;
+      }
+
       const v_819f69 = v_7522a9();
       if (!v_819f69) {
         console.warn('[Pangle] iOS 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
@@ -385,7 +413,13 @@ export const v_e55270 = async (): Promise<void> => {
         );
 
         v_dae2ac.loadAndShowAppOpenAd(v_819f69).catch((v_5e9bfe) => {
-          console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_5e9bfe);
+          const v_badeaf = String(v_5e9bfe?.message ?? v_5e9bfe ?? '');
+
+          if (/not supported|unsupported|unavailable/i.test(v_badeaf)) {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 미지원 — 스킵:', v_badeaf);
+          } else {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 호출 실패:', v_badeaf);
+          }
           if (!v_695d96) {
             v_695d96 = true;
             v_e6ceb8?.remove();

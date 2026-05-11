@@ -3,6 +3,8 @@ import React
 import ReactAppDependencyProvider
 import PAGAdSDK
 import AyetSDK
+import AppTrackingTransparency
+import AdSupport
 
 #if canImport(GoogleMaps)
 import GoogleMaps
@@ -14,6 +16,27 @@ public class AppDelegate: ExpoAppDelegate {
 
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
+
+  private func requestATTIfNeeded() {
+    if #available(iOS 14, *) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        ATTrackingManager.requestTrackingAuthorization { status in
+          switch status {
+          case .authorized:
+            print("[ATT] authorized — IDFA: \(ASIdentifierManager.shared().advertisingIdentifier.uuidString)")
+          case .denied:
+            print("[ATT] denied")
+          case .restricted:
+            print("[ATT] restricted")
+          case .notDetermined:
+            print("[ATT] notDetermined")
+          @unknown default:
+            print("[ATT] unknown status")
+          }
+        }
+      }
+    }
+  }
 
   private func setupPangleSDK() {
     let config = PAGConfig.share()
@@ -34,8 +57,13 @@ public class AppDelegate: ExpoAppDelegate {
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
 
+    requestATTIfNeeded()
+
     setupPangleSDK()
 
+    #if DEBUG
+    AyetSDK.shared.setDebug(true)
+    #endif
     AyetSDK.shared.initialize(placementId: 22062, externalIdentifier: "guest")
 
     let delegate = ReactNativeDelegate()

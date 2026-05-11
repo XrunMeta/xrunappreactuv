@@ -6,6 +6,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_d7d5a2 } from '../services';
+import { v_21ef1f } from '../services/adison';
 import { v_a61db3, v_843035 } from '../constants';
 
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
@@ -32,6 +33,8 @@ export const v_865e57 = () => {
           }
         }
       }
+
+      try { v_21ef1f(); } catch (v_37eab7) {}
 
       await v_e84827.removeItem('isLoggedIn');
       await v_e84827.removeItem('userEmail');

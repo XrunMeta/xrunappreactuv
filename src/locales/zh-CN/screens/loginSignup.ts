@@ -1,4 +1,7 @@
 export default {
+  tutorial1: '参与广告，获得XRUN奖励',
+  tutorial2: '使用获得的XRUN在Shop购物',
+  tutorial3: '分享推荐码，额外获得20% XRUN奖励',
   adText: '全屏广告',
   loginButton: '登录',
   signupButton: '注册',

@@ -102,6 +102,7 @@ export const v_8c1d95 = () => {
     const [v_4622b9, v_fa923c] = v_5ab095<MyItemData[]>([]);
     const [v_683210, v_34a50a] = v_5ab095(true);
     const [v_612e9f, v_575aad] = v_5ab095(false);
+    const [v_e80987, v_bf6163] = v_5ab095<string>('');
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
     const [v_5d756f, v_a563de] = v_5ab095<string>('');
 
@@ -119,6 +120,7 @@ export const v_8c1d95 = () => {
                 return;
             }
             const v_2be3e4 = String(v_660822);
+            v_bf6163(v_2be3e4);
             const [v_35dda7, v_38fb16] = await Promise.all([
                 v_060fa0(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
                 v_97ad19(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
@@ -159,7 +161,6 @@ export const v_8c1d95 = () => {
 
     const v_1c4d31 = v_df9f57(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -167,7 +168,7 @@ export const v_8c1d95 = () => {
     );
 
     const v_42b5ed = (value: typeof v_1c4d31[number]['value']) => {
-        if (v_3b402b === 'xplayShop' || v_3b402b === 'xrunStore') {
+        if (v_3b402b === 'xrunStore') {
 
             v_d0fbad({
                 id: '',
@@ -206,6 +207,8 @@ export const v_8c1d95 = () => {
             brand: v_8c0b26.brand,
             barcodeNumber: '',
             tr_id: v_8c0b26.tr_id ?? v_8c0b26.id,
+            trId: v_8c0b26.tr_id ?? v_8c0b26.id,
+            memberId: v_e80987,
             couponImgUrl: v_8c0b26.couponImgUrl,
         };
         v_d0fbad(v_983c87 as any);

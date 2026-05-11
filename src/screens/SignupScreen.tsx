@@ -41,7 +41,6 @@ import {
   v_60e3a5,
   v_01332e,
   v_35200c,
-  v_9d2541,
   v_91bb22,
   v_4dba02,
   v_a5170b,
@@ -646,6 +645,14 @@ export const v_f40fc5 = () => {
   }, [v_8d7bc8, v_47b466, v_d0472c, v_600254]);
 
   v_a3453e.useEffect(() => {
+    if (v_8d7bc8.referralEmail && v_8d7bc8.referralEmail !== v_9bf12c) {
+      console.log('[회원가입] Context referralEmail 업데이트 감지:', v_8d7bc8.referralEmail);
+      v_fb6bbb(v_8d7bc8.referralEmail);
+    }
+
+  }, [v_8d7bc8.referralEmail]);
+
+  v_a3453e.useEffect(() => {
     if (!v_2ca208.current) return;
 
     v_eee6b0({
@@ -999,41 +1006,44 @@ export const v_f40fc5 = () => {
         }
       }
 
-      console.log('[회원가입] 3단계: 이메일 인증 건너뛰고 바로 회원가입 진행');
+      console.log('[회원가입] 3단계: 회원가입 데이터 저장 및 이메일 인증 화면 이동');
 
       try {
-
-        const v_e16099 = v_326be8.OS === 'android' ? 3112 : 3113;
-        const v_6c3a47 = parseInt(v_459d5e?.dialCode?.replace('+', '') || '82', 10) || 82;
-        const v_94bdf5 = v_5f1e0e && v_2f03bc
-          ? parseInt(v_2f03bc.dialCode, 10) || 0
-          : 0;
-        const v_6582f8 = await v_35200c({
+        const v_0e0310 = {
           email: v_e0c7e8.trim(),
-          pin: v_adc076,
-          firstname: v_c0da8d.trim(),
-          lastname: v_eb8dd4.trim(),
-          gender: v_c3eac4, 
-          mobile: v_3a6ac4.trim(),
-          mobilecode: v_6c3a47,
-          countrycode: v_459d5e?.iso2 || 'KR',
-          country: v_6c3a47,
-          region: v_94bdf5,
-          age: v_f83808, 
-          recommand: v_65bdb1 || 0, 
-          os: v_e16099, 
-        });
+          password: v_adc076,
+          familyName: v_eb8dd4.trim(),
+          givenName: v_c0da8d.trim(),
+          phoneNumber: v_3a6ac4.trim(),
+          selectedCountryDialCode: {
+            iso2: v_459d5e.iso2,
+            dialCode: v_459d5e.dialCode,
+            flagEmoji: v_459d5e.flagEmoji,
+            name: v_459d5e.name,
+          },
+          selectedRegion: v_2f03bc
+            ? {
+                iso2: v_2f03bc.iso2,
+                dialCode: v_2f03bc.dialCode,
+                flagEmoji: v_2f03bc.flagEmoji,
+                name: v_2f03bc.name,
+              }
+            : null,
+          hasRegions: v_5f1e0e,
+          referralMemberId: v_65bdb1,
+          gender: v_c3eac4,
+          ageRange: v_f83808,
+          isAppleSignupMode: false,
+        };
 
-        if (v_6582f8 === true) {
-          console.log('[회원가입] 회원가입 성공');
-          await v_e84827.removeItem('pendingSignupData');
-          v_e33ec0(false);
-          v_9b57fc(v_ce4741.login);
-        } else {
-          console.error('[회원가입] 회원가입 실패');
-          await v_889fad(v_8d41d7('screens.signup.alerts.error'), '회원가입에 실패했습니다.');
-          v_e33ec0(false);
-        }
+        await v_e84827.setItem('pendingSignupData', JSON.stringify(v_0e0310));
+        console.log('[회원가입] AsyncStorage에 회원가입 데이터 저장 완료');
+
+        v_b572c3(v_e0c7e8.trim());
+        v_8f89f3(v_ce4741.signup);
+
+        v_e33ec0(false);
+        v_9b57fc(v_ce4741.emailVerification);
       } catch (v_df17d5) {
         console.error('[회원가입] AsyncStorage 저장 실패:', v_df17d5);
         await v_889fad(

@@ -28,7 +28,7 @@ const v_6361f0 = [
     contract: '0x00000000000000000000000057565e028bc78be6',
     symbol: 'POL',
     decimals: 18,
-    icon: require('../../assets/pol-round-logo.png'),
+    icon: require('../../assets/icon_polyganscan_color.png'),
   },
   {
     id: 'xrun',
