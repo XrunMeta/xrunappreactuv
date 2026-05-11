@@ -5632,7 +5632,8 @@ export const getClauseContent = async (
   const typeNumber = typeMap[clauseType];
 
   try {
-    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements?type=${typeNumber}`);
+    const langParam = language ? `&language=${encodeURIComponent(language)}` : '';
+    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements?type=${typeNumber}${langParam}`);
     const data = await resp.json() as any;
 
     if (data.code !== 200 || !data.data?.content) {
