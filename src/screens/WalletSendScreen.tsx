@@ -87,7 +87,7 @@ export const WalletSendScreen = () => {
   const [memberId, setMemberId] = useState<string | null>(null);
   const [memberLimit, setMemberLimit] = useState<number | null>(null);
 
-  const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [showPinGate, setShowPinGate] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -516,6 +516,12 @@ export const WalletSendScreen = () => {
 
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
+
+    setShowPinGate(true);
+  };
+
+  const handlePinSuccess = () => {
+    setShowPinGate(false);
     navigate(ROUTES.walletEstimate);
   };
 
@@ -529,11 +535,11 @@ export const WalletSendScreen = () => {
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
       {}
-      {!pinUnlocked && (
+      {showPinGate && (
         <PaymentPinGate
           memberId={memberId}
-          onSuccess={() => setPinUnlocked(true)}
-          onCancel={handleBackPress}
+          onSuccess={handlePinSuccess}
+          onCancel={() => setShowPinGate(false)}
         />
       )}
 
