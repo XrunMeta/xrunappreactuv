@@ -1,15 +1,19 @@
-import v_a3453e, { v_c4deb2, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_c4deb2, v_df9f57, v_e662ae, v_5ab095 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
+  v_79c4f2,
   v_472849,
   v_4623af,
   v_39a996,
-  v_326be8,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_729608, v_cb41de, v_570c34 } from '.';
+import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_8025d1, v_415628 } from '../services';
+
+const v_683bb6 = 6;
+const v_ef7132 = 180;
 
 interface Props {
   email: string;
@@ -19,135 +23,153 @@ interface Props {
 
 export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v_fe60db, onCancel: v_c7001c }) => {
   const { t: v_8d41d7 } = v_772971();
-  const [v_ab4803, v_ae4844] = v_5ab095<'sending' | 'input' | 'verifying'>('sending');
   const [v_c99bd2, v_537cbb] = v_5ab095('');
+  const [v_ae68cd, v_83fe8f] = v_5ab095(v_ef7132);
+  const [v_d1dd8f, v_ff0c7a] = v_5ab095(false);
+  const [v_ff9533, v_f30c99] = v_5ab095(false);
   const [v_5e9bfe, v_3a7d09] = v_5ab095('');
-  const [v_77cdad, v_13dcee] = v_5ab095(false);
+  const [v_9dc9e2, v_ad85ac] = v_5ab095(false);
+  const v_56c646 = v_e662ae<v_79c4f2>(null);
 
   v_c4deb2(() => {
+    if (v_9dc9e2) return;
     (async () => {
       try {
-        const v_3ed4c3 = await v_8025d1(v_e0c7e8);
-        if (v_3ed4c3) {
-          v_ae4844('input');
-        } else {
-          v_3a7d09(v_8d41d7('screens.emailOtp.sendFailed') || '인증 코드 발송에 실패했습니다.');
-          v_ae4844('input');
-        }
+        await v_8025d1(v_e0c7e8);
+        v_ad85ac(true);
       } catch (v_9e86fd) {
         console.warn('[EmailOtpGate] send failed', v_9e86fd);
         v_3a7d09(v_8d41d7('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');
-        v_ae4844('input');
+        v_ad85ac(true);
       }
     })();
 
   }, [v_e0c7e8]);
 
   v_c4deb2(() => {
-    if (v_ab4803 !== 'input' || v_c99bd2.length !== 6) return;
-    (async () => {
-      v_ae4844('verifying');
-      v_3a7d09('');
-      try {
-        const v_3ed4c3 = await v_415628(v_e0c7e8, v_c99bd2);
-        if (v_3ed4c3) {
-          v_fe60db();
-        } else {
-          v_3a7d09(v_8d41d7('screens.emailOtp.wrongCode') || '인증 코드가 일치하지 않습니다.');
-          v_537cbb('');
-          v_ae4844('input');
-        }
-      } catch (v_9e86fd) {
-        v_3a7d09(v_8d41d7('screens.emailOtp.verifyError') || '검증 중 오류가 발생했습니다.');
+    if (v_ae68cd <= 0) return;
+    const v_cb36b1 = setInterval(() => v_83fe8f((v_fd5f43) => v_fd5f43 - 1), 1000);
+    return () => clearInterval(v_cb36b1);
+  }, [v_ae68cd]);
+
+  const v_8813df = v_df9f57(() => {
+    const v_35f85c = Math.floor(v_ae68cd / 60).toString().padStart(2, '0');
+    const v_fd5f43 = (v_ae68cd % 60).toString().padStart(2, '0');
+    return `${v_35f85c}:${v_fd5f43}`;
+  }, [v_ae68cd]);
+
+  const v_83b05b = async () => {
+    if (v_c99bd2.length !== v_683bb6) return;
+    v_ff0c7a(true);
+    v_3a7d09('');
+    try {
+      const v_3ed4c3 = await v_415628(v_e0c7e8, v_c99bd2);
+      if (v_3ed4c3) {
+        v_fe60db();
+      } else {
+        v_3a7d09(v_8d41d7('screens.emailOtp.wrongCode') || '인증 코드가 일치하지 않습니다.');
         v_537cbb('');
-        v_ae4844('input');
       }
-    })();
-
-  }, [v_c99bd2, v_ab4803]);
-
-  const v_4464f1 = (v_d5dda0) => {
-    if (v_ab4803 !== 'input') return;
-    v_3a7d09('');
-    if (v_c99bd2.length >= 6) return;
-    v_537cbb(v_c99bd2 + v_d5dda0);
-  };
-  const v_7e2cc5 = () => {
-    if (v_ab4803 !== 'input') return;
-    v_3a7d09('');
-    if (v_c99bd2.length === 0) return;
-    v_537cbb(v_c99bd2.slice(0, -1));
+    } catch (v_9e86fd) {
+      v_3a7d09(v_8d41d7('screens.emailOtp.verifyError') || '검증 중 오류가 발생했습니다.');
+      v_537cbb('');
+    } finally {
+      v_ff0c7a(false);
+    }
   };
 
-  const v_6ee6a9 = async () => {
-    v_13dcee(true);
+  const v_cf9840 = async () => {
+    v_f30c99(true);
     v_3a7d09('');
     v_537cbb('');
     try {
-      const v_3ed4c3 = await v_8025d1(v_e0c7e8);
-      if (!v_3ed4c3) v_3a7d09(v_8d41d7('screens.emailOtp.sendFailed') || '인증 코드 재발송에 실패했습니다.');
+      await v_8025d1(v_e0c7e8);
+      v_83fe8f(v_ef7132);
     } catch {
       v_3a7d09(v_8d41d7('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');
     } finally {
-      v_13dcee(false);
+      v_f30c99(false);
     }
   };
 
   return (
     <View style={v_d81136.overlay}>
-      <Text style={v_d81136.title}>{v_8d41d7('screens.emailOtp.title') || '이메일 인증'}</Text>
-      <Text style={v_d81136.subtitle}>
-        {v_8d41d7('screens.emailOtp.sentTo') || '인증 코드를 발송했습니다:'}
-      </Text>
-      <Text style={v_d81136.email}>{v_e0c7e8}</Text>
-      <Text style={v_d81136.subtitle}>
-        {v_8d41d7('screens.emailOtp.enterCode') || '이메일로 받은 6자리 코드를 입력해 주세요.'}
-      </Text>
+      <Header
+        title={v_8d41d7('screens.verificationCode.title') || '이메일 인증'}
+        onBackPress={v_c7001c}
+        showBackButton
+      />
+      <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={v_d81136.descriptionWrapper}>
+          <Text style={v_d81136.description}>
+            {v_e0c7e8}
+            {v_8d41d7('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
+          </Text>
+        </View>
 
-      <View style={v_d81136.dotsRow}>
-        {Array.from({ length: 6 }).map((v_37eab7, v_ebec57) => (
-          <View key={v_ebec57} style={[v_d81136.dot, v_c99bd2.length > v_ebec57 && v_d81136.dotFilled]}>
-            {v_c99bd2.length > v_ebec57 && <Text style={v_d81136.digit}>{v_c99bd2[v_ebec57]}</Text>}
-          </View>
-        ))}
-      </View>
+        <View style={v_d81136.codeRow}>
+          {Array.from({ length: v_683bb6 }).map((v_37eab7, v_a56041) => {
+            const v_5f701e = v_c99bd2[v_a56041] ?? '';
+            return (
+              <TouchableOpacity
+                key={v_a56041}
+                style={v_d81136.codeBox}
+                onPress={() => v_56c646.current?.focus()}
+                activeOpacity={0.7}
+              >
+                <Text style={v_d81136.codeText}>{v_5f701e}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-      {!!v_5e9bfe && <Text style={v_d81136.error}>{v_5e9bfe}</Text>}
-      {(v_ab4803 === 'verifying' || v_ab4803 === 'sending') && (
-        <View style={{ marginTop: 8 }}>
-          <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-          {v_ab4803 === 'sending' && (
-            <Text style={v_d81136.sendingHint}>
-              {v_8d41d7('screens.emailOtp.sending') || '인증 코드 발송 중...'}
+        <TextInput
+          ref={v_56c646}
+          value={v_c99bd2}
+          onChangeText={(v_81e2ef) => v_537cbb(v_81e2ef.replace(/[^0-9]/g, '').slice(0, v_683bb6))}
+          keyboardType="number-pad"
+          maxLength={v_683bb6}
+          style={v_d81136.hiddenInput}
+          autoFocus={true}
+        />
+
+        {!!v_5e9bfe && <Text style={v_d81136.errorText}>{v_5e9bfe}</Text>}
+
+        <TouchableOpacity
+          style={v_d81136.resendWrapper}
+          onPress={v_ae68cd <= 0 && !v_ff9533 ? v_cf9840 : undefined}
+          activeOpacity={v_ae68cd <= 0 && !v_ff9533 ? 0.7 : 1}
+          disabled={v_ae68cd > 0 || v_ff9533}
+        >
+          {v_ff9533 ? (
+            <ActivityIndicator size="small" color="#2873ff" />
+          ) : (
+            <Text style={v_d81136.resendText}>
+              {v_8d41d7('screens.verificationCode.resendCode') || '인증 코드 재발송'}{' '}
+              {v_ae68cd > 0 && (
+                <Text style={v_d81136.resendTimer} numberOfLines={1}>
+                  {v_8813df}
+                </Text>
+              )}
             </Text>
           )}
+        </TouchableOpacity>
+
+        <View style={v_d81136.buttonWrapper}>
+          {v_d1dd8f ? (
+            <View style={v_d81136.loadingContainer}>
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            </View>
+          ) : (
+            <PrimaryButton
+              title={v_8d41d7('screens.verificationCode.verifyButton') || '확인'}
+              onPress={v_83b05b}
+              fullWidth
+              disabled={v_c99bd2.length !== v_683bb6 || v_d1dd8f}
+            />
+          )}
         </View>
-      )}
-
-      <TouchableOpacity onPress={v_6ee6a9} disabled={v_77cdad || v_ab4803 === 'sending'} style={v_d81136.resendBtn}>
-        <Text style={[v_d81136.resendText, (v_77cdad || v_ab4803 === 'sending') && { opacity: 0.4 }]}>
-          {v_77cdad ? (v_8d41d7('screens.emailOtp.resending') || '재발송 중...') : (v_8d41d7('screens.emailOtp.resend') || '인증 코드 재발송')}
-        </Text>
-      </TouchableOpacity>
-
-      <View style={v_d81136.keypad}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((v_f4e98d) => (
-          <TouchableOpacity key={v_f4e98d} style={v_d81136.key} onPress={() => v_4464f1(String(v_f4e98d))} disabled={v_ab4803 !== 'input'}>
-            <Text style={v_d81136.keyText}>{v_f4e98d}</Text>
-          </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={v_d81136.key} onPress={v_c7001c}>
-          <Text style={[v_d81136.keyText, { fontSize: 14, color: '#94a3b8' }]}>
-            {v_8d41d7('common.cancel') || '취소'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={v_d81136.key} onPress={() => v_4464f1('0')} disabled={v_ab4803 !== 'input'}>
-          <Text style={v_d81136.keyText}>0</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={v_d81136.key} onPress={v_7e2cc5} disabled={v_ab4803 !== 'input'}>
-          <Text style={[v_d81136.keyText, { fontSize: 18 }]}>⌫</Text>
-        </TouchableOpacity>
-      </View>
+      </SafeScrollView>
     </View>
   );
 };
@@ -158,89 +180,84 @@ const v_d81136 = v_472849.create({
     top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: '#fff',
     zIndex: 1000,
-    paddingHorizontal: v_9b1a04.large,
-    paddingTop: 60,
-    alignItems: 'center',
+    ...v_a61db3.container,
   },
-  title: {
-    fontSize: v_843035.size.large,
-    fontWeight: '700',
-    color: v_1bfbd0.text,
-    marginTop: 20,
-    marginBottom: 12,
+  scrollContent: {
+    flexGrow: 1,
+    ...v_a61db3.scrollContent,
   },
-  subtitle: {
+  descriptionWrapper: {
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
+  description: {
     fontSize: v_843035.size.msmall,
-    color: '#64748b',
-    textAlign: 'center',
+    lineHeight: 24,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
   },
-  email: {
-    fontSize: v_843035.size.medium,
-    fontWeight: '600',
-    color: v_1bfbd0.text,
-    marginVertical: 6,
-  },
-  dotsRow: {
+  codeRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
-  dot: {
-    width: 36,
-    height: 44,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#CBD5E1',
-    marginHorizontal: 4,
-    justifyContent: 'center',
+  codeBox: {
+    width: 45,
+    height: 50,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#dedede',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
-  dotFilled: { borderColor: '#343a5a', backgroundColor: '#f8fafc' },
-  digit: { fontSize: 20, fontWeight: '700', color: '#343a5a' },
-  error: {
+  codeText: {
+    fontSize: v_843035.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: v_1bfbd0.headerText,
+  },
+  resendWrapper: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  resendText: {
+    fontSize: v_843035.size.medium,
+    lineHeight: 24,
+    color: v_1bfbd0.headerText,
+    fontFamily: 'Roboto-Medium',
+  },
+  resendTimer: {
+    color: '#2873ff',
+    fontFamily: 'Roboto-Medium',
+  },
+  buttonWrapper: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    marginBottom: 32,
+  },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
+  errorText: {
     fontSize: 13,
     color: '#EF4444',
     textAlign: 'center',
-    marginTop: 8,
-  },
-  sendingHint: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  resendBtn: {
-    marginTop: 12,
-    padding: 8,
-  },
-  resendText: {
-    fontSize: 13,
-    color: v_1bfbd0.buttonPrimary,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  keypad: {
-    marginTop: 'auto',
-    marginBottom: v_326be8.OS === 'ios' ? 32 : 16,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  key: {
-    width: '30%',
-    aspectRatio: 1.5,
-    margin: '1.5%',
-    backgroundColor: '#F1F5F9',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyText: {
-    fontSize: 26,
-    fontWeight: '600',
-    color: v_1bfbd0.text,
+    marginTop: -12,
+    marginBottom: 16,
   },
 });
