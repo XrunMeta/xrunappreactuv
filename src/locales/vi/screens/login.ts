@@ -29,6 +29,8 @@ export default {
     loginFailed: 'Email hoặc mật khẩu không đúng',
     userDataNotFound: 'Không thể lấy thông tin người dùng',
     loginError: 'Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại',
+    idTokenMissing: 'Không nhận được mã thông báo ID. Vui lòng thử lại.',
+    identityTokenMissing: 'Không nhận được mã thông báo Identity. Vui lòng thử lại.',
   },
 };
 

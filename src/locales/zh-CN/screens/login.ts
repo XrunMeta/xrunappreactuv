@@ -29,6 +29,8 @@ export default {
     loginFailed: '邮箱或密码不正确',
     userDataNotFound: '无法获取用户信息',
     loginError: '登录时发生错误，请重试',
+    idTokenMissing: '未能接收 ID 令牌。请重试。',
+    identityTokenMissing: '未能接收 Identity 令牌。请重试。',
   },
 };
 
