@@ -58,3 +58,4 @@ export { default as pangleList } from './pangleList';
 export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleAuth';
 
 
+export { default as paymentPin } from './paymentPin';
