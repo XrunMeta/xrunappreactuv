@@ -11,6 +11,7 @@ import com.bytedance.sdk.openadsdk.api.reward.*
 import com.bytedance.sdk.openadsdk.api.open.*
 import android.os.Handler
 import android.os.Looper
+import run.xrun.xrunapp.BuildConfig
 
 class PangleModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
 
@@ -64,7 +65,7 @@ class PangleModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
             val config = PAGConfig.Builder()
                 .appId(appId)
-                .debugLog(true) 
+                .debugLog(BuildConfig.DEBUG) 
                 .supportMultiProcess(false) 
 
                 .build()
