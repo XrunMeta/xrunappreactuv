@@ -1535,6 +1535,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
     }
 
     v_fd5fd4.current = true;
+    const v_b6483b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
+    const v_46e760 = Date.now();
+    console.log(v_b6483b, '[MapMainScreen] refreshTopAd5AndMapMarkers 시작 (마커+TopAd5 로드)');
     try {
 
       let v_905ecb = new Set<string>();
@@ -1596,10 +1599,12 @@ export const MapMainScreen: v_a3453e.FC = () => {
         console.log('[MapMainScreen] 캐시된 TopAd5 먼저 표시:', v_92ed2d.length, '개 (API 응답 대기)');
       }
 
-      console.log('[MapMainScreen] 1단계: TopAd5 API 호출 시작');
+      const v_0322be = Date.now();
+      console.log(v_b6483b, '[MapMainScreen] 1단계: TopAd5 API 호출 시작');
       let v_e36b07 = null;
 
       v_e36b07 = await v_563153(undefined, v_9d6a91);
+      console.log(v_b6483b, '[MapMainScreen] 1단계: TopAd5 API 호출 완료', `${Date.now() - v_0322be}ms`);
 
       if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
         console.warn('[MapMainScreen] TopAd5 API 데이터가 없습니다. 캐시 유지.');
