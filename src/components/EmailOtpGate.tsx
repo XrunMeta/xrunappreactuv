@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { COLORS, FONTS, SIZES } from '../constants';
+import { Header, PrimaryButton, SafeScrollView } from '.';
+import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { sendEmailVerificationCode, verifyEmailCode } from '../services';
+
+const CODE_LENGTH = 6;
+const RESEND_SECONDS = 180;
 
 interface Props {
   email: string;
@@ -19,135 +23,153 @@ interface Props {
 
 export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) => {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<'sending' | 'input' | 'verifying'>('sending');
   const [code, setCode] = useState('');
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState('');
-  const [resending, setResending] = useState(false);
+  const [sentOnce, setSentOnce] = useState(false);
+  const hiddenInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
+    if (sentOnce) return;
     (async () => {
       try {
-        const ok = await sendEmailVerificationCode(email);
-        if (ok) {
-          setPhase('input');
-        } else {
-          setError(t('screens.emailOtp.sendFailed') || '인증 코드 발송에 실패했습니다.');
-          setPhase('input');
-        }
+        await sendEmailVerificationCode(email);
+        setSentOnce(true);
       } catch (e) {
         console.warn('[EmailOtpGate] send failed', e);
         setError(t('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');
-        setPhase('input');
+        setSentOnce(true);
       }
     })();
 
   }, [email]);
 
   useEffect(() => {
-    if (phase !== 'input' || code.length !== 6) return;
-    (async () => {
-      setPhase('verifying');
-      setError('');
-      try {
-        const ok = await verifyEmailCode(email, code);
-        if (ok) {
-          onSuccess();
-        } else {
-          setError(t('screens.emailOtp.wrongCode') || '인증 코드가 일치하지 않습니다.');
-          setCode('');
-          setPhase('input');
-        }
-      } catch (e) {
-        setError(t('screens.emailOtp.verifyError') || '검증 중 오류가 발생했습니다.');
+    if (secondsLeft <= 0) return;
+    const timer = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearInterval(timer);
+  }, [secondsLeft]);
+
+  const formattedTimer = useMemo(() => {
+    const m = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+    const s = (secondsLeft % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }, [secondsLeft]);
+
+  const handleVerify = async () => {
+    if (code.length !== CODE_LENGTH) return;
+    setIsVerifying(true);
+    setError('');
+    try {
+      const ok = await verifyEmailCode(email, code);
+      if (ok) {
+        onSuccess();
+      } else {
+        setError(t('screens.emailOtp.wrongCode') || '인증 코드가 일치하지 않습니다.');
         setCode('');
-        setPhase('input');
       }
-    })();
-
-  }, [code, phase]);
-
-  const onPressDigit = (d: string) => {
-    if (phase !== 'input') return;
-    setError('');
-    if (code.length >= 6) return;
-    setCode(code + d);
-  };
-  const onPressBackspace = () => {
-    if (phase !== 'input') return;
-    setError('');
-    if (code.length === 0) return;
-    setCode(code.slice(0, -1));
+    } catch (e) {
+      setError(t('screens.emailOtp.verifyError') || '검증 중 오류가 발생했습니다.');
+      setCode('');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
-  const onResend = async () => {
-    setResending(true);
+  const handleResend = async () => {
+    setIsResending(true);
     setError('');
     setCode('');
     try {
-      const ok = await sendEmailVerificationCode(email);
-      if (!ok) setError(t('screens.emailOtp.sendFailed') || '인증 코드 재발송에 실패했습니다.');
+      await sendEmailVerificationCode(email);
+      setSecondsLeft(RESEND_SECONDS);
     } catch {
       setError(t('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');
     } finally {
-      setResending(false);
+      setIsResending(false);
     }
   };
 
   return (
     <View style={styles.overlay}>
-      <Text style={styles.title}>{t('screens.emailOtp.title') || '이메일 인증'}</Text>
-      <Text style={styles.subtitle}>
-        {t('screens.emailOtp.sentTo') || '인증 코드를 발송했습니다:'}
-      </Text>
-      <Text style={styles.email}>{email}</Text>
-      <Text style={styles.subtitle}>
-        {t('screens.emailOtp.enterCode') || '이메일로 받은 6자리 코드를 입력해 주세요.'}
-      </Text>
+      <Header
+        title={t('screens.verificationCode.title') || '이메일 인증'}
+        onBackPress={onCancel}
+        showBackButton
+      />
+      <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.descriptionWrapper}>
+          <Text style={styles.description}>
+            {email}
+            {t('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
+          </Text>
+        </View>
 
-      <View style={styles.dotsRow}>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <View key={i} style={[styles.dot, code.length > i && styles.dotFilled]}>
-            {code.length > i && <Text style={styles.digit}>{code[i]}</Text>}
-          </View>
-        ))}
-      </View>
+        <View style={styles.codeRow}>
+          {Array.from({ length: CODE_LENGTH }).map((_, index) => {
+            const digit = code[index] ?? '';
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.codeBox}
+                onPress={() => hiddenInputRef.current?.focus()}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.codeText}>{digit}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-      {!!error && <Text style={styles.error}>{error}</Text>}
-      {(phase === 'verifying' || phase === 'sending') && (
-        <View style={{ marginTop: 8 }}>
-          <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-          {phase === 'sending' && (
-            <Text style={styles.sendingHint}>
-              {t('screens.emailOtp.sending') || '인증 코드 발송 중...'}
+        <TextInput
+          ref={hiddenInputRef}
+          value={code}
+          onChangeText={(v) => setCode(v.replace(/[^0-9]/g, '').slice(0, CODE_LENGTH))}
+          keyboardType="number-pad"
+          maxLength={CODE_LENGTH}
+          style={styles.hiddenInput}
+          autoFocus={true}
+        />
+
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
+        <TouchableOpacity
+          style={styles.resendWrapper}
+          onPress={secondsLeft <= 0 && !isResending ? handleResend : undefined}
+          activeOpacity={secondsLeft <= 0 && !isResending ? 0.7 : 1}
+          disabled={secondsLeft > 0 || isResending}
+        >
+          {isResending ? (
+            <ActivityIndicator size="small" color="#2873ff" />
+          ) : (
+            <Text style={styles.resendText}>
+              {t('screens.verificationCode.resendCode') || '인증 코드 재발송'}{' '}
+              {secondsLeft > 0 && (
+                <Text style={styles.resendTimer} numberOfLines={1}>
+                  {formattedTimer}
+                </Text>
+              )}
             </Text>
           )}
+        </TouchableOpacity>
+
+        <View style={styles.buttonWrapper}>
+          {isVerifying ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          ) : (
+            <PrimaryButton
+              title={t('screens.verificationCode.verifyButton') || '확인'}
+              onPress={handleVerify}
+              fullWidth
+              disabled={code.length !== CODE_LENGTH || isVerifying}
+            />
+          )}
         </View>
-      )}
-
-      <TouchableOpacity onPress={onResend} disabled={resending || phase === 'sending'} style={styles.resendBtn}>
-        <Text style={[styles.resendText, (resending || phase === 'sending') && { opacity: 0.4 }]}>
-          {resending ? (t('screens.emailOtp.resending') || '재발송 중...') : (t('screens.emailOtp.resend') || '인증 코드 재발송')}
-        </Text>
-      </TouchableOpacity>
-
-      <View style={styles.keypad}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-          <TouchableOpacity key={n} style={styles.key} onPress={() => onPressDigit(String(n))} disabled={phase !== 'input'}>
-            <Text style={styles.keyText}>{n}</Text>
-          </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={styles.key} onPress={onCancel}>
-          <Text style={[styles.keyText, { fontSize: 14, color: '#94a3b8' }]}>
-            {t('common.cancel') || '취소'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.key} onPress={() => onPressDigit('0')} disabled={phase !== 'input'}>
-          <Text style={styles.keyText}>0</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.key} onPress={onPressBackspace} disabled={phase !== 'input'}>
-          <Text style={[styles.keyText, { fontSize: 18 }]}>⌫</Text>
-        </TouchableOpacity>
-      </View>
+      </SafeScrollView>
     </View>
   );
 };
@@ -158,89 +180,84 @@ const styles = StyleSheet.create({
     top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: '#fff',
     zIndex: 1000,
-    paddingHorizontal: SIZES.large,
-    paddingTop: 60,
-    alignItems: 'center',
+    ...COMMON_STYLES.container,
   },
-  title: {
-    fontSize: FONTS.size.large,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: 20,
-    marginBottom: 12,
+  scrollContent: {
+    flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
   },
-  subtitle: {
+  descriptionWrapper: {
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
+  description: {
     fontSize: FONTS.size.msmall,
-    color: '#64748b',
-    textAlign: 'center',
+    lineHeight: 24,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
   },
-  email: {
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginVertical: 6,
-  },
-  dotsRow: {
+  codeRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
-  dot: {
-    width: 36,
-    height: 44,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#CBD5E1',
-    marginHorizontal: 4,
-    justifyContent: 'center',
+  codeBox: {
+    width: 45,
+    height: 50,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#dedede',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
-  dotFilled: { borderColor: '#343a5a', backgroundColor: '#f8fafc' },
-  digit: { fontSize: 20, fontWeight: '700', color: '#343a5a' },
-  error: {
+  codeText: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.headerText,
+  },
+  resendWrapper: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  resendText: {
+    fontSize: FONTS.size.medium,
+    lineHeight: 24,
+    color: COLORS.headerText,
+    fontFamily: 'Roboto-Medium',
+  },
+  resendTimer: {
+    color: '#2873ff',
+    fontFamily: 'Roboto-Medium',
+  },
+  buttonWrapper: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    marginBottom: 32,
+  },
+  loadingContainer: {
+    height: 56,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
+  errorText: {
     fontSize: 13,
     color: '#EF4444',
     textAlign: 'center',
-    marginTop: 8,
-  },
-  sendingHint: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  resendBtn: {
-    marginTop: 12,
-    padding: 8,
-  },
-  resendText: {
-    fontSize: 13,
-    color: COLORS.buttonPrimary,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  keypad: {
-    marginTop: 'auto',
-    marginBottom: Platform.OS === 'ios' ? 32 : 16,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  key: {
-    width: '30%',
-    aspectRatio: 1.5,
-    margin: '1.5%',
-    backgroundColor: '#F1F5F9',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyText: {
-    fontSize: 26,
-    fontWeight: '600',
-    color: COLORS.text,
+    marginTop: -12,
+    marginBottom: 16,
   },
 });
