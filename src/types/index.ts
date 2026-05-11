@@ -938,6 +938,7 @@ export interface GetMyGroupResponse {
   status: 'success' | 'error';
   data: MyGroupItem[];
   message?: string;
+  total8Depth?: number;
 }
 
 export interface GetMyRecommenderRequest {
@@ -1165,6 +1166,7 @@ export interface WalletData {
   subCurrencyName?: string; 
   symbol: string; 
   symbolimg: string; 
+  file?: string; 
   address: string; 
   amount: string; 
   Wamount: string; 

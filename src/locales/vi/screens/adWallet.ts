@@ -50,6 +50,13 @@ export default {
   referralEventRewardReceive: 'Vui lòng nhận phần thưởng sự kiện giới thiệu',
   referralEventUnderReview: 'Đây là sự kiện giới thiệu đang được xem xét',
   referralEventReward: 'Phần thưởng Sự kiện Giới thiệu',
+  attendanceCheckLabel: 'Điểm danh',
+  referralRewardLabel: 'Phần thưởng Giới thiệu',
+  referralRewardWithName: 'Phần thưởng Giới thiệu ({{name}})',
+  playZone1Reward: 'Phần thưởng PLAY ZONE1',
+  playZone2Reward: 'Phần thưởng PLAY ZONE2',
+  obtainableAmount: 'Số tiền có thể nhận',
+  attendanceRewardCompleted: 'Đã nhận phần thưởng điểm danh',
 };
 
 

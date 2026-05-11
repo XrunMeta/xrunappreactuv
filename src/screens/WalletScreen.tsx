@@ -35,9 +35,11 @@ import {
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { TaboolaBanner } from '../components/TaboolaBanner';
+import { getTokenIcon } from '../constants/tokenMeta';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
-const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+
+const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
 const iconSend = require('../../assets/icon-send.png');
 const iconReceive = require('../../assets/icon-receive.png');
 
@@ -69,6 +71,61 @@ const shortenAddress = (address: string, frontChars: number, backChars: number):
   )}`;
 };
 
+const WALLET_LIST_DARK_DISKS = new Set(['#000000', '#111111', '#25292C', '#8347E6']);
+
+function getWalletListDiskBackground(asset: CombinedAsset): string {
+  const sym = (asset.symbol || '').toUpperCase();
+  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
+  if (sym === 'XRUN' && sub.includes('ethereum')) {
+    return '#FFFFFF';
+  }
+  switch (asset.currency) {
+    case 1:
+      return '#000000';
+    case 2:
+      return '#EFF4F5';
+    case 11:
+      return '#EFF4F5';
+    case 16:
+      return '#8347E6';
+    case 18:
+      return '#111111';
+    case 19:
+      return '#25292C';
+    default:
+      return '#EFF4F5';
+  }
+}
+
+function resolveWalletListIconSource(asset: CombinedAsset): any | null {
+  const sym = (asset.symbol || '').toUpperCase();
+  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
+
+  if (asset.currency === 19 || sub.includes('ad xrun')) {
+    return require('../../assets/ad-round-logo.png');
+  }
+  if (sym === 'ETH' || asset.currency === 2) {
+    if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
+      return { uri: asset.icon.trim() };
+    }
+    return require('../../assets/images/ethereum_thumb.png');
+  }
+  if (sym === 'POL' || asset.currency === 16) {
+    return getTokenIcon('POL');
+  }
+  if (sym === 'XRUN') {
+    if (sub.includes('ethereum')) {
+      return getTokenIcon('XRUN', 'Ethereum');
+    }
+    return require('../../assets/xrun-round-logo.png');
+  }
+
+  if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
+    return { uri: asset.icon.trim() };
+  }
+  return null;
+}
+
 interface TokenListItemData extends CombinedAsset {
   title: string;
   subtitle: string;
@@ -80,6 +137,8 @@ interface TokenListItemData extends CombinedAsset {
     background: string;
     text: string;
   };
+
+  listIndex?: number;
 }
 
 export const WalletScreen = () => {
@@ -160,7 +219,7 @@ export const WalletScreen = () => {
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
           amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
-          icon: `data:image/png;base64,${item.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`,
+          icon: item.file || '',
           currency: item.currency,
           isCustom: false,
           contractAddress: item.address,
@@ -168,9 +227,22 @@ export const WalletScreen = () => {
           originalData: item,
         }));
 
+      const primaryPolygonAddr =
+        walletAssets.find((w) => Number(w.currency) === 1)?.contractAddress?.trim() || '';
+      if (primaryPolygonAddr) {
+        walletAssets.forEach((a) => {
+          if (![16, 18].includes(Number(a.currency))) return;
+          const cur = (a.contractAddress || '').trim();
+          if (cur) return;
+          a.contractAddress = primaryPolygonAddr;
+          if (a.originalData && typeof a.originalData === 'object') {
+            a.originalData = { ...a.originalData, address: primaryPolygonAddr };
+          }
+        });
+      }
+
       const customAssets: CombinedAsset[] = customTokens
         .map((token) => {
-
           const matchingWalletData = walletData.find(
             (wallet) => wallet.currency === token.currency,
           );
@@ -181,10 +253,7 @@ export const WalletScreen = () => {
             name: token.name,
             amount: new BigNumber(token.amount || '0').toFixed(2),
             icon: matchingWalletData
-              ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(
-                /(\r\n|\n|\r)/gm,
-                '',
-              ) || ''}`
+              ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`
               : 'https://via.placeholder.com/24',
             currency: token.currency,
             subCurrencyName: token.subCurrencyName,
@@ -202,7 +271,7 @@ export const WalletScreen = () => {
         id: 19,
         symbol: 'XRUN',
         name: 'AD XRUN',
-        amount: new BigNumber(adXrunAmount || '0').toFixed(2),
+        amount: new BigNumber(adXrunAmount || 0).toFixed(2),
         icon: require('../../assets/ad-round-logo.png'),
         currency: 19,
         isCustom: false,
@@ -211,7 +280,6 @@ export const WalletScreen = () => {
         subcurrency: undefined,
         originalData: undefined,
       };
-
       allAssets.push(adXrunItem);
 
       const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
@@ -288,16 +356,33 @@ export const WalletScreen = () => {
     const fetchWalletDataAsync = async () => {
       try {
 
+        console.log('[WalletScreen] fetchWalletData 호출 시작, member:', member);
         const walletResponse = await fetchWalletData(member, 7, navigate);
+
+        console.log('[WalletScreen] walletResponse:', JSON.stringify({
+          hasData: !!walletResponse?.data,
+          dataLength: walletResponse?.data?.length,
+          status: walletResponse?.status,
+          code: walletResponse?.code,
+        }));
 
         if (walletResponse && walletResponse.data) {
 
+          console.log('[WalletScreen] 원본 데이터:', walletResponse.data.map((item: any) => ({
+            currency: item.currency,
+            subcurrency: item.subcurrency,
+            address: item.address ? item.address.substring(0, 10) + '...' : 'NONE',
+            symbol: item.symbol,
+          })));
+
+          console.log('[WalletScreen] statusOtherChain:', statusOtherChain);
           const filteredData = walletResponse.data.filter((item) => {
             if (statusOtherChain === 'on') {
               return true; 
             } else {
 
               return (
+                item.currency === 1 ||
                 item.subcurrency === 5000 ||
                 item.subcurrency === 5100 ||
                 item.subcurrency === 5200 ||
@@ -305,6 +390,13 @@ export const WalletScreen = () => {
               );
             }
           });
+
+          console.log('[WalletScreen] 필터 후 데이터:', filteredData.map((item: any) => ({
+            currency: item.currency,
+            subcurrency: item.subcurrency,
+            address: item.address ? item.address.substring(0, 10) + '...' : 'NONE',
+            symbol: item.symbol,
+          })));
 
           const sortedData = filteredData.sort((a, b) => {
             if (a.currency === 1) return -1; 
@@ -321,16 +413,27 @@ export const WalletScreen = () => {
           setCardsData(sortedData);
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
+          console.log('[WalletScreen] xrunWallet 찾기:', xrunWallet ? {
+            currency: xrunWallet.currency,
+            address: xrunWallet.address,
+            subcurrency: xrunWallet.subcurrency,
+          } : 'NOT FOUND');
 
           if (xrunWallet) {
             setPublicAddress(xrunWallet.address);
+            console.log('[WalletScreen] publicAddress 설정:', xrunWallet.address);
+          } else {
+            console.warn('[WalletScreen] ⚠️ currency=1 지갑을 찾을 수 없음! sortedData currencies:', sortedData.map((d: any) => d.currency));
           }
 
+          setIsLoading(false);
+        } else {
+          console.warn('[WalletScreen] ⚠️ walletResponse에 data 없음:', walletResponse);
           setIsLoading(false);
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          console.error('Failed to fetch wallet data:', error);
+          console.error('[WalletScreen] ❌ fetchWalletData 실패:', error?.message || error);
           setIsLoading(false);
         }
       }
@@ -559,30 +662,9 @@ export const WalletScreen = () => {
 
   const convertAssetToTokenListItem = useCallback(
     (asset: CombinedAsset): TokenListItemData => {
-      const getIconColor = (currency: number): { background: string; text: string } => {
-        switch (currency) {
-          case 1: 
-            return { background: '#EFF4F5', text: '#000000' };
-          case 2: 
-            return { background: '#EFF4F5', text: '#FFFFFF' };
-          case 3: 
-            return { background: '#5F59E0', text: '#FFFFFF' };
-          case 16: 
-            return { background: '#8347E6', text: '#FFFFFF' };
-          case 18: 
-            return { background: '#1e1e1e', text: '#FFFFFF' };
-          case 19: 
-            return { background: '#25292C', text: '#FFFFFF' };
-          default:
-            return { background: '#EDEDED', text: '#343434' };
-        }
-      };
-
-      const iconColors = getIconColor(asset.currency);
-      const iconSource =
-        typeof asset.icon === 'string' && asset.icon.startsWith('data:image')
-          ? { uri: asset.icon }
-          : asset.icon;
+      const diskBg = getWalletListDiskBackground(asset);
+      const iconSource = resolveWalletListIconSource(asset);
+      const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
 
       return {
         ...asset,
@@ -596,7 +678,10 @@ export const WalletScreen = () => {
         suffix: asset.symbol,
         iconSource,
         fallbackLabel: asset.symbol.slice(0, 2).toUpperCase(),
-        fallbackColors: iconColors,
+        fallbackColors: {
+          background: diskBg,
+          text: textOnDisk,
+        },
       };
     },
     [],
@@ -604,8 +689,28 @@ export const WalletScreen = () => {
 
   const fetchTokenListData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<TokenListItemData>> => {
+      let tokenListData = combinedAssets.map((asset, index) => ({
+        ...convertAssetToTokenListItem(asset),
+        listIndex: index,
+      }));
 
-      const tokenListData = combinedAssets.map(convertAssetToTokenListItem);
+      const fifthAsset = combinedAssets[4];
+      if (fifthAsset && tokenListData[3]) {
+        const diskBg = getWalletListDiskBackground(fifthAsset);
+        const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
+        tokenListData = tokenListData.map((row, i) =>
+          i === 3
+            ? {
+                ...row,
+                fallbackColors: {
+                  ...row.fallbackColors,
+                  background: diskBg,
+                  text: textOnDisk,
+                },
+              }
+            : row,
+        );
+      }
 
       return {
         data: tokenListData,
@@ -633,10 +738,25 @@ export const WalletScreen = () => {
   );
 
   const TokenListItemComponent: React.FC<TokenListItemData & { onPress?: () => void }> = (props) => {
-    const { title, subtitle, amount, suffix, iconSource, fallbackLabel, fallbackColors, currency, onPress } =
-      props;
+    const {
+      title,
+      subtitle,
+      amount,
+      suffix,
+      iconSource,
+      fallbackLabel,
+      fallbackColors,
+      currency,
+      listIndex,
+      onPress,
+    } = props;
 
-    const iconSize = currency === 2 ? 28 : 22;
+    const iconSize = listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5) : listIndex === 4 ? Math.round(48 * 0.8) : Math.round(48 * 0.9);
+    const [imgError, setImgError] = useState(false);
+
+    useEffect(() => {
+      setImgError(false);
+    }, [iconSource, currency, listIndex]);
 
     return (
       <TouchableOpacity
@@ -648,25 +768,33 @@ export const WalletScreen = () => {
           <View
             style={[
               styles.tokenIconWrapper,
-              { backgroundColor: fallbackColors?.background || '#EDEDED' },
+              { backgroundColor: fallbackColors?.background || '#EFF4F5' },
             ]}
           >
-            {iconSource ? (
-              <Image
-                source={iconSource}
-                style={[styles.tokenIconImage, { width: iconSize, height: iconSize }]}
-                resizeMode="contain"
-              />
-            ) : (
-              <Text
-                style={[
-                  styles.tokenIconText,
-                  { color: fallbackColors?.text || '#343434' },
-                ]}
-              >
-                {fallbackLabel?.slice(0, 2).toUpperCase() || '??'}
-              </Text>
-            )}
+            <View style={[styles.tokenIconInner, { width: iconSize, height: iconSize }]}>
+              {iconSource && !imgError ? (
+                <Image
+                  source={iconSource}
+                  style={{ width: iconSize, height: iconSize }}
+                  resizeMode="contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.tokenIconText,
+                    typeof listIndex === 'number' &&
+                      listIndex > 0 &&
+                      listIndex < 3 &&
+                      styles.tokenIconTextCompact,
+                    { color: fallbackColors?.text || '#343434' },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {fallbackLabel?.slice(0, 2).toUpperCase() || '??'}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
         <View style={styles.tokenItemMiddle}>
@@ -854,13 +982,16 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     boxSizing: 'border-box',
   },
-  tokenIconImage: {
-    width: 28,
-    height: 28,
+  tokenIconInner: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tokenIconText: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Bold',
+  },
+  tokenIconTextCompact: {
+    fontSize: FONTS.size.small,
   },
   tokenItemMiddle: {
     flex: 1,

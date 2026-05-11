@@ -138,8 +138,9 @@ export const shareReferralLink = async (
 
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
+    const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
-    const message = `${shareText}${userDetails.email}\n\n🔗 바로가기 ${deepLinkUrl}`;
+    const message = `${shareText}${userDetails.email}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
 
     console.log('[shareReferralLink] 공유 메시지:', message);
 

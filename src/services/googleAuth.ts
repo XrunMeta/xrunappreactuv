@@ -132,10 +132,12 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
 
     const idToken = userInfo.data?.idToken;
     if (!idToken) {
+
+      const i18n = require('i18next').default;
       return {
         success: false,
         code: 'ID_TOKEN_MISSING',
-        message: 'ID 토큰을 받지 못했습니다.',
+        message: i18n.t('screens.login.errors.idTokenMissing') || 'Failed to receive ID token. Please try again.',
       };
     }
 

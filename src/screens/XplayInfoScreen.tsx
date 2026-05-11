@@ -11,11 +11,11 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeView } from '../components';
-import { Header, TaboolaBanner } from '../components';
+import { Header } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
-import { getAyetPointsBalance } from '../services';
+import { fetchWalletData } from '../services';
 import { shareReferralLink } from '../utils';
 import { useTranslation } from 'react-i18next';
 
@@ -23,7 +23,10 @@ const xplaySymbol = require('../../assets/xplay_symbol.png');
 const blurYellow = require('../../assets/images/blur_yellow.png');
 const zone1Image = require('../../assets/images/zone1.png');
 const zone2Image = require('../../assets/images/zone2.png');
+const zone3Image = require('../../assets/images/zone3.png');
 const questImage = require('../../assets/images/quest.png');
+
+const SHOW_ZONE3 = false;
 
 export const XplayInfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -47,8 +50,12 @@ export const XplayInfoScreen = () => {
           setMemberId(String(member));
           setBalanceLoading(true);
           try {
-            const result = await getAyetPointsBalance(member, undefined);
-            setPointsBalance(result.total_ayet_points ?? 0);
+
+            const res: any = await fetchWalletData(Number(member), 7, undefined);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const amt = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            setPointsBalance(Number.isFinite(amt) ? amt : 0);
           } catch {
             setPointsBalance(0);
           } finally {
@@ -104,7 +111,7 @@ export const XplayInfoScreen = () => {
                 <Text style={styles.balanceLabel}>{t('screens.xplayInfo.totalPaidAmount')}</Text>
                 <View style={styles.balanceAmountRow}>
                   <View style={styles.balanceXplayIconContainer}>
-                    <Image source={xplaySymbol} style={styles.balanceXplayIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/xrun-round-logo.png')} style={styles.balanceXplayIcon} resizeMode="contain" />
                   </View>
                   {balanceLoading ? (
                     <ActivityIndicator size="small" color="#343a5a" style={styles.balanceLoader} />
@@ -116,7 +123,7 @@ export const XplayInfoScreen = () => {
                 </View>
               </View>
               <View style={styles.xplayTag}>
-                <Text style={styles.xplayTagText}>Xplay</Text>
+                <Text style={styles.xplayTagText}>XRUN</Text>
               </View>
             </View>
           </LinearGradient>
@@ -133,13 +140,23 @@ export const XplayInfoScreen = () => {
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.zoneCard, styles.zoneCardDisabled]}
+            style={styles.zoneCard}
             activeOpacity={0.85}
-            onPress={() => showAlert(t('screens.xplayInfo.alerts.notification'), t('screens.xplayInfo.alerts.comingSoon'))}
+            onPress={() => navigate(ROUTES.myChipsOfferwall)}
           >
             <Image source={zone2Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
+          {SHOW_ZONE3 && (
+            <TouchableOpacity
+              style={styles.zoneCard}
+              activeOpacity={0.85}
+              onPress={() => navigate(ROUTES.adisonOfferwall)}
+            >
+              <Image source={zone3Image} style={styles.zoneImage} resizeMode="contain" />
+              <Text style={styles.zoneCardTitle}>Xplay Zone 3</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {}
@@ -155,13 +172,13 @@ export const XplayInfoScreen = () => {
           </View>
         </TouchableOpacity>
 
+        {}
+        {
+
+}
+
         <View style={styles.bottomSpacer} />
       </ScrollView>
-
-      {}
-      <View style={styles.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
-      </View>
     </SafeView>
   );
 };
@@ -256,6 +273,8 @@ const styles = StyleSheet.create({
     minWidth: 60,
   },
   xplayTag: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
     backgroundColor: '#00d4ff',
     paddingHorizontal: 8,
     paddingVertical: 5,
@@ -344,8 +363,19 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 16,
   },
-  taboolaContainer: {
-    minHeight: 80,
-    backgroundColor: '#F5F5F5',
+  devTestBtn: {
+    marginTop: SIZES.medium,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  devTestBtnText: {
+    fontSize: 13,
+    fontFamily: FONTS.family.semibold,
+    color: '#6B7280',
   },
 });

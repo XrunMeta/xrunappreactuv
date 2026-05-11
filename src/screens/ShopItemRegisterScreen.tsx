@@ -72,7 +72,8 @@ export const ShopItemRegisterScreen = () => {
               setIsEditMode(true);
               setEditItemId(editItem.item);
             if (editItem.title) setTitle(editItem.title);
-            if (editItem.price) setPriceKRW(editItem.price.toString());
+            if (editItem.priceKRW) setPriceKRW(editItem.priceKRW.toString());
+            else if (editItem.price) setPriceKRW(editItem.price.toString());
             if (editItem.priceXrun) setPriceXrun(editItem.priceXrun.toString());
             if (editItem.description) setDescription(editItem.description);
             if (editItem.maxpurchase) setMaxpurchase(editItem.maxpurchase.toString());
@@ -290,15 +291,11 @@ export const ShopItemRegisterScreen = () => {
       console.log('[상품 등록] 응답 데이터:', response.data);
 
       if (response.data) {
+        const dataArr = response.data.data;
+        if ((response.data.success || response.data.status === 'success') && Array.isArray(dataArr) && dataArr.length > 0) {
+          const item = dataArr[0];
 
-        if (response.data.success && response.data.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
-          const fileId = response.data.data[0];
-          console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', fileId);
-          return fileId;
-        }
-
-        if (response.data.status === 'success' && response.data.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
-          const fileId = response.data.data[0];
+          const fileId = typeof item === 'object' && item.fileId ? item.fileId : item;
           console.log('[상품 등록] 이미지 업로드 성공, 파일 ID:', fileId);
           return fileId;
         }
@@ -442,21 +439,21 @@ export const ShopItemRegisterScreen = () => {
                 setIsSubmitting(true);
                 const response = await deleteShopItem(memberId, editItemId, navigate);
 
-                if (response.status === 'success' && response.data.affectedRows > 0) {
-                  await showAlert(t('screens.myinfoShopSales.deleteSuccess'));
+                if (response.status === 'success') {
+                  await showAlert('알림', t('screens.myinfoShopSales.deleteSuccess'));
 
                   goBack();
                 } else {
                   await showAlert(
+                    '알림',
                     t('screens.myinfoShopSales.deleteFailed'),
-                    response.message || t('screens.myinfoShopSales.deleteFailed'),
                   );
                 }
               } catch (error) {
                 console.error('[상품 등록] 상품 삭제 오류:', error);
                 await showAlert(
+                  '알림',
                   t('screens.myinfoShopSales.deleteFailed'),
-                  error instanceof Error ? error.message : t('screens.myinfoShopSales.deleteFailed'),
                 );
               } finally {
                 setIsSubmitting(false);
@@ -619,6 +616,14 @@ export const ShopItemRegisterScreen = () => {
                       <Text style={styles.currentImageLabel}>{t('screens.shopItemRegister.currentImage')}</Text>
                       <Image
                         source={{ uri: `data:image/png;base64,${currentImageBase64}` }}
+                        style={styles.currentImagePreview}
+                      />
+                    </>
+                  ) : imageFileId ? (
+                    <>
+                      <Text style={styles.currentImageLabel}>{t('screens.shopItemRegister.currentImage')}</Text>
+                      <Image
+                        source={{ uri: `https://oth-path-gw.example.invalid/files/${imageFileId}?raw=1` }}
                         style={styles.currentImagePreview}
                       />
                     </>

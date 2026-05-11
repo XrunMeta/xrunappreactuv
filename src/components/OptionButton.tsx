@@ -39,7 +39,12 @@ export const OptionButton: React.FC<OptionButtonProps> = ({
       activeOpacity={0.8}
       disabled={disabled}
     >
-      <Text style={[styles.label, selected && styles.labelSelected, disabled && styles.labelDisabled]}>
+      <Text
+        style={[styles.label, selected && styles.labelSelected, disabled && styles.labelDisabled]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
         {label}
       </Text>
     </TouchableOpacity>

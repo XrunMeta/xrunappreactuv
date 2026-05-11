@@ -103,10 +103,11 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
 
     const identityToken = appleAuthRequestResponse.identityToken;
     if (!identityToken) {
+      const i18n = require('i18next').default;
       return {
         success: false,
         code: 'IDENTITY_TOKEN_MISSING',
-        message: 'Identity 토큰을 받지 못했습니다.',
+        message: i18n.t('screens.login.errors.identityTokenMissing') || 'Failed to receive Identity token. Please try again.',
       };
     }
 

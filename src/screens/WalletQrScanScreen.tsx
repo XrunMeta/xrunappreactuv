@@ -77,10 +77,9 @@ export const WalletQrScanScreen = () => {
 
       if (previousScreen === ROUTES.walletSend) {
 
-        goBack();
+        navigate(ROUTES.walletSend);
       } else if (previousScreen === ROUTES.addWalletAddress) {
-
-        goBack();
+        navigate(ROUTES.addWalletAddress);
       } else {
 
         const asset = createAssetFromCurrency(walletReceiveCurrency);

@@ -102,6 +102,7 @@ export const ShopMyItemsScreen = () => {
     const [items, setItems] = useState<MyItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [currentMember, setCurrentMember] = useState<string>('');
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -119,6 +120,7 @@ export const ShopMyItemsScreen = () => {
                 return;
             }
             const memberStr = String(member);
+            setCurrentMember(memberStr);
             const [giftishowRes, xrunRes] = await Promise.all([
                 getMyGiftishowCoupons(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
                 getXrunPurchasedItems(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
@@ -159,7 +161,6 @@ export const ShopMyItemsScreen = () => {
 
     const segmentedOptions = useMemo(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -167,7 +168,7 @@ export const ShopMyItemsScreen = () => {
     );
 
     const handleTabChange = (value: typeof segmentedOptions[number]['value']) => {
-        if (value === 'xplayShop' || value === 'xrunStore') {
+        if (value === 'xrunStore') {
 
             setSelectedShopItem({
                 id: '',
@@ -206,6 +207,8 @@ export const ShopMyItemsScreen = () => {
             brand: item.brand,
             barcodeNumber: '',
             tr_id: item.tr_id ?? item.id,
+            trId: item.tr_id ?? item.id,
+            memberId: currentMember,
             couponImgUrl: item.couponImgUrl,
         };
         setSelectedShopItem(shopItem as any);

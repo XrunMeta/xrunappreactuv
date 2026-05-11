@@ -12,7 +12,8 @@ import { useAppContext } from '../context';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
-import { getAyetPointsBalance, getXrunWalletBalance } from '../services';
+import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData, getXRUNGopaxPrice } from '../services';
+import type { ShopItemData } from '../types';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -46,7 +47,7 @@ const sampleProducts: ProductData[] = [
         id: '2',
         brand: 'Ethereum',
         title: 'Ethereum 교환권',
-        description: '최소 30,000 Xplay 이상 교환가능',
+        description: '최소 30,000 XRUN 이상 교환가능',
         price: 30000,
         image: ethereumThumb,
     },
@@ -66,22 +67,31 @@ const sampleProducts: ProductData[] = [
     },
 ];
 
-const xrunStoreProducts: ProductData[] = [
-    {
-        id: 'xrun-1',
-        brand: 'XRUN',
-        title: 'Polygon 전송티켓',
-        price: 10,
-        image: xrunHorizontalLogo,
-    },
-];
+function shopItemToProductData(item: ShopItemData): ProductData {
 
-function giftishowToProductData(item: GiftishowProductItem): ProductData {
+    const imgSrc = item.thumbnail || item.image;
+    const imgUri = typeof imgSrc === 'string' && imgSrc.startsWith('http') ? imgSrc : null;
+    return {
+        id: String(item.item),
+        brand: 'XRUN',
+        title: item.title || '-',
+        description: item.description || undefined,
+        price: Number(item.priceXrun) || 0,
+        image: imgUri ? { uri: imgUri } : xrunHorizontalLogo,
+    };
+}
+
+const FALLBACK_KRW_PER_XRUN = 70;
+
+function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number): ProductData {
+    const krw = typeof item.price === 'number' ? item.price : 0;
+    const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
+    const xrunPrice = Math.ceil(krw / divisor);
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
         brand: (item as any).brandName ?? '기프티콘',
         title: item.name ?? '-',
-        price: typeof item.price === 'number' ? item.price : 0,
+        price: xrunPrice,
         image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
         isXplayShop: true,
     };
@@ -92,7 +102,7 @@ export const ShopScreen = () => {
     const { t } = useTranslation();
     const { showAlert } = useAlertDialog();
     const { setSelectedShopItem, selectedShopItem } = useAppContext();
-    const [tab, setTab] = useState<'xplayShop' | 'xrunStore' | 'myItems'>('xplayShop');
+    const [tab, setTab] = useState<'xrunStore' | 'myItems'>('xrunStore');
 
     const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
     const [xplayLoading, setXplayLoading] = useState(false);
@@ -102,7 +112,14 @@ export const ShopScreen = () => {
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
     const [xrunBalance, setXrunBalance] = useState<number | null>(null);
     const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
+    const [xrunStoreProducts, setXrunStoreProducts] = useState<ProductData[]>([]);
+    const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
+
+    const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
     const { navigate } = useAppNavigation();
+
+    const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
+    const XPLAY_BALANCE_CACHE_KEY = 'shop:xplayBalance';
 
     const loadXrunBalance = useCallback(async () => {
         try {
@@ -111,12 +128,23 @@ export const ShopScreen = () => {
             const userData = JSON.parse(userDataStr);
             const member = userData?.member;
             if (member == null) return;
-            setXrunBalanceLoading(true);
-            const result = await getXrunWalletBalance(member, navigate);
-            const parsed = parseFloat(result.formatted);
-            setXrunBalance(Number.isFinite(parsed) ? parsed : null);
-        } catch {
-            setXrunBalance(null);
+
+            setXrunBalance((prev) => {
+                if (prev == null) setXrunBalanceLoading(true);
+                return prev;
+            });
+            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', member);
+            const res: any = await fetchWalletData(Number(member), 7, navigate);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', parsed);
+            const value = Number.isFinite(parsed) ? parsed : null;
+            setXrunBalance(value);
+            if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
+        } catch (e) {
+            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', e);
+
         } finally {
             setXrunBalanceLoading(false);
         }
@@ -135,16 +163,80 @@ export const ShopScreen = () => {
                 setXplayBalance(null);
                 return;
             }
-            setXplayBalanceLoading(true);
+            setXplayBalance((prev) => {
+                if (prev == null) setXplayBalanceLoading(true);
+                return prev;
+            });
+            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', member);
             const result = await getAyetPointsBalance(member, navigate);
-            setXplayBalance(result.total_ayet_points ?? null);
-        } catch {
+            console.log('[ShopScreen] getAyetPointsBalance 결과:', result);
+            const value = result.total_ayet_points ?? null;
+            setXplayBalance(value);
+            if (value != null) AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(value)).catch(() => {});
+        } catch (e) {
+            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', e);
 
-            setXplayBalance(null);
         } finally {
             setXplayBalanceLoading(false);
         }
     }, [navigate]);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            console.log('[ShopScreen] 잔액 마운트 fetch 시작');
+            try {
+                const userDataStr = await AsyncStorage.getItem('userData');
+                if (!userDataStr) return;
+                const userData = JSON.parse(userDataStr);
+                const member = userData?.member;
+                if (member == null) return;
+
+                try {
+                    const [cachedXrun, cachedXplay] = await Promise.all([
+                        AsyncStorage.getItem(XRUN_BALANCE_CACHE_KEY),
+                        AsyncStorage.getItem(XPLAY_BALANCE_CACHE_KEY),
+                    ]);
+                    if (!cancelled) {
+                        if (cachedXrun != null) {
+                            const n = parseFloat(cachedXrun);
+                            if (Number.isFinite(n)) setXrunBalance(n);
+                        }
+                        if (cachedXplay != null) {
+                            const n = parseFloat(cachedXplay);
+                            if (Number.isFinite(n)) setXplayBalance(n);
+                        }
+                    }
+                } catch {}
+
+                const xrunRes = await Promise.allSettled([
+                    fetchWalletData(Number(member), 7, undefined),
+                ]);
+                if (cancelled) return;
+                if (xrunRes[0].status === 'fulfilled') {
+                    const list: any[] = Array.isArray((xrunRes[0].value as any)?.data) ? (xrunRes[0].value as any).data : [];
+                    const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+                    const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+                    const v = Number.isFinite(parsed) ? parsed : 0;
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v);
+                    setXrunBalance(v);
+                    setXplayBalance(v);
+                    AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
+                    AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(v)).catch(() => {});
+                } else {
+                    console.warn('[ShopScreen] Polygon 잔액 실패:', xrunRes[0].reason);
+                }
+            } catch (e) {
+                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', e);
+            } finally {
+                if (!cancelled) {
+                    setXplayBalanceLoading(false);
+                    setXrunBalanceLoading(false);
+                }
+            }
+        })();
+        return () => { cancelled = true; };
+    }, []);
 
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
@@ -160,37 +252,86 @@ export const ShopScreen = () => {
         }
     }, []);
 
+    const loadGopaxKrwPerXrun = useCallback(async () => {
+        try {
+            const cached = await AsyncStorage.getItem('xrungopaxprice');
+            if (cached) {
+                const parsed = JSON.parse(cached) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) setGopaxKrwPerXrun(p);
+            }
+        } catch {
+
+        }
+        try {
+            const result = await getXRUNGopaxPrice(navigate);
+            const p = result?.data?.gopaxPrice;
+            if (typeof p === 'number' && p > 0) {
+                setGopaxKrwPerXrun(p);
+                await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
+                return;
+            }
+        } catch (e) {
+            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', e);
+        }
+        try {
+            const s = await AsyncStorage.getItem('xrungopaxprice');
+            if (s) {
+                const parsed = JSON.parse(s) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) {
+                    setGopaxKrwPerXrun(p);
+                    return;
+                }
+            }
+        } catch {
+
+        }
+    }, [navigate]);
+
     useEffect(() => {
-        if (tab === 'xplayShop') {
+        if (tab === 'xrunStore') {
             setXplayLoading(true);
+            void loadGopaxKrwPerXrun();
             loadXplayProducts().finally(() => setXplayLoading(false));
         }
-    }, [tab, loadXplayProducts]);
+    }, [tab, loadXplayProducts, loadGopaxKrwPerXrun]);
 
     const onXplayRefresh = useCallback(() => {
         setXplayRefreshing(true);
-        Promise.all([loadXplayProducts(), loadXplayBalance()]).finally(() => setXplayRefreshing(false));
-    }, [loadXplayProducts, loadXplayBalance]);
+        Promise.all([loadXplayProducts(), loadXplayBalance(), loadGopaxKrwPerXrun()]).finally(() => setXplayRefreshing(false));
+    }, [loadXplayProducts, loadXplayBalance, loadGopaxKrwPerXrun]);
 
     useEffect(() => {
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
-            const shopTab = (selectedShopItem as any).shopTab;
-            if (shopTab === 'xplayShop' || shopTab === 'xrunStore') {
-                setTab(shopTab);
-
-                setSelectedShopItem(undefined);
-            }
+            setTab('xrunStore');
+            setSelectedShopItem(undefined);
         }
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (tab === 'xplayShop') {
-            loadXplayBalance();
-        } else if (tab === 'xrunStore') {
-            loadXrunBalance();
+    const loadXrunStoreProducts = useCallback(async () => {
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            const res = await getXrunBuyableItems(String(member));
+            if (res.status === 'success' && res.data) {
+                setXrunStoreProducts(res.data.map(shopItemToProductData));
+            }
+        } catch (err) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', err);
         }
-    }, [tab, loadXplayBalance, loadXrunBalance]);
+    }, []);
+
+    useEffect(() => {
+        if (tab === 'xrunStore') {
+            loadXrunBalance();
+            loadXrunStoreProducts();
+        }
+    }, [tab, loadXrunBalance, loadXrunStoreProducts]);
 
     const screenWidth = Dimensions.get('window').width;
     const productCardWidth = useMemo(() => {
@@ -200,9 +341,13 @@ export const ShopScreen = () => {
         return (availableWidth - gap) / 2;
     }, [screenWidth]);
 
+    const xplayProductsAsCards = useMemo(
+        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun)),
+        [xplayProductList, gopaxKrwPerXrun],
+    );
+
     const segmentedOptions = useMemo(
         () => [
-            { label: 'Xplay Shop', value: 'xplayShop' },
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
         ] as const,
@@ -241,9 +386,16 @@ export const ShopScreen = () => {
         ]);
     };
 
+    const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
     const renderProductCard = (product: ProductData, showPurchaseButton: boolean = false) => {
         const isEthereum = product.brand === 'Ethereum' && product.description;
-        const isXrun = product.brand === 'XRUN';
+
+        const isXrun = product.brand === 'XRUN' || product.isXplayShop === true;
+
+        const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
+        const imgFailed = isRemote && failedImages.has(product.id);
+        const displayImage = imgFailed ? xrunHorizontalLogo : product.image;
 
         return (
             <TouchableOpacity
@@ -256,7 +408,16 @@ export const ShopScreen = () => {
                     styles.productImageContainer,
                     isEthereum && styles.productImageContainerEthereum
                 ]}>
-                    <Image source={product.image} style={styles.productImage} resizeMode="contain" />
+                    <Image
+                        source={displayImage}
+                        style={styles.productImage}
+                        resizeMode="contain"
+                        onError={() => {
+                            if (isRemote) {
+                                setFailedImages(prev => new Set(prev).add(product.id));
+                            }
+                        }}
+                    />
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
                             <Text style={styles.imageDescriptionText}>{product.description}</Text>
@@ -272,8 +433,8 @@ export const ShopScreen = () => {
                         <View style={styles.priceContainer}>
                             <View style={styles.xplayIconContainer}>
                                 <Image
-                                    source={isXrun ? xrunRoundLogo : xplaySymbol}
-                                    style={isXrun ? styles.xrunIcon : styles.xplayIcon}
+                                    source={xrunRoundLogo}
+                                    style={styles.xrunIcon}
                                     resizeMode="contain"
                                 />
                             </View>
@@ -310,7 +471,7 @@ export const ShopScreen = () => {
             />
             <View style={styles.contentContainer}>
                 {}
-                {(tab === 'xplayShop' || tab === 'xrunStore') && (
+                {tab === 'xrunStore' && (
                     <View style={styles.balanceCardWrapper}>
                         <LinearGradient
                             colors={['#FFFFFF', '#F9FAFB', '#FFFFFF']}
@@ -324,38 +485,19 @@ export const ShopScreen = () => {
                                 <View style={styles.balanceLeft}>
                                     <Text style={styles.balanceLabel}>{t('screens.shop.myBalance')}</Text>
                                     <View style={styles.balanceAmountRow}>
-                                        <View style={[
-                                            styles.balanceXplayIconContainer,
-                                            tab === 'xrunStore' && styles.balanceXrunIconContainer
-                                        ]}>
+                                        <View style={[styles.balanceXplayIconContainer, styles.balanceXrunIconContainer]}>
                                             <Image
-                                                source={tab === 'xrunStore' ? xrunRoundLogo : xplaySymbol}
+                                                source={xrunRoundLogo}
                                                 style={styles.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        {tab === 'xplayShop' ? (
-                                            xplayBalanceLoading ? (
-                                                <ActivityIndicator size="small" color="#343a5a" style={{ marginLeft: 8 }} />
-                                            ) : (
-                                                <Text style={styles.balanceAmount}>
-                                                    {xplayBalance == null ? '-' : xplayBalance.toLocaleString()}
-                                                </Text>
-                                            )
-                                        ) : (
-                                            <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
-                                        )}
+                                        <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                     </View>
                                 </View>
-                                {tab === 'xplayShop' ? (
-                                    <View style={styles.xplayTag}>
-                                        <Text style={styles.xplayTagText}>Xplay</Text>
-                                    </View>
-                                ) : (
-                                    <View style={styles.xrunTag}>
-                                        <Text style={styles.xrunTagText}>XRUN</Text>
-                                    </View>
-                                )}
+                                <View style={styles.xrunTag}>
+                                    <Text style={styles.xrunTagText}>XRUN</Text>
+                                </View>
                             </View>
                         </LinearGradient>
                     </View>
@@ -377,12 +519,12 @@ export const ShopScreen = () => {
                     backgroundColor="transparent"
                     disableBottomPadding={true}
                     refreshControl={
-                        tab === 'xplayShop' ? (
+                        tab === 'xrunStore' ? (
                             <RefreshControl refreshing={xplayRefreshing} onRefresh={onXplayRefresh} colors={[COLORS.buttonPrimary]} />
                         ) : undefined
                     }
                 >
-                    {tab === 'xplayShop' ? (
+                    {tab === 'xrunStore' ? (
                         <>
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
@@ -395,16 +537,11 @@ export const ShopScreen = () => {
                                 </View>
                             ) : (
                                 <View style={styles.productGrid}>
-                                    {xplayProductList.map((item) =>
-                                        renderProductCard(giftishowToProductData(item), false)
-                                    )}
+                                    {xrunStoreProducts.map((product) => renderProductCard(product, false))}
+                                    {xplayProductsAsCards.map((product) => renderProductCard(product, false))}
                                 </View>
                             )}
                         </>
-                    ) : tab === 'xrunStore' ? (
-                        <View style={styles.productGrid}>
-                            {xrunStoreProducts.map((product) => renderProductCard(product, false))}
-                        </View>
                     ) : (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
@@ -413,9 +550,11 @@ export const ShopScreen = () => {
                 </SafeScrollView>
             </View>
             {}
-            <View style={styles.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
-            </View>
+            {tab !== 'xplayShop' ? (
+                <View style={styles.taboolaContainer}>
+                    <TaboolaBanner placementType="shop" />
+                </View>
+            ) : null}
         </SafeView>
     );
 };

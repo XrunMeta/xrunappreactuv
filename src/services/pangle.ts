@@ -21,9 +21,23 @@ export const isPangleNativeModuleAvailable = (): boolean => {
 export const initializePangle = async (): Promise<void> => {
   try {
 
-    if (isPangleInitialized) {
-      console.log('[Pangle] 이미 초기화되었습니다.');
-      return;
+    if (isPangleInitialized && isPangleAvailable) {
+      if (isPangleNativeModuleAvailable() && typeof PangleModule?.isReady === 'function') {
+        try {
+          const nativeReady = await PangleModule.isReady();
+          if (nativeReady === true) {
+            console.log('[Pangle] 이미 초기화되었습니다.');
+            return;
+          }
+        } catch (e) {
+          console.warn('[Pangle] 네이티브 준비 상태 확인 실패, 재초기화합니다.', e);
+        }
+        isPangleInitialized = false;
+        isPangleAvailable = false;
+      } else {
+        console.log('[Pangle] 이미 초기화되었습니다.');
+        return;
+      }
     }
 
     if (!isPangleNativeModuleAvailable()) {
@@ -45,7 +59,7 @@ export const initializePangle = async (): Promise<void> => {
     });
 
     try {
-      if (Platform.OS === 'android') {
+      if (Platform.OS === 'android' || Platform.OS === 'ios') {
         const initPromise = PangleModule.initialize();
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Pangle 초기화 타임아웃')), 10000)
@@ -189,7 +203,16 @@ export const loadAndShowRewardedAd = async (
       );
       if (errorSubscription) subscriptions.push(() => errorSubscription.remove());
 
-      await PangleModule.loadAndShowRewardedAd(finalAdUnitId);
+      try {
+        await PangleModule.loadRewardedAd(finalAdUnitId);
+        await PangleModule.showRewardedAd(finalAdUnitId);
+      } catch (loadOrShowError) {
+        subscriptions.forEach(unsubscribe => unsubscribe());
+        const msg =
+          loadOrShowError instanceof Error ? loadOrShowError.message : String(loadOrShowError);
+        console.error('[Pangle] iOS 보상형 로드/표시 실패:', msg);
+        if (onAdFailedToLoad) onAdFailedToLoad(loadOrShowError as Error);
+      }
       return;
     }
 
@@ -324,6 +347,11 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         return;
       }
 
+      if (typeof PangleModule.loadAndShowAppOpenAd !== 'function') {
+        console.warn('[Pangle] iOS loadAndShowAppOpenAd 메서드가 아직 네이티브에 없습니다. 스킵합니다.');
+        return;
+      }
+
       const finalAdUnitId = getPangleAppOpeningAdUnitId();
       if (!finalAdUnitId) {
         console.warn('[Pangle] iOS 앱 오프닝 광고 단위 ID가 설정되지 않았습니다.');
@@ -385,7 +413,13 @@ export const loadAndShowAppOpenAd = async (): Promise<void> => {
         );
 
         PangleModule.loadAndShowAppOpenAd(finalAdUnitId).catch((error: any) => {
-          console.error('[Pangle] iOS 앱 오프닝 광고 호출 실패:', error);
+          const msg = String(error?.message ?? error ?? '');
+
+          if (/not supported|unsupported|unavailable/i.test(msg)) {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 미지원 — 스킵:', msg);
+          } else {
+            console.warn('[Pangle] iOS 앱 오프닝 광고 호출 실패:', msg);
+          }
           if (!isResolved) {
             isResolved = true;
             closeSubscription?.remove();

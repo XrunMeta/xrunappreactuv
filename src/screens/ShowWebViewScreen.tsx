@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Linking,
   Platform,
   Modal,
+  BackHandler,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +17,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
+import { showToast } from '../utils';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 
@@ -30,11 +32,43 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
   const { navigate, reset, goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
 
-  const [webViewUrl, setWebViewUrl] = useState(advertisementParams?.urlAD || '');
+  const [webViewUrl, setWebViewUrl] = useState('');
   const [webViewTitle, setWebViewTitle] = useState(advertisementParams?.name || '광고');
   const [webViewError, setWebViewError] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const webViewRef = useRef<WebView>(null);
   const [showAdDetailModal, setShowAdDetailModal] = useState(false); 
+
+  useEffect(() => {
+    const resolveUrl = async () => {
+      const rawUrl = advertisementParams?.urlAD || '';
+      if (!rawUrl) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const resp = await fetch(rawUrl, { method: 'GET' });
+        const contentType = resp.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json = await resp.json();
+          if (json.lurl) {
+            console.log('[ShowWebView] JSON lurl 추출:', json.lurl);
+            setWebViewUrl(json.lurl);
+          } else {
+            setWebViewUrl(rawUrl);
+          }
+        } else {
+          setWebViewUrl(rawUrl);
+        }
+      } catch {
+
+        setWebViewUrl(rawUrl);
+      }
+      setIsLoading(false);
+    };
+    resolveUrl();
+  }, [advertisementParams?.urlAD]);
 
   const handleClose = useCallback(() => {
     resetAdvertisementParams();
@@ -53,12 +87,34 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
     }
   }, [onClose, resetAdvertisementParams, reset, navigate]);
 
-  const handleInfoIconPress = useCallback(() => {
-
-    if (Platform.OS === 'ios') {
-      setShowAdDetailModal(true);
+  const handleGoBack = useCallback(() => {
+    if (canGoBack && webViewRef.current) {
+      webViewRef.current.goBack();
+    } else {
+      handleClose();
     }
-  }, []);
+  }, [canGoBack, handleClose]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (canGoBack && webViewRef.current) {
+        webViewRef.current.goBack();
+        return true;
+      }
+      handleClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [canGoBack, handleClose]);
+
+  const handleInfoIconPress = useCallback(() => {
+    console.log('[ShowWebView] i 아이콘 클릭됨', {
+      platform: Platform.OS,
+      hasAdParams: !!advertisementParams,
+      adCompany: advertisementParams?.ad_company,
+    });
+    setShowAdDetailModal(true);
+  }, [advertisementParams]);
 
   return (
     <View style={styles.container}>
@@ -66,15 +122,17 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       {}
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'ios' ? 20 : 40) }]}>
         {}
-        <TouchableOpacity
-          onPress={handleClose}
-          style={styles.closeButton}
-        >
-          <Ionicons name="close" size={24} color="#000" />
-        </TouchableOpacity>
+        <View style={styles.leftButtons}>
+          <TouchableOpacity
+            onPress={handleGoBack}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
 
         {}
-        <Text 
+        <Text
           style={styles.title}
           numberOfLines={1}
           ellipsizeMode="tail"
@@ -92,7 +150,11 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       </View>
 
       {}
-      {webViewUrl && !webViewError ? (
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#888' }}>로딩 중...</Text>
+        </View>
+      ) : webViewUrl && !webViewError ? (
         <WebView
           ref={webViewRef}
           key={webViewUrl}
@@ -252,6 +314,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           }}
           onNavigationStateChange={(navState) => {
             console.log('[WebView] 네비게이션:', navState.url);
+            setCanGoBack(navState.canGoBack);
 
             if (navState.url && navState.url.startsWith('market://')) {
               try {
@@ -329,6 +392,14 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           onShouldStartLoadWithRequest={(request) => {
             const { url } = request;
             console.log('[WebView] 네비게이션 요청:', url);
+
+            if (url.includes('myappfree.com') || url.includes('go.myappfree')) {
+              console.warn('[WebView] MAF 도메인 리다이렉트 감지 - 차단 후 뒤로가기:', url);
+
+              try { showToast('이 광고는 현재 참여할 수 없습니다.'); } catch {}
+              handleClose();
+              return false;
+            }
 
             if (url.startsWith('market://')) {
               console.warn('[WebView] market:// 스킴 감지 - 백엔드에서 변환되어야 함:', url);
@@ -590,7 +661,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       ) : null}
 
       {}
-      {Platform.OS === 'ios' && (
+      {true && (
         <Modal
           visible={showAdDetailModal}
           transparent={true}
@@ -608,6 +679,8 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
             <View style={{
               width: '90%',
               maxWidth: 400,
+              height: '80%',
+              maxHeight: 600,
             }}>
             {(() => {
               const adCompany = advertisementParams?.ad_company || 'nas';
@@ -650,11 +723,17 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
     backgroundColor: '#fff',
   },
-  closeButton: {
+  leftButtons: {
     flex: 2,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 4,
+  },
+  closeButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   title: {
     fontSize: 18,

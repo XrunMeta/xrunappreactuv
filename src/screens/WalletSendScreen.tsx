@@ -13,13 +13,15 @@ import {
   FlatList,
   Image,
   ImageSourcePropType,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -44,7 +46,7 @@ interface NetworkOption {
 }
 
 const NETWORK_OPTIONS: NetworkOption[] = [
-  { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan.png'), color: '#8247E5' },
+  { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan_color.png'), color: '#8247E5' },
   { value: 'Ethereum', label: 'Ethereum', icon: 'diamond-outline', color: '#627EEA' },
 ];
 
@@ -63,7 +65,7 @@ const STORAGE_KEY = 'wallet_address_book';
 export const WalletSendScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, setWalletSendAmount, selectedWalletAsset } = useAppContext();
+  const { walletSendAddress, setWalletSendAddress, resetWalletSendAddress, walletSendAmount, setWalletSendAmount, selectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
   const [sendAmount, setSendAmount] = useState('0');
   const [receiverAddress, setReceiverAddress] = useState('');
@@ -84,6 +86,9 @@ export const WalletSendScreen = () => {
 
   const [memberId, setMemberId] = useState<string | null>(null);
   const [memberLimit, setMemberLimit] = useState<number | null>(null);
+  const [memberEmail, setMemberEmail] = useState<string>('');
+
+  const [showOtpGate, setShowOtpGate] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -161,12 +166,17 @@ export const WalletSendScreen = () => {
   }, [receiverAddress, t, showAlert]);
 
   useEffect(() => {
-    setSendAmount('0');
+
+    setSendAmount(walletSendAmount && walletSendAmount !== '0' ? walletSendAmount : '0');
     setReceiverAddress('');
     setAddressError(null);
     prevAddressRef.current = '';
     amountInputRef.current?.blur();
   }, []);
+
+  useEffect(() => {
+    setWalletSendAmount(sendAmount);
+  }, [sendAmount, setWalletSendAmount]);
 
   useEffect(() => {
     loadAddressBook();
@@ -266,6 +276,7 @@ export const WalletSendScreen = () => {
           if (userData.member) {
             const member = String(userData.member);
             setMemberId(member);
+            if (userData.email) setMemberEmail(String(userData.email));
 
             if (selectedWalletAsset?.currency) {
               try {
@@ -505,8 +516,21 @@ export const WalletSendScreen = () => {
       return;
     }
 
+    if (!memberEmail) {
+      setWalletSendAddress(trimmedAddress);
+      setWalletSendAmount(cleanAmount);
+      navigate(ROUTES.walletEstimate);
+      return;
+    }
+
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
+
+    setShowOtpGate(true);
+  };
+
+  const handleOtpSuccess = () => {
+    setShowOtpGate(false);
     navigate(ROUTES.walletEstimate);
   };
 
@@ -519,6 +543,16 @@ export const WalletSendScreen = () => {
       <StatusBar style="dark" />
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
+      {}
+      {showOtpGate && memberEmail && (
+        <EmailOtpGate
+          email={memberEmail}
+          onSuccess={handleOtpSuccess}
+          onCancel={() => setShowOtpGate(false)}
+        />
+      )}
+
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.contentContainer}>
         <Text style={styles.amountLabel}>{t('screens.walletSend.amount')}</Text>
         <View style={styles.amountContainer}>
@@ -784,6 +818,7 @@ export const WalletSendScreen = () => {
           />
         </View>
       </View>
+      </TouchableWithoutFeedback>
 
       {}
       <Modal

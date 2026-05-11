@@ -13,12 +13,13 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
+const xrunHorizontalLogo = require('../../assets/xrun-horizontal-logo.png');
 const ethereumThumb = require('../../assets/images/ethereum_thumb.png');
 
 const EXCHANGE_MIN_XPLAY = 30000;
@@ -89,6 +90,7 @@ export const ShopProductDetailScreen = () => {
 
     const [productDetail, setProductDetail] = useState<GiftishowProductDetailItem | null>(null);
     const [productDetailLoading, setProductDetailLoading] = useState(false);
+    const [imageLoadFailed, setImageLoadFailed] = useState<boolean>(false);
 
     const [userPhone, setUserPhone] = useState<string | null>(null);
 
@@ -150,13 +152,12 @@ export const ShopProductDetailScreen = () => {
         if (!member) return;
         setXrunBalanceLoading(true);
         try {
-            const res = await getUserBalance(member, undefined);
-            if (res?.status === 'success' && res?.data?.realtimeBalance) {
-                const balance = parseFloat(res.data.realtimeBalance.balance);
-                setXrunBalanceState(Number.isFinite(balance) ? balance : 0);
-            } else {
-                setXrunBalanceState(0);
-            }
+
+            const res: any = await fetchWalletData(Number(member), 7, undefined);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const balance = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            setXrunBalanceState(Number.isFinite(balance) ? balance : 0);
         } catch (e) {
             console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', e);
             setXrunBalanceState(0);
@@ -166,8 +167,8 @@ export const ShopProductDetailScreen = () => {
     }, [member]);
 
     useEffect(() => {
-        if (!isXplayShop && member) loadXrunBalance();
-    }, [isXplayShop, member, loadXrunBalance]);
+        if (member) loadXrunBalance();
+    }, [member, loadXrunBalance]);
 
     useEffect(() => {
         if (!isXplayShop || !product.id) return;
@@ -186,6 +187,8 @@ export const ShopProductDetailScreen = () => {
             });
         return () => { cancelled = true; };
     }, [isXplayShop, product.id]);
+
+    useEffect(() => { setImageLoadFailed(false); }, [product.id]);
 
     const handleXplayPurchase = useCallback(async () => {
         if (!member || xplayPurchaseLoading) return;
@@ -224,11 +227,14 @@ export const ShopProductDetailScreen = () => {
 
                             const is404 = code === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(msg);
                             const isE0010 = /E0010|비즈머니.*부족/i.test(msg);
+                            const isEnglish = /^[\x00-\x7F\s]+$/.test(msg);
                             const userMsg = is402 || isE0010
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : is404
                                     ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                    : msg;
+                                    : isEnglish
+                                        ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+                                        : msg;
                             console.warn('[Xplay 구매] 실패:', code, msg);
                             showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                         }
@@ -237,11 +243,14 @@ export const ShopProductDetailScreen = () => {
                         const status = err?.response?.status;
                         const msg = err?.response?.data?.message ?? err?.message ?? '구매 처리 중 오류가 발생했습니다.';
 
+                        const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
                         const userMsg = status === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : status === 404
                                 ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
-                                : msg;
+                                : isEnglish
+                                    ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+                                    : msg;
                         console.error('[Xplay 구매] 오류:', status, msg);
                         showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                     } finally {
@@ -395,15 +404,60 @@ export const ShopProductDetailScreen = () => {
     const xrunBalance = xrunBalanceState ?? 0;
     const remainingBalance = xrunBalance - product.price;
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState<boolean>(false);
+    const [xrunPurchaseLoading, setXrunPurchaseLoading] = useState<boolean>(false);
 
     const handlePurchase = () => {
+        if (xrunPurchaseLoading) return;
+        if (!member) {
+            showAlert(t('screens.shopProductDetail.alerts.notification'), '로그인이 필요합니다.', [{ text: t('screens.shopProductDetail.confirm') }]);
+            return;
+        }
+        if (xrunBalance < product.price) {
+            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXRUN'), [{ text: t('screens.shopProductDetail.confirm') }]);
+            return;
+        }
         showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
             { text: t('screens.shop.cancel') },
             {
                 text: t('screens.shop.purchase'),
-                onPress: () => {
-                    console.log('구매:', product.id);
-                    setPaymentSuccessVisible(true);
+                onPress: async () => {
+                    setXrunPurchaseLoading(true);
+                    try {
+                        const itemId = parseInt(String(product.id), 10);
+                        const res = await purchaseXrunItem(member, itemId, String(product.price), navigate);
+                        if (res?.status === 'success' && Number(res.code) === 200) {
+                            console.log('[XRUN 구매] 성공:', product.id);
+                            loadXrunBalance();
+                            setPaymentSuccessVisible(true);
+                        } else {
+                            const code = Number(res?.code);
+                            const rawMsg = res?.message || '';
+                            console.warn('[XRUN 구매] 실패:', code, rawMsg);
+                            let userMsg: string;
+                            if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
+                                userMsg = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (code === 404 || /not found/i.test(rawMsg)) {
+                                userMsg = '상품을 찾을 수 없습니다.';
+                            } else if (code === 400) {
+                                userMsg = '요청 정보가 올바르지 않습니다.';
+                            } else {
+                                const isEnglish = /^[\x00-\x7F\s]+$/.test(rawMsg);
+                                userMsg = isEnglish || !rawMsg ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : rawMsg;
+                            }
+                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
+                        }
+                    } catch (e: any) {
+                        console.error('[XRUN 구매] 오류:', e);
+                        const msg = e?.response?.data?.message ?? e?.message ?? '구매 처리 중 오류가 발생했습니다.';
+                        const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
+                        showAlert(
+                            t('screens.shopProductDetail.alerts.purchaseFailed'),
+                            isEnglish ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' : msg,
+                            [{ text: t('screens.shopProductDetail.confirm') }],
+                        );
+                    } finally {
+                        setXrunPurchaseLoading(false);
+                    }
                 }
             },
         ]);
@@ -420,11 +474,12 @@ export const ShopProductDetailScreen = () => {
     };
 
     const isXrun = product.isXrun || product.brand === 'XRUN';
-    const coinIcon = isXrun ? xrunRoundLogo : xplaySymbol;
+    const coinIcon = xrunRoundLogo;
 
-    const displayImage = (isXplayShop && productDetail?.goodsImgB) || (productDetail?.goodsImgS || productDetail?.mmsGoodsImg)
-        ? { uri: (productDetail?.goodsImgB || productDetail?.goodsImgS || productDetail?.mmsGoodsImg) as string }
-        : product.image;
+    const remoteUri = (isXplayShop && productDetail?.goodsImgB) || productDetail?.goodsImgS || productDetail?.mmsGoodsImg || '';
+    const primarySource = remoteUri ? { uri: remoteUri } : product.image;
+    const showPlaceholder = imageLoadFailed || !primarySource;
+    console.log('[ShopProductDetail] 이미지 소스:', { remoteUri, hasProductImage: !!product.image, imageLoadFailed, usingFallback: !remoteUri || imageLoadFailed });
     const displayTitle = (isXplayShop && productDetail?.goodsName) ? productDetail.goodsName : product.title;
     const displayBrand = (isXplayShop && productDetail?.brandName) ? productDetail.brandName : product.brand;
 
@@ -452,9 +507,10 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.productImageContainer}>
                             <View style={styles.productImageWrapper}>
                                 <Image
-                                    source={displayImage}
+                                    source={showPlaceholder ? xrunHorizontalLogo : primarySource}
                                     style={styles.productImage}
                                     resizeMode="contain"
+                                    onError={() => setImageLoadFailed(true)}
                                 />
                             </View>
                         </View>
@@ -483,24 +539,24 @@ export const ShopProductDetailScreen = () => {
                                 <View style={styles.paymentRow}>
                                     <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                     <View style={styles.priceContainer}>
-                                        <Image source={xplaySymbol} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} Xplay</Text>
+                                        <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
+                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} XRUN</Text>
                                     </View>
                                 </View>
                                 <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXplayBalance')}</Text>
-                                    {xplayBalanceLoading ? (
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXRUNBalance')}</Text>
+                                    {xrunBalanceLoading ? (
                                         <ActivityIndicator size="small" color="#1E3A5F" />
                                     ) : (
                                         <Text style={styles.paymentBalance}>
-                                            {xplayBalanceState == null ? '-' : `${xplayBalanceState.toLocaleString()} Xplay`}
+                                            {xrunBalanceState == null ? '-' : `${xrunBalanceState.toLocaleString()} XRUN`}
                                         </Text>
                                     )}
                                 </View>
                                 <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXplay')}</Text>
+                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXRUN')}</Text>
                                     <Text style={styles.paymentRemaining}>
-                                        {xplayRemainingBalance == null ? '-' : `${xplayRemainingBalance.toLocaleString()} Xplay`}
+                                        {xrunBalanceState == null ? '-' : `${(xrunBalanceState - displayPrice).toLocaleString()} XRUN`}
                                     </Text>
                                 </View>
                             </>
@@ -588,7 +644,7 @@ export const ShopProductDetailScreen = () => {
                                 <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             )}
                             <Text style={styles.purchaseButtonText}>
-                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXplay')}
+                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -641,10 +697,10 @@ export const ShopProductDetailScreen = () => {
                 <View style={styles.modalOverlay}>
                     <View style={[styles.paymentSuccessModal, xplayPurchaseResult?.coupon_img_url ? styles.paymentSuccessModalWide : undefined]}>
                         <View style={styles.modalLogoContainer}>
-                            <Image source={xplaySymbol} style={styles.modalLogo} resizeMode="contain" />
+                            <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={styles.paymentSuccessMessage}>
-                            {xplayPurchaseResult?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'Xplay 포인트 결제가 완료되었습니다'}
+                            {xplayPurchaseResult?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'XRUN 결제가 완료되었습니다'}
                         </Text>
                         {xplayPurchaseResult?.coupon_img_url ? (
                             <ScrollView style={styles.couponBarcodeScroll} showsVerticalScrollIndicator={false}>

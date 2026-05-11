@@ -7,6 +7,13 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { getPlayStoreUrl } from '../utils/playStoreUrl';
 
+export const getApiBaseUrl = (): string => {
+  const env = getEnv();
+  return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+};
+
+export const getEmailAuthApiBaseUrl = (): string => getApiBaseUrl();
+
 export * from './googleAuth';
 
 export * from './appleAuth';
@@ -271,7 +278,7 @@ export const nodeGatewayRequest = async (
   navigation?: any,
 ): Promise<Response> => {
   const env = getEnv();
-  const baseUrl = env.GATEWAY_NODEJS;
+  const baseUrl = getApiBaseUrl();
   const url = endpoint.startsWith('/')
     ? `${baseUrl}${endpoint}`
     : `${baseUrl}/${endpoint}`;
@@ -291,14 +298,13 @@ export const sendAliveSignal = async (
   }
   try {
     const env = getEnv();
-
-    const authHeader = `Bearer ${env.GATEWAY_AUTH_CODE}`;
+    const authCode = env.GATEWAY_AUTH_CODE;
 
     const response = await nodeGatewayRequest('/keepalive', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${authCode}`,
       },
     }, navigation);
 
@@ -346,12 +352,16 @@ export const sendAliveSignal = async (
 
       if (Platform.OS === 'android') {
         if (currentVersion && serverAndroidVersion > currentVersion) {
-          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion); 
-          result.emergencyStop = {
-            enabled: true,
-            message: 'UPDATE_FOUND\nPLEASE_UPDATE',
-            link: getPlayStoreUrl({ gl: 'us' }),
-          };
+          console.log('[App] 새 버전 발견 - 현재:', currentVersion, '서버:', serverAndroidVersion);
+          if (__DEV__) {
+            console.log('[App] 개발 모드이므로 버전 업데이트 진행하지 않습니다. index.ts sendAliveSignal');
+          } else {
+            result.emergencyStop = {
+              enabled: true,
+              message: 'UPDATE_FOUND\nPLEASE_UPDATE',
+              link: getPlayStoreUrl({ gl: 'us' }),
+            };
+          }
         } else {
           console.log('[App android] 최신 버전입니다. 현재:', currentVersion, '서버:', serverAndroidVersion);
         }
@@ -439,12 +449,21 @@ export const getAndroidWalletShowStatus = async (navigation?: any): Promise<bool
   }
 };
 
-export const createAxiosInstance = (navigation?: any) => {
+export type CreateAxiosInstanceOptions = {
+
+  baseURL?: string;
+};
+
+export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInstanceOptions) => {
   const env = getEnv();
-  const baseURL = env.GATEWAY_NODEJS;
+  const baseURL = options?.baseURL ?? getApiBaseUrl();
   const authCode = env.GATEWAY_AUTH_CODE;
 
-  console.log('[createAxiosInstance] GATEWAY_NODEJS:', baseURL);
+  console.log(
+    '[createAxiosInstance] API baseURL:',
+    baseURL,
+    options?.baseURL ? '(override: 이메일 인증 등)' : '',
+  );
   console.log('[createAxiosInstance] __DEV__ 모드:', __DEV__);
 
   const instance = axios.create({
@@ -457,9 +476,7 @@ export const createAxiosInstance = (navigation?: any) => {
   });
 
   instance.interceptors.request.use(
-    async (config) => {
-      config.headers = config.headers || {};
-      config.headers['Authorization'] = `Bearer ${authCode}`;
+    (config) => {
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -1241,7 +1258,9 @@ export const sendEmailVerificationCode = async (
   navigation?: any,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailVerificationRequest = {
       email,
     };
@@ -1280,7 +1299,9 @@ export const verifyEmailCode = async (
   navigation?: any,
 ): Promise<boolean> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailVerificationCodeRequest = {
       email,
       code,
@@ -1322,7 +1343,9 @@ export const loginWithEmailAuth = async (
   navigation?: any,
 ): Promise<EmailAuthLoginResponse> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
+    const axiosInstance = createAxiosInstance(navigation, {
+      baseURL: getEmailAuthApiBaseUrl(),
+    });
     const request: EmailAuthLoginRequest = {
       email,
     };
@@ -1902,7 +1925,7 @@ export const logout = async (
   try {
     const env = getEnv();
     const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = env.GATEWAY_NODEJS;
+    const baseUrl = getApiBaseUrl();
     const url = `${baseUrl}/logout-9705`;
 
     console.log('[로그아웃] 로그아웃 요청:', { member });
@@ -2175,41 +2198,59 @@ export const deleteAllNotifications = async (
   }
 };
 
-export const registerFCMToken = async (
-  pushkey: string,
+export const registerPushToken = async (
   member: number,
   navigation?: any,
-): Promise<FCMTokenRegisterResponse> => {
+): Promise<void> => {
   try {
-    const axiosInstance = createAxiosInstance(navigation);
-    const request: FCMTokenRegisterRequest = {
-      pushkey,
-      member,
-    };
+    const Notifications = require('expo-notifications');
+    const Device = require('expo-device');
+    const Constants = require('expo-constants');
+    const { Platform } = require('react-native');
 
-    console.log('[알림] FCM 토큰 등록 요청:', { member, pushkey: pushkey.substring(0, 20) + '...' });
+    if (!Device.isDevice) {
+      console.log('[푸시] 에뮬레이터에서는 푸시 토큰 등록을 건너뜁니다.');
+      return;
+    }
 
-    const response = await axiosInstance.post<FCMTokenRegisterResponse>(
-      '/login-pushkeyreg',
-      request,
-    );
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      console.log('[푸시] 알림 권한이 거부되었습니다.');
+      return;
+    }
 
-    console.log('[알림] FCM 토큰 등록 성공');
-
-    return response.data;
-  } catch (error) {
-    console.error('[알림] FCM 토큰 등록 오류:', error);
-    if (error instanceof AxiosError) {
-      console.error('[알림] 상세 오류 정보:', {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
       });
     }
-    throw error;
+
+    const projectId = Constants.default?.expoConfig?.extra?.eas?.projectId;
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId || '98780521-4749-4507-8e3a-62a2b3a80783',
+    });
+    const pushToken = tokenData.data; 
+
+    console.log('[푸시] Expo Push Token:', pushToken.substring(0, 30) + '...');
+
+    const axiosInstance = createAxiosInstance(navigation);
+    await axiosInstance.post('/login-pushkeyreg', {
+      pushkey: pushToken,
+      member,
+    });
+
+    console.log('[푸시] 토큰 서버 등록 성공');
+  } catch (error) {
+    console.warn('[푸시] 토큰 등록 오류:', error);
+
   }
 };
 
@@ -2388,7 +2429,7 @@ export const fetchVirtualCoin = async (
 
     try {
       const env = getEnv();
-      const url = `${env.GATEWAY_NODEJS}/virtualCoin`;
+      const url = `${getApiBaseUrl()}/virtualCoin`;
 
       const requestBody = {
         member: member,
@@ -2468,7 +2509,7 @@ export const getCoinNasPrice = async (
 
     try {
       const env = getEnv();
-      const url = `${env.GATEWAY_NODEJS}/getCoinNasPrice`;
+      const url = `${getApiBaseUrl()}/getCoinNasPrice`;
 
       console.log('=== getCoinNasPrice API 호출 ===');
 
@@ -2833,7 +2874,7 @@ export const getNasmobAds = async (
 ): Promise<NasmobAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getNasmobAds`;
+    const url = `${getApiBaseUrl()}/getNasmobAds`;
 
     const isIOS = Platform.OS === 'ios' ||
       deviceInfo.manufacturer === 'Apple' ||
@@ -2983,7 +3024,7 @@ export const getPockAds = async (
 ): Promise<PockAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getPockAds`;
+    const url = `${getApiBaseUrl()}/getPockAds`;
 
     let osType: number;
     let osTypeString: string;
@@ -3129,7 +3170,7 @@ export const getPointClickAds = async (
 ): Promise<PockAdsResponse> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/getPointClickAds`;
+    const url = `${getApiBaseUrl()}/getPointClickAds`;
 
     let osTypeString: string;
 
@@ -3272,7 +3313,7 @@ export const sendNasmobCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/callbackNasmob`;
+    const url = `${getApiBaseUrl()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', callbackData);
 
@@ -3305,9 +3346,7 @@ export const gatewayNodeJS = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/${endpoint}`;
-
-    const authHeader = `Bearer ${env.GATEWAY_AUTH_CODE}`;
+    const url = `${getApiBaseUrl()}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
@@ -3321,7 +3360,7 @@ export const gatewayNodeJS = async (
       method: method,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}`,
       },
     };
 
@@ -3386,7 +3425,7 @@ export const getCryptoPricesInKRW = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/cryptoPricesInKRW`;
+    const url = `${getApiBaseUrl()}/cryptoPricesInKRW`;
 
     console.log('=== cryptoPricesInKRW API 호출 ===');
 
@@ -3422,7 +3461,7 @@ export const getMemberLimits = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/memberLimits`;
+    const url = `${getApiBaseUrl()}/memberLimits`;
 
     const requestBody = {
       member: member,
@@ -3508,7 +3547,7 @@ export const processAdReward = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${env.GATEWAY_NODEJS}/processAdReward`;
+    const url = `${getApiBaseUrl()}/processAdReward`;
 
     const requestBody = {
       member: typeof member === 'number' ? member : parseInt(String(member), 10),
@@ -3885,13 +3924,14 @@ export const getSettlementAmount = async (
 };
 
 export const getRank = async (
+  member: number,
   navigation?: any,
 ): Promise<GetRankResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: GetRankRequest = {};
+    const request: GetRankRequest = { member };
 
-    console.log('[Rank] 전체 순위 조회 요청');
+    console.log('[Rank] 전체 순위 조회 요청:', { member });
 
     const response = await axiosInstance.post<GetRankResponse>(
       '/getRank',
@@ -4583,6 +4623,31 @@ export const purchaseGiftWithXplayPoints = async (
         status: 'error',
         code: error.response?.status,
         message: data?.message || error.message,
+      };
+    }
+    return { status: 'error', message: (error as Error).message };
+  }
+};
+
+export const cancelGiftishowCoupon = async (
+  member: string,
+  tr_id: string,
+  navigation?: any,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/cancelGiftishowCoupon', { member, tr_id });
+    return response.data;
+  } catch (error) {
+    const msg = error instanceof AxiosError
+      ? (error.response?.data as any)?.message || error.message
+      : (error as Error).message;
+    console.error('[기프티쇼] 쿠폰 취소 오류:', msg);
+    if (error instanceof AxiosError) {
+      return {
+        status: 'error',
+        code: error.response?.status,
+        message: (error.response?.data as any)?.message || error.message,
       };
     }
     return { status: 'error', message: (error as Error).message };
@@ -5559,147 +5624,25 @@ export const getClauseContent = async (
   language: string,
   navigation?: any,
 ): Promise<string> => {
-
   const typeMap: Record<'service' | 'location' | 'personal', number> = {
     service: 1,
     location: 2,
     personal: 3,
   };
+  const typeNumber = typeMap[clauseType];
 
   try {
-    const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
-    const baseUrl = env.GATEWAY_NODEJS;
+    const langParam = language ? `&language=${encodeURIComponent(language)}` : '';
+    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements?type=${typeNumber}${langParam}`);
+    const data = await resp.json() as any;
 
-    const typeNumber = typeMap[clauseType];
-    const endpoint = `/agreements?type=${typeNumber}`;
-    const fullUrl = endpoint.startsWith('/')
-      ? `${baseUrl}${endpoint}`
-      : `${baseUrl}/${endpoint}`;
-
-    console.log('[약관] 약관 내용 요청:', {
-      clauseType,
-      typeNumber,
-      endpoint,
-      fullUrl,
-      language,
-      baseUrl,
-    });
-
-    let response: Response;
-    try {
-      response = await nodeGatewayRequest(endpoint, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authCode}`,
-        },
-      }, navigation);
-    } catch (networkError) {
-      console.error('[약관] 네트워크 요청 실패:', {
-        clauseType,
-        typeNumber,
-        endpoint,
-        fullUrl,
-        error: networkError,
-        errorType: networkError instanceof Error ? networkError.constructor.name : typeof networkError,
-        errorMessage: networkError instanceof Error ? networkError.message : String(networkError),
-        errorStack: networkError instanceof Error ? networkError.stack : undefined,
-      });
-      throw networkError;
-    }
-
-    console.log('[약관] HTTP 응답 상태:', {
-      ok: response.ok,
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] HTTP 에러 응답:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorText,
-      });
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-    }
-
-    let data: any;
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      const responseText = await response.text().catch(() => '응답 본문 읽기 실패');
-      console.error('[약관] JSON 파싱 실패:', {
-        clauseType,
-        typeNumber,
-        responseText,
-        error: jsonError,
-      });
-      throw new Error(`JSON 파싱 실패: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
-    }
-
-    console.log('[약관] API 응답 데이터:', JSON.stringify(data, null, 2));
-    console.log('[약관] 응답 구조 분석:', {
-      code: data.code,
-      hasData: !!data.data,
-      dataType: Array.isArray(data.data) ? 'array' : typeof data.data,
-      dataLength: Array.isArray(data.data) ? data.data.length : 'N/A',
-      dataKeys: data.data && typeof data.data === 'object' && !Array.isArray(data.data)
-        ? Object.keys(data.data)
-        : 'N/A',
-    });
-
-    if (data.code !== 200 || !data.data) {
-      console.error('[약관] 응답 데이터 검증 실패:', {
-        code: data.code,
-        hasData: !!data.data,
-        fullResponse: data,
-      });
+    if (data.code !== 200 || !data.data?.content) {
       throw new Error('약관 데이터를 가져올 수 없습니다.');
     }
 
-    const agreementData = data.data;
-
-    if (!agreementData.content) {
-      console.error('[약관] 약관 내용이 없습니다:', {
-        agreementData,
-        hasContent: !!agreementData.content,
-      });
-      throw new Error('약관 내용이 없습니다.');
-    }
-
-    console.log('[약관] 약관 내용 로드 성공:', {
-      clauseType,
-      typeNumber,
-      language,
-      contentLength: agreementData.content.length
-    });
-
-    return agreementData.content;
+    return data.data.content;
   } catch (error) {
     console.error('[약관] 약관 내용 로드 실패:', error);
-    if (error instanceof Error) {
-      console.error('[약관] 상세 오류 정보:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        clauseType,
-        typeNumber: typeMap[clauseType],
-        language,
-        endpoint: `/oth-path?type=${typeMap[clauseType]}`,
-      });
-    } else {
-      console.error('[약관] 알 수 없는 에러:', {
-        error,
-        errorType: typeof error,
-        clauseType,
-        typeNumber: typeMap[clauseType],
-        language,
-      });
-    }
-
     throw error;
   }
 };
@@ -5708,45 +5651,23 @@ export const getAgreementByType = async (
   type?: 'service' | 'location' | 'personal',
   navigation?: any,
 ): Promise<AgreementResponse> => {
+  const typeMap: Record<'service' | 'location' | 'personal', number> = {
+    service: 1,
+    location: 2,
+    personal: 3,
+  };
+
   try {
-    const env = getEnv();
-    const authCode = env.GATEWAY_AUTH_CODE;
+    const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
+    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements${typeParam}`);
+    const data = await resp.json() as any;
 
-    const typeMap: Record<'service' | 'location' | 'personal', number> = {
-      service: 1,
-      location: 2,
-      personal: 3,
-    };
-
-    const endpoint = type
-      ? `/oth-path?type=${typeMap[type]}`
-      : '/oth-path';
-
-    console.log('[약관] 약관 데이터 요청:', { type, typeNumber: type ? typeMap[type] : undefined, endpoint });
-
-    const response = await nodeGatewayRequest(endpoint, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authCode}`,
-      },
-    }, navigation);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: AgreementResponse = await response.json();
-
-    console.log('[약관] 약관 데이터 로드 성공:', { type, hasData: !!data.data });
-
-    return data;
+    return {
+      success: data.code === 200,
+      data: data.data,
+    } as AgreementResponse;
   } catch (error) {
     console.error('[약관] 약관 데이터 로드 실패:', error);
-    if (error instanceof Error && error.message === 'API request timeout') {
-
-      throw error;
-    }
     throw error;
   }
 };
@@ -6053,7 +5974,11 @@ export const getTopAd5 = async (navigation?: any, forceRefresh: boolean = false,
               console.log(`[getTopAd5] 캐시 사용 (${Math.floor(elapsed / 1000)}초 전 저장, ${Math.floor((TOP_AD5_REFRESH_INTERVAL - elapsed) / 1000)}초 남음)`);
               return storedData;
             } else {
-              console.log(`[getTopAd5] 캐시 만료 (${Math.floor(elapsed / 1000)}초 경과, 10분 초과)`);
+
+              console.log(`[getTopAd5] 캐시 만료 but 즉시 반환 (${Math.floor(elapsed / 1000)}초 경과) → 백그라운드 갱신`);
+
+              setTimeout(() => { getTopAd5(navigation, true, false).catch(() => {}); }, 100);
+              return storedData;
             }
           }
         } catch (timestampError) {

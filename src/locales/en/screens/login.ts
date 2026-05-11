@@ -29,6 +29,8 @@ export default {
     loginFailed: 'Email or password is incorrect',
     userDataNotFound: 'Unable to retrieve user information',
     loginError: 'An error occurred during login. Please try again',
+    idTokenMissing: 'Failed to receive ID token. Please try again.',
+    identityTokenMissing: 'Failed to receive Identity token. Please try again.',
   },
 };
 

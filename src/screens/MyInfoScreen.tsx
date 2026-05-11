@@ -14,6 +14,7 @@ import { Header, TaboolaBanner } from '../components';
 import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
+import { unbindAdisonUid } from '../services/adison';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -83,6 +84,7 @@ export const MyInfoScreen = () => {
         iconColor: '#7ca6e8',
         route: 'myinfoShopSales',
       },
+
       {
         id: 'notify',
         label: t('screens.myInfo.notify'),
@@ -216,8 +218,16 @@ export const MyInfoScreen = () => {
         const loginType = await AsyncStorage.getItem('loginType');
         const isAppleLogin = loginType === 'apple';
 
-        console.log('[내 정보] 이메일 인증 건너뛰고 정보 수정 화면으로 직접 이동');
-        navigate(ROUTES.myInfoEdit);
+        if (isAppleLogin) {
+          console.log('[내 정보] 애플 로그인 → 정보 수정 화면으로 직접 이동');
+          navigate(ROUTES.myInfoEdit);
+        } else {
+          console.log('[내 정보] 일반 로그인 → 이메일 인증 화면으로 이동');
+          if (userInfo?.email) {
+            setVerificationEmail(userInfo.email);
+          }
+          navigate(ROUTES.myInfoEmailAuth);
+        }
       } else {
         navigate(ROUTES[menu.route]);
       }
@@ -269,6 +279,8 @@ export const MyInfoScreen = () => {
               } else {
                 console.log('[로그아웃] 사용자 정보 없음 - 로컬 데이터만 삭제하고 로그인 화면으로 이동');
               }
+
+              try { unbindAdisonUid(); } catch (_) {}
 
               await AsyncStorage.removeItem('isLoggedIn');
               await AsyncStorage.removeItem('userEmail');

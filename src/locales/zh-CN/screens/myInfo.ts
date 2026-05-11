@@ -16,6 +16,8 @@ export default {
   referralEditSubtitle: '推荐人管理',
   shopSales: 'Shop 销售额',
   shopSalesSubtitle: '管理销售状态',
+  paymentPin: '设置支付密码',
+  paymentPinSubtitle: '注册/修改6位支付密码',
   logout: '登出',
   shareReferral: '分享推荐链接',
   logoutConfirm: '确定要登出吗？',

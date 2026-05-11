@@ -1,56 +1,78 @@
 package run.xrun.xrunapp
 
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
+import android.content.Context
+import android.util.Log
+import com.facebook.react.bridge.*
 import com.ayet.sdk.AyetSdk
 
 class AyetOfferwallModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
+    private var isInitialized = false
+    private var cachedPlacementId: Int = 0
+
     override fun getName(): String = "AyetOfferwallModule"
 
     @ReactMethod
-    fun setUserId(userId: String, promise: Promise) {
+    fun initialize(placementId: Int, externalIdentifier: String, promise: Promise) {
         try {
-            val ctx = reactApplicationContext ?: run {
-                promise.reject("NO_CONTEXT", "React context is null")
+            val context: Context = reactApplicationContext.applicationContext
+            AyetSdk.init(context, placementId, externalIdentifier)
+            cachedPlacementId = placementId
+            isInitialized = true
+            Log.d("AyetOfferwall", "ayeT SDK 초기화 완료: placementId=$placementId, userId=$externalIdentifier")
+            promise.resolve(true)
+        } catch (e: Exception) {
+            Log.e("AyetOfferwall", "ayeT SDK 초기화 실패", e)
+            promise.reject("INIT_ERROR", e.message ?: "Unknown error")
+        }
+    }
+
+    @ReactMethod
+    fun setUserId(userId: String) {
+        try {
+            if (!isInitialized || cachedPlacementId == 0) {
+                Log.w("AyetOfferwall", "setUserId skipped: SDK not initialized")
                 return
             }
-            val id = userId.trim().takeIf { it.isNotEmpty() }?.take(63) ?: "guest"
-            AyetSdk.init(ctx, 21960, id)
-            promise.resolve(null)
+            val context: Context = reactApplicationContext.applicationContext
+            val id = if (userId.isNotBlank()) userId else "guest"
+            AyetSdk.init(context, cachedPlacementId, id)
+            Log.d("AyetOfferwall", "setUserId (re-init): $id")
         } catch (e: Exception) {
-            promise.reject("SET_USER_ID_ERROR", e.message ?: "setUserId failed", e)
+            Log.e("AyetOfferwall", "setUserId 실패", e)
         }
     }
 
     @ReactMethod
     fun showOfferwall(adSlotName: String, promise: Promise) {
-        val ctx = reactApplicationContext ?: run {
-            promise.reject("NO_CONTEXT", "React context is null")
-            return
-        }
         try {
-            AyetSdk.showOfferwall(ctx, adSlotName)
-            promise.resolve(null)
+            val activity = reactApplicationContext.currentActivity
+            if (activity == null) {
+                promise.reject("NO_ACTIVITY", "Activity를 찾을 수 없습니다.")
+                return
+            }
+            Log.d("AyetOfferwall", "오퍼월 표시: adSlotName=$adSlotName")
+            AyetSdk.showOfferwall(activity as Context, adSlotName)
+            promise.resolve(true)
         } catch (e: Exception) {
-            promise.reject("SHOW_OFFERWALL_ERROR", e.message ?: "showOfferwall failed", e)
+            Log.e("AyetOfferwall", "오퍼월 표시 실패", e)
+            promise.reject("SHOW_ERROR", e.message ?: "Unknown error")
         }
     }
 
     @ReactMethod
     fun getOffers(adSlotName: String, promise: Promise) {
-        val ctx = reactApplicationContext ?: run {
-            promise.resolve("[]")
-            return
-        }
         try {
-            AyetSdk.getOffers(adSlotName) { offersJson ->
-                promise.resolve(offersJson ?: "[]")
+            AyetSdk.getOffers(adSlotName) { json ->
+                if (json != null) {
+                    promise.resolve(json)
+                } else {
+                    promise.resolve("[]")
+                }
             }
         } catch (e: Exception) {
-            promise.resolve("[]")
+            Log.e("AyetOfferwall", "getOffers ��패", e)
+            promise.reject("OFFERS_ERROR", e.message ?: "Unknown error")
         }
     }
 }

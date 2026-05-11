@@ -20,7 +20,7 @@ const HISTORY_DATA = [
     timestamp: '2025.04.30 14:10',
     amount: '1,600',
     suffix: 'POL',
-    icon: require('../../assets/pol-round-logo.png'),
+    icon: require('../../assets/icon_polyganscan_color.png'),
   },
   {
     id: 'tx-2',
@@ -29,7 +29,7 @@ const HISTORY_DATA = [
     timestamp: '2025.04.30 14:00',
     amount: '1,600',
     suffix: 'POL',
-    icon: require('../../assets/pol-round-logo.png'),
+    icon: require('../../assets/icon_polyganscan_color.png'),
   },
 ];
 

@@ -208,12 +208,11 @@ export const getTaboolaPlacement = (
 
 export const getTaboolaPageUrl = (): string => {
 
-  const appStoreUrl =
-    Platform.OS === 'android'
-      ? 'https://play.google.com/store/apps/details?id=com.anonymous.x112102'
-      : 'https://apps.apple.com/app/id123456789'; 
-
-  return appStoreUrl;
+  if (Platform.OS === 'android') {
+    return 'https://play.google.com/store/apps/details?id=run.xrun.xrunapp';
+  }
+  const iosStoreId = getEnvValue('APPSFLYER_APP_ID_IOS');
+  return `https://apps.apple.com/app/id${iosStoreId}`;
 };
 
 export const generateTaboolaHTML = (
@@ -380,7 +379,10 @@ export const generateTaboolaHTML = (
           }
 
           if (!apiFound) {
-            logToRN('[Taboola WebView] Taboola API를 찾을 수 없습니다. 스크립트가 제대로 로드되지 않았을 수 있습니다.', 'error');
+            logToRN(
+              '[Taboola WebView] window.taboola 미감지(모바일 로더는 _taboola 큐만 쓰는 경우가 많음). 스크립트 onload 이후에도 동일하면 네트워크·필 확인.',
+              'log',
+            );
             tryMethod2();
           }
         }, 50); // 100ms에서 50ms로 단축 (최대한 빠른 감지)
@@ -400,6 +402,14 @@ export const generateTaboolaHTML = (
         }
       }, 100); // 200ms에서 100ms로 단축 (최대한 빠른 감지)
 
+      function containerLooksLikeTaboolaFill(container) {
+        if (!container) return false;
+        if (container.querySelectorAll('[class*="taboola"], [id*="taboola"]').length > 0) return true;
+        if (container.querySelector('iframe')) return true;
+        if (/taboola/i.test(container.innerHTML)) return true;
+        return false;
+      }
+
       var checkInterval = setInterval(function() {
         var container = document.getElementById('taboola-container');
         if (container) {
@@ -408,7 +418,7 @@ export const generateTaboolaHTML = (
             innerHTMLLength: container.innerHTML.length,
             childrenCount: container.children.length,
             hasContent: container.innerHTML.trim().length > 0,
-            hasTaboolaElements: container.querySelectorAll('[class*="taboola"], [id*="taboola"]').length > 0
+            hasTaboolaElements: containerLooksLikeTaboolaFill(container)
           };
 
           if (status.hasContent || status.hasTaboolaElements || status.innerHTMLLength > 50) {
@@ -426,7 +436,7 @@ export const generateTaboolaHTML = (
           innerHTMLLength: container ? container.innerHTML.length : 0,
           childrenCount: container ? container.children.length : 0,
           hasContent: container ? container.innerHTML.trim().length > 0 : false,
-          hasTaboolaElements: container ? container.querySelectorAll('[class*="taboola"], [id*="taboola"]').length > 0 : false,
+          hasTaboolaElements: containerLooksLikeTaboolaFill(container),
           windowTaboola: typeof window.taboola !== 'undefined',
           windowTaboolaUnderscore: typeof window._taboola !== 'undefined' && window._taboola.length > 0
         };

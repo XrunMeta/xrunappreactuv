@@ -231,6 +231,7 @@ export const ShopMyTicketDetailScreen = () => {
                         <Text style={styles.saveButtonText}>{t('screens.shopMyTicket.saveImage')}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
+
             </View>
         </SafeView>
     );

@@ -102,3 +102,10 @@ project.xcworkspace
 scripts/upload-ota.js
 scripts/clear-r2.js
 scripts/upload-version.js
+
+# Secrets — added 2026-05-11 (security cleanup)
+src/utils/env.ts
+credentials.json
+google-services.json
+android/app/google-services.json
+*.keystore

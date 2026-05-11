@@ -4,7 +4,6 @@ import { SafeScrollView } from '../components';
 import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
-import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
 
 let xplaySymbol: any = null;
@@ -16,15 +15,13 @@ try {
 
 export const XplayZoneScreen = () => {
   const { goBack, navigate } = useAppNavigation();
-  const { setSelectedShopItem } = useAppContext();
 
   const onZone1Press = () => {
-    setSelectedShopItem({ shopTab: 'xplayShop' } as any);
-    navigate(ROUTES.shop);
+    navigate(ROUTES.ayetOffersXplay);
   };
 
   const onZone2Press = () => {
-    navigate(ROUTES.ayetOffersXplay);
+    navigate(ROUTES.myChipsOfferwall);
   };
 
   return (
@@ -36,7 +33,7 @@ export const XplayZoneScreen = () => {
       >
         {xplaySymbol && (
           <View style={styles.logoContainer}>
-            <Image source={xplaySymbol} style={styles.logo} resizeMode="contain" />
+            <Image source={require('../../assets/xrun-round-logo.png')} style={styles.logo} resizeMode="contain" />
           </View>
         )}
         <Text style={styles.title}>Xplay Zone</Text>
@@ -48,7 +45,7 @@ export const XplayZoneScreen = () => {
           onPress={onZone1Press}
         >
           <Text style={styles.zoneTitle}>Xplay Zone 1</Text>
-          <Text style={styles.zoneDescription}>Xplay Shop · 리워드 상품</Text>
+          <Text style={styles.zoneDescription}>ayeT 오퍼 · Xplay 적립</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -57,7 +54,7 @@ export const XplayZoneScreen = () => {
           onPress={onZone2Press}
         >
           <Text style={styles.zoneTitle}>Xplay Zone 2</Text>
-          <Text style={styles.zoneDescription}>오퍼월 · 리워드 적립</Text>
+          <Text style={styles.zoneDescription}>게임 오퍼월 · 리워드 적립</Text>
         </TouchableOpacity>
       </SafeScrollView>
     </View>
@@ -75,7 +72,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 0,
     marginBottom: 16,
   },
   logo: {

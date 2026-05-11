@@ -11,6 +11,7 @@ import { useAppContext } from '../context';
 import { TransactionDetails, TransactionDetailsScreen } from './TransactionDetailsScreen';
 import {
   fetchEtherscanTransactions,
+  getXRUNGopaxPrice,
 } from '../services';
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
@@ -18,7 +19,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
-const iconPolygonscan = require('../../assets/icon_polyganscan.png');
+const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
 
 interface EtherscanTransactionItem {
   blockNumber: string;
@@ -232,7 +233,6 @@ export const WalletDetailScreen = () => {
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'send' | 'receive'>('all');
-  const [selectedRange, setSelectedRange] = useState<'7d' | '14d' | '30d'>('7d');
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
@@ -278,15 +278,22 @@ export const WalletDetailScreen = () => {
       }
 
       try {
-        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
-        if (priceDataStr) {
-          const priceData = JSON.parse(priceDataStr);
-          const price = priceData?.data?.gopaxPrice || null;
+        const result = await getXRUNGopaxPrice();
+        const price = result?.data?.gopaxPrice || null;
+        if (price) {
           setGopaxPrice(price);
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
           console.log('[WalletDetail] 고팍스 XRUN 가격 로드:', price);
         }
       } catch (error) {
-        console.error('[WalletDetail] 고팍스 XRUN 가격 로드 오류:', error);
+        console.error('[WalletDetail] 고팍스 XRUN 가격 API 오류, fallback:', error);
+        try {
+          const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+          if (priceDataStr) {
+            const priceData = JSON.parse(priceDataStr);
+            setGopaxPrice(priceData?.data?.gopaxPrice || null);
+          }
+        } catch {}
       }
     };
 
@@ -301,28 +308,14 @@ export const WalletDetailScreen = () => {
   }, [selectedWalletAsset, goBack, resetSelectedWalletAsset]);
 
   const handleFilterApply = useCallback(
-    (selection: { type: 'all' | 'send' | 'receive'; range: '7d' | '14d' | '30d' }) => {
+    (selection: { type: 'all' | 'send' | 'receive' }) => {
       setSelectedType(selection.type);
-      setSelectedRange(selection.range);
 
       setCachedTransactionData(null);
       setCacheKey('');
     },
     [],
   );
-
-  const getDaysBefore = useCallback((range: '7d' | '14d' | '30d'): number => {
-    switch (range) {
-      case '7d':
-        return 7;
-      case '14d':
-        return 14;
-      case '30d':
-        return 30;
-      default:
-        return 7;
-    }
-  }, []);
 
   const createFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -335,7 +328,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
 
-      const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}-${selectedRange}`;
+      const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}`;
 
       if (params.page === 1 && cachedTransactionData && cacheKey === currentCacheKey) {
         console.log('[WalletDetail] 캐시된 데이터 사용:', {
@@ -368,6 +361,20 @@ export const WalletDetailScreen = () => {
           console.warn('[WalletDetail] 응답 데이터 형식이 올바르지 않습니다.');
           return { data: [], total: 0, hasMore: false };
         }
+
+        const XRUN_POLYGON_CONTRACT = '0xda7cdea482b4e5f3d5b41aa286811d111f066b6b';
+        const expectedContract =
+          selectedWalletAsset.currency === 18
+            ? XRUN_POLYGON_CONTRACT.toLowerCase()
+            : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
+        const expectedSymbol = (selectedWalletAsset.symbol || '').toUpperCase();
+        response.data = response.data.filter((item: any) => {
+          const c = (item.contractAddress || '').toLowerCase();
+          const s = (item.tokenSymbol || '').toUpperCase();
+          if (expectedContract) return c === expectedContract;
+
+          return !s || s === expectedSymbol;
+        });
 
         const myAddressLower = publicAddress.toLowerCase();
 
@@ -442,16 +449,7 @@ export const WalletDetailScreen = () => {
           return timestampB - timestampA;
         });
 
-        const now = new Date();
-        const daysAgo = getDaysBefore(selectedRange);
-        const cutoffTimestamp = Math.floor((now.getTime() - daysAgo * 24 * 60 * 60 * 1000) / 1000); 
-        const dateFilteredItems = items.filter((item) => {
-          if (item.timeStamp) {
-            const itemTimestamp = parseInt(item.timeStamp, 10);
-            return itemTimestamp >= cutoffTimestamp;
-          }
-          return true; 
-        });
+        const dateFilteredItems = items;
 
         const hasMore = dateFilteredItems.length >= params.pageSize;
 
@@ -479,7 +477,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, publicAddress, selectedType, selectedRange, t, cachedTransactionData, cacheKey, getDaysBefore]);
+  }, [member, selectedWalletAsset, publicAddress, selectedType, t, cachedTransactionData, cacheKey]);
 
   const createSendFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -766,7 +764,6 @@ export const WalletDetailScreen = () => {
         onClose={() => setFilterVisible(false)}
         onApply={handleFilterApply}
         defaultType={selectedType}
-        defaultRange={selectedRange}
       />
 
       <Modal

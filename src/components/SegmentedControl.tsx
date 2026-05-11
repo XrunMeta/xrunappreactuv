@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
+    textAlign: 'center',
   },
   optionLabelActive: {
     color: '#111111',

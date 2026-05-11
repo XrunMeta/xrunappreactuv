@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.10.1",
+    "version": "4.10.6",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -49,17 +49,18 @@
             "CFBundleURLName": "run.xrun.xrunapps"
           }
         ],
-        "GIDClientID": "oth-client.googleusercontent.invalid"
+        "GIDClientID": "oth-client.googleusercontent.invalid",
+        "PAGAppId": "8747761"
       },
       "bundleIdentifier": "run.xrun.xrunapps",
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "13"
+      "buildNumber": "30"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 263,
+      "versionCode": 284,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -102,13 +103,13 @@
             "entitlements": {
               "com.apple.developer.applesignin": [
                 "Default"
-              ]
+              ],
+              "aps-environment": "production"
             },
-            "deploymentTarget": "15.1",
-            "buildReactNativeFromSource": true
+            "deploymentTarget": "26.0"
           },
           "android": {
-            "minSdkVersion": 24,
+            "minSdkVersion": 23,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35
           }
@@ -123,13 +124,7 @@
           "preferAppsFlyerBackupRules": false
         }
       ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-9457909979646034~5020701276",
-          "iosAppId": "ca-app-pub-9457909979646034~5020701276"
-        }
-      ]
+      "expo-tracking-transparency"
     ],
     "extra": {
       "eas": {

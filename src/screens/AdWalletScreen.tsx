@@ -8,7 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, SegmentedControl, DataList, SafeView } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppContext } from '../context';
 import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
@@ -18,9 +19,9 @@ import {
   fetchADXRUNTopBannersSettled,
   fetchQuestList,
   joinQuest,
+  getXRUNGopaxPrice,
 } from '../services';
-import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync } from '../services/pangle';
-import { loadAndShowRewardedAd as loadAndShowRewardedAdAdMob, isAdMobReady } from '../services/admob';
+import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync, isPangleReady, initializePangle } from '../services/pangle';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
@@ -40,6 +41,8 @@ interface AdEntry {
   originalDescription?: string; 
   rewardDescription?: string; 
   extrastr3?: string; 
+  extrastr4?: string; 
+  adName?: string; 
   hasAttended?: boolean; 
   is_rewarded?: boolean; 
   attendance_date?: string; 
@@ -53,7 +56,9 @@ interface AdEntry {
 
 export const AdWalletScreen = () => {
   const { t, i18n } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
+  const { setSelectedShopItem } = useAppContext();
+
   const { showAlert } = useAlertDialog();
   const [tab, setTab] = useState<TabValue>('pending');
   const [member, setMember] = useState<number | null>(null);
@@ -118,15 +123,25 @@ export const AdWalletScreen = () => {
   useEffect(() => {
     const loadGopaxPrice = async () => {
       try {
-        const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
-        if (priceDataStr) {
-          const priceData = JSON.parse(priceDataStr);
-          const price = priceData?.data?.gopaxPrice || null;
+        const result = await getXRUNGopaxPrice();
+        const price = result?.data?.gopaxPrice || null;
+        if (price) {
           setGopaxPrice(price);
+
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
           console.log('[AdWallet] 고팍스 XRUN 가격 로드:', price);
         }
       } catch (error) {
-        console.error('[AdWallet] 고팍스 XRUN 가격 로드 오류:', error);
+        console.error('[AdWallet] 고팍스 XRUN 가격 API 오류, AsyncStorage fallback 시도:', error);
+
+        try {
+          const priceDataStr = await AsyncStorage.getItem('xrungopaxprice');
+          if (priceDataStr) {
+            const priceData = JSON.parse(priceDataStr);
+            const price = priceData?.data?.gopaxPrice || null;
+            setGopaxPrice(price);
+          }
+        } catch {}
       }
     };
 
@@ -137,14 +152,41 @@ export const AdWalletScreen = () => {
     if (!member) return;
 
     const loadTopBanners = async () => {
+
+      if (tab === 'pending') {
+
+        setTimeout(() => {
+          const totalXrun = pendingBannerRef.current.totalXrun;
+          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          let krwamount = '0 KRW';
+          if (gopaxPrice && totalXrun > 0) {
+            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
+            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            krwamount = `KRW ${formatted}`;
+          }
+          setTopBannersData({ krwamount, amountasxrun });
+        }, 500);
+        return;
+      }
+
+      if (tab === 'quest') {
+        setTimeout(() => {
+          const totalXrun = questBannerRef.current.totalXrun;
+          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          let krwamount = '0 KRW';
+          if (gopaxPrice && totalXrun > 0) {
+            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
+            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            krwamount = `KRW ${formatted}`;
+          }
+          setTopBannersData({ krwamount, amountasxrun });
+        }, 500);
+        return;
+      }
       setTopBannersLoading(true);
       try {
         let response;
-        if (tab === 'pending' || tab === 'quest') {
-          response = await fetchADXRUNTopBanners(member);
-        } else {
-          response = await fetchADXRUNTopBannersSettled(member);
-        }
+        response = await fetchADXRUNTopBannersSettled(member);
 
         const responseData = response.data || response;
 
@@ -152,8 +194,7 @@ export const AdWalletScreen = () => {
           const transaction = responseData.transactions[0];
 
           const amountAsXrunNum = parseFloat(transaction.amountasxrun || '0');
-          const flooredAmount = Math.floor(amountAsXrunNum * 100) / 100;
-          const amountasxrun = `${flooredAmount.toFixed(2)} XRUN`;
+          const amountasxrun = `${amountAsXrunNum.toFixed(2)} XRUN`;
 
           let krwamount = '0 KRW';
           if (gopaxPrice && transaction.amountasxrun) {
@@ -342,6 +383,7 @@ export const AdWalletScreen = () => {
         expectedAdRevenueColor: '#707070',
         adRevenueSettlementColor: '#343434',
         extrastr3: item.extrastr3,
+        adName: (item as any).adName || undefined,
       };
     },
     [t, formatDate],
@@ -408,157 +450,51 @@ export const AdWalletScreen = () => {
       const expectedAdRevenueColor = isReviewStatus ? '#cccccc' : '#707070';
       const adRevenueSettlementColor = isReviewStatus ? '#cccccc' : '#343434';
 
-      const translateText = (text: string | undefined): string | undefined => {
-        if (!text) return text;
-
-        let translated = text.trim().replace(/\s+/g, ' ');
-        const originalText = text;
-
-        if (__DEV__) {
-          console.log('[AdWallet] 번역 전 텍스트:', {
-            original: originalText,
-            normalized: translated,
-            language: i18n.language,
-          });
+      const getQuestTitle = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+            return t('screens.adWallet.exclusiveReferralCodeShare') || item.title || '';
+          case 'recommendation':
+            return t('screens.adWallet.referralEventRewardTitle') || item.title || '';
+          case 'attendance':
+            return t('screens.adWallet.attendanceCheck') || item.title || '';
+          default:
+            return item.title || '';
         }
-
-        if (translated === '초대를 받은 지인이 신규 가입을 완료하면, 초대자와 신규 가입자 두 분 모두에게 5 XRUN의 보상을 드립니다.') {
-          return t('screens.adWallet.referralInviteDescription');
-        }
-
-        if (translated === '추천인 이벤트 보상을 받으세요' || translated.includes('추천인 이벤트 보상을 받으세요')) {
-          return t('screens.adWallet.referralEventRewardReceive');
-        }
-
-        if (translated === '심사중인 추천인 이벤트입니다' || translated.includes('심사중인 추천인 이벤트입니다')) {
-          return t('screens.adWallet.referralEventUnderReview');
-        }
-
-        if (translated.includes('보상') && translated.includes('지급이') && translated.includes('완료된') && translated.includes('추천인 이벤트') && translated.includes('입니다')) {
-          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
-        }
-
-        if (translated === '보상 지급이 완료된 추천인 이벤트입니다' || translated.trim() === '보상 지급이 완료된 추천인 이벤트입니다') {
-          return t('screens.adWallet.rewardPaymentCompletedReferralEvent');
-        }
-
-        if (translated === '추천인 이벤트 보상') {
-          return t('screens.adWallet.referralEventReward');
-        }
-
-        if (translated === '로그인, 접속시에 출석 보상을 드립니다') {
-          return t('screens.adWallet.attendanceRewardOnLogin');
-        }
-
-        if (translated === '전용 레퍼럴 코드를 지인에게 공유하기') {
-          return t('screens.adWallet.exclusiveReferralCodeShare');
-        }
-
-        if (translated === '출석체크하기' || translated === '출석 체크하기') {
-          return t('screens.adWallet.attendanceCheckDo');
-        }
-
-        if (translated === '소개 이벤트 보상을 받으세요') {
-          return t('screens.adWallet.referralEventRewardTitle');
-        }
-
-        if (translated === '추천인 이벤트 보상 받기') {
-          return t('screens.adWallet.referralEventRewardTitle');
-        }
-
-        if (translated.includes('보상을 받으세요')) {
-          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상 받기')) {
-          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('출석보상')) {
-          translated = translated.replace(/출석보상/g, t('screens.adWallet.attendanceCheckCompletedReward'));
-        }
-
-        if (translated.includes('정산완료')) {
-          translated = translated.replace(/정산완료/g, t('screens.adWallet.settled'));
-        }
-
-        if (translated.includes('추천인 이벤트')) {
-          translated = translated.replace(/추천인 이벤트/g, t('screens.adWallet.referralEvent'));
-        }
-
-        if (translated.includes('소개 이벤트')) {
-          translated = translated.replace(/소개 이벤트/g, t('screens.adWallet.referralEvent'));
-        }
-
-        if (translated.includes('추천인초대보상')) {
-          translated = translated.replace(/추천인초대보상/g, t('screens.adWallet.referralInviteReward'));
-        }
-
-        if (translated.includes('출석체크') && !translated.includes('출석체크하기') && !translated.includes('출석 체크하기')) {
-          translated = translated.replace(/출석체크|출석 체크/g, t('screens.adWallet.attendanceCheck'));
-        }
-
-        if (translated.includes('전용 레퍼럴 코드') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
-          translated = translated.replace(/전용 레퍼럴 코드/g, t('screens.adWallet.exclusiveReferralCode'));
-        }
-
-        if (translated.includes('지인에게 공유하기') && !translated.includes('전용 레퍼럴 코드를 지인에게 공유하기')) {
-          translated = translated.replace(/지인에게 공유하기/g, t('screens.adWallet.shareWithAcquaintances'));
-        }
-
-        if (translated.includes('심사중')) {
-          translated = translated.replace(/심사중/g, t('screens.adWallet.pending'));
-        }
-
-        if (translated.includes('완료된')) {
-          translated = translated.replace(/완료된/g, t('screens.adWallet.completedPast'));
-        }
-
-        if (translated.includes('완료')) {
-          translated = translated.replace(/완료/g, t('screens.adWallet.completed'));
-        }
-
-        if (translated.includes('지급이 완료된')) {
-          translated = translated.replace(/지급이 완료된/g, t('screens.adWallet.paymentCompleted'));
-        }
-
-        if (translated.includes('지급이')) {
-          translated = translated.replace(/지급이/g, t('screens.adWallet.paymentIs'));
-        }
-
-        if (translated.includes('입니다')) {
-          translated = translated.replace(/입니다/g, t('screens.adWallet.is'));
-        }
-
-        if (translated.includes('보상을 받으세요')) {
-          translated = translated.replace(/보상을 받으세요/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상 받기')) {
-          translated = translated.replace(/보상 받기/g, t('screens.adWallet.receiveReward'));
-        }
-
-        if (translated.includes('보상') && !translated.includes('보상을 받으세요') && !translated.includes('보상 받기')) {
-          translated = translated.replace(/보상/g, t('screens.adWallet.reward'));
-        }
-
-        if (__DEV__ && originalText !== translated) {
-          console.log('[AdWallet] 번역 후 텍스트:', {
-            original: originalText,
-            translated,
-            language: i18n.language,
-          });
-        }
-
-        return translated;
       };
 
-      const displayTitle = isReferralEvent && !isReferralInvite 
-        ? t('screens.adWallet.referralEventRewardTitle')
-        : translateText(item.title);
+      const getQuestDescription = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+            return t('screens.adWallet.referralInviteDescription') || item.description || '';
+          case 'recommendation':
+            if (item.event_status === 'review' && (Number(item.reward_amount) || 0) === 0)
+              return t('screens.adWallet.referralEventUnderReview') || item.description || '';
+            return item.description || t('screens.adWallet.referralEventReward') || '';
+          case 'attendance':
+            if (item.is_rewarded)
+              return t('screens.adWallet.attendanceRewardCompleted') || item.description || '';
+            return t('screens.adWallet.attendanceRewardOnLogin') || item.description || '';
+          default:
+            return item.description || '';
+        }
+      };
 
-      const displayDescription = translateText(item.description);
-      const displayRewardDescription = translateText(item.reward_description);
+      const getQuestRewardDesc = (): string => {
+        switch (item.event_type) {
+          case 'recommendation_invite':
+          case 'recommendation':
+            return t('screens.adWallet.referralEvent') || item.reward_description || '';
+          case 'attendance':
+            return t('screens.adWallet.attendanceCheckCompletedReward') || item.reward_description || '';
+          default:
+            return item.reward_description || '';
+        }
+      };
+
+      const displayTitle = getQuestTitle();
+      const displayDescription = getQuestDescription();
+      const displayRewardDescription = getQuestRewardDesc();
 
       return {
         id: item.id,
@@ -596,32 +532,50 @@ export const AdWalletScreen = () => {
         item.action === 3304 ? t('screens.adWallet.settled') : t('screens.adWallet.conditionNotMet');
       const date = formatDate(item.datetime);
 
-      let expectedAdRevenue = '0 XRUN';
-      expectedAdRevenue = `${item.expected} XRUN`;
+      const extrastr3 = (item as any).extrastr3 || null;
+      let typeLabel = '';
+      if (extrastr3 === '출석보상') typeLabel = t('screens.adWallet.attendanceCheckLabel');
+      else if (extrastr3 === '추천인이벤트') typeLabel = t('screens.adWallet.referralRewardLabel');
+      else if (extrastr3 === 'zone1-instant') typeLabel = t('screens.adWallet.playZone1Reward');
+      else if (extrastr3 === 'zone2-instant') typeLabel = t('screens.adWallet.playZone2Reward');
 
       let adRevenueSettlement = '0.00 XRUN';
       if (item.amountasxrun) {
         const settlementNum = parseFloat(item.amountasxrun);
-        const flooredSettlement = Math.floor(settlementNum * 100) / 100;
-        adRevenueSettlement = `${flooredSettlement.toFixed(2)} XRUN`;
+        const flooredSettlement = Math.floor(settlementNum * 10000) / 10000;
+
+        const formatted = flooredSettlement % 1 === 0 || Math.round(flooredSettlement * 100) / 100 === flooredSettlement
+          ? flooredSettlement.toFixed(2)
+          : parseFloat(flooredSettlement.toFixed(4)).toString();
+        adRevenueSettlement = `${formatted} XRUN`;
       }
+
+      let expectedAdRevenue = '0 XRUN';
+      expectedAdRevenue = typeLabel ? `${typeLabel}` : `${item.expected} XRUN`;
 
       const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';
       const adRevenueSettlementColor =
         status === t('screens.adWallet.settled') ? '#111111' : '#343434';
 
       return {
-        id: item.id,
+        id: item.id || item.transaction,
         status,
         date,
         expectedAdRevenue,
         adRevenueSettlement,
         expectedAdRevenueColor,
         adRevenueSettlementColor,
+        extrastr3,
+        extrastr4: (item as any).extrastr4 || undefined,
       };
     },
     [t, formatDate],
   );
+
+  const pendingTotalRef = useRef<number>(0);
+  const pendingBannerRef = useRef<{ totalXrun: number; updated: boolean }>({ totalXrun: 0, updated: false });
+
+  const questBannerRef = useRef<{ totalXrun: number; updated: boolean }>({ totalXrun: 0, updated: false });
 
   const fetchPendingData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<AdEntry>> => {
@@ -638,15 +592,19 @@ export const AdWalletScreen = () => {
 
         const estimateAdEntries: AdEntry[] = estimateItems.map(convertEstimateToAdEntry);
 
-        const filteredEstimateAdEntries = estimateAdEntries.filter((entry) => {
+        const pageSum = estimateItems.reduce((sum: number, item: any) => {
+          const val = parseFloat(item.amountasxrun || '0');
+          const floored = Math.floor(val * 100) / 100;
+          return sum + (isNaN(floored) ? 0 : floored);
+        }, 0);
 
-          if (entry.title) {
-            return false;
-          }
-          return true;
-        });
+        if (params.page === 1) {
+          pendingTotalRef.current = pageSum;
+        } else {
+          pendingTotalRef.current += pageSum;
+        }
 
-        const allAdEntries = filteredEstimateAdEntries;
+        pendingBannerRef.current = { totalXrun: pendingTotalRef.current, updated: true };
 
         let hasMore = false;
         if (pagination) {
@@ -656,8 +614,8 @@ export const AdWalletScreen = () => {
         }
 
         return {
-          data: allAdEntries,
-          total: allAdEntries.length,
+          data: estimateAdEntries,
+          total: estimateAdEntries.length,
           hasMore,
         };
       } catch (error: any) {
@@ -849,6 +807,19 @@ export const AdWalletScreen = () => {
           제거된항목수: sortedAdEntries.length - filteredByDate.length,
         });
 
+        const availableSum = filteredByDate.reduce((sum: number, entry: AdEntry) => {
+
+          const isAttRewarded = isAttendanceQuest(entry) && entry.is_rewarded === true;
+
+          const isRefReview = entry.isReferralEvent && !entry.isReferralInvite && entry.eventStatus === 'review';
+
+          if (entry.isReferralInvite) return sum;
+          if (isAttRewarded || isRefReview) return sum;
+          const val = parseFloat(entry.expectedAdRevenue || '0');
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
+        questBannerRef.current = { totalXrun: availableSum, updated: true };
+
         return {
           data: filteredByDate,
           total: filteredByDate.length,
@@ -870,35 +841,18 @@ export const AdWalletScreen = () => {
 
       try {
         const response = await fetchADXRUNResultList(member, params.page);
-
         const responseData = response.data || response;
         const items = responseData.items || responseData || [];
         const pagination = responseData.pagination;
-
-        console.log('🔍 [fetchSettledData] responseData:', responseData);
-
         const adEntries: AdEntry[] = items.map(convertResultToAdEntry);
-
-        let hasMore = false;
-        if (pagination) {
-          hasMore = pagination.hasNextPage || false;
-        } else {
-          hasMore = items.length > 0 && items.length >= params.pageSize;
-        }
-
-        console.log('🔍 [fetchSettledData] adEntries:', response);
-
-        return {
-          data: adEntries,
-          total: adEntries.length,
-          hasMore,
-        };
+        const hasMore = pagination ? (pagination.hasNextPage || false) : (items.length > 0 && items.length >= params.pageSize);
+        return { data: adEntries, total: adEntries.length, hasMore };
       } catch (error: any) {
         console.error('Failed to fetch settled data:', error);
         return { data: [], total: 0, hasMore: false };
       }
     },
-    [member, convertResultToAdEntry],
+    [member, convertResultToAdEntry, t],
   );
 
   const handleTabChange = useCallback((value: TabValue) => {
@@ -975,15 +929,25 @@ export const AdWalletScreen = () => {
       try {
         setIsJoiningQuest(true);
 
-        const canShowAdRef = Platform.OS === 'android' ? isAdMobReady() : isPangleReadySync();
-        if (canShowAdRef) {
-          try {
-            console.log('[AdWallet] 추천인 이벤트 광고 준비 완료 (Platform:', Platform.OS, ')');
-            const deviceInfo = await collectDeviceInfo();
-            const memberStr = member.toString();
+        let pangleReadyForReferral = isPangleReadySync();
+        if (!pangleReadyForReferral) {
+          console.log('[AdWallet] 추천인 이벤트: Pangle 즉시 준비 아님 → initializePangle 후 재확인');
+          await initializePangle();
+          pangleReadyForReferral = await isPangleReady();
+        }
 
-            const onRewardedRef = async (reward: { type: string; amount: number }) => {
-                console.log('[AdWallet] 추천인 이벤트 광고 보상 수령:', reward);
+        if (pangleReadyForReferral) {
+          try {
+            console.log('[AdWallet] Pangle 광고 준비 완료 (Platform:', Platform.OS, ')');
+
+            const deviceInfo = await collectDeviceInfo();
+
+            await loadAndShowRewardedAd(
+              getPangleRewardedAdUnitId(),
+              member.toString(),
+              deviceInfo,
+              async (reward) => {
+                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 보상 수령:', reward);
 
                 try {
 
@@ -1003,7 +967,7 @@ export const AdWalletScreen = () => {
                       return;
                     }
 
-                    questId = recommendationEventId;
+                    questId = `recommendation_${recommendationEventId}` as any;
                   } else {
                     questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                     if (isNaN(questId) || questId === 0) {
@@ -1039,16 +1003,17 @@ export const AdWalletScreen = () => {
                 } finally {
                   setIsJoiningQuest(false);
                 }
-            };
+              },
+              () => {
 
-            const onAdClosedRef = () => {
-                console.log('[AdWallet] 추천인 이벤트 광고 닫힘 (시청 미완료)');
+                console.log('[AdWallet] 추천인 이벤트 Pangle 광고 닫힘 (시청 미완료)');
                 setIsJoiningQuest(false);
-            };
+              },
+              (error) => {
 
-            const onAdFailedRef = (error: Error) => {
-                console.error('[AdWallet] 추천인 이벤트 광고 로드 실패:', error);
+                console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error);
                 showToast(t('screens.adWallet.adLoadFailedForReward'));
+
                 (async () => {
                   try {
                     let questId: number;
@@ -1064,7 +1029,7 @@ export const AdWalletScreen = () => {
                         return;
                       }
 
-                      questId = recommendationEventId;
+                      questId = `recommendation_${recommendationEventId}` as any;
                     } else {
                       questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                       if (isNaN(questId) || questId === 0) {
@@ -1091,22 +1056,17 @@ export const AdWalletScreen = () => {
                     } else {
                       showToast(response.message || '처리에 실패했습니다.');
                     }
-                  } catch (err) {
-                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', err);
+                  } catch (error) {
+                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
                     showToast('처리에 실패했습니다. 다시 시도해주세요.');
                   } finally {
                     setIsJoiningQuest(false);
                   }
                 })();
-            };
-
-            if (Platform.OS === 'android') {
-              await loadAndShowRewardedAdAdMob(undefined, memberStr, deviceInfo, onRewardedRef, onAdClosedRef, onAdFailedRef);
-            } else {
-              await loadAndShowRewardedAd(getPangleRewardedAdUnitId(), memberStr, deviceInfo, onRewardedRef, onAdClosedRef, onAdFailedRef);
-            }
+              }
+            );
           } catch (error) {
-            console.error('[AdWallet] 추천인 이벤트 광고 표시 오류:', error);
+            console.error('[AdWallet] 추천인 이벤트 Pangle 광고 표시 오류:', error);
 
             try {
               let questId: number;
@@ -1122,7 +1082,7 @@ export const AdWalletScreen = () => {
                   return;
                 }
 
-                questId = recommendationEventId;
+                questId = `recommendation_${recommendationEventId}` as any;
               } else {
                 questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                 if (isNaN(questId) || questId === 0) {
@@ -1172,7 +1132,7 @@ export const AdWalletScreen = () => {
                 return;
               }
 
-              questId = recommendationEventId;
+              questId = `recommendation_${recommendationEventId}` as any;
             } else {
               questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
               if (isNaN(questId) || questId === 0) {
@@ -1218,80 +1178,103 @@ export const AdWalletScreen = () => {
       (typeof item.id === 'string' && item.id.startsWith('attendance_'));
 
     if (isAttendanceQuest) {
+      console.log('[AdWallet] 출석체크 클릭', { id: item.id, eventType: item.eventType, is_rewarded: item.is_rewarded });
 
       if (item.is_rewarded === true) {
+        console.log('[AdWallet] 출석체크 이미 수령 완료 → 클릭 무시');
         showToast(t('screens.adWallet.attendanceCheckAlreadyCompleted'));
         return;
       }
 
       setIsJoiningQuest(true);
 
-      const canShowAd = Platform.OS === 'android' ? isAdMobReady() : isPangleReadySync();
-      if (canShowAd) {
+      let pangleReady = isPangleReadySync();
+      if (!pangleReady) {
+        console.log('[AdWallet] 출석체크: Pangle 즉시 준비 아님 → initializePangle 후 재확인');
+        await initializePangle();
+        pangleReady = await isPangleReady();
+      }
+      console.log('[AdWallet] 출석체크 Pangle 준비:', pangleReady, 'Platform:', Platform.OS);
+
+      if (pangleReady) {
         try {
-          console.log('[AdWallet] 출석체크 광고 준비 완료 (Platform:', Platform.OS, ')');
+          console.log('[AdWallet] 출석체크 Pangle 광고 표시 시도 (loadAndShowRewardedAd 호출 직전)');
+
           const deviceInfo = await collectDeviceInfo();
-          const memberStr = member.toString();
 
-          const onRewarded = async (reward: { type: string; amount: number }) => {
-            console.log('[AdWallet] 출석체크 광고 보상 수령:', reward);
-            try {
-              const response = await joinQuest(
-                { quest_id: item.id, member },
-                undefined,
-              );
-              if (response.status === 'success') {
-                showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                if (questListRef.current) questListRef.current.reloadData();
-              } else {
-                showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
-              }
-            } catch (error) {
-              console.error('[AdWallet] 출석 체크 참여 오류:', error);
-              showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-            } finally {
-              setIsJoiningQuest(false);
-            }
-          };
+          await loadAndShowRewardedAd(
+            getPangleRewardedAdUnitId(),
+            member.toString(),
+            deviceInfo,
+            async (reward) => {
+              console.log('[AdWallet] 출석체크 Pangle 광고 보상 수령:', reward);
 
-          const onAdClosed = () => {
-            console.log('[AdWallet] 출석체크 광고 닫힘 (시청 미완료)');
-            setIsJoiningQuest(false);
-          };
+              try {
 
-          const onAdFailed = (error: Error) => {
-            console.error('[AdWallet] 출석체크 광고 로드 실패:', error);
-            showToast(t('screens.adWallet.adLoadFailedForAttendance'));
-            joinQuest({ quest_id: item.id, member }, undefined)
-              .then((response) => {
+                const questId = item.id;
+                const response = await joinQuest(
+                  {
+                    quest_id: questId,
+                    member,
+                  },
+                  undefined, 
+                );
+
                 if (response.status === 'success') {
                   showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
-                  if (questListRef.current) questListRef.current.reloadData();
+
+                  if (questListRef.current) {
+                    questListRef.current.reloadData();
+                  }
                 } else {
                   showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
                 }
-              })
-              .catch((e) => {
-                console.error('[AdWallet] 출석 체크 참여 오류:', e);
+              } catch (error) {
+                console.error('[AdWallet] 출석 체크 참여 오류:', error);
                 showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-              })
-              .finally(() => setIsJoiningQuest(false));
-          };
+              } finally {
+                setIsJoiningQuest(false);
+              }
+            },
+            () => {
 
-          if (Platform.OS === 'android') {
-            await loadAndShowRewardedAdAdMob(undefined, memberStr, deviceInfo, onRewarded, onAdClosed, onAdFailed);
-          } else {
-            await loadAndShowRewardedAd(
-              getPangleRewardedAdUnitId(),
-              memberStr,
-              deviceInfo,
-              onRewarded,
-              onAdClosed,
-              onAdFailed,
-            );
-          }
+              console.log('[AdWallet] 출석체크 Pangle 광고 닫힘 (시청 미완료)');
+              setIsJoiningQuest(false);
+            },
+            (error) => {
+
+              console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
+              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
+
+              const questId = item.id;
+              joinQuest(
+                {
+                  quest_id: questId,
+                  member,
+                },
+                undefined,
+              )
+                .then((response) => {
+                  if (response.status === 'success') {
+                    showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+                    if (questListRef.current) {
+                      questListRef.current.reloadData();
+                    }
+                  } else {
+                    showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
+                  }
+                })
+                .catch((error) => {
+                  console.error('[AdWallet] 출석 체크 참여 오류:', error);
+                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
+                })
+                .finally(() => {
+                  setIsJoiningQuest(false);
+                });
+            }
+          );
         } catch (error) {
-          console.error('[AdWallet] 출석체크 광고 표시 오류:', error);
+          console.error('[AdWallet] 출석체크 Pangle 광고 표시 오류:', error);
 
           try {
             const questId = item.id;
@@ -1350,7 +1333,11 @@ export const AdWalletScreen = () => {
   }, [tab, member, goBack, t, userEmail, showAlert]);
 
   const summaryLabel = useMemo(
-    () => (tab === 'pending' || tab === 'quest' ? t('screens.adWallet.expectedAmount') : t('screens.adWallet.confirmedAmount')),
+    () => {
+      if (tab === 'quest') return t('screens.adWallet.obtainableAmount');
+      if (tab === 'pending') return t('screens.adWallet.expectedAmount');
+      return t('screens.adWallet.confirmedAmount');
+    },
     [tab, t],
   );
 
@@ -1365,8 +1352,8 @@ export const AdWalletScreen = () => {
 
   const AdEntryItem: React.FC<AdEntry & { onPress?: () => void; tab?: TabValue }> = (item) => {
 
-    const isQuest = !!item.title || item.extrastr3 === '추천인이벤트';
     const { onPress, tab: itemTab, ...itemData } = item;
+    const isQuest = (itemTab === 'pending' || itemTab === 'settled') ? false : (!!item.title || item.extrastr3 === '추천인이벤트');
 
     const isAttendanceQuest = item.eventType === 'attendance' ||
       (typeof item.id === 'string' && item.id.startsWith('attendance_'));
@@ -1470,7 +1457,14 @@ export const AdWalletScreen = () => {
               </Text>
             </View>
           )
-        ) : item.extrastr3 === '출석보상' ? (
+        ) : (itemTab === 'settled' && item.extrastr3 === '출석보상') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.attendanceCheckLabel')}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab !== 'pending' && item.extrastr3 === '출석보상') ? (
           <View style={styles.adCardRow}>
             <Text style={[
               styles.adCardRowLabel,
@@ -1486,14 +1480,34 @@ export const AdWalletScreen = () => {
               {item.expectedAdRevenue}
             </Text>
           </View>
-        ) : item.extrastr3 === '추천인이벤트' ? (
-
+        ) : (itemTab === 'settled' && item.extrastr3 === '추천인이벤트') ? (
+          <View style={styles.adCardRow}>
+            <Text style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? t('screens.adWallet.referralRewardWithName', { name: item.extrastr4 }) : t('screens.adWallet.referralRewardLabel')}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab === 'settled' && item.extrastr3 === 'zone1-instant') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.playZone1Reward')}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab === 'settled' && item.extrastr3 === 'zone2-instant') ? (
+          <View style={styles.adCardRow}>
+            <Text style={styles.adCardRowLabel}>{t('screens.adWallet.playZone2Reward')}</Text>
+            <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
+              {item.adRevenueSettlement}
+            </Text>
+          </View>
+        ) : (itemTab !== 'pending' && item.extrastr3 === '추천인이벤트') ? (
           <View style={styles.adCardRow}>
             <Text style={[
               styles.adCardRowLabel,
               isDisabled && { color: disabledColor }
             ]}>
-              추천인초대보상
+              {t('screens.adWallet.referralInviteReward')}
             </Text>
             <Text style={[
               styles.adCardRowAmount,
@@ -1505,6 +1519,12 @@ export const AdWalletScreen = () => {
           </View>
         ) : (
           <>
+            {}
+            {itemTab === 'pending' && item.adName && (
+              <Text style={[styles.adCardRowLabel, { maxWidth: '70%', marginBottom: 4 }]} numberOfLines={1} ellipsizeMode="tail">
+                {item.adName}
+              </Text>
+            )}
             {}
             {itemTab !== 'settled' && (
               <View style={styles.adCardRow}>
@@ -1527,7 +1547,7 @@ export const AdWalletScreen = () => {
                 </Text>
               </View>
             )}
-            {!isQuest && item.extrastr3 !== '출석보상' && (
+            {!isQuest && item.extrastr3 !== '출석보상' && itemTab === 'settled' && (
               <View style={styles.adCardRow}>
                 <Text style={styles.adCardRowLabel}>{t('screens.adWallet.adRevenueSettlement')}</Text>
                 <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
@@ -1569,7 +1589,7 @@ export const AdWalletScreen = () => {
                   </View>
                   <Text style={styles.summaryLabel}>{summaryLabel}</Text>
                 </View>
-                <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>
+                {tab === 'pending' && <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>}
               </View>
               <Text style={styles.summaryValue}>
                 {topBannersLoading ? '...' : topBannersData.amountasxrun}

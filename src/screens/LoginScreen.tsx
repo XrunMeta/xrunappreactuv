@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Clipboard from 'expo-clipboard';
 import { useTranslation } from 'react-i18next';
 import {
   FormCheckbox,
@@ -24,6 +25,7 @@ import {
 import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { setAyetUserId } from '../services/ayet';
+import { bindAdisonUid } from '../services/adison';
 import {
   loginWithEmailPassword,
   encryptSHA256,
@@ -35,6 +37,7 @@ import {
   signInWithApple,
   connectAppleAccount,
   showNativeScreen,
+  registerPushToken,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -98,29 +101,62 @@ export const LoginScreen = () => {
   };
 
   useEffect(() => {
-    const loadRememberedEmail = async () => {
+    const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+
+    const loadInitialEmail = async () => {
+      let prefilled = '';
+
       try {
         const remembered = await AsyncStorage.getItem('rememberMe');
         if (remembered === 'true') {
           const savedEmail = await AsyncStorage.getItem('userEmail');
           if (savedEmail) {
+            prefilled = savedEmail;
             setEmail(savedEmail);
             setRememberMe(true);
             console.log('[로그인] 저장된 이메일 불러오기 성공:', savedEmail);
           }
         } else {
-
           setRememberMe(true);
           setOtpRememberMe(true);
         }
       } catch (error) {
         console.error('[로그인] 저장된 이메일 불러오기 실패:', error);
-
         setRememberMe(true);
         setOtpRememberMe(true);
       }
+
+      if (!prefilled) {
+        try {
+          const pending = await AsyncStorage.getItem('pendingPrefillEmail');
+          if (pending && isValidEmail(pending)) {
+            prefilled = pending;
+            setEmail(pending);
+            setOtpEmail(pending);
+            console.log('[로그인] 딥링크 prefillEmail 적용:', pending);
+          }
+          await AsyncStorage.removeItem('pendingPrefillEmail');
+        } catch (err) {
+          console.warn('[로그인] pendingPrefillEmail 읽기 실패:', err);
+        }
+      }
+
+      if (!prefilled) {
+        try {
+          const clip = await Clipboard.getStringAsync();
+          const trimmed = clip?.trim() ?? '';
+          if (trimmed && isValidEmail(trimmed)) {
+            prefilled = trimmed;
+            setEmail(trimmed);
+            setOtpEmail(trimmed);
+            console.log('[로그인] 클립보드 이메일 자동 입력:', trimmed);
+          }
+        } catch (err) {
+          console.warn('[로그인] 클립보드 읽기 실패:', err);
+        }
+      }
     };
-    loadRememberedEmail();
+    loadInitialEmail();
   }, []);
 
   const toggleRememberMe = () => {
@@ -238,6 +274,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email.trim());
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -260,6 +303,10 @@ export const LoginScreen = () => {
       }
 
       console.log('[로그인] 로그인 성공');
+
+      if (userData.member) {
+        registerPushToken(userData.member, navigate).catch(() => {});
+      }
 
       navigate(ROUTES.map);
     } catch (error) {
@@ -341,6 +388,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', userEmail);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
 
       const sessionToken = userData.extrastr || '';
       await AsyncStorage.setItem('userSessionToken', sessionToken);
@@ -455,6 +509,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
@@ -462,6 +523,10 @@ export const LoginScreen = () => {
       console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[구글 로그인] 사용자 정보 저장 완료');
+
+      if (memberId) {
+        registerPushToken(memberId, navigate).catch(() => {});
+      }
 
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
       navigate(ROUTES.map);
@@ -596,6 +661,13 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       if (userData.member != null) setAyetUserId(String(userData.member));
+      if (userData.member != null) {
+
+        bindAdisonUid(userData.member, {
+          gender: (userData as any).gender,
+          age: (userData as any).age,
+        });
+      }
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
@@ -605,6 +677,10 @@ export const LoginScreen = () => {
       console.log('[애플 로그인] 로그인 상태 유지 저장 완료');
 
       console.log('[애플 로그인] 사용자 정보 저장 완료');
+
+      if (memberId) {
+        registerPushToken(memberId, navigate).catch(() => {});
+      }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
       navigate(ROUTES.map);

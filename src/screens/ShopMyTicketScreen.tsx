@@ -30,12 +30,25 @@ const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any):
       ? `txID_${txIDStr}_item_${itemStr}_idx_${index}`
       : `item_${itemStr}_idx_${index}`;
 
+  const rawDate: string | undefined = (item as any).datetime || (item as any).dateupdate;
+  let purchaseDateLabel = '';
+  if (rawDate) {
+    const d = new Date(String(rawDate).replace(' ', 'T') + 'Z');
+    if (!isNaN(d.getTime())) {
+      const pad = (n: number) => String(n).padStart(2, '0');
+      purchaseDateLabel = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    } else {
+      purchaseDateLabel = String(rawDate);
+    }
+  }
+
   return {
 
     ...item,
 
     id: uniqueId,
     title: item.title || '',
+    subtitle: purchaseDateLabel,
     priceLabel: '', 
     detailTotal: quantityLabel,
     image: imageSource,
@@ -265,6 +278,7 @@ export const ShopMyTicketScreen = () => {
                   <ShopItemCard
                     key={item.id}
                     title={item.title}
+                    subtitle={(item as any).subtitle}
                     priceLabel={item.priceLabel}
                     imageSource={imageSource}
                     quantityLabel={item.detailTotal}

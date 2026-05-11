@@ -112,7 +112,8 @@ export const ReferralMyGroupScreen = () => {
 
             membersDataRef.current = members;
             setAllMembers(members);
-            setTotalMembers(members.length);
+
+            setTotalMembers((response as any).total8Depth ?? members.length);
             hasLoadedRef.current = true;
             setIsLoading(false);
           } else {

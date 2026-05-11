@@ -50,6 +50,13 @@ export default {
   referralEventRewardReceive: 'कृपया रेफरल इवेंट पुरस्कार प्राप्त करें',
   referralEventUnderReview: 'यह समीक्षा के अधीन एक रेफरल इवेंट है',
   referralEventReward: 'रेफरल इवेंट पुरस्कार',
+  attendanceCheckLabel: 'उपस्थिति',
+  referralRewardLabel: 'रेफरल पुरस्कार',
+  referralRewardWithName: 'रेफरल पुरस्कार ({{name}})',
+  playZone1Reward: 'PLAY ZONE1 पुरस्कार',
+  playZone2Reward: 'PLAY ZONE2 पुरस्कार',
+  obtainableAmount: 'प्राप्य राशि',
+  attendanceRewardCompleted: 'उपस्थिति पुरस्कार भुगतान पूर्ण',
 };
 
 

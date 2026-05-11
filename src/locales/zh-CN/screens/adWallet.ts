@@ -51,5 +51,12 @@ export default {
   referralEventRewardReceive: '请领取推荐活动奖励',
   referralEventUnderReview: '这是审核中的推荐活动',
   referralEventReward: '推荐活动奖励',
+  attendanceCheckLabel: '签到',
+  referralRewardLabel: '推荐奖励',
+  referralRewardWithName: '推荐奖励({{name}})',
+  playZone1Reward: 'PLAY ZONE1 奖励',
+  playZone2Reward: 'PLAY ZONE2 奖励',
+  obtainableAmount: '可获得金额',
+  attendanceRewardCompleted: '签到奖励已发放',
 };
 

@@ -24,6 +24,7 @@ export const MyinfoShopSalesScreen = () => {
     item: string | null;
     title: string | null;
     price: number;
+    priceKRW: number;
     priceXrun: number;
     participantCount: number;
     totalSales: number;
@@ -37,6 +38,7 @@ export const MyinfoShopSalesScreen = () => {
     item: null,
     title: null,
     price: 0,
+    priceKRW: 0,
     priceXrun: 0,
     participantCount: 0,
     totalSales: 0,
@@ -134,21 +136,23 @@ export const MyinfoShopSalesScreen = () => {
         setIsLoading(true);
         const response = await getItemInfo(shopmember, navigate);
 
-        if (response.status === 'success' && response.data) {
-          const itemTitle = response.data.title;
+        const itemData = Array.isArray(response.data) ? response.data[0] : response.data;
+        if (response.status === 'success' && itemData) {
+          const itemTitle = itemData.title;
           setItemInfo({
-            item: response.data.item || null,
+            item: itemData.item || null,
             title: itemTitle && itemTitle.trim() ? itemTitle : null,
-            price: response.data.price || 0,
-            priceXrun: response.data.priceXrun || 0,
-            participantCount: response.data.participantCount || 0,
-            totalSales: response.data.totalSales || 0,
-            totalSalesXrun: response.data.totalSalesXrun || 0,
-            description: response.data.description,
-            maxpurchase: response.data.maxpurchase,
-            image: response.data.image || null,
-            thumbnail: response.data.thumbnail || null,
-            sdk: response.data.sdk || null,
+            price: itemData.price || 0,
+            priceKRW: itemData.priceKRW || 0,
+            priceXrun: itemData.priceXrun || 0,
+            participantCount: itemData.participantCount || 0,
+            totalSales: itemData.totalSales || 0,
+            totalSalesXrun: itemData.totalSalesXrun || 0,
+            description: itemData.description,
+            maxpurchase: itemData.maxpurchase,
+            image: itemData.image || null,
+            thumbnail: itemData.thumbnail || null,
+            sdk: itemData.sdk || null,
           });
         } else {
 
@@ -156,6 +160,7 @@ export const MyinfoShopSalesScreen = () => {
             item: null,
             title: null,
             price: 0,
+            priceKRW: 0,
             priceXrun: 0,
             participantCount: 0,
             totalSales: 0,
@@ -168,6 +173,7 @@ export const MyinfoShopSalesScreen = () => {
           item: null,
           title: null,
           price: 0,
+          priceKRW: 0,
           priceXrun: 0,
           participantCount: 0,
           totalSales: 0,
@@ -261,6 +267,7 @@ export const MyinfoShopSalesScreen = () => {
         item: itemInfo.item,
         title: itemInfo.title,
         price: itemInfo.price,
+        priceKRW: itemInfo.priceKRW,
         priceXrun: itemInfo.priceXrun,
         description: itemInfo.description || '',
         maxpurchase: itemInfo.maxpurchase || 1,

@@ -50,6 +50,13 @@ export default {
   referralEventRewardReceive: 'กรุณารับรางวัลกิจกรรมแนะนำ',
   referralEventUnderReview: 'นี่คือกิจกรรมแนะนำที่อยู่ระหว่างการตรวจสอบ',
   referralEventReward: 'รางวัลกิจกรรมแนะนำ',
+  attendanceCheckLabel: 'เช็คอิน',
+  referralRewardLabel: 'รางวัลแนะนำ',
+  referralRewardWithName: 'รางวัลแนะนำ ({{name}})',
+  playZone1Reward: 'รางวัล PLAY ZONE1',
+  playZone2Reward: 'รางวัล PLAY ZONE2',
+  obtainableAmount: 'จำนวนเงินที่ได้รับ',
+  attendanceRewardCompleted: 'จ่ายรางวัลเช็คอินแล้ว',
 };
 
 

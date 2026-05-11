@@ -16,22 +16,11 @@ interface TutorialItem {
   image: any;
 }
 
-const tutorialData: TutorialItem[] = [
-  {
-    id: 1,
-    text: '광고에 참여하고 XRUN 리워드를 받아보세요',
-    image: require('../../assets/title2.png'),
-  },
-  {
-    id: 2,
-    text: '획득한 XRUN으로 Shop을 이용할 수 있어요',
-    image: require('../../assets/title3.png'),
-  },
-  {
-    id: 3,
-    text: '레퍼럴 코드 공유로 XRUN 리워드 20%를 더 획득하세요',
-    image: require('../../assets/title1.png'),
-  },
+const tutorialKeys = ['tutorial1', 'tutorial2', 'tutorial3'] as const;
+const tutorialImages = [
+  require('../../assets/title2.png'),
+  require('../../assets/title3.png'),
+  require('../../assets/title1.png'),
 ];
 
 export const LoginSignupScreen = () => {
@@ -59,6 +48,12 @@ export const LoginSignupScreen = () => {
     const page = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setCurrentPage(page);
   };
+
+  const tutorialData: TutorialItem[] = tutorialKeys.map((key, idx) => ({
+    id: idx + 1,
+    text: t(`screens.loginSignup.${key}`),
+    image: tutorialImages[idx],
+  }));
 
   const renderTutorialItem = ({ item }: { item: TutorialItem }) => (
     <View style={styles.tutorialItem}>
