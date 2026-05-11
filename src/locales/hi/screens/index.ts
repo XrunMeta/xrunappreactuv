@@ -59,3 +59,4 @@ export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleA
 
 
 export { default as paymentPin } from './paymentPin';
+export { default as emailOtp } from './emailOtp';

@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, PaymentPinGate } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -86,8 +86,9 @@ export const WalletSendScreen = () => {
 
   const [memberId, setMemberId] = useState<string | null>(null);
   const [memberLimit, setMemberLimit] = useState<number | null>(null);
+  const [memberEmail, setMemberEmail] = useState<string>('');
 
-  const [showPinGate, setShowPinGate] = useState(false);
+  const [showOtpGate, setShowOtpGate] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -275,6 +276,7 @@ export const WalletSendScreen = () => {
           if (userData.member) {
             const member = String(userData.member);
             setMemberId(member);
+            if (userData.email) setMemberEmail(String(userData.email));
 
             if (selectedWalletAsset?.currency) {
               try {
@@ -514,14 +516,21 @@ export const WalletSendScreen = () => {
       return;
     }
 
+    if (!memberEmail) {
+      setWalletSendAddress(trimmedAddress);
+      setWalletSendAmount(cleanAmount);
+      navigate(ROUTES.walletEstimate);
+      return;
+    }
+
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
 
-    setShowPinGate(true);
+    setShowOtpGate(true);
   };
 
-  const handlePinSuccess = () => {
-    setShowPinGate(false);
+  const handleOtpSuccess = () => {
+    setShowOtpGate(false);
     navigate(ROUTES.walletEstimate);
   };
 
@@ -535,11 +544,11 @@ export const WalletSendScreen = () => {
       <Header title={t('screens.walletSend.title')} onBackPress={handleBackPress} showBackButton />
 
       {}
-      {showPinGate && (
-        <PaymentPinGate
-          memberId={memberId}
-          onSuccess={handlePinSuccess}
-          onCancel={() => setShowPinGate(false)}
+      {showOtpGate && memberEmail && (
+        <EmailOtpGate
+          email={memberEmail}
+          onSuccess={handleOtpSuccess}
+          onCancel={() => setShowOtpGate(false)}
         />
       )}
 

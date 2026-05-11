@@ -59,3 +59,4 @@ export { default as xrunInfo } from './xrunInfo';
 export { default as xplayInfo } from './xplayInfo';
 export { default as pangleList } from './pangleList';
 export { default as paymentPin } from './paymentPin';
+export { default as emailOtp } from './emailOtp';
