@@ -18,6 +18,8 @@
 		A1B2C3D4E5F60718293A4B5D1  = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C1 ; };
 		B2C3D4E5F60718293A4B5C6E1  = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6D1 ; };
 		C1D2E3F405162738495A5B6C7  = {isa = PBXBuildFile; fileRef = C1D2E3F405162738495A5B6D7 ; };
+		D1E2F3A4B5C6D7E8F9A0B1C1  = {isa = PBXBuildFile; fileRef = D1E2F3A4B5C6D7E8F9A0B1C2 ; };
+		D1E2F3A4B5C6D7E8F9A0B1C3  = {isa = PBXBuildFile; fileRef = D1E2F3A4B5C6D7E8F9A0B1C4 ; };
 
 		13B07F961A680F5B00A75B9A  = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A  = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = XRUN/Images.xcassets; sourceTree = "<group>"; };
@@ -37,6 +39,8 @@
 		A1B2C3D4E5F60718293A4B5C1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AyetOfferwallModule.swift; path = XRUN/AyetOfferwallModule.swift; sourceTree = "<group>"; };
 		B2C3D4E5F60718293A4B5C6D1  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AyetOfferwallModule.m; path = XRUN/AyetOfferwallModule.m; sourceTree = "<group>"; };
 		C1D2E3F405162738495A5B6D7  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = XRUNAyetOfferwallPresenter.swift; path = XRUN/XRUNAyetOfferwallPresenter.swift; sourceTree = "<group>"; };
+		D1E2F3A4B5C6D7E8F9A0B1C2  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdisonModule.swift; path = XRUN/AdisonModule.swift; sourceTree = "<group>"; };
+		D1E2F3A4B5C6D7E8F9A0B1C4  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AdisonModule.m; path = XRUN/AdisonModule.m; sourceTree = "<group>"; };
 
 		13B07F8C1A680F5B00A75B9A  = {
 			isa = PBXFrameworksBuildPhase;
@@ -57,6 +61,8 @@
 				A1B2C3D4E5F60718293A4B5C1 ,
 				B2C3D4E5F60718293A4B5C6D1 ,
 				C1D2E3F405162738495A5B6D7 ,
+				D1E2F3A4B5C6D7E8F9A0B1C2 ,
+				D1E2F3A4B5C6D7E8F9A0B1C4 ,
 				BB2F792B24A3F905000567C9 ,
 				13B07FB51A68108700A75B9A ,
 				13B07FB61A68108700A75B9A ,
@@ -372,6 +378,8 @@
 				A1B2C3D4E5F60718293A4B5D1 ,
 				B2C3D4E5F60718293A4B5C6E1 ,
 				C1D2E3F405162738495A5B6C7 ,
+				D1E2F3A4B5C6D7E8F9A0B1C1 ,
+				D1E2F3A4B5C6D7E8F9A0B1C3 ,
 				F7E0C62AD8FABDD0C696A613 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
