@@ -127,7 +127,7 @@ class AdisonModule: NSObject {
         reject("NO_ROOT_VC", "No root view controller", nil)
         return
       }
-      Adison.shared.presentOfferwall(from: rootVC, adId: adId.intValue, keepParent: keepParent)
+      Adison.shared.presentOfferwall(from: rootVC, adId: adId, keepParent: keepParent)
       resolve(true)
     }
   }
