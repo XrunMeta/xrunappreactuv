@@ -26,7 +26,7 @@ const zone2Image = require('../../assets/images/zone2.png');
 const zone3Image = require('../../assets/images/zone3.png');
 const questImage = require('../../assets/images/quest.png');
 
-const SHOW_ZONE3 = false;
+const SHOW_ZONE3 = true;
 
 export const XplayInfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
