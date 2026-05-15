@@ -31,6 +31,7 @@ export default {
     loginError: '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
     idTokenMissing: 'ID 토큰을 받지 못했습니다. 다시 시도해주세요.',
     identityTokenMissing: 'Identity 토큰을 받지 못했습니다. 다시 시도해주세요.',
+    googleLoginFailed: '구글 로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
   },
 };
 

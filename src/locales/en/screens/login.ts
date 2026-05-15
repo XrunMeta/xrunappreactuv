@@ -31,6 +31,7 @@ export default {
     loginError: 'An error occurred during login. Please try again',
     idTokenMissing: 'Failed to receive ID token. Please try again.',
     identityTokenMissing: 'Failed to receive Identity token. Please try again.',
+    googleLoginFailed: 'An error occurred during Google sign-in. Please try again.',
   },
 };
 

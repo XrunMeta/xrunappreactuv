@@ -31,6 +31,7 @@ export default {
     loginError: '登录时发生错误，请重试',
     idTokenMissing: '未能接收 ID 令牌。请重试。',
     identityTokenMissing: '未能接收 Identity 令牌。请重试。',
+    googleLoginFailed: '谷歌登录时发生错误。请重试。',
   },
 };
 

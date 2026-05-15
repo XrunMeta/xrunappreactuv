@@ -31,6 +31,7 @@ export default {
     loginError: 'เกิดข้อผิดพลาดระหว่างการเข้าสู่ระบบ กรุณาลองอีกครั้ง',
     idTokenMissing: 'ไม่สามารถรับโทเค็น ID ได้ กรุณาลองอีกครั้ง',
     identityTokenMissing: 'ไม่สามารถรับโทเค็น Identity ได้ กรุณาลองอีกครั้ง',
+    googleLoginFailed: 'เกิดข้อผิดพลาดขณะลงชื่อเข้าใช้ Google โปรดลองอีกครั้ง',
   },
 };
 

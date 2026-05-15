@@ -31,6 +31,7 @@ export default {
     loginError: 'Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại',
     idTokenMissing: 'Không nhận được mã thông báo ID. Vui lòng thử lại.',
     identityTokenMissing: 'Không nhận được mã thông báo Identity. Vui lòng thử lại.',
+    googleLoginFailed: 'Đã xảy ra lỗi trong khi đăng nhập Google. Vui lòng thử lại.',
   },
 };
 

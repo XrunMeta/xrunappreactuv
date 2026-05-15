@@ -434,7 +434,16 @@ export const LoginScreen = () => {
       const result = await signInWithGoogle(navigate);
 
       if (!result.success || !result.data) {
-        const errorMessage = result.message || '구글 로그인에 실패했습니다.';
+
+        if (result.code === 'USER_CANCELLED' || result.code === 'IN_PROGRESS') {
+          setIsLoading(false);
+          return;
+        }
+
+        const errorMessage = result.message
+          || t('screens.login.errors.googleLoginFailed')
+          || t('common.messages.unknownError')
+          || '오류가 발생했습니다.';
         await showAlert(t('common.messages.error') || '오류', errorMessage);
         setIsLoading(false);
         return;
@@ -532,9 +541,12 @@ export const LoginScreen = () => {
       navigate(ROUTES.map);
     } catch (error: any) {
       console.error('[구글 로그인] 오류:', error);
+
       await showAlert(
         t('common.messages.error') || '오류',
-        error.message || '구글 로그인 중 오류가 발생했습니다.',
+        t('screens.login.errors.googleLoginFailed')
+          || t('common.messages.unknownError')
+          || '구글 로그인 중 오류가 발생했습니다.',
       );
     } finally {
       setIsLoading(false);
