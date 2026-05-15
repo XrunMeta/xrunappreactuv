@@ -26,7 +26,7 @@ const v_3ce185 = require('../../assets/images/zone2.png');
 const v_d80408 = require('../../assets/images/zone3.png');
 const v_3d184e = require('../../assets/images/quest.png');
 
-const v_06e388 = true;
+const v_06e388 = false;
 
 export const v_305be8 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
