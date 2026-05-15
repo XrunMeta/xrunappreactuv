@@ -8,7 +8,8 @@
     "ios": "node scripts/set-local-ip.js && npx expo run:ios",
     "web": "npx expo start --web",
     "ota:ios": "node scripts/build-ota-ios.js",
-    "ota:android": "node scripts/build-ota-android.js"
+    "ota:android": "node scripts/build-ota-android.js",
+    "eas-build-pre-install": "node scripts/eas-build-pre-install.js"
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.4.1",
