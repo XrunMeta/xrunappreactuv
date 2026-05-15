@@ -56,11 +56,11 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "33"
+      "buildNumber": "34"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 286,
+      "versionCode": 287,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -78,7 +78,6 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
-        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",

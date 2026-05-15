@@ -192,11 +192,7 @@ export const ShopItemRegisterScreen = () => {
 
   const handleImagePicker = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(t('screens.shopItemRegister.alerts.permissionRequired'), t('screens.shopItemRegister.alerts.permissionMessage'));
-        return;
-      }
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
