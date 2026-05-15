@@ -192,11 +192,7 @@ export const v_680bee = () => {
 
   const v_85f2b3 = async () => {
     try {
-      const { status: v_d308b5 } = await v_d05ab5.requestMediaLibraryPermissionsAsync();
-      if (v_d308b5 !== 'granted') {
-        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.permissionRequired'), v_8d41d7('screens.shopItemRegister.alerts.permissionMessage'));
-        return;
-      }
+
       const v_43c42e = await v_d05ab5.launchImageLibraryAsync({
         mediaTypes: v_d05ab5.MediaTypeOptions.Images,
         allowsEditing: true,
