@@ -31,6 +31,7 @@ export default {
     loginError: 'Terjadi kesalahan saat masuk. Silakan coba lagi',
     idTokenMissing: 'Gagal menerima token ID. Silakan coba lagi.',
     identityTokenMissing: 'Gagal menerima token Identity. Silakan coba lagi.',
+    googleLoginFailed: 'Terjadi kesalahan saat masuk dengan Google. Silakan coba lagi.',
   },
 };
 

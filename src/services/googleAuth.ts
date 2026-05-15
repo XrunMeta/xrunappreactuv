@@ -278,30 +278,35 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
   } catch (v_5e9bfe) {
     console.error('[구글 로그인] 에러:', v_5e9bfe);
 
-    if (v_5e9bfe.code === v_8d3720.SIGN_IN_CANCELLED) {
+    const v_b965ce = v_5e9bfe?.code;
+    const v_1bb710 = [v_8d3720?.SIGN_IN_CANCELLED, 'SIGN_IN_CANCELLED', '-5', 12501];
+    const v_f21254 = [v_8d3720?.IN_PROGRESS, 'IN_PROGRESS'];
+    const v_965dad = [v_8d3720?.PLAY_SERVICES_NOT_AVAILABLE, 'PLAY_SERVICES_NOT_AVAILABLE'];
+
+    if (v_1bb710.includes(v_b965ce)) {
       return {
         success: false,
         code: 'USER_CANCELLED',
-        message: '사용자가 로그인을 취소했습니다.',
+        message: '', 
       };
-    } else if (v_5e9bfe.code === v_8d3720.IN_PROGRESS) {
+    } else if (v_f21254.includes(v_b965ce)) {
       return {
         success: false,
         code: 'IN_PROGRESS',
-        message: '이미 로그인 진행 중입니다.',
+        message: '',
       };
-    } else if (v_5e9bfe.code === v_8d3720.PLAY_SERVICES_NOT_AVAILABLE) {
+    } else if (v_965dad.includes(v_b965ce)) {
       return {
         success: false,
         code: 'PLAY_SERVICES_NOT_AVAILABLE',
-        message: 'Google Play Services를 사용할 수 없습니다.',
+        message: '',
       };
     }
 
     return {
       success: false,
       code: 'UNKNOWN_ERROR',
-      message: v_5e9bfe.message || '알 수 없는 오류가 발생했습니다.',
+      message: '', 
     };
   }
 }

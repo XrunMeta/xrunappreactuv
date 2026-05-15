@@ -434,7 +434,16 @@ export const v_f4f851 = () => {
       const v_43c42e = await v_2683ec(v_9b57fc);
 
       if (!v_43c42e.success || !v_43c42e.data) {
-        const v_1744b9 = v_43c42e.message || '구글 로그인에 실패했습니다.';
+
+        if (v_43c42e.code === 'USER_CANCELLED' || v_43c42e.code === 'IN_PROGRESS') {
+          v_deef62(false);
+          return;
+        }
+
+        const v_1744b9 = v_43c42e.message
+          || v_8d41d7('screens.login.errors.googleLoginFailed')
+          || v_8d41d7('common.messages.unknownError')
+          || '오류가 발생했습니다.';
         await v_889fad(v_8d41d7('common.messages.error') || '오류', v_1744b9);
         v_deef62(false);
         return;
@@ -532,9 +541,12 @@ export const v_f4f851 = () => {
       v_9b57fc(v_ce4741.map);
     } catch (v_5e9bfe) {
       console.error('[구글 로그인] 오류:', v_5e9bfe);
+
       await v_889fad(
         v_8d41d7('common.messages.error') || '오류',
-        v_5e9bfe.message || '구글 로그인 중 오류가 발생했습니다.',
+        v_8d41d7('screens.login.errors.googleLoginFailed')
+          || v_8d41d7('common.messages.unknownError')
+          || '구글 로그인 중 오류가 발생했습니다.',
       );
     } finally {
       v_deef62(false);
