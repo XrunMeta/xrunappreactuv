@@ -232,6 +232,20 @@ const v_e4d665 = async (v_c65f5d) => {
   }
 };
 
+export const v_23dd22 = async (): Promise<string> => {
+  const v_56b352 = await v_e84827.getItem('jwt');
+  if (v_56b352) return `Bearer ${v_56b352}`;
+  const v_c9c489 = v_e4a763();
+  return `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+};
+
+export const v_964a96 = async (v_8f00b9): Promise<void> => {
+  const v_56b352 = v_8f00b9?.data?.jwt;
+  if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
+    await v_e84827.setItem('jwt', v_56b352);
+  }
+};
+
 export const v_d61bb8 = async (
   v_f71b56,
   v_b36f96 = {},
@@ -455,9 +469,7 @@ export type CreateAxiosInstanceOptions = {
 };
 
 export const v_7488d5 = (v_c65f5d, v_b36f96) => {
-  const v_c9c489 = v_e4a763();
   const v_fed274 = v_b36f96?.baseURL ?? v_755eb9();
-  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
   console.log(
     '[createAxiosInstance] API baseURL:',
@@ -471,12 +483,14 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
     timeout: v_8a74cb,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${v_36dd9e}`,
+
     },
   });
 
   v_0c3a5b.interceptors.request.use(
-    (v_74a79c) => {
+    async (v_74a79c) => {
+
+      v_74a79c.headers.Authorization = await v_23dd22();
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -537,7 +551,11 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
                 if (v_627a1e !== 'content-type' && v_627a1e !== 'contenttype') {
                   try {
                     v_6f3521.setRequestHeader(v_b24339, v_558750.headers[v_b24339]);
-                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${v_b24339} = ${v_558750.headers[v_b24339]}`);
+                    if (__DEV__) {
+
+                      const v_5dacf0 = v_627a1e === 'authorization' ? '[REDACTED]' : v_558750.headers[v_b24339];
+                      console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${v_b24339} = ${v_5dacf0}`);
+                    }
                   } catch (v_9e86fd) {
                     console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${v_b24339}`, v_9e86fd);
                   }
@@ -617,7 +635,12 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
         }
 
-        console.log('[API Request] 최종 헤더:', JSON.stringify(v_74a79c.headers, null, 2));
+        if (__DEV__) {
+          const v_9ff8b3 = { ...(v_74a79c.headers as Record<string, unknown>) };
+          if ('Authorization' in v_9ff8b3) v_9ff8b3.Authorization = '[REDACTED]';
+          if ('authorization' in v_9ff8b3) v_9ff8b3.authorization = '[REDACTED]';
+          console.log('[API Request] 최종 헤더:', JSON.stringify(v_9ff8b3, null, 2));
+        }
         console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
@@ -864,6 +887,8 @@ export const v_9d2541 = async (
     const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', v_43c42e ? '성공' : '실패');
 
+    await v_964a96(v_3393e3);
+
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[회원가입 4단계] 로그인 확인 실패:', v_5e9bfe);
@@ -921,6 +946,8 @@ export const v_b699a9 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일/비밀번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', v_3393e3.data);
     }
@@ -974,6 +1001,8 @@ export const v_508a17 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 비밀번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', v_3393e3.data);
     }
@@ -1222,6 +1251,8 @@ export const v_7e0a86 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 전화번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 전화번호 로그인 실패:', v_3393e3.data);
     }
@@ -1359,6 +1390,8 @@ export const v_a81308 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일 인증 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 이메일 인증 로그인 실패:', v_3393e3.data);
     }
@@ -1405,6 +1438,8 @@ export const v_32502f = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] Google ID Token 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', v_3393e3.data);
     }
