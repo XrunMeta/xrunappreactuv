@@ -184,17 +184,21 @@ export const WalletSendScreen = () => {
 
   useEffect(() => {
     if (walletSendAddress && walletSendAddress.trim() && showEditModal) {
-      setModalAddress(walletSendAddress);
-      resetWalletSendAddress();
+      if (walletSendAddress !== modalAddress) {
+        setModalAddress(walletSendAddress);
+        resetWalletSendAddress();
+      }
     }
-  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress, modalAddress]);
 
   useEffect(() => {
     if (walletSendAddress && walletSendAddress.trim() && !showEditModal) {
-      setReceiverAddress(walletSendAddress);
-      resetWalletSendAddress(); 
+      if (walletSendAddress !== receiverAddress) {
+        setReceiverAddress(walletSendAddress);
+        resetWalletSendAddress(); 
+      }
     }
-  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress, receiverAddress]);
 
   const loadAddressBook = useCallback(async () => {
     try {
