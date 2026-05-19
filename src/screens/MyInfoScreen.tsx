@@ -289,6 +289,7 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('userTickets');
               await AsyncStorage.removeItem('rageProgressLastUpdate');
               await AsyncStorage.removeItem('userSessionToken');
+              await AsyncStorage.removeItem('jwt'); 
 
               await AsyncStorage.removeItem('appleSignupCompleted');
               await AsyncStorage.removeItem('appleSignupCompletedEmail');
@@ -309,6 +310,7 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('userTickets');
                 await AsyncStorage.removeItem('rageProgressLastUpdate');
                 await AsyncStorage.removeItem('userSessionToken');
+                await AsyncStorage.removeItem('jwt'); 
 
                 await AsyncStorage.removeItem('appleSignupCompleted');
                 await AsyncStorage.removeItem('appleSignupCompletedEmail');
