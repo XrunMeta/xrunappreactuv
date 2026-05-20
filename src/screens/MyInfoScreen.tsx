@@ -281,6 +281,7 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('userTickets');
               await AsyncStorage.removeItem('rageProgressLastUpdate');
               await AsyncStorage.removeItem('userSessionToken');
+              await AsyncStorage.removeItem('jwt'); 
 
               await AsyncStorage.removeItem('appleSignupCompleted');
               await AsyncStorage.removeItem('appleSignupCompletedEmail');
@@ -288,6 +289,8 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('appleSignupEmail');
               await AsyncStorage.removeItem('googleSignupRequired');
               await AsyncStorage.removeItem('googleSignupEmail');
+
+              await AsyncStorage.removeItem('wallets');
 
               reset(ROUTES.login);
             } catch (error) {
@@ -301,6 +304,7 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('userTickets');
                 await AsyncStorage.removeItem('rageProgressLastUpdate');
                 await AsyncStorage.removeItem('userSessionToken');
+                await AsyncStorage.removeItem('jwt'); 
 
                 await AsyncStorage.removeItem('appleSignupCompleted');
                 await AsyncStorage.removeItem('appleSignupCompletedEmail');
@@ -308,6 +312,8 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('appleSignupEmail');
                 await AsyncStorage.removeItem('googleSignupRequired');
                 await AsyncStorage.removeItem('googleSignupEmail');
+
+                await AsyncStorage.removeItem('wallets');
               } catch (storageError) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
               }
