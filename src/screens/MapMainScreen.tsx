@@ -34,7 +34,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification } from '../components';
+import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification, WalletKeyPinSetupModal } from '../components';
 
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -46,6 +46,7 @@ import { useOTAUpdate } from '../context/OTAUpdateContext';
 import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
+import { jwtPayloadSub, findEntry } from '../services/walletKeyStore';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -345,6 +346,9 @@ export const MapMainScreen: React.FC = () => {
 
   const failedPreFetchCampidsRef = useRef<Set<string>>(new Set());
 
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinModalProps, setPinModalProps] = useState<{ memberId: number; email: string } | null>(null);
+
   useEffect(() => {
     const loadFailedCampids = async () => {
       try {
@@ -360,6 +364,63 @@ export const MapMainScreen: React.FC = () => {
       }
     };
     loadFailedCampids();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    let prevAppState: string = AppState.currentState;
+
+    const checkWalletPinSetup = async () => {
+      try {
+
+        const jwt = await AsyncStorage.getItem('jwt');
+        const memberId = jwt ? jwtPayloadSub(jwt) : null;
+
+        let emailRaw = await AsyncStorage.getItem('userEmail');
+        if (!emailRaw) {
+          try {
+            const ud = await AsyncStorage.getItem('userData');
+            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+          } catch {
+
+          }
+        }
+
+        if (memberId == null || !emailRaw) return;
+
+        const entry = await findEntry(emailRaw, memberId);
+
+        if (cancelled) return;
+        if (entry && entry.s === 's0' && !entry.h) {
+
+          const email = emailRaw.toLowerCase().trim();
+
+          setPinModalProps((prev) => {
+            if (prev && prev.memberId === memberId && prev.email === email) return prev;
+            return { memberId, email };
+          });
+          setShowPinModal(true);
+        }
+
+      } catch {
+
+      }
+    };
+
+    checkWalletPinSetup();
+
+    const sub = AppState.addEventListener('change', (nextState) => {
+      const wasBackground = !!prevAppState.match(/inactive|background/);
+      const isNowActive = nextState === 'active';
+      prevAppState = nextState;
+      if (wasBackground && isNowActive) {
+        checkWalletPinSetup();
+      }
+    });
+    return () => {
+      cancelled = true;
+      sub.remove();
+    };
   }, []);
 
   const startPreFetchAdUrls = useCallback(async (ads: any[]) => {
@@ -3585,6 +3646,19 @@ export const MapMainScreen: React.FC = () => {
 
         </View>
 
+      )}
+
+      {}
+      {pinModalProps != null && (
+        <WalletKeyPinSetupModal
+          memberId={pinModalProps.memberId}
+          email={pinModalProps.email}
+          visible={showPinModal}
+          onSuccess={() => {
+            setShowPinModal(false);
+            setPinModalProps(null);
+          }}
+        />
       )}
 
     </View>
