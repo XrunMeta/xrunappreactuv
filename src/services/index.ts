@@ -250,6 +250,20 @@ const handleTimeoutError = async (navigation?: any) => {
   }
 };
 
+export const getAuthHeader = async (): Promise<string> => {
+  const jwt = await AsyncStorage.getItem('jwt');
+  if (jwt) return `Bearer ${jwt}`;
+  const env = getEnv();
+  return `Bearer ${env.GATEWAY_AUTH_CODE}`;
+};
+
+export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
+  const jwt = res?.data?.jwt;
+  if (typeof jwt === 'string' && jwt.split('.').length === 3) {
+    await AsyncStorage.setItem('jwt', jwt);
+  }
+};
+
 export const apiRequest = async (
   url: string,
   options: RequestInit = {},
@@ -473,9 +487,7 @@ export type CreateAxiosInstanceOptions = {
 };
 
 export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInstanceOptions) => {
-  const env = getEnv();
   const baseURL = options?.baseURL ?? getApiBaseUrl();
-  const authCode = env.GATEWAY_AUTH_CODE;
 
   console.log(
     '[createAxiosInstance] API baseURL:',
@@ -489,12 +501,14 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
     timeout: API_TIMEOUT,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${authCode}`,
+
     },
   });
 
   instance.interceptors.request.use(
-    (config) => {
+    async (config) => {
+
+      config.headers.Authorization = await getAuthHeader();
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -555,7 +569,11 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
                 if (lowerKey !== 'content-type' && lowerKey !== 'contenttype') {
                   try {
                     xhr.setRequestHeader(key, adapterConfig.headers[key]);
-                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${key} = ${adapterConfig.headers[key]}`);
+                    if (__DEV__) {
+
+                      const safeValue = lowerKey === 'authorization' ? '[REDACTED]' : adapterConfig.headers[key];
+                      console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${key} = ${safeValue}`);
+                    }
                   } catch (e) {
                     console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${key}`, e);
                   }
@@ -635,7 +653,12 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
         }
 
-        console.log('[API Request] 최종 헤더:', JSON.stringify(config.headers, null, 2));
+        if (__DEV__) {
+          const safeHeaders = { ...(config.headers as Record<string, unknown>) };
+          if ('Authorization' in safeHeaders) safeHeaders.Authorization = '[REDACTED]';
+          if ('authorization' in safeHeaders) safeHeaders.authorization = '[REDACTED]';
+          console.log('[API Request] 최종 헤더:', JSON.stringify(safeHeaders, null, 2));
+        }
         console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
@@ -882,6 +905,8 @@ export const checkLogin = async (
     const result = response.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', result ? '성공' : '실패');
 
+    await saveJwtIfPresent(response);
+
     await fetchAndSaveWallets();
 
     return result;
@@ -941,6 +966,8 @@ export const loginWithEmailPassword = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 이메일/비밀번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', response.data);
     }
@@ -996,6 +1023,8 @@ export const loginWithPassword = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 비밀번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', response.data);
     }
@@ -1246,6 +1275,8 @@ export const loginWithMobile = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 전화번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 전화번호 로그인 실패:', response.data);
     }
@@ -1385,6 +1416,8 @@ export const loginWithEmailAuth = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 이메일 인증 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 이메일 인증 로그인 실패:', response.data);
     }
@@ -1433,6 +1466,8 @@ export const loginWithGoogleIdToken = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] Google ID Token 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', response.data);
     }
