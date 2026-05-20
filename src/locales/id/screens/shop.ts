@@ -11,6 +11,8 @@ export default {
   used: 'Digunakan',
   availableShort: 'Tersedia',
   usedShort: 'Digunakan',
+  shopBrand: 'Belanja',
+  thankYou: 'Terima kasih',
   noPurchasedCoupons: 'Tidak ada kupon yang dibeli.',
   loadingGiftList: 'Memuat daftar kartu hadiah...',
   loadingCouponList: 'Memuat daftar kupon...',

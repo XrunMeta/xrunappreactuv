@@ -10,6 +10,7 @@ import {
   LoginScreen,
   LoginSignupScreen,
   SignupScreen,
+  ForgotPasswordScreen,
   SplashScreen,
   TermsScreen,
   PrivacyPolicyScreen,
@@ -357,6 +358,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (currentScreen === 'forgotPassword') {
+    return <ForgotPasswordScreen />;
   }
 
   if (currentScreen === 'countryCodeSelect') {

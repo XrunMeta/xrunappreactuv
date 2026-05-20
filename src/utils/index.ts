@@ -146,19 +146,10 @@ export const shareReferralLink = async (
 
     let shareOptions: { message: string; url?: string; title?: string };
 
-    if (Platform.OS === 'ios') {
-
-      shareOptions = {
-        message,
-        url: deepLinkUrl,
-        title: shareText,
-      };
-    } else {
-
-      shareOptions = {
-        message,
-      };
-    }
+    shareOptions = {
+      message,
+      title: shareText,
+    };
 
     console.log('[shareReferralLink] Share API 호출 시작:', shareOptions);
 

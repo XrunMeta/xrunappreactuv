@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: 'हटाए गए आइटम अब प्रदर्शित नहीं होंगे, लेकिन खरीद रिकॉर्ड बनाए रखे जाएंगे।',
   deleteSuccess: 'आइटम हटा दिया गया है।',
   deleteFailed: 'आइटम हटाने में विफल।',
+  approved: 'स्वीकृत',
+  pending: 'लंबित',
 };
-

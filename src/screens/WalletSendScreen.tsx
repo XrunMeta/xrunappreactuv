@@ -467,35 +467,6 @@ export const WalletSendScreen = () => {
     setSendAmount(selectedWalletAsset?.amount || '0');
   };
 
-  const isConfirmEnabled = useMemo(() => {
-
-    const hasAddress = receiverAddress && receiverAddress.trim().length > 0;
-    const isValidAddress = receiverAddress?.startsWith('0x');
-    if (!hasAddress || !isValidAddress) {
-      return false;
-    }
-
-    const cleanAmount = removeCommas(sendAmount);
-    const amount = new BigNumber(cleanAmount || '0');
-    if (amount.lte(0)) {
-      return false;
-    }
-
-    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
-    if (amount.gt(balance)) {
-      return false;
-    }
-
-    if (memberLimit !== null) {
-      const limitAmount = new BigNumber(memberLimit);
-      if (amount.gt(limitAmount)) {
-        return false;
-      }
-    }
-
-    return true;
-  }, [receiverAddress, sendAmount, selectedWalletAsset?.amount, memberLimit, removeCommas]);
-
   const handleConfirm = async () => {
     const cleanAmount = removeCommas(sendAmount);
     const trimmedAddress = receiverAddress.trim();
@@ -517,6 +488,14 @@ export const WalletSendScreen = () => {
     const amount = new BigNumber(cleanAmount || '0');
     if (amount.gt(balance)) {
       await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
+      return;
+    }
+
+    if (memberLimit !== null && amount.gt(new BigNumber(memberLimit))) {
+      await showAlert(
+        t('screens.walletSend.alerts.insufficientBalance'),
+        `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
+      );
       return;
     }
 
@@ -586,34 +565,37 @@ export const WalletSendScreen = () => {
           </View>
         </View>
         <View style={styles.helperContainer}>
-          <Text style={styles.helperAmount}>
-            {(() => {
-              const cleanAmount = removeCommas(sendAmount);
-              const amount = new BigNumber(cleanAmount || '0');
-              if (amount.gt(0)) {
-                let price = 0;
-                const currency = selectedWalletAsset?.currency;
+          {(() => {
+            const cleanAmount = removeCommas(sendAmount);
+            const amount = new BigNumber(cleanAmount || '0');
+            if (amount.lte(0)) {
 
-                if (currency === 1 || currency === 18) {
+              const hasValidAddress = receiverAddress && receiverAddress.trim().length > 0 && receiverAddress.startsWith('0x');
+              const hintText = !hasValidAddress
+                ? '먼저 받는 분의 지갑 주소를 입력해주세요'
+                : '보낼 금액을 입력해주세요';
+              return <Text style={styles.helperHintText}>{hintText}</Text>;
+            }
 
-                  price = gopaxPrice;
-                } else if (currency === 16) {
-
-                  price = cryptoPrices?.POL?.price_krw || 0;
-                } else if (currency === 2) {
-
-                  price = cryptoPrices?.ETH?.price_krw || 0;
-                }
-
-                if (price > 0) {
-                  const krwAmount = amount.multipliedBy(price);
-                  return krwAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }
-              }
-              return '0';
-            })()}
-          </Text>
-          <Text style={styles.helperText}>KRW</Text>
+            let price = 0;
+            const currency = selectedWalletAsset?.currency;
+            if (currency === 1 || currency === 18) {
+              price = gopaxPrice;
+            } else if (currency === 16) {
+              price = cryptoPrices?.POL?.price_krw || 0;
+            } else if (currency === 2) {
+              price = cryptoPrices?.ETH?.price_krw || 0;
+            }
+            const krwDisplay = price > 0
+              ? amount.multipliedBy(price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              : '0';
+            return (
+              <>
+                <Text style={styles.helperAmount}>{krwDisplay}</Text>
+                <Text style={styles.helperText}>KRW</Text>
+              </>
+            );
+          })()}
         </View>
         {}
         <TouchableOpacity onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
@@ -818,7 +800,6 @@ export const WalletSendScreen = () => {
             title={t('screens.walletSend.confirm')}
             fullWidth
             onPress={handleConfirm}
-            disabled={!isConfirmEnabled}
           />
         </View>
       </View>
@@ -1018,6 +999,12 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
+  },
+  helperHintText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#a3aab8',
+    textAlign: 'center',
   },
   availableBalanceContainer: {
     flexDirection: 'row',

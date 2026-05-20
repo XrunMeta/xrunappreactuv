@@ -31,6 +31,10 @@ interface MyItemData {
     item?: number;
 
     couponImgUrl?: string;
+
+    sortKey: number;
+
+    isTransferTicket?: boolean;
 }
 
 function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
@@ -60,8 +64,16 @@ function formatPurchaseDate(raw?: string): string {
 
 function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
 
-  const imageUrl = c.coupon_img_url || c.image_url;
-  const image: ImageSourcePropType = imageUrl ? { uri: imageUrl } : defaultCouponImage;
+  const candidates = [c.image_url, c.coupon_img_url];
+  const validUrl = candidates.find((u) => typeof u === 'string' && /^https?:\/\//i.test(u));
+  if (!validUrl) {
+    console.log('[MyItems] 기본 이미지 fallback:', { tr_id: c.tr_id, image_url: c.image_url, coupon_img_url: c.coupon_img_url });
+  }
+  const image: ImageSourcePropType = validUrl ? { uri: validUrl } : defaultCouponImage;
+
+  const trDigits = (c.tr_id ?? '').match(/\d{8}_?\d{0,6}/)?.[0]?.replace(/\D/g, '') ?? '';
+  const pdDigits = (c.purchase_date ?? '').replace(/\D/g, '');
+  const sortKey = Number(trDigits || pdDigits || 0);
   return {
     id: c.tr_id,
     tr_id: c.tr_id,
@@ -72,26 +84,40 @@ function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
     purchaseDate: formatPurchaseDate(c.purchase_date),
     type: 'giftishow',
     couponImgUrl: c.coupon_img_url || undefined,
+    sortKey,
   };
 }
 
 function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemData {
-  const image: ImageSourcePropType =
-    p.icon && (typeof p.icon === 'string' && p.icon.startsWith('http'))
-      ? { uri: p.icon }
-      : defaultCouponImage;
+
+  const rawImg = (p as any).image || (p as any).thumbnail || (p as any).icon;
+  const imgUri = rawImg && typeof rawImg === 'string' && /^https?:\/\//i.test(rawImg) ? rawImg : null;
+  if (!imgUri) {
+    console.log('[MyItems-XRUN] 기본 이미지 fallback:', { storage: p.storage, txID: p.txID, title: p.title, image: (p as any).image, thumbnail: (p as any).thumbnail, icon: (p as any).icon });
+  }
+  const image: ImageSourcePropType = imgUri ? { uri: imgUri } : defaultCouponImage;
   const id = p.storage ? `xrun_${p.storage}_${index}` : `xrun_${p.txID}_${index}`;
+  const dtDigits = String(p.datetime ?? '').replace(/\D/g, '').slice(0, 14);
+  const fallback = Number(p.storage ?? 0) || 0;
+  const sortKey = dtDigits ? Number(dtDigits) : fallback;
+  const itemType = Number((p as any).type ?? 0);
+  const isTransferTicket = itemType === 10151;
+
+  const rawDate = String(p.datetime ?? '').replace('T', ' ').slice(0, 10);
+  const formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate.replace(/-/g, '.') : '-';
   return {
     id,
-    brand: 'XRUN',
+    brand: isTransferTicket ? 'XRUN' : 'SHOP', 
     title: p.title ?? '-',
     image,
     status: p.status === 10306 ? 'available' : 'used',
-    purchaseDate: '-',
+    purchaseDate: formattedDate,
     type: 'xrun',
+    isTransferTicket,
     storage: p.storage,
     txID: p.txID,
     item: p.item,
+    sortKey,
   };
 }
 
@@ -105,6 +131,7 @@ export const ShopMyItemsScreen = () => {
     const [currentMember, setCurrentMember] = useState<string>('');
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
 
     const loadCoupons = useCallback(async () => {
         try {
@@ -135,7 +162,8 @@ export const ShopMyItemsScreen = () => {
                 xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
                     ? xrunRes.data.map((p, i) => xrunPurchasedToMyItemData(p, i))
                     : [];
-            setItems([...xrunList, ...giftishowList]);
+            const merged = [...xrunList, ...giftishowList].sort((a, b) => b.sortKey - a.sortKey);
+            setItems(merged);
         } catch {
             setItems([]);
         } finally {
@@ -233,21 +261,29 @@ export const ShopMyItemsScreen = () => {
 
     const renderItemCard = (item: MyItemData) => {
         const isAvailable = item.status === 'available';
+        const isRemoteImage = item.image && typeof item.image === 'object' && 'uri' in (item.image as any);
+        const displayImage = isRemoteImage && failedImageIds.has(item.id) ? defaultCouponImage : item.image;
 
         return (
             <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemImageContainer}>
                     <Image
-                        source={item.image}
+                        source={displayImage}
                         style={styles.itemImage}
                         resizeMode="contain"
+                        onError={(e) => {
+                            if (isRemoteImage) {
+                                console.log(`[MyItems] 이미지 로드 실패 → 기본 이미지로 대체:`, item.id, (item.image as any)?.uri, e.nativeEvent);
+                                setFailedImageIds((prev) => new Set(prev).add(item.id));
+                            }
+                        }}
                     />
                 </View>
                 <View style={styles.itemContent}>
                     <View style={styles.itemHeader}>
                         <View style={styles.itemInfo}>
                             <View style={styles.itemTitleRow}>
-                                <Text style={styles.itemBrand}>{item.brand}</Text>
+                                <Text style={styles.itemBrand}>{item.brand === 'SHOP' ? t('screens.shop.shopBrand') : item.brand}</Text>
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : styles.statusTagTextUsed]}>
                                         {isAvailable ? t('screens.shop.availableShort') : t('screens.shop.usedShort')}
@@ -260,7 +296,11 @@ export const ShopMyItemsScreen = () => {
                         </View>
                     </View>
                     <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
-                    {isAvailable && (
+                    {isAvailable && item.type === 'xrun' && item.isTransferTicket === false ? (
+                        <View style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}>
+                            <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.thankYou')}</Text>
+                        </View>
+                    ) : isAvailable ? (
                         <TouchableOpacity
                             style={styles.useButton}
                             onPress={() => handleUseItem(item)}
@@ -268,7 +308,7 @@ export const ShopMyItemsScreen = () => {
                         >
                             <Text style={styles.useButtonText}>{t('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
-                    )}
+                    ) : null}
                 </View>
             </View>
         );
@@ -482,16 +522,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     itemImageContainer: {
-        width: 120,
+        width: 96,
         backgroundColor: '#ffffff',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+        paddingHorizontal: 8,
     },
     itemImage: {
-        width: 120,
-        height: 120,
+        width: 80,
+        height: 80,
         alignSelf: 'center',
+        resizeMode: 'contain',
     },
     itemContent: {
         flex: 1,

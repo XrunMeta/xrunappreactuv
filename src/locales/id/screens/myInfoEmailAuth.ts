@@ -2,7 +2,7 @@ export default {
   title: 'Autentikasi Email',
   emailLabel: 'Email',
   emailPlaceholder: 'Masukkan email Anda',
-  sendButton: 'Kirim Kode Verifikasi',
+  sendButton: 'Verifikasi',
   confirmButton: 'Konfirmasi',
   sending: 'Mengirim...',
   alerts: {

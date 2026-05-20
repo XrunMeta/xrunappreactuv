@@ -715,6 +715,61 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
+
+  type RecentAd = Partial<TokenData> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
+  const [recentAds, setRecentAds] = useState<RecentAd[]>([]);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const RECENT_ADS_KEY = 'recentViewedAds';
+  const RECENT_ADS_MAX = 20;
+
+  useEffect(() => {
+    AsyncStorage.getItem(RECENT_ADS_KEY).then((raw) => {
+      if (!raw) return;
+      try {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) setRecentAds(arr);
+      } catch {}
+    }).catch(() => {});
+  }, []);
+
+  const addToRecentAds = useCallback(async (ad: RecentAd) => {
+    if (!ad.campid || !ad.urlAD) return;
+    setRecentAds((prev) => {
+      const filtered = prev.filter((a) => a.campid !== ad.campid);
+      const next = [{ ...ad, viewedAt: Date.now() }, ...filtered].slice(0, RECENT_ADS_MAX);
+      AsyncStorage.setItem(RECENT_ADS_KEY, JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  }, []);
+
+  const handleTokenClickRef = useRef<((t: TokenData) => void) | null>(null);
+  const handleRecentAdClick = useCallback((ad: RecentAd) => {
+    setShowRecentModal(false);
+    if (handleTokenClickRef.current) {
+
+      const token: TokenData = {
+        spotID: (ad as any).spotID ?? 0,
+        x: (ad as any).x ?? 0,
+        y: (ad as any).y ?? 0,
+        xrunPrice: ad.xrunPrice,
+        distance: ad.distance,
+        name: ad.name,
+        iconurl: ad.iconurl,
+        joindesc: ad.joindesc,
+        brand: ad.brand,
+        advertisement: ad.advertisement,
+        coin: ad.coin,
+        member: ad.member,
+        campid: ad.campid,
+        ad_company: ad.ad_company,
+        urlAD: ad.urlAD,
+      };
+      handleTokenClickRef.current(token);
+    } else if (ad.urlAD) {
+
+      Linking.openURL(ad.urlAD).catch((err) => console.warn('[RecentAds] openURL 실패:', err));
+    }
+  }, []);
   const hasAutoAdTriggeredRef = useRef(false); 
 
   const hasRequestedPermissionRef = useRef(false);
@@ -2454,11 +2509,24 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     setSelectedToken(tokenCopy);
     setShowBottomPanel(true); 
 
+    addToRecentAds({
+      ...tokenCopy,
+      campid: String(tokenCopy.campid ?? ''),
+      name: String(tokenCopy.name ?? ''),
+      iconurl: String(tokenCopy.iconurl ?? ''),
+      urlAD: String((tokenCopy as any).urlAD ?? ''),
+      viewedAt: Date.now(),
+    } as RecentAd);
+
     tokenClickTimeoutRef.current = setTimeout(() => {
       tokenClickTimeoutRef.current = null; 
       showAdInModal(tokenCopy);
     }, 2000);
   }, [showAdInModal]);
+
+  useEffect(() => {
+    handleTokenClickRef.current = handleTokenClick;
+  }, [handleTokenClick]);
 
   const bottomNavItems = [
     { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },
@@ -2515,6 +2583,20 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
 }
         </CameraView>
+
+        {}
+        <TouchableOpacity
+          style={styles.recentAdsButton}
+          onPress={() => setShowRecentModal(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="time-outline" size={22} color="#fff" />
+          {recentAds.length > 0 && (
+            <View style={styles.recentAdsBadge}>
+              <Text style={styles.recentAdsBadgeText}>{Math.min(recentAds.length, 99)}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         {}
         {
@@ -2659,7 +2741,19 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                   pointerEvents: 'box-none', 
                 }}>
                 {}
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={async () => {
+                    console.log('=== 패널 본문(아이콘+텍스트) 클릭 ===');
+                    if (autoAdTimeoutRef.current) {
+                      clearTimeout(autoAdTimeoutRef.current);
+                      autoAdTimeoutRef.current = null;
+                    }
+                    hasAutoAdTriggeredRef.current = true;
+                    if (selectedToken) {
+                      await showAdInModal(selectedToken);
+                    }
+                  }}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -2727,7 +2821,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                         : selectedToken?.joindesc}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 {}
                 <TouchableOpacity
@@ -2768,6 +2862,62 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           </Pressable>
         </Animated.View>
       </View>
+
+      {}
+      <Modal
+        visible={showRecentModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowRecentModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.recentModalBackdrop}
+          activeOpacity={1}
+          onPress={() => setShowRecentModal(false)}
+        >
+          <TouchableOpacity activeOpacity={1} style={styles.recentModalSheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.recentModalHeader}>
+              <Text style={styles.recentModalTitle}>🕒 최근 본 광고</Text>
+              <TouchableOpacity onPress={() => setShowRecentModal(false)}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {recentAds.length === 0 ? (
+                <View style={styles.recentEmpty}>
+                  <Text style={styles.recentEmptyText}>최근 본 광고가 없습니다.</Text>
+                </View>
+              ) : (
+                recentAds.map((ad) => {
+                  const minsAgo = Math.floor((Date.now() - ad.viewedAt) / 60000);
+                  const timeText = minsAgo < 1 ? '방금 전' : minsAgo < 60 ? `${minsAgo}분 전` : `${Math.floor(minsAgo / 60)}시간 전`;
+                  return (
+                    <TouchableOpacity
+                      key={`${ad.campid}-${ad.viewedAt}`}
+                      style={styles.recentItemRow}
+                      onPress={() => handleRecentAdClick(ad)}
+                      activeOpacity={0.7}
+                    >
+                      {ad.iconurl ? (
+                        <Image source={{ uri: ad.iconurl }} style={styles.recentItemIcon} resizeMode="cover" />
+                      ) : (
+                        <View style={styles.recentItemIcon} />
+                      )}
+                      <View style={styles.recentItemTextWrap}>
+                        <Text style={styles.recentItemName} numberOfLines={1}>{ad.name || '광고'}</Text>
+                        <Text style={styles.recentItemTime}>{timeText}</Text>
+                      </View>
+                      <View style={styles.recentItemOpenBtn}>
+                        <Text style={styles.recentItemOpenBtnText}>다시 열기</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              )}
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       {}
       {}
@@ -3364,6 +3514,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               onHttpError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView HTTP 오류:', nativeEvent);
+
+                const dead = [404, 410, 451, 455]
+                if (dead.includes(nativeEvent.statusCode)) {
+                  showAlert(
+                    '광고 이용 불가',
+                    '해당 광고는 이미 참여했거나 종료되어 더 이상 참여할 수 없습니다.',
+                    [{ text: '확인', onPress: () => handleWebViewClose() }],
+                  ).catch(() => handleWebViewClose())
+                }
               }}
             />
           ) : null}
@@ -3566,6 +3725,107 @@ const styles = StyleSheet.create({
     height: 25,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  recentAdsButton: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  recentAdsBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  recentAdsBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  recentModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  recentModalSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '70%',
+    paddingBottom: 32,
+  },
+  recentModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  recentModalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+  },
+  recentItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  recentItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  recentItemTextWrap: {
+    flex: 1,
+  },
+  recentItemName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  recentItemTime: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
+  recentItemOpenBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#6C5CE7',
+    borderRadius: 6,
+  },
+  recentItemOpenBtnText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  recentEmpty: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  recentEmptyText: {
+    color: '#999',
+    fontSize: 14,
   },
   mapPinIcon: {
     width: 25,

@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: '削除された商品は表示されなくなりますが、購入記録は維持されます。',
   deleteSuccess: '商品が削除されました。',
   deleteFailed: '商品の削除に失敗しました。',
+  approved: '承認済み',
+  pending: '承認待ち',
 };
-

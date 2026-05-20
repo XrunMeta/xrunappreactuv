@@ -115,18 +115,6 @@ export const WalletTransactionResultScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hashRow}>
-          <Text style={styles.hashValue} numberOfLines={2}>
-            {txHash}
-          </Text>
-          <TouchableOpacity style={styles.copyButton} onPress={handleCopy}>
-            <View style={styles.copyIconWrapper}>
-              <Ionicons name="copy-outline" size={20} color="#747474" />
-            </View>
-            <Text style={styles.copyText}>{t('screens.walletTransactionResult.copy')}</Text>
-          </TouchableOpacity>
-        </View>
-
         <InfoCard
           label={t('screens.walletTransactionResult.amount')}
           value={`${formattedAmount} ${symbol}`}
@@ -145,8 +133,6 @@ export const WalletTransactionResultScreen = () => {
           value={shortenAddress(txHash)}
           trailing={tokenBadge}
         />
-
-        <Text style={styles.statusText}>{t('screens.walletTransactionResult.completed')}</Text>
 
         <View style={[COMMON_STYLES.bottomSection, styles.bottomSection]}>
           <PrimaryButton

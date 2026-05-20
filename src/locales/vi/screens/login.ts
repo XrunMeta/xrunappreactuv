@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'Vui lòng nhập mật khẩu của bạn',
   xrunPasswordLabel: 'Mật khẩu tài khoản XRUN',
   rememberMe: 'Giữ đăng nhập',
+  forgotPassword: 'Quên mật khẩu',
   loginButton: 'Đăng nhập',
   disclaimer: 'Nếu bạn quên mật khẩu, bạn có thể đăng nhập bằng đăng nhập xã hội hoặc đăng nhập bằng email OTP.',
   emailVerification: 'Xác minh Email',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'Giữ đăng nhập',
+  forgotPassword: 'Quên mật khẩu',
     sendButton: 'Gửi',
   },
   accountLink: 'Liên kết tài khoản',

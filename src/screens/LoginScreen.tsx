@@ -798,7 +798,7 @@ export const LoginScreen = () => {
             }
           />
 
-          <View style={styles.checkboxRow}>
+          <View style={[styles.checkboxRow, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
             <View style={isLoading ? styles.checkboxDisabled : undefined}>
               <FormCheckbox
                 label={t('screens.login.rememberMe')}
@@ -807,6 +807,9 @@ export const LoginScreen = () => {
                 variant="square"
               />
             </View>
+            <TouchableOpacity onPress={() => !isLoading && navigate(ROUTES.forgotPassword)} disabled={isLoading}>
+              <Text style={{ fontSize: 13, color: '#000' }}>{t('screens.login.forgotPassword')}</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.bottomSection}>

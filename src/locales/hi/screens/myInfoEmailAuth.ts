@@ -2,7 +2,7 @@ export default {
   title: 'ईमेल प्रमाणीकरण',
   emailLabel: 'ईमेल',
   emailPlaceholder: 'अपना ईमेल दर्ज करें',
-  sendButton: 'सत्यापन कोड भेजें',
+  sendButton: 'सत्यापित करें',
   confirmButton: 'पुष्टि करें',
   sending: 'भेज रहा है...',
   alerts: {

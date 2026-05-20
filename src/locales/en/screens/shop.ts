@@ -11,6 +11,8 @@ export default {
   used: 'Used',
   availableShort: 'Available',
   usedShort: 'Used',
+  shopBrand: 'Shop',
+  thankYou: 'Thank you',
   noPurchasedCoupons: 'No purchased coupons.',
   loadingGiftList: 'Loading gift card list...',
   loadingCouponList: 'Loading coupon list...',

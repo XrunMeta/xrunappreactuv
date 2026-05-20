@@ -11,6 +11,8 @@ export default {
   used: 'Đã sử dụng',
   availableShort: 'Có thể sử dụng',
   usedShort: 'Đã sử dụng',
+  shopBrand: 'Mua sắm',
+  thankYou: 'Cảm ơn',
   noPurchasedCoupons: 'Chưa có phiếu mua hàng.',
   loadingGiftList: 'Đang tải danh sách thẻ quà tặng...',
   loadingCouponList: 'Đang tải danh sách phiếu giảm giá...',

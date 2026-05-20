@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'कृपया अपना पासवर्ड दर्ज करें',
   xrunPasswordLabel: 'XRUN खाता पासवर्ड',
   rememberMe: 'मुझे लॉग इन रखें',
+  forgotPassword: 'पासवर्ड भूल गए',
   loginButton: 'लॉगिन',
   disclaimer: 'यदि आप अपना पासवर्ड भूल गए हैं, तो आप सोशल लॉगिन या ईमेल OTP लॉगिन के साथ लॉग इन कर सकते हैं।',
   emailVerification: 'ईमेल सत्यापन',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'मुझे लॉग इन रखें',
+  forgotPassword: 'पासवर्ड भूल गए',
     sendButton: 'भेजें',
   },
   accountLink: 'खाता लिंक करें',
