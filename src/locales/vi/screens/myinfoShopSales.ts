@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: 'Các mặt hàng đã xóa sẽ không còn được hiển thị, nhưng hồ sơ mua hàng sẽ được duy trì.',
   deleteSuccess: 'Mặt hàng đã được xóa.',
   deleteFailed: 'Xóa mặt hàng thất bại.',
+  approved: 'Đã duyệt',
+  pending: 'Đang chờ',
 };
-

@@ -16,6 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
@@ -63,6 +64,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { advertisementParams, resetAdvertisementParams } = useAppContext();
+  const { showAlert } = useAlertDialog();
   const { navigate, reset, goBack } = useAppNavigation();
 
   const handleClose = useCallback(() => {
@@ -195,7 +197,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
           fullParams: JSON.stringify(currentParams, null, 2),
         });
         setIsLoading(false);
-        handleClose();
+        await showAlert(
+          t('screens.showPockAd.alerts.error', { defaultValue: '알림' }),
+          t('screens.showPockAd.alerts.invalidCampaign', { defaultValue: '광고 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.' }),
+          [{ text: t('screens.showPockAd.alerts.confirm', { defaultValue: '확인' }), onPress: handleClose }],
+        );
         return;
       }
 

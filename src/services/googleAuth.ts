@@ -278,30 +278,35 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
   } catch (error: any) {
     console.error('[구글 로그인] 에러:', error);
 
-    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    const errCode = error?.code;
+    const cancelCodes = [statusCodes?.SIGN_IN_CANCELLED, 'SIGN_IN_CANCELLED', '-5', 12501];
+    const inProgressCodes = [statusCodes?.IN_PROGRESS, 'IN_PROGRESS'];
+    const noPlayServicesCodes = [statusCodes?.PLAY_SERVICES_NOT_AVAILABLE, 'PLAY_SERVICES_NOT_AVAILABLE'];
+
+    if (cancelCodes.includes(errCode)) {
       return {
         success: false,
         code: 'USER_CANCELLED',
-        message: '사용자가 로그인을 취소했습니다.',
+        message: '', 
       };
-    } else if (error.code === statusCodes.IN_PROGRESS) {
+    } else if (inProgressCodes.includes(errCode)) {
       return {
         success: false,
         code: 'IN_PROGRESS',
-        message: '이미 로그인 진행 중입니다.',
+        message: '',
       };
-    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    } else if (noPlayServicesCodes.includes(errCode)) {
       return {
         success: false,
         code: 'PLAY_SERVICES_NOT_AVAILABLE',
-        message: 'Google Play Services를 사용할 수 없습니다.',
+        message: '',
       };
     }
 
     return {
       success: false,
       code: 'UNKNOWN_ERROR',
-      message: error.message || '알 수 없는 오류가 발생했습니다.',
+      message: '', 
     };
   }
 }

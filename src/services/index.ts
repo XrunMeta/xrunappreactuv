@@ -3380,12 +3380,31 @@ export const gatewayNodeJS = async (
       console.log(`✅ [gatewayNodeJS] endpoint: ${endpoint}`);
       console.log(`✅ [gatewayNodeJS] result.data length:`, result?.data?.length || 'N/A');
       console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+        status: result?.status,
+        code: result?.code,
+        message: result?.message,
         success: result?.success,
         dataLength: result?.data?.length,
         hasData: !!result?.data,
         hasAds: !!result?.ads,
+        adsLength: Array.isArray(result?.ads) ? result.ads.length : 'N/A',
+        hasDiag: !!result?._diag,
         isArray: Array.isArray(result),
       });
+
+      if (endpoint === 'getTopAd5' && result?.status === 'error') {
+        console.error(`❌ [getTopAd5] 백엔드 에러 응답: code=${result?.code} message="${result?.message}"`);
+      }
+
+      if (endpoint === 'getTopAd5' && result?._diag) {
+        console.log(`📋 [getTopAd5 진단] 후보=${result._diag.total_candidates} 실제 fetch=${result._diag.fetched} 살아있음=${result._diag.live} 죽음/skip=${result._diag.dead_or_skip}`);
+        if (Array.isArray(result._diag.details)) {
+          for (const d of result._diag.details) {
+            const icon = d.has_landing ? '✅' : '❌';
+            console.log(`  ${icon} ${d.ad_company} ${d.campid} "${d.name}" → ${d.reason ?? `code=${d.result_code}`}`);
+          }
+        }
+      }
     }
 
     return result;
@@ -4596,6 +4615,10 @@ export const purchaseGiftWithXplayPoints = async (
       member: params.member,
       goods_code: params.goods_code,
       phone_no: params.phone_no ?? '',
+      price: params.price,
+      goods_name: params.goods_name,
+      brand_name: params.brand_name,
+      image_url: params.image_url,
     };
     if (__DEV__) {
       console.log('[기프티쇼] Xplay 구매 요청 body:', { ...body, phone_no: body.phone_no ? `${body.phone_no.slice(0, 3)}***` : '(없음)' });
@@ -5742,84 +5765,57 @@ export const removeBlocklistedCampaignFromCache = async (campid: string | number
   }
 };
 
-export const removeAdFromTopAd5 = async (campid: string | number, navigation?: any): Promise<void> => {
+export const removeAdFromTopAd5 = async (campid: string | number, _navigation?: any): Promise<void> => {
+
   try {
     const campidStr = String(campid);
-    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 시작`);
 
     const storedData = await AsyncStorage.getItem(TOP_AD5_STORAGE_KEY);
-    let topAd5Data: any[] = [];
+    let topAd5Data: any[] = []
+    let actuallyRemoved = false
     if (storedData) {
-      topAd5Data = JSON.parse(storedData);
-      if (Array.isArray(topAd5Data)) {
-        const beforeCount = topAd5Data.length;
-        topAd5Data = topAd5Data.filter((ad: any) => String(ad.campid || '') !== campidStr);
-        if (topAd5Data.length !== beforeCount) {
-          console.log(`[removeAdFromTopAd5] TopAd5에서 제거: ${beforeCount} → ${topAd5Data.length}개`);
+      const parsed = JSON.parse(storedData);
+      if (Array.isArray(parsed)) {
+        const before = parsed.length
+        topAd5Data = parsed.filter((ad: any) => String(ad.campid || '') !== campidStr);
+        actuallyRemoved = topAd5Data.length !== before
+      }
+    }
+
+    if (!actuallyRemoved) {
+      console.log(`[removeAdFromTopAd5] ${campidStr} — 이미 제거됨, 큐 차감 skip (중복 호출 방지)`)
+      return
+    }
+
+    let replenished = false
+    const nextAdsStr = await AsyncStorage.getItem(NEXT_ADS_STORAGE_KEY)
+    if (nextAdsStr) {
+      try {
+        const nextAds = JSON.parse(nextAdsStr)
+        if (Array.isArray(nextAds) && nextAds.length > 0) {
+
+          const topCampids = new Set(topAd5Data.map((a: any) => String(a.campid || '')))
+          topCampids.add(campidStr)
+          const usableIdx = nextAds.findIndex((a: any) => !topCampids.has(String(a.campid || '')))
+          if (usableIdx >= 0) {
+            const replacement = nextAds.splice(usableIdx, 1)[0]
+            topAd5Data.push(replacement)
+            await AsyncStorage.setItem(NEXT_ADS_STORAGE_KEY, JSON.stringify(nextAds))
+            console.log(`[removeAdFromTopAd5] ${campidStr} 제거, nextAds 큐에서 보충: ${replacement.campid} (큐 ${nextAds.length}개 남음)`)
+            replenished = true
+          }
         }
+      } catch (e: any) {
+        console.warn(`[removeAdFromTopAd5] nextAds 파싱 실패:`, e?.message)
       }
     }
-
-    try {
-      console.log(`[removeAdFromTopAd5] 새로운 광고 가져오기 시작`);
-      const newTopAd5Data = await getTopAd5(navigation, true); 
-
-      if (newTopAd5Data && Array.isArray(newTopAd5Data) && newTopAd5Data.length > 0) {
-
-        const existingCampids = new Set(topAd5Data.map((ad: any) => String(ad.campid || '')));
-        const newAds = newTopAd5Data.filter((ad: any) => {
-          const newCampid = String(ad.campid || '');
-          return newCampid !== campidStr && !existingCampids.has(newCampid);
-        });
-
-        if (newAds.length > 0) {
-
-          const replacementAd = newAds[0];
-          topAd5Data.push(replacementAd);
-          console.log(`[removeAdFromTopAd5] 새로운 광고 추가: ${replacementAd.campid || 'N/A'}`);
-
-          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-          await AsyncStorage.setItem(TOP_AD5_TIMESTAMP_KEY, Date.now().toString());
-          console.log(`[removeAdFromTopAd5] TopAd5 업데이트 완료: ${topAd5Data.length}개`);
-        } else {
-          console.log(`[removeAdFromTopAd5] 새로운 광고 없음 - 기존 데이터만 업데이트`);
-
-          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-        }
-      } else {
-        console.log(`[removeAdFromTopAd5] 새로운 TopAd5 데이터 없음 - 기존 데이터만 업데이트`);
-
-        await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-      }
-    } catch (newAdError) {
-      console.warn(`[removeAdFromTopAd5] 새로운 광고 가져오기 실패:`, newAdError);
-
-      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+    if (!replenished) {
+      console.log(`[removeAdFromTopAd5] ${campidStr} 제거 (큐 비어있어 보충 X — 10분 갱신 대기)`)
     }
 
-    const cachedAdStr = await AsyncStorage.getItem('cached_AD');
-    if (cachedAdStr) {
-      const cachedAd = JSON.parse(cachedAdStr);
-      if (cachedAd[campidStr]) {
-        delete cachedAd[campidStr];
-        await AsyncStorage.setItem('cached_AD', JSON.stringify(cachedAd));
-        console.log(`[removeAdFromTopAd5] cached_AD에서 제거: ${campidStr}`);
-      }
-    }
-
-    const failedStr = await AsyncStorage.getItem('failedPreFetchCampids');
-    if (failedStr) {
-      const failed = JSON.parse(failedStr);
-      if (Array.isArray(failed) && failed.includes(campidStr)) {
-        const filteredFailed = failed.filter((id: string) => id !== campidStr);
-        await AsyncStorage.setItem('failedPreFetchCampids', JSON.stringify(filteredFailed));
-        console.log(`[removeAdFromTopAd5] failedPreFetchCampids에서 제거: ${campidStr}`);
-      }
-    }
-
-    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 완료`);
+    await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
   } catch (error) {
-    console.error(`[removeAdFromTopAd5] ${campid} 제거 실패:`, error);
+    console.error(`[removeAdFromTopAd5] ${campid} 처리 실패:`, error);
   }
 };
 
@@ -6572,5 +6568,35 @@ export const createItemFromApp = async (
       });
     }
     throw error;
+  }
+};
+
+export const sendForgotPasswordCode = async (
+  email: string,
+  navigation?: any,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/forgot-password-send', { email });
+    return res.data;
+  } catch (error: any) {
+    const data = error?.response?.data;
+    return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
+  }
+};
+
+export const resetPasswordWithCode = async (
+  email: string,
+  code: string,
+  newPin: string,
+  navigation?: any,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/forgot-password-reset', { email, code, newPin });
+    return res.data;
+  } catch (error: any) {
+    const data = error?.response?.data;
+    return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
   }
 };

@@ -34,6 +34,7 @@ export const MyinfoShopSalesScreen = () => {
     image?: number | null;
     thumbnail?: number | null;
     sdk?: string | null;
+    is_approved?: string;
   }>({
     item: null,
     title: null,
@@ -153,6 +154,7 @@ export const MyinfoShopSalesScreen = () => {
             image: itemData.image || null,
             thumbnail: itemData.thumbnail || null,
             sdk: itemData.sdk || null,
+            is_approved: itemData.is_approved || 'N',
           });
         } else {
 
@@ -425,7 +427,7 @@ export const MyinfoShopSalesScreen = () => {
 
           const formattedDate = purchase.purchaseDate ? purchase.purchaseDate.replace(/-/g, '.') : '';
 
-          const formattedAmount = purchase.amount.toLocaleString('ko-KR') + t('screens.myinfoShopSales.currency');
+          const formattedAmount = `${Number(itemInfo.priceXrun ?? 0).toLocaleString('ko-KR')} XRUN`;
 
           const reversedName = reverseNameOrder(purchase.name);
 
@@ -472,7 +474,7 @@ export const MyinfoShopSalesScreen = () => {
       }
       return { data: [], total: 0, hasMore: false };
     }
-  }, [shopmember, startDateObj, endDateObj, navigate, t]);
+  }, [shopmember, startDateObj, endDateObj, navigate, t, itemInfo.priceXrun]);
 
   const renderHeaderRight = () => (
     <TouchableOpacity
@@ -495,12 +497,23 @@ export const MyinfoShopSalesScreen = () => {
         {}
         {!isLoading && shopmember && itemInfo.title && itemInfo.title.trim() ? (
           <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>{itemInfo.title}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <Text style={styles.infoTitle}>{itemInfo.title}</Text>
+              {itemInfo.is_approved === 'Y' ? (
+                <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{t('screens.myinfoShopSales.approved')}</Text>
+                </View>
+              ) : (
+                <View style={{ backgroundColor: '#f59e0b', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{t('screens.myinfoShopSales.pending')}</Text>
+                </View>
+              )}
+            </View>
             <Text style={styles.infoText}>
-              {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{itemInfo.price.toLocaleString('ko-KR')}{t('screens.myinfoShopSales.currency')}</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
+              {t('screens.myinfoShopSales.productPrice')} : <Text style={styles.infoValue}>{Number(itemInfo.priceXrun ?? 0).toLocaleString('ko-KR')} XRUN</Text> / {t('screens.myinfoShopSales.participants')} : <Text style={styles.infoValue}>{itemInfo.participantCount}{t('screens.myinfoShopSales.personUnit')}</Text>
             </Text>
             <Text style={styles.infoText}>
-              {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{itemInfo.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <Text style={styles.modifyLink} onPress={handleModifyItem}>{t('screens.myinfoShopSales.modify')}</Text>
+              {t('screens.myinfoShopSales.totalSales')} : <Text style={styles.infoHighlight}>{(Number(itemInfo.priceXrun ?? 0) * Number(itemInfo.participantCount ?? 0)).toLocaleString('ko-KR')} XRUN</Text> / <Text style={styles.modifyLink} onPress={handleModifyItem}>{t('screens.myinfoShopSales.modify')}</Text>
             </Text>
           </View>
         ) : null}

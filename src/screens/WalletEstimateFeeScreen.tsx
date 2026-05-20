@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +11,17 @@ import { useAppContext } from '../context';
 import { getGasEstimation } from '../services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const InfoCard = ({ label, value }: { label: string; value: string }) => (
+const InfoCard = ({ label, value, loading }: { label: string; value: string; loading?: boolean }) => (
   <View style={styles.card}>
     <Text style={styles.cardLabel}>{label}</Text>
-    <Text style={styles.cardValue}>{value}</Text>
+    {loading ? (
+      <View style={styles.cardValueLoadingRow}>
+        <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+        <Text style={styles.cardValueLoadingText}>{value}</Text>
+      </View>
+    ) : (
+      <Text style={styles.cardValue}>{value}</Text>
+    )}
   </View>
 );
 
@@ -23,7 +30,7 @@ export const WalletEstimateFeeScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { walletSendAddress, walletSendAmount, selectedWalletAsset } = useAppContext();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [gasPrice, setGasPrice] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(15);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,7 +51,13 @@ export const WalletEstimateFeeScreen = () => {
 
   const fetchGasEstimation = async () => {
     if (!walletSendAddress || !walletSendAmount || !selectedWalletAsset || !userAddress) {
-      console.warn('[WalletEstimateFee] 필수 정보가 없습니다.');
+      console.warn('[WalletEstimateFee] 필수 정보가 없습니다.', {
+        hasWalletSendAddress: !!walletSendAddress,
+        hasWalletSendAmount: !!walletSendAmount,
+        hasSelectedAsset: !!selectedWalletAsset,
+        hasUserAddress: !!userAddress,
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -186,19 +199,6 @@ export const WalletEstimateFeeScreen = () => {
     <View style={styles.container}>
       <Header title={t('screens.walletEstimateFee.title')} onBackPress={goBack} showBackButton />
 
-      {isLoading && (
-        <Modal transparent animationType="fade" visible={isLoading}>
-          <View style={styles.loadingOverlay}>
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFFFFF" />
-              <Text style={styles.loadingText}>
-                {t('screens.walletEstimateFee.loadingGas')}
-              </Text>
-            </View>
-          </View>
-        </Modal>
-      )}
-
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -220,6 +220,7 @@ export const WalletEstimateFeeScreen = () => {
         <InfoCard
           label={t('screens.walletEstimateFee.networkFee')}
           value={formatGasFee()}
+          loading={isLoading || gasPrice === null}
         />
         <InfoCard
           label={t('screens.walletEstimateFee.speed')}
@@ -294,6 +295,17 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#1a2e35',
+    lineHeight: 22,
+  },
+  cardValueLoadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cardValueLoadingText: {
+    fontSize: FONTS.size.medium,
+    fontFamily: 'Roboto-Medium',
+    color: '#8e9bae',
     lineHeight: 22,
   },
   helperText: {

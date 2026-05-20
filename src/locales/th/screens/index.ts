@@ -4,6 +4,7 @@ export { default as loginSignup } from './loginSignup';
 export { default as countryCodeSelect } from './countryCodeSelect';
 export { default as emailVerification } from './emailVerification';
 export { default as verificationCode } from './verificationCode';
+export { default as forgotPassword } from './forgotPassword';
 export { default as terms } from './terms';
 export { default as privacyPolicy } from './privacyPolicy';
 export { default as home } from './home';

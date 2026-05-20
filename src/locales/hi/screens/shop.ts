@@ -11,6 +11,8 @@ export default {
   used: 'उपयोग किया',
   availableShort: 'उपलब्ध',
   usedShort: 'उपयोग किया',
+  shopBrand: 'शॉप',
+  thankYou: 'धन्यवाद',
   noPurchasedCoupons: 'कोई खरीदे गए कूपन नहीं।',
   loadingGiftList: 'गिफ्ट कार्ड सूची लोड हो रही है...',
   loadingCouponList: 'कूपन सूची लोड हो रही है...',

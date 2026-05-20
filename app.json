@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.10.6",
+    "version": "4.10.7",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -56,11 +56,11 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "30"
+      "buildNumber": "34"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 284,
+      "versionCode": 288,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -78,7 +78,6 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
-        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",

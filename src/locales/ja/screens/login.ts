@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'パスワードを入力してください',
   xrunPasswordLabel: 'XRUNアカウントパスワード',
   rememberMe: 'ログイン状態を維持',
+  forgotPassword: 'パスワードを忘れた',
   loginButton: 'ログイン',
   disclaimer: 'パスワードを忘れた場合は、ソーシャルログインまたはメールOTPログインでログインできます。',
   emailVerification: 'メール認証',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'ログイン状態を維持する',
+  forgotPassword: 'パスワードを忘れた',
     sendButton: '送信',
   },
   accountLink: 'アカウント連携',
@@ -31,6 +33,7 @@ export default {
     loginError: 'ログイン中にエラーが発生しました。もう一度お試しください',
     idTokenMissing: 'IDトークンを受信できませんでした。もう一度お試しください。',
     identityTokenMissing: 'Identityトークンを受信できませんでした。もう一度お試しください。',
+    googleLoginFailed: 'Googleログイン中にエラーが発生しました。もう一度お試しください。',
   },
 };
 

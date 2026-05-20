@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { StatusBar } from 'expo-status-bar';
 import {
   View,
   Text,
@@ -812,6 +813,7 @@ export const WalletScreen = () => {
 
   return (
     <SafeView style={styles.container}>
+      <StatusBar style="dark" />
       <Header
         title={t('screens.wallet.title')}
         onBackPress={() => navigate(ROUTES.map)}

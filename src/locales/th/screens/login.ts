@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'กรุณากรอกรหัสผ่านของคุณ',
   xrunPasswordLabel: 'รหัสผ่านบัญชี XRUN',
   rememberMe: 'ให้ฉันเข้าสู่ระบบอยู่',
+  forgotPassword: 'ลืมรหัสผ่าน',
   loginButton: 'เข้าสู่ระบบ',
   disclaimer: 'หากคุณลืมรหัสผ่าน คุณสามารถเข้าสู่ระบบด้วยการเข้าสู่ระบบผ่านโซเชียลหรือการเข้าสู่ระบบด้วยอีเมล OTP',
   emailVerification: 'การยืนยันอีเมล',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'ให้ฉันเข้าสู่ระบบอยู่',
+  forgotPassword: 'ลืมรหัสผ่าน',
     sendButton: 'ส่ง',
   },
   accountLink: 'เชื่อมต่อบัญชี',
@@ -31,6 +33,7 @@ export default {
     loginError: 'เกิดข้อผิดพลาดระหว่างการเข้าสู่ระบบ กรุณาลองอีกครั้ง',
     idTokenMissing: 'ไม่สามารถรับโทเค็น ID ได้ กรุณาลองอีกครั้ง',
     identityTokenMissing: 'ไม่สามารถรับโทเค็น Identity ได้ กรุณาลองอีกครั้ง',
+    googleLoginFailed: 'เกิดข้อผิดพลาดขณะลงชื่อเข้าใช้ Google โปรดลองอีกครั้ง',
   },
 };
 

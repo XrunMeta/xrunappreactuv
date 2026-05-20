@@ -66,15 +66,7 @@ export const MyInfoScreen = () => {
         iconImage: require('../../assets/images/icon_referral_list.png'),
         route: 'referralMyGroup',
       },
-      {
-        id: 'referral',
-        label: t('screens.myInfo.referralEdit'),
-        subtitle: t('screens.myInfo.referralEditSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EC4899',
-        route: 'myInfoReferral',
-      },
+
       {
         id: 'shopSales',
         label: t('screens.myInfo.shopSales'),

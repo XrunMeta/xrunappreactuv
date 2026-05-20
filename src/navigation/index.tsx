@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const ROUTES = {
   authLanding: 'authLanding',
   login: 'login',
+  forgotPassword: 'forgotPassword',
   signup: 'signup',
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',

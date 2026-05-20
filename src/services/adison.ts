@@ -66,9 +66,12 @@ export const initAdison = async (): Promise<boolean> => {
       );
       return false;
     }
-    await AdisonModule!.initialize(appKey, env.ADISON_SERVER || 'production');
+    const serverMode = env.ADISON_SERVER || 'production';
+    console.log(`[adison] ✅ 초기화 시작 — server=${serverMode}, appKey=${appKey.slice(0, 8)}..., platform=${Platform.OS}`);
+    await AdisonModule!.initialize(appKey, serverMode);
     AdisonModule!.setConfig(env.ADISON_OFFERWALL_TITLE || '바로 적립 받기', 'LIST', 'Light');
     initialized = true;
+    console.log(`[adison] ✅ 초기화 완료 — ${serverMode === 'production' ? 'PRD 모드' : 'DEV 모드'}`);
     return true;
   } catch (e: any) {
     console.warn('[adison] init failed', e?.message ?? e);

@@ -157,6 +157,20 @@ export const ShopProductDetailScreen = () => {
             const list: any[] = Array.isArray(res?.data) ? res.data : [];
             const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
             const balance = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            console.log('[ShopProductDetail] XRUN 잔액 로드 완료', {
+                member,
+                walletList: list.map((w) => ({
+                    currency: w?.currency,
+                    Wamount: w?.Wamount,
+                    amount: w?.amount,
+                })),
+                xrunPolygon,
+                balance,
+                productId: product?.id,
+                productPrice: product?.price,
+                productPriceType: typeof product?.price,
+                comparison: `${balance} < ${product?.price} = ${balance < (product?.price ?? 0)}`,
+            });
             setXrunBalanceState(Number.isFinite(balance) ? balance : 0);
         } catch (e) {
             console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', e);
@@ -164,7 +178,7 @@ export const ShopProductDetailScreen = () => {
         } finally {
             setXrunBalanceLoading(false);
         }
-    }, [member]);
+    }, [member, product?.id, product?.price]);
 
     useEffect(() => {
         if (member) loadXrunBalance();
@@ -191,14 +205,28 @@ export const ShopProductDetailScreen = () => {
     useEffect(() => { setImageLoadFailed(false); }, [product.id]);
 
     const handleXplayPurchase = useCallback(async () => {
-        if (!member || xplayPurchaseLoading) return;
+        console.log('[Xplay 구매] handleXplayPurchase 진입', {
+            member, xplayPurchaseLoading, userPhone,
+            productId: product?.id, productPrice: product?.price,
+            xrunBalanceState, xrunBalanceLoading,
+        });
+        if (!member || xplayPurchaseLoading) {
+            console.log('[Xplay 구매] 조기 종료', { member, xplayPurchaseLoading });
+            return;
+        }
         if (!userPhone || !userPhone.trim()) {
             showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.phoneNotRegistered'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
 
         const needPrice = product.price;
-        const balance = xplayBalanceState ?? 0;
+        if (xrunBalanceState === null || xrunBalanceLoading) {
+            console.log('[Xplay 구매] 잔액 로딩 중 — 대기');
+            showAlert(t('screens.shopProductDetail.alerts.notification'), 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: t('screens.shopProductDetail.confirm') }]);
+            return;
+        }
+        const balance = xrunBalanceState;
+        console.log('[Xplay 구매] 잔액 비교', { balance, needPrice, ok: balance >= needPrice });
         if (balance < needPrice) {
             showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
@@ -211,7 +239,15 @@ export const ShopProductDetailScreen = () => {
                     setXplayPurchaseLoading(true);
                     try {
                         const res = await purchaseGiftWithXplayPoints(
-                            { member, goods_code: product.id, phone_no: userPhone ?? undefined },
+                            {
+                                member,
+                                goods_code: product.id,
+                                phone_no: userPhone ?? undefined,
+                                price: product.price,
+                                goods_name: product.title,
+                                brand_name: (product as any).brand,
+                                image_url: (product as any).image,
+                            },
                             undefined,
                         );
                         if (res?.status === 'success') {
@@ -231,7 +267,7 @@ export const ShopProductDetailScreen = () => {
                             const userMsg = is402 || isE0010
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : is404
-                                    ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                    ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : isEnglish
                                         ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
                                         : msg;
@@ -247,7 +283,7 @@ export const ShopProductDetailScreen = () => {
                         const userMsg = status === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : status === 404
-                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : isEnglish
                                     ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
                                     : msg;
@@ -259,7 +295,7 @@ export const ShopProductDetailScreen = () => {
                 },
             },
         ]);
-    }, [member, userPhone, product.id, product.title, product.price, xplayBalanceState, xplayPurchaseLoading, showAlert, loadXplayBalance]);
+    }, [member, userPhone, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, xplayPurchaseLoading, showAlert, loadXplayBalance]);
 
     const [depositAddress, setDepositAddress] = useState<string>('');
     const [xplayAmount, setXplayAmount] = useState<string>('');
@@ -407,12 +443,37 @@ export const ShopProductDetailScreen = () => {
     const [xrunPurchaseLoading, setXrunPurchaseLoading] = useState<boolean>(false);
 
     const handlePurchase = () => {
-        if (xrunPurchaseLoading) return;
+        console.log('[XRUN 구매] handlePurchase 진입', {
+            xrunPurchaseLoading,
+            member,
+            xrunBalance,
+            productPrice: product?.price,
+            productId: product?.id,
+        });
+        if (xrunPurchaseLoading) {
+            console.log('[XRUN 구매] xrunPurchaseLoading=true 라 종료');
+            return;
+        }
         if (!member) {
+            console.log('[XRUN 구매] member 없어서 종료');
             showAlert(t('screens.shopProductDetail.alerts.notification'), '로그인이 필요합니다.', [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }
         if (xrunBalance < product.price) {
+            console.error('[XRUN 구매] 잔액 부족 — 비교 상세', {
+                member,
+                productId: product.id,
+                productTitle: product.title,
+                productPrice: product.price,
+                productPriceType: typeof product.price,
+                productPriceKRW: (product as any).priceKRW,
+                productPriceXrun: (product as any).priceXrun,
+                xrunBalance,
+                xrunBalanceType: typeof xrunBalance,
+                xrunBalanceState,
+                shortfall: product.price - xrunBalance,
+                note: 'xrunBalance(XRUN 단위) 와 productPrice 가 같은 단위인지 확인 필요. productPriceKRW 가 KRW 라면 단위 불일치 가능성.',
+            });
             showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXRUN'), [{ text: t('screens.shopProductDetail.confirm') }]);
             return;
         }

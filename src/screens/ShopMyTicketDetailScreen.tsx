@@ -65,7 +65,8 @@ export const ShopMyTicketDetailScreen = () => {
         }
 
         try {
-            const permission = await MediaLibrary.requestPermissionsAsync();
+
+            const permission = await MediaLibrary.requestPermissionsAsync(true);
             console.log('[내 티켓] MediaLibrary 권한:', permission.status, {
                 canAskAgain: permission.canAskAgain,
                 granted: permission.granted,
