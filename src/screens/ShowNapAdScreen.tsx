@@ -14,6 +14,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_1c4683, v_7a6f92, v_38f5f4, v_aa7dc1, v_8cba1e, v_f4cc2d, v_563153, v_5e0191, v_fda57c } from '../services';
@@ -70,6 +71,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   const { t: v_8d41d7 } = v_772971();
   const v_033e14 = v_e0068c();
   const { advertisementParams: v_d0b6d4, resetAdvertisementParams: v_e10ff9 } = v_700ef9();
+  const { showAlert: v_889fad } = v_4b1173();
   const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
 
   const v_7f2e65 = v_de06a3(() => {
@@ -203,7 +205,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
           fullParams: JSON.stringify(v_766d99, null, 2),
         });
         v_deef62(false);
-        v_7f2e65();
+        await v_889fad(
+          v_8d41d7('screens.showNapAd.alerts.error', { defaultValue: '알림' }),
+          v_8d41d7('screens.showNapAd.alerts.invalidCampaign', { defaultValue: '광고 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.' }),
+          [{ text: v_8d41d7('screens.showNapAd.alerts.confirm', { defaultValue: '확인' }), onPress: v_7f2e65 }],
+        );
         return;
       }
 

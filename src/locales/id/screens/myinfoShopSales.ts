@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: 'Item yang dihapus tidak akan ditampilkan lagi, tetapi catatan pembelian akan dipertahankan.',
   deleteSuccess: 'Item telah dihapus.',
   deleteFailed: 'Gagal menghapus item.',
+  approved: 'Disetujui',
+  pending: 'Menunggu',
 };
-

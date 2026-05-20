@@ -715,6 +715,61 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
   const v_a27ed2 = v_e662ae<NodeJS.Timeout | null>(null); 
+
+  type RecentAd = Partial<v_60c7c3> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
+  const [v_f87d4d, v_32744e] = v_5ab095<RecentAd[]>([]);
+  const [v_558a7d, v_8b4a6c] = v_5ab095(false);
+  const v_0a1033 = 'recentViewedAds';
+  const v_e41db0 = 20;
+
+  v_c4deb2(() => {
+    v_e84827.getItem(v_0a1033).then((v_479f05) => {
+      if (!v_479f05) return;
+      try {
+        const v_d0c056 = JSON.parse(v_479f05);
+        if (Array.isArray(v_d0c056)) v_32744e(v_d0c056);
+      } catch {}
+    }).catch(() => {});
+  }, []);
+
+  const v_bcc877 = v_de06a3(async (v_ddcfed) => {
+    if (!v_ddcfed.campid || !v_ddcfed.urlAD) return;
+    v_32744e((v_ba2215) => {
+      const v_e4cf17 = v_ba2215.filter((v_779914) => v_779914.campid !== v_ddcfed.campid);
+      const v_a448ad = [{ ...v_ddcfed, viewedAt: Date.now() }, ...v_e4cf17].slice(0, v_e41db0);
+      v_e84827.setItem(v_0a1033, JSON.stringify(v_a448ad)).catch(() => {});
+      return v_a448ad;
+    });
+  }, []);
+
+  const v_5987c4 = v_e662ae<((t: v_60c7c3) => void) | null>(null);
+  const v_01e6b2 = v_de06a3((v_ddcfed) => {
+    v_8b4a6c(false);
+    if (v_5987c4.current) {
+
+      const token: v_60c7c3 = {
+        spotID: (v_ddcfed as any).spotID ?? 0,
+        x: (v_ddcfed as any).x ?? 0,
+        y: (v_ddcfed as any).y ?? 0,
+        xrunPrice: v_ddcfed.xrunPrice,
+        distance: v_ddcfed.distance,
+        name: v_ddcfed.name,
+        iconurl: v_ddcfed.iconurl,
+        joindesc: v_ddcfed.joindesc,
+        brand: v_ddcfed.brand,
+        advertisement: v_ddcfed.advertisement,
+        coin: v_ddcfed.coin,
+        member: v_ddcfed.member,
+        campid: v_ddcfed.campid,
+        ad_company: v_ddcfed.ad_company,
+        urlAD: v_ddcfed.urlAD,
+      };
+      v_5987c4.current(v_21cc31);
+    } else if (v_ddcfed.urlAD) {
+
+      v_f2c756.openURL(v_ddcfed.urlAD).catch((v_49263d) => console.warn('[RecentAds] openURL 실패:', v_49263d));
+    }
+  }, []);
   const v_6890b1 = v_e662ae(false); 
 
   const v_ac9fa2 = v_e662ae(false);
@@ -2454,11 +2509,24 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     v_96a9ed(v_021ef9);
     v_6a4dcd(true); 
 
+    v_bcc877({
+      ...v_021ef9,
+      campid: String(v_021ef9.campid ?? ''),
+      name: String(v_021ef9.name ?? ''),
+      iconurl: String(v_021ef9.iconurl ?? ''),
+      urlAD: String((v_021ef9 as any).urlAD ?? ''),
+      viewedAt: Date.now(),
+    } as RecentAd);
+
     v_a27ed2.current = setTimeout(() => {
       v_a27ed2.current = null; 
       v_794bb0(v_021ef9);
     }, 2000);
   }, [v_794bb0]);
+
+  v_c4deb2(() => {
+    v_5987c4.current = v_eed806;
+  }, [v_eed806]);
 
   const v_fce460 = [
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
@@ -2515,6 +2583,20 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
 }
         </CameraView>
+
+        {}
+        <TouchableOpacity
+          style={v_d81136.recentAdsButton}
+          onPress={() => v_8b4a6c(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="time-outline" size={22} color="#fff" />
+          {v_f87d4d.length > 0 && (
+            <View style={v_d81136.recentAdsBadge}>
+              <Text style={v_d81136.recentAdsBadgeText}>{Math.min(v_f87d4d.length, 99)}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         {}
         {
@@ -2659,7 +2741,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   pointerEvents: 'box-none', 
                 }}>
                 {}
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={async () => {
+                    console.log('=== 패널 본문(아이콘+텍스트) 클릭 ===');
+                    if (v_181e3e.current) {
+                      clearTimeout(v_181e3e.current);
+                      v_181e3e.current = null;
+                    }
+                    v_6890b1.current = true;
+                    if (v_04cb77) {
+                      await v_794bb0(v_04cb77);
+                    }
+                  }}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -2727,7 +2821,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                         : v_04cb77?.joindesc}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 {}
                 <TouchableOpacity
@@ -2768,6 +2862,62 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           </Pressable>
         </Animated.View>
       </View>
+
+      {}
+      <Modal
+        visible={v_558a7d}
+        transparent
+        animationType="slide"
+        onRequestClose={() => v_8b4a6c(false)}
+      >
+        <TouchableOpacity
+          style={v_d81136.recentModalBackdrop}
+          activeOpacity={1}
+          onPress={() => v_8b4a6c(false)}
+        >
+          <TouchableOpacity activeOpacity={1} style={v_d81136.recentModalSheet} onPress={(v_9e86fd) => v_9e86fd.stopPropagation()}>
+            <View style={v_d81136.recentModalHeader}>
+              <Text style={v_d81136.recentModalTitle}>🕒 최근 본 광고</Text>
+              <TouchableOpacity onPress={() => v_8b4a6c(false)}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {v_f87d4d.length === 0 ? (
+                <View style={v_d81136.recentEmpty}>
+                  <Text style={v_d81136.recentEmptyText}>최근 본 광고가 없습니다.</Text>
+                </View>
+              ) : (
+                v_f87d4d.map((v_ddcfed) => {
+                  const v_2bb762 = Math.floor((Date.now() - v_ddcfed.viewedAt) / 60000);
+                  const v_375a17 = v_2bb762 < 1 ? '방금 전' : v_2bb762 < 60 ? `${v_2bb762}분 전` : `${Math.floor(v_2bb762 / 60)}시간 전`;
+                  return (
+                    <TouchableOpacity
+                      key={`${v_ddcfed.campid}-${v_ddcfed.viewedAt}`}
+                      style={v_d81136.recentItemRow}
+                      onPress={() => v_01e6b2(v_ddcfed)}
+                      activeOpacity={0.7}
+                    >
+                      {v_ddcfed.iconurl ? (
+                        <Image source={{ uri: v_ddcfed.iconurl }} style={v_d81136.recentItemIcon} resizeMode="cover" />
+                      ) : (
+                        <View style={v_d81136.recentItemIcon} />
+                      )}
+                      <View style={v_d81136.recentItemTextWrap}>
+                        <Text style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
+                        <Text style={v_d81136.recentItemTime}>{v_375a17}</Text>
+                      </View>
+                      <View style={v_d81136.recentItemOpenBtn}>
+                        <Text style={v_d81136.recentItemOpenBtnText}>다시 열기</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              )}
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       {}
       {}
@@ -3364,6 +3514,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               onHttpError={(v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('WebView HTTP 오류:', v_76b943);
+
+                const v_f3e03f = [404, 410, 451, 455]
+                if (v_f3e03f.includes(v_76b943.statusCode)) {
+                  v_889fad(
+                    '광고 이용 불가',
+                    '해당 광고는 이미 참여했거나 종료되어 더 이상 참여할 수 없습니다.',
+                    [{ text: '확인', onPress: () => v_3aa877() }],
+                  ).catch(() => v_3aa877())
+                }
               }}
             />
           ) : null}
@@ -3566,6 +3725,107 @@ const v_d81136 = v_472849.create({
     height: 25,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  recentAdsButton: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  recentAdsBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  recentAdsBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  recentModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  recentModalSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '70%',
+    paddingBottom: 32,
+  },
+  recentModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  recentModalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+  },
+  recentItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  recentItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  recentItemTextWrap: {
+    flex: 1,
+  },
+  recentItemName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  recentItemTime: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
+  recentItemOpenBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#6C5CE7',
+    borderRadius: 6,
+  },
+  recentItemOpenBtnText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  recentEmpty: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  recentEmptyText: {
+    color: '#999',
+    fontSize: 14,
   },
   mapPinIcon: {
     width: 25,

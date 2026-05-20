@@ -66,15 +66,7 @@ export const v_03a231 = () => {
         iconImage: require('../../assets/images/icon_referral_list.png'),
         route: 'referralMyGroup',
       },
-      {
-        id: 'referral',
-        label: v_8d41d7('screens.myInfo.referralEdit'),
-        subtitle: v_8d41d7('screens.myInfo.referralEditSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EC4899',
-        route: 'myInfoReferral',
-      },
+
       {
         id: 'shopSales',
         label: v_8d41d7('screens.myInfo.shopSales'),

@@ -11,6 +11,8 @@ export default {
   used: 'ใช้แล้ว',
   availableShort: 'ใช้ได้',
   usedShort: 'ใช้แล้ว',
+  shopBrand: 'ช้อปปิ้ง',
+  thankYou: 'ขอบคุณ',
   noPurchasedCoupons: 'ไม่มีคูปองที่ซื้อ',
   loadingGiftList: 'กำลังโหลดรายการบัตรของขวัญ...',
   loadingCouponList: 'กำลังโหลดรายการคูปอง...',

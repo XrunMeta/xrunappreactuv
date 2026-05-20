@@ -11,6 +11,8 @@ export default {
   used: '사용완료',
   availableShort: '사용가능',
   usedShort: '사용완료',
+  shopBrand: '쇼핑',
+  thankYou: '감사합니다',
   noPurchasedCoupons: '구매한 쿠폰이 없습니다.',
   loadingGiftList: '기프티콘 목록 불러오는 중...',
   loadingCouponList: '쿠폰 목록 불러오는 중...',

@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: 'Deleted items will no longer be displayed, but purchase records will be maintained.',
   deleteSuccess: 'Item has been deleted.',
   deleteFailed: 'Failed to delete item.',
+  approved: 'Approved',
+  pending: 'Pending',
 };
-

@@ -10,6 +10,7 @@ import {
   v_f4f851,
   v_54d331,
   v_f40fc5,
+  v_040c8f,
   v_7c6176,
   v_d3f135,
   v_086cde,
@@ -357,6 +358,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'signup') {
     return <SignupScreen />;
+  }
+
+  if (v_0f0c7b === 'forgotPassword') {
+    return <ForgotPasswordScreen />;
   }
 
   if (v_0f0c7b === 'countryCodeSelect') {

@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'Masukkan kata sandi Anda',
   xrunPasswordLabel: 'Kata Sandi Akun XRUN',
   rememberMe: 'Tetap masuk',
+  forgotPassword: 'Lupa Password',
   loginButton: 'Masuk',
   disclaimer: 'Jika Anda lupa kata sandi, Anda dapat masuk dengan login sosial atau login OTP email.',
   emailVerification: 'Verifikasi Email',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'Tetap masuk',
+  forgotPassword: 'Lupa Password',
     sendButton: 'Kirim',
   },
   accountLink: 'Tautkan Akun',
@@ -31,6 +33,7 @@ export default {
     loginError: 'Terjadi kesalahan saat masuk. Silakan coba lagi',
     idTokenMissing: 'Gagal menerima token ID. Silakan coba lagi.',
     identityTokenMissing: 'Gagal menerima token Identity. Silakan coba lagi.',
+    googleLoginFailed: 'Terjadi kesalahan saat masuk dengan Google. Silakan coba lagi.',
   },
 };
 

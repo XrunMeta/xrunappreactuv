@@ -146,19 +146,10 @@ export const v_a3bbf0 = async (
 
     let v_4f186c;
 
-    if (v_326be8.OS === 'ios') {
-
-      v_4f186c = {
-        message: v_a8cd21,
-        url: v_25f202,
-        title: v_b657c9,
-      };
-    } else {
-
-      v_4f186c = {
-        message: v_a8cd21,
-      };
-    }
+    v_4f186c = {
+      message: v_a8cd21,
+      title: v_b657c9,
+    };
 
     console.log('[shareReferralLink] Share API 호출 시작:', v_4f186c);
 

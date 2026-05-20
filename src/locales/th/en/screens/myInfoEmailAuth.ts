@@ -2,7 +2,7 @@ export default {
   title: 'Email Authentication',
   emailLabel: 'Email',
   emailPlaceholder: 'Enter your email',
-  sendButton: 'Send Verification Code',
+  sendButton: 'Verify',
   confirmButton: 'Confirm',
   sending: 'Sending...',
   alerts: {

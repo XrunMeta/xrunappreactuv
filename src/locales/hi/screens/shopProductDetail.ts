@@ -31,7 +31,7 @@ export default {
     phoneNotRegistered: 'प्राप्तकर्ता फोन पंजीकृत नहीं। माई पेज में पंजीकृत करें।',
     insufficientXRUN: 'XRUN बैलेंस अपर्याप्त।',
     purchaseConfirmTitle: 'खरीदें',
-    purchaseConfirmMessageXRUN: '{{title}} XRUN से खरीदें?',
+    purchaseConfirmMessageXRUN: '{{title}} को XRUN से खरीदें?',
     cancel: 'रद्द',
     purchase: 'खरीदें',
     purchaseFailed: 'खरीद विफल',
