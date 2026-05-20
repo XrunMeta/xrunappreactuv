@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: '删除的商品将不再显示，但购买记录将保留。',
   deleteSuccess: '商品已删除。',
   deleteFailed: '删除商品失败。',
+  approved: '已批准',
+  pending: '待批准',
 };
-

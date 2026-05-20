@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'パスワードを入力してください',
   xrunPasswordLabel: 'XRUNアカウントパスワード',
   rememberMe: 'ログイン状態を維持',
+  forgotPassword: 'パスワードを忘れた',
   loginButton: 'ログイン',
   disclaimer: 'パスワードを忘れた場合は、ソーシャルログインまたはメールOTPログインでログインできます。',
   emailVerification: 'メール認証',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'ログイン状態を維持する',
+  forgotPassword: 'パスワードを忘れた',
     sendButton: '送信',
   },
   accountLink: 'アカウント連携',

@@ -656,6 +656,15 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
           onHttpError={(v_6f3a9d) => {
             const { nativeEvent: v_76b943 } = v_6f3a9d;
             console.error('WebView HTTP 오류:', v_76b943);
+
+            const v_f3e03f = [404, 410, 451, 455]
+            if (v_f3e03f.includes(v_76b943.statusCode)) {
+              v_889fad(
+                '광고 이용 불가',
+                '해당 광고는 이미 참여했거나 종료되어 더 이상 참여할 수 없습니다.',
+                [{ text: '확인', onPress: () => v_7f2e65() }],
+              ).catch(() => v_7f2e65())
+            }
           }}
         />
       ) : null}

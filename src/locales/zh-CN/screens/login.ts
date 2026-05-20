@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: '请输入密码',
   xrunPasswordLabel: 'XRUN账户密码',
   rememberMe: '保持登录状态',
+  forgotPassword: '忘记密码',
   loginButton: '登录',
   disclaimer: '如果您忘记密码，可以使用社交登录或邮箱OTP登录。',
   emailVerification: '邮箱验证',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: '保持登录状态',
+  forgotPassword: '忘记密码',
     sendButton: '发送',
   },
   accountLink: '关联账户',

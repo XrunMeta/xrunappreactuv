@@ -11,6 +11,8 @@ export default {
   used: '已使用',
   availableShort: '可使用',
   usedShort: '已使用',
+  shopBrand: '购物',
+  thankYou: '谢谢',
   noPurchasedCoupons: '暂无购买的优惠券。',
   loadingGiftList: '正在加载礼品券列表...',
   loadingCouponList: '正在加载优惠券列表...',

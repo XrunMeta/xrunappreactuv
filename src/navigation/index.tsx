@@ -13,6 +13,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 export const v_ce4741 = {
   authLanding: 'authLanding',
   login: 'login',
+  forgotPassword: 'forgotPassword',
   signup: 'signup',
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',

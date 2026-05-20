@@ -1085,6 +1085,10 @@ export interface PurchaseGiftWithXplayPointsRequest {
   member: string;
   goods_code: string;
   phone_no?: string;
+  price?: number;
+  goods_name?: string;
+  brand_name?: string;
+  image_url?: string;
 }
 
 export interface PurchaseGiftWithXplayPointsResponse {

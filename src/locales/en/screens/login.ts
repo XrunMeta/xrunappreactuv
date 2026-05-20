@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'Please enter your password',
   xrunPasswordLabel: 'XRUN Account Password',
   rememberMe: 'Keep me logged in',
+  forgotPassword: 'Forgot Password',
   loginButton: 'Login',
   disclaimer: 'If you forgot your password, you can log in with social login or email OTP login.',
   emailVerification: 'Email Verification',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'Keep me logged in',
+  forgotPassword: 'Forgot Password',
     sendButton: 'Send',
   },
   accountLink: 'Link Account',

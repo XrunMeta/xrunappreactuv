@@ -798,7 +798,7 @@ export const v_f4f851 = () => {
             }
           />
 
-          <View style={v_d81136.checkboxRow}>
+          <View style={[v_d81136.checkboxRow, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
             <View style={v_cd31a8 ? v_d81136.checkboxDisabled : undefined}>
               <FormCheckbox
                 label={v_8d41d7('screens.login.rememberMe')}
@@ -807,6 +807,9 @@ export const v_f4f851 = () => {
                 variant="square"
               />
             </View>
+            <TouchableOpacity onPress={() => !v_cd31a8 && v_9b57fc(v_ce4741.forgotPassword)} disabled={v_cd31a8}>
+              <Text style={{ fontSize: 13, color: '#000' }}>{v_8d41d7('screens.login.forgotPassword')}</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={v_d81136.bottomSection}>

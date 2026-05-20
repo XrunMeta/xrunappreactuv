@@ -4,6 +4,7 @@ export { default as v_42ebbb } from './loginSignup';
 export { default as v_fb78b7 } from './countryCodeSelect';
 export { default as v_43058f } from './emailVerification';
 export { default as v_8e7cda } from './verificationCode';
+export { default as v_e637fd } from './forgotPassword';
 export { default as v_a142f4 } from './terms';
 export { default as v_77795c } from './privacyPolicy';
 export { default as v_02e540 } from './home';
