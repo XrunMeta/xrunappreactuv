@@ -281,6 +281,7 @@ export const v_03a231 = () => {
               await v_e84827.removeItem('userTickets');
               await v_e84827.removeItem('rageProgressLastUpdate');
               await v_e84827.removeItem('userSessionToken');
+              await v_e84827.removeItem('jwt'); 
 
               await v_e84827.removeItem('appleSignupCompleted');
               await v_e84827.removeItem('appleSignupCompletedEmail');
@@ -301,6 +302,7 @@ export const v_03a231 = () => {
                 await v_e84827.removeItem('userTickets');
                 await v_e84827.removeItem('rageProgressLastUpdate');
                 await v_e84827.removeItem('userSessionToken');
+                await v_e84827.removeItem('jwt'); 
 
                 await v_e84827.removeItem('appleSignupCompleted');
                 await v_e84827.removeItem('appleSignupCompletedEmail');
