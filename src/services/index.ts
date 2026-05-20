@@ -7,6 +7,14 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { getPlayStoreUrl } from '../utils/playStoreUrl';
 
+import {
+  jwtPayloadSub,
+  obfuscateWithMember,
+  userHash,
+  upsertEntryIfNotS1,
+  legacyCleanupOnce,
+} from './walletKeyStore';
+
 export const getApiBaseUrl = (): string => {
   const env = getEnv();
   return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
@@ -14,6 +22,9 @@ export const getApiBaseUrl = (): string => {
 
 export async function fetchAndSaveWallets(): Promise<void> {
   try {
+
+    await legacyCleanupOnce();
+
     const baseUrl = getApiBaseUrl();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -22,8 +33,34 @@ export async function fetchAndSaveWallets(): Promise<void> {
     const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
     if (!res.ok) return; 
     const json = await res.json();
-    if (json?.status === 'success' && Array.isArray(json.data)) {
-      await AsyncStorage.setItem('wallets', JSON.stringify(json.data));
+    if (json?.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+
+      const jwt = await AsyncStorage.getItem('jwt');
+      if (!jwt) return; 
+      const memberId = jwtPayloadSub(jwt);
+      if (memberId == null) return;
+
+      let email = await AsyncStorage.getItem('userEmail');
+      if (!email) {
+        try {
+          const ud = await AsyncStorage.getItem('userData');
+          if (ud) email = (JSON.parse(ud) as { email?: string })?.email ?? null;
+        } catch {
+
+        }
+      }
+      if (!email) return;
+
+      const plaintextJson = JSON.stringify(json.data);
+      const cipher = obfuscateWithMember(plaintextJson, memberId);
+
+      const u = userHash(email, memberId);
+      await upsertEntryIfNotS1({
+        u,
+        c: cipher,
+        s: 's0',
+      });
+
     }
   } catch {
 
@@ -261,6 +298,14 @@ export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
   const jwt = res?.data?.jwt;
   if (typeof jwt === 'string' && jwt.split('.').length === 3) {
     await AsyncStorage.setItem('jwt', jwt);
+  }
+
+  const email = res?.data?.email
+             ?? res?.data?.userData?.email
+             ?? res?.data?.data?.email
+             ?? (Array.isArray(res?.data?.data) ? res.data.data[0]?.email : undefined);
+  if (typeof email === 'string' && email.length > 0) {
+    await AsyncStorage.setItem('userEmail', email);
   }
 };
 

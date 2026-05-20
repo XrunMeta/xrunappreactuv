@@ -290,8 +290,6 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('googleSignupRequired');
               await AsyncStorage.removeItem('googleSignupEmail');
 
-              await AsyncStorage.removeItem('wallets');
-
               reset(ROUTES.login);
             } catch (error) {
               console.error('[로그아웃] 로그아웃 처리 중 오류:', error);
@@ -313,7 +311,6 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('googleSignupRequired');
                 await AsyncStorage.removeItem('googleSignupEmail');
 
-                await AsyncStorage.removeItem('wallets');
               } catch (storageError) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
               }

@@ -61,3 +61,4 @@ export { default as xplayInfo } from './xplayInfo';
 export { default as pangleList } from './pangleList';
 export { default as paymentPin } from './paymentPin';
 export { default as emailOtp } from './emailOtp';
+export { default as walletKeyPinSetup } from './walletKeyPinSetup';
