@@ -34,7 +34,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
-import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc } from '../components';
+import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc, v_197924 } from '../components';
 
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -46,6 +46,7 @@ import { v_ba5086 } from '../context/OTAUpdateContext';
 import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
+import { v_9bbbdc, v_7e6df2 } from '../services/walletKeyStore';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -345,6 +346,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_79311c = v_e662ae<Set<string>>(new Set());
 
+  const [v_25fba6, v_f4280a] = v_5ab095(false);
+  const [v_00832d, v_b51724] = v_5ab095<{ memberId: number; email: string } | null>(null);
+
   v_c4deb2(() => {
     const v_43ed8b = async () => {
       try {
@@ -360,6 +364,63 @@ export const MapMainScreen: v_a3453e.FC = () => {
       }
     };
     v_43ed8b();
+  }, []);
+
+  v_c4deb2(() => {
+    let v_2008a4 = false;
+    let v_d9e7b9 = v_6b5698.currentState;
+
+    const v_63929d = async () => {
+      try {
+
+        const v_56b352 = await v_e84827.getItem('jwt');
+        const v_717992 = v_56b352 ? v_9bbbdc(v_56b352) : null;
+
+        let v_b4e012 = await v_e84827.getItem('userEmail');
+        if (!v_b4e012) {
+          try {
+            const v_f21c33 = await v_e84827.getItem('userData');
+            if (v_f21c33) v_b4e012 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+          } catch {
+
+          }
+        }
+
+        if (v_717992 == null || !v_b4e012) return;
+
+        const v_2b8338 = await v_7e6df2(v_b4e012, v_717992);
+
+        if (v_2008a4) return;
+        if (v_2b8338 && v_2b8338.s === 's0' && !v_2b8338.h) {
+
+          const v_e0c7e8 = v_b4e012.toLowerCase().trim();
+
+          v_b51724((v_ba2215) => {
+            if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_e0c7e8) return v_ba2215;
+            return { memberId: v_717992, email: v_e0c7e8 };
+          });
+          v_f4280a(true);
+        }
+
+      } catch {
+
+      }
+    };
+
+    v_63929d();
+
+    const v_1ae212 = v_6b5698.addEventListener('change', (v_612414) => {
+      const v_d19607 = !!v_d9e7b9.match(/inactive|background/);
+      const v_1039f5 = v_612414 === 'active';
+      v_d9e7b9 = v_612414;
+      if (v_d19607 && v_1039f5) {
+        v_63929d();
+      }
+    });
+    return () => {
+      v_2008a4 = true;
+      v_1ae212.remove();
+    };
   }, []);
 
   const v_89e09e = v_de06a3(async (v_04f49c) => {
@@ -3585,6 +3646,19 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         </View>
 
+      )}
+
+      {}
+      {v_00832d != null && (
+        <WalletKeyPinSetupModal
+          memberId={v_00832d.memberId}
+          email={v_00832d.email}
+          visible={v_25fba6}
+          onSuccess={() => {
+            v_f4280a(false);
+            v_b51724(null);
+          }}
+        />
       )}
 
     </View>
