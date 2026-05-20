@@ -12,6 +12,24 @@ export const v_755eb9 = (): string => {
   return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
 };
 
+export async function v_5ed938(): Promise<void> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return; 
+    const v_7ecfd1 = await v_8f00b9.json();
+    if (v_7ecfd1?.status === 'success' && Array.isArray(v_7ecfd1.data)) {
+      await v_e84827.setItem('wallets', JSON.stringify(v_7ecfd1.data));
+    }
+  } catch {
+
+  }
+}
+
 export const v_a57efd = (): string => v_755eb9();
 
 export * from './googleAuth';
@@ -864,6 +882,8 @@ export const v_9d2541 = async (
     const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', v_43c42e ? '성공' : '실패');
 
+    await v_5ed938();
+
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[회원가입 4단계] 로그인 확인 실패:', v_5e9bfe);
@@ -925,6 +945,8 @@ export const v_b699a9 = async (
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', v_3393e3.data);
     }
 
+    await v_5ed938();
+
     return v_3393e3.data;
   } catch (v_5e9bfe) {
 
@@ -977,6 +999,8 @@ export const v_508a17 = async (
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -1226,6 +1250,8 @@ export const v_7e0a86 = async (
       console.error('[로그인] 전화번호 로그인 실패:', v_3393e3.data);
     }
 
+    await v_5ed938();
+
     return v_3393e3.data;
   } catch (v_5e9bfe) {
 
@@ -1363,6 +1389,8 @@ export const v_a81308 = async (
       console.error('[로그인] 이메일 인증 로그인 실패:', v_3393e3.data);
     }
 
+    await v_5ed938();
+
     return v_3393e3.data;
   } catch (v_5e9bfe) {
 
@@ -1408,6 +1436,8 @@ export const v_32502f = async (
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
