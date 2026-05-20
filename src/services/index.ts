@@ -12,6 +12,24 @@ export const getApiBaseUrl = (): string => {
   return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
 };
 
+export async function fetchAndSaveWallets(): Promise<void> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
+    if (!res.ok) return; 
+    const json = await res.json();
+    if (json?.status === 'success' && Array.isArray(json.data)) {
+      await AsyncStorage.setItem('wallets', JSON.stringify(json.data));
+    }
+  } catch {
+
+  }
+}
+
 export const getEmailAuthApiBaseUrl = (): string => getApiBaseUrl();
 
 export * from './googleAuth';
@@ -864,6 +882,8 @@ export const checkLogin = async (
     const result = response.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', result ? '성공' : '실패');
 
+    await fetchAndSaveWallets();
+
     return result;
   } catch (error) {
     console.error('[회원가입 4단계] 로그인 확인 실패:', error);
@@ -925,6 +945,8 @@ export const loginWithEmailPassword = async (
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', response.data);
     }
 
+    await fetchAndSaveWallets();
+
     return response.data;
   } catch (error) {
 
@@ -977,6 +999,8 @@ export const loginWithPassword = async (
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -1226,6 +1250,8 @@ export const loginWithMobile = async (
       console.error('[로그인] 전화번호 로그인 실패:', response.data);
     }
 
+    await fetchAndSaveWallets();
+
     return response.data;
   } catch (error) {
 
@@ -1363,6 +1389,8 @@ export const loginWithEmailAuth = async (
       console.error('[로그인] 이메일 인증 로그인 실패:', response.data);
     }
 
+    await fetchAndSaveWallets();
+
     return response.data;
   } catch (error) {
 
@@ -1408,6 +1436,8 @@ export const loginWithGoogleIdToken = async (
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
