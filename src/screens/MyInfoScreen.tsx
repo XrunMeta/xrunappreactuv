@@ -281,6 +281,7 @@ export const v_03a231 = () => {
               await v_e84827.removeItem('userTickets');
               await v_e84827.removeItem('rageProgressLastUpdate');
               await v_e84827.removeItem('userSessionToken');
+              await v_e84827.removeItem('jwt'); 
 
               await v_e84827.removeItem('appleSignupCompleted');
               await v_e84827.removeItem('appleSignupCompletedEmail');
@@ -288,6 +289,8 @@ export const v_03a231 = () => {
               await v_e84827.removeItem('appleSignupEmail');
               await v_e84827.removeItem('googleSignupRequired');
               await v_e84827.removeItem('googleSignupEmail');
+
+              await v_e84827.removeItem('wallets');
 
               v_487a25(v_ce4741.login);
             } catch (v_5e9bfe) {
@@ -301,6 +304,7 @@ export const v_03a231 = () => {
                 await v_e84827.removeItem('userTickets');
                 await v_e84827.removeItem('rageProgressLastUpdate');
                 await v_e84827.removeItem('userSessionToken');
+                await v_e84827.removeItem('jwt'); 
 
                 await v_e84827.removeItem('appleSignupCompleted');
                 await v_e84827.removeItem('appleSignupCompletedEmail');
@@ -308,6 +312,8 @@ export const v_03a231 = () => {
                 await v_e84827.removeItem('appleSignupEmail');
                 await v_e84827.removeItem('googleSignupRequired');
                 await v_e84827.removeItem('googleSignupEmail');
+
+                await v_e84827.removeItem('wallets');
               } catch (v_df17d5) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', v_df17d5);
               }
