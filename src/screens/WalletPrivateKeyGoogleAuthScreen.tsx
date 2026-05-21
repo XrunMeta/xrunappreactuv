@@ -1,367 +1,294 @@
+
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
   ActivityIndicator,
+  Alert,
+  Share,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, SafeView, PrimaryButton, SafeScrollView, FormField, Dialog } from '../components';
-import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
-import { useAppNavigation, ROUTES } from '../navigation';
+import * as FileSystem from 'expo-file-system';
+import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
+import { COLORS, FONTS, SIZES } from '../constants';
+import { useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
-  getGoogleIdToken,
-  googleAuthForWallet,
-  checkSocialForWallet,
-} from '../services';
+  jwtPayloadSub,
+  exportBackup,
+  type BackupPayload,
+} from '../services/walletKeyStore';
+
+type Stage = 'loading' | 'pin' | 'options' | 'busy';
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
   const { t } = useTranslation();
-  const { goBack, reset, navigate } = useAppNavigation();
+  const { goBack } = useAppNavigation();
   const { showAlert } = useAlertDialog();
 
-  const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
-  const [currentEmail, setCurrentEmail] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [hasGoogleSocialPrefetched, setHasGoogleSocialPrefetched] = useState<boolean | null>(null);
-
-  const [linkingDialogVisible, setLinkingDialogVisible] = useState(false);
-  const [linkingPassword, setLinkingPassword] = useState('');
-  const [passwordDialogIdToken, setPasswordDialogIdToken] = useState<string | null>(null);
-  const [isLinkingLoading, setIsLinkingLoading] = useState(false);
+  const [stage, setStage] = useState<Stage>('loading');
+  const [memberId, setMemberId] = useState<number | null>(null);
+  const [email, setEmail] = useState<string>('');
+  const [pinPromptVisible, setPinPromptVisible] = useState(false);
 
   useEffect(() => {
-    loadCurrentUserInfo();
-  }, []);
-
-  useEffect(() => {
-    if (!currentMemberId) return;
     let cancelled = false;
     (async () => {
       try {
-        const checkRes = await checkSocialForWallet(currentMemberId, navigate);
-        if (!cancelled) {
-          const has = checkRes.success && checkRes.data?.hasGoogleSocial === true;
-          setHasGoogleSocialPrefetched(has);
-          console.log('[프라이빗키 인증] 소셜 연동 여부 미리 조회:', has);
+        const jwt = await AsyncStorage.getItem('jwt');
+        const mid = jwt ? jwtPayloadSub(jwt) : null;
+        let emailRaw = await AsyncStorage.getItem('userEmail');
+        if (!emailRaw) {
+          try {
+            const ud = await AsyncStorage.getItem('userData');
+            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+          } catch {  }
         }
+        if (cancelled) return;
+        if (mid == null || !emailRaw) {
+          await showAlert(
+            t('common.messages.error') || '오류',
+            t('screens.wallet.missingInfo') || '사용자 정보를 찾을 수 없습니다',
+          );
+          goBack();
+          return;
+        }
+        setMemberId(mid);
+        setEmail(emailRaw.toLowerCase().trim());
+        setStage('pin');
+        setPinPromptVisible(true);
       } catch (e) {
-        if (!cancelled) setHasGoogleSocialPrefetched(null);
+        if (__DEV__) console.warn('[WalletKeyBackup] mount fail:', e);
+        goBack();
       }
     })();
     return () => { cancelled = true; };
-  }, [currentMemberId]);
 
-  const loadCurrentUserInfo = async () => {
+  }, []);
+
+  const onPinPromptSuccess = (_wallets: unknown[]) => {
+
+    setPinPromptVisible(false);
+    setStage('options');
+  };
+
+  const onPinPromptCancel = () => {
+    setPinPromptVisible(false);
+    goBack();
+  };
+
+  const buildBackupPayload = async (): Promise<BackupPayload | null> => {
+    if (memberId == null || !email) return null;
+    return exportBackup(email, memberId);
+  };
+
+  const handleFileBackup = async () => {
+    if (stage !== 'options') return;
+    setStage('busy');
     try {
-      const userDataStr = await AsyncStorage.getItem('userData');
-      if (userDataStr) {
-        const userData = JSON.parse(userDataStr);
-        setCurrentMemberId(userData.member || null);
-        setCurrentEmail(userData.email || '');
+      const payload = await buildBackupPayload();
+      if (!payload) {
+        await showAlert(
+          t('common.messages.error') || '오류',
+          'PIN 설정된 지갑이 없습니다. 먼저 지갑 PIN 을 설정하세요.',
+        );
+        setStage('options');
+        return;
       }
+      const json = JSON.stringify(payload, null, 2);
+      const fileName = `xrun-wallet-backup-${payload.member}-${payload.exported_at}.json`;
+      const path = `${FileSystem.documentDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(path, json, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
 
-      const userEmail = await AsyncStorage.getItem('userEmail');
-      if (userEmail && !currentEmail) {
-        setCurrentEmail(userEmail);
+      const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
+      try {
+        await Share.share({
+          url: shareUrl,
+          title: 'XRUN 지갑 백업',
+          message: 'XRUN 지갑 키 백업 (PIN 으로 보호됨)',
+        });
+      } catch {
+
       }
-    } catch (error) {
-      console.error('[프라이빗키 인증] 사용자 정보 로드 실패:', error);
+      await showAlert(
+        '백업 완료',
+        `파일 저장 완료\n경로: ${path}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+      );
+      setStage('options');
+    } catch (e: any) {
+      if (__DEV__) console.warn('[WalletKeyBackup] file fail:', e);
+      await showAlert(
+        t('common.messages.error') || '오류',
+        '파일 저장에 실패했습니다',
+      );
+      setStage('options');
     }
   };
 
-  const handleGoogleAuth = async () => {
-    if (isLoading) {
-      return;
-    }
+  const handleGdriveBackup = async () => {
 
-    if (!currentMemberId) {
-      await showAlert(
-        t('common.messages.error') || '오류',
-        '로그인 정보를 찾을 수 없습니다. 다시 로그인해주세요.',
-      );
-      goBack();
-      return;
-    }
-
-    setIsLoading(true);
-
-    let idToken: string | null = null;
-    try {
-
-      let hasGoogleSocial = false;
-      if (hasGoogleSocialPrefetched !== null) {
-        hasGoogleSocial = hasGoogleSocialPrefetched;
-      } else {
-        try {
-          const checkRes = await checkSocialForWallet(currentMemberId, navigate);
-          hasGoogleSocial = checkRes.success && checkRes.data?.hasGoogleSocial === true;
-          console.log('[프라이빗키 인증] 구글 연동 여부:', hasGoogleSocial);
-        } catch (checkErr) {
-          console.warn('[프라이빗키 인증] check-social-for-wallet 실패, 기존 플로우로 진행:', checkErr);
-        }
-      }
-
-      console.log('[프라이빗키 인증] 구글 인증 시작');
-      const tokenResult = await getGoogleIdToken(!hasGoogleSocial);
-      if (!tokenResult?.idToken) {
-        await showAlert(
-          t('common.messages.error') || '오류',
-          '구글 로그인에 실패했거나 취소되었습니다.',
-        );
-        setIsLoading(false);
-        return;
-      }
-      idToken = tokenResult.idToken;
-
-      if (!hasGoogleSocial) {
-        console.log('[프라이빗키 인증] 소셜 없음 - 비밀번호 입력 다이얼로그 표시');
-        setPasswordDialogIdToken(idToken);
-        setLinkingPassword('');
-        setLinkingDialogVisible(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const res = await googleAuthForWallet(currentMemberId, idToken, undefined, navigate);
-      if (res.success && res.data?.canProceed) {
-        console.log('[프라이빗키 인증] 인증 성공 - 프라이빗 키 화면으로 이동');
-        reset(ROUTES.walletPrivateKeyDisplay);
-        setIsLoading(false);
-        return;
-      }
-      await showAlert(
-        t('common.messages.error') || '오류',
-        res.message || '구글 인증 처리 중 오류가 발생했습니다.',
-      );
-    } catch (error: any) {
-      const status = error.response?.status;
-      const body = error.response?.data;
-      if (status === 400 && body?.data?.requirePassword === true && idToken) {
-        console.log('[프라이빗키 인증] 소셜 없음 - 비밀번호 입력 다이얼로그 표시');
-        setPasswordDialogIdToken(idToken);
-        setLinkingPassword('');
-        setLinkingDialogVisible(true);
-        setIsLoading(false);
-        return;
-      }
-      if (status === 401) {
-        await showAlert(
-          t('common.messages.error') || '오류',
-          body?.message || '비밀번호가 일치하지 않습니다.',
-        );
-        setIsLoading(false);
-        return;
-      }
-      if (status === 409) {
-        await showAlert(
-          t('common.messages.error') || '오류',
-          body?.message || '이 구글 이메일은 이미 다른 계정에 가입되어 있습니다. 다른 구글 이메일을 사용해 주세요.',
-        );
-        setIsLoading(false);
-        return;
-      }
-      console.error('[프라이빗키 인증] 오류:', error);
-      await showAlert(
-        t('common.messages.error') || '오류',
-        body?.message || error.message || '구글 인증 중 오류가 발생했습니다.',
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePasswordSubmit = async () => {
-    if (!linkingPassword.trim()) {
-      await showAlert(t('common.messages.error'), t('screens.login.errors.passwordRequired') || '비밀번호를 입력해주세요.');
-      return;
-    }
-    if (!passwordDialogIdToken || !currentMemberId) {
-      setLinkingDialogVisible(false);
-      setPasswordDialogIdToken(null);
-      return;
-    }
-
-    setIsLinkingLoading(true);
-    try {
-      console.log('[프라이빗키 인증] 비밀번호로 구글 연동 재호출');
-      const res = await googleAuthForWallet(
-        currentMemberId,
-        passwordDialogIdToken,
-        linkingPassword,
-        navigate,
-      );
-      if (res.success && res.data?.canProceed) {
-        console.log('[프라이빗키 인증] 연동 성공 - 프라이빗 키 화면으로 이동');
-        setLinkingDialogVisible(false);
-        setPasswordDialogIdToken(null);
-        setLinkingPassword('');
-        reset(ROUTES.walletPrivateKeyDisplay);
-        setIsLinkingLoading(false);
-        return;
-      }
-      await showAlert(
-        t('common.messages.error') || '오류',
-        res.message || '구글 인증 처리 중 오류가 발생했습니다.',
-      );
-    } catch (error: any) {
-      const status = error.response?.status;
-      const body = error.response?.data;
-      if (status === 401) {
-        await showAlert(
-          t('common.messages.error') || '오류',
-          body?.message || '비밀번호가 일치하지 않습니다.',
-        );
-      } else {
-        console.error('[프라이빗키 인증] 비밀번호 연동 오류:', error);
-        await showAlert(
-          t('common.messages.error') || '오류',
-          body?.message || error.message || '계정 연동 중 오류가 발생했습니다.',
-        );
-      }
-    } finally {
-      setIsLinkingLoading(false);
-    }
+    Alert.alert(
+      'Google Drive 백업',
+      '구현 준비 중입니다. 현재는 파일 백업만 사용 가능합니다.',
+    );
   };
 
   return (
-    <SafeView style={styles.container}>
-      <Header
-        title={t('screens.walletPrivateKeyGoogleAuth.title')}
-        onBackPress={goBack}
-        showBackButton
-      />
-      <SafeScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>
-            {t('screens.walletPrivateKeyGoogleAuth.description')}
-          </Text>
-        </View>
+    <SafeView>
+      <Header title="지갑 키 백업" onBackPress={goBack} showBackButton />
+      <SafeScrollView contentContainerStyle={styles.content}>
+        {stage === 'loading' && (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+          </View>
+        )}
 
-        <View style={styles.buttonWrapper}>
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-            </View>
-          ) : (
-            <PrimaryButton
-              title={t('screens.walletPrivateKeyGoogleAuth.authButton')}
-              onPress={handleGoogleAuth}
-              fullWidth
-              disabled={isLoading}
-            />
-          )}
-        </View>
+        {stage === 'pin' && (
+          <View style={styles.center}>
+            <Text style={styles.message}>PIN 입력을 기다리는 중...</Text>
+          </View>
+        )}
+
+        {(stage === 'options' || stage === 'busy') && (
+          <View style={styles.optionsContainer}>
+            <Text style={styles.title}>백업 방식을 선택하세요</Text>
+            <Text style={styles.subtitle}>
+              지갑 키는 현재 PIN 으로 암호화되어 있습니다.{'\n'}
+              백업 파일은 PIN 없이 복호화할 수 없습니다.
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.optionCard, stage === 'busy' && styles.disabled]}
+              onPress={handleFileBackup}
+              disabled={stage === 'busy'}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="document-outline" size={32} color={COLORS.buttonPrimary} />
+              <View style={styles.optionTextWrap}>
+                <Text style={styles.optionLabel}>파일로 저장</Text>
+                <Text style={styles.optionDesc}>
+                  앱 문서 폴더에 저장 + 다른 앱으로 공유
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, stage === 'busy' && styles.disabled]}
+              onPress={handleGdriveBackup}
+              disabled={stage === 'busy'}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="cloud-upload-outline" size={32} color={COLORS.buttonPrimary} />
+              <View style={styles.optionTextWrap}>
+                <Text style={styles.optionLabel}>Google Drive 에 저장</Text>
+                <Text style={styles.optionDesc}>구글 계정 클라우드에 암호화 저장</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
+            </TouchableOpacity>
+
+            {stage === 'busy' && (
+              <View style={styles.busyOverlay}>
+                <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+                <Text style={styles.busyText}>처리 중...</Text>
+              </View>
+            )}
+          </View>
+        )}
       </SafeScrollView>
 
-      {}
-      <Dialog
-        visible={linkingDialogVisible}
-        title={t('screens.walletPrivateKeyGoogleAuth.passwordDialogTitle')}
-        onClose={() => {
-          setLinkingDialogVisible(false);
-          setPasswordDialogIdToken(null);
-          setLinkingPassword('');
-        }}
-        actions={[
-          {
-            label: t('common.buttons.cancel') || '취소',
-            onPress: () => {
-              setLinkingDialogVisible(false);
-              setPasswordDialogIdToken(null);
-              setLinkingPassword('');
-            },
-            variant: 'secondary',
-            disabled: isLinkingLoading,
-          },
-          {
-            label: t('common.buttons.confirm') || '확인',
-            onPress: handlePasswordSubmit,
-            variant: 'primary',
-            disabled: isLinkingLoading,
-          },
-        ]}
-      >
-        <View style={styles.linkingContainer}>
-          <Text style={styles.linkingMessage}>
-            현재 로그인된 계정(XRUN 계정)의 비밀번호를 입력해 주세요.
-          </Text>
-          <FormField
-            label={t('screens.login.xrunPasswordLabel') || '현재 로그인된 계정(XRUN) 비밀번호'}
-            placeholder={t('screens.login.passwordPlaceholder') || '비밀번호를 입력하세요'}
-            secureTextEntry={true}
-            value={linkingPassword}
-            onChangeText={setLinkingPassword}
-            containerStyle={styles.linkingInput}
-            editable={!isLinkingLoading}
-          />
-
-          {isLinkingLoading && (
-            <View style={styles.linkingLoader}>
-              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-            </View>
-          )}
-        </View>
-      </Dialog>
+      {memberId != null && email !== '' && (
+        <WalletKeyPinPromptModal
+          visible={pinPromptVisible}
+          memberId={memberId}
+          email={email}
+          onSuccess={onPinPromptSuccess}
+          onCancel={onPinPromptCancel}
+        />
+      )}
     </SafeView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    ...COMMON_STYLES.container,
-  },
-  scrollContent: {
+  content: {
     flexGrow: 1,
-    ...COMMON_STYLES.scrollContent,
-    padding: 20,
+    paddingHorizontal: SIZES.large,
+    paddingTop: SIZES.large,
   },
-  descriptionContainer: {
-    marginBottom: 40,
-    paddingHorizontal: 20,
-  },
-  description: {
-    fontSize: FONTS.size.medium,
-    lineHeight: 24,
-    color: COLORS.text,
-    fontFamily: FONTS.family.regular,
-    textAlign: 'center',
-  },
-  buttonWrapper: {
-    width: '100%',
-    maxWidth: 780,
-    alignSelf: 'center',
-  },
-  loadingContainer: {
-    height: 56,
-    width: '100%',
-    alignItems: 'center',
+  center: {
+    flex: 1,
     justifyContent: 'center',
-  },
-  linkingContainer: {
-    paddingVertical: 8,
-  },
-  linkingMessage: {
-    fontSize: FONTS.size.medium,
-    lineHeight: 22,
-    color: '#333333',
-    marginBottom: 8,
-    marginTop: 8,
-    fontFamily: 'Roboto-Regular',
-  },
-  linkingMessageSub: {
-    marginBottom: 20,
-    fontSize: FONTS.size.small,
-    color: '#666666',
-  },
-  linkingInput: {
-    marginBottom: 16,
-  },
-  linkingLoader: {
     alignItems: 'center',
-    marginTop: 10,
+    paddingVertical: 80,
+  },
+  message: {
+    fontSize: 14,
+    color: COLORS.darkGray,
+    fontFamily: FONTS.medium,
+  },
+  optionsContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.titleText,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: COLORS.darkGray,
+    fontFamily: FONTS.regular,
+    marginBottom: 24,
+    lineHeight: 18,
+  },
+  optionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eaeaea',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  optionTextWrap: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  optionLabel: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.titleText,
+    marginBottom: 2,
+  },
+  optionDesc: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: COLORS.darkGray,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  busyOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+  },
+  busyText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: COLORS.darkGray,
   },
 });

@@ -420,6 +420,43 @@ export function clearUserUnlock(email: string, member: number): void {
   _sessionUnlock.delete(sessionUnlockKey(email, member));
 }
 
+export interface BackupEntry {
+  network: WalletNetwork;
+  c: string;     
+  h: string;     
+  s: 's1';       
+}
+
+export interface BackupPayload {
+  v: 1;
+  email_hash: string;   
+  member: number;
+  entries: BackupEntry[];
+  exported_at: number;  
+}
+
+export async function exportBackup(
+  email: string,
+  member: number,
+): Promise<BackupPayload | null> {
+  const entries = await findEntriesForUser(email, member);
+  const result: BackupEntry[] = [];
+  for (const network of ['eth', 'pol'] as const) {
+    const e = entries[network];
+    if (!e || e.s !== 's1' || !e.h) continue;
+    result.push({ network, c: e.c, h: e.h, s: 's1' });
+  }
+  if (result.length === 0) return null;
+  const normalized = normEmail(email);
+  return {
+    v: 1,
+    email_hash: CryptoJS.SHA256(normalized).toString(),
+    member,
+    entries: result,
+    exported_at: Date.now(),
+  };
+}
+
 export type WalletAvailabilitySentinel = 'NQ' | 'DK' | 'ADC' | 'MISSING' | 'DECRYPT_FAIL';
 
 export interface WalletUnavailable {
