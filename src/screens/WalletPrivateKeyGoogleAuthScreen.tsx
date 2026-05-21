@@ -115,7 +115,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         return;
       }
       const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrun-wallet-backup-${payload.member}-${payload.exported_at}.json`;
+      const fileName = `xrunwallet-${payload.exported_at}.key`;
       const path = `${FileSystem.documentDirectory}${fileName}`;
 
       await FileSystem.writeAsStringAsync(path, json);
@@ -158,7 +158,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         return;
       }
       const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrun-wallet-backup-${payload.member}-${payload.exported_at}.json`;
+      const fileName = `xrunwallet-${payload.exported_at}.key`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;
@@ -207,6 +207,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       );
       if (!res.ok) {
         const errBody = await res.text();
+
+        if (res.status === 403 && /has not been used|disabled/i.test(errBody)) {
+          throw new Error(
+            'Google Drive API 가 활성화되어 있지 않습니다.\n관리자가 GCP 콘솔에서 Drive API 를 활성화해야 합니다.',
+          );
+        }
         throw new Error(`Drive upload ${res.status}: ${errBody.slice(0, 200)}`);
       }
       await res.json(); 
