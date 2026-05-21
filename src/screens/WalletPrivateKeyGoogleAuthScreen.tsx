@@ -13,7 +13,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
