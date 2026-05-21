@@ -46,7 +46,7 @@ import { useOTAUpdate } from '../context/OTAUpdateContext';
 import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
-import { jwtPayloadSub, findEntry } from '../services/walletKeyStore';
+import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -388,10 +388,13 @@ export const MapMainScreen: React.FC = () => {
 
         if (memberId == null || !emailRaw) return;
 
-        const entry = await findEntry(emailRaw, memberId);
+        const entries = await findEntriesForUser(emailRaw, memberId);
+        const needPinSetup = (e: { s: string; h?: string } | null) =>
+          e !== null && e.s === 's0' && !e.h;
+        const triggerNeeded = needPinSetup(entries.eth) || needPinSetup(entries.pol);
 
         if (cancelled) return;
-        if (entry && entry.s === 's0' && !entry.h) {
+        if (triggerNeeded) {
 
           const email = emailRaw.toLowerCase().trim();
 

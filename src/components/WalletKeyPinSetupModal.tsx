@@ -15,13 +15,15 @@ import { COLORS, FONTS, SIZES } from '../constants';
 import {
   userHash,
   findEntry,
+  findEntriesForUser,
   upsertEntry,
   deobfuscateWithMember,
   encryptWithPin,
   pinVerifyHash,
   verifyAllWallets,
-  WalletKey,
-  VaultEntry,
+  type WalletKey,
+  type VaultEntry,
+  type WalletNetwork,
 } from '../services/walletKeyStore';
 
 interface Props {
@@ -83,51 +85,63 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     setStep('verifying');
 
     await new Promise<void>((r) => setTimeout(r, 0));
+
+    const targetNetworks: WalletNetwork[] = ['eth', 'pol'];
+    const committedNetworks: WalletNetwork[] = [];
     try {
+      const entries = await findEntriesForUser(email, memberId);
 
-      const u = userHash(email, memberId);
-      const entry = await findEntry(email, memberId);
-      if (!entry || !entry.c) throw new Error('vault-entry-missing');
-
-      const backupCipher = entry.c;
-      await upsertEntry({ ...entry, b: backupCipher });
-
-      const reloaded = await findEntry(email, memberId);
-      if (reloaded?.b !== backupCipher) throw new Error('backup-write-failed');
-
-      const plaintextJson = deobfuscateWithMember(backupCipher, memberId);
-      if (!plaintextJson) throw new Error('deobfuscate-empty');
-      const wallets: WalletKey[] = JSON.parse(plaintextJson);
-
-      const v = await verifyAllWallets(wallets);
-      if (!v.ok) throw new Error('verify-fail:' + v.failed.join(','));
-
-      const cipher2 = encryptWithPin(plaintextJson, pin, email, memberId);
-
-      await upsertEntry({
-        u,
-        c: cipher2,
-        h: pinVerifyHash(pin, email, memberId),
-        s: 's1',
-
+      const toCommit = targetNetworks.filter((net) => {
+        const e = entries[net];
+        return e && e.s === 's0';
       });
+      if (toCommit.length === 0) throw new Error('no-vault-entry-to-commit');
+
+      for (const network of toCommit) {
+        const entry = entries[network];
+        if (!entry || !entry.c) throw new Error(`vault-entry-missing:${network}`);
+
+        const backupCipher = entry.c;
+        await upsertEntry({ ...entry, b: backupCipher });
+
+        const reloaded = await findEntry(email, memberId, network);
+        if (reloaded?.b !== backupCipher) throw new Error(`backup-write-failed:${network}`);
+
+        const plaintextJson = deobfuscateWithMember(backupCipher, memberId);
+        if (!plaintextJson) throw new Error(`deobfuscate-empty:${network}`);
+        const wallets: WalletKey[] = JSON.parse(plaintextJson);
+
+        const v = await verifyAllWallets(wallets);
+        if (!v.ok) throw new Error(`verify-fail:${network}:${v.failed.join(',')}`);
+
+        const cipher2 = encryptWithPin(plaintextJson, pin, email, memberId);
+
+        await upsertEntry({
+          u: userHash(email, memberId, network),
+          c: cipher2,
+          h: pinVerifyHash(pin, email, memberId),
+          s: 's1',
+        });
+        committedNetworks.push(network);
+      }
 
       setPin('');
       setConfirmPin('');
-
       onSuccess();
     } catch {
 
       try {
-        const cur = await findEntry(email, memberId);
-        if (cur) {
-          const restored: VaultEntry = {
-            u: cur.u,
-            c: cur.b ?? cur.c,  
-            s: 's0',
+        for (const network of targetNetworks) {
+          const cur = await findEntry(email, memberId, network);
+          if (cur) {
+            const restored: VaultEntry = {
+              u: cur.u,
+              c: cur.b ?? cur.c, 
+              s: 's0',
 
-          };
-          await upsertEntry(restored);
+            };
+            await upsertEntry(restored);
+          }
         }
       } catch {
 
