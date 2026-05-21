@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8 } from 'rcmrninabrnb';
+import { v_6b5698, v_c3551b, v_2d4718, v_80fa10, v_326be8, v_3094a2 } from 'rcmrninabrnb';
 import * as v_f2c756 from 'rddjsfilumpz';
 import * as v_222528 from 'objipkycgyawxjjk';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
@@ -553,9 +553,31 @@ const v_c0dbdf = () => {
     return <ReferralInputScreen />;
   }
 
-  if (v_0f0c7b === 'shop') {
-    console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
-    return <ShopScreen />;
+  if (v_0f0c7b === 'shop' || v_0f0c7b === 'shopProductDetail') {
+    console.log('[App.tsx] shop/shopProductDetail — ShopScreen keep-alive 모드 (off-screen translate)', { currentScreen: v_0f0c7b });
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        {
+
+}
+        <View
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            transform: [{ translateX: v_0f0c7b === 'shop' ? 0 : -10000 }],
+          }}
+          pointerEvents={v_0f0c7b === 'shop' ? 'auto' : 'none'}
+        >
+          <ShopScreen />
+        </View>
+        {}
+        {v_0f0c7b === 'shopProductDetail' && (
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white' }}>
+            <ShopProductDetailScreen />
+          </View>
+        )}
+      </View>
+    );
   }
 
   if (v_0f0c7b === 'shopTicket') {
@@ -572,10 +594,6 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'shopMyTicketDetail') {
     return <ShopMyTicketDetailScreen />;
-  }
-
-  if (v_0f0c7b === 'shopProductDetail') {
-    return <ShopProductDetailScreen />;
   }
 
   if (v_0f0c7b === 'shopBuy') {

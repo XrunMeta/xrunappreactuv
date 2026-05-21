@@ -743,32 +743,60 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, []);
 
   const v_5987c4 = v_e662ae<((t: v_60c7c3) => void) | null>(null);
+  const v_7a73cc = v_e662ae<((t: v_60c7c3) => Promise<void>) | null>(null);
   const v_01e6b2 = v_de06a3((v_ddcfed) => {
+    console.log('[RecentAds] 다시 열기 클릭', { campid: v_ddcfed.campid, name: v_ddcfed.name, hasUrlAD: !!v_ddcfed.urlAD });
+
+    const token: v_60c7c3 = {
+      spotID: (v_ddcfed as any).spotID ?? 0,
+      x: (v_ddcfed as any).x ?? 0,
+      y: (v_ddcfed as any).y ?? 0,
+      xrunPrice: v_ddcfed.xrunPrice,
+      distance: v_ddcfed.distance,
+      name: v_ddcfed.name,
+      iconurl: v_ddcfed.iconurl,
+      joindesc: v_ddcfed.joindesc,
+      brand: v_ddcfed.brand,
+      advertisement: v_ddcfed.advertisement,
+      coin: v_ddcfed.coin,
+      member: v_ddcfed.member,
+      campid: v_ddcfed.campid,
+      ad_company: v_ddcfed.ad_company,
+      urlAD: v_ddcfed.urlAD,
+    };
+
     v_8b4a6c(false);
-    if (v_5987c4.current) {
 
-      const token: v_60c7c3 = {
-        spotID: (v_ddcfed as any).spotID ?? 0,
-        x: (v_ddcfed as any).x ?? 0,
-        y: (v_ddcfed as any).y ?? 0,
-        xrunPrice: v_ddcfed.xrunPrice,
-        distance: v_ddcfed.distance,
-        name: v_ddcfed.name,
-        iconurl: v_ddcfed.iconurl,
-        joindesc: v_ddcfed.joindesc,
-        brand: v_ddcfed.brand,
-        advertisement: v_ddcfed.advertisement,
-        coin: v_ddcfed.coin,
-        member: v_ddcfed.member,
-        campid: v_ddcfed.campid,
-        ad_company: v_ddcfed.ad_company,
-        urlAD: v_ddcfed.urlAD,
-      };
-      v_5987c4.current(v_21cc31);
-    } else if (v_ddcfed.urlAD) {
-
-      v_f2c756.openURL(v_ddcfed.urlAD).catch((v_49263d) => console.warn('[RecentAds] openURL 실패:', v_49263d));
+    if (v_181e3e.current) {
+      clearTimeout(v_181e3e.current);
+      v_181e3e.current = null;
     }
+    if (v_a27ed2.current) {
+      clearTimeout(v_a27ed2.current);
+      v_a27ed2.current = null;
+    }
+    v_6890b1.current = false;
+
+    v_96a9ed(v_21cc31);
+    v_6a4dcd(true);
+
+    setTimeout(() => {
+      console.log('[RecentAds] showAdInModal 즉시 호출 (2초 타이머 우회)');
+      if (v_7a73cc.current) {
+        v_7a73cc.current(v_21cc31).catch((v_49263d) => {
+          console.warn('[RecentAds] showAdInModal 실패:', v_49263d);
+
+          if (v_ddcfed.urlAD) {
+            v_f2c756.openURL(v_ddcfed.urlAD).catch((v_9e86fd) => console.warn('[RecentAds] openURL 실패:', v_9e86fd));
+          }
+        });
+      } else if (v_5987c4.current) {
+
+        v_5987c4.current(v_21cc31);
+      } else if (v_ddcfed.urlAD) {
+        v_f2c756.openURL(v_ddcfed.urlAD).catch((v_49263d) => console.warn('[RecentAds] openURL 실패:', v_49263d));
+      }
+    }, 200);
   }, []);
   const v_6890b1 = v_e662ae(false); 
 
@@ -2527,6 +2555,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   v_c4deb2(() => {
     v_5987c4.current = v_eed806;
   }, [v_eed806]);
+
+  v_c4deb2(() => {
+    v_7a73cc.current = v_794bb0;
+  }, [v_794bb0]);
 
   const v_fce460 = [
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
