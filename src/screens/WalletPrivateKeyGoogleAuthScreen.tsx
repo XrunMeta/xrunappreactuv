@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
+import * as Clipboard from 'expo-clipboard';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -21,10 +22,18 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
   exportBackup,
+  NETWORK_MAP,
   type BackupPayload,
+  type WalletKey,
+  type WalletNetwork,
 } from '../services/walletKeyStore';
 
-type Stage = 'loading' | 'pin' | 'options' | 'busy';
+type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
+
+const NETWORK_LABEL: Record<WalletNetwork, string> = {
+  eth: 'Ethereum (ETH 계열)',
+  pol: 'Polygon (POL 계열)',
+};
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
   const { t } = useTranslation();
@@ -35,6 +44,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [memberId, setMemberId] = useState<number | null>(null);
   const [email, setEmail] = useState<string>('');
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
+
+  const [wallets, setWallets] = useState<WalletKey[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,8 +82,9 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   }, []);
 
-  const onPinPromptSuccess = (_wallets: unknown[]) => {
+  const onPinPromptSuccess = (ws: WalletKey[]) => {
 
+    setWallets(ws);
     setPinPromptVisible(false);
     setStage('options');
   };
@@ -103,10 +115,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const json = JSON.stringify(payload, null, 2);
       const fileName = `xrun-wallet-backup-${payload.member}-${payload.exported_at}.json`;
       const path = `${FileSystem.documentDirectory}${fileName}`;
-      await FileSystem.writeAsStringAsync(path, json, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
 
+      await FileSystem.writeAsStringAsync(path, json);
       const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
       try {
         await Share.share({
@@ -126,17 +136,55 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       if (__DEV__) console.warn('[WalletKeyBackup] file fail:', e);
       await showAlert(
         t('common.messages.error') || '오류',
-        '파일 저장에 실패했습니다',
+        `파일 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
       );
       setStage('options');
     }
   };
 
   const handleGdriveBackup = async () => {
-
     Alert.alert(
       'Google Drive 백업',
-      '구현 준비 중입니다. 현재는 파일 백업만 사용 가능합니다.',
+      '구현 준비 중입니다. 현재는 파일 백업과 직접 보기만 사용 가능합니다.',
+    );
+  };
+
+  const handleViewKey = () => {
+    if (stage !== 'options') return;
+    Alert.alert(
+      '경고',
+      '개인 키를 평문으로 표시합니다.\n주변에 다른 사람이 화면을 보지 못하도록 주의해주세요.',
+      [
+        { text: '취소', style: 'cancel' },
+        { text: '확인', onPress: () => setStage('view') },
+      ],
+    );
+  };
+
+  const handleCopyKey = (pk: string) => {
+    Alert.alert(
+      '경고',
+      '키를 클립보드에 복사합니다.\n다른 앱이 클립보드를 읽을 수 있습니다. 사용 후 즉시 다른 내용을 복사해 클립보드를 비워주세요.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '확인',
+          onPress: async () => {
+            try {
+              await Clipboard.setStringAsync(pk);
+              await showAlert(
+                '복사 완료',
+                '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
+              );
+            } catch (e: any) {
+              await showAlert(
+                t('common.messages.error') || '오류',
+                `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
+              );
+            }
+          },
+        },
+      ],
     );
   };
 
@@ -160,8 +208,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           <View style={styles.optionsContainer}>
             <Text style={styles.title}>백업 방식을 선택하세요</Text>
             <Text style={styles.subtitle}>
-              지갑 키는 현재 PIN 으로 암호화되어 있습니다.{'\n'}
-              백업 파일은 PIN 없이 복호화할 수 없습니다.
+              지갑 키는 PIN 으로 보호되어 있습니다.{'\n'}
+              파일/Drive 백업은 PIN 없이 복호화할 수 없습니다.
             </Text>
 
             <TouchableOpacity
@@ -170,12 +218,10 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
-              <Ionicons name="document-outline" size={32} color={COLORS.buttonPrimary} />
+              <Ionicons name="document-outline" size={28} color={COLORS.buttonPrimary} />
               <View style={styles.optionTextWrap}>
                 <Text style={styles.optionLabel}>파일로 저장</Text>
-                <Text style={styles.optionDesc}>
-                  앱 문서 폴더에 저장 + 다른 앱으로 공유
-                </Text>
+                <Text style={styles.optionDesc}>다른 앱으로 공유 (메일·iCloud·파일 등)</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
@@ -186,10 +232,24 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
-              <Ionicons name="cloud-upload-outline" size={32} color={COLORS.buttonPrimary} />
+              <Ionicons name="cloud-upload-outline" size={28} color={COLORS.buttonPrimary} />
               <View style={styles.optionTextWrap}>
                 <Text style={styles.optionLabel}>Google Drive 에 저장</Text>
                 <Text style={styles.optionDesc}>구글 계정 클라우드에 암호화 저장</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, styles.viewCard, stage === 'busy' && styles.disabled]}
+              onPress={handleViewKey}
+              disabled={stage === 'busy'}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="eye-outline" size={28} color="#a36a00" />
+              <View style={styles.optionTextWrap}>
+                <Text style={styles.optionLabel}>키 직접 보기 / 복사</Text>
+                <Text style={styles.optionDesc}>평문으로 화면에 표시 + 복사 가능 (주의)</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
@@ -200,6 +260,49 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 <Text style={styles.busyText}>처리 중...</Text>
               </View>
             )}
+          </View>
+        )}
+
+        {stage === 'view' && (
+          <View style={styles.viewContainer}>
+            <View style={styles.warningBox}>
+              <Ionicons name="warning-outline" size={20} color="#a36a00" />
+              <Text style={styles.warningText}>
+                평문 키가 표시되어 있습니다. 화면 캡처·녹화·노출에 주의해주세요.
+              </Text>
+            </View>
+
+            {wallets.map((w) => {
+              const network = NETWORK_MAP[w.wallet_code];
+              if (!network) return null;
+              return (
+                <View key={w.wallet_code} style={styles.keyCard}>
+                  <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
+                  <Text style={styles.codeLabel}>
+                    {w.wallet_code} · {w.address}
+                  </Text>
+                  <Text style={styles.privateKey} selectable>
+                    {w.private_key}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.copyButton}
+                    onPress={() => handleCopyKey(w.private_key)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="copy-outline" size={18} color="#ffffff" />
+                    <Text style={styles.copyButtonText}>이 키 복사</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setStage('options')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.backButtonText}>옵션으로 돌아가기</Text>
+            </TouchableOpacity>
           </View>
         )}
       </SafeScrollView>
@@ -261,12 +364,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12,
   },
+  viewCard: {
+    backgroundColor: '#fffaf2',
+    borderColor: '#f0c97a',
+  },
   optionTextWrap: {
     flex: 1,
     marginLeft: 14,
   },
   optionLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: FONTS.semiBold,
     color: COLORS.titleText,
     marginBottom: 2,
@@ -290,5 +397,80 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
     color: COLORS.darkGray,
+  },
+  viewContainer: {
+    flex: 1,
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff7e6',
+    borderColor: '#f0c97a',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  warningText: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 12,
+    color: '#7a4a00',
+    fontFamily: FONTS.medium,
+  },
+  keyCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eaeaea',
+    padding: 16,
+    marginBottom: 12,
+  },
+  networkLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.titleText,
+    marginBottom: 4,
+  },
+  codeLabel: {
+    fontSize: 11,
+    color: COLORS.darkGray,
+    fontFamily: FONTS.regular,
+    marginBottom: 10,
+  },
+  privateKey: {
+    fontSize: 11,
+    fontFamily: 'Courier',
+    color: '#222',
+    backgroundColor: '#f7f7f7',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  copyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.buttonPrimary,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  copyButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: FONTS.semiBold,
+    marginLeft: 6,
+  },
+  backButton: {
+    alignSelf: 'center',
+    marginTop: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+  },
+  backButtonText: {
+    fontSize: 14,
+    color: COLORS.darkGray,
+    fontFamily: FONTS.medium,
+    textDecorationLine: 'underline',
   },
 });
