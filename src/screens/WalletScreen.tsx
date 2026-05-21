@@ -229,7 +229,7 @@ export const WalletScreen = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const onPinPromptSuccess = (_wallets: any[]) => {
+  const onPinPromptSuccess = (_wallets: any[], _pin?: string) => {
 
     if (pinPromptProps) {
       markUserUnlocked(pinPromptProps.email, pinPromptProps.memberId);

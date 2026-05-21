@@ -429,8 +429,8 @@ export interface BackupEntry {
 
 export interface BackupPayload {
   v: 1;
-  email_hash: string;   
-  member: number;
+  hash: string;         
+  email: string;        
   entries: BackupEntry[];
   exported_at: number;  
 }
@@ -450,9 +450,72 @@ export async function exportBackup(
   const normalized = normEmail(email);
   return {
     v: 1,
-    email_hash: CryptoJS.SHA256(normalized).toString(),
-    member,
+    hash: CryptoJS.SHA256(normalized).toString(),
+    email: normalized,
     entries: result,
+    exported_at: Date.now(),
+  };
+}
+
+export function encryptBackupJson(json: string, pin: string): string {
+  const keyHex = CryptoJS.SHA256(pin).toString();
+  const key = CryptoJS.enc.Hex.parse(keyHex);
+  const iv = CryptoJS.lib.WordArray.random(16);
+  const cipher = CryptoJS.AES.encrypt(json, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  const ivHex = iv.toString(CryptoJS.enc.Hex);
+
+  return `${ivHex}:${cipher.toString()}`;
+}
+
+export function decryptBackupJson(encrypted: string, pin: string): string {
+  const idx = encrypted.indexOf(':');
+  if (idx <= 0) throw new Error('invalid backup format');
+  const ivHex = encrypted.slice(0, idx);
+  const cipherB64 = encrypted.slice(idx + 1);
+  const keyHex = CryptoJS.SHA256(pin).toString();
+  const key = CryptoJS.enc.Hex.parse(keyHex);
+  const iv = CryptoJS.enc.Hex.parse(ivHex);
+  const decrypted = CryptoJS.AES.decrypt(cipherB64, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+export interface PlainBackupPayload {
+  v: 1;
+  warning: 'PLAIN_TEXT_DO_NOT_SHARE';
+  email: string;
+  wallets: Array<{
+    network: WalletNetwork;
+    wallet_code: string;
+    address: string;
+    private_key: string;     
+  }>;
+  exported_at: number;
+}
+
+export function buildPlainBackup(
+  email: string,
+  wallets: WalletKey[],
+): PlainBackupPayload {
+  const list: PlainBackupPayload['wallets'] = [];
+  for (const w of wallets) {
+    const network = NETWORK_MAP[w.wallet_code];
+    if (!network) continue;
+    const pk = w.private_key.startsWith('0x') ? w.private_key : '0x' + w.private_key;
+    list.push({ network, wallet_code: w.wallet_code, address: w.address, private_key: pk });
+  }
+  return {
+    v: 1,
+    warning: 'PLAIN_TEXT_DO_NOT_SHARE',
+    email: normEmail(email),
+    wallets: list,
     exported_at: Date.now(),
   };
 }

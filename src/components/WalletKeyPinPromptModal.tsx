@@ -20,7 +20,8 @@ interface Props {
   memberId: number;
   email: string;   
   visible: boolean;
-  onSuccess: (wallets: WalletKey[]) => void;
+
+  onSuccess: (wallets: WalletKey[], pin: string) => void;
   onCancel: () => void;
 }
 
@@ -60,8 +61,8 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     const result = await unlockUserWallets(currentPin, email, memberId);
     if (result.ok) {
 
+      onSuccess(result.wallets, currentPin);
       setPin('');
-      onSuccess(result.wallets);
       return;
     }
 

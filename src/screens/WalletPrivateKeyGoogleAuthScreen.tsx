@@ -24,6 +24,8 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
   exportBackup,
+  encryptBackupJson,
+  buildPlainBackup,
   NETWORK_MAP,
   type BackupPayload,
   type WalletKey,
@@ -48,6 +50,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
 
   const [wallets, setWallets] = useState<WalletKey[]>([]);
+
+  const [pin, setPinState] = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
@@ -84,9 +88,10 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   }, []);
 
-  const onPinPromptSuccess = (ws: WalletKey[]) => {
+  const onPinPromptSuccess = (ws: WalletKey[], pinPlain: string) => {
 
     setWallets(ws);
+    setPinState(pinPlain);
     setPinPromptVisible(false);
     setStage('options');
   };
@@ -103,6 +108,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   const handleFileBackup = async () => {
     if (stage !== 'options') return;
+    if (!pin) {
+      await showAlert(
+        t('common.messages.error') || '오류',
+        'PIN 정보가 메모리에 없습니다. 화면을 다시 열어 PIN 을 입력해주세요.',
+      );
+      setStage('pin');
+      setPinPromptVisible(true);
+      return;
+    }
     setStage('busy');
     try {
       const payload = await buildBackupPayload();
@@ -114,11 +128,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         setStage('options');
         return;
       }
-      const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrunwallet-${payload.exported_at}.key`;
-      const path = `${FileSystem.documentDirectory}${fileName}`;
 
-      await FileSystem.writeAsStringAsync(path, json);
+      const json = JSON.stringify(payload);
+      const encrypted = encryptBackupJson(json, pin);
+      const fileName = `xrunwallet-${payload.exported_at}.txt`;
+      const path = `${FileSystem.documentDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(path, encrypted);
       const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
       try {
         await Share.share({
@@ -157,8 +172,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         setStage('options');
         return;
       }
-      const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrunwallet-${payload.exported_at}.key`;
+
+      if (!pin) throw new Error('PIN 정보 누락 — 화면을 다시 열어주세요');
+      const jsonRaw = JSON.stringify(payload);
+      const json = encryptBackupJson(jsonRaw, pin);
+      const fileName = `xrunwallet-${payload.exported_at}.txt`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;
@@ -183,14 +201,14 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const boundary = '------xrunbackup-' + Date.now();
       const metadata = JSON.stringify({
         name: fileName,
-        mimeType: 'application/json',
+        mimeType: 'text/plain',
       });
       const body =
         `--${boundary}\r\n` +
         `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
         `${metadata}\r\n` +
         `--${boundary}\r\n` +
-        `Content-Type: application/json\r\n\r\n` +
+        `Content-Type: text/plain\r\n\r\n` +
         `${json}\r\n` +
         `--${boundary}--`;
 
@@ -230,6 +248,114 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       );
       setStage('options');
     }
+  };
+
+  const performGdrivePlainUpload = async () => {
+    setStage('busy');
+    try {
+      if (wallets.length === 0) {
+        throw new Error('표시 가능한 wallet 이 없습니다');
+      }
+      const payload = buildPlainBackup(email, wallets);
+      const json = JSON.stringify(payload, null, 2);
+      const fileName = `xrunwallet-PLAIN-${payload.exported_at}.txt`;
+
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
+      let current: any = null;
+      try { current = GoogleSignin.getCurrentUser(); } catch {  }
+      if (!current) {
+        await GoogleSignin.signIn();
+      }
+      try {
+        await GoogleSignin.addScopes({
+          scopes: ['https://www.googleapis.com/oth-path'],
+        });
+      } catch {  }
+      const tokens = await GoogleSignin.getTokens();
+      const accessToken = tokens?.accessToken;
+      if (!accessToken) throw new Error('Google access token 획득 실패');
+
+      const boundary = '------xrunplain-' + Date.now();
+      const metadata = JSON.stringify({
+        name: fileName,
+        mimeType: 'text/plain',
+      });
+      const body =
+        `--${boundary}\r\n` +
+        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+        `${metadata}\r\n` +
+        `--${boundary}\r\n` +
+        `Content-Type: text/plain\r\n\r\n` +
+        `${json}\r\n` +
+        `--${boundary}--`;
+
+      const res = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+          },
+          body,
+        },
+      );
+      if (!res.ok) {
+        const errBody = await res.text();
+        if (res.status === 403 && /has not been used|disabled/i.test(errBody)) {
+          throw new Error('Google Drive API 가 활성화되어 있지 않습니다.');
+        }
+        throw new Error(`Drive upload ${res.status}: ${errBody.slice(0, 200)}`);
+      }
+      await res.json();
+      await showAlert(
+        '평문 저장 완료',
+        `Google Drive 에 평문 키 저장됨\n파일명: ${fileName}\n\n!! 이 파일이 유출되면 즉시 자산을 옮길 수 있습니다 !!\n사용 후 반드시 Drive 에서 삭제해주세요.`,
+      );
+      setStage('options');
+    } catch (e: any) {
+      if (__DEV__) console.warn('[WalletKeyBackup] gdrive plain fail:', e);
+      await showAlert(
+        t('common.messages.error') || '오류',
+        `Google Drive 평문 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
+      );
+      setStage('options');
+    }
+  };
+
+  const handleGdrivePlainBackup = () => {
+    if (stage !== 'options') return;
+
+    Alert.alert(
+      '⚠️ 매우 위험합니다',
+      '평문 (암호화 없이) 으로 개인 키를 Google Drive 에 저장합니다.\n\n' +
+      '이 파일을 누군가 받으면 비밀번호 없이 지갑의 모든 자산을 옮길 수 있습니다.\n\n' +
+      '정말 진행하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '이해했습니다, 계속',
+          style: 'destructive',
+          onPress: () => {
+
+            Alert.alert(
+              '⚠️ 마지막 확인',
+              '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
+              '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
+              '계속하시겠습니까?',
+              [
+                { text: '취소', style: 'cancel' },
+                {
+                  text: '예, 평문 저장합니다',
+                  style: 'destructive',
+                  onPress: () => { void performGdrivePlainUpload(); },
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
   };
 
   const handleViewKey = () => {
@@ -335,6 +461,22 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 <Text style={styles.optionDesc}>평문으로 화면에 표시 + 복사 가능 (주의)</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, styles.dangerCard, stage === 'busy' && styles.disabled]}
+              onPress={handleGdrivePlainBackup}
+              disabled={stage === 'busy'}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="warning-outline" size={28} color="#ffffff" />
+              <View style={styles.optionTextWrap}>
+                <Text style={styles.dangerLabel}>Google Drive 에 평문 저장</Text>
+                <Text style={styles.dangerDesc}>
+                  암호화 없이 PK 저장. 파일 유출 시 즉시 자산 손실.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#ffffff" />
             </TouchableOpacity>
 
             {stage === 'busy' && (
@@ -450,6 +592,21 @@ const styles = StyleSheet.create({
   viewCard: {
     backgroundColor: '#fffaf2',
     borderColor: '#f0c97a',
+  },
+  dangerCard: {
+    backgroundColor: '#c0392b',
+    borderColor: '#a3271b',
+  },
+  dangerLabel: {
+    fontSize: 15,
+    fontFamily: FONTS.semiBold,
+    color: '#ffffff',
+    marginBottom: 2,
+  },
+  dangerDesc: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: '#ffdedb',
   },
   optionTextWrap: {
     flex: 1,
