@@ -16,7 +16,12 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView, WalletKeyPinPromptModal } from '../components';
-import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
+import {
+  jwtPayloadSub,
+  findEntriesForUser,
+  isUserStillUnlocked,
+  markUserUnlocked,
+} from '../services/walletKeyStore';
 import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -209,6 +214,11 @@ export const WalletScreen = () => {
           return;
         }
 
+        if (isUserStillUnlocked(emailRaw, memberId)) {
+          setWalletsUnlocked(true);
+          return;
+        }
+
         setPinPromptProps({ memberId, email: emailRaw.toLowerCase().trim() });
         setPinPromptVisible(true);
       } catch {
@@ -221,6 +231,9 @@ export const WalletScreen = () => {
 
   const onPinPromptSuccess = (_wallets: any[]) => {
 
+    if (pinPromptProps) {
+      markUserUnlocked(pinPromptProps.email, pinPromptProps.memberId);
+    }
     setPinPromptVisible(false);
     setWalletsUnlocked(true);
   };

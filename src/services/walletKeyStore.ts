@@ -393,6 +393,33 @@ export async function debugVault(): Promise<{ count: number; users: string[] }> 
   };
 }
 
+const SESSION_UNLOCK_TTL_MS = 3 * 60 * 1000;
+const _sessionUnlock = new Map<string, number>();
+
+function sessionUnlockKey(email: string, member: number): string {
+  const normalized = normEmail(email);
+  return CryptoJS.SHA256(`xrun-session:${normalized}:${String(member)}`).toString();
+}
+
+export function markUserUnlocked(email: string, member: number): void {
+  _sessionUnlock.set(sessionUnlockKey(email, member), Date.now());
+}
+
+export function isUserStillUnlocked(email: string, member: number): boolean {
+  const k = sessionUnlockKey(email, member);
+  const ts = _sessionUnlock.get(k);
+  if (!ts) return false;
+  if (Date.now() - ts > SESSION_UNLOCK_TTL_MS) {
+    _sessionUnlock.delete(k);
+    return false;
+  }
+  return true;
+}
+
+export function clearUserUnlock(email: string, member: number): void {
+  _sessionUnlock.delete(sessionUnlockKey(email, member));
+}
+
 export type WalletAvailabilitySentinel = 'NQ' | 'DK' | 'ADC' | 'MISSING' | 'DECRYPT_FAIL';
 
 export interface WalletUnavailable {
