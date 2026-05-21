@@ -266,36 +266,35 @@ interface GoodsDetailApiResponse {
 }
 
 export async function getProductDetail(goodsCode: string): Promise<GiftishowProductDetailResponse> {
-  const encoded = encodeURIComponent(goodsCode);
-  const url = `${GOODS_API_BASE_URL}${GOODS_API_PATH}/${encoded}`;
+
+  const { createAxiosInstance } = await import('./index');
+  const axiosInstance = createAxiosInstance();
+  const endpoint = '/getGiftishowGoodsDetail';
 
   try {
-    logDevRequest('POST', url);
-    const response = await axios.post<GoodsDetailApiResponse>(url, getGiftishowAuthParams(API_CODE_GOODS_DETAIL), {
-      timeout: TIMEOUT_MS,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        Accept: 'application/json',
-      },
-    });
-    logDevRequest('POST', url, response.status);
+    logDevRequest('POST', endpoint);
+    const response = await axiosInstance.post<{
+      status?: string; code?: number; message?: string;
+      data?: GoodsDetailApiResponse;
+    }>(endpoint, { goods_code: goodsCode });
+    logDevRequest('POST', endpoint, response.status);
 
-    const data = response.data;
-    const code = data?.code;
+    const inner = response.data?.data;
+    const code = inner?.code;
     if (code !== '0000' && code !== '000') {
-      const errMsg = getGiftishowErrorMessage(code, data?.message ?? undefined);
-      console.warn('[기프티쇼비즈] 상품 상세 응답 코드:', code, data?.message);
+      const errMsg = getGiftishowErrorMessage(code, inner?.message ?? undefined);
+      console.warn('[기프티쇼비즈] 상품 상세 응답 코드:', code, inner?.message);
       return { resultCode: code ?? undefined, resultMsg: errMsg };
     }
 
-    const detail = data?.result?.goodsDetail;
+    const detail = inner?.result?.goodsDetail;
     if (!detail) {
       return { resultCode: code, resultMsg: '상품 상세 없음' };
     }
-    return { detail, resultCode: code, resultMsg: data?.message ?? undefined };
+    return { detail, resultCode: code, resultMsg: inner?.message ?? undefined };
   } catch (error) {
     if (error instanceof AxiosError) {
-      logDevRequest('POST', url, error.response?.status, error.response?.data);
+      logDevRequest('POST', endpoint, error.response?.status, error.response?.data);
       if (error.response?.status === 404) {
         warn404Once('상품 상세');
         return { resultCode: '404', resultMsg: '상품을 찾을 수 없습니다.' };
@@ -304,6 +303,7 @@ export async function getProductDetail(goodsCode: string): Promise<GiftishowProd
     } else {
       console.error('[기프티쇼비즈] 상품 상세 조회 오류:', error);
     }
+
     throw error;
   }
 }
