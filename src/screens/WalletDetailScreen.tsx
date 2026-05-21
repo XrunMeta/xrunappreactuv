@@ -583,6 +583,7 @@ export const WalletDetailScreen = () => {
   }, [publicAddress, showAlert]);
 
   const handleDownload = useCallback(async () => {
+
     const confirmed = await showAlert(
       t('screens.walletPrivateKeyDisplay.confirmDownloadTitle'),
       t('screens.walletPrivateKeyDisplay.confirmDownloadMessage'),
@@ -592,19 +593,8 @@ export const WalletDetailScreen = () => {
       ],
     );
 
-    if (confirmed === 1) { 
-      const emailConfirmed = await showAlert(
-        t('screens.walletPrivateKeyDisplay.warningTitle'),
-        t('screens.walletPrivateKeyDisplay.emailVerificationRequired'),
-        [
-          { text: t('common.cancel') },
-          { text: t('common.confirm') },
-        ],
-      );
-
-      if (emailConfirmed === 1) {
-        navigate(ROUTES.walletPrivateKeyGoogleAuth);
-      }
+    if (confirmed === 1) {
+      navigate(ROUTES.walletPrivateKeyGoogleAuth);
     }
   }, [t, showAlert, navigate]);
 
