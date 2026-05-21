@@ -67,7 +67,12 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
 
     const msg = result.reason === 'wrong-pin'
       ? 'PIN 이 일치하지 않습니다'
-      : '검증 실패 — 다시 시도해주세요';
+      : __DEV__
+        ? `검증 실패: ${result.reason}`
+        : '검증 실패 — 다시 시도해주세요';
+    if (__DEV__) {
+      console.warn('[WalletKeyPinPromptModal] unlock fail reason:', result.reason);
+    }
     setErrorMsg(msg);
     setStep('error');
     setPin('');
