@@ -49,3 +49,4 @@ export { DevDebugPanel } from './DevDebugPanel';
 export { PaymentPinGate } from './PaymentPinGate';
 export { EmailOtpGate } from './EmailOtpGate';
 export { WalletKeyPinSetupModal } from './WalletKeyPinSetupModal';
+export { WalletKeyPinPromptModal } from './WalletKeyPinPromptModal';

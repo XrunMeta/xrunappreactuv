@@ -46,7 +46,7 @@ import { v_ba5086 } from '../context/OTAUpdateContext';
 import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
-import { v_9bbbdc, v_7e6df2 } from '../services/walletKeyStore';
+import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -388,10 +388,13 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         if (v_717992 == null || !v_b4e012) return;
 
-        const v_2b8338 = await v_7e6df2(v_b4e012, v_717992);
+        const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
+        const v_9034c6 = (v_9e86fd) =>
+          v_9e86fd !== null && v_9e86fd.s === 's0' && !v_9e86fd.h;
+        const v_aa192c = v_9034c6(v_1e6eca.eth) || v_9034c6(v_1e6eca.pol);
 
         if (v_2008a4) return;
-        if (v_2b8338 && v_2b8338.s === 's0' && !v_2b8338.h) {
+        if (v_aa192c) {
 
           const v_e0c7e8 = v_b4e012.toLowerCase().trim();
 
