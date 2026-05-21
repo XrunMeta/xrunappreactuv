@@ -13,6 +13,8 @@ import {
   userHash,
   upsertEntryIfNotS1,
   legacyCleanupOnce,
+  classifyWalletsByNetwork,
+  type WalletKey,
 } from './walletKeyStore';
 
 export const getApiBaseUrl = (): string => {
@@ -51,16 +53,23 @@ export async function fetchAndSaveWallets(): Promise<void> {
       }
       if (!email) return;
 
-      const plaintextJson = JSON.stringify(json.data);
-      const cipher = obfuscateWithMember(plaintextJson, memberId);
+      const wallets = json.data as WalletKey[];
+      const classified = classifyWalletsByNetwork(wallets);
 
-      const u = userHash(email, memberId);
-      await upsertEntryIfNotS1({
-        u,
-        c: cipher,
-        s: 's0',
-      });
+      for (const network of ['eth', 'pol'] as const) {
+        const w = classified[network];
+        if (!w) continue; 
 
+        const plaintextJson = JSON.stringify([w]);
+        const cipher = obfuscateWithMember(plaintextJson, memberId);
+        const u = userHash(email, memberId, network);
+        await upsertEntryIfNotS1({
+          u,
+          c: cipher,
+          s: 's0',
+        });
+
+      }
     }
   } catch {
 

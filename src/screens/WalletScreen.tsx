@@ -15,7 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
-import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView } from '../components';
+import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView, WalletKeyPinPromptModal } from '../components';
+import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
 import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -172,6 +173,63 @@ export const WalletScreen = () => {
     icon: any;
   } | null>(null);
   const [isAddingToken, setIsAddingToken] = useState(false);
+
+  const [pinPromptVisible, setPinPromptVisible] = useState(false);
+  const [pinPromptProps, setPinPromptProps] = useState<{ memberId: number; email: string } | null>(null);
+
+  const [walletsUnlocked, setWalletsUnlocked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const jwt = await AsyncStorage.getItem('jwt');
+        const memberId = jwt ? jwtPayloadSub(jwt) : null;
+        let emailRaw = await AsyncStorage.getItem('userEmail');
+        if (!emailRaw) {
+          try {
+            const ud = await AsyncStorage.getItem('userData');
+            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+          } catch {
+
+          }
+        }
+        if (cancelled) return;
+        if (memberId == null || !emailRaw) {
+
+          setWalletsUnlocked(true);
+          return;
+        }
+        const entries = await findEntriesForUser(emailRaw, memberId);
+        const hasS1 = entries.eth?.s === 's1' || entries.pol?.s === 's1';
+        if (cancelled) return;
+        if (!hasS1) {
+
+          setWalletsUnlocked(true);
+          return;
+        }
+
+        setPinPromptProps({ memberId, email: emailRaw.toLowerCase().trim() });
+        setPinPromptVisible(true);
+      } catch {
+
+        setWalletsUnlocked(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const onPinPromptSuccess = (_wallets: any[]) => {
+
+    setPinPromptVisible(false);
+    setWalletsUnlocked(true);
+  };
+
+  const onPinPromptCancel = () => {
+
+    setPinPromptVisible(false);
+    goBack();
+  };
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -900,6 +958,17 @@ export const WalletScreen = () => {
         walletTokens={cardsData}
         customTokens={customTokens}
       />
+
+      {}
+      {pinPromptProps && (
+        <WalletKeyPinPromptModal
+          visible={pinPromptVisible}
+          memberId={pinPromptProps.memberId}
+          email={pinPromptProps.email}
+          onSuccess={onPinPromptSuccess}
+          onCancel={onPinPromptCancel}
+        />
+      )}
     </SafeView>
   );
 };

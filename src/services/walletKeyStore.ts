@@ -12,6 +12,8 @@ export interface WalletKey {
   derivation_path: string;
 }
 
+export type WalletNetwork = 'eth' | 'pol';
+
 export interface VaultEntry {
   u: string;        
   c: string;        
@@ -23,6 +25,21 @@ export interface VaultEntry {
   k?: string;
   z?: string;
   p?: string;
+}
+
+export const NETWORK_MAP: Record<string, WalletNetwork> = {
+  c1: 'eth',
+  c2: 'eth',
+  c16: 'pol',
+  c18: 'pol',
+};
+
+export function classifyWalletsByNetwork(
+  wallets: WalletKey[],
+): { eth: WalletKey | null; pol: WalletKey | null } {
+  const eth = wallets.find((w) => NETWORK_MAP[w.wallet_code] === 'eth') ?? null;
+  const pol = wallets.find((w) => NETWORK_MAP[w.wallet_code] === 'pol') ?? null;
+  return { eth, pol };
 }
 
 const VAULT_KEY = '__xs_v1';
@@ -185,9 +202,9 @@ export async function verifyAllWallets(
   return { ok: failed.length === 0, failed };
 }
 
-export function userHash(email: string, member: number): string {
+export function userHash(email: string, member: number, network: WalletNetwork): string {
   const normalized = normEmail(email);
-  return CryptoJS.SHA256(`xrun-user:${normalized}:${String(member)}`).toString();
+  return CryptoJS.SHA256(`xrun-user:${normalized}:${String(member)}:${network}`).toString();
 }
 
 function randomDecoys(): Partial<VaultEntry> {
@@ -232,10 +249,27 @@ export async function writeVault(entries: VaultEntry[]): Promise<void> {
   await AsyncStorage.setItem(VAULT_KEY, JSON.stringify(entries));
 }
 
-export async function findEntry(email: string, member: number): Promise<VaultEntry | null> {
+export async function findEntry(
+  email: string,
+  member: number,
+  network: WalletNetwork,
+): Promise<VaultEntry | null> {
   const vault = await readVault();
-  const u = userHash(email, member);
+  const u = userHash(email, member, network);
   return vault.find((e) => e.u === u) ?? null;
+}
+
+export async function findEntriesForUser(
+  email: string,
+  member: number,
+): Promise<{ eth: VaultEntry | null; pol: VaultEntry | null }> {
+  const vault = await readVault();
+  const ethU = userHash(email, member, 'eth');
+  const polU = userHash(email, member, 'pol');
+  return {
+    eth: vault.find((e) => e.u === ethU) ?? null,
+    pol: vault.find((e) => e.u === polU) ?? null,
+  };
 }
 
 export async function upsertEntry(entry: VaultEntry): Promise<void> {
@@ -285,6 +319,58 @@ export async function upsertEntryIfNotS1(entry: VaultEntry): Promise<{ applied: 
     await writeVault(vault);
     return { applied: true };
   });
+}
+
+export async function unlockUserWallets(
+  pin: string,
+  email: string,
+  member: number,
+): Promise<{ ok: true; wallets: WalletKey[] } | { ok: false; reason: string }> {
+  const entries = await findEntriesForUser(email, member);
+  const allWallets: WalletKey[] = [];
+  const targets: WalletNetwork[] = ['eth', 'pol'];
+
+  const candidates = targets.filter((n) => entries[n] !== null);
+  if (candidates.length === 0) return { ok: false, reason: 'no-entries' };
+
+  const expectedHash = pinVerifyHash(pin, email, member);
+
+  for (const network of candidates) {
+    const entry = entries[network]!;
+    if (entry.s !== 's1' || !entry.h) {
+      return { ok: false, reason: `${network}:not-set-up` };
+    }
+
+    if (entry.h !== expectedHash) {
+      return { ok: false, reason: 'wrong-pin' };
+    }
+
+    let plaintext: string;
+    try {
+      plaintext = decryptWithPin(entry.c, pin, email, member);
+    } catch {
+      return { ok: false, reason: `${network}:decrypt-error` };
+    }
+    if (!plaintext) return { ok: false, reason: `${network}:decrypt-empty` };
+
+    let wallets: WalletKey[];
+    try {
+      wallets = JSON.parse(plaintext);
+    } catch {
+      return { ok: false, reason: `${network}:json-parse-fail` };
+    }
+    if (!Array.isArray(wallets) || wallets.length === 0) {
+      return { ok: false, reason: `${network}:empty-array` };
+    }
+
+    const v = await verifyAllWallets(wallets);
+    if (!v.ok) {
+      return { ok: false, reason: `${network}:verify-fail:${v.failed.join(',')}` };
+    }
+    allWallets.push(...wallets);
+  }
+
+  return { ok: true, wallets: allWallets };
 }
 
 const LEGACY_KEYS = ['wallets', 'walletsEncState', 'walletKeyPinHash', 'wallets_stage1_backup'];
