@@ -12,10 +12,19 @@ import {
   v_88b24e,
   v_f6461f,
   v_1d0094,
+  v_f4d56b,
   v_6390b2,
   v_f17f34,
   type v_b9a3bd,
+  type v_39431d,
+  type v_30b48f,
 } from './walletKeyStore';
+
+const v_9bac9c = new Set([
+  'NQ', 'DK', 'ADC', 'MISSING', 'DECRYPT_FAIL',
+]);
+
+const v_2e0522 = new Set(['c1', 'c2', 'c16', 'c18']);
 
 export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
@@ -35,41 +44,57 @@ export async function v_5ed938(): Promise<void> {
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
     if (!v_8f00b9.ok) return; 
     const v_7ecfd1 = await v_8f00b9.json();
-    if (v_7ecfd1?.status === 'success' && Array.isArray(v_7ecfd1.data) && v_7ecfd1.data.length > 0) {
+    if (v_7ecfd1?.status !== 'success') return;
 
-      const v_56b352 = await v_e84827.getItem('jwt');
-      if (!v_56b352) return; 
-      const v_717992 = v_9bbbdc(v_56b352);
-      if (v_717992 == null) return;
+    const v_56b352 = await v_e84827.getItem('jwt');
+    if (!v_56b352) return; 
+    const v_717992 = v_9bbbdc(v_56b352);
+    if (v_717992 == null) return;
 
-      let v_e0c7e8 = await v_e84827.getItem('userEmail');
-      if (!v_e0c7e8) {
-        try {
-          const v_f21c33 = await v_e84827.getItem('userData');
-          if (v_f21c33) v_e0c7e8 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
-        } catch {
-
-        }
-      }
-      if (!v_e0c7e8) return;
-
-      const v_53579f = v_7ecfd1.data as v_b9a3bd[];
-      const v_97d66c = v_f17f34(v_53579f);
-
-      for (const v_74efc1 of ['eth', 'pol'] as const) {
-        const v_32f7b8 = v_97d66c[v_74efc1];
-        if (!v_32f7b8) continue; 
-
-        const v_eb0188 = JSON.stringify([v_32f7b8]);
-        const v_1de163 = v_88b24e(v_eb0188, v_717992);
-        const v_ceb55a = v_f6461f(v_e0c7e8, v_717992, v_74efc1);
-        await v_1d0094({
-          u: v_ceb55a,
-          c: v_1de163,
-          s: 's0',
-        });
+    let v_e0c7e8 = await v_e84827.getItem('userEmail');
+    if (!v_e0c7e8) {
+      try {
+        const v_f21c33 = await v_e84827.getItem('userData');
+        if (v_f21c33) v_e0c7e8 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+      } catch {
 
       }
+    }
+    if (!v_e0c7e8) return;
+
+    const v_609f58 = Array.isArray(v_7ecfd1.unavailable) ? v_7ecfd1.unavailable : [];
+    const unavailable: v_39431d[] = [];
+    for (const v_ceb55a of v_609f58) {
+      if (typeof v_ceb55a !== 'object' || v_ceb55a === null) continue;
+      const v_c99bd2 = (v_ceb55a as Record<string, unknown>).wallet_code;
+      const v_b88780 = (v_ceb55a as Record<string, unknown>).savedstring;
+      if (typeof v_c99bd2 !== 'string' || !v_2e0522.has(v_c99bd2)) continue;
+      if (typeof v_b88780 !== 'string' || !v_9bac9c.has(v_b88780)) continue;
+      v_a8e631.push({
+        wallet_code: v_c99bd2,
+        savedstring: v_b88780 as v_30b48f,
+      });
+    }
+    await v_f4d56b(v_e0c7e8, v_717992, v_a8e631);
+
+    const wallets: v_b9a3bd[] = Array.isArray(v_7ecfd1.data) ? (v_7ecfd1.data as v_b9a3bd[]) : [];
+    if (v_53579f.length === 0) return; 
+
+    const v_97d66c = v_f17f34(v_53579f);
+
+    for (const v_74efc1 of ['eth', 'pol'] as const) {
+      const v_32f7b8 = v_97d66c[v_74efc1];
+      if (!v_32f7b8) continue; 
+
+      const v_eb0188 = JSON.stringify([v_32f7b8]);
+      const v_1de163 = v_88b24e(v_eb0188, v_717992);
+      const v_ceb55a = v_f6461f(v_e0c7e8, v_717992, v_74efc1);
+      await v_1d0094({
+        u: v_ceb55a,
+        c: v_1de163,
+        s: 's0',
+      });
+
     }
   } catch {
 
