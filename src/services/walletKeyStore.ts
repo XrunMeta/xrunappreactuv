@@ -392,3 +392,70 @@ export async function debugVault(): Promise<{ count: number; users: string[] }> 
     users: vault.map((e) => e.u.slice(0, 12) + '...'),
   };
 }
+
+export type WalletAvailabilitySentinel = 'NQ' | 'DK' | 'ADC' | 'MISSING' | 'DECRYPT_FAIL';
+
+export interface WalletUnavailable {
+  wallet_code: string;                       
+  savedstring: WalletAvailabilitySentinel;
+}
+
+export interface AvailabilityEntry {
+  u: string;                       
+  un: WalletUnavailable[];         
+  t: number;                       
+}
+
+const AVAILABILITY_KEY = '__xs_av1';
+
+export function userAvailabilityHash(email: string, member: number): string {
+  const normalized = normEmail(email);
+  return CryptoJS.SHA256(`xrun-av:${normalized}:${String(member)}`).toString();
+}
+
+export async function readAvailability(): Promise<AvailabilityEntry[]> {
+  try {
+    const raw = await AsyncStorage.getItem(AVAILABILITY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    if (__DEV__) {
+      console.warn('[walletKeyStore] readAvailability parse 실패', e);
+    }
+    return [];
+  }
+}
+
+async function writeAvailability(entries: AvailabilityEntry[]): Promise<void> {
+  await AsyncStorage.setItem(AVAILABILITY_KEY, JSON.stringify(entries));
+}
+
+export async function findUnavailable(
+  email: string,
+  member: number,
+): Promise<WalletUnavailable[]> {
+  const list = await readAvailability();
+  const u = userAvailabilityHash(email, member);
+  const entry = list.find((e) => e.u === u);
+  return entry?.un ?? [];
+}
+
+export async function upsertAvailability(
+  email: string,
+  member: number,
+  unavailable: WalletUnavailable[],
+): Promise<void> {
+  return withVaultLock(async () => {
+    const list = await readAvailability();
+    const u = userAvailabilityHash(email, member);
+    const next: AvailabilityEntry = { u, un: unavailable, t: Date.now() };
+    const idx = list.findIndex((e) => e.u === u);
+    if (idx >= 0) {
+      list[idx] = next;
+    } else {
+      list.push(next);
+    }
+    await writeAvailability(list);
+  });
+}

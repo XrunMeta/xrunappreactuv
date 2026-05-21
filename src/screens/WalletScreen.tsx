@@ -16,7 +16,16 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView, WalletKeyPinPromptModal } from '../components';
-import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
+import {
+  jwtPayloadSub,
+  findEntriesForUser,
+  findUnavailable,
+  type WalletUnavailable,
+} from '../services/walletKeyStore';
+
+const WALLET_CODE_TO_CURRENCY: Record<string, number> = {
+  c1: 1, c2: 2, c16: 16, c18: 18,
+};
 import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -179,6 +188,17 @@ export const WalletScreen = () => {
 
   const [walletsUnlocked, setWalletsUnlocked] = useState(false);
 
+  const [unavailableList, setUnavailableList] = useState<WalletUnavailable[]>([]);
+
+  const unavailableCurrencies = useMemo(() => {
+    const s = new Set<number>();
+    for (const u of unavailableList) {
+      const c = WALLET_CODE_TO_CURRENCY[u.wallet_code];
+      if (typeof c === 'number') s.add(c);
+    }
+    return s;
+  }, [unavailableList]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -200,6 +220,10 @@ export const WalletScreen = () => {
           setWalletsUnlocked(true);
           return;
         }
+
+        const un = await findUnavailable(emailRaw, memberId);
+        if (!cancelled) setUnavailableList(un);
+
         const entries = await findEntriesForUser(emailRaw, memberId);
         const hasS1 = entries.eth?.s === 's1' || entries.pol?.s === 's1';
         if (cancelled) return;
@@ -784,6 +808,17 @@ export const WalletScreen = () => {
     (item: TokenListItemData) => {
       const currency = item.currency;
 
+      if (unavailableCurrencies.has(currency)) {
+        Alert.alert(
+          t('screens.wallet.unavailableTitle', '지갑 키를 받을 수 없습니다'),
+          t(
+            'screens.wallet.unavailableBody',
+            '이 통화는 보호 키가 발급되지 않아 사용할 수 없습니다. 자세한 사항은 고객센터로 문의해주세요.',
+          ),
+        );
+        return;
+      }
+
       if (currency === 19) {
 
         navigate(ROUTES.adHistory);
@@ -793,7 +828,7 @@ export const WalletScreen = () => {
         navigate(ROUTES.walletDetail);
       }
     },
-    [navigate, setSelectedWalletAsset],
+    [navigate, setSelectedWalletAsset, unavailableCurrencies, t],
   );
 
   const TokenListItemComponent: React.FC<TokenListItemData & { onPress?: () => void }> = (props) => {
@@ -917,6 +952,21 @@ export const WalletScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {}
+        {unavailableList.length > 0 && (
+          <View style={styles.unavailableNotice}>
+            <Ionicons name="alert-circle-outline" size={16} color="#a36a00" />
+            <Text style={styles.unavailableNoticeText}>
+              {t(
+                'screens.wallet.unavailableNotice',
+                '아래 통화는 보호 키가 발급되지 않아 사용할 수 없습니다',
+              )}
+              {': '}
+              {unavailableList.map((u) => u.wallet_code).join(', ')}
+            </Text>
+          </View>
+        )}
+
         <View style={styles.listWrapper}>
           {isLoading ? (
             <View style={styles.loadingContainer}>
@@ -1014,6 +1064,25 @@ const styles = StyleSheet.create({
   },
   listWrapper: {
     flex: 1,
+  },
+  unavailableNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff7e6',
+    borderColor: '#f0c97a',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginHorizontal: 4,
+    marginBottom: 8,
+  },
+  unavailableNoticeText: {
+    flex: 1,
+    marginLeft: 6,
+    fontSize: 12,
+    color: '#7a4a00',
+    fontFamily: FONTS.medium,
   },
   dataListContent: {
     paddingBottom: 32,
