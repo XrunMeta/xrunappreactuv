@@ -743,32 +743,60 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, []);
 
   const handleTokenClickRef = useRef<((t: TokenData) => void) | null>(null);
+  const showAdInModalRef = useRef<((t: TokenData) => Promise<void>) | null>(null);
   const handleRecentAdClick = useCallback((ad: RecentAd) => {
+    console.log('[RecentAds] 다시 열기 클릭', { campid: ad.campid, name: ad.name, hasUrlAD: !!ad.urlAD });
+
+    const token: TokenData = {
+      spotID: (ad as any).spotID ?? 0,
+      x: (ad as any).x ?? 0,
+      y: (ad as any).y ?? 0,
+      xrunPrice: ad.xrunPrice,
+      distance: ad.distance,
+      name: ad.name,
+      iconurl: ad.iconurl,
+      joindesc: ad.joindesc,
+      brand: ad.brand,
+      advertisement: ad.advertisement,
+      coin: ad.coin,
+      member: ad.member,
+      campid: ad.campid,
+      ad_company: ad.ad_company,
+      urlAD: ad.urlAD,
+    };
+
     setShowRecentModal(false);
-    if (handleTokenClickRef.current) {
 
-      const token: TokenData = {
-        spotID: (ad as any).spotID ?? 0,
-        x: (ad as any).x ?? 0,
-        y: (ad as any).y ?? 0,
-        xrunPrice: ad.xrunPrice,
-        distance: ad.distance,
-        name: ad.name,
-        iconurl: ad.iconurl,
-        joindesc: ad.joindesc,
-        brand: ad.brand,
-        advertisement: ad.advertisement,
-        coin: ad.coin,
-        member: ad.member,
-        campid: ad.campid,
-        ad_company: ad.ad_company,
-        urlAD: ad.urlAD,
-      };
-      handleTokenClickRef.current(token);
-    } else if (ad.urlAD) {
-
-      Linking.openURL(ad.urlAD).catch((err) => console.warn('[RecentAds] openURL 실패:', err));
+    if (autoAdTimeoutRef.current) {
+      clearTimeout(autoAdTimeoutRef.current);
+      autoAdTimeoutRef.current = null;
     }
+    if (tokenClickTimeoutRef.current) {
+      clearTimeout(tokenClickTimeoutRef.current);
+      tokenClickTimeoutRef.current = null;
+    }
+    hasAutoAdTriggeredRef.current = false;
+
+    setSelectedToken(token);
+    setShowBottomPanel(true);
+
+    setTimeout(() => {
+      console.log('[RecentAds] showAdInModal 즉시 호출 (2초 타이머 우회)');
+      if (showAdInModalRef.current) {
+        showAdInModalRef.current(token).catch((err) => {
+          console.warn('[RecentAds] showAdInModal 실패:', err);
+
+          if (ad.urlAD) {
+            Linking.openURL(ad.urlAD).catch((e) => console.warn('[RecentAds] openURL 실패:', e));
+          }
+        });
+      } else if (handleTokenClickRef.current) {
+
+        handleTokenClickRef.current(token);
+      } else if (ad.urlAD) {
+        Linking.openURL(ad.urlAD).catch((err) => console.warn('[RecentAds] openURL 실패:', err));
+      }
+    }, 200);
   }, []);
   const hasAutoAdTriggeredRef = useRef(false); 
 
@@ -2527,6 +2555,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   useEffect(() => {
     handleTokenClickRef.current = handleTokenClick;
   }, [handleTokenClick]);
+
+  useEffect(() => {
+    showAdInModalRef.current = showAdInModal;
+  }, [showAdInModal]);
 
   const bottomNavItems = [
     { id: 'xplay', label: t('components.bottomNavigationBar.xplay'), icon: iconXplay },

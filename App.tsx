@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform } from 'react-native';
+import { AppState, AppStateStatus, InteractionManager, NativeModules, Platform, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as Application from 'expo-application';
 import * as Clipboard from 'expo-clipboard';
@@ -553,9 +553,31 @@ const ScreenHost = () => {
     return <ReferralInputScreen />;
   }
 
-  if (currentScreen === 'shop') {
-    console.log('[App.tsx] currentScreen이 shop이므로 ShopScreen 렌더링');
-    return <ShopScreen />;
+  if (currentScreen === 'shop' || currentScreen === 'shopProductDetail') {
+    console.log('[App.tsx] shop/shopProductDetail — ShopScreen keep-alive 모드 (off-screen translate)', { currentScreen });
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        {
+
+}
+        <View
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            transform: [{ translateX: currentScreen === 'shop' ? 0 : -10000 }],
+          }}
+          pointerEvents={currentScreen === 'shop' ? 'auto' : 'none'}
+        >
+          <ShopScreen />
+        </View>
+        {}
+        {currentScreen === 'shopProductDetail' && (
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white' }}>
+            <ShopProductDetailScreen />
+          </View>
+        )}
+      </View>
+    );
   }
 
   if (currentScreen === 'shopTicket') {
@@ -572,10 +594,6 @@ const ScreenHost = () => {
 
   if (currentScreen === 'shopMyTicketDetail') {
     return <ShopMyTicketDetailScreen />;
-  }
-
-  if (currentScreen === 'shopProductDetail') {
-    return <ShopProductDetailScreen />;
   }
 
   if (currentScreen === 'shopBuy') {
