@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
 import { useAppNavigation } from '../navigation';
@@ -130,7 +131,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
       await showAlert(
         '백업 완료',
-        `파일 저장 완료\n경로: ${path}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
       );
       setStage('options');
     } catch (e: any) {
@@ -144,10 +145,85 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   };
 
   const handleGdriveBackup = async () => {
-    Alert.alert(
-      'Google Drive 백업',
-      '구현 준비 중입니다. 현재는 파일 백업과 직접 보기만 사용 가능합니다.',
-    );
+    if (stage !== 'options') return;
+    setStage('busy');
+    try {
+      const payload = await buildBackupPayload();
+      if (!payload) {
+        await showAlert(
+          t('common.messages.error') || '오류',
+          'PIN 설정된 지갑이 없습니다. 먼저 지갑 PIN 을 설정하세요.',
+        );
+        setStage('options');
+        return;
+      }
+      const json = JSON.stringify(payload, null, 2);
+      const fileName = `xrun-wallet-backup-${payload.member}-${payload.exported_at}.json`;
+
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
+      let current: any = null;
+      try { current = GoogleSignin.getCurrentUser(); } catch {  }
+      if (!current) {
+        await GoogleSignin.signIn();
+      }
+
+      try {
+        await GoogleSignin.addScopes({
+          scopes: ['https://www.googleapis.com/oth-path'],
+        });
+      } catch (scopeErr: any) {
+
+        if (__DEV__) console.warn('[WalletKeyBackup] addScopes:', scopeErr);
+      }
+
+      const tokens = await GoogleSignin.getTokens();
+      const accessToken = tokens?.accessToken;
+      if (!accessToken) throw new Error('Google access token 획득 실패');
+
+      const boundary = '------xrunbackup-' + Date.now();
+      const metadata = JSON.stringify({
+        name: fileName,
+        mimeType: 'application/json',
+      });
+      const body =
+        `--${boundary}\r\n` +
+        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+        `${metadata}\r\n` +
+        `--${boundary}\r\n` +
+        `Content-Type: application/json\r\n\r\n` +
+        `${json}\r\n` +
+        `--${boundary}--`;
+
+      const res = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+          },
+          body,
+        },
+      );
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Drive upload ${res.status}: ${errBody.slice(0, 200)}`);
+      }
+      await res.json(); 
+
+      await showAlert(
+        '백업 완료',
+        `Google Drive 에 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+      );
+      setStage('options');
+    } catch (e: any) {
+      if (__DEV__) console.warn('[WalletKeyBackup] gdrive fail:', e);
+      await showAlert(
+        t('common.messages.error') || '오류',
+        `Google Drive 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
+      );
+      setStage('options');
+    }
   };
 
   const handleViewKey = () => {
