@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
+import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3, v_df9f57 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
@@ -46,12 +46,41 @@ const v_273f15 = {
 };
 
 export const v_a59951 = () => {
+    const [v_c0b92e, v_d7875b] = v_a3453e.useState(false);
+    v_a3453e.useEffect(() => {
+        const v_8d41d7 = setTimeout(() => {
+            console.log('[CRASH-TRACE] DELAY-WRAPPER: 1초 경과, 실제 content render 시작');
+            v_d7875b(true);
+        }, 1000);
+        return () => clearTimeout(v_8d41d7);
+    }, []);
+
+    if (!v_c0b92e) {
+        console.log('[CRASH-TRACE] DELAY-WRAPPER: 진입 직후 placeholder 표시 (1초 대기)');
+        return (
+            <View style={{ flex: 1, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#1E3A5F" />
+            </View>
+        );
+    }
+
+    return <ShopProductDetailScreenImpl />;
+};
+
+const v_544ad4 = () => {
+    console.log('[CRASH-TRACE] 1. ShopProductDetail 컴포넌트 진입');
     const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
+    console.log('[CRASH-TRACE] 2. useAppNavigation OK');
     const { t: v_8d41d7 } = v_772971();
+    console.log('[CRASH-TRACE] 3. useTranslation OK');
     const { showAlert: v_889fad } = v_4b1173();
+    console.log('[CRASH-TRACE] 4. useAlertDialog OK');
     const { selectedShopItem: v_dfe883 } = v_700ef9();
+    console.log('[CRASH-TRACE] 5. useAppContext OK', { hasItem: !!v_dfe883, itemKeys: v_dfe883 ? Object.keys(v_dfe883) : null });
     const v_033e14 = v_e0068c();
+    console.log('[CRASH-TRACE] 6. useSafeAreaInsets OK', v_033e14);
     const v_f9771e = v_c18c22(0);
+    console.log('[CRASH-TRACE] 7. useAndroidNavigationBarHeight OK', { navBarHeight: v_f9771e });
 
     const v_365f44 = v_326be8.OS === 'ios'
         ? v_033e14.bottom
@@ -66,10 +95,16 @@ export const v_a59951 = () => {
         image: v_dfe883.image || v_273f15.image,
         isXrun: (v_dfe883 as any).isXrun || false,
     } : v_273f15;
+    console.log('[CRASH-TRACE] 8. product 생성 OK', {
+      id: v_01bee9.id, brand: v_01bee9.brand, price: v_01bee9.price,
+      isXrun: v_01bee9.isXrun, imageType: typeof v_01bee9.image,
+      imageVal: typeof v_01bee9.image === 'object' ? JSON.stringify(v_01bee9.image).slice(0, 100) : String(v_01bee9.image),
+    });
 
     const v_b3ea98 = false;
 
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
+    console.log('[CRASH-TRACE] 9. isXplayShop=', v_5db874);
 
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
@@ -185,24 +220,46 @@ export const v_a59951 = () => {
     }, [v_660822, v_abb08d]);
 
     v_c4deb2(() => {
-        if (!v_5db874 || !v_01bee9.id) return;
+
+        if (!v_5db874 || !v_01bee9.id) { v_ccda6f(null); return; }
         let v_2008a4 = false;
+        console.log('[CRASH-TRACE] 200. 0111 useEffect 진입, productId=', v_01bee9.id);
         v_8df718(true);
         v_ccda6f(null);
+        console.log('[CRASH-TRACE] 201. setState(loading=true, detail=null) 완료, getProductDetail 호출 직전');
         v_5e3aed(v_01bee9.id)
             .then((v_8f00b9) => {
+                console.log('[CRASH-TRACE] 202. getProductDetail 응답 OK', { cancelled: v_2008a4, hasDetail: !!v_8f00b9?.detail, code: v_8f00b9?.resultCode });
                 if (!v_2008a4 && v_8f00b9.detail) v_ccda6f(v_8f00b9.detail);
+                console.log('[CRASH-TRACE] 203. setProductDetail 완료');
             })
-            .catch(() => {
+            .catch((v_49263d) => {
+                console.log('[CRASH-TRACE] 202E. getProductDetail 에러', { cancelled: v_2008a4, msg: v_49263d?.message, code: v_49263d?.code });
                 if (!v_2008a4) v_ccda6f(null);
             })
             .finally(() => {
+                console.log('[CRASH-TRACE] 204. finally, loading=false 설정');
                 if (!v_2008a4) v_8df718(false);
             });
         return () => { v_2008a4 = true; };
     }, [v_5db874, v_01bee9.id]);
 
     v_c4deb2(() => { v_aad6d1(false); }, [v_01bee9.id]);
+
+    const [v_2938c2, v_ec707f] = v_5ab095(false);
+    v_c4deb2(() => {
+        console.log('[CRASH-TRACE] 100. useEffect[]: 마운트 직후');
+        const v_28800f = setTimeout(() => {
+            console.log('[CRASH-TRACE] 110. stableMount=true 설정 (remote image 활성화)');
+            v_ec707f(true);
+        }, 300);
+        const v_b66f2c = setTimeout(() => console.log('[CRASH-TRACE] 101. +0ms 살아있음'), 0);
+        const v_ece1e8 = setTimeout(() => console.log('[CRASH-TRACE] 102. +100ms 살아있음'), 100);
+        const v_a9fa04 = setTimeout(() => console.log('[CRASH-TRACE] 103. +500ms 살아있음'), 500);
+        const v_dfdbc1 = setTimeout(() => console.log('[CRASH-TRACE] 104. +1500ms 살아있음'), 1500);
+        const v_ee9476 = setTimeout(() => console.log('[CRASH-TRACE] 105. +3000ms 살아있음'), 3000);
+        return () => { clearTimeout(v_28800f); clearTimeout(v_b66f2c); clearTimeout(v_ece1e8); clearTimeout(v_a9fa04); clearTimeout(v_dfdbc1); clearTimeout(v_ee9476); };
+    }, []);
 
     const v_b000c1 = v_de06a3(async () => {
         console.log('[Xplay 구매] handleXplayPurchase 진입', {
@@ -537,8 +594,18 @@ export const v_a59951 = () => {
     const v_fa78fb = v_01bee9.isXrun || v_01bee9.brand === 'XRUN';
     const v_1efa5f = v_33c40c;
 
-    const v_a7bcbf = (v_5db874 && v_90e57e?.goodsImgB) || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg || '';
-    const v_6ef3ee = v_a7bcbf ? { uri: v_a7bcbf } : v_01bee9.image;
+    const v_a7bcbf = v_5db874
+      ? (v_90e57e?.goodsImgB || v_90e57e?.goodsImgS || v_90e57e?.mmsGoodsImg || '')
+      : '';
+
+    const v_6ef3ee = v_df9f57<v_07a341>(
+        () => {
+
+            if (!v_2938c2) return v_47af4d;
+            return v_a7bcbf ? { uri: v_a7bcbf } : v_01bee9.image;
+        },
+        [v_2938c2, v_a7bcbf, v_01bee9.image],
+    );
     const v_a12826 = v_ca5e50 || !v_6ef3ee;
     console.log('[ShopProductDetail] 이미지 소스:', { remoteUri: v_a7bcbf, hasProductImage: !!v_01bee9.image, imageLoadFailed: v_ca5e50, usingFallback: !v_a7bcbf || v_ca5e50 });
     const v_ba7f97 = (v_5db874 && v_90e57e?.goodsName) ? v_90e57e.goodsName : v_01bee9.title;
@@ -547,6 +614,7 @@ export const v_a59951 = () => {
     const v_e72b09 = v_01bee9.price;
     const v_513fb9 = v_b7c830 == null ? null : (v_b7c830 - v_e72b09);
     const v_d0206c = v_5db874 && v_90e57e && (v_90e57e.content || v_90e57e.contentAddDesc);
+    console.log('[CRASH-TRACE] 99. render return 직전, primarySource:', { hasPrimary: !!v_6ef3ee, hasRemote: !!v_a7bcbf, showPlaceholder: v_a12826 });
 
     return (
         <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
@@ -560,18 +628,29 @@ export const v_a59951 = () => {
                 <View style={v_d81136.content}>
                     {}
                     <View style={v_d81136.productCard}>
-                        {v_5db874 && v_39954a && (
-                            <View style={v_d81136.detailLoadingWrap}>
+                        {
+}
+                        <View
+                            style={v_d81136.detailLoadingWrap}
+                            pointerEvents="none"
+                        >
+                            {v_5db874 && v_39954a ? (
                                 <ActivityIndicator size="small" color="#1E3A5F" />
-                            </View>
-                        )}
+                            ) : null}
+                        </View>
                         <View style={v_d81136.productImageContainer}>
                             <View style={v_d81136.productImageWrapper}>
                                 <Image
                                     source={v_a12826 ? v_47af4d : v_6ef3ee}
                                     style={v_d81136.productImage}
                                     resizeMode="contain"
-                                    onError={() => v_aad6d1(true)}
+                                    onLoadStart={() => console.log('[CRASH-TRACE] IMG 300. onLoadStart', { showPlaceholder: v_a12826, hasRemote: !!v_a7bcbf })}
+                                    onLoad={() => console.log('[CRASH-TRACE] IMG 301. onLoad OK')}
+                                    onLoadEnd={() => console.log('[CRASH-TRACE] IMG 302. onLoadEnd')}
+                                    onError={(v_9e86fd) => {
+                                        console.log('[CRASH-TRACE] IMG 303. onError', v_9e86fd?.nativeEvent);
+                                        v_aad6d1(true);
+                                    }}
                                 />
                             </View>
                         </View>

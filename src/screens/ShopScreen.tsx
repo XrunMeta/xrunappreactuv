@@ -123,7 +123,7 @@ export const v_10886b = () => {
     const [v_a502c3, v_77037a] = v_5ab095(false);
 
     const [v_ca7424, v_c235bc] = v_5ab095<number>(v_4994d5);
-    const { navigate: v_9b57fc } = v_a0daa8();
+    const { navigate: v_9b57fc, currentScreen: v_0f0c7b } = v_a0daa8();
 
     const v_5536d4 = 'shop:xrunBalance';
     const v_fc87c6 = 'shop:xplayBalance';
@@ -330,11 +330,12 @@ export const v_10886b = () => {
     }, [v_f61b49, v_c1e7a4, v_d0991f]);
 
     v_c4deb2(() => {
+        if (v_0f0c7b !== 'shop') return;
         if (v_dfe883 && (v_dfe883 as any).shopTab) {
             v_94ee83('xrunStore');
             v_d0fbad(undefined);
         }
-    }, [v_dfe883, v_d0fbad]);
+    }, [v_dfe883, v_d0fbad, v_0f0c7b]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
     const [v_5d756f, v_a563de] = v_5ab095<string>('');
 
