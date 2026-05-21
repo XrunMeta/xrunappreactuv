@@ -457,10 +457,18 @@ export async function exportBackup(
   };
 }
 
+function pseudoRandomIv(): CryptoJS.lib.WordArray {
+  const words: number[] = [];
+  for (let i = 0; i < 4; i++) {
+    words.push((Math.random() * 0x100000000) | 0);
+  }
+  return CryptoJS.lib.WordArray.create(words, 16);
+}
+
 export function encryptBackupJson(json: string, pin: string): string {
   const keyHex = CryptoJS.SHA256(pin).toString();
   const key = CryptoJS.enc.Hex.parse(keyHex);
-  const iv = CryptoJS.lib.WordArray.random(16);
+  const iv = pseudoRandomIv();
   const cipher = CryptoJS.AES.encrypt(json, key, {
     iv,
     mode: CryptoJS.mode.CBC,
