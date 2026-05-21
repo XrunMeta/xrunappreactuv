@@ -266,36 +266,35 @@ interface GoodsDetailApiResponse {
 }
 
 export async function v_5e3aed(v_d90a5e): Promise<GiftishowProductDetailResponse> {
-  const v_d8855b = encodeURIComponent(v_d90a5e);
-  const v_f71b56 = `${v_ef21d8}${v_11bd70}/${v_d8855b}`;
+
+  const { createAxiosInstance: v_7488d5 } = await import('./index');
+  const v_9f42a4 = v_7488d5();
+  const v_09dafd = '/getGiftishowGoodsDetail';
 
   try {
-    v_ab35b6('POST', v_f71b56);
-    const v_3393e3 = await v_b5030f.post<GoodsDetailApiResponse>(v_f71b56, v_5f4b77(v_d53a6f), {
-      timeout: v_635f22,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        Accept: 'application/json',
-      },
-    });
-    v_ab35b6('POST', v_f71b56, v_3393e3.status);
+    v_ab35b6('POST', v_09dafd);
+    const v_3393e3 = await v_9f42a4.post<{
+      status?: string; code?: number; message?: string;
+      data?: GoodsDetailApiResponse;
+    }>(v_09dafd, { goods_code: v_d90a5e });
+    v_ab35b6('POST', v_09dafd, v_3393e3.status);
 
-    const v_9390e8 = v_3393e3.data;
-    const v_c99bd2 = v_9390e8?.code;
+    const v_db991d = v_3393e3.data?.data;
+    const v_c99bd2 = v_db991d?.code;
     if (v_c99bd2 !== '0000' && v_c99bd2 !== '000') {
-      const v_953d22 = v_62a286(v_c99bd2, v_9390e8?.message ?? undefined);
-      console.warn('[기프티쇼비즈] 상품 상세 응답 코드:', v_c99bd2, v_9390e8?.message);
+      const v_953d22 = v_62a286(v_c99bd2, v_db991d?.message ?? undefined);
+      console.warn('[기프티쇼비즈] 상품 상세 응답 코드:', v_c99bd2, v_db991d?.message);
       return { resultCode: v_c99bd2 ?? undefined, resultMsg: v_953d22 };
     }
 
-    const v_3cfdfc = v_9390e8?.result?.goodsDetail;
+    const v_3cfdfc = v_db991d?.result?.goodsDetail;
     if (!v_3cfdfc) {
       return { resultCode: v_c99bd2, resultMsg: '상품 상세 없음' };
     }
-    return { detail: v_3cfdfc, resultCode: v_c99bd2, resultMsg: v_9390e8?.message ?? undefined };
+    return { detail: v_3cfdfc, resultCode: v_c99bd2, resultMsg: v_db991d?.message ?? undefined };
   } catch (v_5e9bfe) {
     if (v_5e9bfe instanceof v_3333d3) {
-      v_ab35b6('POST', v_f71b56, v_5e9bfe.response?.status, v_5e9bfe.response?.data);
+      v_ab35b6('POST', v_09dafd, v_5e9bfe.response?.status, v_5e9bfe.response?.data);
       if (v_5e9bfe.response?.status === 404) {
         v_2150c5('상품 상세');
         return { resultCode: '404', resultMsg: '상품을 찾을 수 없습니다.' };
@@ -304,6 +303,7 @@ export async function v_5e3aed(v_d90a5e): Promise<GiftishowProductDetailResponse
     } else {
       console.error('[기프티쇼비즈] 상품 상세 조회 오류:', v_5e9bfe);
     }
+
     throw v_5e9bfe;
   }
 }
