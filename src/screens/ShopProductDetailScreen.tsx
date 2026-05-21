@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -46,12 +46,41 @@ const defaultProductFallback: ProductDetailData = {
 };
 
 export const ShopProductDetailScreen = () => {
+    const [readyToRender, setReadyToRender] = React.useState(false);
+    React.useEffect(() => {
+        const t = setTimeout(() => {
+            console.log('[CRASH-TRACE] DELAY-WRAPPER: 1초 경과, 실제 content render 시작');
+            setReadyToRender(true);
+        }, 1000);
+        return () => clearTimeout(t);
+    }, []);
+
+    if (!readyToRender) {
+        console.log('[CRASH-TRACE] DELAY-WRAPPER: 진입 직후 placeholder 표시 (1초 대기)');
+        return (
+            <View style={{ flex: 1, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#1E3A5F" />
+            </View>
+        );
+    }
+
+    return <ShopProductDetailScreenImpl />;
+};
+
+const ShopProductDetailScreenImpl = () => {
+    console.log('[CRASH-TRACE] 1. ShopProductDetail 컴포넌트 진입');
     const { goBack, navigate } = useAppNavigation();
+    console.log('[CRASH-TRACE] 2. useAppNavigation OK');
     const { t } = useTranslation();
+    console.log('[CRASH-TRACE] 3. useTranslation OK');
     const { showAlert } = useAlertDialog();
+    console.log('[CRASH-TRACE] 4. useAlertDialog OK');
     const { selectedShopItem } = useAppContext();
+    console.log('[CRASH-TRACE] 5. useAppContext OK', { hasItem: !!selectedShopItem, itemKeys: selectedShopItem ? Object.keys(selectedShopItem) : null });
     const insets = useSafeAreaInsets();
+    console.log('[CRASH-TRACE] 6. useSafeAreaInsets OK', insets);
     const navBarHeight = useAndroidNavigationBarHeight(0);
+    console.log('[CRASH-TRACE] 7. useAndroidNavigationBarHeight OK', { navBarHeight });
 
     const bottomSafeArea = Platform.OS === 'ios'
         ? insets.bottom
@@ -66,10 +95,16 @@ export const ShopProductDetailScreen = () => {
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
     } : defaultProductFallback;
+    console.log('[CRASH-TRACE] 8. product 생성 OK', {
+      id: product.id, brand: product.brand, price: product.price,
+      isXrun: product.isXrun, imageType: typeof product.image,
+      imageVal: typeof product.image === 'object' ? JSON.stringify(product.image).slice(0, 100) : String(product.image),
+    });
 
     const isExchangeProduct = false;
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
+    console.log('[CRASH-TRACE] 9. isXplayShop=', isXplayShop);
 
     const [member, setMember] = useState<string | null>(null);
 
@@ -185,24 +220,46 @@ export const ShopProductDetailScreen = () => {
     }, [member, loadXrunBalance]);
 
     useEffect(() => {
-        if (!isXplayShop || !product.id) return;
+
+        if (!isXplayShop || !product.id) { setProductDetail(null); return; }
         let cancelled = false;
+        console.log('[CRASH-TRACE] 200. 0111 useEffect 진입, productId=', product.id);
         setProductDetailLoading(true);
         setProductDetail(null);
+        console.log('[CRASH-TRACE] 201. setState(loading=true, detail=null) 완료, getProductDetail 호출 직전');
         getProductDetail(product.id)
             .then((res) => {
+                console.log('[CRASH-TRACE] 202. getProductDetail 응답 OK', { cancelled, hasDetail: !!res?.detail, code: res?.resultCode });
                 if (!cancelled && res.detail) setProductDetail(res.detail);
+                console.log('[CRASH-TRACE] 203. setProductDetail 완료');
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log('[CRASH-TRACE] 202E. getProductDetail 에러', { cancelled, msg: err?.message, code: err?.code });
                 if (!cancelled) setProductDetail(null);
             })
             .finally(() => {
+                console.log('[CRASH-TRACE] 204. finally, loading=false 설정');
                 if (!cancelled) setProductDetailLoading(false);
             });
         return () => { cancelled = true; };
     }, [isXplayShop, product.id]);
 
     useEffect(() => { setImageLoadFailed(false); }, [product.id]);
+
+    const [stableMount, setStableMount] = useState(false);
+    useEffect(() => {
+        console.log('[CRASH-TRACE] 100. useEffect[]: 마운트 직후');
+        const stableT = setTimeout(() => {
+            console.log('[CRASH-TRACE] 110. stableMount=true 설정 (remote image 활성화)');
+            setStableMount(true);
+        }, 300);
+        const t0 = setTimeout(() => console.log('[CRASH-TRACE] 101. +0ms 살아있음'), 0);
+        const t1 = setTimeout(() => console.log('[CRASH-TRACE] 102. +100ms 살아있음'), 100);
+        const t2 = setTimeout(() => console.log('[CRASH-TRACE] 103. +500ms 살아있음'), 500);
+        const t3 = setTimeout(() => console.log('[CRASH-TRACE] 104. +1500ms 살아있음'), 1500);
+        const t4 = setTimeout(() => console.log('[CRASH-TRACE] 105. +3000ms 살아있음'), 3000);
+        return () => { clearTimeout(stableT); clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    }, []);
 
     const handleXplayPurchase = useCallback(async () => {
         console.log('[Xplay 구매] handleXplayPurchase 진입', {
@@ -537,8 +594,18 @@ export const ShopProductDetailScreen = () => {
     const isXrun = product.isXrun || product.brand === 'XRUN';
     const coinIcon = xrunRoundLogo;
 
-    const remoteUri = (isXplayShop && productDetail?.goodsImgB) || productDetail?.goodsImgS || productDetail?.mmsGoodsImg || '';
-    const primarySource = remoteUri ? { uri: remoteUri } : product.image;
+    const remoteUri = isXplayShop
+      ? (productDetail?.goodsImgB || productDetail?.goodsImgS || productDetail?.mmsGoodsImg || '')
+      : '';
+
+    const primarySource = useMemo<ImageSourcePropType>(
+        () => {
+
+            if (!stableMount) return xrunHorizontalLogo;
+            return remoteUri ? { uri: remoteUri } : product.image;
+        },
+        [stableMount, remoteUri, product.image],
+    );
     const showPlaceholder = imageLoadFailed || !primarySource;
     console.log('[ShopProductDetail] 이미지 소스:', { remoteUri, hasProductImage: !!product.image, imageLoadFailed, usingFallback: !remoteUri || imageLoadFailed });
     const displayTitle = (isXplayShop && productDetail?.goodsName) ? productDetail.goodsName : product.title;
@@ -547,6 +614,7 @@ export const ShopProductDetailScreen = () => {
     const displayPrice = product.price;
     const xplayRemainingBalance = xplayBalanceState == null ? null : (xplayBalanceState - displayPrice);
     const hasDetailDescription = isXplayShop && productDetail && (productDetail.content || productDetail.contentAddDesc);
+    console.log('[CRASH-TRACE] 99. render return 직전, primarySource:', { hasPrimary: !!primarySource, hasRemote: !!remoteUri, showPlaceholder });
 
     return (
         <SafeView style={styles.container} backgroundColor="#F8FAFC">
@@ -560,18 +628,29 @@ export const ShopProductDetailScreen = () => {
                 <View style={styles.content}>
                     {}
                     <View style={styles.productCard}>
-                        {isXplayShop && productDetailLoading && (
-                            <View style={styles.detailLoadingWrap}>
+                        {
+}
+                        <View
+                            style={styles.detailLoadingWrap}
+                            pointerEvents="none"
+                        >
+                            {isXplayShop && productDetailLoading ? (
                                 <ActivityIndicator size="small" color="#1E3A5F" />
-                            </View>
-                        )}
+                            ) : null}
+                        </View>
                         <View style={styles.productImageContainer}>
                             <View style={styles.productImageWrapper}>
                                 <Image
                                     source={showPlaceholder ? xrunHorizontalLogo : primarySource}
                                     style={styles.productImage}
                                     resizeMode="contain"
-                                    onError={() => setImageLoadFailed(true)}
+                                    onLoadStart={() => console.log('[CRASH-TRACE] IMG 300. onLoadStart', { showPlaceholder, hasRemote: !!remoteUri })}
+                                    onLoad={() => console.log('[CRASH-TRACE] IMG 301. onLoad OK')}
+                                    onLoadEnd={() => console.log('[CRASH-TRACE] IMG 302. onLoadEnd')}
+                                    onError={(e) => {
+                                        console.log('[CRASH-TRACE] IMG 303. onError', e?.nativeEvent);
+                                        setImageLoadFailed(true);
+                                    }}
                                 />
                             </View>
                         </View>

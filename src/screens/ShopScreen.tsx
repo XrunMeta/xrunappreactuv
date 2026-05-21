@@ -123,7 +123,7 @@ export const ShopScreen = () => {
     const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
 
     const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
-    const { navigate } = useAppNavigation();
+    const { navigate, currentScreen } = useAppNavigation();
 
     const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
     const XPLAY_BALANCE_CACHE_KEY = 'shop:xplayBalance';
@@ -330,11 +330,12 @@ export const ShopScreen = () => {
     }, [loadXplayProducts, loadXplayBalance, loadGopaxKrwPerXrun]);
 
     useEffect(() => {
+        if (currentScreen !== 'shop') return;
         if (selectedShopItem && (selectedShopItem as any).shopTab) {
             setTab('xrunStore');
             setSelectedShopItem(undefined);
         }
-    }, [selectedShopItem, setSelectedShopItem]);
+    }, [selectedShopItem, setSelectedShopItem, currentScreen]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
