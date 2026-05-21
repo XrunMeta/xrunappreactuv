@@ -185,7 +185,7 @@ export async function verifyAllWallets(
   const failed: string[] = [];
   for (const w of wallets) {
 
-    if (!/^0x[0-9a-fA-F]{64}$/.test(w.private_key)) {
+    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(w.private_key)) {
       failed.push(`${w.wallet_code}:format`);
       continue;
     }
