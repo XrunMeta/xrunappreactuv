@@ -14,6 +14,7 @@ export { default as v_269e04 } from './polygonWallet';
 export { default as v_0cd34d } from './xrunWallet';
 export { default as v_410f77 } from './walletPrivateKeyDisplay';
 export { default as v_53f3c7 } from './walletPrivateKeyGoogleAuth';
+export { default as v_323a5a } from './walletRestore';
 
 export { default as v_b12e1b } from './nftWallet';
 export { default as v_8bc52c } from './adWallet';

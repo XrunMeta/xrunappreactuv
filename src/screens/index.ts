@@ -69,6 +69,7 @@ export { AyetOffersScreen } from './AyetOffersScreen';
 export { TapjoyListScreen } from './TapjoyListScreen';
 export { WalletPrivateKeyDisplayScreen } from './WalletPrivateKeyDisplayScreen';
 export { WalletPrivateKeyGoogleAuthScreen } from './WalletPrivateKeyGoogleAuthScreen';
+export { WalletRestoreScreen } from './WalletRestoreScreen';
 export { MyInfoEmailAuthScreen } from './MyInfoEmailAuthScreen';
 export { MyChipsOfferwallScreen } from './MyChipsOfferwallScreen';
 export { AdisonOfferwallScreen } from './AdisonOfferwallScreen';

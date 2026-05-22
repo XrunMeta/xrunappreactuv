@@ -2,6 +2,8 @@ export default {
   title: '设置',
   closeMembership: '注销会员',
   languageSelect: '语言选择',
+  walletBackup: 'Backup Wallet Keys',
+  walletRestore: 'Restore Wallet Keys',
   reward: '奖励',
   ayet_offers: 'ayeT 优惠',
   ayet_offers_xplay: 'Xplay 优惠',

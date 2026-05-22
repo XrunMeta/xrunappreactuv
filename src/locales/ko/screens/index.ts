@@ -56,6 +56,7 @@ export { default as v_ebd772 } from './myinfoShopSales';
 export { default as v_ef4dc3 } from './camera';
 export { default as v_410f77 } from './walletPrivateKeyDisplay';
 export { default as v_53f3c7 } from './walletPrivateKeyGoogleAuth';
+export { default as v_323a5a } from './walletRestore';
 export { default as v_dc9f15 } from './xrunInfo';
 export { default as v_37b2d1 } from './xplayInfo';
 export { default as v_fe1952 } from './pangleList';

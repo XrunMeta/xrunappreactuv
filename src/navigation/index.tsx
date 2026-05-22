@@ -80,6 +80,7 @@ export const v_ce4741 = {
   tapjoyList: 'tapjoyList',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
+  walletRestore: 'walletRestore',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoPaymentPin: 'myInfoPaymentPin',
   myChipsOfferwall: 'myChipsOfferwall',
