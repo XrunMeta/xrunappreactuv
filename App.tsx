@@ -71,6 +71,7 @@ import {
   TapjoyListScreen,
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
+  WalletRestoreScreen,
   MyChipsOfferwallScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
@@ -502,6 +503,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'walletPrivateKeyGoogleAuth') {
     return <WalletPrivateKeyGoogleAuthScreen />;
+  }
+
+  if (currentScreen === 'walletRestore') {
+    return <WalletRestoreScreen />;
   }
 
   if (currentScreen === 'myInfoCloseMembership') {

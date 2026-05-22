@@ -872,6 +872,23 @@ export const WalletScreen = () => {
     );
   };
 
+  if (!walletsUnlocked) {
+    return (
+      <SafeView style={styles.container}>
+        <StatusBar style="dark" />
+        {pinPromptProps && (
+          <WalletKeyPinPromptModal
+            visible={pinPromptVisible}
+            memberId={pinPromptProps.memberId}
+            email={pinPromptProps.email}
+            onSuccess={onPinPromptSuccess}
+            onCancel={onPinPromptCancel}
+          />
+        )}
+      </SafeView>
+    );
+  }
+
   return (
     <SafeView style={styles.container}>
       <StatusBar style="dark" />

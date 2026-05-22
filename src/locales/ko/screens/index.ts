@@ -56,6 +56,7 @@ export { default as myinfoShopSales } from './myinfoShopSales';
 export { default as camera } from './camera';
 export { default as walletPrivateKeyDisplay } from './walletPrivateKeyDisplay';
 export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleAuth';
+export { default as walletRestore } from './walletRestore';
 export { default as xrunInfo } from './xrunInfo';
 export { default as xplayInfo } from './xplayInfo';
 export { default as pangleList } from './pangleList';
