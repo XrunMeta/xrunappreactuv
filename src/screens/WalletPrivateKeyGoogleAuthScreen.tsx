@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Share,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,6 +53,55 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [wallets, setWallets] = useState<WalletKey[]>([]);
 
   const [pin, setPinState] = useState<string>('');
+
+  const CONSENT_BASE_LABELS = [
+    '키는 지갑을 사용할 수 있는 중요한 정보입니다',
+    '키를 분실하면 지갑을 사용할 수 없음을 알고 있습니다',
+    '다른 사람과 공유하면 안되는 정보입니다',
+    '위 내용을 이해했으며 누구에게도 공유하지 않을 것을 약속합니다',
+  ];
+  const CONSENT_GDRIVE_LABEL = '이 Google 계정은 개인용이며, 본인만 사용하는 계정입니다';
+
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [confirmChecks, setConfirmChecks] = useState<boolean[]>([]);
+  const [confirmLabels, setConfirmLabels] = useState<string[]>([]);
+  const [pendingAction, setPendingAction] = useState<{ run: () => void } | null>(null);
+  const [confirmDangerNote, setConfirmDangerNote] = useState<string | null>(null);
+
+  const requestBackupConsent = (
+    action: () => void,
+    opts?: { isGoogleDrive?: boolean; dangerNote?: string },
+  ) => {
+    const labels = opts?.isGoogleDrive
+      ? [...CONSENT_BASE_LABELS, CONSENT_GDRIVE_LABEL]
+      : CONSENT_BASE_LABELS;
+    setConfirmLabels(labels);
+    setConfirmChecks(labels.map(() => false));
+    setConfirmDangerNote(opts?.dangerNote ?? null);
+    setPendingAction({ run: action });
+    setConfirmVisible(true);
+  };
+
+  const toggleConfirmCheck = (idx: number) => {
+    setConfirmChecks((prev) => prev.map((v, i) => (i === idx ? !v : v)));
+  };
+
+  const closeConsent = () => {
+    setConfirmVisible(false);
+    setConfirmChecks([]);
+    setConfirmLabels([]);
+    setPendingAction(null);
+    setConfirmDangerNote(null);
+  };
+
+  const allChecked = confirmChecks.length > 0 && confirmChecks.every((v) => v);
+
+  const proceedConsent = () => {
+    if (!allChecked || !pendingAction) return;
+    const fn = pendingAction.run;
+    closeConsent();
+    fn();
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -131,7 +181,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
       const json = JSON.stringify(payload);
       const encrypted = encryptBackupJson(json, pin);
-      const fileName = `xrunwallet-${payload.exported_at}.txt`;
+      const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
       const path = `${FileSystem.documentDirectory}${fileName}`;
       await FileSystem.writeAsStringAsync(path, encrypted);
       const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
@@ -176,7 +226,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       if (!pin) throw new Error('PIN 정보 누락 — 화면을 다시 열어주세요');
       const jsonRaw = JSON.stringify(payload);
       const json = encryptBackupJson(jsonRaw, pin);
-      const fileName = `xrunwallet-${payload.exported_at}.txt`;
+      const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;
@@ -258,7 +308,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
       const payload = buildPlainBackup(email, wallets);
       const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrunwallet-PLAIN-${payload.exported_at}.txt`;
+      const fileName = `xrunwallet-PLAIN-${payload.exported_at}.keyplain`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;
@@ -423,7 +473,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
-              onPress={handleFileBackup}
+              onPress={() => requestBackupConsent(() => { void handleFileBackup(); }, {})}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -437,7 +487,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
-              onPress={handleGdriveBackup}
+              onPress={() => requestBackupConsent(() => { void handleGdriveBackup(); }, { isGoogleDrive: true })}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -451,7 +501,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, styles.viewCard, stage === 'busy' && styles.disabled]}
-              onPress={handleViewKey}
+              onPress={() => requestBackupConsent(handleViewKey, { dangerNote: '평문 PK 가 화면에 표시됩니다. 주변에 다른 사람이 없는지 먼저 확인해주세요.' })}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -465,7 +515,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, styles.dangerCard, stage === 'busy' && styles.disabled]}
-              onPress={handleGdrivePlainBackup}
+              onPress={() => requestBackupConsent(handleGdrivePlainBackup, { isGoogleDrive: true, dangerNote: '⚠️ 이 옵션은 PK 를 암호화 없이 Google Drive 에 저장합니다. 파일이 누구든 손에 들어가면 자산을 즉시 옮길 수 있습니다.' })}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -541,6 +591,78 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           onCancel={onPinPromptCancel}
         />
       )}
+
+      {}
+      <Modal
+        visible={confirmVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={closeConsent}
+      >
+        <View style={styles.consentOverlay}>
+          <View style={styles.consentCard}>
+            <View style={styles.consentIconWrap}>
+              <Ionicons name="warning" size={36} color="#cf3a3a" />
+            </View>
+            <Text style={styles.consentTitle}>백업 전 동의</Text>
+            <Text style={styles.consentBody}>
+              백업 파일은 지갑 자산을 통제하는 <Text style={styles.consentStrong}>유일한 열쇠</Text>입니다.{'\n\n'}
+              • 누구와도 공유하지 마세요 (개발자·고객센터 포함){'\n'}
+              • 메신저·이메일로 전송하지 마세요{'\n'}
+              • 공용 PC·공용 클라우드에 저장하지 마세요{'\n'}
+              • 파일을 받은 사람은 자산을 즉시 옮길 수 있습니다
+            </Text>
+            {!!confirmDangerNote && (
+              <View style={styles.consentDangerBox}>
+                <Text style={styles.consentDangerText}>{confirmDangerNote}</Text>
+              </View>
+            )}
+
+            <View style={styles.consentChecksWrap}>
+              {confirmLabels.map((label, idx) => {
+                const checked = confirmChecks[idx] ?? false;
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.consentCheckRow}
+                    activeOpacity={0.7}
+                    onPress={() => toggleConfirmCheck(idx)}
+                  >
+                    <Ionicons
+                      name={checked ? 'checkbox' : 'square-outline'}
+                      size={22}
+                      color={checked ? COLORS.buttonPrimary : COLORS.darkGray}
+                    />
+                    <Text style={styles.consentCheckLabel}>{label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.consentButtonRow}>
+              <TouchableOpacity
+                style={[styles.consentButton, styles.consentCancel]}
+                onPress={closeConsent}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.consentCancelText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.consentButton,
+                  styles.consentProceed,
+                  !allChecked && styles.consentProceedDisabled,
+                ]}
+                onPress={proceedConsent}
+                disabled={!allChecked}
+                activeOpacity={allChecked ? 0.8 : 1}
+              >
+                <Text style={styles.consentProceedText}>계속</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeView>
   );
 };
@@ -712,5 +834,113 @@ const styles = StyleSheet.create({
     color: COLORS.darkGray,
     fontFamily: FONTS.medium,
     textDecorationLine: 'underline',
+  },
+
+  consentOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  consentCard: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingTop: 22,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
+  },
+  consentIconWrap: {
+    alignSelf: 'center',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#ffe5e5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  consentTitle: {
+    fontSize: 18,
+    fontFamily: FONTS.semiBold,
+    color: '#cf3a3a',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  consentBody: {
+    fontSize: 13,
+    color: '#343434',
+    lineHeight: 20,
+  },
+  consentStrong: {
+    fontFamily: FONTS.semiBold,
+    color: '#cf3a3a',
+  },
+  consentDangerBox: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#ffe5e5',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#cf3a3a',
+  },
+  consentDangerText: {
+    fontSize: 12,
+    color: '#a02828',
+    lineHeight: 18,
+  },
+  consentChecksWrap: {
+    marginTop: 12,
+  },
+  consentCheckRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 6,
+  },
+  consentCheckLabel: {
+    flex: 1,
+    fontSize: 13,
+    color: '#343434',
+    marginLeft: 10,
+    lineHeight: 19,
+  },
+  consentButtonRow: {
+    flexDirection: 'row',
+    marginTop: 16,
+    gap: 10,
+  },
+  consentButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  consentCancel: {
+    backgroundColor: '#eeeeee',
+  },
+  consentCancelText: {
+    fontSize: 15,
+    color: '#343434',
+    fontFamily: FONTS.medium,
+  },
+  consentProceed: {
+    backgroundColor: COLORS.buttonPrimary,
+  },
+  consentProceedDisabled: {
+    backgroundColor: '#c5c5c5',
+  },
+  consentProceedText: {
+    fontSize: 15,
+    color: '#ffffff',
+    fontFamily: FONTS.semiBold,
   },
 });
