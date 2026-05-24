@@ -2,6 +2,8 @@ export default {
   title: '설정',
   closeMembership: '회원 탈퇴',
   languageSelect: '언어 선택',
+  walletBackup: '지갑 키 백업',
+  walletRestore: '지갑 키 복원',
   reward: '리워드',
   ayet_offers: 'ayeT 오퍼 보기',
   ayet_offers_xplay: 'Xplay 오퍼 보기',

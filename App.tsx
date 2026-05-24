@@ -71,6 +71,7 @@ import {
   v_f2ecfa,
   v_a50cad,
   v_d4a78d,
+  v_626337,
   v_0ca15f,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
@@ -502,6 +503,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'walletPrivateKeyGoogleAuth') {
     return <WalletPrivateKeyGoogleAuthScreen />;
+  }
+
+  if (v_0f0c7b === 'walletRestore') {
+    return <WalletRestoreScreen />;
   }
 
   if (v_0f0c7b === 'myInfoCloseMembership') {
