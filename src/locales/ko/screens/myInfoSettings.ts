@@ -4,6 +4,7 @@ export default {
   languageSelect: '언어 선택',
   walletBackup: '지갑 키 백업',
   walletRestore: '지갑 키 복원',
+  walletKeyGuide: '지갑 키 안내 다시 보기',
   reward: '리워드',
   ayet_offers: 'ayeT 오퍼 보기',
   ayet_offers_xplay: 'Xplay 오퍼 보기',

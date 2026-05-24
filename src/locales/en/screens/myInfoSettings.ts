@@ -4,6 +4,7 @@ export default {
   languageSelect: 'Language Select',
   walletBackup: 'Backup Wallet Keys',
   walletRestore: 'Restore Wallet Keys',
+  walletKeyGuide: 'Review Wallet Key Guide',
   reward: 'Reward',
   ayet_offers: 'ayeT Offers',
   ayet_offers_xplay: 'Xplay Offers',
