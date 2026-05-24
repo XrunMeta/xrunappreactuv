@@ -12,10 +12,19 @@ import {
   obfuscateWithMember,
   userHash,
   upsertEntryIfNotS1,
+  upsertAvailability,
   legacyCleanupOnce,
   classifyWalletsByNetwork,
   type WalletKey,
+  type WalletUnavailable,
+  type WalletAvailabilitySentinel,
 } from './walletKeyStore';
+
+const VALID_AV_SENTINELS: ReadonlySet<string> = new Set([
+  'NQ', 'DK', 'ADC', 'MISSING', 'DECRYPT_FAIL',
+]);
+
+const VALID_WALLET_CODES: ReadonlySet<string> = new Set(['c1', 'c2', 'c16', 'c18']);
 
 export const getApiBaseUrl = (): string => {
   const env = getEnv();
@@ -35,41 +44,57 @@ export async function fetchAndSaveWallets(): Promise<void> {
     const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
     if (!res.ok) return; 
     const json = await res.json();
-    if (json?.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+    if (json?.status !== 'success') return;
 
-      const jwt = await AsyncStorage.getItem('jwt');
-      if (!jwt) return; 
-      const memberId = jwtPayloadSub(jwt);
-      if (memberId == null) return;
+    const jwt = await AsyncStorage.getItem('jwt');
+    if (!jwt) return; 
+    const memberId = jwtPayloadSub(jwt);
+    if (memberId == null) return;
 
-      let email = await AsyncStorage.getItem('userEmail');
-      if (!email) {
-        try {
-          const ud = await AsyncStorage.getItem('userData');
-          if (ud) email = (JSON.parse(ud) as { email?: string })?.email ?? null;
-        } catch {
-
-        }
-      }
-      if (!email) return;
-
-      const wallets = json.data as WalletKey[];
-      const classified = classifyWalletsByNetwork(wallets);
-
-      for (const network of ['eth', 'pol'] as const) {
-        const w = classified[network];
-        if (!w) continue; 
-
-        const plaintextJson = JSON.stringify([w]);
-        const cipher = obfuscateWithMember(plaintextJson, memberId);
-        const u = userHash(email, memberId, network);
-        await upsertEntryIfNotS1({
-          u,
-          c: cipher,
-          s: 's0',
-        });
+    let email = await AsyncStorage.getItem('userEmail');
+    if (!email) {
+      try {
+        const ud = await AsyncStorage.getItem('userData');
+        if (ud) email = (JSON.parse(ud) as { email?: string })?.email ?? null;
+      } catch {
 
       }
+    }
+    if (!email) return;
+
+    const rawUn: unknown[] = Array.isArray(json.unavailable) ? json.unavailable : [];
+    const unavailable: WalletUnavailable[] = [];
+    for (const u of rawUn) {
+      if (typeof u !== 'object' || u === null) continue;
+      const code = (u as Record<string, unknown>).wallet_code;
+      const ss = (u as Record<string, unknown>).savedstring;
+      if (typeof code !== 'string' || !VALID_WALLET_CODES.has(code)) continue;
+      if (typeof ss !== 'string' || !VALID_AV_SENTINELS.has(ss)) continue;
+      unavailable.push({
+        wallet_code: code,
+        savedstring: ss as WalletAvailabilitySentinel,
+      });
+    }
+    await upsertAvailability(email, memberId, unavailable);
+
+    const wallets: WalletKey[] = Array.isArray(json.data) ? (json.data as WalletKey[]) : [];
+    if (wallets.length === 0) return; 
+
+    const classified = classifyWalletsByNetwork(wallets);
+
+    for (const network of ['eth', 'pol'] as const) {
+      const w = classified[network];
+      if (!w) continue; 
+
+      const plaintextJson = JSON.stringify([w]);
+      const cipher = obfuscateWithMember(plaintextJson, memberId);
+      const u = userHash(email, memberId, network);
+      await upsertEntryIfNotS1({
+        u,
+        c: cipher,
+        s: 's0',
+      });
+
     }
   } catch {
 

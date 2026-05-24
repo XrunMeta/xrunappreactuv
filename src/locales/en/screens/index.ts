@@ -14,6 +14,7 @@ export { default as polygonWallet } from './polygonWallet';
 export { default as xrunWallet } from './xrunWallet';
 export { default as walletPrivateKeyDisplay } from './walletPrivateKeyDisplay';
 export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleAuth';
+export { default as walletRestore } from './walletRestore';
 
 export { default as nftWallet } from './nftWallet';
 export { default as adWallet } from './adWallet';

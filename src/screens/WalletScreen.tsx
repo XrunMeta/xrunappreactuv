@@ -16,7 +16,12 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, DataList, AddTokenModal, SafeView, WalletKeyPinPromptModal } from '../components';
-import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
+import {
+  jwtPayloadSub,
+  findEntriesForUser,
+  isUserStillUnlocked,
+  markUserUnlocked,
+} from '../services/walletKeyStore';
 import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -209,6 +214,11 @@ export const WalletScreen = () => {
           return;
         }
 
+        if (isUserStillUnlocked(emailRaw, memberId)) {
+          setWalletsUnlocked(true);
+          return;
+        }
+
         setPinPromptProps({ memberId, email: emailRaw.toLowerCase().trim() });
         setPinPromptVisible(true);
       } catch {
@@ -219,8 +229,11 @@ export const WalletScreen = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const onPinPromptSuccess = (_wallets: any[]) => {
+  const onPinPromptSuccess = (_wallets: any[], _pin?: string) => {
 
+    if (pinPromptProps) {
+      markUserUnlocked(pinPromptProps.email, pinPromptProps.memberId);
+    }
     setPinPromptVisible(false);
     setWalletsUnlocked(true);
   };
@@ -549,6 +562,7 @@ export const WalletScreen = () => {
   };
 
   const handleDownload = async () => {
+
     const confirmed = await showAlert(
       t('screens.walletPrivateKeyDisplay.confirmDownloadTitle'),
       t('screens.walletPrivateKeyDisplay.confirmDownloadMessage'),
@@ -558,19 +572,8 @@ export const WalletScreen = () => {
       ],
     );
 
-    if (confirmed === 1) { 
-      const emailConfirmed = await showAlert(
-        t('screens.walletPrivateKeyDisplay.warningTitle'),
-        t('screens.walletPrivateKeyDisplay.emailVerificationRequired'),
-        [
-          { text: t('common.cancel') },
-          { text: t('common.confirm') },
-        ],
-      );
-
-      if (emailConfirmed === 1) {
-        navigate(ROUTES.walletPrivateKeyGoogleAuth);
-      }
+    if (confirmed === 1) {
+      navigate(ROUTES.walletPrivateKeyGoogleAuth);
     }
   };
 
@@ -868,6 +871,23 @@ export const WalletScreen = () => {
       </TouchableOpacity>
     );
   };
+
+  if (!walletsUnlocked) {
+    return (
+      <SafeView style={styles.container}>
+        <StatusBar style="dark" />
+        {pinPromptProps && (
+          <WalletKeyPinPromptModal
+            visible={pinPromptVisible}
+            memberId={pinPromptProps.memberId}
+            email={pinPromptProps.email}
+            onSuccess={onPinPromptSuccess}
+            onCancel={onPinPromptCancel}
+          />
+        )}
+      </SafeView>
+    );
+  }
 
   return (
     <SafeView style={styles.container}>

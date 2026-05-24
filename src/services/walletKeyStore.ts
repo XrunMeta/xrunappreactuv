@@ -185,7 +185,7 @@ export async function verifyAllWallets(
   const failed: string[] = [];
   for (const w of wallets) {
 
-    if (!/^0x[0-9a-fA-F]{64}$/.test(w.private_key)) {
+    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(w.private_key)) {
       failed.push(`${w.wallet_code}:format`);
       continue;
     }
@@ -391,4 +391,373 @@ export async function debugVault(): Promise<{ count: number; users: string[] }> 
     count: vault.length,
     users: vault.map((e) => e.u.slice(0, 12) + '...'),
   };
+}
+
+const SESSION_UNLOCK_TTL_MS = 3 * 60 * 1000;
+const _sessionUnlock = new Map<string, number>();
+
+function sessionUnlockKey(email: string, member: number): string {
+  const normalized = normEmail(email);
+  return CryptoJS.SHA256(`xrun-session:${normalized}:${String(member)}`).toString();
+}
+
+export function markUserUnlocked(email: string, member: number): void {
+  _sessionUnlock.set(sessionUnlockKey(email, member), Date.now());
+}
+
+export function isUserStillUnlocked(email: string, member: number): boolean {
+  const k = sessionUnlockKey(email, member);
+  const ts = _sessionUnlock.get(k);
+  if (!ts) return false;
+  if (Date.now() - ts > SESSION_UNLOCK_TTL_MS) {
+    _sessionUnlock.delete(k);
+    return false;
+  }
+  return true;
+}
+
+export function clearUserUnlock(email: string, member: number): void {
+  _sessionUnlock.delete(sessionUnlockKey(email, member));
+}
+
+export interface BackupEntry {
+  network: WalletNetwork;
+  c: string;     
+  h: string;     
+  s: 's1';       
+}
+
+export interface BackupPayload {
+  v: 1;
+  hash: string;         
+  email: string;        
+  entries: BackupEntry[];
+  exported_at: number;  
+}
+
+export async function exportBackup(
+  email: string,
+  member: number,
+): Promise<BackupPayload | null> {
+  const entries = await findEntriesForUser(email, member);
+  const result: BackupEntry[] = [];
+  for (const network of ['eth', 'pol'] as const) {
+    const e = entries[network];
+    if (!e || e.s !== 's1' || !e.h) continue;
+    result.push({ network, c: e.c, h: e.h, s: 's1' });
+  }
+  if (result.length === 0) return null;
+  const normalized = normEmail(email);
+  return {
+    v: 1,
+    hash: CryptoJS.SHA256(normalized).toString(),
+    email: normalized,
+    entries: result,
+    exported_at: Date.now(),
+  };
+}
+
+function pseudoRandomIv(): CryptoJS.lib.WordArray {
+  const words: number[] = [];
+  for (let i = 0; i < 4; i++) {
+    words.push((Math.random() * 0x100000000) | 0);
+  }
+  return CryptoJS.lib.WordArray.create(words, 16);
+}
+
+export function encryptBackupJson(json: string, pin: string): string {
+  const keyHex = CryptoJS.SHA256(pin).toString();
+  const key = CryptoJS.enc.Hex.parse(keyHex);
+  const iv = pseudoRandomIv();
+  const cipher = CryptoJS.AES.encrypt(json, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  const ivHex = iv.toString(CryptoJS.enc.Hex);
+
+  return `${ivHex}:${cipher.toString()}`;
+}
+
+export function decryptBackupJson(encrypted: string, pin: string): string {
+  const idx = encrypted.indexOf(':');
+  if (idx <= 0) throw new Error('invalid backup format');
+  const ivHex = encrypted.slice(0, idx);
+  const cipherB64 = encrypted.slice(idx + 1);
+  const keyHex = CryptoJS.SHA256(pin).toString();
+  const key = CryptoJS.enc.Hex.parse(keyHex);
+  const iv = CryptoJS.enc.Hex.parse(ivHex);
+  const decrypted = CryptoJS.AES.decrypt(cipherB64, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+export interface RestoreResult {
+  ok: boolean;
+  imported: WalletNetwork[];
+  skipped: { network: string; reason: string }[];
+  reason?: string;
+}
+
+export async function restoreBackup(
+  payload: BackupPayload,
+  email: string,
+  member: number,
+  pin: string,
+): Promise<RestoreResult> {
+  if (payload.v !== 1) {
+    return { ok: false, imported: [], skipped: [], reason: 'invalid-version' };
+  }
+  if (!Array.isArray(payload.entries) || payload.entries.length === 0) {
+    return { ok: false, imported: [], skipped: [], reason: 'empty-entries' };
+  }
+  const normalized = normEmail(email);
+  if (normEmail(payload.email) !== normalized) {
+    return { ok: false, imported: [], skipped: [], reason: 'email-mismatch' };
+  }
+  const expectedHash = CryptoJS.SHA256(normalized).toString();
+  if (payload.hash !== expectedHash) {
+    return { ok: false, imported: [], skipped: [], reason: 'hash-mismatch' };
+  }
+  const expectedH = pinVerifyHash(pin, email, member);
+
+  const imported: WalletNetwork[] = [];
+  const skipped: { network: string; reason: string }[] = [];
+
+  for (const e of payload.entries) {
+    if (e.network !== 'eth' && e.network !== 'pol') {
+      skipped.push({ network: String(e.network), reason: 'unknown-network' });
+      continue;
+    }
+    if (e.s !== 's1' || !e.c || !e.h) {
+      skipped.push({ network: e.network, reason: 'malformed' });
+      continue;
+    }
+    if (e.h !== expectedH) {
+      skipped.push({ network: e.network, reason: 'wrong-pin' });
+      continue;
+    }
+    let plaintext: string;
+    try {
+      plaintext = decryptWithPin(e.c, pin, email, member);
+    } catch {
+      skipped.push({ network: e.network, reason: 'decrypt-error' });
+      continue;
+    }
+    if (!plaintext) {
+      skipped.push({ network: e.network, reason: 'decrypt-empty' });
+      continue;
+    }
+    let wallets: WalletKey[];
+    try {
+      wallets = JSON.parse(plaintext);
+    } catch {
+      skipped.push({ network: e.network, reason: 'json-parse-fail' });
+      continue;
+    }
+    if (!Array.isArray(wallets) || wallets.length === 0) {
+      skipped.push({ network: e.network, reason: 'empty-array' });
+      continue;
+    }
+    const v = await verifyAllWallets(wallets);
+    if (!v.ok) {
+      skipped.push({ network: e.network, reason: `verify-fail:${v.failed.join(',')}` });
+      continue;
+    }
+    await upsertEntry({
+      u: userHash(email, member, e.network),
+      c: e.c,
+      h: e.h,
+      s: 's1',
+    });
+    imported.push(e.network);
+  }
+
+  return {
+    ok: imported.length > 0,
+    imported,
+    skipped,
+  };
+}
+
+export interface PlainBackupPayload {
+  v: 1;
+  warning: 'PLAIN_TEXT_DO_NOT_SHARE';
+  email: string;
+  wallets: Array<{
+    network: WalletNetwork;
+    wallet_code: string;
+    address: string;
+    private_key: string;     
+  }>;
+  exported_at: number;
+}
+
+export interface RestorePlainResult {
+  ok: boolean;
+  imported: WalletNetwork[];
+  skipped: { wallet_code: string; reason: string }[];
+  reason?: string;
+}
+
+export async function restorePlainBackup(
+  payload: PlainBackupPayload,
+  email: string,
+  member: number,
+  pin: string,
+): Promise<RestorePlainResult> {
+  if (payload.v !== 1 || payload.warning !== 'PLAIN_TEXT_DO_NOT_SHARE') {
+    return { ok: false, imported: [], skipped: [], reason: 'invalid-format' };
+  }
+  if (!Array.isArray(payload.wallets) || payload.wallets.length === 0) {
+    return { ok: false, imported: [], skipped: [], reason: 'empty-wallets' };
+  }
+  const normalized = normEmail(email);
+  if (normEmail(payload.email) !== normalized) {
+    return { ok: false, imported: [], skipped: [], reason: 'email-mismatch' };
+  }
+
+  const grouped: Record<WalletNetwork, WalletKey[]> = { eth: [], pol: [] };
+  const skipped: { wallet_code: string; reason: string }[] = [];
+
+  for (const w of payload.wallets) {
+    const code = w.wallet_code || '?';
+    if (w.network !== 'eth' && w.network !== 'pol') {
+      skipped.push({ wallet_code: code, reason: 'unknown-network' });
+      continue;
+    }
+    if (!w.private_key || !w.address) {
+      skipped.push({ wallet_code: code, reason: 'malformed' });
+      continue;
+    }
+    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(w.private_key)) {
+      skipped.push({ wallet_code: code, reason: 'pk-format' });
+      continue;
+    }
+    grouped[w.network].push({
+      wallet_code: w.wallet_code,
+      address: w.address,
+      private_key: w.private_key.startsWith('0x') ? w.private_key : '0x' + w.private_key,
+      derivation_path: '',
+    });
+  }
+
+  const imported: WalletNetwork[] = [];
+  for (const network of ['eth', 'pol'] as const) {
+    const wallets = grouped[network];
+    if (wallets.length === 0) continue;
+    const v = await verifyAllWallets(wallets);
+    if (!v.ok) {
+      for (const f of v.failed) {
+        skipped.push({ wallet_code: f, reason: 'verify-fail' });
+      }
+      continue;
+    }
+    const plaintext = JSON.stringify(wallets);
+    const cipher = encryptWithPin(plaintext, pin, email, member);
+    const h = pinVerifyHash(pin, email, member);
+    await upsertEntry({
+      u: userHash(email, member, network),
+      c: cipher,
+      h,
+      s: 's1',
+    });
+    imported.push(network);
+  }
+
+  return {
+    ok: imported.length > 0,
+    imported,
+    skipped,
+  };
+}
+
+export function buildPlainBackup(
+  email: string,
+  wallets: WalletKey[],
+): PlainBackupPayload {
+  const list: PlainBackupPayload['wallets'] = [];
+  for (const w of wallets) {
+    const network = NETWORK_MAP[w.wallet_code];
+    if (!network) continue;
+    const pk = w.private_key.startsWith('0x') ? w.private_key : '0x' + w.private_key;
+    list.push({ network, wallet_code: w.wallet_code, address: w.address, private_key: pk });
+  }
+  return {
+    v: 1,
+    warning: 'PLAIN_TEXT_DO_NOT_SHARE',
+    email: normEmail(email),
+    wallets: list,
+    exported_at: Date.now(),
+  };
+}
+
+export type WalletAvailabilitySentinel = 'NQ' | 'DK' | 'ADC' | 'MISSING' | 'DECRYPT_FAIL';
+
+export interface WalletUnavailable {
+  wallet_code: string;                       
+  savedstring: WalletAvailabilitySentinel;
+}
+
+export interface AvailabilityEntry {
+  u: string;                       
+  un: WalletUnavailable[];         
+  t: number;                       
+}
+
+const AVAILABILITY_KEY = '__xs_av1';
+
+export function userAvailabilityHash(email: string, member: number): string {
+  const normalized = normEmail(email);
+  return CryptoJS.SHA256(`xrun-av:${normalized}:${String(member)}`).toString();
+}
+
+export async function readAvailability(): Promise<AvailabilityEntry[]> {
+  try {
+    const raw = await AsyncStorage.getItem(AVAILABILITY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    if (__DEV__) {
+      console.warn('[walletKeyStore] readAvailability parse 실패', e);
+    }
+    return [];
+  }
+}
+
+async function writeAvailability(entries: AvailabilityEntry[]): Promise<void> {
+  await AsyncStorage.setItem(AVAILABILITY_KEY, JSON.stringify(entries));
+}
+
+export async function findUnavailable(
+  email: string,
+  member: number,
+): Promise<WalletUnavailable[]> {
+  const list = await readAvailability();
+  const u = userAvailabilityHash(email, member);
+  const entry = list.find((e) => e.u === u);
+  return entry?.un ?? [];
+}
+
+export async function upsertAvailability(
+  email: string,
+  member: number,
+  unavailable: WalletUnavailable[],
+): Promise<void> {
+  return withVaultLock(async () => {
+    const list = await readAvailability();
+    const u = userAvailabilityHash(email, member);
+    const next: AvailabilityEntry = { u, un: unavailable, t: Date.now() };
+    const idx = list.findIndex((e) => e.u === u);
+    if (idx >= 0) {
+      list[idx] = next;
+    } else {
+      list.push(next);
+    }
+    await writeAvailability(list);
+  });
 }

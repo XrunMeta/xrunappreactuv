@@ -128,7 +128,12 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       setPin('');
       setConfirmPin('');
       onSuccess();
-    } catch {
+    } catch (verifyErr) {
+      const reasonStr =
+        verifyErr instanceof Error ? verifyErr.message : String(verifyErr);
+      if (__DEV__) {
+        console.warn('[WalletKeyPinSetupModal] verify/commit fail:', reasonStr);
+      }
 
       try {
         for (const network of targetNetworks) {
@@ -146,7 +151,11 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       } catch {
 
       }
-      setErrorMsg('검증 실패 — 다시 시도해주세요');
+      setErrorMsg(
+        __DEV__
+          ? `검증 실패: ${reasonStr}`
+          : '검증 실패 — 다시 시도해주세요',
+      );
       setStep('error');
       setPin('');
       setConfirmPin('');

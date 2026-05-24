@@ -2,6 +2,8 @@ export default {
   title: 'Setting',
   closeMembership: 'Close Membership',
   languageSelect: 'Language Select',
+  walletBackup: 'Backup Wallet Keys',
+  walletRestore: 'Restore Wallet Keys',
   reward: 'Reward',
   ayet_offers: 'ayeT Offers',
   ayet_offers_xplay: 'Xplay Offers',

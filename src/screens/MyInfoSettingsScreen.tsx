@@ -82,6 +82,20 @@ export const MyInfoSettingsScreen = () => {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletPrivateKeyGoogleAuth)}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.walletBackup')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletRestore)}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.walletRestore')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
