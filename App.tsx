@@ -73,6 +73,7 @@ import {
   WalletPrivateKeyGoogleAuthScreen,
   WalletRestoreScreen,
   MyChipsOfferwallScreen,
+  WalletKeyTutorialScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
@@ -415,6 +416,13 @@ const ScreenHost = () => {
 
   if (currentScreen === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (currentScreen === 'walletKeyTutorial') {
+    return <WalletKeyTutorialScreen mode="signup" />;
+  }
+  if (currentScreen === 'walletKeyGuide') {
+    return <WalletKeyTutorialScreen mode="readonly" />;
   }
 
   if (currentScreen === 'map') {
