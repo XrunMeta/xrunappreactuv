@@ -30,6 +30,7 @@ import {
 } from '../services';
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
+import { v_019a30 } from './walletKeyTutorialHelpers';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -261,6 +262,12 @@ export const v_667a00 = () => {
           }
 
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
+
+          try {
+            await v_e84827.setItem(v_019a30, 'true');
+          } catch (v_9e86fd) {
+            console.warn('[회원가입] 튜토리얼 pending 플래그 저장 실패:', v_9e86fd);
+          }
 
           v_036f76();
 

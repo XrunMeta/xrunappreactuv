@@ -73,6 +73,7 @@ import {
   v_d4a78d,
   v_626337,
   v_0ca15f,
+  v_fad5f1,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
@@ -415,6 +416,13 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (v_0f0c7b === 'walletKeyTutorial') {
+    return <WalletKeyTutorialScreen mode="signup" />;
+  }
+  if (v_0f0c7b === 'walletKeyGuide') {
+    return <WalletKeyTutorialScreen mode="readonly" />;
   }
 
   if (v_0f0c7b === 'map') {

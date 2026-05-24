@@ -54,6 +54,11 @@ import { v_e4a763 } from '../utils/env';
 import { v_a61db3, v_843035 } from '../constants';
 import { v_f3de6d, v_a4e2ac } from '../utils/napApiUtils';
 import { v_cba33f } from '../utils';
+import {
+  v_235370,
+  v_019a30,
+  v_4e5f7b,
+} from './walletKeyTutorialHelpers';
 
 interface LocationData {
 
@@ -225,6 +230,25 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const { checkForUpdate: v_7e5bd3 } = v_ba5086();
 
   const v_4166d2 = v_e662ae<string | null>(null);
+
+  const v_e790c7 = v_e662ae(false);
+
+  v_c4deb2(() => {
+    if (v_e790c7.current) return;
+    v_e790c7.current = true;
+    (async () => {
+      try {
+        const v_483de2 = await v_e84827.getItem(v_019a30);
+        const v_0ba044 = await v_e84827.getItem(v_4e5f7b);
+        if (v_235370(v_483de2, v_0ba044)) {
+          await v_e84827.removeItem(v_019a30);
+          v_9b57fc(v_ce4741.walletKeyTutorial);
+        }
+      } catch (v_9e86fd) {
+        console.warn('[MapMain] 튜토리얼 가드 확인 실패:', v_9e86fd);
+      }
+    })();
+  }, [v_9b57fc]);
 
   v_c4deb2(() => {
     v_7e5bd3();
