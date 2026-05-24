@@ -18,6 +18,7 @@ interface FormCheckboxProps {
   onToggle: () => void;
   variant?: CheckboxVariant;
   style?: v_961e77<v_7e4944>;
+  testID?: string;
 }
 
 export const FormCheckbox: v_a3453e.FC<FormCheckboxProps> = ({
@@ -26,12 +27,14 @@ export const FormCheckbox: v_a3453e.FC<FormCheckboxProps> = ({
   onToggle: v_0a2cea,
   variant: v_46e192 = 'square',
   style: v_7fa4e4,
+  testID: v_681472,
 }) => {
   return (
     <TouchableOpacity
       onPress={v_0a2cea}
       activeOpacity={0.8}
       style={[v_d81136.container, v_7fa4e4]}
+      testID={v_681472}
     >
       <View
         style={[
