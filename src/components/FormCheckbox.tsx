@@ -18,6 +18,7 @@ interface FormCheckboxProps {
   onToggle: () => void;
   variant?: CheckboxVariant;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 }
 
 export const FormCheckbox: React.FC<FormCheckboxProps> = ({
@@ -26,12 +27,14 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({
   onToggle,
   variant = 'square',
   style,
+  testID,
 }) => {
   return (
     <TouchableOpacity
       onPress={onToggle}
       activeOpacity={0.8}
       style={[styles.container, style]}
+      testID={testID}
     >
       <View
         style={[

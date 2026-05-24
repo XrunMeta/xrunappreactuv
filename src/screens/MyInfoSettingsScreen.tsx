@@ -96,6 +96,15 @@ export const MyInfoSettingsScreen = () => {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletKeyGuide)}
+          >
+            <Text style={styles.cardText}>
+              {t('screens.myInfoSettings.walletKeyGuide')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
