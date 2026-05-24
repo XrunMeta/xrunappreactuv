@@ -54,6 +54,11 @@ import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
 import { collectDeviceInfo, getMinimalDeviceInfo } from '../utils/napApiUtils';
 import { showToast } from '../utils';
+import {
+  shouldShowTutorial,
+  TUTORIAL_PENDING_KEY,
+  TUTORIAL_COMPLETED_KEY,
+} from './walletKeyTutorialHelpers';
 
 interface LocationData {
 
@@ -225,6 +230,25 @@ export const MapMainScreen: React.FC = () => {
   const { checkForUpdate } = useOTAUpdate();
 
   const prevScreenRef = useRef<string | null>(null);
+
+  const tutorialGuardChecked = useRef(false);
+
+  useEffect(() => {
+    if (tutorialGuardChecked.current) return;
+    tutorialGuardChecked.current = true;
+    (async () => {
+      try {
+        const pending = await AsyncStorage.getItem(TUTORIAL_PENDING_KEY);
+        const completed = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+        if (shouldShowTutorial(pending, completed)) {
+          await AsyncStorage.removeItem(TUTORIAL_PENDING_KEY);
+          navigate(ROUTES.walletKeyTutorial);
+        }
+      } catch (e) {
+        console.warn('[MapMain] 튜토리얼 가드 확인 실패:', e);
+      }
+    })();
+  }, [navigate]);
 
   useEffect(() => {
     checkForUpdate();
