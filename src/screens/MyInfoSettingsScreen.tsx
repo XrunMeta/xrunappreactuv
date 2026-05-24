@@ -96,6 +96,15 @@ export const v_4a40b2 = () => {
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
+            onPress={() => v_9b57fc(v_ce4741.walletKeyGuide)}
+          >
+            <Text style={v_d81136.cardText}>
+              {v_8d41d7('screens.myInfoSettings.walletKeyGuide')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={v_d81136.card}
+            activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.myInfoCloseMembership)}
           >
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.closeMembership')}</Text>
