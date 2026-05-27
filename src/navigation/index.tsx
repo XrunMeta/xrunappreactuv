@@ -143,7 +143,15 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
           return;
         }
 
-        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지', {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          console.log('[Navigation] 이전 로그인 흔적 있음 + 현재 로그아웃 → LoginScreen 으로 이동');
+          setStack([ROUTES.login]);
+          setIsInitialized(true);
+          return;
+        }
+
+        console.log('[Navigation] 자동 로그인 없음 + userData 없음: 기본 화면 유지', {
           remember,
           loggedIn,
           rememberCheck: remember === 'true',
