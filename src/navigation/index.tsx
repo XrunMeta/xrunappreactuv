@@ -143,7 +143,15 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
           return;
         }
 
-        console.log('[Navigation] 자동 로그인 없음: 기본 화면 유지', {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          console.log('[Navigation] 이전 로그인 흔적 있음 + 현재 로그아웃 → LoginScreen 으로 이동');
+          v_768005([v_ce4741.login]);
+          v_da6fbe(true);
+          return;
+        }
+
+        console.log('[Navigation] 자동 로그인 없음 + userData 없음: 기본 화면 유지', {
           remember: v_efe339,
           loggedIn: v_0fd7ed,
           rememberCheck: v_efe339 === 'true',
