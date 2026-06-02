@@ -14,7 +14,7 @@ interface PangleBannerNativeProps {
 
 const PangleBannerNative = requireNativeComponent<PangleBannerNativeProps>('PangleBannerView');
 
-const DEFAULT_SLOT_ID = '983205100';
+const DEFAULT_SLOT_ID = Platform.OS === 'ios' ? '983205194' : '983205100';
 const PLACEMENT_TO_SLOT: Record<string, string> = {
   myinfo: DEFAULT_SLOT_ID,
   shop: DEFAULT_SLOT_ID,
