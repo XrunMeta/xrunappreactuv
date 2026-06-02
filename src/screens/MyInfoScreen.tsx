@@ -10,7 +10,7 @@ import {
 import { v_dec439, v_f832ec, v_25515d } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_4c7b5d } from '../components';
+import { v_729608, v_143351 } from '../components';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
@@ -371,7 +371,7 @@ export const v_03a231 = () => {
       />
       {}
       <View style={v_d81136.adBanner}>
-        < TaboolaBanner placementType="myinfo_OS_395x80" />
+        <PangleBanner placementType="myinfo_OS_395x80" />
       </View>
 
       <View style={v_d81136.scrollContent}>

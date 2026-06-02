@@ -22,7 +22,7 @@ import { v_f3de6d } from '../utils/napApiUtils';
 import { v_aa7dc1, v_167376, v_38f5f4, v_8cba1e, v_f4cc2d, v_563153, v_5e0191, v_fda57c } from '../services';
 import { v_cba33f } from '../utils';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_4c7b5d, v_570c34 } from '../components';
+import { v_143351, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_6b63f9 } from '../types';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
@@ -766,7 +766,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
       {}
       {v_7a79cf && (
         <View style={v_d81136.bannerContainer}>
-          <TaboolaBanner
+          <PangleBanner
             placementType="reward_OS_395x80"
             onLoadComplete={() => {
               console.log('[ShowPockAdScreen] Taboola 배너 로딩 완료');
