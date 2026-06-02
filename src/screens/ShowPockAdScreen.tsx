@@ -22,7 +22,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
 import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TaboolaBanner, SafeScrollView } from '../components';
+import { PangleBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { PockAdsResponse } from '../types';
 import { Ionicons } from '@expo/vector-icons';
@@ -766,7 +766,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
       {}
       {waitingForWebSocketResponse && (
         <View style={styles.bannerContainer}>
-          <TaboolaBanner
+          <PangleBanner
             placementType="reward_OS_395x80"
             onLoadComplete={() => {
               console.log('[ShowPockAdScreen] Taboola 배너 로딩 완료');

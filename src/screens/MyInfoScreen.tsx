@@ -10,7 +10,7 @@ import {
 import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header, TaboolaBanner } from '../components';
+import { Header, PangleBanner } from '../components';
 import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
@@ -371,7 +371,7 @@ export const MyInfoScreen = () => {
       />
       {}
       <View style={styles.adBanner}>
-        < TaboolaBanner placementType="myinfo_OS_395x80" />
+        <PangleBanner placementType="myinfo_OS_395x80" />
       </View>
 
       <View style={styles.scrollContent}>

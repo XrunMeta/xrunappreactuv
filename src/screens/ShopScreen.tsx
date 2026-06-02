@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl, TaboolaBanner } from '../components';
+import { Header, SegmentedControl, PangleBanner } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -619,7 +619,7 @@ export const ShopScreen = () => {
             {}
             {tab !== 'xplayShop' ? (
                 <View style={styles.taboolaContainer}>
-                    <TaboolaBanner placementType="shop" />
+                    <PangleBanner placementType="shop" />
                 </View>
             ) : null}
         </SafeView>

@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl, ShopItemCard, Dialog, SafeView, TaboolaBanner } from '../components';
+import { Header, SegmentedControl, ShopItemCard, Dialog, SafeView, PangleBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ShopItem } from '../types';
@@ -303,7 +303,7 @@ export const ShopMyTicketScreen = () => {
       )}
       {}
       <View style={styles.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
+        <PangleBanner placementType="shop" />
       </View>
 
       {}

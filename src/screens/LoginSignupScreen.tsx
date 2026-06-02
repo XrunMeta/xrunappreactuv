@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PrimaryButton, SecondaryButton, SafeView } from '../components';
 import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
-import { TaboolaBanner } from '../components/TaboolaBanner';
+import { PangleBanner } from '../components/PangleBanner';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -110,7 +110,7 @@ export const LoginSignupScreen = () => {
 
       {}
       <View style={styles.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
+        <PangleBanner placementType="shop" />
       </View>
     </SafeView>
   );

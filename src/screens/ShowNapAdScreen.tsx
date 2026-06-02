@@ -20,7 +20,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TaboolaBanner, SafeScrollView } from '../components';
+import { PangleBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
 

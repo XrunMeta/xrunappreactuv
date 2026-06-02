@@ -35,7 +35,7 @@ import {
   CustomToken,
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
-import { TaboolaBanner } from '../components/TaboolaBanner';
+import { PangleBanner } from '../components/PangleBanner';
 import { getTokenIcon } from '../constants/tokenMeta';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
@@ -821,7 +821,7 @@ export const WalletScreen = () => {
       />
       {}
       <View style={styles.taboolaContainer}>
-        <TaboolaBanner placementType="shop" />
+        <PangleBanner placementType="shop" />
       </View>
 
       <View style={styles.content}>

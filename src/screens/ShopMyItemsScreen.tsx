@@ -5,7 +5,7 @@ import { SafeScrollView, SafeView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Header, SegmentedControl, TaboolaBanner } from '../components';
+import { Header, SegmentedControl, PangleBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -406,7 +406,7 @@ export const ShopMyItemsScreen = () => {
             </View>
             {}
             <View style={styles.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
+                <PangleBanner placementType="shop" />
             </View>
         </SafeView>
     );
