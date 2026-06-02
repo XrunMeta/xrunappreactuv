@@ -14,7 +14,7 @@ interface PangleBannerNativeProps {
 
 const v_e0cc28 = v_027028<PangleBannerNativeProps>('PangleBannerView');
 
-const v_4158ca = '983205100';
+const v_4158ca = v_326be8.OS === 'ios' ? '983205194' : '983205100';
 const v_1a79bf = {
   myinfo: v_4158ca,
   shop: v_4158ca,
