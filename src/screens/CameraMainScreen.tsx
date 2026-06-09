@@ -732,8 +732,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }).catch(() => {});
   }, []);
 
+  const removeCompletedFromRecentAds = useCallback(async (completed: Set<string> | string[] | string) => {
+    const completedSet = typeof completed === 'string'
+      ? new Set([completed])
+      : completed instanceof Set
+        ? completed
+        : new Set(completed);
+    if (completedSet.size === 0) return;
+    setRecentAds((prev) => {
+      const next = prev.filter((a) => !completedSet.has(a.campid));
+      if (next.length !== prev.length) {
+        AsyncStorage.setItem(RECENT_ADS_KEY, JSON.stringify(next)).catch(() => {});
+        console.log(`[RecentAds] 완료된 광고 ${prev.length - next.length}개 제거 (남은 ${next.length}개)`);
+      }
+      return next;
+    });
+  }, []);
+
   const addToRecentAds = useCallback(async (ad: RecentAd) => {
     if (!ad.campid || !ad.urlAD) return;
+
+    if (completedAdsSetRef.current?.has(ad.campid)) {
+      console.log(`[RecentAds] 이미 완료된 광고 — 최근 본 광고 추가 건너뜀: ${ad.campid}`);
+      return;
+    }
     setRecentAds((prev) => {
       const filtered = prev.filter((a) => a.campid !== ad.campid);
       const next = [{ ...ad, viewedAt: Date.now() }, ...filtered].slice(0, RECENT_ADS_MAX);
@@ -1100,6 +1122,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
           completedAdsSetRef.current = mergedSet;
           console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${existingCompletedAds.size}개 + 새로 ${completedAdsSet.size}개 = 총 ${mergedSet.size}개`);
+
+          removeCompletedFromRecentAds(mergedSet);
         } catch (error) {
           console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
 
@@ -1710,6 +1734,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       if (completedAdsSet && completedAdsSet.size > 0) {
         completedAdsSetRef.current = completedAdsSet;
         console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+
+        removeCompletedFromRecentAds(completedAdsSet);
       }
 
       if (topAd5Response && Array.isArray(topAd5Response) && topAd5Response.length > 0) {
@@ -1852,6 +1878,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     console.log(`[CameraMainScreen] completedAdsSetRef에 추가: ${completedAdCampid} (현재 크기: ${completedAdsSetRef.current.size})`);
                   }
 
+                  removeCompletedFromRecentAds(completedAdCampid);
+
                   setTokens(prevTokens => [...prevTokens]);
 
                   await removeAdFromTopAd5(completedAdCampid, navigate);
@@ -1868,6 +1896,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       const completedAdsSet = await getCompletedAdsSet(member, navigate, true);
                       completedAdsSetRef.current = completedAdsSet;
                       console.log(`[CameraMainScreen] 완료된 광고 목록 업데이트: ${completedAdsSet.size}개`);
+
+                      removeCompletedFromRecentAds(completedAdsSet);
 
                       setTokens(prevTokens => [...prevTokens]);
                     }
