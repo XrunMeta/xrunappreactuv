@@ -2077,6 +2077,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
+      const v_43b152 = /gpakorea\.com/i.test(v_7ec08d);
+      if (v_43b152) {
+        console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+        try {
+          await v_f2c756.openURL(v_7ec08d);
+        } catch (v_49263d) {
+          console.error('[showAdInModal] 외부 브라우저 오픈 실패:', v_49263d);
+          v_cba33f('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
+
       if (v_326be8.OS === 'ios') {
 
         v_9b57fc(v_ce4741.showWebView);
@@ -2379,6 +2391,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_96a9ed(v_21cc31);
 
       v_d48a26(v_75c344);
+
+      const v_e7a956 = /gpakorea\.com/i.test(v_7ec08d);
+      if (v_e7a956) {
+        console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+        try {
+          await v_f2c756.openURL(v_7ec08d);
+        } catch (v_49263d) {
+          console.error('[다른 경로] 외부 브라우저 오픈 실패:', v_49263d);
+          v_cba33f('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
 
       if (v_326be8.OS === 'ios') {
 
