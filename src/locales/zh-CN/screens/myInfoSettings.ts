@@ -1,6 +1,9 @@
 export default {
   title: '设置',
   closeMembership: '注销会员',
+  pushNotifications: '推送通知',
+  pushNotificationsOn: '开启',
+  pushNotificationsOff: '关闭',
   languageSelect: '语言选择',
   walletBackup: 'Backup Wallet Keys',
   walletRestore: 'Restore Wallet Keys',

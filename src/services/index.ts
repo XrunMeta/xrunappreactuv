@@ -2342,11 +2342,57 @@ export const v_3e4cca = async (
   }
 };
 
+export const v_f3c4d5 = 'pushNotificationsEnabled';
+
+export const v_8b775f = async (): Promise<boolean> => {
+  try {
+    const v_e84827 = require('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv').default;
+    const v_81e2ef = await v_e84827.getItem(v_f3c4d5);
+    if (v_81e2ef === null || v_81e2ef === undefined) return true; 
+    return v_81e2ef === 'true';
+  } catch {
+    return true;
+  }
+};
+
+export const v_415b23 = async (
+  v_d20c84,
+  v_660822,
+  v_c65f5d,
+): Promise<void> => {
+  const v_e84827 = require('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv').default;
+  await v_e84827.setItem(v_f3c4d5, v_d20c84 ? 'true' : 'false');
+
+  if (v_d20c84) {
+
+    await v_cec605(v_660822, v_c65f5d);
+  } else {
+
+    try {
+      const v_9f42a4 = v_7488d5(v_c65f5d);
+      await v_9f42a4.post('/login-pushkeyreg', {
+        pushkey: '',
+        member: v_660822,
+      });
+      console.log('[푸시] 토큰 서버 해제 완료');
+    } catch (v_5e9bfe) {
+      console.warn('[푸시] 토큰 해제 실패:', v_5e9bfe);
+    }
+  }
+};
+
 export const v_cec605 = async (
   v_660822,
   v_c65f5d,
 ): Promise<void> => {
   try {
+
+    const v_d20c84 = await v_8b775f();
+    if (!v_d20c84) {
+      console.log('[푸시] 사용자가 알림을 비활성화함 — 토큰 등록 건너뜀');
+      return;
+    }
+
     const v_2b7a17 = require('bpebbcghaffswkrsep');
     const v_a06ea0 = require('wtbgvqvuebu');
     const v_c9be60 = require('qfrscldecidiqs');
