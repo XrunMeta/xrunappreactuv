@@ -567,12 +567,17 @@ export const ShopProductDetailScreen = () => {
                         )}
                         <View style={styles.productImageContainer}>
                             <View style={styles.productImageWrapper}>
-                                <Image
-                                    source={showPlaceholder ? xrunHorizontalLogo : primarySource}
-                                    style={styles.productImage}
-                                    resizeMode="contain"
-                                    onError={() => setImageLoadFailed(true)}
-                                />
+                                {showPlaceholder ? (
+
+                                    <View style={styles.productImage} />
+                                ) : (
+                                    <Image
+                                        source={primarySource}
+                                        style={styles.productImage}
+                                        resizeMode="contain"
+                                        onError={() => setImageLoadFailed(true)}
+                                    />
+                                )}
                             </View>
                         </View>
                         <View style={styles.productInfoContainer}>
