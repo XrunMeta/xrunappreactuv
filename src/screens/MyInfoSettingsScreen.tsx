@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_4623af, v_326be8 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_4623af, v_326be8, v_79139e, v_39a996 } from 'rcmrninabrnb';
+import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
@@ -10,6 +11,10 @@ import {
   v_de7bac,
   v_4503ee
 } from '../services/versionCheck';
+import {
+  v_8b775f,
+  v_415b23,
+} from '../services';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -21,6 +26,45 @@ export const v_4a40b2 = () => {
     iosCurrent: number;
     iosLatest: number;
   } | null>(null);
+
+  const [v_1486be, v_1a9606] = v_5ab095<boolean>(true);
+  const [v_b3e3c3, v_2f1158] = v_5ab095<boolean>(false);
+  const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
+
+  v_c4deb2(() => {
+    (async () => {
+      try {
+        const v_d20c84 = await v_8b775f();
+        v_1a9606(v_d20c84);
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        if (v_f24fd5) {
+          const v_ef7306 = JSON.parse(v_f24fd5);
+          if (v_ef7306?.member) v_9d6aeb(Number(v_ef7306.member));
+        }
+      } catch (v_49263d) {
+        console.warn('[MyInfoSettings] 푸시 상태 로드 실패:', v_49263d);
+      }
+    })();
+  }, []);
+
+  const v_465139 = async (v_a448ad) => {
+    if (v_b3e3c3) return;
+    if (!v_717992) {
+      console.warn('[MyInfoSettings] memberId 없음 — 토글 무시');
+      return;
+    }
+    v_2f1158(true);
+
+    v_1a9606(v_a448ad);
+    try {
+      await v_415b23(v_a448ad, v_717992, v_9b57fc);
+    } catch (v_49263d) {
+      console.warn('[MyInfoSettings] 푸시 토글 실패 — 롤백:', v_49263d);
+      v_1a9606(!v_a448ad);
+    } finally {
+      v_2f1158(false);
+    }
+  };
 
   v_c4deb2(() => {
     const v_d7f2ec = async () => {
@@ -72,6 +116,31 @@ export const v_4a40b2 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
+          {}
+          <View style={[v_d81136.card, v_d81136.rowCard]}>
+            <View style={v_d81136.rowCardLeft}>
+              <Text style={v_d81136.cardText}>
+                {v_8d41d7('screens.myInfoSettings.pushNotifications')}
+              </Text>
+              <Text style={v_d81136.rowCardSub}>
+                {v_1486be
+                  ? v_8d41d7('screens.myInfoSettings.pushNotificationsOn')
+                  : v_8d41d7('screens.myInfoSettings.pushNotificationsOff')}
+              </Text>
+            </View>
+            {v_b3e3c3 ? (
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            ) : (
+              <Switch
+                value={v_1486be}
+                onValueChange={v_465139}
+                disabled={!v_717992}
+                trackColor={{ false: '#d4d4d4', true: v_1bfbd0.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
@@ -160,6 +229,21 @@ const v_d81136 = v_472849.create({
     fontSize: v_843035.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
+  },
+  rowCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  rowCardLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  rowCardSub: {
+    marginTop: 4,
+    fontSize: v_843035.size.xsmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#888888',
   },
   versionContainer: {
     width: '100%',
