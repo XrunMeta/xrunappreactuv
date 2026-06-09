@@ -369,10 +369,13 @@ export const v_667a00 = () => {
                 }
 
                 if (v_43c42e.email && v_354151 && v_43c42e.email !== v_354151) {
+
                   await v_889fad(
                     v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
-                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage') || '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
-                    [{ text: v_8d41d7('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                    v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage', { email: v_fad096.email })
+                      || `가입 시 입력하신 이메일 (${v_fad096.email}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n같은 이메일로 다시 로그인해주세요.`,
+                    [{ text: v_8d41d7('screens.verificationCode.gmailGoogleLogin.emailMismatchButton') || '확인', onPress: () => {} }],
+                    { hideCloseButton: true },
                   );
                   continue;
                 }
