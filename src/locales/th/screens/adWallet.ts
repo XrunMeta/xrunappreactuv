@@ -23,7 +23,7 @@ export default {
   attendanceCheck: 'เช็คอิน',
   attendanceCheckCompletedReward: 'รางวัลการเช็คอินเสร็จสมบูรณ์',
   attendanceCheckNotAvailable: 'การเช็คอินไม่พร้อมใช้งาน',
-  settlementNotice: 'ชำระเงินใน 75 วัน',
+  settlementNotice: 'ชำระเงินภายใน 14 วัน',
   referralEventRewardTitle: 'รับรางวัลกิจกรรมแนะนำ',
   referralEventAlreadyCompleted: 'รางวัลกิจกรรมแนะนำเสร็จสมบูรณ์แล้ว',
   rewardNotAvailable: 'รางวัลไม่พร้อมใช้งานในสถานะนี้',

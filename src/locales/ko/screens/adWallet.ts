@@ -23,7 +23,7 @@ export default {
   attendanceCheck: '출석체크',
   attendanceCheckCompletedReward: '출석체크완료보상',
   attendanceCheckNotAvailable: '출석체크를 할 수 없습니다',
-  settlementNotice: '75일후 정산됨',
+  settlementNotice: '14일 이내 정산',
   referralEventRewardTitle: '추천인 이벤트 보상 받기',
   referralEventAlreadyCompleted: '추천인 이벤트 보상을 이미 완료했습니다.',
   rewardNotAvailable: '보상을 받을 수 없는 상태입니다.',

@@ -23,7 +23,7 @@ export default {
   attendanceCheck: '出席チェック',
   attendanceCheckCompletedReward: '出席チェック完了報酬',
   attendanceCheckNotAvailable: '出席チェックはできません',
-  settlementNotice: '75日後に決済',
+  settlementNotice: '14日以内に決済',
   referralEventRewardTitle: '紹介イベント報酬を受け取る',
   referralEventAlreadyCompleted: '紹介イベント報酬は既に完了しています。',
   rewardNotAvailable: 'この状態では報酬を受け取ることができません。',

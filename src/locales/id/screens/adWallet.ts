@@ -23,7 +23,7 @@ export default {
   attendanceCheck: 'Check In',
   attendanceCheckCompletedReward: 'Hadiah Check-In Selesai',
   attendanceCheckNotAvailable: 'Check-in tidak tersedia',
-  settlementNotice: 'Diselesaikan dalam 75 hari',
+  settlementNotice: 'Diselesaikan dalam 14 hari',
   referralEventRewardTitle: 'Terima Hadiah Acara Referral',
   referralEventAlreadyCompleted: 'Hadiah acara referral telah selesai.',
   rewardNotAvailable: 'Hadiah tidak tersedia dalam status ini.',

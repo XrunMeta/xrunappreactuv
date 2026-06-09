@@ -23,7 +23,7 @@ export default {
   attendanceCheck: 'Check In',
   attendanceCheckCompletedReward: 'Attendance Check Completed Reward',
   attendanceCheckNotAvailable: 'Attendance check is not available',
-  settlementNotice: 'Settled in 75 days',
+  settlementNotice: 'Settled within 14 days',
   referralEventRewardTitle: 'Receive Referral Event Reward',
   referralEventAlreadyCompleted: 'Referral event reward has already been completed.',
   rewardNotAvailable: 'Reward is not available in this state.',
