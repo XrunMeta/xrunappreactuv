@@ -1,6 +1,9 @@
 export default {
   title: '설정',
   closeMembership: '회원 탈퇴',
+  pushNotifications: '푸시 알림',
+  pushNotificationsOn: '허용',
+  pushNotificationsOff: '미허용',
   languageSelect: '언어 선택',
   walletBackup: '지갑 키 백업',
   walletRestore: '지갑 키 복원',
