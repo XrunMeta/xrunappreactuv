@@ -567,12 +567,17 @@ export const v_a59951 = () => {
                         )}
                         <View style={v_d81136.productImageContainer}>
                             <View style={v_d81136.productImageWrapper}>
-                                <Image
-                                    source={v_a12826 ? v_47af4d : v_6ef3ee}
-                                    style={v_d81136.productImage}
-                                    resizeMode="contain"
-                                    onError={() => v_aad6d1(true)}
-                                />
+                                {v_a12826 ? (
+
+                                    <View style={v_d81136.productImage} />
+                                ) : (
+                                    <Image
+                                        source={v_6ef3ee}
+                                        style={v_d81136.productImage}
+                                        resizeMode="contain"
+                                        onError={() => v_aad6d1(true)}
+                                    />
+                                )}
                             </View>
                         </View>
                         <View style={v_d81136.productInfoContainer}>
