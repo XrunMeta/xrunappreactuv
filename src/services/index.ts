@@ -2342,11 +2342,57 @@ export const deleteAllNotifications = async (
   }
 };
 
+export const PUSH_ENABLED_KEY = 'pushNotificationsEnabled';
+
+export const getPushNotificationsEnabled = async (): Promise<boolean> => {
+  try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const v = await AsyncStorage.getItem(PUSH_ENABLED_KEY);
+    if (v === null || v === undefined) return true; 
+    return v === 'true';
+  } catch {
+    return true;
+  }
+};
+
+export const setPushNotificationsEnabled = async (
+  enabled: boolean,
+  member: number,
+  navigation?: any,
+): Promise<void> => {
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  await AsyncStorage.setItem(PUSH_ENABLED_KEY, enabled ? 'true' : 'false');
+
+  if (enabled) {
+
+    await registerPushToken(member, navigation);
+  } else {
+
+    try {
+      const axiosInstance = createAxiosInstance(navigation);
+      await axiosInstance.post('/login-pushkeyreg', {
+        pushkey: '',
+        member,
+      });
+      console.log('[푸시] 토큰 서버 해제 완료');
+    } catch (error) {
+      console.warn('[푸시] 토큰 해제 실패:', error);
+    }
+  }
+};
+
 export const registerPushToken = async (
   member: number,
   navigation?: any,
 ): Promise<void> => {
   try {
+
+    const enabled = await getPushNotificationsEnabled();
+    if (!enabled) {
+      console.log('[푸시] 사용자가 알림을 비활성화함 — 토큰 등록 건너뜀');
+      return;
+    }
+
     const Notifications = require('expo-notifications');
     const Device = require('expo-device');
     const Constants = require('expo-constants');
