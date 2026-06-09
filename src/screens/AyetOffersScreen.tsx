@@ -82,7 +82,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   if (v_cd31a8) {
     return (
       <View style={v_d81136.container}>
-        <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+        <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.primary} />
         </View>
@@ -92,7 +92,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
 
   return (
     <View style={v_d81136.container}>
-      <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+      <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
       <WebView
         key={v_a039ac}
         ref={v_35f830}
