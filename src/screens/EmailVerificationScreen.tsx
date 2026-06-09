@@ -128,6 +128,8 @@ export const EmailVerificationScreen = () => {
           value={email}
           onChangeText={setEmail}
           containerStyle={styles.fieldContainer}
+
+          editable={false}
         />
 
         <View style={styles.buttonWrapper}>
