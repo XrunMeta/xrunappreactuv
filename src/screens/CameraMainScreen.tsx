@@ -2077,6 +2077,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
+      const needsExternalBrowser = /gpakorea\.com/i.test(urlAD);
+      if (needsExternalBrowser) {
+        console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+        try {
+          await Linking.openURL(urlAD);
+        } catch (err) {
+          console.error('[showAdInModal] 외부 브라우저 오픈 실패:', err);
+          showToast('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
+
       if (Platform.OS === 'ios') {
 
         navigate(ROUTES.showWebView);
@@ -2379,6 +2391,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       setSelectedToken(token);
 
       setAdvertisementParams(adParams);
+
+      const needsExternalBrowser2 = /gpakorea\.com/i.test(urlAD);
+      if (needsExternalBrowser2) {
+        console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+        try {
+          await Linking.openURL(urlAD);
+        } catch (err) {
+          console.error('[다른 경로] 외부 브라우저 오픈 실패:', err);
+          showToast('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
 
       if (Platform.OS === 'ios') {
 
