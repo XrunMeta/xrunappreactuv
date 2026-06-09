@@ -63,7 +63,7 @@ export const v_0ca15f = () => {
   if (v_cd31a8) {
     return (
       <View style={v_d81136.container}>
-        <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+        <Header title="Zone 2" onBackPress={v_c7ac57} showBackButton />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.primary} />
         </View>
@@ -73,7 +73,7 @@ export const v_0ca15f = () => {
 
   return (
     <View style={v_d81136.container}>
-      <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+      <Header title="Zone 2" onBackPress={v_c7ac57} showBackButton />
       <WebView
         ref={v_35f830}
         source={{ uri: v_6da94b }}
