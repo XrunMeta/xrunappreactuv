@@ -82,7 +82,7 @@ export const v_4922a9 = {
   },
   wallet: {
     adxrun: {
-      settlementIn45Days: '75일후 정산완료됨',
+      settlementIn45Days: '30일 이후 정산',
     },
   },
   screen_info: {
