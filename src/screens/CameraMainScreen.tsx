@@ -732,8 +732,30 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     }).catch(() => {});
   }, []);
 
+  const v_a2b2c4 = v_de06a3(async (v_0ba044) => {
+    const v_43ea0c = typeof v_0ba044 === 'string'
+      ? new Set([v_0ba044])
+      : v_0ba044 instanceof Set
+        ? v_0ba044
+        : new Set(v_0ba044);
+    if (v_43ea0c.size === 0) return;
+    v_32744e((v_ba2215) => {
+      const v_a448ad = v_ba2215.filter((v_779914) => !v_43ea0c.has(v_779914.campid));
+      if (v_a448ad.length !== v_ba2215.length) {
+        v_e84827.setItem(v_0a1033, JSON.stringify(v_a448ad)).catch(() => {});
+        console.log(`[RecentAds] 완료된 광고 ${v_ba2215.length - v_a448ad.length}개 제거 (남은 ${v_a448ad.length}개)`);
+      }
+      return v_a448ad;
+    });
+  }, []);
+
   const v_bcc877 = v_de06a3(async (v_ddcfed) => {
     if (!v_ddcfed.campid || !v_ddcfed.urlAD) return;
+
+    if (v_7c7dd0.current?.has(v_ddcfed.campid)) {
+      console.log(`[RecentAds] 이미 완료된 광고 — 최근 본 광고 추가 건너뜀: ${v_ddcfed.campid}`);
+      return;
+    }
     v_32744e((v_ba2215) => {
       const v_e4cf17 = v_ba2215.filter((v_779914) => v_779914.campid !== v_ddcfed.campid);
       const v_a448ad = [{ ...v_ddcfed, viewedAt: Date.now() }, ...v_e4cf17].slice(0, v_e41db0);
@@ -1100,6 +1122,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
           v_7c7dd0.current = v_b63d4a;
           console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${v_96f338.size}개 + 새로 ${v_905ecb.size}개 = 총 ${v_b63d4a.size}개`);
+
+          v_a2b2c4(v_b63d4a);
         } catch (v_5e9bfe) {
           console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
 
@@ -1710,6 +1734,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       if (v_905ecb && v_905ecb.size > 0) {
         v_7c7dd0.current = v_905ecb;
         console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+        v_a2b2c4(v_905ecb);
       }
 
       if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
@@ -1852,6 +1878,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     console.log(`[CameraMainScreen] completedAdsSetRef에 추가: ${v_dc62a4} (현재 크기: ${v_7c7dd0.current.size})`);
                   }
 
+                  v_a2b2c4(v_dc62a4);
+
                   v_8ce112(v_93ce34 => [...v_93ce34]);
 
                   await v_8cba1e(v_dc62a4, v_9b57fc);
@@ -1868,6 +1896,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       const v_905ecb = await v_318c45(v_660822, v_9b57fc, true);
                       v_7c7dd0.current = v_905ecb;
                       console.log(`[CameraMainScreen] 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+                      v_a2b2c4(v_905ecb);
 
                       v_8ce112(v_93ce34 => [...v_93ce34]);
                     }
