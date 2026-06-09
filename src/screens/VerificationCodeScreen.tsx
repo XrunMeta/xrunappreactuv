@@ -369,10 +369,13 @@ export const VerificationCodeScreen = () => {
                 }
 
                 if (result.email && signupEmailLower && result.email !== signupEmailLower) {
+
                   await showAlert(
                     t('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
-                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage') || '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
-                    [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
+                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage', { email: pendingData.email })
+                      || `가입 시 입력하신 이메일 (${pendingData.email}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n같은 이메일로 다시 로그인해주세요.`,
+                    [{ text: t('screens.verificationCode.gmailGoogleLogin.emailMismatchButton') || '확인', onPress: () => {} }],
+                    { hideCloseButton: true },
                   );
                   continue;
                 }

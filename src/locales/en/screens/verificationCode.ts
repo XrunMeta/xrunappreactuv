@@ -29,7 +29,8 @@ export default {
     message: 'Linking your Gmail account with Google Login allows you to sign in easily next time.',
     button: 'Google Login',
     emailMismatchTitle: 'Email Mismatch',
-    emailMismatchMessage: 'The Google account you use for sign-in must match the email you used to sign up.',
+    emailMismatchMessage: 'The email you signed up with ({{email}}) does not match the Google account you just used.\n\nPlease sign in again with the same email. If you picked a different Google account, select your sign-up email on the account picker.',
+    emailMismatchButton: 'OK',
   },
 };
 
