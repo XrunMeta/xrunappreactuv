@@ -1,7 +1,7 @@
 export default {
   title: '紹介',
   income: '総収益',
-  settlementIn45Days: '75日で決済完了',
+  settlementIn45Days: '30日以降に決済',
   settlementDescription: '紹介広告収益決済',
   noSettlementHistory: '決済履歴がありません。',
   group: 'マイグループ',
