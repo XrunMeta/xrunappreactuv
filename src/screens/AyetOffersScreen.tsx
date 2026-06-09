@@ -82,7 +82,7 @@ export const AyetOffersScreen: React.FC = () => {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <Header title="Xplay" onBackPress={goBack} showBackButton />
+        <Header title="Zone 1" onBackPress={goBack} showBackButton />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -92,7 +92,7 @@ export const AyetOffersScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Xplay" onBackPress={goBack} showBackButton />
+      <Header title="Zone 1" onBackPress={goBack} showBackButton />
       <WebView
         key={webViewKey}
         ref={webViewRef}
