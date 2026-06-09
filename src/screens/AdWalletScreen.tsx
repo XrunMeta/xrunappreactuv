@@ -550,8 +550,15 @@ export const AdWalletScreen = () => {
         adRevenueSettlement = `${formatted} XRUN`;
       }
 
+      const adName = (item as any).adName as string | undefined;
       let expectedAdRevenue = '0 XRUN';
-      expectedAdRevenue = typeLabel ? `${typeLabel}` : `${item.expected} XRUN`;
+      if (typeLabel) {
+        expectedAdRevenue = typeLabel;
+      } else if (adName && adName.trim()) {
+        expectedAdRevenue = adName.trim();
+      } else {
+        expectedAdRevenue = `${item.expected} XRUN`;
+      }
 
       const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';
       const adRevenueSettlementColor =
