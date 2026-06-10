@@ -185,48 +185,9 @@ export const WalletScreen = () => {
   const [walletsUnlocked, setWalletsUnlocked] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const jwt = await AsyncStorage.getItem('jwt');
-        const memberId = jwt ? jwtPayloadSub(jwt) : null;
-        let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
-          try {
-            const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
-          } catch {
 
-          }
-        }
-        if (cancelled) return;
-        if (memberId == null || !emailRaw) {
+    setWalletsUnlocked(true);
 
-          setWalletsUnlocked(true);
-          return;
-        }
-        const entries = await findEntriesForUser(emailRaw, memberId);
-        const hasS1 = entries.eth?.s === 's1' || entries.pol?.s === 's1';
-        if (cancelled) return;
-        if (!hasS1) {
-
-          setWalletsUnlocked(true);
-          return;
-        }
-
-        if (isUserStillUnlocked(emailRaw, memberId)) {
-          setWalletsUnlocked(true);
-          return;
-        }
-
-        setPinPromptProps({ memberId, email: emailRaw.toLowerCase().trim() });
-        setPinPromptVisible(true);
-      } catch {
-
-        setWalletsUnlocked(true);
-      }
-    })();
-    return () => { cancelled = true; };
   }, []);
 
   const onPinPromptSuccess = (_wallets: any[], _pin?: string) => {
