@@ -3568,7 +3568,20 @@ export const gatewayNodeJS = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/${endpoint}`;
+
+    const adEndpointPatterns = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const isAdEndpoint = adEndpointPatterns.some(re => re.test(endpoint));
+    const baseUrl = isAdEndpoint ? getAdApiBaseUrl() : getApiBaseUrl();
+    const url = `${baseUrl}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
