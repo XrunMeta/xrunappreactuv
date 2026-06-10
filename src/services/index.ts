@@ -26,9 +26,24 @@ const v_9bac9c = new Set([
 
 const v_2e0522 = new Set(['c1', 'c2', 'c16', 'c18']);
 
+const v_6e1b73 = 'https://oth-path-bab568.example.invalid/oth-path';
+
+const v_84b7b1 = 'https://oth-path-f0013c.example.invalid/oth-path';
+
+export const v_db0872 = (): string => {
+  const v_c9c489 = v_e4a763();
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+  return v_84b7b1; 
+};
+
 export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
-  return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return v_6e1b73;
+  }
+  return v_c9c489.GATEWAY_WORKERS;
 };
 
 export async function v_5ed938(): Promise<void> {
@@ -588,6 +603,22 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
     async (v_74a79c) => {
 
       v_74a79c.headers.Authorization = await v_23dd22();
+
+      const v_288349 = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const v_966ad8 = v_74a79c.url && v_288349.some(v_d95200 => v_d95200.test(v_74a79c.url!));
+      if (v_966ad8) {
+        v_74a79c.baseURL = v_db0872();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', v_74a79c.baseURL);
+      }
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -3503,7 +3534,8 @@ export const v_7a6f92 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/callbackNasmob`;
+
+    const v_f71b56 = `${v_db0872()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', v_d8bcf0);
 
@@ -5871,8 +5903,13 @@ export const v_519669 = async (
   };
 
   try {
-    const v_b67de5 = v_3b27d9 ? `?type=${v_74cb95[v_3b27d9]}` : '?type=1';
-    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements${v_b67de5}`);
+
+    const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+    const v_5254bf = (v_9c213b?.language as string | undefined) || 'ko';
+    const v_653390 = v_3b27d9 ? v_74cb95[v_3b27d9] : 1;
+    const v_f71b56 = `https://oth-path-f0013c.example.invalid/agreements?type=${v_653390}&language=${encodeURIComponent(v_5254bf)}`;
+    console.log('[약관] 요청 URL:', v_f71b56);
+    const v_eb792a = await fetch(v_f71b56);
     const v_9390e8 = await v_eb792a.json() as any;
 
     return {
