@@ -3621,17 +3621,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
       )}
 
       {}
-      {v_00832d != null && (
-        <WalletKeyPinSetupModal
-          memberId={v_00832d.memberId}
-          email={v_00832d.email}
-          visible={v_25fba6}
-          onSuccess={() => {
-            v_f4280a(false);
-            v_b51724(null);
-          }}
-        />
-      )}
+      {
+
+}
 
     </View>
 
