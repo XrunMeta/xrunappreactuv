@@ -33,9 +33,6 @@ const v_84b7b1 = 'https://oth-path-f0013c.example.invalid/oth-path';
 export const v_db0872 = (): string => {
   const v_c9c489 = v_e4a763();
   if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
-  if (process.env.EXPO_PUBLIC_USE_PREVIEW_WORKER === 'true') {
-    return v_6e1b73;
-  }
   return v_84b7b1; 
 };
 
@@ -44,10 +41,6 @@ export const v_755eb9 = (): string => {
   if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
 
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return v_6e1b73;
-  }
-
-  if (process.env.EXPO_PUBLIC_USE_PREVIEW_WORKER === 'true') {
     return v_6e1b73;
   }
   return v_c9c489.GATEWAY_WORKERS;
