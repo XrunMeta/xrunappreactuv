@@ -391,63 +391,8 @@ export const MapMainScreen: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    let prevAppState: string = AppState.currentState;
 
-    const checkWalletPinSetup = async () => {
-      try {
-
-        const jwt = await AsyncStorage.getItem('jwt');
-        const memberId = jwt ? jwtPayloadSub(jwt) : null;
-
-        let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
-          try {
-            const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
-          } catch {
-
-          }
-        }
-
-        if (memberId == null || !emailRaw) return;
-
-        const entries = await findEntriesForUser(emailRaw, memberId);
-        const needPinSetup = (e: { s: string; h?: string } | null) =>
-          e !== null && e.s === 's0' && !e.h;
-        const triggerNeeded = needPinSetup(entries.eth) || needPinSetup(entries.pol);
-
-        if (cancelled) return;
-        if (triggerNeeded) {
-
-          const email = emailRaw.toLowerCase().trim();
-
-          setPinModalProps((prev) => {
-            if (prev && prev.memberId === memberId && prev.email === email) return prev;
-            return { memberId, email };
-          });
-          setShowPinModal(true);
-        }
-
-      } catch {
-
-      }
-    };
-
-    checkWalletPinSetup();
-
-    const sub = AppState.addEventListener('change', (nextState) => {
-      const wasBackground = !!prevAppState.match(/inactive|background/);
-      const isNowActive = nextState === 'active';
-      prevAppState = nextState;
-      if (wasBackground && isNowActive) {
-        checkWalletPinSetup();
-      }
-    });
-    return () => {
-      cancelled = true;
-      sub.remove();
-    };
+    return;
   }, []);
 
   const startPreFetchAdUrls = useCallback(async (ads: any[]) => {
