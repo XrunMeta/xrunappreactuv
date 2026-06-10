@@ -402,6 +402,11 @@ export const WalletDetailScreen = () => {
             actionType = t('screens.walletDetail.other');
           }
 
+          const onchainCategory = (item as any).category as string | undefined;
+          if (onchainCategory && onchainCategory.trim()) {
+            actionType = onchainCategory.trim();
+          }
+
           const amountInEth = weiToEth(item.value, item.tokenDecimal);
 
           const formattedTimestamp = timestampToDate(item.timeStamp);
