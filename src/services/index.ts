@@ -33,6 +33,9 @@ const MAIN_GATEWAY_URL = 'https://oth-path-gw.example.invalid/oth-path';
 export const getAdApiBaseUrl = (): string => {
   const env = getEnv();
   if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+  if (process.env.EXPO_PUBLIC_USE_PREVIEW_WORKER === 'true') {
+    return PREVIEW_GATEWAY_URL;
+  }
   return MAIN_GATEWAY_URL; 
 };
 
@@ -41,6 +44,10 @@ export const getApiBaseUrl = (): string => {
   if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
 
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return PREVIEW_GATEWAY_URL;
+  }
+
+  if (process.env.EXPO_PUBLIC_USE_PREVIEW_WORKER === 'true') {
     return PREVIEW_GATEWAY_URL;
   }
   return env.GATEWAY_WORKERS;
