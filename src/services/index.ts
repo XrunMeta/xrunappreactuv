@@ -3568,7 +3568,20 @@ export const v_c07360 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/${v_09dafd}`;
+
+    const v_288349 = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const v_966ad8 = v_288349.some(v_d95200 => v_d95200.test(v_09dafd));
+    const v_c01615 = v_966ad8 ? v_db0872() : v_755eb9();
+    const v_f71b56 = `${v_c01615}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
