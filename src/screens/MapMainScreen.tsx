@@ -391,63 +391,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   }, []);
 
   v_c4deb2(() => {
-    let v_2008a4 = false;
-    let v_d9e7b9 = v_6b5698.currentState;
 
-    const v_63929d = async () => {
-      try {
-
-        const v_56b352 = await v_e84827.getItem('jwt');
-        const v_717992 = v_56b352 ? v_9bbbdc(v_56b352) : null;
-
-        let v_b4e012 = await v_e84827.getItem('userEmail');
-        if (!v_b4e012) {
-          try {
-            const v_f21c33 = await v_e84827.getItem('userData');
-            if (v_f21c33) v_b4e012 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
-          } catch {
-
-          }
-        }
-
-        if (v_717992 == null || !v_b4e012) return;
-
-        const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
-        const v_9034c6 = (v_9e86fd) =>
-          v_9e86fd !== null && v_9e86fd.s === 's0' && !v_9e86fd.h;
-        const v_aa192c = v_9034c6(v_1e6eca.eth) || v_9034c6(v_1e6eca.pol);
-
-        if (v_2008a4) return;
-        if (v_aa192c) {
-
-          const v_e0c7e8 = v_b4e012.toLowerCase().trim();
-
-          v_b51724((v_ba2215) => {
-            if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_e0c7e8) return v_ba2215;
-            return { memberId: v_717992, email: v_e0c7e8 };
-          });
-          v_f4280a(true);
-        }
-
-      } catch {
-
-      }
-    };
-
-    v_63929d();
-
-    const v_1ae212 = v_6b5698.addEventListener('change', (v_612414) => {
-      const v_d19607 = !!v_d9e7b9.match(/inactive|background/);
-      const v_1039f5 = v_612414 === 'active';
-      v_d9e7b9 = v_612414;
-      if (v_d19607 && v_1039f5) {
-        v_63929d();
-      }
-    });
-    return () => {
-      v_2008a4 = true;
-      v_1ae212.remove();
-    };
+    return;
   }, []);
 
   const v_89e09e = v_de06a3(async (v_04f49c) => {
