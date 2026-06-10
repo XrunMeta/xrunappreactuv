@@ -3621,17 +3621,9 @@ export const MapMainScreen: React.FC = () => {
       )}
 
       {}
-      {pinModalProps != null && (
-        <WalletKeyPinSetupModal
-          memberId={pinModalProps.memberId}
-          email={pinModalProps.email}
-          visible={showPinModal}
-          onSuccess={() => {
-            setShowPinModal(false);
-            setPinModalProps(null);
-          }}
-        />
-      )}
+      {
+
+}
 
     </View>
 
