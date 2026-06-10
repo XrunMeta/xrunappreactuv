@@ -8,6 +8,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
@@ -19,6 +20,7 @@ const AYET_AD_SLOT_ID = Platform.OS === 'ios' ? '25755' : '25617';
 
 export const AyetOffersScreen: React.FC = () => {
   const { goBack } = useAppNavigation();
+  const insets = useSafeAreaInsets();
   const webViewRef = useRef<WebView>(null);
   const [userId, setUserId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -79,9 +81,11 @@ export const AyetOffersScreen: React.FC = () => {
 
   const offerwallUrl = `https://offerwall.ayet.io/offers?adSlot=${AYET_AD_SLOT_ID}&external_identifier=${encodeURIComponent(userId)}`;
 
+  const bottomPadding = insets.bottom;
+
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: bottomPadding }]}>
         <Header title="Zone 1" onBackPress={goBack} showBackButton />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -91,7 +95,7 @@ export const AyetOffersScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
       <Header title="Zone 1" onBackPress={goBack} showBackButton />
       <WebView
         key={webViewKey}
