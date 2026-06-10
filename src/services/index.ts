@@ -26,9 +26,24 @@ const VALID_AV_SENTINELS: ReadonlySet<string> = new Set([
 
 const VALID_WALLET_CODES: ReadonlySet<string> = new Set(['c1', 'c2', 'c16', 'c18']);
 
+const PREVIEW_GATEWAY_URL = 'https://edge-preview.example.invalid/oth-path';
+
+const MAIN_GATEWAY_URL = 'https://oth-path-gw.example.invalid/oth-path';
+
+export const getAdApiBaseUrl = (): string => {
+  const env = getEnv();
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+  return MAIN_GATEWAY_URL; 
+};
+
 export const getApiBaseUrl = (): string => {
   const env = getEnv();
-  return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return PREVIEW_GATEWAY_URL;
+  }
+  return env.GATEWAY_WORKERS;
 };
 
 export async function fetchAndSaveWallets(): Promise<void> {
@@ -588,6 +603,22 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
     async (config) => {
 
       config.headers.Authorization = await getAuthHeader();
+
+      const adEndpointPatterns = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const isAdEndpoint = config.url && adEndpointPatterns.some(re => re.test(config.url!));
+      if (isAdEndpoint) {
+        config.baseURL = getAdApiBaseUrl();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', config.baseURL);
+      }
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -3503,7 +3534,8 @@ export const sendNasmobCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/callbackNasmob`;
+
+    const url = `${getAdApiBaseUrl()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', callbackData);
 
@@ -5871,8 +5903,13 @@ export const getAgreementByType = async (
   };
 
   try {
-    const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
-    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements${typeParam}`);
+
+    const i18n = require('i18next').default || require('i18next');
+    const lang = (i18n?.language as string | undefined) || 'ko';
+    const typeNum = type ? typeMap[type] : 1;
+    const url = `https://oth-path-gw.example.invalid/agreements?type=${typeNum}&language=${encodeURIComponent(lang)}`;
+    console.log('[약관] 요청 URL:', url);
+    const resp = await fetch(url);
     const data = await resp.json() as any;
 
     return {
