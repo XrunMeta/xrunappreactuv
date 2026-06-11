@@ -21,12 +21,14 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate, WalletKeyPinPromptModal } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW } from '../services';
+import type { WalletKey } from '../services/walletKeyStore';
+import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 
 interface AddressBookItem {
   id: string;
@@ -89,6 +91,8 @@ export const WalletSendScreen = () => {
   const [memberEmail, setMemberEmail] = useState<string>('');
 
   const [showOtpGate, setShowOtpGate] = useState(false);
+
+  const [showPinPrompt, setShowPinPrompt] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -514,7 +518,27 @@ export const WalletSendScreen = () => {
 
   const handleOtpSuccess = () => {
     setShowOtpGate(false);
+    const currency = selectedWalletAsset?.currency;
+    const isPolygon = currency === 16 || currency === 18;
+    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
+      console.log('[송금-로컬] dev scope + Polygon → PIN 모달 진입', { email: memberEmail, currency });
+      setShowPinPrompt(true);
+    } else {
+      console.log('[송금-로컬] 일반 흐름 (postTransferNew) — Estimate 화면으로', { email: memberEmail, currency });
+      navigate(ROUTES.walletEstimate);
+    }
+  };
+
+  const handlePinPromptSuccess = (wallets: WalletKey[], _pin: string) => {
+    console.log('[송금-로컬] vault unlock 성공, wallets 임시 stage');
+    stagePendingWallets(wallets);
+    setShowPinPrompt(false);
     navigate(ROUTES.walletEstimate);
+  };
+
+  const handlePinPromptCancel = () => {
+    console.log('[송금-로컬] PIN 모달 취소');
+    setShowPinPrompt(false);
   };
 
   if (!selectedWalletAsset) {
@@ -532,6 +556,17 @@ export const WalletSendScreen = () => {
           email={memberEmail}
           onSuccess={handleOtpSuccess}
           onCancel={() => setShowOtpGate(false)}
+        />
+      )}
+
+      {}
+      {showPinPrompt && memberId && memberEmail && (
+        <WalletKeyPinPromptModal
+          visible={showPinPrompt}
+          memberId={Number(memberId)}
+          email={memberEmail}
+          onSuccess={handlePinPromptSuccess}
+          onCancel={handlePinPromptCancel}
         />
       )}
 

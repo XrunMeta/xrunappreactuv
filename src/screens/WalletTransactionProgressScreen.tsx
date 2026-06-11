@@ -9,6 +9,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { postTransferNew } from '../services';
+import { consumePendingWallets, sendPolygonLocal, isLocalSendEnabledForUser, clearPendingWallets } from '../services/walletSendLocal';
 
 const InfoCard = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.card}>
@@ -33,6 +34,7 @@ export const WalletTransactionProgressScreen = () => {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [userAddress, setUserAddress] = useState<string>('');
   const [member, setMember] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
   const [transferFailedDialogVisible, setTransferFailedDialogVisible] = useState(false);
   const transferExecutedRef = useRef(false);
 
@@ -49,6 +51,9 @@ export const WalletTransactionProgressScreen = () => {
           const userData = JSON.parse(userDataStr);
           if (userData.member) {
             setMember(String(userData.member));
+          }
+          if (userData.email) {
+            setUserEmail(String(userData.email));
           }
         }
       } catch (error) {
@@ -86,16 +91,59 @@ export const WalletTransactionProgressScreen = () => {
         const network = isPolygon ? 'POL' : 'ETH';
         const chainId = isPolygon ? 153 : 1;
 
-        const transferResult = await postTransferNew(
-          userAddress,
-          walletSendAddress,
-          formattedAmount,
-          member,
-          network,
-          currency,
-          chainId,
-          navigate,
-        );
+        let transferResult: any;
+        const pendingWallets = consumePendingWallets();
+        if (
+          pendingWallets &&
+          isLocalSendEnabledForUser(userEmail) &&
+          isPolygon
+        ) {
+          console.log('[WalletTransactionProgress] 🔥 클라사이드 송금 흐름 진입', {
+            email: userEmail, currency, count: pendingWallets.length,
+          });
+
+          const targetCode = currency === 16 ? 'c16' : 'c18';
+          const target = pendingWallets.find(w => w.wallet_code === targetCode)
+            ?? pendingWallets.find(w => /pol|c18|c16/i.test(w.wallet_code));
+          if (!target) {
+            console.error('[WalletTransactionProgress] 매칭 wallet 없음', { targetCode });
+            clearPendingWallets();
+            throw new Error('지갑 키 매칭 실패 — 다시 시도해주세요.');
+          }
+          const local = await sendPolygonLocal({
+            privateKey: target.private_key,
+            fromAddress: userAddress,
+            toAddress: walletSendAddress,
+            amount: formattedAmount,
+            currency,
+          });
+
+          (target as any).private_key = '';
+          pendingWallets.length = 0;
+
+          if (!local.ok) {
+            console.error('[WalletTransactionProgress] 로컬 송금 실패:', local);
+            throw new Error(`송금 실패: ${(local as any).reason} ${(local as any).detail ?? ''}`);
+          }
+          transferResult = {
+            status: 'success',
+            code: 200,
+            data: [{ txHash: local.txHash, blockNumber: String(local.blockNumber) }],
+            message: '클라사이드 송금 완료',
+          };
+        } else {
+          console.log('[WalletTransactionProgress] 기존 서버 송금 흐름 (postTransferNew)');
+          transferResult = await postTransferNew(
+            userAddress,
+            walletSendAddress,
+            formattedAmount,
+            member,
+            network,
+            currency,
+            chainId,
+            navigate,
+          );
+        }
 
         console.log('[WalletTransactionProgress] 전송 결과:', transferResult);
         console.log('[WalletTransactionProgress] 전송 결과 코드:', transferResult.code);
