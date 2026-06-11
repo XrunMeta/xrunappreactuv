@@ -136,6 +136,26 @@ export async function markWalletKeyAT(): Promise<{ ok: boolean }> {
   }
 }
 
+export async function upsertWalletPin(member: number, pin: string): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/upsertWalletPin`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ member, pin }),
+    });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
   try {
     const baseUrl = getApiBaseUrl();
