@@ -7,7 +7,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
-import { v_b7594c, v_5bb1ab, v_2dc778 } from '../services';
+import { v_2dc778 } from '../services';
 import type { v_cc1705 } from '../services';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
@@ -154,12 +154,9 @@ export const v_08aac3 = () => {
     try {
       v_34a50a(true);
 
-      const [v_11b884, v_0b09a2] = await Promise.all([
-        v_2dc778(v_660822, v_9b57fc),
-        v_5bb1ab(v_660822, v_9b57fc),
-      ]);
+      const v_11b884 = await v_2dc778(v_660822, v_9b57fc);
 
-      if (v_11b884.status === 'success' && v_0b09a2.status === 'success') {
+      if (v_11b884.status === 'success') {
 
         const v_18b8bf = (v_11b884.data || []).map((item: v_cc1705, v_e86ad8) => {
           const v_2869c1 = v_af0703[v_8c0b26.source_type] || v_8c0b26.source_type || '레퍼럴 분배';
@@ -175,13 +172,15 @@ export const v_08aac3 = () => {
         });
         v_2f9613(v_18b8bf);
 
-        const v_2c49ad = v_0b09a2.data[0]?.amount || '0';
-        const v_a35cbd = typeof v_2c49ad === 'string' ? parseFloat(v_2c49ad) : v_2c49ad;
-        const v_e0fe28 = isNaN(v_a35cbd) ? '0' : v_a35cbd.toFixed(2);
+        const v_a35cbd = (v_11b884.data || []).reduce(
+          (v_dce0a8, item: v_cc1705) => v_dce0a8 + (Number(v_8c0b26.xrun_amount) || 0),
+          0
+        );
+        const v_e0fe28 = v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
         const v_6bbb57 = v_beea9d > 0 ? v_beea9d : 176; 
-        console.log('[정산] 원화 계산:', { totalAmount: v_2c49ad, totalAmountNum: v_a35cbd, price: v_6bbb57 });
+        console.log('[정산] 원화 계산:', { totalAmountNum: v_a35cbd, price: v_6bbb57 });
 
         const v_f02564 = v_b9db3d(v_a35cbd, v_6bbb57);
         console.log('[정산] 원화 환산 결과:', v_f02564);
@@ -195,10 +194,7 @@ export const v_08aac3 = () => {
         v_be9dba(1);
         v_1454f0(v_18b8bf.length > v_0d35a8);
       } else {
-        console.error(
-          '정산 데이터 조회 실패:',
-          v_11b884.message || v_0b09a2.message,
-        );
+        console.error('정산 데이터 조회 실패:', v_11b884.message);
         v_2f9613([]);
         v_690164([]);
         v_54eab4('0 XRUN');
