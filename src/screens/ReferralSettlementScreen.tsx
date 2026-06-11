@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
-import { getSettlementList, getSettlementAmount } from '../services';
+import { getSettlementList, getSettlementAmount, getReferralIncome } from '../services';
+import type { ReferralIncomeItem } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -19,7 +20,20 @@ interface TransformedSettlementData {
   amount: string; 
   date: string;
   transaction: number;
+  status?: 'pending' | 'sent' | string; 
 }
+
+const SOURCE_LABEL: Record<string, string> = {
+  nas: 'AR 광고 (나스미디어)',
+  nasmedia: 'AR 광고 (나스미디어)',
+  pocr: 'AR 광고 (포인트클릭)',
+  pointclick: 'AR 광고 (포인트클릭)',
+  ayet: 'Xplay Zone 1',
+  maf: 'Xplay Zone 2',
+  mychips: 'Xplay Zone 2',
+  recommand: '추천 가입',
+  attendance: '출석체크',
+};
 
 const formatDateTime = (dateString: string): string => {
   try {
@@ -140,17 +154,26 @@ export const ReferralSettlementScreen = () => {
     try {
       setLoading(true);
 
-      const [resultList, resultAmount] = await Promise.all([
-        getSettlementList(member, navigate),
+      const [resultRef, resultAmount] = await Promise.all([
+        getReferralIncome(member, navigate),
         getSettlementAmount(member, navigate),
       ]);
 
-      if (
-        resultList.status === 'success' &&
-        resultAmount.status === 'success'
-      ) {
-        const transformedData = transformSettlementData(resultList.data, t);
-        setSettlementData(transformedData);
+      if (resultRef.status === 'success' && resultAmount.status === 'success') {
+
+        const rows: TransformedSettlementData[] = (resultRef.data || []).map((item: ReferralIncomeItem, idx: number) => {
+          const label = SOURCE_LABEL[item.source_type] || item.source_type || '레퍼럴 분배';
+          return {
+            id: `ref_${item.id}_${idx}`,
+            type: label,
+            description: label,
+            amount: `+${(Number(item.xrun_amount) || 0).toFixed(2)} XRUN`,
+            date: formatDateTime(item.created_at),
+            transaction: item.id,
+            status: item.status,
+          };
+        });
+        setSettlementData(rows);
 
         const totalAmount = resultAmount.data[0]?.amount || '0';
         const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
@@ -167,14 +190,14 @@ export const ReferralSettlementScreen = () => {
         console.log('[정산] 원화 포맷팅 결과:', formattedWon);
         setTotalRevenueWon(formattedWon);
 
-        const initialItems = transformedData.slice(0, ITEMS_PER_PAGE);
+        const initialItems = rows.slice(0, ITEMS_PER_PAGE);
         setCurrentData(initialItems);
         setCurrentPage(1);
-        setHasMore(transformedData.length > ITEMS_PER_PAGE);
+        setHasMore(rows.length > ITEMS_PER_PAGE);
       } else {
         console.error(
           '정산 데이터 조회 실패:',
-          resultList.message || resultAmount.message,
+          resultRef.message || resultAmount.message,
         );
         setSettlementData([]);
         setCurrentData([]);
@@ -230,21 +253,31 @@ export const ReferralSettlementScreen = () => {
   };
 
   const renderSettlementItem = ({ item }: { item: TransformedSettlementData }) => {
+    const isPaid = item.status === 'sent';
+    const paidColor = '#cccccc';
     return (
-      <View style={styles.listItem}>
+      <View style={[styles.listItem, isPaid && { opacity: 0.7 }]}>
         <View style={styles.listItemRow}>
           {item.description ? <Text
-            style={[styles.descriptionText, { flex: 1, marginRight: 10 }]}
+            style={[
+              styles.descriptionText,
+              isPaid && { color: paidColor },
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {}
-            추천예상수익
+            {item.description}
           </Text> : null}
+          {item.date ? <Text style={[styles.dateText, isPaid && { color: paidColor }]}>{item.date}</Text> : null}
         </View>
         <View style={styles.listItemRow2}>
-          {item.date ? <Text style={styles.dateText}>{item.date}</Text> : null}
-          {item.amount ? <Text style={styles.amountText}>{item.amount}</Text> : null}
+          <Text style={[
+            styles.statusBadge,
+            isPaid ? styles.statusPaid : styles.statusPending,
+          ]}>
+            {isPaid ? (t('screens.referralSettlement.paid') || '지급 완료') : (t('screens.referralSettlement.pending') || '지급 대기')}
+          </Text>
+          {item.amount ? <Text style={[styles.amountText, isPaid && { color: paidColor }]}>{item.amount}</Text> : null}
         </View>
       </View>
     );
@@ -367,6 +400,23 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 4,
     alignItems: 'flex-end',
+  },
+
+  statusBadge: {
+    fontSize: 10,
+    fontFamily: 'Roboto-Bold',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  statusPaid: {
+    backgroundColor: '#eeeeee',
+    color: '#9a9a9a',
+  },
+  statusPending: {
+    backgroundColor: '#fff4e5',
+    color: '#e07b00',
   },
   refTypeText: {
     fontSize: FONTS.size.small,

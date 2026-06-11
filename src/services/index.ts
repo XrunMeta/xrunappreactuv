@@ -4109,6 +4109,43 @@ export const getSettlementList = async (
   }
 };
 
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const getReferralIncome = async (
+  member: number,
+  navigation?: any,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', response.data.data?.length || 0);
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴정산] 조회 오류:', error);
+    throw error;
+  }
+};
+
 export const getSettlementCompletedList = async (
   member: number,
   navigation?: any,
