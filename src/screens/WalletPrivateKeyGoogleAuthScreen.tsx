@@ -392,78 +392,70 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     }
   };
 
-  const handleGdrivePlainBackup = () => {
+  const handleGdrivePlainBackup = async () => {
     if (stage !== 'options') return;
 
-    Alert.alert(
+    const r1 = await showAlert(
       '⚠️ 매우 위험합니다',
       '평문 (암호화 없이) 으로 개인 키를 Google Drive 에 저장합니다.\n\n' +
       '이 파일을 누군가 받으면 비밀번호 없이 지갑의 모든 자산을 옮길 수 있습니다.\n\n' +
       '정말 진행하시겠습니까?',
       [
         { text: '취소', style: 'cancel' },
-        {
-          text: '이해했습니다, 계속',
-          style: 'destructive',
-          onPress: () => {
-
-            Alert.alert(
-              '⚠️ 마지막 확인',
-              '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
-              '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
-              '계속하시겠습니까?',
-              [
-                { text: '취소', style: 'cancel' },
-                {
-                  text: '예, 평문 저장합니다',
-                  style: 'destructive',
-                  onPress: () => { void performGdrivePlainUpload(); },
-                },
-              ],
-            );
-          },
-        },
+        { text: '이해했습니다, 계속', style: 'destructive' },
       ],
     );
+    if (r1 !== 1) return;
+
+    const r2 = await showAlert(
+      '⚠️ 마지막 확인',
+      '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
+      '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
+      '계속하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        { text: '예, 평문 저장합니다', style: 'destructive' },
+      ],
+    );
+    if (r2 !== 1) return;
+    void performGdrivePlainUpload();
   };
 
-  const handleViewKey = () => {
+  const handleViewKey = async () => {
     if (stage !== 'options') return;
-    Alert.alert(
+    const r = await showAlert(
       '경고',
       '개인 키를 평문으로 표시합니다.\n주변에 다른 사람이 화면을 보지 못하도록 주의해주세요.',
       [
         { text: '취소', style: 'cancel' },
-        { text: '확인', onPress: () => setStage('view') },
+        { text: '확인' },
       ],
     );
+    if (r === 1) setStage('view');
   };
 
-  const handleCopyKey = (pk: string) => {
-    Alert.alert(
+  const handleCopyKey = async (pk: string) => {
+    const r = await showAlert(
       '경고',
       '키를 클립보드에 복사합니다.\n다른 앱이 클립보드를 읽을 수 있습니다. 사용 후 즉시 다른 내용을 복사해 클립보드를 비워주세요.',
       [
         { text: '취소', style: 'cancel' },
-        {
-          text: '확인',
-          onPress: async () => {
-            try {
-              await Clipboard.setStringAsync(pk);
-              await showAlert(
-                '복사 완료',
-                '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
-              );
-            } catch (e: any) {
-              await showAlert(
-                t('common.messages.error') || '오류',
-                `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
-              );
-            }
-          },
-        },
+        { text: '확인' },
       ],
     );
+    if (r !== 1) return;
+    try {
+      await Clipboard.setStringAsync(pk);
+      await showAlert(
+        '복사 완료',
+        '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
+      );
+    } catch (e: any) {
+      await showAlert(
+        t('common.messages.error') || '오류',
+        `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
+      );
+    }
   };
 
   return (
