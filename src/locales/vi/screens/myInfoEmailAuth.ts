@@ -2,7 +2,7 @@ export default {
   title: 'Xác thực Email',
   emailLabel: 'Email',
   emailPlaceholder: 'Nhập email của bạn',
-  sendButton: 'Gửi mã xác minh',
+  sendButton: 'Xác minh',
   confirmButton: 'Xác nhận',
   sending: 'Đang gửi...',
   alerts: {

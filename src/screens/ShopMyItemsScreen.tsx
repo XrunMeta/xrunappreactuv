@@ -31,6 +31,10 @@ interface MyItemData {
     item?: number;
 
     couponImgUrl?: string;
+
+    sortKey: number;
+
+    isTransferTicket?: boolean;
 }
 
 function v_52c82e(v_03cc9e): 'available' | 'used' {
@@ -60,8 +64,16 @@ function v_b88ffe(v_479f05): string {
 
 function v_037021(c: v_a649c5): MyItemData {
 
-  const v_8a33c8 = v_3f4e2e.coupon_img_url || v_3f4e2e.image_url;
-  const image: v_07a341 = v_8a33c8 ? { uri: v_8a33c8 } : v_818aa7;
+  const v_6f7c85 = [v_3f4e2e.image_url, v_3f4e2e.coupon_img_url];
+  const v_87b3a3 = v_6f7c85.find((v_ceb55a) => typeof v_ceb55a === 'string' && /^https?:\/\//i.test(v_ceb55a));
+  if (!v_87b3a3) {
+    console.log('[MyItems] 기본 이미지 fallback:', { tr_id: v_3f4e2e.tr_id, image_url: v_3f4e2e.image_url, coupon_img_url: v_3f4e2e.coupon_img_url });
+  }
+  const image: v_07a341 = v_87b3a3 ? { uri: v_87b3a3 } : v_818aa7;
+
+  const v_8af80f = (v_3f4e2e.tr_id ?? '').match(/\d{8}_?\d{0,6}/)?.[0]?.replace(/\D/g, '') ?? '';
+  const v_564b94 = (v_3f4e2e.purchase_date ?? '').replace(/\D/g, '');
+  const v_45efe3 = Number(v_8af80f || v_564b94 || 0);
   return {
     id: v_3f4e2e.tr_id,
     tr_id: v_3f4e2e.tr_id,
@@ -72,26 +84,40 @@ function v_037021(c: v_a649c5): MyItemData {
     purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
     type: 'giftishow',
     couponImgUrl: v_3f4e2e.coupon_img_url || undefined,
+    sortKey: v_45efe3,
   };
 }
 
 function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
-  const image: v_07a341 =
-    v_e2a85c.icon && (typeof v_e2a85c.icon === 'string' && v_e2a85c.icon.startsWith('http'))
-      ? { uri: v_e2a85c.icon }
-      : v_818aa7;
+
+  const v_68a846 = (v_e2a85c as any).image || (v_e2a85c as any).thumbnail || (v_e2a85c as any).icon;
+  const v_74f4a3 = v_68a846 && typeof v_68a846 === 'string' && /^https?:\/\//i.test(v_68a846) ? v_68a846 : null;
+  if (!v_74f4a3) {
+    console.log('[MyItems-XRUN] 기본 이미지 fallback:', { storage: v_e2a85c.storage, txID: v_e2a85c.txID, title: v_e2a85c.title, image: (v_e2a85c as any).image, thumbnail: (v_e2a85c as any).thumbnail, icon: (v_e2a85c as any).icon });
+  }
+  const image: v_07a341 = v_74f4a3 ? { uri: v_74f4a3 } : v_818aa7;
   const v_389afb = v_e2a85c.storage ? `xrun_${v_e2a85c.storage}_${v_a56041}` : `xrun_${v_e2a85c.txID}_${v_a56041}`;
+  const v_5bee1f = String(v_e2a85c.datetime ?? '').replace(/\D/g, '').slice(0, 14);
+  const v_0debf4 = Number(v_e2a85c.storage ?? 0) || 0;
+  const v_45efe3 = v_5bee1f ? Number(v_5bee1f) : v_0debf4;
+  const v_6c7ab8 = Number((v_e2a85c as any).type ?? 0);
+  const v_21c862 = v_6c7ab8 === 10151;
+
+  const v_e46046 = String(v_e2a85c.datetime ?? '').replace('T', ' ').slice(0, 10);
+  const v_14b228 = /^\d{4}-\d{2}-\d{2}$/.test(v_e46046) ? v_e46046.replace(/-/g, '.') : '-';
   return {
     id: v_389afb,
-    brand: 'XRUN',
+    brand: v_21c862 ? 'XRUN' : 'SHOP', 
     title: v_e2a85c.title ?? '-',
     image: v_7ddb73,
     status: v_e2a85c.status === 10306 ? 'available' : 'used',
-    purchaseDate: '-',
+    purchaseDate: v_14b228,
     type: 'xrun',
+    isTransferTicket: v_21c862,
     storage: v_e2a85c.storage,
     txID: v_e2a85c.txID,
     item: v_e2a85c.item,
+    sortKey: v_45efe3,
   };
 }
 
@@ -105,6 +131,7 @@ export const v_8c1d95 = () => {
     const [v_e80987, v_bf6163] = v_5ab095<string>('');
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
     const [v_5d756f, v_a563de] = v_5ab095<string>('');
+    const [v_ba33a5, v_eb3640] = v_5ab095<Set<string>>(new Set());
 
     const v_605807 = v_de06a3(async () => {
         try {
@@ -135,7 +162,8 @@ export const v_8c1d95 = () => {
                 v_38fb16?.status === 'success' && Array.isArray(v_38fb16.data)
                     ? v_38fb16.data.map((v_e2a85c, v_ebec57) => v_e9b0bb(v_e2a85c, v_ebec57))
                     : [];
-            v_fa923c([...v_04aa3c, ...v_63c5e6]);
+            const v_2b7a6d = [...v_04aa3c, ...v_63c5e6].sort((v_779914, v_148ff6) => v_148ff6.sortKey - v_779914.sortKey);
+            v_fa923c(v_2b7a6d);
         } catch {
             v_fa923c([]);
         } finally {
@@ -233,21 +261,29 @@ export const v_8c1d95 = () => {
 
     const v_f24e20 = (v_8c0b26) => {
         const v_2911e0 = v_8c0b26.status === 'available';
+        const v_41844b = v_8c0b26.image && typeof v_8c0b26.image === 'object' && 'uri' in (v_8c0b26.image as any);
+        const v_fafc7f = v_41844b && v_ba33a5.has(v_8c0b26.id) ? v_818aa7 : v_8c0b26.image;
 
         return (
             <View key={v_8c0b26.id} style={v_d81136.itemCard}>
                 <View style={v_d81136.itemImageContainer}>
                     <Image
-                        source={v_8c0b26.image}
+                        source={v_fafc7f}
                         style={v_d81136.itemImage}
                         resizeMode="contain"
+                        onError={(v_9e86fd) => {
+                            if (v_41844b) {
+                                console.log(`[MyItems] 이미지 로드 실패 → 기본 이미지로 대체:`, v_8c0b26.id, (v_8c0b26.image as any)?.uri, v_9e86fd.nativeEvent);
+                                v_eb3640((v_ba2215) => new Set(v_ba2215).add(v_8c0b26.id));
+                            }
+                        }}
                     />
                 </View>
                 <View style={v_d81136.itemContent}>
                     <View style={v_d81136.itemHeader}>
                         <View style={v_d81136.itemInfo}>
                             <View style={v_d81136.itemTitleRow}>
-                                <Text style={v_d81136.itemBrand}>{v_8c0b26.brand}</Text>
+                                <Text style={v_d81136.itemBrand}>{v_8c0b26.brand === 'SHOP' ? v_8d41d7('screens.shop.shopBrand') : v_8c0b26.brand}</Text>
                                 <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_d81136.statusTagUsed]}>
                                     <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_d81136.statusTagTextUsed]}>
                                         {v_2911e0 ? v_8d41d7('screens.shop.availableShort') : v_8d41d7('screens.shop.usedShort')}
@@ -260,7 +296,11 @@ export const v_8c1d95 = () => {
                         </View>
                     </View>
                     <Text style={v_d81136.purchaseDate}>{v_8d41d7('screens.shop.purchaseDateLabel')}: {v_8c0b26.purchaseDate}</Text>
-                    {v_2911e0 && (
+                    {v_2911e0 && v_8c0b26.type === 'xrun' && v_8c0b26.isTransferTicket === false ? (
+                        <View style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}>
+                            <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>{v_8d41d7('screens.shop.thankYou')}</Text>
+                        </View>
+                    ) : v_2911e0 ? (
                         <TouchableOpacity
                             style={v_d81136.useButton}
                             onPress={() => v_09c55b(v_8c0b26)}
@@ -268,7 +308,7 @@ export const v_8c1d95 = () => {
                         >
                             <Text style={v_d81136.useButtonText}>{v_8d41d7('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
-                    )}
+                    ) : null}
                 </View>
             </View>
         );
@@ -482,16 +522,18 @@ const v_d81136 = v_472849.create({
         flexDirection: 'row',
     },
     itemImageContainer: {
-        width: 120,
+        width: 96,
         backgroundColor: '#ffffff',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+        paddingHorizontal: 8,
     },
     itemImage: {
-        width: 120,
-        height: 120,
+        width: 80,
+        height: 80,
         alignSelf: 'center',
+        resizeMode: 'contain',
     },
     itemContent: {
         flex: 1,

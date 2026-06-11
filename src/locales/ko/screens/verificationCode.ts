@@ -29,7 +29,8 @@ export default {
     message: 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
     button: '구글 로그인',
     emailMismatchTitle: '이메일 불일치',
-    emailMismatchMessage: '가입 시 입력한 이메일과 소셜 로그인에 사용한 구글 이메일이 일치해야 합니다.',
+    emailMismatchMessage: '가입 시 입력하신 이메일 ({{email}}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n같은 이메일로 다시 로그인해주세요. 다른 구글 계정을 선택하셨다면 계정 선택 화면에서 가입 이메일을 골라주세요.',
+    emailMismatchButton: '확인',
   },
 };
 

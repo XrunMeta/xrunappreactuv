@@ -6,6 +6,7 @@ import {
   v_1ed974,
   v_326be8,
 } from 'rcmrninabrnb';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
@@ -18,6 +19,7 @@ const v_0625de = v_326be8.OS === 'ios'
 
 export const v_0ca15f = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
+  const v_033e14 = v_e0068c();
   const v_35f830 = v_e662ae<v_2694e4>(null);
   const [v_43e90c, v_688dd2] = v_5ab095<string>('');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
@@ -60,10 +62,12 @@ export const v_0ca15f = () => {
 
   const v_6da94b = `https://sdk.mychips.io/content?content_id=${v_0625de}&user_id=${v_43e90c}&gender=&age=`;
 
+  const v_0a35c3 = v_033e14.bottom;
+
   if (v_cd31a8) {
     return (
-      <View style={v_d81136.container}>
-        <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+      <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
+        <Header title="Zone 2" onBackPress={v_c7ac57} showBackButton />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.primary} />
         </View>
@@ -72,8 +76,8 @@ export const v_0ca15f = () => {
   }
 
   return (
-    <View style={v_d81136.container}>
-      <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+    <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
+      <Header title="Zone 2" onBackPress={v_c7ac57} showBackButton />
       <WebView
         ref={v_35f830}
         source={{ uri: v_6da94b }}

@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62, v_79c4f2 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_570c34, v_556baf } from '../components';
@@ -84,9 +84,16 @@ function v_02c692(item: v_20035e): ProductData {
 const v_4994d5 = 70;
 
 function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
-    const v_72648c = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
-    const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
-    const v_7be02f = Math.ceil(v_72648c / v_b7ffba);
+    const v_56d99d = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
+
+    const v_20ff2e = typeof (v_8c0b26 as any).priceKRW === 'number';
+    let v_7be02f;
+    if (v_20ff2e) {
+        v_7be02f = v_56d99d; 
+    } else {
+        const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
+        v_7be02f = Math.ceil(v_56d99d / v_b7ffba);
+    }
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
         brand: (v_8c0b26 as any).brandName ?? '기프티콘',
@@ -241,14 +248,34 @@ export const v_10886b = () => {
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
         try {
-            const v_8f00b9 = await v_25c73c({ start: 1, size: 50 });
-            const v_ef8ab1 = Array.isArray(v_8f00b9.list) ? v_8f00b9.list : [];
-            v_4ff2fa(v_ef8ab1);
-            console.log('[Xplay Shop] 상품 목록 조회:', v_ef8ab1.length, '건', v_ef8ab1.map((v_8c0b26) => ({ id: v_8c0b26.id, name: v_8c0b26.name, price: v_8c0b26.price })));
-            if (v_ef8ab1.length === 0 && v_8f00b9.resultMsg) v_33ec67(v_8f00b9.resultMsg);
+
+            const v_9f42a4 = (await import('../services')).createAxiosInstance();
+            const v_8f00b9 = await v_9f42a4.post('/getGiftishowActiveGoods', {});
+            const v_479f05 = Array.isArray(v_8f00b9.data?.data?.list) ? v_8f00b9.data.data.list as any[] : [];
+
+            const v_ef8ab1 = v_479f05.map((v_206b88) => ({
+                id: v_206b88.goods_code,
+                name: v_206b88.goods_name,
+                brand: v_206b88.brand_name,
+                price: Number(v_206b88.xplay_points ?? 0),    
+                priceKRW: Number(v_206b88.real_price ?? 0),
+                imageUrl: v_206b88.goods_image,
+            }));
+            v_4ff2fa(v_ef8ab1 as any);
+            console.log('[Xplay Shop] DB 활성 상품:', v_ef8ab1.length, '건');
+            if (v_ef8ab1.length === 0) v_33ec67('등록된 기프티콘 상품이 없습니다.');
         } catch (v_9e86fd) {
-            v_33ec67(v_9e86fd instanceof Error ? v_9e86fd.message : '기프티콘 목록을 불러오지 못했습니다.');
-            v_4ff2fa([]);
+            console.warn('[Xplay Shop] 백엔드 호출 실패, 비즈 API fallback:', v_9e86fd);
+
+            try {
+                const v_8c4840 = await v_25c73c({ start: 1, size: 50 });
+                const v_ef8ab1 = Array.isArray(v_8c4840.list) ? v_8c4840.list : [];
+                v_4ff2fa(v_ef8ab1);
+                if (v_ef8ab1.length === 0 && v_8c4840.resultMsg) v_33ec67(v_8c4840.resultMsg);
+            } catch (v_85f11a) {
+                v_33ec67(v_85f11a instanceof Error ? v_85f11a.message : '기프티콘 목록을 불러오지 못했습니다.');
+                v_4ff2fa([]);
+            }
         }
     }, []);
 
@@ -309,6 +336,7 @@ export const v_10886b = () => {
         }
     }, [v_dfe883, v_d0fbad]);
     const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
+    const [v_5d756f, v_a563de] = v_5ab095<string>('');
 
     const v_734b9d = v_de06a3(async () => {
         try {
@@ -345,6 +373,19 @@ export const v_10886b = () => {
         () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424)),
         [v_50b846, v_ca7424],
     );
+
+    const v_cb1f8e = v_de06a3((v_ef8ab1): ProductData[] => {
+        const v_ab6401 = v_5d756f.trim().toLowerCase();
+        if (!v_ab6401) return v_ef8ab1;
+        return v_ef8ab1.filter((v_e2a85c) => {
+            const v_a2e3a2 = `${v_e2a85c.brand || ''} ${v_e2a85c.title || ''} ${v_e2a85c.description || ''}`.toLowerCase();
+            return v_a2e3a2.includes(v_ab6401);
+        });
+    }, [v_5d756f]);
+
+    const v_41d7ed = v_df9f57(() => v_cb1f8e(v_7fb877), [v_cb1f8e, v_7fb877]);
+    const v_eb6490 = v_df9f57(() => v_cb1f8e(v_f523cd), [v_cb1f8e, v_f523cd]);
+    const v_259393 = v_41d7ed.length + v_eb6490.length > 0;
 
     const v_1c4d31 = v_df9f57(
         () => [
@@ -461,11 +502,15 @@ export const v_10886b = () => {
                 title={v_8d41d7('screens.shop.title')}
                 rightComponent={
                     <TouchableOpacity
-                        onPress={() => v_f10880(!v_61d92f)}
+                        onPress={() => {
+                            const v_a448ad = !v_61d92f;
+                            v_f10880(v_a448ad);
+                            if (!v_a448ad) v_a563de('');
+                        }}
                         activeOpacity={0.7}
                         style={v_d81136.searchButton}
                     >
-                        <Feather name="search" size={20} color="#007aff" />
+                        <Feather name={v_61d92f ? 'x' : 'search'} size={20} color="#007aff" />
                     </TouchableOpacity>
                 }
             />
@@ -513,6 +558,23 @@ export const v_10886b = () => {
                 />
 
                 {}
+                {v_61d92f && (
+                    <View style={v_d81136.searchBar}>
+                        <Feather name="search" size={18} color="#0296f2" />
+                        <TextInput
+                            placeholder="Search"
+                            placeholderTextColor="#bcbec4"
+                            style={v_d81136.searchInput}
+                            value={v_5d756f}
+                            onChangeText={v_a563de}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            returnKeyType="search"
+                        />
+                    </View>
+                )}
+
+                {}
                 <SafeScrollView
                     showsVerticalScrollIndicator={false}
                     showBottomBackground={false}
@@ -535,10 +597,14 @@ export const v_10886b = () => {
                                 <View style={v_d81136.errorContainer}>
                                     <Text style={v_d81136.errorText}>{v_02e6ad}</Text>
                                 </View>
+                            ) : v_5d756f.trim() && !v_259393 ? (
+                                <View style={v_d81136.errorContainer}>
+                                    <Text style={v_d81136.noResultText}>"{v_5d756f.trim()}"에 대한 검색 결과가 없습니다.</Text>
+                                </View>
                             ) : (
                                 <View style={v_d81136.productGrid}>
-                                    {v_7fb877.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                                    {v_f523cd.map((v_01bee9) => v_80b207(v_01bee9, false))}
+                                    {v_41d7ed.map((v_01bee9) => v_80b207(v_01bee9, false))}
+                                    {v_eb6490.map((v_01bee9) => v_80b207(v_01bee9, false))}
                                 </View>
                             )}
                         </>
@@ -580,6 +646,30 @@ const v_d81136 = v_472849.create({
         fontSize: v_843035.size.small,
         fontFamily: 'Roboto-Regular',
         color: '#007aff',
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#ededed',
+        backgroundColor: '#ffffff',
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        marginHorizontal: 16,
+        marginBottom: 20,
+        shadowColor: '#182b78',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 8,
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#1a2e35',
     },
     balanceCardWrapper: {
         marginHorizontal: 16,
@@ -842,6 +932,12 @@ const v_d81136 = v_472849.create({
         fontSize: v_843035.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#b91c1c',
+        textAlign: 'center',
+    },
+    noResultText: {
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#8e9bae',
         textAlign: 'center',
     },
     emptyContainer: {

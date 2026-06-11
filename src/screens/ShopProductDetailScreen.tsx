@@ -157,6 +157,20 @@ export const v_a59951 = () => {
             const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
             const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
             const v_c88e9b = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
+            console.log('[ShopProductDetail] XRUN 잔액 로드 완료', {
+                member: v_660822,
+                walletList: v_ef8ab1.map((v_32f7b8) => ({
+                    currency: v_32f7b8?.currency,
+                    Wamount: v_32f7b8?.Wamount,
+                    amount: v_32f7b8?.amount,
+                })),
+                xrunPolygon: v_b25f51,
+                balance: v_c88e9b,
+                productId: v_01bee9?.id,
+                productPrice: v_01bee9?.price,
+                productPriceType: typeof v_01bee9?.price,
+                comparison: `${v_c88e9b} < ${v_01bee9?.price} = ${v_c88e9b < (v_01bee9?.price ?? 0)}`,
+            });
             v_0ce8dd(Number.isFinite(v_c88e9b) ? v_c88e9b : 0);
         } catch (v_9e86fd) {
             console.warn('[ShopProductDetail] XRUN 잔액 조회 실패:', v_9e86fd);
@@ -164,7 +178,7 @@ export const v_a59951 = () => {
         } finally {
             v_14129c(false);
         }
-    }, [v_660822]);
+    }, [v_660822, v_01bee9?.id, v_01bee9?.price]);
 
     v_c4deb2(() => {
         if (v_660822) v_abb08d();
@@ -191,14 +205,28 @@ export const v_a59951 = () => {
     v_c4deb2(() => { v_aad6d1(false); }, [v_01bee9.id]);
 
     const v_b000c1 = v_de06a3(async () => {
-        if (!v_660822 || v_18a900) return;
+        console.log('[Xplay 구매] handleXplayPurchase 진입', {
+            member: v_660822, xplayPurchaseLoading: v_18a900, userPhone: v_7496db,
+            productId: v_01bee9?.id, productPrice: v_01bee9?.price,
+            xrunBalanceState: v_a1c497, xrunBalanceLoading: v_19340b,
+        });
+        if (!v_660822 || v_18a900) {
+            console.log('[Xplay 구매] 조기 종료', { member: v_660822, xplayPurchaseLoading: v_18a900 });
+            return;
+        }
         if (!v_7496db || !v_7496db.trim()) {
             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.phoneNotRegistered'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
 
         const v_c25eec = v_01bee9.price;
-        const v_c88e9b = v_b7c830 ?? 0;
+        if (v_a1c497 === null || v_19340b) {
+            console.log('[Xplay 구매] 잔액 로딩 중 — 대기');
+            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+            return;
+        }
+        const v_c88e9b = v_a1c497;
+        console.log('[Xplay 구매] 잔액 비교', { balance: v_c88e9b, needPrice: v_c25eec, ok: v_c88e9b >= v_c25eec });
         if (v_c88e9b < v_c25eec) {
             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
@@ -211,7 +239,15 @@ export const v_a59951 = () => {
                     v_0409f2(true);
                     try {
                         const v_8f00b9 = await v_44edcc(
-                            { member: v_660822, goods_code: v_01bee9.id, phone_no: v_7496db ?? undefined },
+                            {
+                                member: v_660822,
+                                goods_code: v_01bee9.id,
+                                phone_no: v_7496db ?? undefined,
+                                price: v_01bee9.price,
+                                goods_name: v_01bee9.title,
+                                brand_name: (v_01bee9 as any).brand,
+                                image_url: (v_01bee9 as any).image,
+                            },
                             undefined,
                         );
                         if (v_8f00b9?.status === 'success') {
@@ -231,7 +267,7 @@ export const v_a59951 = () => {
                             const v_43f890 = v_f942f4 || v_a2d859
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : v_ce37ad
-                                    ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                    ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : v_d6be1a
                                         ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
                                         : v_badeaf;
@@ -247,7 +283,7 @@ export const v_a59951 = () => {
                         const v_43f890 = v_d308b5 === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : v_d308b5 === 404
-                                ? '해당 상품이 등록되지 않았거나 Xplay 가격이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
+                                ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : v_d6be1a
                                     ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
                                     : v_badeaf;
@@ -259,7 +295,7 @@ export const v_a59951 = () => {
                 },
             },
         ]);
-    }, [v_660822, v_7496db, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_b7c830, v_18a900, v_889fad, v_c1e7a4]);
+    }, [v_660822, v_7496db, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_18a900, v_889fad, v_c1e7a4]);
 
     const [v_b36076, v_a2ae27] = v_5ab095<string>('');
     const [v_a0d01e, v_80ea24] = v_5ab095<string>('');
@@ -407,12 +443,37 @@ export const v_a59951 = () => {
     const [v_03c827, v_e94938] = v_5ab095<boolean>(false);
 
     const v_dfaad1 = () => {
-        if (v_03c827) return;
+        console.log('[XRUN 구매] handlePurchase 진입', {
+            xrunPurchaseLoading: v_03c827,
+            member: v_660822,
+            xrunBalance: v_1d54f1,
+            productPrice: v_01bee9?.price,
+            productId: v_01bee9?.id,
+        });
+        if (v_03c827) {
+            console.log('[XRUN 구매] xrunPurchaseLoading=true 라 종료');
+            return;
+        }
         if (!v_660822) {
+            console.log('[XRUN 구매] member 없어서 종료');
             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), '로그인이 필요합니다.', [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
         if (v_1d54f1 < v_01bee9.price) {
+            console.error('[XRUN 구매] 잔액 부족 — 비교 상세', {
+                member: v_660822,
+                productId: v_01bee9.id,
+                productTitle: v_01bee9.title,
+                productPrice: v_01bee9.price,
+                productPriceType: typeof v_01bee9.price,
+                productPriceKRW: (v_01bee9 as any).priceKRW,
+                productPriceXrun: (v_01bee9 as any).priceXrun,
+                xrunBalance: v_1d54f1,
+                xrunBalanceType: typeof v_1d54f1,
+                xrunBalanceState: v_a1c497,
+                shortfall: v_01bee9.price - v_1d54f1,
+                note: 'xrunBalance(XRUN 단위) 와 productPrice 가 같은 단위인지 확인 필요. productPriceKRW 가 KRW 라면 단위 불일치 가능성.',
+            });
             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.insufficientXRUN'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
             return;
         }
@@ -506,12 +567,17 @@ export const v_a59951 = () => {
                         )}
                         <View style={v_d81136.productImageContainer}>
                             <View style={v_d81136.productImageWrapper}>
-                                <Image
-                                    source={v_a12826 ? v_47af4d : v_6ef3ee}
-                                    style={v_d81136.productImage}
-                                    resizeMode="contain"
-                                    onError={() => v_aad6d1(true)}
-                                />
+                                {v_a12826 ? (
+
+                                    <View style={v_d81136.productImage} />
+                                ) : (
+                                    <Image
+                                        source={v_6ef3ee}
+                                        style={v_d81136.productImage}
+                                        resizeMode="contain"
+                                        onError={() => v_aad6d1(true)}
+                                    />
+                                )}
                             </View>
                         </View>
                         <View style={v_d81136.productInfoContainer}>

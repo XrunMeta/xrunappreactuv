@@ -1,7 +1,12 @@
 export default {
   title: '設定',
   closeMembership: '退会',
+  pushNotifications: 'プッシュ通知',
+  pushNotificationsOn: 'オン',
+  pushNotificationsOff: 'オフ',
   languageSelect: '言語選択',
+  walletBackup: 'Backup Wallet Keys',
+  walletRestore: 'Restore Wallet Keys',
   reward: 'リワード',
   ayet_offers: 'ayeTオファーを見る',
   ayet_offers_xplay: 'Xplayオファーを見る',

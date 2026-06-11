@@ -7,7 +7,8 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
-import { v_b7594c, v_5bb1ab } from '../services';
+import { v_2dc778 } from '../services';
+import type { v_cc1705 } from '../services';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -19,7 +20,20 @@ interface TransformedSettlementData {
   amount: string; 
   date: string;
   transaction: number;
+  status?: 'pending' | 'sent' | string; 
 }
+
+const v_af0703 = {
+  nas: 'AR 광고 (나스미디어)',
+  nasmedia: 'AR 광고 (나스미디어)',
+  pocr: 'AR 광고 (포인트클릭)',
+  pointclick: 'AR 광고 (포인트클릭)',
+  ayet: 'Xplay Zone 1',
+  maf: 'Xplay Zone 2',
+  mychips: 'Xplay Zone 2',
+  recommand: '추천 가입',
+  attendance: '출석체크',
+};
 
 const v_16897e = (v_a86996): string => {
   try {
@@ -140,25 +154,33 @@ export const v_08aac3 = () => {
     try {
       v_34a50a(true);
 
-      const [v_79d0f6, v_0b09a2] = await Promise.all([
-        v_b7594c(v_660822, v_9b57fc),
-        v_5bb1ab(v_660822, v_9b57fc),
-      ]);
+      const v_11b884 = await v_2dc778(v_660822, v_9b57fc);
 
-      if (
-        v_79d0f6.status === 'success' &&
-        v_0b09a2.status === 'success'
-      ) {
-        const v_2a6164 = v_325ac3(v_79d0f6.data, v_8d41d7);
-        v_2f9613(v_2a6164);
+      if (v_11b884.status === 'success') {
 
-        const v_2c49ad = v_0b09a2.data[0]?.amount || '0';
-        const v_a35cbd = typeof v_2c49ad === 'string' ? parseFloat(v_2c49ad) : v_2c49ad;
-        const v_e0fe28 = isNaN(v_a35cbd) ? '0' : v_a35cbd.toFixed(2);
+        const v_18b8bf = (v_11b884.data || []).map((item: v_cc1705, v_e86ad8) => {
+          const v_2869c1 = v_af0703[v_8c0b26.source_type] || v_8c0b26.source_type || '레퍼럴 분배';
+          return {
+            id: `ref_${v_8c0b26.id}_${v_e86ad8}`,
+            type: v_2869c1,
+            description: v_2869c1,
+            amount: `+${(Number(v_8c0b26.xrun_amount) || 0).toFixed(2)} XRUN`,
+            date: v_16897e(v_8c0b26.created_at),
+            transaction: v_8c0b26.id,
+            status: v_8c0b26.status,
+          };
+        });
+        v_2f9613(v_18b8bf);
+
+        const v_a35cbd = (v_11b884.data || []).reduce(
+          (v_dce0a8, item: v_cc1705) => v_dce0a8 + (Number(v_8c0b26.xrun_amount) || 0),
+          0
+        );
+        const v_e0fe28 = v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
         const v_6bbb57 = v_beea9d > 0 ? v_beea9d : 176; 
-        console.log('[정산] 원화 계산:', { totalAmount: v_2c49ad, totalAmountNum: v_a35cbd, price: v_6bbb57 });
+        console.log('[정산] 원화 계산:', { totalAmountNum: v_a35cbd, price: v_6bbb57 });
 
         const v_f02564 = v_b9db3d(v_a35cbd, v_6bbb57);
         console.log('[정산] 원화 환산 결과:', v_f02564);
@@ -167,15 +189,12 @@ export const v_08aac3 = () => {
         console.log('[정산] 원화 포맷팅 결과:', v_41185e);
         v_a80d65(v_41185e);
 
-        const v_e45688 = v_2a6164.slice(0, v_0d35a8);
+        const v_e45688 = v_18b8bf.slice(0, v_0d35a8);
         v_690164(v_e45688);
         v_be9dba(1);
-        v_1454f0(v_2a6164.length > v_0d35a8);
+        v_1454f0(v_18b8bf.length > v_0d35a8);
       } else {
-        console.error(
-          '정산 데이터 조회 실패:',
-          v_79d0f6.message || v_0b09a2.message,
-        );
+        console.error('정산 데이터 조회 실패:', v_11b884.message);
         v_2f9613([]);
         v_690164([]);
         v_54eab4('0 XRUN');
@@ -230,21 +249,31 @@ export const v_08aac3 = () => {
   };
 
   const v_d24ee8 = ({ item: v_8c0b26 }: { item: TransformedSettlementData }) => {
+    const v_619bad = v_8c0b26.status === 'sent';
+    const v_675e11 = '#cccccc';
     return (
-      <View style={v_d81136.listItem}>
+      <View style={[v_d81136.listItem, v_619bad && { opacity: 0.7 }]}>
         <View style={v_d81136.listItemRow}>
           {v_8c0b26.description ? <Text
-            style={[v_d81136.descriptionText, { flex: 1, marginRight: 10 }]}
+            style={[
+              v_d81136.descriptionText,
+              v_619bad && { color: v_675e11 },
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {}
-            추천예상수익
+            {v_8c0b26.description}
           </Text> : null}
+          {v_8c0b26.date ? <Text style={[v_d81136.dateText, v_619bad && { color: v_675e11 }]}>{v_8c0b26.date}</Text> : null}
         </View>
         <View style={v_d81136.listItemRow2}>
-          {v_8c0b26.date ? <Text style={v_d81136.dateText}>{v_8c0b26.date}</Text> : null}
-          {v_8c0b26.amount ? <Text style={v_d81136.amountText}>{v_8c0b26.amount}</Text> : null}
+          <Text style={[
+            v_d81136.statusBadge,
+            v_619bad ? v_d81136.statusPaid : v_d81136.statusPending,
+          ]}>
+            {v_619bad ? (v_8d41d7('screens.referralSettlement.paid') || '지급 완료') : (v_8d41d7('screens.referralSettlement.pending') || '지급 대기')}
+          </Text>
+          {v_8c0b26.amount ? <Text style={[v_d81136.amountText, v_619bad && { color: v_675e11 }]}>{v_8c0b26.amount}</Text> : null}
         </View>
       </View>
     );
@@ -367,6 +396,23 @@ const v_d81136 = v_472849.create({
     flexDirection: 'column',
     gap: 4,
     alignItems: 'flex-end',
+  },
+
+  statusBadge: {
+    fontSize: 10,
+    fontFamily: 'Roboto-Bold',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  statusPaid: {
+    backgroundColor: '#eeeeee',
+    color: '#9a9a9a',
+  },
+  statusPending: {
+    backgroundColor: '#fff4e5',
+    color: '#e07b00',
   },
   refTypeText: {
     fontSize: v_843035.size.small,

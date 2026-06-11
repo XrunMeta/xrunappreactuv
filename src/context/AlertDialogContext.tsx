@@ -13,6 +13,8 @@ interface AlertDialogContextValue {
       onPress?: () => void;
       style?: 'default' | 'cancel' | 'destructive';
     }>,
+
+    options?: { hideCloseButton?: boolean },
   ) => Promise<number | undefined>; 
 }
 
@@ -30,6 +32,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
       onPress?: () => void;
       style?: 'default' | 'cancel' | 'destructive';
     }>;
+    hideCloseButton?: boolean;
     resolve?: () => void;
   } | null>(null);
 
@@ -37,6 +40,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     v_9f1622,
     v_a8cd21,
     v_3d694a,
+    v_b36f96,
   ): Promise<number | undefined> => {
     return new Promise((v_6f7712) => {
 
@@ -48,6 +52,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
           title: v_9f1622,
           message: v_a8cd21,
           buttons: v_3d694a,
+          hideCloseButton: v_b36f96?.hideCloseButton,
           resolve: () => {
             v_059529?.();
             v_6f7712(0); 
@@ -147,7 +152,8 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
       <Dialog
         visible={v_21132d}
         title={v_4519dd?.title || ''}
-        onClose={v_cb6b8d}
+
+        onClose={v_4519dd?.hideCloseButton ? undefined : v_cb6b8d}
         actions={[
           {
             label: v_4519dd?.buttons?.[0]?.text || '확인',

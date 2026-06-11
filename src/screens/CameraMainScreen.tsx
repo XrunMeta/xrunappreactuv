@@ -715,6 +715,83 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
   const v_a27ed2 = v_e662ae<NodeJS.Timeout | null>(null); 
+
+  type RecentAd = Partial<v_60c7c3> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
+  const [v_f87d4d, v_32744e] = v_5ab095<RecentAd[]>([]);
+  const [v_558a7d, v_8b4a6c] = v_5ab095(false);
+  const v_0a1033 = 'recentViewedAds';
+  const v_e41db0 = 20;
+
+  v_c4deb2(() => {
+    v_e84827.getItem(v_0a1033).then((v_479f05) => {
+      if (!v_479f05) return;
+      try {
+        const v_d0c056 = JSON.parse(v_479f05);
+        if (Array.isArray(v_d0c056)) v_32744e(v_d0c056);
+      } catch {}
+    }).catch(() => {});
+  }, []);
+
+  const v_a2b2c4 = v_de06a3(async (v_0ba044) => {
+    const v_43ea0c = typeof v_0ba044 === 'string'
+      ? new Set([v_0ba044])
+      : v_0ba044 instanceof Set
+        ? v_0ba044
+        : new Set(v_0ba044);
+    if (v_43ea0c.size === 0) return;
+    v_32744e((v_ba2215) => {
+      const v_a448ad = v_ba2215.filter((v_779914) => !v_43ea0c.has(v_779914.campid));
+      if (v_a448ad.length !== v_ba2215.length) {
+        v_e84827.setItem(v_0a1033, JSON.stringify(v_a448ad)).catch(() => {});
+        console.log(`[RecentAds] 완료된 광고 ${v_ba2215.length - v_a448ad.length}개 제거 (남은 ${v_a448ad.length}개)`);
+      }
+      return v_a448ad;
+    });
+  }, []);
+
+  const v_bcc877 = v_de06a3(async (v_ddcfed) => {
+    if (!v_ddcfed.campid || !v_ddcfed.urlAD) return;
+
+    if (v_7c7dd0.current?.has(v_ddcfed.campid)) {
+      console.log(`[RecentAds] 이미 완료된 광고 — 최근 본 광고 추가 건너뜀: ${v_ddcfed.campid}`);
+      return;
+    }
+    v_32744e((v_ba2215) => {
+      const v_e4cf17 = v_ba2215.filter((v_779914) => v_779914.campid !== v_ddcfed.campid);
+      const v_a448ad = [{ ...v_ddcfed, viewedAt: Date.now() }, ...v_e4cf17].slice(0, v_e41db0);
+      v_e84827.setItem(v_0a1033, JSON.stringify(v_a448ad)).catch(() => {});
+      return v_a448ad;
+    });
+  }, []);
+
+  const v_5987c4 = v_e662ae<((t: v_60c7c3) => void) | null>(null);
+  const v_01e6b2 = v_de06a3((v_ddcfed) => {
+    v_8b4a6c(false);
+    if (v_5987c4.current) {
+
+      const token: v_60c7c3 = {
+        spotID: (v_ddcfed as any).spotID ?? 0,
+        x: (v_ddcfed as any).x ?? 0,
+        y: (v_ddcfed as any).y ?? 0,
+        xrunPrice: v_ddcfed.xrunPrice,
+        distance: v_ddcfed.distance,
+        name: v_ddcfed.name,
+        iconurl: v_ddcfed.iconurl,
+        joindesc: v_ddcfed.joindesc,
+        brand: v_ddcfed.brand,
+        advertisement: v_ddcfed.advertisement,
+        coin: v_ddcfed.coin,
+        member: v_ddcfed.member,
+        campid: v_ddcfed.campid,
+        ad_company: v_ddcfed.ad_company,
+        urlAD: v_ddcfed.urlAD,
+      };
+      v_5987c4.current(v_21cc31);
+    } else if (v_ddcfed.urlAD) {
+
+      v_f2c756.openURL(v_ddcfed.urlAD).catch((v_49263d) => console.warn('[RecentAds] openURL 실패:', v_49263d));
+    }
+  }, []);
   const v_6890b1 = v_e662ae(false); 
 
   const v_ac9fa2 = v_e662ae(false);
@@ -1045,6 +1122,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
           v_7c7dd0.current = v_b63d4a;
           console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${v_96f338.size}개 + 새로 ${v_905ecb.size}개 = 총 ${v_b63d4a.size}개`);
+
+          v_a2b2c4(v_b63d4a);
         } catch (v_5e9bfe) {
           console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
 
@@ -1655,6 +1734,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       if (v_905ecb && v_905ecb.size > 0) {
         v_7c7dd0.current = v_905ecb;
         console.log(`[CameraMainScreen] 백그라운드: 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+        v_a2b2c4(v_905ecb);
       }
 
       if (v_e36b07 && Array.isArray(v_e36b07) && v_e36b07.length > 0) {
@@ -1797,6 +1878,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     console.log(`[CameraMainScreen] completedAdsSetRef에 추가: ${v_dc62a4} (현재 크기: ${v_7c7dd0.current.size})`);
                   }
 
+                  v_a2b2c4(v_dc62a4);
+
                   v_8ce112(v_93ce34 => [...v_93ce34]);
 
                   await v_8cba1e(v_dc62a4, v_9b57fc);
@@ -1813,6 +1896,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       const v_905ecb = await v_318c45(v_660822, v_9b57fc, true);
                       v_7c7dd0.current = v_905ecb;
                       console.log(`[CameraMainScreen] 완료된 광고 목록 업데이트: ${v_905ecb.size}개`);
+
+                      v_a2b2c4(v_905ecb);
 
                       v_8ce112(v_93ce34 => [...v_93ce34]);
                     }
@@ -2021,6 +2106,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_96a9ed(v_21cc31);
 
       v_d48a26(v_75c344);
+
+      const v_43b152 = /gpakorea\.com/i.test(v_7ec08d);
+      if (v_43b152) {
+        console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+        try {
+          await v_f2c756.openURL(v_7ec08d);
+        } catch (v_49263d) {
+          console.error('[showAdInModal] 외부 브라우저 오픈 실패:', v_49263d);
+          v_cba33f('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
 
       if (v_326be8.OS === 'ios') {
 
@@ -2325,6 +2422,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
+      const v_e7a956 = /gpakorea\.com/i.test(v_7ec08d);
+      if (v_e7a956) {
+        console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+        try {
+          await v_f2c756.openURL(v_7ec08d);
+        } catch (v_49263d) {
+          console.error('[다른 경로] 외부 브라우저 오픈 실패:', v_49263d);
+          v_cba33f('브라우저를 열 수 없습니다.');
+        }
+        return;
+      }
+
       if (v_326be8.OS === 'ios') {
 
         v_9b57fc(v_ce4741.showWebView);
@@ -2454,11 +2563,24 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     v_96a9ed(v_021ef9);
     v_6a4dcd(true); 
 
+    v_bcc877({
+      ...v_021ef9,
+      campid: String(v_021ef9.campid ?? ''),
+      name: String(v_021ef9.name ?? ''),
+      iconurl: String(v_021ef9.iconurl ?? ''),
+      urlAD: String((v_021ef9 as any).urlAD ?? ''),
+      viewedAt: Date.now(),
+    } as RecentAd);
+
     v_a27ed2.current = setTimeout(() => {
       v_a27ed2.current = null; 
       v_794bb0(v_021ef9);
     }, 2000);
   }, [v_794bb0]);
+
+  v_c4deb2(() => {
+    v_5987c4.current = v_eed806;
+  }, [v_eed806]);
 
   const v_fce460 = [
     { id: 'xplay', label: v_8d41d7('components.bottomNavigationBar.xplay'), icon: v_622956 },
@@ -2515,6 +2637,20 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
 }
         </CameraView>
+
+        {}
+        <TouchableOpacity
+          style={v_d81136.recentAdsButton}
+          onPress={() => v_8b4a6c(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="time-outline" size={22} color="#fff" />
+          {v_f87d4d.length > 0 && (
+            <View style={v_d81136.recentAdsBadge}>
+              <Text style={v_d81136.recentAdsBadgeText}>{Math.min(v_f87d4d.length, 99)}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         {}
         {
@@ -2659,7 +2795,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                   pointerEvents: 'box-none', 
                 }}>
                 {}
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={async () => {
+                    console.log('=== 패널 본문(아이콘+텍스트) 클릭 ===');
+                    if (v_181e3e.current) {
+                      clearTimeout(v_181e3e.current);
+                      v_181e3e.current = null;
+                    }
+                    v_6890b1.current = true;
+                    if (v_04cb77) {
+                      await v_794bb0(v_04cb77);
+                    }
+                  }}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -2727,7 +2875,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                         : v_04cb77?.joindesc}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 {}
                 <TouchableOpacity
@@ -2768,6 +2916,62 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           </Pressable>
         </Animated.View>
       </View>
+
+      {}
+      <Modal
+        visible={v_558a7d}
+        transparent
+        animationType="slide"
+        onRequestClose={() => v_8b4a6c(false)}
+      >
+        <TouchableOpacity
+          style={v_d81136.recentModalBackdrop}
+          activeOpacity={1}
+          onPress={() => v_8b4a6c(false)}
+        >
+          <TouchableOpacity activeOpacity={1} style={v_d81136.recentModalSheet} onPress={(v_9e86fd) => v_9e86fd.stopPropagation()}>
+            <View style={v_d81136.recentModalHeader}>
+              <Text style={v_d81136.recentModalTitle}>🕒 최근 본 광고</Text>
+              <TouchableOpacity onPress={() => v_8b4a6c(false)}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {v_f87d4d.length === 0 ? (
+                <View style={v_d81136.recentEmpty}>
+                  <Text style={v_d81136.recentEmptyText}>최근 본 광고가 없습니다.</Text>
+                </View>
+              ) : (
+                v_f87d4d.map((v_ddcfed) => {
+                  const v_2bb762 = Math.floor((Date.now() - v_ddcfed.viewedAt) / 60000);
+                  const v_375a17 = v_2bb762 < 1 ? '방금 전' : v_2bb762 < 60 ? `${v_2bb762}분 전` : `${Math.floor(v_2bb762 / 60)}시간 전`;
+                  return (
+                    <TouchableOpacity
+                      key={`${v_ddcfed.campid}-${v_ddcfed.viewedAt}`}
+                      style={v_d81136.recentItemRow}
+                      onPress={() => v_01e6b2(v_ddcfed)}
+                      activeOpacity={0.7}
+                    >
+                      {v_ddcfed.iconurl ? (
+                        <Image source={{ uri: v_ddcfed.iconurl }} style={v_d81136.recentItemIcon} resizeMode="cover" />
+                      ) : (
+                        <View style={v_d81136.recentItemIcon} />
+                      )}
+                      <View style={v_d81136.recentItemTextWrap}>
+                        <Text style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
+                        <Text style={v_d81136.recentItemTime}>{v_375a17}</Text>
+                      </View>
+                      <View style={v_d81136.recentItemOpenBtn}>
+                        <Text style={v_d81136.recentItemOpenBtnText}>다시 열기</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              )}
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       {}
       {}
@@ -3364,6 +3568,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               onHttpError={(v_6f3a9d) => {
                 const { nativeEvent: v_76b943 } = v_6f3a9d;
                 console.error('WebView HTTP 오류:', v_76b943);
+
+                const v_f3e03f = [404, 410, 451, 455]
+                if (v_f3e03f.includes(v_76b943.statusCode)) {
+                  v_889fad(
+                    '광고 이용 불가',
+                    '해당 광고는 이미 참여했거나 종료되어 더 이상 참여할 수 없습니다.',
+                    [{ text: '확인', onPress: () => v_3aa877() }],
+                  ).catch(() => v_3aa877())
+                }
               }}
             />
           ) : null}
@@ -3566,6 +3779,107 @@ const v_d81136 = v_472849.create({
     height: 25,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  recentAdsButton: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  recentAdsBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  recentAdsBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  recentModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  recentModalSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '70%',
+    paddingBottom: 32,
+  },
+  recentModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  recentModalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+  },
+  recentItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  recentItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  recentItemTextWrap: {
+    flex: 1,
+  },
+  recentItemName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  recentItemTime: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
+  recentItemOpenBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#6C5CE7',
+    borderRadius: 6,
+  },
+  recentItemOpenBtnText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  recentEmpty: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  recentEmptyText: {
+    color: '#999',
+    fontSize: 14,
   },
   mapPinIcon: {
     width: 25,

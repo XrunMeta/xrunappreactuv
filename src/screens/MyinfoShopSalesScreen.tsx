@@ -34,6 +34,7 @@ export const v_1cca63 = () => {
     image?: number | null;
     thumbnail?: number | null;
     sdk?: string | null;
+    is_approved?: string;
   }>({
     item: null,
     title: null,
@@ -153,6 +154,7 @@ export const v_1cca63 = () => {
             image: v_741623.image || null,
             thumbnail: v_741623.thumbnail || null,
             sdk: v_741623.sdk || null,
+            is_approved: v_741623.is_approved || 'N',
           });
         } else {
 
@@ -425,7 +427,7 @@ export const v_1cca63 = () => {
 
           const v_14b228 = v_54e15b.purchaseDate ? v_54e15b.purchaseDate.replace(/-/g, '.') : '';
 
-          const v_e0fe28 = v_54e15b.amount.toLocaleString('ko-KR') + v_8d41d7('screens.myinfoShopSales.currency');
+          const v_e0fe28 = `${Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')} XRUN`;
 
           const v_90d2f8 = v_fac091(v_54e15b.name);
 
@@ -472,7 +474,7 @@ export const v_1cca63 = () => {
       }
       return { data: [], total: 0, hasMore: false };
     }
-  }, [v_c5bd46, v_0ec7ad, v_331624, v_9b57fc, v_8d41d7]);
+  }, [v_c5bd46, v_0ec7ad, v_331624, v_9b57fc, v_8d41d7, v_d20ab2.priceXrun]);
 
   const v_a37640 = () => (
     <TouchableOpacity
@@ -495,12 +497,23 @@ export const v_1cca63 = () => {
         {}
         {!v_cd31a8 && v_c5bd46 && v_d20ab2.title && v_d20ab2.title.trim() ? (
           <View style={v_d81136.infoCard}>
-            <Text style={v_d81136.infoTitle}>{v_d20ab2.title}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <Text style={v_d81136.infoTitle}>{v_d20ab2.title}</Text>
+              {v_d20ab2.is_approved === 'Y' ? (
+                <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{v_8d41d7('screens.myinfoShopSales.approved')}</Text>
+                </View>
+              ) : (
+                <View style={{ backgroundColor: '#f59e0b', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{v_8d41d7('screens.myinfoShopSales.pending')}</Text>
+                </View>
+              )}
+            </View>
             <Text style={v_d81136.infoText}>
-              {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{v_d20ab2.price.toLocaleString('ko-KR')}{v_8d41d7('screens.myinfoShopSales.currency')}</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
+              {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')} XRUN</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
             </Text>
             <Text style={v_d81136.infoText}>
-              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{v_d20ab2.totalSalesXrun.toLocaleString('ko-KR')} XRUN</Text> / <Text style={v_d81136.modifyLink} onPress={v_264d8b}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text>
+              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{(Number(v_d20ab2.priceXrun ?? 0) * Number(v_d20ab2.participantCount ?? 0)).toLocaleString('ko-KR')} XRUN</Text> / <Text style={v_d81136.modifyLink} onPress={v_264d8b}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text>
             </Text>
           </View>
         ) : null}

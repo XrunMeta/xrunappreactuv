@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: 'รายการที่ลบจะไม่แสดงอีกต่อไป แต่บันทึกการซื้อจะยังคงอยู่',
   deleteSuccess: 'รายการถูกลบแล้ว',
   deleteFailed: 'การลบรายการล้มเหลว',
+  approved: 'อนุมัติแล้ว',
+  pending: 'รออนุมัติ',
 };
-

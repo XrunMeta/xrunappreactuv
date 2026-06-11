@@ -65,7 +65,8 @@ export const v_1184c4 = () => {
         }
 
         try {
-            const v_d1a6bb = await v_8682f1.requestPermissionsAsync();
+
+            const v_d1a6bb = await v_8682f1.requestPermissionsAsync(true);
             console.log('[내 티켓] MediaLibrary 권한:', v_d1a6bb.status, {
                 canAskAgain: v_d1a6bb.canAskAgain,
                 granted: v_d1a6bb.granted,

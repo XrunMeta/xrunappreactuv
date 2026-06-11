@@ -8,6 +8,7 @@ import {
   v_f2c756,
   v_326be8,
 } from 'rcmrninabrnb';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
@@ -19,6 +20,7 @@ const v_e56d32 = v_326be8.OS === 'ios' ? '25755' : '25617';
 
 export const AyetOffersScreen: v_a3453e.FC = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
+  const v_033e14 = v_e0068c();
   const v_35f830 = v_e662ae<v_2694e4>(null);
   const [v_43e90c, v_688dd2] = v_5ab095<string>('');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
@@ -79,10 +81,12 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
 
   const v_6da94b = `https://offerwall.ayet.io/offers?adSlot=${v_e56d32}&external_identifier=${encodeURIComponent(v_43e90c)}`;
 
+  const v_0a35c3 = v_033e14.bottom;
+
   if (v_cd31a8) {
     return (
-      <View style={v_d81136.container}>
-        <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+      <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
+        <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.primary} />
         </View>
@@ -91,8 +95,8 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   }
 
   return (
-    <View style={v_d81136.container}>
-      <Header title="Xplay" onBackPress={v_c7ac57} showBackButton />
+    <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
+      <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
       <WebView
         key={v_a039ac}
         ref={v_35f830}

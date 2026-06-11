@@ -128,6 +128,8 @@ export const v_a82b55 = () => {
           value={v_e0c7e8}
           onChangeText={v_fedf34}
           containerStyle={v_d81136.fieldContainer}
+
+          editable={false}
         />
 
         <View style={v_d81136.buttonWrapper}>

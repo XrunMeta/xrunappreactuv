@@ -2,7 +2,7 @@ export default {
   title: 'การยืนยันอีเมล',
   emailLabel: 'อีเมล',
   emailPlaceholder: 'กรอกอีเมลของคุณ',
-  sendButton: 'ส่งรหัสยืนยัน',
+  sendButton: 'ยืนยัน',
   confirmButton: 'ยืนยัน',
   sending: 'กำลังส่ง...',
   alerts: {

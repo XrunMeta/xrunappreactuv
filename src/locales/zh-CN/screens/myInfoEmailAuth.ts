@@ -2,7 +2,7 @@ export default {
   title: '邮箱认证',
   emailLabel: '邮箱',
   emailPlaceholder: '请输入您的邮箱',
-  sendButton: '发送验证码',
+  sendButton: '验证',
   confirmButton: '确认',
   sending: '发送中...',
   alerts: {

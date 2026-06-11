@@ -10,6 +10,7 @@ import {
   v_f4f851,
   v_54d331,
   v_f40fc5,
+  v_040c8f,
   v_7c6176,
   v_d3f135,
   v_086cde,
@@ -70,7 +71,9 @@ import {
   v_f2ecfa,
   v_a50cad,
   v_d4a78d,
+  v_626337,
   v_0ca15f,
+  v_fad5f1,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
@@ -168,7 +171,7 @@ const v_c0dbdf = () => {
 
         console.log('parsed.queryParams:', v_8decf8.queryParams);
 
-        const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
+        const v_fc7051 = (v_8decf8.queryParams?.referral || v_8decf8.queryParams?.ref) as string | undefined;
 
         const v_d136d6 = v_8decf8.queryParams?.email as string | undefined;
         const v_4be5e8 = v_8decf8.queryParams?.from as string | undefined;
@@ -359,6 +362,10 @@ const v_c0dbdf = () => {
     return <SignupScreen />;
   }
 
+  if (v_0f0c7b === 'forgotPassword') {
+    return <ForgotPasswordScreen />;
+  }
+
   if (v_0f0c7b === 'countryCodeSelect') {
     return <CountryCodeSelectScreen />;
   }
@@ -409,6 +416,13 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (v_0f0c7b === 'walletKeyTutorial') {
+    return <WalletKeyTutorialScreen mode="signup" />;
+  }
+  if (v_0f0c7b === 'walletKeyGuide') {
+    return <WalletKeyTutorialScreen mode="readonly" />;
   }
 
   if (v_0f0c7b === 'map') {
@@ -497,6 +511,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'walletPrivateKeyGoogleAuth') {
     return <WalletPrivateKeyGoogleAuthScreen />;
+  }
+
+  if (v_0f0c7b === 'walletRestore') {
+    return <WalletRestoreScreen />;
   }
 
   if (v_0f0c7b === 'myInfoCloseMembership') {

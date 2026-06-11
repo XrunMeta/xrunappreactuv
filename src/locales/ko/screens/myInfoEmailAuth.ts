@@ -2,7 +2,7 @@ export default {
   title: '이메일 인증',
   emailLabel: '이메일',
   emailPlaceholder: '이메일을 입력해주세요',
-  sendButton: '인증코드 발송',
+  sendButton: '인증',
   confirmButton: '확인',
   sending: '전송 중...',
   alerts: {

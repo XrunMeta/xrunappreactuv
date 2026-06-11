@@ -49,6 +49,8 @@ export const v_680bee = () => {
   const [v_4d0f89, v_698ad3] = v_5ab095<boolean>(false);
   const [v_6d6ad9, v_56ef48] = v_5ab095<string | null>(null);
 
+  const [v_a5da00, v_036c4a] = v_5ab095<string>('');
+
   v_c4deb2(() => {
     const v_0e1f49 = async () => {
       try {
@@ -171,13 +173,20 @@ export const v_680bee = () => {
   }, [v_1b9174, v_373157, v_ee89db, v_0fc63a]);
 
   const v_071275 = v_de06a3((): string => {
-    if (!v_f4fb5e || v_f4fb5e.length < 2) {
-      return '';
-    }
-    const v_cc65d6 = v_f4fb5e.substring(0, 2).toUpperCase();
+    if (!v_f4fb5e) return '';
+    const v_2abccc = v_f4fb5e.split('@')[0] || '';
+    if (v_2abccc.length < 2) return '';
+    const v_cc65d6 = v_2abccc.substring(0, 2).toUpperCase();
     const v_70e169 = Math.floor(100000 + Math.random() * 900000); 
     return `${v_cc65d6}${v_70e169}`;
   }, [v_f4fb5e]);
+
+  v_c4deb2(() => {
+    if (!v_f4fb5e || v_1b9174) return;
+    if (v_a5da00) return; 
+    const v_8f8118 = v_071275();
+    if (v_8f8118) v_036c4a(v_8f8118);
+  }, [v_f4fb5e, v_1b9174, v_a5da00, v_071275]);
 
   const v_0ef408 = (v_3b402b) => {
     v_1eb7da(v_3b402b);
@@ -192,11 +201,7 @@ export const v_680bee = () => {
 
   const v_85f2b3 = async () => {
     try {
-      const { status: v_d308b5 } = await v_d05ab5.requestMediaLibraryPermissionsAsync();
-      if (v_d308b5 !== 'granted') {
-        v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.permissionRequired'), v_8d41d7('screens.shopItemRegister.alerts.permissionMessage'));
-        return;
-      }
+
       const v_43c42e = await v_d05ab5.launchImageLibraryAsync({
         mediaTypes: v_d05ab5.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -332,8 +337,30 @@ export const v_680bee = () => {
   };
 
   const v_585b02 = async () => {
-    if (!v_9f1622.trim()) {
+    const v_25e98c = v_9f1622.trim();
+    const v_17b3f8 = v_6856a9.trim();
+
+    if (!v_25e98c) {
       v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.productNameRequired'));
+      return;
+    }
+
+    if (v_25e98c.length > 50) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+      return;
+    }
+    if (v_17b3f8.length > 500) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      return;
+    }
+
+    if (/(.)\1{4,}/.test(v_25e98c) || /(.)\1{4,}/.test(v_17b3f8)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      return;
+    }
+
+    if (/^[ㄱ-㆏\s]+$/.test(v_25e98c)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
@@ -342,23 +369,13 @@ export const v_680bee = () => {
       return;
     }
 
-    const v_d55c14 = parseFloat(v_1c86a8) || 0;
     const v_e921e1 = parseFloat(v_318e8b) || 0;
-
-    if (v_d55c14 <= 0 && v_e921e1 <= 0) {
-      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceRequired'));
-      return;
-    }
-
-    if (v_d55c14 <= 0) {
-      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceKRWRequired'));
-      return;
-    }
-
     if (v_e921e1 <= 0) {
       v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.priceXrunRequired'));
       return;
     }
+
+    const v_d55c14 = v_beea9d > 0 ? Math.round(v_e921e1 * v_beea9d) : 0;
 
     let v_2b9521;
     if (v_1b9174) {
@@ -369,7 +386,8 @@ export const v_680bee = () => {
         return;
       }
     } else {
-      v_2b9521 = v_071275();
+
+      v_2b9521 = v_a5da00;
       if (!v_2b9521) {
         v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.sdkGenerateFailed'));
         return;
@@ -525,6 +543,7 @@ export const v_680bee = () => {
               onChangeText={v_73c0df}
               placeholder={v_8d41d7('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
+              maxLength={50}
             />
           </View>
 
@@ -539,30 +558,21 @@ export const v_680bee = () => {
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
+              maxLength={500}
             />
           </View>
 
           {}
           <View style={v_d81136.section}>
-            <Text style={v_d81136.label}>가격 (KRW) *</Text>
+            <Text style={v_d81136.label}>가격 (XRUN) *</Text>
             <TextInput
               style={v_d81136.input}
-              value={v_1c86a8}
-              onChangeText={v_0ef408}
-              placeholder="KRW 가격을 입력하세요"
+              value={v_318e8b}
+              onChangeText={v_5f29a4}
+              placeholder="XRUN 가격을 입력하세요"
               placeholderTextColor="#999"
               keyboardType="number-pad"
             />
-            {v_318e8b && (
-              <Text style={v_d81136.calculatedPrice}>
-                XRUN: {parseInt(v_318e8b).toLocaleString('ko-KR')} XRUN
-              </Text>
-            )}
-            {v_beea9d > 0 && (
-              <Text style={v_d81136.gopaxInfo}>
-                현재 XRUN 가격: {v_beea9d.toLocaleString('ko-KR')}원
-              </Text>
-            )}
           </View>
 
           {}
@@ -659,10 +669,10 @@ export const v_680bee = () => {
           {}
           {!v_1b9174 && (
             <View style={v_d81136.section}>
-              <Text style={v_d81136.label}>SDK</Text>
+              <Text style={v_d81136.label}>상품 코드</Text>
               <TextInput
                 style={[v_d81136.input, v_d81136.readOnlyInput]}
-                value={v_071275()}
+                value={v_a5da00}
                 editable={false}
                 placeholder={v_8d41d7('screens.shopItemRegister.placeholders.autoGenerated')}
                 placeholderTextColor="#999"

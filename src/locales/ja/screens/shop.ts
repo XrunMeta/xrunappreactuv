@@ -18,6 +18,8 @@ export default {
   used: '使用済み',
   availableShort: '利用可能',
   usedShort: '使用済み',
+  shopBrand: 'ショップ',
+  thankYou: 'ありがとうございます',
   noPurchasedCoupons: '購入したクーポンがありません。',
   loadingGiftList: 'ギフト券リストを読み込み中...',
   loadingCouponList: 'クーポンリストを読み込み中...',

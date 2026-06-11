@@ -7,10 +7,173 @@ import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_843337 } from '../utils/playStoreUrl';
 
+import {
+  v_9bbbdc,
+  v_88b24e,
+  v_f6461f,
+  v_1d0094,
+  v_f4d56b,
+  v_6390b2,
+  v_f17f34,
+  type v_b9a3bd,
+  type v_39431d,
+  type v_30b48f,
+} from './walletKeyStore';
+
+const v_9bac9c = new Set([
+  'NQ', 'DK', 'ADC', 'MISSING', 'DECRYPT_FAIL',
+]);
+
+const v_2e0522 = new Set(['c1', 'c2', 'c16', 'c18']);
+
+const v_6e1b73 = 'https://oth-path-bab568.example.invalid/oth-path';
+
+const v_84b7b1 = 'https://oth-path-f0013c.example.invalid/oth-path';
+
+export const v_db0872 = (): string => {
+  const v_c9c489 = v_e4a763();
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+  return v_84b7b1; 
+};
+
 export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
-  return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return v_6e1b73;
+  }
+  return v_c9c489.GATEWAY_WORKERS;
 };
+
+export async function v_5ed938(): Promise<void> {
+  try {
+
+    await v_6390b2();
+
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return; 
+    const v_7ecfd1 = await v_8f00b9.json();
+    if (v_7ecfd1?.status !== 'success') return;
+
+    const v_56b352 = await v_e84827.getItem('jwt');
+    if (!v_56b352) return; 
+    const v_717992 = v_9bbbdc(v_56b352);
+    if (v_717992 == null) return;
+
+    let v_e0c7e8 = await v_e84827.getItem('userEmail');
+    if (!v_e0c7e8) {
+      try {
+        const v_f21c33 = await v_e84827.getItem('userData');
+        if (v_f21c33) v_e0c7e8 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+      } catch {
+
+      }
+    }
+    if (!v_e0c7e8) return;
+
+    const v_609f58 = Array.isArray(v_7ecfd1.unavailable) ? v_7ecfd1.unavailable : [];
+    const unavailable: v_39431d[] = [];
+    for (const v_ceb55a of v_609f58) {
+      if (typeof v_ceb55a !== 'object' || v_ceb55a === null) continue;
+      const v_c99bd2 = (v_ceb55a as Record<string, unknown>).wallet_code;
+      const v_b88780 = (v_ceb55a as Record<string, unknown>).savedstring;
+      if (typeof v_c99bd2 !== 'string' || !v_2e0522.has(v_c99bd2)) continue;
+      if (typeof v_b88780 !== 'string' || !v_9bac9c.has(v_b88780)) continue;
+      v_a8e631.push({
+        wallet_code: v_c99bd2,
+        savedstring: v_b88780 as v_30b48f,
+      });
+    }
+    await v_f4d56b(v_e0c7e8, v_717992, v_a8e631);
+
+    const wallets: v_b9a3bd[] = Array.isArray(v_7ecfd1.data) ? (v_7ecfd1.data as v_b9a3bd[]) : [];
+    if (v_53579f.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
+
+    const v_97d66c = v_f17f34(v_53579f);
+
+    for (const v_74efc1 of ['eth', 'pol'] as const) {
+      const v_32f7b8 = v_97d66c[v_74efc1];
+      if (!v_32f7b8) continue; 
+
+      const v_eb0188 = JSON.stringify([v_32f7b8]);
+      const v_1de163 = v_88b24e(v_eb0188, v_717992);
+      const v_ceb55a = v_f6461f(v_e0c7e8, v_717992, v_74efc1);
+      await v_1d0094({
+        u: v_ceb55a,
+        c: v_1de163,
+        s: 's0',
+      });
+
+    }
+  } catch {
+
+  }
+}
+
+export async function v_2320bd(): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-mark`, { method: 'POST', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function v_1a40bb(v_660822, v_6bee94): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/upsertWalletPin`, {
+      method: 'POST',
+      headers: v_3f4675,
+      body: JSON.stringify({ member: v_660822, pin: v_6bee94 }),
+    });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { at: false, at_at: null };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return {
+      at: !!v_7ecfd1?.data?.at,
+      at_at: v_7ecfd1?.data?.at_at ?? null,
+    };
+  } catch {
+    return { at: false, at_at: null };
+  }
+}
 
 export const v_a57efd = (): string => v_755eb9();
 
@@ -229,6 +392,28 @@ const v_e4d665 = async (v_c65f5d) => {
         console.error('navigation.reset 호출 실패:', v_16229f);
       }
     }
+  }
+};
+
+export const v_23dd22 = async (): Promise<string> => {
+  const v_56b352 = await v_e84827.getItem('jwt');
+  if (v_56b352) return `Bearer ${v_56b352}`;
+  const v_c9c489 = v_e4a763();
+  return `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+};
+
+export const v_964a96 = async (v_8f00b9): Promise<void> => {
+  const v_56b352 = v_8f00b9?.data?.jwt;
+  if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
+    await v_e84827.setItem('jwt', v_56b352);
+  }
+
+  const v_e0c7e8 = v_8f00b9?.data?.email
+             ?? v_8f00b9?.data?.userData?.email
+             ?? v_8f00b9?.data?.data?.email
+             ?? (Array.isArray(v_8f00b9?.data?.data) ? v_8f00b9.data.data[0]?.email : undefined);
+  if (typeof v_e0c7e8 === 'string' && v_e0c7e8.length > 0) {
+    await v_e84827.setItem('userEmail', v_e0c7e8);
   }
 };
 
@@ -455,9 +640,7 @@ export type CreateAxiosInstanceOptions = {
 };
 
 export const v_7488d5 = (v_c65f5d, v_b36f96) => {
-  const v_c9c489 = v_e4a763();
   const v_fed274 = v_b36f96?.baseURL ?? v_755eb9();
-  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
 
   console.log(
     '[createAxiosInstance] API baseURL:',
@@ -471,12 +654,30 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
     timeout: v_8a74cb,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${v_36dd9e}`,
+
     },
   });
 
   v_0c3a5b.interceptors.request.use(
-    (v_74a79c) => {
+    async (v_74a79c) => {
+
+      v_74a79c.headers.Authorization = await v_23dd22();
+
+      const v_288349 = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const v_966ad8 = v_74a79c.url && v_288349.some(v_d95200 => v_d95200.test(v_74a79c.url!));
+      if (v_966ad8) {
+        v_74a79c.baseURL = v_db0872();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', v_74a79c.baseURL);
+      }
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -537,7 +738,11 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
                 if (v_627a1e !== 'content-type' && v_627a1e !== 'contenttype') {
                   try {
                     v_6f3521.setRequestHeader(v_b24339, v_558750.headers[v_b24339]);
-                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${v_b24339} = ${v_558750.headers[v_b24339]}`);
+                    if (__DEV__) {
+
+                      const v_5dacf0 = v_627a1e === 'authorization' ? '[REDACTED]' : v_558750.headers[v_b24339];
+                      console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${v_b24339} = ${v_5dacf0}`);
+                    }
                   } catch (v_9e86fd) {
                     console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${v_b24339}`, v_9e86fd);
                   }
@@ -617,7 +822,12 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
         }
 
-        console.log('[API Request] 최종 헤더:', JSON.stringify(v_74a79c.headers, null, 2));
+        if (__DEV__) {
+          const v_9ff8b3 = { ...(v_74a79c.headers as Record<string, unknown>) };
+          if ('Authorization' in v_9ff8b3) v_9ff8b3.Authorization = '[REDACTED]';
+          if ('authorization' in v_9ff8b3) v_9ff8b3.authorization = '[REDACTED]';
+          console.log('[API Request] 최종 헤더:', JSON.stringify(v_9ff8b3, null, 2));
+        }
         console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
@@ -769,30 +979,41 @@ export const v_f5ecec = async (
 };
 
 export const v_01332e = async (
-  v_9bf12c,
+  v_c4cf0d,
   v_c65f5d,
 ): Promise<number | null> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_a357d3 = { email: v_9bf12c };
+    const v_2f361a = (v_c4cf0d || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', v_9bf12c);
+    const v_909fd0 = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(v_2f361a);
+    if (v_909fd0) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', v_2f361a);
+      const v_c1cd9e = await v_9f42a4.get(`/lookup-referral?code=${encodeURIComponent(v_2f361a.toUpperCase())}`);
+      const v_3b7754 = v_c1cd9e.data?.data?.[0];
+      if (v_3b7754?.exists && v_3b7754.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', v_3b7754.member);
+        return v_3b7754.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: v_a357d3 = { email: v_2f361a };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', v_2f361a);
     const v_3393e3 = await v_9f42a4.post<v_d6bdce>(
       '/ap1810-i01',
       v_576f5a,
     );
-
     const v_43c42e = v_3393e3.data.data[0];
     if (v_43c42e?.result === true && v_43c42e.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', v_43c42e.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', v_43c42e.member);
       return v_43c42e.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (v_5e9bfe) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', v_5e9bfe);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
@@ -864,6 +1085,10 @@ export const v_9d2541 = async (
     const v_43c42e = v_3393e3.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', v_43c42e ? '성공' : '실패');
 
+    await v_964a96(v_3393e3);
+
+    await v_5ed938();
+
     return v_43c42e;
   } catch (v_5e9bfe) {
     console.error('[회원가입 4단계] 로그인 확인 실패:', v_5e9bfe);
@@ -921,9 +1146,13 @@ export const v_b699a9 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일/비밀번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -974,9 +1203,13 @@ export const v_508a17 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 비밀번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -1222,9 +1455,13 @@ export const v_7e0a86 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 전화번호 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 전화번호 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -1359,9 +1596,13 @@ export const v_a81308 = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] 이메일 인증 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] 이메일 인증 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -1405,9 +1646,13 @@ export const v_32502f = async (
 
     if (v_3393e3.data.status === 'success') {
       console.log('[로그인] Google ID Token 로그인 성공');
+
+      await v_964a96(v_3393e3);
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', v_3393e3.data);
     }
+
+    await v_5ed938();
 
     return v_3393e3.data;
   } catch (v_5e9bfe) {
@@ -2198,11 +2443,57 @@ export const v_3e4cca = async (
   }
 };
 
+export const v_f3c4d5 = 'pushNotificationsEnabled';
+
+export const v_8b775f = async (): Promise<boolean> => {
+  try {
+    const v_e84827 = require('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv').default;
+    const v_81e2ef = await v_e84827.getItem(v_f3c4d5);
+    if (v_81e2ef === null || v_81e2ef === undefined) return true; 
+    return v_81e2ef === 'true';
+  } catch {
+    return true;
+  }
+};
+
+export const v_415b23 = async (
+  v_d20c84,
+  v_660822,
+  v_c65f5d,
+): Promise<void> => {
+  const v_e84827 = require('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv').default;
+  await v_e84827.setItem(v_f3c4d5, v_d20c84 ? 'true' : 'false');
+
+  if (v_d20c84) {
+
+    await v_cec605(v_660822, v_c65f5d);
+  } else {
+
+    try {
+      const v_9f42a4 = v_7488d5(v_c65f5d);
+      await v_9f42a4.post('/login-pushkeyreg', {
+        pushkey: '',
+        member: v_660822,
+      });
+      console.log('[푸시] 토큰 서버 해제 완료');
+    } catch (v_5e9bfe) {
+      console.warn('[푸시] 토큰 해제 실패:', v_5e9bfe);
+    }
+  }
+};
+
 export const v_cec605 = async (
   v_660822,
   v_c65f5d,
 ): Promise<void> => {
   try {
+
+    const v_d20c84 = await v_8b775f();
+    if (!v_d20c84) {
+      console.log('[푸시] 사용자가 알림을 비활성화함 — 토큰 등록 건너뜀');
+      return;
+    }
+
     const v_2b7a17 = require('bpebbcghaffswkrsep');
     const v_a06ea0 = require('wtbgvqvuebu');
     const v_c9be60 = require('qfrscldecidiqs');
@@ -3313,7 +3604,8 @@ export const v_7a6f92 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/callbackNasmob`;
+
+    const v_f71b56 = `${v_db0872()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', v_d8bcf0);
 
@@ -3346,7 +3638,20 @@ export const v_c07360 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/${v_09dafd}`;
+
+    const v_288349 = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const v_966ad8 = v_288349.some(v_d95200 => v_d95200.test(v_09dafd));
+    const v_c01615 = v_966ad8 ? v_db0872() : v_755eb9();
+    const v_f71b56 = `${v_c01615}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
@@ -3380,12 +3685,31 @@ export const v_c07360 = async (
       console.log(`✅ [gatewayNodeJS] endpoint: ${v_09dafd}`);
       console.log(`✅ [gatewayNodeJS] result.data length:`, v_43c42e?.data?.length || 'N/A');
       console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+        status: v_43c42e?.status,
+        code: v_43c42e?.code,
+        message: v_43c42e?.message,
         success: v_43c42e?.success,
         dataLength: v_43c42e?.data?.length,
         hasData: !!v_43c42e?.data,
         hasAds: !!v_43c42e?.ads,
+        adsLength: Array.isArray(v_43c42e?.ads) ? v_43c42e.ads.length : 'N/A',
+        hasDiag: !!v_43c42e?._diag,
         isArray: Array.isArray(v_43c42e),
       });
+
+      if (v_09dafd === 'getTopAd5' && v_43c42e?.status === 'error') {
+        console.error(`❌ [getTopAd5] 백엔드 에러 응답: code=${v_43c42e?.code} message="${v_43c42e?.message}"`);
+      }
+
+      if (v_09dafd === 'getTopAd5' && v_43c42e?._diag) {
+        console.log(`📋 [getTopAd5 진단] 후보=${v_43c42e._diag.total_candidates} 실제 fetch=${v_43c42e._diag.fetched} 살아있음=${v_43c42e._diag.live} 죽음/skip=${v_43c42e._diag.dead_or_skip}`);
+        if (Array.isArray(v_43c42e._diag.details)) {
+          for (const v_d5dda0 of v_43c42e._diag.details) {
+            const v_9ddfab = v_d5dda0.has_landing ? '✅' : '❌';
+            console.log(`  ${v_9ddfab} ${v_d5dda0.ad_company} ${v_d5dda0.campid} "${v_d5dda0.name}" → ${v_d5dda0.reason ?? `code=${v_d5dda0.result_code}`}`);
+          }
+        }
+      }
     }
 
     return v_43c42e;
@@ -3851,6 +4175,43 @@ export const v_b7594c = async (
         message: v_5e9bfe.message,
       });
     }
+    throw v_5e9bfe;
+  }
+};
+
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const v_2dc778 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member: v_660822 },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴정산] 조회 오류:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
@@ -4596,6 +4957,10 @@ export const v_44edcc = async (
       member: v_24baff.member,
       goods_code: v_24baff.goods_code,
       phone_no: v_24baff.phone_no ?? '',
+      price: v_24baff.price,
+      goods_name: v_24baff.goods_name,
+      brand_name: v_24baff.brand_name,
+      image_url: v_24baff.image_url,
     };
     if (__DEV__) {
       console.log('[기프티쇼] Xplay 구매 요청 body:', { ...v_4d33b2, phone_no: v_4d33b2.phone_no ? `${v_4d33b2.phone_no.slice(0, 3)}***` : '(없음)' });
@@ -5658,8 +6023,13 @@ export const v_519669 = async (
   };
 
   try {
-    const v_b67de5 = v_3b27d9 ? `?type=${v_74cb95[v_3b27d9]}` : '?type=1';
-    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements${v_b67de5}`);
+
+    const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+    const v_5254bf = (v_9c213b?.language as string | undefined) || 'ko';
+    const v_653390 = v_3b27d9 ? v_74cb95[v_3b27d9] : 1;
+    const v_f71b56 = `https://oth-path-f0013c.example.invalid/agreements?type=${v_653390}&language=${encodeURIComponent(v_5254bf)}`;
+    console.log('[약관] 요청 URL:', v_f71b56);
+    const v_eb792a = await fetch(v_f71b56);
     const v_9390e8 = await v_eb792a.json() as any;
 
     return {
@@ -5742,84 +6112,57 @@ export const v_18b723 = async (v_aa0917): Promise<void> => {
   }
 };
 
-export const v_8cba1e = async (v_aa0917, v_c65f5d): Promise<void> => {
+export const v_8cba1e = async (v_aa0917, v_e7e852): Promise<void> => {
+
   try {
     const v_92fecf = String(v_aa0917);
-    console.log(`[removeAdFromTopAd5] ${v_92fecf} 제거 및 대체 시작`);
 
     const v_fe7102 = await v_e84827.getItem(v_332c06);
-    let v_4cf0ad = [];
+    let v_4cf0ad = []
+    let v_ae1fa0 = false
     if (v_fe7102) {
-      v_4cf0ad = JSON.parse(v_fe7102);
-      if (Array.isArray(v_4cf0ad)) {
-        const v_aeaa6e = v_4cf0ad.length;
-        v_4cf0ad = v_4cf0ad.filter((v_ddcfed) => String(v_ddcfed.campid || '') !== v_92fecf);
-        if (v_4cf0ad.length !== v_aeaa6e) {
-          console.log(`[removeAdFromTopAd5] TopAd5에서 제거: ${v_aeaa6e} → ${v_4cf0ad.length}개`);
+      const v_8decf8 = JSON.parse(v_fe7102);
+      if (Array.isArray(v_8decf8)) {
+        const v_e98932 = v_8decf8.length
+        v_4cf0ad = v_8decf8.filter((v_ddcfed) => String(v_ddcfed.campid || '') !== v_92fecf);
+        v_ae1fa0 = v_4cf0ad.length !== v_e98932
+      }
+    }
+
+    if (!v_ae1fa0) {
+      console.log(`[removeAdFromTopAd5] ${v_92fecf} — 이미 제거됨, 큐 차감 skip (중복 호출 방지)`)
+      return
+    }
+
+    let v_79f0be = false
+    const v_405e5f = await v_e84827.getItem(v_69b0b7)
+    if (v_405e5f) {
+      try {
+        const v_17d86b = JSON.parse(v_405e5f)
+        if (Array.isArray(v_17d86b) && v_17d86b.length > 0) {
+
+          const v_8f199d = new Set(v_4cf0ad.map((v_779914) => String(v_779914.campid || '')))
+          v_8f199d.add(v_92fecf)
+          const v_faafe6 = v_17d86b.findIndex((v_779914) => !v_8f199d.has(String(v_779914.campid || '')))
+          if (v_faafe6 >= 0) {
+            const v_4a36a4 = v_17d86b.splice(v_faafe6, 1)[0]
+            v_4cf0ad.push(v_4a36a4)
+            await v_e84827.setItem(v_69b0b7, JSON.stringify(v_17d86b))
+            console.log(`[removeAdFromTopAd5] ${v_92fecf} 제거, nextAds 큐에서 보충: ${v_4a36a4.campid} (큐 ${v_17d86b.length}개 남음)`)
+            v_79f0be = true
+          }
         }
+      } catch (v_9e86fd) {
+        console.warn(`[removeAdFromTopAd5] nextAds 파싱 실패:`, v_9e86fd?.message)
       }
     }
-
-    try {
-      console.log(`[removeAdFromTopAd5] 새로운 광고 가져오기 시작`);
-      const v_7cacfc = await v_563153(v_c65f5d, true); 
-
-      if (v_7cacfc && Array.isArray(v_7cacfc) && v_7cacfc.length > 0) {
-
-        const v_dc091b = new Set(v_4cf0ad.map((v_ddcfed) => String(v_ddcfed.campid || '')));
-        const v_df415b = v_7cacfc.filter((v_ddcfed) => {
-          const v_ae3fdc = String(v_ddcfed.campid || '');
-          return v_ae3fdc !== v_92fecf && !v_dc091b.has(v_ae3fdc);
-        });
-
-        if (v_df415b.length > 0) {
-
-          const v_38b17a = v_df415b[0];
-          v_4cf0ad.push(v_38b17a);
-          console.log(`[removeAdFromTopAd5] 새로운 광고 추가: ${v_38b17a.campid || 'N/A'}`);
-
-          await v_e84827.setItem(v_332c06, JSON.stringify(v_4cf0ad));
-          await v_e84827.setItem(v_b5dcce, Date.now().toString());
-          console.log(`[removeAdFromTopAd5] TopAd5 업데이트 완료: ${v_4cf0ad.length}개`);
-        } else {
-          console.log(`[removeAdFromTopAd5] 새로운 광고 없음 - 기존 데이터만 업데이트`);
-
-          await v_e84827.setItem(v_332c06, JSON.stringify(v_4cf0ad));
-        }
-      } else {
-        console.log(`[removeAdFromTopAd5] 새로운 TopAd5 데이터 없음 - 기존 데이터만 업데이트`);
-
-        await v_e84827.setItem(v_332c06, JSON.stringify(v_4cf0ad));
-      }
-    } catch (v_72084e) {
-      console.warn(`[removeAdFromTopAd5] 새로운 광고 가져오기 실패:`, v_72084e);
-
-      await v_e84827.setItem(v_332c06, JSON.stringify(v_4cf0ad));
+    if (!v_79f0be) {
+      console.log(`[removeAdFromTopAd5] ${v_92fecf} 제거 (큐 비어있어 보충 X — 10분 갱신 대기)`)
     }
 
-    const v_90e1d7 = await v_e84827.getItem('cached_AD');
-    if (v_90e1d7) {
-      const v_4fc87f = JSON.parse(v_90e1d7);
-      if (v_4fc87f[v_92fecf]) {
-        delete v_4fc87f[v_92fecf];
-        await v_e84827.setItem('cached_AD', JSON.stringify(v_4fc87f));
-        console.log(`[removeAdFromTopAd5] cached_AD에서 제거: ${v_92fecf}`);
-      }
-    }
-
-    const v_798f24 = await v_e84827.getItem('failedPreFetchCampids');
-    if (v_798f24) {
-      const v_0bc646 = JSON.parse(v_798f24);
-      if (Array.isArray(v_0bc646) && v_0bc646.includes(v_92fecf)) {
-        const v_730f6c = v_0bc646.filter((v_389afb) => v_389afb !== v_92fecf);
-        await v_e84827.setItem('failedPreFetchCampids', JSON.stringify(v_730f6c));
-        console.log(`[removeAdFromTopAd5] failedPreFetchCampids에서 제거: ${v_92fecf}`);
-      }
-    }
-
-    console.log(`[removeAdFromTopAd5] ${v_92fecf} 제거 및 대체 완료`);
+    await v_e84827.setItem(v_332c06, JSON.stringify(v_4cf0ad));
   } catch (v_5e9bfe) {
-    console.error(`[removeAdFromTopAd5] ${v_aa0917} 제거 실패:`, v_5e9bfe);
+    console.error(`[removeAdFromTopAd5] ${v_aa0917} 처리 실패:`, v_5e9bfe);
   }
 };
 
@@ -6572,5 +6915,35 @@ export const v_5027e2 = async (
       });
     }
     throw v_5e9bfe;
+  }
+};
+
+export const v_08c9ee = async (
+  v_e0c7e8,
+  v_c65f5d,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_8f00b9 = await v_9f42a4.post('/forgot-password-send', { email: v_e0c7e8 });
+    return v_8f00b9.data;
+  } catch (v_5e9bfe) {
+    const v_9390e8 = v_5e9bfe?.response?.data;
+    return { status: 'error', code: v_5e9bfe?.response?.status, message: v_9390e8?.message || v_5e9bfe?.message || 'failed' };
+  }
+};
+
+export const v_5e332c = async (
+  v_e0c7e8,
+  v_c99bd2,
+  v_a85523,
+  v_c65f5d,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_8f00b9 = await v_9f42a4.post('/forgot-password-reset', { email: v_e0c7e8, code: v_c99bd2, newPin: v_a85523 });
+    return v_8f00b9.data;
+  } catch (v_5e9bfe) {
+    const v_9390e8 = v_5e9bfe?.response?.data;
+    return { status: 'error', code: v_5e9bfe?.response?.status, message: v_9390e8?.message || v_5e9bfe?.message || 'failed' };
   }
 };

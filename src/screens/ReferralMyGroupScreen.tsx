@@ -11,7 +11,7 @@ import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
-import { v_fb1936 } from '../services';
+import { v_fb1936, v_08316d } from '../services';
 import { v_b0f886 } from '../types';
 
 interface MemberData {
@@ -34,6 +34,9 @@ export const v_58584a = () => {
   const [v_03be4c, v_e2e8ad] = v_5ab095<number>(0);
   const [v_87203a, v_8d99ff] = v_5ab095<MemberData[]>([]);
   const [v_cd31a8, v_deef62] = v_5ab095<boolean>(true);
+  const [v_e2a808, v_81c4fc] = v_5ab095<string>('');
+  const [v_f27013, v_165075] = v_5ab095<string>('');
+  const [v_0c195e, v_87bd2c] = v_5ab095<boolean>(false);
   const v_bce118 = v_e662ae<boolean>(false);
   const v_58d2fc = v_e662ae<boolean>(false);
   const v_61b66e = v_e662ae<MemberData[]>([]);
@@ -62,6 +65,38 @@ export const v_58584a = () => {
     };
     v_0e1f49();
   }, []);
+
+  v_c4deb2(() => {
+    if (!v_717992) return;
+    let v_2008a4 = false;
+    (async () => {
+      try {
+        const v_43c42e = await v_08316d(v_717992, v_9b57fc);
+        if (v_2008a4) return;
+        if (v_43c42e && v_43c42e.status === 'success') {
+          const v_9740cd = (v_43c42e as any).data;
+          const v_10ede1 = Array.isArray(v_9740cd) ? v_9740cd[0] : v_9740cd;
+          if (v_10ede1 && v_10ede1.email) {
+            const v_b43178 = v_10ede1.masked_email || v_10ede1.email || '';
+            const v_8a1355 =
+              v_10ede1.firstname || v_10ede1.lastname
+                ? `${v_10ede1.firstname || ''}${v_10ede1.lastname || ''}`
+                : '';
+            v_81c4fc(v_b43178);
+            v_165075(v_8a1355);
+          } else {
+            v_81c4fc('');
+            v_165075('');
+          }
+        }
+      } catch (v_49263d) {
+        console.error('[내 그룹] 추천인 정보 로드 실패:', v_49263d);
+      } finally {
+        if (!v_2008a4) v_87bd2c(true);
+      }
+    })();
+    return () => { v_2008a4 = true; };
+  }, [v_717992, v_9b57fc]);
 
   const v_e5b428 = v_de06a3(async (
     params: v_5b0045
@@ -178,7 +213,7 @@ export const v_58584a = () => {
     }
     await v_a3bbf0(
       v_8d41d7,
-      { email: v_f4fb5e },
+      { email: v_f4fb5e, member: v_717992 ? Number(v_717992) : undefined },
       v_889fad,
       v_9b57fc,
     );
@@ -199,6 +234,13 @@ export const v_58584a = () => {
         <ReferralStatsCard
           title={v_8d41d7('screens.referralMyGroup.myGroupMembers')}
           value={`${v_03be4c} ${v_8d41d7('screens.referralMyGroup.members')}`}
+          subtitle={
+            v_0c195e && v_e2a808
+              ? v_f27013
+                ? `${v_f27013} (${v_e2a808})`
+                : v_e2a808
+              : undefined
+          }
         />
 
         <SegmentedControl
@@ -250,6 +292,12 @@ const v_d81136 = v_472849.create({
   },
   segmented: {
     marginVertical: v_9b1a04.large,
+  },
+  recommenderText: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#2a2727',
+    marginBottom: 8,
   },
   listContainer: {
     flex: 1,

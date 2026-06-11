@@ -66,9 +66,12 @@ export const v_14739d = async (): Promise<boolean> => {
       );
       return false;
     }
-    await v_37118b!.initialize(v_eb1151, v_c9c489.ADISON_SERVER || 'production');
+    const v_b7fbdb = v_c9c489.ADISON_SERVER || 'production';
+    console.log(`[adison] ✅ 초기화 시작 — server=${v_b7fbdb}, appKey=${v_eb1151.slice(0, 8)}..., platform=${v_326be8.OS}`);
+    await v_37118b!.initialize(v_eb1151, v_b7fbdb);
     v_37118b!.setConfig(v_c9c489.ADISON_OFFERWALL_TITLE || '바로 적립 받기', 'LIST', 'Light');
     v_c9f274 = true;
+    console.log(`[adison] ✅ 초기화 완료 — ${v_b7fbdb === 'production' ? 'PRD 모드' : 'DEV 모드'}`);
     return true;
   } catch (v_9e86fd) {
     console.warn('[adison] init failed', v_9e86fd?.message ?? v_9e86fd);

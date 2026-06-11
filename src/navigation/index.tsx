@@ -13,6 +13,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 export const v_ce4741 = {
   authLanding: 'authLanding',
   login: 'login',
+  forgotPassword: 'forgotPassword',
   signup: 'signup',
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
@@ -79,11 +80,14 @@ export const v_ce4741 = {
   tapjoyList: 'tapjoyList',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
+  walletRestore: 'walletRestore',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoPaymentPin: 'myInfoPaymentPin',
   myChipsOfferwall: 'myChipsOfferwall',
   adisonOfferwall: 'adisonOfferwall',
   adisonTest: 'adisonTest',
+  walletKeyTutorial: 'walletKeyTutorial',
+  walletKeyGuide: 'walletKeyGuide',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;
@@ -204,6 +208,11 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       const v_393a6b = v_cf6dc2.current;
       const v_0f0c7b = v_393a6b[v_393a6b.length - 1];
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b, '현재 화면:', v_0f0c7b);
+
+      if (v_0f0c7b === 'walletKeyTutorial') {
+        console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');
+        return true; 
+      }
 
       const v_7af375 = v_0f0c7b?.startsWith('wallet') || v_0f0c7b === 'polygonHistory' || v_0f0c7b === 'xrunHistory' || v_0f0c7b === 'nftHistory' || v_0f0c7b === 'xrunHistory2' || v_0f0c7b === 'adHistory';
 

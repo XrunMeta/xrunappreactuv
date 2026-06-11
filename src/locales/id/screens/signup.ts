@@ -22,8 +22,8 @@ export default {
   ageLabel: 'Usia',
   ageSelect: 'Pilih',
   optional: 'Opsional',
-  referralEmailLabel: 'Email Referral',
-  referralEmailPlaceholder: 'oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {
     service: 'Ketentuan Layanan XRUN',

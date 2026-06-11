@@ -34,7 +34,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
-import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc } from '../components';
+import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc, v_197924 } from '../components';
 
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -46,6 +46,7 @@ import { v_ba5086 } from '../context/OTAUpdateContext';
 import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
+import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -53,6 +54,11 @@ import { v_e4a763 } from '../utils/env';
 import { v_a61db3, v_843035 } from '../constants';
 import { v_f3de6d, v_a4e2ac } from '../utils/napApiUtils';
 import { v_cba33f } from '../utils';
+import {
+  v_235370,
+  v_019a30,
+  v_4e5f7b,
+} from './walletKeyTutorialHelpers';
 
 interface LocationData {
 
@@ -225,6 +231,25 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_4166d2 = v_e662ae<string | null>(null);
 
+  const v_e790c7 = v_e662ae(false);
+
+  v_c4deb2(() => {
+    if (v_e790c7.current) return;
+    v_e790c7.current = true;
+    (async () => {
+      try {
+        const v_483de2 = await v_e84827.getItem(v_019a30);
+        const v_0ba044 = await v_e84827.getItem(v_4e5f7b);
+        if (v_235370(v_483de2, v_0ba044)) {
+          await v_e84827.removeItem(v_019a30);
+          v_9b57fc(v_ce4741.walletKeyTutorial);
+        }
+      } catch (v_9e86fd) {
+        console.warn('[MapMain] 튜토리얼 가드 확인 실패:', v_9e86fd);
+      }
+    })();
+  }, [v_9b57fc]);
+
   v_c4deb2(() => {
     v_7e5bd3();
   }, [v_7e5bd3]);
@@ -345,6 +370,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_79311c = v_e662ae<Set<string>>(new Set());
 
+  const [v_25fba6, v_f4280a] = v_5ab095(false);
+  const [v_00832d, v_b51724] = v_5ab095<{ memberId: number; email: string } | null>(null);
+
   v_c4deb2(() => {
     const v_43ed8b = async () => {
       try {
@@ -360,6 +388,67 @@ export const MapMainScreen: v_a3453e.FC = () => {
       }
     };
     v_43ed8b();
+  }, []);
+
+  v_c4deb2(() => {
+    let v_2008a4 = false;
+    let v_d9e7b9 = v_6b5698.currentState;
+
+    const v_63929d = async () => {
+      try {
+
+        const v_56b352 = await v_e84827.getItem('jwt');
+        const v_717992 = v_56b352 ? v_9bbbdc(v_56b352) : null;
+
+        let v_b4e012 = await v_e84827.getItem('userEmail');
+        if (!v_b4e012) {
+          try {
+            const v_f21c33 = await v_e84827.getItem('userData');
+            if (v_f21c33) v_b4e012 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+          } catch {
+
+          }
+        }
+
+        if (v_717992 == null || !v_b4e012) return;
+
+        const v_dabeaa = v_b4e012.toLowerCase().trim();
+        if (v_dabeaa !== 'oth-test@example.invalid') return;
+
+        const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
+        const v_9034c6 = (v_9e86fd) =>
+          v_9e86fd !== null && v_9e86fd.s === 's0' && !v_9e86fd.h;
+        const v_aa192c = v_9034c6(v_1e6eca.eth) || v_9034c6(v_1e6eca.pol);
+
+        if (v_2008a4) return;
+        if (v_aa192c) {
+
+          v_b51724((v_ba2215) => {
+            if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
+            return { memberId: v_717992, email: v_dabeaa };
+          });
+          v_f4280a(true);
+        }
+
+      } catch {
+
+      }
+    };
+
+    v_63929d();
+
+    const v_1ae212 = v_6b5698.addEventListener('change', (v_612414) => {
+      const v_d19607 = !!v_d9e7b9.match(/inactive|background/);
+      const v_1039f5 = v_612414 === 'active';
+      v_d9e7b9 = v_612414;
+      if (v_d19607 && v_1039f5) {
+        v_63929d();
+      }
+    });
+    return () => {
+      v_2008a4 = true;
+      v_1ae212.remove();
+    };
   }, []);
 
   const v_89e09e = v_de06a3(async (v_04f49c) => {
@@ -3585,6 +3674,19 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         </View>
 
+      )}
+
+      {}
+      {v_00832d != null && (
+        <WalletKeyPinSetupModal
+          memberId={v_00832d.memberId}
+          email={v_00832d.email}
+          visible={v_25fba6}
+          onSuccess={() => {
+            v_f4280a(false);
+            v_b51724(null);
+          }}
+        />
       )}
 
     </View>
