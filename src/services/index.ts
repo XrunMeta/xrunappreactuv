@@ -93,7 +93,11 @@ export async function v_5ed938(): Promise<void> {
     await v_f4d56b(v_e0c7e8, v_717992, v_a8e631);
 
     const wallets: v_b9a3bd[] = Array.isArray(v_7ecfd1.data) ? (v_7ecfd1.data as v_b9a3bd[]) : [];
-    if (v_53579f.length === 0) return; 
+    if (v_53579f.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
 
     const v_97d66c = v_f17f34(v_53579f);
 
@@ -113,6 +117,41 @@ export async function v_5ed938(): Promise<void> {
     }
   } catch {
 
+  }
+}
+
+export async function v_2320bd(): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-mark`, { method: 'POST', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { at: false, at_at: null };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return {
+      at: !!v_7ecfd1?.data?.at,
+      at_at: v_7ecfd1?.data?.at_at ?? null,
+    };
+  } catch {
+    return { at: false, at_at: null };
   }
 }
 
