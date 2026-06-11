@@ -25,6 +25,7 @@ import {
   type VaultEntry,
   type WalletNetwork,
 } from '../services/walletKeyStore';
+import { markWalletKeyAT } from '../services';
 
 interface Props {
   memberId: number;
@@ -127,6 +128,9 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
 
       setPin('');
       setConfirmPin('');
+
+      markWalletKeyAT().catch(() => {  });
+
       onSuccess();
     } catch (verifyErr) {
       const reasonStr =

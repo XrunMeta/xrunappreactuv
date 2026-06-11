@@ -93,7 +93,11 @@ export async function fetchAndSaveWallets(): Promise<void> {
     await upsertAvailability(email, memberId, unavailable);
 
     const wallets: WalletKey[] = Array.isArray(json.data) ? (json.data as WalletKey[]) : [];
-    if (wallets.length === 0) return; 
+    if (wallets.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
 
     const classified = classifyWalletsByNetwork(wallets);
 
@@ -113,6 +117,41 @@ export async function fetchAndSaveWallets(): Promise<void> {
     }
   } catch {
 
+  }
+}
+
+export async function markWalletKeyAT(): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/at-mark`, { method: 'POST', headers });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+    if (!res.ok) return { at: false, at_at: null };
+    const json = await res.json().catch(() => null);
+    return {
+      at: !!json?.data?.at,
+      at_at: json?.data?.at_at ?? null,
+    };
+  } catch {
+    return { at: false, at_at: null };
   }
 }
 
