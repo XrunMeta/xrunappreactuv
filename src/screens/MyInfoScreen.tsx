@@ -222,6 +222,13 @@ export const MyInfoScreen = () => {
           }
           navigate(ROUTES.myInfoEmailAuth);
         }
+      } else if (menu.id === 'notify') {
+
+        console.log('[내 정보] 알림 메뉴 — 빨간 점 즉시 숨김 (옵티미스틱)');
+        setHasUnreadNotifications(false);
+
+        AsyncStorage.setItem('lastNotificationCheckTime', new Date().toISOString()).catch(() => {});
+        navigate(ROUTES[menu.route]);
       } else {
         navigate(ROUTES[menu.route]);
       }
