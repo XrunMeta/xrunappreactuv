@@ -156,6 +156,23 @@ export async function v_1a40bb(v_660822, v_6bee94): Promise<{ ok: boolean }> {
   }
 }
 
+export async function v_cf7998(): Promise<{ ok: boolean; updated?: number; error?: string }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/deleteSavedstring`, { method: 'POST', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { ok: false, error: `HTTP ${v_8f00b9.status}` };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    if (v_7ecfd1?.status !== 'success') return { ok: false, error: v_7ecfd1?.message ?? 'unknown' };
+    return { ok: true, updated: v_7ecfd1?.data?.updated };
+  } catch (v_9e86fd) {
+    return { ok: false, error: v_9e86fd?.message ?? 'network' };
+  }
+}
+
 export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
   try {
     const v_c01615 = v_755eb9();
