@@ -12,7 +12,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as DocumentPicker from 'expo-document-picker';
+
+const DocumentPicker: any = { getDocumentAsync: async () => ({ canceled: true, assets: [] }) };
 import * as FileSystem from 'expo-file-system/legacy';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
@@ -139,14 +140,16 @@ export const WalletRestoreScreen = () => {
         return;
       }
 
-      const msg = `백업 유형: 암호화 (PIN)\n` +
-        `백업 사용자: ${payload.email || '(없음)'}\n` +
-        `백업 시각: ${new Date(payload.exported_at || 0).toLocaleString()}\n` +
-        `entry 수: ${payload.entries?.length ?? 0}\n\n` +
-        `현재 사용자(${email}) vault 에 덮어쓰기 진행할까요?`;
-      const ok = await showAlert('복원 확인', msg, [
+      const networkCount = payload.entries?.length ?? 0;
+      const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+      const msg =
+        `📅 백업 일시\n${dateStr}\n\n` +
+        `🔑 복원될 키 개수\n${networkCount}개\n\n` +
+        `현재 지갑에 위 백업으로 덮어쓸까요?\n` +
+        `(이전 키는 사라지고 백업한 시점의 키로 바뀝니다)`;
+      const ok = await showAlert('지갑 복원', msg, [
         { text: t('common.cancel') || '취소' },
-        { text: t('common.confirm') || '확인' },
+        { text: t('common.confirm') || '복원하기' },
       ]);
       if (ok !== 1) return;
       const result = await restoreBackup(payload, email, memberId, pin);
@@ -175,17 +178,19 @@ export const WalletRestoreScreen = () => {
           return;
         }
 
+        const NETWORK_NAME: Record<string, string> = { eth: 'Ethereum', pol: 'Polygon' };
         const addrLines = plain.wallets
-          .map((w) => `• ${w.wallet_code} (${w.network}): ${w.address}`)
+          .map((w) => `• ${NETWORK_NAME[w.network] || w.network}: ${w.address.slice(0, 10)}…${w.address.slice(-6)}`)
           .join('\n');
-        const msg = `백업 유형: ⚠️ 평문\n` +
-          `백업 사용자: ${plain.email}\n` +
-          `백업 시각: ${new Date(plain.exported_at || 0).toLocaleString()}\n\n` +
-          `주소 목록:\n${addrLines}\n\n` +
-          `PIN 으로 암호화하여 vault 에 저장합니다. 진행할까요?`;
-        const ok = await showAlert('복원 확인 (평문)', msg, [
+        const dateStr = new Date(plain.exported_at || 0).toLocaleString();
+        const msg =
+          `⚠️ 암호화되지 않은 백업입니다.\n\n` +
+          `📅 백업 일시\n${dateStr}\n\n` +
+          `📋 복원될 지갑\n${addrLines}\n\n` +
+          `복원 후 PIN 으로 안전하게 다시 암호화됩니다. 진행할까요?`;
+        const ok = await showAlert('지갑 복원', msg, [
           { text: t('common.cancel') || '취소' },
-          { text: t('common.confirm') || '확인' },
+          { text: t('common.confirm') || '복원하기' },
         ]);
         if (ok !== 1) return;
         const result = await restorePlainBackup(plain, email, memberId, pin);
