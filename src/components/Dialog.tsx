@@ -41,7 +41,9 @@ export const Dialog: React.FC<DialogProps> = ({
       <View style={styles.overlay}>
         <View style={[styles.card, containerStyle]}>
           <View style={styles.header}>
-            {onClose ? (
+            {
+}
+            {onClose && actions.length === 0 ? (
               <>
                 <View style={styles.closePlaceholder} />
                 <Text style={styles.title}>{title}</Text>
@@ -181,5 +183,4 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 });
-
 
