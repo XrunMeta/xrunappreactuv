@@ -337,8 +337,30 @@ export const ShopItemRegisterScreen = () => {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim()) {
+    const trimmedTitle = title.trim();
+    const trimmedDesc = description.trim();
+
+    if (!trimmedTitle) {
       Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.productNameRequired'));
+      return;
+    }
+
+    if (trimmedTitle.length > 50) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+      return;
+    }
+    if (trimmedDesc.length > 500) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      return;
+    }
+
+    if (/(.)\1{4,}/.test(trimmedTitle) || /(.)\1{4,}/.test(trimmedDesc)) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      return;
+    }
+
+    if (/^[ㄱ-㆏\s]+$/.test(trimmedTitle)) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
@@ -521,6 +543,7 @@ export const ShopItemRegisterScreen = () => {
               onChangeText={setTitle}
               placeholder={t('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
+              maxLength={50}
             />
           </View>
 
@@ -535,6 +558,7 @@ export const ShopItemRegisterScreen = () => {
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
+              maxLength={500}
             />
           </View>
 
