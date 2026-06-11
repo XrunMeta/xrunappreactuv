@@ -13,7 +13,13 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const DocumentPicker: any = { getDocumentAsync: async () => ({ canceled: true, assets: [] }) };
+let DocumentPicker: any;
+try {
+  DocumentPicker = require('expo-document-picker');
+} catch (e) {
+  console.warn('[WalletRestore] expo-document-picker 네이티브 모듈 없음 — 리빌드 필요:', e);
+  DocumentPicker = { getDocumentAsync: async () => ({ canceled: true, assets: [], __missingNative: true }) };
+}
 import * as FileSystem from 'expo-file-system/legacy';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
@@ -263,6 +269,13 @@ export const WalletRestoreScreen = () => {
         copyToCacheDirectory: true,
         multiple: false,
       });
+      if ((picked as any).__missingNative) {
+        Alert.alert(
+          '복원 불가',
+          '파일 선택 기능이 현재 빌드에 포함되지 않았습니다.\n앱을 새 빌드로 업데이트한 뒤 다시 시도해주세요.\n(개발자: ./gradlew clean + EAS dev build 필요)',
+        );
+        return;
+      }
       if (picked.canceled) return;
       const asset = picked.assets?.[0];
       if (!asset?.uri) {

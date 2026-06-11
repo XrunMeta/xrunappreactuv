@@ -8,6 +8,8 @@ export default {
   settlement: 'Daftar Penyelesaian',
   rank: 'Peringkat',
   referralLabel: 'Referral',
+  pending: 'Menunggu',
+  paid: 'Dibayar',
 };
 
 

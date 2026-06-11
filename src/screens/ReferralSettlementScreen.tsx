@@ -21,6 +21,7 @@ interface TransformedSettlementData {
   date: string;
   transaction: number;
   status?: 'pending' | 'sent' | string; 
+  fromName?: string | null; 
 }
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -154,7 +155,32 @@ export const ReferralSettlementScreen = () => {
     try {
       setLoading(true);
 
+      console.log('═══════════════════════════════════════════');
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', member);
+      console.log('═══════════════════════════════════════════');
+
       const resultRef = await getReferralIncome(member, navigate);
+
+      console.log('[정산 디버그] 백엔드 응답 status:', resultRef.status);
+      console.log('[정산 디버그] 백엔드 응답 message:', resultRef.message);
+      console.log('[정산 디버그] 백엔드 응답 data 개수:', resultRef.data?.length ?? 0);
+      if (resultRef.data && resultRef.data.length > 0) {
+        console.log('[정산 디버그] 첫 행 샘플:', JSON.stringify(resultRef.data[0], null, 2));
+        console.log('[정산 디버그] source_type 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.source_type ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] status 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.status ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] xrun_amount 합계 (Number 변환 전):',
+          resultRef.data.reduce((sum: number, item: any) => sum + (Number(item.xrun_amount) || 0), 0));
+      } else {
+        console.log('[정산 디버그] ⚠️ 백엔드 응답 data 가 비어있음');
+      }
 
       if (resultRef.status === 'success') {
 
@@ -168,8 +194,11 @@ export const ReferralSettlementScreen = () => {
             date: formatDateTime(item.created_at),
             transaction: item.id,
             status: item.status,
+            fromName: item.from_name || (item.from_member ? `#${item.from_member}` : null),
           };
         });
+        console.log('[정산 디버그] 변환된 rows 개수:', rows.length);
+        if (rows.length > 0) console.log('[정산 디버그] 변환 첫 행:', JSON.stringify(rows[0], null, 2));
         setSettlementData(rows);
 
         const totalAmountNum = (resultRef.data || []).reduce(
@@ -193,16 +222,23 @@ export const ReferralSettlementScreen = () => {
         setCurrentData(initialItems);
         setCurrentPage(1);
         setHasMore(rows.length > ITEMS_PER_PAGE);
+        console.log('[정산 디버그] ✅ 화면 표시 완료 — 총',
+          formattedAmount, 'XRUN /', rows.length, '건 /', formattedWon);
+        console.log('═══════════════════════════════════════════');
       } else {
-        console.error('정산 데이터 조회 실패:', resultRef.message);
+        console.error('[정산 디버그] ❌ 백엔드 status !== success — message:', resultRef.message);
         setSettlementData([]);
         setCurrentData([]);
         setTotalRevenue('0 XRUN');
         setTotalRevenueWon('₩0');
         setHasMore(false);
       }
-    } catch (error) {
-      console.error('[정산] 정산 데이터 조회 실패:', error);
+    } catch (error: any) {
+      console.error('[정산 디버그] ❌ 예외 발생');
+      console.error('  message:', error?.message);
+      console.error('  response status:', error?.response?.status);
+      console.error('  response data:', JSON.stringify(error?.response?.data ?? null));
+      console.error('  stack:', error?.stack);
       setSettlementData([]);
       setCurrentData([]);
       setTotalRevenue('0 XRUN');
@@ -263,6 +299,7 @@ export const ReferralSettlementScreen = () => {
             ellipsizeMode="tail"
           >
             {item.description}
+            {item.fromName ? <Text style={[styles.fromText, isPaid && { color: paidColor }]}>{`  · ${item.fromName} 님`}</Text> : null}
           </Text> : null}
           {item.date ? <Text style={[styles.dateText, isPaid && { color: paidColor }]}>{item.date}</Text> : null}
         </View>
@@ -435,6 +472,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#343434',
     letterSpacing: -1,
+  },
+  fromText: {
+    fontSize: FONTS.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#707070',
   },
   amountText: {
     fontSize: FONTS.size.medium,
