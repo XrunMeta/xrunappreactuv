@@ -267,9 +267,12 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
           )}
         </View>
 
-        {}
-        {isInputStep && (
-          <View style={styles.keypad}>
+        {
+}
+        <View
+          style={[styles.keypad, !isInputStep && { opacity: 0 }]}
+          pointerEvents={isInputStep ? 'auto' : 'none'}
+        >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <TouchableOpacity
                 key={n}
@@ -290,8 +293,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
             <TouchableOpacity style={styles.key} onPress={onPressBackspace}>
               <Text style={[styles.keyText, { fontSize: 18 }]}>{'<'}</Text>
             </TouchableOpacity>
-          </View>
-        )}
+        </View>
       </View>
     </Modal>
   );
