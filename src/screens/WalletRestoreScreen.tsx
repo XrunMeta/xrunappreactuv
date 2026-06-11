@@ -245,7 +245,7 @@ export const WalletRestoreScreen = () => {
       : '';
     showAlert(
       '복원 완료',
-      `다음 지갑이 복원됐어요:\n\n${successList}${skipDetail}\n\n지갑 화면으로 이동할게요.`,
+      `다음 지갑이 복원됐어요:\n\n${successList}${skipDetail}`,
       [{ text: t('common.confirm') || '확인' }],
     ).then(() => {
       navigate(ROUTES.wallet);
