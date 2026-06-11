@@ -171,7 +171,7 @@ const v_c0dbdf = () => {
 
         console.log('parsed.queryParams:', v_8decf8.queryParams);
 
-        const v_fc7051 = v_8decf8.queryParams?.referral as string | undefined;
+        const v_fc7051 = (v_8decf8.queryParams?.referral || v_8decf8.queryParams?.ref) as string | undefined;
 
         const v_d136d6 = v_8decf8.queryParams?.email as string | undefined;
         const v_4be5e8 = v_8decf8.queryParams?.from as string | undefined;

@@ -22,8 +22,8 @@ export default {
   ageLabel: '年龄',
   ageSelect: '选择',
   optional: '可选',
-  referralEmailLabel: '推荐码 (或邮箱)',
-  referralEmailPlaceholder: 'ABC123 或 oth-staff@example.invalid',
+  referralEmailLabel: '推荐码',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: '。',
   terms: {
     service: 'XRUN服务条款',

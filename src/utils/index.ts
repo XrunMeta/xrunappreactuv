@@ -150,13 +150,14 @@ export const v_a3bbf0 = async (
       ? `ref=${encodeURIComponent(v_2fa46c)}`
       : (v_412c99.email ? `referral=${encodeURIComponent(v_412c99.email)}` : '');
     const v_25f202 = `https://www.xrun.run/invite?${v_400193}`;
+    const v_c653f6 = `xrun://invite?${v_400193}`;
 
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');
     const v_8d1ab0 = v_8d41d7('screens.referral.share.linkLabel') || 'Link';
 
     const v_7c8c91 = v_2fa46c || v_412c99.email || '';
-    const v_a8cd21 = `${v_b657c9}${v_7c8c91}\n\n🔗 ${v_8d1ab0} ${v_25f202}`;
+    const v_a8cd21 = `${v_b657c9}${v_7c8c91}\n\n🔗 ${v_8d1ab0} ${v_25f202}\n📱 ${v_c653f6}`;
 
     console.log('[shareReferralLink] 공유 메시지:', v_a8cd21);
 

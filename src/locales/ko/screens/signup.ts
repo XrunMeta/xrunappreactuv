@@ -22,8 +22,8 @@ export default {
   ageLabel: '나이',
   ageSelect: '선택',
   optional: '선택사항',
-  referralEmailLabel: '추천 코드 (또는 이메일)',
-  referralEmailPlaceholder: 'ABC123 또는 oth-staff@example.invalid',
+  referralEmailLabel: '추천 코드',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: '에 동의합니다.',
   terms: {
     service: 'XRUN 서비스 약관',
