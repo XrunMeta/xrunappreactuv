@@ -25,8 +25,33 @@ export function clearPendingWallets(): void {
   }
 }
 
-const POLYGON_RPC_URL = 'https://polygon-rpc.com';
+const POLYGON_RPC_URLS = [
+  'https://polygon-bor-rpc.publicnode.com',
+  'https://polygon.llamarpc.com',
+  'https://polygon.drpc.org',
+  'https://1rpc.io/matic',
+  'https://polygon-rpc.com',
+];
 const POLYGON_CHAIN_ID = 137;
+
+async function pickHealthyPolygonRpc(): Promise<ethers.JsonRpcProvider> {
+  for (const url of POLYGON_RPC_URLS) {
+    try {
+      console.log('[송금-로컬] RPC 시도:', url);
+      const provider = new ethers.JsonRpcProvider(url, POLYGON_CHAIN_ID);
+      const chainId = await provider.getNetwork().then(n => Number(n.chainId));
+      if (chainId === POLYGON_CHAIN_ID) {
+        console.log('[송금-로컬] RPC 정상:', url);
+        return provider;
+      }
+      console.warn('[송금-로컬] RPC chainId 불일치:', { url, chainId });
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').slice(0, 100);
+      console.warn('[송금-로컬] RPC 실패:', url, msg);
+    }
+  }
+  throw new Error('No healthy Polygon RPC available');
+}
 
 const ERC20_ABI = [
   'function transfer(address to, uint256 amount) returns (bool)',
@@ -73,8 +98,8 @@ export async function sendPolygonLocal(
 
   let provider: ethers.JsonRpcProvider;
   try {
-    console.log('[송금-로컬] 1/6 RPC provider 초기화:', POLYGON_RPC_URL);
-    provider = new ethers.JsonRpcProvider(POLYGON_RPC_URL, POLYGON_CHAIN_ID);
+    console.log('[송금-로컬] 1/6 RPC provider 헬스체크 시작');
+    provider = await pickHealthyPolygonRpc();
   } catch (e: any) {
     console.error('[송금-로컬] RPC 초기화 실패:', e?.message);
     return { ok: false, reason: 'rpc-init-failed', detail: String(e?.message ?? e) };
