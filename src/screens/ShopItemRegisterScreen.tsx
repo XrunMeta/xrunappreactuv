@@ -345,8 +345,8 @@ export const v_680bee = () => {
       return;
     }
 
-    if (v_25e98c.length > 50) {
-      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+    if (v_25e98c.length > 20) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명은 20자 이내로 입력해주세요.');
       return;
     }
     if (v_17b3f8.length > 500) {
@@ -543,7 +543,7 @@ export const v_680bee = () => {
               onChangeText={v_73c0df}
               placeholder={v_8d41d7('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
-              maxLength={50}
+              maxLength={20}
             />
           </View>
 
