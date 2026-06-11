@@ -200,55 +200,58 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     <Modal visible={visible} animationType="fade" transparent={false}>
       <View style={styles.overlay}>
         {}
-        <Text style={styles.title}>지갑 보호 PIN 설정</Text>
+        <View style={styles.centerBlock}>
+          {}
+          <Text style={styles.title}>지갑 보호 PIN 설정</Text>
 
-        {}
-        <Text style={styles.warning}>
-          지갑 키 보호 전용입니다.
-        </Text>
+          {}
+          <Text style={styles.warning}>
+            지갑 키 보호 전용입니다.
+          </Text>
 
-        {}
-        {step === 'enter' && (
-          <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
-        )}
-        {step === 'confirm' && (
-          <Text style={styles.prompt}>다시 한번 입력해주세요</Text>
-        )}
-        {step === 'verifying' && (
-          <Text style={styles.prompt}>검증 중...</Text>
-        )}
-        {step === 'error' && (
-          <Text style={styles.prompt}>다시 시도해주세요</Text>
-        )}
+          {}
+          {step === 'enter' && (
+            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+          )}
+          {step === 'confirm' && (
+            <Text style={styles.prompt}>다시 한번 입력해주세요</Text>
+          )}
+          {step === 'verifying' && (
+            <Text style={styles.prompt}>검증 중...</Text>
+          )}
+          {step === 'error' && (
+            <Text style={styles.prompt}>다시 시도해주세요</Text>
+          )}
 
-        {}
-        <View style={styles.dotsRow}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, currentPin.length > i && styles.dotFilled]}
-            />
-          ))}
-        </View>
-
-        {}
-        {step === 'error' && !!errorMsg && (
-          <Text style={styles.error}>{errorMsg}</Text>
-        )}
-
-        {}
-        {step === 'verifying' && (
-          <View style={styles.loadingRow}>
-            <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+          {}
+          <View style={styles.dotsRow}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, currentPin.length > i && styles.dotFilled]}
+              />
+            ))}
           </View>
-        )}
 
-        {}
-        {step === 'error' && (
-          <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-            <Text style={styles.retryText}>다시 시도</Text>
-          </TouchableOpacity>
-        )}
+          {}
+          {step === 'error' && !!errorMsg && (
+            <Text style={styles.error}>{errorMsg}</Text>
+          )}
+
+          {}
+          {step === 'verifying' && (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          )}
+
+          {}
+          {step === 'error' && (
+            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+              <Text style={styles.retryText}>다시 시도</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {}
         {isInputStep && (
@@ -287,6 +290,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.large,
     paddingTop: 60,
     alignItems: 'center',
+  },
+
+  centerBlock: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: FONTS.size.large,
