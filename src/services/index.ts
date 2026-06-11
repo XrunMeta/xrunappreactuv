@@ -56,6 +56,18 @@ export async function v_5ed938(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await v_23dd22(),
     };
+
+    try {
+      const v_80bdbd = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+      if (v_80bdbd.ok) {
+        const v_177978 = await v_80bdbd.json().catch(() => null);
+        if (v_177978?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
     if (!v_8f00b9.ok) return; 
     const v_7ecfd1 = await v_8f00b9.json();
