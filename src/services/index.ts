@@ -136,6 +136,26 @@ export async function v_2320bd(): Promise<{ ok: boolean }> {
   }
 }
 
+export async function v_1a40bb(v_660822, v_6bee94): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/upsertWalletPin`, {
+      method: 'POST',
+      headers: v_3f4675,
+      body: JSON.stringify({ member: v_660822, pin: v_6bee94 }),
+    });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
   try {
     const v_c01615 = v_755eb9();
