@@ -9,7 +9,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { postTransferNew } from '../services';
-import { consumePendingWallets, sendPolygonLocal, isLocalSendEnabledForUser, clearPendingWallets } from '../services/walletSendLocal';
+import { consumePendingWallets, sendPolygonLocal, isLocalSendEnabledForUser, clearPendingWallets, recordOnchainTransfer } from '../services/walletSendLocal';
 
 const InfoCard = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.card}>
@@ -125,6 +125,18 @@ export const WalletTransactionProgressScreen = () => {
             console.error('[WalletTransactionProgress] 로컬 송금 실패:', local);
             throw new Error(`송금 실패: ${(local as any).reason} ${(local as any).detail ?? ''}`);
           }
+
+          recordOnchainTransfer({
+            member: Number(member),
+            from: userAddress,
+            to: walletSendAddress,
+            amount: formattedAmount,
+            currency,
+            network: 'POL',
+            txHash: local.txHash,
+            blockNumber: local.blockNumber,
+          }).catch(() => {  });
+
           transferResult = {
             status: 'success',
             code: 200,

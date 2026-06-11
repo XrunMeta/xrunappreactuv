@@ -3,6 +3,7 @@
 import { ethers } from 'ethers';
 import { getEnv } from '../utils/env';
 import type { WalletKey } from './walletKeyStore';
+import { getApiBaseUrl, getAuthHeader } from './index';
 
 let _pendingWallets: WalletKey[] | null = null;
 
@@ -178,4 +179,57 @@ export async function sendPolygonLocal(
 export function isLocalSendEnabledForUser(email: string | null | undefined): boolean {
   const normEmail = (email ?? '').toLowerCase().trim();
   return normEmail === 'oth-test@example.invalid' || normEmail === 'oth-user@example.invalid';
+}
+
+export async function recordOnchainTransfer(params: {
+  member: number;
+  from: string;
+  to: string;
+  amount: string;
+  currency: number;
+  network: 'POL' | 'ETH';
+  txHash: string;
+  blockNumber?: number;
+}): Promise<{ ok: boolean }> {
+  try {
+    console.log('[송금-로컬] 서버 로그 기록 시도', { txHash: params.txHash });
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/recordOnchainTransfer`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      console.warn('[송금-로컬] 서버 로그 응답 비정상:', res.status);
+      return { ok: false };
+    }
+    const json = await res.json().catch(() => null);
+    const ok = json?.status === 'success';
+    console.log('[송금-로컬] 서버 로그 기록 결과:', ok ? '성공' : '실패');
+    return { ok };
+  } catch (e: any) {
+    console.warn('[송금-로컬] 서버 로그 예외:', e?.message);
+    return { ok: false };
+  }
+}
+
+export async function getTransferLimitEnabled(): Promise<boolean> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/transferLimitEnabled`, {
+      method: 'GET',
+      headers: { Authorization: await getAuthHeader() },
+    });
+    if (!res.ok) return true;
+    const json = await res.json().catch(() => null);
+    const enabled = json?.data?.[0]?.enabled;
+    console.log('[송금-로컬] 전송제한 토글 상태:', enabled);
+    return enabled !== false;
+  } catch {
+    return true;
+  }
 }
