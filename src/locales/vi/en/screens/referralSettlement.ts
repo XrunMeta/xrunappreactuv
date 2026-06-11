@@ -8,6 +8,8 @@ export default {
   settlement: 'Settlement List',
   rank: 'Rank',
   referralLabel: 'Referral',
+  pending: 'Pending',
+  paid: 'Paid',
 };
 
 

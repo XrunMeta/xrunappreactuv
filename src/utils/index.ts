@@ -515,3 +515,49 @@ export const v_51fb8d = (v_270351): string => {
   if (!v_270351 || v_270351.length < 10) return v_270351;
   return `${v_270351.substring(0, 6)}...${v_270351.substring(v_270351.length - 4)}`;
 };
+
+export const v_8a1e5d = async (v_380676): Promise<void> => {
+  const { Linking: v_118165 } = await import('rcmrninabrnb');
+  let v_1794cd = null;
+
+  try {
+
+    const v_a9684b = v_380676.match(/[;#]S\.browser_fallback_url=([^;]+)/);
+    if (v_a9684b?.[1]) {
+      try { v_1794cd = decodeURIComponent(v_a9684b[1]); } catch { v_1794cd = v_a9684b[1]; }
+    }
+
+    if (!v_1794cd) {
+      const v_cd73e9 = v_380676.match(/[?&]url=([^&#]+)/);
+      if (v_cd73e9?.[1]) {
+        try {
+          let v_4adf64 = decodeURIComponent(v_cd73e9[1]);
+          if (v_4adf64.includes('%')) {
+            try { v_4adf64 = decodeURIComponent(v_4adf64); } catch {  }
+          }
+          v_1794cd = v_4adf64;
+        } catch { v_1794cd = v_cd73e9[1]; }
+      }
+    }
+
+    if (!v_1794cd) {
+      const v_1d3cec = v_380676.match(/[;#]package=([^;]+)/) || v_380676.match(/[?&]id=([^&#]+)/);
+      if (v_1d3cec?.[1]) {
+        v_1794cd = 'https://play.google.com/store/apps/details?id=' + v_1d3cec[1];
+      }
+    }
+  } catch (v_9e86fd) {
+    console.warn('[openIntentUrlOrFallback] parse fail:', v_9e86fd);
+  }
+
+  if (!v_1794cd) {
+    console.warn('[openIntentUrlOrFallback] resolve 실패 — 원본 시도:', v_380676.slice(0, 100));
+    v_1794cd = v_380676;
+  }
+
+  try {
+    await v_118165.openURL(v_1794cd);
+  } catch (v_9e86fd) {
+    console.warn('[openIntentUrlOrFallback] openURL 실패:', v_1794cd.slice(0, 100), v_9e86fd);
+  }
+};

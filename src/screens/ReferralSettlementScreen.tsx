@@ -21,6 +21,7 @@ interface TransformedSettlementData {
   date: string;
   transaction: number;
   status?: 'pending' | 'sent' | string; 
+  fromName?: string | null; 
 }
 
 const v_af0703 = {
@@ -154,7 +155,32 @@ export const v_08aac3 = () => {
     try {
       v_34a50a(true);
 
+      console.log('═══════════════════════════════════════════');
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', v_660822);
+      console.log('═══════════════════════════════════════════');
+
       const v_11b884 = await v_2dc778(v_660822, v_9b57fc);
+
+      console.log('[정산 디버그] 백엔드 응답 status:', v_11b884.status);
+      console.log('[정산 디버그] 백엔드 응답 message:', v_11b884.message);
+      console.log('[정산 디버그] 백엔드 응답 data 개수:', v_11b884.data?.length ?? 0);
+      if (v_11b884.data && v_11b884.data.length > 0) {
+        console.log('[정산 디버그] 첫 행 샘플:', JSON.stringify(v_11b884.data[0], null, 2));
+        console.log('[정산 디버그] source_type 분포:', v_11b884.data.reduce((v_9f1d92, v_8c0b26) => {
+          const v_fd5f43 = v_8c0b26.source_type ?? 'NULL';
+          v_9f1d92[v_fd5f43] = (v_9f1d92[v_fd5f43] || 0) + 1;
+          return v_9f1d92;
+        }, {}));
+        console.log('[정산 디버그] status 분포:', v_11b884.data.reduce((v_9f1d92, v_8c0b26) => {
+          const v_fd5f43 = v_8c0b26.status ?? 'NULL';
+          v_9f1d92[v_fd5f43] = (v_9f1d92[v_fd5f43] || 0) + 1;
+          return v_9f1d92;
+        }, {}));
+        console.log('[정산 디버그] xrun_amount 합계 (Number 변환 전):',
+          v_11b884.data.reduce((v_dce0a8, v_8c0b26) => v_dce0a8 + (Number(v_8c0b26.xrun_amount) || 0), 0));
+      } else {
+        console.log('[정산 디버그] ⚠️ 백엔드 응답 data 가 비어있음');
+      }
 
       if (v_11b884.status === 'success') {
 
@@ -168,8 +194,11 @@ export const v_08aac3 = () => {
             date: v_16897e(v_8c0b26.created_at),
             transaction: v_8c0b26.id,
             status: v_8c0b26.status,
+            fromName: v_8c0b26.from_name || (v_8c0b26.from_member ? `#${v_8c0b26.from_member}` : null),
           };
         });
+        console.log('[정산 디버그] 변환된 rows 개수:', v_18b8bf.length);
+        if (v_18b8bf.length > 0) console.log('[정산 디버그] 변환 첫 행:', JSON.stringify(v_18b8bf[0], null, 2));
         v_2f9613(v_18b8bf);
 
         const v_a35cbd = (v_11b884.data || []).reduce(
@@ -193,8 +222,11 @@ export const v_08aac3 = () => {
         v_690164(v_e45688);
         v_be9dba(1);
         v_1454f0(v_18b8bf.length > v_0d35a8);
+        console.log('[정산 디버그] ✅ 화면 표시 완료 — 총',
+          v_e0fe28, 'XRUN /', v_18b8bf.length, '건 /', v_41185e);
+        console.log('═══════════════════════════════════════════');
       } else {
-        console.error('정산 데이터 조회 실패:', v_11b884.message);
+        console.error('[정산 디버그] ❌ 백엔드 status !== success — message:', v_11b884.message);
         v_2f9613([]);
         v_690164([]);
         v_54eab4('0 XRUN');
@@ -202,7 +234,11 @@ export const v_08aac3 = () => {
         v_1454f0(false);
       }
     } catch (v_5e9bfe) {
-      console.error('[정산] 정산 데이터 조회 실패:', v_5e9bfe);
+      console.error('[정산 디버그] ❌ 예외 발생');
+      console.error('  message:', v_5e9bfe?.message);
+      console.error('  response status:', v_5e9bfe?.response?.status);
+      console.error('  response data:', JSON.stringify(v_5e9bfe?.response?.data ?? null));
+      console.error('  stack:', v_5e9bfe?.stack);
       v_2f9613([]);
       v_690164([]);
       v_54eab4('0 XRUN');
@@ -263,6 +299,7 @@ export const v_08aac3 = () => {
             ellipsizeMode="tail"
           >
             {v_8c0b26.description}
+            {v_8c0b26.fromName ? <Text style={[v_d81136.fromText, v_619bad && { color: v_675e11 }]}>{`  · ${v_8c0b26.fromName} 님`}</Text> : null}
           </Text> : null}
           {v_8c0b26.date ? <Text style={[v_d81136.dateText, v_619bad && { color: v_675e11 }]}>{v_8c0b26.date}</Text> : null}
         </View>
@@ -435,6 +472,11 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Regular',
     color: '#343434',
     letterSpacing: -1,
+  },
+  fromText: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#707070',
   },
   amountText: {
     fontSize: v_843035.size.medium,

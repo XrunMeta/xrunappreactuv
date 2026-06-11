@@ -4220,6 +4220,9 @@ export interface ReferralIncomeItem {
   tx_time: string | null;
   created_at: string;
   error_message: string | null;
+
+  from_member?: number | null;
+  from_name?: string | null;
 }
 export interface GetReferralIncomeResponse {
   status: 'success' | 'error' | 'fail';
