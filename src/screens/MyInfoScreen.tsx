@@ -41,6 +41,7 @@ export const v_03a231 = () => {
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
     email?: string;
+    member?: number;
   } | null>(null);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
   const [v_79b081, v_0dfa96] = v_5ab095(false);
@@ -143,6 +144,7 @@ export const v_03a231 = () => {
               v_a61751({
                 name: v_05b02f,
                 email: v_625c74.email || '',
+                member: v_660822,
               });
             }
           }
@@ -231,7 +233,7 @@ export const v_03a231 = () => {
       await v_889fad(v_8d41d7('screens.myInfo.alerts.shareFailed'), v_8d41d7('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await v_a3bbf0(v_8d41d7, { email: v_bb789b.email }, v_889fad, v_9b57fc);
+    await v_a3bbf0(v_8d41d7, { email: v_bb789b.email, member: v_bb789b.member }, v_889fad, v_9b57fc);
   };
 
   const v_06b8a4 = async () => {
