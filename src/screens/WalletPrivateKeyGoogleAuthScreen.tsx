@@ -563,11 +563,14 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               if (!network) return null;
               return (
                 <View key={w.wallet_code} style={styles.keyCard}>
+                  {}
                   <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
-                  <Text style={styles.codeLabel}>
-                    {w.wallet_code} · {w.address}
+                  <Text style={styles.fieldLabel}>지갑 주소</Text>
+                  <Text style={styles.fieldValue} selectable>
+                    {w.address}
                   </Text>
-                  <Text style={styles.privateKey} selectable>
+                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>비밀키</Text>
+                  <Text style={[styles.fieldValue, styles.privateKey]} selectable>
                     {w.private_key}
                   </Text>
                   <TouchableOpacity
@@ -811,13 +814,24 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     marginBottom: 10,
   },
-  privateKey: {
-    fontSize: 11,
+
+  fieldLabel: {
+    fontSize: 12,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.darkGray,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  fieldValue: {
+    fontSize: 12,
     fontFamily: 'Courier',
     color: '#222',
     backgroundColor: '#f7f7f7',
     padding: 10,
     borderRadius: 6,
+  },
+  privateKey: {
+
     marginBottom: 10,
   },
   copyButton: {
