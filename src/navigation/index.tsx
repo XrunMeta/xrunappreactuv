@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const ROUTES = {
   authLanding: 'authLanding',
   login: 'login',
+  forgotPassword: 'forgotPassword',
   signup: 'signup',
   countryCodeSelect: 'countryCodeSelect',
   emailVerification: 'emailVerification',
@@ -79,11 +80,14 @@ export const ROUTES = {
   tapjoyList: 'tapjoyList',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
+  walletRestore: 'walletRestore',
   myInfoEmailAuth: 'myInfoEmailAuth',
   myInfoPaymentPin: 'myInfoPaymentPin',
   myChipsOfferwall: 'myChipsOfferwall',
   adisonOfferwall: 'adisonOfferwall',
   adisonTest: 'adisonTest',
+  walletKeyTutorial: 'walletKeyTutorial',
+  walletKeyGuide: 'walletKeyGuide',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;
@@ -204,6 +208,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       const currentStack = stackRef.current;
       const currentScreen = currentStack[currentStack.length - 1];
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack, '현재 화면:', currentScreen);
+
+      if (currentScreen === 'walletKeyTutorial') {
+        console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');
+        return true; 
+      }
 
       const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
 

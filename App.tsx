@@ -10,6 +10,7 @@ import {
   LoginScreen,
   LoginSignupScreen,
   SignupScreen,
+  ForgotPasswordScreen,
   SplashScreen,
   TermsScreen,
   PrivacyPolicyScreen,
@@ -70,7 +71,9 @@ import {
   TapjoyListScreen,
   WalletPrivateKeyDisplayScreen,
   WalletPrivateKeyGoogleAuthScreen,
+  WalletRestoreScreen,
   MyChipsOfferwallScreen,
+  WalletKeyTutorialScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
@@ -168,7 +171,7 @@ const ScreenHost = () => {
 
         console.log('parsed.queryParams:', parsed.queryParams);
 
-        const referral = parsed.queryParams?.referral as string | undefined;
+        const referral = (parsed.queryParams?.referral || parsed.queryParams?.ref) as string | undefined;
 
         const prefillEmail = parsed.queryParams?.email as string | undefined;
         const fromApp = parsed.queryParams?.from as string | undefined;
@@ -359,6 +362,10 @@ const ScreenHost = () => {
     return <SignupScreen />;
   }
 
+  if (currentScreen === 'forgotPassword') {
+    return <ForgotPasswordScreen />;
+  }
+
   if (currentScreen === 'countryCodeSelect') {
     return <CountryCodeSelectScreen />;
   }
@@ -409,6 +416,13 @@ const ScreenHost = () => {
 
   if (currentScreen === 'transactionDetails') {
     return <TransactionDetailsScreen />;
+  }
+
+  if (currentScreen === 'walletKeyTutorial') {
+    return <WalletKeyTutorialScreen mode="signup" />;
+  }
+  if (currentScreen === 'walletKeyGuide') {
+    return <WalletKeyTutorialScreen mode="readonly" />;
   }
 
   if (currentScreen === 'map') {
@@ -497,6 +511,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'walletPrivateKeyGoogleAuth') {
     return <WalletPrivateKeyGoogleAuthScreen />;
+  }
+
+  if (currentScreen === 'walletRestore') {
+    return <WalletRestoreScreen />;
   }
 
   if (currentScreen === 'myInfoCloseMembership') {

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
@@ -84,9 +84,16 @@ function shopItemToProductData(item: ShopItemData): ProductData {
 const FALLBACK_KRW_PER_XRUN = 70;
 
 function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number): ProductData {
-    const krw = typeof item.price === 'number' ? item.price : 0;
-    const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
-    const xrunPrice = Math.ceil(krw / divisor);
+    const rawPrice = typeof item.price === 'number' ? item.price : 0;
+
+    const hasBackendXrun = typeof (item as any).priceKRW === 'number';
+    let xrunPrice: number;
+    if (hasBackendXrun) {
+        xrunPrice = rawPrice; 
+    } else {
+        const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
+        xrunPrice = Math.ceil(rawPrice / divisor);
+    }
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
         brand: (item as any).brandName ?? '기프티콘',
@@ -241,14 +248,34 @@ export const ShopScreen = () => {
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
         try {
-            const res = await getProductList({ start: 1, size: 50 });
-            const list = Array.isArray(res.list) ? res.list : [];
-            setXplayProductList(list);
-            console.log('[Xplay Shop] 상품 목록 조회:', list.length, '건', list.map((item) => ({ id: item.id, name: item.name, price: item.price })));
-            if (list.length === 0 && res.resultMsg) setXplayError(res.resultMsg);
+
+            const axiosInstance = (await import('../services')).createAxiosInstance();
+            const res = await axiosInstance.post('/getGiftishowActiveGoods', {});
+            const raw = Array.isArray(res.data?.data?.list) ? res.data.data.list as any[] : [];
+
+            const list = raw.map((g: any) => ({
+                id: g.goods_code,
+                name: g.goods_name,
+                brand: g.brand_name,
+                price: Number(g.xplay_points ?? 0),    
+                priceKRW: Number(g.real_price ?? 0),
+                imageUrl: g.goods_image,
+            }));
+            setXplayProductList(list as any);
+            console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');
+            if (list.length === 0) setXplayError('등록된 기프티콘 상품이 없습니다.');
         } catch (e) {
-            setXplayError(e instanceof Error ? e.message : '기프티콘 목록을 불러오지 못했습니다.');
-            setXplayProductList([]);
+            console.warn('[Xplay Shop] 백엔드 호출 실패, 비즈 API fallback:', e);
+
+            try {
+                const bizRes = await getProductList({ start: 1, size: 50 });
+                const list = Array.isArray(bizRes.list) ? bizRes.list : [];
+                setXplayProductList(list);
+                if (list.length === 0 && bizRes.resultMsg) setXplayError(bizRes.resultMsg);
+            } catch (e2) {
+                setXplayError(e2 instanceof Error ? e2.message : '기프티콘 목록을 불러오지 못했습니다.');
+                setXplayProductList([]);
+            }
         }
     }, []);
 
@@ -309,6 +336,7 @@ export const ShopScreen = () => {
         }
     }, [selectedShopItem, setSelectedShopItem]);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     const loadXrunStoreProducts = useCallback(async () => {
         try {
@@ -345,6 +373,19 @@ export const ShopScreen = () => {
         () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun)),
         [xplayProductList, gopaxKrwPerXrun],
     );
+
+    const filterByQuery = useCallback((list: ProductData[]): ProductData[] => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return list;
+        return list.filter((p) => {
+            const hay = `${p.brand || ''} ${p.title || ''} ${p.description || ''}`.toLowerCase();
+            return hay.includes(q);
+        });
+    }, [searchQuery]);
+
+    const filteredXrunStoreProducts = useMemo(() => filterByQuery(xrunStoreProducts), [filterByQuery, xrunStoreProducts]);
+    const filteredXplayProducts = useMemo(() => filterByQuery(xplayProductsAsCards), [filterByQuery, xplayProductsAsCards]);
+    const hasAnyResult = filteredXrunStoreProducts.length + filteredXplayProducts.length > 0;
 
     const segmentedOptions = useMemo(
         () => [
@@ -461,11 +502,15 @@ export const ShopScreen = () => {
                 title={t('screens.shop.title')}
                 rightComponent={
                     <TouchableOpacity
-                        onPress={() => setShowSearchBar(!showSearchBar)}
+                        onPress={() => {
+                            const next = !showSearchBar;
+                            setShowSearchBar(next);
+                            if (!next) setSearchQuery('');
+                        }}
                         activeOpacity={0.7}
                         style={styles.searchButton}
                     >
-                        <Feather name="search" size={20} color="#007aff" />
+                        <Feather name={showSearchBar ? 'x' : 'search'} size={20} color="#007aff" />
                     </TouchableOpacity>
                 }
             />
@@ -513,6 +558,23 @@ export const ShopScreen = () => {
                 />
 
                 {}
+                {showSearchBar && (
+                    <View style={styles.searchBar}>
+                        <Feather name="search" size={18} color="#0296f2" />
+                        <TextInput
+                            placeholder="Search"
+                            placeholderTextColor="#bcbec4"
+                            style={styles.searchInput}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            returnKeyType="search"
+                        />
+                    </View>
+                )}
+
+                {}
                 <SafeScrollView
                     showsVerticalScrollIndicator={false}
                     showBottomBackground={false}
@@ -535,10 +597,14 @@ export const ShopScreen = () => {
                                 <View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>{xplayError}</Text>
                                 </View>
+                            ) : searchQuery.trim() && !hasAnyResult ? (
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.noResultText}>"{searchQuery.trim()}"에 대한 검색 결과가 없습니다.</Text>
+                                </View>
                             ) : (
                                 <View style={styles.productGrid}>
-                                    {xrunStoreProducts.map((product) => renderProductCard(product, false))}
-                                    {xplayProductsAsCards.map((product) => renderProductCard(product, false))}
+                                    {filteredXrunStoreProducts.map((product) => renderProductCard(product, false))}
+                                    {filteredXplayProducts.map((product) => renderProductCard(product, false))}
                                 </View>
                             )}
                         </>
@@ -580,6 +646,30 @@ const styles = StyleSheet.create({
         fontSize: FONTS.size.small,
         fontFamily: 'Roboto-Regular',
         color: '#007aff',
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#ededed',
+        backgroundColor: '#ffffff',
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        marginHorizontal: 16,
+        marginBottom: 20,
+        shadowColor: '#182b78',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 8,
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#1a2e35',
     },
     balanceCardWrapper: {
         marginHorizontal: 16,
@@ -842,6 +932,12 @@ const styles = StyleSheet.create({
         fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#b91c1c',
+        textAlign: 'center',
+    },
+    noResultText: {
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#8e9bae',
         textAlign: 'center',
     },
     emptyContainer: {

@@ -11,7 +11,7 @@ import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
-import { getMyGroup } from '../services';
+import { getMyGroup, getMyRecommender } from '../services';
 import { MyGroupItem } from '../types';
 
 interface MemberData {
@@ -34,6 +34,9 @@ export const ReferralMyGroupScreen = () => {
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [allMembers, setAllMembers] = useState<MemberData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [recommenderEmail, setRecommenderEmail] = useState<string>('');
+  const [recommenderName, setRecommenderName] = useState<string>('');
+  const [recommenderLoaded, setRecommenderLoaded] = useState<boolean>(false);
   const isLoadingRef = useRef<boolean>(false);
   const hasLoadedRef = useRef<boolean>(false);
   const membersDataRef = useRef<MemberData[]>([]);
@@ -62,6 +65,38 @@ export const ReferralMyGroupScreen = () => {
     };
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    if (!memberId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await getMyRecommender(memberId, navigate);
+        if (cancelled) return;
+        if (result && result.status === 'success') {
+          const rawData = (result as any).data;
+          const recommender = Array.isArray(rawData) ? rawData[0] : rawData;
+          if (recommender && recommender.email) {
+            const displayEmail = recommender.masked_email || recommender.email || '';
+            const displayName =
+              recommender.firstname || recommender.lastname
+                ? `${recommender.firstname || ''}${recommender.lastname || ''}`
+                : '';
+            setRecommenderEmail(displayEmail);
+            setRecommenderName(displayName);
+          } else {
+            setRecommenderEmail('');
+            setRecommenderName('');
+          }
+        }
+      } catch (err) {
+        console.error('[내 그룹] 추천인 정보 로드 실패:', err);
+      } finally {
+        if (!cancelled) setRecommenderLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [memberId, navigate]);
 
   const fetchReferralMembers = useCallback(async (
     params: PaginationParams
@@ -178,7 +213,7 @@ export const ReferralMyGroupScreen = () => {
     }
     await shareReferralLink(
       t,
-      { email: userEmail },
+      { email: userEmail, member: memberId ? Number(memberId) : undefined },
       showAlert,
       navigate,
     );
@@ -199,6 +234,13 @@ export const ReferralMyGroupScreen = () => {
         <ReferralStatsCard
           title={t('screens.referralMyGroup.myGroupMembers')}
           value={`${totalMembers} ${t('screens.referralMyGroup.members')}`}
+          subtitle={
+            recommenderLoaded && recommenderEmail
+              ? recommenderName
+                ? `${recommenderName} (${recommenderEmail})`
+                : recommenderEmail
+              : undefined
+          }
         />
 
         <SegmentedControl
@@ -250,6 +292,12 @@ const styles = StyleSheet.create({
   },
   segmented: {
     marginVertical: SIZES.large,
+  },
+  recommenderText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Medium',
+    color: '#2a2727',
+    marginBottom: 8,
   },
   listContainer: {
     flex: 1,

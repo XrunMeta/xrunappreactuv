@@ -23,7 +23,7 @@ export default {
   attendanceCheck: 'Check In',
   attendanceCheckCompletedReward: 'उपस्थिति जांच पूर्ण पुरस्कार',
   attendanceCheckNotAvailable: 'उपस्थिति जांच उपलब्ध नहीं है',
-  settlementNotice: '75 दिनों में निपटाया गया',
+  settlementNotice: '14 दिनों के भीतर निपटान',
   referralEventRewardTitle: 'रेफरल इवेंट पुरस्कार प्राप्त करें',
   referralEventAlreadyCompleted: 'रेफरल इवेंट पुरस्कार पहले से ही पूर्ण हो गया है।',
   rewardNotAvailable: 'इस स्थिति में पुरस्कार उपलब्ध नहीं है।',

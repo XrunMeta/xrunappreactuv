@@ -49,6 +49,8 @@ export const ShopItemRegisterScreen = () => {
   const [isLoadingCurrentImage, setIsLoadingCurrentImage] = useState<boolean>(false);
   const [editSdk, setEditSdk] = useState<string | null>(null);
 
+  const [generatedSdk, setGeneratedSdk] = useState<string>('');
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -171,13 +173,20 @@ export const ShopItemRegisterScreen = () => {
   }, [isEditMode, imageFileId, imageUri, loadCurrentImage]);
 
   const generateSDK = useCallback((): string => {
-    if (!userEmail || userEmail.length < 2) {
-      return '';
-    }
-    const emailPrefix = userEmail.substring(0, 2).toUpperCase();
+    if (!userEmail) return '';
+    const localPart = userEmail.split('@')[0] || '';
+    if (localPart.length < 2) return '';
+    const emailPrefix = localPart.substring(0, 2).toUpperCase();
     const randomNum = Math.floor(100000 + Math.random() * 900000); 
     return `${emailPrefix}${randomNum}`;
   }, [userEmail]);
+
+  useEffect(() => {
+    if (!userEmail || isEditMode) return;
+    if (generatedSdk) return; 
+    const newSdk = generateSDK();
+    if (newSdk) setGeneratedSdk(newSdk);
+  }, [userEmail, isEditMode, generatedSdk, generateSDK]);
 
   const handlePriceKRWChange = (value: string) => {
     setPriceKRW(value);
@@ -192,11 +201,7 @@ export const ShopItemRegisterScreen = () => {
 
   const handleImagePicker = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(t('screens.shopItemRegister.alerts.permissionRequired'), t('screens.shopItemRegister.alerts.permissionMessage'));
-        return;
-      }
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -332,8 +337,30 @@ export const ShopItemRegisterScreen = () => {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim()) {
+    const trimmedTitle = title.trim();
+    const trimmedDesc = description.trim();
+
+    if (!trimmedTitle) {
       Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.productNameRequired'));
+      return;
+    }
+
+    if (trimmedTitle.length > 50) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+      return;
+    }
+    if (trimmedDesc.length > 500) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      return;
+    }
+
+    if (/(.)\1{4,}/.test(trimmedTitle) || /(.)\1{4,}/.test(trimmedDesc)) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      return;
+    }
+
+    if (/^[ㄱ-㆏\s]+$/.test(trimmedTitle)) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
@@ -342,23 +369,13 @@ export const ShopItemRegisterScreen = () => {
       return;
     }
 
-    const finalPriceKRW = parseFloat(priceKRW) || 0;
     const finalPriceXrun = parseFloat(priceXrun) || 0;
-
-    if (finalPriceKRW <= 0 && finalPriceXrun <= 0) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceRequired'));
-      return;
-    }
-
-    if (finalPriceKRW <= 0) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceKRWRequired'));
-      return;
-    }
-
     if (finalPriceXrun <= 0) {
       Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceXrunRequired'));
       return;
     }
+
+    const finalPriceKRW = gopaxPrice > 0 ? Math.round(finalPriceXrun * gopaxPrice) : 0;
 
     let sdk: string | undefined;
     if (isEditMode) {
@@ -369,7 +386,8 @@ export const ShopItemRegisterScreen = () => {
         return;
       }
     } else {
-      sdk = generateSDK();
+
+      sdk = generatedSdk;
       if (!sdk) {
         Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkGenerateFailed'));
         return;
@@ -525,6 +543,7 @@ export const ShopItemRegisterScreen = () => {
               onChangeText={setTitle}
               placeholder={t('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
+              maxLength={50}
             />
           </View>
 
@@ -539,30 +558,21 @@ export const ShopItemRegisterScreen = () => {
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
+              maxLength={500}
             />
           </View>
 
           {}
           <View style={styles.section}>
-            <Text style={styles.label}>가격 (KRW) *</Text>
+            <Text style={styles.label}>가격 (XRUN) *</Text>
             <TextInput
               style={styles.input}
-              value={priceKRW}
-              onChangeText={handlePriceKRWChange}
-              placeholder="KRW 가격을 입력하세요"
+              value={priceXrun}
+              onChangeText={setPriceXrun}
+              placeholder="XRUN 가격을 입력하세요"
               placeholderTextColor="#999"
               keyboardType="number-pad"
             />
-            {priceXrun && (
-              <Text style={styles.calculatedPrice}>
-                XRUN: {parseInt(priceXrun).toLocaleString('ko-KR')} XRUN
-              </Text>
-            )}
-            {gopaxPrice > 0 && (
-              <Text style={styles.gopaxInfo}>
-                현재 XRUN 가격: {gopaxPrice.toLocaleString('ko-KR')}원
-              </Text>
-            )}
           </View>
 
           {}
@@ -659,10 +669,10 @@ export const ShopItemRegisterScreen = () => {
           {}
           {!isEditMode && (
             <View style={styles.section}>
-              <Text style={styles.label}>SDK</Text>
+              <Text style={styles.label}>상품 코드</Text>
               <TextInput
                 style={[styles.input, styles.readOnlyInput]}
-                value={generateSDK()}
+                value={generatedSdk}
                 editable={false}
                 placeholder={t('screens.shopItemRegister.placeholders.autoGenerated')}
                 placeholderTextColor="#999"

@@ -23,7 +23,7 @@ export default {
   attendanceCheck: 'Check In',
   attendanceCheckCompletedReward: 'Phần thưởng Check-in Hoàn tất',
   attendanceCheckNotAvailable: 'Check-in không khả dụng',
-  settlementNotice: 'Thanh toán trong 75 ngày',
+  settlementNotice: 'Thanh toán trong 14 ngày',
   referralEventRewardTitle: 'Nhận Phần thưởng Sự kiện Giới thiệu',
   referralEventAlreadyCompleted: 'Phần thưởng sự kiện giới thiệu đã hoàn tất.',
   rewardNotAvailable: 'Phần thưởng không khả dụng trong trạng thái này.',

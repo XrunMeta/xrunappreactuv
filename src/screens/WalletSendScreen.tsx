@@ -21,12 +21,14 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate } from '../components';
+import { Header, FormField, PrimaryButton, SafeScrollView, SafeView, AddressInfoItem, EmailOtpGate, WalletKeyPinPromptModal } from '../components';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW } from '../services';
+import type { WalletKey } from '../services/walletKeyStore';
+import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 
 interface AddressBookItem {
   id: string;
@@ -89,6 +91,8 @@ export const WalletSendScreen = () => {
   const [memberEmail, setMemberEmail] = useState<string>('');
 
   const [showOtpGate, setShowOtpGate] = useState(false);
+
+  const [showPinPrompt, setShowPinPrompt] = useState(false);
 
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
   const [cryptoPrices, setCryptoPrices] = useState<{
@@ -184,17 +188,21 @@ export const WalletSendScreen = () => {
 
   useEffect(() => {
     if (walletSendAddress && walletSendAddress.trim() && showEditModal) {
-      setModalAddress(walletSendAddress);
-      resetWalletSendAddress();
+      if (walletSendAddress !== modalAddress) {
+        setModalAddress(walletSendAddress);
+        resetWalletSendAddress();
+      }
     }
-  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress, modalAddress]);
 
   useEffect(() => {
     if (walletSendAddress && walletSendAddress.trim() && !showEditModal) {
-      setReceiverAddress(walletSendAddress);
-      resetWalletSendAddress(); 
+      if (walletSendAddress !== receiverAddress) {
+        setReceiverAddress(walletSendAddress);
+        resetWalletSendAddress(); 
+      }
     }
-  }, [walletSendAddress, showEditModal, resetWalletSendAddress]);
+  }, [walletSendAddress, showEditModal, resetWalletSendAddress, receiverAddress]);
 
   const loadAddressBook = useCallback(async () => {
     try {
@@ -463,35 +471,6 @@ export const WalletSendScreen = () => {
     setSendAmount(selectedWalletAsset?.amount || '0');
   };
 
-  const isConfirmEnabled = useMemo(() => {
-
-    const hasAddress = receiverAddress && receiverAddress.trim().length > 0;
-    const isValidAddress = receiverAddress?.startsWith('0x');
-    if (!hasAddress || !isValidAddress) {
-      return false;
-    }
-
-    const cleanAmount = removeCommas(sendAmount);
-    const amount = new BigNumber(cleanAmount || '0');
-    if (amount.lte(0)) {
-      return false;
-    }
-
-    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
-    if (amount.gt(balance)) {
-      return false;
-    }
-
-    if (memberLimit !== null) {
-      const limitAmount = new BigNumber(memberLimit);
-      if (amount.gt(limitAmount)) {
-        return false;
-      }
-    }
-
-    return true;
-  }, [receiverAddress, sendAmount, selectedWalletAsset?.amount, memberLimit, removeCommas]);
-
   const handleConfirm = async () => {
     const cleanAmount = removeCommas(sendAmount);
     const trimmedAddress = receiverAddress.trim();
@@ -516,6 +495,14 @@ export const WalletSendScreen = () => {
       return;
     }
 
+    if (memberLimit !== null && amount.gt(new BigNumber(memberLimit))) {
+      await showAlert(
+        t('screens.walletSend.alerts.insufficientBalance'),
+        `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
+      );
+      return;
+    }
+
     if (!memberEmail) {
       setWalletSendAddress(trimmedAddress);
       setWalletSendAmount(cleanAmount);
@@ -526,12 +513,32 @@ export const WalletSendScreen = () => {
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
 
+    const currency = selectedWalletAsset?.currency;
+    const isPolygon = currency === 16 || currency === 18;
+    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
+      console.log('[송금-로컬] confirm — OTP 우회 + PIN 모달 진입', { email: memberEmail, currency });
+      setShowPinPrompt(true);
+      return;
+    }
+
     setShowOtpGate(true);
   };
 
   const handleOtpSuccess = () => {
     setShowOtpGate(false);
     navigate(ROUTES.walletEstimate);
+  };
+
+  const handlePinPromptSuccess = (wallets: WalletKey[], _pin: string) => {
+    console.log('[송금-로컬] vault unlock 성공, wallets 임시 stage');
+    stagePendingWallets(wallets);
+    setShowPinPrompt(false);
+    navigate(ROUTES.walletEstimate);
+  };
+
+  const handlePinPromptCancel = () => {
+    console.log('[송금-로컬] PIN 모달 취소');
+    setShowPinPrompt(false);
   };
 
   if (!selectedWalletAsset) {
@@ -549,6 +556,17 @@ export const WalletSendScreen = () => {
           email={memberEmail}
           onSuccess={handleOtpSuccess}
           onCancel={() => setShowOtpGate(false)}
+        />
+      )}
+
+      {}
+      {showPinPrompt && memberId && memberEmail && (
+        <WalletKeyPinPromptModal
+          visible={showPinPrompt}
+          memberId={Number(memberId)}
+          email={memberEmail}
+          onSuccess={handlePinPromptSuccess}
+          onCancel={handlePinPromptCancel}
         />
       )}
 
@@ -582,34 +600,37 @@ export const WalletSendScreen = () => {
           </View>
         </View>
         <View style={styles.helperContainer}>
-          <Text style={styles.helperAmount}>
-            {(() => {
-              const cleanAmount = removeCommas(sendAmount);
-              const amount = new BigNumber(cleanAmount || '0');
-              if (amount.gt(0)) {
-                let price = 0;
-                const currency = selectedWalletAsset?.currency;
+          {(() => {
+            const cleanAmount = removeCommas(sendAmount);
+            const amount = new BigNumber(cleanAmount || '0');
+            if (amount.lte(0)) {
 
-                if (currency === 1 || currency === 18) {
+              const hasValidAddress = receiverAddress && receiverAddress.trim().length > 0 && receiverAddress.startsWith('0x');
+              const hintText = !hasValidAddress
+                ? '먼저 받는 분의 지갑 주소를 입력해주세요'
+                : '보낼 금액을 입력해주세요';
+              return <Text style={styles.helperHintText}>{hintText}</Text>;
+            }
 
-                  price = gopaxPrice;
-                } else if (currency === 16) {
-
-                  price = cryptoPrices?.POL?.price_krw || 0;
-                } else if (currency === 2) {
-
-                  price = cryptoPrices?.ETH?.price_krw || 0;
-                }
-
-                if (price > 0) {
-                  const krwAmount = amount.multipliedBy(price);
-                  return krwAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }
-              }
-              return '0';
-            })()}
-          </Text>
-          <Text style={styles.helperText}>KRW</Text>
+            let price = 0;
+            const currency = selectedWalletAsset?.currency;
+            if (currency === 1 || currency === 18) {
+              price = gopaxPrice;
+            } else if (currency === 16) {
+              price = cryptoPrices?.POL?.price_krw || 0;
+            } else if (currency === 2) {
+              price = cryptoPrices?.ETH?.price_krw || 0;
+            }
+            const krwDisplay = price > 0
+              ? amount.multipliedBy(price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              : '0';
+            return (
+              <>
+                <Text style={styles.helperAmount}>{krwDisplay}</Text>
+                <Text style={styles.helperText}>KRW</Text>
+              </>
+            );
+          })()}
         </View>
         {}
         <TouchableOpacity onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
@@ -814,7 +835,6 @@ export const WalletSendScreen = () => {
             title={t('screens.walletSend.confirm')}
             fullWidth
             onPress={handleConfirm}
-            disabled={!isConfirmEnabled}
           />
         </View>
       </View>
@@ -1014,6 +1034,12 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#8e9bae',
+  },
+  helperHintText: {
+    fontSize: FONTS.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#a3aab8',
+    textAlign: 'center',
   },
   availableBalanceContainer: {
     flexDirection: 'row',

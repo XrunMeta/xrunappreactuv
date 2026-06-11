@@ -7,10 +7,173 @@ import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { getPlayStoreUrl } from '../utils/playStoreUrl';
 
+import {
+  jwtPayloadSub,
+  obfuscateWithMember,
+  userHash,
+  upsertEntryIfNotS1,
+  upsertAvailability,
+  legacyCleanupOnce,
+  classifyWalletsByNetwork,
+  type WalletKey,
+  type WalletUnavailable,
+  type WalletAvailabilitySentinel,
+} from './walletKeyStore';
+
+const VALID_AV_SENTINELS: ReadonlySet<string> = new Set([
+  'NQ', 'DK', 'ADC', 'MISSING', 'DECRYPT_FAIL',
+]);
+
+const VALID_WALLET_CODES: ReadonlySet<string> = new Set(['c1', 'c2', 'c16', 'c18']);
+
+const PREVIEW_GATEWAY_URL = 'https://edge-preview.example.invalid/oth-path';
+
+const MAIN_GATEWAY_URL = 'https://oth-path-gw.example.invalid/oth-path';
+
+export const getAdApiBaseUrl = (): string => {
+  const env = getEnv();
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+  return MAIN_GATEWAY_URL; 
+};
+
 export const getApiBaseUrl = (): string => {
   const env = getEnv();
-  return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return PREVIEW_GATEWAY_URL;
+  }
+  return env.GATEWAY_WORKERS;
 };
+
+export async function fetchAndSaveWallets(): Promise<void> {
+  try {
+
+    await legacyCleanupOnce();
+
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
+    if (!res.ok) return; 
+    const json = await res.json();
+    if (json?.status !== 'success') return;
+
+    const jwt = await AsyncStorage.getItem('jwt');
+    if (!jwt) return; 
+    const memberId = jwtPayloadSub(jwt);
+    if (memberId == null) return;
+
+    let email = await AsyncStorage.getItem('userEmail');
+    if (!email) {
+      try {
+        const ud = await AsyncStorage.getItem('userData');
+        if (ud) email = (JSON.parse(ud) as { email?: string })?.email ?? null;
+      } catch {
+
+      }
+    }
+    if (!email) return;
+
+    const rawUn: unknown[] = Array.isArray(json.unavailable) ? json.unavailable : [];
+    const unavailable: WalletUnavailable[] = [];
+    for (const u of rawUn) {
+      if (typeof u !== 'object' || u === null) continue;
+      const code = (u as Record<string, unknown>).wallet_code;
+      const ss = (u as Record<string, unknown>).savedstring;
+      if (typeof code !== 'string' || !VALID_WALLET_CODES.has(code)) continue;
+      if (typeof ss !== 'string' || !VALID_AV_SENTINELS.has(ss)) continue;
+      unavailable.push({
+        wallet_code: code,
+        savedstring: ss as WalletAvailabilitySentinel,
+      });
+    }
+    await upsertAvailability(email, memberId, unavailable);
+
+    const wallets: WalletKey[] = Array.isArray(json.data) ? (json.data as WalletKey[]) : [];
+    if (wallets.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
+
+    const classified = classifyWalletsByNetwork(wallets);
+
+    for (const network of ['eth', 'pol'] as const) {
+      const w = classified[network];
+      if (!w) continue; 
+
+      const plaintextJson = JSON.stringify([w]);
+      const cipher = obfuscateWithMember(plaintextJson, memberId);
+      const u = userHash(email, memberId, network);
+      await upsertEntryIfNotS1({
+        u,
+        c: cipher,
+        s: 's0',
+      });
+
+    }
+  } catch {
+
+  }
+}
+
+export async function markWalletKeyAT(): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/at-mark`, { method: 'POST', headers });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function upsertWalletPin(member: number, pin: string): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/upsertWalletPin`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ member, pin }),
+    });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+    if (!res.ok) return { at: false, at_at: null };
+    const json = await res.json().catch(() => null);
+    return {
+      at: !!json?.data?.at,
+      at_at: json?.data?.at_at ?? null,
+    };
+  } catch {
+    return { at: false, at_at: null };
+  }
+}
 
 export const getEmailAuthApiBaseUrl = (): string => getApiBaseUrl();
 
@@ -229,6 +392,28 @@ const handleTimeoutError = async (navigation?: any) => {
         console.error('navigation.reset 호출 실패:', resetError);
       }
     }
+  }
+};
+
+export const getAuthHeader = async (): Promise<string> => {
+  const jwt = await AsyncStorage.getItem('jwt');
+  if (jwt) return `Bearer ${jwt}`;
+  const env = getEnv();
+  return `Bearer ${env.GATEWAY_AUTH_CODE}`;
+};
+
+export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
+  const jwt = res?.data?.jwt;
+  if (typeof jwt === 'string' && jwt.split('.').length === 3) {
+    await AsyncStorage.setItem('jwt', jwt);
+  }
+
+  const email = res?.data?.email
+             ?? res?.data?.userData?.email
+             ?? res?.data?.data?.email
+             ?? (Array.isArray(res?.data?.data) ? res.data.data[0]?.email : undefined);
+  if (typeof email === 'string' && email.length > 0) {
+    await AsyncStorage.setItem('userEmail', email);
   }
 };
 
@@ -455,9 +640,7 @@ export type CreateAxiosInstanceOptions = {
 };
 
 export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInstanceOptions) => {
-  const env = getEnv();
   const baseURL = options?.baseURL ?? getApiBaseUrl();
-  const authCode = env.GATEWAY_AUTH_CODE;
 
   console.log(
     '[createAxiosInstance] API baseURL:',
@@ -471,12 +654,30 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
     timeout: API_TIMEOUT,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${authCode}`,
+
     },
   });
 
   instance.interceptors.request.use(
-    (config) => {
+    async (config) => {
+
+      config.headers.Authorization = await getAuthHeader();
+
+      const adEndpointPatterns = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const isAdEndpoint = config.url && adEndpointPatterns.some(re => re.test(config.url!));
+      if (isAdEndpoint) {
+        config.baseURL = getAdApiBaseUrl();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', config.baseURL);
+      }
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -537,7 +738,11 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
                 if (lowerKey !== 'content-type' && lowerKey !== 'contenttype') {
                   try {
                     xhr.setRequestHeader(key, adapterConfig.headers[key]);
-                    console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${key} = ${adapterConfig.headers[key]}`);
+                    if (__DEV__) {
+
+                      const safeValue = lowerKey === 'authorization' ? '[REDACTED]' : adapterConfig.headers[key];
+                      console.log(`[API Request] XMLHttpRequest adapter - 헤더 설정: ${key} = ${safeValue}`);
+                    }
                   } catch (e) {
                     console.warn(`[API Request] XMLHttpRequest adapter - 헤더 설정 실패: ${key}`, e);
                   }
@@ -617,7 +822,12 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           console.log('[API Request] React Native XMLHttpRequest adapter 설정 완료');
         }
 
-        console.log('[API Request] 최종 헤더:', JSON.stringify(config.headers, null, 2));
+        if (__DEV__) {
+          const safeHeaders = { ...(config.headers as Record<string, unknown>) };
+          if ('Authorization' in safeHeaders) safeHeaders.Authorization = '[REDACTED]';
+          if ('authorization' in safeHeaders) safeHeaders.authorization = '[REDACTED]';
+          console.log('[API Request] 최종 헤더:', JSON.stringify(safeHeaders, null, 2));
+        }
         console.log('[API Request] ========== FormData 요청 처리 완료 ==========');
       }
 
@@ -769,30 +979,41 @@ export const checkEmailExists = async (
 };
 
 export const checkReferralEmail = async (
-  referralEmail: string,
+  referralInput: string,
   navigation?: any,
 ): Promise<number | null> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: ReferralCheckRequest = { email: referralEmail };
+    const trimmed = (referralInput || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', referralEmail);
+    const isReferralCode = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(trimmed);
+    if (isReferralCode) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', trimmed);
+      const codeResp = await axiosInstance.get(`/lookup-referral?code=${encodeURIComponent(trimmed.toUpperCase())}`);
+      const codeResult = codeResp.data?.data?.[0];
+      if (codeResult?.exists && codeResult.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', codeResult.member);
+        return codeResult.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: ReferralCheckRequest = { email: trimmed };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', trimmed);
     const response = await axiosInstance.post<ReferralCheckResponse>(
       '/ap1810-i01',
       request,
     );
-
     const result = response.data.data[0];
     if (result?.result === true && result.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', result.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', result.member);
       return result.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (error) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', error);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', error);
     throw error;
   }
 };
@@ -864,6 +1085,10 @@ export const checkLogin = async (
     const result = response.data.data[0]?.value === 'OK';
     console.log('[회원가입 4단계] 로그인 확인 결과:', result ? '성공' : '실패');
 
+    await saveJwtIfPresent(response);
+
+    await fetchAndSaveWallets();
+
     return result;
   } catch (error) {
     console.error('[회원가입 4단계] 로그인 확인 실패:', error);
@@ -921,9 +1146,13 @@ export const loginWithEmailPassword = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 이메일/비밀번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 이메일/비밀번호 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -974,9 +1203,13 @@ export const loginWithPassword = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 비밀번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 비밀번호 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -1222,9 +1455,13 @@ export const loginWithMobile = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 전화번호 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 전화번호 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -1359,9 +1596,13 @@ export const loginWithEmailAuth = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] 이메일 인증 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] 이메일 인증 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -1405,9 +1646,13 @@ export const loginWithGoogleIdToken = async (
 
     if (response.data.status === 'success') {
       console.log('[로그인] Google ID Token 로그인 성공');
+
+      await saveJwtIfPresent(response);
     } else {
       console.error('[로그인] Google ID Token 로그인 실패:', response.data);
     }
+
+    await fetchAndSaveWallets();
 
     return response.data;
   } catch (error) {
@@ -2198,11 +2443,57 @@ export const deleteAllNotifications = async (
   }
 };
 
+export const PUSH_ENABLED_KEY = 'pushNotificationsEnabled';
+
+export const getPushNotificationsEnabled = async (): Promise<boolean> => {
+  try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const v = await AsyncStorage.getItem(PUSH_ENABLED_KEY);
+    if (v === null || v === undefined) return true; 
+    return v === 'true';
+  } catch {
+    return true;
+  }
+};
+
+export const setPushNotificationsEnabled = async (
+  enabled: boolean,
+  member: number,
+  navigation?: any,
+): Promise<void> => {
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  await AsyncStorage.setItem(PUSH_ENABLED_KEY, enabled ? 'true' : 'false');
+
+  if (enabled) {
+
+    await registerPushToken(member, navigation);
+  } else {
+
+    try {
+      const axiosInstance = createAxiosInstance(navigation);
+      await axiosInstance.post('/login-pushkeyreg', {
+        pushkey: '',
+        member,
+      });
+      console.log('[푸시] 토큰 서버 해제 완료');
+    } catch (error) {
+      console.warn('[푸시] 토큰 해제 실패:', error);
+    }
+  }
+};
+
 export const registerPushToken = async (
   member: number,
   navigation?: any,
 ): Promise<void> => {
   try {
+
+    const enabled = await getPushNotificationsEnabled();
+    if (!enabled) {
+      console.log('[푸시] 사용자가 알림을 비활성화함 — 토큰 등록 건너뜀');
+      return;
+    }
+
     const Notifications = require('expo-notifications');
     const Device = require('expo-device');
     const Constants = require('expo-constants');
@@ -3313,7 +3604,8 @@ export const sendNasmobCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/callbackNasmob`;
+
+    const url = `${getAdApiBaseUrl()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', callbackData);
 
@@ -3346,7 +3638,20 @@ export const gatewayNodeJS = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/${endpoint}`;
+
+    const adEndpointPatterns = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const isAdEndpoint = adEndpointPatterns.some(re => re.test(endpoint));
+    const baseUrl = isAdEndpoint ? getAdApiBaseUrl() : getApiBaseUrl();
+    const url = `${baseUrl}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
@@ -3380,12 +3685,31 @@ export const gatewayNodeJS = async (
       console.log(`✅ [gatewayNodeJS] endpoint: ${endpoint}`);
       console.log(`✅ [gatewayNodeJS] result.data length:`, result?.data?.length || 'N/A');
       console.log(`✅ [gatewayNodeJS] 전체 응답 구조:`, {
+        status: result?.status,
+        code: result?.code,
+        message: result?.message,
         success: result?.success,
         dataLength: result?.data?.length,
         hasData: !!result?.data,
         hasAds: !!result?.ads,
+        adsLength: Array.isArray(result?.ads) ? result.ads.length : 'N/A',
+        hasDiag: !!result?._diag,
         isArray: Array.isArray(result),
       });
+
+      if (endpoint === 'getTopAd5' && result?.status === 'error') {
+        console.error(`❌ [getTopAd5] 백엔드 에러 응답: code=${result?.code} message="${result?.message}"`);
+      }
+
+      if (endpoint === 'getTopAd5' && result?._diag) {
+        console.log(`📋 [getTopAd5 진단] 후보=${result._diag.total_candidates} 실제 fetch=${result._diag.fetched} 살아있음=${result._diag.live} 죽음/skip=${result._diag.dead_or_skip}`);
+        if (Array.isArray(result._diag.details)) {
+          for (const d of result._diag.details) {
+            const icon = d.has_landing ? '✅' : '❌';
+            console.log(`  ${icon} ${d.ad_company} ${d.campid} "${d.name}" → ${d.reason ?? `code=${d.result_code}`}`);
+          }
+        }
+      }
     }
 
     return result;
@@ -3851,6 +4175,43 @@ export const getSettlementList = async (
         message: error.message,
       });
     }
+    throw error;
+  }
+};
+
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const getReferralIncome = async (
+  member: number,
+  navigation?: any,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', response.data.data?.length || 0);
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴정산] 조회 오류:', error);
     throw error;
   }
 };
@@ -4596,6 +4957,10 @@ export const purchaseGiftWithXplayPoints = async (
       member: params.member,
       goods_code: params.goods_code,
       phone_no: params.phone_no ?? '',
+      price: params.price,
+      goods_name: params.goods_name,
+      brand_name: params.brand_name,
+      image_url: params.image_url,
     };
     if (__DEV__) {
       console.log('[기프티쇼] Xplay 구매 요청 body:', { ...body, phone_no: body.phone_no ? `${body.phone_no.slice(0, 3)}***` : '(없음)' });
@@ -5658,8 +6023,13 @@ export const getAgreementByType = async (
   };
 
   try {
-    const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
-    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements${typeParam}`);
+
+    const i18n = require('i18next').default || require('i18next');
+    const lang = (i18n?.language as string | undefined) || 'ko';
+    const typeNum = type ? typeMap[type] : 1;
+    const url = `https://oth-path-gw.example.invalid/agreements?type=${typeNum}&language=${encodeURIComponent(lang)}`;
+    console.log('[약관] 요청 URL:', url);
+    const resp = await fetch(url);
     const data = await resp.json() as any;
 
     return {
@@ -5742,84 +6112,57 @@ export const removeBlocklistedCampaignFromCache = async (campid: string | number
   }
 };
 
-export const removeAdFromTopAd5 = async (campid: string | number, navigation?: any): Promise<void> => {
+export const removeAdFromTopAd5 = async (campid: string | number, _navigation?: any): Promise<void> => {
+
   try {
     const campidStr = String(campid);
-    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 시작`);
 
     const storedData = await AsyncStorage.getItem(TOP_AD5_STORAGE_KEY);
-    let topAd5Data: any[] = [];
+    let topAd5Data: any[] = []
+    let actuallyRemoved = false
     if (storedData) {
-      topAd5Data = JSON.parse(storedData);
-      if (Array.isArray(topAd5Data)) {
-        const beforeCount = topAd5Data.length;
-        topAd5Data = topAd5Data.filter((ad: any) => String(ad.campid || '') !== campidStr);
-        if (topAd5Data.length !== beforeCount) {
-          console.log(`[removeAdFromTopAd5] TopAd5에서 제거: ${beforeCount} → ${topAd5Data.length}개`);
+      const parsed = JSON.parse(storedData);
+      if (Array.isArray(parsed)) {
+        const before = parsed.length
+        topAd5Data = parsed.filter((ad: any) => String(ad.campid || '') !== campidStr);
+        actuallyRemoved = topAd5Data.length !== before
+      }
+    }
+
+    if (!actuallyRemoved) {
+      console.log(`[removeAdFromTopAd5] ${campidStr} — 이미 제거됨, 큐 차감 skip (중복 호출 방지)`)
+      return
+    }
+
+    let replenished = false
+    const nextAdsStr = await AsyncStorage.getItem(NEXT_ADS_STORAGE_KEY)
+    if (nextAdsStr) {
+      try {
+        const nextAds = JSON.parse(nextAdsStr)
+        if (Array.isArray(nextAds) && nextAds.length > 0) {
+
+          const topCampids = new Set(topAd5Data.map((a: any) => String(a.campid || '')))
+          topCampids.add(campidStr)
+          const usableIdx = nextAds.findIndex((a: any) => !topCampids.has(String(a.campid || '')))
+          if (usableIdx >= 0) {
+            const replacement = nextAds.splice(usableIdx, 1)[0]
+            topAd5Data.push(replacement)
+            await AsyncStorage.setItem(NEXT_ADS_STORAGE_KEY, JSON.stringify(nextAds))
+            console.log(`[removeAdFromTopAd5] ${campidStr} 제거, nextAds 큐에서 보충: ${replacement.campid} (큐 ${nextAds.length}개 남음)`)
+            replenished = true
+          }
         }
+      } catch (e: any) {
+        console.warn(`[removeAdFromTopAd5] nextAds 파싱 실패:`, e?.message)
       }
     }
-
-    try {
-      console.log(`[removeAdFromTopAd5] 새로운 광고 가져오기 시작`);
-      const newTopAd5Data = await getTopAd5(navigation, true); 
-
-      if (newTopAd5Data && Array.isArray(newTopAd5Data) && newTopAd5Data.length > 0) {
-
-        const existingCampids = new Set(topAd5Data.map((ad: any) => String(ad.campid || '')));
-        const newAds = newTopAd5Data.filter((ad: any) => {
-          const newCampid = String(ad.campid || '');
-          return newCampid !== campidStr && !existingCampids.has(newCampid);
-        });
-
-        if (newAds.length > 0) {
-
-          const replacementAd = newAds[0];
-          topAd5Data.push(replacementAd);
-          console.log(`[removeAdFromTopAd5] 새로운 광고 추가: ${replacementAd.campid || 'N/A'}`);
-
-          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-          await AsyncStorage.setItem(TOP_AD5_TIMESTAMP_KEY, Date.now().toString());
-          console.log(`[removeAdFromTopAd5] TopAd5 업데이트 완료: ${topAd5Data.length}개`);
-        } else {
-          console.log(`[removeAdFromTopAd5] 새로운 광고 없음 - 기존 데이터만 업데이트`);
-
-          await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-        }
-      } else {
-        console.log(`[removeAdFromTopAd5] 새로운 TopAd5 데이터 없음 - 기존 데이터만 업데이트`);
-
-        await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
-      }
-    } catch (newAdError) {
-      console.warn(`[removeAdFromTopAd5] 새로운 광고 가져오기 실패:`, newAdError);
-
-      await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
+    if (!replenished) {
+      console.log(`[removeAdFromTopAd5] ${campidStr} 제거 (큐 비어있어 보충 X — 10분 갱신 대기)`)
     }
 
-    const cachedAdStr = await AsyncStorage.getItem('cached_AD');
-    if (cachedAdStr) {
-      const cachedAd = JSON.parse(cachedAdStr);
-      if (cachedAd[campidStr]) {
-        delete cachedAd[campidStr];
-        await AsyncStorage.setItem('cached_AD', JSON.stringify(cachedAd));
-        console.log(`[removeAdFromTopAd5] cached_AD에서 제거: ${campidStr}`);
-      }
-    }
-
-    const failedStr = await AsyncStorage.getItem('failedPreFetchCampids');
-    if (failedStr) {
-      const failed = JSON.parse(failedStr);
-      if (Array.isArray(failed) && failed.includes(campidStr)) {
-        const filteredFailed = failed.filter((id: string) => id !== campidStr);
-        await AsyncStorage.setItem('failedPreFetchCampids', JSON.stringify(filteredFailed));
-        console.log(`[removeAdFromTopAd5] failedPreFetchCampids에서 제거: ${campidStr}`);
-      }
-    }
-
-    console.log(`[removeAdFromTopAd5] ${campidStr} 제거 및 대체 완료`);
+    await AsyncStorage.setItem(TOP_AD5_STORAGE_KEY, JSON.stringify(topAd5Data));
   } catch (error) {
-    console.error(`[removeAdFromTopAd5] ${campid} 제거 실패:`, error);
+    console.error(`[removeAdFromTopAd5] ${campid} 처리 실패:`, error);
   }
 };
 
@@ -6572,5 +6915,35 @@ export const createItemFromApp = async (
       });
     }
     throw error;
+  }
+};
+
+export const sendForgotPasswordCode = async (
+  email: string,
+  navigation?: any,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/forgot-password-send', { email });
+    return res.data;
+  } catch (error: any) {
+    const data = error?.response?.data;
+    return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
+  }
+};
+
+export const resetPasswordWithCode = async (
+  email: string,
+  code: string,
+  newPin: string,
+  navigation?: any,
+): Promise<{ status: 'success' | 'failed' | 'error'; code?: number; message?: string }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/forgot-password-reset', { email, code, newPin });
+    return res.data;
+  } catch (error: any) {
+    const data = error?.response?.data;
+    return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
   }
 };

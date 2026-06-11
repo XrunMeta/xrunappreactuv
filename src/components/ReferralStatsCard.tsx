@@ -42,7 +42,8 @@ export const ReferralStatsCard: React.FC<ReferralStatsCardProps> = ({
 
         {}
         <View style={styles.content}>
-          {(title && title.trim()) || subtitle ? (
+          {}
+          {title && title.trim() ? (
             <View style={styles.titleRow}>
               <View style={styles.titleLeft}>
                 {icon && (
@@ -50,7 +51,7 @@ export const ReferralStatsCard: React.FC<ReferralStatsCardProps> = ({
                     <Ionicons name={icon} size={20} color={iconColor} />
                   </View>
                 )}
-                {title && title.trim() ? <Text style={styles.title}>{title}</Text> : null}
+                <Text style={styles.title}>{title}</Text>
               </View>
               {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
             </View>
@@ -106,6 +107,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
+  subtitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
   titleLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -131,8 +138,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   subtitle: {
-    fontSize: FONTS.size.small,
-    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: FONTS.size.xxsmall,
+    color: 'rgba(255, 255, 255, 0.85)',
     fontFamily: 'Roboto-Medium',
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 10,

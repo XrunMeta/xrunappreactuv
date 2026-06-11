@@ -656,6 +656,15 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
           onHttpError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             console.error('WebView HTTP 오류:', nativeEvent);
+
+            const dead = [404, 410, 451, 455]
+            if (dead.includes(nativeEvent.statusCode)) {
+              showAlert(
+                '광고 이용 불가',
+                '해당 광고는 이미 참여했거나 종료되어 더 이상 참여할 수 없습니다.',
+                [{ text: '확인', onPress: () => handleClose() }],
+              ).catch(() => handleClose())
+            }
           }}
         />
       ) : null}

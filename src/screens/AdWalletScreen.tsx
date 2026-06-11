@@ -550,8 +550,15 @@ export const AdWalletScreen = () => {
         adRevenueSettlement = `${formatted} XRUN`;
       }
 
+      const adName = (item as any).adName as string | undefined;
       let expectedAdRevenue = '0 XRUN';
-      expectedAdRevenue = typeLabel ? `${typeLabel}` : `${item.expected} XRUN`;
+      if (typeLabel) {
+        expectedAdRevenue = typeLabel;
+      } else if (adName && adName.trim()) {
+        expectedAdRevenue = adName.trim();
+      } else {
+        expectedAdRevenue = `${item.expected} XRUN`;
+      }
 
       const expectedAdRevenueColor = status === t('screens.adWallet.settled') ? '#111111' : '#707070';
       const adRevenueSettlementColor =
@@ -897,7 +904,7 @@ export const AdWalletScreen = () => {
 
       try {
         console.log('[AdWallet] shareReferralLink 호출 시작');
-        await shareReferralLink(t, { email: userEmail }, showAlert, goBack);
+        await shareReferralLink(t, { email: userEmail, member: member ?? undefined }, showAlert, goBack);
         console.log('[AdWallet] shareReferralLink 호출 완료');
       } catch (error) {
         console.error('[AdWallet] 공유하기 오류:', error);

@@ -43,5 +43,6 @@ export default {
   deleteConfirmMessage: '삭제된 상품은 더 이상 표시되지 않지만, 구매 기록은 유지됩니다.',
   deleteSuccess: '상품이 삭제되었습니다.',
   deleteFailed: '상품 삭제에 실패했습니다.',
+  approved: '승인 완료',
+  pending: '승인 대기',
 };
-

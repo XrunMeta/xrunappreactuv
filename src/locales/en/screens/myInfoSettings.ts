@@ -1,7 +1,13 @@
 export default {
   title: 'Setting',
   closeMembership: 'Close Membership',
+  pushNotifications: 'Push Notifications',
+  pushNotificationsOn: 'On',
+  pushNotificationsOff: 'Off',
   languageSelect: 'Language Select',
+  walletBackup: 'Backup Wallet Keys',
+  walletRestore: 'Restore Wallet Keys',
+  walletKeyGuide: 'Review Wallet Key Guide',
   reward: 'Reward',
   ayet_offers: 'ayeT Offers',
   ayet_offers_xplay: 'Xplay Offers',

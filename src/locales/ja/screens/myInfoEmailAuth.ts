@@ -2,7 +2,7 @@ export default {
   title: 'メール認証',
   emailLabel: 'メール',
   emailPlaceholder: 'メールアドレスを入力してください',
-  sendButton: '認証コード送信',
+  sendButton: '認証',
   confirmButton: '確認',
   sending: '送信中...',
   alerts: {

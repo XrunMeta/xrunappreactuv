@@ -22,8 +22,8 @@ export default {
   ageLabel: 'Age',
   ageSelect: 'Select',
   optional: 'Optional',
-  referralEmailLabel: 'Referral Email',
-  referralEmailPlaceholder: 'oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {
     service: 'XRUN Service Terms',

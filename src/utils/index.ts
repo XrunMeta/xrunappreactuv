@@ -122,43 +122,51 @@ export const formatCurrency = (amount: string | number | object | null | undefin
 
 export const shareReferralLink = async (
   t: (key: string) => string,
-  userDetails: { email: string },
+  userDetails: { email?: string; member?: number | string },
   showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   navigation?: any,
 ): Promise<void> => {
   try {
     console.log('[shareReferralLink] 시작 - 플랫폼:', Platform.OS);
-    console.log('[shareReferralLink] 사용자 이메일:', userDetails.email);
+    console.log('[shareReferralLink] member:', userDetails.member, 'email:', userDetails.email);
 
     const androidLink = getPlayStoreUrl({ gl: 'kr', campaignId: 'web_share' });
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
-    const encodedEmail = encodeURIComponent(userDetails.email);
-    const deepLinkUrl = `https://www.xrun.run/invite?referral=${encodedEmail}`;
+    let referralCode: string | null = null;
+    if (userDetails.member) {
+      try {
+        const { createAxiosInstance } = await import('../services');
+        const axiosInstance = createAxiosInstance(navigation);
+        const codeRes = await axiosInstance.get(`/my-referral-code?member=${userDetails.member}`);
+        referralCode = codeRes.data?.data?.[0]?.code ?? null;
+        console.log('[shareReferralLink] referral_code 조회 결과:', referralCode);
+      } catch (e) {
+        console.warn('[shareReferralLink] referral_code 조회 실패, email fallback:', e);
+      }
+    }
+
+    const inviteParam = referralCode
+      ? `ref=${encodeURIComponent(referralCode)}`
+      : (userDetails.email ? `referral=${encodeURIComponent(userDetails.email)}` : '');
+    const deepLinkUrl = `https://www.xrun.run/invite?${inviteParam}`;
+    const appSchemeUrl = `xrun://invite?${inviteParam}`;
 
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
-    const message = `${shareText}${userDetails.email}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
+    const identifier = referralCode || userDetails.email || '';
+    const message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}\n📱 ${appSchemeUrl}`;
 
     console.log('[shareReferralLink] 공유 메시지:', message);
 
     let shareOptions: { message: string; url?: string; title?: string };
 
-    if (Platform.OS === 'ios') {
-
-      shareOptions = {
-        message,
-        url: deepLinkUrl,
-        title: shareText,
-      };
-    } else {
-
-      shareOptions = {
-        message,
-      };
-    }
+    shareOptions = {
+      message,
+      title: shareText,
+    };
 
     console.log('[shareReferralLink] Share API 호출 시작:', shareOptions);
 

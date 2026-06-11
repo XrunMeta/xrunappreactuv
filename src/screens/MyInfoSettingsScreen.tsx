@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Switch, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
@@ -10,6 +11,10 @@ import {
   checkServerVersion,
   openStore
 } from '../services/versionCheck';
+import {
+  getPushNotificationsEnabled,
+  setPushNotificationsEnabled,
+} from '../services';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -21,6 +26,45 @@ export const MyInfoSettingsScreen = () => {
     iosCurrent: number;
     iosLatest: number;
   } | null>(null);
+
+  const [pushEnabled, setPushEnabled] = useState<boolean>(true);
+  const [pushToggleLoading, setPushToggleLoading] = useState<boolean>(false);
+  const [memberId, setMemberId] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const enabled = await getPushNotificationsEnabled();
+        setPushEnabled(enabled);
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData?.member) setMemberId(Number(userData.member));
+        }
+      } catch (err) {
+        console.warn('[MyInfoSettings] 푸시 상태 로드 실패:', err);
+      }
+    })();
+  }, []);
+
+  const handleTogglePush = async (next: boolean) => {
+    if (pushToggleLoading) return;
+    if (!memberId) {
+      console.warn('[MyInfoSettings] memberId 없음 — 토글 무시');
+      return;
+    }
+    setPushToggleLoading(true);
+
+    setPushEnabled(next);
+    try {
+      await setPushNotificationsEnabled(next, memberId, navigate);
+    } catch (err) {
+      console.warn('[MyInfoSettings] 푸시 토글 실패 — 롤백:', err);
+      setPushEnabled(!next);
+    } finally {
+      setPushToggleLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchVersionInfo = async () => {
@@ -72,12 +116,60 @@ export const MyInfoSettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
+          {}
+          <View style={[styles.card, styles.rowCard]}>
+            <View style={styles.rowCardLeft}>
+              <Text style={styles.cardText}>
+                {t('screens.myInfoSettings.pushNotifications')}
+              </Text>
+              <Text style={styles.rowCardSub}>
+                {pushEnabled
+                  ? t('screens.myInfoSettings.pushNotificationsOn')
+                  : t('screens.myInfoSettings.pushNotificationsOff')}
+              </Text>
+            </View>
+            {pushToggleLoading ? (
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            ) : (
+              <Switch
+                value={pushEnabled}
+                onValueChange={handleTogglePush}
+                disabled={!memberId}
+                trackColor={{ false: '#d4d4d4', true: COLORS.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => setLanguageSelectorVisible(true)}
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletPrivateKeyGoogleAuth)}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.walletBackup')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletRestore)}
+          >
+            <Text style={styles.cardText}>{t('screens.myInfoSettings.walletRestore')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() => navigate(ROUTES.walletKeyGuide)}
+          >
+            <Text style={styles.cardText}>
+              {t('screens.myInfoSettings.walletKeyGuide')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.card}
@@ -137,6 +229,21 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-SemiBold',
     color: '#343434',
+  },
+  rowCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  rowCardLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  rowCardSub: {
+    marginTop: 4,
+    fontSize: FONTS.size.xsmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#888888',
   },
   versionContainer: {
     width: '100%',

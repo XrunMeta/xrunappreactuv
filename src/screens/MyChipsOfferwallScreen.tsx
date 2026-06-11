@@ -6,6 +6,7 @@ import {
   BackHandler,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
@@ -18,6 +19,7 @@ const MYCHIPS_CONTENT_ID = Platform.OS === 'ios'
 
 export const MyChipsOfferwallScreen = () => {
   const { goBack } = useAppNavigation();
+  const insets = useSafeAreaInsets();
   const webViewRef = useRef<WebView>(null);
   const [userId, setUserId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -60,10 +62,12 @@ export const MyChipsOfferwallScreen = () => {
 
   const offerwallUrl = `https://sdk.mychips.io/content?content_id=${MYCHIPS_CONTENT_ID}&user_id=${userId}&gender=&age=`;
 
+  const bottomPadding = insets.bottom;
+
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Header title="Xplay" onBackPress={goBack} showBackButton />
+      <View style={[styles.container, { paddingBottom: bottomPadding }]}>
+        <Header title="Zone 2" onBackPress={goBack} showBackButton />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -72,8 +76,8 @@ export const MyChipsOfferwallScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Header title="Xplay" onBackPress={goBack} showBackButton />
+    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
+      <Header title="Zone 2" onBackPress={goBack} showBackButton />
       <WebView
         ref={webViewRef}
         source={{ uri: offerwallUrl }}

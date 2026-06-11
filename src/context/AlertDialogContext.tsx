@@ -13,6 +13,8 @@ interface AlertDialogContextValue {
       onPress?: () => void;
       style?: 'default' | 'cancel' | 'destructive';
     }>,
+
+    options?: { hideCloseButton?: boolean },
   ) => Promise<number | undefined>; 
 }
 
@@ -30,6 +32,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
       onPress?: () => void;
       style?: 'default' | 'cancel' | 'destructive';
     }>;
+    hideCloseButton?: boolean;
     resolve?: () => void;
   } | null>(null);
 
@@ -41,6 +44,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
       onPress?: () => void;
       style?: 'default' | 'cancel' | 'destructive';
     }>,
+    options?: { hideCloseButton?: boolean },
   ): Promise<number | undefined> => {
     return new Promise((resolve) => {
 
@@ -52,6 +56,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
           title,
           message,
           buttons,
+          hideCloseButton: options?.hideCloseButton,
           resolve: () => {
             buttonAction?.();
             resolve(0); 
@@ -151,7 +156,8 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
       <Dialog
         visible={simpleDialogVisible}
         title={currentConfig?.title || ''}
-        onClose={handleSimpleDialogClose}
+
+        onClose={currentConfig?.hideCloseButton ? undefined : handleSimpleDialogClose}
         actions={[
           {
             label: currentConfig?.buttons?.[0]?.text || '확인',

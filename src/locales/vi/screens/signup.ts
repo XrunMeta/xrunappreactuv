@@ -22,8 +22,8 @@ export default {
   ageLabel: 'Tuổi',
   ageSelect: 'Chọn',
   optional: 'Tùy chọn',
-  referralEmailLabel: 'Email giới thiệu',
-  referralEmailPlaceholder: 'oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {
     service: 'Điều khoản dịch vụ XRUN',

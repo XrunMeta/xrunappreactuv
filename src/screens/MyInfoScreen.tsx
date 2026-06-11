@@ -41,6 +41,7 @@ export const MyInfoScreen = () => {
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     email?: string;
+    member?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
@@ -66,15 +67,7 @@ export const MyInfoScreen = () => {
         iconImage: require('../../assets/images/icon_referral_list.png'),
         route: 'referralMyGroup',
       },
-      {
-        id: 'referral',
-        label: t('screens.myInfo.referralEdit'),
-        subtitle: t('screens.myInfo.referralEditSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#EC4899',
-        route: 'myInfoReferral',
-      },
+
       {
         id: 'shopSales',
         label: t('screens.myInfo.shopSales'),
@@ -151,6 +144,7 @@ export const MyInfoScreen = () => {
               setUserInfo({
                 name: fullName,
                 email: user.email || '',
+                member,
               });
             }
           }
@@ -239,7 +233,7 @@ export const MyInfoScreen = () => {
       await showAlert(t('screens.myInfo.alerts.shareFailed'), t('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await shareReferralLink(t, { email: userInfo.email }, showAlert, navigate);
+    await shareReferralLink(t, { email: userInfo.email, member: userInfo.member }, showAlert, navigate);
   };
 
   const handleLogout = async () => {
@@ -289,6 +283,7 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('userTickets');
               await AsyncStorage.removeItem('rageProgressLastUpdate');
               await AsyncStorage.removeItem('userSessionToken');
+              await AsyncStorage.removeItem('jwt'); 
 
               await AsyncStorage.removeItem('appleSignupCompleted');
               await AsyncStorage.removeItem('appleSignupCompletedEmail');
@@ -309,6 +304,7 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('userTickets');
                 await AsyncStorage.removeItem('rageProgressLastUpdate');
                 await AsyncStorage.removeItem('userSessionToken');
+                await AsyncStorage.removeItem('jwt'); 
 
                 await AsyncStorage.removeItem('appleSignupCompleted');
                 await AsyncStorage.removeItem('appleSignupCompletedEmail');
@@ -316,6 +312,7 @@ export const MyInfoScreen = () => {
                 await AsyncStorage.removeItem('appleSignupEmail');
                 await AsyncStorage.removeItem('googleSignupRequired');
                 await AsyncStorage.removeItem('googleSignupEmail');
+
               } catch (storageError) {
                 console.error('[로그아웃] AsyncStorage 삭제 중 오류:', storageError);
               }

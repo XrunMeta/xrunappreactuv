@@ -54,7 +54,7 @@ export const ReferralRankScreen = () => {
     }
     await shareReferralLink(
       t,
-      { email: userEmail },
+      { email: userEmail, member: memberId ?? undefined },
       showAlert,
       navigate,
     );

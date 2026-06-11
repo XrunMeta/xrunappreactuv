@@ -34,7 +34,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification } from '../components';
+import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification, WalletKeyPinSetupModal } from '../components';
 
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -46,6 +46,7 @@ import { useOTAUpdate } from '../context/OTAUpdateContext';
 import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
+import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -53,6 +54,11 @@ import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
 import { collectDeviceInfo, getMinimalDeviceInfo } from '../utils/napApiUtils';
 import { showToast } from '../utils';
+import {
+  shouldShowTutorial,
+  TUTORIAL_PENDING_KEY,
+  TUTORIAL_COMPLETED_KEY,
+} from './walletKeyTutorialHelpers';
 
 interface LocationData {
 
@@ -225,6 +231,25 @@ export const MapMainScreen: React.FC = () => {
 
   const prevScreenRef = useRef<string | null>(null);
 
+  const tutorialGuardChecked = useRef(false);
+
+  useEffect(() => {
+    if (tutorialGuardChecked.current) return;
+    tutorialGuardChecked.current = true;
+    (async () => {
+      try {
+        const pending = await AsyncStorage.getItem(TUTORIAL_PENDING_KEY);
+        const completed = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+        if (shouldShowTutorial(pending, completed)) {
+          await AsyncStorage.removeItem(TUTORIAL_PENDING_KEY);
+          navigate(ROUTES.walletKeyTutorial);
+        }
+      } catch (e) {
+        console.warn('[MapMain] 튜토리얼 가드 확인 실패:', e);
+      }
+    })();
+  }, [navigate]);
+
   useEffect(() => {
     checkForUpdate();
   }, [checkForUpdate]);
@@ -345,6 +370,9 @@ export const MapMainScreen: React.FC = () => {
 
   const failedPreFetchCampidsRef = useRef<Set<string>>(new Set());
 
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinModalProps, setPinModalProps] = useState<{ memberId: number; email: string } | null>(null);
+
   useEffect(() => {
     const loadFailedCampids = async () => {
       try {
@@ -360,6 +388,67 @@ export const MapMainScreen: React.FC = () => {
       }
     };
     loadFailedCampids();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    let prevAppState: string = AppState.currentState;
+
+    const checkWalletPinSetup = async () => {
+      try {
+
+        const jwt = await AsyncStorage.getItem('jwt');
+        const memberId = jwt ? jwtPayloadSub(jwt) : null;
+
+        let emailRaw = await AsyncStorage.getItem('userEmail');
+        if (!emailRaw) {
+          try {
+            const ud = await AsyncStorage.getItem('userData');
+            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+          } catch {
+
+          }
+        }
+
+        if (memberId == null || !emailRaw) return;
+
+        const normEmail = emailRaw.toLowerCase().trim();
+        if (normEmail !== 'oth-test@example.invalid') return;
+
+        const entries = await findEntriesForUser(emailRaw, memberId);
+        const needPinSetup = (e: { s: string; h?: string } | null) =>
+          e !== null && e.s === 's0' && !e.h;
+        const triggerNeeded = needPinSetup(entries.eth) || needPinSetup(entries.pol);
+
+        if (cancelled) return;
+        if (triggerNeeded) {
+
+          setPinModalProps((prev) => {
+            if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
+            return { memberId, email: normEmail };
+          });
+          setShowPinModal(true);
+        }
+
+      } catch {
+
+      }
+    };
+
+    checkWalletPinSetup();
+
+    const sub = AppState.addEventListener('change', (nextState) => {
+      const wasBackground = !!prevAppState.match(/inactive|background/);
+      const isNowActive = nextState === 'active';
+      prevAppState = nextState;
+      if (wasBackground && isNowActive) {
+        checkWalletPinSetup();
+      }
+    });
+    return () => {
+      cancelled = true;
+      sub.remove();
+    };
   }, []);
 
   const startPreFetchAdUrls = useCallback(async (ads: any[]) => {
@@ -3585,6 +3674,19 @@ export const MapMainScreen: React.FC = () => {
 
         </View>
 
+      )}
+
+      {}
+      {pinModalProps != null && (
+        <WalletKeyPinSetupModal
+          memberId={pinModalProps.memberId}
+          email={pinModalProps.email}
+          visible={showPinModal}
+          onSuccess={() => {
+            setShowPinModal(false);
+            setPinModalProps(null);
+          }}
+        />
       )}
 
     </View>

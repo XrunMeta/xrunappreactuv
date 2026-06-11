@@ -12,6 +12,7 @@ export default {
   passwordPlaceholder: 'Vui lòng nhập mật khẩu của bạn',
   xrunPasswordLabel: 'Mật khẩu tài khoản XRUN',
   rememberMe: 'Giữ đăng nhập',
+  forgotPassword: 'Quên mật khẩu',
   loginButton: 'Đăng nhập',
   disclaimer: 'Nếu bạn quên mật khẩu, bạn có thể đăng nhập bằng đăng nhập xã hội hoặc đăng nhập bằng email OTP.',
   emailVerification: 'Xác minh Email',
@@ -19,6 +20,7 @@ export default {
 
   otp: {
     rememberMe: 'Giữ đăng nhập',
+  forgotPassword: 'Quên mật khẩu',
     sendButton: 'Gửi',
   },
   accountLink: 'Liên kết tài khoản',
@@ -31,6 +33,7 @@ export default {
     loginError: 'Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại',
     idTokenMissing: 'Không nhận được mã thông báo ID. Vui lòng thử lại.',
     identityTokenMissing: 'Không nhận được mã thông báo Identity. Vui lòng thử lại.',
+    googleLoginFailed: 'Đã xảy ra lỗi trong khi đăng nhập Google. Vui lòng thử lại.',
   },
 };
 

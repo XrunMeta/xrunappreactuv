@@ -23,7 +23,7 @@ export default {
   attendanceCheck: '签到',
   attendanceCheckCompletedReward: '签到完成奖励',
   attendanceCheckNotAvailable: '无法进行签到',
-  settlementNotice: '75天后结算',
+  settlementNotice: '14天内结算',
   referralEventRewardTitle: '领取推荐活动奖励',
   referralEventAlreadyCompleted: '推荐活动奖励已完成。',
   rewardNotAvailable: '当前状态无法领取奖励。',
