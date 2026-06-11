@@ -10,6 +10,7 @@ import {
   Alert,
   Share,
   Modal,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -182,22 +183,40 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const json = JSON.stringify(payload);
       const encrypted = encryptBackupJson(json, pin);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
-      const path = `${FileSystem.documentDirectory}${fileName}`;
-      await FileSystem.writeAsStringAsync(path, encrypted);
-      const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
-      try {
-        await Share.share({
-          url: shareUrl,
-          title: 'XRUN 지갑 백업',
-          message: 'XRUN 지갑 키 백업 (PIN 으로 보호됨)',
-        });
-      } catch {
 
+      if (Platform.OS === 'android') {
+        const SAF = (FileSystem as any).StorageAccessFramework;
+        if (!SAF) throw new Error('StorageAccessFramework 미지원 환경');
+        const perm = await SAF.requestDirectoryPermissionsAsync();
+        if (!perm.granted) {
+          await showAlert('취소됨', '폴더 선택이 취소되어 파일을 저장하지 않았습니다.');
+          setStage('options');
+          return;
+        }
+        const newUri = await SAF.createFileAsync(perm.directoryUri, fileName, 'application/octet-stream');
+        await SAF.writeAsStringAsync(newUri, encrypted);
+        await showAlert(
+          '백업 완료',
+          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        );
+      } else {
+
+        const path = `${FileSystem.documentDirectory}${fileName}`;
+        await FileSystem.writeAsStringAsync(path, encrypted);
+        const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
+        try {
+          await Share.share({
+            url: shareUrl,
+            title: 'XRUN 지갑 백업',
+          });
+        } catch {
+
+        }
+        await showAlert(
+          '백업 완료',
+          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        );
       }
-      await showAlert(
-        '백업 완료',
-        `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
-      );
       setStage('options');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletKeyBackup] file fail:', e);
