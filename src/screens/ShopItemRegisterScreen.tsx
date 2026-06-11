@@ -345,8 +345,8 @@ export const ShopItemRegisterScreen = () => {
       return;
     }
 
-    if (trimmedTitle.length > 50) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+    if (trimmedTitle.length > 20) {
+      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 20자 이내로 입력해주세요.');
       return;
     }
     if (trimmedDesc.length > 500) {
@@ -543,7 +543,7 @@ export const ShopItemRegisterScreen = () => {
               onChangeText={setTitle}
               placeholder={t('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
-              maxLength={50}
+              maxLength={20}
             />
           </View>
 
