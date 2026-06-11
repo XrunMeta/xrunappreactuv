@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+
+import ImageCropPicker from 'react-native-image-crop-picker';
 import { SafeView, Header } from '../components';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -202,27 +204,33 @@ export const ShopItemRegisterScreen = () => {
   const handleImagePicker = async () => {
     try {
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
+      const cropped = await ImageCropPicker.openPicker({
+        width: 500,
+        height: 500,
+        cropping: true,
+        cropperToolbarTitle: '상품 이미지 자르기',
+        cropperChooseText: '선택',
+        cropperCancelText: '취소',
+        compressImageQuality: 0.9,
+        mediaType: 'photo',
+        showCropFrame: true,
+        showCropGuidelines: true,
+        avoidEmptySpaceAroundImage: true,
+
       });
-      if (result.canceled || !result.assets || result.assets.length === 0) {
-        return;
-      }
-      const asset = result.assets[0];
+
+      console.log('[상품 등록] 자르기 완료:', cropped.path);
       setIsUploadingImage(true);
 
-      console.log('[상품 등록] 이미지 리사이즈 시작');
       const manipulatedImage = await ImageManipulator.manipulateAsync(
-        asset.uri,
-        [{ resize: { width: 250 } }], 
+        cropped.path,
+        [{ resize: { width: 250 } }],
         { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
       );
       console.log('[상품 등록] 이미지 리사이즈 완료:', manipulatedImage.uri);
 
       setImageUri(manipulatedImage.uri);
+      void ImagePicker; 
 
       console.log('[상품 등록] 이미지 업로드 시작');
       const uploadResult = await uploadImage(manipulatedImage.uri);
@@ -239,8 +247,15 @@ export const ShopItemRegisterScreen = () => {
         setImageFileId(null);
       }
     } catch (error: any) {
+
+      const msg = String(error?.message ?? '');
+      const code = String(error?.code ?? '');
+      if (code === 'E_PICKER_CANCELLED' || /cancel/i.test(msg)) {
+        console.log('[상품 등록] 이미지 선택 취소');
+        return;
+      }
       console.error('[상품 등록] 이미지 선택/업로드 오류:', error);
-      const errorMessage = error?.message || t('screens.shopItemRegister.alerts.imageProcessingError');
+      const errorMessage = msg || t('screens.shopItemRegister.alerts.imageProcessingError');
       Alert.alert(t('screens.shopItemRegister.alerts.error'), errorMessage);
       setImageUri(null);
       setImageFileId(null);
