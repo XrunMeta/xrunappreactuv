@@ -979,30 +979,41 @@ export const v_f5ecec = async (
 };
 
 export const v_01332e = async (
-  v_9bf12c,
+  v_c4cf0d,
   v_c65f5d,
 ): Promise<number | null> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_a357d3 = { email: v_9bf12c };
+    const v_2f361a = (v_c4cf0d || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', v_9bf12c);
+    const v_909fd0 = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(v_2f361a);
+    if (v_909fd0) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', v_2f361a);
+      const v_c1cd9e = await v_9f42a4.get(`/lookup-referral?code=${encodeURIComponent(v_2f361a.toUpperCase())}`);
+      const v_3b7754 = v_c1cd9e.data?.data?.[0];
+      if (v_3b7754?.exists && v_3b7754.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', v_3b7754.member);
+        return v_3b7754.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: v_a357d3 = { email: v_2f361a };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', v_2f361a);
     const v_3393e3 = await v_9f42a4.post<v_d6bdce>(
       '/ap1810-i01',
       v_576f5a,
     );
-
     const v_43c42e = v_3393e3.data.data[0];
     if (v_43c42e?.result === true && v_43c42e.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', v_43c42e.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', v_43c42e.member);
       return v_43c42e.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (v_5e9bfe) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', v_5e9bfe);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };

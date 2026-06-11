@@ -22,8 +22,8 @@ export default {
   ageLabel: 'อายุ',
   ageSelect: 'เลือก',
   optional: 'ไม่บังคับ',
-  referralEmailLabel: 'อีเมลแนะนำ',
-  referralEmailPlaceholder: 'oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code (or Email)',
+  referralEmailPlaceholder: 'ABC123 or oth-staff@example.invalid',
   termsAgree: '.',
   terms: {
     service: 'ข้อกำหนดการให้บริการ XRUN',
