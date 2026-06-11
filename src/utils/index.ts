@@ -150,13 +150,14 @@ export const shareReferralLink = async (
       ? `ref=${encodeURIComponent(referralCode)}`
       : (userDetails.email ? `referral=${encodeURIComponent(userDetails.email)}` : '');
     const deepLinkUrl = `https://www.xrun.run/invite?${inviteParam}`;
+    const appSchemeUrl = `xrun://invite?${inviteParam}`;
 
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
     const identifier = referralCode || userDetails.email || '';
-    const message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
+    const message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}\n📱 ${appSchemeUrl}`;
 
     console.log('[shareReferralLink] 공유 메시지:', message);
 

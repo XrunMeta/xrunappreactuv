@@ -22,8 +22,8 @@ export default {
   ageLabel: '年齢',
   ageSelect: '選択',
   optional: '任意',
-  referralEmailLabel: 'Referral Code (or Email)',
-  referralEmailPlaceholder: 'ABC123 or oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code',
+  referralEmailPlaceholder: 'ABC123',
   termsAgree: 'に同意します。',
   terms: {
     service: 'XRUNサービス規約',
