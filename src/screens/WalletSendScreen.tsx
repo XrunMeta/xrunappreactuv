@@ -513,20 +513,20 @@ export const WalletSendScreen = () => {
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
 
+    const currency = selectedWalletAsset?.currency;
+    const isPolygon = currency === 16 || currency === 18;
+    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
+      console.log('[송금-로컬] confirm — OTP 우회 + PIN 모달 진입', { email: memberEmail, currency });
+      setShowPinPrompt(true);
+      return;
+    }
+
     setShowOtpGate(true);
   };
 
   const handleOtpSuccess = () => {
     setShowOtpGate(false);
-    const currency = selectedWalletAsset?.currency;
-    const isPolygon = currency === 16 || currency === 18;
-    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
-      console.log('[송금-로컬] dev scope + Polygon → PIN 모달 진입', { email: memberEmail, currency });
-      setShowPinPrompt(true);
-    } else {
-      console.log('[송금-로컬] 일반 흐름 (postTransferNew) — Estimate 화면으로', { email: memberEmail, currency });
-      navigate(ROUTES.walletEstimate);
-    }
+    navigate(ROUTES.walletEstimate);
   };
 
   const handlePinPromptSuccess = (wallets: WalletKey[], _pin: string) => {
