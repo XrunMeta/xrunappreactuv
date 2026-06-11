@@ -167,8 +167,7 @@ export const v_4a40b2 = () => {
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.walletKeyGuide)}
           >
-            {}
-            <Text style={[v_d81136.cardText, { textAlign: 'center' }]}>
+            <Text style={v_d81136.cardText}>
               {v_8d41d7('screens.myInfoSettings.walletKeyGuide')}
             </Text>
           </TouchableOpacity>
