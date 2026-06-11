@@ -34,6 +34,7 @@ import {
   fetchTokenBalance,
   checkERC20Token,
   getUsersBalanceUpdateV2,
+  getReferralIncome,
 } from '../services';
 import {
   WalletData,
@@ -160,6 +161,8 @@ export const WalletScreen = () => {
   const [customTokens, setCustomTokens] = useState<CustomToken[]>([]);
   const [combinedAssets, setCombinedAssets] = useState<CombinedAsset[]>([]);
   const [adXrunAmount, setAdXrunAmount] = useState<number>(0);
+
+  const [referralAmount, setReferralAmount] = useState<number>(0);
   const [statusOtherChain, setStatusOtherChain] = useState<string>('off');
   const [member, setMember] = useState<number | null>(null);
   const [userData, setUserData] = useState<any>(null);
@@ -243,7 +246,7 @@ export const WalletScreen = () => {
   }, [navigate]);
 
   const combineTokenData = useCallback(
-    (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number): CombinedAsset[] => {
+    (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number, referralAmount: number): CombinedAsset[] => {
 
       const walletAssets: CombinedAsset[] = walletData
         .map((item) => ({
@@ -315,6 +318,21 @@ export const WalletScreen = () => {
       };
       allAssets.push(adXrunItem);
 
+      const rfItem: CombinedAsset = {
+        id: 1900,
+        symbol: 'XRUN',
+        name: 'RF',
+        amount: new BigNumber(referralAmount || 0).toFixed(2),
+        icon: require('../../assets/xrun-round-logo.png'),
+        currency: 1900,
+        isCustom: false,
+        subCurrencyName: 'RF',
+        contractAddress: '',
+        subcurrency: undefined,
+        originalData: undefined,
+      };
+      allAssets.push(rfItem);
+
       const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
         const existingIndex = acc.findIndex((item) => {
 
@@ -348,7 +366,7 @@ export const WalletScreen = () => {
       }, []);
 
       const sortedAssets = uniqueAssets.sort((a, b) => {
-        const priorityOrder = [18, 16, 19, 1, 2]; 
+        const priorityOrder = [18, 16, 19, 1900, 1, 2]; 
 
         const aPriority = priorityOrder.indexOf(a.currency);
         const bPriority = priorityOrder.indexOf(b.currency);
@@ -371,10 +389,10 @@ export const WalletScreen = () => {
 
   useEffect(() => {
     if (cardsData.length > 0 || customTokens.length > 0) {
-      const combined = combineTokenData(cardsData, customTokens, adXrunAmount);
+      const combined = combineTokenData(cardsData, customTokens, adXrunAmount, referralAmount);
       setCombinedAssets(combined);
     }
-  }, [cardsData, customTokens, adXrunAmount, combineTokenData]);
+  }, [cardsData, customTokens, adXrunAmount, referralAmount, combineTokenData]);
 
   useEffect(() => {
     if (!member) return;
@@ -507,9 +525,24 @@ export const WalletScreen = () => {
       }
     };
 
+    const fetchReferralIncomeAsync = async () => {
+      try {
+        const res = await getReferralIncome(member, navigate);
+        if (res?.status === 'success' && Array.isArray(res.data)) {
+          const total = res.data.reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
+          setReferralAmount(total);
+        }
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') {
+          console.warn('[지갑] RF 레퍼럴 조회 실패:', e?.message);
+        }
+      }
+    };
+
     fetchWalletDataAsync();
     fetchOtherChainsStatusAsync();
     fetchADXRUNTopBannersAsync();
+    fetchReferralIncomeAsync();
 
     return () => {
       abortController.abort();
@@ -751,6 +784,9 @@ export const WalletScreen = () => {
       if (currency === 19) {
 
         navigate(ROUTES.adHistory);
+      } else if (currency === 1900) {
+
+        navigate(ROUTES.referralSettlement);
       } else {
 
         setSelectedWalletAsset(item);
