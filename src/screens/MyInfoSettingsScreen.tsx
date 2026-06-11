@@ -167,7 +167,8 @@ export const MyInfoSettingsScreen = () => {
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.walletKeyGuide)}
           >
-            <Text style={styles.cardText}>
+            {}
+            <Text style={[styles.cardText, { textAlign: 'center' }]}>
               {t('screens.myInfoSettings.walletKeyGuide')}
             </Text>
           </TouchableOpacity>
