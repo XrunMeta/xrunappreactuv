@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: SIZES.large,
-    paddingTop: 60,
+
     alignItems: 'center',
   },
   centerBlock: {
