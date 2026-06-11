@@ -3,6 +3,7 @@
 import { ethers } from 'ethers';
 import { getEnv } from '../utils/env';
 import type { WalletKey } from './walletKeyStore';
+import { getApiBaseUrl, getAuthHeader } from './index';
 
 let _pendingWallets: WalletKey[] | null = null;
 
@@ -25,8 +26,33 @@ export function clearPendingWallets(): void {
   }
 }
 
-const POLYGON_RPC_URL = 'https://polygon-rpc.com';
+const POLYGON_RPC_URLS = [
+  'https://polygon-bor-rpc.publicnode.com',
+  'https://polygon.llamarpc.com',
+  'https://polygon.drpc.org',
+  'https://1rpc.io/matic',
+  'https://polygon-rpc.com',
+];
 const POLYGON_CHAIN_ID = 137;
+
+async function pickHealthyPolygonRpc(): Promise<ethers.JsonRpcProvider> {
+  for (const url of POLYGON_RPC_URLS) {
+    try {
+      console.log('[송금-로컬] RPC 시도:', url);
+      const provider = new ethers.JsonRpcProvider(url, POLYGON_CHAIN_ID);
+      const chainId = await provider.getNetwork().then(n => Number(n.chainId));
+      if (chainId === POLYGON_CHAIN_ID) {
+        console.log('[송금-로컬] RPC 정상:', url);
+        return provider;
+      }
+      console.warn('[송금-로컬] RPC chainId 불일치:', { url, chainId });
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').slice(0, 100);
+      console.warn('[송금-로컬] RPC 실패:', url, msg);
+    }
+  }
+  throw new Error('No healthy Polygon RPC available');
+}
 
 const ERC20_ABI = [
   'function transfer(address to, uint256 amount) returns (bool)',
@@ -73,8 +99,8 @@ export async function sendPolygonLocal(
 
   let provider: ethers.JsonRpcProvider;
   try {
-    console.log('[송금-로컬] 1/6 RPC provider 초기화:', POLYGON_RPC_URL);
-    provider = new ethers.JsonRpcProvider(POLYGON_RPC_URL, POLYGON_CHAIN_ID);
+    console.log('[송금-로컬] 1/6 RPC provider 헬스체크 시작');
+    provider = await pickHealthyPolygonRpc();
   } catch (e: any) {
     console.error('[송금-로컬] RPC 초기화 실패:', e?.message);
     return { ok: false, reason: 'rpc-init-failed', detail: String(e?.message ?? e) };
@@ -154,3 +180,40 @@ export function isLocalSendEnabledForUser(email: string | null | undefined): boo
   const normEmail = (email ?? '').toLowerCase().trim();
   return normEmail === 'oth-test@example.invalid' || normEmail === 'oth-user@example.invalid';
 }
+
+export async function recordOnchainTransfer(params: {
+  member: number;
+  from: string;
+  to: string;
+  amount: string;
+  currency: number;
+  network: 'POL' | 'ETH';
+  txHash: string;
+  blockNumber?: number;
+}): Promise<{ ok: boolean }> {
+  try {
+    console.log('[송금-로컬] 서버 로그 기록 시도', { txHash: params.txHash });
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/recordOnchainTransfer`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      console.warn('[송금-로컬] 서버 로그 응답 비정상:', res.status);
+      return { ok: false };
+    }
+    const json = await res.json().catch(() => null);
+    const ok = json?.status === 'success';
+    console.log('[송금-로컬] 서버 로그 기록 결과:', ok ? '성공' : '실패');
+    return { ok };
+  } catch (e: any) {
+    console.warn('[송금-로컬] 서버 로그 예외:', e?.message);
+    return { ok: false };
+  }
+}
+
