@@ -89,6 +89,9 @@ type AppContextValue = {
   selectedTransactionDetails: import('../screens/TransactionDetailsScreen').TransactionDetails | null;
   setSelectedTransactionDetails: (details: import('../screens/TransactionDetailsScreen').TransactionDetails | null) => void;
   resetSelectedTransactionDetails: () => void;
+
+  unlockedWalletsForSend: import('../services/walletKeyStore').WalletKey[] | null;
+  setUnlockedWalletsForSend: (wallets: import('../services/walletKeyStore').WalletKey[] | null) => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -175,6 +178,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   } | null>(null);
   const [selectedTransactionDetails, setSelectedTransactionDetails] = useState<import('../screens/TransactionDetailsScreen').TransactionDetails | null>(null);
 
+  const [unlockedWalletsForSend, setUnlockedWalletsForSend] = useState<import('../services/walletKeyStore').WalletKey[] | null>(null);
+
   const value = useMemo(
     () => ({
       walletSendAddress,
@@ -255,6 +260,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedTransactionDetails,
       setSelectedTransactionDetails,
       resetSelectedTransactionDetails: () => setSelectedTransactionDetails(null),
+      unlockedWalletsForSend,
+      setUnlockedWalletsForSend,
     }),
     [
       walletSendAddress,
@@ -277,6 +284,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       selectedWalletAsset,
       transactionResult,
       selectedTransactionDetails,
+      unlockedWalletsForSend,
     ],
   );
 

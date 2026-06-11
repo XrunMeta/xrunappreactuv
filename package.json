@@ -26,6 +26,7 @@
     "bignumber.js": "^9.3.1",
     "country-state-city": "^3.2.1",
     "crypto-js": "^4.2.0",
+    "ethers": "^6.16.0",
     "expo": "~54.0.31",
     "expo-apple-authentication": "~8.0.8",
     "expo-application": "~7.0.8",

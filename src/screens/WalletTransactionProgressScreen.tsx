@@ -8,7 +8,8 @@ import { Header, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
-import { postTransferNew } from '../services';
+import { JsonRpcProvider, Wallet, Contract, parseUnits, getAddress } from 'ethers';
+import { getEnv } from '../utils';
 
 const InfoCard = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.card}>
@@ -25,6 +26,8 @@ export const WalletTransactionProgressScreen = () => {
     walletSendAmount,
     selectedWalletAsset,
     setTransactionResult,
+    unlockedWalletsForSend,
+    setUnlockedWalletsForSend,
   } = useAppContext();
 
   const [isProcessing, setIsProcessing] = useState(true);
@@ -74,64 +77,74 @@ export const WalletTransactionProgressScreen = () => {
 
     const processTransfer = async () => {
       try {
-        console.log('[WalletTransactionProgress] 전송 프로세스 시작...');
+        console.log('[WalletTransactionProgress] 전송 프로세스 시작 (T-031 클라이언트 서명)...');
 
         setStatusMessage(t('screens.walletTransactionProgress.checkingTicket') || 'Checking transfer ticket...');
 
-        setStatusMessage(t('screens.walletTransactionProgress.executingTransfer') || 'Executing blockchain transfer...');
+        if (!unlockedWalletsForSend || unlockedWalletsForSend.length === 0) {
+          throw new Error('지갑 키가 잠겨있습니다. 이전 화면으로 돌아가서 PIN을 다시 입력해주세요.');
+        }
 
         const formattedAmount = new BigNumber(walletSendAmount || '0').toFixed();
         const currency = selectedWalletAsset.currency || 0;
         const isPolygon = currency === 16 || currency === 18;
         const network = isPolygon ? 'POL' : 'ETH';
-        const chainId = isPolygon ? 153 : 1;
+        const chainId = isPolygon ? 137 : 1;
 
-        const transferResult = await postTransferNew(
-          userAddress,
-          walletSendAddress,
-          formattedAmount,
-          member,
-          network,
-          currency,
-          chainId,
-          navigate,
-        );
-
-        console.log('[WalletTransactionProgress] 전송 결과:', transferResult);
-        console.log('[WalletTransactionProgress] 전송 결과 코드:', transferResult.code);
-        console.log('[WalletTransactionProgress] 전송 결과 코드 타입:', typeof transferResult.code);
-
-        const code = Number(transferResult.code);
-        if (code === 2000) {
-          setStatusMessage('전송가능 금액이 초과되었습니다.');          
-          setIsProcessing(false);
-          setIsSuccess(false);
-          setTransferFailedDialogVisible(true);
-          return;
-        }
-
-        const transferData = Array.isArray(transferResult.data)
-          ? transferResult.data[0]
-          : transferResult.data;
-
-        if (transferResult.status !== 'success' || !transferData?.txHash) {
-          const rawMsg = transferResult.message || t('screens.walletTransactionProgress.noTxHash') || 'No transaction hash';
-          let krMsg = rawMsg;
-          if (/amount is zero|Required fields missing/i.test(rawMsg)) {
-            krMsg = '전송 금액이 0이거나 필수 정보가 누락되었습니다.';
-          } else if (/limit exceeded|transfer limit/i.test(rawMsg)) {
-            krMsg = '전송 가능 금액이 초과되었습니다.';
-          } else if (/insufficient/i.test(rawMsg)) {
-            krMsg = '잔액이 부족합니다.';
-          } else if (/^[\x00-\x7F\s]+$/.test(rawMsg)) {
-            krMsg = '전송 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+        setStatusMessage('전송 한도 확인 중...');
+        try {
+          const env = getEnv();
+          const limitRes = await fetch(`https://oth-path-gw.example.invalid/oth-path`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.GATEWAY_AUTH_CODE}` },
+            body: JSON.stringify({ member, currency, amount: formattedAmount }),
+          });
+          const limitJson = await limitRes.json().catch(() => ({} as any));
+          if (!limitJson?.data?.allowed) {
+            throw new Error(`전송 한도 초과: 한도 ${limitJson?.data?.limit ?? 0}, 요청 ${limitJson?.data?.requested ?? 0}`);
           }
-          throw new Error(
-            (t('screens.walletTransactionProgress.transferFailed') || '전송 실패') + ': ' + krMsg
-          );
+        } catch (limitErr: any) {
+          throw new Error(limitErr?.message || '한도 확인 실패');
         }
 
-        const resultTxHash = transferData.txHash;
+        setStatusMessage(t('screens.walletTransactionProgress.executingTransfer') || 'Executing blockchain transfer...');
+
+        const walletCode = `c${currency}`;
+        const myWallet = unlockedWalletsForSend.find((w) => w.wallet_code === walletCode);
+        if (!myWallet) {
+          throw new Error(`해당 통화(${walletCode})의 지갑 키를 찾을 수 없습니다.`);
+        }
+
+        const env = getEnv();
+        const rpcUrl = isPolygon
+          ? `https://polygon-mainnet.infura.io/v3/${env.INFURA_APIKEY}`
+          : `https://mainnet.infura.io/v3/${env.INFURA_APIKEY}`;
+        const provider = new JsonRpcProvider(rpcUrl);
+        const signer = new Wallet(myWallet.private_key, provider);
+
+        const tokenAddress = isPolygon ? env.CONTRACT_ADDRESS_POLYGON : env.CONTRACT_ADDRESS_ETH;
+        const isERC20 = currency === 1 || currency === 18; 
+        const toAddressChecksum = getAddress(walletSendAddress);
+        const value = parseUnits(formattedAmount, 18);
+
+        let tx: { hash: string; wait?: () => Promise<unknown> };
+        if (isERC20) {
+          if (!tokenAddress) throw new Error('토큰 컨트랙트 주소가 설정되지 않았습니다.');
+          const ERC20_ABI = ['function transfer(address to, uint256 amount) returns (bool)'];
+          const contract = new Contract(tokenAddress, ERC20_ABI, signer);
+          tx = await (contract.transfer as any)(toAddressChecksum, value);
+        } else {
+
+          tx = await signer.sendTransaction({ to: toAddressChecksum, value });
+        }
+
+        console.log('[WalletTransactionProgress] 트랜잭션 broadcast 완료:', tx.hash);
+
+        try {
+          setUnlockedWalletsForSend(null);
+        } catch {  }
+
+        const resultTxHash = tx.hash;
         setTxHash(resultTxHash);
         setIsSuccess(true);
         setIsProcessing(false);
@@ -171,7 +184,7 @@ export const WalletTransactionProgressScreen = () => {
     };
 
     processTransfer();
-  }, [walletSendAddress, walletSendAmount, selectedWalletAsset, userAddress, member, navigate, setTransactionResult, t]);
+  }, [walletSendAddress, walletSendAmount, selectedWalletAsset, userAddress, member, navigate, setTransactionResult, t, unlockedWalletsForSend, setUnlockedWalletsForSend]);
 
   const formattedSendAmount = walletSendAmount
     ? new BigNumber(walletSendAmount || '0').toFixed()
