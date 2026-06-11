@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
-import { getSettlementList, getSettlementAmount, getReferralIncome } from '../services';
+import { getReferralIncome } from '../services';
 import type { ReferralIncomeItem } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
@@ -154,12 +154,9 @@ export const ReferralSettlementScreen = () => {
     try {
       setLoading(true);
 
-      const [resultRef, resultAmount] = await Promise.all([
-        getReferralIncome(member, navigate),
-        getSettlementAmount(member, navigate),
-      ]);
+      const resultRef = await getReferralIncome(member, navigate);
 
-      if (resultRef.status === 'success' && resultAmount.status === 'success') {
+      if (resultRef.status === 'success') {
 
         const rows: TransformedSettlementData[] = (resultRef.data || []).map((item: ReferralIncomeItem, idx: number) => {
           const label = SOURCE_LABEL[item.source_type] || item.source_type || '레퍼럴 분배';
@@ -175,13 +172,15 @@ export const ReferralSettlementScreen = () => {
         });
         setSettlementData(rows);
 
-        const totalAmount = resultAmount.data[0]?.amount || '0';
-        const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
-        const formattedAmount = isNaN(totalAmountNum) ? '0' : totalAmountNum.toFixed(2);
+        const totalAmountNum = (resultRef.data || []).reduce(
+          (sum: number, item: ReferralIncomeItem) => sum + (Number(item.xrun_amount) || 0),
+          0
+        );
+        const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
         const price = gopaxPrice > 0 ? gopaxPrice : 176; 
-        console.log('[정산] 원화 계산:', { totalAmount, totalAmountNum, price });
+        console.log('[정산] 원화 계산:', { totalAmountNum, price });
 
         const wonEquivalent = calculateWonEquivalent(totalAmountNum, price);
         console.log('[정산] 원화 환산 결과:', wonEquivalent);
@@ -195,10 +194,7 @@ export const ReferralSettlementScreen = () => {
         setCurrentPage(1);
         setHasMore(rows.length > ITEMS_PER_PAGE);
       } else {
-        console.error(
-          '정산 데이터 조회 실패:',
-          resultRef.message || resultAmount.message,
-        );
+        console.error('정산 데이터 조회 실패:', resultRef.message);
         setSettlementData([]);
         setCurrentData([]);
         setTotalRevenue('0 XRUN');
