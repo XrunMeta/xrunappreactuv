@@ -514,8 +514,8 @@ export const WalletSendScreen = () => {
     setWalletSendAmount(cleanAmount);
 
     const currency = selectedWalletAsset?.currency;
-    const isPolygon = currency === 16 || currency === 18;
-    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
+    const isSupported = currency === 1 || currency === 2 || currency === 16 || currency === 18;
+    if (isLocalSendEnabledForUser(memberEmail) && isSupported) {
       console.log('[송금-로컬] confirm — OTP 우회 + PIN 모달 진입', { email: memberEmail, currency });
       setShowPinPrompt(true);
       return;
