@@ -460,7 +460,18 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   return (
     <SafeView>
-      <Header title="지갑 키 백업" onBackPress={goBack} showBackButton />
+      {}
+      <Header
+        title="지갑 키 백업"
+        onBackPress={() => {
+          if (stage === 'view') {
+            setStage('options');
+          } else {
+            goBack();
+          }
+        }}
+        showBackButton
+      />
       <SafeScrollView contentContainerStyle={styles.content}>
         {stage === 'loading' && (
           <View style={styles.center}>
@@ -584,14 +595,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 </View>
               );
             })}
-
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setStage('options')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.backButtonText}>옵션으로 돌아가기</Text>
-            </TouchableOpacity>
+            {}
           </View>
         )}
       </SafeScrollView>
