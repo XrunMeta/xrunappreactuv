@@ -217,19 +217,3 @@ export async function recordOnchainTransfer(params: {
   }
 }
 
-export async function getTransferLimitEnabled(): Promise<boolean> {
-  try {
-    const baseUrl = getApiBaseUrl();
-    const res = await fetch(`${baseUrl}/transferLimitEnabled`, {
-      method: 'GET',
-      headers: { Authorization: await getAuthHeader() },
-    });
-    if (!res.ok) return true;
-    const json = await res.json().catch(() => null);
-    const enabled = json?.data?.[0]?.enabled;
-    console.log('[송금-로컬] 전송제한 토글 상태:', enabled);
-    return enabled !== false;
-  } catch {
-    return true;
-  }
-}

@@ -28,7 +28,7 @@ import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW } from '../services';
 import type { WalletKey } from '../services/walletKeyStore';
-import { isLocalSendEnabledForUser, stagePendingWallets, getTransferLimitEnabled } from '../services/walletSendLocal';
+import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 
 interface AddressBookItem {
   id: string;
@@ -496,17 +496,11 @@ export const WalletSendScreen = () => {
     }
 
     if (memberLimit !== null && amount.gt(new BigNumber(memberLimit))) {
-      const limitEnabled = await getTransferLimitEnabled();
-      if (limitEnabled) {
-        console.log('[송금-로컬] 전송제한 ON — 한도 초과 차단');
-        await showAlert(
-          t('screens.walletSend.alerts.insufficientBalance'),
-          `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
-        );
-        return;
-      } else {
-        console.log('[송금-로컬] 전송제한 OFF — 한도 초과 허용');
-      }
+      await showAlert(
+        t('screens.walletSend.alerts.insufficientBalance'),
+        `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
+      );
+      return;
     }
 
     if (!memberEmail) {
