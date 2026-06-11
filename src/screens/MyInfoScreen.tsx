@@ -41,6 +41,7 @@ export const MyInfoScreen = () => {
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     email?: string;
+    member?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
@@ -143,6 +144,7 @@ export const MyInfoScreen = () => {
               setUserInfo({
                 name: fullName,
                 email: user.email || '',
+                member,
               });
             }
           }
@@ -231,7 +233,7 @@ export const MyInfoScreen = () => {
       await showAlert(t('screens.myInfo.alerts.shareFailed'), t('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await shareReferralLink(t, { email: userInfo.email }, showAlert, navigate);
+    await shareReferralLink(t, { email: userInfo.email, member: userInfo.member }, showAlert, navigate);
   };
 
   const handleLogout = async () => {
