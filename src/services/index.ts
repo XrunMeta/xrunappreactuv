@@ -56,6 +56,18 @@ export async function fetchAndSaveWallets(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await getAuthHeader(),
     };
+
+    try {
+      const atRes = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+      if (atRes.ok) {
+        const atJson = await atRes.json().catch(() => null);
+        if (atJson?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
     if (!res.ok) return; 
     const json = await res.json();
