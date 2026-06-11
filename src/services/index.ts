@@ -156,6 +156,23 @@ export async function upsertWalletPin(member: number, pin: string): Promise<{ ok
   }
 }
 
+export async function deleteServerSavedstring(): Promise<{ ok: boolean; updated?: number; error?: string }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/deleteSavedstring`, { method: 'POST', headers });
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+    const json = await res.json().catch(() => null);
+    if (json?.status !== 'success') return { ok: false, error: json?.message ?? 'unknown' };
+    return { ok: true, updated: json?.data?.updated };
+  } catch (e: any) {
+    return { ok: false, error: e?.message ?? 'network' };
+  }
+}
+
 export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
   try {
     const baseUrl = getApiBaseUrl();
