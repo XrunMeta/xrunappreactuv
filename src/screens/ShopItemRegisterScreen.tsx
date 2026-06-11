@@ -337,8 +337,30 @@ export const v_680bee = () => {
   };
 
   const v_585b02 = async () => {
-    if (!v_9f1622.trim()) {
+    const v_25e98c = v_9f1622.trim();
+    const v_17b3f8 = v_6856a9.trim();
+
+    if (!v_25e98c) {
       v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.productNameRequired'));
+      return;
+    }
+
+    if (v_25e98c.length > 50) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명은 50자 이내로 입력해주세요.');
+      return;
+    }
+    if (v_17b3f8.length > 500) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      return;
+    }
+
+    if (/(.)\1{4,}/.test(v_25e98c) || /(.)\1{4,}/.test(v_17b3f8)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      return;
+    }
+
+    if (/^[ㄱ-㆏\s]+$/.test(v_25e98c)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
@@ -521,6 +543,7 @@ export const v_680bee = () => {
               onChangeText={v_73c0df}
               placeholder={v_8d41d7('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
+              maxLength={50}
             />
           </View>
 
@@ -535,6 +558,7 @@ export const v_680bee = () => {
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
+              maxLength={500}
             />
           </View>
 
