@@ -4109,6 +4109,43 @@ export const v_b7594c = async (
   }
 };
 
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const v_2dc778 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member: v_660822 },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴정산] 조회 오류:', v_5e9bfe);
+    throw v_5e9bfe;
+  }
+};
+
 export const v_602f88 = async (
   v_660822,
   v_c65f5d,
