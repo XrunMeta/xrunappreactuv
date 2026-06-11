@@ -229,19 +229,23 @@ export const WalletRestoreScreen = () => {
           default: return `복원 실패: ${reason || '알 수 없는 오류'}`;
         }
       })();
+
       const detail = skipped.length > 0
-        ? '\n\n실패 entry:\n' + skipped.map((s) => `• ${NETWORK_LABEL[s.network] || s.network}: ${s.reason}`).join('\n')
+        ? '\n\n· 복원 못 한 키:\n' + skipped.map((s) => `   ${NETWORK_LABEL[s.network] || s.network} (${s.reason})`).join('\n')
         : '';
-      Alert.alert(`복원 실패 (${sourceLabel})`, reasonText + detail);
+      showAlert('지갑 복원 실패', reasonText + detail, [
+        { text: t('common.confirm') || '확인' },
+      ]);
       return;
     }
+
     const successList = imported.map((n) => `✓ ${NETWORK_LABEL[n] || n}`).join('\n');
     const skipDetail = skipped.length > 0
-      ? '\n\n복원되지 않은 항목:\n' + skipped.map((s) => `• ${NETWORK_LABEL[s.network] || s.network}: ${s.reason}`).join('\n')
+      ? '\n\n복원 못 한 키:\n' + skipped.map((s) => `· ${NETWORK_LABEL[s.network] || s.network}`).join('\n')
       : '';
     showAlert(
-      `복원 완료 (${sourceLabel})`,
-      `${successList}${skipDetail}\n\n지갑 화면으로 이동합니다.`,
+      '복원 완료',
+      `다음 지갑이 복원됐어요:\n\n${successList}${skipDetail}\n\n지갑 화면으로 이동할게요.`,
       [{ text: t('common.confirm') || '확인' }],
     ).then(() => {
       navigate(ROUTES.wallet);
