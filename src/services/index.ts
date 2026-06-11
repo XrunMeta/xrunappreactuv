@@ -979,30 +979,41 @@ export const checkEmailExists = async (
 };
 
 export const checkReferralEmail = async (
-  referralEmail: string,
+  referralInput: string,
   navigation?: any,
 ): Promise<number | null> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: ReferralCheckRequest = { email: referralEmail };
+    const trimmed = (referralInput || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', referralEmail);
+    const isReferralCode = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(trimmed);
+    if (isReferralCode) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', trimmed);
+      const codeResp = await axiosInstance.get(`/lookup-referral?code=${encodeURIComponent(trimmed.toUpperCase())}`);
+      const codeResult = codeResp.data?.data?.[0];
+      if (codeResult?.exists && codeResult.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', codeResult.member);
+        return codeResult.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: ReferralCheckRequest = { email: trimmed };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', trimmed);
     const response = await axiosInstance.post<ReferralCheckResponse>(
       '/ap1810-i01',
       request,
     );
-
     const result = response.data.data[0];
     if (result?.result === true && result.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', result.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', result.member);
       return result.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (error) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', error);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', error);
     throw error;
   }
 };

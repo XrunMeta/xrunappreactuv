@@ -22,8 +22,8 @@ export default {
   ageLabel: 'उम्र',
   ageSelect: 'चुनें',
   optional: 'वैकल्पिक',
-  referralEmailLabel: 'रेफरल ईमेल',
-  referralEmailPlaceholder: 'oth-staff@example.invalid',
+  referralEmailLabel: 'Referral Code (or Email)',
+  referralEmailPlaceholder: 'ABC123 or oth-staff@example.invalid',
   termsAgree: '.',
   terms: {
     service: 'XRUN सेवा नियम',
