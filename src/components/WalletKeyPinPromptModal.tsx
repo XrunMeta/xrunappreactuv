@@ -85,8 +85,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     if (__DEV__) {
       console.warn('[WalletKeyPinPromptModal] unlock fail reason:', result.reason);
     }
-    const msg = '비밀번호가 틀렸습니다 다시 입력해주세요';
-    setErrorMsg(msg);
+    setErrorMsg('');
     setStep('error');
     setPin('');
   };
@@ -152,7 +151,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <Text style={styles.prompt}>검증 중...</Text>
           )}
           {step === 'error' && (
-            <Text style={styles.prompt}>다시 시도해주세요</Text>
+            <Text style={styles.prompt}>비밀번호가 틀렸습니다. 다시 입력해 주세요</Text>
           )}
 
           {}
