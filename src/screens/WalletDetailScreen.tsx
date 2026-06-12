@@ -17,6 +17,9 @@ import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
+import { findEntriesForUser } from '../services/walletKeyStore';
+import { getWalletKeyATStatus } from '../services';
+import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
@@ -583,15 +586,53 @@ export const WalletDetailScreen = () => {
   }, [selectedType, createFetchFunction, createSendFetchFunction, createReceiveFetchFunction]);
 
   const handleAction = useCallback(
-    (type: 'scan' | 'receive' | 'send') => {
+    async (type: 'scan' | 'receive' | 'send') => {
       if (type === 'send') {
-        if (selectedWalletAsset) {
-          isNavigatingToSendRef.current = true;
-          setSelectedWalletAsset(selectedWalletAsset);
-          navigate(ROUTES.walletSend);
-        } else {
+        if (!selectedWalletAsset) {
           console.warn('[WalletDetail] selectedWalletAsset이 없어 보내기 화면으로 이동할 수 없습니다.');
+          return;
         }
+
+        try {
+          const userDataStr = await AsyncStorage.getItem('userData');
+          const userData = userDataStr ? JSON.parse(userDataStr) : null;
+          const email = (userData?.email ?? '').toLowerCase().trim();
+          const memberId = userData?.member != null ? Number(userData.member) : null;
+          if (isLocalSendEnabledForUser(email) && email && memberId != null) {
+            const entries = await findEntriesForUser(email, memberId);
+            const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+            if (!hasKey) {
+              const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
+              if (atStatus.at) {
+
+                const choice = await showAlert(
+                  '지갑 키 복원이 필요해요',
+                  '이전에 설정하신 비밀번호와 백업 파일이 있어야 송금할 수 있어요.\n' +
+                  '백업 파일이 있으시면 지금 복원해주세요.',
+                  [
+                    { text: '나중에' },
+                    { text: '복원하기' },
+                  ],
+                );
+                if (choice === 1) navigate(ROUTES.walletRestore);
+              } else {
+
+                await showAlert(
+                  '비밀번호 설정이 필요해요',
+                  '지갑 키 보호를 위한 6자리 비밀번호가 아직 설정되지 않았습니다.\n' +
+                  '메인 화면에서 비밀번호 설정을 먼저 진행해주세요.',
+                );
+              }
+              return;
+            }
+          }
+        } catch (e: any) {
+          console.warn('[WalletDetail] vault/AT check failed:', e?.message);
+
+        }
+        isNavigatingToSendRef.current = true;
+        setSelectedWalletAsset(selectedWalletAsset);
+        navigate(ROUTES.walletSend);
         return;
       }
       if (type === 'receive') {
@@ -626,6 +667,7 @@ export const WalletDetailScreen = () => {
       setWalletReceiveAddress,
       setWalletReceiveCurrency,
       setSelectedWalletAsset,
+      showAlert,
     ],
   );
 
