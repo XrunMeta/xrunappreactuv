@@ -110,15 +110,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     (async () => {
       try {
         const jwt = await AsyncStorage.getItem('jwt');
-        const mid = jwt ? jwtPayloadSub(jwt) : null;
+        let mid: number | null = jwt ? jwtPayloadSub(jwt) : null;
         let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
+
+        if (mid == null || !emailRaw) {
           try {
             const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+            if (ud) {
+              const parsed = JSON.parse(ud) as { email?: string; member?: number | string };
+              if (mid == null && parsed?.member != null) mid = Number(parsed.member);
+              if (!emailRaw && parsed?.email) emailRaw = parsed.email;
+            }
           } catch {  }
         }
         if (cancelled) return;
+        console.log('[WalletKeyBackup] mount', { mid, email: emailRaw, hasJwt: !!jwt });
         if (mid == null || !emailRaw) {
           await showAlert(
             t('common.messages.error') || '오류',
