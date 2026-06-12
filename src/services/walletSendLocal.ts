@@ -204,8 +204,9 @@ export async function sendOnchainLocal(
 export const sendPolygonLocal = sendOnchainLocal;
 
 export function isLocalSendEnabledForUser(email: string | null | undefined): boolean {
+  const LOCAL_SEND_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
   const normEmail = (email ?? '').toLowerCase().trim();
-  return normEmail === 'oth-test@example.invalid' || normEmail === 'oth-user@example.invalid';
+  return LOCAL_SEND_DEV_EMAILS.includes(normEmail);
 }
 
 export async function recordOnchainTransfer(params: {
