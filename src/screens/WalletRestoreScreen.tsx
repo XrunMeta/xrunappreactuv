@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -136,7 +135,7 @@ export const WalletRestoreScreen = () => {
     sourceLabel: string,
   ) => {
     if (memberId == null || !email) {
-      Alert.alert('오류', '인증 정보 누락');
+      await showAlert('오류', '인증 정보 누락');
       return;
     }
     setPendingBackup({ content, source: sourceLabel });
@@ -149,7 +148,7 @@ export const WalletRestoreScreen = () => {
     pinArg: string,
   ) => {
     if (memberId == null || !email || !pinArg) {
-      Alert.alert('오류', '인증 정보 누락');
+      await showAlert('오류', '인증 정보 누락');
       return;
     }
     const trimmed = content.trim();
@@ -160,18 +159,18 @@ export const WalletRestoreScreen = () => {
       try {
         json = decryptBackupJson(trimmed, pinArg);
       } catch {
-        Alert.alert('복호화 실패', 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다');
+        await showAlert('복호화 실패', 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다');
         return;
       }
       if (!json) {
-        Alert.alert('복호화 실패', '백업 파일을 풀 수 없습니다 (PIN 불일치)');
+        await showAlert('복호화 실패', '백업 파일을 풀 수 없습니다 (PIN 불일치)');
         return;
       }
       let payload: BackupPayload;
       try {
         payload = JSON.parse(json) as BackupPayload;
       } catch {
-        Alert.alert('파일 형식 오류', '백업 JSON 파싱 실패');
+        await showAlert('파일 형식 오류', '백업 JSON 파싱 실패');
         return;
       }
 
@@ -198,14 +197,14 @@ export const WalletRestoreScreen = () => {
       try {
         parsed = JSON.parse(trimmed);
       } catch {
-        Alert.alert('파일 형식 오류', '지원하지 않는 백업 형식입니다');
+        await showAlert('파일 형식 오류', '지원하지 않는 백업 형식입니다');
         return;
       }
       if (parsed && parsed.warning === 'PLAIN_TEXT_DO_NOT_SHARE' && Array.isArray(parsed.wallets)) {
         const plain = parsed as PlainBackupPayload;
 
         if ((plain.email || '').toLowerCase().trim() !== email) {
-          Alert.alert(
+          await showAlert(
             '사용자 불일치',
             `백업의 사용자(${plain.email}) 와 현재 사용자(${email}) 가 다릅니다.\n` +
               '자신의 계정으로 로그인한 상태에서 복원해주세요.',
@@ -238,11 +237,11 @@ export const WalletRestoreScreen = () => {
         );
         return;
       }
-      Alert.alert('파일 형식 오류', '지원하지 않는 백업 JSON 입니다');
+      await showAlert('파일 형식 오류', '지원하지 않는 백업 JSON 입니다');
       return;
     }
 
-    Alert.alert('파일 형식 오류', '암호화 백업도 평문 백업도 아닙니다');
+    await showAlert('파일 형식 오류', '암호화 백업도 평문 백업도 아닙니다');
   };
 
   const showRestoreResult = (
@@ -289,7 +288,7 @@ export const WalletRestoreScreen = () => {
 
   const handleRestoreFromFile = async () => {
     if (!email || memberId == null || !pin) {
-      Alert.alert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
+      await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
     try {
@@ -299,7 +298,7 @@ export const WalletRestoreScreen = () => {
         multiple: false,
       });
       if ((picked as any).__missingNative) {
-        Alert.alert(
+        await showAlert(
           '복원 불가',
           '파일 선택 기능이 현재 빌드에 포함되지 않았습니다.\n앱을 새 빌드로 업데이트한 뒤 다시 시도해주세요.\n(개발자: ./gradlew clean + EAS dev build 필요)',
         );
@@ -308,7 +307,7 @@ export const WalletRestoreScreen = () => {
       if (picked.canceled) return;
       const asset = picked.assets?.[0];
       if (!asset?.uri) {
-        Alert.alert('파일 선택 실패', 'URI 를 가져오지 못했습니다');
+        await showAlert('파일 선택 실패', 'URI 를 가져오지 못했습니다');
         return;
       }
       setStage('busy');
@@ -317,7 +316,7 @@ export const WalletRestoreScreen = () => {
         content = await FileSystem.readAsStringAsync(asset.uri);
       } catch (e: any) {
         setStage('options');
-        Alert.alert('파일 읽기 실패', e?.message || '파일을 읽을 수 없습니다');
+        await showAlert('파일 읽기 실패', e?.message || '파일을 읽을 수 없습니다');
         return;
       }
       await processBackupContent(content, '파일');
@@ -325,7 +324,7 @@ export const WalletRestoreScreen = () => {
     } catch (e: any) {
       setStage('options');
       if (__DEV__) console.warn('[WalletRestore] file restore fail:', e);
-      Alert.alert('복원 오류', e?.message || '알 수 없는 오류');
+      await showAlert('복원 오류', e?.message || '알 수 없는 오류');
     }
   };
 
@@ -373,7 +372,7 @@ export const WalletRestoreScreen = () => {
 
   const handleRestoreFromGDrive = async () => {
     if (!email || memberId == null || !pin) {
-      Alert.alert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
+      await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
     setStage('busy');
@@ -382,7 +381,7 @@ export const WalletRestoreScreen = () => {
       const files = await fetchDriveFiles(token);
       if (files.length === 0) {
         setStage('options');
-        Alert.alert('백업 파일 없음', 'Google Drive 에 백업 파일이 없습니다');
+        await showAlert('백업 파일 없음', 'Google Drive 에 백업 파일이 없습니다');
         return;
       }
       setDriveFiles(files);
@@ -390,7 +389,7 @@ export const WalletRestoreScreen = () => {
     } catch (e: any) {
       setStage('options');
       if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e);
-      Alert.alert('Drive 목록 조회 실패', e?.message || '알 수 없는 오류');
+      await showAlert('Drive 목록 조회 실패', e?.message || '알 수 없는 오류');
     }
   };
 
@@ -410,7 +409,7 @@ export const WalletRestoreScreen = () => {
       await processBackupContent(content, 'Google Drive');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletRestore] gdrive download fail:', e);
-      Alert.alert('Drive 다운로드 실패', e?.message || '알 수 없는 오류');
+      await showAlert('Drive 다운로드 실패', e?.message || '알 수 없는 오류');
     } finally {
       setStage('options');
     }
