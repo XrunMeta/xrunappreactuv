@@ -422,6 +422,19 @@ export const WalletDetailScreen = () => {
 
           const amountInEth = weiToEth(item.value, item.tokenDecimal);
 
+          if (typeof (globalThis as any).__walletDetailAmtLogged === 'undefined') {
+            console.log('[WalletDetail] 첫 변환 sample:', {
+              rawValue: item.value,
+              tokenDecimal: item.tokenDecimal,
+              amountInEth,
+              from: item.from,
+              to: item.to,
+            });
+            (globalThis as any).__walletDetailAmtLogged = true;
+
+            setTimeout(() => { delete (globalThis as any).__walletDetailAmtLogged; }, 5000);
+          }
+
           const formattedTimestamp = timestampToDate(item.timeStamp);
 
           return {
