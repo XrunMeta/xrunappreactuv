@@ -491,12 +491,15 @@ export const WalletDetailScreen = () => {
         });
 
         items.sort((a, b) => {
+          const tA = parseInt(((a as any).timeStamp ?? '0'), 10);
+          const tB = parseInt(((b as any).timeStamp ?? '0'), 10);
+          if (tB !== tA) return tB - tA;
 
-          const originalItemA = response.data.find((item) => item.hash === a.id);
-          const originalItemB = response.data.find((item) => item.hash === b.id);
-          const timestampA = originalItemA ? parseInt(originalItemA.timeStamp, 10) : 0;
-          const timestampB = originalItemB ? parseInt(originalItemB.timeStamp, 10) : 0;
-          return timestampB - timestampA;
+          const aIsSend = a.action === 3305;
+          const bIsSend = b.action === 3305;
+          if (aIsSend && !bIsSend) return -1;
+          if (!aIsSend && bIsSend) return 1;
+          return 0;
         });
 
         const dateFilteredItems = items;
