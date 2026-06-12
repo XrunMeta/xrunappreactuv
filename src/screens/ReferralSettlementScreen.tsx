@@ -190,7 +190,7 @@ export const v_08aac3 = () => {
             id: `ref_${v_8c0b26.id}_${v_e86ad8}`,
             type: v_2869c1,
             description: v_2869c1,
-            amount: `${(Number(v_8c0b26.xrun_amount) || 0).toFixed(2)} XRUN`,
+            amount: `${(Number(v_8c0b26.xrun_amount) || 0).toFixed(3).replace(/\.?0+$/, '') || '0'} XRUN`,
             date: v_16897e(v_8c0b26.created_at),
             transaction: v_8c0b26.id,
             status: v_8c0b26.status,
