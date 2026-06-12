@@ -115,6 +115,17 @@ export const MyInfoSettingsScreen = () => {
     fetchVersionInfo();
   }, []);
 
+  useEffect(() => {
+    if (!IS_DEV_MODE) return;
+    (async () => {
+      const existing = await AsyncStorage.getItem(DEV_QUICK_LOGIN_SECRET_KEY);
+      if (!existing) {
+        await AsyncStorage.setItem(DEV_QUICK_LOGIN_SECRET_KEY, 'Aaaaaa1');
+        console.log('[dev] USR_SECRET 자동 저장 완료');
+      }
+    })();
+  }, []);
+
   const handleQuickLogin = async () => {
     if (quickLoginLoading) return;
     setQuickLoginLoading(true);
