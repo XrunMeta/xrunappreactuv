@@ -148,6 +148,30 @@ export async function sendOnchainLocal(
   let txResponse: ethers.TransactionResponse;
   const isNative = currency === 2 || currency === 16;
 
+  if (!isNative) {
+    try {
+      const [nativeBal, gasPrice] = await Promise.all([
+        provider.getBalance(wallet.address),
+        provider.getFeeData().then(d => d.gasPrice ?? d.maxFeePerGas ?? 0n),
+      ]);
+
+      const estimatedFee = BigInt(gasPrice) * 130_000n;
+      if (nativeBal < estimatedFee) {
+        const nativeName = currency === 1 ? 'ETH' : 'POL';
+        const needFmt = Number(ethers.formatEther(estimatedFee)).toFixed(6);
+        const haveFmt = Number(ethers.formatEther(nativeBal)).toFixed(6);
+        console.error(`[송금-로컬] 가스비 부족: ${nativeName} 보유 ${haveFmt} < 필요 ${needFmt}`);
+        return {
+          ok: false,
+          reason: 'broadcast-failed',
+          detail: '송금에 필요한 네트워크 수수료가 부족해요.\n관리자가 곧 처리해드릴 예정이니\n잠시 후 다시 시도해주세요.',
+        };
+      }
+    } catch (gasErr: any) {
+      console.warn('[송금-로컬] 가스 사전 체크 실패, broadcast 시도 진행:', gasErr?.message);
+    }
+  }
+
   try {
     if (isNative) {
       const tokenName = currency === 2 ? 'ETH' : 'POL';
@@ -173,6 +197,15 @@ export async function sendOnchainLocal(
     console.log('[송금-로컬] 4/6 broadcast 완료, txHash=', txResponse.hash);
   } catch (e: any) {
     const msg = String(e?.message ?? e ?? 'unknown').slice(0, 300);
+
+    if (/insufficient funds/i.test(msg)) {
+      console.error('[송금-로컬] 가스비 부족 broadcast 실패');
+      return {
+        ok: false,
+        reason: 'broadcast-failed',
+        detail: '송금에 필요한 네트워크 수수료가 부족해요.\n관리자가 곧 처리해드릴 예정이니\n잠시 후 다시 시도해주세요.',
+      };
+    }
     console.error('[송금-로컬] broadcast 실패:', msg);
     return { ok: false, reason: 'broadcast-failed', detail: msg };
   }
