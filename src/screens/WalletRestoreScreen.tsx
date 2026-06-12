@@ -401,6 +401,7 @@ export const WalletRestoreScreen = () => {
   if (stage === 'pin') {
     return (
       <SafeView style={styles.container}>
+        {}
         {memberId != null && email && (
           <WalletKeyPinPromptModal
             visible={pinPromptVisible}
@@ -408,6 +409,7 @@ export const WalletRestoreScreen = () => {
             email={email}
             onSuccess={onPinPromptSuccess}
             onCancel={onPinPromptCancel}
+            skipVaultCheck
           />
         )}
       </SafeView>

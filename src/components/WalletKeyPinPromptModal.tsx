@@ -23,6 +23,8 @@ interface Props {
 
   onSuccess: (wallets: WalletKey[], pin: string) => void;
   onCancel: () => void;
+
+  skipVaultCheck?: boolean;
 }
 
 type Step = 'enter' | 'verifying' | 'error';
@@ -33,6 +35,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   visible,
   onSuccess,
   onCancel,
+  skipVaultCheck = false,
 }) => {
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
@@ -57,6 +60,18 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     setStep('verifying');
 
     await new Promise<void>((r) => setTimeout(r, 0));
+
+    if (skipVaultCheck) {
+      if (/^\d{6}$/.test(currentPin)) {
+        onSuccess([], currentPin);
+        setPin('');
+        return;
+      }
+      setErrorMsg('6자리 숫자를 입력해주세요');
+      setStep('error');
+      setPin('');
+      return;
+    }
 
     const result = await unlockUserWallets(currentPin, email, memberId);
     if (result.ok) {
