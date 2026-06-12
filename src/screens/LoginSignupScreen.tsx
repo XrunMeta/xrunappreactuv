@@ -1,18 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PrimaryButton, SecondaryButton, SafeView } from '../components';
-import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
+import { COLORS, SIZES, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { TaboolaBanner } from '../components/TaboolaBanner';
-import { loginWithEmailPassword } from '../services';
-import { useAlertDialog } from '../context/AlertDialogContext';
-
-const DEV_QUICK_LOGIN_EMAIL = 'oth-user@example.invalid';
-const DEV_QUICK_LOGIN_SECRET_KEY = '__dev_quick_login_usr_secret';
-const DEV_QUICK_LOGIN_SECRET_VALUE = 'Aaaaaa1';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -30,60 +24,10 @@ const tutorialImages = [
 ];
 
 export const LoginSignupScreen = () => {
-  const { navigate, reset } = useAppNavigation();
+  const { navigate } = useAppNavigation();
   const { t } = useTranslation();
-  const { showAlert } = useAlertDialog();
   const [currentPage, setCurrentPage] = useState(0);
-  const [quickLoginLoading, setQuickLoginLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-
-  useEffect(() => {
-    if (!IS_DEV_MODE) return;
-    (async () => {
-      const existing = await AsyncStorage.getItem(DEV_QUICK_LOGIN_SECRET_KEY);
-      if (!existing) {
-        await AsyncStorage.setItem(DEV_QUICK_LOGIN_SECRET_KEY, DEV_QUICK_LOGIN_SECRET_VALUE);
-      }
-    })();
-  }, []);
-
-  const handleQuickLogin = async () => {
-    if (quickLoginLoading) return;
-    setQuickLoginLoading(true);
-    try {
-      const secret = await AsyncStorage.getItem(DEV_QUICK_LOGIN_SECRET_KEY);
-      if (!secret) {
-        await showAlert('오류', 'USR_SECRET 가 저장되지 않았습니다.');
-        return;
-      }
-
-      const allKeys = await AsyncStorage.getAllKeys();
-      const toRemove = allKeys.filter((k) =>
-        k === 'userData' || k === 'jwt' || k === 'loggedIn' || k === 'userEmail' || k === 'remember'
-      );
-      if (toRemove.length > 0) await AsyncStorage.multiRemove(toRemove);
-
-      const res = await loginWithEmailPassword(DEV_QUICK_LOGIN_EMAIL, secret);
-      if (res?.status === 'success') {
-        const userData = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (userData) {
-          await AsyncStorage.setItem('userData', JSON.stringify(userData));
-          await AsyncStorage.setItem('userEmail', userData.email || DEV_QUICK_LOGIN_EMAIL);
-          await AsyncStorage.setItem('loggedIn', 'true');
-          await AsyncStorage.setItem('remember', 'true');
-        }
-        console.log('[dev 빠른 로그인] 성공:', DEV_QUICK_LOGIN_EMAIL);
-        reset(ROUTES.map);
-      } else {
-        await showAlert('로그인 실패', String((res as any)?.message ?? '시크릿 또는 서버 설정 확인'));
-      }
-    } catch (e: any) {
-      console.warn('[dev 빠른 로그인] 예외:', e?.message);
-      await showAlert('로그인 오류', e?.message ?? '알 수 없는 오류');
-    } finally {
-      setQuickLoginLoading(false);
-    }
-  };
 
   const handleLogin = () => navigate(ROUTES.login);
   const handleSignUp = async () => {
@@ -163,19 +107,6 @@ export const LoginSignupScreen = () => {
           fullWidth
         />
 
-        {}
-        {IS_DEV_MODE && (
-          <TouchableOpacity
-            style={styles.devQuickLoginButton}
-            onPress={handleQuickLogin}
-            disabled={quickLoginLoading}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.devQuickLoginText}>
-              {quickLoginLoading ? '로그인 중...' : '🧪 viaggio 빠른 로그인 (DEV)'}
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       {}
@@ -249,21 +180,5 @@ const styles = StyleSheet.create({
   taboolaContainer: {
     borderWidth: 2,
     borderColor: '#ededed',
-  },
-
-  devQuickLoginButton: {
-    marginTop: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  devQuickLoginText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#92400E',
   },
 });
