@@ -20,6 +20,7 @@ import { copyToClipboard, showToast } from '../utils';
 import { findEntriesForUser } from '../services/walletKeyStore';
 import { getWalletKeyATStatus } from '../services';
 import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
+import { WalletKeyPinSetupModal } from '../components';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
@@ -239,6 +240,9 @@ export const WalletDetailScreen = () => {
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+
+  const [pinSetupVisible, setPinSetupVisible] = useState(false);
+  const [pinSetupCtx, setPinSetupCtx] = useState<{ memberId: number; email: string } | null>(null);
   const isNavigatingToSendRef = useRef(false);
   const [transactionDetailsModalVisible, setTransactionDetailsModalVisible] = useState(false);
   const [selectedTransactionDetailsForModal, setSelectedTransactionDetailsForModal] = useState<TransactionDetails | null>(null);
@@ -617,11 +621,8 @@ export const WalletDetailScreen = () => {
                 if (choice === 1) navigate(ROUTES.walletRestore);
               } else {
 
-                await showAlert(
-                  '비밀번호 설정이 필요해요',
-                  '지갑 키 보호를 위한 6자리 비밀번호가 아직 설정되지 않았습니다.\n' +
-                  '메인 화면에서 비밀번호 설정을 먼저 진행해주세요.',
-                );
+                setPinSetupCtx({ memberId, email });
+                setPinSetupVisible(true);
               }
               return;
             }
@@ -870,6 +871,25 @@ export const WalletDetailScreen = () => {
           />
         )}
       </Modal>
+
+      {}
+      {pinSetupCtx != null && pinSetupVisible && (
+        <WalletKeyPinSetupModal
+          memberId={pinSetupCtx.memberId}
+          email={pinSetupCtx.email}
+          visible={pinSetupVisible}
+          onSuccess={() => {
+            setPinSetupVisible(false);
+            setPinSetupCtx(null);
+
+            if (selectedWalletAsset) {
+              isNavigatingToSendRef.current = true;
+              setSelectedWalletAsset(selectedWalletAsset);
+              navigate(ROUTES.walletSend);
+            }
+          }}
+        />
+      )}
     </SafeView>
   );
 };

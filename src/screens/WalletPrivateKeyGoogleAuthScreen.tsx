@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
+import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, WalletKeyPinSetupModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -34,6 +34,7 @@ import {
   type WalletKey,
   type WalletNetwork,
 } from '../services/walletKeyStore';
+import { getWalletKeyATStatus } from '../services';
 
 type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
 
@@ -51,6 +52,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [memberId, setMemberId] = useState<number | null>(null);
   const [email, setEmail] = useState<string>('');
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
+
+  const [pinSetupVisible, setPinSetupVisible] = useState(false);
 
   const [wallets, setWallets] = useState<WalletKey[]>([]);
 
@@ -140,20 +143,22 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         const entries = await findEntriesForUser(normEmail, mid);
         const hasS1 = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
         if (!hasS1) {
-          const choice = await showAlert(
-            '지갑 키가 없어요',
-            '이 기기엔 지갑 키가 저장돼있지 않습니다.\n\n' +
-              '• 이전에 백업한 파일이 있으면 [복원하기]\n' +
-              '• 처음이라면 [돌아가기] → 메인에서 비밀번호 설정',
-            [
-              { text: '돌아가기', style: 'cancel' },
-              { text: '복원하기' },
-            ],
-          );
-          if (choice === 1) {
-            navigate(ROUTES.walletRestore);
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
+          if (cancelled) return;
+          if (atStatus.at) {
+            const choice = await showAlert(
+              '지갑 키 복원이 필요해요',
+              '이전에 설정하신 비밀번호와 백업 파일로 지갑을 복원할 수 있어요.',
+              [
+                { text: '나중에', style: 'cancel' },
+                { text: '복원하기' },
+              ],
+            );
+            if (choice === 1) navigate(ROUTES.walletRestore);
+            else goBack();
           } else {
-            goBack();
+
+            setPinSetupVisible(true);
           }
           return;
         }
@@ -637,6 +642,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           email={email}
           onSuccess={onPinPromptSuccess}
           onCancel={onPinPromptCancel}
+        />
+      )}
+
+      {}
+      {memberId != null && email !== '' && pinSetupVisible && (
+        <WalletKeyPinSetupModal
+          memberId={memberId}
+          email={email}
+          visible={pinSetupVisible}
+          onSuccess={() => {
+            setPinSetupVisible(false);
+
+            setStage('pin');
+            setPinPromptVisible(true);
+          }}
         />
       )}
 
