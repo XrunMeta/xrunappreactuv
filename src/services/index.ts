@@ -443,8 +443,14 @@ export const v_23dd22 = async (): Promise<string> => {
 
 export const v_964a96 = async (v_8f00b9): Promise<void> => {
   const v_56b352 = v_8f00b9?.data?.jwt;
-  if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
+  const v_e4436a = typeof v_56b352;
+  const v_1b140d = typeof v_56b352 === 'string' && v_56b352.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(v_8f00b9?.data ?? {}), 'jwt type:', v_e4436a, 'valid:', v_1b140d);
+  if (v_1b140d) {
     await v_e84827.setItem('jwt', v_56b352);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', v_56b352.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const v_e0c7e8 = v_8f00b9?.data?.email
