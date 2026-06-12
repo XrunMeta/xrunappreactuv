@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
   unlockUserWallets,
@@ -23,6 +24,8 @@ interface Props {
 
   onSuccess: (wallets: WalletKey[], pin: string) => void;
   onCancel: () => void;
+
+  skipVaultCheck?: boolean;
 }
 
 type Step = 'enter' | 'verifying' | 'error';
@@ -33,6 +36,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   visible,
   onSuccess,
   onCancel,
+  skipVaultCheck = false,
 }) => {
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
@@ -47,7 +51,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   }, [visible]);
 
   useEffect(() => {
-    if (step === 'enter' && pin.length === 6) {
+    if ((step === 'enter' || step === 'error') && pin.length === 6) {
       handleVerify(pin);
     }
 
@@ -58,6 +62,18 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
 
     await new Promise<void>((r) => setTimeout(r, 0));
 
+    if (skipVaultCheck) {
+      if (/^\d{6}$/.test(currentPin)) {
+        onSuccess([], currentPin);
+        setPin('');
+        return;
+      }
+      setErrorMsg('6자리 숫자를 입력해주세요');
+      setStep('error');
+      setPin('');
+      return;
+    }
+
     const result = await unlockUserWallets(currentPin, email, memberId);
     if (result.ok) {
 
@@ -66,90 +82,106 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
       return;
     }
 
-    const msg = result.reason === 'wrong-pin'
-      ? 'PIN 이 일치하지 않습니다'
-      : __DEV__
-        ? `검증 실패: ${result.reason}`
-        : '검증 실패 — 다시 시도해주세요';
     if (__DEV__) {
       console.warn('[WalletKeyPinPromptModal] unlock fail reason:', result.reason);
     }
-    setErrorMsg(msg);
+    setErrorMsg('');
     setStep('error');
     setPin('');
   };
 
-  const handleRetry = () => {
+  const _unusedHandleRetry = () => {
     setStep('enter');
     setPin('');
     setErrorMsg('');
   };
+  void _unusedHandleRetry;
 
   const onPressDigit = (d: string) => {
-    if (step !== 'enter') return;
+
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+    } else if (step !== 'enter') return;
     if (pin.length >= 6) return;
     setPin(pin + d);
   };
 
   const onPressBackspace = () => {
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+      return;
+    }
     if (step !== 'enter') return;
     if (pin.length === 0) return;
     setPin(pin.slice(0, -1));
   };
 
-  const isInputStep = step === 'enter';
+  const isInputStep = step === 'enter' || step === 'error';
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false}>
+    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onCancel}>
       <View style={styles.overlay}>
         {}
-        <Text style={styles.title}>지갑 보호 PIN 확인</Text>
-
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerBackButton}
+            onPress={onCancel}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+        </View>
         {}
-        <Text style={styles.warning}>
-          지갑 키 보호 전용입니다.
-        </Text>
+        <View style={styles.centerBlock}>
+          {}
+          <Text style={styles.title}>지갑 보호 PIN 확인</Text>
 
-        {}
-        {step === 'enter' && (
-          <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
-        )}
-        {step === 'verifying' && (
-          <Text style={styles.prompt}>검증 중...</Text>
-        )}
-        {step === 'error' && (
-          <Text style={styles.prompt}>다시 시도해주세요</Text>
-        )}
+          {}
+          <Text style={styles.warning}>
+            지갑 키 보호 전용입니다.
+          </Text>
 
-        {}
-        <View style={styles.dotsRow}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, pin.length > i && styles.dotFilled]}
-            />
-          ))}
+          {}
+          {step === 'enter' && (
+            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+          )}
+          {step === 'verifying' && (
+            <Text style={styles.prompt}>검증 중...</Text>
+          )}
+          {step === 'error' && (
+            <Text style={styles.prompt}>비밀번호가 틀렸습니다. 다시 입력해 주세요</Text>
+          )}
+
+          {}
+          <View style={styles.dotsRow}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, pin.length > i && styles.dotFilled]}
+              />
+            ))}
+          </View>
+
+          {step === 'error' && !!errorMsg && (
+            <Text style={styles.error}>{errorMsg}</Text>
+          )}
+
+          {step === 'verifying' && (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          )}
+          {}
         </View>
 
-        {step === 'error' && !!errorMsg && (
-          <Text style={styles.error}>{errorMsg}</Text>
-        )}
-
-        {step === 'verifying' && (
-          <View style={styles.loadingRow}>
-            <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-          </View>
-        )}
-
-        {step === 'error' && (
-          <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-            <Text style={styles.retryText}>다시 시도</Text>
-          </TouchableOpacity>
-        )}
-
-        {}
-        {isInputStep && (
-          <View style={styles.keypad}>
+        {
+}
+        <View
+          style={[styles.keypad, !isInputStep && { opacity: 0 }]}
+          pointerEvents={isInputStep ? 'auto' : 'none'}
+        >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <TouchableOpacity
                 key={n}
@@ -172,8 +204,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <TouchableOpacity style={styles.key} onPress={onPressBackspace}>
               <Text style={[styles.keyText, { fontSize: 18 }]}>{'<'}</Text>
             </TouchableOpacity>
-          </View>
-        )}
+        </View>
       </View>
     </Modal>
   );
@@ -184,80 +215,112 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: SIZES.large,
-    paddingTop: Platform.OS === 'ios' ? 80 : 60,
     alignItems: 'center',
   },
+
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 8,
+  },
+  headerBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerBlock: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: {
-    fontSize: 22,
-    fontFamily: FONTS.semiBold,
-    color: COLORS.titleText,
+    fontSize: FONTS.size.large,
+    fontWeight: '700',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginTop: 20,
     marginBottom: 8,
   },
   warning: {
-    fontSize: 13,
-    color: COLORS.darkGray,
-    marginBottom: 24,
+    fontSize: FONTS.size.msmall,
+    color: '#64748b',
     textAlign: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 8,
   },
   prompt: {
-    fontSize: 16,
-    fontFamily: FONTS.medium,
-    color: COLORS.darkGray,
-    marginBottom: 28,
+    fontSize: FONTS.size.medium,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 24,
+    fontWeight: '500',
   },
   dotsRow: {
     flexDirection: 'row',
-    marginBottom: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   dot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#eee',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#CBD5E1',
     marginHorizontal: 8,
   },
   dotFilled: {
-    backgroundColor: COLORS.buttonPrimary,
+    backgroundColor: '#343a5a',
+    borderColor: '#343a5a',
   },
   error: {
-    fontSize: 14,
-    color: '#d44',
-    marginTop: 8,
-    marginBottom: 16,
+    fontSize: 13,
+    color: '#EF4444',
     textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 8,
   },
   loadingRow: {
     marginTop: 12,
   },
   retryButton: {
-    marginTop: 12,
-    paddingHorizontal: 28,
+    marginTop: 24,
+    paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
     backgroundColor: COLORS.buttonPrimary,
+    borderRadius: 8,
   },
   retryText: {
     color: '#fff',
-    fontSize: 16,
-    fontFamily: FONTS.semiBold,
+    fontSize: FONTS.size.medium,
+    fontWeight: '600',
   },
   keypad: {
-    marginTop: 24,
-    width: 300,
+    marginTop: 'auto',
+    marginBottom: Platform.OS === 'ios' ? 32 : 16,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    width: '100%',
   },
   key: {
-    width: 90,
-    height: 70,
+    width: '30%',
+    aspectRatio: 1.5,
+    margin: '1.5%',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 6,
   },
   keyText: {
-    fontSize: 24,
-    fontFamily: FONTS.semiBold,
-    color: COLORS.titleText,
+    fontSize: 26,
+    fontWeight: '600',
+    color: COLORS.text,
   },
 });

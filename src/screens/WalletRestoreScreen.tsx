@@ -7,12 +7,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as DocumentPicker from 'expo-document-picker';
+
+let DocumentPicker: any;
+try {
+  DocumentPicker = require('expo-document-picker');
+} catch (e) {
+  console.warn('[WalletRestore] expo-document-picker 네이티브 모듈 없음 — 리빌드 필요:', e);
+  DocumentPicker = { getDocumentAsync: async () => ({ canceled: true, assets: [], __missingNative: true }) };
+}
 import * as FileSystem from 'expo-file-system/legacy';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
@@ -21,7 +27,6 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
-  markUserUnlocked,
   decryptBackupJson,
   restoreBackup,
   restorePlainBackup,
@@ -59,20 +64,28 @@ export const WalletRestoreScreen = () => {
   const [pin, setPin] = useState<string>('');
   const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
 
+  const [pendingBackup, setPendingBackup] = useState<{ content: string; source: string } | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const jwt = await AsyncStorage.getItem('jwt');
-        const mid = jwt ? jwtPayloadSub(jwt) : null;
+        let mid: number | null = jwt ? jwtPayloadSub(jwt) : null;
         let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
+
+        if (mid == null || !emailRaw) {
           try {
             const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+            if (ud) {
+              const parsed = JSON.parse(ud) as { email?: string; member?: number | string };
+              if (mid == null && parsed?.member != null) mid = Number(parsed.member);
+              if (!emailRaw && parsed?.email) emailRaw = parsed.email;
+            }
           } catch {  }
         }
         if (cancelled) return;
+        console.log('[WalletRestore] mount', { mid, email: emailRaw, hasJwt: !!jwt });
         if (mid == null || !emailRaw) {
           await showAlert(
             t('common.messages.error') || '오류',
@@ -84,8 +97,8 @@ export const WalletRestoreScreen = () => {
         const normEmail = emailRaw.toLowerCase().trim();
         setMemberId(mid);
         setEmail(normEmail);
-        setStage('pin');
-        setPinPromptVisible(true);
+
+        setStage('options');
       } catch (e) {
         if (__DEV__) console.warn('[WalletRestore] mount fail:', e);
         goBack();
@@ -95,25 +108,47 @@ export const WalletRestoreScreen = () => {
   }, [goBack, showAlert, t]);
 
   const onPinPromptSuccess = (_wallets: any[], pinValue?: string) => {
-    if (email && memberId != null) {
-      markUserUnlocked(email, memberId);
-    }
-    setPin(pinValue ?? '');
+    const p = pinValue ?? '';
+    setPin(p);
     setPinPromptVisible(false);
-    setStage('options');
+
+    if (pendingBackup) {
+      const { content, source } = pendingBackup;
+      setPendingBackup(null);
+      runDecryption(content, source, p);
+    }
   };
 
   const onPinPromptCancel = () => {
     setPinPromptVisible(false);
+
+    if (pendingBackup) {
+      setPendingBackup(null);
+      setStage('options');
+      return;
+    }
     goBack();
   };
 
   const processBackupContent = async (
     content: string,
-    sourceLabel: string,   
+    sourceLabel: string,
   ) => {
-    if (memberId == null || !email || !pin) {
-      Alert.alert('오류', '인증 정보 누락');
+    if (memberId == null || !email) {
+      await showAlert('오류', '인증 정보 누락');
+      return;
+    }
+    setPendingBackup({ content, source: sourceLabel });
+    setPinPromptVisible(true);
+  };
+
+  const runDecryption = async (
+    content: string,
+    sourceLabel: string,
+    pinArg: string,
+  ) => {
+    if (memberId == null || !email || !pinArg) {
+      await showAlert('오류', '인증 정보 누락');
       return;
     }
     const trimmed = content.trim();
@@ -122,34 +157,36 @@ export const WalletRestoreScreen = () => {
 
       let json: string;
       try {
-        json = decryptBackupJson(trimmed, pin);
+        json = decryptBackupJson(trimmed, pinArg);
       } catch {
-        Alert.alert('복호화 실패', 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다');
+        await showAlert('복호화 실패', 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다');
         return;
       }
       if (!json) {
-        Alert.alert('복호화 실패', '백업 파일을 풀 수 없습니다 (PIN 불일치)');
+        await showAlert('복호화 실패', '백업 파일을 풀 수 없습니다 (PIN 불일치)');
         return;
       }
       let payload: BackupPayload;
       try {
         payload = JSON.parse(json) as BackupPayload;
       } catch {
-        Alert.alert('파일 형식 오류', '백업 JSON 파싱 실패');
+        await showAlert('파일 형식 오류', '백업 JSON 파싱 실패');
         return;
       }
 
-      const msg = `백업 유형: 암호화 (PIN)\n` +
-        `백업 사용자: ${payload.email || '(없음)'}\n` +
-        `백업 시각: ${new Date(payload.exported_at || 0).toLocaleString()}\n` +
-        `entry 수: ${payload.entries?.length ?? 0}\n\n` +
-        `현재 사용자(${email}) vault 에 덮어쓰기 진행할까요?`;
-      const ok = await showAlert('복원 확인', msg, [
+      const networkCount = payload.entries?.length ?? 0;
+      const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+      const msg =
+        `백업 일시   ${dateStr}\n` +
+        `포함된 키   ${networkCount}개\n\n` +
+        `지금 사용하고 있는 지갑 키를\n` +
+        `이 백업으로 바꿔서 가져올게요.`;
+      const ok = await showAlert('지갑 복원', msg, [
         { text: t('common.cancel') || '취소' },
-        { text: t('common.confirm') || '확인' },
+        { text: t('common.confirm') || '복원하기' },
       ]);
       if (ok !== 1) return;
-      const result = await restoreBackup(payload, email, memberId, pin);
+      const result = await restoreBackup(payload, email, memberId, pinArg);
       showRestoreResult(result.ok, result.imported, result.skipped, result.reason, sourceLabel);
       return;
     }
@@ -160,14 +197,14 @@ export const WalletRestoreScreen = () => {
       try {
         parsed = JSON.parse(trimmed);
       } catch {
-        Alert.alert('파일 형식 오류', '지원하지 않는 백업 형식입니다');
+        await showAlert('파일 형식 오류', '지원하지 않는 백업 형식입니다');
         return;
       }
       if (parsed && parsed.warning === 'PLAIN_TEXT_DO_NOT_SHARE' && Array.isArray(parsed.wallets)) {
         const plain = parsed as PlainBackupPayload;
 
         if ((plain.email || '').toLowerCase().trim() !== email) {
-          Alert.alert(
+          await showAlert(
             '사용자 불일치',
             `백업의 사용자(${plain.email}) 와 현재 사용자(${email}) 가 다릅니다.\n` +
               '자신의 계정으로 로그인한 상태에서 복원해주세요.',
@@ -175,20 +212,22 @@ export const WalletRestoreScreen = () => {
           return;
         }
 
+        const NETWORK_NAME: Record<string, string> = { eth: 'Ethereum', pol: 'Polygon' };
         const addrLines = plain.wallets
-          .map((w) => `• ${w.wallet_code} (${w.network}): ${w.address}`)
+          .map((w) => `   ${NETWORK_NAME[w.network] || w.network}    ${w.address.slice(0, 10)}…${w.address.slice(-6)}`)
           .join('\n');
-        const msg = `백업 유형: ⚠️ 평문\n` +
-          `백업 사용자: ${plain.email}\n` +
-          `백업 시각: ${new Date(plain.exported_at || 0).toLocaleString()}\n\n` +
-          `주소 목록:\n${addrLines}\n\n` +
-          `PIN 으로 암호화하여 vault 에 저장합니다. 진행할까요?`;
-        const ok = await showAlert('복원 확인 (평문)', msg, [
+        const dateStr = new Date(plain.exported_at || 0).toLocaleString();
+        const msg =
+          `이 백업은 암호화되지 않은 상태예요.\n` +
+          `복원하면 비밀번호로 다시 안전하게 보호돼요.\n\n` +
+          `백업 일시   ${dateStr}\n\n` +
+          `복원될 지갑\n${addrLines}`;
+        const ok = await showAlert('지갑 복원', msg, [
           { text: t('common.cancel') || '취소' },
-          { text: t('common.confirm') || '확인' },
+          { text: t('common.confirm') || '복원하기' },
         ]);
         if (ok !== 1) return;
-        const result = await restorePlainBackup(plain, email, memberId, pin);
+        const result = await restorePlainBackup(plain, email, memberId, pinArg);
         showRestoreResult(
           result.ok,
           result.imported,
@@ -198,11 +237,11 @@ export const WalletRestoreScreen = () => {
         );
         return;
       }
-      Alert.alert('파일 형식 오류', '지원하지 않는 백업 JSON 입니다');
+      await showAlert('파일 형식 오류', '지원하지 않는 백업 JSON 입니다');
       return;
     }
 
-    Alert.alert('파일 형식 오류', '암호화 백업도 평문 백업도 아닙니다');
+    await showAlert('파일 형식 오류', '암호화 백업도 평문 백업도 아닙니다');
   };
 
   const showRestoreResult = (
@@ -224,19 +263,23 @@ export const WalletRestoreScreen = () => {
           default: return `복원 실패: ${reason || '알 수 없는 오류'}`;
         }
       })();
+
       const detail = skipped.length > 0
-        ? '\n\n실패 entry:\n' + skipped.map((s) => `• ${NETWORK_LABEL[s.network] || s.network}: ${s.reason}`).join('\n')
+        ? '\n\n· 복원 못 한 키:\n' + skipped.map((s) => `   ${NETWORK_LABEL[s.network] || s.network} (${s.reason})`).join('\n')
         : '';
-      Alert.alert(`복원 실패 (${sourceLabel})`, reasonText + detail);
+      showAlert('지갑 복원 실패', reasonText + detail, [
+        { text: t('common.confirm') || '확인' },
+      ]);
       return;
     }
+
     const successList = imported.map((n) => `✓ ${NETWORK_LABEL[n] || n}`).join('\n');
     const skipDetail = skipped.length > 0
-      ? '\n\n복원되지 않은 항목:\n' + skipped.map((s) => `• ${NETWORK_LABEL[s.network] || s.network}: ${s.reason}`).join('\n')
+      ? '\n\n복원 못 한 키:\n' + skipped.map((s) => `· ${NETWORK_LABEL[s.network] || s.network}`).join('\n')
       : '';
     showAlert(
-      `복원 완료 (${sourceLabel})`,
-      `${successList}${skipDetail}\n\n지갑 화면으로 이동합니다.`,
+      '복원 완료',
+      `다음 지갑이 복원됐어요:\n\n${successList}${skipDetail}`,
       [{ text: t('common.confirm') || '확인' }],
     ).then(() => {
       navigate(ROUTES.wallet);
@@ -244,8 +287,9 @@ export const WalletRestoreScreen = () => {
   };
 
   const handleRestoreFromFile = async () => {
-    if (!email || memberId == null || !pin) {
-      Alert.alert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
+
+    if (!email || memberId == null) {
+      await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
     try {
@@ -254,10 +298,17 @@ export const WalletRestoreScreen = () => {
         copyToCacheDirectory: true,
         multiple: false,
       });
+      if ((picked as any).__missingNative) {
+        await showAlert(
+          '복원 불가',
+          '파일 선택 기능이 현재 빌드에 포함되지 않았습니다.\n앱을 새 빌드로 업데이트한 뒤 다시 시도해주세요.\n(개발자: ./gradlew clean + EAS dev build 필요)',
+        );
+        return;
+      }
       if (picked.canceled) return;
       const asset = picked.assets?.[0];
       if (!asset?.uri) {
-        Alert.alert('파일 선택 실패', 'URI 를 가져오지 못했습니다');
+        await showAlert('파일 선택 실패', 'URI 를 가져오지 못했습니다');
         return;
       }
       setStage('busy');
@@ -266,7 +317,7 @@ export const WalletRestoreScreen = () => {
         content = await FileSystem.readAsStringAsync(asset.uri);
       } catch (e: any) {
         setStage('options');
-        Alert.alert('파일 읽기 실패', e?.message || '파일을 읽을 수 없습니다');
+        await showAlert('파일 읽기 실패', e?.message || '파일을 읽을 수 없습니다');
         return;
       }
       await processBackupContent(content, '파일');
@@ -274,7 +325,7 @@ export const WalletRestoreScreen = () => {
     } catch (e: any) {
       setStage('options');
       if (__DEV__) console.warn('[WalletRestore] file restore fail:', e);
-      Alert.alert('복원 오류', e?.message || '알 수 없는 오류');
+      await showAlert('복원 오류', e?.message || '알 수 없는 오류');
     }
   };
 
@@ -321,8 +372,9 @@ export const WalletRestoreScreen = () => {
   };
 
   const handleRestoreFromGDrive = async () => {
-    if (!email || memberId == null || !pin) {
-      Alert.alert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
+
+    if (!email || memberId == null) {
+      await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
     setStage('busy');
@@ -331,7 +383,7 @@ export const WalletRestoreScreen = () => {
       const files = await fetchDriveFiles(token);
       if (files.length === 0) {
         setStage('options');
-        Alert.alert('백업 파일 없음', 'Google Drive 에 백업 파일이 없습니다');
+        await showAlert('백업 파일 없음', 'Google Drive 에 백업 파일이 없습니다');
         return;
       }
       setDriveFiles(files);
@@ -339,7 +391,7 @@ export const WalletRestoreScreen = () => {
     } catch (e: any) {
       setStage('options');
       if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e);
-      Alert.alert('Drive 목록 조회 실패', e?.message || '알 수 없는 오류');
+      await showAlert('Drive 목록 조회 실패', e?.message || '알 수 없는 오류');
     }
   };
 
@@ -359,7 +411,7 @@ export const WalletRestoreScreen = () => {
       await processBackupContent(content, 'Google Drive');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletRestore] gdrive download fail:', e);
-      Alert.alert('Drive 다운로드 실패', e?.message || '알 수 없는 오류');
+      await showAlert('Drive 다운로드 실패', e?.message || '알 수 없는 오류');
     } finally {
       setStage('options');
     }
@@ -376,25 +428,21 @@ export const WalletRestoreScreen = () => {
     );
   }
 
-  if (stage === 'pin') {
-    return (
-      <SafeView style={styles.container}>
-        {memberId != null && email && (
-          <WalletKeyPinPromptModal
-            visible={pinPromptVisible}
-            memberId={memberId}
-            email={email}
-            onSuccess={onPinPromptSuccess}
-            onCancel={onPinPromptCancel}
-          />
-        )}
-      </SafeView>
-    );
-  }
+  const pinModal = memberId != null && email ? (
+    <WalletKeyPinPromptModal
+      visible={pinPromptVisible}
+      memberId={memberId}
+      email={email}
+      onSuccess={onPinPromptSuccess}
+      onCancel={onPinPromptCancel}
+      skipVaultCheck
+    />
+  ) : null;
 
   if (stage === 'gdrive-list') {
     return (
       <SafeView style={styles.container}>
+        {pinModal}
         <Header
           title={t('screens.walletRestore.title') || '지갑 복원'}
           onBackPress={() => setStage('options')}
@@ -436,6 +484,7 @@ export const WalletRestoreScreen = () => {
 
   return (
     <SafeView style={styles.container}>
+      {pinModal}
       <Header title={t('screens.walletRestore.title') || '지갑 복원'} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.heading}>

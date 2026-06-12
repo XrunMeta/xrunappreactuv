@@ -213,7 +213,7 @@ export const ReferralMyGroupScreen = () => {
     }
     await shareReferralLink(
       t,
-      { email: userEmail },
+      { email: userEmail, member: memberId ? Number(memberId) : undefined },
       showAlert,
       navigate,
     );

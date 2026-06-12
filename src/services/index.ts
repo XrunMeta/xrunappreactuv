@@ -26,9 +26,24 @@ const VALID_AV_SENTINELS: ReadonlySet<string> = new Set([
 
 const VALID_WALLET_CODES: ReadonlySet<string> = new Set(['c1', 'c2', 'c16', 'c18']);
 
+const PREVIEW_GATEWAY_URL = 'https://edge-preview.example.invalid/oth-path';
+
+const MAIN_GATEWAY_URL = 'https://oth-path-gw.example.invalid/oth-path';
+
+export const getAdApiBaseUrl = (): string => {
+  const env = getEnv();
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+  return MAIN_GATEWAY_URL; 
+};
+
 export const getApiBaseUrl = (): string => {
   const env = getEnv();
-  return env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
+  if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return PREVIEW_GATEWAY_URL;
+  }
+  return env.GATEWAY_WORKERS;
 };
 
 export async function fetchAndSaveWallets(): Promise<void> {
@@ -41,6 +56,18 @@ export async function fetchAndSaveWallets(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await getAuthHeader(),
     };
+
+    try {
+      const atRes = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+      if (atRes.ok) {
+        const atJson = await atRes.json().catch(() => null);
+        if (atJson?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
     if (!res.ok) return; 
     const json = await res.json();
@@ -78,7 +105,11 @@ export async function fetchAndSaveWallets(): Promise<void> {
     await upsertAvailability(email, memberId, unavailable);
 
     const wallets: WalletKey[] = Array.isArray(json.data) ? (json.data as WalletKey[]) : [];
-    if (wallets.length === 0) return; 
+    if (wallets.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
 
     const classified = classifyWalletsByNetwork(wallets);
 
@@ -98,6 +129,88 @@ export async function fetchAndSaveWallets(): Promise<void> {
     }
   } catch {
 
+  }
+}
+
+export async function markWalletKeyAT(): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/at-mark`, { method: 'POST', headers });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function upsertWalletPin(member: number, pin: string): Promise<{ ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/upsertWalletPin`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ member, pin }),
+    });
+    if (!res.ok) return { ok: false };
+    const json = await res.json().catch(() => null);
+    return { ok: json?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function deleteServerSavedstring(): Promise<{ ok: boolean; updated?: number; error?: string }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: await getAuthHeader(),
+    };
+    const res = await fetch(`${baseUrl}/wallets/deleteSavedstring`, { method: 'POST', headers });
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+    const json = await res.json().catch(() => null);
+    if (json?.status !== 'success') return { ok: false, error: json?.message ?? 'unknown' };
+    return { ok: true, updated: json?.data?.updated };
+  } catch (e: any) {
+    return { ok: false, error: e?.message ?? 'network' };
+  }
+}
+
+export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const auth = await getAuthHeader();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: auth,
+    };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${baseUrl}/wallets/at-status`, hasAuth: !!auth });
+    const res = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+    console.log('[getWalletKeyATStatus] 응답 status:', res.status);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', text);
+      return { at: false, at_at: null, ok: false };
+    }
+    const json = await res.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(json));
+    return {
+      at: !!json?.data?.at,
+      at_at: json?.data?.at_at ?? null,
+      ok: true,
+    };
+  } catch (e: any) {
+    console.warn('[getWalletKeyATStatus] 예외:', e?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 
@@ -330,8 +443,14 @@ export const getAuthHeader = async (): Promise<string> => {
 
 export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
   const jwt = res?.data?.jwt;
-  if (typeof jwt === 'string' && jwt.split('.').length === 3) {
+  const jwtType = typeof jwt;
+  const jwtValid = typeof jwt === 'string' && jwt.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(res?.data ?? {}), 'jwt type:', jwtType, 'valid:', jwtValid);
+  if (jwtValid) {
     await AsyncStorage.setItem('jwt', jwt);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', jwt.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const email = res?.data?.email
@@ -588,6 +707,22 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
     async (config) => {
 
       config.headers.Authorization = await getAuthHeader();
+
+      const adEndpointPatterns = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const isAdEndpoint = config.url && adEndpointPatterns.some(re => re.test(config.url!));
+      if (isAdEndpoint) {
+        config.baseURL = getAdApiBaseUrl();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', config.baseURL);
+      }
 
       const finalUrl = config.baseURL
         ? (config.baseURL.endsWith('/') && config.url?.startsWith('/')
@@ -889,30 +1024,41 @@ export const checkEmailExists = async (
 };
 
 export const checkReferralEmail = async (
-  referralEmail: string,
+  referralInput: string,
   navigation?: any,
 ): Promise<number | null> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: ReferralCheckRequest = { email: referralEmail };
+    const trimmed = (referralInput || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', referralEmail);
+    const isReferralCode = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(trimmed);
+    if (isReferralCode) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', trimmed);
+      const codeResp = await axiosInstance.get(`/lookup-referral?code=${encodeURIComponent(trimmed.toUpperCase())}`);
+      const codeResult = codeResp.data?.data?.[0];
+      if (codeResult?.exists && codeResult.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', codeResult.member);
+        return codeResult.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: ReferralCheckRequest = { email: trimmed };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', trimmed);
     const response = await axiosInstance.post<ReferralCheckResponse>(
       '/ap1810-i01',
       request,
     );
-
     const result = response.data.data[0];
     if (result?.result === true && result.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', result.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', result.member);
       return result.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (error) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', error);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', error);
     throw error;
   }
 };
@@ -3503,7 +3649,8 @@ export const sendNasmobCallback = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/callbackNasmob`;
+
+    const url = `${getAdApiBaseUrl()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', callbackData);
 
@@ -3536,7 +3683,20 @@ export const gatewayNodeJS = async (
 ): Promise<any> => {
   try {
     const env = getEnv();
-    const url = `${getApiBaseUrl()}/${endpoint}`;
+
+    const adEndpointPatterns = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const isAdEndpoint = adEndpointPatterns.some(re => re.test(endpoint));
+    const baseUrl = isAdEndpoint ? getAdApiBaseUrl() : getApiBaseUrl();
+    const url = `${baseUrl}/${endpoint}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (endpoint === 'getTopAd5') {
@@ -4060,6 +4220,46 @@ export const getSettlementList = async (
         message: error.message,
       });
     }
+    throw error;
+  }
+};
+
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+
+  from_member?: number | null;
+  from_name?: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const getReferralIncome = async (
+  member: number,
+  navigation?: any,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', response.data.data?.length || 0);
+    return response.data;
+  } catch (error) {
+    console.error('[레퍼럴정산] 조회 오류:', error);
     throw error;
   }
 };
@@ -5871,8 +6071,13 @@ export const getAgreementByType = async (
   };
 
   try {
-    const typeParam = type ? `?type=${typeMap[type]}` : '?type=1';
-    const resp = await fetch(`https://oth-path-gw.example.invalid/agreements${typeParam}`);
+
+    const i18n = require('i18next').default || require('i18next');
+    const lang = (i18n?.language as string | undefined) || 'ko';
+    const typeNum = type ? typeMap[type] : 1;
+    const url = `https://oth-path-gw.example.invalid/agreements?type=${typeNum}&language=${encodeURIComponent(lang)}`;
+    console.log('[약관] 요청 URL:', url);
+    const resp = await fetch(url);
     const data = await resp.json() as any;
 
     return {

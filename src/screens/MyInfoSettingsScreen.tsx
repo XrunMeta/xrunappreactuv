@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
-import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
+import { COLORS, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import {
   getCurrentAppVersionNumber,
@@ -15,10 +15,12 @@ import {
   getPushNotificationsEnabled,
   setPushNotificationsEnabled,
 } from '../services';
+import { useAlertDialog } from '../context/AlertDialogContext';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
   const [versionInfo, setVersionInfo] = useState<{
     androidCurrent: number;

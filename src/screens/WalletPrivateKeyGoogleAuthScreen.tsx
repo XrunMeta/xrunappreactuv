@@ -10,6 +10,7 @@ import {
   Alert,
   Share,
   Modal,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,12 +19,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
+import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, WalletKeyPinSetupModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
+  findEntriesForUser,
   exportBackup,
   encryptBackupJson,
   buildPlainBackup,
@@ -32,6 +34,7 @@ import {
   type WalletKey,
   type WalletNetwork,
 } from '../services/walletKeyStore';
+import { getWalletKeyATStatus } from '../services';
 
 type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
 
@@ -42,13 +45,15 @@ const NETWORK_LABEL: Record<WalletNetwork, string> = {
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
 
   const [stage, setStage] = useState<Stage>('loading');
   const [memberId, setMemberId] = useState<number | null>(null);
   const [email, setEmail] = useState<string>('');
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
+
+  const [pinSetupVisible, setPinSetupVisible] = useState(false);
 
   const [wallets, setWallets] = useState<WalletKey[]>([]);
 
@@ -108,15 +113,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     (async () => {
       try {
         const jwt = await AsyncStorage.getItem('jwt');
-        const mid = jwt ? jwtPayloadSub(jwt) : null;
+        let mid: number | null = jwt ? jwtPayloadSub(jwt) : null;
         let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
+
+        if (mid == null || !emailRaw) {
           try {
             const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
+            if (ud) {
+              const parsed = JSON.parse(ud) as { email?: string; member?: number | string };
+              if (mid == null && parsed?.member != null) mid = Number(parsed.member);
+              if (!emailRaw && parsed?.email) emailRaw = parsed.email;
+            }
           } catch {  }
         }
         if (cancelled) return;
+        console.log('[WalletKeyBackup] mount', { mid, email: emailRaw, hasJwt: !!jwt });
         if (mid == null || !emailRaw) {
           await showAlert(
             t('common.messages.error') || '오류',
@@ -125,8 +136,36 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           goBack();
           return;
         }
+        const normEmail = emailRaw.toLowerCase().trim();
         setMemberId(mid);
-        setEmail(emailRaw.toLowerCase().trim());
+        setEmail(normEmail);
+
+        const entries = await findEntriesForUser(normEmail, mid);
+        const hasS1 = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+        if (!hasS1) {
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
+          if (cancelled) return;
+          console.log('[WalletKeyBackup] AT 상태', atStatus);
+
+          const shouldShowRestore = atStatus.at || !atStatus.ok;
+          if (shouldShowRestore) {
+            const choice = await showAlert(
+              '지갑 키 복원이 필요해요',
+              '이전에 설정하신 비밀번호와 백업 파일로 지갑을 복원할 수 있어요.',
+              [
+                { text: '나중에', style: 'cancel' },
+                { text: '복원하기' },
+              ],
+            );
+            if (choice === 1) navigate(ROUTES.walletRestore);
+            else goBack();
+          } else {
+
+            setPinSetupVisible(true);
+          }
+          return;
+        }
+
         setStage('pin');
         setPinPromptVisible(true);
       } catch (e) {
@@ -182,22 +221,40 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const json = JSON.stringify(payload);
       const encrypted = encryptBackupJson(json, pin);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
-      const path = `${FileSystem.documentDirectory}${fileName}`;
-      await FileSystem.writeAsStringAsync(path, encrypted);
-      const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
-      try {
-        await Share.share({
-          url: shareUrl,
-          title: 'XRUN 지갑 백업',
-          message: 'XRUN 지갑 키 백업 (PIN 으로 보호됨)',
-        });
-      } catch {
 
+      if (Platform.OS === 'android') {
+        const SAF = (FileSystem as any).StorageAccessFramework;
+        if (!SAF) throw new Error('StorageAccessFramework 미지원 환경');
+        const perm = await SAF.requestDirectoryPermissionsAsync();
+        if (!perm.granted) {
+          await showAlert('취소됨', '폴더 선택이 취소되어 파일을 저장하지 않았습니다.');
+          setStage('options');
+          return;
+        }
+        const newUri = await SAF.createFileAsync(perm.directoryUri, fileName, 'application/octet-stream');
+        await SAF.writeAsStringAsync(newUri, encrypted);
+        await showAlert(
+          '백업 완료',
+          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        );
+      } else {
+
+        const path = `${FileSystem.documentDirectory}${fileName}`;
+        await FileSystem.writeAsStringAsync(path, encrypted);
+        const shareUrl = path.startsWith('file://') ? path : `file://${path}`;
+        try {
+          await Share.share({
+            url: shareUrl,
+            title: 'XRUN 지갑 백업',
+          });
+        } catch {
+
+        }
+        await showAlert(
+          '백업 완료',
+          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        );
       }
-      await showAlert(
-        '백업 완료',
-        `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
-      );
       setStage('options');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletKeyBackup] file fail:', e);
@@ -373,83 +430,86 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     }
   };
 
-  const handleGdrivePlainBackup = () => {
+  const handleGdrivePlainBackup = async () => {
     if (stage !== 'options') return;
 
-    Alert.alert(
+    const r1 = await showAlert(
       '⚠️ 매우 위험합니다',
       '평문 (암호화 없이) 으로 개인 키를 Google Drive 에 저장합니다.\n\n' +
       '이 파일을 누군가 받으면 비밀번호 없이 지갑의 모든 자산을 옮길 수 있습니다.\n\n' +
       '정말 진행하시겠습니까?',
       [
         { text: '취소', style: 'cancel' },
-        {
-          text: '이해했습니다, 계속',
-          style: 'destructive',
-          onPress: () => {
-
-            Alert.alert(
-              '⚠️ 마지막 확인',
-              '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
-              '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
-              '계속하시겠습니까?',
-              [
-                { text: '취소', style: 'cancel' },
-                {
-                  text: '예, 평문 저장합니다',
-                  style: 'destructive',
-                  onPress: () => { void performGdrivePlainUpload(); },
-                },
-              ],
-            );
-          },
-        },
+        { text: '이해했습니다, 계속', style: 'destructive' },
       ],
     );
+    if (r1 !== 1) return;
+
+    const r2 = await showAlert(
+      '⚠️ 마지막 확인',
+      '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
+      '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
+      '계속하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        { text: '예, 평문 저장합니다', style: 'destructive' },
+      ],
+    );
+    if (r2 !== 1) return;
+    void performGdrivePlainUpload();
   };
 
-  const handleViewKey = () => {
+  const handleViewKey = async () => {
     if (stage !== 'options') return;
-    Alert.alert(
+    const r = await showAlert(
       '경고',
       '개인 키를 평문으로 표시합니다.\n주변에 다른 사람이 화면을 보지 못하도록 주의해주세요.',
       [
         { text: '취소', style: 'cancel' },
-        { text: '확인', onPress: () => setStage('view') },
+        { text: '확인' },
       ],
     );
+    if (r === 1) setStage('view');
   };
 
-  const handleCopyKey = (pk: string) => {
-    Alert.alert(
+  const handleCopyKey = async (pk: string) => {
+    const r = await showAlert(
       '경고',
       '키를 클립보드에 복사합니다.\n다른 앱이 클립보드를 읽을 수 있습니다. 사용 후 즉시 다른 내용을 복사해 클립보드를 비워주세요.',
       [
         { text: '취소', style: 'cancel' },
-        {
-          text: '확인',
-          onPress: async () => {
-            try {
-              await Clipboard.setStringAsync(pk);
-              await showAlert(
-                '복사 완료',
-                '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
-              );
-            } catch (e: any) {
-              await showAlert(
-                t('common.messages.error') || '오류',
-                `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
-              );
-            }
-          },
-        },
+        { text: '확인' },
       ],
     );
+    if (r !== 1) return;
+    try {
+      await Clipboard.setStringAsync(pk);
+      await showAlert(
+        '복사 완료',
+        '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
+      );
+    } catch (e: any) {
+      await showAlert(
+        t('common.messages.error') || '오류',
+        `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
+      );
+    }
   };
 
   return (
     <SafeView>
-      <Header title="지갑 키 백업" onBackPress={goBack} showBackButton />
+      {}
+      <Header
+        title="지갑 키 백업"
+        onBackPress={() => {
+          if (stage === 'view') {
+            setStage('options');
+          } else {
+            goBack();
+          }
+        }}
+        showBackButton
+      />
       <SafeScrollView contentContainerStyle={styles.content}>
         {stage === 'loading' && (
           <View style={styles.center}>
@@ -552,11 +612,14 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               if (!network) return null;
               return (
                 <View key={w.wallet_code} style={styles.keyCard}>
+                  {}
                   <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
-                  <Text style={styles.codeLabel}>
-                    {w.wallet_code} · {w.address}
+                  <Text style={styles.fieldLabel}>지갑 주소</Text>
+                  <Text style={styles.fieldValue} selectable>
+                    {w.address}
                   </Text>
-                  <Text style={styles.privateKey} selectable>
+                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>비밀키</Text>
+                  <Text style={[styles.fieldValue, styles.privateKey]} selectable>
                     {w.private_key}
                   </Text>
                   <TouchableOpacity
@@ -570,14 +633,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 </View>
               );
             })}
-
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setStage('options')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.backButtonText}>옵션으로 돌아가기</Text>
-            </TouchableOpacity>
+            {}
           </View>
         )}
       </SafeScrollView>
@@ -589,6 +645,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           email={email}
           onSuccess={onPinPromptSuccess}
           onCancel={onPinPromptCancel}
+        />
+      )}
+
+      {}
+      {memberId != null && email !== '' && pinSetupVisible && (
+        <WalletKeyPinSetupModal
+          memberId={memberId}
+          email={email}
+          visible={pinSetupVisible}
+          onSuccess={() => {
+            setPinSetupVisible(false);
+
+            setStage('pin');
+            setPinPromptVisible(true);
+          }}
         />
       )}
 
@@ -800,13 +871,24 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     marginBottom: 10,
   },
-  privateKey: {
-    fontSize: 11,
+
+  fieldLabel: {
+    fontSize: 12,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.darkGray,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  fieldValue: {
+    fontSize: 12,
     fontFamily: 'Courier',
     color: '#222',
     backgroundColor: '#f7f7f7',
     padding: 10,
     borderRadius: 6,
+  },
+  privateKey: {
+
     marginBottom: 10,
   },
   copyButton: {

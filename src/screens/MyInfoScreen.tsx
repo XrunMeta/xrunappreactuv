@@ -41,6 +41,7 @@ export const MyInfoScreen = () => {
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     email?: string;
+    member?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
@@ -143,6 +144,7 @@ export const MyInfoScreen = () => {
               setUserInfo({
                 name: fullName,
                 email: user.email || '',
+                member,
               });
             }
           }
@@ -220,6 +222,13 @@ export const MyInfoScreen = () => {
           }
           navigate(ROUTES.myInfoEmailAuth);
         }
+      } else if (menu.id === 'notify') {
+
+        console.log('[내 정보] 알림 메뉴 — 빨간 점 즉시 숨김 (옵티미스틱)');
+        setHasUnreadNotifications(false);
+
+        AsyncStorage.setItem('lastNotificationCheckTime', new Date().toISOString()).catch(() => {});
+        navigate(ROUTES[menu.route]);
       } else {
         navigate(ROUTES[menu.route]);
       }
@@ -231,7 +240,7 @@ export const MyInfoScreen = () => {
       await showAlert(t('screens.myInfo.alerts.shareFailed'), t('screens.myInfo.alerts.shareFailedMessage'));
       return;
     }
-    await shareReferralLink(t, { email: userInfo.email }, showAlert, navigate);
+    await shareReferralLink(t, { email: userInfo.email, member: userInfo.member }, showAlert, navigate);
   };
 
   const handleLogout = async () => {

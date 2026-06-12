@@ -162,7 +162,10 @@ export const WalletEstimateFeeScreen = () => {
       const currency = selectedWalletAsset?.currency || 0;
       const isPolygon = currency === 16 || currency === 18;
       const network = isPolygon ? 'POL' : 'ETH';
-      return `${parseFloat(gasPrice.toString()).toFixed(6)} ${network}`;
+
+      const fixed = parseFloat(gasPrice.toString()).toFixed(6);
+      const trimmed = fixed.replace(/\.?0+$/, '');
+      return `${trimmed} ${network}`;
     } catch (error) {
       console.error('[WalletEstimateFee] 가스 수수료 포맷팅 오류:', error);
       return t('screens.walletEstimateFee.error');

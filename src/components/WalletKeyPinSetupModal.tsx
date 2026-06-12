@@ -25,6 +25,7 @@ import {
   type VaultEntry,
   type WalletNetwork,
 } from '../services/walletKeyStore';
+import { markWalletKeyAT, upsertWalletPin, deleteServerSavedstring } from '../services';
 
 interface Props {
   memberId: number;
@@ -125,8 +126,25 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         committedNetworks.push(network);
       }
 
+      const PIN_SYNC_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+      const normEmail = (email ?? '').toLowerCase().trim();
+      if (PIN_SYNC_DEV_EMAILS.includes(normEmail)) {
+        upsertWalletPin(memberId, pin).catch(() => {  });
+
+        deleteServerSavedstring().then((r) => {
+          if (r.ok) {
+            console.log('[WalletKeyPinSetupModal] 서버 비밀키 삭제 완료:', r.updated);
+          } else {
+            console.warn('[WalletKeyPinSetupModal] 서버 비밀키 삭제 실패 (PIN 설정은 성공):', r.error);
+          }
+        });
+      }
+
       setPin('');
       setConfirmPin('');
+
+      markWalletKeyAT().catch(() => {  });
+
       onSuccess();
     } catch (verifyErr) {
       const reasonStr =
@@ -196,59 +214,65 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     <Modal visible={visible} animationType="fade" transparent={false}>
       <View style={styles.overlay}>
         {}
-        <Text style={styles.title}>지갑 보호 PIN 설정</Text>
+        <View style={styles.centerBlock}>
+          {}
+          <Text style={styles.title}>지갑 보호 PIN 설정</Text>
 
-        {}
-        <Text style={styles.warning}>
-          지갑 키 보호 전용입니다.
-        </Text>
+          {}
+          <Text style={styles.warning}>
+            지갑 키 보호 전용입니다.
+          </Text>
 
-        {}
-        {step === 'enter' && (
-          <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
-        )}
-        {step === 'confirm' && (
-          <Text style={styles.prompt}>다시 한번 입력해주세요</Text>
-        )}
-        {step === 'verifying' && (
-          <Text style={styles.prompt}>검증 중...</Text>
-        )}
-        {step === 'error' && (
-          <Text style={styles.prompt}>다시 시도해주세요</Text>
-        )}
+          {}
+          {step === 'enter' && (
+            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+          )}
+          {step === 'confirm' && (
+            <Text style={styles.prompt}>다시 한번 입력해주세요</Text>
+          )}
+          {step === 'verifying' && (
+            <Text style={styles.prompt}>검증 중...</Text>
+          )}
+          {step === 'error' && (
+            <Text style={styles.prompt}>다시 시도해주세요</Text>
+          )}
 
-        {}
-        <View style={styles.dotsRow}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, currentPin.length > i && styles.dotFilled]}
-            />
-          ))}
+          {}
+          <View style={styles.dotsRow}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, currentPin.length > i && styles.dotFilled]}
+              />
+            ))}
+          </View>
+
+          {}
+          {step === 'error' && !!errorMsg && (
+            <Text style={styles.error}>{errorMsg}</Text>
+          )}
+
+          {}
+          {step === 'verifying' && (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            </View>
+          )}
+
+          {}
+          {step === 'error' && (
+            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+              <Text style={styles.retryText}>다시 시도</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {}
-        {step === 'error' && !!errorMsg && (
-          <Text style={styles.error}>{errorMsg}</Text>
-        )}
-
-        {}
-        {step === 'verifying' && (
-          <View style={styles.loadingRow}>
-            <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-          </View>
-        )}
-
-        {}
-        {step === 'error' && (
-          <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-            <Text style={styles.retryText}>다시 시도</Text>
-          </TouchableOpacity>
-        )}
-
-        {}
-        {isInputStep && (
-          <View style={styles.keypad}>
+        {
+}
+        <View
+          style={[styles.keypad, !isInputStep && { opacity: 0 }]}
+          pointerEvents={isInputStep ? 'auto' : 'none'}
+        >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <TouchableOpacity
                 key={n}
@@ -269,8 +293,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
             <TouchableOpacity style={styles.key} onPress={onPressBackspace}>
               <Text style={[styles.keyText, { fontSize: 18 }]}>{'<'}</Text>
             </TouchableOpacity>
-          </View>
-        )}
+        </View>
       </View>
     </Modal>
   );
@@ -281,8 +304,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: SIZES.large,
-    paddingTop: 60,
+
     alignItems: 'center',
+  },
+
+  centerBlock: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: FONTS.size.large,

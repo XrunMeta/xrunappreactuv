@@ -8,6 +8,8 @@ export default {
   settlement: '決済リスト',
   rank: 'ランク',
   referralLabel: '紹介',
+  pending: '支払い待ち',
+  paid: '支払い完了',
 };
 
 

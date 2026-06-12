@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
-import { getSettlementList, getSettlementAmount } from '../services';
+import { getReferralIncome } from '../services';
+import type { ReferralIncomeItem } from '../services';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -19,7 +20,21 @@ interface TransformedSettlementData {
   amount: string; 
   date: string;
   transaction: number;
+  status?: 'pending' | 'sent' | string; 
+  fromName?: string | null; 
 }
+
+const SOURCE_LABEL: Record<string, string> = {
+  nas: 'AR 광고 (나스미디어)',
+  nasmedia: 'AR 광고 (나스미디어)',
+  pocr: 'AR 광고 (포인트클릭)',
+  pointclick: 'AR 광고 (포인트클릭)',
+  ayet: 'Xplay Zone 1',
+  maf: 'Xplay Zone 2',
+  mychips: 'Xplay Zone 2',
+  recommand: '추천 가입',
+  attendance: '출석체크',
+};
 
 const formatDateTime = (dateString: string): string => {
   try {
@@ -102,7 +117,7 @@ export const ReferralSettlementScreen = () => {
     }
     await shareReferralLink(
       t,
-      { email: userEmail },
+      { email: userEmail, member: memberId ?? undefined },
       showAlert,
       navigate,
     );
@@ -140,25 +155,61 @@ export const ReferralSettlementScreen = () => {
     try {
       setLoading(true);
 
-      const [resultList, resultAmount] = await Promise.all([
-        getSettlementList(member, navigate),
-        getSettlementAmount(member, navigate),
-      ]);
+      console.log('═══════════════════════════════════════════');
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', member);
+      console.log('═══════════════════════════════════════════');
 
-      if (
-        resultList.status === 'success' &&
-        resultAmount.status === 'success'
-      ) {
-        const transformedData = transformSettlementData(resultList.data, t);
-        setSettlementData(transformedData);
+      const resultRef = await getReferralIncome(member, navigate);
 
-        const totalAmount = resultAmount.data[0]?.amount || '0';
-        const totalAmountNum = typeof totalAmount === 'string' ? parseFloat(totalAmount) : totalAmount;
-        const formattedAmount = isNaN(totalAmountNum) ? '0' : totalAmountNum.toFixed(2);
+      console.log('[정산 디버그] 백엔드 응답 status:', resultRef.status);
+      console.log('[정산 디버그] 백엔드 응답 message:', resultRef.message);
+      console.log('[정산 디버그] 백엔드 응답 data 개수:', resultRef.data?.length ?? 0);
+      if (resultRef.data && resultRef.data.length > 0) {
+        console.log('[정산 디버그] 첫 행 샘플:', JSON.stringify(resultRef.data[0], null, 2));
+        console.log('[정산 디버그] source_type 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.source_type ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] status 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.status ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] xrun_amount 합계 (Number 변환 전):',
+          resultRef.data.reduce((sum: number, item: any) => sum + (Number(item.xrun_amount) || 0), 0));
+      } else {
+        console.log('[정산 디버그] ⚠️ 백엔드 응답 data 가 비어있음');
+      }
+
+      if (resultRef.status === 'success') {
+
+        const rows: TransformedSettlementData[] = (resultRef.data || []).map((item: ReferralIncomeItem, idx: number) => {
+          const label = SOURCE_LABEL[item.source_type] || item.source_type || '레퍼럴 분배';
+          return {
+            id: `ref_${item.id}_${idx}`,
+            type: label,
+            description: label,
+            amount: `${(Number(item.xrun_amount) || 0).toFixed(3).replace(/\.?0+$/, '') || '0'} XRUN`,
+            date: formatDateTime(item.created_at),
+            transaction: item.id,
+            status: item.status,
+            fromName: item.from_name || (item.from_member ? `#${item.from_member}` : null),
+          };
+        });
+        console.log('[정산 디버그] 변환된 rows 개수:', rows.length);
+        if (rows.length > 0) console.log('[정산 디버그] 변환 첫 행:', JSON.stringify(rows[0], null, 2));
+        setSettlementData(rows);
+
+        const totalAmountNum = (resultRef.data || []).reduce(
+          (sum: number, item: ReferralIncomeItem) => sum + (Number(item.xrun_amount) || 0),
+          0
+        );
+        const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
         const price = gopaxPrice > 0 ? gopaxPrice : 176; 
-        console.log('[정산] 원화 계산:', { totalAmount, totalAmountNum, price });
+        console.log('[정산] 원화 계산:', { totalAmountNum, price });
 
         const wonEquivalent = calculateWonEquivalent(totalAmountNum, price);
         console.log('[정산] 원화 환산 결과:', wonEquivalent);
@@ -167,23 +218,27 @@ export const ReferralSettlementScreen = () => {
         console.log('[정산] 원화 포맷팅 결과:', formattedWon);
         setTotalRevenueWon(formattedWon);
 
-        const initialItems = transformedData.slice(0, ITEMS_PER_PAGE);
+        const initialItems = rows.slice(0, ITEMS_PER_PAGE);
         setCurrentData(initialItems);
         setCurrentPage(1);
-        setHasMore(transformedData.length > ITEMS_PER_PAGE);
+        setHasMore(rows.length > ITEMS_PER_PAGE);
+        console.log('[정산 디버그] ✅ 화면 표시 완료 — 총',
+          formattedAmount, 'XRUN /', rows.length, '건 /', formattedWon);
+        console.log('═══════════════════════════════════════════');
       } else {
-        console.error(
-          '정산 데이터 조회 실패:',
-          resultList.message || resultAmount.message,
-        );
+        console.error('[정산 디버그] ❌ 백엔드 status !== success — message:', resultRef.message);
         setSettlementData([]);
         setCurrentData([]);
         setTotalRevenue('0 XRUN');
         setTotalRevenueWon('₩0');
         setHasMore(false);
       }
-    } catch (error) {
-      console.error('[정산] 정산 데이터 조회 실패:', error);
+    } catch (error: any) {
+      console.error('[정산 디버그] ❌ 예외 발생');
+      console.error('  message:', error?.message);
+      console.error('  response status:', error?.response?.status);
+      console.error('  response data:', JSON.stringify(error?.response?.data ?? null));
+      console.error('  stack:', error?.stack);
       setSettlementData([]);
       setCurrentData([]);
       setTotalRevenue('0 XRUN');
@@ -230,21 +285,32 @@ export const ReferralSettlementScreen = () => {
   };
 
   const renderSettlementItem = ({ item }: { item: TransformedSettlementData }) => {
+    const isPaid = item.status === 'sent';
+    const badgeLabel = isPaid
+      ? (t('screens.referralSettlement.paid') || '지급 완료')
+      : (t('screens.referralSettlement.pending') || '지급 대기');
+    const fromLine = item.fromName ? `${item.fromName} 님이 발생시킨 수익이에요.` : null;
     return (
-      <View style={styles.listItem}>
-        <View style={styles.listItemRow}>
-          {item.description ? <Text
-            style={[styles.descriptionText, { flex: 1, marginRight: 10 }]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {}
-            추천예상수익
-          </Text> : null}
+      <View style={[styles.questCard, isPaid && styles.questCardPaid]}>
+        <View style={[styles.questBadge, isPaid ? styles.statusPaid : styles.statusPending]}>
+          <Text style={[styles.questBadgeText, isPaid ? styles.statusPaidText : styles.statusPendingText]}>
+            {badgeLabel}
+          </Text>
         </View>
-        <View style={styles.listItemRow2}>
-          {item.date ? <Text style={styles.dateText}>{item.date}</Text> : null}
-          {item.amount ? <Text style={styles.amountText}>{item.amount}</Text> : null}
+        <Text style={[styles.questTitle, isPaid && styles.textPaid]} numberOfLines={2}>
+          {item.description}
+        </Text>
+        {(fromLine || item.date) ? (
+          <Text style={[styles.questSub, isPaid && styles.textPaidSub]} numberOfLines={2}>
+            {fromLine}
+            {fromLine && item.date ? '\n' : ''}
+            {item.date}
+          </Text>
+        ) : null}
+        <View style={styles.questDivider} />
+        <View style={styles.questFooter}>
+          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>보상금액</Text>
+          <Text style={[styles.questAmount, isPaid && styles.textPaid]}>{item.amount}</Text>
         </View>
       </View>
     );
@@ -341,59 +407,89 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
-  listItem: {
+
+  questCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eaeaef',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
+    shadowColor: '#00000010',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  questCardPaid: {
+    opacity: 0.65,
+  },
+  questBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  questBadgeText: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Bold',
+    letterSpacing: -0.3,
+  },
+  questTitle: {
+    fontSize: 15,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a1a1a',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  questSub: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#8a8a8f',
+    lineHeight: 17,
+    letterSpacing: -0.3,
+  },
+  questDivider: {
+    height: 1,
+    backgroundColor: '#f1f1f4',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  questFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: SIZES.medium,
-    paddingVertical: SIZES.large,
-    borderRadius: SIZES.small,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#00000014',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: SIZES.small,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#ededed',
-    marginBottom: SIZES.xsmall,
+    alignItems: 'center',
   },
-  listItemRow: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
-  },
-  listItemRow2: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
-    alignItems: 'flex-end',
-  },
-  refTypeText: {
-    fontSize: FONTS.size.small,
-    fontFamily: 'Roboto-SemiBold',
-    color: COLORS.white,
-    width: 'auto',
-    backgroundColor: COLORS.info,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  dateText: {
-    fontSize: FONTS.size.small,
+  questFooterLabel: {
+    fontSize: 12,
     fontFamily: 'Roboto-Regular',
-    color: '#707070',
+    color: '#8a8a8f',
   },
-  descriptionText: {
-    fontSize: FONTS.size.msmall,
-    fontFamily: 'Roboto-Regular',
-    color: '#343434',
-    letterSpacing: -1,
+  questAmount: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
   },
-  amountText: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: COLORS.buttonPrimary,
+  textPaid: {
+    color: '#b5b5b8',
+  },
+  textPaidSub: {
+    color: '#c8c8cc',
+  },
+  statusPaid: {
+    backgroundColor: '#eeeeee',
+  },
+  statusPending: {
+    backgroundColor: '#e6efff',
+  },
+  statusPaidText: {
+    color: '#9a9a9a',
+  },
+  statusPendingText: {
+    color: '#3060d8',
   },
   loadingMoreContainer: {
     paddingVertical: 16,

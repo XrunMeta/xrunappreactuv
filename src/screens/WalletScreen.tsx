@@ -34,6 +34,9 @@ import {
   fetchTokenBalance,
   checkERC20Token,
   getUsersBalanceUpdateV2,
+  getReferralIncome,
+  getApiBaseUrl,
+  getAuthHeader,
 } from '../services';
 import {
   WalletData,
@@ -160,6 +163,8 @@ export const WalletScreen = () => {
   const [customTokens, setCustomTokens] = useState<CustomToken[]>([]);
   const [combinedAssets, setCombinedAssets] = useState<CombinedAsset[]>([]);
   const [adXrunAmount, setAdXrunAmount] = useState<number>(0);
+
+  const [referralAmount, setReferralAmount] = useState<number>(0);
   const [statusOtherChain, setStatusOtherChain] = useState<string>('off');
   const [member, setMember] = useState<number | null>(null);
   const [userData, setUserData] = useState<any>(null);
@@ -185,48 +190,9 @@ export const WalletScreen = () => {
   const [walletsUnlocked, setWalletsUnlocked] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const jwt = await AsyncStorage.getItem('jwt');
-        const memberId = jwt ? jwtPayloadSub(jwt) : null;
-        let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
-          try {
-            const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
-          } catch {
 
-          }
-        }
-        if (cancelled) return;
-        if (memberId == null || !emailRaw) {
+    setWalletsUnlocked(true);
 
-          setWalletsUnlocked(true);
-          return;
-        }
-        const entries = await findEntriesForUser(emailRaw, memberId);
-        const hasS1 = entries.eth?.s === 's1' || entries.pol?.s === 's1';
-        if (cancelled) return;
-        if (!hasS1) {
-
-          setWalletsUnlocked(true);
-          return;
-        }
-
-        if (isUserStillUnlocked(emailRaw, memberId)) {
-          setWalletsUnlocked(true);
-          return;
-        }
-
-        setPinPromptProps({ memberId, email: emailRaw.toLowerCase().trim() });
-        setPinPromptVisible(true);
-      } catch {
-
-        setWalletsUnlocked(true);
-      }
-    })();
-    return () => { cancelled = true; };
   }, []);
 
   const onPinPromptSuccess = (_wallets: any[], _pin?: string) => {
@@ -282,7 +248,7 @@ export const WalletScreen = () => {
   }, [navigate]);
 
   const combineTokenData = useCallback(
-    (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number): CombinedAsset[] => {
+    (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number, referralAmount: number): CombinedAsset[] => {
 
       const walletAssets: CombinedAsset[] = walletData
         .map((item) => ({
@@ -354,6 +320,21 @@ export const WalletScreen = () => {
       };
       allAssets.push(adXrunItem);
 
+      const rfItem: CombinedAsset = {
+        id: 1900,
+        symbol: 'XRUN',
+        name: 'RF',
+        amount: new BigNumber(referralAmount || 0).toFixed(2),
+        icon: require('../../assets/xrun-round-logo.png'),
+        currency: 1900,
+        isCustom: false,
+        subCurrencyName: 'RF',
+        contractAddress: '',
+        subcurrency: undefined,
+        originalData: undefined,
+      };
+      allAssets.push(rfItem);
+
       const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
         const existingIndex = acc.findIndex((item) => {
 
@@ -387,7 +368,7 @@ export const WalletScreen = () => {
       }, []);
 
       const sortedAssets = uniqueAssets.sort((a, b) => {
-        const priorityOrder = [18, 16, 19, 1, 2]; 
+        const priorityOrder = [18, 16, 19, 1900, 1, 2]; 
 
         const aPriority = priorityOrder.indexOf(a.currency);
         const bPriority = priorityOrder.indexOf(b.currency);
@@ -410,10 +391,10 @@ export const WalletScreen = () => {
 
   useEffect(() => {
     if (cardsData.length > 0 || customTokens.length > 0) {
-      const combined = combineTokenData(cardsData, customTokens, adXrunAmount);
+      const combined = combineTokenData(cardsData, customTokens, adXrunAmount, referralAmount);
       setCombinedAssets(combined);
     }
-  }, [cardsData, customTokens, adXrunAmount, combineTokenData]);
+  }, [cardsData, customTokens, adXrunAmount, referralAmount, combineTokenData]);
 
   useEffect(() => {
     if (!member) return;
@@ -482,6 +463,43 @@ export const WalletScreen = () => {
             return 0;
           });
 
+          try {
+            console.log('[WalletScreen] RPC 잔액 조회 시도 — member:', member);
+            const baseUrl = getApiBaseUrl();
+            const headers: Record<string, string> = {
+              'Content-Type': 'application/json',
+              Authorization: await getAuthHeader(),
+            };
+            const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ member }),
+            });
+            console.log('[WalletScreen] RPC HTTP 상태:', rpcRes.status);
+            if (rpcRes.ok) {
+              const rpcJson: any = await rpcRes.json().catch(() => null);
+              const balances: Array<{ currency: number; address: string; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
+              console.log('[WalletScreen] RPC 잔액 응답:', balances.length, '건');
+              const rpcByCurrency = new Map<number, string>();
+              for (const b of balances) {
+                if (b.status === 'ok' && b.rpcAmount != null) {
+                  rpcByCurrency.set(Number(b.currency), b.rpcAmount);
+                }
+              }
+              for (const item of sortedData as any[]) {
+                const cur = Number(item.currency);
+                if (rpcByCurrency.has(cur)) {
+                  const rpcAmt = rpcByCurrency.get(cur)!;
+                  item.Wamount = rpcAmt;
+                  item.amount = rpcAmt;
+                  console.log(`[WalletScreen] currency=${cur} RPC 적용:`, rpcAmt);
+                }
+              }
+            }
+          } catch (e: any) {
+            console.warn('[WalletScreen] RPC 잔액 조회 실패 (DB 잔액 그대로 사용):', e?.message);
+          }
+
           setCardsData(sortedData);
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
@@ -546,9 +564,26 @@ export const WalletScreen = () => {
       }
     };
 
+    const fetchReferralIncomeAsync = async () => {
+      try {
+        const res = await getReferralIncome(member, navigate);
+        if (res?.status === 'success' && Array.isArray(res.data)) {
+          const total = res.data
+            .filter((r) => r.status === 'sent')
+            .reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
+          setReferralAmount(total);
+        }
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') {
+          console.warn('[지갑] RF 레퍼럴 조회 실패:', e?.message);
+        }
+      }
+    };
+
     fetchWalletDataAsync();
     fetchOtherChainsStatusAsync();
     fetchADXRUNTopBannersAsync();
+    fetchReferralIncomeAsync();
 
     return () => {
       abortController.abort();
@@ -790,6 +825,9 @@ export const WalletScreen = () => {
       if (currency === 19) {
 
         navigate(ROUTES.adHistory);
+      } else if (currency === 1900) {
+
+        navigate(ROUTES.referralSettlement);
       } else {
 
         setSelectedWalletAsset(item);

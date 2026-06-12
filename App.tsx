@@ -171,7 +171,7 @@ const ScreenHost = () => {
 
         console.log('parsed.queryParams:', parsed.queryParams);
 
-        const referral = parsed.queryParams?.referral as string | undefined;
+        const referral = (parsed.queryParams?.referral || parsed.queryParams?.ref) as string | undefined;
 
         const prefillEmail = parsed.queryParams?.email as string | undefined;
         const fromApp = parsed.queryParams?.from as string | undefined;

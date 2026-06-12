@@ -122,25 +122,41 @@ export const formatCurrency = (amount: string | number | object | null | undefin
 
 export const shareReferralLink = async (
   t: (key: string) => string,
-  userDetails: { email: string },
+  userDetails: { email?: string; member?: number | string },
   showAlert: (title: string, message?: string, buttons?: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>) => Promise<number | undefined>,
   navigation?: any,
 ): Promise<void> => {
   try {
     console.log('[shareReferralLink] 시작 - 플랫폼:', Platform.OS);
-    console.log('[shareReferralLink] 사용자 이메일:', userDetails.email);
+    console.log('[shareReferralLink] member:', userDetails.member, 'email:', userDetails.email);
 
     const androidLink = getPlayStoreUrl({ gl: 'kr', campaignId: 'web_share' });
     const iosLink = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
-    const encodedEmail = encodeURIComponent(userDetails.email);
-    const deepLinkUrl = `https://www.xrun.run/invite?referral=${encodedEmail}`;
+    let referralCode: string | null = null;
+    if (userDetails.member) {
+      try {
+        const { createAxiosInstance } = await import('../services');
+        const axiosInstance = createAxiosInstance(navigation);
+        const codeRes = await axiosInstance.get(`/my-referral-code?member=${userDetails.member}`);
+        referralCode = codeRes.data?.data?.[0]?.code ?? null;
+        console.log('[shareReferralLink] referral_code 조회 결과:', referralCode);
+      } catch (e) {
+        console.warn('[shareReferralLink] referral_code 조회 실패, email fallback:', e);
+      }
+    }
+
+    const inviteParam = referralCode
+      ? `ref=${encodeURIComponent(referralCode)}`
+      : (userDetails.email ? `referral=${encodeURIComponent(userDetails.email)}` : '');
+    const deepLinkUrl = `https://www.xrun.run/invite?${inviteParam}`;
 
     const shareText = t('screens.referral.share.shareText');
     const downloadLabel = t('screens.referral.share.download');
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
-    const message = `${shareText}${userDetails.email}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
+    const identifier = referralCode || userDetails.email || '';
+    const message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
 
     console.log('[shareReferralLink] 공유 메시지:', message);
 
@@ -498,4 +514,50 @@ export const getColdStartResult = async (): Promise<{ isColdStart: boolean; elap
 export const maskPrivateKey = (pk: string): string => {
   if (!pk || pk.length < 10) return pk;
   return `${pk.substring(0, 6)}...${pk.substring(pk.length - 4)}`;
+};
+
+export const openIntentUrlOrFallback = async (intentUrl: string): Promise<void> => {
+  const { Linking: RNLinking } = await import('react-native');
+  let resolved: string | null = null;
+
+  try {
+
+    const fallbackMatch = intentUrl.match(/[;#]S\.browser_fallback_url=([^;]+)/);
+    if (fallbackMatch?.[1]) {
+      try { resolved = decodeURIComponent(fallbackMatch[1]); } catch { resolved = fallbackMatch[1]; }
+    }
+
+    if (!resolved) {
+      const urlMatch = intentUrl.match(/[?&]url=([^&#]+)/);
+      if (urlMatch?.[1]) {
+        try {
+          let decoded = decodeURIComponent(urlMatch[1]);
+          if (decoded.includes('%')) {
+            try { decoded = decodeURIComponent(decoded); } catch {  }
+          }
+          resolved = decoded;
+        } catch { resolved = urlMatch[1]; }
+      }
+    }
+
+    if (!resolved) {
+      const pkgMatch = intentUrl.match(/[;#]package=([^;]+)/) || intentUrl.match(/[?&]id=([^&#]+)/);
+      if (pkgMatch?.[1]) {
+        resolved = 'https://play.google.com/store/apps/details?id=' + pkgMatch[1];
+      }
+    }
+  } catch (e) {
+    console.warn('[openIntentUrlOrFallback] parse fail:', e);
+  }
+
+  if (!resolved) {
+    console.warn('[openIntentUrlOrFallback] resolve 실패 — 원본 시도:', intentUrl.slice(0, 100));
+    resolved = intentUrl;
+  }
+
+  try {
+    await RNLinking.openURL(resolved);
+  } catch (e) {
+    console.warn('[openIntentUrlOrFallback] openURL 실패:', resolved.slice(0, 100), e);
+  }
 };
