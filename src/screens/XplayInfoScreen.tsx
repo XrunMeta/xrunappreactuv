@@ -84,8 +84,8 @@ export const XplayInfoScreen = () => {
       await showAlert(t('screens.xplayInfo.alerts.notification'), t('screens.xplayInfo.alerts.userInfoUnavailable'));
       return;
     }
-    await shareReferralLink(t, { email: userEmail }, showAlert, navigate);
-  }, [userEmail, showAlert, t, navigate]);
+    await shareReferralLink(t, { email: userEmail, member: memberId ? Number(memberId) : undefined }, showAlert, navigate);
+  }, [userEmail, memberId, showAlert, t, navigate]);
 
   return (
     <SafeView style={styles.container}>

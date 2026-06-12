@@ -172,7 +172,7 @@ export const LoginSignupScreen = () => {
             activeOpacity={0.85}
           >
             <Text style={styles.devQuickLoginText}>
-              {quickLoginLoading ? '로그인 중...' : '🧪 khangyou7 빠른 로그인 (DEV)'}
+              {quickLoginLoading ? '로그인 중...' : '🧪 viaggio 빠른 로그인 (DEV)'}
             </Text>
           </TouchableOpacity>
         )}
