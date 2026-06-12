@@ -28,7 +28,6 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
-  markUserUnlocked,
   decryptBackupJson,
   restoreBackup,
   restorePlainBackup,
@@ -66,6 +65,8 @@ export const WalletRestoreScreen = () => {
   const [pin, setPin] = useState<string>('');
   const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
 
+  const [pendingBackup, setPendingBackup] = useState<{ content: string; source: string } | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -91,8 +92,8 @@ export const WalletRestoreScreen = () => {
         const normEmail = emailRaw.toLowerCase().trim();
         setMemberId(mid);
         setEmail(normEmail);
-        setStage('pin');
-        setPinPromptVisible(true);
+
+        setStage('options');
       } catch (e) {
         if (__DEV__) console.warn('[WalletRestore] mount fail:', e);
         goBack();
@@ -102,24 +103,46 @@ export const WalletRestoreScreen = () => {
   }, [goBack, showAlert, t]);
 
   const onPinPromptSuccess = (_wallets: any[], pinValue?: string) => {
-    if (email && memberId != null) {
-      markUserUnlocked(email, memberId);
-    }
-    setPin(pinValue ?? '');
+    const p = pinValue ?? '';
+    setPin(p);
     setPinPromptVisible(false);
-    setStage('options');
+
+    if (pendingBackup) {
+      const { content, source } = pendingBackup;
+      setPendingBackup(null);
+      runDecryption(content, source, p);
+    }
   };
 
   const onPinPromptCancel = () => {
     setPinPromptVisible(false);
+
+    if (pendingBackup) {
+      setPendingBackup(null);
+      setStage('options');
+      return;
+    }
     goBack();
   };
 
   const processBackupContent = async (
     content: string,
-    sourceLabel: string,   
+    sourceLabel: string,
   ) => {
-    if (memberId == null || !email || !pin) {
+    if (memberId == null || !email) {
+      Alert.alert('오류', '인증 정보 누락');
+      return;
+    }
+    setPendingBackup({ content, source: sourceLabel });
+    setPinPromptVisible(true);
+  };
+
+  const runDecryption = async (
+    content: string,
+    sourceLabel: string,
+    pinArg: string,
+  ) => {
+    if (memberId == null || !email || !pinArg) {
       Alert.alert('오류', '인증 정보 누락');
       return;
     }
@@ -129,7 +152,7 @@ export const WalletRestoreScreen = () => {
 
       let json: string;
       try {
-        json = decryptBackupJson(trimmed, pin);
+        json = decryptBackupJson(trimmed, pinArg);
       } catch {
         Alert.alert('복호화 실패', 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다');
         return;
@@ -158,7 +181,7 @@ export const WalletRestoreScreen = () => {
         { text: t('common.confirm') || '복원하기' },
       ]);
       if (ok !== 1) return;
-      const result = await restoreBackup(payload, email, memberId, pin);
+      const result = await restoreBackup(payload, email, memberId, pinArg);
       showRestoreResult(result.ok, result.imported, result.skipped, result.reason, sourceLabel);
       return;
     }
@@ -199,7 +222,7 @@ export const WalletRestoreScreen = () => {
           { text: t('common.confirm') || '복원하기' },
         ]);
         if (ok !== 1) return;
-        const result = await restorePlainBackup(plain, email, memberId, pin);
+        const result = await restorePlainBackup(plain, email, memberId, pinArg);
         showRestoreResult(
           result.ok,
           result.imported,
@@ -398,27 +421,21 @@ export const WalletRestoreScreen = () => {
     );
   }
 
-  if (stage === 'pin') {
-    return (
-      <SafeView style={styles.container}>
-        {}
-        {memberId != null && email && (
-          <WalletKeyPinPromptModal
-            visible={pinPromptVisible}
-            memberId={memberId}
-            email={email}
-            onSuccess={onPinPromptSuccess}
-            onCancel={onPinPromptCancel}
-            skipVaultCheck
-          />
-        )}
-      </SafeView>
-    );
-  }
+  const pinModal = memberId != null && email ? (
+    <WalletKeyPinPromptModal
+      visible={pinPromptVisible}
+      memberId={memberId}
+      email={email}
+      onSuccess={onPinPromptSuccess}
+      onCancel={onPinPromptCancel}
+      skipVaultCheck
+    />
+  ) : null;
 
   if (stage === 'gdrive-list') {
     return (
       <SafeView style={styles.container}>
+        {pinModal}
         <Header
           title={t('screens.walletRestore.title') || '지갑 복원'}
           onBackPress={() => setStage('options')}
@@ -460,6 +477,7 @@ export const WalletRestoreScreen = () => {
 
   return (
     <SafeView style={styles.container}>
+      {pinModal}
       <Header title={t('screens.walletRestore.title') || '지갑 복원'} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.heading}>
