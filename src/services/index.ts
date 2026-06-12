@@ -443,8 +443,14 @@ export const getAuthHeader = async (): Promise<string> => {
 
 export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
   const jwt = res?.data?.jwt;
-  if (typeof jwt === 'string' && jwt.split('.').length === 3) {
+  const jwtType = typeof jwt;
+  const jwtValid = typeof jwt === 'string' && jwt.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(res?.data ?? {}), 'jwt type:', jwtType, 'valid:', jwtValid);
+  if (jwtValid) {
     await AsyncStorage.setItem('jwt', jwt);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', jwt.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const email = res?.data?.email
