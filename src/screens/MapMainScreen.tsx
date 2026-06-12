@@ -47,6 +47,7 @@ import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
+import { getWalletKeyATStatus } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -429,8 +430,28 @@ export const MapMainScreen: React.FC = () => {
             return { memberId, email: normEmail };
           });
           setShowPinModal(true);
+          return;
         }
 
+        const vaultEmpty = entries.eth === null && entries.pol === null;
+        if (vaultEmpty) {
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
+          if (cancelled) return;
+          if (atStatus.at) {
+            const choice = await showAlert(
+              '지갑 키 복원이 필요해요',
+              '이전에 설정하신 비밀번호가 있어요.\n' +
+              '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+              [
+                { text: '나중에' },
+                { text: '복원하기' },
+              ],
+            );
+            if (choice === 1) {
+              navigate(ROUTES.walletRestore);
+            }
+          }
+        }
       } catch {
 
       }
