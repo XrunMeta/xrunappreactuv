@@ -21,7 +21,7 @@ import * as Clipboard from 'expo-clipboard';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
 import { COLORS, FONTS, SIZES } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
@@ -44,7 +44,7 @@ const NETWORK_LABEL: Record<WalletNetwork, string> = {
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
   const { t } = useTranslation();
-  const { goBack } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
 
   const [stage, setStage] = useState<Stage>('loading');
@@ -134,11 +134,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         const entries = await findEntriesForUser(normEmail, mid);
         const hasS1 = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
         if (!hasS1) {
-          await showAlert(
-            '비밀번호 설정 필요',
-            '지갑 키 백업 전에 비밀번호를 먼저 설정해주세요.\n메인 화면에서 비밀번호 설정 안내가 표시됩니다.',
+          const choice = await showAlert(
+            '지갑 키가 없어요',
+            '이 기기엔 지갑 키가 저장돼있지 않습니다.\n\n' +
+              '• 이전에 백업한 파일이 있으면 [복원하기]\n' +
+              '• 처음이라면 [돌아가기] → 메인에서 비밀번호 설정',
+            [
+              { text: '돌아가기', style: 'cancel' },
+              { text: '복원하기' },
+            ],
           );
-          goBack();
+          if (choice === 1) {
+            navigate(ROUTES.walletRestore);
+          } else {
+            goBack();
+          }
           return;
         }
 
