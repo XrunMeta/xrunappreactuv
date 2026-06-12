@@ -190,7 +190,7 @@ export const v_08aac3 = () => {
             id: `ref_${v_8c0b26.id}_${v_e86ad8}`,
             type: v_2869c1,
             description: v_2869c1,
-            amount: `+${(Number(v_8c0b26.xrun_amount) || 0).toFixed(2)} XRUN`,
+            amount: `${(Number(v_8c0b26.xrun_amount) || 0).toFixed(2)} XRUN`,
             date: v_16897e(v_8c0b26.created_at),
             transaction: v_8c0b26.id,
             status: v_8c0b26.status,
@@ -286,31 +286,31 @@ export const v_08aac3 = () => {
 
   const v_d24ee8 = ({ item: v_8c0b26 }: { item: TransformedSettlementData }) => {
     const v_619bad = v_8c0b26.status === 'sent';
-    const v_675e11 = '#cccccc';
+    const v_3fd4b5 = v_619bad
+      ? (v_8d41d7('screens.referralSettlement.paid') || '지급 완료')
+      : (v_8d41d7('screens.referralSettlement.pending') || '지급 대기');
+    const v_18d53e = v_8c0b26.fromName ? `${v_8c0b26.fromName} 님이 발생시킨 수익이에요.` : null;
     return (
-      <View style={[v_d81136.listItem, v_619bad && { opacity: 0.7 }]}>
-        <View style={v_d81136.listItemRow}>
-          {v_8c0b26.description ? <Text
-            style={[
-              v_d81136.descriptionText,
-              v_619bad && { color: v_675e11 },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {v_8c0b26.description}
-            {v_8c0b26.fromName ? <Text style={[v_d81136.fromText, v_619bad && { color: v_675e11 }]}>{`  · ${v_8c0b26.fromName} 님`}</Text> : null}
-          </Text> : null}
-          {v_8c0b26.date ? <Text style={[v_d81136.dateText, v_619bad && { color: v_675e11 }]}>{v_8c0b26.date}</Text> : null}
-        </View>
-        <View style={v_d81136.listItemRow2}>
-          <Text style={[
-            v_d81136.statusBadge,
-            v_619bad ? v_d81136.statusPaid : v_d81136.statusPending,
-          ]}>
-            {v_619bad ? (v_8d41d7('screens.referralSettlement.paid') || '지급 완료') : (v_8d41d7('screens.referralSettlement.pending') || '지급 대기')}
+      <View style={[v_d81136.questCard, v_619bad && v_d81136.questCardPaid]}>
+        <View style={[v_d81136.questBadge, v_619bad ? v_d81136.statusPaid : v_d81136.statusPending]}>
+          <Text style={[v_d81136.questBadgeText, v_619bad ? v_d81136.statusPaidText : v_d81136.statusPendingText]}>
+            {v_3fd4b5}
           </Text>
-          {v_8c0b26.amount ? <Text style={[v_d81136.amountText, v_619bad && { color: v_675e11 }]}>{v_8c0b26.amount}</Text> : null}
+        </View>
+        <Text style={[v_d81136.questTitle, v_619bad && v_d81136.textPaid]} numberOfLines={2}>
+          {v_8c0b26.description}
+        </Text>
+        {(v_18d53e || v_8c0b26.date) ? (
+          <Text style={[v_d81136.questSub, v_619bad && v_d81136.textPaidSub]} numberOfLines={2}>
+            {v_18d53e}
+            {v_18d53e && v_8c0b26.date ? '\n' : ''}
+            {v_8c0b26.date}
+          </Text>
+        ) : null}
+        <View style={v_d81136.questDivider} />
+        <View style={v_d81136.questFooter}>
+          <Text style={[v_d81136.questFooterLabel, v_619bad && v_d81136.textPaidSub]}>보상금액</Text>
+          <Text style={[v_d81136.questAmount, v_619bad && v_d81136.textPaid]}>{v_8c0b26.amount}</Text>
         </View>
       </View>
     );
@@ -407,81 +407,89 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
-  listItem: {
+
+  questCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eaeaef',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
+    shadowColor: '#00000010',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  questCardPaid: {
+    opacity: 0.65,
+  },
+  questBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  questBadgeText: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Bold',
+    letterSpacing: -0.3,
+  },
+  questTitle: {
+    fontSize: 15,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a1a1a',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  questSub: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#8a8a8f',
+    lineHeight: 17,
+    letterSpacing: -0.3,
+  },
+  questDivider: {
+    height: 1,
+    backgroundColor: '#f1f1f4',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  questFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: v_9b1a04.medium,
-    paddingVertical: v_9b1a04.large,
-    borderRadius: v_9b1a04.small,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#00000014',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: v_9b1a04.small,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#ededed',
-    marginBottom: v_9b1a04.xsmall,
+    alignItems: 'center',
   },
-  listItemRow: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
+  questFooterLabel: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#8a8a8f',
   },
-  listItemRow2: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
-    alignItems: 'flex-end',
-  },
-
-  statusBadge: {
-    fontSize: 10,
+  questAmount: {
+    fontSize: 16,
     fontFamily: 'Roboto-Bold',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    overflow: 'hidden',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
+  },
+  textPaid: {
+    color: '#b5b5b8',
+  },
+  textPaidSub: {
+    color: '#c8c8cc',
   },
   statusPaid: {
     backgroundColor: '#eeeeee',
-    color: '#9a9a9a',
   },
   statusPending: {
-    backgroundColor: '#fff4e5',
-    color: '#e07b00',
+    backgroundColor: '#e6efff',
   },
-  refTypeText: {
-    fontSize: v_843035.size.small,
-    fontFamily: 'Roboto-SemiBold',
-    color: v_1bfbd0.white,
-    width: 'auto',
-    backgroundColor: v_1bfbd0.info,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-    borderRadius: 4,
+  statusPaidText: {
+    color: '#9a9a9a',
   },
-  dateText: {
-    fontSize: v_843035.size.small,
-    fontFamily: 'Roboto-Regular',
-    color: '#707070',
-  },
-  descriptionText: {
-    fontSize: v_843035.size.msmall,
-    fontFamily: 'Roboto-Regular',
-    color: '#343434',
-    letterSpacing: -1,
-  },
-  fromText: {
-    fontSize: v_843035.size.small,
-    fontFamily: 'Roboto-Regular',
-    color: '#707070',
-  },
-  amountText: {
-    fontSize: v_843035.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: v_1bfbd0.buttonPrimary,
+  statusPendingText: {
+    color: '#3060d8',
   },
   loadingMoreContainer: {
     paddingVertical: 16,
