@@ -435,9 +435,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         const v_b5ce2e = v_1e6eca.eth === null && v_1e6eca.pol === null;
         if (v_b5ce2e) {
-          const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null }));
+          const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null, ok: false }));
           if (v_2008a4) return;
-          if (v_5a9fc7.at) {
+          console.log('[MapMain] AT 상태', v_5a9fc7);
+
+          if (v_5a9fc7.at || !v_5a9fc7.ok) {
             const v_7be387 = await v_889fad(
               '지갑 키 복원이 필요해요',
               '이전에 설정하신 비밀번호가 있어요.\n' +

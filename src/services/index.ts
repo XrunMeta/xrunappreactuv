@@ -185,22 +185,32 @@ export async function v_cf7998(): Promise<{ ok: boolean; updated?: number; error
   }
 }
 
-export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
+export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
   try {
     const v_c01615 = v_755eb9();
+    const v_68f0aa = await v_23dd22();
     const v_3f4675 = {
       'Content-Type': 'application/json',
-      Authorization: await v_23dd22(),
+      Authorization: v_68f0aa,
     };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${v_c01615}/wallets/at-status`, hasAuth: !!v_68f0aa });
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
-    if (!v_8f00b9.ok) return { at: false, at_at: null };
+    console.log('[getWalletKeyATStatus] 응답 status:', v_8f00b9.status);
+    if (!v_8f00b9.ok) {
+      const v_9b6134 = await v_8f00b9.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', v_9b6134);
+      return { at: false, at_at: null, ok: false };
+    }
     const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(v_7ecfd1));
     return {
       at: !!v_7ecfd1?.data?.at,
       at_at: v_7ecfd1?.data?.at_at ?? null,
+      ok: true,
     };
-  } catch {
-    return { at: false, at_at: null };
+  } catch (v_9e86fd) {
+    console.warn('[getWalletKeyATStatus] 예외:', v_9e86fd?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 
