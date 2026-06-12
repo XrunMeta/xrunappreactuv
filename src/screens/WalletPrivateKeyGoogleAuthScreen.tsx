@@ -25,6 +25,7 @@ import { useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
+  findEntriesForUser,
   exportBackup,
   encryptBackupJson,
   buildPlainBackup,
@@ -126,8 +127,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           goBack();
           return;
         }
+        const normEmail = emailRaw.toLowerCase().trim();
         setMemberId(mid);
-        setEmail(emailRaw.toLowerCase().trim());
+        setEmail(normEmail);
+
+        const entries = await findEntriesForUser(normEmail, mid);
+        const hasS1 = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+        if (!hasS1) {
+          await showAlert(
+            '비밀번호 설정 필요',
+            '지갑 키 백업 전에 비밀번호를 먼저 설정해주세요.\n메인 화면에서 비밀번호 설정 안내가 표시됩니다.',
+          );
+          goBack();
+          return;
+        }
+
         setStage('pin');
         setPinPromptVisible(true);
       } catch (e) {
