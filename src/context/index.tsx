@@ -89,6 +89,9 @@ type AppContextValue = {
   selectedTransactionDetails: import('../screens/TransactionDetailsScreen').TransactionDetails | null;
   setSelectedTransactionDetails: (details: import('../screens/TransactionDetailsScreen').TransactionDetails | null) => void;
   resetSelectedTransactionDetails: () => void;
+
+  unlockedWalletsForSend: import('../services/walletKeyStore').WalletKey[] | null;
+  setUnlockedWalletsForSend: (wallets: import('../services/walletKeyStore').WalletKey[] | null) => void;
 };
 
 const v_b657db = v_af12cb<AppContextValue | undefined>(undefined);
@@ -175,6 +178,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   } | null>(null);
   const [v_c51166, v_b2bb9d] = v_5ab095<import('../screens/TransactionDetailsScreen').TransactionDetails | null>(null);
 
+  const [v_b262b4, v_dc0dd4] = v_5ab095<import('../services/walletKeyStore').WalletKey[] | null>(null);
+
   const v_3b402b = v_df9f57(
     () => ({
       walletSendAddress: v_ee27aa,
@@ -255,6 +260,8 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       selectedTransactionDetails: v_c51166,
       setSelectedTransactionDetails: v_b2bb9d,
       resetSelectedTransactionDetails: () => v_b2bb9d(null),
+      unlockedWalletsForSend: v_b262b4,
+      setUnlockedWalletsForSend: v_dc0dd4,
     }),
     [
       v_ee27aa,
@@ -277,6 +284,7 @@ export const v_4b64f4 = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       v_ea6a7a,
       v_0fc1c4,
       v_c51166,
+      v_b262b4,
     ],
   );
 
