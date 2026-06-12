@@ -172,7 +172,7 @@ export const v_54d331 = () => {
             activeOpacity={0.85}
           >
             <Text style={v_d81136.devQuickLoginText}>
-              {v_590bd5 ? '로그인 중...' : '🧪 khangyou7 빠른 로그인 (DEV)'}
+              {v_590bd5 ? '로그인 중...' : '🧪 viaggio 빠른 로그인 (DEV)'}
             </Text>
           </TouchableOpacity>
         )}
