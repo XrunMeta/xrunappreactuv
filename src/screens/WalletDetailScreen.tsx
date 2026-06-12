@@ -394,10 +394,26 @@ export const WalletDetailScreen = () => {
         const userAddress = '0xc3769f23e0b94d5d36f558c8f79e81d589ea119f';
         const userAddressLower = userAddress.toLowerCase();
 
-        const items: TransactionListItemData[] = response.data.map((item) => {
+        const expandedData: any[] = [];
+        for (const it of response.data) {
+          const fromLower = (it.from || '').toLowerCase();
+          const toLower = (it.to || '').toLowerCase();
+          if (fromLower === myAddressLower && toLower === myAddressLower) {
 
-          const isReceive = item.to.toLowerCase() === myAddressLower;
-          const isSend = item.from.toLowerCase() === myAddressLower;
+            expandedData.push({ ...it, __selfSplit: 'out', __syntheticTo: it.to });
+            expandedData.push({ ...it, __selfSplit: 'in', __syntheticFrom: it.from });
+          } else {
+            expandedData.push(it);
+          }
+        }
+
+        const items: TransactionListItemData[] = expandedData.map((item) => {
+
+          const isSelfOut = item.__selfSplit === 'out';
+          const isSelfIn = item.__selfSplit === 'in';
+
+          const isReceive = isSelfIn || (!isSelfOut && item.to.toLowerCase() === myAddressLower);
+          const isSend = isSelfOut || (!isSelfIn && item.from.toLowerCase() === myAddressLower);
 
           const isToUserAddress = item.to.toLowerCase() === userAddressLower;
           const iconName = isToUserAddress ? 'download-outline' : 'send-outline';
@@ -437,8 +453,11 @@ export const WalletDetailScreen = () => {
 
           const formattedTimestamp = timestampToDate(item.timeStamp);
 
+          const uniqueId = item.__selfSplit
+            ? `${item.hash}-${item.__selfSplit}`
+            : item.hash;
           return {
-            id: item.hash,
+            id: uniqueId,
             transaction: item.hash,
             excuteddatetime: timestampToDate(item.timeStamp),
             date: timestampToDate(item.timeStamp),
