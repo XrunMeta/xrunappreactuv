@@ -190,7 +190,7 @@ export const ReferralSettlementScreen = () => {
             id: `ref_${item.id}_${idx}`,
             type: label,
             description: label,
-            amount: `${(Number(item.xrun_amount) || 0).toFixed(2)} XRUN`,
+            amount: `${(Number(item.xrun_amount) || 0).toFixed(3).replace(/\.?0+$/, '') || '0'} XRUN`,
             date: formatDateTime(item.created_at),
             transaction: item.id,
             status: item.status,
