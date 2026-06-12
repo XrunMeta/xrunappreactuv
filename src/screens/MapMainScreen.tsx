@@ -47,6 +47,7 @@ import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
+import { v_ecc3ca } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -429,8 +430,28 @@ export const MapMainScreen: v_a3453e.FC = () => {
             return { memberId: v_717992, email: v_dabeaa };
           });
           v_f4280a(true);
+          return;
         }
 
+        const v_b5ce2e = v_1e6eca.eth === null && v_1e6eca.pol === null;
+        if (v_b5ce2e) {
+          const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null }));
+          if (v_2008a4) return;
+          if (v_5a9fc7.at) {
+            const v_7be387 = await v_889fad(
+              '지갑 키 복원이 필요해요',
+              '이전에 설정하신 비밀번호가 있어요.\n' +
+              '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+              [
+                { text: '나중에' },
+                { text: '복원하기' },
+              ],
+            );
+            if (v_7be387 === 1) {
+              v_9b57fc(v_ce4741.walletRestore);
+            }
+          }
+        }
       } catch {
 
       }
