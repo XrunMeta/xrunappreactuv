@@ -287,7 +287,8 @@ export const WalletRestoreScreen = () => {
   };
 
   const handleRestoreFromFile = async () => {
-    if (!email || memberId == null || !pin) {
+
+    if (!email || memberId == null) {
       await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
@@ -371,7 +372,8 @@ export const WalletRestoreScreen = () => {
   };
 
   const handleRestoreFromGDrive = async () => {
-    if (!email || memberId == null || !pin) {
+
+    if (!email || memberId == null) {
       await showAlert(t('common.messages.error') || '오류', '인증 정보 누락 — 다시 진입해주세요');
       return;
     }
