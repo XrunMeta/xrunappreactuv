@@ -152,8 +152,7 @@ export const WalletRestoreScreen = () => {
         `백업 일시   ${dateStr}\n` +
         `포함된 키   ${networkCount}개\n\n` +
         `지금 사용하고 있는 지갑 키를\n` +
-        `이 백업으로 바꿔서 가져올게요.\n\n` +
-        `진행해도 괜찮을까요?`;
+        `이 백업으로 바꿔서 가져올게요.`;
       const ok = await showAlert('지갑 복원', msg, [
         { text: t('common.cancel') || '취소' },
         { text: t('common.confirm') || '복원하기' },
@@ -194,8 +193,7 @@ export const WalletRestoreScreen = () => {
           `이 백업은 암호화되지 않은 상태예요.\n` +
           `복원하면 비밀번호로 다시 안전하게 보호돼요.\n\n` +
           `백업 일시   ${dateStr}\n\n` +
-          `복원될 지갑\n${addrLines}\n\n` +
-          `진행해도 괜찮을까요?`;
+          `복원될 지갑\n${addrLines}`;
         const ok = await showAlert('지갑 복원', msg, [
           { text: t('common.cancel') || '취소' },
           { text: t('common.confirm') || '복원하기' },
