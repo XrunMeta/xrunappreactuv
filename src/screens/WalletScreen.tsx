@@ -568,7 +568,9 @@ export const WalletScreen = () => {
       try {
         const res = await getReferralIncome(member, navigate);
         if (res?.status === 'success' && Array.isArray(res.data)) {
-          const total = res.data.reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
+          const total = res.data
+            .filter((r) => r.status === 'sent')
+            .reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
           setReferralAmount(total);
         }
       } catch (e: any) {
