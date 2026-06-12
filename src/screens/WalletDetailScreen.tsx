@@ -357,16 +357,29 @@ export const WalletDetailScreen = () => {
           params.pageSize,
         ) as EtherscanTransactionsResponse;
 
+        console.log('[WalletDetail] Etherscan raw 응답 개수:', response.data.length);
+        if (response.data.length > 0) {
+          console.log('[WalletDetail] 첫 row sample:', {
+            contractAddress: response.data[0].contractAddress,
+            tokenSymbol: response.data[0].tokenSymbol,
+            from: response.data[0].from,
+            to: response.data[0].to,
+          });
+        }
+
         if (!response.data || !Array.isArray(response.data)) {
           console.warn('[WalletDetail] 응답 데이터 형식이 올바르지 않습니다.');
           return { data: [], total: 0, hasMore: false };
         }
 
         const XRUN_POLYGON_CONTRACT = '0xda7cdea482b4e5f3d5b41aa286811d111f066b6b';
+        const XRUN_ETHEREUM_CONTRACT = '0x5833dbb0749887174b254ba4a5df747ff523a905';
         const expectedContract =
           selectedWalletAsset.currency === 18
             ? XRUN_POLYGON_CONTRACT.toLowerCase()
-            : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
+            : selectedWalletAsset.currency === 1
+              ? XRUN_ETHEREUM_CONTRACT.toLowerCase()
+              : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
         const expectedSymbol = (selectedWalletAsset.symbol || '').toUpperCase();
         response.data = response.data.filter((item: any) => {
           const c = (item.contractAddress || '').toLowerCase();
