@@ -326,6 +326,13 @@ export async function unlockUserWallets(
   email: string,
   member: number,
 ): Promise<{ ok: true; wallets: WalletKey[] } | { ok: false; reason: string }> {
+
+  const cached = tryGetCachedWallets(email, member, pin);
+  if (cached) {
+    console.log('[unlockUserWallets] 세션 캐시 hit — PBKDF2 우회');
+    return { ok: true, wallets: cached };
+  }
+
   const entries = await findEntriesForUser(email, member);
   const allWallets: WalletKey[] = [];
   const targets: WalletNetwork[] = ['eth', 'pol'];
@@ -370,6 +377,8 @@ export async function unlockUserWallets(
     allWallets.push(...wallets);
   }
 
+  cacheSessionUnlock(email, member, pin, allWallets);
+
   return { ok: true, wallets: allWallets };
 }
 
@@ -396,9 +405,20 @@ export async function debugVault(): Promise<{ count: number; users: string[] }> 
 const SESSION_UNLOCK_TTL_MS = 3 * 60 * 1000;
 const _sessionUnlock = new Map<string, number>();
 
+type SessionUnlockCache = {
+  pinHashFast: string;
+  wallets: WalletKey[];
+  ts: number;
+};
+const _sessionUnlockCache = new Map<string, SessionUnlockCache>();
+
 function sessionUnlockKey(email: string, member: number): string {
   const normalized = normEmail(email);
   return CryptoJS.SHA256(`xrun-session:${normalized}:${String(member)}`).toString();
+}
+
+function fastPinHash(pin: string): string {
+  return CryptoJS.SHA256(`xrun-session-pin:${pin}`).toString();
 }
 
 export function markUserUnlocked(email: string, member: number): void {
@@ -418,6 +438,27 @@ export function isUserStillUnlocked(email: string, member: number): boolean {
 
 export function clearUserUnlock(email: string, member: number): void {
   _sessionUnlock.delete(sessionUnlockKey(email, member));
+  _sessionUnlockCache.delete(sessionUnlockKey(email, member));
+}
+
+function cacheSessionUnlock(email: string, member: number, pin: string, wallets: WalletKey[]): void {
+  _sessionUnlockCache.set(sessionUnlockKey(email, member), {
+    pinHashFast: fastPinHash(pin),
+    wallets,
+    ts: Date.now(),
+  });
+}
+
+function tryGetCachedWallets(email: string, member: number, pin: string): WalletKey[] | null {
+  const k = sessionUnlockKey(email, member);
+  const entry = _sessionUnlockCache.get(k);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > SESSION_UNLOCK_TTL_MS) {
+    _sessionUnlockCache.delete(k);
+    return null;
+  }
+  if (entry.pinHashFast !== fastPinHash(pin)) return null;
+  return entry.wallets;
 }
 
 export interface BackupEntry {
