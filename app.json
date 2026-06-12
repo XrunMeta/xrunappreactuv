@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.10.12",
+    "version": "4.10.13",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -56,7 +56,7 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "46"
+      "buildNumber": "47"
     },
     "android": {
       "package": "run.xrun.xrunapp",
