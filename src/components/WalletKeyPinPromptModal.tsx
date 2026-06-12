@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
   unlockUserWallets,
@@ -50,7 +51,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   }, [visible]);
 
   useEffect(() => {
-    if (step === 'enter' && pin.length === 6) {
+    if ((step === 'enter' || step === 'error') && pin.length === 6) {
       handleVerify(pin);
     }
 
@@ -94,29 +95,49 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     setPin('');
   };
 
-  const handleRetry = () => {
+  const _unusedHandleRetry = () => {
     setStep('enter');
     setPin('');
     setErrorMsg('');
   };
+  void _unusedHandleRetry;
 
   const onPressDigit = (d: string) => {
-    if (step !== 'enter') return;
+
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+    } else if (step !== 'enter') return;
     if (pin.length >= 6) return;
     setPin(pin + d);
   };
 
   const onPressBackspace = () => {
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+      return;
+    }
     if (step !== 'enter') return;
     if (pin.length === 0) return;
     setPin(pin.slice(0, -1));
   };
 
-  const isInputStep = step === 'enter';
+  const isInputStep = step === 'enter' || step === 'error';
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false}>
+    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onCancel}>
       <View style={styles.overlay}>
+        {}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerBackButton}
+            onPress={onCancel}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+        </View>
         {}
         <View style={styles.centerBlock}>
           {}
@@ -157,12 +178,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             </View>
           )}
-
-          {step === 'error' && (
-            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-              <Text style={styles.retryText}>다시 시도</Text>
-            </TouchableOpacity>
-          )}
+          {}
         </View>
 
         {
@@ -204,8 +220,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: SIZES.large,
-
     alignItems: 'center',
+  },
+
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 8,
+  },
+  headerBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerBlock: {
     flex: 1,
