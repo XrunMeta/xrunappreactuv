@@ -43,11 +43,6 @@ export const ReferralStatsCard: v_a3453e.FC<ReferralStatsCardProps> = ({
         {}
         <View style={v_d81136.content}>
           {}
-          {v_dda473 ? (
-            <View style={v_d81136.subtitleRow}>
-              <Text style={v_d81136.subtitle}>{v_dda473}</Text>
-            </View>
-          ) : null}
           {v_9f1622 && v_9f1622.trim() ? (
             <View style={v_d81136.titleRow}>
               <View style={v_d81136.titleLeft}>
@@ -58,6 +53,7 @@ export const ReferralStatsCard: v_a3453e.FC<ReferralStatsCardProps> = ({
                 )}
                 <Text style={v_d81136.title}>{v_9f1622}</Text>
               </View>
+              {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
             </View>
           ) : null}
           {v_21f619 ? (
@@ -111,12 +107,11 @@ const v_d81136 = v_472849.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   subtitleRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginTop: -12,
-    marginBottom: 0,
   },
   titleLeft: {
     flexDirection: 'row',

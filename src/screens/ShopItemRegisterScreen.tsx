@@ -14,6 +14,8 @@ import {
 } from 'rcmrninabrnb';
 import * as v_d05ab5 from 'khtmgrssvfqqjmzoc';
 import * as v_3c288d from 'bxoplsnixpmvnirxbbkstg';
+
+import v_5fa273 from 'gmtgezhlglmiymhocpfzxsfjgndjfd';
 import { v_556baf, v_729608 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -202,27 +204,33 @@ export const v_680bee = () => {
   const v_85f2b3 = async () => {
     try {
 
-      const v_43c42e = await v_d05ab5.launchImageLibraryAsync({
-        mediaTypes: v_d05ab5.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
+      const v_cb762c = await v_5fa273.openPicker({
+        width: 500,
+        height: 500,
+        cropping: true,
+        cropperToolbarTitle: '상품 이미지 자르기',
+        cropperChooseText: '선택',
+        cropperCancelText: '취소',
+        compressImageQuality: 0.9,
+        mediaType: 'photo',
+        showCropFrame: true,
+        showCropGuidelines: true,
+        avoidEmptySpaceAroundImage: true,
+
       });
-      if (v_43c42e.canceled || !v_43c42e.assets || v_43c42e.assets.length === 0) {
-        return;
-      }
-      const v_b76cd8 = v_43c42e.assets[0];
+
+      console.log('[상품 등록] 자르기 완료:', v_cb762c.path);
       v_395d5b(true);
 
-      console.log('[상품 등록] 이미지 리사이즈 시작');
       const v_8f957a = await v_3c288d.manipulateAsync(
-        v_b76cd8.uri,
-        [{ resize: { width: 250 } }], 
+        v_cb762c.path,
+        [{ resize: { width: 250 } }],
         { compress: 0.8, format: v_3c288d.SaveFormat.JPEG }
       );
       console.log('[상품 등록] 이미지 리사이즈 완료:', v_8f957a.uri);
 
       v_3456cd(v_8f957a.uri);
+      void v_d05ab5; 
 
       console.log('[상품 등록] 이미지 업로드 시작');
       const v_aea053 = await v_8db246(v_8f957a.uri);
@@ -239,8 +247,15 @@ export const v_680bee = () => {
         v_6f0c3f(null);
       }
     } catch (v_5e9bfe) {
+
+      const v_badeaf = String(v_5e9bfe?.message ?? '');
+      const v_c99bd2 = String(v_5e9bfe?.code ?? '');
+      if (v_c99bd2 === 'E_PICKER_CANCELLED' || /cancel/i.test(v_badeaf)) {
+        console.log('[상품 등록] 이미지 선택 취소');
+        return;
+      }
       console.error('[상품 등록] 이미지 선택/업로드 오류:', v_5e9bfe);
-      const v_1744b9 = v_5e9bfe?.message || v_8d41d7('screens.shopItemRegister.alerts.imageProcessingError');
+      const v_1744b9 = v_badeaf || v_8d41d7('screens.shopItemRegister.alerts.imageProcessingError');
       v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_1744b9);
       v_3456cd(null);
       v_6f0c3f(null);
@@ -337,8 +352,30 @@ export const v_680bee = () => {
   };
 
   const v_585b02 = async () => {
-    if (!v_9f1622.trim()) {
+    const v_25e98c = v_9f1622.trim();
+    const v_17b3f8 = v_6856a9.trim();
+
+    if (!v_25e98c) {
       v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error'), v_8d41d7('screens.shopItemRegister.alerts.productNameRequired'));
+      return;
+    }
+
+    if (v_25e98c.length > 20) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명은 20자 이내로 입력해주세요.');
+      return;
+    }
+    if (v_17b3f8.length > 500) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      return;
+    }
+
+    if (/(.)\1{4,}/.test(v_25e98c) || /(.)\1{4,}/.test(v_17b3f8)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      return;
+    }
+
+    if (/^[ㄱ-㆏\s]+$/.test(v_25e98c)) {
+      v_03e392.alert(v_8d41d7('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
@@ -521,6 +558,7 @@ export const v_680bee = () => {
               onChangeText={v_73c0df}
               placeholder={v_8d41d7('screens.shopItemRegister.placeholders.productName')}
               placeholderTextColor="#999"
+              maxLength={20}
             />
           </View>
 
@@ -535,6 +573,7 @@ export const v_680bee = () => {
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
+              maxLength={500}
             />
           </View>
 

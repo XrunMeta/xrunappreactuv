@@ -213,7 +213,7 @@ export const v_58584a = () => {
     }
     await v_a3bbf0(
       v_8d41d7,
-      { email: v_f4fb5e },
+      { email: v_f4fb5e, member: v_717992 ? Number(v_717992) : undefined },
       v_889fad,
       v_9b57fc,
     );

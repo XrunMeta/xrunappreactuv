@@ -8,5 +8,7 @@ export default {
   settlement: '정산목록',
   rank: '순위',
   referralLabel: '레퍼럴',
+  pending: '지급 대기',
+  paid: '지급 완료',
 };
 

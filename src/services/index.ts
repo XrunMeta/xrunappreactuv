@@ -26,9 +26,24 @@ const v_9bac9c = new Set([
 
 const v_2e0522 = new Set(['c1', 'c2', 'c16', 'c18']);
 
+const v_6e1b73 = 'https://oth-path-bab568.example.invalid/oth-path';
+
+const v_84b7b1 = 'https://oth-path-f0013c.example.invalid/oth-path';
+
+export const v_db0872 = (): string => {
+  const v_c9c489 = v_e4a763();
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+  return v_84b7b1; 
+};
+
 export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
-  return v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
+  if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
+
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return v_6e1b73;
+  }
+  return v_c9c489.GATEWAY_WORKERS;
 };
 
 export async function v_5ed938(): Promise<void> {
@@ -41,6 +56,18 @@ export async function v_5ed938(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await v_23dd22(),
     };
+
+    try {
+      const v_80bdbd = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+      if (v_80bdbd.ok) {
+        const v_177978 = await v_80bdbd.json().catch(() => null);
+        if (v_177978?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
     if (!v_8f00b9.ok) return; 
     const v_7ecfd1 = await v_8f00b9.json();
@@ -78,7 +105,11 @@ export async function v_5ed938(): Promise<void> {
     await v_f4d56b(v_e0c7e8, v_717992, v_a8e631);
 
     const wallets: v_b9a3bd[] = Array.isArray(v_7ecfd1.data) ? (v_7ecfd1.data as v_b9a3bd[]) : [];
-    if (v_53579f.length === 0) return; 
+    if (v_53579f.length === 0) {
+
+      if (__DEV__) console.log('[fetchAndSaveWallets] 신규 가입/빈 wallets — vault 변경 없음, Setup 모달 안 뜸');
+      return;
+    }
 
     const v_97d66c = v_f17f34(v_53579f);
 
@@ -98,6 +129,88 @@ export async function v_5ed938(): Promise<void> {
     }
   } catch {
 
+  }
+}
+
+export async function v_2320bd(): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-mark`, { method: 'POST', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function v_1a40bb(v_660822, v_6bee94): Promise<{ ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/upsertWalletPin`, {
+      method: 'POST',
+      headers: v_3f4675,
+      body: JSON.stringify({ member: v_660822, pin: v_6bee94 }),
+    });
+    if (!v_8f00b9.ok) return { ok: false };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    return { ok: v_7ecfd1?.status === 'success' };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function v_cf7998(): Promise<{ ok: boolean; updated?: number; error?: string }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: await v_23dd22(),
+    };
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/deleteSavedstring`, { method: 'POST', headers: v_3f4675 });
+    if (!v_8f00b9.ok) return { ok: false, error: `HTTP ${v_8f00b9.status}` };
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    if (v_7ecfd1?.status !== 'success') return { ok: false, error: v_7ecfd1?.message ?? 'unknown' };
+    return { ok: true, updated: v_7ecfd1?.data?.updated };
+  } catch (v_9e86fd) {
+    return { ok: false, error: v_9e86fd?.message ?? 'network' };
+  }
+}
+
+export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
+  try {
+    const v_c01615 = v_755eb9();
+    const v_68f0aa = await v_23dd22();
+    const v_3f4675 = {
+      'Content-Type': 'application/json',
+      Authorization: v_68f0aa,
+    };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${v_c01615}/wallets/at-status`, hasAuth: !!v_68f0aa });
+    const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+    console.log('[getWalletKeyATStatus] 응답 status:', v_8f00b9.status);
+    if (!v_8f00b9.ok) {
+      const v_9b6134 = await v_8f00b9.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', v_9b6134);
+      return { at: false, at_at: null, ok: false };
+    }
+    const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(v_7ecfd1));
+    return {
+      at: !!v_7ecfd1?.data?.at,
+      at_at: v_7ecfd1?.data?.at_at ?? null,
+      ok: true,
+    };
+  } catch (v_9e86fd) {
+    console.warn('[getWalletKeyATStatus] 예외:', v_9e86fd?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 
@@ -330,8 +443,14 @@ export const v_23dd22 = async (): Promise<string> => {
 
 export const v_964a96 = async (v_8f00b9): Promise<void> => {
   const v_56b352 = v_8f00b9?.data?.jwt;
-  if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
+  const v_e4436a = typeof v_56b352;
+  const v_1b140d = typeof v_56b352 === 'string' && v_56b352.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(v_8f00b9?.data ?? {}), 'jwt type:', v_e4436a, 'valid:', v_1b140d);
+  if (v_1b140d) {
     await v_e84827.setItem('jwt', v_56b352);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', v_56b352.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const v_e0c7e8 = v_8f00b9?.data?.email
@@ -588,6 +707,22 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
     async (v_74a79c) => {
 
       v_74a79c.headers.Authorization = await v_23dd22();
+
+      const v_288349 = [
+        /\/callbackNasmob\b/,
+        /\/callbackPointClick\b/,
+        /\/callbackAyet\b/,
+        /\/callbackMaf\b/,
+        /\/callbackMyChips\b/,
+        /\/getTopAd5\b/,
+        /\/Ayet\//,
+        /\/Maf\//,
+      ];
+      const v_966ad8 = v_74a79c.url && v_288349.some(v_d95200 => v_d95200.test(v_74a79c.url!));
+      if (v_966ad8) {
+        v_74a79c.baseURL = v_db0872();
+        console.log('[API Request] 🎯 광고 엔드포인트 — doongi(main) 로 강제 라우팅:', v_74a79c.baseURL);
+      }
 
       const v_f409eb = v_74a79c.baseURL
         ? (v_74a79c.baseURL.endsWith('/') && v_74a79c.url?.startsWith('/')
@@ -889,30 +1024,41 @@ export const v_f5ecec = async (
 };
 
 export const v_01332e = async (
-  v_9bf12c,
+  v_c4cf0d,
   v_c65f5d,
 ): Promise<number | null> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_a357d3 = { email: v_9bf12c };
+    const v_2f361a = (v_c4cf0d || '').trim();
 
-    console.log('[회원가입 2단계] 추천인 이메일 확인 요청:', v_9bf12c);
+    const v_909fd0 = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/i.test(v_2f361a);
+    if (v_909fd0) {
+      console.log('[회원가입 2단계] 추천코드 형식 감지 → lookup-referral:', v_2f361a);
+      const v_c1cd9e = await v_9f42a4.get(`/lookup-referral?code=${encodeURIComponent(v_2f361a.toUpperCase())}`);
+      const v_3b7754 = v_c1cd9e.data?.data?.[0];
+      if (v_3b7754?.exists && v_3b7754.member) {
+        console.log('[회원가입 2단계] 추천코드 매칭 성공:', v_3b7754.member);
+        return v_3b7754.member;
+      }
+      console.log('[회원가입 2단계] 추천코드 매칭 실패');
+      return null;
+    }
 
+    const request: v_a357d3 = { email: v_2f361a };
+    console.log('[회원가입 2단계] 추천이메일 확인 요청:', v_2f361a);
     const v_3393e3 = await v_9f42a4.post<v_d6bdce>(
       '/ap1810-i01',
       v_576f5a,
     );
-
     const v_43c42e = v_3393e3.data.data[0];
     if (v_43c42e?.result === true && v_43c42e.member) {
-      console.log('[회원가입 2단계] 추천인 확인 성공, member ID:', v_43c42e.member);
+      console.log('[회원가입 2단계] 추천이메일 매칭 성공:', v_43c42e.member);
       return v_43c42e.member;
-    } else {
-      console.log('[회원가입 2단계] 추천인 확인 실패: 유효하지 않은 이메일');
-      return null;
     }
+    console.log('[회원가입 2단계] 추천이메일 매칭 실패');
+    return null;
   } catch (v_5e9bfe) {
-    console.error('[회원가입 2단계] 추천인 이메일 확인 실패:', v_5e9bfe);
+    console.error('[회원가입 2단계] 추천 입력 확인 실패:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
@@ -3503,7 +3649,8 @@ export const v_7a6f92 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/callbackNasmob`;
+
+    const v_f71b56 = `${v_db0872()}/callbackNasmob`;
 
     console.log('NStation 콜백 전송:', v_d8bcf0);
 
@@ -3536,7 +3683,20 @@ export const v_c07360 = async (
 ): Promise<any> => {
   try {
     const v_c9c489 = v_e4a763();
-    const v_f71b56 = `${v_755eb9()}/${v_09dafd}`;
+
+    const v_288349 = [
+      /^callbackNasmob$/,
+      /^callbackPointClick$/,
+      /^callbackAyet$/,
+      /^callbackMaf$/,
+      /^callbackMyChips$/,
+      /^getTopAd5$/,
+      /^Ayet\//,
+      /^Maf\//,
+    ];
+    const v_966ad8 = v_288349.some(v_d95200 => v_d95200.test(v_09dafd));
+    const v_c01615 = v_966ad8 ? v_db0872() : v_755eb9();
+    const v_f71b56 = `${v_c01615}/${v_09dafd}`;
 
     console.log(`🌐 [gatewayNodeJS] API 호출 시작`);
     if (v_09dafd === 'getTopAd5') {
@@ -4060,6 +4220,46 @@ export const v_b7594c = async (
         message: v_5e9bfe.message,
       });
     }
+    throw v_5e9bfe;
+  }
+};
+
+export interface ReferralIncomeItem {
+  id: number;
+  xrun_amount: number;
+  krw_amount: number;
+  level: number;
+  source_type: string;
+  source_callback_id: number | null;
+  status: 'pending' | 'sent' | string;
+  tx_hash: string | null;
+  tx_time: string | null;
+  created_at: string;
+  error_message: string | null;
+
+  from_member?: number | null;
+  from_name?: string | null;
+}
+export interface GetReferralIncomeResponse {
+  status: 'success' | 'error' | 'fail';
+  code?: number;
+  data: ReferralIncomeItem[];
+  message?: string;
+}
+export const v_2dc778 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<GetReferralIncomeResponse> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post<GetReferralIncomeResponse>(
+      '/getReferralIncome',
+      { member: v_660822 },
+    );
+    console.log('[레퍼럴정산] 조회 성공, 개수:', v_3393e3.data.data?.length || 0);
+    return v_3393e3.data;
+  } catch (v_5e9bfe) {
+    console.error('[레퍼럴정산] 조회 오류:', v_5e9bfe);
     throw v_5e9bfe;
   }
 };
@@ -5871,8 +6071,13 @@ export const v_519669 = async (
   };
 
   try {
-    const v_b67de5 = v_3b27d9 ? `?type=${v_74cb95[v_3b27d9]}` : '?type=1';
-    const v_eb792a = await fetch(`https://oth-path-f0013c.example.invalid/agreements${v_b67de5}`);
+
+    const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+    const v_5254bf = (v_9c213b?.language as string | undefined) || 'ko';
+    const v_653390 = v_3b27d9 ? v_74cb95[v_3b27d9] : 1;
+    const v_f71b56 = `https://oth-path-f0013c.example.invalid/agreements?type=${v_653390}&language=${encodeURIComponent(v_5254bf)}`;
+    console.log('[약관] 요청 URL:', v_f71b56);
+    const v_eb792a = await fetch(v_f71b56);
     const v_9390e8 = await v_eb792a.json() as any;
 
     return {

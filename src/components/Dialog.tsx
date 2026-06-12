@@ -41,7 +41,9 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
       <View style={v_d81136.overlay}>
         <View style={[v_d81136.card, v_4affe9]}>
           <View style={v_d81136.header}>
-            {v_0890f8 ? (
+            {
+}
+            {v_0890f8 && v_dd943a.length === 0 ? (
               <>
                 <View style={v_d81136.closePlaceholder} />
                 <Text style={v_d81136.title}>{v_9f1622}</Text>
@@ -181,5 +183,4 @@ const v_d81136 = v_472849.create({
     opacity: 0.7,
   },
 });
-
 

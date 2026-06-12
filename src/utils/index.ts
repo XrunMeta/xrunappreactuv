@@ -128,19 +128,35 @@ export const v_a3bbf0 = async (
 ): Promise<void> => {
   try {
     console.log('[shareReferralLink] 시작 - 플랫폼:', v_326be8.OS);
-    console.log('[shareReferralLink] 사용자 이메일:', v_412c99.email);
+    console.log('[shareReferralLink] member:', v_412c99.member, 'email:', v_412c99.email);
 
     const v_17aa0b = v_843337({ gl: 'kr', campaignId: 'web_share' });
     const v_47d9ba = 'https://apps.apple.com/id/app/xrun-go/id6502924173';
 
-    const v_c79b94 = encodeURIComponent(v_412c99.email);
-    const v_25f202 = `https://www.xrun.run/invite?referral=${v_c79b94}`;
+    let v_2fa46c = null;
+    if (v_412c99.member) {
+      try {
+        const { createAxiosInstance: v_7488d5 } = await import('../services');
+        const v_9f42a4 = v_7488d5(v_c65f5d);
+        const v_ff002b = await v_9f42a4.get(`/my-referral-code?member=${v_412c99.member}`);
+        v_2fa46c = v_ff002b.data?.data?.[0]?.code ?? null;
+        console.log('[shareReferralLink] referral_code 조회 결과:', v_2fa46c);
+      } catch (v_9e86fd) {
+        console.warn('[shareReferralLink] referral_code 조회 실패, email fallback:', v_9e86fd);
+      }
+    }
+
+    const v_400193 = v_2fa46c
+      ? `ref=${encodeURIComponent(v_2fa46c)}`
+      : (v_412c99.email ? `referral=${encodeURIComponent(v_412c99.email)}` : '');
+    const v_25f202 = `https://www.xrun.run/invite?${v_400193}`;
 
     const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
     const v_542b81 = v_8d41d7('screens.referral.share.download');
     const v_8d1ab0 = v_8d41d7('screens.referral.share.linkLabel') || 'Link';
 
-    const v_a8cd21 = `${v_b657c9}${v_412c99.email}\n\n🔗 ${v_8d1ab0} ${v_25f202}`;
+    const v_7c8c91 = v_2fa46c || v_412c99.email || '';
+    const v_a8cd21 = `${v_b657c9}${v_7c8c91}\n\n🔗 ${v_8d1ab0} ${v_25f202}`;
 
     console.log('[shareReferralLink] 공유 메시지:', v_a8cd21);
 
@@ -498,4 +514,50 @@ export const v_f1ee1a = async (): Promise<{ isColdStart: boolean; elapsedSeconds
 export const v_51fb8d = (v_270351): string => {
   if (!v_270351 || v_270351.length < 10) return v_270351;
   return `${v_270351.substring(0, 6)}...${v_270351.substring(v_270351.length - 4)}`;
+};
+
+export const v_8a1e5d = async (v_380676): Promise<void> => {
+  const { Linking: v_118165 } = await import('rcmrninabrnb');
+  let v_1794cd = null;
+
+  try {
+
+    const v_a9684b = v_380676.match(/[;#]S\.browser_fallback_url=([^;]+)/);
+    if (v_a9684b?.[1]) {
+      try { v_1794cd = decodeURIComponent(v_a9684b[1]); } catch { v_1794cd = v_a9684b[1]; }
+    }
+
+    if (!v_1794cd) {
+      const v_cd73e9 = v_380676.match(/[?&]url=([^&#]+)/);
+      if (v_cd73e9?.[1]) {
+        try {
+          let v_4adf64 = decodeURIComponent(v_cd73e9[1]);
+          if (v_4adf64.includes('%')) {
+            try { v_4adf64 = decodeURIComponent(v_4adf64); } catch {  }
+          }
+          v_1794cd = v_4adf64;
+        } catch { v_1794cd = v_cd73e9[1]; }
+      }
+    }
+
+    if (!v_1794cd) {
+      const v_1d3cec = v_380676.match(/[;#]package=([^;]+)/) || v_380676.match(/[?&]id=([^&#]+)/);
+      if (v_1d3cec?.[1]) {
+        v_1794cd = 'https://play.google.com/store/apps/details?id=' + v_1d3cec[1];
+      }
+    }
+  } catch (v_9e86fd) {
+    console.warn('[openIntentUrlOrFallback] parse fail:', v_9e86fd);
+  }
+
+  if (!v_1794cd) {
+    console.warn('[openIntentUrlOrFallback] resolve 실패 — 원본 시도:', v_380676.slice(0, 100));
+    v_1794cd = v_380676;
+  }
+
+  try {
+    await v_118165.openURL(v_1794cd);
+  } catch (v_9e86fd) {
+    console.warn('[openIntentUrlOrFallback] openURL 실패:', v_1794cd.slice(0, 100), v_9e86fd);
+  }
 };

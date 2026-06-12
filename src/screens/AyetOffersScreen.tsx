@@ -8,17 +8,20 @@ import {
   v_f2c756,
   v_326be8,
 } from 'rcmrninabrnb';
+import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_a61db3, v_1bfbd0 } from '../constants';
 import { v_5e4f0b } from '../services/ayet';
+import { v_8a1e5d } from '../utils';
 
 const v_e56d32 = v_326be8.OS === 'ios' ? '25755' : '25617';
 
 export const AyetOffersScreen: v_a3453e.FC = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
+  const v_033e14 = v_e0068c();
   const v_35f830 = v_e662ae<v_2694e4>(null);
   const [v_43e90c, v_688dd2] = v_5ab095<string>('');
   const [v_cd31a8, v_deef62] = v_5ab095(true);
@@ -79,9 +82,11 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
 
   const v_6da94b = `https://offerwall.ayet.io/offers?adSlot=${v_e56d32}&external_identifier=${encodeURIComponent(v_43e90c)}`;
 
+  const v_0a35c3 = v_033e14.bottom;
+
   if (v_cd31a8) {
     return (
-      <View style={v_d81136.container}>
+      <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
         <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.primary} />
@@ -91,7 +96,7 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
   }
 
   return (
-    <View style={v_d81136.container}>
+    <View style={[v_d81136.container, { paddingBottom: v_0a35c3 }]}>
       <Header title="Zone 1" onBackPress={v_c7ac57} showBackButton />
       <WebView
         key={v_a039ac}
@@ -124,9 +129,24 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] App Store open 실패:', v_9e86fd));
             return false;
           }
-          if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+          if (v_f71b56.startsWith('intent://')) {
+
             v_eb8c24.current = true;
-            v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] Play Store/Intent open 실패:', v_9e86fd));
+            v_8a1e5d(v_f71b56);
+            return false;
+          }
+          if (v_f71b56.startsWith('market://')) {
+            v_eb8c24.current = true;
+            v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => {
+
+              const v_ae8a0a = v_f71b56.match(/[?&]id=([^&#]+)/);
+              if (v_ae8a0a?.[1]) {
+                v_f2c756.openURL('https://play.google.com/store/apps/details?id=' + v_ae8a0a[1])
+                  .catch((v_85f11a) => console.warn('[ayeT WebView] Play Store fallback 실패:', v_85f11a));
+              } else {
+                console.warn('[ayeT WebView] market:// open 실패:', v_9e86fd);
+              }
+            });
             return false;
           }
           return true;
