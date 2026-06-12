@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
-import { COLORS, IS_DEV_MODE, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
+import { COLORS, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import {
   getCurrentAppVersionNumber,
@@ -14,19 +14,14 @@ import {
 import {
   getPushNotificationsEnabled,
   setPushNotificationsEnabled,
-  loginWithEmailPassword,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
 
-const DEV_QUICK_LOGIN_EMAIL = 'oth-user@example.invalid';
-const DEV_QUICK_LOGIN_SECRET_KEY = '__dev_quick_login_usr_secret';
-
 export const MyInfoSettingsScreen = () => {
-  const { goBack, navigate, reset } = useAppNavigation();
+  const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
-  const [quickLoginLoading, setQuickLoginLoading] = useState(false);
   const [versionInfo, setVersionInfo] = useState<{
     androidCurrent: number;
     androidLatest: number;
@@ -115,62 +110,6 @@ export const MyInfoSettingsScreen = () => {
     fetchVersionInfo();
   }, []);
 
-  useEffect(() => {
-    if (!IS_DEV_MODE) return;
-    (async () => {
-      const existing = await AsyncStorage.getItem(DEV_QUICK_LOGIN_SECRET_KEY);
-      if (!existing) {
-        await AsyncStorage.setItem(DEV_QUICK_LOGIN_SECRET_KEY, 'Aaaaaa1');
-        console.log('[dev] USR_SECRET 자동 저장 완료');
-      }
-    })();
-  }, []);
-
-  const handleQuickLogin = async () => {
-    if (quickLoginLoading) return;
-    setQuickLoginLoading(true);
-    try {
-      let secret = await AsyncStorage.getItem(DEV_QUICK_LOGIN_SECRET_KEY);
-      if (!secret) {
-
-        await showAlert(
-          'USR_SECRET 입력 필요',
-          'Metro 콘솔 또는 디바이스에서:\n' +
-          'await AsyncStorage.setItem("__dev_quick_login_usr_secret", "<USR_SECRET>")\n\n' +
-          '실행 후 다시 시도해주세요.',
-        );
-        setQuickLoginLoading(false);
-        return;
-      }
-
-      const keepKeys = ['__xs_v1', '__xs_av1', DEV_QUICK_LOGIN_SECRET_KEY];
-      const allKeys = await AsyncStorage.getAllKeys();
-      const toRemove = allKeys.filter((k) => !keepKeys.includes(k) && (k.startsWith('userData') || k === 'userData' || k === 'jwt' || k === 'loggedIn' || k === 'userEmail'));
-      if (toRemove.length > 0) await AsyncStorage.multiRemove(toRemove);
-
-      const res = await loginWithEmailPassword(DEV_QUICK_LOGIN_EMAIL, secret);
-      if (res?.status === 'success') {
-
-        const userData = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (userData) {
-          await AsyncStorage.setItem('userData', JSON.stringify(userData));
-          await AsyncStorage.setItem('userEmail', userData.email || DEV_QUICK_LOGIN_EMAIL);
-          await AsyncStorage.setItem('loggedIn', 'true');
-          await AsyncStorage.setItem('remember', 'true');
-        }
-        console.log('[dev 빠른 로그인] 성공:', DEV_QUICK_LOGIN_EMAIL);
-        reset(ROUTES.map);
-      } else {
-        await showAlert('로그인 실패', String((res as any)?.message ?? '시크릿 확인 후 다시 시도'));
-      }
-    } catch (e: any) {
-      console.warn('[dev 빠른 로그인] 예외:', e?.message);
-      await showAlert('로그인 오류', e?.message ?? '알 수 없는 오류');
-    } finally {
-      setQuickLoginLoading(false);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Header title={t('screens.myInfoSettings.title')} onBackPress={goBack} showBackButton />
@@ -241,20 +180,6 @@ export const MyInfoSettingsScreen = () => {
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
-
-          {}
-          {IS_DEV_MODE && (
-            <TouchableOpacity
-              style={[styles.card, { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#F59E0B' }]}
-              activeOpacity={0.85}
-              onPress={handleQuickLogin}
-              disabled={quickLoginLoading}
-            >
-              <Text style={[styles.cardText, { color: '#92400E' }]}>
-                {quickLoginLoading ? '로그인 중...' : '🧪 khangyou7 빠른 로그인 (DEV)'}
-              </Text>
-            </TouchableOpacity>
-          )}
 
           {}
           {versionInfo && (
