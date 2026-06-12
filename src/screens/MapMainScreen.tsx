@@ -435,9 +435,11 @@ export const MapMainScreen: React.FC = () => {
 
         const vaultEmpty = entries.eth === null && entries.pol === null;
         if (vaultEmpty) {
-          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
           if (cancelled) return;
-          if (atStatus.at) {
+          console.log('[MapMain] AT 상태', atStatus);
+
+          if (atStatus.at || !atStatus.ok) {
             const choice = await showAlert(
               '지갑 키 복원이 필요해요',
               '이전에 설정하신 비밀번호가 있어요.\n' +

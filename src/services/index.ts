@@ -185,22 +185,32 @@ export async function deleteServerSavedstring(): Promise<{ ok: boolean; updated?
   }
 }
 
-export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
+export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
   try {
     const baseUrl = getApiBaseUrl();
+    const auth = await getAuthHeader();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      Authorization: await getAuthHeader(),
+      Authorization: auth,
     };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${baseUrl}/wallets/at-status`, hasAuth: !!auth });
     const res = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
-    if (!res.ok) return { at: false, at_at: null };
+    console.log('[getWalletKeyATStatus] 응답 status:', res.status);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', text);
+      return { at: false, at_at: null, ok: false };
+    }
     const json = await res.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(json));
     return {
       at: !!json?.data?.at,
       at_at: json?.data?.at_at ?? null,
+      ok: true,
     };
-  } catch {
-    return { at: false, at_at: null };
+  } catch (e: any) {
+    console.warn('[getWalletKeyATStatus] 예외:', e?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 

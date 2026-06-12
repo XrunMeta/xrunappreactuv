@@ -143,9 +143,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         const entries = await findEntriesForUser(normEmail, mid);
         const hasS1 = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
         if (!hasS1) {
-          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
           if (cancelled) return;
-          if (atStatus.at) {
+          console.log('[WalletKeyBackup] AT 상태', atStatus);
+
+          const shouldShowRestore = atStatus.at || !atStatus.ok;
+          if (shouldShowRestore) {
             const choice = await showAlert(
               '지갑 키 복원이 필요해요',
               '이전에 설정하신 비밀번호와 백업 파일로 지갑을 복원할 수 있어요.',

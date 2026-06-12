@@ -602,12 +602,17 @@ export const WalletDetailScreen = () => {
           const userData = userDataStr ? JSON.parse(userDataStr) : null;
           const email = (userData?.email ?? '').toLowerCase().trim();
           const memberId = userData?.member != null ? Number(userData.member) : null;
+          console.log('[WalletDetail] send 분기 진입', { email, memberId, inWhitelist: isLocalSendEnabledForUser(email) });
           if (isLocalSendEnabledForUser(email) && email && memberId != null) {
             const entries = await findEntriesForUser(email, memberId);
             const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+            console.log('[WalletDetail] vault 체크', { hasKey, eth: entries.eth?.s, pol: entries.pol?.s });
             if (!hasKey) {
-              const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null }));
-              if (atStatus.at) {
+              const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
+              console.log('[WalletDetail] AT 상태', atStatus);
+
+              const shouldShowRestore = atStatus.at || !atStatus.ok;
+              if (shouldShowRestore) {
 
                 const choice = await showAlert(
                   '지갑 키 복원이 필요해요',
