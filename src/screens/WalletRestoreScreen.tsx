@@ -149,10 +149,11 @@ export const WalletRestoreScreen = () => {
       const networkCount = payload.entries?.length ?? 0;
       const dateStr = new Date(payload.exported_at || 0).toLocaleString();
       const msg =
-        `📅 백업 일시\n${dateStr}\n\n` +
-        `🔑 복원될 키 개수\n${networkCount}개\n\n` +
-        `현재 지갑에 위 백업으로 덮어쓸까요?\n` +
-        `(이전 키는 사라지고 백업한 시점의 키로 바뀝니다)`;
+        `백업 일시   ${dateStr}\n` +
+        `포함된 키   ${networkCount}개\n\n` +
+        `지금 사용하고 있는 지갑 키를\n` +
+        `이 백업으로 바꿔서 가져올게요.\n\n` +
+        `진행해도 괜찮을까요?`;
       const ok = await showAlert('지갑 복원', msg, [
         { text: t('common.cancel') || '취소' },
         { text: t('common.confirm') || '복원하기' },
@@ -186,14 +187,15 @@ export const WalletRestoreScreen = () => {
 
         const NETWORK_NAME: Record<string, string> = { eth: 'Ethereum', pol: 'Polygon' };
         const addrLines = plain.wallets
-          .map((w) => `• ${NETWORK_NAME[w.network] || w.network}: ${w.address.slice(0, 10)}…${w.address.slice(-6)}`)
+          .map((w) => `   ${NETWORK_NAME[w.network] || w.network}    ${w.address.slice(0, 10)}…${w.address.slice(-6)}`)
           .join('\n');
         const dateStr = new Date(plain.exported_at || 0).toLocaleString();
         const msg =
-          `⚠️ 암호화되지 않은 백업입니다.\n\n` +
-          `📅 백업 일시\n${dateStr}\n\n` +
-          `📋 복원될 지갑\n${addrLines}\n\n` +
-          `복원 후 PIN 으로 안전하게 다시 암호화됩니다. 진행할까요?`;
+          `이 백업은 암호화되지 않은 상태예요.\n` +
+          `복원하면 비밀번호로 다시 안전하게 보호돼요.\n\n` +
+          `백업 일시   ${dateStr}\n\n` +
+          `복원될 지갑\n${addrLines}\n\n` +
+          `진행해도 괜찮을까요?`;
         const ok = await showAlert('지갑 복원', msg, [
           { text: t('common.cancel') || '취소' },
           { text: t('common.confirm') || '복원하기' },
