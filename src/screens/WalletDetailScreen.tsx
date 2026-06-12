@@ -323,7 +323,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
 
-      if (![1, 16, 18].includes(selectedWalletAsset.currency)) {
+      if (![1, 2, 16, 18].includes(selectedWalletAsset.currency)) {
         console.warn('[WalletDetail] 지원하지 않는 currency:', selectedWalletAsset.currency);
         return { data: [], total: 0, hasMore: false };
       }

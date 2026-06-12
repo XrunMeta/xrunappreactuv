@@ -35,6 +35,8 @@ import {
   checkERC20Token,
   getUsersBalanceUpdateV2,
   getReferralIncome,
+  getApiBaseUrl,
+  getAuthHeader,
 } from '../services';
 import {
   WalletData,
@@ -462,16 +464,18 @@ export const WalletScreen = () => {
           });
 
           try {
-            const baseUrl = (await import('../services')).getApiBaseUrl();
+            console.log('[WalletScreen] RPC 잔액 조회 시도 — member:', member);
+            const baseUrl = getApiBaseUrl();
             const headers: Record<string, string> = {
               'Content-Type': 'application/json',
-              Authorization: await (await import('../services')).getAuthHeader(),
+              Authorization: await getAuthHeader(),
             };
             const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
               method: 'POST',
               headers,
               body: JSON.stringify({ member }),
             });
+            console.log('[WalletScreen] RPC HTTP 상태:', rpcRes.status);
             if (rpcRes.ok) {
               const rpcJson: any = await rpcRes.json().catch(() => null);
               const balances: Array<{ currency: number; address: string; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
