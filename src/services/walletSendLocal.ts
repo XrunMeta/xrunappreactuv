@@ -26,6 +26,10 @@ export function clearPendingWallets(): void {
   }
 }
 
+export function hasPendingWallets(): boolean {
+  return _pendingWallets !== null && _pendingWallets.length > 0;
+}
+
 const POLYGON_RPC_URLS = [
   'https://polygon-bor-rpc.publicnode.com',
   'https://polygon.llamarpc.com',
