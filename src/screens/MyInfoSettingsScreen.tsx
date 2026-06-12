@@ -4,7 +4,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
-import { v_1bfbd0, v_731ab4, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
   v_650134,
@@ -14,19 +14,14 @@ import {
 import {
   v_8b775f,
   v_415b23,
-  v_b699a9,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
 
-const v_649e06 = 'oth-user@example.invalid';
-const v_851158 = '__dev_quick_login_usr_secret';
-
 export const v_4a40b2 = () => {
-  const { goBack: v_c7ac57, navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const [v_7b4f11, v_7f8510] = v_5ab095(false);
-  const [v_590bd5, v_59e88a] = v_5ab095(false);
   const [v_ea6ee8, v_3a1e39] = v_5ab095<{
     androidCurrent: number;
     androidLatest: number;
@@ -115,62 +110,6 @@ export const v_4a40b2 = () => {
     v_d7f2ec();
   }, []);
 
-  v_c4deb2(() => {
-    if (!v_731ab4) return;
-    (async () => {
-      const v_3c8572 = await v_e84827.getItem(v_851158);
-      if (!v_3c8572) {
-        await v_e84827.setItem(v_851158, 'Aaaaaa1');
-        console.log('[dev] USR_SECRET 자동 저장 완료');
-      }
-    })();
-  }, []);
-
-  const v_ea4e8c = async () => {
-    if (v_590bd5) return;
-    v_59e88a(true);
-    try {
-      let v_43fd42 = await v_e84827.getItem(v_851158);
-      if (!v_43fd42) {
-
-        await v_889fad(
-          'USR_SECRET 입력 필요',
-          'Metro 콘솔 또는 디바이스에서:\n' +
-          'await AsyncStorage.setItem("__dev_quick_login_usr_secret", "<USR_SECRET>")\n\n' +
-          '실행 후 다시 시도해주세요.',
-        );
-        v_59e88a(false);
-        return;
-      }
-
-      const v_3d09b9 = ['__xs_v1', '__xs_av1', v_851158];
-      const v_e66bb4 = await v_e84827.getAllKeys();
-      const v_55369f = v_e66bb4.filter((v_0eb677) => !v_3d09b9.includes(v_0eb677) && (v_0eb677.startsWith('userData') || v_0eb677 === 'userData' || v_0eb677 === 'jwt' || v_0eb677 === 'loggedIn' || v_0eb677 === 'userEmail'));
-      if (v_55369f.length > 0) await v_e84827.multiRemove(v_55369f);
-
-      const v_8f00b9 = await v_b699a9(v_649e06, v_43fd42);
-      if (v_8f00b9?.status === 'success') {
-
-        const v_ef7306 = Array.isArray(v_8f00b9.data) ? v_8f00b9.data[0] : v_8f00b9.data;
-        if (v_ef7306) {
-          await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
-          await v_e84827.setItem('userEmail', v_ef7306.email || v_649e06);
-          await v_e84827.setItem('loggedIn', 'true');
-          await v_e84827.setItem('remember', 'true');
-        }
-        console.log('[dev 빠른 로그인] 성공:', v_649e06);
-        v_487a25(v_ce4741.map);
-      } else {
-        await v_889fad('로그인 실패', String((v_8f00b9 as any)?.message ?? '시크릿 확인 후 다시 시도'));
-      }
-    } catch (v_9e86fd) {
-      console.warn('[dev 빠른 로그인] 예외:', v_9e86fd?.message);
-      await v_889fad('로그인 오류', v_9e86fd?.message ?? '알 수 없는 오류');
-    } finally {
-      v_59e88a(false);
-    }
-  };
-
   return (
     <View style={v_d81136.container}>
       <Header title={v_8d41d7('screens.myInfoSettings.title')} onBackPress={v_c7ac57} showBackButton />
@@ -241,20 +180,6 @@ export const v_4a40b2 = () => {
           >
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.closeMembership')}</Text>
           </TouchableOpacity>
-
-          {}
-          {v_731ab4 && (
-            <TouchableOpacity
-              style={[v_d81136.card, { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#F59E0B' }]}
-              activeOpacity={0.85}
-              onPress={v_ea4e8c}
-              disabled={v_590bd5}
-            >
-              <Text style={[v_d81136.cardText, { color: '#92400E' }]}>
-                {v_590bd5 ? '로그인 중...' : '🧪 khangyou7 빠른 로그인 (DEV)'}
-              </Text>
-            </TouchableOpacity>
-          )}
 
           {}
           {v_ea6ee8 && (
