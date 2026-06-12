@@ -115,6 +115,17 @@ export const v_4a40b2 = () => {
     v_d7f2ec();
   }, []);
 
+  v_c4deb2(() => {
+    if (!v_731ab4) return;
+    (async () => {
+      const v_3c8572 = await v_e84827.getItem(v_851158);
+      if (!v_3c8572) {
+        await v_e84827.setItem(v_851158, 'Aaaaaa1');
+        console.log('[dev] USR_SECRET 자동 저장 완료');
+      }
+    })();
+  }, []);
+
   const v_ea4e8c = async () => {
     if (v_590bd5) return;
     v_59e88a(true);
