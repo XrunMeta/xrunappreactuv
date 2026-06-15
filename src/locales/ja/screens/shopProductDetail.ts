@@ -28,6 +28,9 @@ export default {
   viewMyGift: 'マイギフト券を見る',
   alerts: {
     notification: 'お知らせ',
+    couponSendFail: 'クーポン送信失敗',
+    paymentCompletePendingCouponTitle: '決済完了 / クーポン送信待ち',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\n決済は完了しました。クーポンは自動または手動でまもなく送信されます。({{tx}}…)',
     phoneNotRegistered: '受取人電話番号が登録されていません。マイページで登録してください。',
     insufficientXRUN: 'XRUN残高が不足しています。',
     purchaseConfirmTitle: '購入',

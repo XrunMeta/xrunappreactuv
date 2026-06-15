@@ -28,6 +28,9 @@ export default {
   viewMyGift: 'Xem thẻ quà',
   alerts: {
     notification: 'Thông báo',
+    couponSendFail: 'Gửi mã giảm giá thất bại',
+    paymentCompletePendingCouponTitle: 'Thanh toán hoàn tất / Mã giảm giá đang chờ',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\nThanh toán đã hoàn tất. Mã giảm giá sẽ được gửi tự động hoặc thủ công sớm. ({{tx}}…)',
     phoneNotRegistered: 'Chưa đăng ký SĐT người nhận. Vui lòng đăng ký tại Trang cá nhân.',
     insufficientXRUN: 'Số dư XRUN không đủ.',
     purchaseConfirmTitle: 'Mua',
