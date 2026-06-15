@@ -2129,6 +2129,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       const v_43b152 = /gpakorea\.com/i.test(v_7ec08d);
       if (v_43b152) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+
+        try {
+          const v_ce5e26 = v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK' ? 'pointclick' : 'nas';
+          await v_38f5f4(parseInt(v_660822, 10), v_aa0917, v_ce5e26, v_9b57fc);
+        } catch (v_53d118) {
+          if (v_53d118?.code !== 404 && !v_53d118?.message?.includes('404')) {
+            console.warn('[showAdInModal-외부] processAdReward 실패:', v_53d118);
+          }
+        }
         try {
           await v_f2c756.openURL(v_7ec08d);
         } catch (v_49263d) {
@@ -2444,6 +2453,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       const v_e7a956 = /gpakorea\.com/i.test(v_7ec08d);
       if (v_e7a956) {
         console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+
+        try {
+          const v_ce5e26 = v_5a9c46 === 'pock' || v_5a9c46 === 'pointclick' || v_5a9c46 === 'POCK' ? 'pointclick' : 'nas';
+          await v_38f5f4(parseInt(v_660822, 10), v_aa0917, v_ce5e26, v_9b57fc);
+        } catch (v_53d118) {
+          if (v_53d118?.code !== 404 && !v_53d118?.message?.includes('404')) {
+            console.warn('[다른 경로-외부] processAdReward 실패:', v_53d118);
+          }
+        }
         try {
           await v_f2c756.openURL(v_7ec08d);
         } catch (v_49263d) {
