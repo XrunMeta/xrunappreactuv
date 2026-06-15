@@ -4,3 +4,4 @@ export { default as walletFilterDialog } from './walletFilterDialog';
 export { default as bottomNavigationBar } from './bottomNavigationBar';
 
 export { default as walletKeyPinPrompt } from './walletKeyPinPrompt';
+export { default as walletKeyPinSetup } from './walletKeyPinSetup';
