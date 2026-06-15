@@ -84,6 +84,7 @@ async function pickHealthyRpc(config: ChainConfig): Promise<ethers.JsonRpcProvid
 const ERC20_ABI = [
   'function transfer(address to, uint256 amount) returns (bool)',
   'function decimals() view returns (uint8)',
+  'function balanceOf(address owner) view returns (uint256)',
 ];
 
 export interface SendLocalParams {
