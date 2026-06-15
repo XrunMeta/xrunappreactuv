@@ -5115,6 +5115,39 @@ export const purchaseXrunItemPrepare = async (
   return response.data;
 };
 
+export interface PurchaseGiftPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  goods_code: string;
+  goods_name: string;
+  brand_name: string;
+  image_url: string;
+}
+export const purchaseGiftPrepare = async (
+  member: string | number,
+  goods_code: string,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: PurchaseGiftPrepareData[] | null }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseGiftPrepare', { member, goods_code });
+  return response.data;
+};
+export const purchaseGiftRecord = async (
+  member: string | number,
+  goods_code: string,
+  phone_no: string,
+  txHash: string,
+  amount: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseGiftRecord', { member, goods_code, phone_no, txHash, amount });
+  return response.data;
+};
+
 export const purchaseXrunItemRecord = async (
   member: string | number,
   item: number,

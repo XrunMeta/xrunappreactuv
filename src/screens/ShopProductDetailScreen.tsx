@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
@@ -65,7 +65,7 @@ export const ShopProductDetailScreen = () => {
         brand: (selectedShopItem as any).brand ?? '',
         title: selectedShopItem.title || '',
         description: (selectedShopItem as any).description,
-        price: parseInt(selectedShopItem.priceLabel?.replace(/,/g, '') || '0', 10),
+        price: parseFloat(selectedShopItem.priceLabel?.replace(/,/g, '') || '0'),
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
     } : defaultProductFallback;
@@ -86,7 +86,7 @@ export const ShopProductDetailScreen = () => {
     const [member, setMember] = useState<string | null>(null);
 
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
-    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string } | null>(null);
+    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
     const [purchaseLocalLoading, setPurchaseLocalLoading] = useState(false);
 
     const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
@@ -274,6 +274,30 @@ export const ShopProductDetailScreen = () => {
                         } else {
                             const msg = res?.message ?? '구매에 실패했습니다.';
                             const code = res?.code;
+
+                            if (code === 410) {
+                                try {
+                                    const userDataStr = await AsyncStorage.getItem('userData');
+                                    const ud = userDataStr ? JSON.parse(userDataStr) : null;
+                                    const memberId = ud?.member != null ? Number(ud.member) : null;
+                                    const email = (ud?.email ?? '').toLowerCase().trim();
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
+                                        setPurchaseCtx({ memberId, email, kind: 'gift' });
+                                        setPurchasePinVisible(true);
+                                        setXplayPurchaseLoading(false);
+                                        return;
+                                    }
+                                } catch {  }
+                                showAlert(
+                                    t('screens.shopProductDetail.alerts.purchaseFailed'),
+                                    '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.',
+                                    [
+                                        { text: t('screens.shopProductDetail.confirm') },
+                                        { text: '복원하기', onPress: () => navigate(ROUTES.walletRestore) },
+                                    ],
+                                );
+                                return;
+                            }
 
                             const is402 = code === 402 || /잔액.*부족|insufficient/i.test(msg);
 
@@ -522,7 +546,7 @@ export const ShopProductDetailScreen = () => {
                                     const memberId = ud?.member != null ? Number(ud.member) : null;
                                     const email = (ud?.email ?? '').toLowerCase().trim();
                                     if (memberId && email && isLocalSendEnabledForUser(email)) {
-                                        setPurchaseCtx({ memberId, email });
+                                        setPurchaseCtx({ memberId, email, kind: 'item' });
                                         setPurchasePinVisible(true);
                                         setXrunPurchaseLoading(false);
                                         return;
@@ -875,19 +899,47 @@ export const ShopProductDetailScreen = () => {
                         setPurchasePinVisible(false);
                         if (purchaseLocalLoading) return;
                         setPurchaseLocalLoading(true);
+                        const kind = purchaseCtx.kind;
                         try {
+
+                            const target = wallets.find((w) => w.wallet_code === 'c18');
+                            if (!target?.private_key) {
+                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (kind === 'gift') {
+
+                                const prep = await purchaseGiftPrepare(member!, String(product.id), navigate);
+                                if (prep?.status !== 'success' || !prep.data?.[0]) {
+                                    throw new Error(prep?.message || 'prepare 실패');
+                                }
+                                const meta = prep.data[0];
+                                const send = await sendOnchainLocal({
+                                    privateKey: target.private_key,
+                                    fromAddress: meta.userAddress,
+                                    toAddress: meta.casherAddress,
+                                    amount: String(meta.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!send.ok) {
+                                    const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
+                                    throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+                                }
+                                const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
+                                if (rec?.status !== 'success') {
+                                    throw new Error(rec?.message || 'record 실패');
+                                }
+                                console.log('[T-031 기프티콘 구매] 성공:', { txHash: send.txHash });
+                                setXplayPurchaseResult(rec?.data?.[0] ?? rec?.data ?? null);
+                                setXplayPaymentSuccessVisible(true);
+                                loadXrunBalance();
+                                return;
+                            }
 
                             const prep = await purchaseXrunItemPrepare(member!, parseInt(String(product.id), 10), navigate);
                             if (prep?.status !== 'success' || !prep.data?.[0]) {
                                 throw new Error(prep?.message || 'prepare 실패');
                             }
                             const meta = prep.data[0];
-
-                            const target = wallets.find((w) => w.wallet_code === 'c18');
-                            if (!target?.private_key) {
-                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
-                            }
-
                             const send = await sendOnchainLocal({
                                 privateKey: target.private_key,
                                 fromAddress: meta.userAddress,
@@ -899,7 +951,6 @@ export const ShopProductDetailScreen = () => {
                                 const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
                                 throw new Error(typeof detail === 'string' ? detail : '송금 실패');
                             }
-
                             const rec = await purchaseXrunItemRecord(member!, parseInt(String(product.id), 10), send.txHash, meta.actualPurchaseAmount, navigate);
                             if (rec?.status !== 'success') {
                                 throw new Error(rec?.message || 'record 실패');
