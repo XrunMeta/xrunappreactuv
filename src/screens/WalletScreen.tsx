@@ -1064,6 +1064,9 @@ export const WalletScreen = () => {
                 setTimeout(() => navigate(ROUTES.walletPrivateKeyGoogleAuth), 250);
               }}
             >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="shield-checkmark-outline" size={22} color="#343a5a" />
+              </View>
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletBackup')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
@@ -1074,6 +1077,9 @@ export const WalletScreen = () => {
                 setTimeout(() => navigate(ROUTES.walletRestore), 250);
               }}
             >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="cloud-download-outline" size={22} color="#343a5a" />
+              </View>
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletRestore')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
@@ -1084,6 +1090,9 @@ export const WalletScreen = () => {
                 setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
               }}
             >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
+              </View>
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
