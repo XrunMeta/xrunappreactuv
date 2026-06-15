@@ -11,6 +11,7 @@ import { useAppContext } from '../context';
 import { getGasEstimation } from '../services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtPayloadSub, type WalletKey } from '../services/walletKeyStore';
+import { hasPendingWallets, isLocalSendEnabledForUser } from '../services/walletSendLocal';
 
 const InfoCard = ({ label, value, loading }: { label: string; value: string; loading?: boolean }) => (
   <View style={styles.card}>
@@ -226,6 +227,16 @@ export const WalletEstimateFeeScreen = () => {
         t('screens.walletEstimateFee.alerts.error'),
         t('screens.walletEstimateFee.alerts.gasNotReady'),
       );
+      return;
+    }
+
+    if (hasPendingWallets()) {
+
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+      navigate(ROUTES.walletTransactionProgress);
       return;
     }
 

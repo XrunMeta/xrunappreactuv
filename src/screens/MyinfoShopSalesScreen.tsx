@@ -499,7 +499,12 @@ export const MyinfoShopSalesScreen = () => {
           <View style={styles.infoCard}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <Text style={styles.infoTitle}>{itemInfo.title}</Text>
-              {itemInfo.is_approved === 'Y' ? (
+              {}
+              {Number((itemInfo as any).status) === 0 ? (
+                <View style={{ backgroundColor: '#6b7280', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>판매 종료</Text>
+                </View>
+              ) : itemInfo.is_approved === 'Y' ? (
                 <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
                   <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{t('screens.myinfoShopSales.approved')}</Text>
                 </View>
