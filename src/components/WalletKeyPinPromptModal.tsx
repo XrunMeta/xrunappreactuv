@@ -26,6 +26,8 @@ interface Props {
   onCancel: () => void;
 
   skipVaultCheck?: boolean;
+
+  processingLabel?: string;
 }
 
 type Step = 'enter' | 'verifying' | 'processing' | 'error';
@@ -37,6 +39,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   onSuccess,
   onCancel,
   skipVaultCheck = false,
+  processingLabel,
 }) => {
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
@@ -153,7 +156,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <Text style={styles.prompt}>검증 중...</Text>
           )}
           {step === 'processing' && (
-            <Text style={styles.prompt}>결제 처리 중...{'\n'}창을 닫지 말고 잠시만 기다려주세요</Text>
+            <Text style={styles.prompt}>{processingLabel || '처리 중...'}{'\n'}창을 닫지 말고 잠시만 기다려주세요</Text>
           )}
           {step === 'error' && (
             <Text style={styles.prompt}>비밀번호가 틀렸습니다. 다시 입력해 주세요</Text>
