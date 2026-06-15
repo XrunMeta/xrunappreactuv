@@ -437,36 +437,19 @@ export const MapMainScreen: React.FC = () => {
         if (vaultEmpty) {
           const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
           if (cancelled) return;
-          console.log('[MapMain] AT 상태', atStatus);
+          console.log('[MapMain] AT 상태', atStatus, 'email=', normEmail, 'member=', memberId);
 
-          if (atStatus.at || !atStatus.ok) {
-            const choice = await showAlert(
-              '지갑 키 복원이 필요해요',
-              '이전에 설정하신 비밀번호가 있어요.\n' +
-              '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
-              [
-                { text: '나중에' },
-                { text: '복원하기' },
-              ],
-            );
-            if (choice === 1) {
-              navigate(ROUTES.walletRestore);
-            }
-            return;
-          }
-
-          console.log('[MapMain] vault 비어있음 + AT 미마킹 — fetchAndSaveWallets 보강 호출');
-          await fetchAndSaveWallets().catch((e) => console.warn('[MapMain] fetchAndSaveWallets 실패:', e));
-          if (cancelled) return;
-          const entries2 = await findEntriesForUser(emailRaw, memberId);
-          const triggerNeeded2 = needPinSetup(entries2.eth) || needPinSetup(entries2.pol);
-          if (cancelled) return;
-          if (triggerNeeded2) {
-            setPinModalProps((prev) => {
-              if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
-              return { memberId, email: normEmail };
-            });
-            setShowPinModal(true);
+          const choice = await showAlert(
+            '지갑 키 복원이 필요해요',
+            '이전에 설정하신 비밀번호가 있어요.\n' +
+            '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+            [
+              { text: '나중에' },
+              { text: '복원하기' },
+            ],
+          );
+          if (choice === 1) {
+            navigate(ROUTES.walletRestore);
           }
         }
       } catch {
