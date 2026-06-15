@@ -297,9 +297,29 @@ export const ShopMyItemsScreen = () => {
                     </View>
                     <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
                     {isAvailable && item.type === 'xrun' && item.isTransferTicket === false ? (
-                        <View style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}>
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                const shopItem = {
+                                    id: String(item.item ?? item.id),
+                                    title: item.title,
+                                    priceLabel: '',
+                                    image: item.image,
+                                    detailTotal: '',
+                                    brand: item.brand,
+                                    isXrun: true,
+                                    storage: item.storage,
+                                    txID: item.txID,
+                                    item: item.item,
+                                };
+                                setSelectedShopItem(shopItem as any);
+                                navigate(ROUTES.shopProductDetail);
+                            }}
+                        >
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.thankYou')}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ) : isAvailable ? (
                         <TouchableOpacity
                             style={styles.useButton}
