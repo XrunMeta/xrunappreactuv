@@ -939,6 +939,35 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
         console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
       }
 
+      {
+        const status = error.response?.status;
+        const url = error.config?.url ?? '';
+        const isExpectedAuthFlow =
+          url.includes('google-auth-for-wallet') ||
+          url.includes('/login') ||
+          url.includes('/signup') ||
+          url.includes('/email-login') ||
+          url.includes('rotateSession');
+        if (status === 401 && !isExpectedAuthFlow) {
+          try {
+            console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
+            await Promise.all([
+              AsyncStorage.removeItem('isLoggedIn'),
+              AsyncStorage.removeItem('rememberMe'),
+              AsyncStorage.removeItem('jwt'),
+              AsyncStorage.removeItem('userData'),
+            ]);
+          } catch (e) {
+            console.warn('[API] auth state 클리어 실패:', e);
+          }
+          if (navigation?.reset) {
+            try { navigation.reset(['login']); } catch {  }
+          } else if (navigation?.navigate) {
+            try { navigation.navigate('login'); } catch {  }
+          }
+        }
+      }
+
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
         console.error('[API Timeout]', error.config?.url);
         if (navigation) {
@@ -5065,6 +5094,37 @@ export const cancelGiftishowCoupon = async (
     }
     return { status: 'error', message: (error as Error).message };
   }
+};
+
+export interface PurchaseXrunItemPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  sku: string;
+  title: string;
+}
+export const purchaseXrunItemPrepare = async (
+  member: string | number,
+  item: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: PurchaseXrunItemPrepareData[] | null }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseXrunItemPrepare', { member, item });
+  return response.data;
+};
+
+export const purchaseXrunItemRecord = async (
+  member: string | number,
+  item: number,
+  txHash: string,
+  amount: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseXrunItemRecord', { member, item, txHash, amount });
+  return response.data;
 };
 
 export const purchaseXrunItem = async (
