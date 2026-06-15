@@ -47,7 +47,7 @@ import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
-import { getWalletKeyATStatus } from '../services';
+import { getWalletKeyATStatus, fetchAndSaveWallets } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -452,6 +452,21 @@ export const MapMainScreen: React.FC = () => {
             if (choice === 1) {
               navigate(ROUTES.walletRestore);
             }
+            return;
+          }
+
+          console.log('[MapMain] vault 비어있음 + AT 미마킹 — fetchAndSaveWallets 보강 호출');
+          await fetchAndSaveWallets().catch((e) => console.warn('[MapMain] fetchAndSaveWallets 실패:', e));
+          if (cancelled) return;
+          const entries2 = await findEntriesForUser(emailRaw, memberId);
+          const triggerNeeded2 = needPinSetup(entries2.eth) || needPinSetup(entries2.pol);
+          if (cancelled) return;
+          if (triggerNeeded2) {
+            setPinModalProps((prev) => {
+              if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
+              return { memberId, email: normEmail };
+            });
+            setShowPinModal(true);
           }
         }
       } catch {
