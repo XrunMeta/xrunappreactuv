@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: 'Coming Soon',
   comingSoonMessage: 'Restore feature will be available in a future update.',
   driveAuthFailTitle: 'Google sign-in required',
-  driveAuthFailMessage: 'Please sign in again',
+  driveAuthFailMessage: 'Please sign in again\nThen tap the Google Drive button again',
 };

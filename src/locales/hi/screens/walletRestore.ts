@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: 'जल्द आ रहा है',
   comingSoonMessage: 'पुनर्स्थापना सुविधा भविष्य के अपडेट में उपलब्ध होगी।',
   driveAuthFailTitle: 'Google साइन-इन आवश्यक',
-  driveAuthFailMessage: 'कृपया पुनः साइन इन करें',
+  driveAuthFailMessage: 'कृपया पुनः साइन इन करें\nफिर Google Drive बटन पर फिर से टैप करें',
 };

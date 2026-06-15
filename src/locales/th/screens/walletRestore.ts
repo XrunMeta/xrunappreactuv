@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: 'เร็วๆ นี้',
   comingSoonMessage: 'ฟีเจอร์กู้คืนจะเปิดให้ใช้ในการอัปเดตครั้งถัดไป',
   driveAuthFailTitle: 'ต้องลงชื่อเข้าใช้ Google',
-  driveAuthFailMessage: 'กรุณาลงชื่อเข้าใช้อีกครั้ง',
+  driveAuthFailMessage: 'กรุณาลงชื่อเข้าใช้อีกครั้ง\nจากนั้นแตะปุ่ม Google Drive อีกครั้ง',
 };

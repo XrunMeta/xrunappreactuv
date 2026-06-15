@@ -10,5 +10,5 @@ export default {
   comingSoonTitle: '即将推出',
   comingSoonMessage: '恢复功能将在下次更新中提供。',
   driveAuthFailTitle: '需要 Google 登录',
-  driveAuthFailMessage: '请重新登录',
+  driveAuthFailMessage: '请重新登录\n然后再次点击 Google Drive 按钮',
 };

@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: 'Segera Hadir',
   comingSoonMessage: 'Fitur pemulihan akan tersedia di pembaruan mendatang.',
   driveAuthFailTitle: 'Login Google diperlukan',
-  driveAuthFailMessage: 'Silakan masuk lagi',
+  driveAuthFailMessage: 'Silakan masuk lagi\nKemudian ketuk tombol Google Drive lagi',
 };

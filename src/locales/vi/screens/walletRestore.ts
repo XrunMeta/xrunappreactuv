@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: 'Sắp ra mắt',
   comingSoonMessage: 'Tính năng khôi phục sẽ có trong bản cập nhật sắp tới.',
   driveAuthFailTitle: 'Cần đăng nhập Google',
-  driveAuthFailMessage: 'Vui lòng đăng nhập lại',
+  driveAuthFailMessage: 'Vui lòng đăng nhập lại\nSau đó nhấn lại nút Google Drive',
 };
