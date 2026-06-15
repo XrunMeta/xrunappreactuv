@@ -13,9 +13,12 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9 } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
+import { v_f9f38e } from '../components';
+import { v_e134f3, v_5e6c2c } from '../services/walletSendLocal';
+import type { v_b9a3bd } from '../services/walletKeyStore';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -72,6 +75,10 @@ export const v_a59951 = () => {
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
 
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
+
+    const [v_f5e16b, v_1c868b] = v_5ab095(false);
+    const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string } | null>(null);
+    const [v_bd58fc, v_24bbbd] = v_5ab095(false);
 
     const [v_b7c830, v_179642] = v_5ab095<number | null>(null);
     const [v_837630, v_2f87ed] = v_5ab095(false);
@@ -493,10 +500,27 @@ export const v_a59951 = () => {
                         } else {
                             const v_c99bd2 = Number(v_8f00b9?.code);
                             const v_44854f = v_8f00b9?.message || '';
-                            console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f);
+                            console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f, 'fullRes:', JSON.stringify(v_8f00b9));
                             let v_43f890;
+                            let v_252e2b = false;
                             if (v_c99bd2 === 409 || /max purchase|limit reached/i.test(v_44854f)) {
                                 v_43f890 = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (v_c99bd2 === 410) {
+
+                                try {
+                                    const v_f24fd5 = await v_e84827.getItem('userData');
+                                    const v_f21c33 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
+                                    const v_717992 = v_f21c33?.member != null ? Number(v_f21c33.member) : null;
+                                    const v_e0c7e8 = (v_f21c33?.email ?? '').toLowerCase().trim();
+                                    if (v_717992 && v_e0c7e8 && v_5e6c2c(v_e0c7e8)) {
+                                        v_04a3b7({ memberId: v_717992, email: v_e0c7e8 });
+                                        v_1c868b(true);
+                                        v_e94938(false);
+                                        return;
+                                    }
+                                } catch {  }
+                                v_43f890 = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
+                                v_252e2b = true;
                             } else if (v_c99bd2 === 404 || /not found/i.test(v_44854f)) {
                                 v_43f890 = '상품을 찾을 수 없습니다.';
                             } else if (v_c99bd2 === 400) {
@@ -505,10 +529,19 @@ export const v_a59951 = () => {
                                 const v_d6be1a = /^[\x00-\x7F\s]+$/.test(v_44854f);
                                 v_43f890 = v_d6be1a || !v_44854f ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : v_44854f;
                             }
-                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+
+                            const v_3d694a = v_252e2b
+                                ? [
+                                    { text: v_8d41d7('screens.shopProductDetail.confirm') },
+                                    { text: '복원하기', onPress: () => v_9b57fc(v_ce4741.walletRestore) },
+                                ]
+                                : [{ text: v_8d41d7('screens.shopProductDetail.confirm') }];
+                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, v_3d694a);
                         }
                     } catch (v_9e86fd) {
-                        console.error('[XRUN 구매] 오류:', v_9e86fd);
+                        const v_d308b5 = v_9e86fd?.response?.status;
+                        const v_49b0b7 = v_9e86fd?.response?.data;
+                        console.error('[XRUN 구매] 오류:', { status: v_d308b5, respData: v_49b0b7, errMsg: v_9e86fd?.message, stack: v_9e86fd?.stack });
                         const v_badeaf = v_9e86fd?.response?.data?.message ?? v_9e86fd?.message ?? '구매 처리 중 오류가 발생했습니다.';
                         const v_d6be1a = typeof v_badeaf === 'string' && /^[\x00-\x7F\s]+$/.test(v_badeaf);
                         v_889fad(
@@ -789,6 +822,67 @@ export const v_a59951 = () => {
                     </View>
                 </View>
             </Modal>
+
+            {}
+            {v_f5e16b && v_d49490 && (
+                <WalletKeyPinPromptModal
+                    visible={v_f5e16b}
+                    memberId={v_d49490.memberId}
+                    email={v_d49490.email}
+                    onSuccess={async (wallets: v_b9a3bd[]) => {
+                        v_1c868b(false);
+                        if (v_bd58fc) return;
+                        v_24bbbd(true);
+                        try {
+
+                            const v_f91eae = await v_070bef(v_660822!, parseInt(String(v_01bee9.id), 10), v_9b57fc);
+                            if (v_f91eae?.status !== 'success' || !v_f91eae.data?.[0]) {
+                                throw new Error(v_f91eae?.message || 'prepare 실패');
+                            }
+                            const v_ab4c96 = v_f91eae.data[0];
+
+                            const v_5f5d6d = v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c18');
+                            if (!v_5f5d6d?.private_key) {
+                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+
+                            const v_9c423d = await v_e134f3({
+                                privateKey: v_5f5d6d.private_key,
+                                fromAddress: v_ab4c96.userAddress,
+                                toAddress: v_ab4c96.casherAddress,
+                                amount: String(v_ab4c96.actualPurchaseAmount),
+                                currency: 18,
+                            });
+                            if (!v_9c423d.ok) {
+                                const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
+                                throw new Error(typeof v_3cfdfc === 'string' ? v_3cfdfc : '송금 실패');
+                            }
+
+                            const v_94a7a9 = await v_324bd9(v_660822!, parseInt(String(v_01bee9.id), 10), v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
+                            if (v_94a7a9?.status !== 'success') {
+                                throw new Error(v_94a7a9?.message || 'record 실패');
+                            }
+                            console.log('[T-031 구매] 성공:', { txHash: v_9c423d.txHash });
+                            v_abb08d();
+                            v_9375ae(true);
+                        } catch (v_9e86fd) {
+                            console.error('[T-031 구매] 실패:', v_9e86fd?.message);
+                            v_889fad(
+                                v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'),
+                                v_9e86fd?.message || '구매 처리 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.',
+                                [{ text: v_8d41d7('screens.shopProductDetail.confirm') }],
+                            );
+                        } finally {
+                            v_24bbbd(false);
+                            v_04a3b7(null);
+                        }
+                    }}
+                    onCancel={() => {
+                        v_1c868b(false);
+                        v_04a3b7(null);
+                    }}
+                />
+            )}
         </SafeView>
     );
 };

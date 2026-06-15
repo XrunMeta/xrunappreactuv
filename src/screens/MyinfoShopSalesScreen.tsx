@@ -499,7 +499,12 @@ export const v_1cca63 = () => {
           <View style={v_d81136.infoCard}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <Text style={v_d81136.infoTitle}>{v_d20ab2.title}</Text>
-              {v_d20ab2.is_approved === 'Y' ? (
+              {}
+              {Number((v_d20ab2 as any).status) === 0 ? (
+                <View style={{ backgroundColor: '#6b7280', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>판매 종료</Text>
+                </View>
+              ) : v_d20ab2.is_approved === 'Y' ? (
                 <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
                   <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{v_8d41d7('screens.myinfoShopSales.approved')}</Text>
                 </View>

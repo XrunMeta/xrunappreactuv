@@ -939,6 +939,35 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
         console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
       }
 
+      {
+        const v_d308b5 = v_5e9bfe.response?.status;
+        const v_f71b56 = v_5e9bfe.config?.url ?? '';
+        const v_f9da5d =
+          v_f71b56.includes('google-auth-for-wallet') ||
+          v_f71b56.includes('/login') ||
+          v_f71b56.includes('/signup') ||
+          v_f71b56.includes('/email-login') ||
+          v_f71b56.includes('rotateSession');
+        if (v_d308b5 === 401 && !v_f9da5d) {
+          try {
+            console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
+            await Promise.all([
+              v_e84827.removeItem('isLoggedIn'),
+              v_e84827.removeItem('rememberMe'),
+              v_e84827.removeItem('jwt'),
+              v_e84827.removeItem('userData'),
+            ]);
+          } catch (v_9e86fd) {
+            console.warn('[API] auth state 클리어 실패:', v_9e86fd);
+          }
+          if (v_c65f5d?.reset) {
+            try { v_c65f5d.reset(['login']); } catch {  }
+          } else if (v_c65f5d?.navigate) {
+            try { v_c65f5d.navigate('login'); } catch {  }
+          }
+        }
+      }
+
       if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
         console.error('[API Timeout]', v_5e9bfe.config?.url);
         if (v_c65f5d) {
@@ -5065,6 +5094,37 @@ export const v_47cccc = async (
     }
     return { status: 'error', message: (v_5e9bfe as Error).message };
   }
+};
+
+export interface PurchaseXrunItemPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  sku: string;
+  title: string;
+}
+export const v_070bef = async (
+  v_660822,
+  v_8c0b26,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: PurchaseXrunItemPrepareData[] | null }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseXrunItemPrepare', { member: v_660822, item: v_8c0b26 });
+  return v_3393e3.data;
+};
+
+export const v_324bd9 = async (
+  v_660822,
+  v_8c0b26,
+  v_359525,
+  v_f63e09,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseXrunItemRecord', { member: v_660822, item: v_8c0b26, txHash: v_359525, amount: v_f63e09 });
+  return v_3393e3.data;
 };
 
 export const v_9c9f1b = async (
