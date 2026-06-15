@@ -35,6 +35,7 @@ export const v_1cca63 = () => {
     thumbnail?: number | null;
     sdk?: string | null;
     is_approved?: string;
+    status?: number;
   }>({
     item: null,
     title: null,
@@ -155,6 +156,8 @@ export const v_1cca63 = () => {
             thumbnail: v_741623.thumbnail || null,
             sdk: v_741623.sdk || null,
             is_approved: v_741623.is_approved || 'N',
+
+            status: v_741623.status != null ? Number(v_741623.status) : undefined,
           });
         } else {
 
@@ -497,29 +500,59 @@ export const v_1cca63 = () => {
         {}
         {!v_cd31a8 && v_c5bd46 && v_d20ab2.title && v_d20ab2.title.trim() ? (
           <View style={v_d81136.infoCard}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <Text style={v_d81136.infoTitle}>{v_d20ab2.title}</Text>
-              {}
+            {}
+            <View style={{ alignItems: 'center', marginBottom: 14 }}>
+              <Text
+                style={[v_d81136.infoTitle, { textAlign: 'center', marginBottom: 6 }]}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {v_d20ab2.title}
+              </Text>
               {Number((v_d20ab2 as any).status) === 0 ? (
-                <View style={{ backgroundColor: '#6b7280', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                <View style={{ backgroundColor: '#6b7280', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 }}>
                   <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>판매 종료</Text>
                 </View>
               ) : v_d20ab2.is_approved === 'Y' ? (
-                <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                <View style={{ backgroundColor: '#22c55e', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 }}>
                   <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{v_8d41d7('screens.myinfoShopSales.approved')}</Text>
                 </View>
               ) : (
-                <View style={{ backgroundColor: '#f59e0b', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                <View style={{ backgroundColor: '#f59e0b', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 }}>
                   <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{v_8d41d7('screens.myinfoShopSales.pending')}</Text>
                 </View>
               )}
             </View>
-            <Text style={v_d81136.infoText}>
-              {v_8d41d7('screens.myinfoShopSales.productPrice')} : <Text style={v_d81136.infoValue}>{Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')} XRUN</Text> / {v_8d41d7('screens.myinfoShopSales.participants')} : <Text style={v_d81136.infoValue}>{v_d20ab2.participantCount}{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
-            </Text>
-            <Text style={v_d81136.infoText}>
-              {v_8d41d7('screens.myinfoShopSales.totalSales')} : <Text style={v_d81136.infoHighlight}>{(Number(v_d20ab2.priceXrun ?? 0) * Number(v_d20ab2.participantCount ?? 0)).toLocaleString('ko-KR')} XRUN</Text> / <Text style={v_d81136.modifyLink} onPress={v_264d8b}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text>
-            </Text>
+
+            {}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#e5e7eb' }}>
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.myinfoShopSales.productPrice')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
+              </View>
+              <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.myinfoShopSales.participants')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(v_d20ab2.participantCount ?? 0).toLocaleString('ko-KR')}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>{v_8d41d7('screens.myinfoShopSales.personUnit')}</Text>
+              </View>
+              <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.myinfoShopSales.totalSales')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>{(Number(v_d20ab2.priceXrun ?? 0) * Number(v_d20ab2.participantCount ?? 0)).toLocaleString('ko-KR')}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
+              </View>
+            </View>
+
+            {}
+            <TouchableOpacity
+              onPress={v_264d8b}
+              activeOpacity={0.7}
+              style={{ marginTop: 12, alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, backgroundColor: '#f3f4f6', borderWidth: 1, borderColor: '#e5e7eb' }}
+            >
+              <Text style={{ fontSize: 12, color: '#374151', fontWeight: '600' }}>{v_8d41d7('screens.myinfoShopSales.modify')}</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
 
