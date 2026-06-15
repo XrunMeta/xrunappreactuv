@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
   userHash,
@@ -42,6 +43,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
   visible,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -171,8 +173,8 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       }
       setErrorMsg(
         __DEV__
-          ? `검증 실패: ${reasonStr}`
-          : '검증 실패 — 다시 시도해주세요',
+          ? `${t('components.walletKeyPinSetup.verifyFailDefault')}: ${reasonStr}`
+          : t('components.walletKeyPinSetup.verifyFailDefault'),
       );
       setStep('error');
       setPin('');
@@ -216,25 +218,25 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>지갑 보호 PIN 설정</Text>
+          <Text style={styles.title}>{t('components.walletKeyPinSetup.title')}</Text>
 
           {}
           <Text style={styles.warning}>
-            지갑 키 보호 전용입니다.
+            {t('components.walletKeyPinSetup.warning')}
           </Text>
 
           {}
           {step === 'enter' && (
-            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinSetup.enterPrompt')}</Text>
           )}
           {step === 'confirm' && (
-            <Text style={styles.prompt}>다시 한번 입력해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinSetup.confirmPrompt')}</Text>
           )}
           {step === 'verifying' && (
-            <Text style={styles.prompt}>검증 중...</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinSetup.verifying')}</Text>
           )}
           {step === 'error' && (
-            <Text style={styles.prompt}>다시 시도해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinSetup.errorPrompt')}</Text>
           )}
 
           {}
@@ -262,7 +264,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
           {}
           {step === 'error' && (
             <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-              <Text style={styles.retryText}>다시 시도</Text>
+              <Text style={styles.retryText}>{t('components.walletKeyPinSetup.retryButton')}</Text>
             </TouchableOpacity>
           )}
         </View>
