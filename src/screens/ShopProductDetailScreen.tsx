@@ -497,6 +497,9 @@ export const v_a59951 = () => {
                             let v_43f890;
                             if (v_c99bd2 === 409 || /max purchase|limit reached/i.test(v_44854f)) {
                                 v_43f890 = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (v_c99bd2 === 410) {
+
+                                v_43f890 = '비밀번호로 보호된 지갑은 현재 XRUN 직접 구매가 지원되지 않습니다.\n곧 클라이언트 사이드 결제 기능을 추가할 예정입니다.';
                             } else if (v_c99bd2 === 404 || /not found/i.test(v_44854f)) {
                                 v_43f890 = '상품을 찾을 수 없습니다.';
                             } else if (v_c99bd2 === 400) {
