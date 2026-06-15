@@ -102,6 +102,9 @@ function getWalletListDiskBackground(asset: CombinedAsset): string {
       return '#111111';
     case 19:
       return '#25292C';
+    case 1900:
+
+      return '#000000';
     default:
       return '#EFF4F5';
   }
@@ -111,6 +114,9 @@ function resolveWalletListIconSource(asset: CombinedAsset): any | null {
   const sym = (asset.symbol || '').toUpperCase();
   const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
 
+  if (asset.currency === 1900) {
+    return null;
+  }
   if (asset.currency === 19 || sub.includes('ad xrun')) {
     return require('../../assets/ad-round-logo.png');
   }
@@ -323,12 +329,12 @@ export const WalletScreen = () => {
       const rfItem: CombinedAsset = {
         id: 1900,
         symbol: 'XRUN',
-        name: 'RF',
+        name: 'REFERAL XRUN',
         amount: new BigNumber(referralAmount || 0).toFixed(2),
-        icon: require('../../assets/xrun-round-logo.png'),
+        icon: '__RF__' as any,
         currency: 1900,
         isCustom: false,
-        subCurrencyName: 'RF',
+        subCurrencyName: 'REFERAL XRUN',
         contractAddress: '',
         subcurrency: undefined,
         originalData: undefined,
@@ -774,7 +780,8 @@ export const WalletScreen = () => {
         }),
         suffix: asset.symbol,
         iconSource,
-        fallbackLabel: asset.symbol.slice(0, 2).toUpperCase(),
+
+        fallbackLabel: asset.currency === 1900 ? 'RF' : asset.symbol.slice(0, 2).toUpperCase(),
         fallbackColors: {
           background: diskBg,
           text: textOnDisk,
@@ -796,7 +803,8 @@ export const WalletScreen = () => {
         const diskBg = getWalletListDiskBackground(fifthAsset);
         const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
         tokenListData = tokenListData.map((row, i) =>
-          i === 3
+
+          i === 3 && row.currency !== 1900
             ? {
                 ...row,
                 fallbackColors: {
@@ -962,6 +970,22 @@ export const WalletScreen = () => {
                 label: t('screens.wallet.receive'),
                 icon: 'download-outline',
                 onPress: handleReceive,
+              },
+
+              {
+                label: t('screens.myInfoSettings.walletBackup') || '백업',
+                icon: 'shield-checkmark-outline',
+                onPress: () => navigate(ROUTES.walletPrivateKeyGoogleAuth),
+              },
+              {
+                label: t('screens.myInfoSettings.walletRestore') || '복원',
+                icon: 'cloud-download-outline',
+                onPress: () => navigate(ROUTES.walletRestore),
+              },
+              {
+                label: t('screens.myInfoSettings.walletKeyGuide') || '설명',
+                icon: 'help-circle-outline',
+                onPress: () => navigate(ROUTES.walletKeyGuide),
               },
             ]}
           />

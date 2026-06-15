@@ -201,7 +201,9 @@ const styles = StyleSheet.create({
   },
 
   quickActions: {
+
     flexDirection: 'row',
+    flexWrap: 'wrap',
     backgroundColor: '#ffffff',
     borderRadius: 16,
     paddingVertical: 12,
@@ -217,10 +219,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   actionButton: {
-    flex: 1,
+
+    width: '33.33%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   actionIcon: {
     marginBottom: 6,

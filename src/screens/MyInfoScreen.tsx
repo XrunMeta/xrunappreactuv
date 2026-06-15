@@ -57,16 +57,6 @@ export const MyInfoScreen = () => {
         iconColor: '#6366F1',
         route: 'myInfoEdit',
       },
-      {
-        id: 'referralList',
-        label: t('screens.myInfo.referral'),
-        subtitle: t('screens.myInfo.referralSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#6366F1',
-        iconImage: require('../../assets/images/icon_referral_list.png'),
-        route: 'referralMyGroup',
-      },
 
       {
         id: 'shopSales',
