@@ -17,7 +17,7 @@ import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWi
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
-import { sendOnchainLocal } from '../services/walletSendLocal';
+import { sendOnchainLocal, isLocalSendEnabledForUser } from '../services/walletSendLocal';
 import type { WalletKey } from '../services/walletKeyStore';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
@@ -512,7 +512,7 @@ export const ShopProductDetailScreen = () => {
                                     const ud = userDataStr ? JSON.parse(userDataStr) : null;
                                     const memberId = ud?.member != null ? Number(ud.member) : null;
                                     const email = (ud?.email ?? '').toLowerCase().trim();
-                                    if (memberId && email) {
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
                                         setPurchaseCtx({ memberId, email });
                                         setPurchasePinVisible(true);
                                         setXrunPurchaseLoading(false);
