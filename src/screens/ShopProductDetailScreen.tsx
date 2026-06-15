@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9 } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
@@ -65,7 +65,7 @@ export const v_a59951 = () => {
         brand: (v_dfe883 as any).brand ?? '',
         title: v_dfe883.title || '',
         description: (v_dfe883 as any).description,
-        price: parseInt(v_dfe883.priceLabel?.replace(/,/g, '') || '0', 10),
+        price: parseFloat(v_dfe883.priceLabel?.replace(/,/g, '') || '0'),
         image: v_dfe883.image || v_273f15.image,
         isXrun: (v_dfe883 as any).isXrun || false,
     } : v_273f15;
@@ -86,7 +86,7 @@ export const v_a59951 = () => {
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
-    const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string } | null>(null);
+    const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
     const [v_bd58fc, v_24bbbd] = v_5ab095(false);
 
     const [v_b7c830, v_179642] = v_5ab095<number | null>(null);
@@ -274,6 +274,30 @@ export const v_a59951 = () => {
                         } else {
                             const v_badeaf = v_8f00b9?.message ?? '구매에 실패했습니다.';
                             const v_c99bd2 = v_8f00b9?.code;
+
+                            if (v_c99bd2 === 410) {
+                                try {
+                                    const v_f24fd5 = await v_e84827.getItem('userData');
+                                    const v_f21c33 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
+                                    const v_717992 = v_f21c33?.member != null ? Number(v_f21c33.member) : null;
+                                    const v_e0c7e8 = (v_f21c33?.email ?? '').toLowerCase().trim();
+                                    if (v_717992 && v_e0c7e8 && v_5e6c2c(v_e0c7e8)) {
+                                        v_04a3b7({ memberId: v_717992, email: v_e0c7e8, kind: 'gift' });
+                                        v_1c868b(true);
+                                        v_0409f2(false);
+                                        return;
+                                    }
+                                } catch {  }
+                                v_889fad(
+                                    v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'),
+                                    '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.',
+                                    [
+                                        { text: v_8d41d7('screens.shopProductDetail.confirm') },
+                                        { text: '복원하기', onPress: () => v_9b57fc(v_ce4741.walletRestore) },
+                                    ],
+                                );
+                                return;
+                            }
 
                             const v_f942f4 = v_c99bd2 === 402 || /잔액.*부족|insufficient/i.test(v_badeaf);
 
@@ -522,7 +546,7 @@ export const v_a59951 = () => {
                                     const v_717992 = v_f21c33?.member != null ? Number(v_f21c33.member) : null;
                                     const v_e0c7e8 = (v_f21c33?.email ?? '').toLowerCase().trim();
                                     if (v_717992 && v_e0c7e8 && v_5e6c2c(v_e0c7e8)) {
-                                        v_04a3b7({ memberId: v_717992, email: v_e0c7e8 });
+                                        v_04a3b7({ memberId: v_717992, email: v_e0c7e8, kind: 'item' });
                                         v_1c868b(true);
                                         v_e94938(false);
                                         return;
@@ -875,19 +899,47 @@ export const v_a59951 = () => {
                         v_1c868b(false);
                         if (v_bd58fc) return;
                         v_24bbbd(true);
+                        const v_94302c = v_d49490.kind;
                         try {
+
+                            const v_5f5d6d = v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c18');
+                            if (!v_5f5d6d?.private_key) {
+                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (v_94302c === 'gift') {
+
+                                const v_f91eae = await v_01eada(v_660822!, String(v_01bee9.id), v_9b57fc);
+                                if (v_f91eae?.status !== 'success' || !v_f91eae.data?.[0]) {
+                                    throw new Error(v_f91eae?.message || 'prepare 실패');
+                                }
+                                const v_ab4c96 = v_f91eae.data[0];
+                                const v_9c423d = await v_e134f3({
+                                    privateKey: v_5f5d6d.private_key,
+                                    fromAddress: v_ab4c96.userAddress,
+                                    toAddress: v_ab4c96.casherAddress,
+                                    amount: String(v_ab4c96.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!v_9c423d.ok) {
+                                    const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
+                                    throw new Error(typeof v_3cfdfc === 'string' ? v_3cfdfc : '송금 실패');
+                                }
+                                const v_94a7a9 = await v_48805f(v_660822!, String(v_01bee9.id), v_7496db ?? '', v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
+                                if (v_94a7a9?.status !== 'success') {
+                                    throw new Error(v_94a7a9?.message || 'record 실패');
+                                }
+                                console.log('[T-031 기프티콘 구매] 성공:', { txHash: v_9c423d.txHash });
+                                v_b75b27(v_94a7a9?.data?.[0] ?? v_94a7a9?.data ?? null);
+                                v_453192(true);
+                                v_abb08d();
+                                return;
+                            }
 
                             const v_f91eae = await v_070bef(v_660822!, parseInt(String(v_01bee9.id), 10), v_9b57fc);
                             if (v_f91eae?.status !== 'success' || !v_f91eae.data?.[0]) {
                                 throw new Error(v_f91eae?.message || 'prepare 실패');
                             }
                             const v_ab4c96 = v_f91eae.data[0];
-
-                            const v_5f5d6d = v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c18');
-                            if (!v_5f5d6d?.private_key) {
-                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
-                            }
-
                             const v_9c423d = await v_e134f3({
                                 privateKey: v_5f5d6d.private_key,
                                 fromAddress: v_ab4c96.userAddress,
@@ -899,7 +951,6 @@ export const v_a59951 = () => {
                                 const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
                                 throw new Error(typeof v_3cfdfc === 'string' ? v_3cfdfc : '송금 실패');
                             }
-
                             const v_94a7a9 = await v_324bd9(v_660822!, parseInt(String(v_01bee9.id), 10), v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
                             if (v_94a7a9?.status !== 'success') {
                                 throw new Error(v_94a7a9?.message || 'record 실패');
