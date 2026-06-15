@@ -2129,6 +2129,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const needsExternalBrowser = /gpakorea\.com/i.test(urlAD);
       if (needsExternalBrowser) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+
+        try {
+          const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+          await processAdReward(parseInt(member, 10), campid, adType, navigate);
+        } catch (rewardError: any) {
+          if (rewardError?.code !== 404 && !rewardError?.message?.includes('404')) {
+            console.warn('[showAdInModal-외부] processAdReward 실패:', rewardError);
+          }
+        }
         try {
           await Linking.openURL(urlAD);
         } catch (err) {
@@ -2444,6 +2453,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const needsExternalBrowser2 = /gpakorea\.com/i.test(urlAD);
       if (needsExternalBrowser2) {
         console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+
+        try {
+          const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+          await processAdReward(parseInt(member, 10), campid, adType, navigate);
+        } catch (rewardError: any) {
+          if (rewardError?.code !== 404 && !rewardError?.message?.includes('404')) {
+            console.warn('[다른 경로-외부] processAdReward 실패:', rewardError);
+          }
+        }
         try {
           await Linking.openURL(urlAD);
         } catch (err) {
