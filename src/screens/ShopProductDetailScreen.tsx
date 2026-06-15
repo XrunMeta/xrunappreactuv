@@ -905,7 +905,7 @@ export const ShopProductDetailScreen = () => {
                     memberId={purchaseCtx.memberId}
                     email={purchaseCtx.email}
                     onSuccess={async (wallets: WalletKey[]) => {
-                        setPurchasePinVisible(false);
+
                         if (purchaseLocalLoading) return;
                         setPurchaseLocalLoading(true);
                         const kind = purchaseCtx.kind;
@@ -935,10 +935,11 @@ export const ShopProductDetailScreen = () => {
                                 }
                                 const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
                                 if (rec?.status !== 'success') {
-
                                     const pendingManual = Array.isArray(rec?.data) && rec.data[0]?.pending_manual;
                                     const baseMsg = rec?.message || '쿠폰 발송 실패';
                                     if (pendingManual) {
+
+                                        setPurchasePinVisible(false);
                                         showAlert('결제 완료 / 쿠폰 발송 대기', `${baseMsg}\n\n결제는 완료됐으니 곧 쿠폰이 자동/수동으로 발송돼요. (${send.txHash.slice(0, 16)}…)`, [{ text: t('screens.shopProductDetail.confirm') }]);
                                         loadXrunBalance();
                                         return;
@@ -946,7 +947,9 @@ export const ShopProductDetailScreen = () => {
                                     throw new Error(baseMsg);
                                 }
                                 console.log('[T-031 기프티콘 구매] 성공:', { txHash: send.txHash });
+
                                 setXplayPurchaseResult(rec?.data?.[0] ?? rec?.data ?? null);
+                                setPurchasePinVisible(false);
                                 setXplayPaymentSuccessVisible(true);
                                 loadXrunBalance();
                                 return;
@@ -974,9 +977,13 @@ export const ShopProductDetailScreen = () => {
                             }
                             console.log('[T-031 구매] 성공:', { txHash: send.txHash });
                             loadXrunBalance();
+
+                            setPurchasePinVisible(false);
                             setPaymentSuccessVisible(true);
                         } catch (e: any) {
                             console.error('[T-031 구매] 실패:', e?.message);
+
+                            setPurchasePinVisible(false);
                             showAlert(
                                 t('screens.shopProductDetail.alerts.purchaseFailed'),
                                 e?.message || '구매 처리 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.',
