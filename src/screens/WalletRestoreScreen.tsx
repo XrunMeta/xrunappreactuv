@@ -391,7 +391,11 @@ export const WalletRestoreScreen = () => {
     } catch (e: any) {
       setStage('options');
       if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e);
-      await showAlert('Drive 목록 조회 실패', e?.message || '알 수 없는 오류');
+
+      await showAlert(
+        t('screens.walletRestore.driveAuthFailTitle'),
+        t('screens.walletRestore.driveAuthFailMessage'),
+      );
     }
   };
 

@@ -10,4 +10,6 @@ export default {
   note: 'You must enter the same PIN used during backup to decrypt. Lost PIN means lost restore.',
   comingSoonTitle: 'Coming Soon',
   comingSoonMessage: 'Restore feature will be available in a future update.',
+  driveAuthFailTitle: 'Google sign-in required',
+  driveAuthFailMessage: 'Please sign in again',
 };
