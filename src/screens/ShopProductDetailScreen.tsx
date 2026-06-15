@@ -783,9 +783,7 @@ export const v_a59951 = () => {
                         >
                             {v_18a900 ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                            ) : (
-                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                            )}
+                            ) : null}
                             <Text style={v_d81136.purchaseButtonText}>
                                 {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
@@ -803,7 +801,6 @@ export const v_a59951 = () => {
                             end={{ x: 1, y: 0 }}
                             style={v_d81136.purchaseButtonGradient}
                         >
-                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
                             <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
