@@ -437,36 +437,19 @@ export const MapMainScreen: v_a3453e.FC = () => {
         if (v_b5ce2e) {
           const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null, ok: false }));
           if (v_2008a4) return;
-          console.log('[MapMain] AT 상태', v_5a9fc7);
+          console.log('[MapMain] AT 상태', v_5a9fc7, 'email=', v_dabeaa, 'member=', v_717992);
 
-          if (v_5a9fc7.at || !v_5a9fc7.ok) {
-            const v_7be387 = await v_889fad(
-              '지갑 키 복원이 필요해요',
-              '이전에 설정하신 비밀번호가 있어요.\n' +
-              '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
-              [
-                { text: '나중에' },
-                { text: '복원하기' },
-              ],
-            );
-            if (v_7be387 === 1) {
-              v_9b57fc(v_ce4741.walletRestore);
-            }
-            return;
-          }
-
-          console.log('[MapMain] vault 비어있음 + AT 미마킹 — fetchAndSaveWallets 보강 호출');
-          await v_5ed938().catch((v_9e86fd) => console.warn('[MapMain] fetchAndSaveWallets 실패:', v_9e86fd));
-          if (v_2008a4) return;
-          const v_c5bc24 = await v_9d7f6b(v_b4e012, v_717992);
-          const v_6d7778 = v_9034c6(v_c5bc24.eth) || v_9034c6(v_c5bc24.pol);
-          if (v_2008a4) return;
-          if (v_6d7778) {
-            v_b51724((v_ba2215) => {
-              if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
-              return { memberId: v_717992, email: v_dabeaa };
-            });
-            v_f4280a(true);
+          const v_7be387 = await v_889fad(
+            '지갑 키 복원이 필요해요',
+            '이전에 설정하신 비밀번호가 있어요.\n' +
+            '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+            [
+              { text: '나중에' },
+              { text: '복원하기' },
+            ],
+          );
+          if (v_7be387 === 1) {
+            v_9b57fc(v_ce4741.walletRestore);
           }
         }
       } catch {
