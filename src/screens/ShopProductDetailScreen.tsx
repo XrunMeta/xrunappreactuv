@@ -17,7 +17,7 @@ import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
-import { v_e134f3 } from '../services/walletSendLocal';
+import { v_e134f3, v_5e6c2c } from '../services/walletSendLocal';
 import type { v_b9a3bd } from '../services/walletKeyStore';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
@@ -512,7 +512,7 @@ export const v_a59951 = () => {
                                     const v_f21c33 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
                                     const v_717992 = v_f21c33?.member != null ? Number(v_f21c33.member) : null;
                                     const v_e0c7e8 = (v_f21c33?.email ?? '').toLowerCase().trim();
-                                    if (v_717992 && v_e0c7e8) {
+                                    if (v_717992 && v_e0c7e8 && v_5e6c2c(v_e0c7e8)) {
                                         v_04a3b7({ memberId: v_717992, email: v_e0c7e8 });
                                         v_1c868b(true);
                                         v_e94938(false);
