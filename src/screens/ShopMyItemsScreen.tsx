@@ -121,6 +121,7 @@ function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemD
 
     description: (p as any).description ?? '',
     paidXrun: (p as any).paidXrun ?? null,
+    priceXrun: (p as any).priceXrun ?? null,
   } as any;
 }
 
@@ -320,6 +321,7 @@ export const ShopMyItemsScreen = () => {
                                     isPurchased: true,                        
                                     description: (item as any).description,
                                     paidXrun: (item as any).paidXrun,
+                                    priceXrun: (item as any).priceXrun,       
                                     purchaseDate: item.purchaseDate,
                                 };
                                 setSelectedShopItem(shopItem as any);

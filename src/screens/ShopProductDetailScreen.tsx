@@ -77,6 +77,11 @@ export const ShopProductDetailScreen = () => {
     const isPurchasedView = !!(selectedShopItem as any)?.isPurchased;
     const purchasedPaidXrun = Number((selectedShopItem as any)?.paidXrun ?? 0);
     const purchasedDate = String((selectedShopItem as any)?.purchaseDate ?? '');
+    useEffect(() => {
+        if (isPurchasedView) {
+            console.log('[상품 상세-구매완료] selectedShopItem:', JSON.stringify(selectedShopItem));
+        }
+    }, [isPurchasedView, selectedShopItem]);
 
     const [member, setMember] = useState<string | null>(null);
 
@@ -643,9 +648,18 @@ export const ShopProductDetailScreen = () => {
                                 <View style={styles.priceContainer}>
                                     <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
                                     <Text style={styles.paymentValue}>
-                                        {purchasedPaidXrun > 0
-                                            ? `${purchasedPaidXrun.toFixed(4).replace(/\.?0+$/, '')} XRUN`
-                                            : '-'}
+                                        {(() => {
+
+                                            const candidates = [
+                                                purchasedPaidXrun,
+                                                Number((selectedShopItem as any)?.priceXrun ?? 0),
+                                                Number(product.price ?? 0),
+                                            ];
+                                            const val = candidates.find((n) => isFinite(n) && n > 0) ?? 0;
+                                            return val > 0
+                                                ? `${val.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                                : '-';
+                                        })()}
                                     </Text>
                                 </View>
                             </View>
