@@ -18,6 +18,7 @@ export default {
   used: '使用済み',
   availableShort: '利用可能',
   usedShort: '使用済み',
+  pendingShort: '待機中',
   shopBrand: 'ショップ',
   thankYou: 'ありがとうございます',
   noPurchasedCoupons: '購入したクーポンがありません。',
