@@ -592,6 +592,7 @@ export const ShopProductDetailScreen = () => {
 
     const handlePaymentSuccessClose = () => {
         setPaymentSuccessVisible(false);
+        navigate(ROUTES.shopMyItems);
     };
 
     const handleXplayPaymentSuccessClose = () => {
