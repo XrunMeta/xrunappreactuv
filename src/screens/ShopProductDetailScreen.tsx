@@ -493,7 +493,7 @@ export const v_a59951 = () => {
                         } else {
                             const v_c99bd2 = Number(v_8f00b9?.code);
                             const v_44854f = v_8f00b9?.message || '';
-                            console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f);
+                            console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f, 'fullRes:', JSON.stringify(v_8f00b9));
                             let v_43f890;
                             if (v_c99bd2 === 409 || /max purchase|limit reached/i.test(v_44854f)) {
                                 v_43f890 = '최대 구매 가능 개수를 초과했습니다.';
@@ -505,10 +505,16 @@ export const v_a59951 = () => {
                                 const v_d6be1a = /^[\x00-\x7F\s]+$/.test(v_44854f);
                                 v_43f890 = v_d6be1a || !v_44854f ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : v_44854f;
                             }
+
+                            if (__DEV__) {
+                                v_43f890 += `\n\n[DEV] code=${v_c99bd2} msg=${v_44854f}`;
+                            }
                             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                         }
                     } catch (v_9e86fd) {
-                        console.error('[XRUN 구매] 오류:', v_9e86fd);
+                        const v_d308b5 = v_9e86fd?.response?.status;
+                        const v_49b0b7 = v_9e86fd?.response?.data;
+                        console.error('[XRUN 구매] 오류:', { status: v_d308b5, respData: v_49b0b7, errMsg: v_9e86fd?.message, stack: v_9e86fd?.stack });
                         const v_badeaf = v_9e86fd?.response?.data?.message ?? v_9e86fd?.message ?? '구매 처리 중 오류가 발생했습니다.';
                         const v_d6be1a = typeof v_badeaf === 'string' && /^[\x00-\x7F\s]+$/.test(v_badeaf);
                         v_889fad(
