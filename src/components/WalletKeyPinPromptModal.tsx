@@ -28,7 +28,7 @@ interface Props {
   skipVaultCheck?: boolean;
 }
 
-type Step = 'enter' | 'verifying' | 'error';
+type Step = 'enter' | 'verifying' | 'processing' | 'error';
 
 export const WalletKeyPinPromptModal: React.FC<Props> = ({
   memberId,
@@ -64,7 +64,8 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
 
     if (skipVaultCheck) {
       if (/^\d{6}$/.test(currentPin)) {
-        onSuccess([], currentPin);
+        setStep('processing');
+        try { await onSuccess([], currentPin); } catch {  }
         setPin('');
         return;
       }
@@ -77,7 +78,8 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     const result = await unlockUserWallets(currentPin, email, memberId);
     if (result.ok) {
 
-      onSuccess(result.wallets, currentPin);
+      setStep('processing');
+      try { await onSuccess(result.wallets, currentPin); } catch {  }
       setPin('');
       return;
     }
@@ -150,6 +152,9 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
           {step === 'verifying' && (
             <Text style={styles.prompt}>검증 중...</Text>
           )}
+          {step === 'processing' && (
+            <Text style={styles.prompt}>결제 처리 중...{'\n'}창을 닫지 말고 잠시만 기다려주세요</Text>
+          )}
           {step === 'error' && (
             <Text style={styles.prompt}>비밀번호가 틀렸습니다. 다시 입력해 주세요</Text>
           )}
@@ -168,7 +173,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <Text style={styles.error}>{errorMsg}</Text>
           )}
 
-          {step === 'verifying' && (
+          {(step === 'verifying' || step === 'processing') && (
             <View style={styles.loadingRow}>
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             </View>
