@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
@@ -41,6 +42,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   skipVaultCheck = false,
   processingLabel,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -72,7 +74,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
         setPin('');
         return;
       }
-      setErrorMsg('6자리 숫자를 입력해주세요');
+      setErrorMsg(t('components.walletKeyPinPrompt.formatError'));
       setStep('error');
       setPin('');
       return;
@@ -141,25 +143,25 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>지갑 보호 PIN 확인</Text>
+          <Text style={styles.title}>{t('components.walletKeyPinPrompt.title')}</Text>
 
           {}
           <Text style={styles.warning}>
-            지갑 키 보호 전용입니다.
+            {t('components.walletKeyPinPrompt.warning')}
           </Text>
 
           {}
           {step === 'enter' && (
-            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.enterPrompt')}</Text>
           )}
           {step === 'verifying' && (
-            <Text style={styles.prompt}>검증 중...</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.verifying')}</Text>
           )}
           {step === 'processing' && (
-            <Text style={styles.prompt}>{processingLabel || '처리 중...'}{'\n'}창을 닫지 말고 잠시만 기다려주세요</Text>
+            <Text style={styles.prompt}>{processingLabel || t('components.walletKeyPinPrompt.processingDefault')}{'\n'}{t('components.walletKeyPinPrompt.processingSubtitle')}</Text>
           )}
           {step === 'error' && (
-            <Text style={styles.prompt}>비밀번호가 틀렸습니다. 다시 입력해 주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.error')}</Text>
           )}
 
           {}
@@ -201,7 +203,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             ))}
             {}
             <TouchableOpacity style={styles.key} onPress={onCancel}>
-              <Text style={[styles.keyText, { fontSize: 14, color: COLORS.darkGray }]}>취소</Text>
+              <Text style={[styles.keyText, { fontSize: 14, color: COLORS.darkGray }]}>{t('components.walletKeyPinPrompt.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.key}

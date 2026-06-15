@@ -5,3 +5,4 @@ export { default as bottomNavigationBar } from './bottomNavigationBar';
 
 
 
+export { default as walletKeyPinPrompt } from './walletKeyPinPrompt';
