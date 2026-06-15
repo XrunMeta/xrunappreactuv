@@ -76,9 +76,15 @@ export const ShopItemRegisterScreen = () => {
               setIsEditMode(true);
               setEditItemId(editItem.item);
             if (editItem.title) setTitle(editItem.title);
-            if (editItem.priceKRW) setPriceKRW(editItem.priceKRW.toString());
-            else if (editItem.price) setPriceKRW(editItem.price.toString());
-            if (editItem.priceXrun) setPriceXrun(editItem.priceXrun.toString());
+
+            const fmtNum = (v: any): string => {
+              const n = Number(v);
+              if (!isFinite(n)) return String(v);
+              return n.toFixed(4).replace(/\.?0+$/, '');
+            };
+            if (editItem.priceKRW) setPriceKRW(fmtNum(editItem.priceKRW));
+            else if (editItem.price) setPriceKRW(fmtNum(editItem.price));
+            if (editItem.priceXrun) setPriceXrun(fmtNum(editItem.priceXrun));
             if (editItem.description) setDescription(editItem.description);
             if (editItem.maxpurchase) setMaxpurchase(editItem.maxpurchase.toString());
 
@@ -356,37 +362,37 @@ export const ShopItemRegisterScreen = () => {
     const trimmedDesc = description.trim();
 
     if (!trimmedTitle) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.productNameRequired'));
+      await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.productNameRequired'));
       return;
     }
 
     if (trimmedTitle.length > 20) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 20자 이내로 입력해주세요.');
+      await showAlert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명은 20자 이내로 입력해주세요.');
       return;
     }
     if (trimmedDesc.length > 500) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
+      await showAlert(t('screens.shopItemRegister.alerts.error') || '오류', '설명은 500자 이내로 입력해주세요.');
       return;
     }
 
     if (/(.)\1{4,}/.test(trimmedTitle) || /(.)\1{4,}/.test(trimmedDesc)) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
+      await showAlert(t('screens.shopItemRegister.alerts.error') || '오류', '의미 없는 반복 문자가 포함되어 있습니다. 다시 작성해주세요.');
       return;
     }
 
     if (/^[ㄱ-㆏\s]+$/.test(trimmedTitle)) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
+      await showAlert(t('screens.shopItemRegister.alerts.error') || '오류', '상품명이 올바르지 않습니다.');
       return;
     }
 
     if (!memberId) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.userInfoLoadFailed'));
+      await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.userInfoLoadFailed'));
       return;
     }
 
     const finalPriceXrun = parseFloat(priceXrun) || 0;
     if (finalPriceXrun <= 0) {
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceXrunRequired'));
+      await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.priceXrunRequired'));
       return;
     }
 
@@ -397,14 +403,14 @@ export const ShopItemRegisterScreen = () => {
       if (editSdk) {
         sdk = editSdk;
       } else {
-        Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkNotFound'));
+        await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkNotFound'));
         return;
       }
     } else {
 
       sdk = generatedSdk;
       if (!sdk) {
-        Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkGenerateFailed'));
+        await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.sdkGenerateFailed'));
         return;
       }
     }
@@ -432,18 +438,21 @@ export const ShopItemRegisterScreen = () => {
       const response = await createItemFromApp(request);
 
       if (response.status === 'success') {
-        Alert.alert(t('screens.shopItemRegister.alerts.success'), isEditMode ? t('screens.shopItemRegister.alerts.productUpdated') : t('screens.shopItemRegister.alerts.productRegistered'), [
-          {
-            text: '확인',
-            onPress: () => goBack(),
-          },
-        ]);
+
+        await showAlert(
+          t('screens.shopItemRegister.alerts.success'),
+          isEditMode ? t('screens.shopItemRegister.alerts.productUpdated') : t('screens.shopItemRegister.alerts.productRegistered'),
+        );
+        goBack();
       } else {
-        Alert.alert(t('screens.shopItemRegister.alerts.error'), response.message || (isEditMode ? t('screens.shopItemRegister.alerts.editFailed') : t('screens.shopItemRegister.alerts.registerFailed')));
+        await showAlert(
+          t('screens.shopItemRegister.alerts.error'),
+          response.message || (isEditMode ? t('screens.shopItemRegister.alerts.editFailed') : t('screens.shopItemRegister.alerts.registerFailed')),
+        );
       }
     } catch (error) {
       console.error('[상품 등록] 오류:', error);
-      Alert.alert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.errorDuringRegister'));
+      await showAlert(t('screens.shopItemRegister.alerts.error'), t('screens.shopItemRegister.alerts.errorDuringRegister'));
     } finally {
       setIsSubmitting(false);
     }
@@ -500,22 +509,7 @@ export const ShopItemRegisterScreen = () => {
     }
   };
 
-  const renderHeaderRight = () => {
-    if (!isEditMode) {
-      return null;
-    }
-
-    return (
-      <TouchableOpacity
-        style={styles.headerDeleteButton}
-        onPress={handleDeleteItem}
-        activeOpacity={0.7}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.headerDeleteButtonText}>{t('screens.myinfoShopSales.delete')}</Text>
-      </TouchableOpacity>
-    );
-  };
+  const renderHeaderRight = () => null;
 
   if (isLoading) {
     return (
@@ -699,18 +693,51 @@ export const ShopItemRegisterScreen = () => {
           )}
 
           {}
-          <TouchableOpacity
-            style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-            activeOpacity={0.7}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.submitButtonText}>{isEditMode ? t('screens.shopItemRegister.editButton') : t('screens.shopItemRegister.registerButton')}</Text>
-            )}
-          </TouchableOpacity>
+          {isEditMode ? (
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: SIZES.large }}>
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  { flex: 1, marginTop: 0 },
+                  isSubmitting && styles.submitButtonDisabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+                activeOpacity={0.7}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.submitButtonText}>{t('screens.shopItemRegister.editButton')}</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  { flex: 1, marginTop: 0, backgroundColor: '#ef4444' },
+                  isSubmitting && styles.submitButtonDisabled,
+                ]}
+                onPress={handleDeleteItem}
+                disabled={isSubmitting}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.submitButtonText}>{t('screens.myinfoShopSales.delete') || '삭제하기'}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+              activeOpacity={0.7}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>{t('screens.shopItemRegister.registerButton')}</Text>
+              )}
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeView>
