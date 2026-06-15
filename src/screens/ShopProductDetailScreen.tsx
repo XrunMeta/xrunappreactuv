@@ -592,6 +592,7 @@ export const v_a59951 = () => {
 
     const v_184ff4 = () => {
         v_9375ae(false);
+        v_9b57fc(v_ce4741.shopMyItems);
     };
 
     const v_48c801 = () => {
