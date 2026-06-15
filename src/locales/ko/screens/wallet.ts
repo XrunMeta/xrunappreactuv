@@ -6,6 +6,8 @@ export default {
   polygonScan: 'PolygonScan',
   etherscan: 'Etherscan',
   receive: '받기',
+  walletInfo: '지갑 정보',
+  walletInfoSubtitle: '지갑 키 백업, 복원, 안내를 확인할 수 있어요',
   send: '보내기',
   preparing: '준비 중',
   preparingMessage: '기능은 아직 준비 중입니다.',
