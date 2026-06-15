@@ -150,29 +150,7 @@ export const v_4a40b2 = () => {
           >
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletPrivateKeyGoogleAuth)}
-          >
-            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.walletBackup')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletRestore)}
-          >
-            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.walletRestore')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletKeyGuide)}
-          >
-            <Text style={v_d81136.cardText}>
-              {v_8d41d7('screens.myInfoSettings.walletKeyGuide')}
-            </Text>
-          </TouchableOpacity>
+          {}
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}
