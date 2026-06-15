@@ -495,11 +495,13 @@ export const v_a59951 = () => {
                             const v_44854f = v_8f00b9?.message || '';
                             console.warn('[XRUN 구매] 실패:', v_c99bd2, v_44854f, 'fullRes:', JSON.stringify(v_8f00b9));
                             let v_43f890;
+                            let v_252e2b = false;
                             if (v_c99bd2 === 409 || /max purchase|limit reached/i.test(v_44854f)) {
                                 v_43f890 = '최대 구매 가능 개수를 초과했습니다.';
                             } else if (v_c99bd2 === 410) {
 
                                 v_43f890 = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
+                                v_252e2b = true;
                             } else if (v_c99bd2 === 404 || /not found/i.test(v_44854f)) {
                                 v_43f890 = '상품을 찾을 수 없습니다.';
                             } else if (v_c99bd2 === 400) {
@@ -509,10 +511,13 @@ export const v_a59951 = () => {
                                 v_43f890 = v_d6be1a || !v_44854f ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : v_44854f;
                             }
 
-                            if (__DEV__) {
-                                v_43f890 += `\n\n[DEV] code=${v_c99bd2} msg=${v_44854f}`;
-                            }
-                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+                            const v_3d694a = v_252e2b
+                                ? [
+                                    { text: v_8d41d7('screens.shopProductDetail.confirm') },
+                                    { text: '복원하기', onPress: () => v_9b57fc(v_ce4741.walletRestore) },
+                                ]
+                                : [{ text: v_8d41d7('screens.shopProductDetail.confirm') }];
+                            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, v_3d694a);
                         }
                     } catch (v_9e86fd) {
                         const v_d308b5 = v_9e86fd?.response?.status;
