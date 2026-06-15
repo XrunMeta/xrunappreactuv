@@ -1066,7 +1066,16 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       let v_e36b07 = await v_563153(undefined, !v_70197b, true);
 
       if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
-        console.warn('[CameraMainScreen] TopAd5 데이터 없음');
+        console.warn('[CameraMainScreen] TopAd5 1차 응답 없음 — stored 폴백 + force refresh 재시도');
+        const v_5885b8 = await v_5d7ca4().catch(() => null);
+        if (v_5885b8 && Array.isArray(v_5885b8) && v_5885b8.length > 0) {
+          v_e36b07 = v_5885b8
+        } else {
+          v_e36b07 = await v_563153(undefined, true, true).catch(() => null) as any
+        }
+      }
+      if (!v_e36b07 || !Array.isArray(v_e36b07) || v_e36b07.length === 0) {
+        console.warn('[CameraMainScreen] TopAd5 데이터 없음 (재시도도 실패)');
         v_34a50a(false);
         return;
       }
@@ -1709,6 +1718,25 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       });
     }
   }, [v_b9ce93, v_0a6f80]);
+
+  v_c4deb2(() => {
+    const v_ece1e8 = setTimeout(() => {
+      if (!v_683210 && v_ef86b6.length === 0) {
+        console.warn('🆘 [AR watchdog] 1s: tokens=0 → loadTokenData(true) 강제 재시도');
+        v_0b2c53.current = false;
+        v_c4c061(true);
+      }
+    }, 1000);
+    const v_a9fa04 = setTimeout(() => {
+      if (!v_683210 && v_ef86b6.length === 0) {
+        console.warn('🆘 [AR watchdog] 3s: tokens=0 → loadTokenData(true) 한 번 더');
+        v_0b2c53.current = false;
+        v_c4c061(true);
+      }
+    }, 3000);
+    return () => { clearTimeout(v_ece1e8); clearTimeout(v_a9fa04); };
+
+  }, []);
 
   const v_d00cdb = v_de06a3(async () => {
     try {
