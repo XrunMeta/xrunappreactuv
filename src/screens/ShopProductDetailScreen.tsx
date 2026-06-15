@@ -74,6 +74,15 @@ export const ShopProductDetailScreen = () => {
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
 
+    const isPurchasedView = !!(selectedShopItem as any)?.isPurchased;
+    const purchasedPaidXrun = Number((selectedShopItem as any)?.paidXrun ?? 0);
+    const purchasedDate = String((selectedShopItem as any)?.purchaseDate ?? '');
+    useEffect(() => {
+        if (isPurchasedView) {
+            console.log('[상품 상세-구매완료] selectedShopItem:', JSON.stringify(selectedShopItem));
+        }
+    }, [isPurchasedView, selectedShopItem]);
+
     const [member, setMember] = useState<string | null>(null);
 
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
@@ -627,6 +636,39 @@ export const ShopProductDetailScreen = () => {
                     </View>
 
                     {}
+                    {isPurchasedView ? (
+                        <View style={styles.paymentCard}>
+                            <View style={styles.sectionHeader}>
+                                <Feather name="check-circle" size={18} color="#22c55e" />
+                                <Text style={styles.sectionTitle}>구매 완료 정보</Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.paymentRow}>
+                                <Text style={styles.paymentLabel}>결제 금액</Text>
+                                <View style={styles.priceContainer}>
+                                    <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
+                                    <Text style={styles.paymentValue}>
+                                        {(() => {
+
+                                            const candidates = [
+                                                purchasedPaidXrun,
+                                                Number((selectedShopItem as any)?.priceXrun ?? 0),
+                                                Number(product.price ?? 0),
+                                            ];
+                                            const val = candidates.find((n) => isFinite(n) && n > 0) ?? 0;
+                                            return val > 0
+                                                ? `${val.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                                : '-';
+                                        })()}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.paymentRowLast}>
+                                <Text style={styles.paymentLabel}>구매일</Text>
+                                <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
+                            </View>
+                        </View>
+                    ) : (
                     <View style={styles.paymentCard}>
                         <View style={styles.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
@@ -683,6 +725,7 @@ export const ShopProductDetailScreen = () => {
                             </>
                         )}
                     </View>
+                    )}
 
                     {}
                     <View style={styles.guideCard}>
@@ -723,6 +766,7 @@ export const ShopProductDetailScreen = () => {
             </SafeScrollView>
 
             {}
+            {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
                 {isXplayShop ? (
                     <TouchableOpacity
@@ -739,9 +783,7 @@ export const ShopProductDetailScreen = () => {
                         >
                             {xplayPurchaseLoading ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} />
-                            ) : (
-                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
-                            )}
+                            ) : null}
                             <Text style={styles.purchaseButtonText}>
                                 {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
@@ -759,12 +801,12 @@ export const ShopProductDetailScreen = () => {
                             end={{ x: 1, y: 0 }}
                             style={styles.purchaseButtonGradient}
                         >
-                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             <Text style={styles.purchaseButtonText}>{t('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
             </View>
+            )}
 
             {}
             <Modal

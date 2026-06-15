@@ -118,7 +118,11 @@ function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemD
     txID: p.txID,
     item: p.item,
     sortKey,
-  };
+
+    description: (p as any).description ?? '',
+    paidXrun: (p as any).paidXrun ?? null,
+    priceXrun: (p as any).priceXrun ?? null,
+  } as any;
 }
 
 export const ShopMyItemsScreen = () => {
@@ -297,9 +301,35 @@ export const ShopMyItemsScreen = () => {
                     </View>
                     <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
                     {isAvailable && item.type === 'xrun' && item.isTransferTicket === false ? (
-                        <View style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}>
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+
+                                const shopItem = {
+                                    id: String(item.item ?? item.id),
+                                    title: item.title,
+                                    priceLabel: '',
+                                    image: item.image,
+                                    detailTotal: '',
+                                    brand: item.brand,
+                                    isXrun: true,
+                                    storage: item.storage,
+                                    txID: item.txID,
+                                    item: item.item,
+                                    isPurchased: true,                        
+                                    description: (item as any).description,
+                                    paidXrun: (item as any).paidXrun,
+                                    priceXrun: (item as any).priceXrun,       
+                                    purchaseDate: item.purchaseDate,
+                                };
+                                setSelectedShopItem(shopItem as any);
+                                navigate(ROUTES.shopProductDetail);
+                            }}
+                        >
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.thankYou')}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ) : isAvailable ? (
                         <TouchableOpacity
                             style={styles.useButton}
