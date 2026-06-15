@@ -118,7 +118,10 @@ function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemD
     txID: p.txID,
     item: p.item,
     sortKey,
-  };
+
+    description: (p as any).description ?? '',
+    paidXrun: (p as any).paidXrun ?? null,
+  } as any;
 }
 
 export const ShopMyItemsScreen = () => {
@@ -302,6 +305,7 @@ export const ShopMyItemsScreen = () => {
                             style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
                             activeOpacity={0.8}
                             onPress={() => {
+
                                 const shopItem = {
                                     id: String(item.item ?? item.id),
                                     title: item.title,
@@ -313,6 +317,10 @@ export const ShopMyItemsScreen = () => {
                                     storage: item.storage,
                                     txID: item.txID,
                                     item: item.item,
+                                    isPurchased: true,                        
+                                    description: (item as any).description,
+                                    paidXrun: (item as any).paidXrun,
+                                    purchaseDate: item.purchaseDate,
                                 };
                                 setSelectedShopItem(shopItem as any);
                                 navigate(ROUTES.shopProductDetail);

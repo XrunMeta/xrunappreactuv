@@ -74,6 +74,10 @@ export const ShopProductDetailScreen = () => {
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
 
+    const isPurchasedView = !!(selectedShopItem as any)?.isPurchased;
+    const purchasedPaidXrun = Number((selectedShopItem as any)?.paidXrun ?? 0);
+    const purchasedDate = String((selectedShopItem as any)?.purchaseDate ?? '');
+
     const [member, setMember] = useState<string | null>(null);
 
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
@@ -627,6 +631,30 @@ export const ShopProductDetailScreen = () => {
                     </View>
 
                     {}
+                    {isPurchasedView ? (
+                        <View style={styles.paymentCard}>
+                            <View style={styles.sectionHeader}>
+                                <Feather name="check-circle" size={18} color="#22c55e" />
+                                <Text style={styles.sectionTitle}>구매 완료 정보</Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.paymentRow}>
+                                <Text style={styles.paymentLabel}>결제 금액</Text>
+                                <View style={styles.priceContainer}>
+                                    <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
+                                    <Text style={styles.paymentValue}>
+                                        {purchasedPaidXrun > 0
+                                            ? `${purchasedPaidXrun.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                            : '-'}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.paymentRowLast}>
+                                <Text style={styles.paymentLabel}>구매일</Text>
+                                <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
+                            </View>
+                        </View>
+                    ) : (
                     <View style={styles.paymentCard}>
                         <View style={styles.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
@@ -683,6 +711,7 @@ export const ShopProductDetailScreen = () => {
                             </>
                         )}
                     </View>
+                    )}
 
                     {}
                     <View style={styles.guideCard}>
@@ -723,6 +752,7 @@ export const ShopProductDetailScreen = () => {
             </SafeScrollView>
 
             {}
+            {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
                 {isXplayShop ? (
                     <TouchableOpacity
@@ -765,6 +795,7 @@ export const ShopProductDetailScreen = () => {
                     </TouchableOpacity>
                 )}
             </View>
+            )}
 
             {}
             <Modal
