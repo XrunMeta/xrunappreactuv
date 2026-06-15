@@ -43,6 +43,9 @@ export const v_755eb9 = (): string => {
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return v_6e1b73;
   }
+  if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
+    return v_6e1b73;
+  }
   return v_c9c489.GATEWAY_WORKERS;
 };
 
