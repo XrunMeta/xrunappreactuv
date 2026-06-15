@@ -937,11 +937,15 @@ export const ShopProductDetailScreen = () => {
                                 const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
                                 if (rec?.status !== 'success') {
                                     const pendingManual = Array.isArray(rec?.data) && rec.data[0]?.pending_manual;
-                                    const baseMsg = rec?.message || '쿠폰 발송 실패';
+                                    const baseMsg = rec?.message || t('screens.shopProductDetail.alerts.couponSendFail');
                                     if (pendingManual) {
 
                                         setPurchasePinVisible(false);
-                                        showAlert('결제 완료 / 쿠폰 발송 대기', `${baseMsg}\n\n결제는 완료됐으니 곧 쿠폰이 자동/수동으로 발송돼요. (${send.txHash.slice(0, 16)}…)`, [{ text: t('screens.shopProductDetail.confirm') }]);
+                                        showAlert(
+                                            t('screens.shopProductDetail.alerts.paymentCompletePendingCouponTitle'),
+                                            t('screens.shopProductDetail.alerts.paymentCompletePendingCouponMessage', { reason: baseMsg, tx: send.txHash.slice(0, 16) }),
+                                            [{ text: t('screens.shopProductDetail.confirm') }],
+                                        );
                                         loadXrunBalance();
                                         return;
                                     }

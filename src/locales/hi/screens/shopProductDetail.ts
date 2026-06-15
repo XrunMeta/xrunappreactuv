@@ -28,6 +28,9 @@ export default {
   viewMyGift: 'मेरे गिफ्ट कार्ड देखें',
   alerts: {
     notification: 'सूचना',
+    couponSendFail: 'कूपन भेजने में विफल',
+    paymentCompletePendingCouponTitle: 'भुगतान पूर्ण / कूपन प्रतीक्षित',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\nभुगतान पूर्ण हो गया है। कूपन शीघ्र ही स्वचालित या मैन्युअल रूप से भेजा जाएगा। ({{tx}}…)',
     phoneNotRegistered: 'प्राप्तकर्ता फोन पंजीकृत नहीं। माई पेज में पंजीकृत करें।',
     insufficientXRUN: 'XRUN बैलेंस अपर्याप्त।',
     purchaseConfirmTitle: 'खरीदें',

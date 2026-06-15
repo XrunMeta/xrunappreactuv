@@ -28,6 +28,9 @@ export default {
   viewMyGift: 'Lihat Gift Card',
   alerts: {
     notification: 'Pemberitahuan',
+    couponSendFail: 'Pengiriman kupon gagal',
+    paymentCompletePendingCouponTitle: 'Pembayaran selesai / Kupon menunggu',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\nPembayaran telah selesai. Kupon akan dikirim otomatis atau manual segera. ({{tx}}…)',
     phoneNotRegistered: 'Nomor penerima belum terdaftar. Daftar di Halaman Saya.',
     insufficientXRUN: 'Saldo XRUN tidak cukup.',
     purchaseConfirmTitle: 'Beli',
