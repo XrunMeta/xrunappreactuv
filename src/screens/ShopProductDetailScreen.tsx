@@ -493,7 +493,7 @@ export const ShopProductDetailScreen = () => {
                         } else {
                             const code = Number(res?.code);
                             const rawMsg = res?.message || '';
-                            console.warn('[XRUN 구매] 실패:', code, rawMsg);
+                            console.warn('[XRUN 구매] 실패:', code, rawMsg, 'fullRes:', JSON.stringify(res));
                             let userMsg: string;
                             if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
                                 userMsg = '최대 구매 가능 개수를 초과했습니다.';
@@ -505,10 +505,16 @@ export const ShopProductDetailScreen = () => {
                                 const isEnglish = /^[\x00-\x7F\s]+$/.test(rawMsg);
                                 userMsg = isEnglish || !rawMsg ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : rawMsg;
                             }
+
+                            if (__DEV__) {
+                                userMsg += `\n\n[DEV] code=${code} msg=${rawMsg}`;
+                            }
                             showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                         }
                     } catch (e: any) {
-                        console.error('[XRUN 구매] 오류:', e);
+                        const status = e?.response?.status;
+                        const respData = e?.response?.data;
+                        console.error('[XRUN 구매] 오류:', { status, respData, errMsg: e?.message, stack: e?.stack });
                         const msg = e?.response?.data?.message ?? e?.message ?? '구매 처리 중 오류가 발생했습니다.';
                         const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
                         showAlert(
