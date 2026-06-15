@@ -5115,6 +5115,39 @@ export const v_070bef = async (
   return v_3393e3.data;
 };
 
+export interface PurchaseGiftPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  goods_code: string;
+  goods_name: string;
+  brand_name: string;
+  image_url: string;
+}
+export const v_01eada = async (
+  v_660822,
+  v_bb5572,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: PurchaseGiftPrepareData[] | null }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseGiftPrepare', { member: v_660822, goods_code: v_bb5572 });
+  return v_3393e3.data;
+};
+export const v_48805f = async (
+  v_660822,
+  v_bb5572,
+  v_3b9397,
+  v_359525,
+  v_f63e09,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseGiftRecord', { member: v_660822, goods_code: v_bb5572, phone_no: v_3b9397, txHash: v_359525, amount: v_f63e09 });
+  return v_3393e3.data;
+};
+
 export const v_324bd9 = async (
   v_660822,
   v_8c0b26,
