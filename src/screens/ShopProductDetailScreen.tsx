@@ -77,6 +77,11 @@ export const v_a59951 = () => {
     const v_d0d89e = !!(v_dfe883 as any)?.isPurchased;
     const v_509dc4 = Number((v_dfe883 as any)?.paidXrun ?? 0);
     const v_6468c7 = String((v_dfe883 as any)?.purchaseDate ?? '');
+    v_c4deb2(() => {
+        if (v_d0d89e) {
+            console.log('[상품 상세-구매완료] selectedShopItem:', JSON.stringify(v_dfe883));
+        }
+    }, [v_d0d89e, v_dfe883]);
 
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
@@ -643,9 +648,18 @@ export const v_a59951 = () => {
                                 <View style={v_d81136.priceContainer}>
                                     <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
                                     <Text style={v_d81136.paymentValue}>
-                                        {v_509dc4 > 0
-                                            ? `${v_509dc4.toFixed(4).replace(/\.?0+$/, '')} XRUN`
-                                            : '-'}
+                                        {(() => {
+
+                                            const v_6f7c85 = [
+                                                v_509dc4,
+                                                Number((v_dfe883 as any)?.priceXrun ?? 0),
+                                                Number(v_01bee9.price ?? 0),
+                                            ];
+                                            const v_a057b5 = v_6f7c85.find((v_f4e98d) => isFinite(v_f4e98d) && v_f4e98d > 0) ?? 0;
+                                            return v_a057b5 > 0
+                                                ? `${v_a057b5.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                                : '-';
+                                        })()}
                                     </Text>
                                 </View>
                             </View>

@@ -121,6 +121,7 @@ function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
 
     description: (v_e2a85c as any).description ?? '',
     paidXrun: (v_e2a85c as any).paidXrun ?? null,
+    priceXrun: (v_e2a85c as any).priceXrun ?? null,
   } as any;
 }
 
@@ -320,6 +321,7 @@ export const v_8c1d95 = () => {
                                     isPurchased: true,                        
                                     description: (v_8c0b26 as any).description,
                                     paidXrun: (v_8c0b26 as any).paidXrun,
+                                    priceXrun: (v_8c0b26 as any).priceXrun,       
                                     purchaseDate: v_8c0b26.purchaseDate,
                                 };
                                 v_d0fbad(v_983c87 as any);
