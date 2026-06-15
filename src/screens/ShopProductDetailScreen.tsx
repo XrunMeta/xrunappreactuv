@@ -905,7 +905,7 @@ export const v_a59951 = () => {
                     memberId={v_d49490.memberId}
                     email={v_d49490.email}
                     onSuccess={async (wallets: v_b9a3bd[]) => {
-                        v_1c868b(false);
+
                         if (v_bd58fc) return;
                         v_24bbbd(true);
                         const v_94302c = v_d49490.kind;
@@ -935,10 +935,11 @@ export const v_a59951 = () => {
                                 }
                                 const v_94a7a9 = await v_48805f(v_660822!, String(v_01bee9.id), v_7496db ?? '', v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
                                 if (v_94a7a9?.status !== 'success') {
-
                                     const v_3aa4d9 = Array.isArray(v_94a7a9?.data) && v_94a7a9.data[0]?.pending_manual;
                                     const v_4d1536 = v_94a7a9?.message || '쿠폰 발송 실패';
                                     if (v_3aa4d9) {
+
+                                        v_1c868b(false);
                                         v_889fad('결제 완료 / 쿠폰 발송 대기', `${v_4d1536}\n\n결제는 완료됐으니 곧 쿠폰이 자동/수동으로 발송돼요. (${v_9c423d.txHash.slice(0, 16)}…)`, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                                         v_abb08d();
                                         return;
@@ -946,7 +947,9 @@ export const v_a59951 = () => {
                                     throw new Error(v_4d1536);
                                 }
                                 console.log('[T-031 기프티콘 구매] 성공:', { txHash: v_9c423d.txHash });
+
                                 v_b75b27(v_94a7a9?.data?.[0] ?? v_94a7a9?.data ?? null);
+                                v_1c868b(false);
                                 v_453192(true);
                                 v_abb08d();
                                 return;
@@ -974,9 +977,13 @@ export const v_a59951 = () => {
                             }
                             console.log('[T-031 구매] 성공:', { txHash: v_9c423d.txHash });
                             v_abb08d();
+
+                            v_1c868b(false);
                             v_9375ae(true);
                         } catch (v_9e86fd) {
                             console.error('[T-031 구매] 실패:', v_9e86fd?.message);
+
+                            v_1c868b(false);
                             v_889fad(
                                 v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'),
                                 v_9e86fd?.message || '구매 처리 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.',
