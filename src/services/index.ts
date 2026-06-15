@@ -43,6 +43,9 @@ export const getApiBaseUrl = (): string => {
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return PREVIEW_GATEWAY_URL;
   }
+  if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
+    return PREVIEW_GATEWAY_URL;
+  }
   return env.GATEWAY_WORKERS;
 };
 
