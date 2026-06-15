@@ -1117,29 +1117,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           };
         });
 
-        let completedAdsSet = new Set<string>();
-        try {
-
-          const existingCompletedAds = completedAdsSetRef.current ? new Set(completedAdsSetRef.current) : new Set<string>();
-
-          completedAdsSet = await getCompletedAdsSet(member, navigate);
-          console.log(`[CameraMainScreen] 완료된 광고 목록: ${completedAdsSet.size}개`);
-
-          const mergedSet = new Set<string>();
-          existingCompletedAds.forEach(campid => mergedSet.add(campid));
-          completedAdsSet.forEach(campid => mergedSet.add(campid));
-
-          completedAdsSetRef.current = mergedSet;
-          console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${existingCompletedAds.size}개 + 새로 ${completedAdsSet.size}개 = 총 ${mergedSet.size}개`);
-
-          removeCompletedFromRecentAds(mergedSet);
-        } catch (error) {
-          console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
-
-          if (!completedAdsSetRef.current) {
-            completedAdsSetRef.current = new Set<string>();
-          }
+        if (!completedAdsSetRef.current) {
+          completedAdsSetRef.current = new Set<string>();
         }
+        getCompletedAdsSet(member, navigate).then((completedAdsSet) => {
+          const existing = new Set(completedAdsSetRef.current as Set<string>);
+          const mergedSet = new Set<string>();
+          existing.forEach(c => mergedSet.add(c));
+          completedAdsSet.forEach(c => mergedSet.add(c));
+          completedAdsSetRef.current = mergedSet;
+          console.log(`[CameraMainScreen] (bg) 완료광고 병합: 기존 ${existing.size} + 새 ${completedAdsSet.size} = ${mergedSet.size}`);
+          removeCompletedFromRecentAds(mergedSet);
+        }).catch(() => {  });
 
         const filteredValidatedCoinsData = validatedCoinsData;
 
@@ -1334,6 +1323,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             try {
               organizeData(mappedCoinsData, loadedCache);
+
+              setLoading(false);
             } catch (organizeErr) {
               console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', organizeErr);
             }
