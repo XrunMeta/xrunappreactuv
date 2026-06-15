@@ -294,10 +294,10 @@ export const ShopProductDetailScreen = () => {
                                 } catch {  }
                                 showAlert(
                                     t('screens.shopProductDetail.alerts.purchaseFailed'),
-                                    '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.',
+                                    t('screens.walletRestore.restoreNeededShort'),
                                     [
                                         { text: t('screens.shopProductDetail.confirm') },
-                                        { text: '복원하기', onPress: () => navigate(ROUTES.walletRestore) },
+                                        { text: t('screens.walletRestore.restoreNow'), onPress: () => navigate(ROUTES.walletRestore) },
                                     ],
                                 );
                                 return;
@@ -560,7 +560,7 @@ export const ShopProductDetailScreen = () => {
                                         }
                                     }
                                 } catch {  }
-                                userMsg = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
+                                userMsg = t('screens.walletRestore.restoreNeededShort');
                                 showRestoreButton = true;
                             } else if (code === 404 || /not found/i.test(rawMsg)) {
                                 userMsg = '상품을 찾을 수 없습니다.';

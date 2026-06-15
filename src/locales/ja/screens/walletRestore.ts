@@ -10,6 +10,11 @@ export default {
   note: '復元時に同じPINを入力する必要があります。PINを忘れると復元できません。',
   comingSoonTitle: '準備中',
   comingSoonMessage: '復元機能は次回アップデートで対応予定です。',
+  restoreNeededTitle: 'ウォレットキーの復元が必要',
+  restoreNeededMessage: '以前に設定されたパスワードがあります。\nバックアップファイルと当時のパスワードでウォレットを復元できます。',
+  restoreNeededShort: 'ウォレットキーの復元が必要です。\nバックアップファイルとパスワードで復元してから再試行してください。',
+  restoreLater: '後で',
+  restoreNow: '復元',
   driveAuthFailTitle: 'Google ログインが必要',
   driveAuthFailMessage: '再度ログインしてください\nもう一度 Google Drive ボタンをタップしてください',
   alerts: {
