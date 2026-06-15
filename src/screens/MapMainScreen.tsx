@@ -440,12 +440,11 @@ export const MapMainScreen: React.FC = () => {
           console.log('[MapMain] AT 상태', atStatus, 'email=', normEmail, 'member=', memberId);
 
           const choice = await showAlert(
-            '지갑 키 복원이 필요해요',
-            '이전에 설정하신 비밀번호가 있어요.\n' +
-            '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+            t('screens.walletRestore.restoreNeededTitle'),
+            t('screens.walletRestore.restoreNeededMessage'),
             [
-              { text: '나중에' },
-              { text: '복원하기' },
+              { text: t('screens.walletRestore.restoreLater') },
+              { text: t('screens.walletRestore.restoreNow') },
             ],
           );
           if (choice === 1) {

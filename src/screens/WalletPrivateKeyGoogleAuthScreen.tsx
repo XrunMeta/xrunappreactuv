@@ -150,11 +150,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           const shouldShowRestore = atStatus.at || !atStatus.ok;
           if (shouldShowRestore) {
             const choice = await showAlert(
-              '지갑 키 복원이 필요해요',
-              '이전에 설정하신 비밀번호와 백업 파일로 지갑을 복원할 수 있어요.',
+              t('screens.walletRestore.restoreNeededTitle'),
+              t('screens.walletRestore.restoreNeededMessage'),
               [
-                { text: '나중에', style: 'cancel' },
-                { text: '복원하기' },
+                { text: t('screens.walletRestore.restoreLater'), style: 'cancel' },
+                { text: t('screens.walletRestore.restoreNow') },
               ],
             );
             if (choice === 1) navigate(ROUTES.walletRestore);

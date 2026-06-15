@@ -10,6 +10,11 @@ export default {
   note: 'Anda harus memasukkan PIN yang sama yang digunakan saat backup untuk dekripsi. PIN hilang berarti pemulihan hilang.',
   comingSoonTitle: 'Segera Hadir',
   comingSoonMessage: 'Fitur pemulihan akan tersedia di pembaruan mendatang.',
+  restoreNeededTitle: 'Pemulihan kunci dompet diperlukan',
+  restoreNeededMessage: 'Anda memiliki kata sandi yang ditetapkan sebelumnya.\nAnda dapat memulihkan dompet dengan file backup dan kata sandi tersebut.',
+  restoreNeededShort: 'Pemulihan kunci dompet diperlukan.\nPulihkan dengan file backup dan kata sandi, lalu coba lagi.',
+  restoreLater: 'Nanti',
+  restoreNow: 'Pulihkan',
   driveAuthFailTitle: 'Login Google diperlukan',
   driveAuthFailMessage: 'Silakan masuk lagi\nKemudian ketuk tombol Google Drive lagi',
   alerts: {

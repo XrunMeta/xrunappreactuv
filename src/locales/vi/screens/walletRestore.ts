@@ -10,6 +10,11 @@ export default {
   note: 'Bạn phải nhập cùng PIN đã dùng khi sao lưu để giải mã. Mất PIN nghĩa là không thể khôi phục.',
   comingSoonTitle: 'Sắp ra mắt',
   comingSoonMessage: 'Tính năng khôi phục sẽ có trong bản cập nhật sắp tới.',
+  restoreNeededTitle: 'Cần khôi phục khóa ví',
+  restoreNeededMessage: 'Bạn đã đặt mật khẩu trước đó.\nBạn có thể khôi phục ví bằng file sao lưu và mật khẩu lúc đó.',
+  restoreNeededShort: 'Cần khôi phục khóa ví.\nKhôi phục bằng file sao lưu và mật khẩu, sau đó thử lại.',
+  restoreLater: 'Sau',
+  restoreNow: 'Khôi phục',
   driveAuthFailTitle: 'Cần đăng nhập Google',
   driveAuthFailMessage: 'Vui lòng đăng nhập lại\nSau đó nhấn lại nút Google Drive',
   alerts: {

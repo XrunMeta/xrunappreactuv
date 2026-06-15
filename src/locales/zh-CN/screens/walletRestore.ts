@@ -9,6 +9,11 @@ export default {
   note: '恢复时必须输入相同的 PIN 才能解密。遗忘 PIN 将无法恢复。',
   comingSoonTitle: '即将推出',
   comingSoonMessage: '恢复功能将在下次更新中提供。',
+  restoreNeededTitle: '需要恢复钱包密钥',
+  restoreNeededMessage: '您之前已设置密码。\n可以使用备份文件和当时的密码恢复钱包。',
+  restoreNeededShort: '需要恢复钱包密钥。\n请使用备份文件和密码恢复后再试。',
+  restoreLater: '稍后',
+  restoreNow: '恢复',
   driveAuthFailTitle: '需要 Google 登录',
   driveAuthFailMessage: '请重新登录\n然后再次点击 Google Drive 按钮',
   alerts: {

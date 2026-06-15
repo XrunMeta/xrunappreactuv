@@ -10,6 +10,11 @@ export default {
   note: 'You must enter the same PIN used during backup to decrypt. Lost PIN means lost restore.',
   comingSoonTitle: 'Coming Soon',
   comingSoonMessage: 'Restore feature will be available in a future update.',
+  restoreNeededTitle: 'Wallet key restore needed',
+  restoreNeededMessage: 'You have a password set previously.\nYou can restore the wallet with the backup file and that password.',
+  restoreNeededShort: 'Wallet key restore needed.\nRestore using your backup file and password, then try again.',
+  restoreLater: 'Later',
+  restoreNow: 'Restore',
   driveAuthFailTitle: 'Google sign-in required',
   driveAuthFailMessage: 'Please sign in again\nThen tap the Google Drive button again',
   alerts: {
