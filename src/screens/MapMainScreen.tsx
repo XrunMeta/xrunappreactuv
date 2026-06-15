@@ -440,12 +440,11 @@ export const MapMainScreen: v_a3453e.FC = () => {
           console.log('[MapMain] AT 상태', v_5a9fc7, 'email=', v_dabeaa, 'member=', v_717992);
 
           const v_7be387 = await v_889fad(
-            '지갑 키 복원이 필요해요',
-            '이전에 설정하신 비밀번호가 있어요.\n' +
-            '백업 파일과 그때의 비밀번호로 지갑을 복원할 수 있어요.',
+            v_8d41d7('screens.walletRestore.restoreNeededTitle'),
+            v_8d41d7('screens.walletRestore.restoreNeededMessage'),
             [
-              { text: '나중에' },
-              { text: '복원하기' },
+              { text: v_8d41d7('screens.walletRestore.restoreLater') },
+              { text: v_8d41d7('screens.walletRestore.restoreNow') },
             ],
           );
           if (v_7be387 === 1) {
