@@ -27,7 +27,10 @@ export default {
   confirm: 'Confirm',
   viewMyGift: 'View My Gift Cards',
   alerts: {
-    notification: 'Notice',
+    notification: 'แจ้งเตือน',
+    couponSendFail: 'ส่งคูปองล้มเหลว',
+    paymentCompletePendingCouponTitle: 'ชำระเงินเสร็จ / รอส่งคูปอง',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\nชำระเงินเสร็จแล้ว คูปองจะถูกส่งแบบอัตโนมัติหรือด้วยตนเองในไม่ช้า ({{tx}}…)',
     phoneNotRegistered: 'Recipient phone number is not registered. Please register in My Page.',
     insufficientXRUN: 'Insufficient XRUN balance.',
     purchaseConfirmTitle: 'Purchase',
