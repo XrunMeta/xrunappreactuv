@@ -1117,29 +1117,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           };
         });
 
-        let v_905ecb = new Set<string>();
-        try {
-
-          const v_96f338 = v_7c7dd0.current ? new Set(v_7c7dd0.current) : new Set<string>();
-
-          v_905ecb = await v_318c45(v_660822, v_9b57fc);
-          console.log(`[CameraMainScreen] 완료된 광고 목록: ${v_905ecb.size}개`);
-
-          const v_b63d4a = new Set<string>();
-          v_96f338.forEach(v_aa0917 => v_b63d4a.add(v_aa0917));
-          v_905ecb.forEach(v_aa0917 => v_b63d4a.add(v_aa0917));
-
-          v_7c7dd0.current = v_b63d4a;
-          console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${v_96f338.size}개 + 새로 ${v_905ecb.size}개 = 총 ${v_b63d4a.size}개`);
-
-          v_a2b2c4(v_b63d4a);
-        } catch (v_5e9bfe) {
-          console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', v_5e9bfe);
-
-          if (!v_7c7dd0.current) {
-            v_7c7dd0.current = new Set<string>();
-          }
+        if (!v_7c7dd0.current) {
+          v_7c7dd0.current = new Set<string>();
         }
+        v_318c45(v_660822, v_9b57fc).then((v_905ecb) => {
+          const v_3c8572 = new Set(v_7c7dd0.current as Set<string>);
+          const v_b63d4a = new Set<string>();
+          v_3c8572.forEach(v_3f4e2e => v_b63d4a.add(v_3f4e2e));
+          v_905ecb.forEach(v_3f4e2e => v_b63d4a.add(v_3f4e2e));
+          v_7c7dd0.current = v_b63d4a;
+          console.log(`[CameraMainScreen] (bg) 완료광고 병합: 기존 ${v_3c8572.size} + 새 ${v_905ecb.size} = ${v_b63d4a.size}`);
+          v_a2b2c4(v_b63d4a);
+        }).catch(() => {  });
 
         const v_3ce376 = v_3d87ed;
 
@@ -1334,6 +1323,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
             try {
               v_0a6f80(v_8ceeaa, v_ed29b7);
+
+              v_34a50a(false);
             } catch (v_15a64b) {
               console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', v_15a64b);
             }
