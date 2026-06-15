@@ -495,11 +495,13 @@ export const ShopProductDetailScreen = () => {
                             const rawMsg = res?.message || '';
                             console.warn('[XRUN 구매] 실패:', code, rawMsg, 'fullRes:', JSON.stringify(res));
                             let userMsg: string;
+                            let showRestoreButton = false;
                             if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
                                 userMsg = '최대 구매 가능 개수를 초과했습니다.';
                             } else if (code === 410) {
 
                                 userMsg = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
+                                showRestoreButton = true;
                             } else if (code === 404 || /not found/i.test(rawMsg)) {
                                 userMsg = '상품을 찾을 수 없습니다.';
                             } else if (code === 400) {
@@ -509,10 +511,13 @@ export const ShopProductDetailScreen = () => {
                                 userMsg = isEnglish || !rawMsg ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : rawMsg;
                             }
 
-                            if (__DEV__) {
-                                userMsg += `\n\n[DEV] code=${code} msg=${rawMsg}`;
-                            }
-                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
+                            const buttons = showRestoreButton
+                                ? [
+                                    { text: t('screens.shopProductDetail.confirm') },
+                                    { text: '복원하기', onPress: () => navigate(ROUTES.walletRestore) },
+                                ]
+                                : [{ text: t('screens.shopProductDetail.confirm') }];
+                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, buttons);
                         }
                     } catch (e: any) {
                         const status = e?.response?.status;
