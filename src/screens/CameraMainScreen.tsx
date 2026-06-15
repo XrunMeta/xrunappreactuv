@@ -1066,7 +1066,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       let topAd5Response = await getTopAd5(undefined, !useCache, true);
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-        console.warn('[CameraMainScreen] TopAd5 데이터 없음');
+        console.warn('[CameraMainScreen] TopAd5 1차 응답 없음 — stored 폴백 + force refresh 재시도');
+        const stored = await getStoredTopAd5().catch(() => null);
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+          topAd5Response = stored
+        } else {
+          topAd5Response = await getTopAd5(undefined, true, true).catch(() => null) as any
+        }
+      }
+      if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+        console.warn('[CameraMainScreen] TopAd5 데이터 없음 (재시도도 실패)');
         setLoading(false);
         return;
       }
@@ -1709,6 +1718,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       });
     }
   }, [coinsData, organizeData]);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => {
+      if (!loading && tokens.length === 0) {
+        console.warn('🆘 [AR watchdog] 1s: tokens=0 → loadTokenData(true) 강제 재시도');
+        hasLoadedDataRef.current = false;
+        loadTokenData(true);
+      }
+    }, 1000);
+    const t2 = setTimeout(() => {
+      if (!loading && tokens.length === 0) {
+        console.warn('🆘 [AR watchdog] 3s: tokens=0 → loadTokenData(true) 한 번 더');
+        hasLoadedDataRef.current = false;
+        loadTokenData(true);
+      }
+    }, 3000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+
+  }, []);
 
   const refreshTopAd5Data = useCallback(async () => {
     try {
