@@ -10,6 +10,7 @@ import {
   Dimensions,
   Image,
   Linking,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -192,6 +193,8 @@ export const WalletScreen = () => {
 
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
   const [pinPromptProps, setPinPromptProps] = useState<{ memberId: number; email: string } | null>(null);
+
+  const [walletInfoVisible, setWalletInfoVisible] = useState(false);
 
   const [walletsUnlocked, setWalletsUnlocked] = useState(false);
 
@@ -961,31 +964,16 @@ export const WalletScreen = () => {
                 iconImage: iconPolygonscan,
                 onPress: handlePolygonscan,
               },
+
               {
-                label: t('screens.wallet.etherscan'),
-                iconImage: iconEtherscan,
-                onPress: handleEtherscan,
+                label: t('screens.wallet.walletInfo') || '지갑 정보',
+                icon: 'information-circle-outline',
+                onPress: () => setWalletInfoVisible(true),
               },
               {
                 label: t('screens.wallet.receive'),
                 icon: 'download-outline',
                 onPress: handleReceive,
-              },
-
-              {
-                label: t('screens.myInfoSettings.walletBackup') || '백업',
-                icon: 'shield-checkmark-outline',
-                onPress: () => navigate(ROUTES.walletPrivateKeyGoogleAuth),
-              },
-              {
-                label: t('screens.myInfoSettings.walletRestore') || '복원',
-                icon: 'cloud-download-outline',
-                onPress: () => navigate(ROUTES.walletRestore),
-              },
-              {
-                label: t('screens.myInfoSettings.walletKeyGuide') || '설명',
-                icon: 'help-circle-outline',
-                onPress: () => navigate(ROUTES.walletKeyGuide),
               },
             ]}
           />
@@ -1051,6 +1039,66 @@ export const WalletScreen = () => {
           onCancel={onPinPromptCancel}
         />
       )}
+
+      {}
+      <Modal
+        visible={walletInfoVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setWalletInfoVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.walletInfoOverlay}
+          activeOpacity={1}
+          onPress={() => setWalletInfoVisible(false)}
+        >
+          <View style={styles.walletInfoSheet} onStartShouldSetResponder={() => true}>
+            <View style={styles.walletInfoHeader}>
+              <Text style={styles.walletInfoTitle}>{t('screens.wallet.walletInfo')}</Text>
+              <Text style={styles.walletInfoSubtitle}>{t('screens.wallet.walletInfoSubtitle')}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletPrivateKeyGoogleAuth), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="shield-checkmark-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletBackup')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletRestore), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="cloud-download-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletRestore')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeView>
   );
 };
@@ -1068,6 +1116,60 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingTop: 0,
     zIndex: 10,
+  },
+
+  walletInfoOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  walletInfoSheet: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 36,
+  },
+  walletInfoHeader: {
+    paddingHorizontal: 4,
+    paddingBottom: 16,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  walletInfoTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  walletInfoSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  walletInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  walletInfoIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  walletInfoRowText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
   },
   sectionHeader: {
     flexDirection: 'row',

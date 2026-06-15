@@ -6,6 +6,8 @@ export default {
   polygonScan: 'PolygonScan',
   etherscan: 'Etherscan',
   receive: 'Terima',
+  walletInfo: 'Info Dompet',
+  walletInfoSubtitle: 'Cadangkan, pulihkan, dan panduan kunci dompet',
   send: 'Kirim',
   preparing: 'Mempersiapkan',
   preparingMessage: 'Fitur ini sedang dipersiapkan',

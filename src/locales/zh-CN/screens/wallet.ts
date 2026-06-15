@@ -6,6 +6,8 @@ export default {
   polygonScan: 'PolygonScan',
   etherscan: 'Etherscan',
   receive: '收款',
+  walletInfo: '钱包信息',
+  walletInfoSubtitle: '查看钱包密钥的备份、恢复和指南',
   send: '转账',
   preparing: '准备中',
   preparingMessage: '功能正在准备中',

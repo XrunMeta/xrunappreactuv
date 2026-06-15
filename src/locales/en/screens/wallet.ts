@@ -6,6 +6,8 @@ export default {
   polygonScan: 'PolygonScan',
   etherscan: 'Etherscan',
   receive: 'Receive',
+  walletInfo: 'Wallet Info',
+  walletInfoSubtitle: 'Backup, restore, and view the wallet key guide',
   send: 'Send',
   preparing: 'Preparing',
   preparingMessage: 'This feature is being prepared',

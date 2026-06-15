@@ -6,6 +6,8 @@ export default {
   polygonScan: 'PolygonScan',
   etherscan: 'Etherscan',
   receive: '受取',
+  walletInfo: 'ウォレット情報',
+  walletInfoSubtitle: 'ウォレットキーのバックアップ、復元、ガイド',
   send: '送金',
   preparing: '準備中',
   preparingMessage: 'この機能は準備中です',
