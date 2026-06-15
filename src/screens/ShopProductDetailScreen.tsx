@@ -783,9 +783,7 @@ export const ShopProductDetailScreen = () => {
                         >
                             {xplayPurchaseLoading ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} />
-                            ) : (
-                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
-                            )}
+                            ) : null}
                             <Text style={styles.purchaseButtonText}>
                                 {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
@@ -803,7 +801,6 @@ export const ShopProductDetailScreen = () => {
                             end={{ x: 1, y: 0 }}
                             style={styles.purchaseButtonGradient}
                         >
-                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             <Text style={styles.purchaseButtonText}>{t('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
