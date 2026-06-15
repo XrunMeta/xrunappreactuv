@@ -39,8 +39,8 @@ import { getWalletKeyATStatus } from '../services';
 type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
 
 const NETWORK_LABEL: Record<WalletNetwork, string> = {
-  eth: 'Ethereum (ETH 계열)',
-  pol: 'Polygon (POL 계열)',
+  eth: 'Ethereum',
+  pol: 'Polygon',
 };
 
 export const WalletPrivateKeyGoogleAuthScreen = () => {
@@ -501,7 +501,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     <SafeView>
       {}
       <Header
-        title="지갑 키 백업"
+        title={t('screens.walletPrivateKeyGoogleAuth.headerTitle') || '지갑 키 백업'}
         onBackPress={() => {
           if (stage === 'view') {
             setStage('options');
