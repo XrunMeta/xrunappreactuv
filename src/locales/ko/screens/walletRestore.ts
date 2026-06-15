@@ -10,4 +10,6 @@ export default {
   note: '복원 시 같은 PIN 을 입력해야 백업 내용을 풀 수 있습니다. PIN 을 잊으면 복원이 불가능합니다.',
   comingSoonTitle: '준비 중',
   comingSoonMessage: '복원 기능은 다음 업데이트에서 지원될 예정입니다.',
+  driveAuthFailTitle: '구글 로그인 필요',
+  driveAuthFailMessage: '다시 로그인 해주세요',
 };
