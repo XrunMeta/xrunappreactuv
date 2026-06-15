@@ -5,8 +5,9 @@ export default {
   pushNotificationsOn: 'เปิด',
   pushNotificationsOff: 'ปิด',
   languageSelect: 'เลือกภาษา',
-  walletBackup: 'Backup Wallet Keys',
-  walletRestore: 'Restore Wallet Keys',
+  walletBackup: 'สำรองข้อมูล',
+  walletRestore: 'กู้คืน',
+  walletKeyGuide: 'คู่มือ',
 };
 
 

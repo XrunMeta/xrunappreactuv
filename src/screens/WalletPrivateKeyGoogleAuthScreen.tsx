@@ -227,7 +227,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         if (!SAF) throw new Error('StorageAccessFramework 미지원 환경');
         const perm = await SAF.requestDirectoryPermissionsAsync();
         if (!perm.granted) {
-          await showAlert('취소됨', '폴더 선택이 취소되어 파일을 저장하지 않았습니다.');
+
+          await showAlert('', t('screens.walletPrivateKeyGoogleAuth.folderPickCancelled'));
           setStage('options');
           return;
         }
