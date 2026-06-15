@@ -154,10 +154,28 @@ export async function sendOnchainLocal(
 
   if (!isNative) {
     try {
-      const [nativeBal, gasPrice] = await Promise.all([
+      const env = getEnv();
+      const tokenAddr = currency === 1 ? env.CONTRACT_ADDRESS_ETH : env.CONTRACT_ADDRESS_POLYGON;
+      const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, provider);
+      const [nativeBal, gasPrice, tokenBal, tokenDecimals] = await Promise.all([
         provider.getBalance(wallet.address),
         provider.getFeeData().then(d => d.gasPrice ?? d.maxFeePerGas ?? 0n),
+        tokenContract.balanceOf(wallet.address) as Promise<bigint>,
+        tokenContract.decimals().then((n: any) => Number(n)).catch(() => 18),
       ]);
+
+      const requiredAmount = ethers.parseUnits(String(amount), tokenDecimals);
+      if (tokenBal < requiredAmount) {
+        const tokenName = currency === 1 || currency === 18 ? 'XRUN' : 'TOKEN';
+        const haveFmt = Number(ethers.formatUnits(tokenBal, tokenDecimals)).toFixed(4);
+        const needFmt = Number(ethers.formatUnits(requiredAmount, tokenDecimals)).toFixed(4);
+        console.error(`[송금-로컬] 토큰 잔액 부족: ${tokenName} 보유 ${haveFmt} < 필요 ${needFmt}`);
+        return {
+          ok: false,
+          reason: 'broadcast-failed',
+          detail: `${tokenName} 잔액이 부족해요.\n보유: ${haveFmt} ${tokenName} / 필요: ${needFmt} ${tokenName}`,
+        };
+      }
 
       const estimatedFee = BigInt(gasPrice) * 130_000n;
       if (nativeBal < estimatedFee) {
@@ -172,7 +190,7 @@ export async function sendOnchainLocal(
         };
       }
     } catch (gasErr: any) {
-      console.warn('[송금-로컬] 가스 사전 체크 실패, broadcast 시도 진행:', gasErr?.message);
+      console.warn('[송금-로컬] 잔액/가스 사전 체크 실패, broadcast 시도 진행:', gasErr?.message);
     }
   }
 
