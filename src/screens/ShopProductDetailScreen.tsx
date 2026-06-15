@@ -497,6 +497,9 @@ export const ShopProductDetailScreen = () => {
                             let userMsg: string;
                             if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
                                 userMsg = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (code === 410) {
+
+                                userMsg = '비밀번호로 보호된 지갑은 현재 XRUN 직접 구매가 지원되지 않습니다.\n곧 클라이언트 사이드 결제 기능을 추가할 예정입니다.';
                             } else if (code === 404 || /not found/i.test(rawMsg)) {
                                 userMsg = '상품을 찾을 수 없습니다.';
                             } else if (code === 400) {
