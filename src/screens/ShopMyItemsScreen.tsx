@@ -118,7 +118,11 @@ function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
     txID: v_e2a85c.txID,
     item: v_e2a85c.item,
     sortKey: v_45efe3,
-  };
+
+    description: (v_e2a85c as any).description ?? '',
+    paidXrun: (v_e2a85c as any).paidXrun ?? null,
+    priceXrun: (v_e2a85c as any).priceXrun ?? null,
+  } as any;
 }
 
 export const v_8c1d95 = () => {
@@ -297,9 +301,35 @@ export const v_8c1d95 = () => {
                     </View>
                     <Text style={v_d81136.purchaseDate}>{v_8d41d7('screens.shop.purchaseDateLabel')}: {v_8c0b26.purchaseDate}</Text>
                     {v_2911e0 && v_8c0b26.type === 'xrun' && v_8c0b26.isTransferTicket === false ? (
-                        <View style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}>
+
+                        <TouchableOpacity
+                            style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+
+                                const v_983c87 = {
+                                    id: String(v_8c0b26.item ?? v_8c0b26.id),
+                                    title: v_8c0b26.title,
+                                    priceLabel: '',
+                                    image: v_8c0b26.image,
+                                    detailTotal: '',
+                                    brand: v_8c0b26.brand,
+                                    isXrun: true,
+                                    storage: v_8c0b26.storage,
+                                    txID: v_8c0b26.txID,
+                                    item: v_8c0b26.item,
+                                    isPurchased: true,                        
+                                    description: (v_8c0b26 as any).description,
+                                    paidXrun: (v_8c0b26 as any).paidXrun,
+                                    priceXrun: (v_8c0b26 as any).priceXrun,       
+                                    purchaseDate: v_8c0b26.purchaseDate,
+                                };
+                                v_d0fbad(v_983c87 as any);
+                                v_9b57fc(v_ce4741.shopProductDetail);
+                            }}
+                        >
                             <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>{v_8d41d7('screens.shop.thankYou')}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ) : v_2911e0 ? (
                         <TouchableOpacity
                             style={v_d81136.useButton}

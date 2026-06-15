@@ -74,6 +74,15 @@ export const v_a59951 = () => {
 
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
 
+    const v_d0d89e = !!(v_dfe883 as any)?.isPurchased;
+    const v_509dc4 = Number((v_dfe883 as any)?.paidXrun ?? 0);
+    const v_6468c7 = String((v_dfe883 as any)?.purchaseDate ?? '');
+    v_c4deb2(() => {
+        if (v_d0d89e) {
+            console.log('[상품 상세-구매완료] selectedShopItem:', JSON.stringify(v_dfe883));
+        }
+    }, [v_d0d89e, v_dfe883]);
+
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
@@ -627,6 +636,39 @@ export const v_a59951 = () => {
                     </View>
 
                     {}
+                    {v_d0d89e ? (
+                        <View style={v_d81136.paymentCard}>
+                            <View style={v_d81136.sectionHeader}>
+                                <Feather name="check-circle" size={18} color="#22c55e" />
+                                <Text style={v_d81136.sectionTitle}>구매 완료 정보</Text>
+                            </View>
+                            <View style={v_d81136.divider} />
+                            <View style={v_d81136.paymentRow}>
+                                <Text style={v_d81136.paymentLabel}>결제 금액</Text>
+                                <View style={v_d81136.priceContainer}>
+                                    <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
+                                    <Text style={v_d81136.paymentValue}>
+                                        {(() => {
+
+                                            const v_6f7c85 = [
+                                                v_509dc4,
+                                                Number((v_dfe883 as any)?.priceXrun ?? 0),
+                                                Number(v_01bee9.price ?? 0),
+                                            ];
+                                            const v_a057b5 = v_6f7c85.find((v_f4e98d) => isFinite(v_f4e98d) && v_f4e98d > 0) ?? 0;
+                                            return v_a057b5 > 0
+                                                ? `${v_a057b5.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                                : '-';
+                                        })()}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={v_d81136.paymentRowLast}>
+                                <Text style={v_d81136.paymentLabel}>구매일</Text>
+                                <Text style={v_d81136.paymentBalance}>{v_6468c7 || '-'}</Text>
+                            </View>
+                        </View>
+                    ) : (
                     <View style={v_d81136.paymentCard}>
                         <View style={v_d81136.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
@@ -683,6 +725,7 @@ export const v_a59951 = () => {
                             </>
                         )}
                     </View>
+                    )}
 
                     {}
                     <View style={v_d81136.guideCard}>
@@ -723,6 +766,7 @@ export const v_a59951 = () => {
             </SafeScrollView>
 
             {}
+            {!v_d0d89e && (
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
                 {v_5db874 ? (
                     <TouchableOpacity
@@ -739,9 +783,7 @@ export const v_a59951 = () => {
                         >
                             {v_18a900 ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                            ) : (
-                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
-                            )}
+                            ) : null}
                             <Text style={v_d81136.purchaseButtonText}>
                                 {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
@@ -759,12 +801,12 @@ export const v_a59951 = () => {
                             end={{ x: 1, y: 0 }}
                             style={v_d81136.purchaseButtonGradient}
                         >
-                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={v_d81136.purchaseIcon} />
                             <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
             </View>
+            )}
 
             {}
             <Modal
