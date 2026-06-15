@@ -47,7 +47,7 @@ import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
-import { v_ecc3ca } from '../services';
+import { v_ecc3ca, v_5ed938 } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -452,6 +452,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
             if (v_7be387 === 1) {
               v_9b57fc(v_ce4741.walletRestore);
             }
+            return;
+          }
+
+          console.log('[MapMain] vault 비어있음 + AT 미마킹 — fetchAndSaveWallets 보강 호출');
+          await v_5ed938().catch((v_9e86fd) => console.warn('[MapMain] fetchAndSaveWallets 실패:', v_9e86fd));
+          if (v_2008a4) return;
+          const v_c5bc24 = await v_9d7f6b(v_b4e012, v_717992);
+          const v_6d7778 = v_9034c6(v_c5bc24.eth) || v_9034c6(v_c5bc24.pol);
+          if (v_2008a4) return;
+          if (v_6d7778) {
+            v_b51724((v_ba2215) => {
+              if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
+              return { memberId: v_717992, email: v_dabeaa };
+            });
+            v_f4280a(true);
           }
         }
       } catch {
