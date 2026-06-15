@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: '준비 중',
   comingSoonMessage: '복원 기능은 다음 업데이트에서 지원될 예정입니다.',
   driveAuthFailTitle: '구글 로그인 필요',
-  driveAuthFailMessage: '다시 로그인 해주세요',
+  driveAuthFailMessage: '다시 로그인 해주세요\n다시 Google Drive 버튼을 클릭 해주세요',
 };

@@ -11,5 +11,5 @@ export default {
   comingSoonTitle: '準備中',
   comingSoonMessage: '復元機能は次回アップデートで対応予定です。',
   driveAuthFailTitle: 'Google ログインが必要',
-  driveAuthFailMessage: '再度ログインしてください',
+  driveAuthFailMessage: '再度ログインしてください\nもう一度 Google Drive ボタンをタップしてください',
 };
