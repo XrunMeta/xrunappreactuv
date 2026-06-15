@@ -11,6 +11,7 @@ export default {
   used: '已使用',
   availableShort: '可使用',
   usedShort: '已使用',
+  pendingShort: '待发送',
   shopBrand: '购物',
   thankYou: '谢谢',
   noPurchasedCoupons: '暂无购买的优惠券。',

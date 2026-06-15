@@ -11,6 +11,7 @@ export default {
   used: 'उपयोग किया',
   availableShort: 'उपलब्ध',
   usedShort: 'उपयोग किया',
+  pendingShort: 'प्रतीक्षित',
   shopBrand: 'शॉप',
   thankYou: 'धन्यवाद',
   noPurchasedCoupons: 'कोई खरीदे गए कूपन नहीं।',
