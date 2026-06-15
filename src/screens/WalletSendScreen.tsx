@@ -565,6 +565,7 @@ export const WalletSendScreen = () => {
           visible={showPinPrompt}
           memberId={Number(memberId)}
           email={memberEmail}
+          processingLabel="송금 처리 중..."
           onSuccess={handlePinPromptSuccess}
           onCancel={handlePinPromptCancel}
         />
