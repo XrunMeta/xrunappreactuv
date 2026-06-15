@@ -11,6 +11,7 @@ export default {
   used: 'Đã sử dụng',
   availableShort: 'Có thể sử dụng',
   usedShort: 'Đã sử dụng',
+  pendingShort: 'Đang chờ',
   shopBrand: 'Mua sắm',
   thankYou: 'Cảm ơn',
   noPurchasedCoupons: 'Chưa có phiếu mua hàng.',
