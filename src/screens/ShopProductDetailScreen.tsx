@@ -294,10 +294,10 @@ export const v_a59951 = () => {
                                 } catch {  }
                                 v_889fad(
                                     v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'),
-                                    '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.',
+                                    v_8d41d7('screens.walletRestore.restoreNeededShort'),
                                     [
                                         { text: v_8d41d7('screens.shopProductDetail.confirm') },
-                                        { text: '복원하기', onPress: () => v_9b57fc(v_ce4741.walletRestore) },
+                                        { text: v_8d41d7('screens.walletRestore.restoreNow'), onPress: () => v_9b57fc(v_ce4741.walletRestore) },
                                     ],
                                 );
                                 return;
@@ -560,7 +560,7 @@ export const v_a59951 = () => {
                                         }
                                     }
                                 } catch {  }
-                                v_43f890 = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
+                                v_43f890 = v_8d41d7('screens.walletRestore.restoreNeededShort');
                                 v_252e2b = true;
                             } else if (v_c99bd2 === 404 || /not found/i.test(v_44854f)) {
                                 v_43f890 = '상품을 찾을 수 없습니다.';
