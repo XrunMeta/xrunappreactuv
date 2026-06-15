@@ -18,7 +18,7 @@ import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
 import { sendOnchainLocal, isLocalSendEnabledForUser } from '../services/walletSendLocal';
-import type { WalletKey } from '../services/walletKeyStore';
+import { findEntriesForUser, type WalletKey } from '../services/walletKeyStore';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -282,10 +282,14 @@ export const ShopProductDetailScreen = () => {
                                     const memberId = ud?.member != null ? Number(ud.member) : null;
                                     const email = (ud?.email ?? '').toLowerCase().trim();
                                     if (memberId && email && isLocalSendEnabledForUser(email)) {
-                                        setPurchaseCtx({ memberId, email, kind: 'gift' });
-                                        setPurchasePinVisible(true);
-                                        setXplayPurchaseLoading(false);
-                                        return;
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'gift' });
+                                            setPurchasePinVisible(true);
+                                            setXplayPurchaseLoading(false);
+                                            return;
+                                        }
                                     }
                                 } catch {  }
                                 showAlert(
@@ -546,10 +550,14 @@ export const ShopProductDetailScreen = () => {
                                     const memberId = ud?.member != null ? Number(ud.member) : null;
                                     const email = (ud?.email ?? '').toLowerCase().trim();
                                     if (memberId && email && isLocalSendEnabledForUser(email)) {
-                                        setPurchaseCtx({ memberId, email, kind: 'item' });
-                                        setPurchasePinVisible(true);
-                                        setXrunPurchaseLoading(false);
-                                        return;
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'item' });
+                                            setPurchasePinVisible(true);
+                                            setXrunPurchaseLoading(false);
+                                            return;
+                                        }
                                     }
                                 } catch {  }
                                 userMsg = '지갑 키 복원이 필요해요.\n백업 파일과 비밀번호로 복원한 뒤 다시 시도해주세요.';
