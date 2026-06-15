@@ -60,12 +60,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [pin, setPinState] = useState<string>('');
 
   const CONSENT_BASE_LABELS = [
-    '키는 지갑을 사용할 수 있는 중요한 정보입니다',
-    '키를 분실하면 지갑을 사용할 수 없음을 알고 있습니다',
-    '다른 사람과 공유하면 안되는 정보입니다',
-    '위 내용을 이해했으며 누구에게도 공유하지 않을 것을 약속합니다',
+    t('screens.walletPrivateKeyGoogleAuth.consentCheck1'),
+    t('screens.walletPrivateKeyGoogleAuth.consentCheck2'),
+    t('screens.walletPrivateKeyGoogleAuth.consentCheck3'),
+    t('screens.walletPrivateKeyGoogleAuth.consentCheck4'),
   ];
-  const CONSENT_GDRIVE_LABEL = '이 Google 계정은 개인용이며, 본인만 사용하는 계정입니다';
+  const CONSENT_GDRIVE_LABEL = t('screens.walletPrivateKeyGoogleAuth.consentCheckGdrive');
 
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [confirmChecks, setConfirmChecks] = useState<boolean[]>([]);
@@ -130,8 +130,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         console.log('[WalletKeyBackup] mount', { mid, email: emailRaw, hasJwt: !!jwt });
         if (mid == null || !emailRaw) {
           await showAlert(
-            t('common.messages.error') || '오류',
-            t('screens.wallet.missingInfo') || '사용자 정보를 찾을 수 없습니다',
+            t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
+            t('screens.walletPrivateKeyGoogleAuth.missingUserInfo'),
           );
           goBack();
           return;
@@ -199,7 +199,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     if (stage !== 'options') return;
     if (!pin) {
       await showAlert(
-        t('common.messages.error') || '오류',
+        t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
         'PIN 정보가 메모리에 없습니다. 화면을 다시 열어 PIN 을 입력해주세요.',
       );
       setStage('pin');
@@ -211,7 +211,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const payload = await buildBackupPayload();
       if (!payload) {
         await showAlert(
-          t('common.messages.error') || '오류',
+          t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
           'PIN 설정된 지갑이 없습니다. 먼저 지갑 PIN 을 설정하세요.',
         );
         setStage('options');
@@ -235,8 +235,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         const newUri = await SAF.createFileAsync(perm.directoryUri, fileName, 'application/octet-stream');
         await SAF.writeAsStringAsync(newUri, encrypted);
         await showAlert(
-          '백업 완료',
-          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+          t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
+          `${fileName}`,
         );
       } else {
 
@@ -252,16 +252,16 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
         }
         await showAlert(
-          '백업 완료',
-          `파일 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+          t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
+          `${fileName}`,
         );
       }
       setStage('options');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletKeyBackup] file fail:', e);
       await showAlert(
-        t('common.messages.error') || '오류',
-        `파일 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
+        t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
+        `${t('screens.walletPrivateKeyGoogleAuth.fileSaveFail')}: ${e?.message ?? t('screens.walletPrivateKeyGoogleAuth.unknownError')}`,
       );
       setStage('options');
     }
@@ -274,7 +274,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       const payload = await buildBackupPayload();
       if (!payload) {
         await showAlert(
-          t('common.messages.error') || '오류',
+          t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
           'PIN 설정된 지갑이 없습니다. 먼저 지갑 PIN 을 설정하세요.',
         );
         setStage('options');
@@ -344,15 +344,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       await res.json(); 
 
       await showAlert(
-        '백업 완료',
-        `Google Drive 에 저장 완료\n파일명: ${fileName}\n\n이 파일은 PIN 없이는 복호화할 수 없습니다.`,
+        t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
+        `${fileName}`,
       );
       setStage('options');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletKeyBackup] gdrive fail:', e);
       await showAlert(
-        t('common.messages.error') || '오류',
-        `Google Drive 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
+        t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
+        `${t('screens.walletPrivateKeyGoogleAuth.gdriveSaveFail')}: ${e?.message ?? t('screens.walletPrivateKeyGoogleAuth.unknownError')}`,
       );
       setStage('options');
     }
@@ -362,7 +362,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     setStage('busy');
     try {
       if (wallets.length === 0) {
-        throw new Error('표시 가능한 wallet 이 없습니다');
+        throw new Error(t('screens.walletPrivateKeyGoogleAuth.noDisplayableWallet'));
       }
       const payload = buildPlainBackup(email, wallets);
       const json = JSON.stringify(payload, null, 2);
@@ -417,15 +417,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
       await res.json();
       await showAlert(
-        '평문 저장 완료',
-        `Google Drive 에 평문 키 저장됨\n파일명: ${fileName}\n\n!! 이 파일이 유출되면 즉시 자산을 옮길 수 있습니다 !!\n사용 후 반드시 Drive 에서 삭제해주세요.`,
+        t('screens.walletPrivateKeyGoogleAuth.alertPlainBackupComplete'),
+        `${fileName}`,
       );
       setStage('options');
     } catch (e: any) {
       if (__DEV__) console.warn('[WalletKeyBackup] gdrive plain fail:', e);
       await showAlert(
-        t('common.messages.error') || '오류',
-        `Google Drive 평문 저장 실패: ${e?.message ?? '알 수 없는 오류'}`,
+        t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
+        `${t('screens.walletPrivateKeyGoogleAuth.gdrivePlainSaveFail')}: ${e?.message ?? t('screens.walletPrivateKeyGoogleAuth.unknownError')}`,
       );
       setStage('options');
     }
@@ -433,27 +433,21 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   const handleGdrivePlainBackup = async () => {
     if (stage !== 'options') return;
-
     const r1 = await showAlert(
-      '⚠️ 매우 위험합니다',
-      '평문 (암호화 없이) 으로 개인 키를 Google Drive 에 저장합니다.\n\n' +
-      '이 파일을 누군가 받으면 비밀번호 없이 지갑의 모든 자산을 옮길 수 있습니다.\n\n' +
-      '정말 진행하시겠습니까?',
+      t('screens.walletPrivateKeyGoogleAuth.alertVeryDangerTitle'),
+      t('screens.walletPrivateKeyGoogleAuth.alertVeryDangerMessage'),
       [
-        { text: '취소', style: 'cancel' },
-        { text: '이해했습니다, 계속', style: 'destructive' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.cancel'), style: 'cancel' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.alertUnderstoodContinue'), style: 'destructive' },
       ],
     );
     if (r1 !== 1) return;
-
     const r2 = await showAlert(
-      '⚠️ 마지막 확인',
-      '평문 PK 가 그대로 Drive 에 저장됩니다.\n' +
-      '파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n' +
-      '계속하시겠습니까?',
+      t('screens.walletPrivateKeyGoogleAuth.alertFinalConfirmTitle'),
+      t('screens.walletPrivateKeyGoogleAuth.alertFinalConfirmMessage'),
       [
-        { text: '취소', style: 'cancel' },
-        { text: '예, 평문 저장합니다', style: 'destructive' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.cancel'), style: 'cancel' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.alertYesPlainSave'), style: 'destructive' },
       ],
     );
     if (r2 !== 1) return;
@@ -463,11 +457,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const handleViewKey = async () => {
     if (stage !== 'options') return;
     const r = await showAlert(
-      '경고',
-      '개인 키를 평문으로 표시합니다.\n주변에 다른 사람이 화면을 보지 못하도록 주의해주세요.',
+      t('screens.walletPrivateKeyGoogleAuth.alertWarning'),
+      t('screens.walletPrivateKeyGoogleAuth.alertShowPlainKey'),
       [
-        { text: '취소', style: 'cancel' },
-        { text: '확인' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.cancel'), style: 'cancel' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.confirm') },
       ],
     );
     if (r === 1) setStage('view');
@@ -475,24 +469,24 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
   const handleCopyKey = async (pk: string) => {
     const r = await showAlert(
-      '경고',
-      '키를 클립보드에 복사합니다.\n다른 앱이 클립보드를 읽을 수 있습니다. 사용 후 즉시 다른 내용을 복사해 클립보드를 비워주세요.',
+      t('screens.walletPrivateKeyGoogleAuth.alertWarning'),
+      t('screens.walletPrivateKeyGoogleAuth.alertCopyClipboard'),
       [
-        { text: '취소', style: 'cancel' },
-        { text: '확인' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.cancel'), style: 'cancel' },
+        { text: t('screens.walletPrivateKeyGoogleAuth.confirm') },
       ],
     );
     if (r !== 1) return;
     try {
       await Clipboard.setStringAsync(pk);
       await showAlert(
-        '복사 완료',
-        '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
+        t('screens.walletPrivateKeyGoogleAuth.alertCopyComplete'),
+        t('screens.walletPrivateKeyGoogleAuth.alertCopyCompleteMessage'),
       );
     } catch (e: any) {
       await showAlert(
-        t('common.messages.error') || '오류',
-        `복사 실패: ${e?.message ?? '알 수 없는 오류'}`,
+        t('screens.walletPrivateKeyGoogleAuth.errorTitle'),
+        `${t('screens.walletPrivateKeyGoogleAuth.copyFail')}: ${e?.message ?? t('screens.walletPrivateKeyGoogleAuth.unknownError')}`,
       );
     }
   };
@@ -520,16 +514,15 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
         {stage === 'pin' && (
           <View style={styles.center}>
-            <Text style={styles.message}>PIN 입력을 기다리는 중...</Text>
+            <Text style={styles.message}>{t('screens.walletPrivateKeyGoogleAuth.pinWaiting')}</Text>
           </View>
         )}
 
         {(stage === 'options' || stage === 'busy') && (
           <View style={styles.optionsContainer}>
-            <Text style={styles.title}>백업 방식을 선택하세요</Text>
+            <Text style={styles.title}>{t('screens.walletPrivateKeyGoogleAuth.chooseBackup')}</Text>
             <Text style={styles.subtitle}>
-              지갑 키는 PIN 으로 보호되어 있습니다.{'\n'}
-              파일/Drive 백업은 PIN 없이 복호화할 수 없습니다.
+              {t('screens.walletPrivateKeyGoogleAuth.chooseBackupSubtitle')}
             </Text>
 
             <TouchableOpacity
@@ -540,8 +533,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             >
               <Ionicons name="document-outline" size={28} color={COLORS.buttonPrimary} />
               <View style={styles.optionTextWrap}>
-                <Text style={styles.optionLabel}>파일로 저장</Text>
-                <Text style={styles.optionDesc}>다른 앱으로 공유 (메일·iCloud·파일 등)</Text>
+                <Text style={styles.optionLabel}>{t('screens.walletPrivateKeyGoogleAuth.optionFileLabel')}</Text>
+                <Text style={styles.optionDesc}>{t('screens.walletPrivateKeyGoogleAuth.optionFileDesc')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
@@ -554,37 +547,37 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             >
               <Ionicons name="cloud-upload-outline" size={28} color={COLORS.buttonPrimary} />
               <View style={styles.optionTextWrap}>
-                <Text style={styles.optionLabel}>Google Drive 에 저장</Text>
-                <Text style={styles.optionDesc}>구글 계정 클라우드에 암호화 저장</Text>
+                <Text style={styles.optionLabel}>{t('screens.walletPrivateKeyGoogleAuth.optionGdriveLabel')}</Text>
+                <Text style={styles.optionDesc}>{t('screens.walletPrivateKeyGoogleAuth.optionGdriveDesc')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.optionCard, styles.viewCard, stage === 'busy' && styles.disabled]}
-              onPress={() => requestBackupConsent(handleViewKey, { dangerNote: '평문 PK 가 화면에 표시됩니다. 주변에 다른 사람이 없는지 먼저 확인해주세요.' })}
+              onPress={() => requestBackupConsent(handleViewKey, { dangerNote: t('screens.walletPrivateKeyGoogleAuth.consentDangerView') })}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
               <Ionicons name="eye-outline" size={28} color="#a36a00" />
               <View style={styles.optionTextWrap}>
-                <Text style={styles.optionLabel}>키 직접 보기 / 복사</Text>
-                <Text style={styles.optionDesc}>평문으로 화면에 표시 + 복사 가능 (주의)</Text>
+                <Text style={styles.optionLabel}>{t('screens.walletPrivateKeyGoogleAuth.optionViewLabel')}</Text>
+                <Text style={styles.optionDesc}>{t('screens.walletPrivateKeyGoogleAuth.optionViewDesc')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.optionCard, styles.dangerCard, stage === 'busy' && styles.disabled]}
-              onPress={() => requestBackupConsent(handleGdrivePlainBackup, { isGoogleDrive: true, dangerNote: '⚠️ 이 옵션은 PK 를 암호화 없이 Google Drive 에 저장합니다. 파일이 누구든 손에 들어가면 자산을 즉시 옮길 수 있습니다.' })}
+              onPress={() => requestBackupConsent(handleGdrivePlainBackup, { isGoogleDrive: true, dangerNote: t('screens.walletPrivateKeyGoogleAuth.consentDangerPlain') })}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
               <Ionicons name="warning-outline" size={28} color="#ffffff" />
               <View style={styles.optionTextWrap}>
-                <Text style={styles.dangerLabel}>Google Drive 에 평문 저장</Text>
+                <Text style={styles.dangerLabel}>{t('screens.walletPrivateKeyGoogleAuth.optionPlainLabel')}</Text>
                 <Text style={styles.dangerDesc}>
-                  암호화 없이 PK 저장. 파일 유출 시 즉시 자산 손실.
+                  {t('screens.walletPrivateKeyGoogleAuth.optionPlainDesc')}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#ffffff" />
@@ -593,7 +586,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             {stage === 'busy' && (
               <View style={styles.busyOverlay}>
                 <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-                <Text style={styles.busyText}>처리 중...</Text>
+                <Text style={styles.busyText}>{t('screens.walletPrivateKeyGoogleAuth.processing')}</Text>
               </View>
             )}
           </View>
@@ -604,7 +597,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             <View style={styles.warningBox}>
               <Ionicons name="warning-outline" size={20} color="#a36a00" />
               <Text style={styles.warningText}>
-                평문 키가 표시되어 있습니다. 화면 캡처·녹화·노출에 주의해주세요.
+                {t('screens.walletPrivateKeyGoogleAuth.plainWarning')}
               </Text>
             </View>
 
@@ -615,11 +608,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 <View key={w.wallet_code} style={styles.keyCard}>
                   {}
                   <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
-                  <Text style={styles.fieldLabel}>지갑 주소</Text>
+                  <Text style={styles.fieldLabel}>{t('screens.walletPrivateKeyGoogleAuth.walletAddress')}</Text>
                   <Text style={styles.fieldValue} selectable>
                     {w.address}
                   </Text>
-                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>비밀키</Text>
+                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>{t('screens.walletPrivateKeyGoogleAuth.privateKey')}</Text>
                   <Text style={[styles.fieldValue, styles.privateKey]} selectable>
                     {w.private_key}
                   </Text>
@@ -629,7 +622,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                     activeOpacity={0.7}
                   >
                     <Ionicons name="copy-outline" size={18} color="#ffffff" />
-                    <Text style={styles.copyButtonText}>이 키 복사</Text>
+                    <Text style={styles.copyButtonText}>{t('screens.walletPrivateKeyGoogleAuth.copyKey')}</Text>
                   </TouchableOpacity>
                 </View>
               );
@@ -676,13 +669,13 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             <View style={styles.consentIconWrap}>
               <Ionicons name="warning" size={36} color="#cf3a3a" />
             </View>
-            <Text style={styles.consentTitle}>백업 전 동의</Text>
+            <Text style={styles.consentTitle}>{t('screens.walletPrivateKeyGoogleAuth.consentTitle')}</Text>
             <Text style={styles.consentBody}>
-              백업 파일은 지갑 자산을 통제하는 <Text style={styles.consentStrong}>유일한 열쇠</Text>입니다.{'\n\n'}
-              • 누구와도 공유하지 마세요 (개발자·고객센터 포함){'\n'}
-              • 메신저·이메일로 전송하지 마세요{'\n'}
-              • 공용 PC·공용 클라우드에 저장하지 마세요{'\n'}
-              • 파일을 받은 사람은 자산을 즉시 옮길 수 있습니다
+              {t('screens.walletPrivateKeyGoogleAuth.consentBodyPrefix')}<Text style={styles.consentStrong}>{t('screens.walletPrivateKeyGoogleAuth.consentKeyEmphasis')}</Text>{t('screens.walletPrivateKeyGoogleAuth.consentBodySuffix')}{'\n\n'}
+              • {t('screens.walletPrivateKeyGoogleAuth.consentRule1')}{'\n'}
+              • {t('screens.walletPrivateKeyGoogleAuth.consentRule2')}{'\n'}
+              • {t('screens.walletPrivateKeyGoogleAuth.consentRule3')}{'\n'}
+              • {t('screens.walletPrivateKeyGoogleAuth.consentRule4')}
             </Text>
             {!!confirmDangerNote && (
               <View style={styles.consentDangerBox}>
@@ -717,7 +710,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 onPress={closeConsent}
                 activeOpacity={0.8}
               >
-                <Text style={styles.consentCancelText}>취소</Text>
+                <Text style={styles.consentCancelText}>{t('screens.walletPrivateKeyGoogleAuth.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -729,7 +722,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 disabled={!allChecked}
                 activeOpacity={allChecked ? 0.8 : 1}
               >
-                <Text style={styles.consentProceedText}>계속</Text>
+                <Text style={styles.consentProceedText}>{t('screens.walletPrivateKeyGoogleAuth.continue')}</Text>
               </TouchableOpacity>
             </View>
           </View>
