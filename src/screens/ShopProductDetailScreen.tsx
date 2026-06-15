@@ -74,6 +74,10 @@ export const v_a59951 = () => {
 
     const v_5db874 = (v_dfe883 as any)?.shopTab === 'xplayShop';
 
+    const v_d0d89e = !!(v_dfe883 as any)?.isPurchased;
+    const v_509dc4 = Number((v_dfe883 as any)?.paidXrun ?? 0);
+    const v_6468c7 = String((v_dfe883 as any)?.purchaseDate ?? '');
+
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
@@ -627,6 +631,30 @@ export const v_a59951 = () => {
                     </View>
 
                     {}
+                    {v_d0d89e ? (
+                        <View style={v_d81136.paymentCard}>
+                            <View style={v_d81136.sectionHeader}>
+                                <Feather name="check-circle" size={18} color="#22c55e" />
+                                <Text style={v_d81136.sectionTitle}>구매 완료 정보</Text>
+                            </View>
+                            <View style={v_d81136.divider} />
+                            <View style={v_d81136.paymentRow}>
+                                <Text style={v_d81136.paymentLabel}>결제 금액</Text>
+                                <View style={v_d81136.priceContainer}>
+                                    <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
+                                    <Text style={v_d81136.paymentValue}>
+                                        {v_509dc4 > 0
+                                            ? `${v_509dc4.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                            : '-'}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={v_d81136.paymentRowLast}>
+                                <Text style={v_d81136.paymentLabel}>구매일</Text>
+                                <Text style={v_d81136.paymentBalance}>{v_6468c7 || '-'}</Text>
+                            </View>
+                        </View>
+                    ) : (
                     <View style={v_d81136.paymentCard}>
                         <View style={v_d81136.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
@@ -683,6 +711,7 @@ export const v_a59951 = () => {
                             </>
                         )}
                     </View>
+                    )}
 
                     {}
                     <View style={v_d81136.guideCard}>
@@ -723,6 +752,7 @@ export const v_a59951 = () => {
             </SafeScrollView>
 
             {}
+            {!v_d0d89e && (
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
                 {v_5db874 ? (
                     <TouchableOpacity
@@ -765,6 +795,7 @@ export const v_a59951 = () => {
                     </TouchableOpacity>
                 )}
             </View>
+            )}
 
             {}
             <Modal
