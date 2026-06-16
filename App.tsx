@@ -152,6 +152,12 @@ const v_c0dbdf = () => {
   v_c4deb2(() => {
     const v_14b011 = (response: v_2b7a17.NotificationResponse) => {
       try {
+        const v_9390e8 = (v_3393e3?.notification?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const v_3b27d9 = String(v_9390e8.type ?? '');
+        if (v_3b27d9 === 'inquiry_reply') {
+          v_9b57fc(v_ce4741.myInfoNotify);
+          return;
+        }
         const xrunPolAsset: v_5681b1 = {
           id: 18, symbol: 'XRUN', name: 'XRUN', amount: '0', icon: '', currency: 18, isCustom: false,
         };
