@@ -17,7 +17,7 @@ export default {
   loginButton: '登录',
   disclaimer: '如果您忘记密码，可以使用社交登录或邮箱OTP登录。',
   emailVerification: '邮箱验证',
-  orLoginWith: 'Or login in with',
+  orLoginWith: '使用其他方式登录',
 
   otp: {
     rememberMe: '保持登录状态',
