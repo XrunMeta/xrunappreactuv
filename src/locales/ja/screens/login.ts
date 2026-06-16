@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'メール情報を取得できません。',
   title: 'ログイン',
 
   tabs: {

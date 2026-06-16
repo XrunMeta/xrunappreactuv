@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: '이메일 정보를 가져올 수 없습니다.',
   title: '로그인',
 
   tabs: {

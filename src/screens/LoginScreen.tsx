@@ -466,7 +466,7 @@ export const v_f4f851 = () => {
 
         const v_e0c7e8 = v_43c42e.data.email || '';
         if (!v_e0c7e8) {
-          await v_889fad(v_8d41d7('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          await v_889fad(v_8d41d7('common.messages.error') || '오류', v_8d41d7('screens.login.emailFetchFail') || '이메일 정보를 가져올 수 없습니다.');
           v_deef62(false);
           return;
         }
@@ -597,7 +597,7 @@ export const v_f4f851 = () => {
 
         const v_e0c7e8 = v_43c42e.data.email || '';
         if (!v_e0c7e8) {
-          await v_889fad(v_8d41d7('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          await v_889fad(v_8d41d7('common.messages.error') || '오류', v_8d41d7('screens.login.emailFetchFail') || '이메일 정보를 가져올 수 없습니다.');
           v_deef62(false);
           return;
         }
