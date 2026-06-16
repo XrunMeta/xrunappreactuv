@@ -3,6 +3,8 @@ export default {
   firstName: 'First Name',
   lastName: 'Last Name',
   email: 'Email',
+  password: 'Password',
+  changePassword: 'Change password',
   phone: 'Phone',
   region: 'Region',
   selectCountry: 'Select Country',

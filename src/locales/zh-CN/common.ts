@@ -1,4 +1,5 @@
 export default {
+  notice: '通知',
   cancel: '取消',
   confirm: '确认',
   buttons: {

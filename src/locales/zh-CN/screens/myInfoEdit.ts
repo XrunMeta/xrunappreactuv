@@ -3,6 +3,8 @@ export default {
   firstName: '名',
   lastName: '姓',
   email: '邮箱',
+  password: '密码',
+  changePassword: '修改密码',
   phone: '电话号码',
   region: '地区',
   selectCountry: '选择国家',

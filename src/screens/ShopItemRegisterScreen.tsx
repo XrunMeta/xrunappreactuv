@@ -482,19 +482,19 @@ export const v_680bee = () => {
                 const v_3393e3 = await v_d33616(v_717992, v_7b46e6, v_9b57fc);
 
                 if (v_3393e3.status === 'success') {
-                  await v_889fad('알림', v_8d41d7('screens.myinfoShopSales.deleteSuccess'));
+                  await v_889fad(v_8d41d7('common.notice'), v_8d41d7('screens.myinfoShopSales.deleteSuccess'));
 
                   v_c7ac57();
                 } else {
                   await v_889fad(
-                    '알림',
+                    v_8d41d7('common.notice'),
                     v_8d41d7('screens.myinfoShopSales.deleteFailed'),
                   );
                 }
               } catch (v_5e9bfe) {
                 console.error('[상품 등록] 상품 삭제 오류:', v_5e9bfe);
                 await v_889fad(
-                  '알림',
+                  v_8d41d7('common.notice'),
                   v_8d41d7('screens.myinfoShopSales.deleteFailed'),
                 );
               } finally {
