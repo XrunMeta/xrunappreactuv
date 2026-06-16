@@ -57,16 +57,6 @@ export const v_03a231 = () => {
         iconColor: '#6366F1',
         route: 'myInfoEdit',
       },
-      {
-        id: 'referralList',
-        label: v_8d41d7('screens.myInfo.referral'),
-        subtitle: v_8d41d7('screens.myInfo.referralSubtitle'),
-        iconName: 'people-outline',
-        iconLibrary: 'Ionicons',
-        iconColor: '#6366F1',
-        iconImage: require('../../assets/images/icon_referral_list.png'),
-        route: 'referralMyGroup',
-      },
 
       {
         id: 'shopSales',
@@ -222,6 +212,13 @@ export const v_03a231 = () => {
           }
           v_9b57fc(v_ce4741.myInfoEmailAuth);
         }
+      } else if (v_714568.id === 'notify') {
+
+        console.log('[내 정보] 알림 메뉴 — 빨간 점 즉시 숨김 (옵티미스틱)');
+        v_0dfa96(false);
+
+        v_e84827.setItem('lastNotificationCheckTime', new Date().toISOString()).catch(() => {});
+        v_9b57fc(v_ce4741[v_714568.route]);
       } else {
         v_9b57fc(v_ce4741[v_714568.route]);
       }

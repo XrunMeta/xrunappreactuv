@@ -43,6 +43,9 @@ export const v_755eb9 = (): string => {
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return v_6e1b73;
   }
+  if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
+    return v_6e1b73;
+  }
   return v_c9c489.GATEWAY_WORKERS;
 };
 
@@ -56,6 +59,18 @@ export async function v_5ed938(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await v_23dd22(),
     };
+
+    try {
+      const v_80bdbd = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
+      if (v_80bdbd.ok) {
+        const v_177978 = await v_80bdbd.json().catch(() => null);
+        if (v_177978?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/keys`, { method: 'GET', headers: v_3f4675 });
     if (!v_8f00b9.ok) return; 
     const v_7ecfd1 = await v_8f00b9.json();
@@ -173,22 +188,32 @@ export async function v_cf7998(): Promise<{ ok: boolean; updated?: number; error
   }
 }
 
-export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null }> {
+export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
   try {
     const v_c01615 = v_755eb9();
+    const v_68f0aa = await v_23dd22();
     const v_3f4675 = {
       'Content-Type': 'application/json',
-      Authorization: await v_23dd22(),
+      Authorization: v_68f0aa,
     };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${v_c01615}/wallets/at-status`, hasAuth: !!v_68f0aa });
     const v_8f00b9 = await fetch(`${v_c01615}/wallets/at-status`, { method: 'GET', headers: v_3f4675 });
-    if (!v_8f00b9.ok) return { at: false, at_at: null };
+    console.log('[getWalletKeyATStatus] 응답 status:', v_8f00b9.status);
+    if (!v_8f00b9.ok) {
+      const v_9b6134 = await v_8f00b9.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', v_9b6134);
+      return { at: false, at_at: null, ok: false };
+    }
     const v_7ecfd1 = await v_8f00b9.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(v_7ecfd1));
     return {
       at: !!v_7ecfd1?.data?.at,
       at_at: v_7ecfd1?.data?.at_at ?? null,
+      ok: true,
     };
-  } catch {
-    return { at: false, at_at: null };
+  } catch (v_9e86fd) {
+    console.warn('[getWalletKeyATStatus] 예외:', v_9e86fd?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 
@@ -421,8 +446,14 @@ export const v_23dd22 = async (): Promise<string> => {
 
 export const v_964a96 = async (v_8f00b9): Promise<void> => {
   const v_56b352 = v_8f00b9?.data?.jwt;
-  if (typeof v_56b352 === 'string' && v_56b352.split('.').length === 3) {
+  const v_e4436a = typeof v_56b352;
+  const v_1b140d = typeof v_56b352 === 'string' && v_56b352.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(v_8f00b9?.data ?? {}), 'jwt type:', v_e4436a, 'valid:', v_1b140d);
+  if (v_1b140d) {
     await v_e84827.setItem('jwt', v_56b352);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', v_56b352.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const v_e0c7e8 = v_8f00b9?.data?.email
@@ -909,6 +940,35 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           }
         }
         console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
+      }
+
+      {
+        const v_d308b5 = v_5e9bfe.response?.status;
+        const v_f71b56 = v_5e9bfe.config?.url ?? '';
+        const v_f9da5d =
+          v_f71b56.includes('google-auth-for-wallet') ||
+          v_f71b56.includes('/login') ||
+          v_f71b56.includes('/signup') ||
+          v_f71b56.includes('/email-login') ||
+          v_f71b56.includes('rotateSession');
+        if (v_d308b5 === 401 && !v_f9da5d) {
+          try {
+            console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
+            await Promise.all([
+              v_e84827.removeItem('isLoggedIn'),
+              v_e84827.removeItem('rememberMe'),
+              v_e84827.removeItem('jwt'),
+              v_e84827.removeItem('userData'),
+            ]);
+          } catch (v_9e86fd) {
+            console.warn('[API] auth state 클리어 실패:', v_9e86fd);
+          }
+          if (v_c65f5d?.reset) {
+            try { v_c65f5d.reset(['login']); } catch {  }
+          } else if (v_c65f5d?.navigate) {
+            try { v_c65f5d.navigate('login'); } catch {  }
+          }
+        }
       }
 
       if (v_5e9bfe.code === 'ECONNABORTED' || v_5e9bfe.message.includes('timeout')) {
@@ -4208,6 +4268,9 @@ export interface ReferralIncomeItem {
   tx_time: string | null;
   created_at: string;
   error_message: string | null;
+
+  from_member?: number | null;
+  from_name?: string | null;
 }
 export interface GetReferralIncomeResponse {
   status: 'success' | 'error' | 'fail';
@@ -5034,6 +5097,70 @@ export const v_47cccc = async (
     }
     return { status: 'error', message: (v_5e9bfe as Error).message };
   }
+};
+
+export interface PurchaseXrunItemPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  sku: string;
+  title: string;
+}
+export const v_070bef = async (
+  v_660822,
+  v_8c0b26,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: PurchaseXrunItemPrepareData[] | null }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseXrunItemPrepare', { member: v_660822, item: v_8c0b26 });
+  return v_3393e3.data;
+};
+
+export interface PurchaseGiftPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  goods_code: string;
+  goods_name: string;
+  brand_name: string;
+  image_url: string;
+}
+export const v_01eada = async (
+  v_660822,
+  v_bb5572,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: PurchaseGiftPrepareData[] | null }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseGiftPrepare', { member: v_660822, goods_code: v_bb5572 });
+  return v_3393e3.data;
+};
+export const v_48805f = async (
+  v_660822,
+  v_bb5572,
+  v_3b9397,
+  v_359525,
+  v_f63e09,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseGiftRecord', { member: v_660822, goods_code: v_bb5572, phone_no: v_3b9397, txHash: v_359525, amount: v_f63e09 });
+  return v_3393e3.data;
+};
+
+export const v_324bd9 = async (
+  v_660822,
+  v_8c0b26,
+  v_359525,
+  v_f63e09,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/purchaseXrunItemRecord', { member: v_660822, item: v_8c0b26, txHash: v_359525, amount: v_f63e09 });
+  return v_3393e3.data;
 };
 
 export const v_9c9f1b = async (

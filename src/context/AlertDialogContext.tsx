@@ -1,4 +1,5 @@
 import v_a3453e, { v_af12cb, v_76a8a9, v_e662ae, v_4a8ba2, v_5ab095 } from 'bapkr';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_3a67b0, v_eaf177 } from '../components/ChoiceDialog';
 import { v_c2fdd1 } from '../components/Dialog';
 import { v_19b633, v_3094a2, v_472849 } from 'rcmrninabrnb';
@@ -21,6 +22,7 @@ interface AlertDialogContextValue {
 const v_ec4174 = v_af12cb<AlertDialogContextValue | undefined>(undefined);
 
 export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
+  const { t: v_8d41d7 } = v_772971();
   const v_580dd6 = v_e662ae<v_eaf177>(null);
   const [v_21132d, v_8619cf] = v_5ab095(false);
   const [v_9762fc, v_b8817e] = v_5ab095(false);
@@ -45,7 +47,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     return new Promise((v_6f7712) => {
 
       if (!v_3d694a || v_3d694a.length === 0 || v_3d694a.length === 1) {
-        const v_c2a02a = v_3d694a?.[0]?.text || '확인';
+        const v_c2a02a = v_3d694a?.[0]?.text || v_8d41d7('common.buttons.confirm');
         const v_059529 = v_3d694a?.[0]?.onPress;
 
         v_af9459({
@@ -156,7 +158,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
         onClose={v_4519dd?.hideCloseButton ? undefined : v_cb6b8d}
         actions={[
           {
-            label: v_4519dd?.buttons?.[0]?.text || '확인',
+            label: v_4519dd?.buttons?.[0]?.text || v_8d41d7('common.buttons.confirm'),
             onPress: v_cb6b8d,
             variant: 'primary',
           },

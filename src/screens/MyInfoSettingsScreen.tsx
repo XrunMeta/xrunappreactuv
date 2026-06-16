@@ -4,7 +4,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
-import { v_1bfbd0, v_731ab4, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
   v_650134,
@@ -15,10 +15,12 @@ import {
   v_8b775f,
   v_415b23,
 } from '../services';
+import { v_4b1173 } from '../context/AlertDialogContext';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_7b4f11, v_7f8510] = v_5ab095(false);
   const [v_ea6ee8, v_3a1e39] = v_5ab095<{
     androidCurrent: number;
@@ -148,29 +150,7 @@ export const v_4a40b2 = () => {
           >
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletPrivateKeyGoogleAuth)}
-          >
-            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.walletBackup')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletRestore)}
-          >
-            <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.walletRestore')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={v_d81136.card}
-            activeOpacity={0.85}
-            onPress={() => v_9b57fc(v_ce4741.walletKeyGuide)}
-          >
-            <Text style={v_d81136.cardText}>
-              {v_8d41d7('screens.myInfoSettings.walletKeyGuide')}
-            </Text>
-          </TouchableOpacity>
+          {}
           <TouchableOpacity
             style={v_d81136.card}
             activeOpacity={0.85}

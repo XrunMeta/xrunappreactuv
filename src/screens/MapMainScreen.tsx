@@ -47,6 +47,7 @@ import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
+import { v_ecc3ca, v_5ed938 } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -412,8 +413,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         if (v_717992 == null || !v_b4e012) return;
 
+        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const v_dabeaa = v_b4e012.toLowerCase().trim();
-        if (v_dabeaa !== 'oth-test@example.invalid') return;
+        if (!v_7cbea7.includes(v_dabeaa)) return;
 
         const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
         const v_9034c6 = (v_9e86fd) =>
@@ -428,8 +430,41 @@ export const MapMainScreen: v_a3453e.FC = () => {
             return { memberId: v_717992, email: v_dabeaa };
           });
           v_f4280a(true);
+          return;
         }
 
+        const v_b5ce2e = v_1e6eca.eth === null && v_1e6eca.pol === null;
+        if (v_b5ce2e) {
+
+          const v_53cc65 = `restoreLaterDismissedAt:${v_dabeaa}`;
+          try {
+            const v_620175 = await v_e84827.getItem(v_53cc65);
+            if (v_620175) {
+              const v_e56026 = Date.now() - Number(v_620175);
+              if (v_e56026 < 10 * 60 * 1000) {
+
+                return;
+              }
+            }
+          } catch {  }
+          const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null, ok: false }));
+          if (v_2008a4) return;
+          console.log('[MapMain] AT 상태', v_5a9fc7, 'email=', v_dabeaa, 'member=', v_717992);
+          const v_7be387 = await v_889fad(
+            v_8d41d7('screens.walletRestore.restoreNeededTitle'),
+            v_8d41d7('screens.walletRestore.restoreNeededMessage'),
+            [
+              { text: v_8d41d7('screens.walletRestore.restoreLater') },
+              { text: v_8d41d7('screens.walletRestore.restoreNow') },
+            ],
+          );
+          if (v_7be387 === 1) {
+            v_9b57fc(v_ce4741.walletRestore);
+          } else {
+
+            try { await v_e84827.setItem(v_53cc65, String(Date.now())); } catch {  }
+          }
+        }
       } catch {
 
       }

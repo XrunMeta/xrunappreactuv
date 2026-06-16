@@ -84,8 +84,8 @@ export const v_305be8 = () => {
       await v_889fad(v_8d41d7('screens.xplayInfo.alerts.notification'), v_8d41d7('screens.xplayInfo.alerts.userInfoUnavailable'));
       return;
     }
-    await v_a3bbf0(v_8d41d7, { email: v_f4fb5e }, v_889fad, v_9b57fc);
-  }, [v_f4fb5e, v_889fad, v_8d41d7, v_9b57fc]);
+    await v_a3bbf0(v_8d41d7, { email: v_f4fb5e, member: v_717992 ? Number(v_717992) : undefined }, v_889fad, v_9b57fc);
+  }, [v_f4fb5e, v_717992, v_889fad, v_8d41d7, v_9b57fc]);
 
   return (
     <SafeView style={v_d81136.container}>

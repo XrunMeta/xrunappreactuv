@@ -3,6 +3,8 @@ export default {
   firstName: 'नाम',
   lastName: 'उपनाम',
   email: 'ईमेल',
+  password: 'पासवर्ड',
+  changePassword: 'पासवर्ड बदलें',
   phone: 'फोन',
   region: 'क्षेत्र',
   selectCountry: 'देश चुनें',

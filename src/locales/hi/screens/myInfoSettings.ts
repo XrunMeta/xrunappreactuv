@@ -5,8 +5,9 @@ export default {
   pushNotificationsOn: 'चालू',
   pushNotificationsOff: 'बंद',
   languageSelect: 'भाषा चुनें',
-  walletBackup: 'Backup Wallet Keys',
-  walletRestore: 'Restore Wallet Keys',
+  walletBackup: 'बैकअप',
+  walletRestore: 'पुनर्स्थापित',
+  walletKeyGuide: 'गाइड',
 };
 
 

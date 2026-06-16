@@ -8,6 +8,8 @@ export default {
   settlement: '结算列表',
   rank: '排名',
   referralLabel: '推荐',
+  pending: '待支付',
+  paid: '已支付',
 };
 
 

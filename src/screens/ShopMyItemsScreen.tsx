@@ -21,7 +21,7 @@ interface MyItemData {
     brand: string;
     title: string;
     image: v_07a341;
-    status: 'available' | 'used';
+    status: 'available' | 'used' | 'pending';
     purchaseDate: string;
     tr_id?: string;
 
@@ -37,8 +37,10 @@ interface MyItemData {
     isTransferTicket?: boolean;
 }
 
-function v_52c82e(v_03cc9e): 'available' | 'used' {
-  return v_03cc9e === '01' ? 'available' : 'used';
+function v_52c82e(v_03cc9e): 'available' | 'used' | 'pending' {
+  if (v_03cc9e === '01') return 'available';
+  if (v_03cc9e === '99') return 'pending';
+  return 'used';
 }
 
 function v_2d457b(coupon: v_a649c5): boolean {
@@ -118,7 +120,11 @@ function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
     txID: v_e2a85c.txID,
     item: v_e2a85c.item,
     sortKey: v_45efe3,
-  };
+
+    description: (v_e2a85c as any).description ?? '',
+    paidXrun: (v_e2a85c as any).paidXrun ?? null,
+    priceXrun: (v_e2a85c as any).priceXrun ?? null,
+  } as any;
 }
 
 export const v_8c1d95 = () => {
@@ -261,6 +267,7 @@ export const v_8c1d95 = () => {
 
     const v_f24e20 = (v_8c0b26) => {
         const v_2911e0 = v_8c0b26.status === 'available';
+        const v_6e3315 = v_8c0b26.status === 'pending';
         const v_41844b = v_8c0b26.image && typeof v_8c0b26.image === 'object' && 'uri' in (v_8c0b26.image as any);
         const v_fafc7f = v_41844b && v_ba33a5.has(v_8c0b26.id) ? v_818aa7 : v_8c0b26.image;
 
@@ -284,9 +291,9 @@ export const v_8c1d95 = () => {
                         <View style={v_d81136.itemInfo}>
                             <View style={v_d81136.itemTitleRow}>
                                 <Text style={v_d81136.itemBrand}>{v_8c0b26.brand === 'SHOP' ? v_8d41d7('screens.shop.shopBrand') : v_8c0b26.brand}</Text>
-                                <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_d81136.statusTagUsed]}>
-                                    <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_d81136.statusTagTextUsed]}>
-                                        {v_2911e0 ? v_8d41d7('screens.shop.availableShort') : v_8d41d7('screens.shop.usedShort')}
+                                <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_6e3315 ? v_d81136.statusTagPending : v_d81136.statusTagUsed]}>
+                                    <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_6e3315 ? v_d81136.statusTagTextPending : v_d81136.statusTagTextUsed]}>
+                                        {v_2911e0 ? v_8d41d7('screens.shop.availableShort') : v_6e3315 ? v_8d41d7('screens.shop.pendingShort') : v_8d41d7('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -297,9 +304,35 @@ export const v_8c1d95 = () => {
                     </View>
                     <Text style={v_d81136.purchaseDate}>{v_8d41d7('screens.shop.purchaseDateLabel')}: {v_8c0b26.purchaseDate}</Text>
                     {v_2911e0 && v_8c0b26.type === 'xrun' && v_8c0b26.isTransferTicket === false ? (
-                        <View style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}>
+
+                        <TouchableOpacity
+                            style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+
+                                const v_983c87 = {
+                                    id: String(v_8c0b26.item ?? v_8c0b26.id),
+                                    title: v_8c0b26.title,
+                                    priceLabel: '',
+                                    image: v_8c0b26.image,
+                                    detailTotal: '',
+                                    brand: v_8c0b26.brand,
+                                    isXrun: true,
+                                    storage: v_8c0b26.storage,
+                                    txID: v_8c0b26.txID,
+                                    item: v_8c0b26.item,
+                                    isPurchased: true,                        
+                                    description: (v_8c0b26 as any).description,
+                                    paidXrun: (v_8c0b26 as any).paidXrun,
+                                    priceXrun: (v_8c0b26 as any).priceXrun,       
+                                    purchaseDate: v_8c0b26.purchaseDate,
+                                };
+                                v_d0fbad(v_983c87 as any);
+                                v_9b57fc(v_ce4741.shopProductDetail);
+                            }}
+                        >
                             <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>{v_8d41d7('screens.shop.thankYou')}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ) : v_2911e0 ? (
                         <TouchableOpacity
                             style={v_d81136.useButton}
@@ -576,6 +609,10 @@ const v_d81136 = v_472849.create({
     statusTagUsed: {
         backgroundColor: '#F5F5F5',
     },
+
+    statusTagPending: {
+        backgroundColor: '#FFF7E6',
+    },
     statusTagText: {
         fontSize: 10,
         fontFamily: 'Roboto-Medium',
@@ -585,6 +622,9 @@ const v_d81136 = v_472849.create({
     },
     statusTagTextUsed: {
         color: '#707070',
+    },
+    statusTagTextPending: {
+        color: '#FA8C16',
     },
     purchaseDate: {
         fontSize: 12,

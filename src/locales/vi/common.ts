@@ -1,4 +1,5 @@
 export default {
+  notice: 'Thông báo',
   buttons: {
     submit: 'Gửi',
     cancel: 'Hủy',

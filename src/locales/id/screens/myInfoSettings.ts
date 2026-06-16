@@ -5,8 +5,9 @@ export default {
   pushNotificationsOn: 'Aktif',
   pushNotificationsOff: 'Nonaktif',
   languageSelect: 'Pilih Bahasa',
-  walletBackup: 'Backup Wallet Keys',
-  walletRestore: 'Restore Wallet Keys',
+  walletBackup: 'Cadangkan',
+  walletRestore: 'Pulihkan',
+  walletKeyGuide: 'Panduan',
 };
 
 

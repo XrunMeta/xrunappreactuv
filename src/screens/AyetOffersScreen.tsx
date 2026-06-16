@@ -15,6 +15,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_a61db3, v_1bfbd0 } from '../constants';
 import { v_5e4f0b } from '../services/ayet';
+import { v_8a1e5d } from '../utils';
 
 const v_e56d32 = v_326be8.OS === 'ios' ? '25755' : '25617';
 
@@ -128,9 +129,24 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
             v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] App Store open 실패:', v_9e86fd));
             return false;
           }
-          if (v_f71b56.startsWith('market://') || v_f71b56.startsWith('intent://')) {
+          if (v_f71b56.startsWith('intent://')) {
+
             v_eb8c24.current = true;
-            v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => console.warn('[ayeT WebView] Play Store/Intent open 실패:', v_9e86fd));
+            v_8a1e5d(v_f71b56);
+            return false;
+          }
+          if (v_f71b56.startsWith('market://')) {
+            v_eb8c24.current = true;
+            v_f2c756.openURL(v_f71b56).catch((v_9e86fd) => {
+
+              const v_ae8a0a = v_f71b56.match(/[?&]id=([^&#]+)/);
+              if (v_ae8a0a?.[1]) {
+                v_f2c756.openURL('https://play.google.com/store/apps/details?id=' + v_ae8a0a[1])
+                  .catch((v_85f11a) => console.warn('[ayeT WebView] Play Store fallback 실패:', v_85f11a));
+              } else {
+                console.warn('[ayeT WebView] market:// open 실패:', v_9e86fd);
+              }
+            });
             return false;
           }
           return true;

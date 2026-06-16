@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'Tidak dapat mengambil informasi email.',
   title: 'Masuk',
 
   tabs: {
@@ -16,7 +17,7 @@ export default {
   loginButton: 'Masuk',
   disclaimer: 'Jika Anda lupa kata sandi, Anda dapat masuk dengan login sosial atau login OTP email.',
   emailVerification: 'Verifikasi Email',
-  orLoginWith: 'Or login in with',
+  orLoginWith: 'Atau masuk dengan',
 
   otp: {
     rememberMe: 'Tetap masuk',

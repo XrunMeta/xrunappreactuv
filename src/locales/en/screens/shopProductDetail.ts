@@ -28,6 +28,9 @@ export default {
   viewMyGift: 'View My Gift Cards',
   alerts: {
     notification: 'Notice',
+    couponSendFail: 'Coupon send failed',
+    paymentCompletePendingCouponTitle: 'Payment complete / Coupon pending',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\nPayment is complete. The coupon will be sent automatically or manually shortly. ({{tx}}…)',
     phoneNotRegistered: 'Recipient phone number is not registered. Please register in My Page.',
     insufficientXRUN: 'Insufficient XRUN balance.',
     insufficientXplay: 'Insufficient XRUN balance.',

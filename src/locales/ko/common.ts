@@ -1,4 +1,5 @@
 export default {
+  notice: '알림',
   cancel: '취소',
   confirm: '확인',
   buttons: {
