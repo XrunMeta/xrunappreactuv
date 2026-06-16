@@ -79,7 +79,8 @@ import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
 import { v_e90247 } from './src/screens/AdisonTestScreen';
 
-import { v_00e8f9, v_a0daa8 } from './src/navigation';
+import { v_00e8f9, v_a0daa8, v_ce4741 } from './src/navigation';
+import type { v_5681b1 } from './src/types';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
@@ -129,7 +130,7 @@ let v_435733 = false;
 
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
-  const { setSignupFormData: v_eee6b0 } = v_700ef9();
+  const { setSignupFormData: v_eee6b0, setSelectedWalletAsset: v_84bd3c } = v_700ef9();
 
   v_c4deb2(() => {
     let v_2008a4 = false;
@@ -147,6 +148,28 @@ const v_c0dbdf = () => {
     })();
     return () => { v_2008a4 = true; };
   }, []);
+
+  v_c4deb2(() => {
+    const v_14b011 = (response: v_2b7a17.NotificationResponse) => {
+      try {
+        const xrunPolAsset: v_5681b1 = {
+          id: 18, symbol: 'XRUN', name: 'XRUN', amount: '0', icon: '', currency: 18, isCustom: false,
+        };
+        v_84bd3c(v_998d47);
+        v_9b57fc(v_ce4741.walletDetail);
+      } catch (v_9e86fd) {
+        console.warn('[push tap] navigate fail:', v_9e86fd);
+      }
+    };
+
+    const v_1ae212 = v_2b7a17.addNotificationResponseReceivedListener(v_14b011);
+
+    v_2b7a17.getLastNotificationResponseAsync()
+      .then((v_eb792a) => { if (v_eb792a) v_14b011(v_eb792a); })
+      .catch(() => {});
+
+    return () => { v_1ae212.remove(); };
+  }, [v_9b57fc, v_84bd3c]);
 
   v_c4deb2(() => {
 
