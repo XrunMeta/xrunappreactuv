@@ -53,7 +53,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_ENV": "preview"
+        "EXPO_PUBLIC_API_ENV": "production"
       }
     },
     "production": {
