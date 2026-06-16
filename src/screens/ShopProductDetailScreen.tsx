@@ -912,7 +912,8 @@ export const ShopProductDetailScreen = () => {
                         const kind = purchaseCtx.kind;
                         try {
 
-                            const target = wallets.find((w) => w.wallet_code === 'c18');
+                            const target = wallets.find((w) => w.wallet_code === 'c18')
+                                ?? wallets.find((w) => w.wallet_code === 'c16');
                             if (!target?.private_key) {
                                 throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
                             }
