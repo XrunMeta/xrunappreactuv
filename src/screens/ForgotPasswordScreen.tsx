@@ -1,6 +1,7 @@
 import { v_e662ae, v_5ab095 } from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_39a996, v_472849, v_79c4f2 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_570c34, v_368e80, v_cb41de, v_729608 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -20,6 +21,8 @@ export const v_040c8f = () => {
   const [v_c99bd2, v_537cbb] = v_5ab095('');
   const [v_a85523, v_f8869d] = v_5ab095('');
   const [v_f3c499, v_7763dd] = v_5ab095('');
+  const [v_3c03d9, v_9a358b] = v_5ab095(false);
+  const [v_4df534, v_7dbd17] = v_5ab095(false);
   const [v_cd31a8, v_deef62] = v_5ab095(false);
   const v_56c646 = v_e662ae<v_79c4f2>(null);
 
@@ -162,12 +165,26 @@ export const v_040c8f = () => {
 
         {v_2ae4e7 === 'password' && (
           <>
-            <FormField label={v_bee4c1('password.newLabel')} placeholder={v_bee4c1('password.newPlaceholder')}
-              secureTextEntry value={v_a85523} onChangeText={v_f8869d} editable={!v_cd31a8}
-              containerStyle={v_d81136.fieldContainer} />
-            <FormField label={v_bee4c1('password.confirmLabel')} placeholder={v_bee4c1('password.confirmPlaceholder')}
-              secureTextEntry value={v_f3c499} onChangeText={v_7763dd} editable={!v_cd31a8}
-              containerStyle={v_d81136.fieldContainer} />
+            <FormField
+              label={v_bee4c1('password.newLabel')} placeholder={v_bee4c1('password.newPlaceholder')}
+              secureTextEntry={!v_3c03d9} value={v_a85523} onChangeText={v_f8869d}
+              editable={!v_cd31a8} autoCapitalize="none" containerStyle={v_d81136.fieldContainer}
+              rightAccessory={
+                <TouchableOpacity onPress={() => v_9a358b(v_81e2ef => !v_81e2ef)} activeOpacity={0.7} disabled={v_cd31a8} style={v_d81136.eyeButton}>
+                  <Ionicons name={v_3c03d9 ? 'eye-outline' : 'eye-off-outline'} size={20} color="#666666" />
+                </TouchableOpacity>
+              }
+            />
+            <FormField
+              label={v_bee4c1('password.confirmLabel')} placeholder={v_bee4c1('password.confirmPlaceholder')}
+              secureTextEntry={!v_4df534} value={v_f3c499} onChangeText={v_7763dd}
+              editable={!v_cd31a8} autoCapitalize="none" containerStyle={v_d81136.fieldContainer}
+              rightAccessory={
+                <TouchableOpacity onPress={() => v_7dbd17(v_81e2ef => !v_81e2ef)} activeOpacity={0.7} disabled={v_cd31a8} style={v_d81136.eyeButton}>
+                  <Ionicons name={v_4df534 ? 'eye-outline' : 'eye-off-outline'} size={20} color="#666666" />
+                </TouchableOpacity>
+              }
+            />
             <View style={v_d81136.buttonWrapper}>
               {v_cd31a8
                 ? <ActivityIndicator size="small" color="#000" />
@@ -185,6 +202,7 @@ const v_d81136 = v_472849.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scrollContent: { padding: 20, flexGrow: 1 },
   fieldContainer: { marginBottom: 14 },
+  eyeButton: { paddingHorizontal: 4, paddingVertical: 4 },
   buttonWrapper: { width: '100%', maxWidth: 780, alignSelf: 'center', marginTop: 10, marginBottom: 16 },
   linkRow: { alignItems: 'center', padding: 8 },
   linkText: { fontSize: 13, color: '#000' },
