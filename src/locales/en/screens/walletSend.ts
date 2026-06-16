@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: 'Please enter the recipient wallet address first',
+  hintEnterAmount: 'Please enter the amount to send',
   title: 'Sending',
   balance: 'Balance',
   amount: 'Amount',

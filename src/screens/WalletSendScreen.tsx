@@ -608,8 +608,8 @@ export const WalletSendScreen = () => {
 
               const hasValidAddress = receiverAddress && receiverAddress.trim().length > 0 && receiverAddress.startsWith('0x');
               const hintText = !hasValidAddress
-                ? '먼저 받는 분의 지갑 주소를 입력해주세요'
-                : '보낼 금액을 입력해주세요';
+                ? t('screens.walletSend.hintEnterAddressFirst')
+                : t('screens.walletSend.hintEnterAmount');
               return <Text style={styles.helperHintText}>{hintText}</Text>;
             }
 

@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: '先に受取人のウォレットアドレスを入力してください',
+  hintEnterAmount: '送金額を入力してください',
   title: '送金',
   balance: '残高',
   amount: '金額',
