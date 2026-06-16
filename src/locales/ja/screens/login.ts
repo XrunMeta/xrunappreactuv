@@ -17,7 +17,7 @@ export default {
   loginButton: 'ログイン',
   disclaimer: 'パスワードを忘れた場合は、ソーシャルログインまたはメールOTPログインでログインできます。',
   emailVerification: 'メール認証',
-  orLoginWith: 'Or login in with',
+  orLoginWith: '他の方法でログイン',
 
   otp: {
     rememberMe: 'ログイン状態を維持する',
