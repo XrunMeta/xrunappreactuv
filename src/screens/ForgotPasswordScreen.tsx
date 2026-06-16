@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { SafeScrollView, FormField, PrimaryButton, Header } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -20,6 +21,8 @@ export const ForgotPasswordScreen = () => {
   const [code, setCode] = useState('');
   const [newPin, setNewPin] = useState('');
   const [newPinConfirm, setNewPinConfirm] = useState('');
+  const [isPinVisible, setIsPinVisible] = useState(false);
+  const [isPinConfirmVisible, setIsPinConfirmVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const hiddenInputRef = useRef<TextInput>(null);
 
@@ -162,12 +165,26 @@ export const ForgotPasswordScreen = () => {
 
         {stage === 'password' && (
           <>
-            <FormField label={tr('password.newLabel')} placeholder={tr('password.newPlaceholder')}
-              secureTextEntry value={newPin} onChangeText={setNewPin} editable={!isLoading}
-              containerStyle={styles.fieldContainer} />
-            <FormField label={tr('password.confirmLabel')} placeholder={tr('password.confirmPlaceholder')}
-              secureTextEntry value={newPinConfirm} onChangeText={setNewPinConfirm} editable={!isLoading}
-              containerStyle={styles.fieldContainer} />
+            <FormField
+              label={tr('password.newLabel')} placeholder={tr('password.newPlaceholder')}
+              secureTextEntry={!isPinVisible} value={newPin} onChangeText={setNewPin}
+              editable={!isLoading} autoCapitalize="none" containerStyle={styles.fieldContainer}
+              rightAccessory={
+                <TouchableOpacity onPress={() => setIsPinVisible(v => !v)} activeOpacity={0.7} disabled={isLoading} style={styles.eyeButton}>
+                  <Ionicons name={isPinVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#666666" />
+                </TouchableOpacity>
+              }
+            />
+            <FormField
+              label={tr('password.confirmLabel')} placeholder={tr('password.confirmPlaceholder')}
+              secureTextEntry={!isPinConfirmVisible} value={newPinConfirm} onChangeText={setNewPinConfirm}
+              editable={!isLoading} autoCapitalize="none" containerStyle={styles.fieldContainer}
+              rightAccessory={
+                <TouchableOpacity onPress={() => setIsPinConfirmVisible(v => !v)} activeOpacity={0.7} disabled={isLoading} style={styles.eyeButton}>
+                  <Ionicons name={isPinConfirmVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#666666" />
+                </TouchableOpacity>
+              }
+            />
             <View style={styles.buttonWrapper}>
               {isLoading
                 ? <ActivityIndicator size="small" color="#000" />
@@ -185,6 +202,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scrollContent: { padding: 20, flexGrow: 1 },
   fieldContainer: { marginBottom: 14 },
+  eyeButton: { paddingHorizontal: 4, paddingVertical: 4 },
   buttonWrapper: { width: '100%', maxWidth: 780, alignSelf: 'center', marginTop: 10, marginBottom: 16 },
   linkRow: { alignItems: 'center', padding: 8 },
   linkText: { fontSize: 13, color: '#000' },
