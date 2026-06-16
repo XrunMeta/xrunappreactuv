@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'ไม่สามารถดึงข้อมูลอีเมล',
   title: 'เข้าสู่ระบบ',
 
   tabs: {

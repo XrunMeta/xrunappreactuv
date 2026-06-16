@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: '无法获取邮箱信息。',
   title: '登录',
 
   tabs: {

@@ -466,7 +466,7 @@ export const LoginScreen = () => {
 
         const email = result.data.email || '';
         if (!email) {
-          await showAlert(t('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          await showAlert(t('common.messages.error') || '오류', t('screens.login.emailFetchFail') || '이메일 정보를 가져올 수 없습니다.');
           setIsLoading(false);
           return;
         }
@@ -597,7 +597,7 @@ export const LoginScreen = () => {
 
         const email = result.data.email || '';
         if (!email) {
-          await showAlert(t('common.messages.error') || '오류', '이메일 정보를 가져올 수 없습니다.');
+          await showAlert(t('common.messages.error') || '오류', t('screens.login.emailFetchFail') || '이메일 정보를 가져올 수 없습니다.');
           setIsLoading(false);
           return;
         }
