@@ -1,4 +1,5 @@
 export default {
+  notice: 'सूचना',
   buttons: {
     submit: 'जमा करें',
     cancel: 'रद्द करें',

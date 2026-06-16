@@ -3,6 +3,8 @@ export default {
   firstName: 'Nama Depan',
   lastName: 'Nama Belakang',
   email: 'Email',
+  password: 'Kata Sandi',
+  changePassword: 'Ubah kata sandi',
   phone: 'Telepon',
   region: 'Wilayah',
   selectCountry: 'Pilih Negara',

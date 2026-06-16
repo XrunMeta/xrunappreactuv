@@ -482,19 +482,19 @@ export const ShopItemRegisterScreen = () => {
                 const response = await deleteShopItem(memberId, editItemId, navigate);
 
                 if (response.status === 'success') {
-                  await showAlert('알림', t('screens.myinfoShopSales.deleteSuccess'));
+                  await showAlert(t('common.notice'), t('screens.myinfoShopSales.deleteSuccess'));
 
                   goBack();
                 } else {
                   await showAlert(
-                    '알림',
+                    t('common.notice'),
                     t('screens.myinfoShopSales.deleteFailed'),
                   );
                 }
               } catch (error) {
                 console.error('[상품 등록] 상품 삭제 오류:', error);
                 await showAlert(
-                  '알림',
+                  t('common.notice'),
                   t('screens.myinfoShopSales.deleteFailed'),
                 );
               } finally {
