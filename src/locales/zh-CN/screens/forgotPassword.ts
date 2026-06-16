@@ -27,7 +27,7 @@ export default {
     emailRequired: '이메일을 입력해 주세요.',
     emailInvalid: '이메일 형식이 올바르지 않습니다.',
     codeSent: '인증코드를 이메일로 발송했습니다. (10분 유효)',
-    emailNotRegistered: '등록되지 않은 이메일입니다.',
+    emailNotRegistered: '此邮箱未注册。',
     sendFailed: '발송 실패',
     codeRequired: '인증코드 6자리를 입력해 주세요.',
     codeResent: '인증코드를 다시 발송했습니다.',
