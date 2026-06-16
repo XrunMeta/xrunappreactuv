@@ -912,7 +912,8 @@ export const v_a59951 = () => {
                         const v_94302c = v_d49490.kind;
                         try {
 
-                            const v_5f5d6d = v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c18');
+                            const v_5f5d6d = v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c18')
+                                ?? v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c16');
                             if (!v_5f5d6d?.private_key) {
                                 throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
                             }
