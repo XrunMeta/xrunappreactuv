@@ -405,6 +405,27 @@ export const WalletScreen = () => {
     }
   }, [cardsData, customTokens, adXrunAmount, referralAmount, combineTokenData]);
 
+  const pushAutoNavConsumed = useRef(false);
+  useEffect(() => {
+    if (pushAutoNavConsumed.current) return;
+    if (combinedAssets.length === 0) return;
+    (async () => {
+      try {
+        const flag = await AsyncStorage.getItem('pendingPushWalletNav');
+        if (flag !== 'xrun_pol') return;
+        pushAutoNavConsumed.current = true;
+        await AsyncStorage.removeItem('pendingPushWalletNav');
+        const target = combinedAssets.find((a) => Number(a.currency) === 18);
+        if (target) {
+          setSelectedWalletAsset(target);
+          navigate(ROUTES.walletDetail);
+        }
+      } catch (e) {
+        if (__DEV__) console.warn('[WalletScreen] push auto nav fail:', e);
+      }
+    })();
+  }, [combinedAssets, navigate, setSelectedWalletAsset]);
+
   useEffect(() => {
     if (!member) return;
 

@@ -157,6 +157,8 @@ const ScreenHost = () => {
           navigate(ROUTES.myInfoNotify);
           return;
         }
+
+        AsyncStorage.setItem('pendingPushWalletNav', 'xrun_pol').catch(() => {});
         navigate(ROUTES.wallet);
       } catch (e) {
         console.warn('[push tap] navigate fail:', e);
