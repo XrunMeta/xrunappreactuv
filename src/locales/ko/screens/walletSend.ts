@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: '먼저 받는 분의 지갑 주소를 입력해주세요',
+  hintEnterAmount: '보낼 금액을 입력해주세요',
   title: '보내기',
   balance: '잔액',
   amount: '금액',
