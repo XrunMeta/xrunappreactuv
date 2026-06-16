@@ -241,8 +241,31 @@ export const MapMainScreen: v_a3453e.FC = () => {
       try {
         const v_483de2 = await v_e84827.getItem(v_019a30);
         const v_0ba044 = await v_e84827.getItem(v_4e5f7b);
+
         if (v_235370(v_483de2, v_0ba044)) {
           await v_e84827.removeItem(v_019a30);
+          v_9b57fc(v_ce4741.walletKeyTutorial);
+          return;
+        }
+
+        if (v_0ba044 === 'true') return;
+        const v_56b352 = await v_e84827.getItem('jwt');
+        const v_717992 = v_56b352 ? v_9bbbdc(v_56b352) : null;
+        let v_b4e012 = await v_e84827.getItem('userEmail');
+        if (!v_b4e012) {
+          try {
+            const v_f21c33 = await v_e84827.getItem('userData');
+            if (v_f21c33) v_b4e012 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
+          } catch {  }
+        }
+        if (v_717992 == null || !v_b4e012) return;
+        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+        const v_dabeaa = v_b4e012.toLowerCase().trim();
+        if (!v_7cbea7.includes(v_dabeaa)) return;
+        const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
+        const v_9034c6 = (v_9e86fd) =>
+          v_9e86fd !== null && v_9e86fd.s === 's0' && !v_9e86fd.h;
+        if (v_9034c6(v_1e6eca.eth) || v_9034c6(v_1e6eca.pol)) {
           v_9b57fc(v_ce4741.walletKeyTutorial);
         }
       } catch (v_9e86fd) {
