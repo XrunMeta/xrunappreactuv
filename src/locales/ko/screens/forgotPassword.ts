@@ -36,7 +36,8 @@ export default {
     passwordPolicy: '비밀번호는 7자 이상이며 영문 대/소문자 및 숫자를 포함해야 합니다.',
     passwordMismatch: '비밀번호가 일치하지 않습니다.',
     resetSuccess: '비밀번호가 재설정되었습니다. 다시 로그인해 주세요.',
-    codeInvalid: '인증코드가 잘못되었거나 만료되었습니다.',
+    codeInvalid: '인증코드가 잘못되었습니다. 가장 최근 이메일의 코드를 확인해주세요.',
+    codeExpired: '인증코드가 만료되었습니다. 다시 발급해주세요.',
     resetFailed: '비밀번호 재설정 실패',
   },
 };

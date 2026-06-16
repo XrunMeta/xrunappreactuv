@@ -36,7 +36,8 @@ export default {
     passwordPolicy: 'パスワードは 7 文字以上で、英大文字/小文字および数字を含む必要があります。',
     passwordMismatch: 'パスワードが一致しません。',
     resetSuccess: 'パスワードがリセットされました。再度ログインしてください。',
-    codeInvalid: '認証コードが無効または期限切れです。',
+    codeInvalid: '認証コードが正しくありません。最新のメールのコードを確認してください。',
+    codeExpired: '認証コードの有効期限が切れました。再発行してください。',
     resetFailed: 'パスワードリセット失敗',
   },
 };

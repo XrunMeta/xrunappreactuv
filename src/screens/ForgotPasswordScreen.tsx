@@ -86,7 +86,14 @@ export const ForgotPasswordScreen = () => {
       await showAlert(tr('alerts.done'), tr('alerts.resetSuccess'), [
         { text: tr('alerts.confirm'), onPress: () => navigate(ROUTES.login) },
       ]);
+    } else if (res.code === 410) {
+
+      await showAlert(tr('alerts.notice'), tr('alerts.codeExpired'), [
+        { text: tr('alerts.reissue'), onPress: () => setStage('email') },
+        { text: tr('alerts.confirm'), style: 'cancel' },
+      ]);
     } else if (res.code === 401) {
+
       await showAlert(tr('alerts.notice'), tr('alerts.codeInvalid'), [
         { text: tr('alerts.reissue'), onPress: () => setStage('email') },
         { text: tr('alerts.confirm'), style: 'cancel' },

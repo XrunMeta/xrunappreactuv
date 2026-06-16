@@ -36,7 +36,8 @@ export default {
     passwordPolicy: '密码至少 7 个字符，必须包含英文大小写和数字。',
     passwordMismatch: '密码不一致。',
     resetSuccess: '密码已重置，请重新登录。',
-    codeInvalid: '验证码无效或已过期。',
+    codeInvalid: '验证码错误。请使用最新邮件中的验证码。',
+    codeExpired: '验证码已过期，请重新发送。',
     resetFailed: '密码重置失败',
   },
 };

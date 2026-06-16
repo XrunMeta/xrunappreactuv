@@ -36,7 +36,8 @@ export default {
     passwordPolicy: 'Mật khẩu phải có ít nhất 7 ký tự và bao gồm chữ hoa/thường và số.',
     passwordMismatch: 'Mật khẩu không khớp.',
     resetSuccess: 'Mật khẩu đã được đặt lại. Vui lòng đăng nhập lại.',
-    codeInvalid: 'Mã xác minh không hợp lệ hoặc đã hết hạn.',
+    codeInvalid: 'Mã không hợp lệ. Vui lòng dùng mã từ email mới nhất.',
+    codeExpired: 'Mã đã hết hạn. Vui lòng yêu cầu mã mới.',
     resetFailed: 'Đặt lại mật khẩu thất bại',
   },
 };

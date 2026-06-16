@@ -435,10 +435,21 @@ export const MapMainScreen: React.FC = () => {
 
         const vaultEmpty = entries.eth === null && entries.pol === null;
         if (vaultEmpty) {
+
+          const dismissKey = `restoreLaterDismissedAt:${normEmail}`;
+          try {
+            const dismissedAt = await AsyncStorage.getItem(dismissKey);
+            if (dismissedAt) {
+              const elapsed = Date.now() - Number(dismissedAt);
+              if (elapsed < 10 * 60 * 1000) {
+
+                return;
+              }
+            }
+          } catch {  }
           const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
           if (cancelled) return;
           console.log('[MapMain] AT 상태', atStatus, 'email=', normEmail, 'member=', memberId);
-
           const choice = await showAlert(
             t('screens.walletRestore.restoreNeededTitle'),
             t('screens.walletRestore.restoreNeededMessage'),
@@ -449,6 +460,9 @@ export const MapMainScreen: React.FC = () => {
           );
           if (choice === 1) {
             navigate(ROUTES.walletRestore);
+          } else {
+
+            try { await AsyncStorage.setItem(dismissKey, String(Date.now())); } catch {  }
           }
         }
       } catch {
