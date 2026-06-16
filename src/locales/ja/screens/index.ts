@@ -59,3 +59,5 @@ export { default as pangleList } from './pangleList';
 export { default as walletPrivateKeyGoogleAuth } from './walletPrivateKeyGoogleAuth';
 export { default as paymentPin } from './paymentPin';
 export { default as emailOtp } from './emailOtp';
+export { default as walletRestore } from './walletRestore';
+export { default as walletKeyTutorial } from './walletKeyTutorial';

@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: 'कृपया पहले प्राप्तकर्ता का वॉलेट पता दर्ज करें',
+  hintEnterAmount: 'कृपया भेजी जाने वाली राशि दर्ज करें',
   title: 'Sending',
   balance: 'Balance',
   amount: 'Amount',

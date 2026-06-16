@@ -21,7 +21,7 @@ interface MyItemData {
     brand: string;
     title: string;
     image: ImageSourcePropType;
-    status: 'available' | 'used';
+    status: 'available' | 'used' | 'pending';
     purchaseDate: string;
     tr_id?: string;
 
@@ -37,8 +37,10 @@ interface MyItemData {
     isTransferTicket?: boolean;
 }
 
-function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' {
-  return pin_status === '01' ? 'available' : 'used';
+function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' | 'pending' {
+  if (pin_status === '01') return 'available';
+  if (pin_status === '99') return 'pending';
+  return 'used';
 }
 
 function isCancelledGiftishowCoupon(coupon: MyGiftishowCouponItem): boolean {
@@ -118,7 +120,11 @@ function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemD
     txID: p.txID,
     item: p.item,
     sortKey,
-  };
+
+    description: (p as any).description ?? '',
+    paidXrun: (p as any).paidXrun ?? null,
+    priceXrun: (p as any).priceXrun ?? null,
+  } as any;
 }
 
 export const ShopMyItemsScreen = () => {
@@ -261,6 +267,7 @@ export const ShopMyItemsScreen = () => {
 
     const renderItemCard = (item: MyItemData) => {
         const isAvailable = item.status === 'available';
+        const isPending = item.status === 'pending';
         const isRemoteImage = item.image && typeof item.image === 'object' && 'uri' in (item.image as any);
         const displayImage = isRemoteImage && failedImageIds.has(item.id) ? defaultCouponImage : item.image;
 
@@ -284,9 +291,9 @@ export const ShopMyItemsScreen = () => {
                         <View style={styles.itemInfo}>
                             <View style={styles.itemTitleRow}>
                                 <Text style={styles.itemBrand}>{item.brand === 'SHOP' ? t('screens.shop.shopBrand') : item.brand}</Text>
-                                <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : styles.statusTagUsed]}>
-                                    <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : styles.statusTagTextUsed]}>
-                                        {isAvailable ? t('screens.shop.availableShort') : t('screens.shop.usedShort')}
+                                <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : isPending ? styles.statusTagPending : styles.statusTagUsed]}>
+                                    <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : isPending ? styles.statusTagTextPending : styles.statusTagTextUsed]}>
+                                        {isAvailable ? t('screens.shop.availableShort') : isPending ? t('screens.shop.pendingShort') : t('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -297,9 +304,35 @@ export const ShopMyItemsScreen = () => {
                     </View>
                     <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
                     {isAvailable && item.type === 'xrun' && item.isTransferTicket === false ? (
-                        <View style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}>
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+
+                                const shopItem = {
+                                    id: String(item.item ?? item.id),
+                                    title: item.title,
+                                    priceLabel: '',
+                                    image: item.image,
+                                    detailTotal: '',
+                                    brand: item.brand,
+                                    isXrun: true,
+                                    storage: item.storage,
+                                    txID: item.txID,
+                                    item: item.item,
+                                    isPurchased: true,                        
+                                    description: (item as any).description,
+                                    paidXrun: (item as any).paidXrun,
+                                    priceXrun: (item as any).priceXrun,       
+                                    purchaseDate: item.purchaseDate,
+                                };
+                                setSelectedShopItem(shopItem as any);
+                                navigate(ROUTES.shopProductDetail);
+                            }}
+                        >
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.thankYou')}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ) : isAvailable ? (
                         <TouchableOpacity
                             style={styles.useButton}
@@ -576,6 +609,10 @@ const styles = StyleSheet.create({
     statusTagUsed: {
         backgroundColor: '#F5F5F5',
     },
+
+    statusTagPending: {
+        backgroundColor: '#FFF7E6',
+    },
     statusTagText: {
         fontSize: 10,
         fontFamily: 'Roboto-Medium',
@@ -585,6 +622,9 @@ const styles = StyleSheet.create({
     },
     statusTagTextUsed: {
         color: '#707070',
+    },
+    statusTagTextPending: {
+        color: '#FA8C16',
     },
     purchaseDate: {
         fontSize: 12,

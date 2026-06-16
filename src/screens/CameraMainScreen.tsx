@@ -1066,7 +1066,16 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       let topAd5Response = await getTopAd5(undefined, !useCache, true);
 
       if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
-        console.warn('[CameraMainScreen] TopAd5 데이터 없음');
+        console.warn('[CameraMainScreen] TopAd5 1차 응답 없음 — stored 폴백 + force refresh 재시도');
+        const stored = await getStoredTopAd5().catch(() => null);
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+          topAd5Response = stored
+        } else {
+          topAd5Response = await getTopAd5(undefined, true, true).catch(() => null) as any
+        }
+      }
+      if (!topAd5Response || !Array.isArray(topAd5Response) || topAd5Response.length === 0) {
+        console.warn('[CameraMainScreen] TopAd5 데이터 없음 (재시도도 실패)');
         setLoading(false);
         return;
       }
@@ -1108,29 +1117,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           };
         });
 
-        let completedAdsSet = new Set<string>();
-        try {
-
-          const existingCompletedAds = completedAdsSetRef.current ? new Set(completedAdsSetRef.current) : new Set<string>();
-
-          completedAdsSet = await getCompletedAdsSet(member, navigate);
-          console.log(`[CameraMainScreen] 완료된 광고 목록: ${completedAdsSet.size}개`);
-
-          const mergedSet = new Set<string>();
-          existingCompletedAds.forEach(campid => mergedSet.add(campid));
-          completedAdsSet.forEach(campid => mergedSet.add(campid));
-
-          completedAdsSetRef.current = mergedSet;
-          console.log(`[CameraMainScreen] 완료된 광고 목록 병합: 기존 ${existingCompletedAds.size}개 + 새로 ${completedAdsSet.size}개 = 총 ${mergedSet.size}개`);
-
-          removeCompletedFromRecentAds(mergedSet);
-        } catch (error) {
-          console.warn('[CameraMainScreen] 완료된 광고 목록 조회 실패 (무시):', error);
-
-          if (!completedAdsSetRef.current) {
-            completedAdsSetRef.current = new Set<string>();
-          }
+        if (!completedAdsSetRef.current) {
+          completedAdsSetRef.current = new Set<string>();
         }
+        getCompletedAdsSet(member, navigate).then((completedAdsSet) => {
+          const existing = new Set(completedAdsSetRef.current as Set<string>);
+          const mergedSet = new Set<string>();
+          existing.forEach(c => mergedSet.add(c));
+          completedAdsSet.forEach(c => mergedSet.add(c));
+          completedAdsSetRef.current = mergedSet;
+          console.log(`[CameraMainScreen] (bg) 완료광고 병합: 기존 ${existing.size} + 새 ${completedAdsSet.size} = ${mergedSet.size}`);
+          removeCompletedFromRecentAds(mergedSet);
+        }).catch(() => {  });
 
         const filteredValidatedCoinsData = validatedCoinsData;
 
@@ -1325,6 +1323,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
             try {
               organizeData(mappedCoinsData, loadedCache);
+
+              setLoading(false);
             } catch (organizeErr) {
               console.error('❌ [CameraMainScreen API] organizeData 실행 중 오류:', organizeErr);
             }
@@ -1709,6 +1709,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       });
     }
   }, [coinsData, organizeData]);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => {
+      if (!loading && tokens.length === 0) {
+        console.warn('🆘 [AR watchdog] 1s: tokens=0 → loadTokenData(true) 강제 재시도');
+        hasLoadedDataRef.current = false;
+        loadTokenData(true);
+      }
+    }, 1000);
+    const t2 = setTimeout(() => {
+      if (!loading && tokens.length === 0) {
+        console.warn('🆘 [AR watchdog] 3s: tokens=0 → loadTokenData(true) 한 번 더');
+        hasLoadedDataRef.current = false;
+        loadTokenData(true);
+      }
+    }, 3000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+
+  }, []);
 
   const refreshTopAd5Data = useCallback(async () => {
     try {
@@ -2110,6 +2129,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const needsExternalBrowser = /gpakorea\.com/i.test(urlAD);
       if (needsExternalBrowser) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
+
+        try {
+          const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+          await processAdReward(parseInt(member, 10), campid, adType, navigate);
+        } catch (rewardError: any) {
+          if (rewardError?.code !== 404 && !rewardError?.message?.includes('404')) {
+            console.warn('[showAdInModal-외부] processAdReward 실패:', rewardError);
+          }
+        }
         try {
           await Linking.openURL(urlAD);
         } catch (err) {
@@ -2425,6 +2453,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const needsExternalBrowser2 = /gpakorea\.com/i.test(urlAD);
       if (needsExternalBrowser2) {
         console.log('[다른 경로] GPA Korea 광고 — 외부 브라우저로 오픈');
+
+        try {
+          const adType = adCompany === 'pock' || adCompany === 'pointclick' || adCompany === 'POCK' ? 'pointclick' : 'nas';
+          await processAdReward(parseInt(member, 10), campid, adType, navigate);
+        } catch (rewardError: any) {
+          if (rewardError?.code !== 404 && !rewardError?.message?.includes('404')) {
+            console.warn('[다른 경로-외부] processAdReward 실패:', rewardError);
+          }
+        }
         try {
           await Linking.openURL(urlAD);
         } catch (err) {

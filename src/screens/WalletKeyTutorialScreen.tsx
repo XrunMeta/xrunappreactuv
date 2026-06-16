@@ -24,22 +24,27 @@ import {
 
 type Mode = 'signup' | 'readonly';
 
-const PAGE_ICONS = ['🔑', '💾', '🏢']; 
-
 const TutorialPage: React.FC<{
   width: number;
-  icon: string;
   title: string;
   body: string[];
-}> = ({ width, icon, title, body }) => (
+  pageIndex: number;
+  totalPages: number;
+}> = ({ width, title, body, pageIndex, totalPages }) => (
+
   <View style={[styles.page, { width }]}>
-    <Text style={styles.icon}>{icon}</Text>
-    <Text style={styles.title}>{title}</Text>
-    {body.map((line, i) => (
-      <Text key={i} style={styles.bodyLine}>
-        {`• ${line}`}
+    <View style={styles.pageInner}>
+      <Text style={styles.stepLabel}>
+        {`STEP ${pageIndex + 1} / ${totalPages}`}
       </Text>
-    ))}
+      <Text style={styles.title}>{title}</Text>
+      <View style={styles.divider} />
+      {body.map((line, i) => (
+        <Text key={i} style={styles.bodyLine}>
+          {`• ${line}`}
+        </Text>
+      ))}
+    </View>
   </View>
 );
 
@@ -79,7 +84,6 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
   }, [reset]);
 
   const pages = Array.from({ length: TOTAL_PAGES }, (_, i) => i).map((i) => ({
-    icon: PAGE_ICONS[i],
     title: t(`screens.walletKeyTutorial.page${i + 1}.title`),
     body: t(`screens.walletKeyTutorial.page${i + 1}.body`, {
       returnObjects: true,
@@ -97,9 +101,10 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={onScrollEnd}
         scrollEventThrottle={16}
+        style={{ flex: 1 }}
       >
         {pages.map((p, i) => (
-          <TutorialPage key={i} width={width} {...p} />
+          <TutorialPage key={i} width={width} pageIndex={i} totalPages={TOTAL_PAGES} {...p} />
         ))}
       </ScrollView>
 
@@ -168,21 +173,50 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  page: { paddingHorizontal: 28, paddingTop: 48, alignItems: 'center' },
-  icon: { fontSize: 72, marginBottom: 24 },
+
+  page: {
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  pageInner: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  stepLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.buttonPrimary,
+    letterSpacing: 1,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
   title: {
     fontSize: 22,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 24,
     textAlign: 'center',
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EAEAEA',
+    marginBottom: 20,
   },
   bodyLine: {
     fontSize: 15,
     lineHeight: 24,
     color: COLORS.text,
-    alignSelf: 'stretch',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   dots: { flexDirection: 'row', justifyContent: 'center', marginVertical: 16 },
   dot: {

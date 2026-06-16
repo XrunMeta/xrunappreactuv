@@ -5,8 +5,9 @@ export default {
   pushNotificationsOn: 'Bật',
   pushNotificationsOff: 'Tắt',
   languageSelect: 'Chọn ngôn ngữ',
-  walletBackup: 'Backup Wallet Keys',
-  walletRestore: 'Restore Wallet Keys',
+  walletBackup: 'Sao lưu',
+  walletRestore: 'Khôi phục',
+  walletKeyGuide: 'Hướng dẫn',
 };
 
 

@@ -4,12 +4,14 @@ import { SafeScrollView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
-import { Header, PrimaryButton } from '../components';
+import { Header, PrimaryButton, WalletKeyPinPromptModal } from '../components';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { getGasEstimation } from '../services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtPayloadSub, type WalletKey } from '../services/walletKeyStore';
+import { hasPendingWallets, isLocalSendEnabledForUser } from '../services/walletSendLocal';
 
 const InfoCard = ({ label, value, loading }: { label: string; value: string; loading?: boolean }) => (
   <View style={styles.card}>
@@ -28,13 +30,16 @@ const InfoCard = ({ label, value, loading }: { label: string; value: string; loa
 export const WalletEstimateFeeScreen = () => {
   const { t } = useTranslation();
   const { goBack, navigate } = useAppNavigation();
-  const { walletSendAddress, walletSendAmount, selectedWalletAsset } = useAppContext();
+  const { walletSendAddress, walletSendAmount, selectedWalletAsset, setUnlockedWalletsForSend } = useAppContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [gasPrice, setGasPrice] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(15);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const [userAddress, setUserAddress] = useState<string>('');
+
+  const [pinPromptVisible, setPinPromptVisible] = useState(false);
+  const [pinPromptProps, setPinPromptProps] = useState<{ memberId: number; email: string } | null>(null);
 
   useEffect(() => {
     const loadUserAddress = async () => {
@@ -172,7 +177,51 @@ export const WalletEstimateFeeScreen = () => {
     return t('screens.walletEstimateFee.speedNormal');
   };
 
-  const handleConfirm = () => {
+  const triggerPinPrompt = async () => {
+    try {
+      const jwt = await AsyncStorage.getItem('jwt');
+      const memberId = jwt ? jwtPayloadSub(jwt) : null;
+      let emailRaw = await AsyncStorage.getItem('userEmail');
+      if (!emailRaw) {
+        const ud = await AsyncStorage.getItem('userData');
+        if (ud) {
+          try { emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null; } catch {}
+        }
+      }
+      if (memberId == null || !emailRaw) {
+        Alert.alert('오류', '세션 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+        return false;
+      }
+      const email = emailRaw.toLowerCase().trim();
+      setPinPromptProps({ memberId, email });
+      setPinPromptVisible(true);
+      return true;
+    } catch (e) {
+      console.error('[WalletEstimateFee] PIN prompt 초기화 실패:', e);
+      Alert.alert('오류', '송금 준비 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
+  const onPinSuccess = (wallets: WalletKey[], _pin: string) => {
+    setPinPromptVisible(false);
+    setPinPromptProps(null);
+
+    setUnlockedWalletsForSend(wallets);
+
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    navigate(ROUTES.walletTransactionProgress);
+  };
+
+  const onPinCancel = () => {
+    setPinPromptVisible(false);
+    setPinPromptProps(null);
+  };
+
+  const handleConfirm = async () => {
     if (!gasPrice && gasPrice !== 0) {
       Alert.alert(
         t('screens.walletEstimateFee.alerts.error'),
@@ -181,12 +230,17 @@ export const WalletEstimateFeeScreen = () => {
       return;
     }
 
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
+    if (hasPendingWallets()) {
+
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+      navigate(ROUTES.walletTransactionProgress);
+      return;
     }
 
-    navigate(ROUTES.walletTransactionProgress);
+    await triggerPinPrompt();
   };
 
   const formattedSendAmount = walletSendAmount
@@ -245,6 +299,16 @@ export const WalletEstimateFeeScreen = () => {
           />
         </View>
       </SafeScrollView>
+      {}
+      {pinPromptProps && (
+        <WalletKeyPinPromptModal
+          visible={pinPromptVisible}
+          memberId={pinPromptProps.memberId}
+          email={pinPromptProps.email}
+          onSuccess={onPinSuccess}
+          onCancel={onPinCancel}
+        />
+      )}
     </View>
   );
 };

@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'Could not fetch email information.',
   title: 'Login',
 
   tabs: {
@@ -16,7 +17,7 @@ export default {
   loginButton: 'Login',
   disclaimer: 'If you forgot your password, you can log in with social login or email OTP login.',
   emailVerification: 'Email Verification',
-  orLoginWith: 'Or login in with',
+  orLoginWith: 'Or sign in with',
 
   otp: {
     rememberMe: 'Keep me logged in',

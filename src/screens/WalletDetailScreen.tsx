@@ -17,6 +17,10 @@ import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
+import { findEntriesForUser } from '../services/walletKeyStore';
+import { getWalletKeyATStatus } from '../services';
+import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
+import { WalletKeyPinSetupModal } from '../components';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 const iconPolygonscan = require('../../assets/icon_polyganscan_color.png');
@@ -236,6 +240,9 @@ export const WalletDetailScreen = () => {
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+
+  const [pinSetupVisible, setPinSetupVisible] = useState(false);
+  const [pinSetupCtx, setPinSetupCtx] = useState<{ memberId: number; email: string } | null>(null);
   const isNavigatingToSendRef = useRef(false);
   const [transactionDetailsModalVisible, setTransactionDetailsModalVisible] = useState(false);
   const [selectedTransactionDetailsForModal, setSelectedTransactionDetailsForModal] = useState<TransactionDetails | null>(null);
@@ -323,7 +330,7 @@ export const WalletDetailScreen = () => {
         return { data: [], total: 0, hasMore: false };
       }
 
-      if (![1, 16, 18].includes(selectedWalletAsset.currency)) {
+      if (![1, 2, 16, 18].includes(selectedWalletAsset.currency)) {
         console.warn('[WalletDetail] 지원하지 않는 currency:', selectedWalletAsset.currency);
         return { data: [], total: 0, hasMore: false };
       }
@@ -357,16 +364,29 @@ export const WalletDetailScreen = () => {
           params.pageSize,
         ) as EtherscanTransactionsResponse;
 
+        console.log('[WalletDetail] Etherscan raw 응답 개수:', response.data.length);
+        if (response.data.length > 0) {
+          console.log('[WalletDetail] 첫 row sample:', {
+            contractAddress: response.data[0].contractAddress,
+            tokenSymbol: response.data[0].tokenSymbol,
+            from: response.data[0].from,
+            to: response.data[0].to,
+          });
+        }
+
         if (!response.data || !Array.isArray(response.data)) {
           console.warn('[WalletDetail] 응답 데이터 형식이 올바르지 않습니다.');
           return { data: [], total: 0, hasMore: false };
         }
 
         const XRUN_POLYGON_CONTRACT = '0xda7cdea482b4e5f3d5b41aa286811d111f066b6b';
+        const XRUN_ETHEREUM_CONTRACT = '0x5833dbb0749887174b254ba4a5df747ff523a905';
         const expectedContract =
           selectedWalletAsset.currency === 18
             ? XRUN_POLYGON_CONTRACT.toLowerCase()
-            : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
+            : selectedWalletAsset.currency === 1
+              ? XRUN_ETHEREUM_CONTRACT.toLowerCase()
+              : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
         const expectedSymbol = (selectedWalletAsset.symbol || '').toUpperCase();
         response.data = response.data.filter((item: any) => {
           const c = (item.contractAddress || '').toLowerCase();
@@ -381,10 +401,26 @@ export const WalletDetailScreen = () => {
         const userAddress = '0xc3769f23e0b94d5d36f558c8f79e81d589ea119f';
         const userAddressLower = userAddress.toLowerCase();
 
-        const items: TransactionListItemData[] = response.data.map((item) => {
+        const expandedData: any[] = [];
+        for (const it of response.data) {
+          const fromLower = (it.from || '').toLowerCase();
+          const toLower = (it.to || '').toLowerCase();
+          if (fromLower === myAddressLower && toLower === myAddressLower) {
 
-          const isReceive = item.to.toLowerCase() === myAddressLower;
-          const isSend = item.from.toLowerCase() === myAddressLower;
+            expandedData.push({ ...it, __selfSplit: 'out', __syntheticTo: it.to });
+            expandedData.push({ ...it, __selfSplit: 'in', __syntheticFrom: it.from });
+          } else {
+            expandedData.push(it);
+          }
+        }
+
+        const items: TransactionListItemData[] = expandedData.map((item) => {
+
+          const isSelfOut = item.__selfSplit === 'out';
+          const isSelfIn = item.__selfSplit === 'in';
+
+          const isReceive = isSelfIn || (!isSelfOut && item.to.toLowerCase() === myAddressLower);
+          const isSend = isSelfOut || (!isSelfIn && item.from.toLowerCase() === myAddressLower);
 
           const isToUserAddress = item.to.toLowerCase() === userAddressLower;
           const iconName = isToUserAddress ? 'download-outline' : 'send-outline';
@@ -409,10 +445,26 @@ export const WalletDetailScreen = () => {
 
           const amountInEth = weiToEth(item.value, item.tokenDecimal);
 
+          if (typeof (globalThis as any).__walletDetailAmtLogged === 'undefined') {
+            console.log('[WalletDetail] 첫 변환 sample:', {
+              rawValue: item.value,
+              tokenDecimal: item.tokenDecimal,
+              amountInEth,
+              from: item.from,
+              to: item.to,
+            });
+            (globalThis as any).__walletDetailAmtLogged = true;
+
+            setTimeout(() => { delete (globalThis as any).__walletDetailAmtLogged; }, 5000);
+          }
+
           const formattedTimestamp = timestampToDate(item.timeStamp);
 
+          const uniqueId = item.__selfSplit
+            ? `${item.hash}-${item.__selfSplit}`
+            : item.hash;
           return {
-            id: item.hash,
+            id: uniqueId,
             transaction: item.hash,
             excuteddatetime: timestampToDate(item.timeStamp),
             date: timestampToDate(item.timeStamp),
@@ -446,12 +498,15 @@ export const WalletDetailScreen = () => {
         });
 
         items.sort((a, b) => {
+          const tA = parseInt(((a as any).timeStamp ?? '0'), 10);
+          const tB = parseInt(((b as any).timeStamp ?? '0'), 10);
+          if (tB !== tA) return tB - tA;
 
-          const originalItemA = response.data.find((item) => item.hash === a.id);
-          const originalItemB = response.data.find((item) => item.hash === b.id);
-          const timestampA = originalItemA ? parseInt(originalItemA.timeStamp, 10) : 0;
-          const timestampB = originalItemB ? parseInt(originalItemB.timeStamp, 10) : 0;
-          return timestampB - timestampA;
+          const aIsSend = a.action === 3305;
+          const bIsSend = b.action === 3305;
+          if (aIsSend && !bIsSend) return -1;
+          if (!aIsSend && bIsSend) return 1;
+          return 0;
         });
 
         const dateFilteredItems = items;
@@ -535,15 +590,55 @@ export const WalletDetailScreen = () => {
   }, [selectedType, createFetchFunction, createSendFetchFunction, createReceiveFetchFunction]);
 
   const handleAction = useCallback(
-    (type: 'scan' | 'receive' | 'send') => {
+    async (type: 'scan' | 'receive' | 'send') => {
       if (type === 'send') {
-        if (selectedWalletAsset) {
-          isNavigatingToSendRef.current = true;
-          setSelectedWalletAsset(selectedWalletAsset);
-          navigate(ROUTES.walletSend);
-        } else {
+        if (!selectedWalletAsset) {
           console.warn('[WalletDetail] selectedWalletAsset이 없어 보내기 화면으로 이동할 수 없습니다.');
+          return;
         }
+
+        try {
+          const userDataStr = await AsyncStorage.getItem('userData');
+          const userData = userDataStr ? JSON.parse(userDataStr) : null;
+          const email = (userData?.email ?? '').toLowerCase().trim();
+          const memberId = userData?.member != null ? Number(userData.member) : null;
+          console.log('[WalletDetail] send 분기 진입', { email, memberId, inWhitelist: isLocalSendEnabledForUser(email) });
+          if (isLocalSendEnabledForUser(email) && email && memberId != null) {
+            const entries = await findEntriesForUser(email, memberId);
+            const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+            console.log('[WalletDetail] vault 체크', { hasKey, eth: entries.eth?.s, pol: entries.pol?.s });
+            if (!hasKey) {
+              const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
+              console.log('[WalletDetail] AT 상태', atStatus);
+
+              const shouldShowRestore = atStatus.at || !atStatus.ok;
+              if (shouldShowRestore) {
+
+                const choice = await showAlert(
+                  '지갑 키 복원이 필요해요',
+                  '이전에 설정하신 비밀번호와 백업 파일이 있어야 송금할 수 있어요.\n' +
+                  '백업 파일이 있으시면 지금 복원해주세요.',
+                  [
+                    { text: '나중에' },
+                    { text: '복원하기' },
+                  ],
+                );
+                if (choice === 1) navigate(ROUTES.walletRestore);
+              } else {
+
+                setPinSetupCtx({ memberId, email });
+                setPinSetupVisible(true);
+              }
+              return;
+            }
+          }
+        } catch (e: any) {
+          console.warn('[WalletDetail] vault/AT check failed:', e?.message);
+
+        }
+        isNavigatingToSendRef.current = true;
+        setSelectedWalletAsset(selectedWalletAsset);
+        navigate(ROUTES.walletSend);
         return;
       }
       if (type === 'receive') {
@@ -578,6 +673,7 @@ export const WalletDetailScreen = () => {
       setWalletReceiveAddress,
       setWalletReceiveCurrency,
       setSelectedWalletAsset,
+      showAlert,
     ],
   );
 
@@ -780,6 +876,25 @@ export const WalletDetailScreen = () => {
           />
         )}
       </Modal>
+
+      {}
+      {pinSetupCtx != null && pinSetupVisible && (
+        <WalletKeyPinSetupModal
+          memberId={pinSetupCtx.memberId}
+          email={pinSetupCtx.email}
+          visible={pinSetupVisible}
+          onSuccess={() => {
+            setPinSetupVisible(false);
+            setPinSetupCtx(null);
+
+            if (selectedWalletAsset) {
+              isNavigatingToSendRef.current = true;
+              setSelectedWalletAsset(selectedWalletAsset);
+              navigate(ROUTES.walletSend);
+            }
+          }}
+        />
+      )}
     </SafeView>
   );
 };

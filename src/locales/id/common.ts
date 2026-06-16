@@ -1,4 +1,5 @@
 export default {
+  notice: 'Pemberitahuan',
   cancel: 'Batal',
   confirm: 'Konfirmasi',
   buttons: {

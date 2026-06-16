@@ -515,3 +515,49 @@ export const maskPrivateKey = (pk: string): string => {
   if (!pk || pk.length < 10) return pk;
   return `${pk.substring(0, 6)}...${pk.substring(pk.length - 4)}`;
 };
+
+export const openIntentUrlOrFallback = async (intentUrl: string): Promise<void> => {
+  const { Linking: RNLinking } = await import('react-native');
+  let resolved: string | null = null;
+
+  try {
+
+    const fallbackMatch = intentUrl.match(/[;#]S\.browser_fallback_url=([^;]+)/);
+    if (fallbackMatch?.[1]) {
+      try { resolved = decodeURIComponent(fallbackMatch[1]); } catch { resolved = fallbackMatch[1]; }
+    }
+
+    if (!resolved) {
+      const urlMatch = intentUrl.match(/[?&]url=([^&#]+)/);
+      if (urlMatch?.[1]) {
+        try {
+          let decoded = decodeURIComponent(urlMatch[1]);
+          if (decoded.includes('%')) {
+            try { decoded = decodeURIComponent(decoded); } catch {  }
+          }
+          resolved = decoded;
+        } catch { resolved = urlMatch[1]; }
+      }
+    }
+
+    if (!resolved) {
+      const pkgMatch = intentUrl.match(/[;#]package=([^;]+)/) || intentUrl.match(/[?&]id=([^&#]+)/);
+      if (pkgMatch?.[1]) {
+        resolved = 'https://play.google.com/store/apps/details?id=' + pkgMatch[1];
+      }
+    }
+  } catch (e) {
+    console.warn('[openIntentUrlOrFallback] parse fail:', e);
+  }
+
+  if (!resolved) {
+    console.warn('[openIntentUrlOrFallback] resolve 실패 — 원본 시도:', intentUrl.slice(0, 100));
+    resolved = intentUrl;
+  }
+
+  try {
+    await RNLinking.openURL(resolved);
+  } catch (e) {
+    console.warn('[openIntentUrlOrFallback] openURL 실패:', resolved.slice(0, 100), e);
+  }
+};

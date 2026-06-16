@@ -93,18 +93,23 @@ export const WalletTransactionProgressScreen = () => {
 
         let transferResult: any;
         const pendingWallets = consumePendingWallets();
+
+        const isClientSignSupported = currency === 1 || currency === 2 || currency === 16 || currency === 18;
         if (
           pendingWallets &&
           isLocalSendEnabledForUser(userEmail) &&
-          isPolygon
+          isClientSignSupported
         ) {
           console.log('[WalletTransactionProgress] 🔥 클라사이드 송금 흐름 진입', {
             email: userEmail, currency, count: pendingWallets.length,
           });
 
-          const targetCode = currency === 16 ? 'c16' : 'c18';
+          const isEthChain = currency === 1 || currency === 2;
+          const targetCode = `c${currency}`;
           const target = pendingWallets.find(w => w.wallet_code === targetCode)
-            ?? pendingWallets.find(w => /pol|c18|c16/i.test(w.wallet_code));
+            ?? pendingWallets.find(w => isEthChain
+              ? /^c[12]$|eth/i.test(w.wallet_code)
+              : /^c(16|18)$|pol/i.test(w.wallet_code));
           if (!target) {
             console.error('[WalletTransactionProgress] 매칭 wallet 없음', { targetCode });
             clearPendingWallets();
@@ -132,7 +137,7 @@ export const WalletTransactionProgressScreen = () => {
             to: walletSendAddress,
             amount: formattedAmount,
             currency,
-            network: 'POL',
+            network: local.network,  
             txHash: local.txHash,
             blockNumber: local.blockNumber,
           }).catch(() => {  });

@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'ईमेल जानकारी प्राप्त नहीं कर सका।',
   title: 'लॉगिन',
 
   tabs: {

@@ -21,6 +21,7 @@ interface TransformedSettlementData {
   date: string;
   transaction: number;
   status?: 'pending' | 'sent' | string; 
+  fromName?: string | null; 
 }
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -116,7 +117,7 @@ export const ReferralSettlementScreen = () => {
     }
     await shareReferralLink(
       t,
-      { email: userEmail },
+      { email: userEmail, member: memberId ?? undefined },
       showAlert,
       navigate,
     );
@@ -154,7 +155,32 @@ export const ReferralSettlementScreen = () => {
     try {
       setLoading(true);
 
+      console.log('═══════════════════════════════════════════');
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', member);
+      console.log('═══════════════════════════════════════════');
+
       const resultRef = await getReferralIncome(member, navigate);
+
+      console.log('[정산 디버그] 백엔드 응답 status:', resultRef.status);
+      console.log('[정산 디버그] 백엔드 응답 message:', resultRef.message);
+      console.log('[정산 디버그] 백엔드 응답 data 개수:', resultRef.data?.length ?? 0);
+      if (resultRef.data && resultRef.data.length > 0) {
+        console.log('[정산 디버그] 첫 행 샘플:', JSON.stringify(resultRef.data[0], null, 2));
+        console.log('[정산 디버그] source_type 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.source_type ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] status 분포:', resultRef.data.reduce((acc: Record<string, number>, item: any) => {
+          const s = item.status ?? 'NULL';
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {}));
+        console.log('[정산 디버그] xrun_amount 합계 (Number 변환 전):',
+          resultRef.data.reduce((sum: number, item: any) => sum + (Number(item.xrun_amount) || 0), 0));
+      } else {
+        console.log('[정산 디버그] ⚠️ 백엔드 응답 data 가 비어있음');
+      }
 
       if (resultRef.status === 'success') {
 
@@ -164,12 +190,15 @@ export const ReferralSettlementScreen = () => {
             id: `ref_${item.id}_${idx}`,
             type: label,
             description: label,
-            amount: `+${(Number(item.xrun_amount) || 0).toFixed(2)} XRUN`,
+            amount: `${(Number(item.xrun_amount) || 0).toFixed(3).replace(/\.?0+$/, '') || '0'} XRUN`,
             date: formatDateTime(item.created_at),
             transaction: item.id,
             status: item.status,
+            fromName: item.from_name || (item.from_member ? `#${item.from_member}` : null),
           };
         });
+        console.log('[정산 디버그] 변환된 rows 개수:', rows.length);
+        if (rows.length > 0) console.log('[정산 디버그] 변환 첫 행:', JSON.stringify(rows[0], null, 2));
         setSettlementData(rows);
 
         const totalAmountNum = (resultRef.data || []).reduce(
@@ -193,16 +222,23 @@ export const ReferralSettlementScreen = () => {
         setCurrentData(initialItems);
         setCurrentPage(1);
         setHasMore(rows.length > ITEMS_PER_PAGE);
+        console.log('[정산 디버그] ✅ 화면 표시 완료 — 총',
+          formattedAmount, 'XRUN /', rows.length, '건 /', formattedWon);
+        console.log('═══════════════════════════════════════════');
       } else {
-        console.error('정산 데이터 조회 실패:', resultRef.message);
+        console.error('[정산 디버그] ❌ 백엔드 status !== success — message:', resultRef.message);
         setSettlementData([]);
         setCurrentData([]);
         setTotalRevenue('0 XRUN');
         setTotalRevenueWon('₩0');
         setHasMore(false);
       }
-    } catch (error) {
-      console.error('[정산] 정산 데이터 조회 실패:', error);
+    } catch (error: any) {
+      console.error('[정산 디버그] ❌ 예외 발생');
+      console.error('  message:', error?.message);
+      console.error('  response status:', error?.response?.status);
+      console.error('  response data:', JSON.stringify(error?.response?.data ?? null));
+      console.error('  stack:', error?.stack);
       setSettlementData([]);
       setCurrentData([]);
       setTotalRevenue('0 XRUN');
@@ -250,30 +286,31 @@ export const ReferralSettlementScreen = () => {
 
   const renderSettlementItem = ({ item }: { item: TransformedSettlementData }) => {
     const isPaid = item.status === 'sent';
-    const paidColor = '#cccccc';
+    const badgeLabel = isPaid
+      ? (t('screens.referralSettlement.paid') || '지급 완료')
+      : (t('screens.referralSettlement.pending') || '지급 대기');
+    const fromLine = item.fromName ? `${item.fromName} 님이 발생시킨 수익이에요.` : null;
     return (
-      <View style={[styles.listItem, isPaid && { opacity: 0.7 }]}>
-        <View style={styles.listItemRow}>
-          {item.description ? <Text
-            style={[
-              styles.descriptionText,
-              isPaid && { color: paidColor },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {item.description}
-          </Text> : null}
-          {item.date ? <Text style={[styles.dateText, isPaid && { color: paidColor }]}>{item.date}</Text> : null}
-        </View>
-        <View style={styles.listItemRow2}>
-          <Text style={[
-            styles.statusBadge,
-            isPaid ? styles.statusPaid : styles.statusPending,
-          ]}>
-            {isPaid ? (t('screens.referralSettlement.paid') || '지급 완료') : (t('screens.referralSettlement.pending') || '지급 대기')}
+      <View style={[styles.questCard, isPaid && styles.questCardPaid]}>
+        <View style={[styles.questBadge, isPaid ? styles.statusPaid : styles.statusPending]}>
+          <Text style={[styles.questBadgeText, isPaid ? styles.statusPaidText : styles.statusPendingText]}>
+            {badgeLabel}
           </Text>
-          {item.amount ? <Text style={[styles.amountText, isPaid && { color: paidColor }]}>{item.amount}</Text> : null}
+        </View>
+        <Text style={[styles.questTitle, isPaid && styles.textPaid]} numberOfLines={2}>
+          {item.description}
+        </Text>
+        {(fromLine || item.date) ? (
+          <Text style={[styles.questSub, isPaid && styles.textPaidSub]} numberOfLines={2}>
+            {fromLine}
+            {fromLine && item.date ? '\n' : ''}
+            {item.date}
+          </Text>
+        ) : null}
+        <View style={styles.questDivider} />
+        <View style={styles.questFooter}>
+          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>보상금액</Text>
+          <Text style={[styles.questAmount, isPaid && styles.textPaid]}>{item.amount}</Text>
         </View>
       </View>
     );
@@ -370,76 +407,89 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#7d7e83',
   },
-  listItem: {
+
+  questCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eaeaef',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
+    shadowColor: '#00000010',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  questCardPaid: {
+    opacity: 0.65,
+  },
+  questBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  questBadgeText: {
+    fontSize: 11,
+    fontFamily: 'Roboto-Bold',
+    letterSpacing: -0.3,
+  },
+  questTitle: {
+    fontSize: 15,
+    fontFamily: 'Roboto-Bold',
+    color: '#1a1a1a',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  questSub: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#8a8a8f',
+    lineHeight: 17,
+    letterSpacing: -0.3,
+  },
+  questDivider: {
+    height: 1,
+    backgroundColor: '#f1f1f4',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  questFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: SIZES.medium,
-    paddingVertical: SIZES.large,
-    borderRadius: SIZES.small,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#00000014',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: SIZES.small,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#ededed',
-    marginBottom: SIZES.xsmall,
+    alignItems: 'center',
   },
-  listItemRow: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
+  questFooterLabel: {
+    fontSize: 12,
+    fontFamily: 'Roboto-Regular',
+    color: '#8a8a8f',
   },
-  listItemRow2: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 4,
-    alignItems: 'flex-end',
-  },
-
-  statusBadge: {
-    fontSize: 10,
+  questAmount: {
+    fontSize: 16,
     fontFamily: 'Roboto-Bold',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    overflow: 'hidden',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
+  },
+  textPaid: {
+    color: '#b5b5b8',
+  },
+  textPaidSub: {
+    color: '#c8c8cc',
   },
   statusPaid: {
     backgroundColor: '#eeeeee',
-    color: '#9a9a9a',
   },
   statusPending: {
-    backgroundColor: '#fff4e5',
-    color: '#e07b00',
+    backgroundColor: '#e6efff',
   },
-  refTypeText: {
-    fontSize: FONTS.size.small,
-    fontFamily: 'Roboto-SemiBold',
-    color: COLORS.white,
-    width: 'auto',
-    backgroundColor: COLORS.info,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-    borderRadius: 4,
+  statusPaidText: {
+    color: '#9a9a9a',
   },
-  dateText: {
-    fontSize: FONTS.size.small,
-    fontFamily: 'Roboto-Regular',
-    color: '#707070',
-  },
-  descriptionText: {
-    fontSize: FONTS.size.msmall,
-    fontFamily: 'Roboto-Regular',
-    color: '#343434',
-    letterSpacing: -1,
-  },
-  amountText: {
-    fontSize: FONTS.size.medium,
-    fontFamily: 'Roboto-SemiBold',
-    color: COLORS.buttonPrimary,
+  statusPendingText: {
+    color: '#3060d8',
   },
   loadingMoreContainer: {
     paddingVertical: 16,

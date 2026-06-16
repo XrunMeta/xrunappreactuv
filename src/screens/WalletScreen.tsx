@@ -10,6 +10,7 @@ import {
   Dimensions,
   Image,
   Linking,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,6 +36,8 @@ import {
   checkERC20Token,
   getUsersBalanceUpdateV2,
   getReferralIncome,
+  getApiBaseUrl,
+  getAuthHeader,
 } from '../services';
 import {
   WalletData,
@@ -100,6 +103,9 @@ function getWalletListDiskBackground(asset: CombinedAsset): string {
       return '#111111';
     case 19:
       return '#25292C';
+    case 1900:
+
+      return '#000000';
     default:
       return '#EFF4F5';
   }
@@ -109,6 +115,9 @@ function resolveWalletListIconSource(asset: CombinedAsset): any | null {
   const sym = (asset.symbol || '').toUpperCase();
   const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
 
+  if (asset.currency === 1900) {
+    return null;
+  }
   if (asset.currency === 19 || sub.includes('ad xrun')) {
     return require('../../assets/ad-round-logo.png');
   }
@@ -184,6 +193,8 @@ export const WalletScreen = () => {
 
   const [pinPromptVisible, setPinPromptVisible] = useState(false);
   const [pinPromptProps, setPinPromptProps] = useState<{ memberId: number; email: string } | null>(null);
+
+  const [walletInfoVisible, setWalletInfoVisible] = useState(false);
 
   const [walletsUnlocked, setWalletsUnlocked] = useState(false);
 
@@ -321,12 +332,12 @@ export const WalletScreen = () => {
       const rfItem: CombinedAsset = {
         id: 1900,
         symbol: 'XRUN',
-        name: 'RF',
+        name: 'REFERAL XRUN',
         amount: new BigNumber(referralAmount || 0).toFixed(2),
-        icon: require('../../assets/xrun-round-logo.png'),
+        icon: '__RF__' as any,
         currency: 1900,
         isCustom: false,
-        subCurrencyName: 'RF',
+        subCurrencyName: 'REFERAL XRUN',
         contractAddress: '',
         subcurrency: undefined,
         originalData: undefined,
@@ -461,6 +472,43 @@ export const WalletScreen = () => {
             return 0;
           });
 
+          try {
+            console.log('[WalletScreen] RPC 잔액 조회 시도 — member:', member);
+            const baseUrl = getApiBaseUrl();
+            const headers: Record<string, string> = {
+              'Content-Type': 'application/json',
+              Authorization: await getAuthHeader(),
+            };
+            const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ member }),
+            });
+            console.log('[WalletScreen] RPC HTTP 상태:', rpcRes.status);
+            if (rpcRes.ok) {
+              const rpcJson: any = await rpcRes.json().catch(() => null);
+              const balances: Array<{ currency: number; address: string; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
+              console.log('[WalletScreen] RPC 잔액 응답:', balances.length, '건');
+              const rpcByCurrency = new Map<number, string>();
+              for (const b of balances) {
+                if (b.status === 'ok' && b.rpcAmount != null) {
+                  rpcByCurrency.set(Number(b.currency), b.rpcAmount);
+                }
+              }
+              for (const item of sortedData as any[]) {
+                const cur = Number(item.currency);
+                if (rpcByCurrency.has(cur)) {
+                  const rpcAmt = rpcByCurrency.get(cur)!;
+                  item.Wamount = rpcAmt;
+                  item.amount = rpcAmt;
+                  console.log(`[WalletScreen] currency=${cur} RPC 적용:`, rpcAmt);
+                }
+              }
+            }
+          } catch (e: any) {
+            console.warn('[WalletScreen] RPC 잔액 조회 실패 (DB 잔액 그대로 사용):', e?.message);
+          }
+
           setCardsData(sortedData);
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
@@ -529,7 +577,9 @@ export const WalletScreen = () => {
       try {
         const res = await getReferralIncome(member, navigate);
         if (res?.status === 'success' && Array.isArray(res.data)) {
-          const total = res.data.reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
+          const total = res.data
+            .filter((r) => r.status === 'sent')
+            .reduce((s, r) => s + (Number(r.xrun_amount) || 0), 0);
           setReferralAmount(total);
         }
       } catch (e: any) {
@@ -733,7 +783,8 @@ export const WalletScreen = () => {
         }),
         suffix: asset.symbol,
         iconSource,
-        fallbackLabel: asset.symbol.slice(0, 2).toUpperCase(),
+
+        fallbackLabel: asset.currency === 1900 ? 'RF' : asset.symbol.slice(0, 2).toUpperCase(),
         fallbackColors: {
           background: diskBg,
           text: textOnDisk,
@@ -755,7 +806,8 @@ export const WalletScreen = () => {
         const diskBg = getWalletListDiskBackground(fifthAsset);
         const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
         tokenListData = tokenListData.map((row, i) =>
-          i === 3
+
+          i === 3 && row.currency !== 1900
             ? {
                 ...row,
                 fallbackColors: {
@@ -912,10 +964,11 @@ export const WalletScreen = () => {
                 iconImage: iconPolygonscan,
                 onPress: handlePolygonscan,
               },
+
               {
-                label: t('screens.wallet.etherscan'),
-                iconImage: iconEtherscan,
-                onPress: handleEtherscan,
+                label: t('screens.wallet.walletInfo') || '지갑 정보',
+                icon: 'information-circle-outline',
+                onPress: () => setWalletInfoVisible(true),
               },
               {
                 label: t('screens.wallet.receive'),
@@ -986,6 +1039,66 @@ export const WalletScreen = () => {
           onCancel={onPinPromptCancel}
         />
       )}
+
+      {}
+      <Modal
+        visible={walletInfoVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setWalletInfoVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.walletInfoOverlay}
+          activeOpacity={1}
+          onPress={() => setWalletInfoVisible(false)}
+        >
+          <View style={styles.walletInfoSheet} onStartShouldSetResponder={() => true}>
+            <View style={styles.walletInfoHeader}>
+              <Text style={styles.walletInfoTitle}>{t('screens.wallet.walletInfo')}</Text>
+              <Text style={styles.walletInfoSubtitle}>{t('screens.wallet.walletInfoSubtitle')}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletPrivateKeyGoogleAuth), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="shield-checkmark-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletBackup')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletRestore), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="cloud-download-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletRestore')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeView>
   );
 };
@@ -1003,6 +1116,60 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingTop: 0,
     zIndex: 10,
+  },
+
+  walletInfoOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  walletInfoSheet: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 36,
+  },
+  walletInfoHeader: {
+    paddingHorizontal: 4,
+    paddingBottom: 16,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  walletInfoTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  walletInfoSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  walletInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  walletInfoIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  walletInfoRowText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
   },
   sectionHeader: {
     flexDirection: 'row',

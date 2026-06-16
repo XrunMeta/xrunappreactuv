@@ -51,7 +51,10 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_ENV": "preview"
+      }
     },
     "production": {
       "autoIncrement": true,

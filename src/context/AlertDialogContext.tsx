@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useRef, ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChoiceDialog, ChoiceDialogRef } from '../components/ChoiceDialog';
 import { Dialog } from '../components/Dialog';
 import { Text, View, StyleSheet } from 'react-native';
@@ -21,6 +22,7 @@ interface AlertDialogContextValue {
 const AlertDialogContext = createContext<AlertDialogContextValue | undefined>(undefined);
 
 export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
+  const { t } = useTranslation();
   const choiceDialogRef = useRef<ChoiceDialogRef>(null);
   const [simpleDialogVisible, setSimpleDialogVisible] = useState(false);
   const [choiceDialogVisible, setChoiceDialogVisible] = useState(false);
@@ -49,7 +51,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     return new Promise((resolve) => {
 
       if (!buttons || buttons.length === 0 || buttons.length === 1) {
-        const buttonLabel = buttons?.[0]?.text || '확인';
+        const buttonLabel = buttons?.[0]?.text || t('common.buttons.confirm');
         const buttonAction = buttons?.[0]?.onPress;
 
         setCurrentConfig({
@@ -160,7 +162,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
         onClose={currentConfig?.hideCloseButton ? undefined : handleSimpleDialogClose}
         actions={[
           {
-            label: currentConfig?.buttons?.[0]?.text || '확인',
+            label: currentConfig?.buttons?.[0]?.text || t('common.buttons.confirm'),
             onPress: handleSimpleDialogClose,
             variant: 'primary',
           },

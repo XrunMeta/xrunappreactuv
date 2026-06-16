@@ -43,6 +43,9 @@ export const getApiBaseUrl = (): string => {
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return PREVIEW_GATEWAY_URL;
   }
+  if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
+    return PREVIEW_GATEWAY_URL;
+  }
   return env.GATEWAY_WORKERS;
 };
 
@@ -56,6 +59,18 @@ export async function fetchAndSaveWallets(): Promise<void> {
       'Content-Type': 'application/json',
       Authorization: await getAuthHeader(),
     };
+
+    try {
+      const atRes = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
+      if (atRes.ok) {
+        const atJson = await atRes.json().catch(() => null);
+        if (atJson?.data?.at === true) {
+          if (__DEV__) console.log('[fetchAndSaveWallets] AT 마킹 사용자 — /wallets/keys 호출 skip');
+          return;
+        }
+      }
+    } catch {  }
+
     const res = await fetch(`${baseUrl}/wallets/keys`, { method: 'GET', headers });
     if (!res.ok) return; 
     const json = await res.json();
@@ -173,22 +188,32 @@ export async function deleteServerSavedstring(): Promise<{ ok: boolean; updated?
   }
 }
 
-export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null }> {
+export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: string | null; ok: boolean }> {
   try {
     const baseUrl = getApiBaseUrl();
+    const auth = await getAuthHeader();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      Authorization: await getAuthHeader(),
+      Authorization: auth,
     };
+    console.log('[getWalletKeyATStatus] 요청', { url: `${baseUrl}/wallets/at-status`, hasAuth: !!auth });
     const res = await fetch(`${baseUrl}/wallets/at-status`, { method: 'GET', headers });
-    if (!res.ok) return { at: false, at_at: null };
+    console.log('[getWalletKeyATStatus] 응답 status:', res.status);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn('[getWalletKeyATStatus] not ok, body:', text);
+      return { at: false, at_at: null, ok: false };
+    }
     const json = await res.json().catch(() => null);
+    console.log('[getWalletKeyATStatus] 응답 json:', JSON.stringify(json));
     return {
       at: !!json?.data?.at,
       at_at: json?.data?.at_at ?? null,
+      ok: true,
     };
-  } catch {
-    return { at: false, at_at: null };
+  } catch (e: any) {
+    console.warn('[getWalletKeyATStatus] 예외:', e?.message);
+    return { at: false, at_at: null, ok: false };
   }
 }
 
@@ -421,8 +446,14 @@ export const getAuthHeader = async (): Promise<string> => {
 
 export const saveJwtIfPresent = async (res: { data?: any }): Promise<void> => {
   const jwt = res?.data?.jwt;
-  if (typeof jwt === 'string' && jwt.split('.').length === 3) {
+  const jwtType = typeof jwt;
+  const jwtValid = typeof jwt === 'string' && jwt.split('.').length === 3;
+  console.log('[saveJwtIfPresent] 응답 키:', Object.keys(res?.data ?? {}), 'jwt type:', jwtType, 'valid:', jwtValid);
+  if (jwtValid) {
     await AsyncStorage.setItem('jwt', jwt);
+    console.log('[saveJwtIfPresent] jwt 저장 완료 (length:', jwt.length, ')');
+  } else {
+    console.warn('[saveJwtIfPresent] jwt 응답에 없음 또는 형식 불일치 — AT 가드 등 인증 API 호출 시 401 발생 예상');
   }
 
   const email = res?.data?.email
@@ -909,6 +940,35 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           }
         }
         console.error('[API Error] ========== FormData 요청 오류 끝 ==========');
+      }
+
+      {
+        const status = error.response?.status;
+        const url = error.config?.url ?? '';
+        const isExpectedAuthFlow =
+          url.includes('google-auth-for-wallet') ||
+          url.includes('/login') ||
+          url.includes('/signup') ||
+          url.includes('/email-login') ||
+          url.includes('rotateSession');
+        if (status === 401 && !isExpectedAuthFlow) {
+          try {
+            console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
+            await Promise.all([
+              AsyncStorage.removeItem('isLoggedIn'),
+              AsyncStorage.removeItem('rememberMe'),
+              AsyncStorage.removeItem('jwt'),
+              AsyncStorage.removeItem('userData'),
+            ]);
+          } catch (e) {
+            console.warn('[API] auth state 클리어 실패:', e);
+          }
+          if (navigation?.reset) {
+            try { navigation.reset(['login']); } catch {  }
+          } else if (navigation?.navigate) {
+            try { navigation.navigate('login'); } catch {  }
+          }
+        }
       }
 
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
@@ -4208,6 +4268,9 @@ export interface ReferralIncomeItem {
   tx_time: string | null;
   created_at: string;
   error_message: string | null;
+
+  from_member?: number | null;
+  from_name?: string | null;
 }
 export interface GetReferralIncomeResponse {
   status: 'success' | 'error' | 'fail';
@@ -5034,6 +5097,70 @@ export const cancelGiftishowCoupon = async (
     }
     return { status: 'error', message: (error as Error).message };
   }
+};
+
+export interface PurchaseXrunItemPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  sku: string;
+  title: string;
+}
+export const purchaseXrunItemPrepare = async (
+  member: string | number,
+  item: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: PurchaseXrunItemPrepareData[] | null }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseXrunItemPrepare', { member, item });
+  return response.data;
+};
+
+export interface PurchaseGiftPrepareData {
+  userAddress: string;
+  casherAddress: string;
+  tokenAddress: string;
+  actualPurchaseAmount: number;
+  currency: number;
+  goods_code: string;
+  goods_name: string;
+  brand_name: string;
+  image_url: string;
+}
+export const purchaseGiftPrepare = async (
+  member: string | number,
+  goods_code: string,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: PurchaseGiftPrepareData[] | null }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseGiftPrepare', { member, goods_code });
+  return response.data;
+};
+export const purchaseGiftRecord = async (
+  member: string | number,
+  goods_code: string,
+  phone_no: string,
+  txHash: string,
+  amount: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseGiftRecord', { member, goods_code, phone_no, txHash, amount });
+  return response.data;
+};
+
+export const purchaseXrunItemRecord = async (
+  member: string | number,
+  item: number,
+  txHash: string,
+  amount: number,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: any }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/purchaseXrunItemRecord', { member, item, txHash, amount });
+  return response.data;
 };
 
 export const purchaseXrunItem = async (

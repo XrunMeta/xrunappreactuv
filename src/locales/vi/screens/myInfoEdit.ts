@@ -3,6 +3,8 @@ export default {
   firstName: 'Tên',
   lastName: 'Họ',
   email: 'Email',
+  password: 'Mật khẩu',
+  changePassword: 'Đổi mật khẩu',
   phone: 'Điện thoại',
   region: 'Khu vực',
   selectCountry: 'Chọn quốc gia',

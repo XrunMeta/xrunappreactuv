@@ -106,6 +106,7 @@ export const LoginSignupScreen = () => {
           onPress={handleSignUp}
           fullWidth
         />
+
       </View>
 
       {}

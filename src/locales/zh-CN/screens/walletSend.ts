@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: '请先输入收款人钱包地址',
+  hintEnterAmount: '请输入转账金额',
   title: '发送',
   balance: '余额',
   amount: '金额',

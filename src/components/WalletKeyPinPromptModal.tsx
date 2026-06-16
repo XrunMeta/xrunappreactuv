@@ -10,6 +10,8 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
   unlockUserWallets,
@@ -23,9 +25,13 @@ interface Props {
 
   onSuccess: (wallets: WalletKey[], pin: string) => void;
   onCancel: () => void;
+
+  skipVaultCheck?: boolean;
+
+  processingLabel?: string;
 }
 
-type Step = 'enter' | 'verifying' | 'error';
+type Step = 'enter' | 'verifying' | 'processing' | 'error';
 
 export const WalletKeyPinPromptModal: React.FC<Props> = ({
   memberId,
@@ -33,7 +39,10 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   visible,
   onSuccess,
   onCancel,
+  skipVaultCheck = false,
+  processingLabel,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -47,7 +56,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   }, [visible]);
 
   useEffect(() => {
-    if (step === 'enter' && pin.length === 6) {
+    if ((step === 'enter' || step === 'error') && pin.length === 6) {
       handleVerify(pin);
     }
 
@@ -58,69 +67,101 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
 
     await new Promise<void>((r) => setTimeout(r, 0));
 
-    const result = await unlockUserWallets(currentPin, email, memberId);
-    if (result.ok) {
-
-      onSuccess(result.wallets, currentPin);
+    if (skipVaultCheck) {
+      if (/^\d{6}$/.test(currentPin)) {
+        setStep('processing');
+        try { await onSuccess([], currentPin); } catch {  }
+        setPin('');
+        return;
+      }
+      setErrorMsg(t('components.walletKeyPinPrompt.formatError'));
+      setStep('error');
       setPin('');
       return;
     }
 
-    const msg = result.reason === 'wrong-pin'
-      ? 'PIN 이 일치하지 않습니다'
-      : __DEV__
-        ? `검증 실패: ${result.reason}`
-        : '검증 실패 — 다시 시도해주세요';
+    const result = await unlockUserWallets(currentPin, email, memberId);
+    if (result.ok) {
+
+      setStep('processing');
+      try { await onSuccess(result.wallets, currentPin); } catch {  }
+      setPin('');
+      return;
+    }
+
     if (__DEV__) {
       console.warn('[WalletKeyPinPromptModal] unlock fail reason:', result.reason);
     }
-    setErrorMsg(msg);
+    setErrorMsg('');
     setStep('error');
     setPin('');
   };
 
-  const handleRetry = () => {
+  const _unusedHandleRetry = () => {
     setStep('enter');
     setPin('');
     setErrorMsg('');
   };
+  void _unusedHandleRetry;
 
   const onPressDigit = (d: string) => {
-    if (step !== 'enter') return;
+
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+    } else if (step !== 'enter') return;
     if (pin.length >= 6) return;
     setPin(pin + d);
   };
 
   const onPressBackspace = () => {
+    if (step === 'error') {
+      setStep('enter');
+      setErrorMsg('');
+      return;
+    }
     if (step !== 'enter') return;
     if (pin.length === 0) return;
     setPin(pin.slice(0, -1));
   };
 
-  const isInputStep = step === 'enter';
+  const isInputStep = step === 'enter' || step === 'error';
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false}>
+    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onCancel}>
       <View style={styles.overlay}>
+        {}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerBackButton}
+            onPress={onCancel}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+        </View>
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>지갑 보호 PIN 확인</Text>
+          <Text style={styles.title}>{t('components.walletKeyPinPrompt.title')}</Text>
 
           {}
           <Text style={styles.warning}>
-            지갑 키 보호 전용입니다.
+            {t('components.walletKeyPinPrompt.warning')}
           </Text>
 
           {}
           {step === 'enter' && (
-            <Text style={styles.prompt}>6자리 PIN 을 입력해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.enterPrompt')}</Text>
           )}
           {step === 'verifying' && (
-            <Text style={styles.prompt}>검증 중...</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.verifying')}</Text>
+          )}
+          {step === 'processing' && (
+            <Text style={styles.prompt}>{processingLabel || t('components.walletKeyPinPrompt.processingDefault')}{'\n'}{t('components.walletKeyPinPrompt.processingSubtitle')}</Text>
           )}
           {step === 'error' && (
-            <Text style={styles.prompt}>다시 시도해주세요</Text>
+            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.error')}</Text>
           )}
 
           {}
@@ -137,22 +178,20 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <Text style={styles.error}>{errorMsg}</Text>
           )}
 
-          {step === 'verifying' && (
+          {(step === 'verifying' || step === 'processing') && (
             <View style={styles.loadingRow}>
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             </View>
           )}
-
-          {step === 'error' && (
-            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-              <Text style={styles.retryText}>다시 시도</Text>
-            </TouchableOpacity>
-          )}
+          {}
         </View>
 
-        {}
-        {isInputStep && (
-          <View style={styles.keypad}>
+        {
+}
+        <View
+          style={[styles.keypad, !isInputStep && { opacity: 0 }]}
+          pointerEvents={isInputStep ? 'auto' : 'none'}
+        >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <TouchableOpacity
                 key={n}
@@ -164,7 +203,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             ))}
             {}
             <TouchableOpacity style={styles.key} onPress={onCancel}>
-              <Text style={[styles.keyText, { fontSize: 14, color: COLORS.darkGray }]}>취소</Text>
+              <Text style={[styles.keyText, { fontSize: 14, color: COLORS.darkGray }]}>{t('components.walletKeyPinPrompt.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.key}
@@ -175,8 +214,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <TouchableOpacity style={styles.key} onPress={onPressBackspace}>
               <Text style={[styles.keyText, { fontSize: 18 }]}>{'<'}</Text>
             </TouchableOpacity>
-          </View>
-        )}
+        </View>
       </View>
     </Modal>
   );
@@ -187,8 +225,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: SIZES.large,
-
     alignItems: 'center',
+  },
+
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 8,
+  },
+  headerBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerBlock: {
     flex: 1,

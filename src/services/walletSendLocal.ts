@@ -26,6 +26,10 @@ export function clearPendingWallets(): void {
   }
 }
 
+export function hasPendingWallets(): boolean {
+  return _pendingWallets !== null && _pendingWallets.length > 0;
+}
+
 const POLYGON_RPC_URLS = [
   'https://polygon-bor-rpc.publicnode.com',
   'https://polygon.llamarpc.com',
@@ -33,30 +37,54 @@ const POLYGON_RPC_URLS = [
   'https://1rpc.io/matic',
   'https://polygon-rpc.com',
 ];
+const ETHEREUM_RPC_URLS = [
+  'https://ethereum-rpc.publicnode.com',
+  'https://eth.llamarpc.com',
+  'https://eth.drpc.org',
+  'https://1rpc.io/eth',
+  'https://rpc.ankr.com/eth',
+];
 const POLYGON_CHAIN_ID = 137;
+const ETHEREUM_CHAIN_ID = 1;
 
-async function pickHealthyPolygonRpc(): Promise<ethers.JsonRpcProvider> {
-  for (const url of POLYGON_RPC_URLS) {
+type ChainNetwork = 'POL' | 'ETH';
+
+interface ChainConfig {
+  rpcUrls: string[];
+  chainId: number;
+  network: ChainNetwork;
+}
+
+const CHAIN_BY_CURRENCY: Record<number, ChainConfig> = {
+  1: { rpcUrls: ETHEREUM_RPC_URLS, chainId: ETHEREUM_CHAIN_ID, network: 'ETH' },  
+  2: { rpcUrls: ETHEREUM_RPC_URLS, chainId: ETHEREUM_CHAIN_ID, network: 'ETH' },  
+  16: { rpcUrls: POLYGON_RPC_URLS, chainId: POLYGON_CHAIN_ID, network: 'POL' },   
+  18: { rpcUrls: POLYGON_RPC_URLS, chainId: POLYGON_CHAIN_ID, network: 'POL' },   
+};
+
+async function pickHealthyRpc(config: ChainConfig): Promise<ethers.JsonRpcProvider> {
+  for (const url of config.rpcUrls) {
     try {
-      console.log('[송금-로컬] RPC 시도:', url);
-      const provider = new ethers.JsonRpcProvider(url, POLYGON_CHAIN_ID);
+      console.log(`[송금-로컬] RPC 시도 (${config.network}):`, url);
+      const provider = new ethers.JsonRpcProvider(url, config.chainId);
       const chainId = await provider.getNetwork().then(n => Number(n.chainId));
-      if (chainId === POLYGON_CHAIN_ID) {
-        console.log('[송금-로컬] RPC 정상:', url);
+      if (chainId === config.chainId) {
+        console.log(`[송금-로컬] RPC 정상 (${config.network}):`, url);
         return provider;
       }
-      console.warn('[송금-로컬] RPC chainId 불일치:', { url, chainId });
+      console.warn(`[송금-로컬] RPC chainId 불일치 (${config.network}):`, { url, chainId });
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').slice(0, 100);
-      console.warn('[송금-로컬] RPC 실패:', url, msg);
+      console.warn(`[송금-로컬] RPC 실패 (${config.network}):`, url, msg);
     }
   }
-  throw new Error('No healthy Polygon RPC available');
+  throw new Error(`No healthy ${config.network} RPC available`);
 }
 
 const ERC20_ABI = [
   'function transfer(address to, uint256 amount) returns (bool)',
   'function decimals() view returns (uint8)',
+  'function balanceOf(address owner) view returns (uint256)',
 ];
 
 export interface SendLocalParams {
@@ -71,7 +99,7 @@ export interface SendLocalResult {
   ok: true;
   txHash: string;
   blockNumber: number;
-  network: 'POL';
+  network: ChainNetwork;
   currency: number;
 }
 
@@ -83,7 +111,7 @@ export type SendLocalError =
   | { ok: false; reason: 'broadcast-failed'; detail: string }
   | { ok: false; reason: 'wait-failed'; detail: string };
 
-export async function sendPolygonLocal(
+export async function sendOnchainLocal(
   params: SendLocalParams,
 ): Promise<SendLocalResult | SendLocalError> {
   const { privateKey, fromAddress, toAddress, amount, currency } = params;
@@ -92,15 +120,17 @@ export async function sendPolygonLocal(
     from: fromAddress, to: toAddress, amount, currency,
   });
 
-  if (currency !== 16 && currency !== 18) {
+  const chainConfig = CHAIN_BY_CURRENCY[currency];
+  if (!chainConfig) {
     console.warn('[송금-로컬] 지원 안 하는 currency:', currency);
     return { ok: false, reason: 'unsupported-currency' };
   }
+  console.log('[송금-로컬] 체인 결정:', chainConfig.network);
 
   let provider: ethers.JsonRpcProvider;
   try {
     console.log('[송금-로컬] 1/6 RPC provider 헬스체크 시작');
-    provider = await pickHealthyPolygonRpc();
+    provider = await pickHealthyRpc(chainConfig);
   } catch (e: any) {
     console.error('[송금-로컬] RPC 초기화 실패:', e?.message);
     return { ok: false, reason: 'rpc-init-failed', detail: String(e?.message ?? e) };
@@ -121,12 +151,55 @@ export async function sendPolygonLocal(
   }
 
   let txResponse: ethers.TransactionResponse;
+  const isNative = currency === 2 || currency === 16;
+
+  if (!isNative) {
+    try {
+      const env = getEnv();
+      const tokenAddr = currency === 1 ? env.CONTRACT_ADDRESS_ETH : env.CONTRACT_ADDRESS_POLYGON;
+      const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, provider);
+      const [nativeBal, gasPrice, tokenBal, tokenDecimals] = await Promise.all([
+        provider.getBalance(wallet.address),
+        provider.getFeeData().then(d => d.gasPrice ?? d.maxFeePerGas ?? 0n),
+        tokenContract.balanceOf(wallet.address) as Promise<bigint>,
+        tokenContract.decimals().then((n: any) => Number(n)).catch(() => 18),
+      ]);
+
+      const requiredAmount = ethers.parseUnits(String(amount), tokenDecimals);
+      if (tokenBal < requiredAmount) {
+        const tokenName = currency === 1 || currency === 18 ? 'XRUN' : 'TOKEN';
+        const haveFmt = Number(ethers.formatUnits(tokenBal, tokenDecimals)).toFixed(4);
+        const needFmt = Number(ethers.formatUnits(requiredAmount, tokenDecimals)).toFixed(4);
+        console.error(`[송금-로컬] 토큰 잔액 부족: ${tokenName} 보유 ${haveFmt} < 필요 ${needFmt}`);
+        return {
+          ok: false,
+          reason: 'broadcast-failed',
+          detail: `${tokenName} 잔액이 부족해요.\n보유: ${haveFmt} ${tokenName} / 필요: ${needFmt} ${tokenName}`,
+        };
+      }
+
+      const estimatedFee = BigInt(gasPrice) * 130_000n;
+      if (nativeBal < estimatedFee) {
+        const nativeName = currency === 1 ? 'ETH' : 'POL';
+        const needFmt = Number(ethers.formatEther(estimatedFee)).toFixed(6);
+        const haveFmt = Number(ethers.formatEther(nativeBal)).toFixed(6);
+        console.error(`[송금-로컬] 가스비 부족: ${nativeName} 보유 ${haveFmt} < 필요 ${needFmt}`);
+        return {
+          ok: false,
+          reason: 'broadcast-failed',
+          detail: '송금에 필요한 네트워크 수수료가 부족해요.\n관리자가 곧 처리해드릴 예정이니\n잠시 후 다시 시도해주세요.',
+        };
+      }
+    } catch (gasErr: any) {
+      console.warn('[송금-로컬] 잔액/가스 사전 체크 실패, broadcast 시도 진행:', gasErr?.message);
+    }
+  }
 
   try {
-    if (currency === 16) {
-
+    if (isNative) {
+      const tokenName = currency === 2 ? 'ETH' : 'POL';
       const valueWei = ethers.parseEther(String(amount));
-      console.log('[송금-로컬] 3/6 POL native 송금 준비:', {
+      console.log(`[송금-로컬] 3/6 ${tokenName} native 송금 준비:`, {
         value: amount, valueWei: valueWei.toString(),
       });
       txResponse = await wallet.sendTransaction({
@@ -136,18 +209,26 @@ export async function sendPolygonLocal(
     } else {
 
       const env = getEnv();
-      const contractAddress = env.CONTRACT_ADDRESS_POLYGON;
-      console.log('[송금-로컬] 3/6 XRUN ERC-20 송금 준비:', {
+      const contractAddress = currency === 1 ? env.CONTRACT_ADDRESS_ETH : env.CONTRACT_ADDRESS_POLYGON;
+      console.log(`[송금-로컬] 3/6 XRUN ERC-20 송금 준비 (${chainConfig.network}):`, {
         contract: contractAddress, amount,
       });
       const contract = new ethers.Contract(contractAddress, ERC20_ABI, wallet);
-
       const amountWei = ethers.parseUnits(String(amount), 18);
       txResponse = await contract.transfer(toAddress, amountWei);
     }
     console.log('[송금-로컬] 4/6 broadcast 완료, txHash=', txResponse.hash);
   } catch (e: any) {
     const msg = String(e?.message ?? e ?? 'unknown').slice(0, 300);
+
+    if (/insufficient funds/i.test(msg)) {
+      console.error('[송금-로컬] 가스비 부족 broadcast 실패');
+      return {
+        ok: false,
+        reason: 'broadcast-failed',
+        detail: '송금에 필요한 네트워크 수수료가 부족해요.\n관리자가 곧 처리해드릴 예정이니\n잠시 후 다시 시도해주세요.',
+      };
+    }
     console.error('[송금-로컬] broadcast 실패:', msg);
     return { ok: false, reason: 'broadcast-failed', detail: msg };
   }
@@ -164,21 +245,24 @@ export async function sendPolygonLocal(
   }
 
   console.log('[송금-로컬] 6/6 완료', {
-    txHash: receipt.hash, blockNumber: receipt.blockNumber,
+    txHash: receipt.hash, blockNumber: receipt.blockNumber, network: chainConfig.network,
   });
 
   return {
     ok: true,
     txHash: receipt.hash,
     blockNumber: receipt.blockNumber,
-    network: 'POL',
+    network: chainConfig.network,
     currency,
   };
 }
 
+export const sendPolygonLocal = sendOnchainLocal;
+
 export function isLocalSendEnabledForUser(email: string | null | undefined): boolean {
+  const LOCAL_SEND_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
   const normEmail = (email ?? '').toLowerCase().trim();
-  return normEmail === 'oth-test@example.invalid' || normEmail === 'oth-user@example.invalid';
+  return LOCAL_SEND_DEV_EMAILS.includes(normEmail);
 }
 
 export async function recordOnchainTransfer(params: {

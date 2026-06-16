@@ -15,6 +15,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { COMMON_STYLES, COLORS } from '../constants';
 import { setAyetUserIdAsync } from '../services/ayet';
+import { openIntentUrlOrFallback } from '../utils';
 
 const AYET_AD_SLOT_ID = Platform.OS === 'ios' ? '25755' : '25617';
 
@@ -128,9 +129,24 @@ export const AyetOffersScreen: React.FC = () => {
             Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] App Store open 실패:', e));
             return false;
           }
-          if (url.startsWith('market://') || url.startsWith('intent://')) {
+          if (url.startsWith('intent://')) {
+
             wentExternalRef.current = true;
-            Linking.openURL(url).catch((e) => console.warn('[ayeT WebView] Play Store/Intent open 실패:', e));
+            openIntentUrlOrFallback(url);
+            return false;
+          }
+          if (url.startsWith('market://')) {
+            wentExternalRef.current = true;
+            Linking.openURL(url).catch((e) => {
+
+              const idMatch = url.match(/[?&]id=([^&#]+)/);
+              if (idMatch?.[1]) {
+                Linking.openURL('https://play.google.com/store/apps/details?id=' + idMatch[1])
+                  .catch((e2) => console.warn('[ayeT WebView] Play Store fallback 실패:', e2));
+              } else {
+                console.warn('[ayeT WebView] market:// open 실패:', e);
+              }
+            });
             return false;
           }
           return true;

@@ -47,6 +47,7 @@ import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
+import { getWalletKeyATStatus, fetchAndSaveWallets } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -412,8 +413,9 @@ export const MapMainScreen: React.FC = () => {
 
         if (memberId == null || !emailRaw) return;
 
+        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const normEmail = emailRaw.toLowerCase().trim();
-        if (normEmail !== 'oth-test@example.invalid') return;
+        if (!PIN_DEV_EMAILS.includes(normEmail)) return;
 
         const entries = await findEntriesForUser(emailRaw, memberId);
         const needPinSetup = (e: { s: string; h?: string } | null) =>
@@ -428,8 +430,41 @@ export const MapMainScreen: React.FC = () => {
             return { memberId, email: normEmail };
           });
           setShowPinModal(true);
+          return;
         }
 
+        const vaultEmpty = entries.eth === null && entries.pol === null;
+        if (vaultEmpty) {
+
+          const dismissKey = `restoreLaterDismissedAt:${normEmail}`;
+          try {
+            const dismissedAt = await AsyncStorage.getItem(dismissKey);
+            if (dismissedAt) {
+              const elapsed = Date.now() - Number(dismissedAt);
+              if (elapsed < 10 * 60 * 1000) {
+
+                return;
+              }
+            }
+          } catch {  }
+          const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
+          if (cancelled) return;
+          console.log('[MapMain] AT 상태', atStatus, 'email=', normEmail, 'member=', memberId);
+          const choice = await showAlert(
+            t('screens.walletRestore.restoreNeededTitle'),
+            t('screens.walletRestore.restoreNeededMessage'),
+            [
+              { text: t('screens.walletRestore.restoreLater') },
+              { text: t('screens.walletRestore.restoreNow') },
+            ],
+          );
+          if (choice === 1) {
+            navigate(ROUTES.walletRestore);
+          } else {
+
+            try { await AsyncStorage.setItem(dismissKey, String(Date.now())); } catch {  }
+          }
+        }
       } catch {
 
       }

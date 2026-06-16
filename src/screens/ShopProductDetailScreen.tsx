@@ -13,9 +13,12 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
+import { WalletKeyPinPromptModal } from '../components';
+import { sendOnchainLocal, isLocalSendEnabledForUser } from '../services/walletSendLocal';
+import { findEntriesForUser, type WalletKey } from '../services/walletKeyStore';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -62,7 +65,7 @@ export const ShopProductDetailScreen = () => {
         brand: (selectedShopItem as any).brand ?? '',
         title: selectedShopItem.title || '',
         description: (selectedShopItem as any).description,
-        price: parseInt(selectedShopItem.priceLabel?.replace(/,/g, '') || '0', 10),
+        price: parseFloat(selectedShopItem.priceLabel?.replace(/,/g, '') || '0'),
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
     } : defaultProductFallback;
@@ -71,7 +74,20 @@ export const ShopProductDetailScreen = () => {
 
     const isXplayShop = (selectedShopItem as any)?.shopTab === 'xplayShop';
 
+    const isPurchasedView = !!(selectedShopItem as any)?.isPurchased;
+    const purchasedPaidXrun = Number((selectedShopItem as any)?.paidXrun ?? 0);
+    const purchasedDate = String((selectedShopItem as any)?.purchaseDate ?? '');
+    useEffect(() => {
+        if (isPurchasedView) {
+            console.log('[상품 상세-구매완료] selectedShopItem:', JSON.stringify(selectedShopItem));
+        }
+    }, [isPurchasedView, selectedShopItem]);
+
     const [member, setMember] = useState<string | null>(null);
+
+    const [purchasePinVisible, setPurchasePinVisible] = useState(false);
+    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
+    const [purchaseLocalLoading, setPurchaseLocalLoading] = useState(false);
 
     const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
@@ -258,6 +274,34 @@ export const ShopProductDetailScreen = () => {
                         } else {
                             const msg = res?.message ?? '구매에 실패했습니다.';
                             const code = res?.code;
+
+                            if (code === 410) {
+                                try {
+                                    const userDataStr = await AsyncStorage.getItem('userData');
+                                    const ud = userDataStr ? JSON.parse(userDataStr) : null;
+                                    const memberId = ud?.member != null ? Number(ud.member) : null;
+                                    const email = (ud?.email ?? '').toLowerCase().trim();
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'gift' });
+                                            setPurchasePinVisible(true);
+                                            setXplayPurchaseLoading(false);
+                                            return;
+                                        }
+                                    }
+                                } catch {  }
+                                showAlert(
+                                    t('screens.shopProductDetail.alerts.purchaseFailed'),
+                                    t('screens.walletRestore.restoreNeededShort'),
+                                    [
+                                        { text: t('screens.shopProductDetail.confirm') },
+                                        { text: t('screens.walletRestore.restoreNow'), onPress: () => navigate(ROUTES.walletRestore) },
+                                    ],
+                                );
+                                return;
+                            }
 
                             const is402 = code === 402 || /잔액.*부족|insufficient/i.test(msg);
 
@@ -493,10 +537,31 @@ export const ShopProductDetailScreen = () => {
                         } else {
                             const code = Number(res?.code);
                             const rawMsg = res?.message || '';
-                            console.warn('[XRUN 구매] 실패:', code, rawMsg);
+                            console.warn('[XRUN 구매] 실패:', code, rawMsg, 'fullRes:', JSON.stringify(res));
                             let userMsg: string;
+                            let showRestoreButton = false;
                             if (code === 409 || /max purchase|limit reached/i.test(rawMsg)) {
                                 userMsg = '최대 구매 가능 개수를 초과했습니다.';
+                            } else if (code === 410) {
+
+                                try {
+                                    const userDataStr = await AsyncStorage.getItem('userData');
+                                    const ud = userDataStr ? JSON.parse(userDataStr) : null;
+                                    const memberId = ud?.member != null ? Number(ud.member) : null;
+                                    const email = (ud?.email ?? '').toLowerCase().trim();
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.eth?.s === 's1') || (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'item' });
+                                            setPurchasePinVisible(true);
+                                            setXrunPurchaseLoading(false);
+                                            return;
+                                        }
+                                    }
+                                } catch {  }
+                                userMsg = t('screens.walletRestore.restoreNeededShort');
+                                showRestoreButton = true;
                             } else if (code === 404 || /not found/i.test(rawMsg)) {
                                 userMsg = '상품을 찾을 수 없습니다.';
                             } else if (code === 400) {
@@ -505,10 +570,19 @@ export const ShopProductDetailScreen = () => {
                                 const isEnglish = /^[\x00-\x7F\s]+$/.test(rawMsg);
                                 userMsg = isEnglish || !rawMsg ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.' : rawMsg;
                             }
-                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
+
+                            const buttons = showRestoreButton
+                                ? [
+                                    { text: t('screens.shopProductDetail.confirm') },
+                                    { text: '복원하기', onPress: () => navigate(ROUTES.walletRestore) },
+                                ]
+                                : [{ text: t('screens.shopProductDetail.confirm') }];
+                            showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, buttons);
                         }
                     } catch (e: any) {
-                        console.error('[XRUN 구매] 오류:', e);
+                        const status = e?.response?.status;
+                        const respData = e?.response?.data;
+                        console.error('[XRUN 구매] 오류:', { status, respData, errMsg: e?.message, stack: e?.stack });
                         const msg = e?.response?.data?.message ?? e?.message ?? '구매 처리 중 오류가 발생했습니다.';
                         const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
                         showAlert(
@@ -526,6 +600,7 @@ export const ShopProductDetailScreen = () => {
 
     const handlePaymentSuccessClose = () => {
         setPaymentSuccessVisible(false);
+        navigate(ROUTES.shopMyItems);
     };
 
     const handleXplayPaymentSuccessClose = () => {
@@ -594,6 +669,39 @@ export const ShopProductDetailScreen = () => {
                     </View>
 
                     {}
+                    {isPurchasedView ? (
+                        <View style={styles.paymentCard}>
+                            <View style={styles.sectionHeader}>
+                                <Feather name="check-circle" size={18} color="#22c55e" />
+                                <Text style={styles.sectionTitle}>구매 완료 정보</Text>
+                            </View>
+                            <View style={styles.divider} />
+                            <View style={styles.paymentRow}>
+                                <Text style={styles.paymentLabel}>결제 금액</Text>
+                                <View style={styles.priceContainer}>
+                                    <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
+                                    <Text style={styles.paymentValue}>
+                                        {(() => {
+
+                                            const candidates = [
+                                                purchasedPaidXrun,
+                                                Number((selectedShopItem as any)?.priceXrun ?? 0),
+                                                Number(product.price ?? 0),
+                                            ];
+                                            const val = candidates.find((n) => isFinite(n) && n > 0) ?? 0;
+                                            return val > 0
+                                                ? `${val.toFixed(4).replace(/\.?0+$/, '')} XRUN`
+                                                : '-';
+                                        })()}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.paymentRowLast}>
+                                <Text style={styles.paymentLabel}>구매일</Text>
+                                <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
+                            </View>
+                        </View>
+                    ) : (
                     <View style={styles.paymentCard}>
                         <View style={styles.sectionHeader}>
                             <Feather name="credit-card" size={18} color="#1E3A5F" />
@@ -650,6 +758,7 @@ export const ShopProductDetailScreen = () => {
                             </>
                         )}
                     </View>
+                    )}
 
                     {}
                     <View style={styles.guideCard}>
@@ -690,6 +799,7 @@ export const ShopProductDetailScreen = () => {
             </SafeScrollView>
 
             {}
+            {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
                 {isXplayShop ? (
                     <TouchableOpacity
@@ -706,9 +816,7 @@ export const ShopProductDetailScreen = () => {
                         >
                             {xplayPurchaseLoading ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} />
-                            ) : (
-                                <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
-                            )}
+                            ) : null}
                             <Text style={styles.purchaseButtonText}>
                                 {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
                             </Text>
@@ -726,12 +834,12 @@ export const ShopProductDetailScreen = () => {
                             end={{ x: 1, y: 0 }}
                             style={styles.purchaseButtonGradient}
                         >
-                            <Feather name="shopping-cart" size={18} color="#FFFFFF" style={styles.purchaseIcon} />
                             <Text style={styles.purchaseButtonText}>{t('screens.shopProductDetail.purchaseButton')}</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
             </View>
+            )}
 
             {}
             <Modal
@@ -789,6 +897,114 @@ export const ShopProductDetailScreen = () => {
                     </View>
                 </View>
             </Modal>
+
+            {}
+            {purchasePinVisible && purchaseCtx && (
+                <WalletKeyPinPromptModal
+                    visible={purchasePinVisible}
+                    memberId={purchaseCtx.memberId}
+                    email={purchaseCtx.email}
+                    processingLabel="결제 처리 중..."
+                    onSuccess={async (wallets: WalletKey[]) => {
+
+                        if (purchaseLocalLoading) return;
+                        setPurchaseLocalLoading(true);
+                        const kind = purchaseCtx.kind;
+                        try {
+
+                            const target = wallets.find((w) => w.wallet_code === 'c18');
+                            if (!target?.private_key) {
+                                throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (kind === 'gift') {
+
+                                const prep = await purchaseGiftPrepare(member!, String(product.id), navigate);
+                                if (prep?.status !== 'success' || !prep.data?.[0]) {
+                                    throw new Error(prep?.message || 'prepare 실패');
+                                }
+                                const meta = prep.data[0];
+                                const send = await sendOnchainLocal({
+                                    privateKey: target.private_key,
+                                    fromAddress: meta.userAddress,
+                                    toAddress: meta.casherAddress,
+                                    amount: String(meta.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!send.ok) {
+                                    const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
+                                    throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+                                }
+                                const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
+                                if (rec?.status !== 'success') {
+                                    const pendingManual = Array.isArray(rec?.data) && rec.data[0]?.pending_manual;
+                                    const baseMsg = rec?.message || t('screens.shopProductDetail.alerts.couponSendFail');
+                                    if (pendingManual) {
+
+                                        setPurchasePinVisible(false);
+                                        showAlert(
+                                            t('screens.shopProductDetail.alerts.paymentCompletePendingCouponTitle'),
+                                            t('screens.shopProductDetail.alerts.paymentCompletePendingCouponMessage', { reason: baseMsg, tx: send.txHash.slice(0, 16) }),
+                                            [{ text: t('screens.shopProductDetail.confirm') }],
+                                        );
+                                        loadXrunBalance();
+                                        return;
+                                    }
+                                    throw new Error(baseMsg);
+                                }
+                                console.log('[T-031 기프티콘 구매] 성공:', { txHash: send.txHash });
+
+                                setXplayPurchaseResult(rec?.data?.[0] ?? rec?.data ?? null);
+                                setPurchasePinVisible(false);
+                                setXplayPaymentSuccessVisible(true);
+                                loadXrunBalance();
+                                return;
+                            }
+
+                            const prep = await purchaseXrunItemPrepare(member!, parseInt(String(product.id), 10), navigate);
+                            if (prep?.status !== 'success' || !prep.data?.[0]) {
+                                throw new Error(prep?.message || 'prepare 실패');
+                            }
+                            const meta = prep.data[0];
+                            const send = await sendOnchainLocal({
+                                privateKey: target.private_key,
+                                fromAddress: meta.userAddress,
+                                toAddress: meta.casherAddress,
+                                amount: String(meta.actualPurchaseAmount),
+                                currency: 18,
+                            });
+                            if (!send.ok) {
+                                const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
+                                throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+                            }
+                            const rec = await purchaseXrunItemRecord(member!, parseInt(String(product.id), 10), send.txHash, meta.actualPurchaseAmount, navigate);
+                            if (rec?.status !== 'success') {
+                                throw new Error(rec?.message || 'record 실패');
+                            }
+                            console.log('[T-031 구매] 성공:', { txHash: send.txHash });
+                            loadXrunBalance();
+
+                            setPurchasePinVisible(false);
+                            setPaymentSuccessVisible(true);
+                        } catch (e: any) {
+                            console.error('[T-031 구매] 실패:', e?.message);
+
+                            setPurchasePinVisible(false);
+                            showAlert(
+                                t('screens.shopProductDetail.alerts.purchaseFailed'),
+                                e?.message || '구매 처리 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.',
+                                [{ text: t('screens.shopProductDetail.confirm') }],
+                            );
+                        } finally {
+                            setPurchaseLocalLoading(false);
+                            setPurchaseCtx(null);
+                        }
+                    }}
+                    onCancel={() => {
+                        setPurchasePinVisible(false);
+                        setPurchaseCtx(null);
+                    }}
+                />
+            )}
         </SafeView>
     );
 };

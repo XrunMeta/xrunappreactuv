@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: '이메일 정보를 가져올 수 없습니다.',
   title: '로그인',
 
   tabs: {
@@ -16,7 +17,7 @@ export default {
   loginButton: '로그인',
   disclaimer: '비밀번호를 잊으셨다면, 소셜 로그인 또는 이메일 OTP 로그인으로 로그인할 수 있습니다.',
   emailVerification: '이메일 인증',
-  orLoginWith: 'Or login in with',
+  orLoginWith: '다른 방법으로 로그인',
 
   otp: {
     rememberMe: '로그인 상태 유지하기',

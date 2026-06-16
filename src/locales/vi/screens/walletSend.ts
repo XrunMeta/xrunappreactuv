@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: 'Vui lòng nhập địa chỉ ví của người nhận trước',
+  hintEnterAmount: 'Vui lòng nhập số tiền cần gửi',
   title: 'Sending',
   balance: 'Balance',
   amount: 'Amount',

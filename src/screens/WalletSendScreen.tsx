@@ -514,8 +514,8 @@ export const WalletSendScreen = () => {
     setWalletSendAmount(cleanAmount);
 
     const currency = selectedWalletAsset?.currency;
-    const isPolygon = currency === 16 || currency === 18;
-    if (isLocalSendEnabledForUser(memberEmail) && isPolygon) {
+    const isSupported = currency === 1 || currency === 2 || currency === 16 || currency === 18;
+    if (isLocalSendEnabledForUser(memberEmail) && isSupported) {
       console.log('[송금-로컬] confirm — OTP 우회 + PIN 모달 진입', { email: memberEmail, currency });
       setShowPinPrompt(true);
       return;
@@ -565,6 +565,7 @@ export const WalletSendScreen = () => {
           visible={showPinPrompt}
           memberId={Number(memberId)}
           email={memberEmail}
+          processingLabel="송금 처리 중..."
           onSuccess={handlePinPromptSuccess}
           onCancel={handlePinPromptCancel}
         />
@@ -607,8 +608,8 @@ export const WalletSendScreen = () => {
 
               const hasValidAddress = receiverAddress && receiverAddress.trim().length > 0 && receiverAddress.startsWith('0x');
               const hintText = !hasValidAddress
-                ? '먼저 받는 분의 지갑 주소를 입력해주세요'
-                : '보낼 금액을 입력해주세요';
+                ? t('screens.walletSend.hintEnterAddressFirst')
+                : t('screens.walletSend.hintEnterAmount');
               return <Text style={styles.helperHintText}>{hintText}</Text>;
             }
 

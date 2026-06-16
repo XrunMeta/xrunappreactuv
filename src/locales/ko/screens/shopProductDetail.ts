@@ -28,6 +28,9 @@ export default {
   viewMyGift: '내 기프티콘 보기',
   alerts: {
     notification: '알림',
+    couponSendFail: '쿠폰 발송 실패',
+    paymentCompletePendingCouponTitle: '결제 완료 / 쿠폰 발송 대기',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\n결제는 완료됐으니 곧 쿠폰이 자동/수동으로 발송돼요. ({{tx}}…)',
     phoneNotRegistered: '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.',
     insufficientXRUN: 'XRUN 잔액이 부족합니다.',
     insufficientXplay: 'XRUN 잔액이 부족합니다.',

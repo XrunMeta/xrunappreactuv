@@ -81,6 +81,17 @@ $AppsFlyerPurchaseConnector=true
           phase.always_out_of_date = '1'
         end
       end
+      # 🔥 [2026-06-11] Xcode 26.4 Clang 의 strict consteval 로 fmt 컴파일 실패 수정
+      #   FMT_HEADER_ONLY=1 + gnu++17 강제 (FMT_COMPILE_STRING 매크로가 새 consteval 검증 통과 못 함)
+      installer.pods_project.targets.each do |target|
+        if target.name == 'fmt'
+          target.build_configurations.each do |config|
+            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'FMT_HEADER_ONLY=1'
+            config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
+          end
+        end
+      end
       installer.pods_project.save
     end
   end

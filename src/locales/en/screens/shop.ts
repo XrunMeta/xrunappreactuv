@@ -11,6 +11,7 @@ export default {
   used: 'Used',
   availableShort: 'Available',
   usedShort: 'Used',
+  pendingShort: 'Pending',
   shopBrand: 'Shop',
   thankYou: 'Thank you',
   noPurchasedCoupons: 'No purchased coupons.',

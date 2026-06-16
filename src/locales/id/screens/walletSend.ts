@@ -1,4 +1,6 @@
 export default {
+  hintEnterAddressFirst: 'Silakan masukkan alamat dompet penerima terlebih dahulu',
+  hintEnterAmount: 'Silakan masukkan jumlah yang akan dikirim',
   title: 'Mengirim',
   balance: 'Saldo',
   amount: 'Jumlah',

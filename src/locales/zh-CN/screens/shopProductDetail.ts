@@ -28,6 +28,9 @@ export default {
   viewMyGift: '查看我的礼品券',
   alerts: {
     notification: '提示',
+    couponSendFail: '优惠券发送失败',
+    paymentCompletePendingCouponTitle: '支付完成 / 优惠券待发送',
+    paymentCompletePendingCouponMessage: '{{reason}}\n\n支付已完成，优惠券将自动或手动发送。({{tx}}…)',
     phoneNotRegistered: '未登记收件人手机号，请在个人中心登记。',
     insufficientXRUN: 'XRUN余额不足。',
     purchaseConfirmTitle: '购买',
