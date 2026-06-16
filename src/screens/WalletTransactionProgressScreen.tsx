@@ -8,6 +8,7 @@ import { Header, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { postTransferNew } from '../services';
 import { consumePendingWallets, sendPolygonLocal, isLocalSendEnabledForUser, clearPendingWallets, recordOnchainTransfer } from '../services/walletSendLocal';
 
@@ -20,6 +21,7 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
 
 export const WalletTransactionProgressScreen = () => {
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const { goBack, navigate } = useAppNavigation();
   const {
     walletSendAddress,
@@ -128,6 +130,19 @@ export const WalletTransactionProgressScreen = () => {
 
           if (!local.ok) {
             console.error('[WalletTransactionProgress] 로컬 송금 실패:', local);
+
+            const failDetail = String((local as any).detail ?? '');
+            const isGasShort = (local as any).reason === 'broadcast-failed'
+              && /수수료|가스|insufficient funds/i.test(failDetail);
+            if (isGasShort) {
+              setIsProcessing(false);
+              setIsSuccess(false);
+              await showAlert(
+                '가스비 부족',
+                '지갑에 송금 수수료(가스비)가 부족해 송금을 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+              );
+              return;
+            }
             throw new Error(`송금 실패: ${(local as any).reason} ${(local as any).detail ?? ''}`);
           }
 

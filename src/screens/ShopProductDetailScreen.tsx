@@ -933,7 +933,20 @@ export const ShopProductDetailScreen = () => {
                                 });
                                 if (!send.ok) {
                                     const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
-                                    throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+
+                                    const detailStr = typeof detail === 'string' ? detail : '';
+                                    const isGasShort = (send as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(detailStr);
+                                    if (isGasShort) {
+                                        setPurchasePinVisible(false);
+                                        setPurchaseLocalLoading(false);
+                                        await showAlert(
+                                            '가스비 부족',
+                                            '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                        );
+                                        return;
+                                    }
+                                    throw new Error(detailStr || '송금 실패');
                                 }
                                 const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
                                 if (rec?.status !== 'success') {
@@ -975,7 +988,20 @@ export const ShopProductDetailScreen = () => {
                             });
                             if (!send.ok) {
                                 const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
-                                throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+
+                                const detailStr = typeof detail === 'string' ? detail : '';
+                                const isGasShort = (send as any).reason === 'broadcast-failed'
+                                    && /수수료|가스|insufficient funds/i.test(detailStr);
+                                if (isGasShort) {
+                                    setPurchasePinVisible(false);
+                                    setPurchaseLocalLoading(false);
+                                    await showAlert(
+                                        '가스비 부족',
+                                        '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                    );
+                                    return;
+                                }
+                                throw new Error(detailStr || '송금 실패');
                             }
                             const rec = await purchaseXrunItemRecord(member!, parseInt(String(product.id), 10), send.txHash, meta.actualPurchaseAmount, navigate);
                             if (rec?.status !== 'success') {
