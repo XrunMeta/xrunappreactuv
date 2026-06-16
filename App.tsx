@@ -157,6 +157,8 @@ const v_c0dbdf = () => {
           v_9b57fc(v_ce4741.myInfoNotify);
           return;
         }
+
+        v_e84827.setItem('pendingPushWalletNav', 'xrun_pol').catch(() => {});
         v_9b57fc(v_ce4741.wallet);
       } catch (v_9e86fd) {
         console.warn('[push tap] navigate fail:', v_9e86fd);
