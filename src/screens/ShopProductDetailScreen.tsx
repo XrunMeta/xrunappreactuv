@@ -933,7 +933,20 @@ export const v_a59951 = () => {
                                 });
                                 if (!v_9c423d.ok) {
                                     const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
-                                    throw new Error(typeof v_3cfdfc === 'string' ? v_3cfdfc : '송금 실패');
+
+                                    const v_f2d01d = typeof v_3cfdfc === 'string' ? v_3cfdfc : '';
+                                    const v_f17ac7 = (v_9c423d as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(v_f2d01d);
+                                    if (v_f17ac7) {
+                                        v_1c868b(false);
+                                        v_24bbbd(false);
+                                        await v_889fad(
+                                            '가스비 부족',
+                                            '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                        );
+                                        return;
+                                    }
+                                    throw new Error(v_f2d01d || '송금 실패');
                                 }
                                 const v_94a7a9 = await v_48805f(v_660822!, String(v_01bee9.id), v_7496db ?? '', v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
                                 if (v_94a7a9?.status !== 'success') {
@@ -975,7 +988,20 @@ export const v_a59951 = () => {
                             });
                             if (!v_9c423d.ok) {
                                 const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
-                                throw new Error(typeof v_3cfdfc === 'string' ? v_3cfdfc : '송금 실패');
+
+                                const v_f2d01d = typeof v_3cfdfc === 'string' ? v_3cfdfc : '';
+                                const v_f17ac7 = (v_9c423d as any).reason === 'broadcast-failed'
+                                    && /수수료|가스|insufficient funds/i.test(v_f2d01d);
+                                if (v_f17ac7) {
+                                    v_1c868b(false);
+                                    v_24bbbd(false);
+                                    await v_889fad(
+                                        '가스비 부족',
+                                        '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                    );
+                                    return;
+                                }
+                                throw new Error(v_f2d01d || '송금 실패');
                             }
                             const v_94a7a9 = await v_324bd9(v_660822!, parseInt(String(v_01bee9.id), 10), v_9c423d.txHash, v_ab4c96.actualPurchaseAmount, v_9b57fc);
                             if (v_94a7a9?.status !== 'success') {
