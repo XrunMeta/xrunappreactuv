@@ -40,6 +40,11 @@ export default {
     title: 'Notice',
     viewDetails: 'View Details',
   },
+  gasInsufficient: {
+    title: 'Insufficient Gas',
+    messageTransfer: 'Your wallet does not have enough network fee (gas) to send.\n\nPlease top up Polygon network gas tokens (POL) and try again.',
+    messagePurchase: 'Your wallet does not have enough network fee (gas) to complete this purchase.\n\nPlease top up Polygon network gas tokens (POL) and try again.',
+  },
 };
 
 

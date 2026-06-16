@@ -941,8 +941,8 @@ export const ShopProductDetailScreen = () => {
                                         setPurchasePinVisible(false);
                                         setPurchaseLocalLoading(false);
                                         await showAlert(
-                                            '가스비 부족',
-                                            '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                            t('common.gasInsufficient.title'),
+                                            t('common.gasInsufficient.messagePurchase'),
                                         );
                                         return;
                                     }
@@ -996,8 +996,8 @@ export const ShopProductDetailScreen = () => {
                                     setPurchasePinVisible(false);
                                     setPurchaseLocalLoading(false);
                                     await showAlert(
-                                        '가스비 부족',
-                                        '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                        t('common.gasInsufficient.title'),
+                                        t('common.gasInsufficient.messagePurchase'),
                                     );
                                     return;
                                 }

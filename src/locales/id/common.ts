@@ -39,6 +39,11 @@ export default {
     title: 'Pemberitahuan',
     viewDetails: 'Lihat Detail',
   },
+  gasInsufficient: {
+    title: 'Biaya Gas Tidak Cukup',
+    messageTransfer: 'Saldo biaya jaringan (gas) di dompet Anda tidak cukup untuk melakukan transfer.\n\nSilakan isi ulang token gas jaringan Polygon (POL) dan coba lagi.',
+    messagePurchase: 'Saldo biaya jaringan (gas) di dompet Anda tidak cukup untuk menyelesaikan pembelian.\n\nSilakan isi ulang token gas jaringan Polygon (POL) dan coba lagi.',
+  },
 };
 
 
