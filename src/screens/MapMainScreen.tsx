@@ -259,7 +259,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
           } catch {  }
         }
         if (v_717992 == null || !v_b4e012) return;
-        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const v_dabeaa = v_b4e012.toLowerCase().trim();
         if (!v_7cbea7.includes(v_dabeaa)) return;
         const v_1e6eca = await v_9d7f6b(v_b4e012, v_717992);
@@ -436,7 +436,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         if (v_717992 == null || !v_b4e012) return;
 
-        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const v_dabeaa = v_b4e012.toLowerCase().trim();
         if (!v_7cbea7.includes(v_dabeaa)) return;
 
