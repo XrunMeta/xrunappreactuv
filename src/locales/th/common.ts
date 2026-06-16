@@ -1,4 +1,5 @@
 export default {
+  notice: 'แจ้งเตือน',
   buttons: {
     submit: 'ส่ง',
     cancel: 'ยกเลิก',

@@ -3,6 +3,8 @@ export default {
   firstName: '名',
   lastName: '姓',
   email: 'メール',
+  password: 'パスワード',
+  changePassword: 'パスワード変更',
   phone: '電話番号',
   region: '地域',
   selectCountry: '国を選択',

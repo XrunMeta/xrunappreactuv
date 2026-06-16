@@ -1,4 +1,5 @@
 export default {
+  notice: 'Notice',
   cancel: 'Cancel',
   confirm: 'Confirm',
   buttons: {

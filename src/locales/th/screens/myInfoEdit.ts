@@ -3,6 +3,8 @@ export default {
   firstName: 'ชื่อ',
   lastName: 'นามสกุล',
   email: 'อีเมล',
+  password: 'รหัสผ่าน',
+  changePassword: 'เปลี่ยนรหัสผ่าน',
   phone: 'โทรศัพท์',
   region: 'ภูมิภาค',
   selectCountry: 'เลือกประเทศ',
