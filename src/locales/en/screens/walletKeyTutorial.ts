@@ -11,9 +11,9 @@ export default {
     title: 'Back Up Your Key Safely',
     body: [
       'You can back up your wallet key in the app. Even if you lose your device or delete the app, a backup lets you restore your wallet.',
-      'Encrypted backup: locked with a password for safety — recommended',
+      'Encrypted backup: locked with a PIN for safety — recommended',
       'Plain backup: anyone can open it, so never share it',
-      'If you lose your backup file and password, no one can recover it for you. Keep them in a safe, separate place.',
+      'If you lose your backup file and PIN, no one can recover it for you. Keep them in a safe, separate place.',
     ],
   },
   page3: {

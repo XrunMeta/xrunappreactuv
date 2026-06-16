@@ -11,9 +11,9 @@ export default {
     title: 'Sao lưu Khóa An toàn',
     body: [
       'Bạn có thể sao lưu khóa ví trong ứng dụng. Ngay cả khi mất thiết bị hoặc xóa ứng dụng, bản sao lưu sẽ giúp khôi phục ví.',
-      'Sao lưu đã mã hóa: được khóa bằng mật khẩu để an toàn — khuyến nghị',
+      'Sao lưu đã mã hóa: được khóa bằng mã PIN để an toàn — khuyến nghị',
       'Sao lưu thuần văn bản: ai cũng có thể mở, đừng bao giờ chia sẻ',
-      'Nếu bạn mất file sao lưu và mật khẩu, không ai có thể khôi phục. Hãy giữ chúng ở nơi an toàn và riêng biệt.',
+      'Nếu bạn mất file sao lưu và mã PIN, không ai có thể khôi phục. Hãy giữ chúng ở nơi an toàn và riêng biệt.',
     ],
   },
   page3: {
