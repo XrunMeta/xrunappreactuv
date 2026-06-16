@@ -39,6 +39,11 @@ export default {
     title: '通知',
     viewDetails: '查看详情',
   },
+  gasInsufficient: {
+    title: 'Gas费不足',
+    messageTransfer: '钱包中的网络手续费(Gas费)不足，无法转账。\n\n请充值Polygon网络Gas代币(POL)后再试。',
+    messagePurchase: '钱包中的支付手续费(Gas费)不足，无法完成购买。\n\n请充值Polygon网络Gas代币(POL)后再试。',
+  },
 };
 
 

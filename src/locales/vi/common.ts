@@ -37,6 +37,11 @@ export default {
     title: 'Thông báo',
     viewDetails: 'Xem chi tiết',
   },
+  gasInsufficient: {
+    title: 'Phí Gas không đủ',
+    messageTransfer: 'Ví của bạn không đủ phí mạng (gas) để thực hiện chuyển khoản.\n\nVui lòng nạp token gas mạng Polygon (POL) rồi thử lại.',
+    messagePurchase: 'Ví của bạn không đủ phí mạng (gas) để hoàn tất giao dịch mua.\n\nVui lòng nạp token gas mạng Polygon (POL) rồi thử lại.',
+  },
 };
 
 

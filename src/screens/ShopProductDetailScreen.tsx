@@ -941,8 +941,8 @@ export const v_a59951 = () => {
                                         v_1c868b(false);
                                         v_24bbbd(false);
                                         await v_889fad(
-                                            '가스비 부족',
-                                            '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                            v_8d41d7('common.gasInsufficient.title'),
+                                            v_8d41d7('common.gasInsufficient.messagePurchase'),
                                         );
                                         return;
                                     }
@@ -996,8 +996,8 @@ export const v_a59951 = () => {
                                     v_1c868b(false);
                                     v_24bbbd(false);
                                     await v_889fad(
-                                        '가스비 부족',
-                                        '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+                                        v_8d41d7('common.gasInsufficient.title'),
+                                        v_8d41d7('common.gasInsufficient.messagePurchase'),
                                     );
                                     return;
                                 }

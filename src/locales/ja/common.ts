@@ -40,6 +40,11 @@ export default {
     title: 'お知らせ',
     viewDetails: '詳細を見る',
   },
+  gasInsufficient: {
+    title: 'ガス代不足',
+    messageTransfer: 'ウォレットに送金手数料(ガス代)が不足しているため、送金できません。\n\nPolygonネットワークのガストークン(POL)をチャージしてから、もう一度お試しください。',
+    messagePurchase: 'ウォレットに決済手数料(ガス代)が不足しているため、購入できません。\n\nPolygonネットワークのガストークン(POL)をチャージしてから、もう一度お試しください。',
+  },
 };
 
 
