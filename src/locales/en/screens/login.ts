@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'Could not fetch email information.',
   title: 'Login',
 
   tabs: {

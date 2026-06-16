@@ -37,8 +37,8 @@ import {
 type Stage = 'loading' | 'pin' | 'options' | 'busy' | 'gdrive-list';
 
 const NETWORK_LABEL: Record<string, string> = {
-  eth: 'Ethereum (ETH 계열)',
-  pol: 'Polygon (POL 계열)',
+  eth: 'Ethereum',
+  pol: 'Polygon',
 };
 
 interface DriveFile {

@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'Không thể lấy thông tin email.',
   title: 'Đăng nhập',
 
   tabs: {

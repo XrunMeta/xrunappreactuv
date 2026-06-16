@@ -1,4 +1,5 @@
 export default {
+  emailFetchFail: 'Tidak dapat mengambil informasi email.',
   title: 'Masuk',
 
   tabs: {
