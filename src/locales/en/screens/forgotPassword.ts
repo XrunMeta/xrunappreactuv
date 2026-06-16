@@ -36,7 +36,8 @@ export default {
     passwordPolicy: 'Password must be at least 7 characters and include uppercase, lowercase, and numbers.',
     passwordMismatch: 'Passwords do not match.',
     resetSuccess: 'Password has been reset. Please log in again.',
-    codeInvalid: 'Code is invalid or expired.',
+    codeInvalid: 'Invalid code. Please use the code from the latest email.',
+    codeExpired: 'Code expired. Please request a new code.',
     resetFailed: 'Password reset failed',
   },
 };

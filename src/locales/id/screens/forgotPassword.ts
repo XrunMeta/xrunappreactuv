@@ -36,7 +36,8 @@ export default {
     passwordPolicy: 'Kata sandi harus minimal 7 karakter dan mengandung huruf besar/kecil dan angka.',
     passwordMismatch: 'Kata sandi tidak cocok.',
     resetSuccess: 'Kata sandi telah diatur ulang. Silakan login kembali.',
-    codeInvalid: 'Kode verifikasi tidak valid atau telah kedaluwarsa.',
+    codeInvalid: 'Kode tidak valid. Silakan gunakan kode dari email terbaru.',
+    codeExpired: 'Kode telah kedaluwarsa. Silakan minta kode baru.',
     resetFailed: 'Pengaturan ulang kata sandi gagal',
   },
 };

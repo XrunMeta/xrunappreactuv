@@ -86,7 +86,14 @@ export const v_040c8f = () => {
       await v_889fad(v_bee4c1('alerts.done'), v_bee4c1('alerts.resetSuccess'), [
         { text: v_bee4c1('alerts.confirm'), onPress: () => v_9b57fc(v_ce4741.login) },
       ]);
+    } else if (v_8f00b9.code === 410) {
+
+      await v_889fad(v_bee4c1('alerts.notice'), v_bee4c1('alerts.codeExpired'), [
+        { text: v_bee4c1('alerts.reissue'), onPress: () => v_cc5c9e('email') },
+        { text: v_bee4c1('alerts.confirm'), style: 'cancel' },
+      ]);
     } else if (v_8f00b9.code === 401) {
+
       await v_889fad(v_bee4c1('alerts.notice'), v_bee4c1('alerts.codeInvalid'), [
         { text: v_bee4c1('alerts.reissue'), onPress: () => v_cc5c9e('email') },
         { text: v_bee4c1('alerts.confirm'), style: 'cancel' },

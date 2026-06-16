@@ -435,10 +435,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         const v_b5ce2e = v_1e6eca.eth === null && v_1e6eca.pol === null;
         if (v_b5ce2e) {
+
+          const v_53cc65 = `restoreLaterDismissedAt:${v_dabeaa}`;
+          try {
+            const v_620175 = await v_e84827.getItem(v_53cc65);
+            if (v_620175) {
+              const v_e56026 = Date.now() - Number(v_620175);
+              if (v_e56026 < 10 * 60 * 1000) {
+
+                return;
+              }
+            }
+          } catch {  }
           const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null, ok: false }));
           if (v_2008a4) return;
           console.log('[MapMain] AT 상태', v_5a9fc7, 'email=', v_dabeaa, 'member=', v_717992);
-
           const v_7be387 = await v_889fad(
             v_8d41d7('screens.walletRestore.restoreNeededTitle'),
             v_8d41d7('screens.walletRestore.restoreNeededMessage'),
@@ -449,6 +460,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
           );
           if (v_7be387 === 1) {
             v_9b57fc(v_ce4741.walletRestore);
+          } else {
+
+            try { await v_e84827.setItem(v_53cc65, String(Date.now())); } catch {  }
           }
         }
       } catch {
