@@ -152,6 +152,12 @@ const ScreenHost = () => {
   useEffect(() => {
     const handleTap = (response: Notifications.NotificationResponse) => {
       try {
+        const data = (response?.notification?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const type = String(data.type ?? '');
+        if (type === 'inquiry_reply') {
+          navigate(ROUTES.myInfoNotify);
+          return;
+        }
         const xrunPolAsset: CombinedAsset = {
           id: 18, symbol: 'XRUN', name: 'XRUN', amount: '0', icon: '', currency: 18, isCustom: false,
         };
