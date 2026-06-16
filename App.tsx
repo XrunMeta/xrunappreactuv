@@ -80,7 +80,6 @@ import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
 import { AdisonTestScreen } from './src/screens/AdisonTestScreen';
 
 import { NavigationProvider, useAppNavigation, ROUTES } from './src/navigation';
-import type { CombinedAsset } from './src/types';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
@@ -130,7 +129,7 @@ let isDeepLinkProcessing = false;
 
 const ScreenHost = () => {
   const { currentScreen, navigate } = useAppNavigation();
-  const { setSignupFormData, setSelectedWalletAsset } = useAppContext();
+  const { setSignupFormData } = useAppContext();
 
   useEffect(() => {
     let cancelled = false;
@@ -158,11 +157,7 @@ const ScreenHost = () => {
           navigate(ROUTES.myInfoNotify);
           return;
         }
-        const xrunPolAsset: CombinedAsset = {
-          id: 18, symbol: 'XRUN', name: 'XRUN', amount: '0', icon: '', currency: 18, isCustom: false,
-        };
-        setSelectedWalletAsset(xrunPolAsset);
-        navigate(ROUTES.walletDetail);
+        navigate(ROUTES.wallet);
       } catch (e) {
         console.warn('[push tap] navigate fail:', e);
       }
@@ -175,7 +170,7 @@ const ScreenHost = () => {
       .catch(() => {});
 
     return () => { sub.remove(); };
-  }, [navigate, setSelectedWalletAsset]);
+  }, [navigate]);
 
   useEffect(() => {
 
