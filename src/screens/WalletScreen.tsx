@@ -920,10 +920,12 @@ export const WalletScreen = () => {
                 <Text
                   style={[
                     styles.tokenIconText,
-                    typeof listIndex === 'number' &&
+
+                    !isTextBadge && typeof listIndex === 'number' &&
                       listIndex > 0 &&
                       listIndex < 3 &&
                       styles.tokenIconTextCompact,
+                    isTextBadge && { fontSize: 20, lineHeight: 24 },
                     { color: fallbackColors?.text || '#343434' },
                   ]}
                   numberOfLines={1}
