@@ -883,7 +883,12 @@ export const WalletScreen = () => {
       onPress,
     } = props;
 
-    const iconSize = listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5) : listIndex === 4 ? Math.round(48 * 0.8) : Math.round(48 * 0.9);
+    const isTextBadge = currency === 19 || currency === 1900;
+    const iconSize = isTextBadge
+      ? Math.round(48 * 0.9)
+      : listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5)
+      : listIndex === 4 ? Math.round(48 * 0.8)
+      : Math.round(48 * 0.9);
     const [imgError, setImgError] = useState(false);
 
     useEffect(() => {
