@@ -35,7 +35,7 @@ export default {
   submitting: 'Processing...',
   errors: {
     termsRequired: 'You must agree to the required terms',
-    nameRequired: 'Please enter your family name and given name',
+    nameRequired: 'Please enter your name',
     emailRequired: 'Please enter your email',
     passwordRequired: 'Please enter your password',
     passwordPolicy: 'Password must be at least 7 characters and include a number, a lowercase letter, and an uppercase letter',
@@ -43,6 +43,8 @@ export default {
     passwordMismatch: 'Passwords do not match',
     phoneRequired: 'Please enter your phone number',
     regionRequired: 'Please select a region',
+    genderRequired: 'Please select gender',
+    ageRequired: 'Please select age range',
     emailDuplicate: 'This email is already in use',
     referralInvalid: 'Invalid referral email. Do you want to continue?',
     referralEmpty: 'If you do not enter a referral, a random referral will be assigned.',

@@ -30,7 +30,7 @@ import {
 } from '../services';
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
-import { v_019a30 } from './walletKeyTutorialHelpers';
+import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -138,6 +138,10 @@ export const v_667a00 = () => {
             recommand: v_fad096.referralMemberId || 0,
             os: v_91bb22.getOSCode(),
             social_code: v_d0472c ? 2052 : (v_47b466 ? 2051 : undefined), 
+
+            agree_service: !!v_fad096.agree_service,
+            agree_location: !!v_fad096.agree_location,
+            agree_privacy: !!v_fad096.agree_privacy,
           };
 
           console.log('[회원가입] 회원가입 API 호출 시작', {
@@ -264,6 +268,7 @@ export const v_667a00 = () => {
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           try {
+            await v_e84827.removeItem(v_4e5f7b);
             await v_e84827.setItem(v_019a30, 'true');
           } catch (v_9e86fd) {
             console.warn('[회원가입] 튜토리얼 pending 플래그 저장 실패:', v_9e86fd);

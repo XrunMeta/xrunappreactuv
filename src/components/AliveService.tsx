@@ -15,6 +15,8 @@ export const AliveService: v_a3453e.FC = () => {
   const v_3ac63b = v_e662ae<NodeJS.Timeout | null>(null);
   const v_1b7402 = v_e662ae<v_c3551b>(v_6b5698.currentState);
 
+  const v_5d6849 = v_e662ae<number>(0);
+
   v_c4deb2(() => {
     v_0917d2.current = v_75e98a;
   }, [v_75e98a]);
@@ -51,6 +53,11 @@ export const AliveService: v_a3453e.FC = () => {
   };
 
   const v_fd4e8f = async () => {
+
+    if (Date.now() < v_5d6849.current) {
+      console.log('[AliveService] resume grace — fail 무시 (다음 30초 호출 대기)');
+      return;
+    }
     const v_654087 = v_0917d2.current + 1;
     v_fd5a46(v_654087);
     v_0917d2.current = v_654087;
@@ -84,6 +91,10 @@ export const AliveService: v_a3453e.FC = () => {
       v_1b7402.current.match(/inactive|background/) &&
       v_3b10d8 === 'active'
     ) {
+
+      v_5d6849.current = Date.now() + 30000;
+      v_fd5a46(0);
+      v_0917d2.current = 0;
 
       v_f4cb97();
       v_7592ef();

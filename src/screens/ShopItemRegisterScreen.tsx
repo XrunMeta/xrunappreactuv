@@ -577,10 +577,13 @@ export const v_680bee = () => {
             <TextInput
               style={v_d81136.input}
               value={v_318e8b}
-              onChangeText={v_5f29a4}
+
+              onChangeText={(v_9b6134) => v_5f29a4(v_9b6134.replace(/[^0-9]/g, '').slice(0, 5))}
               placeholder={v_8d41d7('screens.shopItemRegister.pricePlaceholder')}
               placeholderTextColor="#999"
               keyboardType="number-pad"
+              inputMode="numeric"
+              maxLength={5}
             />
           </View>
 

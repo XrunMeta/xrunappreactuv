@@ -8,7 +8,8 @@ import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
 import { v_2dc778 } from '../services';
-import type { v_cc1705 } from '../services';
+import type { v_cc1705, v_55701f } from '../services';
+import { v_ca58e0, v_7ac54c } from '../services/referralSettlementCache';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -99,7 +100,8 @@ export const v_08aac3 = () => {
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_3af388, v_2f9613] = v_5ab095<TransformedSettlementData[]>([]);
   const [v_def2d0, v_690164] = v_5ab095<TransformedSettlementData[]>([]);
-  const [v_683210, v_34a50a] = v_5ab095(true);
+
+  const [v_683210, v_34a50a] = v_5ab095(false);
   const [v_a78eba, v_64f9bd] = v_5ab095(false);
   const [v_7815ff, v_be9dba] = v_5ab095(0);
   const [v_6bbe19, v_1454f0] = v_5ab095(true);
@@ -151,15 +153,16 @@ export const v_08aac3 = () => {
     v_0e1f49();
   }, []);
 
-  const v_5ee940 = v_de06a3(async (v_660822) => {
+  const v_5ee940 = v_de06a3(async (v_660822, prefetchedResponse?: v_55701f, v_669bef) => {
     try {
-      v_34a50a(true);
+
+      if (!v_f08231 && !v_669bef) v_34a50a(true);
 
       console.log('═══════════════════════════════════════════');
-      console.log('[정산 디버그] fetchSettlementData 시작, member:', v_660822);
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', v_660822, v_f08231 ? '(캐시 사용)' : '(API 호출)');
       console.log('═══════════════════════════════════════════');
 
-      const v_11b884 = await v_2dc778(v_660822, v_9b57fc);
+      const v_11b884 = v_f08231 ?? await v_2dc778(v_660822, v_9b57fc);
 
       console.log('[정산 디버그] 백엔드 응답 status:', v_11b884.status);
       console.log('[정산 디버그] 백엔드 응답 message:', v_11b884.message);
@@ -250,9 +253,24 @@ export const v_08aac3 = () => {
   }, [v_9b57fc, v_beea9d]);
 
   v_c4deb2(() => {
-    if (v_717992) {
-      v_5ee940(v_717992);
+    if (!v_717992) return;
+    const v_e2a6a6 = v_ca58e0(v_717992);
+    if (v_e2a6a6) {
+      v_5ee940(v_717992, v_e2a6a6);
+      setTimeout(() => { v_5ee940(v_717992, undefined, true); }, 0);
+      return;
     }
+    const v_d7fc78 = v_7ac54c(v_717992);
+    if (v_d7fc78) {
+
+      v_34a50a(true);
+      v_d7fc78.then((v_9390e8) => {
+        if (v_9390e8) v_5ee940(v_717992, v_9390e8);
+        else v_5ee940(v_717992); 
+      });
+      return;
+    }
+    v_5ee940(v_717992);
   }, [v_717992, v_5ee940]);
 
   const v_e15c3b = v_de06a3(() => {

@@ -169,12 +169,23 @@ export const v_03a231 = () => {
               const v_90af29 = await v_e84827.getItem('lastNotificationCheckTime');
               const v_910d40 = v_90af29 ? new Date(v_90af29).getTime() : 0;
 
-              const v_f66810 = v_3393e3.data.some((v_b9faeb) => {
-                const v_85f156 = new Date(v_b9faeb.datetime).getTime();
+              const v_ffe9e6 = (v_479f05): number => {
+                const v_fd5f43 = String(v_479f05 ?? '').trim();
+                if (!v_fd5f43) return 0;
+
+                const v_6fc191 = v_fd5f43.includes('T') ? v_fd5f43 : v_fd5f43.replace(' ', 'T') + (v_fd5f43.endsWith('Z') ? '' : 'Z');
+                return new Date(v_6fc191).getTime();
+              };
+              const v_4a7208 = v_3393e3.data.filter((v_b9faeb) => {
+
+                if (Number(v_b9faeb.type) === 9303) return false;
+                const v_85f156 = v_ffe9e6(v_b9faeb.datetime);
                 return v_85f156 > v_910d40;
               });
+              const v_f66810 = v_4a7208.length > 0;
 
               v_0dfa96(v_f66810);
+
             } else {
               v_0dfa96(false);
             }
@@ -214,10 +225,6 @@ export const v_03a231 = () => {
         }
       } else if (v_714568.id === 'notify') {
 
-        console.log('[내 정보] 알림 메뉴 — 빨간 점 즉시 숨김 (옵티미스틱)');
-        v_0dfa96(false);
-
-        v_e84827.setItem('lastNotificationCheckTime', new Date().toISOString()).catch(() => {});
         v_9b57fc(v_ce4741[v_714568.route]);
       } else {
         v_9b57fc(v_ce4741[v_714568.route]);

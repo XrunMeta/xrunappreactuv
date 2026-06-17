@@ -21,7 +21,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_570c34, v_556baf } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
-import { v_a0daa8 } from '../navigation';
+import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
   v_ab08d0,
   v_26e528,
@@ -200,8 +200,8 @@ export const v_386af2 = () => {
   const v_11b765 = v_de06a3(() => {
     if (v_e99f51.current && v_b9c00c.length > 0 && v_d16a0d.current) {
       setTimeout(() => {
-        v_e99f51.current?.scrollToEnd({ animated: true });
-      }, 100);
+        v_e99f51.current?.scrollToEnd({ animated: false });
+      }, 0);
     }
   }, [v_b9c00c.length]);
 
@@ -380,6 +380,17 @@ export const v_386af2 = () => {
                 <TouchableOpacity
                   style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={async () => {
+
+                    const v_9f1622 = String(v_b9faeb.title ?? '');
+                    if (v_9f1622.includes('출석체크')) {
+                      try {
+                        await v_e84827.setItem('pendingPushWalletNav', 'xrun_pol');
+                        v_9b57fc(v_ce4741.wallet);
+                      } catch (v_9e86fd) {
+                        console.warn('[Notify] 출석체크 navigate 실패:', v_9e86fd);
+                      }
+                      return;
+                    }
                     const v_f71b56 = `https://oth-path-51a04e.example.invalid/oth-path?id=${v_b9faeb.board}`;
                     v_f2c756.openURL(v_f71b56).catch(async () => {
                       await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.linkError'), v_8d41d7('screens.myInfoNotify.alerts.linkErrorMessage'));

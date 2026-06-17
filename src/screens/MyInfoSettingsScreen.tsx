@@ -14,6 +14,8 @@ import {
 import {
   v_8b775f,
   v_415b23,
+  v_c07be3,
+  v_13c90a,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
 
@@ -33,6 +35,11 @@ export const v_4a40b2 = () => {
   const [v_b3e3c3, v_2f1158] = v_5ab095<boolean>(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
 
+  const [v_be324f, v_14a7e3] = v_5ab095<boolean>(true);
+  const [v_839078, v_798637] = v_5ab095<boolean>(true);
+  const [v_7aa88d, v_61af28] = v_5ab095<boolean>(false);
+  const [v_5fed92, v_032c2e] = v_5ab095<boolean>(false);
+
   v_c4deb2(() => {
     (async () => {
       try {
@@ -41,13 +48,54 @@ export const v_4a40b2 = () => {
         const v_f24fd5 = await v_e84827.getItem('userData');
         if (v_f24fd5) {
           const v_ef7306 = JSON.parse(v_f24fd5);
-          if (v_ef7306?.member) v_9d6aeb(Number(v_ef7306.member));
+          if (v_ef7306?.member) {
+            const v_73ad51 = Number(v_ef7306.member);
+            v_9d6aeb(v_73ad51);
+
+            try {
+              const v_8f00b9 = await v_c07be3(v_73ad51);
+              if (v_8f00b9) {
+                v_14a7e3(v_8f00b9.notice);
+                v_798637(v_8f00b9.event);
+              }
+            } catch (v_9e86fd) {
+              console.warn('[MyInfoSettings] 카테고리 설정 로드 실패:', v_9e86fd);
+            }
+          }
         }
       } catch (v_49263d) {
         console.warn('[MyInfoSettings] 푸시 상태 로드 실패:', v_49263d);
       }
     })();
   }, []);
+
+  const v_880ae3 = async (v_a448ad) => {
+    if (v_7aa88d || !v_717992) return;
+    v_61af28(true);
+    v_14a7e3(v_a448ad); 
+    try {
+      await v_13c90a(v_717992, { notice: v_a448ad });
+    } catch (v_9e86fd) {
+      console.warn('[MyInfoSettings] 공지 토글 실패 — 롤백:', v_9e86fd);
+      v_14a7e3(!v_a448ad);
+    } finally {
+      v_61af28(false);
+    }
+  };
+
+  const v_004928 = async (v_a448ad) => {
+    if (v_5fed92 || !v_717992) return;
+    v_032c2e(true);
+    v_798637(v_a448ad);
+    try {
+      await v_13c90a(v_717992, { event: v_a448ad });
+    } catch (v_9e86fd) {
+      console.warn('[MyInfoSettings] 이벤트 토글 실패 — 롤백:', v_9e86fd);
+      v_798637(!v_a448ad);
+    } finally {
+      v_032c2e(false);
+    }
+  };
 
   const v_465139 = async (v_a448ad) => {
     if (v_b3e3c3) return;
@@ -58,11 +106,27 @@ export const v_4a40b2 = () => {
     v_2f1158(true);
 
     v_1a9606(v_a448ad);
+
+    const v_7f0f9d = v_be324f;
+    const v_d5f27d = v_839078;
+    if (!v_a448ad) {
+      v_14a7e3(false);
+      v_798637(false);
+    }
     try {
       await v_415b23(v_a448ad, v_717992, v_9b57fc);
+      if (!v_a448ad) {
+
+        await v_13c90a(v_717992, { notice: false, event: false }).catch(() => {});
+      }
     } catch (v_49263d) {
       console.warn('[MyInfoSettings] 푸시 토글 실패 — 롤백:', v_49263d);
       v_1a9606(!v_a448ad);
+      if (!v_a448ad) {
+
+        v_14a7e3(v_7f0f9d);
+        v_798637(v_d5f27d);
+      }
     } finally {
       v_2f1158(false);
     }
@@ -118,16 +182,12 @@ export const v_4a40b2 = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={v_d81136.inner}>
-          {}
+          {
+}
           <View style={[v_d81136.card, v_d81136.rowCard]}>
             <View style={v_d81136.rowCardLeft}>
               <Text style={v_d81136.cardText}>
                 {v_8d41d7('screens.myInfoSettings.pushNotifications')}
-              </Text>
-              <Text style={v_d81136.rowCardSub}>
-                {v_1486be
-                  ? v_8d41d7('screens.myInfoSettings.pushNotificationsOn')
-                  : v_8d41d7('screens.myInfoSettings.pushNotificationsOff')}
               </Text>
             </View>
             {v_b3e3c3 ? (
@@ -137,6 +197,41 @@ export const v_4a40b2 = () => {
                 value={v_1486be}
                 onValueChange={v_465139}
                 disabled={!v_717992}
+                trackColor={{ false: '#d4d4d4', true: v_1bfbd0.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
+          {}
+          <View style={[v_d81136.card, v_d81136.rowCard]}>
+            <View style={v_d81136.rowCardLeft}>
+              <Text style={v_d81136.cardText}>공지사항 알림</Text>
+            </View>
+            {v_7aa88d ? (
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            ) : (
+              <Switch
+                value={v_be324f}
+                onValueChange={v_880ae3}
+                disabled={!v_717992 || !v_1486be}
+                trackColor={{ false: '#d4d4d4', true: v_1bfbd0.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
+          <View style={[v_d81136.card, v_d81136.rowCard]}>
+            <View style={v_d81136.rowCardLeft}>
+              <Text style={v_d81136.cardText}>이벤트 알림</Text>
+            </View>
+            {v_5fed92 ? (
+              <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+            ) : (
+              <Switch
+                value={v_839078}
+                onValueChange={v_004928}
+                disabled={!v_717992 || !v_1486be}
                 trackColor={{ false: '#d4d4d4', true: v_1bfbd0.buttonPrimary }}
                 thumbColor={'#ffffff'}
               />

@@ -82,7 +82,7 @@ import { v_e90247 } from './src/screens/AdisonTestScreen';
 import { v_00e8f9, v_a0daa8, v_ce4741 } from './src/navigation';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
-import { v_aabda8, v_b631a8, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
+import { v_aabda8, v_b631a8, v_7e2242, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
 import { v_8ecf08, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
@@ -119,6 +119,8 @@ import * as v_2b7a17 from 'bpebbcghaffswkrsep';
 v_2b7a17.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -1212,6 +1214,7 @@ export default function v_6540c3() {
             <OTAUpdateProvider>
               <PermissionRequester isAdFinished={v_65941f} />
               <AliveService />
+              <NotificationToastService />
               <ScreenHost />
               <GlobalDialogs />
               {__DEV__ && <DevDebugPanel />}

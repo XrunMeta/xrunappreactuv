@@ -48,6 +48,7 @@ import {
 } from '../services';
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
+import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 
 const v_0c96f7 = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -745,16 +746,18 @@ export const v_f40fc5 = () => {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.phoneRequired'));
         return;
       }
-      if (v_5f1e0e && v_590486 && (!v_2f03bc || v_2f03bc.dialCode === '0')) {
+
+      if (v_5f1e0e && (!v_2f03bc || v_2f03bc.dialCode === '0')) {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.regionRequired'));
         return;
       }
       if (!v_c3eac4 || v_c3eac4 === '0') {
-        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.genderRequired') || '성별을 선택해주세요.');
+
+        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.genderRequired', { defaultValue: '성별을 선택해주세요.' }));
         return;
       }
       if (!v_f83808 || v_f83808 === '0') {
-        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.ageRequired') || '연령대를 선택해주세요.');
+        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.ageRequired', { defaultValue: '연령대를 선택해주세요.' }));
         return;
       }
     }
@@ -888,6 +891,10 @@ export const v_f40fc5 = () => {
             recommand: v_65bdb1 || 0,
             os: v_91bb22.getOSCode(),
             social_code: 2052, 
+
+            agree_service: v_471e49,
+            agree_location: v_68a5a9,
+            agree_privacy: v_e55f34,
           };
 
           console.log('[회원가입] 애플 회원가입 API 호출 시작');
@@ -929,6 +936,13 @@ export const v_f40fc5 = () => {
 
           await v_e84827.setItem('appleSignupCompleted', 'true');
           await v_e84827.setItem('appleSignupCompletedEmail', v_e0c7e8.trim());
+
+          try {
+            await v_e84827.removeItem(v_4e5f7b);
+            await v_e84827.setItem(v_019a30, 'true');
+          } catch (v_9e86fd) {
+            console.warn('[애플 회원가입] 튜토리얼 pending 플래그 저장 실패:', v_9e86fd);
+          }
           console.log('[회원가입] 애플 회원가입 완료 플래그 저장:', v_e0c7e8.trim());
 
           await v_e84827.removeItem('appleSignupRequired');
@@ -1034,6 +1048,10 @@ export const v_f40fc5 = () => {
           gender: v_c3eac4,
           ageRange: v_f83808,
           isAppleSignupMode: false,
+
+          agree_service: v_471e49,
+          agree_location: v_68a5a9,
+          agree_privacy: v_e55f34,
         };
 
         await v_e84827.setItem('pendingSignupData', JSON.stringify(v_0e0310));

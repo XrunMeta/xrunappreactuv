@@ -21,6 +21,7 @@ export { ReferralMemberRow } from './ReferralMemberRow';
 export { ShopSalesMemberRow, type ShopSalesMemberData } from './ShopSalesMemberRow';
 export { ShopItemCard } from './ShopItemCard';
 export { AliveService } from './AliveService';
+export { NotificationToastService } from './NotificationToastService';
 export { CountryCodeListItem } from './CountryCodeListItem';
 export { CountryFlagImage } from './CountryFlagImage';
 export { EmergencyStopDialog } from './EmergencyStopDialog';

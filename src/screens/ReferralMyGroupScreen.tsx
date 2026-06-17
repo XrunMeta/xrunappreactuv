@@ -12,6 +12,7 @@ import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
 import { v_fb1936, v_08316d } from '../services';
+import { v_492864 } from '../services/referralSettlementCache';
 import { v_b0f886 } from '../types';
 
 interface MemberData {
@@ -65,6 +66,14 @@ export const v_58584a = () => {
     };
     v_0e1f49();
   }, []);
+
+  v_c4deb2(() => {
+    if (!v_717992) return;
+    const v_90772d = Number(v_717992);
+    if (Number.isFinite(v_90772d) && v_90772d > 0) {
+      v_492864(v_90772d, v_9b57fc);
+    }
+  }, [v_717992, v_9b57fc]);
 
   v_c4deb2(() => {
     if (!v_717992) return;

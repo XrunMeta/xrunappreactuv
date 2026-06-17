@@ -7091,3 +7091,47 @@ export const v_5e332c = async (
     return { status: 'error', code: v_5e9bfe?.response?.status, message: v_9390e8?.message || v_5e9bfe?.message || 'failed' };
   }
 };
+
+export const v_c07be3 = async (
+  v_660822,
+): Promise<{ all: boolean; notice: boolean; event: boolean } | null> => {
+  try {
+    const v_9f42a4 = v_7488d5();
+    const v_8f00b9 = await v_9f42a4.get(`/notification-settings?member=${v_660822}`);
+    const v_3ac7e7 = v_8f00b9.data?.data?.[0];
+    if (!v_3ac7e7) return null;
+    return { all: !!v_3ac7e7.all, notice: !!v_3ac7e7.notice, event: !!v_3ac7e7.event };
+  } catch (v_9e86fd) {
+    console.warn('[getNotificationSettings] failed:', v_9e86fd);
+    return null;
+  }
+};
+
+export const v_13c90a = async (
+  v_660822,
+  v_17dc8a,
+): Promise<boolean> => {
+  try {
+    const v_9f42a4 = v_7488d5();
+    await v_9f42a4.post('/notification-settings', { member: v_660822, ...v_17dc8a });
+    return true;
+  } catch (v_9e86fd) {
+    console.warn('[updateNotificationSettings] failed:', v_9e86fd);
+    throw v_9e86fd;
+  }
+};
+
+export const v_884f91 = async (): Promise<boolean> => {
+  try {
+    const v_56b352 = await v_e84827.getItem('jwt');
+    if (!v_56b352) return false;
+    const v_660822 = v_9bbbdc(v_56b352);
+    if (!v_660822) return false;
+    const v_9f42a4 = v_7488d5();
+    await v_9f42a4.post('/wallet-tutorial/complete', { member: v_660822 });
+    return true;
+  } catch (v_9e86fd) {
+    console.warn('[recordWalletTutorialComplete] failed:', v_9e86fd);
+    return false;
+  }
+};

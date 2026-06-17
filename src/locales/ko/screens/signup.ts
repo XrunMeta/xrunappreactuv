@@ -35,7 +35,7 @@ export default {
   submitting: '처리 중...',
   errors: {
     termsRequired: '약관 동의가 필요합니다.',
-    nameRequired: '성과 이름을 입력해주세요.',
+    nameRequired: '이름을 입력해주세요.',
     emailRequired: '이메일을 입력해주세요.',
     passwordRequired: '비밀번호를 입력해주세요.',
     passwordPolicy: '비밀번호는 7자 이상이며 숫자, 영문 소문자, 영문 대문자를 모두 포함해야 합니다.',
@@ -43,6 +43,8 @@ export default {
     passwordMismatch: '비밀번호가 일치하지 않습니다.',
     phoneRequired: '전화번호를 입력해주세요.',
     regionRequired: '지역을 선택해주세요.',
+    genderRequired: '성별을 선택해주세요.',
+    ageRequired: '연령대를 선택해주세요.',
     emailDuplicate: '이미 사용 중인 이메일입니다.',
     referralInvalid: '유효하지 않은 추천인 이메일입니다. 계속 진행하시겠습니까?',
     referralEmpty: '추천인을 입력하지 않으면 임의의 추천인이 지정됩니다.',
