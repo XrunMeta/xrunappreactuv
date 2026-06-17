@@ -115,11 +115,8 @@ function resolveWalletListIconSource(asset: CombinedAsset): any | null {
   const sym = (asset.symbol || '').toUpperCase();
   const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
 
-  if (asset.currency === 1900) {
+  if (asset.currency === 1900 || asset.currency === 19) {
     return null;
-  }
-  if (asset.currency === 19 || sub.includes('ad xrun')) {
-    return require('../../assets/ad-round-logo.png');
   }
   if (sym === 'ETH' || asset.currency === 2) {
     if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
@@ -805,7 +802,10 @@ export const WalletScreen = () => {
         suffix: asset.symbol,
         iconSource,
 
-        fallbackLabel: asset.currency === 1900 ? 'RF' : asset.symbol.slice(0, 2).toUpperCase(),
+        fallbackLabel:
+          asset.currency === 1900 ? 'RF'
+          : asset.currency === 19 ? 'AD'
+          : asset.symbol.slice(0, 2).toUpperCase(),
         fallbackColors: {
           background: diskBg,
           text: textOnDisk,
@@ -1078,6 +1078,20 @@ export const WalletScreen = () => {
               <Text style={styles.walletInfoTitle}>{t('screens.wallet.walletInfo')}</Text>
               <Text style={styles.walletInfoSubtitle}>{t('screens.wallet.walletInfoSubtitle')}</Text>
             </View>
+            {}
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.walletInfoRow}
               onPress={() => {
@@ -1092,7 +1106,7 @@ export const WalletScreen = () => {
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.walletInfoRow}
+              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
               onPress={() => {
                 setWalletInfoVisible(false);
                 setTimeout(() => navigate(ROUTES.walletRestore), 250);
@@ -1102,19 +1116,6 @@ export const WalletScreen = () => {
                 <Ionicons name="cloud-download-outline" size={22} color="#343a5a" />
               </View>
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletRestore')}</Text>
-              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
-              onPress={() => {
-                setWalletInfoVisible(false);
-                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
-              }}
-            >
-              <View style={styles.walletInfoIconWrap}>
-                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
-              </View>
-              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
           </View>
