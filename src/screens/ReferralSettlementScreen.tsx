@@ -8,7 +8,8 @@ import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../compon
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
 import { getReferralIncome } from '../services';
-import type { ReferralIncomeItem } from '../services';
+import type { ReferralIncomeItem, GetReferralIncomeResponse } from '../services';
+import { getCachedReferralSettlement, getInflightReferralSettlement } from '../services/referralSettlementCache';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -99,7 +100,8 @@ export const ReferralSettlementScreen = () => {
   const [memberId, setMemberId] = useState<number | null>(null);
   const [settlementData, setSettlementData] = useState<TransformedSettlementData[]>([]);
   const [currentData, setCurrentData] = useState<TransformedSettlementData[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -151,15 +153,16 @@ export const ReferralSettlementScreen = () => {
     loadUserData();
   }, []);
 
-  const fetchSettlementData = useCallback(async (member: number) => {
+  const fetchSettlementData = useCallback(async (member: number, prefetchedResponse?: GetReferralIncomeResponse, silent?: boolean) => {
     try {
-      setLoading(true);
+
+      if (!prefetchedResponse && !silent) setLoading(true);
 
       console.log('═══════════════════════════════════════════');
-      console.log('[정산 디버그] fetchSettlementData 시작, member:', member);
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', member, prefetchedResponse ? '(캐시 사용)' : '(API 호출)');
       console.log('═══════════════════════════════════════════');
 
-      const resultRef = await getReferralIncome(member, navigate);
+      const resultRef = prefetchedResponse ?? await getReferralIncome(member, navigate);
 
       console.log('[정산 디버그] 백엔드 응답 status:', resultRef.status);
       console.log('[정산 디버그] 백엔드 응답 message:', resultRef.message);
@@ -250,9 +253,24 @@ export const ReferralSettlementScreen = () => {
   }, [navigate, gopaxPrice]);
 
   useEffect(() => {
-    if (memberId) {
-      fetchSettlementData(memberId);
+    if (!memberId) return;
+    const cached = getCachedReferralSettlement(memberId);
+    if (cached) {
+      fetchSettlementData(memberId, cached);
+      setTimeout(() => { fetchSettlementData(memberId, undefined, true); }, 0);
+      return;
     }
+    const inflight = getInflightReferralSettlement(memberId);
+    if (inflight) {
+
+      setLoading(true);
+      inflight.then((data) => {
+        if (data) fetchSettlementData(memberId, data);
+        else fetchSettlementData(memberId); 
+      });
+      return;
+    }
+    fetchSettlementData(memberId);
   }, [memberId, fetchSettlementData]);
 
   const loadMoreData = useCallback(() => {

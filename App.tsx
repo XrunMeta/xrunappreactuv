@@ -82,7 +82,7 @@ import { AdisonTestScreen } from './src/screens/AdisonTestScreen';
 import { NavigationProvider, useAppNavigation, ROUTES } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
+import { AddTokenDialog, AliveService, NotificationToastService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
 import { loadEnvSync, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
@@ -119,6 +119,8 @@ import * as Notifications from 'expo-notifications';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -1212,6 +1214,7 @@ export default function App() {
             <OTAUpdateProvider>
               <PermissionRequester isAdFinished={isAdFinished} />
               <AliveService />
+              <NotificationToastService />
               <ScreenHost />
               <GlobalDialogs />
               {__DEV__ && <DevDebugPanel />}

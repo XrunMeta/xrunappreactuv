@@ -259,7 +259,7 @@ export const MapMainScreen: React.FC = () => {
           } catch {  }
         }
         if (memberId == null || !emailRaw) return;
-        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const normEmail = emailRaw.toLowerCase().trim();
         if (!PIN_DEV_EMAILS.includes(normEmail)) return;
         const entries = await findEntriesForUser(emailRaw, memberId);
@@ -436,7 +436,7 @@ export const MapMainScreen: React.FC = () => {
 
         if (memberId == null || !emailRaw) return;
 
-        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const normEmail = emailRaw.toLowerCase().trim();
         if (!PIN_DEV_EMAILS.includes(normEmail)) return;
 
@@ -447,6 +447,12 @@ export const MapMainScreen: React.FC = () => {
 
         if (cancelled) return;
         if (triggerNeeded) {
+
+          const tutorialDone = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+          if (tutorialDone !== 'true') {
+            navigate(ROUTES.walletKeyTutorial);
+            return;
+          }
 
           setPinModalProps((prev) => {
             if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;

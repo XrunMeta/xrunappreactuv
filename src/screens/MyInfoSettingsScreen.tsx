@@ -14,6 +14,8 @@ import {
 import {
   getPushNotificationsEnabled,
   setPushNotificationsEnabled,
+  getNotificationSettings,
+  updateNotificationSettings,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
 
@@ -33,6 +35,11 @@ export const MyInfoSettingsScreen = () => {
   const [pushToggleLoading, setPushToggleLoading] = useState<boolean>(false);
   const [memberId, setMemberId] = useState<number | null>(null);
 
+  const [noticeEnabled, setNoticeEnabled] = useState<boolean>(true);
+  const [eventEnabled, setEventEnabled] = useState<boolean>(true);
+  const [noticeToggleLoading, setNoticeToggleLoading] = useState<boolean>(false);
+  const [eventToggleLoading, setEventToggleLoading] = useState<boolean>(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -41,13 +48,54 @@ export const MyInfoSettingsScreen = () => {
         const userDataStr = await AsyncStorage.getItem('userData');
         if (userDataStr) {
           const userData = JSON.parse(userDataStr);
-          if (userData?.member) setMemberId(Number(userData.member));
+          if (userData?.member) {
+            const mid = Number(userData.member);
+            setMemberId(mid);
+
+            try {
+              const res = await getNotificationSettings(mid);
+              if (res) {
+                setNoticeEnabled(res.notice);
+                setEventEnabled(res.event);
+              }
+            } catch (e) {
+              console.warn('[MyInfoSettings] 카테고리 설정 로드 실패:', e);
+            }
+          }
         }
       } catch (err) {
         console.warn('[MyInfoSettings] 푸시 상태 로드 실패:', err);
       }
     })();
   }, []);
+
+  const handleToggleNotice = async (next: boolean) => {
+    if (noticeToggleLoading || !memberId) return;
+    setNoticeToggleLoading(true);
+    setNoticeEnabled(next); 
+    try {
+      await updateNotificationSettings(memberId, { notice: next });
+    } catch (e) {
+      console.warn('[MyInfoSettings] 공지 토글 실패 — 롤백:', e);
+      setNoticeEnabled(!next);
+    } finally {
+      setNoticeToggleLoading(false);
+    }
+  };
+
+  const handleToggleEvent = async (next: boolean) => {
+    if (eventToggleLoading || !memberId) return;
+    setEventToggleLoading(true);
+    setEventEnabled(next);
+    try {
+      await updateNotificationSettings(memberId, { event: next });
+    } catch (e) {
+      console.warn('[MyInfoSettings] 이벤트 토글 실패 — 롤백:', e);
+      setEventEnabled(!next);
+    } finally {
+      setEventToggleLoading(false);
+    }
+  };
 
   const handleTogglePush = async (next: boolean) => {
     if (pushToggleLoading) return;
@@ -58,11 +106,27 @@ export const MyInfoSettingsScreen = () => {
     setPushToggleLoading(true);
 
     setPushEnabled(next);
+
+    const prevNotice = noticeEnabled;
+    const prevEvent = eventEnabled;
+    if (!next) {
+      setNoticeEnabled(false);
+      setEventEnabled(false);
+    }
     try {
       await setPushNotificationsEnabled(next, memberId, navigate);
+      if (!next) {
+
+        await updateNotificationSettings(memberId, { notice: false, event: false }).catch(() => {});
+      }
     } catch (err) {
       console.warn('[MyInfoSettings] 푸시 토글 실패 — 롤백:', err);
       setPushEnabled(!next);
+      if (!next) {
+
+        setNoticeEnabled(prevNotice);
+        setEventEnabled(prevEvent);
+      }
     } finally {
       setPushToggleLoading(false);
     }
@@ -118,16 +182,12 @@ export const MyInfoSettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inner}>
-          {}
+          {
+}
           <View style={[styles.card, styles.rowCard]}>
             <View style={styles.rowCardLeft}>
               <Text style={styles.cardText}>
                 {t('screens.myInfoSettings.pushNotifications')}
-              </Text>
-              <Text style={styles.rowCardSub}>
-                {pushEnabled
-                  ? t('screens.myInfoSettings.pushNotificationsOn')
-                  : t('screens.myInfoSettings.pushNotificationsOff')}
               </Text>
             </View>
             {pushToggleLoading ? (
@@ -137,6 +197,41 @@ export const MyInfoSettingsScreen = () => {
                 value={pushEnabled}
                 onValueChange={handleTogglePush}
                 disabled={!memberId}
+                trackColor={{ false: '#d4d4d4', true: COLORS.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
+          {}
+          <View style={[styles.card, styles.rowCard]}>
+            <View style={styles.rowCardLeft}>
+              <Text style={styles.cardText}>공지사항 알림</Text>
+            </View>
+            {noticeToggleLoading ? (
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            ) : (
+              <Switch
+                value={noticeEnabled}
+                onValueChange={handleToggleNotice}
+                disabled={!memberId || !pushEnabled}
+                trackColor={{ false: '#d4d4d4', true: COLORS.buttonPrimary }}
+                thumbColor={'#ffffff'}
+              />
+            )}
+          </View>
+
+          <View style={[styles.card, styles.rowCard]}>
+            <View style={styles.rowCardLeft}>
+              <Text style={styles.cardText}>이벤트 알림</Text>
+            </View>
+            {eventToggleLoading ? (
+              <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+            ) : (
+              <Switch
+                value={eventEnabled}
+                onValueChange={handleToggleEvent}
+                disabled={!memberId || !pushEnabled}
                 trackColor={{ false: '#d4d4d4', true: COLORS.buttonPrimary }}
                 thumbColor={'#ffffff'}
               />

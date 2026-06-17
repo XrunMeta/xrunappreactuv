@@ -859,7 +859,7 @@ export const WalletScreen = () => {
         navigate(ROUTES.adHistory);
       } else if (currency === 1900) {
 
-        navigate(ROUTES.referralSettlement);
+        navigate(ROUTES.referralMyGroup);
       } else {
 
         setSelectedWalletAsset(item);

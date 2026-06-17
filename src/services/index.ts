@@ -7091,3 +7091,47 @@ export const resetPasswordWithCode = async (
     return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
   }
 };
+
+export const getNotificationSettings = async (
+  member: number,
+): Promise<{ all: boolean; notice: boolean; event: boolean } | null> => {
+  try {
+    const axiosInstance = createAxiosInstance();
+    const res = await axiosInstance.get(`/notification-settings?member=${member}`);
+    const row = res.data?.data?.[0];
+    if (!row) return null;
+    return { all: !!row.all, notice: !!row.notice, event: !!row.event };
+  } catch (e) {
+    console.warn('[getNotificationSettings] failed:', e);
+    return null;
+  }
+};
+
+export const updateNotificationSettings = async (
+  member: number,
+  patch: { all?: boolean; notice?: boolean; event?: boolean },
+): Promise<boolean> => {
+  try {
+    const axiosInstance = createAxiosInstance();
+    await axiosInstance.post('/notification-settings', { member, ...patch });
+    return true;
+  } catch (e) {
+    console.warn('[updateNotificationSettings] failed:', e);
+    throw e;
+  }
+};
+
+export const recordWalletTutorialComplete = async (): Promise<boolean> => {
+  try {
+    const jwt = await AsyncStorage.getItem('jwt');
+    if (!jwt) return false;
+    const member = jwtPayloadSub(jwt);
+    if (!member) return false;
+    const axiosInstance = createAxiosInstance();
+    await axiosInstance.post('/wallet-tutorial/complete', { member });
+    return true;
+  } catch (e) {
+    console.warn('[recordWalletTutorialComplete] failed:', e);
+    return false;
+  }
+};

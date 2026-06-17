@@ -12,6 +12,7 @@ import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { getMyGroup, getMyRecommender } from '../services';
+import { prefetchReferralSettlement } from '../services/referralSettlementCache';
 import { MyGroupItem } from '../types';
 
 interface MemberData {
@@ -65,6 +66,14 @@ export const ReferralMyGroupScreen = () => {
     };
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    if (!memberId) return;
+    const memberNum = Number(memberId);
+    if (Number.isFinite(memberNum) && memberNum > 0) {
+      prefetchReferralSettlement(memberNum, navigate);
+    }
+  }, [memberId, navigate]);
 
   useEffect(() => {
     if (!memberId) return;

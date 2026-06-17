@@ -7,7 +7,7 @@ export default {
   expectedAmount: '예상금액',
   confirmedAmount: '확정금액',
   expectedAdRevenue: '예상광고수익',
-  adRevenueSettlement: '광고수익정산',
+  adRevenueSettlement: 'AR광고 정산',
   rewardAmount: '보상금액',
   attendanceCheckTitle: '출석 체크를 하시겠습니까?',
   attendanceCheckCompletedTitle: '출석체크를 완료했습니다',

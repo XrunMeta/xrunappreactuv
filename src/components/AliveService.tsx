@@ -15,6 +15,8 @@ export const AliveService: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
+  const graceUntilRef = useRef<number>(0);
+
   useEffect(() => {
     failureCountRef.current = failureCount;
   }, [failureCount]);
@@ -51,6 +53,11 @@ export const AliveService: React.FC = () => {
   };
 
   const handleFailure = async () => {
+
+    if (Date.now() < graceUntilRef.current) {
+      console.log('[AliveService] resume grace — fail 무시 (다음 30초 호출 대기)');
+      return;
+    }
     const newFailureCount = failureCountRef.current + 1;
     setFailureCount(newFailureCount);
     failureCountRef.current = newFailureCount;
@@ -84,6 +91,10 @@ export const AliveService: React.FC = () => {
       appStateRef.current.match(/inactive|background/) &&
       nextAppState === 'active'
     ) {
+
+      graceUntilRef.current = Date.now() + 30000;
+      setFailureCount(0);
+      failureCountRef.current = 0;
 
       sendAlive();
       startInterval();

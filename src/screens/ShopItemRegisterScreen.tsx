@@ -577,10 +577,13 @@ export const ShopItemRegisterScreen = () => {
             <TextInput
               style={styles.input}
               value={priceXrun}
-              onChangeText={setPriceXrun}
+
+              onChangeText={(text) => setPriceXrun(text.replace(/[^0-9]/g, '').slice(0, 5))}
               placeholder={t('screens.shopItemRegister.pricePlaceholder')}
               placeholderTextColor="#999"
               keyboardType="number-pad"
+              inputMode="numeric"
+              maxLength={5}
             />
           </View>
 

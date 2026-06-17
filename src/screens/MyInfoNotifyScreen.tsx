@@ -21,7 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SafeScrollView, SafeView } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { COLORS, SIZES, FONTS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import {
   getNotificationList,
   sendNotificationMessage,
@@ -200,8 +200,8 @@ export const MyInfoNotifyScreen = () => {
   const handleContentSizeChange = useCallback(() => {
     if (scrollViewRef.current && notifications.length > 0 && shouldAutoScroll.current) {
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+        scrollViewRef.current?.scrollToEnd({ animated: false });
+      }, 0);
     }
   }, [notifications.length]);
 
@@ -380,6 +380,17 @@ export const MyInfoNotifyScreen = () => {
                 <TouchableOpacity
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={async () => {
+
+                    const title = String(notification.title ?? '');
+                    if (title.includes('출석체크')) {
+                      try {
+                        await AsyncStorage.setItem('pendingPushWalletNav', 'xrun_pol');
+                        navigate(ROUTES.wallet);
+                      } catch (e) {
+                        console.warn('[Notify] 출석체크 navigate 실패:', e);
+                      }
+                      return;
+                    }
                     const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
                     Linking.openURL(url).catch(async () => {
                       await showAlert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));

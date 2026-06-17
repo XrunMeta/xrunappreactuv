@@ -764,7 +764,8 @@ export const WalletDetailScreen = () => {
           subValue={krwValue || ''}
           address={shortenedAddress}
           onCopy={handleCopyAddress}
-          onDownload={selectedWalletAsset?.currency === 19 ? undefined : handleDownload}
+
+          onDownload={undefined}
           actions={[
             {
               label: explorerLabel,
