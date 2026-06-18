@@ -11,7 +11,9 @@ import {
   Image,
   Linking,
   Modal,
+  AppState,
 } from 'react-native';
+import type { AppStateStatus } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -423,6 +425,9 @@ export const WalletScreen = () => {
     })();
   }, [combinedAssets, navigate, setSelectedWalletAsset]);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshAllRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     if (!member) return;
 
@@ -607,15 +612,54 @@ export const WalletScreen = () => {
       }
     };
 
+    const refreshAll = () => {
+      if (!member) return;
+      console.log('[WalletScreen] refreshAll — 4종 데이터 fetch');
+      getUsersBalanceUpdateV2(String(member), navigate).catch(() => {});
+      fetchWalletDataAsync();
+      fetchOtherChainsStatusAsync();
+      fetchADXRUNTopBannersAsync();
+      fetchReferralIncomeAsync();
+    };
+    refreshAllRef.current = refreshAll;
+
     fetchWalletDataAsync();
     fetchOtherChainsStatusAsync();
     fetchADXRUNTopBannersAsync();
     fetchReferralIncomeAsync();
 
+    let prevAppState: AppStateStatus = AppState.currentState;
+    const sub = AppState.addEventListener('change', (nextAppState) => {
+      const wasBackground = !!prevAppState.match(/inactive|background/);
+      const isNowActive = nextAppState === 'active';
+      prevAppState = nextAppState;
+      if (wasBackground && isNowActive) refreshAll();
+    });
+
+    let unsub: (() => void) | null = null;
+    import('../utils/walletEvents').then(({ subscribeWalletRefresh }) => {
+      unsub = subscribeWalletRefresh(() => {
+        if (refreshAllRef.current) refreshAllRef.current();
+      });
+    }).catch(() => {});
+
     return () => {
       abortController.abort();
+      sub.remove();
+      if (unsub) unsub();
     };
   }, [member, statusOtherChain, navigate]);
+
+  const onPullRefresh = useCallback(async () => {
+    if (!member || refreshing) return;
+    setRefreshing(true);
+    try {
+      if (refreshAllRef.current) refreshAllRef.current();
+    } finally {
+
+      setTimeout(() => setRefreshing(false), 1200);
+    }
+  }, [member, refreshing]);
 
   const handleCopyAddress = () => {
     if (publicAddress) {
@@ -1028,6 +1072,8 @@ export const WalletScreen = () => {
               contentContainerStyle={styles.dataListContent}
               keyExtractor={(item, index) => `token-${item.id}-${index}`}
               onItemPress={handleTokenPress}
+              refreshing={refreshing}
+              onRefresh={onPullRefresh}
             />
           )}
         </View>

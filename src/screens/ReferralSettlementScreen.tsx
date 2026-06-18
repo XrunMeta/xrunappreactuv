@@ -211,15 +211,14 @@ export const ReferralSettlementScreen = () => {
         const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
-        const price = gopaxPrice > 0 ? gopaxPrice : 176; 
-        console.log('[정산] 원화 계산:', { totalAmountNum, price });
-
-        const wonEquivalent = calculateWonEquivalent(totalAmountNum, price);
-        console.log('[정산] 원화 환산 결과:', wonEquivalent);
-
-        const formattedWon = formatWonAmount(wonEquivalent);
-        console.log('[정산] 원화 포맷팅 결과:', formattedWon);
-        setTotalRevenueWon(formattedWon);
+        if (!gopaxPrice || gopaxPrice <= 0) {
+          setTotalRevenueWon('⏳ 가격 정보 갱신 중');
+        } else {
+          const wonEquivalent = calculateWonEquivalent(totalAmountNum, gopaxPrice);
+          const formattedWon = formatWonAmount(wonEquivalent);
+          console.log('[정산] 원화 환산:', { totalAmountNum, price: gopaxPrice, formattedWon });
+          setTotalRevenueWon(formattedWon);
+        }
 
         const initialItems = rows.slice(0, ITEMS_PER_PAGE);
         setCurrentData(initialItems);

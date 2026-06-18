@@ -173,7 +173,23 @@ const ScreenHost = () => {
       .then((resp) => { if (resp) handleTap(resp); })
       .catch(() => {});
 
-    return () => { sub.remove(); };
+    const recvSub = Notifications.addNotificationReceivedListener((notif) => {
+      try {
+        const data = (notif?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const category = String(data.category ?? '');
+
+        if (['deposit', 'withdrawal', 'ar_nas', 'ar_pointclick', 'xplay_ayet', 'xplay_maf', 'referral_reward'].includes(category)) {
+
+          import('./src/utils/walletEvents').then(({ emitWalletRefresh }) => {
+            emitWalletRefresh(`push:${category}`);
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('[push received] handler error:', e);
+      }
+    });
+
+    return () => { sub.remove(); recvSub.remove(); };
   }, [navigate]);
 
   useEffect(() => {

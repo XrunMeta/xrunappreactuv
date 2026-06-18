@@ -709,8 +709,12 @@ export const WalletDetailScreen = () => {
 
   const krwValue = useMemo(() => {
 
-    if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19) || !gopaxPrice) {
+    if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19)) {
       return null;
+    }
+
+    if (!gopaxPrice) {
+      return '⏳ 가격 정보 갱신 중';
     }
 
     try {
@@ -726,7 +730,7 @@ export const WalletDetailScreen = () => {
       return `KRW ${formattedInteger}`;
     } catch (error) {
       console.error('[WalletDetail] KRW 금액 계산 오류:', error);
-      return null;
+      return '⏳ 가격 정보 갱신 중';
     }
   }, [selectedWalletAsset, gopaxPrice]);
 
