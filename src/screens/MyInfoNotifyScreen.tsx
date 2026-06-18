@@ -36,6 +36,10 @@ const v_144b19 = require('../../assets/thumb_event.png');
 const v_436552 = require('../../assets/chat-xrun.png');
 const v_01b6c9 = require('../../assets/chat-user.png');
 
+const v_ae501b = 'https://xrun.run';
+const v_9181c6 = (v_94302c, v_389afb): string =>
+  `${v_ae501b}/?board=${v_94302c}&id=${v_389afb}`;
+
 const v_e065e5 = (v_a86996): string => {
   try {
     const v_8dffde = new Date(v_a86996);
@@ -391,7 +395,7 @@ export const v_386af2 = () => {
                       }
                       return;
                     }
-                    const v_f71b56 = `https://oth-path-51a04e.example.invalid/oth-path?id=${v_b9faeb.board}`;
+                    const v_f71b56 = v_9181c6('notice', v_b9faeb.board);
                     v_f2c756.openURL(v_f71b56).catch(async () => {
                       await v_889fad(v_8d41d7('screens.myInfoNotify.alerts.linkError'), v_8d41d7('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
@@ -402,10 +406,10 @@ export const v_386af2 = () => {
                 </TouchableOpacity>
               )}
               {}
-              {v_fc7457 && v_b9faeb.guid !== '' && v_b9faeb.guid !== null && (
+              {v_fc7457 && (
                 <TouchableOpacity
                   style={v_d81136.ctaButton}
-                  onPress={() => v_0a2feb(v_b9faeb.guid)}
+                  onPress={() => v_0a2feb(v_9181c6('event', v_b9faeb.board))}
                   activeOpacity={0.85}
                 >
                   <Text style={v_d81136.ctaText}>{v_8d41d7('screens.myInfoNotify.goToEvent')}</Text>
