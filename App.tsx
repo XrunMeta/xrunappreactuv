@@ -173,7 +173,23 @@ const v_c0dbdf = () => {
       .then((v_eb792a) => { if (v_eb792a) v_14b011(v_eb792a); })
       .catch(() => {});
 
-    return () => { v_1ae212.remove(); };
+    const v_5228ae = v_2b7a17.addNotificationReceivedListener((v_25a5cd) => {
+      try {
+        const v_9390e8 = (v_25a5cd?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const v_8b9cd4 = String(v_9390e8.category ?? '');
+
+        if (['deposit', 'withdrawal', 'ar_nas', 'ar_pointclick', 'xplay_ayet', 'xplay_maf', 'referral_reward'].includes(v_8b9cd4)) {
+
+          import('./src/utils/walletEvents').then(({ emitWalletRefresh: v_c407c0 }) => {
+            v_c407c0(`push:${v_8b9cd4}`);
+          }).catch(() => {});
+        }
+      } catch (v_9e86fd) {
+        console.warn('[push received] handler error:', v_9e86fd);
+      }
+    });
+
+    return () => { v_1ae212.remove(); v_5228ae.remove(); };
   }, [v_9b57fc]);
 
   v_c4deb2(() => {

@@ -6,6 +6,7 @@ import {
   v_39a996,
   v_7e4944,
   v_19b633,
+  v_6c4f62,
 } from 'rcmrninabrnb';
 import { v_5b0045, v_ae32ae, v_029581 } from '../types';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
@@ -27,6 +28,9 @@ export interface DataListProps<T> {
   emptyMessage?: string;
 
   itemProps?: Record<string, any>;
+
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 const v_2219b3 = <T extends Record<string, any>>(
@@ -39,6 +43,8 @@ const v_2219b3 = <T extends Record<string, any>>(
     onItemPress: v_659a80,
     emptyMessage: v_76ab9a,
     itemProps: v_bce170,
+    refreshing: v_612e9f,
+    onRefresh: v_d5345f,
   }: DataListProps<T>,
   ref: v_a3453e.Ref<v_029581>
 ) => {
@@ -176,6 +182,11 @@ const v_2219b3 = <T extends Record<string, any>>(
         v_9aecf5,
       ]}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        v_d5345f ? (
+          <RefreshControl refreshing={!!v_612e9f} onRefresh={v_d5345f} />
+        ) : undefined
+      }
       onScroll={({ nativeEvent: v_76b943 }) => {
         const { layoutMeasurement: v_6f469f, contentOffset: v_e29918, contentSize: v_d1b3ac } = v_76b943;
 

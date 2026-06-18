@@ -211,22 +211,21 @@ export const v_08aac3 = () => {
         const v_e0fe28 = v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
-        const v_6bbb57 = v_beea9d > 0 ? v_beea9d : 176; 
-        console.log('[정산] 원화 계산:', { totalAmountNum: v_a35cbd, price: v_6bbb57 });
-
-        const v_f02564 = v_b9db3d(v_a35cbd, v_6bbb57);
-        console.log('[정산] 원화 환산 결과:', v_f02564);
-
-        const v_41185e = v_d7e45e(v_f02564);
-        console.log('[정산] 원화 포맷팅 결과:', v_41185e);
-        v_a80d65(v_41185e);
+        if (!v_beea9d || v_beea9d <= 0) {
+          v_a80d65('⏳ 가격 정보 갱신 중');
+        } else {
+          const v_f02564 = v_b9db3d(v_a35cbd, v_beea9d);
+          const v_41185e = v_d7e45e(v_f02564);
+          console.log('[정산] 원화 환산:', { totalAmountNum: v_a35cbd, price: v_beea9d, formattedWon: v_41185e });
+          v_a80d65(v_41185e);
+        }
 
         const v_e45688 = v_18b8bf.slice(0, v_0d35a8);
         v_690164(v_e45688);
         v_be9dba(1);
         v_1454f0(v_18b8bf.length > v_0d35a8);
         console.log('[정산 디버그] ✅ 화면 표시 완료 — 총',
-          v_e0fe28, 'XRUN /', v_18b8bf.length, '건 /', v_41185e);
+          v_e0fe28, 'XRUN /', v_18b8bf.length, '건 /', formattedWon);
         console.log('═══════════════════════════════════════════');
       } else {
         console.error('[정산 디버그] ❌ 백엔드 status !== success — message:', v_11b884.message);
