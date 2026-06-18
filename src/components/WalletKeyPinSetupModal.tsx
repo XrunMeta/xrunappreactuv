@@ -224,6 +224,9 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
           <Text style={styles.warning}>
             {t('components.walletKeyPinSetup.warning')}
           </Text>
+          <Text style={styles.warning}>
+            {t('components.walletKeyPinSetup.backupHint')}
+          </Text>
 
           {}
           {step === 'enter' && (
