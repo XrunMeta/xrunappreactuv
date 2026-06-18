@@ -1,6 +1,7 @@
 export default {
   title: '지갑 보호 PIN 설정',
   warning: '지갑 키 보호 전용입니다.',
+  backupHint: '설정 완료 시에 백업하여 지갑을 보호해주세요.',
   enterPrompt: '6자리 PIN 을 입력해주세요',
   confirmPrompt: '다시 한번 입력해주세요',
   verifying: '검증 중...',
