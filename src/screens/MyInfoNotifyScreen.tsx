@@ -36,6 +36,10 @@ const eventImage = require('../../assets/thumb_event.png');
 const chatXrun = require('../../assets/chat-xrun.png');
 const chatUser = require('../../assets/chat-user.png');
 
+const HOMEPAGE_BASE = 'https://xrun.run';
+const buildBoardUrl = (kind: string, id: number | string): string =>
+  `${HOMEPAGE_BASE}/?board=${kind}&id=${id}`;
+
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -391,7 +395,7 @@ export const MyInfoNotifyScreen = () => {
                       }
                       return;
                     }
-                    const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
+                    const url = buildBoardUrl('notice', notification.board);
                     Linking.openURL(url).catch(async () => {
                       await showAlert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
@@ -402,10 +406,10 @@ export const MyInfoNotifyScreen = () => {
                 </TouchableOpacity>
               )}
               {}
-              {isEvent && notification.guid !== '' && notification.guid !== null && (
+              {isEvent && (
                 <TouchableOpacity
                   style={styles.ctaButton}
-                  onPress={() => openLink(notification.guid)}
+                  onPress={() => openLink(buildBoardUrl('event', notification.board))}
                   activeOpacity={0.85}
                 >
                   <Text style={styles.ctaText}>{t('screens.myInfoNotify.goToEvent')}</Text>
