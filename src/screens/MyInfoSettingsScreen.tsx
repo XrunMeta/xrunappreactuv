@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Switch, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeScrollView } from '../components';
+import { SafeScrollView, WalletKeyPinSetupModal } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
+import { jwtPayloadSub } from '../services/walletKeyStore';
 import { COLORS, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import {
@@ -24,6 +25,28 @@ export const MyInfoSettingsScreen = () => {
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
+
+  const [pinSetupVisible, setPinSetupVisible] = useState(false);
+  const [pinSetupArgs, setPinSetupArgs] = useState<{ memberId: number; email: string } | null>(null);
+  const openPinSetup = async () => {
+    try {
+      const jwt = await AsyncStorage.getItem('jwt');
+      const member = jwt ? jwtPayloadSub(jwt) : null;
+      let email = await AsyncStorage.getItem('userEmail');
+      if (!email) {
+        const ud = await AsyncStorage.getItem('userData');
+        if (ud) { try { email = (JSON.parse(ud) as { email?: string }).email ?? null; } catch {} }
+      }
+      if (!member || !email) {
+        await showAlert('알림', '로그인 정보가 없습니다. 다시 로그인 후 시도해주세요.');
+        return;
+      }
+      setPinSetupArgs({ memberId: member, email: email.toLowerCase().trim() });
+      setPinSetupVisible(true);
+    } catch (e: any) {
+      await showAlert('오류', `PIN 설정 화면 열기 실패: ${e?.message ?? e}`);
+    }
+  };
   const [versionInfo, setVersionInfo] = useState<{
     androidCurrent: number;
     androidLatest: number;
@@ -249,6 +272,15 @@ export const MyInfoSettingsScreen = () => {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
+            onPress={openPinSetup}
+          >
+            <Text style={styles.cardText}>지갑 PIN 설정 (테스트)</Text>
+          </TouchableOpacity>
+
+          {}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}
           >
             <Text style={styles.cardText}>{t('screens.myInfoSettings.closeMembership')}</Text>
@@ -274,6 +306,18 @@ export const MyInfoSettingsScreen = () => {
         visible={languageSelectorVisible}
         onClose={() => setLanguageSelectorVisible(false)}
       />
+      {}
+      {pinSetupArgs && (
+        <WalletKeyPinSetupModal
+          memberId={pinSetupArgs.memberId}
+          email={pinSetupArgs.email}
+          visible={pinSetupVisible}
+          onSuccess={() => {
+            setPinSetupVisible(false);
+            setPinSetupArgs(null);
+          }}
+        />
+      )}
     </View>
   );
 };
