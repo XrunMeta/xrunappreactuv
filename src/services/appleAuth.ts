@@ -36,8 +36,11 @@ const v_e4d665 = async (v_c65f5d) => {
 
 const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
-  const v_c01615 = v_c9c489.USE_WORKERS_API === 'true' ? v_c9c489.GATEWAY_WORKERS : v_c9c489.GATEWAY_NODEJS;
 
+  let v_c01615 = v_c9c489.GATEWAY_WORKERS;
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    v_c01615 = 'https://oth-path-bab568.example.invalid/oth-path';
+  }
   if (v_c01615.endsWith('/oth-path')) {
     return v_c01615;
   }
