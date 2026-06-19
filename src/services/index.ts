@@ -40,9 +40,6 @@ export const getApiBaseUrl = (): string => {
   const env = getEnv();
   if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
 
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return PREVIEW_GATEWAY_URL;
-  }
   if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
     return PREVIEW_GATEWAY_URL;
   }

@@ -37,13 +37,7 @@ const handleTimeoutError = async (navigation: any) => {
 const getApiBaseUrl = (): string => {
   const env = getEnv();
 
-  let baseUrl = env.GATEWAY_WORKERS;
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    baseUrl = 'https://edge-preview.example.invalid/oth-path';
-  }
-  if (baseUrl.endsWith('/oth-path')) {
-    return baseUrl;
-  }
+  const baseUrl = env.GATEWAY_WORKERS;
   return baseUrl;
 };
 
