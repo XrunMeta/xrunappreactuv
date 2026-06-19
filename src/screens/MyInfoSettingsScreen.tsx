@@ -206,7 +206,7 @@ export const MyInfoSettingsScreen = () => {
           {}
           <View style={[styles.card, styles.rowCard]}>
             <View style={styles.rowCardLeft}>
-              <Text style={styles.cardText}>공지사항 알림</Text>
+              <Text style={styles.cardText}>{t('screens.myInfoSettings.noticeNotifications')}</Text>
             </View>
             {noticeToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
@@ -223,7 +223,7 @@ export const MyInfoSettingsScreen = () => {
 
           <View style={[styles.card, styles.rowCard]}>
             <View style={styles.rowCardLeft}>
-              <Text style={styles.cardText}>이벤트 알림</Text>
+              <Text style={styles.cardText}>{t('screens.myInfoSettings.eventNotifications')}</Text>
             </View>
             {eventToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />

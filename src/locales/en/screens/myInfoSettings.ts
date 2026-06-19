@@ -4,6 +4,8 @@ export default {
   pushNotifications: 'Push Notifications',
   pushNotificationsOn: 'On',
   pushNotificationsOff: 'Off',
+  noticeNotifications: 'Notice Alerts',
+  eventNotifications: 'Event Alerts',
   languageSelect: 'Language Select',
   walletBackup: 'Backup',
   walletRestore: 'Restore',
