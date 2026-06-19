@@ -4,6 +4,8 @@ export default {
   pushNotifications: '푸시 알림',
   pushNotificationsOn: '허용',
   pushNotificationsOff: '미허용',
+  noticeNotifications: '공지사항 알림',
+  eventNotifications: '이벤트 알림',
   languageSelect: '언어 선택',
   walletBackup: '백업',
   walletRestore: '복원',

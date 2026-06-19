@@ -4,6 +4,8 @@ export default {
   pushNotifications: 'Thông báo đẩy',
   pushNotificationsOn: 'Bật',
   pushNotificationsOff: 'Tắt',
+  noticeNotifications: 'Thông báo tin tức',
+  eventNotifications: 'Thông báo sự kiện',
   languageSelect: 'Chọn ngôn ngữ',
   walletBackup: 'Sao lưu',
   walletRestore: 'Khôi phục',

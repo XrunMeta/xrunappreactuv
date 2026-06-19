@@ -4,6 +4,8 @@ export default {
   pushNotifications: 'पुश सूचनाएं',
   pushNotificationsOn: 'चालू',
   pushNotificationsOff: 'बंद',
+  noticeNotifications: 'सूचना अलर्ट',
+  eventNotifications: 'इवेंट अलर्ट',
   languageSelect: 'भाषा चुनें',
   walletBackup: 'बैकअप',
   walletRestore: 'पुनर्स्थापित',

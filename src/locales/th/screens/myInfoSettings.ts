@@ -4,6 +4,8 @@ export default {
   pushNotifications: 'การแจ้งเตือน',
   pushNotificationsOn: 'เปิด',
   pushNotificationsOff: 'ปิด',
+  noticeNotifications: 'แจ้งเตือนประกาศ',
+  eventNotifications: 'แจ้งเตือนกิจกรรม',
   languageSelect: 'เลือกภาษา',
   walletBackup: 'สำรองข้อมูล',
   walletRestore: 'กู้คืน',

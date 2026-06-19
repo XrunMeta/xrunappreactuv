@@ -206,7 +206,7 @@ export const v_4a40b2 = () => {
           {}
           <View style={[v_d81136.card, v_d81136.rowCard]}>
             <View style={v_d81136.rowCardLeft}>
-              <Text style={v_d81136.cardText}>공지사항 알림</Text>
+              <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.noticeNotifications')}</Text>
             </View>
             {v_7aa88d ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
@@ -223,7 +223,7 @@ export const v_4a40b2 = () => {
 
           <View style={[v_d81136.card, v_d81136.rowCard]}>
             <View style={v_d81136.rowCardLeft}>
-              <Text style={v_d81136.cardText}>이벤트 알림</Text>
+              <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.eventNotifications')}</Text>
             </View>
             {v_5fed92 ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />

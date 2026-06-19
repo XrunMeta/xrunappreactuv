@@ -4,6 +4,8 @@ export default {
   pushNotifications: '推送通知',
   pushNotificationsOn: '开启',
   pushNotificationsOff: '关闭',
+  noticeNotifications: '公告通知',
+  eventNotifications: '活动通知',
   languageSelect: '语言选择',
   walletBackup: '备份',
   walletRestore: '恢复',
