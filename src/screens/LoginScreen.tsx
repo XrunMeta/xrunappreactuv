@@ -38,6 +38,7 @@ import {
   v_1fee11,
   v_a763e6,
   v_cec605,
+  v_5ed938,
 } from '../services';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -522,6 +523,13 @@ export const v_f4f851 = () => {
       if (typeof v_60ca11 === 'string' && v_60ca11.split('.').length === 3) {
         await v_e84827.setItem('jwt', v_60ca11);
         console.log('[구글 로그인] jwt 저장 완료 (len:', v_60ca11.length, ')');
+
+        try {
+          await v_5ed938();
+          console.log('[구글 로그인] fetchAndSaveWallets 완료');
+        } catch (v_9e86fd) {
+          console.warn('[구글 로그인] fetchAndSaveWallets 실패:', v_9e86fd?.message);
+        }
       }
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       if (v_ef7306.member != null) {
@@ -683,6 +691,13 @@ export const v_f4f851 = () => {
       if (typeof v_60ca11 === 'string' && v_60ca11.split('.').length === 3) {
         await v_e84827.setItem('jwt', v_60ca11);
         console.log('[애플 로그인] jwt 저장 완료 (len:', v_60ca11.length, ')');
+
+        try {
+          await v_5ed938();
+          console.log('[애플 로그인] fetchAndSaveWallets 완료');
+        } catch (v_9e86fd) {
+          console.warn('[애플 로그인] fetchAndSaveWallets 실패:', v_9e86fd?.message);
+        }
       }
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       if (v_ef7306.member != null) {
