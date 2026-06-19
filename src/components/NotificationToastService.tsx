@@ -50,7 +50,7 @@ export const NotificationToastService: React.FC = () => {
         const type = Number(latest.type);
         const baseMsg = type === 9304
           ? t('screens.myInfoNotify.toast.inquiryReplyArrived')
-          : `${t('screens.myInfoNotify.toast.newNotification')} ${latest.title || ''}`.trim();
+          : (latest.title || t('screens.myInfoNotify.toast.newNotification'));
         showToast(`${baseMsg}${more}`);
       }
 

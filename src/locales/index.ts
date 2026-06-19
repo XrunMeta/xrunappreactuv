@@ -148,7 +148,8 @@ const syncLanguageToServer = async (language: LanguageCode): Promise<void> => {
     const baseUrl = getApiBaseUrl();
     const authHeader = await getAuthHeader();
     if (!authHeader) return; 
-    await fetch(`${baseUrl}/oth-path`, {
+
+    await fetch(`${baseUrl}/me/language`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: authHeader },
       body: JSON.stringify({ language }),
