@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: '无法打开当前页面。',
     loadFailed: '加载通知列表失败。',
   },
+  toast: {
+    inquiryReplyArrived: '💬 1:1 咨询回复已送达',
+    newNotification: '🔔 新通知',
+    moreCount: ' 等 {{count}} 条',
+  },
 };
 
 

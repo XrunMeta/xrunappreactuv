@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: 'Không thể mở trang hiện tại.',
     loadFailed: 'Tải danh sách thông báo thất bại.',
   },
+  toast: {
+    inquiryReplyArrived: '💬 Đã nhận phản hồi yêu cầu 1:1',
+    newNotification: '🔔 Thông báo mới',
+    moreCount: ' và {{count}} cái khác',
+  },
 };
 
 

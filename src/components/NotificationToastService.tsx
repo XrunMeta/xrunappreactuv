@@ -1,10 +1,12 @@
 import v_a3453e, { v_c4deb2, v_e662ae } from 'bapkr';
 import { v_6b5698, v_c3551b } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_772971 } from 'jmpfvteuuztnp';
 import { v_ab08d0 } from '../services';
 import { v_cba33f } from '../utils';
 
 export const NotificationToastService: v_a3453e.FC = () => {
+  const { t: v_8d41d7 } = v_772971();
   const v_3ac63b = v_e662ae<NodeJS.Timeout | null>(null);
   const v_1b7402 = v_e662ae<v_c3551b>(v_6b5698.currentState);
   const v_636b6b = v_e662ae<boolean>(false);
@@ -41,12 +43,15 @@ export const NotificationToastService: v_a3453e.FC = () => {
       const v_6eba2f = v_715061.filter((v_f4e98d) => Number(v_f4e98d.type) !== 9303);
       if (v_6eba2f.length > 0) {
         const v_1300ee = v_6eba2f[0];
-        const v_c92005 = v_6eba2f.length > 1 ? ` 외 ${v_6eba2f.length - 1}건` : '';
+
+        const v_c92005 = v_6eba2f.length > 1
+          ? v_8d41d7('screens.myInfoNotify.toast.moreCount', { count: v_6eba2f.length - 1 })
+          : '';
         const v_3b27d9 = Number(v_1300ee.type);
-        const v_badeaf = v_3b27d9 === 9304
-          ? `💬 1:1 문의 답변 도착${v_c92005}`
-          : `🔔 ${v_1300ee.title || '새 알림'}${v_c92005}`;
-        v_cba33f(v_badeaf);
+        const v_4d1536 = v_3b27d9 === 9304
+          ? v_8d41d7('screens.myInfoNotify.toast.inquiryReplyArrived')
+          : `${v_8d41d7('screens.myInfoNotify.toast.newNotification')} ${v_1300ee.title || ''}`.trim();
+        v_cba33f(`${v_4d1536}${v_c92005}`);
       }
 
       const v_bdd083 = Math.max(...v_715061.map((v_f4e98d) => v_ffe9e6(v_f4e98d.datetime)));

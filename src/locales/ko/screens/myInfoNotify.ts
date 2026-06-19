@@ -26,5 +26,10 @@ export default {
     linkErrorMessage: '현재 페이지를 열 수 없어요.',
     loadFailed: '알림 목록을 불러오는데 실패했습니다.',
   },
+  toast: {
+    inquiryReplyArrived: '💬 1:1 문의 답변 도착',
+    newNotification: '🔔 새 알림',
+    moreCount: ' 외 {{count}}건',
+  },
 };
 

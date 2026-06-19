@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: 'Tidak dapat membuka halaman saat ini.',
     loadFailed: 'Gagal memuat daftar notifikasi.',
   },
+  toast: {
+    inquiryReplyArrived: '💬 Balasan Tanya Jawab 1:1 telah tiba',
+    newNotification: '🔔 Notifikasi Baru',
+    moreCount: ' dan {{count}} lainnya',
+  },
 };
 
 
