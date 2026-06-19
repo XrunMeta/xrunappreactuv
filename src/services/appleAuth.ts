@@ -263,7 +263,7 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
 
       return {
         success: true,
-        data: v_9390e8.data,
+        data: { ...(v_9390e8.data ?? {}), ...(typeof v_9390e8.jwt === 'string' ? { jwt: v_9390e8.jwt } : {}) },
       };
     } catch (v_690fe1) {
 
