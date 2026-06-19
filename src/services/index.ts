@@ -40,9 +40,6 @@ export const v_755eb9 = (): string => {
   const v_c9c489 = v_e4a763();
   if (v_c9c489.USE_WORKERS_API !== 'true') return v_c9c489.GATEWAY_NODEJS;
 
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return v_6e1b73;
-  }
   if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
     return v_6e1b73;
   }
