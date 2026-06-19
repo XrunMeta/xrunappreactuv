@@ -37,7 +37,7 @@ interface NetworkOption {
 
 const NETWORK_OPTIONS: NetworkOption[] = [
     { value: 'Polygon', label: 'Polygon', image: require('../../assets/icon_polyganscan_color.png') },
-    { value: 'Ethereum', label: 'Ethereum', icon: 'diamond-outline' },
+    { value: 'Ethereum', label: 'Ethereum', image: require('../../assets/icon_ethereum.png') },
 ];
 
 const NetworkIcon = ({ option, size = 20, color = COLORS.headerText }: { option: NetworkOption; size?: number; color?: string }) => {
