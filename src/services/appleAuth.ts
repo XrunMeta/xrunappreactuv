@@ -263,7 +263,7 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
 
       return {
         success: true,
-        data: data.data,
+        data: { ...(data.data ?? {}), ...(typeof data.jwt === 'string' ? { jwt: data.jwt } : {}) },
       };
     } catch (fetchError: any) {
 

@@ -257,7 +257,7 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
 
       return {
         success: true,
-        data: data.data,
+        data: { ...(data.data ?? {}), ...(typeof data.jwt === 'string' ? { jwt: data.jwt } : {}) },
       };
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
