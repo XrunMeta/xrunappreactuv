@@ -50,7 +50,7 @@ export const NotificationToastService: v_a3453e.FC = () => {
         const v_3b27d9 = Number(v_1300ee.type);
         const v_4d1536 = v_3b27d9 === 9304
           ? v_8d41d7('screens.myInfoNotify.toast.inquiryReplyArrived')
-          : `${v_8d41d7('screens.myInfoNotify.toast.newNotification')} ${v_1300ee.title || ''}`.trim();
+          : (v_1300ee.title || v_8d41d7('screens.myInfoNotify.toast.newNotification'));
         v_cba33f(`${v_4d1536}${v_c92005}`);
       }
 

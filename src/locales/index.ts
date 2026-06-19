@@ -148,7 +148,8 @@ const v_f93aba = async (v_05bb19): Promise<void> => {
     const v_c01615 = v_755eb9();
     const v_5c1e3a = await v_23dd22();
     if (!v_5c1e3a) return; 
-    await fetch(`${v_c01615}/oth-path`, {
+
+    await fetch(`${v_c01615}/me/language`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: v_5c1e3a },
       body: JSON.stringify({ language: v_05bb19 }),
