@@ -408,7 +408,7 @@ export const v_386af2 = () => {
               {}
               {v_fc7457 && (
                 <TouchableOpacity
-                  style={v_d81136.ctaButton}
+                  style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={() => v_0a2feb(v_9181c6('event', v_b9faeb.board))}
                   activeOpacity={0.85}
                 >

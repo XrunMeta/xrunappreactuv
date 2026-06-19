@@ -517,6 +517,12 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+
+      const v_60ca11 = (v_43c42e.data as any)?.jwt;
+      if (typeof v_60ca11 === 'string' && v_60ca11.split('.').length === 3) {
+        await v_e84827.setItem('jwt', v_60ca11);
+        console.log('[구글 로그인] jwt 저장 완료 (len:', v_60ca11.length, ')');
+      }
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       if (v_ef7306.member != null) {
 
@@ -672,6 +678,12 @@ export const v_f4f851 = () => {
 
       await v_e84827.setItem('userEmail', v_e0c7e8);
       await v_e84827.setItem('userData', JSON.stringify(v_ef7306));
+
+      const v_60ca11 = (v_43c42e.data as any)?.jwt;
+      if (typeof v_60ca11 === 'string' && v_60ca11.split('.').length === 3) {
+        await v_e84827.setItem('jwt', v_60ca11);
+        console.log('[애플 로그인] jwt 저장 완료 (len:', v_60ca11.length, ')');
+      }
       if (v_ef7306.member != null) v_e8d7c0(String(v_ef7306.member));
       if (v_ef7306.member != null) {
 
