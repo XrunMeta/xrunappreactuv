@@ -65,7 +65,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a1a2e"
+        "backgroundColor": "#171C2D"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
