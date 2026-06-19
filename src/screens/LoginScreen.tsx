@@ -38,6 +38,7 @@ import {
   connectAppleAccount,
   showNativeScreen,
   registerPushToken,
+  fetchAndSaveWallets,
 } from '../services';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -522,6 +523,13 @@ export const LoginScreen = () => {
       if (typeof responseJwt === 'string' && responseJwt.split('.').length === 3) {
         await AsyncStorage.setItem('jwt', responseJwt);
         console.log('[구글 로그인] jwt 저장 완료 (len:', responseJwt.length, ')');
+
+        try {
+          await fetchAndSaveWallets();
+          console.log('[구글 로그인] fetchAndSaveWallets 완료');
+        } catch (e: any) {
+          console.warn('[구글 로그인] fetchAndSaveWallets 실패:', e?.message);
+        }
       }
       if (userData.member != null) setAyetUserId(String(userData.member));
       if (userData.member != null) {
@@ -683,6 +691,13 @@ export const LoginScreen = () => {
       if (typeof responseJwt === 'string' && responseJwt.split('.').length === 3) {
         await AsyncStorage.setItem('jwt', responseJwt);
         console.log('[애플 로그인] jwt 저장 완료 (len:', responseJwt.length, ')');
+
+        try {
+          await fetchAndSaveWallets();
+          console.log('[애플 로그인] fetchAndSaveWallets 완료');
+        } catch (e: any) {
+          console.warn('[애플 로그인] fetchAndSaveWallets 실패:', e?.message);
+        }
       }
       if (userData.member != null) setAyetUserId(String(userData.member));
       if (userData.member != null) {
