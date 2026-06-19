@@ -408,7 +408,7 @@ export const MyInfoNotifyScreen = () => {
               {}
               {isEvent && (
                 <TouchableOpacity
-                  style={styles.ctaButton}
+                  style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={() => openLink(buildBoardUrl('event', notification.board))}
                   activeOpacity={0.85}
                 >

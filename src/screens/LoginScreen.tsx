@@ -517,6 +517,12 @@ export const LoginScreen = () => {
 
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+      const responseJwt = (result.data as any)?.jwt;
+      if (typeof responseJwt === 'string' && responseJwt.split('.').length === 3) {
+        await AsyncStorage.setItem('jwt', responseJwt);
+        console.log('[구글 로그인] jwt 저장 완료 (len:', responseJwt.length, ')');
+      }
       if (userData.member != null) setAyetUserId(String(userData.member));
       if (userData.member != null) {
 
@@ -672,6 +678,12 @@ export const LoginScreen = () => {
 
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+      const responseJwt = (result.data as any)?.jwt;
+      if (typeof responseJwt === 'string' && responseJwt.split('.').length === 3) {
+        await AsyncStorage.setItem('jwt', responseJwt);
+        console.log('[애플 로그인] jwt 저장 완료 (len:', responseJwt.length, ')');
+      }
       if (userData.member != null) setAyetUserId(String(userData.member));
       if (userData.member != null) {
 
