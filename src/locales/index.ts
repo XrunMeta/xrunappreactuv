@@ -135,8 +135,26 @@ export const v_0e4a4f = async (v_05bb19): Promise<void> => {
     await v_0e4b58(v_05bb19);
     await v_e84827.setItem(v_201aab, v_05bb19);
     await v_9c213b.changeLanguage(v_05bb19);
+
+    v_f93aba(v_05bb19).catch(v_9e86fd => console.warn('[i18n] server sync failed:', v_9e86fd?.message));
   } catch (v_5e9bfe) {
     console.error('언어 설정 저장 실패:', v_5e9bfe);
+  }
+};
+
+const v_f93aba = async (v_05bb19): Promise<void> => {
+  try {
+    const { getApiBaseUrl: v_755eb9, getAuthHeader: v_23dd22 } = await import('../services');
+    const v_c01615 = v_755eb9();
+    const v_5c1e3a = await v_23dd22();
+    if (!v_5c1e3a) return; 
+    await fetch(`${v_c01615}/oth-path`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: v_5c1e3a },
+      body: JSON.stringify({ language: v_05bb19 }),
+    });
+  } catch (v_9e86fd) {
+
   }
 };
 
