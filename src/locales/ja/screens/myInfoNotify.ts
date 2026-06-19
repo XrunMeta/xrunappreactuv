@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: '現在のページを開くことができません。',
     loadFailed: '通知リストの読み込みに失敗しました。',
   },
+  toast: {
+    inquiryReplyArrived: '💬 1:1 お問い合わせ返信が届きました',
+    newNotification: '🔔 新しい通知',
+    moreCount: ' 他 {{count}}件',
+  },
 };
 
 

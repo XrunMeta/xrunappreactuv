@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: 'वर्तमान पृष्ठ खोलने में असमर्थ।',
     loadFailed: 'सूचना सूची लोड करने में विफल।',
   },
+  toast: {
+    inquiryReplyArrived: '💬 1:1 पूछताछ का जवाब आया',
+    newNotification: '🔔 नई सूचना',
+    moreCount: ' और {{count}} अन्य',
+  },
 };
 
 

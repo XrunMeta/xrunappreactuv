@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { getNotificationList } from '../services';
 import { showToast } from '../utils';
 
 export const NotificationToastService: React.FC = () => {
+  const { t } = useTranslation();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const inflightRef = useRef<boolean>(false);
@@ -41,12 +43,15 @@ export const NotificationToastService: React.FC = () => {
       const displayable = untoasted.filter((n: any) => Number(n.type) !== 9303);
       if (displayable.length > 0) {
         const latest = displayable[0];
-        const more = displayable.length > 1 ? ` 외 ${displayable.length - 1}건` : '';
+
+        const more = displayable.length > 1
+          ? t('screens.myInfoNotify.toast.moreCount', { count: displayable.length - 1 })
+          : '';
         const type = Number(latest.type);
-        const msg = type === 9304
-          ? `💬 1:1 문의 답변 도착${more}`
-          : `🔔 ${latest.title || '새 알림'}${more}`;
-        showToast(msg);
+        const baseMsg = type === 9304
+          ? t('screens.myInfoNotify.toast.inquiryReplyArrived')
+          : `${t('screens.myInfoNotify.toast.newNotification')} ${latest.title || ''}`.trim();
+        showToast(`${baseMsg}${more}`);
       }
 
       const maxMs = Math.max(...untoasted.map((n: any) => toUtcMs(n.datetime)));
