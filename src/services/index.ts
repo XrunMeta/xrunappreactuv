@@ -627,6 +627,17 @@ export const sendAliveSignal = async (
   }
 };
 
+export const getIosGuideShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && (server.data as any).iosOnGuide !== undefined) {
+      const v = (server.data as any).iosOnGuide;
+      return v === 1 || v === true;
+    }
+  } catch (_) {}
+  return true; 
+};
+
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
   try {
     const server = await checkServerVersion();

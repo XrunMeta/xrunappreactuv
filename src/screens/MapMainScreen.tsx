@@ -47,7 +47,7 @@ import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
-import { getWalletKeyATStatus, fetchAndSaveWallets } from '../services';
+import { getWalletKeyATStatus, fetchAndSaveWallets, getIosGuideShowStatus } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -239,6 +239,14 @@ export const MapMainScreen: React.FC = () => {
     tutorialGuardChecked.current = true;
     (async () => {
       try {
+
+        if (Platform.OS === 'ios') {
+          const iosGuideOn = await getIosGuideShowStatus(navigate);
+          if (!iosGuideOn) {
+            await AsyncStorage.removeItem(TUTORIAL_PENDING_KEY); 
+            return;
+          }
+        }
         const pending = await AsyncStorage.getItem(TUTORIAL_PENDING_KEY);
         const completed = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
 
