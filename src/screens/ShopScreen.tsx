@@ -127,6 +127,10 @@ export const ShopScreen = () => {
 
     const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
     const [gpsDenied, setGpsDenied] = useState<boolean>(false);
+
+    const SHOP_DEV_EMAILS = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+    const [isDevAccount, setIsDevAccount] = useState<boolean>(false);
+    const [forceCountry, setForceCountry] = useState<'AUTO' | 'KR' | 'ID'>('AUTO');
     const { navigate } = useAppNavigation();
 
     const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
@@ -249,7 +253,27 @@ export const ShopScreen = () => {
         return () => { cancelled = true; };
     }, []);
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const ud = await AsyncStorage.getItem('userData');
+                const email = ud ? (JSON.parse(ud)?.email ?? '').toLowerCase().trim() : '';
+                if (email && SHOP_DEV_EMAILS.includes(email)) {
+                    setIsDevAccount(true);
+                    const saved = await AsyncStorage.getItem('devShopForceCountry');
+                    if (saved === 'KR' || saved === 'ID') setForceCountry(saved);
+                }
+            } catch {  }
+        })();
+
+    }, []);
+
     const detectCountry = useCallback(async () => {
+        if (forceCountry !== 'AUTO') {
+            setShopCountry(forceCountry);
+            setGpsDenied(false);
+            return;
+        }
         try {
             const perm = await Location.getForegroundPermissionsAsync();
             let granted = perm.granted;
@@ -275,7 +299,7 @@ export const ShopScreen = () => {
             setGpsDenied(true);
             setShopCountry('KR');
         }
-    }, []);
+    }, [forceCountry]);
 
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
@@ -628,6 +652,30 @@ export const ShopScreen = () => {
                     {tab === 'xrunStore' ? (
                         <>
                             {}
+                            {isDevAccount && (
+                                <View style={styles.devCountryRow}>
+                                    <Text style={styles.devCountryLabel}>DEV 국가:</Text>
+                                    {(['AUTO', 'KR', 'ID'] as const).map((c) => (
+                                        <TouchableOpacity
+                                            key={c}
+                                            onPress={async () => {
+                                                setForceCountry(c);
+                                                if (c === 'AUTO') await AsyncStorage.removeItem('devShopForceCountry');
+                                                else await AsyncStorage.setItem('devShopForceCountry', c);
+                                                setShopCountry(null); 
+                                            }}
+                                            style={[styles.devCountryChip, forceCountry === c && styles.devCountryChipActive]}
+                                        >
+                                            <Text style={[styles.devCountryChipText, forceCountry === c && styles.devCountryChipTextActive]}>
+                                                {c === 'AUTO' ? '🌐 GPS' : c === 'KR' ? '🇰🇷 KR' : '🇮🇩 ID'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <Text style={styles.devCountryCurrent}>현재: {shopCountry ?? '...'}</Text>
+                                </View>
+                            )}
+
+                            {}
                             {gpsDenied && (
                                 <TouchableOpacity
                                     onPress={async () => {
@@ -972,6 +1020,47 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
         textAlign: 'center',
+    },
+    devCountryRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginHorizontal: 16,
+        marginTop: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        backgroundColor: '#1f2937',
+        borderRadius: 6,
+        flexWrap: 'wrap',
+    },
+    devCountryLabel: {
+        fontSize: 11,
+        color: '#9ca3af',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryChip: {
+        paddingVertical: 3,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        backgroundColor: '#374151',
+    },
+    devCountryChipActive: {
+        backgroundColor: '#3b82f6',
+    },
+    devCountryChipText: {
+        fontSize: 11,
+        color: '#d1d5db',
+        fontFamily: 'Roboto-Medium',
+    },
+    devCountryChipTextActive: {
+        color: '#fff',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryCurrent: {
+        marginLeft: 'auto',
+        fontSize: 10,
+        color: '#fbbf24',
+        fontFamily: 'Roboto-Regular',
     },
     gpsBanner: {
         flexDirection: 'row',
