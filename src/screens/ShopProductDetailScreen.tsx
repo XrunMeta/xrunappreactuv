@@ -684,6 +684,7 @@ export const v_a59951 = () => {
         v_c43513(false);
         v_23d029('');
         v_303962(null);
+        v_9b57fc(v_ce4741.shopMyItems);
     };
 
     const v_48c801 = () => {
