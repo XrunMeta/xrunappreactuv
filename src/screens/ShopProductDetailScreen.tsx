@@ -101,6 +101,8 @@ export const ShopProductDetailScreen = () => {
     const [iakPurchaseResult, setIakPurchaseResult] = useState<any>(null);
     const [iakSuccessVisible, setIakSuccessVisible] = useState(false);
 
+    const [iakPhoneModalVisible, setIakPhoneModalVisible] = useState(false);
+
     const [xplayPurchaseResult, setXplayPurchaseResult] = useState<{
         tr_id?: string;
         coupon_img_url?: string;
@@ -861,36 +863,24 @@ export const ShopProductDetailScreen = () => {
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
                 {product.isIak ? (
 
-                    <View style={{ width: '100%' }}>
-                        <Text style={{ fontSize: 13, fontFamily: 'Roboto-Medium', color: '#374151', marginBottom: 6 }}>
-                            충전 받을 인도네시아 휴대폰 번호
-                        </Text>
-                        <TextInput
-                            value={iakPhone}
-                            onChangeText={setIakPhone}
-                            placeholder="예: 0812xxxxxxxx"
-                            keyboardType="phone-pad"
-                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 12, backgroundColor: '#fff' }}
-                        />
-                        <TouchableOpacity
-                            style={[styles.purchaseButton, iakPurchaseLoading && styles.purchaseButtonDisabled]}
-                            onPress={handleIakPurchase}
-                            disabled={iakPurchaseLoading || member == null}
-                            activeOpacity={0.8}
+                    <TouchableOpacity
+                        style={[styles.purchaseButton, iakPurchaseLoading && styles.purchaseButtonDisabled]}
+                        onPress={() => { setIakPhone(''); setIakPhoneModalVisible(true); }}
+                        disabled={iakPurchaseLoading || member == null}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.purchaseButtonGradient}
                         >
-                            <LinearGradient
-                                colors={['#1E3A5F', '#2D4A6F']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.purchaseButtonGradient}
-                            >
-                                {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
-                                <Text style={styles.purchaseButtonText}>
-                                    {iakPurchaseLoading ? '처리 중…' : 'XRUN 으로 충전하기'}
-                                </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
+                            {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
+                            <Text style={styles.purchaseButtonText}>
+                                {iakPurchaseLoading ? '처리 중…' : 'XRUN 으로 구매하기'}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
                 ) : isXplayShop ? (
                     <TouchableOpacity
                         style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
@@ -947,6 +937,51 @@ export const ShopProductDetailScreen = () => {
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={iakPhoneModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIakPhoneModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.paymentSuccessModal, { paddingTop: 24 }]}>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
+                            충전 받을 휴대폰 번호
+                        </Text>
+                        <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
+                            인도네시아 휴대폰 번호를 입력해주세요
+                        </Text>
+                        <TextInput
+                            value={iakPhone}
+                            onChangeText={setIakPhone}
+                            placeholder="예: 0812xxxxxxxx"
+                            keyboardType="phone-pad"
+                            autoFocus
+                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
+                        />
+                        <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
+                                onPress={() => setIakPhoneModalVisible(false)}
+                                disabled={iakPurchaseLoading}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#374151', fontWeight: '600' }}>취소</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: iakPhone.trim() ? '#1E3A5F' : '#9ca3af', alignItems: 'center' }}
+                                onPress={() => { setIakPhoneModalVisible(false); handleIakPurchase(); }}
+                                disabled={iakPurchaseLoading || !iakPhone.trim()}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>구매</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
