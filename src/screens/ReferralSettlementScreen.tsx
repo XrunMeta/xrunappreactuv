@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
-import { getReferralIncome } from '../services';
+import { getReferralIncome, getXRUNGopaxPrice } from '../services';
 import type { ReferralIncomeItem, GetReferralIncomeResponse } from '../services';
 import { getCachedReferralSettlement, getInflightReferralSettlement } from '../services/referralSettlementCache';
 import { SettlementListItem } from '../types';
@@ -108,6 +108,30 @@ export const ReferralSettlementScreen = () => {
   const [totalRevenue, setTotalRevenue] = useState<string>('0 XRUN');
   const [totalRevenueWon, setTotalRevenueWon] = useState<string>('₩0');
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await getXRUNGopaxPrice();
+        const price = Number(result?.data?.gopaxPrice ?? 0);
+        if (price > 0) {
+          setGopaxPrice(price);
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
+          return;
+        }
+      } catch (e) {
+        console.warn('[정산] 고팍스 가격 API 실패, AsyncStorage fallback:', e);
+      }
+      try {
+        const cached = await AsyncStorage.getItem('xrungopaxprice');
+        if (cached) {
+          const data = JSON.parse(cached);
+          const p = Number(data?.data?.gopaxPrice ?? 0);
+          if (p > 0) setGopaxPrice(p);
+        }
+      } catch {  }
+    })();
+  }, []);
   const [userEmail, setUserEmail] = useState<string>('');
 
   const { t } = useTranslation();
@@ -211,7 +235,7 @@ export const ReferralSettlementScreen = () => {
         const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
-        let formattedWon = '⏳ 가격 정보 갱신 중';
+        let formattedWon = '가격 정보 갱신 중';
         if (!gopaxPrice || gopaxPrice <= 0) {
           setTotalRevenueWon(formattedWon);
         } else {
