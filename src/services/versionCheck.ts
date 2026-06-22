@@ -22,6 +22,7 @@ interface ServerCheckResponse {
     server_status: string;
     version: number; 
     version_ios: number; 
+    iosOnGuide?: number; 
   };
 }
 

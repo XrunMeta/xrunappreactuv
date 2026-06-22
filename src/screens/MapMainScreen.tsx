@@ -47,7 +47,7 @@ import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
-import { v_ecc3ca, v_5ed938 } from '../services';
+import { v_ecc3ca, v_5ed938, v_6acfff } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -239,6 +239,14 @@ export const MapMainScreen: v_a3453e.FC = () => {
     v_e790c7.current = true;
     (async () => {
       try {
+
+        if (v_326be8.OS === 'ios') {
+          const v_459b0b = await v_6acfff(v_9b57fc);
+          if (!v_459b0b) {
+            await v_e84827.removeItem(v_019a30); 
+            return;
+          }
+        }
         const v_483de2 = await v_e84827.getItem(v_019a30);
         const v_0ba044 = await v_e84827.getItem(v_4e5f7b);
 
