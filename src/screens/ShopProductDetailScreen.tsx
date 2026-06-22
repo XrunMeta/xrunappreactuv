@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996, v_e767d1 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_556baf, v_570c34 } from '../components';
@@ -949,7 +949,10 @@ export const v_a59951 = () => {
                 animationType="fade"
                 onRequestClose={() => v_37f2b0(false)}
             >
-                <View style={v_d81136.modalOverlay}>
+                <KeyboardAvoidingView
+                    behavior={v_326be8.OS === 'ios' ? 'padding' : 'height'}
+                    style={v_d81136.modalOverlay}
+                >
                     <View style={[v_d81136.paymentSuccessModal, { paddingTop: 24 }]}>
                         <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
                             {v_8d41d7('screens.shop.iak.phoneModalTitle')}
@@ -984,7 +987,7 @@ export const v_a59951 = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             </Modal>
 
             {}
