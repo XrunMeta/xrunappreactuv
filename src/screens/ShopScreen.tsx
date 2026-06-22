@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput, Linking } from 'react-native';
+import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
@@ -123,6 +124,9 @@ export const ShopScreen = () => {
     const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
 
     const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
+
+    const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
+    const [gpsDenied, setGpsDenied] = useState<boolean>(false);
     const { navigate } = useAppNavigation();
 
     const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
@@ -245,12 +249,41 @@ export const ShopScreen = () => {
         return () => { cancelled = true; };
     }, []);
 
+    const detectCountry = useCallback(async () => {
+        try {
+            const perm = await Location.getForegroundPermissionsAsync();
+            let granted = perm.granted;
+            if (!granted) {
+                const req = await Location.requestForegroundPermissionsAsync();
+                granted = req.granted;
+            }
+            if (!granted) {
+                setGpsDenied(true);
+                setShopCountry('KR');
+                return;
+            }
+            setGpsDenied(false);
+            const pos = await Location.getLastKnownPositionAsync({ maxAge: 60_000, requiredAccuracy: 1000 })
+                ?? await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            if (!pos?.coords) { setShopCountry('KR'); return; }
+            const geo = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }).catch(() => []);
+            const isoCountry = (geo?.[0]?.isoCountryCode ?? '').toUpperCase();
+            setShopCountry(isoCountry === 'ID' ? 'ID' : 'KR');
+            console.log('[ShopScreen] GPS country detected:', isoCountry, '→', isoCountry === 'ID' ? 'ID' : 'KR');
+        } catch (e) {
+            console.warn('[ShopScreen] GPS detect failed, fallback KR:', e);
+            setGpsDenied(true);
+            setShopCountry('KR');
+        }
+    }, []);
+
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
-        try {
 
+        const endpoint = shopCountry === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
+        try {
             const axiosInstance = (await import('../services')).createAxiosInstance();
-            const res = await axiosInstance.post('/getGiftishowActiveGoods', {});
+            const res = await axiosInstance.post(endpoint, {});
             const raw = Array.isArray(res.data?.data?.list) ? res.data.data.list as any[] : [];
 
             const list = raw.map((g: any) => ({
@@ -317,12 +350,18 @@ export const ShopScreen = () => {
     }, [navigate]);
 
     useEffect(() => {
-        if (tab === 'xrunStore') {
+        if (tab === 'xrunStore' && shopCountry === null) {
+            void detectCountry();
+        }
+    }, [tab, shopCountry, detectCountry]);
+
+    useEffect(() => {
+        if (tab === 'xrunStore' && shopCountry !== null) {
             setXplayLoading(true);
             void loadGopaxKrwPerXrun();
             loadXplayProducts().finally(() => setXplayLoading(false));
         }
-    }, [tab, loadXplayProducts, loadGopaxKrwPerXrun]);
+    }, [tab, shopCountry, loadXplayProducts, loadGopaxKrwPerXrun]);
 
     const onXplayRefresh = useCallback(() => {
         setXplayRefreshing(true);
@@ -588,6 +627,27 @@ export const ShopScreen = () => {
                 >
                     {tab === 'xrunStore' ? (
                         <>
+                            {}
+                            {gpsDenied && (
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        const req = await Location.requestForegroundPermissionsAsync();
+                                        if (req.granted) {
+                                            setShopCountry(null); 
+                                        } else {
+
+                                            Linking.openSettings();
+                                        }
+                                    }}
+                                    activeOpacity={0.8}
+                                    style={styles.gpsBanner}
+                                >
+                                    <Feather name="map-pin" size={16} color="#92400e" />
+                                    <Text style={styles.gpsBannerText}>
+                                        위치 권한을 허용하면 지역에 맞는 상품을 보여드려요. 탭 해서 허용
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
                                     <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
@@ -912,6 +972,26 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
         textAlign: 'center',
+    },
+    gpsBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginHorizontal: 16,
+        marginTop: 8,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: '#fef3c7',
+        borderWidth: 1,
+        borderColor: '#fbbf24',
+    },
+    gpsBannerText: {
+        flex: 1,
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#92400e',
     },
     loadingContainer: {
         paddingVertical: 40,
