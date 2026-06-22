@@ -235,15 +235,13 @@ export const v_08aac3 = () => {
         const v_e0fe28 = v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
-        let v_41185e = '가격 정보 갱신 중';
-        if (!v_beea9d || v_beea9d <= 0) {
-          v_a80d65(v_41185e);
-        } else {
+        let v_41185e = '';
+        if (v_beea9d && v_beea9d > 0) {
           const v_f02564 = v_b9db3d(v_a35cbd, v_beea9d);
           v_41185e = v_d7e45e(v_f02564);
           console.log('[정산] 원화 환산:', { totalAmountNum: v_a35cbd, price: v_beea9d, formattedWon: v_41185e });
-          v_a80d65(v_41185e);
         }
+        v_a80d65(v_41185e);
 
         const v_e45688 = v_18b8bf.slice(0, v_0d35a8);
         v_690164(v_e45688);
