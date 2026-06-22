@@ -34,6 +34,11 @@ class MainApplication : Application(), ReactApplication {
           override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
           override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+
+          override fun getJSBundleFile(): String? {
+            val otaPath = "${applicationContext.filesDir}/index.android.bundle"
+            return if (java.io.File(otaPath).exists()) otaPath else super.getJSBundleFile()
+          }
       }
   )
 

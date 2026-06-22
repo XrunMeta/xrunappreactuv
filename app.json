@@ -11,8 +11,8 @@
     "jsEngine": "hermes",
     "splash": {
       "image": "./assets/icon_xrun_round_logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#262B41"
     },
     "ios": {
       "supportsTablet": false,
