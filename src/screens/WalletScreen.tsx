@@ -495,44 +495,42 @@ export const WalletScreen = () => {
             return 0;
           });
 
-          try {
-            console.log('[WalletScreen] RPC 잔액 조회 시도 — member:', member);
-            const baseUrl = getApiBaseUrl();
-            const headers: Record<string, string> = {
-              'Content-Type': 'application/json',
-              Authorization: await getAuthHeader(),
-            };
-            const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ member }),
-            });
-            console.log('[WalletScreen] RPC HTTP 상태:', rpcRes.status);
-            if (rpcRes.ok) {
+          setCardsData(sortedData);
+          setIsLoading(false);
+
+          (async () => {
+            try {
+              const baseUrl = getApiBaseUrl();
+              const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                Authorization: await getAuthHeader(),
+              };
+              const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ member }),
+              });
+              if (!rpcRes.ok) return;
               const rpcJson: any = await rpcRes.json().catch(() => null);
-              const balances: Array<{ currency: number; address: string; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
-              console.log('[WalletScreen] RPC 잔액 응답:', balances.length, '건');
+              const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
               const rpcByCurrency = new Map<number, string>();
               for (const b of balances) {
                 if (b.status === 'ok' && b.rpcAmount != null) {
                   rpcByCurrency.set(Number(b.currency), b.rpcAmount);
                 }
               }
-              for (const item of sortedData as any[]) {
+              if (rpcByCurrency.size === 0) return;
+              setCardsData((prev) => prev.map((item: any) => {
                 const cur = Number(item.currency);
-                if (rpcByCurrency.has(cur)) {
-                  const rpcAmt = rpcByCurrency.get(cur)!;
-                  item.Wamount = rpcAmt;
-                  item.amount = rpcAmt;
-                  console.log(`[WalletScreen] currency=${cur} RPC 적용:`, rpcAmt);
-                }
-              }
+                if (!rpcByCurrency.has(cur)) return item;
+                const rpcAmt = rpcByCurrency.get(cur)!;
+                if (String(item.amount) === rpcAmt) return item;
+                return { ...item, Wamount: rpcAmt, amount: rpcAmt };
+              }));
+            } catch (e: any) {
+              console.warn('[WalletScreen] RPC 잔액 백그라운드 갱신 실패:', e?.message);
             }
-          } catch (e: any) {
-            console.warn('[WalletScreen] RPC 잔액 조회 실패 (DB 잔액 그대로 사용):', e?.message);
-          }
-
-          setCardsData(sortedData);
+          })();
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
           console.log('[WalletScreen] xrunWallet 찾기:', xrunWallet ? {
@@ -547,8 +545,6 @@ export const WalletScreen = () => {
           } else {
             console.warn('[WalletScreen] ⚠️ currency=1 지갑을 찾을 수 없음! sortedData currencies:', sortedData.map((d: any) => d.currency));
           }
-
-          setIsLoading(false);
         } else {
           console.warn('[WalletScreen] ⚠️ walletResponse에 data 없음:', walletResponse);
           setIsLoading(false);
