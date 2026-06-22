@@ -264,7 +264,11 @@ export const ShopScreen = () => {
                 if (email && SHOP_DEV_EMAILS.includes(email)) {
                     setIsDevAccount(true);
                     const saved = await AsyncStorage.getItem('devShopForceCountry');
-                    if (saved === 'KR' || saved === 'ID') setForceCountry(saved);
+                    if (saved === 'KR' || saved === 'ID') {
+                        setForceCountry(saved);
+
+                        setShopCountry(saved);
+                    }
                 }
             } catch {  }
         })();
