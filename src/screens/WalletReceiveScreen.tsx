@@ -284,10 +284,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: FONTS.family.bold,
     color: COLORS.text,
-    marginBottom: 12,
+    marginBottom: 18,
   },
   qrContainer: {
-    marginBottom: 20,
+    marginBottom: 26,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
