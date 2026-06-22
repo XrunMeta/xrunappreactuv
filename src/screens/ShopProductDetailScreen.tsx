@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f, v_960478 } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f, v_960478, v_6acf4c, v_b20e92 } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
@@ -88,7 +88,7 @@ export const v_a59951 = () => {
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
-    const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
+    const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
     const [v_bd58fc, v_24bbbd] = v_5ab095(false);
 
     const [v_b7c830, v_179642] = v_5ab095<number | null>(null);
@@ -647,6 +647,28 @@ export const v_a59951 = () => {
                                 v_303962(v_8f00b9?.data ?? null);
                                 v_c43513(true);
                                 v_abb08d();
+                            } else if (v_8f00b9?.code === 410) {
+
+                                try {
+                                    const v_f24fd5 = await v_e84827.getItem('userData');
+                                    const v_f21c33 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
+                                    const v_717992 = v_f21c33?.member != null ? Number(v_f21c33.member) : null;
+                                    const v_e0c7e8 = (v_f21c33?.email ?? '').toLowerCase().trim();
+                                    if (v_717992 && v_e0c7e8 && v_5e6c2c(v_e0c7e8)) {
+                                        const v_1e6eca = await v_9d7f6b(v_e0c7e8, v_717992);
+                                        const v_dfc1c0 = (v_1e6eca.pol?.s === 's1');
+                                        if (v_dfc1c0) {
+                                            v_04a3b7({ memberId: v_717992, email: v_e0c7e8, kind: 'iak', iakCustomerId: v_d74a81 });
+                                            v_1c868b(true);
+                                            v_beef40(false);
+                                            return;
+                                        }
+                                    }
+                                } catch {  }
+                                v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), v_8d41d7('screens.walletRestore.restoreNeededShort'), [
+                                    { text: v_8d41d7('screens.shop.iak.ok') },
+                                    { text: v_8d41d7('screens.walletRestore.restoreNow'), onPress: () => v_9b57fc(v_ce4741.walletRestore) },
+                                ]);
                             } else {
                                 v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), v_8f00b9?.message ?? v_8d41d7('screens.shop.iak.unknownError'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
                             }
@@ -1080,6 +1102,48 @@ export const v_a59951 = () => {
                                 ?? v_53579f.find((v_32f7b8) => v_32f7b8.wallet_code === 'c16');
                             if (!v_5f5d6d?.private_key) {
                                 throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (v_94302c === 'iak') {
+
+                                const v_d61629 = v_d49490.iakCustomerId ?? '';
+                                if (!v_d61629) throw new Error(v_8d41d7('screens.shop.iak.phoneRequired'));
+                                const v_f91eae = await v_6acf4c(v_660822!, String(v_01bee9.id), v_9b57fc);
+                                if (v_f91eae?.status !== 'success' || !v_f91eae.data?.[0]) {
+                                    throw new Error(v_f91eae?.message || 'IAK prepare 실패');
+                                }
+                                const v_ab4c96 = v_f91eae.data[0];
+                                const v_9c423d = await v_e134f3({
+                                    privateKey: v_5f5d6d.private_key,
+                                    fromAddress: v_ab4c96.userAddress,
+                                    toAddress: v_ab4c96.casherAddress,
+                                    amount: String(v_ab4c96.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!v_9c423d.ok) {
+                                    const v_3cfdfc = (v_9c423d as any).detail ?? (v_9c423d as any).reason ?? '송금 실패';
+                                    const v_f2d01d = typeof v_3cfdfc === 'string' ? v_3cfdfc : '';
+                                    const v_f17ac7 = (v_9c423d as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(v_f2d01d);
+                                    if (v_f17ac7) {
+                                        v_1c868b(false);
+                                        v_24bbbd(false);
+                                        await v_889fad(v_8d41d7('common.gasInsufficient.title'), v_8d41d7('common.gasInsufficient.messagePurchase'));
+                                        return;
+                                    }
+                                    throw new Error(v_f2d01d || '송금 실패');
+                                }
+                                const v_94a7a9 = await v_b20e92(
+                                    v_660822!, v_ab4c96.ref_id, v_d61629, v_9c423d.txHash, String(v_01bee9.id), v_9b57fc
+                                );
+                                if (v_94a7a9?.status !== 'success') {
+                                    throw new Error(v_94a7a9?.message || 'IAK record 실패');
+                                }
+                                console.log('[T-031 IAK 구매] 성공:', { txHash: v_9c423d.txHash, ref_id: v_ab4c96.ref_id });
+                                v_303962(v_94a7a9?.data?.[0] ?? null);
+                                v_1c868b(false);
+                                v_c43513(true);
+                                v_abb08d();
+                                return;
                             }
                             if (v_94302c === 'gift') {
 

@@ -5113,6 +5113,29 @@ export const v_23c64e = async (
   }
 };
 
+export const v_6acf4c = async (
+  v_660822,
+  v_e55dc1,
+  v_c65f5d,
+): Promise<any> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_cb35cb = await v_9f42a4.post('/purchaseIakPrepare', { member: v_660822, product_code: v_e55dc1 });
+  return v_cb35cb.data;
+};
+
+export const v_b20e92 = async (
+  v_660822,
+  v_300415,
+  v_0ace9d,
+  v_359525,
+  v_e55dc1,
+  v_c65f5d,
+): Promise<any> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_cb35cb = await v_9f42a4.post('/purchaseIakRecord', { member: v_660822, ref_id: v_300415, customer_id: v_0ace9d, txHash: v_359525, product_code: v_e55dc1 });
+  return v_cb35cb.data;
+};
+
 export const v_960478 = async (
   v_24baff,
   v_c65f5d,
