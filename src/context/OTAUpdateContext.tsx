@@ -1,7 +1,7 @@
 
 
 import React, { createContext, useCallback, useContext, useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, BackHandler, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, BackHandler, ActivityIndicator, NativeModules } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
@@ -53,7 +53,18 @@ export const OTAUpdateProvider = ({ children }: { children: React.ReactNode }) =
         Alert.alert(
           t('common.versionUpdate.updateComplete'),
           t('common.versionUpdate.restartMessage'),
-          [{ text: t('common.versionUpdate.confirm'), onPress: () => BackHandler.exitApp() }],
+          [{
+            text: t('common.versionUpdate.confirm'),
+            onPress: () => {
+
+              const ForceKill = (NativeModules as any).ForceKill;
+              if (ForceKill?.killProcess) {
+                ForceKill.killProcess();
+              } else {
+                BackHandler.exitApp();
+              }
+            },
+          }],
           { cancelable: false }
         );
       } else {
