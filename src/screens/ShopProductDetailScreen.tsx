@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun, purchaseIakPrepare, purchaseIakRecord } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
@@ -88,7 +88,7 @@ export const ShopProductDetailScreen = () => {
     const [member, setMember] = useState<string | null>(null);
 
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
-    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
+    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
     const [purchaseLocalLoading, setPurchaseLocalLoading] = useState(false);
 
     const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
@@ -647,6 +647,28 @@ export const ShopProductDetailScreen = () => {
                                 setIakPurchaseResult(res?.data ?? null);
                                 setIakSuccessVisible(true);
                                 loadXrunBalance();
+                            } else if (res?.code === 410) {
+
+                                try {
+                                    const userDataStr = await AsyncStorage.getItem('userData');
+                                    const ud = userDataStr ? JSON.parse(userDataStr) : null;
+                                    const memberId = ud?.member != null ? Number(ud.member) : null;
+                                    const email = (ud?.email ?? '').toLowerCase().trim();
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'iak', iakCustomerId: phone });
+                                            setPurchasePinVisible(true);
+                                            setIakPurchaseLoading(false);
+                                            return;
+                                        }
+                                    }
+                                } catch {  }
+                                showAlert(t('screens.shop.iak.purchaseFailed'), t('screens.walletRestore.restoreNeededShort'), [
+                                    { text: t('screens.shop.iak.ok') },
+                                    { text: t('screens.walletRestore.restoreNow'), onPress: () => navigate(ROUTES.walletRestore) },
+                                ]);
                             } else {
                                 showAlert(t('screens.shop.iak.purchaseFailed'), res?.message ?? t('screens.shop.iak.unknownError'), [{ text: t('screens.shop.iak.ok') }]);
                             }
@@ -1080,6 +1102,48 @@ export const ShopProductDetailScreen = () => {
                                 ?? wallets.find((w) => w.wallet_code === 'c16');
                             if (!target?.private_key) {
                                 throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (kind === 'iak') {
+
+                                const customerId = purchaseCtx.iakCustomerId ?? '';
+                                if (!customerId) throw new Error(t('screens.shop.iak.phoneRequired'));
+                                const prep = await purchaseIakPrepare(member!, String(product.id), navigate);
+                                if (prep?.status !== 'success' || !prep.data?.[0]) {
+                                    throw new Error(prep?.message || 'IAK prepare 실패');
+                                }
+                                const meta = prep.data[0];
+                                const send = await sendOnchainLocal({
+                                    privateKey: target.private_key,
+                                    fromAddress: meta.userAddress,
+                                    toAddress: meta.casherAddress,
+                                    amount: String(meta.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!send.ok) {
+                                    const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
+                                    const detailStr = typeof detail === 'string' ? detail : '';
+                                    const isGasShort = (send as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(detailStr);
+                                    if (isGasShort) {
+                                        setPurchasePinVisible(false);
+                                        setPurchaseLocalLoading(false);
+                                        await showAlert(t('common.gasInsufficient.title'), t('common.gasInsufficient.messagePurchase'));
+                                        return;
+                                    }
+                                    throw new Error(detailStr || '송금 실패');
+                                }
+                                const rec = await purchaseIakRecord(
+                                    member!, meta.ref_id, customerId, send.txHash, String(product.id), navigate
+                                );
+                                if (rec?.status !== 'success') {
+                                    throw new Error(rec?.message || 'IAK record 실패');
+                                }
+                                console.log('[T-031 IAK 구매] 성공:', { txHash: send.txHash, ref_id: meta.ref_id });
+                                setIakPurchaseResult(rec?.data?.[0] ?? null);
+                                setPurchasePinVisible(false);
+                                setIakSuccessVisible(true);
+                                loadXrunBalance();
+                                return;
                             }
                             if (kind === 'gift') {
 

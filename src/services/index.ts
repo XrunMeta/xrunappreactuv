@@ -5113,6 +5113,29 @@ export const getMyIakTxns = async (
   }
 };
 
+export const purchaseIakPrepare = async (
+  member: number,
+  product_code: string,
+  navigation?: any,
+): Promise<any> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const r = await axiosInstance.post('/purchaseIakPrepare', { member, product_code });
+  return r.data;
+};
+
+export const purchaseIakRecord = async (
+  member: number,
+  ref_id: string,
+  customer_id: string,
+  txHash: string,
+  product_code: string,
+  navigation?: any,
+): Promise<any> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const r = await axiosInstance.post('/purchaseIakRecord', { member, ref_id, customer_id, txHash, product_code });
+  return r.data;
+};
+
 export const purchaseIakWithXrun = async (
   params: { member: number; product_code: string; customer_id: string; env?: 'dev' | 'prod' },
   navigation?: any,
