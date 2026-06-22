@@ -5082,6 +5082,37 @@ export const purchaseGiftWithXplayPoints = async (
   }
 };
 
+export interface MyIakTxnItem {
+  ref_id: string;
+  product_code: string;
+  product_name: string | null;
+  customer_id: string;
+  product_price: number;  
+  xrun_amount: number;
+  status: 'pending' | 'success' | 'failed' | 'refunded';
+  iak_sn: string | null;
+  iak_message: string | null;
+  created_at: string;
+  callback_at: string | null;
+}
+export const getMyIakTxns = async (
+  member: number | string,
+  navigation?: any,
+): Promise<{ status: string; data: MyIakTxnItem[] }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/getMyIakTxns', { member: Number(member) });
+    const data = res.data;
+    if (data?.status === 'success' && Array.isArray(data.data)) {
+      return { status: 'success', data: data.data as MyIakTxnItem[] };
+    }
+    return { status: 'error', data: [] };
+  } catch (e) {
+    console.warn('[IAK] My txn fetch err:', (e as Error).message);
+    return { status: 'error', data: [] };
+  }
+};
+
 export const purchaseIakWithXrun = async (
   params: { member: number; product_code: string; customer_id: string; env?: 'dev' | 'prod' },
   navigation?: any,

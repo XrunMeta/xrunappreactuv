@@ -10,7 +10,8 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { getMyGiftishowCoupons, getXrunPurchasedItems } from '../services';
+import { getMyGiftishowCoupons, getXrunPurchasedItems, getMyIakTxns } from '../services';
+import type { MyIakTxnItem } from '../services';
 import type { MyGiftishowCouponItem } from '../types';
 import type { PurchasedItemData } from '../types';
 
@@ -25,7 +26,11 @@ interface MyItemData {
     purchaseDate: string;
     tr_id?: string;
 
-    type: 'xrun' | 'giftishow';
+    type: 'xrun' | 'giftishow' | 'iak';  
+
+    iakSn?: string;
+
+    iakCustomerId?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -154,9 +159,10 @@ export const ShopMyItemsScreen = () => {
             }
             const memberStr = String(member);
             setCurrentMember(memberStr);
-            const [giftishowRes, xrunRes] = await Promise.all([
+            const [giftishowRes, xrunRes, iakRes] = await Promise.all([
                 getMyGiftishowCoupons(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
                 getXrunPurchasedItems(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
+                getMyIakTxns(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] as MyIakTxnItem[] })),
             ]);
             const giftishowList: MyItemData[] =
                 giftishowRes?.status === 'success' && Array.isArray(giftishowRes.data)
@@ -168,7 +174,26 @@ export const ShopMyItemsScreen = () => {
                 xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
                     ? xrunRes.data.map((p, i) => xrunPurchasedToMyItemData(p, i))
                     : [];
-            const merged = [...xrunList, ...giftishowList].sort((a, b) => b.sortKey - a.sortKey);
+
+            const iakList: MyItemData[] =
+                iakRes?.status === 'success' && Array.isArray(iakRes.data)
+                    ? iakRes.data.map((t) => ({
+                        id: `iak-${t.ref_id}`,
+                        brand: 'IAK 충전',
+                        title: t.product_name || t.product_code,
+                        image: defaultCouponImage,
+                        status: t.status === 'success' ? 'available'
+                              : t.status === 'pending' ? 'pending'
+                              : 'used',  
+                        purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                        tr_id: t.ref_id,
+                        type: 'iak' as const,
+                        iakSn: t.iak_sn ?? undefined,
+                        iakCustomerId: t.customer_id,
+                        sortKey: new Date(String(t.created_at)).getTime() || 0,
+                    } as MyItemData))
+                    : [];
+            const merged = [...xrunList, ...giftishowList, ...iakList].sort((a, b) => b.sortKey - a.sortKey);
             setItems(merged);
         } catch {
             setItems([]);
@@ -216,6 +241,19 @@ export const ShopMyItemsScreen = () => {
     };
 
     const handleUseItem = (item: MyItemData) => {
+
+        if (item.type === 'iak') {
+            const lines: string[] = [];
+            if (item.iakCustomerId) lines.push(`📞 충전 번호: ${item.iakCustomerId}`);
+            if (item.iakSn) lines.push(`🧾 시리얼: ${item.iakSn}`);
+            if (item.status === 'pending') lines.push('\n⏳ 처리 중 (콜백 대기)');
+            else if (item.status === 'used') lines.push('\n⚠️ 실패 또는 환불됨');
+            else lines.push('\n✅ 통신사 SMS 로도 확인 가능');
+
+            const msg = lines.join('\n');
+            (require('react-native').Alert.alert)(item.title, msg, [{ text: '확인' }]);
+            return;
+        }
         if (item.type === 'xrun') {
             const shopItem = {
                 id: item.id,
