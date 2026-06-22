@@ -334,7 +334,7 @@ export const ShopScreen = () => {
                 setXplayProductList([]);
             }
         }
-    }, []);
+    }, [shopCountry]);
 
     const loadGopaxKrwPerXrun = useCallback(async () => {
         try {
