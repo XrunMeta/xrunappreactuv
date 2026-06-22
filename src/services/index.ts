@@ -5094,6 +5094,7 @@ export interface MyIakTxnItem {
   iak_message: string | null;
   created_at: string;
   callback_at: string | null;
+  icon_url?: string | null;  
 }
 export const getMyIakTxns = async (
   member: number | string,

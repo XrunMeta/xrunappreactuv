@@ -177,21 +177,23 @@ export const ShopMyItemsScreen = () => {
 
             const iakList: MyItemData[] =
                 iakRes?.status === 'success' && Array.isArray(iakRes.data)
-                    ? iakRes.data.map((t) => ({
-                        id: `iak-${t.ref_id}`,
-                        brand: 'IAK 충전',
-                        title: t.product_name || t.product_code,
-                        image: defaultCouponImage,
-                        status: t.status === 'success' ? 'available'
-                              : t.status === 'pending' ? 'pending'
-                              : 'used',  
-                        purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
-                        tr_id: t.ref_id,
-                        type: 'iak' as const,
-                        iakSn: t.iak_sn ?? undefined,
-                        iakCustomerId: t.customer_id,
-                        sortKey: new Date(String(t.created_at)).getTime() || 0,
-                    } as MyItemData))
+                    ? iakRes.data.map((t) => {
+                        const hasIcon = t.icon_url && t.icon_url !== '-' && /^https?:\/\//.test(t.icon_url);
+                        return {
+                            id: `iak-${t.ref_id}`,
+                            brand: 'IAK',
+                            title: t.product_name || t.product_code,
+                            image: hasIcon ? { uri: t.icon_url! } : defaultCouponImage,
+
+                            status: t.status === 'pending' ? 'pending' : 'available',
+                            purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                            tr_id: t.ref_id,
+                            type: 'iak' as const,
+                            iakSn: t.iak_sn ?? undefined,
+                            iakCustomerId: t.customer_id,
+                            sortKey: new Date(String(t.created_at)).getTime() || 0,
+                        } as MyItemData;
+                    })
                     : [];
             const merged = [...xrunList, ...giftishowList, ...iakList].sort((a, b) => b.sortKey - a.sortKey);
             setItems(merged);
