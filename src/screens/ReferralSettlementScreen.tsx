@@ -7,7 +7,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608, v_f16775, v_b34ce5, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_9b1a04, v_843035 } from '../constants';
-import { v_2dc778 } from '../services';
+import { v_2dc778, v_dd87bc } from '../services';
 import type { v_cc1705, v_55701f } from '../services';
 import { v_ca58e0, v_7ac54c } from '../services/referralSettlementCache';
 import { v_5f9ea4 } from '../types';
@@ -108,6 +108,30 @@ export const v_08aac3 = () => {
   const [v_13f115, v_54eab4] = v_5ab095<string>('0 XRUN');
   const [v_26e26f, v_a80d65] = v_5ab095<string>('₩0');
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0); 
+
+  v_c4deb2(() => {
+    (async () => {
+      try {
+        const v_43c42e = await v_dd87bc();
+        const v_6bbb57 = Number(v_43c42e?.data?.gopaxPrice ?? 0);
+        if (v_6bbb57 > 0) {
+          v_0d9a89(v_6bbb57);
+          await v_e84827.setItem('xrungopaxprice', JSON.stringify(v_43c42e));
+          return;
+        }
+      } catch (v_9e86fd) {
+        console.warn('[정산] 고팍스 가격 API 실패, AsyncStorage fallback:', v_9e86fd);
+      }
+      try {
+        const v_e2a6a6 = await v_e84827.getItem('xrungopaxprice');
+        if (v_e2a6a6) {
+          const v_9390e8 = JSON.parse(v_e2a6a6);
+          const v_e2a85c = Number(v_9390e8?.data?.gopaxPrice ?? 0);
+          if (v_e2a85c > 0) v_0d9a89(v_e2a85c);
+        }
+      } catch {  }
+    })();
+  }, []);
   const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('');
 
   const { t: v_8d41d7 } = v_772971();
@@ -211,7 +235,7 @@ export const v_08aac3 = () => {
         const v_e0fe28 = v_a35cbd.toFixed(2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
-        let v_41185e = '⏳ 가격 정보 갱신 중';
+        let v_41185e = '가격 정보 갱신 중';
         if (!v_beea9d || v_beea9d <= 0) {
           v_a80d65(v_41185e);
         } else {
