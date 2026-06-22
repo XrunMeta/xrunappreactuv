@@ -159,6 +159,8 @@ export const WalletReceiveScreen = () => {
           </TouchableOpacity>
         </View>
         {}
+        <View style={styles.centerArea}>
+        {}
         <View style={styles.topSection}>
           <Text style={styles.tokenName}>{currencyInfo.symbol}</Text>
 
@@ -213,6 +215,7 @@ export const WalletReceiveScreen = () => {
             isAddress
             onCopy={handleCopyAddress}
           />
+        </View>
         </View>
       </SafeScrollView>
     </SafeView >
@@ -273,9 +276,12 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     ...COMMON_STYLES.scrollContent,
   },
+  centerArea: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   topSection: {
     alignItems: 'center',
-    marginTop: 8,
     marginBottom: 16,
   },
   tokenName: {
