@@ -699,7 +699,7 @@ export const v_10886b = () => {
                                 >
                                     <Feather name="map-pin" size={16} color="#92400e" />
                                     <Text style={v_d81136.gpsBannerText}>
-                                        위치 권한을 허용하면 지역에 맞는 상품을 보여드려요. 탭 해서 허용
+                                        {v_8d41d7('screens.shop.iak.gpsBanner')}
                                     </Text>
                                 </TouchableOpacity>
                             )}

@@ -244,14 +244,13 @@ export const v_8c1d95 = () => {
 
         if (v_8c0b26.type === 'iak') {
             const v_a52412 = [];
-            if (v_8c0b26.iakCustomerId) v_a52412.push(`📞 충전 번호: ${v_8c0b26.iakCustomerId}`);
-            if (v_8c0b26.iakSn) v_a52412.push(`🧾 시리얼: ${v_8c0b26.iakSn}`);
-            if (v_8c0b26.status === 'pending') v_a52412.push('\n⏳ 처리 중 (콜백 대기)');
-            else if (v_8c0b26.status === 'used') v_a52412.push('\n⚠️ 실패 또는 환불됨');
-            else v_a52412.push('\n✅ 통신사 SMS 로도 확인 가능');
-
+            if (v_8c0b26.iakCustomerId) v_a52412.push(v_8d41d7('screens.shop.iak.phoneLabelLine', { phone: v_8c0b26.iakCustomerId }));
+            if (v_8c0b26.iakSn) v_a52412.push(v_8d41d7('screens.shop.iak.snInfoLine', { sn: v_8c0b26.iakSn }));
+            if (v_8c0b26.status === 'pending') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.pendingNote'));
+            else if (v_8c0b26.status === 'used') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.failedNote'));
+            else v_a52412.push('\n' + v_8d41d7('screens.shop.iak.successNote'));
             const v_badeaf = v_a52412.join('\n');
-            (require('rcmrninabrnb').Alert.alert)(v_8c0b26.title, v_badeaf, [{ text: '확인' }]);
+            (require('rcmrninabrnb').Alert.alert)(v_8c0b26.title, v_badeaf, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
         if (v_8c0b26.type === 'xrun') {

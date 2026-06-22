@@ -616,23 +616,24 @@ export const v_a59951 = () => {
         if (!v_660822 || v_673bf2) return;
         const v_d74a81 = v_f3e760.trim();
         if (!v_d74a81) {
-            v_889fad('알림', '충전 받을 인도네시아 휴대폰 번호를 입력해주세요.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7('screens.shop.iak.phoneRequired'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
         if (v_a1c497 === null || v_19340b) {
-            v_889fad('알림', 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7('screens.shop.iak.balanceLoading'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
         if (v_a1c497 < v_01bee9.price) {
-            v_889fad('알림', 'XRUN 잔액이 부족합니다.', [{ text: '확인' }]);
+            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7('screens.shop.iak.insufficientBalance'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
-        v_889fad('구매 확인',
-            `${v_01bee9.title}\n${v_01bee9.price} XRUN\n충전 번호: ${v_d74a81}\n\n진행하시겠습니까?`,
+        v_889fad(
+            v_8d41d7('screens.shop.iak.purchaseConfirmTitle'),
+            v_8d41d7('screens.shop.iak.purchaseConfirmMessage', { title: v_01bee9.title, price: v_01bee9.price, phone: v_d74a81 }),
             [
-                { text: '취소' },
+                { text: v_8d41d7('screens.shop.iak.cancel') },
                 {
-                    text: '구매',
+                    text: v_8d41d7('screens.shop.iak.buyConfirm'),
                     onPress: async () => {
                         v_beef40(true);
                         try {
@@ -647,7 +648,7 @@ export const v_a59951 = () => {
                                 v_c43513(true);
                                 v_abb08d();
                             } else {
-                                v_889fad('구매 실패', v_8f00b9?.message ?? '알 수 없는 오류', [{ text: '확인' }]);
+                                v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), v_8f00b9?.message ?? v_8d41d7('screens.shop.iak.unknownError'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
                             }
                         } finally {
                             v_beef40(false);
@@ -655,7 +656,7 @@ export const v_a59951 = () => {
                     },
                 },
             ]);
-    }, [v_660822, v_f3e760, v_673bf2, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_889fad, v_9b57fc, v_abb08d]);
+    }, [v_8d41d7, v_660822, v_f3e760, v_673bf2, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_889fad, v_9b57fc, v_abb08d]);
 
     const v_435347 = () => {
         v_c43513(false);
@@ -877,7 +878,7 @@ export const v_a59951 = () => {
                         >
                             {v_673bf2 ? <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} /> : null}
                             <Text style={v_d81136.purchaseButtonText}>
-                                {v_673bf2 ? '처리 중…' : 'XRUN 으로 구매하기'}
+                                {v_673bf2 ? v_8d41d7('screens.shop.iak.processing') : v_8d41d7('screens.shop.iak.buyButton')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -951,15 +952,15 @@ export const v_a59951 = () => {
                 <View style={v_d81136.modalOverlay}>
                     <View style={[v_d81136.paymentSuccessModal, { paddingTop: 24 }]}>
                         <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
-                            충전 받을 휴대폰 번호
+                            {v_8d41d7('screens.shop.iak.phoneModalTitle')}
                         </Text>
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
-                            인도네시아 휴대폰 번호를 입력해주세요
+                            {v_8d41d7('screens.shop.iak.phoneModalDesc')}
                         </Text>
                         <TextInput
                             value={v_f3e760}
                             onChangeText={v_23d029}
-                            placeholder="예: 0812xxxxxxxx"
+                            placeholder={v_8d41d7('screens.shop.iak.phonePlaceholder')}
                             keyboardType="phone-pad"
                             autoFocus
                             style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
@@ -971,7 +972,7 @@ export const v_a59951 = () => {
                                 disabled={v_673bf2}
                                 activeOpacity={0.8}
                             >
-                                <Text style={{ color: '#374151', fontWeight: '600' }}>취소</Text>
+                                <Text style={{ color: '#374151', fontWeight: '600' }}>{v_8d41d7('screens.shop.iak.cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: v_f3e760.trim() ? '#1E3A5F' : '#9ca3af', alignItems: 'center' }}
@@ -979,7 +980,7 @@ export const v_a59951 = () => {
                                 disabled={v_673bf2 || !v_f3e760.trim()}
                                 activeOpacity={0.8}
                             >
-                                <Text style={{ color: '#fff', fontWeight: '700' }}>구매</Text>
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shop.iak.buyConfirm')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -999,11 +1000,11 @@ export const v_a59951 = () => {
                             <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={[v_d81136.paymentSuccessMessage, { marginBottom: 12 }]}>
-                            ✅ 충전 완료
+                            {v_8d41d7('screens.shop.iak.successTitle')}
                         </Text>
                         {v_889a26?.iak?.sn ? (
                             <View style={{ alignItems: 'center', marginBottom: 16 }}>
-                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>시리얼 번호</Text>
+                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.shop.iak.snLabel')}</Text>
                                 <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: 'Roboto-Medium', color: '#111827', letterSpacing: 1 }}>
                                     {v_889a26.iak.sn}
                                 </Text>
@@ -1011,11 +1012,11 @@ export const v_a59951 = () => {
                         ) : null}
                         <View style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
                             <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, textAlign: 'center' }}>
-                                💬 충전 내역은 통신사에서 발송한 SMS 로도 확인 가능합니다.
+                                {v_8d41d7('screens.shop.iak.smsNotice')}
                             </Text>
                         </View>
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_435347} activeOpacity={0.8}>
-                            <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
+                            <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shop.iak.ok')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
