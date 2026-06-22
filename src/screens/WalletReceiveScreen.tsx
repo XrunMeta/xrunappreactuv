@@ -144,7 +144,7 @@ export const WalletReceiveScreen = () => {
       />
 
       <SafeScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, styles.scrollContentEvenly]}
         backgroundColor="transparent"
         showsVerticalScrollIndicator={false}
         showBottomBackground={false}
@@ -158,8 +158,6 @@ export const WalletReceiveScreen = () => {
             <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.scan')}</Text>
           </TouchableOpacity>
         </View>
-        {}
-        <View style={styles.centerArea}>
         {}
         <View style={styles.topSection}>
           <Text style={styles.tokenName}>{currencyInfo.symbol}</Text>
@@ -215,7 +213,6 @@ export const WalletReceiveScreen = () => {
             isAddress
             onCopy={handleCopyAddress}
           />
-        </View>
         </View>
       </SafeScrollView>
     </SafeView >
@@ -276,13 +273,12 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     ...COMMON_STYLES.scrollContent,
   },
-  centerArea: {
-    flex: 1,
-    justifyContent: 'center',
+  scrollContentEvenly: {
+
+    justifyContent: 'space-evenly',
   },
   topSection: {
     alignItems: 'center',
-    marginBottom: 16,
   },
   tokenName: {
     fontSize: 24,
