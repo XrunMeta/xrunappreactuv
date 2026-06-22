@@ -2126,7 +2126,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
-      const needsExternalBrowser = /gpakorea\.com/i.test(urlAD);
+      const tokenName = String(token?.name ?? '').toLowerCase();
+      const needsExternalBrowser = /유튜브|youtube/i.test(tokenName);
       if (needsExternalBrowser) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
 
