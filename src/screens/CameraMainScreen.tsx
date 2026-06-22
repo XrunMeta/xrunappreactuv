@@ -2126,7 +2126,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       v_d48a26(v_75c344);
 
-      const v_43b152 = /gpakorea\.com/i.test(v_7ec08d);
+      const v_6d4c0b = String(v_21cc31?.name ?? '').toLowerCase();
+      const v_43b152 = /유튜브|youtube/i.test(v_6d4c0b);
       if (v_43b152) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
 
