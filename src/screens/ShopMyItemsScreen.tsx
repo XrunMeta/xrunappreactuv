@@ -244,14 +244,13 @@ export const ShopMyItemsScreen = () => {
 
         if (item.type === 'iak') {
             const lines: string[] = [];
-            if (item.iakCustomerId) lines.push(`📞 충전 번호: ${item.iakCustomerId}`);
-            if (item.iakSn) lines.push(`🧾 시리얼: ${item.iakSn}`);
-            if (item.status === 'pending') lines.push('\n⏳ 처리 중 (콜백 대기)');
-            else if (item.status === 'used') lines.push('\n⚠️ 실패 또는 환불됨');
-            else lines.push('\n✅ 통신사 SMS 로도 확인 가능');
-
+            if (item.iakCustomerId) lines.push(t('screens.shop.iak.phoneLabelLine', { phone: item.iakCustomerId }));
+            if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
+            if (item.status === 'pending') lines.push('\n' + t('screens.shop.iak.pendingNote'));
+            else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
+            else lines.push('\n' + t('screens.shop.iak.successNote'));
             const msg = lines.join('\n');
-            (require('react-native').Alert.alert)(item.title, msg, [{ text: '확인' }]);
+            (require('react-native').Alert.alert)(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
         if (item.type === 'xrun') {

@@ -616,23 +616,24 @@ export const ShopProductDetailScreen = () => {
         if (!member || iakPurchaseLoading) return;
         const phone = iakPhone.trim();
         if (!phone) {
-            showAlert('알림', '충전 받을 인도네시아 휴대폰 번호를 입력해주세요.', [{ text: '확인' }]);
+            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.phoneRequired'), [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
         if (xrunBalanceState === null || xrunBalanceLoading) {
-            showAlert('알림', 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: '확인' }]);
+            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.balanceLoading'), [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
         if (xrunBalanceState < product.price) {
-            showAlert('알림', 'XRUN 잔액이 부족합니다.', [{ text: '확인' }]);
+            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.insufficientBalance'), [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
-        showAlert('구매 확인',
-            `${product.title}\n${product.price} XRUN\n충전 번호: ${phone}\n\n진행하시겠습니까?`,
+        showAlert(
+            t('screens.shop.iak.purchaseConfirmTitle'),
+            t('screens.shop.iak.purchaseConfirmMessage', { title: product.title, price: product.price, phone }),
             [
-                { text: '취소' },
+                { text: t('screens.shop.iak.cancel') },
                 {
-                    text: '구매',
+                    text: t('screens.shop.iak.buyConfirm'),
                     onPress: async () => {
                         setIakPurchaseLoading(true);
                         try {
@@ -647,7 +648,7 @@ export const ShopProductDetailScreen = () => {
                                 setIakSuccessVisible(true);
                                 loadXrunBalance();
                             } else {
-                                showAlert('구매 실패', res?.message ?? '알 수 없는 오류', [{ text: '확인' }]);
+                                showAlert(t('screens.shop.iak.purchaseFailed'), res?.message ?? t('screens.shop.iak.unknownError'), [{ text: t('screens.shop.iak.ok') }]);
                             }
                         } finally {
                             setIakPurchaseLoading(false);
@@ -655,7 +656,7 @@ export const ShopProductDetailScreen = () => {
                     },
                 },
             ]);
-    }, [member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance]);
+    }, [t, member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance]);
 
     const handleIakSuccessClose = () => {
         setIakSuccessVisible(false);
@@ -877,7 +878,7 @@ export const ShopProductDetailScreen = () => {
                         >
                             {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
                             <Text style={styles.purchaseButtonText}>
-                                {iakPurchaseLoading ? '처리 중…' : 'XRUN 으로 구매하기'}
+                                {iakPurchaseLoading ? t('screens.shop.iak.processing') : t('screens.shop.iak.buyButton')}
                             </Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -951,15 +952,15 @@ export const ShopProductDetailScreen = () => {
                 <View style={styles.modalOverlay}>
                     <View style={[styles.paymentSuccessModal, { paddingTop: 24 }]}>
                         <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
-                            충전 받을 휴대폰 번호
+                            {t('screens.shop.iak.phoneModalTitle')}
                         </Text>
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
-                            인도네시아 휴대폰 번호를 입력해주세요
+                            {t('screens.shop.iak.phoneModalDesc')}
                         </Text>
                         <TextInput
                             value={iakPhone}
                             onChangeText={setIakPhone}
-                            placeholder="예: 0812xxxxxxxx"
+                            placeholder={t('screens.shop.iak.phonePlaceholder')}
                             keyboardType="phone-pad"
                             autoFocus
                             style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
@@ -971,7 +972,7 @@ export const ShopProductDetailScreen = () => {
                                 disabled={iakPurchaseLoading}
                                 activeOpacity={0.8}
                             >
-                                <Text style={{ color: '#374151', fontWeight: '600' }}>취소</Text>
+                                <Text style={{ color: '#374151', fontWeight: '600' }}>{t('screens.shop.iak.cancel')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: iakPhone.trim() ? '#1E3A5F' : '#9ca3af', alignItems: 'center' }}
@@ -979,7 +980,7 @@ export const ShopProductDetailScreen = () => {
                                 disabled={iakPurchaseLoading || !iakPhone.trim()}
                                 activeOpacity={0.8}
                             >
-                                <Text style={{ color: '#fff', fontWeight: '700' }}>구매</Text>
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shop.iak.buyConfirm')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -999,11 +1000,11 @@ export const ShopProductDetailScreen = () => {
                             <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={[styles.paymentSuccessMessage, { marginBottom: 12 }]}>
-                            ✅ 충전 완료
+                            {t('screens.shop.iak.successTitle')}
                         </Text>
                         {iakPurchaseResult?.iak?.sn ? (
                             <View style={{ alignItems: 'center', marginBottom: 16 }}>
-                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>시리얼 번호</Text>
+                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('screens.shop.iak.snLabel')}</Text>
                                 <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: 'Roboto-Medium', color: '#111827', letterSpacing: 1 }}>
                                     {iakPurchaseResult.iak.sn}
                                 </Text>
@@ -1011,11 +1012,11 @@ export const ShopProductDetailScreen = () => {
                         ) : null}
                         <View style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
                             <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, textAlign: 'center' }}>
-                                💬 충전 내역은 통신사에서 발송한 SMS 로도 확인 가능합니다.
+                                {t('screens.shop.iak.smsNotice')}
                             </Text>
                         </View>
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleIakSuccessClose} activeOpacity={0.8}>
-                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
+                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shop.iak.ok')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

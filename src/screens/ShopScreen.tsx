@@ -699,7 +699,7 @@ export const ShopScreen = () => {
                                 >
                                     <Feather name="map-pin" size={16} color="#92400e" />
                                     <Text style={styles.gpsBannerText}>
-                                        위치 권한을 허용하면 지역에 맞는 상품을 보여드려요. 탭 해서 허용
+                                        {t('screens.shop.iak.gpsBanner')}
                                     </Text>
                                 </TouchableOpacity>
                             )}
