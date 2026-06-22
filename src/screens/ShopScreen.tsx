@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62, v_79c4f2 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62, v_79c4f2, v_f2c756 } from 'rcmrninabrnb';
+import * as v_8a44cb from 'zryrlwvgokjhz';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_570c34, v_556baf } from '../components';
@@ -123,6 +124,9 @@ export const v_10886b = () => {
     const [v_a502c3, v_77037a] = v_5ab095(false);
 
     const [v_ca7424, v_c235bc] = v_5ab095<number>(v_4994d5);
+
+    const [v_b70da2, v_068f20] = v_5ab095<'KR' | 'ID' | null>(null);  
+    const [v_ae728d, v_9982dc] = v_5ab095<boolean>(false);
     const { navigate: v_9b57fc } = v_a0daa8();
 
     const v_5536d4 = 'shop:xrunBalance';
@@ -245,12 +249,41 @@ export const v_10886b = () => {
         return () => { v_2008a4 = true; };
     }, []);
 
+    const v_add9f8 = v_de06a3(async () => {
+        try {
+            const v_d60769 = await v_8a44cb.getForegroundPermissionsAsync();
+            let v_b6d66b = v_d60769.granted;
+            if (!v_b6d66b) {
+                const v_309144 = await v_8a44cb.requestForegroundPermissionsAsync();
+                v_b6d66b = v_309144.granted;
+            }
+            if (!v_b6d66b) {
+                v_9982dc(true);
+                v_068f20('KR');
+                return;
+            }
+            v_9982dc(false);
+            const v_9e7a9d = await v_8a44cb.getLastKnownPositionAsync({ maxAge: 60_000, requiredAccuracy: 1000 })
+                ?? await v_8a44cb.getCurrentPositionAsync({ accuracy: v_8a44cb.Accuracy.Balanced });
+            if (!v_9e7a9d?.coords) { v_068f20('KR'); return; }
+            const v_c53393 = await v_8a44cb.reverseGeocodeAsync({ latitude: v_9e7a9d.coords.latitude, longitude: v_9e7a9d.coords.longitude }).catch(() => []);
+            const v_fb024c = (v_c53393?.[0]?.isoCountryCode ?? '').toUpperCase();
+            v_068f20(v_fb024c === 'ID' ? 'ID' : 'KR');
+            console.log('[ShopScreen] GPS country detected:', v_fb024c, '→', v_fb024c === 'ID' ? 'ID' : 'KR');
+        } catch (v_9e86fd) {
+            console.warn('[ShopScreen] GPS detect failed, fallback KR:', v_9e86fd);
+            v_9982dc(true);
+            v_068f20('KR');
+        }
+    }, []);
+
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
-        try {
 
+        const v_09dafd = v_b70da2 === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
+        try {
             const v_9f42a4 = (await import('../services')).createAxiosInstance();
-            const v_8f00b9 = await v_9f42a4.post('/getGiftishowActiveGoods', {});
+            const v_8f00b9 = await v_9f42a4.post(v_09dafd, {});
             const v_479f05 = Array.isArray(v_8f00b9.data?.data?.list) ? v_8f00b9.data.data.list as any[] : [];
 
             const v_ef8ab1 = v_479f05.map((v_206b88) => ({
@@ -317,12 +350,18 @@ export const v_10886b = () => {
     }, [v_9b57fc]);
 
     v_c4deb2(() => {
-        if (v_11083e === 'xrunStore') {
+        if (v_11083e === 'xrunStore' && v_b70da2 === null) {
+            void v_add9f8();
+        }
+    }, [v_11083e, v_b70da2, v_add9f8]);
+
+    v_c4deb2(() => {
+        if (v_11083e === 'xrunStore' && v_b70da2 !== null) {
             v_0e5971(true);
             void v_d0991f();
             v_f61b49().finally(() => v_0e5971(false));
         }
-    }, [v_11083e, v_f61b49, v_d0991f]);
+    }, [v_11083e, v_b70da2, v_f61b49, v_d0991f]);
 
     const v_f80453 = v_de06a3(() => {
         v_ad5fd0(true);
@@ -588,6 +627,27 @@ export const v_10886b = () => {
                 >
                     {v_11083e === 'xrunStore' ? (
                         <>
+                            {}
+                            {v_ae728d && (
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        const v_309144 = await v_8a44cb.requestForegroundPermissionsAsync();
+                                        if (v_309144.granted) {
+                                            v_068f20(null); 
+                                        } else {
+
+                                            v_f2c756.openSettings();
+                                        }
+                                    }}
+                                    activeOpacity={0.8}
+                                    style={v_d81136.gpsBanner}
+                                >
+                                    <Feather name="map-pin" size={16} color="#92400e" />
+                                    <Text style={v_d81136.gpsBannerText}>
+                                        위치 권한을 허용하면 지역에 맞는 상품을 보여드려요. 탭 해서 허용
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
                             {v_32c9b7 && !v_5605ec ? (
                                 <View style={v_d81136.loadingContainer}>
                                     <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
@@ -912,6 +972,26 @@ const v_d81136 = v_472849.create({
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
         textAlign: 'center',
+    },
+    gpsBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginHorizontal: 16,
+        marginTop: 8,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: '#fef3c7',
+        borderWidth: 1,
+        borderColor: '#fbbf24',
+    },
+    gpsBannerText: {
+        flex: 1,
+        fontSize: v_843035.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#92400e',
     },
     loadingContainer: {
         paddingVertical: 40,
