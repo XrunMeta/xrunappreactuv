@@ -127,6 +127,10 @@ export const v_10886b = () => {
 
     const [v_b70da2, v_068f20] = v_5ab095<'KR' | 'ID' | null>(null);  
     const [v_ae728d, v_9982dc] = v_5ab095<boolean>(false);
+
+    const v_0e6593 = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+    const [v_d51f37, v_bba8d0] = v_5ab095<boolean>(false);
+    const [v_01305e, v_e94174] = v_5ab095<'AUTO' | 'KR' | 'ID'>('AUTO');
     const { navigate: v_9b57fc } = v_a0daa8();
 
     const v_5536d4 = 'shop:xrunBalance';
@@ -249,7 +253,27 @@ export const v_10886b = () => {
         return () => { v_2008a4 = true; };
     }, []);
 
+    v_c4deb2(() => {
+        (async () => {
+            try {
+                const v_f21c33 = await v_e84827.getItem('userData');
+                const v_e0c7e8 = v_f21c33 ? (JSON.parse(v_f21c33)?.email ?? '').toLowerCase().trim() : '';
+                if (v_e0c7e8 && v_0e6593.includes(v_e0c7e8)) {
+                    v_bba8d0(true);
+                    const v_39de0e = await v_e84827.getItem('devShopForceCountry');
+                    if (v_39de0e === 'KR' || v_39de0e === 'ID') v_e94174(v_39de0e);
+                }
+            } catch {  }
+        })();
+
+    }, []);
+
     const v_add9f8 = v_de06a3(async () => {
+        if (v_01305e !== 'AUTO') {
+            v_068f20(v_01305e);
+            v_9982dc(false);
+            return;
+        }
         try {
             const v_d60769 = await v_8a44cb.getForegroundPermissionsAsync();
             let v_b6d66b = v_d60769.granted;
@@ -275,7 +299,7 @@ export const v_10886b = () => {
             v_9982dc(true);
             v_068f20('KR');
         }
-    }, []);
+    }, [v_01305e]);
 
     const v_f61b49 = v_de06a3(async () => {
         v_33ec67(null);
@@ -628,6 +652,30 @@ export const v_10886b = () => {
                     {v_11083e === 'xrunStore' ? (
                         <>
                             {}
+                            {v_d51f37 && (
+                                <View style={v_d81136.devCountryRow}>
+                                    <Text style={v_d81136.devCountryLabel}>DEV 국가:</Text>
+                                    {(['AUTO', 'KR', 'ID'] as const).map((v_3f4e2e) => (
+                                        <TouchableOpacity
+                                            key={v_3f4e2e}
+                                            onPress={async () => {
+                                                v_e94174(v_3f4e2e);
+                                                if (v_3f4e2e === 'AUTO') await v_e84827.removeItem('devShopForceCountry');
+                                                else await v_e84827.setItem('devShopForceCountry', v_3f4e2e);
+                                                v_068f20(null); 
+                                            }}
+                                            style={[v_d81136.devCountryChip, v_01305e === v_3f4e2e && v_d81136.devCountryChipActive]}
+                                        >
+                                            <Text style={[v_d81136.devCountryChipText, v_01305e === v_3f4e2e && v_d81136.devCountryChipTextActive]}>
+                                                {v_3f4e2e === 'AUTO' ? '🌐 GPS' : v_3f4e2e === 'KR' ? '🇰🇷 KR' : '🇮🇩 ID'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <Text style={v_d81136.devCountryCurrent}>현재: {v_b70da2 ?? '...'}</Text>
+                                </View>
+                            )}
+
+                            {}
                             {v_ae728d && (
                                 <TouchableOpacity
                                     onPress={async () => {
@@ -972,6 +1020,47 @@ const v_d81136 = v_472849.create({
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
         textAlign: 'center',
+    },
+    devCountryRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginHorizontal: 16,
+        marginTop: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        backgroundColor: '#1f2937',
+        borderRadius: 6,
+        flexWrap: 'wrap',
+    },
+    devCountryLabel: {
+        fontSize: 11,
+        color: '#9ca3af',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryChip: {
+        paddingVertical: 3,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        backgroundColor: '#374151',
+    },
+    devCountryChipActive: {
+        backgroundColor: '#3b82f6',
+    },
+    devCountryChipText: {
+        fontSize: 11,
+        color: '#d1d5db',
+        fontFamily: 'Roboto-Medium',
+    },
+    devCountryChipTextActive: {
+        color: '#fff',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryCurrent: {
+        marginLeft: 'auto',
+        fontSize: 10,
+        color: '#fbbf24',
+        fontFamily: 'Roboto-Regular',
     },
     gpsBanner: {
         flexDirection: 'row',
