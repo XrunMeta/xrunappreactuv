@@ -32,7 +32,7 @@ export const v_bb787c = async (): Promise<number> => {
     }
 };
 
-const v_838bb3 = false;
+const v_838bb3 = true;
 
 export const v_dc21b6 = async (): Promise<OTAVersionInfo | null> => {
     if (!v_838bb3) return null;
