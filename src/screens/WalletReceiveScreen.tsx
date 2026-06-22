@@ -160,6 +160,8 @@ export const WalletReceiveScreen = () => {
         </View>
         {}
         <View style={styles.topSection}>
+          <Text style={styles.tokenName}>{currencyInfo.symbol}</Text>
+
           <View style={styles.qrContainer}>
             <View style={styles.qrBorder}>
               <View style={styles.qrBase}>
@@ -275,6 +277,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 16,
+  },
+  tokenName: {
+    fontSize: 24,
+    fontFamily: FONTS.family.bold,
+    color: COLORS.text,
+    marginBottom: 12,
   },
   qrContainer: {
     marginBottom: 20,
