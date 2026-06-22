@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
@@ -37,6 +37,7 @@ interface ProductDetailData {
     price: number;
     image: ImageSourcePropType;
     isXrun?: boolean;
+    isIak?: boolean;  
 }
 
 const defaultProductFallback: ProductDetailData = {
@@ -68,6 +69,7 @@ export const ShopProductDetailScreen = () => {
         price: parseFloat(selectedShopItem.priceLabel?.replace(/,/g, '') || '0'),
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
+        isIak: (selectedShopItem as any).isIak || false,
     } : defaultProductFallback;
 
     const isExchangeProduct = false;
@@ -93,6 +95,11 @@ export const ShopProductDetailScreen = () => {
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
     const [xplayPurchaseLoading, setXplayPurchaseLoading] = useState(false);
     const [xplayPaymentSuccessVisible, setXplayPaymentSuccessVisible] = useState(false);
+
+    const [iakPhone, setIakPhone] = useState<string>('');
+    const [iakPurchaseLoading, setIakPurchaseLoading] = useState(false);
+    const [iakPurchaseResult, setIakPurchaseResult] = useState<any>(null);
+    const [iakSuccessVisible, setIakSuccessVisible] = useState(false);
 
     const [xplayPurchaseResult, setXplayPurchaseResult] = useState<{
         tr_id?: string;
@@ -603,6 +610,57 @@ export const ShopProductDetailScreen = () => {
         navigate(ROUTES.shopMyItems);
     };
 
+    const handleIakPurchase = useCallback(async () => {
+        if (!member || iakPurchaseLoading) return;
+        const phone = iakPhone.trim();
+        if (!phone) {
+            showAlert('알림', '충전 받을 인도네시아 휴대폰 번호를 입력해주세요.', [{ text: '확인' }]);
+            return;
+        }
+        if (xrunBalanceState === null || xrunBalanceLoading) {
+            showAlert('알림', 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: '확인' }]);
+            return;
+        }
+        if (xrunBalanceState < product.price) {
+            showAlert('알림', 'XRUN 잔액이 부족합니다.', [{ text: '확인' }]);
+            return;
+        }
+        showAlert('구매 확인',
+            `${product.title}\n${product.price} XRUN\n충전 번호: ${phone}\n\n진행하시겠습니까?`,
+            [
+                { text: '취소' },
+                {
+                    text: '구매',
+                    onPress: async () => {
+                        setIakPurchaseLoading(true);
+                        try {
+                            const res = await purchaseIakWithXrun({
+                                member: Number(member),
+                                product_code: String(product.id),
+                                customer_id: phone,
+                                env: 'prod',
+                            }, navigate);
+                            if (res?.status === 'success') {
+                                setIakPurchaseResult(res?.data ?? null);
+                                setIakSuccessVisible(true);
+                                loadXrunBalance();
+                            } else {
+                                showAlert('구매 실패', res?.message ?? '알 수 없는 오류', [{ text: '확인' }]);
+                            }
+                        } finally {
+                            setIakPurchaseLoading(false);
+                        }
+                    },
+                },
+            ]);
+    }, [member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance]);
+
+    const handleIakSuccessClose = () => {
+        setIakSuccessVisible(false);
+        setIakPhone('');
+        setIakPurchaseResult(null);
+    };
+
     const handleXplayPaymentSuccessClose = () => {
         setXplayPaymentSuccessVisible(false);
         setXplayPurchaseResult(null);
@@ -801,7 +859,39 @@ export const ShopProductDetailScreen = () => {
             {}
             {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
-                {isXplayShop ? (
+                {product.isIak ? (
+
+                    <View style={{ width: '100%' }}>
+                        <Text style={{ fontSize: 13, fontFamily: 'Roboto-Medium', color: '#374151', marginBottom: 6 }}>
+                            충전 받을 인도네시아 휴대폰 번호
+                        </Text>
+                        <TextInput
+                            value={iakPhone}
+                            onChangeText={setIakPhone}
+                            placeholder="예: 0812xxxxxxxx"
+                            keyboardType="phone-pad"
+                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 12, backgroundColor: '#fff' }}
+                        />
+                        <TouchableOpacity
+                            style={[styles.purchaseButton, iakPurchaseLoading && styles.purchaseButtonDisabled]}
+                            onPress={handleIakPurchase}
+                            disabled={iakPurchaseLoading || member == null}
+                            activeOpacity={0.8}
+                        >
+                            <LinearGradient
+                                colors={['#1E3A5F', '#2D4A6F']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.purchaseButtonGradient}
+                            >
+                                {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
+                                <Text style={styles.purchaseButtonText}>
+                                    {iakPurchaseLoading ? '처리 중…' : 'XRUN 으로 충전하기'}
+                                </Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                ) : isXplayShop ? (
                     <TouchableOpacity
                         style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
                         onPress={handleXplayPurchase}
@@ -855,6 +945,41 @@ export const ShopProductDetailScreen = () => {
                         </View>
                         <Text style={styles.paymentSuccessMessage}>{t('screens.shopProductDetail.paymentComplete')}</Text>
                         <TouchableOpacity style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
+                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={iakSuccessVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleIakSuccessClose}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.paymentSuccessModal}>
+                        <View style={styles.modalLogoContainer}>
+                            <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
+                        </View>
+                        <Text style={[styles.paymentSuccessMessage, { marginBottom: 12 }]}>
+                            ✅ 충전 완료
+                        </Text>
+                        {iakPurchaseResult?.iak?.sn ? (
+                            <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>시리얼 번호</Text>
+                                <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: 'Roboto-Medium', color: '#111827', letterSpacing: 1 }}>
+                                    {iakPurchaseResult.iak.sn}
+                                </Text>
+                            </View>
+                        ) : null}
+                        <View style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
+                            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, textAlign: 'center' }}>
+                                💬 충전 내역은 통신사에서 발송한 SMS 로도 확인 가능합니다.
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleIakSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>

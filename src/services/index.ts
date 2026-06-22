@@ -5082,6 +5082,38 @@ export const purchaseGiftWithXplayPoints = async (
   }
 };
 
+export const purchaseIakWithXrun = async (
+  params: { member: number; product_code: string; customer_id: string; env?: 'dev' | 'prod' },
+  navigation?: any,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/purchaseIakWithXrun', {
+      member: params.member,
+      product_code: params.product_code,
+      customer_id: params.customer_id,
+      env: params.env ?? 'prod',
+    });
+    const data = response.data;
+    if (data?.status === 'success') {
+      console.log('[IAK] 구매 성공:', { member: params.member, product_code: params.product_code, data: data?.data });
+    } else {
+      console.warn('[IAK] 구매 실패:', data?.message ?? data);
+    }
+    return data;
+  } catch (error) {
+    const msg = error instanceof AxiosError
+      ? (error.response?.data as any)?.message || error.message
+      : (error as Error).message;
+    console.error('[IAK] 구매 오류:', msg);
+    if (error instanceof AxiosError) {
+      const d = error.response?.data as any;
+      return { status: 'error', code: error.response?.status, message: d?.message || error.message };
+    }
+    return { status: 'error', message: (error as Error).message };
+  }
+};
+
 export const cancelGiftishowCoupon = async (
   member: string,
   tr_id: string,

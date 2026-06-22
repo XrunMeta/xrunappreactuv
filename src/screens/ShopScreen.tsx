@@ -34,6 +34,8 @@ interface ProductData {
     image: ImageSourcePropType;
 
     isXplayShop?: boolean;
+
+    isIak?: boolean;
 }
 
 const sampleProducts: ProductData[] = [
@@ -102,6 +104,7 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number):
         price: xrunPrice,
         image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
         isXplayShop: true,
+        isIak: (item as any).source === 'iak',
     };
 }
 
@@ -317,6 +320,8 @@ export const ShopScreen = () => {
                 price: Number(g.xplay_points ?? 0),    
                 priceKRW: Number(g.real_price ?? 0),
                 imageUrl: g.goods_image,
+
+                source: shopCountry === 'ID' ? 'iak' : 'kr_giftishow',
             }));
             setXplayProductList(list as any);
             console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');
