@@ -483,6 +483,8 @@ export const ShopScreen = () => {
             description: product.description,
             isXrun: product.brand === 'XRUN',
             shopTab: product.isXplayShop ? ('xplayShop' as const) : undefined,
+
+            isIak: product.isIak ?? false,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopProductDetail);
