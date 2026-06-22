@@ -264,7 +264,11 @@ export const v_10886b = () => {
                 if (v_e0c7e8 && v_0e6593.includes(v_e0c7e8)) {
                     v_bba8d0(true);
                     const v_39de0e = await v_e84827.getItem('devShopForceCountry');
-                    if (v_39de0e === 'KR' || v_39de0e === 'ID') v_e94174(v_39de0e);
+                    if (v_39de0e === 'KR' || v_39de0e === 'ID') {
+                        v_e94174(v_39de0e);
+
+                        v_068f20(v_39de0e);
+                    }
                 }
             } catch {  }
         })();
