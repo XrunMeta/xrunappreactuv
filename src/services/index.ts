@@ -5082,6 +5082,37 @@ export const v_44edcc = async (
   }
 };
 
+export interface MyIakTxnItem {
+  ref_id: string;
+  product_code: string;
+  product_name: string | null;
+  customer_id: string;
+  product_price: number;  
+  xrun_amount: number;
+  status: 'pending' | 'success' | 'failed' | 'refunded';
+  iak_sn: string | null;
+  iak_message: string | null;
+  created_at: string;
+  callback_at: string | null;
+}
+export const v_23c64e = async (
+  v_660822,
+  v_c65f5d,
+): Promise<{ status: string; data: MyIakTxnItem[] }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_8f00b9 = await v_9f42a4.post('/getMyIakTxns', { member: Number(v_660822) });
+    const v_9390e8 = v_8f00b9.data;
+    if (v_9390e8?.status === 'success' && Array.isArray(v_9390e8.data)) {
+      return { status: 'success', data: v_9390e8.data as MyIakTxnItem[] };
+    }
+    return { status: 'error', data: [] };
+  } catch (v_9e86fd) {
+    console.warn('[IAK] My txn fetch err:', (v_9e86fd as Error).message);
+    return { status: 'error', data: [] };
+  }
+};
+
 export const v_960478 = async (
   v_24baff,
   v_c65f5d,

@@ -10,7 +10,8 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import { v_060fa0, v_97ad19 } from '../services';
+import { v_060fa0, v_97ad19, v_23c64e } from '../services';
+import type { v_2a3275 } from '../services';
 import type { v_a649c5 } from '../types';
 import type { v_029bad } from '../types';
 
@@ -25,7 +26,11 @@ interface MyItemData {
     purchaseDate: string;
     tr_id?: string;
 
-    type: 'xrun' | 'giftishow';
+    type: 'xrun' | 'giftishow' | 'iak';  
+
+    iakSn?: string;
+
+    iakCustomerId?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -154,9 +159,10 @@ export const v_8c1d95 = () => {
             }
             const v_2be3e4 = String(v_660822);
             v_bf6163(v_2be3e4);
-            const [v_35dda7, v_38fb16] = await Promise.all([
+            const [v_35dda7, v_38fb16, v_078347] = await Promise.all([
                 v_060fa0(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
                 v_97ad19(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] })),
+                v_23c64e(v_2be3e4, v_9b57fc).catch(() => ({ status: 'error' as const, data: [] as v_2a3275[] })),
             ]);
             const v_63c5e6 =
                 v_35dda7?.status === 'success' && Array.isArray(v_35dda7.data)
@@ -168,7 +174,26 @@ export const v_8c1d95 = () => {
                 v_38fb16?.status === 'success' && Array.isArray(v_38fb16.data)
                     ? v_38fb16.data.map((v_e2a85c, v_ebec57) => v_e9b0bb(v_e2a85c, v_ebec57))
                     : [];
-            const v_2b7a6d = [...v_04aa3c, ...v_63c5e6].sort((v_779914, v_148ff6) => v_148ff6.sortKey - v_779914.sortKey);
+
+            const v_45e042 =
+                v_078347?.status === 'success' && Array.isArray(v_078347.data)
+                    ? v_078347.data.map((v_8d41d7) => ({
+                        id: `iak-${v_8d41d7.ref_id}`,
+                        brand: 'IAK 충전',
+                        title: v_8d41d7.product_name || v_8d41d7.product_code,
+                        image: v_818aa7,
+                        status: v_8d41d7.status === 'success' ? 'available'
+                              : v_8d41d7.status === 'pending' ? 'pending'
+                              : 'used',  
+                        purchaseDate: String(v_8d41d7.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                        tr_id: v_8d41d7.ref_id,
+                        type: 'iak' as const,
+                        iakSn: v_8d41d7.iak_sn ?? undefined,
+                        iakCustomerId: v_8d41d7.customer_id,
+                        sortKey: new Date(String(v_8d41d7.created_at)).getTime() || 0,
+                    } as MyItemData))
+                    : [];
+            const v_2b7a6d = [...v_04aa3c, ...v_63c5e6, ...v_45e042].sort((v_779914, v_148ff6) => v_148ff6.sortKey - v_779914.sortKey);
             v_fa923c(v_2b7a6d);
         } catch {
             v_fa923c([]);
@@ -216,6 +241,19 @@ export const v_8c1d95 = () => {
     };
 
     const v_09c55b = (v_8c0b26) => {
+
+        if (v_8c0b26.type === 'iak') {
+            const v_a52412 = [];
+            if (v_8c0b26.iakCustomerId) v_a52412.push(`📞 충전 번호: ${v_8c0b26.iakCustomerId}`);
+            if (v_8c0b26.iakSn) v_a52412.push(`🧾 시리얼: ${v_8c0b26.iakSn}`);
+            if (v_8c0b26.status === 'pending') v_a52412.push('\n⏳ 처리 중 (콜백 대기)');
+            else if (v_8c0b26.status === 'used') v_a52412.push('\n⚠️ 실패 또는 환불됨');
+            else v_a52412.push('\n✅ 통신사 SMS 로도 확인 가능');
+
+            const v_badeaf = v_a52412.join('\n');
+            (require('rcmrninabrnb').Alert.alert)(v_8c0b26.title, v_badeaf, [{ text: '확인' }]);
+            return;
+        }
         if (v_8c0b26.type === 'xrun') {
             const v_983c87 = {
                 id: v_8c0b26.id,
