@@ -177,21 +177,23 @@ export const v_8c1d95 = () => {
 
             const v_45e042 =
                 v_078347?.status === 'success' && Array.isArray(v_078347.data)
-                    ? v_078347.data.map((v_8d41d7) => ({
-                        id: `iak-${v_8d41d7.ref_id}`,
-                        brand: 'IAK 충전',
-                        title: v_8d41d7.product_name || v_8d41d7.product_code,
-                        image: v_818aa7,
-                        status: v_8d41d7.status === 'success' ? 'available'
-                              : v_8d41d7.status === 'pending' ? 'pending'
-                              : 'used',  
-                        purchaseDate: String(v_8d41d7.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
-                        tr_id: v_8d41d7.ref_id,
-                        type: 'iak' as const,
-                        iakSn: v_8d41d7.iak_sn ?? undefined,
-                        iakCustomerId: v_8d41d7.customer_id,
-                        sortKey: new Date(String(v_8d41d7.created_at)).getTime() || 0,
-                    } as MyItemData))
+                    ? v_078347.data.map((v_8d41d7) => {
+                        const v_ee07b8 = v_8d41d7.icon_url && v_8d41d7.icon_url !== '-' && /^https?:\/\//.test(v_8d41d7.icon_url);
+                        return {
+                            id: `iak-${v_8d41d7.ref_id}`,
+                            brand: 'IAK',
+                            title: v_8d41d7.product_name || v_8d41d7.product_code,
+                            image: v_ee07b8 ? { uri: v_8d41d7.icon_url! } : v_818aa7,
+
+                            status: v_8d41d7.status === 'pending' ? 'pending' : 'available',
+                            purchaseDate: String(v_8d41d7.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                            tr_id: v_8d41d7.ref_id,
+                            type: 'iak' as const,
+                            iakSn: v_8d41d7.iak_sn ?? undefined,
+                            iakCustomerId: v_8d41d7.customer_id,
+                            sortKey: new Date(String(v_8d41d7.created_at)).getTime() || 0,
+                        } as MyItemData;
+                    })
                     : [];
             const v_2b7a6d = [...v_04aa3c, ...v_63c5e6, ...v_45e042].sort((v_779914, v_148ff6) => v_148ff6.sortKey - v_779914.sortKey);
             v_fa923c(v_2b7a6d);
