@@ -1,7 +1,7 @@
 
 
 import v_a3453e, { v_af12cb, v_de06a3, v_76a8a9, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_1ed974, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_1ed974, v_39a996, v_80fa10 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
@@ -53,7 +53,18 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
         v_03e392.alert(
           v_8d41d7('common.versionUpdate.updateComplete'),
           v_8d41d7('common.versionUpdate.restartMessage'),
-          [{ text: v_8d41d7('common.versionUpdate.confirm'), onPress: () => v_1ed974.exitApp() }],
+          [{
+            text: v_8d41d7('common.versionUpdate.confirm'),
+            onPress: () => {
+
+              const v_4b4bb9 = (v_80fa10 as any).ForceKill;
+              if (v_4b4bb9?.killProcess) {
+                v_4b4bb9.killProcess();
+              } else {
+                v_1ed974.exitApp();
+              }
+            },
+          }],
           { cancelable: false }
         );
       } else {
