@@ -211,11 +211,12 @@ export const ReferralSettlementScreen = () => {
         const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
+        let formattedWon = '⏳ 가격 정보 갱신 중';
         if (!gopaxPrice || gopaxPrice <= 0) {
-          setTotalRevenueWon('⏳ 가격 정보 갱신 중');
+          setTotalRevenueWon(formattedWon);
         } else {
           const wonEquivalent = calculateWonEquivalent(totalAmountNum, gopaxPrice);
-          const formattedWon = formatWonAmount(wonEquivalent);
+          formattedWon = formatWonAmount(wonEquivalent);
           console.log('[정산] 원화 환산:', { totalAmountNum, price: gopaxPrice, formattedWon });
           setTotalRevenueWon(formattedWon);
         }
