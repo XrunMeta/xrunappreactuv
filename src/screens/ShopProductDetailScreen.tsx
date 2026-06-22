@@ -101,6 +101,8 @@ export const v_a59951 = () => {
     const [v_889a26, v_303962] = v_5ab095<any>(null);
     const [v_818c63, v_c43513] = v_5ab095(false);
 
+    const [v_417986, v_37f2b0] = v_5ab095(false);
+
     const [v_a71862, v_b75b27] = v_5ab095<{
         tr_id?: string;
         coupon_img_url?: string;
@@ -861,36 +863,24 @@ export const v_a59951 = () => {
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
                 {v_01bee9.isIak ? (
 
-                    <View style={{ width: '100%' }}>
-                        <Text style={{ fontSize: 13, fontFamily: 'Roboto-Medium', color: '#374151', marginBottom: 6 }}>
-                            충전 받을 인도네시아 휴대폰 번호
-                        </Text>
-                        <TextInput
-                            value={v_f3e760}
-                            onChangeText={v_23d029}
-                            placeholder="예: 0812xxxxxxxx"
-                            keyboardType="phone-pad"
-                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 12, backgroundColor: '#fff' }}
-                        />
-                        <TouchableOpacity
-                            style={[v_d81136.purchaseButton, v_673bf2 && v_d81136.purchaseButtonDisabled]}
-                            onPress={v_1bfbb1}
-                            disabled={v_673bf2 || v_660822 == null}
-                            activeOpacity={0.8}
+                    <TouchableOpacity
+                        style={[v_d81136.purchaseButton, v_673bf2 && v_d81136.purchaseButtonDisabled]}
+                        onPress={() => { v_23d029(''); v_37f2b0(true); }}
+                        disabled={v_673bf2 || v_660822 == null}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={v_d81136.purchaseButtonGradient}
                         >
-                            <LinearGradient
-                                colors={['#1E3A5F', '#2D4A6F']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={v_d81136.purchaseButtonGradient}
-                            >
-                                {v_673bf2 ? <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} /> : null}
-                                <Text style={v_d81136.purchaseButtonText}>
-                                    {v_673bf2 ? '처리 중…' : 'XRUN 으로 충전하기'}
-                                </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
+                            {v_673bf2 ? <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} /> : null}
+                            <Text style={v_d81136.purchaseButtonText}>
+                                {v_673bf2 ? '처리 중…' : 'XRUN 으로 구매하기'}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
                 ) : v_5db874 ? (
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
@@ -947,6 +937,51 @@ export const v_a59951 = () => {
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={v_417986}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => v_37f2b0(false)}
+            >
+                <View style={v_d81136.modalOverlay}>
+                    <View style={[v_d81136.paymentSuccessModal, { paddingTop: 24 }]}>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
+                            충전 받을 휴대폰 번호
+                        </Text>
+                        <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
+                            인도네시아 휴대폰 번호를 입력해주세요
+                        </Text>
+                        <TextInput
+                            value={v_f3e760}
+                            onChangeText={v_23d029}
+                            placeholder="예: 0812xxxxxxxx"
+                            keyboardType="phone-pad"
+                            autoFocus
+                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
+                        />
+                        <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
+                                onPress={() => v_37f2b0(false)}
+                                disabled={v_673bf2}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#374151', fontWeight: '600' }}>취소</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: v_f3e760.trim() ? '#1E3A5F' : '#9ca3af', alignItems: 'center' }}
+                                onPress={() => { v_37f2b0(false); v_1bfbb1(); }}
+                                disabled={v_673bf2 || !v_f3e760.trim()}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>구매</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
