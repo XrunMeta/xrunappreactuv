@@ -9,7 +9,7 @@ export default {
 
   emailLabel: '이메일',
   emailPlaceholder: '이메일을 입력해주세요.',
-  passwordLabel: '비밀번호!',
+  passwordLabel: '비밀번호',
   passwordPlaceholder: '비밀번호를 입력해주세요.',
   xrunPasswordLabel: 'XRUN 계정 비밀번호',
   rememberMe: '로그인 상태 유지',
