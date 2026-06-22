@@ -684,6 +684,7 @@ export const ShopProductDetailScreen = () => {
         setIakSuccessVisible(false);
         setIakPhone('');
         setIakPurchaseResult(null);
+        navigate(ROUTES.shopMyItems);
     };
 
     const handleXplayPaymentSuccessClose = () => {
