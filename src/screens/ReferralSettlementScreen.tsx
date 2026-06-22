@@ -235,15 +235,13 @@ export const ReferralSettlementScreen = () => {
         const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
-        let formattedWon = '가격 정보 갱신 중';
-        if (!gopaxPrice || gopaxPrice <= 0) {
-          setTotalRevenueWon(formattedWon);
-        } else {
+        let formattedWon = '';
+        if (gopaxPrice && gopaxPrice > 0) {
           const wonEquivalent = calculateWonEquivalent(totalAmountNum, gopaxPrice);
           formattedWon = formatWonAmount(wonEquivalent);
           console.log('[정산] 원화 환산:', { totalAmountNum, price: gopaxPrice, formattedWon });
-          setTotalRevenueWon(formattedWon);
         }
+        setTotalRevenueWon(formattedWon);
 
         const initialItems = rows.slice(0, ITEMS_PER_PAGE);
         setCurrentData(initialItems);
