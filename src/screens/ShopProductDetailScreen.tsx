@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f, v_960478 } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
@@ -37,6 +37,7 @@ interface ProductDetailData {
     price: number;
     image: v_07a341;
     isXrun?: boolean;
+    isIak?: boolean;  
 }
 
 const v_273f15 = {
@@ -68,6 +69,7 @@ export const v_a59951 = () => {
         price: parseFloat(v_dfe883.priceLabel?.replace(/,/g, '') || '0'),
         image: v_dfe883.image || v_273f15.image,
         isXrun: (v_dfe883 as any).isXrun || false,
+        isIak: (v_dfe883 as any).isIak || false,
     } : v_273f15;
 
     const v_b3ea98 = false;
@@ -93,6 +95,11 @@ export const v_a59951 = () => {
     const [v_837630, v_2f87ed] = v_5ab095(false);
     const [v_18a900, v_0409f2] = v_5ab095(false);
     const [v_809e5c, v_453192] = v_5ab095(false);
+
+    const [v_f3e760, v_23d029] = v_5ab095<string>('');
+    const [v_673bf2, v_beef40] = v_5ab095(false);
+    const [v_889a26, v_303962] = v_5ab095<any>(null);
+    const [v_818c63, v_c43513] = v_5ab095(false);
 
     const [v_a71862, v_b75b27] = v_5ab095<{
         tr_id?: string;
@@ -603,6 +610,57 @@ export const v_a59951 = () => {
         v_9b57fc(v_ce4741.shopMyItems);
     };
 
+    const v_1bfbb1 = v_de06a3(async () => {
+        if (!v_660822 || v_673bf2) return;
+        const v_d74a81 = v_f3e760.trim();
+        if (!v_d74a81) {
+            v_889fad('알림', '충전 받을 인도네시아 휴대폰 번호를 입력해주세요.', [{ text: '확인' }]);
+            return;
+        }
+        if (v_a1c497 === null || v_19340b) {
+            v_889fad('알림', 'XRUN 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.', [{ text: '확인' }]);
+            return;
+        }
+        if (v_a1c497 < v_01bee9.price) {
+            v_889fad('알림', 'XRUN 잔액이 부족합니다.', [{ text: '확인' }]);
+            return;
+        }
+        v_889fad('구매 확인',
+            `${v_01bee9.title}\n${v_01bee9.price} XRUN\n충전 번호: ${v_d74a81}\n\n진행하시겠습니까?`,
+            [
+                { text: '취소' },
+                {
+                    text: '구매',
+                    onPress: async () => {
+                        v_beef40(true);
+                        try {
+                            const v_8f00b9 = await v_960478({
+                                member: Number(v_660822),
+                                product_code: String(v_01bee9.id),
+                                customer_id: v_d74a81,
+                                env: 'prod',
+                            }, v_9b57fc);
+                            if (v_8f00b9?.status === 'success') {
+                                v_303962(v_8f00b9?.data ?? null);
+                                v_c43513(true);
+                                v_abb08d();
+                            } else {
+                                v_889fad('구매 실패', v_8f00b9?.message ?? '알 수 없는 오류', [{ text: '확인' }]);
+                            }
+                        } finally {
+                            v_beef40(false);
+                        }
+                    },
+                },
+            ]);
+    }, [v_660822, v_f3e760, v_673bf2, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_889fad, v_9b57fc, v_abb08d]);
+
+    const v_435347 = () => {
+        v_c43513(false);
+        v_23d029('');
+        v_303962(null);
+    };
+
     const v_48c801 = () => {
         v_453192(false);
         v_b75b27(null);
@@ -801,7 +859,39 @@ export const v_a59951 = () => {
             {}
             {!v_d0d89e && (
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
-                {v_5db874 ? (
+                {v_01bee9.isIak ? (
+
+                    <View style={{ width: '100%' }}>
+                        <Text style={{ fontSize: 13, fontFamily: 'Roboto-Medium', color: '#374151', marginBottom: 6 }}>
+                            충전 받을 인도네시아 휴대폰 번호
+                        </Text>
+                        <TextInput
+                            value={v_f3e760}
+                            onChangeText={v_23d029}
+                            placeholder="예: 0812xxxxxxxx"
+                            keyboardType="phone-pad"
+                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 12, backgroundColor: '#fff' }}
+                        />
+                        <TouchableOpacity
+                            style={[v_d81136.purchaseButton, v_673bf2 && v_d81136.purchaseButtonDisabled]}
+                            onPress={v_1bfbb1}
+                            disabled={v_673bf2 || v_660822 == null}
+                            activeOpacity={0.8}
+                        >
+                            <LinearGradient
+                                colors={['#1E3A5F', '#2D4A6F']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={v_d81136.purchaseButtonGradient}
+                            >
+                                {v_673bf2 ? <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} /> : null}
+                                <Text style={v_d81136.purchaseButtonText}>
+                                    {v_673bf2 ? '처리 중…' : 'XRUN 으로 충전하기'}
+                                </Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                ) : v_5db874 ? (
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
                         onPress={v_b000c1}
@@ -855,6 +945,41 @@ export const v_a59951 = () => {
                         </View>
                         <Text style={v_d81136.paymentSuccessMessage}>{v_8d41d7('screens.shopProductDetail.paymentComplete')}</Text>
                         <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
+                            <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={v_818c63}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={v_435347}
+            >
+                <View style={v_d81136.modalOverlay}>
+                    <View style={v_d81136.paymentSuccessModal}>
+                        <View style={v_d81136.modalLogoContainer}>
+                            <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
+                        </View>
+                        <Text style={[v_d81136.paymentSuccessMessage, { marginBottom: 12 }]}>
+                            ✅ 충전 완료
+                        </Text>
+                        {v_889a26?.iak?.sn ? (
+                            <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>시리얼 번호</Text>
+                                <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: 'Roboto-Medium', color: '#111827', letterSpacing: 1 }}>
+                                    {v_889a26.iak.sn}
+                                </Text>
+                            </View>
+                        ) : null}
+                        <View style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
+                            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, textAlign: 'center' }}>
+                                💬 충전 내역은 통신사에서 발송한 SMS 로도 확인 가능합니다.
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_435347} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>

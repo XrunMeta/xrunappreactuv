@@ -5082,6 +5082,38 @@ export const v_44edcc = async (
   }
 };
 
+export const v_960478 = async (
+  v_24baff,
+  v_c65f5d,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const v_9f42a4 = v_7488d5(v_c65f5d);
+    const v_3393e3 = await v_9f42a4.post('/purchaseIakWithXrun', {
+      member: v_24baff.member,
+      product_code: v_24baff.product_code,
+      customer_id: v_24baff.customer_id,
+      env: v_24baff.env ?? 'prod',
+    });
+    const v_9390e8 = v_3393e3.data;
+    if (v_9390e8?.status === 'success') {
+      console.log('[IAK] 구매 성공:', { member: v_24baff.member, product_code: v_24baff.product_code, data: v_9390e8?.data });
+    } else {
+      console.warn('[IAK] 구매 실패:', v_9390e8?.message ?? v_9390e8);
+    }
+    return v_9390e8;
+  } catch (v_5e9bfe) {
+    const v_badeaf = v_5e9bfe instanceof v_3333d3
+      ? (v_5e9bfe.response?.data as any)?.message || v_5e9bfe.message
+      : (v_5e9bfe as Error).message;
+    console.error('[IAK] 구매 오류:', v_badeaf);
+    if (v_5e9bfe instanceof v_3333d3) {
+      const v_d5dda0 = v_5e9bfe.response?.data as any;
+      return { status: 'error', code: v_5e9bfe.response?.status, message: v_d5dda0?.message || v_5e9bfe.message };
+    }
+    return { status: 'error', message: (v_5e9bfe as Error).message };
+  }
+};
+
 export const v_47cccc = async (
   v_660822,
   v_b9de1d,
