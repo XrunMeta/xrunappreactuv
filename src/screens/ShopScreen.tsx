@@ -334,7 +334,7 @@ export const v_10886b = () => {
                 v_4ff2fa([]);
             }
         }
-    }, []);
+    }, [v_b70da2]);
 
     const v_d0991f = v_de06a3(async () => {
         try {
