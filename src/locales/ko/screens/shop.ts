@@ -12,6 +12,7 @@ export default {
   availableShort: '사용가능',
   usedShort: '사용완료',
   pendingShort: '대기중',
+  completedShort: '구매 완료',
   shopBrand: '쇼핑',
   thankYou: '구매 완료',
   noPurchasedCoupons: '구매한 쿠폰이 없습니다.',

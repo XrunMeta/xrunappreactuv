@@ -12,6 +12,7 @@ export default {
   availableShort: 'Tersedia',
   usedShort: 'Digunakan',
   pendingShort: 'Menunggu',
+  completedShort: 'Selesai',
   shopBrand: 'Belanja',
   thankYou: 'Terima kasih',
   noPurchasedCoupons: 'Tidak ada kupon yang dibeli.',

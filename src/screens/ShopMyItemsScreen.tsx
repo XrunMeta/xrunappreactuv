@@ -309,6 +309,8 @@ export const ShopMyItemsScreen = () => {
     const renderItemCard = (item: MyItemData) => {
         const isAvailable = item.status === 'available';
         const isPending = item.status === 'pending';
+
+        const isIakCompleted = item.type === 'iak' && isAvailable;
         const isRemoteImage = item.image && typeof item.image === 'object' && 'uri' in (item.image as any);
         const displayImage = isRemoteImage && failedImageIds.has(item.id) ? defaultCouponImage : item.image;
 
@@ -334,7 +336,13 @@ export const ShopMyItemsScreen = () => {
                                 <Text style={styles.itemBrand}>{item.brand === 'SHOP' ? t('screens.shop.shopBrand') : item.brand}</Text>
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : isPending ? styles.statusTagPending : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : isPending ? styles.statusTagTextPending : styles.statusTagTextUsed]}>
-                                        {isAvailable ? t('screens.shop.availableShort') : isPending ? t('screens.shop.pendingShort') : t('screens.shop.usedShort')}
+                                        {isIakCompleted
+                                            ? t('screens.shop.completedShort')
+                                            : isAvailable
+                                                ? t('screens.shop.availableShort')
+                                                : isPending
+                                                    ? t('screens.shop.pendingShort')
+                                                    : t('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
