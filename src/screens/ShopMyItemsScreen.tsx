@@ -193,7 +193,8 @@ export const ShopMyItemsScreen = () => {
                             type: 'iak' as const,
                             iakSn: t.iak_sn ?? undefined,
                             iakCustomerId: t.customer_id,
-                            sortKey: new Date(String(t.created_at)).getTime() || 0,
+
+                            sortKey: Number(String(t.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
                     })
                     : [];
