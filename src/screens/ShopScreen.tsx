@@ -31,7 +31,7 @@ interface ProductData {
     title: string;
     description?: string;
     price: number;
-    image: v_07a341;
+    image?: v_07a341 | null;
 
     isXplayShop?: boolean;
 
@@ -99,7 +99,8 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
         const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
         v_7be02f = Math.ceil(v_56d99d / v_b7ffba);
     }
-    const v_0158ad = v_b0e133 ? { uri: v_b0e133 } : v_b236ed;
+
+    const v_0158ad = v_b0e133 ? { uri: v_b0e133 } : null;
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
 
@@ -108,7 +109,7 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
 
         description: (v_8c0b26 as any).description ?? undefined,
         price: v_7be02f,
-        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_0158ad,
+        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : (v_0158ad as any),
         isXplayShop: true,
         isIak: (v_8c0b26 as any).source === 'iak',
         iakCategory: (v_8c0b26 as any).iakCategory ?? (v_8c0b26 as any).category ?? undefined,
@@ -546,7 +547,8 @@ export const v_10886b = () => {
 
         const v_419eb6 = v_01bee9.image && typeof v_01bee9.image === 'object' && 'uri' in v_01bee9.image;
         const v_f3e29a = v_419eb6 && v_23faa2.has(v_01bee9.id);
-        const v_fafc7f = v_f3e29a ? v_47af4d : v_01bee9.image;
+        const v_fafc7f = v_f3e29a ? null : v_01bee9.image;
+        const v_01a739 = !!v_fafc7f;
 
         return (
             <TouchableOpacity
@@ -559,16 +561,18 @@ export const v_10886b = () => {
                     v_d81136.productImageContainer,
                     v_2141e0 && v_d81136.productImageContainerEthereum
                 ]}>
-                    <Image
-                        source={v_fafc7f}
-                        style={v_d81136.productImage}
-                        resizeMode="contain"
-                        onError={() => {
-                            if (v_419eb6) {
-                                v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
-                            }
-                        }}
-                    />
+                    {v_01a739 ? (
+                        <Image
+                            source={v_fafc7f as v_07a341}
+                            style={v_d81136.productImage}
+                            resizeMode="contain"
+                            onError={() => {
+                                if (v_419eb6) {
+                                    v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
+                                }
+                            }}
+                        />
+                    ) : null}
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
                             <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
