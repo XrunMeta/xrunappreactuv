@@ -1511,6 +1511,8 @@ const styles = StyleSheet.create({
         lineHeight: 20,
 
         textAlign: 'left',
+        alignSelf: 'stretch',
+        width: '100%',
     },
     detailLoadingWrap: {
         position: 'absolute',
