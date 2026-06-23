@@ -88,6 +88,19 @@ function shopItemToProductData(item: ShopItemData): ProductData {
 
 const FALLBACK_KRW_PER_XRUN = 70;
 
+function resolveAssetUri(uri: string | null | undefined): string | null {
+    if (!uri) return null;
+    const s = String(uri).trim();
+    if (!s) return null;
+    if (/^https?:\/\//i.test(s)) return s;
+    if (s.startsWith('/files/')) {
+
+        const id = s.slice('/files/'.length);
+        return `https://oth-path-gw.example.invalid/oth-path${id}`;
+    }
+    return s;
+}
+
 function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, defaultImageUri?: string | null): ProductData {
     const rawPrice = typeof item.price === 'number' ? item.price : 0;
 
@@ -100,7 +113,8 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
         xrunPrice = Math.ceil(rawPrice / divisor);
     }
 
-    const fallbackImage = defaultImageUri ? { uri: defaultImageUri } : null;
+    const resolvedDefault = resolveAssetUri(defaultImageUri);
+    const fallbackImage = resolvedDefault ? { uri: resolvedDefault } : null;
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
 
@@ -109,7 +123,7 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
 
         description: (item as any).description ?? undefined,
         price: xrunPrice,
-        image: item.imageUrl ? { uri: item.imageUrl } : (fallbackImage as any),
+        image: item.imageUrl ? { uri: resolveAssetUri(item.imageUrl) ?? item.imageUrl } : (fallbackImage as any),
         isXplayShop: true,
         isIak: (item as any).source === 'iak',
         iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
