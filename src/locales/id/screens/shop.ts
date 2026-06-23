@@ -29,6 +29,7 @@ export default {
     gpsBanner: 'Izinkan lokasi untuk melihat produk yang tersedia di wilayah Anda. Ketuk untuk mengizinkan',
     buyButton: 'Beli dengan XRUN',
     processing: 'Memproses…',
+    processingPayment: 'Memproses pembayaran...',
     phoneModalTitle: 'Nomor HP penerima top-up',
     phoneModalDesc: 'Masukkan nomor HP Indonesia',
     phonePlaceholder: 'contoh: 0812xxxxxxxx',

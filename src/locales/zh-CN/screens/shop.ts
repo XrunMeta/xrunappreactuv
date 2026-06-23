@@ -29,6 +29,7 @@ export default {
     gpsBanner: '允许位置权限以查看您所在地区的商品。点击允许',
     buyButton: '用 XRUN 购买',
     processing: '处理中…',
+    processingPayment: '支付处理中...',
     phoneModalTitle: '接收充值的手机号',
     phoneModalDesc: '请输入印度尼西亚手机号',
     phonePlaceholder: '例如: 0812xxxxxxxx',

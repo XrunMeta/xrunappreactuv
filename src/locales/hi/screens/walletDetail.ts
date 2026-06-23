@@ -13,6 +13,7 @@ export default {
   withdrawal: 'Withdrawal',
   shop: 'Shop',
   other: 'Other',
+  priceUpdating: 'मूल्य जानकारी अपडेट हो रही है',
 };
 
 

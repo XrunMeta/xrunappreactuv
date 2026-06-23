@@ -13,6 +13,7 @@ export default {
   withdrawal: 'Penarikan',
   shop: 'Toko',
   other: 'Lainnya',
+  priceUpdating: 'Memperbarui info harga',
 };
 
 

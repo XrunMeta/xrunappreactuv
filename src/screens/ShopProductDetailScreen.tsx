@@ -1125,7 +1125,7 @@ export const ShopProductDetailScreen = () => {
                     visible={purchasePinVisible}
                     memberId={purchaseCtx.memberId}
                     email={purchaseCtx.email}
-                    processingLabel="결제 처리 중..."
+                    processingLabel={t('screens.shop.iak.processingPayment')}
                     onSuccess={async (wallets: WalletKey[]) => {
 
                         if (purchaseLocalLoading) return;

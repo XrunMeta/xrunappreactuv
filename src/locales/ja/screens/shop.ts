@@ -36,6 +36,7 @@ export default {
     gpsBanner: '位置情報を許可すると、地域に合った商品が表示されます。タップして許可',
     buyButton: 'XRUN で購入',
     processing: '処理中…',
+    processingPayment: '決済処理中...',
     phoneModalTitle: 'チャージ先の携帯番号',
     phoneModalDesc: 'インドネシアの携帯番号を入力してください',
     phonePlaceholder: '例: 0812xxxxxxxx',

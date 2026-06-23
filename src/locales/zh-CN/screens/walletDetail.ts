@@ -13,6 +13,7 @@ export default {
   withdrawal: '提现',
   shop: '商店',
   other: '其他',
+  priceUpdating: '正在更新价格信息',
 };
 
 

@@ -13,6 +13,7 @@ export default {
   withdrawal: 'Withdrawal',
   shop: 'Shop',
   other: 'Other',
+  priceUpdating: 'Updating price info',
 };
 
 

@@ -13,6 +13,7 @@ export default {
   withdrawal: '출금',
   shop: '상점',
   other: '기타',
+  priceUpdating: '가격 정보 갱신 중',
 };
 
 

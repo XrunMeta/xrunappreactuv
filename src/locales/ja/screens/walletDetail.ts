@@ -13,6 +13,7 @@ export default {
   withdrawal: '引き出し',
   shop: 'ショップ',
   other: 'その他',
+  priceUpdating: '価格情報を更新中',
 };
 
 

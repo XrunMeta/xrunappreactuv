@@ -29,6 +29,7 @@ export default {
     gpsBanner: 'Cho phép quyền vị trí để xem sản phẩm có sẵn ở khu vực của bạn. Nhấn để cho phép',
     buyButton: 'Mua bằng XRUN',
     processing: 'Đang xử lý…',
+    processingPayment: 'Đang xử lý thanh toán...',
     phoneModalTitle: 'Số điện thoại nhận nạp tiền',
     phoneModalDesc: 'Vui lòng nhập số điện thoại Indonesia',
     phonePlaceholder: 'VD: 0812xxxxxxxx',
