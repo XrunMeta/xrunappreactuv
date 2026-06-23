@@ -11,6 +11,13 @@ export default {
   pending: '待支付',
   paid: '已支付',
   fromUserRevenue: '由 {{name}} 产生的收益',
+  source_nas: 'AR广告 (Nasmedia)',
+  source_pocr: 'AR广告 (PointClick)',
+  source_xplay_zone1: 'Xplay Zone 1',
+  source_xplay_zone2: 'Xplay Zone 2',
+  source_recommend: '推荐注册',
+  source_attendance: '签到',
+  source_referral_share: '推荐分配',
 };
 
 

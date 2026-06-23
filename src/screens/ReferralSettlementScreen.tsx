@@ -25,16 +25,16 @@ interface TransformedSettlementData {
   fromName?: string | null; 
 }
 
-const v_af0703 = {
-  nas: 'AR 광고 (나스미디어)',
-  nasmedia: 'AR 광고 (나스미디어)',
-  pocr: 'AR 광고 (포인트클릭)',
-  pointclick: 'AR 광고 (포인트클릭)',
-  ayet: 'Xplay Zone 1',
-  maf: 'Xplay Zone 2',
-  mychips: 'Xplay Zone 2',
-  recommand: '추천 가입',
-  attendance: '출석체크',
+const v_464f82 = {
+  nas: 'source_nas',
+  nasmedia: 'source_nas',
+  pocr: 'source_pocr',
+  pointclick: 'source_pocr',
+  ayet: 'source_xplay_zone1',
+  maf: 'source_xplay_zone2',
+  mychips: 'source_xplay_zone2',
+  recommand: 'source_recommend',
+  attendance: 'source_attendance',
 };
 
 const v_16897e = (v_a86996): string => {
@@ -212,7 +212,11 @@ export const v_08aac3 = () => {
       if (v_11b884.status === 'success') {
 
         const v_18b8bf = (v_11b884.data || []).map((item: v_cc1705, v_e86ad8) => {
-          const v_2869c1 = v_af0703[v_8c0b26.source_type] || v_8c0b26.source_type || '레퍼럴 분배';
+
+          const v_35fa84 = v_464f82[v_8c0b26.source_type];
+          const v_2869c1 = v_35fa84
+            ? v_8d41d7(`screens.referralSettlement.${v_35fa84}`)
+            : (v_8c0b26.source_type || v_8d41d7('screens.referralSettlement.source_referral_share'));
           return {
             id: `ref_${v_8c0b26.id}_${v_e86ad8}`,
             type: v_2869c1,

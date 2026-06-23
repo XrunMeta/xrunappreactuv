@@ -11,5 +11,12 @@ export default {
   pending: '지급 대기',
   paid: '지급 완료',
   fromUserRevenue: '{{name}} 님이 발생시킨 수익',
+  source_nas: 'AR 광고 (나스미디어)',
+  source_pocr: 'AR 광고 (포인트클릭)',
+  source_xplay_zone1: 'Xplay Zone 1',
+  source_xplay_zone2: 'Xplay Zone 2',
+  source_recommend: '추천 가입',
+  source_attendance: '출석체크',
+  source_referral_share: '레퍼럴 분배',
 };
 
