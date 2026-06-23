@@ -8,6 +8,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_b34ce5, v_4c7b5d } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import { v_060fa0, v_97ad19, v_23c64e } from '../services';
@@ -136,6 +137,7 @@ export const v_8c1d95 = () => {
     const { navigate: v_9b57fc, currentScreen: v_0f0c7b } = v_a0daa8();
     const { t: v_8d41d7 } = v_772971();
     const { setSelectedShopItem: v_d0fbad } = v_700ef9();
+    const { showAlert: v_889fad } = v_4b1173();
     const [v_4622b9, v_fa923c] = v_5ab095<MyItemData[]>([]);
     const [v_683210, v_34a50a] = v_5ab095(true);
     const [v_612e9f, v_575aad] = v_5ab095(false);
@@ -252,7 +254,7 @@ export const v_8c1d95 = () => {
             else if (v_8c0b26.status === 'used') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.failedNote'));
             else v_a52412.push('\n' + v_8d41d7('screens.shop.iak.successNote'));
             const v_badeaf = v_a52412.join('\n');
-            (require('rcmrninabrnb').Alert.alert)(v_8c0b26.title, v_badeaf, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+            v_889fad(v_8c0b26.title, v_badeaf, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
         if (v_8c0b26.type === 'xrun') {
