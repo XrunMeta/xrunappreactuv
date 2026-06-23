@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996, v_e767d1 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996, v_e767d1, v_1ed974 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_556baf, v_570c34 } from '../components';
@@ -101,6 +101,16 @@ export const v_a59951 = () => {
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
     const [v_25cfbb, v_6bc978] = v_5ab095(1);
+
+    const [v_32eda7, v_047920] = v_5ab095<'desc' | 'guide'>('desc');
+
+    v_c4deb2(() => {
+        const v_1ae212 = v_1ed974.addEventListener('hardwareBackPress', () => {
+            v_9b57fc(v_ce4741.shop);
+            return true;
+        });
+        return () => v_1ae212.remove();
+    }, [v_9b57fc]);
 
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
     const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
@@ -786,22 +796,6 @@ export const v_a59951 = () => {
                                 <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
-                            {v_d0206c ? (
-                                <Text
-                                    style={[v_d81136.productDescription, { textAlign: 'left' }]}
-                                    onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
-                                >
-                                    {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
-                                </Text>
-                            ) : v_01bee9.description ? (
-                                <Text
-                                    style={[v_d81136.productDescription, { textAlign: 'left' }]}
-                                    onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
-                                >
-                                    {String(v_01bee9.description).trim()}
-                                </Text>
-                            ) : null}
-                            {}
                             {v_25cfbb > 9999 && null}
                         </View>
                     </View>
@@ -900,12 +894,48 @@ export const v_a59951 = () => {
 
                     {}
                     <View style={v_d81136.guideCard}>
-                        <View style={v_d81136.sectionHeader}>
-                            <Feather name="info" size={18} color="#1E3A5F" />
-                            <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.shopProductDetail.guide')}</Text>
+                        <View style={v_d81136.tabRow}>
+                            <TouchableOpacity
+                                onPress={() => v_047920('desc')}
+                                style={[v_d81136.tabButton, v_32eda7 === 'desc' && v_d81136.tabButtonActive]}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[v_d81136.tabButtonText, v_32eda7 === 'desc' && v_d81136.tabButtonTextActive]}>
+                                    {v_8d41d7('screens.shopProductDetail.tabDescription')}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => v_047920('guide')}
+                                style={[v_d81136.tabButton, v_32eda7 === 'guide' && v_d81136.tabButtonActive]}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[v_d81136.tabButtonText, v_32eda7 === 'guide' && v_d81136.tabButtonTextActive]}>
+                                    {v_8d41d7('screens.shopProductDetail.tabGuide')}
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                        <View style={v_d81136.divider} />
 
+                        {}
+                        {v_32eda7 === 'desc' && (
+                            <View style={{ paddingTop: 16 }}>
+                                {v_d0206c ? (
+                                    <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                        {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
+                                    </Text>
+                                ) : v_01bee9.description ? (
+                                    <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                        {String(v_01bee9.description).trim()}
+                                    </Text>
+                                ) : (
+                                    <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, color: '#9CA3AF' }]}>
+                                        {v_8d41d7('screens.shopProductDetail.noDescription')}
+                                    </Text>
+                                )}
+                            </View>
+                        )}
+
+                        {}
+                        {v_32eda7 === 'guide' && (<>
                         <View style={v_d81136.guideItem}>
                             <View style={v_d81136.guideItemHeader}>
                                 <View style={v_d81136.guideNumber}>
@@ -932,6 +962,7 @@ export const v_a59951 = () => {
                                 <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.guideLine2')}</Text>
                             </View>
                         </View>
+                        </>)}
                     </View>
                 </View>
             </SafeScrollView>
@@ -1518,6 +1549,33 @@ const v_d81136 = v_472849.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+
+    tabRow: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E7EB',
+        marginBottom: 4,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+        marginBottom: -1,
+    },
+    tabButtonActive: {
+        borderBottomColor: '#1E3A5F',
+    },
+    tabButtonText: {
+        fontSize: 14,
+        color: '#9CA3AF',
+        fontWeight: '500',
+    },
+    tabButtonTextActive: {
+        color: '#1E3A5F',
+        fontWeight: '700',
     },
 
     detailPriceText: {
