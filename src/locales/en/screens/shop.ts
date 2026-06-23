@@ -29,6 +29,7 @@ export default {
     gpsBanner: 'Allow location permission to see products available in your area. Tap to allow',
     buyButton: 'Buy with XRUN',
     processing: 'Processing…',
+    processingPayment: 'Processing payment...',
     phoneModalTitle: 'Phone number to receive top-up',
     phoneModalDesc: 'Please enter an Indonesian mobile number',
     phonePlaceholder: 'e.g., 0812xxxxxxxx',

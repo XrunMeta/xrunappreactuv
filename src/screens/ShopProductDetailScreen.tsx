@@ -1125,7 +1125,7 @@ export const v_a59951 = () => {
                     visible={v_f5e16b}
                     memberId={v_d49490.memberId}
                     email={v_d49490.email}
-                    processingLabel="결제 처리 중..."
+                    processingLabel={v_8d41d7('screens.shop.iak.processingPayment')}
                     onSuccess={async (wallets: v_b9a3bd[]) => {
 
                         if (v_bd58fc) return;

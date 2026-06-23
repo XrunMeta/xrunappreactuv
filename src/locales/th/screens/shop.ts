@@ -29,6 +29,7 @@ export default {
     gpsBanner: 'อนุญาตการเข้าถึงตำแหน่งเพื่อดูสินค้าในพื้นที่ของคุณ แตะเพื่ออนุญาต',
     buyButton: 'ซื้อด้วย XRUN',
     processing: 'กำลังประมวลผล…',
+    processingPayment: 'กำลังดำเนินการชำระเงิน...',
     phoneModalTitle: 'หมายเลขโทรศัพท์รับเติมเงิน',
     phoneModalDesc: 'โปรดกรอกหมายเลขโทรศัพท์อินโดนีเซีย',
     phonePlaceholder: 'เช่น: 0812xxxxxxxx',
