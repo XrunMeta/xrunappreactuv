@@ -14,6 +14,8 @@ export default {
   pendingShort: 'Menunggu',
   completedShort: 'Selesai',
   shopBrand: 'Belanja',
+  giftBrand: 'Gift card',
+  iakBrand: 'Top-up',
   thankYou: 'Terima kasih',
   noPurchasedCoupons: 'Tidak ada kupon yang dibeli.',
   loadingGiftList: 'Memuat daftar kartu hadiah...',

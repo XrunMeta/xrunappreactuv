@@ -21,6 +21,8 @@ export default {
   pendingShort: '待機中',
   completedShort: '購入完了',
   shopBrand: 'ショップ',
+  giftBrand: 'ギフティコン',
+  iakBrand: 'チャージ',
   thankYou: 'ありがとうございます',
   noPurchasedCoupons: '購入したクーポンがありません。',
   loadingGiftList: 'ギフト券リストを読み込み中...',

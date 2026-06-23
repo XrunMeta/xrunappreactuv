@@ -14,6 +14,8 @@ export default {
   pendingShort: 'Pending',
   completedShort: 'Completed',
   shopBrand: 'Shop',
+  giftBrand: 'Gift card',
+  iakBrand: 'Top-up',
   thankYou: 'Thank you',
   noPurchasedCoupons: 'No purchased coupons.',
   loadingGiftList: 'Loading gift card list...',

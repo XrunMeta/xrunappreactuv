@@ -14,6 +14,8 @@ export default {
   pendingShort: 'प्रतीक्षित',
   completedShort: 'खरीद पूर्ण',
   shopBrand: 'शॉप',
+  giftBrand: 'गिफ्ट कार्ड',
+  iakBrand: 'टॉप-अप',
   thankYou: 'धन्यवाद',
   noPurchasedCoupons: 'कोई खरीदे गए कूपन नहीं।',
   loadingGiftList: 'गिफ्ट कार्ड सूची लोड हो रही है...',

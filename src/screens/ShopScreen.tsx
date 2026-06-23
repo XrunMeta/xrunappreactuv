@@ -102,7 +102,8 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
     const v_0158ad = v_b0e133 ? { uri: v_b0e133 } : v_b236ed;
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
-        brand: (v_8c0b26 as any).brandName ?? '기프티콘',
+
+        brand: (v_8c0b26 as any).brandName ?? (v_8c0b26 as any).brand ?? '',
         title: v_8c0b26.name ?? '-',
         price: v_7be02f,
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_0158ad,
@@ -571,7 +572,7 @@ export const v_10886b = () => {
                     )}
                 </View>
                 <View style={v_d81136.productInfo}>
-                    <Text style={v_d81136.productBrand}>{v_01bee9.brand}</Text>
+                    <Text style={v_d81136.productBrand}>{v_01bee9.brand || (v_01bee9.isIak ? v_8d41d7('screens.shop.iakBrand') : v_8d41d7('screens.shop.giftBrand'))}</Text>
                     <Text style={v_d81136.productTitle} numberOfLines={2}>
                         {v_01bee9.title}
                     </Text>
