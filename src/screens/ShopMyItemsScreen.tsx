@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, TaboolaBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import { getMyGiftishowCoupons, getXrunPurchasedItems, getMyIakTxns } from '../services';
@@ -136,6 +137,7 @@ export const ShopMyItemsScreen = () => {
     const { navigate, currentScreen } = useAppNavigation();
     const { t } = useTranslation();
     const { setSelectedShopItem } = useAppContext();
+    const { showAlert } = useAlertDialog();
     const [items, setItems] = useState<MyItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -252,7 +254,7 @@ export const ShopMyItemsScreen = () => {
             else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
             else lines.push('\n' + t('screens.shop.iak.successNote'));
             const msg = lines.join('\n');
-            (require('react-native').Alert.alert)(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
+            showAlert(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
         if (item.type === 'xrun') {
