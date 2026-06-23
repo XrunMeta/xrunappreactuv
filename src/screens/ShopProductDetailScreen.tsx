@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeView, SafeScrollView } from '../components';
@@ -101,6 +101,16 @@ export const ShopProductDetailScreen = () => {
     const [member, setMember] = useState<string | null>(null);
 
     const [descLines, setDescLines] = useState(1);
+
+    const [detailTab, setDetailTab] = useState<'desc' | 'guide'>('desc');
+
+    useEffect(() => {
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            navigate(ROUTES.shop);
+            return true;
+        });
+        return () => sub.remove();
+    }, [navigate]);
 
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
     const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
@@ -786,22 +796,6 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
-                            {hasDetailDescription ? (
-                                <Text
-                                    style={[styles.productDescription, { textAlign: 'left' }]}
-                                    onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
-                                >
-                                    {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
-                                </Text>
-                            ) : product.description ? (
-                                <Text
-                                    style={[styles.productDescription, { textAlign: 'left' }]}
-                                    onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
-                                >
-                                    {String(product.description).trim()}
-                                </Text>
-                            ) : null}
-                            {}
                             {descLines > 9999 && null}
                         </View>
                     </View>
@@ -900,12 +894,48 @@ export const ShopProductDetailScreen = () => {
 
                     {}
                     <View style={styles.guideCard}>
-                        <View style={styles.sectionHeader}>
-                            <Feather name="info" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.guide')}</Text>
+                        <View style={styles.tabRow}>
+                            <TouchableOpacity
+                                onPress={() => setDetailTab('desc')}
+                                style={[styles.tabButton, detailTab === 'desc' && styles.tabButtonActive]}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.tabButtonText, detailTab === 'desc' && styles.tabButtonTextActive]}>
+                                    {t('screens.shopProductDetail.tabDescription')}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setDetailTab('guide')}
+                                style={[styles.tabButton, detailTab === 'guide' && styles.tabButtonActive]}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.tabButtonText, detailTab === 'guide' && styles.tabButtonTextActive]}>
+                                    {t('screens.shopProductDetail.tabGuide')}
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                        <View style={styles.divider} />
 
+                        {}
+                        {detailTab === 'desc' && (
+                            <View style={{ paddingTop: 16 }}>
+                                {hasDetailDescription ? (
+                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                        {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
+                                    </Text>
+                                ) : product.description ? (
+                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                        {String(product.description).trim()}
+                                    </Text>
+                                ) : (
+                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, color: '#9CA3AF' }]}>
+                                        {t('screens.shopProductDetail.noDescription')}
+                                    </Text>
+                                )}
+                            </View>
+                        )}
+
+                        {}
+                        {detailTab === 'guide' && (<>
                         <View style={styles.guideItem}>
                             <View style={styles.guideItemHeader}>
                                 <View style={styles.guideNumber}>
@@ -932,6 +962,7 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.guideText}>• {t('screens.shopProductDetail.guideLine2')}</Text>
                             </View>
                         </View>
+                        </>)}
                     </View>
                 </View>
             </SafeScrollView>
@@ -1518,6 +1549,33 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+
+    tabRow: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E7EB',
+        marginBottom: 4,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+        marginBottom: -1,
+    },
+    tabButtonActive: {
+        borderBottomColor: '#1E3A5F',
+    },
+    tabButtonText: {
+        fontSize: 14,
+        color: '#9CA3AF',
+        fontWeight: '500',
+    },
+    tabButtonTextActive: {
+        color: '#1E3A5F',
+        fontWeight: '700',
     },
 
     detailPriceText: {
