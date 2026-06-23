@@ -775,28 +775,37 @@ export const v_a59951 = () => {
                                 )}
                             </View>
                         </View>
-                        <View style={v_d81136.productInfoContainer}>
+                        {}
+                        <View style={[v_d81136.productInfoContainer, { alignItems: 'flex-start' }]}>
                             <View style={v_d81136.brandContainer}>
-                                <Text style={v_d81136.brand}>{v_b034a8}</Text>
+                                <Text style={[v_d81136.brand, { textAlign: 'left' }]}>{v_b034a8}</Text>
                             </View>
-                            <Text style={v_d81136.title}>{v_ba7f97}</Text>
+                            <Text style={[v_d81136.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{v_ba7f97}</Text>
+                            {}
+                            {!v_d0d89e && (
+                                <View style={v_d81136.detailPriceBox}>
+                                    <Image source={v_33c40c} style={v_d81136.coinIcon} resizeMode="contain" />
+                                    <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
+                                </View>
+                            )}
                             {}
                             {v_d0206c ? (
                                 <Text
-                                    style={[v_d81136.productDescription, v_25cfbb > 1 && { textAlign: 'left' }]}
+                                    style={[v_d81136.productDescription, { textAlign: 'left' }]}
                                     onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
                                 >
                                     {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
                                 </Text>
                             ) : v_01bee9.description ? (
-
                                 <Text
-                                    style={[v_d81136.productDescription, v_25cfbb > 1 && { textAlign: 'left' }]}
+                                    style={[v_d81136.productDescription, { textAlign: 'left' }]}
                                     onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
                                 >
                                     {String(v_01bee9.description).trim()}
                                 </Text>
                             ) : null}
+                            {}
+                            {v_25cfbb > 9999 && null}
                         </View>
                     </View>
 
@@ -1511,6 +1520,24 @@ const v_d81136 = v_472849.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+
+    detailPriceBox: {
+        marginTop: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 8,
+        alignSelf: 'flex-start',
+    },
+    detailPriceText: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#1E3A5F',
+        fontFamily: 'Roboto-Bold',
     },
     productDescription: {
         marginTop: 12,
