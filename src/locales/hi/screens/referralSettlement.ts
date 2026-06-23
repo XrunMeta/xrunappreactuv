@@ -10,6 +10,7 @@ export default {
   referralLabel: 'Referral',
   pending: 'Pending',
   paid: 'Paid',
+  fromUserRevenue: '{{name}} द्वारा अर्जित राजस्व',
 };
 
 

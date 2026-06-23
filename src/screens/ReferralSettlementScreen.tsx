@@ -329,7 +329,7 @@ export const v_08aac3 = () => {
     const v_3fd4b5 = v_619bad
       ? (v_8d41d7('screens.referralSettlement.paid') || '지급 완료')
       : (v_8d41d7('screens.referralSettlement.pending') || '지급 대기');
-    const v_18d53e = v_8c0b26.fromName ? `${v_8c0b26.fromName} 님이 발생시킨 수익이에요.` : null;
+    const v_18d53e = v_8c0b26.fromName ? v_8d41d7('screens.referralSettlement.fromUserRevenue', { name: v_8c0b26.fromName }) : null;
     return (
       <View style={[v_d81136.questCard, v_619bad && v_d81136.questCardPaid]}>
         <View style={[v_d81136.questBadge, v_619bad ? v_d81136.statusPaid : v_d81136.statusPending]}>
