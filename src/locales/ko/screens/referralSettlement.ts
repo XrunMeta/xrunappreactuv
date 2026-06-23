@@ -18,5 +18,6 @@ export default {
   source_recommend: '추천 가입',
   source_attendance: '출석체크',
   source_referral_share: '레퍼럴 분배',
+  rewardAmount: '보상금액',
 };
 

@@ -353,7 +353,7 @@ export const v_08aac3 = () => {
         ) : null}
         <View style={v_d81136.questDivider} />
         <View style={v_d81136.questFooter}>
-          <Text style={[v_d81136.questFooterLabel, v_619bad && v_d81136.textPaidSub]}>보상금액</Text>
+          <Text style={[v_d81136.questFooterLabel, v_619bad && v_d81136.textPaidSub]}>{v_8d41d7('screens.referralSettlement.rewardAmount')}</Text>
           <Text style={[v_d81136.questAmount, v_619bad && v_d81136.textPaid]}>{v_8c0b26.amount}</Text>
         </View>
       </View>

@@ -18,6 +18,7 @@ export default {
   source_recommend: 'Pendaftaran referral',
   source_attendance: 'Absensi',
   source_referral_share: 'Distribusi referral',
+  rewardAmount: 'Jumlah hadiah',
 };
 
 

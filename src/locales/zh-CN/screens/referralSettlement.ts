@@ -18,6 +18,7 @@ export default {
   source_recommend: '推荐注册',
   source_attendance: '签到',
   source_referral_share: '推荐分配',
+  rewardAmount: '奖励金额',
 };
 
 

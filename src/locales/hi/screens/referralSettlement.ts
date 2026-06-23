@@ -18,6 +18,7 @@ export default {
   source_recommend: 'रेफरल साइन-अप',
   source_attendance: 'उपस्थिति',
   source_referral_share: 'रेफरल साझा',
+  rewardAmount: 'पुरस्कार राशि',
 };
 
 
