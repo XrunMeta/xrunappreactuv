@@ -935,34 +935,22 @@ export const ShopProductDetailScreen = () => {
                         )}
 
                         {}
-                        {detailTab === 'guide' && (<>
-                        <View style={styles.guideItem}>
-                            <View style={styles.guideItemHeader}>
-                                <View style={styles.guideNumber}>
-                                    <Text style={styles.guideNumberText}>1</Text>
-                                </View>
-                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.cancelRefund')}</Text>
-                            </View>
-                            <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine1')}</Text>
-                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine2')}</Text>
-                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine3')}</Text>
-                            </View>
-                        </View>
+                        {detailTab === 'guide' && (
+                            <View style={{ paddingTop: 16 }}>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {t('screens.shopProductDetail.cancelRefund')}
+                                </Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.cancelRefundLine1')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.cancelRefundLine2')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 16 }]}>• {t('screens.shopProductDetail.cancelRefundLine3')}</Text>
 
-                        <View style={styles.guideItem}>
-                            <View style={styles.guideItemHeader}>
-                                <View style={styles.guideNumber}>
-                                    <Text style={styles.guideNumberText}>2</Text>
-                                </View>
-                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.guideSubtitle')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {t('screens.shopProductDetail.guideSubtitle')}
+                                </Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.guideLine1')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.guideLine2')}</Text>
                             </View>
-                            <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.guideLine1')}</Text>
-                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.guideLine2')}</Text>
-                            </View>
-                        </View>
-                        </>)}
+                        )}
                     </View>
                 </View>
             </SafeScrollView>
