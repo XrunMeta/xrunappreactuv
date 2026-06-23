@@ -88,7 +88,7 @@ function shopItemToProductData(item: ShopItemData): ProductData {
 
 const FALLBACK_KRW_PER_XRUN = 70;
 
-function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number): ProductData {
+function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, defaultImageUri?: string | null): ProductData {
     const rawPrice = typeof item.price === 'number' ? item.price : 0;
 
     const hasBackendXrun = typeof (item as any).priceKRW === 'number';
@@ -99,12 +99,13 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number):
         const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
         xrunPrice = Math.ceil(rawPrice / divisor);
     }
+    const fallbackImage = defaultImageUri ? { uri: defaultImageUri } : sampleCU;
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
         brand: (item as any).brandName ?? '기프티콘',
         title: item.name ?? '-',
         price: xrunPrice,
-        image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
+        image: item.imageUrl ? { uri: item.imageUrl } : fallbackImage,
         isXplayShop: true,
         isIak: (item as any).source === 'iak',
         iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
@@ -119,6 +120,8 @@ export const ShopScreen = () => {
     const [tab, setTab] = useState<'xrunStore' | 'myItems'>('xrunStore');
 
     const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
+
+    const [serverDefaultImage, setServerDefaultImage] = useState<string | null>(null);
     const [xplayLoading, setXplayLoading] = useState(false);
     const [xplayRefreshing, setXplayRefreshing] = useState(false);
     const [xplayError, setXplayError] = useState<string | null>(null);
@@ -320,6 +323,8 @@ export const ShopScreen = () => {
             const res = await axiosInstance.post(endpoint, {});
             const raw = Array.isArray(res.data?.data?.list) ? res.data.data.list as any[] : [];
 
+            setServerDefaultImage(typeof res.data?.data?.default_image === 'string' ? res.data.data.default_image : null);
+
             const list = raw.map((g: any) => ({
                 id: g.goods_code,
                 name: g.goods_name,
@@ -447,8 +452,8 @@ export const ShopScreen = () => {
     }, [screenWidth]);
 
     const xplayProductsAsCards = useMemo(
-        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun)),
-        [xplayProductList, gopaxKrwPerXrun],
+        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun, serverDefaultImage)),
+        [xplayProductList, gopaxKrwPerXrun, serverDefaultImage],
     );
 
     const filterByQuery = useCallback((list: ProductData[]): ProductData[] => {
