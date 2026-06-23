@@ -1507,7 +1507,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
 
-        borderRadius: 8,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
