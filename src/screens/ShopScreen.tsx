@@ -105,6 +105,8 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
 
         brand: (item as any).brandName ?? (item as any).brand ?? '',
         title: item.name ?? '-',
+
+        description: (item as any).description ?? undefined,
         price: xrunPrice,
         image: item.imageUrl ? { uri: item.imageUrl } : fallbackImage,
         isXplayShop: true,
@@ -357,6 +359,8 @@ export const ShopScreen = () => {
                 source: shopCountry === 'ID' ? 'iak' : 'kr_giftishow',
 
                 iakCategory: shopCountry === 'ID' ? (g.category ?? null) : null,
+
+                description: typeof g.description === 'string' ? g.description : undefined,
             }));
             setXplayProductList(list as any);
             console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');

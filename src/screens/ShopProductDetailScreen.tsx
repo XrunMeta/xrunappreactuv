@@ -782,6 +782,11 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.productDescription}>
                                     {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
                                 </Text>
+                            ) : product.description ? (
+
+                                <Text style={styles.productDescription}>
+                                    {String(product.description).trim()}
+                                </Text>
                             ) : null}
                         </View>
                     </View>
