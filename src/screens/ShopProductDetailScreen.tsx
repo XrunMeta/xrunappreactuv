@@ -783,10 +783,7 @@ export const ShopProductDetailScreen = () => {
                             <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
                             {}
                             {!isPurchasedView && (
-                                <View style={styles.detailPriceBox}>
-                                    <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
-                                    <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
-                                </View>
+                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
                             {hasDetailDescription ? (
@@ -1523,22 +1520,13 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
 
-    detailPriceBox: {
-        marginTop: 14,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        backgroundColor: '#F3F4F6',
-        borderRadius: 8,
-        alignSelf: 'flex-start',
-    },
     detailPriceText: {
-        fontSize: 16,
+        marginTop: 10,
+        fontSize: 22,
         fontWeight: '700',
-        color: '#1E3A5F',
+        color: '#111827',
         fontFamily: 'Roboto-Bold',
+        alignSelf: 'flex-start',
     },
     productDescription: {
         marginTop: 12,
