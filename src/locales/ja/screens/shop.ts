@@ -47,6 +47,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nチャージ番号: {{phone}}\n\n進めますか？',
     purchaseFailed: '購入失敗',
     unknownError: '不明なエラー',
+    autoRefunded: '決済金額は自動的に返金され、XRUN 残高に復元されました。',
     successTitle: 'チャージ完了',
     snLabel: 'シリアル番号',
     smsNotice: 'チャージ履歴は通信事業者の SMS でも確認できます。',

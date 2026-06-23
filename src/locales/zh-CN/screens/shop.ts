@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\n充值号码: {{phone}}\n\n继续?',
     purchaseFailed: '购买失败',
     unknownError: '未知错误',
+    autoRefunded: '支付金额已自动退款并恢复到您的 XRUN 余额。',
     successTitle: '充值完成',
     snLabel: '序列号',
     smsNotice: '充值记录也可通过运营商发送的短信确认。',

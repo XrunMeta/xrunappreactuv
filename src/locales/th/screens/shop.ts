@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nเบอร์: {{phone}}\n\nดำเนินการต่อ?',
     purchaseFailed: 'การซื้อล้มเหลว',
     unknownError: 'ข้อผิดพลาดที่ไม่รู้จัก',
+    autoRefunded: 'จำนวนเงินที่ชำระได้รับการคืนเข้ายอด XRUN ของคุณโดยอัตโนมัติแล้ว',
     successTitle: 'เติมเงินสำเร็จ',
     snLabel: 'หมายเลขซีเรียล',
     smsNotice: 'ประวัติการเติมเงินสามารถยืนยันได้ผ่าน SMS จากผู้ให้บริการเครือข่าย',

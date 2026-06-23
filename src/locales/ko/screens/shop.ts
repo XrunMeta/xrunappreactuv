@@ -41,6 +41,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\n충전 번호: {{phone}}\n\n진행하시겠습니까?',
     purchaseFailed: '구매 실패',
     unknownError: '알 수 없는 오류',
+    autoRefunded: '결제 금액은 자동으로 환불되어 XRUN 잔액으로 복구되었습니다.',
     successTitle: '충전 완료',
     snLabel: '시리얼 번호',
     smsNotice: '충전 내역은 통신사에서 발송한 SMS 로도 확인 가능합니다.',

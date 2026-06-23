@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nफोन: {{phone}}\n\nजारी रखें?',
     purchaseFailed: 'खरीद विफल',
     unknownError: 'अज्ञात त्रुटि',
+    autoRefunded: 'भुगतान राशि स्वचालित रूप से वापस आपके XRUN बैलेंस में जमा कर दी गई है।',
     successTitle: 'टॉप-अप पूर्ण',
     snLabel: 'सीरियल नंबर',
     smsNotice: 'टॉप-अप इतिहास कैरियर द्वारा भेजे गए SMS से भी पुष्टि की जा सकती है।',

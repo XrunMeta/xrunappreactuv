@@ -643,9 +643,20 @@ export const ShopProductDetailScreen = () => {
                                 customer_id: phone,
                                 env: 'prod',
                             }, navigate);
-                            if (res?.status === 'success') {
-                                setIakPurchaseResult(res?.data ?? null);
+
+                            const innerData: any = res?.data ?? null;
+                            const innerStatus = innerData?.txn_status;
+                            const userMessage = innerData?.user_message ?? null;
+                            const wasRefunded = !!innerData?.refunded || innerStatus === 'refunded';
+                            if (res?.status === 'success' && innerStatus === 'success') {
+                                setIakPurchaseResult(innerData);
                                 setIakSuccessVisible(true);
+                                loadXrunBalance();
+                            } else if (res?.status === 'success' && (innerStatus === 'failed' || innerStatus === 'refunded')) {
+                                const failTitle = t('screens.shop.iak.purchaseFailed');
+                                const reason = userMessage || res?.message || t('screens.shop.iak.unknownError');
+                                const refundLine = wasRefunded ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                showAlert(failTitle, `${reason}${refundLine}`, [{ text: t('screens.shop.iak.ok') }]);
                                 loadXrunBalance();
                             } else if (res?.code === 410) {
 
@@ -670,7 +681,14 @@ export const ShopProductDetailScreen = () => {
                                     { text: t('screens.walletRestore.restoreNow'), onPress: () => navigate(ROUTES.walletRestore) },
                                 ]);
                             } else {
-                                showAlert(t('screens.shop.iak.purchaseFailed'), res?.message ?? t('screens.shop.iak.unknownError'), [{ text: t('screens.shop.iak.ok') }]);
+
+                                const innerData2: any = (res as any)?.data ?? null;
+                                const userMsg2 = innerData2?.user_message ?? null;
+                                const wasRefunded2 = !!innerData2?.refunded || innerData2?.txn_status === 'refunded';
+                                const reason2 = userMsg2 || res?.message || t('screens.shop.iak.unknownError');
+                                const refundLine2 = wasRefunded2 ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                showAlert(t('screens.shop.iak.purchaseFailed'), `${reason2}${refundLine2}`, [{ text: t('screens.shop.iak.ok') }]);
+                                loadXrunBalance();
                             }
                         } finally {
                             setIakPurchaseLoading(false);
@@ -1136,11 +1154,29 @@ export const ShopProductDetailScreen = () => {
                                 const rec = await purchaseIakRecord(
                                     member!, meta.ref_id, customerId, send.txHash, String(product.id), navigate
                                 );
-                                if (rec?.status !== 'success') {
-                                    throw new Error(rec?.message || 'IAK record 실패');
+
+                                const recData: any = Array.isArray(rec?.data) ? rec.data[0] : rec?.data;
+                                const recInnerStatus = recData?.txn_status;
+                                if (rec?.status === 'success' && recInnerStatus === 'success') {
+                                    console.log('[T-031 IAK 구매] 성공:', { txHash: send.txHash, ref_id: meta.ref_id });
+                                    setIakPurchaseResult(recData);
+                                    setPurchasePinVisible(false);
+                                    setIakSuccessVisible(true);
+                                    loadXrunBalance();
+                                    return;
                                 }
-                                console.log('[T-031 IAK 구매] 성공:', { txHash: send.txHash, ref_id: meta.ref_id });
-                                setIakPurchaseResult(rec?.data?.[0] ?? null);
+                                if (recInnerStatus === 'failed' || recInnerStatus === 'refunded' || rec?.status !== 'success') {
+                                    setPurchasePinVisible(false);
+                                    setPurchaseLocalLoading(false);
+                                    const reason = recData?.user_message || rec?.message || t('screens.shop.iak.unknownError');
+                                    const wasRefunded = !!recData?.refunded || recInnerStatus === 'refunded';
+                                    const refundLine = wasRefunded ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                    showAlert(t('screens.shop.iak.purchaseFailed'), `${reason}${refundLine}`, [{ text: t('screens.shop.iak.ok') }]);
+                                    loadXrunBalance();
+                                    return;
+                                }
+
+                                setIakPurchaseResult(recData);
                                 setPurchasePinVisible(false);
                                 setIakSuccessVisible(true);
                                 loadXrunBalance();

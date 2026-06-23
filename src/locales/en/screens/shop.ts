@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nPhone: {{phone}}\n\nProceed?',
     purchaseFailed: 'Purchase failed',
     unknownError: 'Unknown error',
+    autoRefunded: 'The payment amount has been automatically refunded to your XRUN balance.',
     successTitle: 'Top-up complete',
     snLabel: 'Serial number',
     smsNotice: 'The top-up history can also be confirmed via SMS sent by the carrier.',
