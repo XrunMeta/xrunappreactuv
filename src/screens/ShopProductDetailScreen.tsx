@@ -1490,7 +1490,8 @@ const v_d81136 = v_472849.create({
     productImageWrapper: {
         width: '100%',
         height: 200,
-        borderRadius: 16,
+
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
