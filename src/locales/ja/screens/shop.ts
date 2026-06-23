@@ -19,6 +19,7 @@ export default {
   availableShort: '利用可能',
   usedShort: '使用済み',
   pendingShort: '待機中',
+  completedShort: '購入完了',
   shopBrand: 'ショップ',
   thankYou: 'ありがとうございます',
   noPurchasedCoupons: '購入したクーポンがありません。',

@@ -309,6 +309,8 @@ export const v_8c1d95 = () => {
     const v_f24e20 = (v_8c0b26) => {
         const v_2911e0 = v_8c0b26.status === 'available';
         const v_6e3315 = v_8c0b26.status === 'pending';
+
+        const v_2ec305 = v_8c0b26.type === 'iak' && v_2911e0;
         const v_41844b = v_8c0b26.image && typeof v_8c0b26.image === 'object' && 'uri' in (v_8c0b26.image as any);
         const v_fafc7f = v_41844b && v_ba33a5.has(v_8c0b26.id) ? v_818aa7 : v_8c0b26.image;
 
@@ -334,7 +336,13 @@ export const v_8c1d95 = () => {
                                 <Text style={v_d81136.itemBrand}>{v_8c0b26.brand === 'SHOP' ? v_8d41d7('screens.shop.shopBrand') : v_8c0b26.brand}</Text>
                                 <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_6e3315 ? v_d81136.statusTagPending : v_d81136.statusTagUsed]}>
                                     <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_6e3315 ? v_d81136.statusTagTextPending : v_d81136.statusTagTextUsed]}>
-                                        {v_2911e0 ? v_8d41d7('screens.shop.availableShort') : v_6e3315 ? v_8d41d7('screens.shop.pendingShort') : v_8d41d7('screens.shop.usedShort')}
+                                        {v_2ec305
+                                            ? v_8d41d7('screens.shop.completedShort')
+                                            : v_2911e0
+                                                ? v_8d41d7('screens.shop.availableShort')
+                                                : v_6e3315
+                                                    ? v_8d41d7('screens.shop.pendingShort')
+                                                    : v_8d41d7('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>

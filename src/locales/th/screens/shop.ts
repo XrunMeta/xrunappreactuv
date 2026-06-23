@@ -12,6 +12,7 @@ export default {
   availableShort: 'ใช้ได้',
   usedShort: 'ใช้แล้ว',
   pendingShort: 'รอดำเนินการ',
+  completedShort: 'ซื้อสำเร็จ',
   shopBrand: 'ช้อปปิ้ง',
   thankYou: 'ขอบคุณ',
   noPurchasedCoupons: 'ไม่มีคูปองที่ซื้อ',
