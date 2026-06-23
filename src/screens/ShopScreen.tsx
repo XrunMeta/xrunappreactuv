@@ -105,6 +105,8 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
 
         brand: (v_8c0b26 as any).brandName ?? (v_8c0b26 as any).brand ?? '',
         title: v_8c0b26.name ?? '-',
+
+        description: (v_8c0b26 as any).description ?? undefined,
         price: v_7be02f,
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_0158ad,
         isXplayShop: true,
@@ -357,6 +359,8 @@ export const v_10886b = () => {
                 source: v_b70da2 === 'ID' ? 'iak' : 'kr_giftishow',
 
                 iakCategory: v_b70da2 === 'ID' ? (v_206b88.category ?? null) : null,
+
+                description: typeof v_206b88.description === 'string' ? v_206b88.description : undefined,
             }));
             v_4ff2fa(v_ef8ab1 as any);
             console.log('[Xplay Shop] DB 활성 상품:', v_ef8ab1.length, '건');

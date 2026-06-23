@@ -782,6 +782,11 @@ export const v_a59951 = () => {
                                 <Text style={v_d81136.productDescription}>
                                     {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
                                 </Text>
+                            ) : v_01bee9.description ? (
+
+                                <Text style={v_d81136.productDescription}>
+                                    {String(v_01bee9.description).trim()}
+                                </Text>
                             ) : null}
                         </View>
                     </View>
