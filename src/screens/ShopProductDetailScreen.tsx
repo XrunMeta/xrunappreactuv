@@ -1507,7 +1507,7 @@ const v_d81136 = v_472849.create({
         width: '100%',
         height: 200,
 
-        borderRadius: 8,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
