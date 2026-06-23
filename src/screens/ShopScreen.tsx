@@ -31,7 +31,7 @@ interface ProductData {
     title: string;
     description?: string;
     price: number;
-    image: ImageSourcePropType;
+    image?: ImageSourcePropType | null;
 
     isXplayShop?: boolean;
 
@@ -99,7 +99,8 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
         const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
         xrunPrice = Math.ceil(rawPrice / divisor);
     }
-    const fallbackImage = defaultImageUri ? { uri: defaultImageUri } : sampleCU;
+
+    const fallbackImage = defaultImageUri ? { uri: defaultImageUri } : null;
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
 
@@ -108,7 +109,7 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
 
         description: (item as any).description ?? undefined,
         price: xrunPrice,
-        image: item.imageUrl ? { uri: item.imageUrl } : fallbackImage,
+        image: item.imageUrl ? { uri: item.imageUrl } : (fallbackImage as any),
         isXplayShop: true,
         isIak: (item as any).source === 'iak',
         iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
@@ -546,7 +547,8 @@ export const ShopScreen = () => {
 
         const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
         const imgFailed = isRemote && failedImages.has(product.id);
-        const displayImage = imgFailed ? xrunHorizontalLogo : product.image;
+        const displayImage = imgFailed ? null : product.image;
+        const hasImage = !!displayImage;
 
         return (
             <TouchableOpacity
@@ -559,16 +561,18 @@ export const ShopScreen = () => {
                     styles.productImageContainer,
                     isEthereum && styles.productImageContainerEthereum
                 ]}>
-                    <Image
-                        source={displayImage}
-                        style={styles.productImage}
-                        resizeMode="contain"
-                        onError={() => {
-                            if (isRemote) {
-                                setFailedImages(prev => new Set(prev).add(product.id));
-                            }
-                        }}
-                    />
+                    {hasImage ? (
+                        <Image
+                            source={displayImage as ImageSourcePropType}
+                            style={styles.productImage}
+                            resizeMode="contain"
+                            onError={() => {
+                                if (isRemote) {
+                                    setFailedImages(prev => new Set(prev).add(product.id));
+                                }
+                            }}
+                        />
+                    ) : null}
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
                             <Text style={styles.imageDescriptionText}>{product.description}</Text>
