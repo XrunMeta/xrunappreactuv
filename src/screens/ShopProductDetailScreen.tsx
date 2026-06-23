@@ -791,11 +791,11 @@ export const v_a59951 = () => {
                         <View style={v_d81136.paymentCard}>
                             <View style={v_d81136.sectionHeader}>
                                 <Feather name="check-circle" size={18} color="#22c55e" />
-                                <Text style={v_d81136.sectionTitle}>구매 완료 정보</Text>
+                                <Text style={v_d81136.sectionTitle}>{v_8d41d7('screens.shopProductDetail.purchaseCompleteInfo')}</Text>
                             </View>
                             <View style={v_d81136.divider} />
                             <View style={v_d81136.paymentRow}>
-                                <Text style={v_d81136.paymentLabel}>결제 금액</Text>
+                                <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
                                 <View style={v_d81136.priceContainer}>
                                     <Image source={v_1efa5f} style={v_d81136.coinIcon} resizeMode="contain" />
                                     <Text style={v_d81136.paymentValue}>
@@ -815,7 +815,7 @@ export const v_a59951 = () => {
                                 </View>
                             </View>
                             <View style={v_d81136.paymentRowLast}>
-                                <Text style={v_d81136.paymentLabel}>구매일</Text>
+                                <Text style={v_d81136.paymentLabel}>{v_8d41d7('screens.shopProductDetail.purchaseDateLabel')}</Text>
                                 <Text style={v_d81136.paymentBalance}>{v_6468c7 || '-'}</Text>
                             </View>
                         </View>

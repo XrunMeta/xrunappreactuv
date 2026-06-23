@@ -13,6 +13,8 @@ export default {
   exchange: '兑换',
   paymentInfo: '支付信息',
   paymentAmount: '支付金额',
+  purchaseCompleteInfo: '购买完成信息',
+  purchaseDateLabel: '购买日期',
   myXRUNBalance: '我的XRUN余额',
   remainingXRUN: '购买后XRUN余额',
   myXrunBalance: '持有XRUN',

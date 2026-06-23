@@ -13,6 +13,8 @@ export default {
   exchange: 'Đổi',
   paymentInfo: 'Thanh toán',
   paymentAmount: 'Số tiền thanh toán',
+  purchaseCompleteInfo: 'Thông tin mua hàng',
+  purchaseDateLabel: 'Ngày mua',
   myXRUNBalance: 'Số dư XRUN',
   remainingXRUN: 'XRUN sau khi mua',
   myXrunBalance: 'Số dư XRUN',
