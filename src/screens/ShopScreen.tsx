@@ -36,6 +36,8 @@ interface ProductData {
     isXplayShop?: boolean;
 
     isIak?: boolean;
+
+    iakCategory?: string;
 }
 
 const v_426e67 = [
@@ -105,6 +107,7 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
         image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
         isXplayShop: true,
         isIak: (v_8c0b26 as any).source === 'iak',
+        iakCategory: (v_8c0b26 as any).iakCategory ?? (v_8c0b26 as any).category ?? undefined,
     };
 }
 
@@ -326,6 +329,8 @@ export const v_10886b = () => {
                 imageUrl: v_206b88.goods_image,
 
                 source: v_b70da2 === 'ID' ? 'iak' : 'kr_giftishow',
+
+                iakCategory: v_b70da2 === 'ID' ? (v_206b88.category ?? null) : null,
             }));
             v_4ff2fa(v_ef8ab1 as any);
             console.log('[Xplay Shop] DB 활성 상품:', v_ef8ab1.length, '건');
@@ -489,6 +494,7 @@ export const v_10886b = () => {
             shopTab: v_01bee9.isXplayShop ? ('xplayShop' as const) : undefined,
 
             isIak: v_01bee9.isIak ?? false,
+            iakCategory: v_01bee9.iakCategory ?? null,
         };
         v_d0fbad(v_983c87 as any);
         v_9b57fc(v_ce4741.shopProductDetail);

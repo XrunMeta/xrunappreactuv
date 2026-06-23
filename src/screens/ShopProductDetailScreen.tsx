@@ -38,6 +38,17 @@ interface ProductDetailData {
     image: v_07a341;
     isXrun?: boolean;
     isIak?: boolean;  
+    iakCategory?: string | null;  
+}
+
+type IakInputKind = 'phone' | 'game_id' | 'meter' | 'generic';
+function v_fa97b3(v_8b9cd4): IakInputKind {
+    if (!v_8b9cd4) return 'phone';
+    const v_3f4e2e = String(v_8b9cd4).toLowerCase();
+    if (v_3f4e2e === 'game') return 'game_id';
+    if (v_3f4e2e === 'pln') return 'meter';
+
+    return 'phone';
 }
 
 const v_273f15 = {
@@ -70,7 +81,9 @@ export const v_a59951 = () => {
         image: v_dfe883.image || v_273f15.image,
         isXrun: (v_dfe883 as any).isXrun || false,
         isIak: (v_dfe883 as any).isIak || false,
+        iakCategory: (v_dfe883 as any).iakCategory ?? null,
     } : v_273f15;
+    const v_d62ac8 = v_01bee9.isIak ? v_fa97b3(v_01bee9.iakCategory) : 'phone';
 
     const v_b3ea98 = false;
 
@@ -612,11 +625,14 @@ export const v_a59951 = () => {
         v_9b57fc(v_ce4741.shopMyItems);
     };
 
+    const v_fde250 = v_d62ac8 === 'game_id' ? 'gameId' : v_d62ac8 === 'meter' ? 'meter' : 'phone';
+    const v_d1823a = v_de06a3((v_ae8e76) => `screens.shop.iak.${v_fde250}${v_ae8e76}`, [v_fde250]);
+    const v_fb1620 = v_8d41d7(v_d1823a('Label'));
     const v_1bfbb1 = v_de06a3(async () => {
         if (!v_660822 || v_673bf2) return;
         const v_d74a81 = v_f3e760.trim();
         if (!v_d74a81) {
-            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7('screens.shop.iak.phoneRequired'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7(v_d1823a('Required')), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
             return;
         }
         if (v_a1c497 === null || v_19340b) {
@@ -629,7 +645,7 @@ export const v_a59951 = () => {
         }
         v_889fad(
             v_8d41d7('screens.shop.iak.purchaseConfirmTitle'),
-            v_8d41d7('screens.shop.iak.purchaseConfirmMessage', { title: v_01bee9.title, price: v_01bee9.price, phone: v_d74a81 }),
+            v_8d41d7('screens.shop.iak.purchaseConfirmMessage', { title: v_01bee9.title, price: v_01bee9.price, label: v_fb1620, customer: v_d74a81, phone: v_d74a81 }),
             [
                 { text: v_8d41d7('screens.shop.iak.cancel') },
                 {
@@ -696,7 +712,7 @@ export const v_a59951 = () => {
                     },
                 },
             ]);
-    }, [v_8d41d7, v_660822, v_f3e760, v_673bf2, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_889fad, v_9b57fc, v_abb08d]);
+    }, [v_8d41d7, v_660822, v_f3e760, v_673bf2, v_01bee9.id, v_01bee9.title, v_01bee9.price, v_a1c497, v_19340b, v_889fad, v_9b57fc, v_abb08d, v_d1823a, v_fb1620]);
 
     const v_435347 = () => {
         v_c43513(false);
@@ -996,16 +1012,16 @@ export const v_a59951 = () => {
                 >
                     <View style={[v_d81136.paymentSuccessModal, { paddingTop: 24 }]}>
                         <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
-                            {v_8d41d7('screens.shop.iak.phoneModalTitle')}
+                            {v_8d41d7(v_d1823a('ModalTitle'))}
                         </Text>
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
-                            {v_8d41d7('screens.shop.iak.phoneModalDesc')}
+                            {v_8d41d7(v_d1823a('ModalDesc'))}
                         </Text>
                         <TextInput
                             value={v_f3e760}
                             onChangeText={v_23d029}
-                            placeholder={v_8d41d7('screens.shop.iak.phonePlaceholder')}
-                            keyboardType="phone-pad"
+                            placeholder={v_8d41d7(v_d1823a('Placeholder'))}
+                            keyboardType={v_d62ac8 === 'game_id' ? 'numeric' : 'phone-pad'}
                             autoFocus
                             style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
                         />
@@ -1125,7 +1141,7 @@ export const v_a59951 = () => {
                             if (v_94302c === 'iak') {
 
                                 const v_d61629 = v_d49490.iakCustomerId ?? '';
-                                if (!v_d61629) throw new Error(v_8d41d7('screens.shop.iak.phoneRequired'));
+                                if (!v_d61629) throw new Error(v_8d41d7(v_d1823a('Required')));
                                 const v_f91eae = await v_6acf4c(v_660822!, String(v_01bee9.id), v_9b57fc);
                                 if (v_f91eae?.status !== 'success' || !v_f91eae.data?.[0]) {
                                     throw new Error(v_f91eae?.message || 'IAK prepare 실패');
