@@ -100,6 +100,8 @@ export const v_a59951 = () => {
 
     const [v_660822, v_06fdbc] = v_5ab095<string | null>(null);
 
+    const [v_25cfbb, v_6bc978] = v_5ab095(1);
+
     const [v_f5e16b, v_1c868b] = v_5ab095(false);
     const [v_d49490, v_04a3b7] = v_5ab095<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
     const [v_bd58fc, v_24bbbd] = v_5ab095(false);
@@ -778,13 +780,20 @@ export const v_a59951 = () => {
                                 <Text style={v_d81136.brand}>{v_b034a8}</Text>
                             </View>
                             <Text style={v_d81136.title}>{v_ba7f97}</Text>
+                            {}
                             {v_d0206c ? (
-                                <Text style={v_d81136.productDescription}>
+                                <Text
+                                    style={[v_d81136.productDescription, v_25cfbb > 1 && { textAlign: 'left' }]}
+                                    onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
+                                >
                                     {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
                                 </Text>
                             ) : v_01bee9.description ? (
 
-                                <Text style={v_d81136.productDescription}>
+                                <Text
+                                    style={[v_d81136.productDescription, v_25cfbb > 1 && { textAlign: 'left' }]}
+                                    onTextLayout={(v_9e86fd) => v_6bc978(v_9e86fd.nativeEvent.lines.length)}
+                                >
                                     {String(v_01bee9.description).trim()}
                                 </Text>
                             ) : null}
@@ -1510,7 +1519,7 @@ const v_d81136 = v_472849.create({
         color: '#6B7280',
         lineHeight: 20,
 
-        textAlign: 'left',
+        textAlign: 'center',
         alignSelf: 'stretch',
         width: '100%',
     },
