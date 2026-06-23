@@ -281,12 +281,27 @@ export const ShopScreen = () => {
 
     }, []);
 
+    const GPS_CACHE_KEY = 'shopGpsCountry';
+    const GPS_CACHE_TTL = 30 * 60 * 1000; 
     const detectCountry = useCallback(async () => {
         if (forceCountry !== 'AUTO') {
             setShopCountry(forceCountry);
             setGpsDenied(false);
             return;
         }
+
+        try {
+            const cached = await AsyncStorage.getItem(GPS_CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed?.country && parsed?.ts && (Date.now() - parsed.ts) < GPS_CACHE_TTL) {
+                    setShopCountry(parsed.country === 'ID' ? 'ID' : 'KR');
+                    setGpsDenied(false);
+                    console.log('[ShopScreen] GPS country cache hit:', parsed.country, '(age', Math.round((Date.now() - parsed.ts)/1000), 's)');
+                    return;
+                }
+            }
+        } catch {  }
         try {
             const perm = await Location.getForegroundPermissionsAsync();
             let granted = perm.granted;
@@ -305,8 +320,13 @@ export const ShopScreen = () => {
             if (!pos?.coords) { setShopCountry('KR'); return; }
             const geo = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }).catch(() => []);
             const isoCountry = (geo?.[0]?.isoCountryCode ?? '').toUpperCase();
-            setShopCountry(isoCountry === 'ID' ? 'ID' : 'KR');
-            console.log('[ShopScreen] GPS country detected:', isoCountry, '→', isoCountry === 'ID' ? 'ID' : 'KR');
+            const finalCountry = isoCountry === 'ID' ? 'ID' : 'KR';
+            setShopCountry(finalCountry);
+            console.log('[ShopScreen] GPS country detected:', isoCountry, '→', finalCountry);
+
+            try {
+                await AsyncStorage.setItem(GPS_CACHE_KEY, JSON.stringify({ country: finalCountry, ts: Date.now() }));
+            } catch {  }
         } catch (e) {
             console.warn('[ShopScreen] GPS detect failed, fallback KR:', e);
             setGpsDenied(true);
@@ -393,10 +413,10 @@ export const ShopScreen = () => {
     }, [navigate]);
 
     useEffect(() => {
-        if (tab === 'xrunStore' && shopCountry === null) {
+        if (tab === 'xrunStore') {
             void detectCountry();
         }
-    }, [tab, shopCountry, detectCountry]);
+    }, [tab, detectCountry]);
 
     useEffect(() => {
         if (tab === 'xrunStore' && shopCountry !== null) {
