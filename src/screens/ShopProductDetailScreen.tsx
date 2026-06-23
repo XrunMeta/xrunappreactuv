@@ -643,9 +643,20 @@ export const v_a59951 = () => {
                                 customer_id: v_d74a81,
                                 env: 'prod',
                             }, v_9b57fc);
-                            if (v_8f00b9?.status === 'success') {
-                                v_303962(v_8f00b9?.data ?? null);
+
+                            const v_46d11c = v_8f00b9?.data ?? null;
+                            const v_44c7d6 = v_46d11c?.txn_status;
+                            const v_e629b5 = v_46d11c?.user_message ?? null;
+                            const v_3bf403 = !!v_46d11c?.refunded || v_44c7d6 === 'refunded';
+                            if (v_8f00b9?.status === 'success' && v_44c7d6 === 'success') {
+                                v_303962(v_46d11c);
                                 v_c43513(true);
+                                v_abb08d();
+                            } else if (v_8f00b9?.status === 'success' && (v_44c7d6 === 'failed' || v_44c7d6 === 'refunded')) {
+                                const v_3d2fa3 = v_8d41d7('screens.shop.iak.purchaseFailed');
+                                const v_58ca36 = v_e629b5 || v_8f00b9?.message || v_8d41d7('screens.shop.iak.unknownError');
+                                const v_09a83a = v_3bf403 ? `\n\n${v_8d41d7('screens.shop.iak.autoRefunded')}` : '';
+                                v_889fad(v_3d2fa3, `${v_58ca36}${v_09a83a}`, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
                                 v_abb08d();
                             } else if (v_8f00b9?.code === 410) {
 
@@ -670,7 +681,14 @@ export const v_a59951 = () => {
                                     { text: v_8d41d7('screens.walletRestore.restoreNow'), onPress: () => v_9b57fc(v_ce4741.walletRestore) },
                                 ]);
                             } else {
-                                v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), v_8f00b9?.message ?? v_8d41d7('screens.shop.iak.unknownError'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+
+                                const v_45d3c9 = (v_8f00b9 as any)?.data ?? null;
+                                const v_f6084d = v_45d3c9?.user_message ?? null;
+                                const v_306ba5 = !!v_45d3c9?.refunded || v_45d3c9?.txn_status === 'refunded';
+                                const v_5387f9 = v_f6084d || v_8f00b9?.message || v_8d41d7('screens.shop.iak.unknownError');
+                                const v_c4199b = v_306ba5 ? `\n\n${v_8d41d7('screens.shop.iak.autoRefunded')}` : '';
+                                v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), `${v_5387f9}${v_c4199b}`, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+                                v_abb08d();
                             }
                         } finally {
                             v_beef40(false);
@@ -1136,11 +1154,29 @@ export const v_a59951 = () => {
                                 const v_94a7a9 = await v_b20e92(
                                     v_660822!, v_ab4c96.ref_id, v_d61629, v_9c423d.txHash, String(v_01bee9.id), v_9b57fc
                                 );
-                                if (v_94a7a9?.status !== 'success') {
-                                    throw new Error(v_94a7a9?.message || 'IAK record 실패');
+
+                                const v_9b4c90 = Array.isArray(v_94a7a9?.data) ? v_94a7a9.data[0] : v_94a7a9?.data;
+                                const v_7a4a92 = v_9b4c90?.txn_status;
+                                if (v_94a7a9?.status === 'success' && v_7a4a92 === 'success') {
+                                    console.log('[T-031 IAK 구매] 성공:', { txHash: v_9c423d.txHash, ref_id: v_ab4c96.ref_id });
+                                    v_303962(v_9b4c90);
+                                    v_1c868b(false);
+                                    v_c43513(true);
+                                    v_abb08d();
+                                    return;
                                 }
-                                console.log('[T-031 IAK 구매] 성공:', { txHash: v_9c423d.txHash, ref_id: v_ab4c96.ref_id });
-                                v_303962(v_94a7a9?.data?.[0] ?? null);
+                                if (v_7a4a92 === 'failed' || v_7a4a92 === 'refunded' || v_94a7a9?.status !== 'success') {
+                                    v_1c868b(false);
+                                    v_24bbbd(false);
+                                    const v_58ca36 = v_9b4c90?.user_message || v_94a7a9?.message || v_8d41d7('screens.shop.iak.unknownError');
+                                    const v_3bf403 = !!v_9b4c90?.refunded || v_7a4a92 === 'refunded';
+                                    const v_09a83a = v_3bf403 ? `\n\n${v_8d41d7('screens.shop.iak.autoRefunded')}` : '';
+                                    v_889fad(v_8d41d7('screens.shop.iak.purchaseFailed'), `${v_58ca36}${v_09a83a}`, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+                                    v_abb08d();
+                                    return;
+                                }
+
+                                v_303962(v_9b4c90);
                                 v_1c868b(false);
                                 v_c43513(true);
                                 v_abb08d();

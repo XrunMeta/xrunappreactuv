@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nSố ĐT: {{phone}}\n\nTiếp tục?',
     purchaseFailed: 'Mua thất bại',
     unknownError: 'Lỗi không xác định',
+    autoRefunded: 'Số tiền thanh toán đã được tự động hoàn lại vào số dư XRUN của bạn.',
     successTitle: 'Nạp tiền hoàn tất',
     snLabel: 'Số serial',
     smsNotice: 'Lịch sử nạp tiền cũng có thể được xác nhận qua SMS từ nhà mạng.',

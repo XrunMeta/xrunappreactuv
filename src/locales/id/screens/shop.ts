@@ -40,6 +40,7 @@ export default {
     purchaseConfirmMessage: '{{title}}\n{{price}} XRUN\nNo. HP: {{phone}}\n\nLanjutkan?',
     purchaseFailed: 'Pembelian gagal',
     unknownError: 'Kesalahan tidak diketahui',
+    autoRefunded: 'Jumlah pembayaran telah otomatis dikembalikan ke saldo XRUN Anda.',
     successTitle: 'Top-up selesai',
     snLabel: 'Nomor seri',
     smsNotice: 'Riwayat top-up juga dapat dikonfirmasi melalui SMS dari operator.',
