@@ -775,28 +775,37 @@ export const ShopProductDetailScreen = () => {
                                 )}
                             </View>
                         </View>
-                        <View style={styles.productInfoContainer}>
+                        {}
+                        <View style={[styles.productInfoContainer, { alignItems: 'flex-start' }]}>
                             <View style={styles.brandContainer}>
-                                <Text style={styles.brand}>{displayBrand}</Text>
+                                <Text style={[styles.brand, { textAlign: 'left' }]}>{displayBrand}</Text>
                             </View>
-                            <Text style={styles.title}>{displayTitle}</Text>
+                            <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
+                            {}
+                            {!isPurchasedView && (
+                                <View style={styles.detailPriceBox}>
+                                    <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
+                                    <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
+                                </View>
+                            )}
                             {}
                             {hasDetailDescription ? (
                                 <Text
-                                    style={[styles.productDescription, descLines > 1 && { textAlign: 'left' }]}
+                                    style={[styles.productDescription, { textAlign: 'left' }]}
                                     onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
                                 >
                                     {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
                                 </Text>
                             ) : product.description ? (
-
                                 <Text
-                                    style={[styles.productDescription, descLines > 1 && { textAlign: 'left' }]}
+                                    style={[styles.productDescription, { textAlign: 'left' }]}
                                     onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
                                 >
                                     {String(product.description).trim()}
                                 </Text>
                             ) : null}
+                            {}
+                            {descLines > 9999 && null}
                         </View>
                     </View>
 
@@ -1511,6 +1520,24 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+
+    detailPriceBox: {
+        marginTop: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 8,
+        alignSelf: 'flex-start',
+    },
+    detailPriceText: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#1E3A5F',
+        fontFamily: 'Roboto-Bold',
     },
     productDescription: {
         marginTop: 12,
