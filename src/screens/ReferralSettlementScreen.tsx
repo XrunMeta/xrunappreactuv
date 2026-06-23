@@ -25,16 +25,16 @@ interface TransformedSettlementData {
   fromName?: string | null; 
 }
 
-const SOURCE_LABEL: Record<string, string> = {
-  nas: 'AR 광고 (나스미디어)',
-  nasmedia: 'AR 광고 (나스미디어)',
-  pocr: 'AR 광고 (포인트클릭)',
-  pointclick: 'AR 광고 (포인트클릭)',
-  ayet: 'Xplay Zone 1',
-  maf: 'Xplay Zone 2',
-  mychips: 'Xplay Zone 2',
-  recommand: '추천 가입',
-  attendance: '출석체크',
+const SOURCE_KEY: Record<string, string> = {
+  nas: 'source_nas',
+  nasmedia: 'source_nas',
+  pocr: 'source_pocr',
+  pointclick: 'source_pocr',
+  ayet: 'source_xplay_zone1',
+  maf: 'source_xplay_zone2',
+  mychips: 'source_xplay_zone2',
+  recommand: 'source_recommend',
+  attendance: 'source_attendance',
 };
 
 const formatDateTime = (dateString: string): string => {
@@ -212,7 +212,11 @@ export const ReferralSettlementScreen = () => {
       if (resultRef.status === 'success') {
 
         const rows: TransformedSettlementData[] = (resultRef.data || []).map((item: ReferralIncomeItem, idx: number) => {
-          const label = SOURCE_LABEL[item.source_type] || item.source_type || '레퍼럴 분배';
+
+          const sourceKey = SOURCE_KEY[item.source_type];
+          const label = sourceKey
+            ? t(`screens.referralSettlement.${sourceKey}`)
+            : (item.source_type || t('screens.referralSettlement.source_referral_share'));
           return {
             id: `ref_${item.id}_${idx}`,
             type: label,
