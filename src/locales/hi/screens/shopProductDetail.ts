@@ -13,6 +13,8 @@ export default {
   exchange: 'एक्सचेंज',
   paymentInfo: 'भुगतान जानकारी',
   paymentAmount: 'भुगतान राशि',
+  purchaseCompleteInfo: 'खरीद की जानकारी',
+  purchaseDateLabel: 'खरीद की तारीख',
   myXRUNBalance: 'मेरा XRUN बैलेंस',
   remainingXRUN: 'खरीद के बाद XRUN',
   myXrunBalance: 'मेरा XRUN बैलेंस',

@@ -791,11 +791,11 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.paymentCard}>
                             <View style={styles.sectionHeader}>
                                 <Feather name="check-circle" size={18} color="#22c55e" />
-                                <Text style={styles.sectionTitle}>구매 완료 정보</Text>
+                                <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.purchaseCompleteInfo')}</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.paymentRow}>
-                                <Text style={styles.paymentLabel}>결제 금액</Text>
+                                <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                 <View style={styles.priceContainer}>
                                     <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
                                     <Text style={styles.paymentValue}>
@@ -815,7 +815,7 @@ export const ShopProductDetailScreen = () => {
                                 </View>
                             </View>
                             <View style={styles.paymentRowLast}>
-                                <Text style={styles.paymentLabel}>구매일</Text>
+                                <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.purchaseDateLabel')}</Text>
                                 <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
                             </View>
                         </View>

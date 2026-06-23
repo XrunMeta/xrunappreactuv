@@ -13,6 +13,8 @@ export default {
   exchange: '交換する',
   paymentInfo: '決済情報',
   paymentAmount: '決済金額',
+  purchaseCompleteInfo: '購入完了情報',
+  purchaseDateLabel: '購入日',
   myXRUNBalance: 'XRUN残高',
   remainingXRUN: '購入後XRUN残高',
   myXrunBalance: '保有XRUN',

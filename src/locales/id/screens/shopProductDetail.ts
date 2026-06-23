@@ -13,6 +13,8 @@ export default {
   exchange: 'Tukar',
   paymentInfo: 'Info Pembayaran',
   paymentAmount: 'Jumlah Pembayaran',
+  purchaseCompleteInfo: 'Info pembelian',
+  purchaseDateLabel: 'Tanggal pembelian',
   myXRUNBalance: 'Saldo XRUN',
   remainingXRUN: 'XRUN Setelah Beli',
   myXrunBalance: 'Saldo XRUN',

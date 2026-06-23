@@ -13,6 +13,8 @@ export default {
   exchange: 'Exchange',
   paymentInfo: 'Payment Info',
   paymentAmount: 'Payment Amount',
+  purchaseCompleteInfo: 'Purchase complete',
+  purchaseDateLabel: 'Purchase date',
   myXRUNBalance: 'My XRUN Balance',
   remainingXRUN: 'XRUN After Purchase',
   myXrunBalance: 'My XRUN Balance',
