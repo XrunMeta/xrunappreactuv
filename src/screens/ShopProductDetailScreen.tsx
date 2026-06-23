@@ -1666,19 +1666,10 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
     guideCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
 
-        padding: 20,
+        paddingHorizontal: 4,
         paddingBottom: 32,
         marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 5,
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
     },
     guideItem: {
         marginBottom: 20,
