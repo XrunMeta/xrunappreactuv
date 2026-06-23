@@ -997,6 +997,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
+
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
     },
     productImageContainerEthereum: {
         backgroundColor: '#f2f2f2',
