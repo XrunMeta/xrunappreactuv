@@ -703,9 +703,16 @@ export const v_10886b = () => {
                                             key={v_3f4e2e}
                                             onPress={async () => {
                                                 v_e94174(v_3f4e2e);
-                                                if (v_3f4e2e === 'AUTO') await v_e84827.removeItem('devShopForceCountry');
-                                                else await v_e84827.setItem('devShopForceCountry', v_3f4e2e);
-                                                v_068f20(null); 
+                                                if (v_3f4e2e === 'AUTO') {
+                                                    await v_e84827.removeItem('devShopForceCountry');
+
+                                                    await v_e84827.removeItem('shopGpsCountry');
+                                                    v_068f20(null); 
+                                                } else {
+                                                    await v_e84827.setItem('devShopForceCountry', v_3f4e2e);
+
+                                                    v_068f20(v_3f4e2e);
+                                                }
                                             }}
                                             style={[v_d81136.devCountryChip, v_01305e === v_3f4e2e && v_d81136.devCountryChipActive]}
                                         >
