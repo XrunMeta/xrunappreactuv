@@ -10,6 +10,7 @@ export default {
   referralLabel: '推荐',
   pending: '待支付',
   paid: '已支付',
+  fromUserRevenue: '由 {{name}} 产生的收益',
 };
 
 

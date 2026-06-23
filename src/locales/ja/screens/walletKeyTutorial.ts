@@ -24,6 +24,7 @@ export default {
       'キーを失った場合、会社も復元できません。鍵管理の最終的な責任はあなたにあります。',
     ],
   },
+  rememberHeading: '必ずご記憶ください',
   agree: { label: '上記の内容をすべて理解しました。' },
   button: { prev: '戻る', next: '次へ', start: '始める' },
   readonly: { close: '閉じる' },

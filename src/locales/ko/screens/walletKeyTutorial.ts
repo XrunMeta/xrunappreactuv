@@ -28,6 +28,7 @@ export default {
       '지갑과 개인 키의 관리 책임은 사용자 본인에게 있습니다.',
     ],
   },
+  rememberHeading: '꼭 기억해주세요',
   agree: { label: '위 내용을 모두 이해했습니다.' },
   button: { prev: '이전', next: '다음', start: '시작하기' },
   readonly: { close: '닫기' },

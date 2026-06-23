@@ -37,7 +37,8 @@ const TutorialPage: React.FC<{
   title: string;
   body: string[];
   iconName: keyof typeof Ionicons.glyphMap;
-}> = ({ width, title, body, iconName }) => (
+  rememberHeading: string;
+}> = ({ width, title, body, iconName, rememberHeading }) => (
   <ScrollView
     style={[styles.page, { width }]}
     contentContainerStyle={styles.pageContent}
@@ -53,7 +54,7 @@ const TutorialPage: React.FC<{
 
     {}
     <View style={styles.card}>
-      <Text style={styles.cardHeading}>꼭 기억해주세요</Text>
+      <Text style={styles.cardHeading}>{rememberHeading}</Text>
       {body.map((line, i) => (
         <View key={i} style={styles.checkRow}>
           <Ionicons
@@ -141,7 +142,7 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
         style={{ flex: 1 }}
       >
         {pages.map((p, i) => (
-          <TutorialPage key={i} width={width} {...p} />
+          <TutorialPage key={i} width={width} {...p} rememberHeading={t('screens.walletKeyTutorial.rememberHeading')} />
         ))}
       </ScrollView>
 

@@ -10,6 +10,7 @@ export default {
   referralLabel: '紹介',
   pending: '支払い待ち',
   paid: '支払い完了',
+  fromUserRevenue: '{{name}} さんが発生させた収益',
 };
 
 

@@ -24,6 +24,7 @@ export default {
       'Jika Anda kehilangan kunci, perusahaan pun tidak dapat memulihkannya. Tanggung jawab akhir pengelolaan kunci ada pada Anda.',
     ],
   },
+  rememberHeading: 'Harap diingat',
   agree: { label: 'Saya telah membaca dan memahami semua hal di atas.' },
   button: { prev: 'Kembali', next: 'Berikutnya', start: 'Mulai' },
   readonly: { close: 'Tutup' },

@@ -24,6 +24,7 @@ export default {
       'If you lose your key, the company cannot recover it. The ultimate responsibility for key management is yours.',
     ],
   },
+  rememberHeading: 'Please remember',
   agree: { label: 'I have read and understood all of the above.' },
   button: { prev: 'Back', next: 'Next', start: 'Get Started' },
   readonly: { close: 'Close' },

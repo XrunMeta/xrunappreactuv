@@ -329,7 +329,7 @@ export const ReferralSettlementScreen = () => {
     const badgeLabel = isPaid
       ? (t('screens.referralSettlement.paid') || '지급 완료')
       : (t('screens.referralSettlement.pending') || '지급 대기');
-    const fromLine = item.fromName ? `${item.fromName} 님이 발생시킨 수익이에요.` : null;
+    const fromLine = item.fromName ? t('screens.referralSettlement.fromUserRevenue', { name: item.fromName }) : null;
     return (
       <View style={[styles.questCard, isPaid && styles.questCardPaid]}>
         <View style={[styles.questBadge, isPaid ? styles.statusPaid : styles.statusPending]}>

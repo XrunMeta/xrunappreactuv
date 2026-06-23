@@ -24,6 +24,7 @@ export default {
       'Nếu bạn mất khóa, công ty cũng không thể khôi phục. Trách nhiệm cuối cùng trong việc quản lý khóa thuộc về bạn.',
     ],
   },
+  rememberHeading: 'Vui lòng ghi nhớ',
   agree: { label: 'Tôi đã đọc và hiểu tất cả nội dung trên.' },
   button: { prev: 'Quay lại', next: 'Tiếp', start: 'Bắt đầu' },
   readonly: { close: 'Đóng' },

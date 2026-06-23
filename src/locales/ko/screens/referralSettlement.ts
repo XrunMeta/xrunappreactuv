@@ -10,5 +10,6 @@ export default {
   referralLabel: '레퍼럴',
   pending: '지급 대기',
   paid: '지급 완료',
+  fromUserRevenue: '{{name}} 님이 발생시킨 수익',
 };
 

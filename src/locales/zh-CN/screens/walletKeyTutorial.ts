@@ -24,6 +24,7 @@ export default {
       '若您丢失密钥，公司也无法恢复。密钥管理的最终责任在于您本人。',
     ],
   },
+  rememberHeading: '请务必牢记',
   agree: { label: '我已阅读并理解以上全部内容。' },
   button: { prev: '上一步', next: '下一步', start: '开始' },
   readonly: { close: '关闭' },

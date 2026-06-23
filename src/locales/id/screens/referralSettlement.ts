@@ -10,6 +10,7 @@ export default {
   referralLabel: 'Referral',
   pending: 'Menunggu',
   paid: 'Dibayar',
+  fromUserRevenue: 'Pendapatan dari {{name}}',
 };
 
 

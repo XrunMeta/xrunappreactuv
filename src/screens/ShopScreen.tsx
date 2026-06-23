@@ -973,10 +973,10 @@ const styles = StyleSheet.create({
     },
     productImage: {
 
-        width: '90%',
-        height: '90%',
+        width: '80%',
+        height: '80%',
         alignSelf: 'center',
-        marginTop: '5%',
+        marginTop: '10%',
     },
     imageDescriptionOverlay: {
         position: 'absolute',
