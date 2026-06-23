@@ -100,6 +100,8 @@ export const ShopProductDetailScreen = () => {
 
     const [member, setMember] = useState<string | null>(null);
 
+    const [descLines, setDescLines] = useState(1);
+
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
     const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
     const [purchaseLocalLoading, setPurchaseLocalLoading] = useState(false);
@@ -778,13 +780,20 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.brand}>{displayBrand}</Text>
                             </View>
                             <Text style={styles.title}>{displayTitle}</Text>
+                            {}
                             {hasDetailDescription ? (
-                                <Text style={styles.productDescription}>
+                                <Text
+                                    style={[styles.productDescription, descLines > 1 && { textAlign: 'left' }]}
+                                    onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
+                                >
                                     {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
                                 </Text>
                             ) : product.description ? (
 
-                                <Text style={styles.productDescription}>
+                                <Text
+                                    style={[styles.productDescription, descLines > 1 && { textAlign: 'left' }]}
+                                    onTextLayout={(e) => setDescLines(e.nativeEvent.lines.length)}
+                                >
                                     {String(product.description).trim()}
                                 </Text>
                             ) : null}
@@ -1510,7 +1519,7 @@ const styles = StyleSheet.create({
         color: '#6B7280',
         lineHeight: 20,
 
-        textAlign: 'left',
+        textAlign: 'center',
         alignSelf: 'stretch',
         width: '100%',
     },
