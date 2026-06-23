@@ -703,9 +703,16 @@ export const ShopScreen = () => {
                                             key={c}
                                             onPress={async () => {
                                                 setForceCountry(c);
-                                                if (c === 'AUTO') await AsyncStorage.removeItem('devShopForceCountry');
-                                                else await AsyncStorage.setItem('devShopForceCountry', c);
-                                                setShopCountry(null); 
+                                                if (c === 'AUTO') {
+                                                    await AsyncStorage.removeItem('devShopForceCountry');
+
+                                                    await AsyncStorage.removeItem('shopGpsCountry');
+                                                    setShopCountry(null); 
+                                                } else {
+                                                    await AsyncStorage.setItem('devShopForceCountry', c);
+
+                                                    setShopCountry(c);
+                                                }
                                             }}
                                             style={[styles.devCountryChip, forceCountry === c && styles.devCountryChipActive]}
                                         >
