@@ -1511,6 +1511,8 @@ const v_d81136 = v_472849.create({
         lineHeight: 20,
 
         textAlign: 'left',
+        alignSelf: 'stretch',
+        width: '100%',
     },
     detailLoadingWrap: {
         position: 'absolute',
