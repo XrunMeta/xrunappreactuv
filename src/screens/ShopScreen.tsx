@@ -997,6 +997,9 @@ const v_d81136 = v_472849.create({
         backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
+
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
     },
     productImageContainerEthereum: {
         backgroundColor: '#f2f2f2',
