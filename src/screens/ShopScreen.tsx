@@ -88,7 +88,7 @@ function v_02c692(item: v_20035e): ProductData {
 
 const v_4994d5 = 70;
 
-function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
+function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
     const v_56d99d = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
 
     const v_20ff2e = typeof (v_8c0b26 as any).priceKRW === 'number';
@@ -99,12 +99,13 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb): ProductData {
         const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
         v_7be02f = Math.ceil(v_56d99d / v_b7ffba);
     }
+    const v_0158ad = v_b0e133 ? { uri: v_b0e133 } : v_b236ed;
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
         brand: (v_8c0b26 as any).brandName ?? '기프티콘',
         title: v_8c0b26.name ?? '-',
         price: v_7be02f,
-        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_b236ed,
+        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : v_0158ad,
         isXplayShop: true,
         isIak: (v_8c0b26 as any).source === 'iak',
         iakCategory: (v_8c0b26 as any).iakCategory ?? (v_8c0b26 as any).category ?? undefined,
@@ -119,6 +120,8 @@ export const v_10886b = () => {
     const [v_11083e, v_94ee83] = v_5ab095<'xrunStore' | 'myItems'>('xrunStore');
 
     const [v_50b846, v_4ff2fa] = v_5ab095<v_d62ea7[]>([]);
+
+    const [v_2bb9f6, v_180395] = v_5ab095<string | null>(null);
     const [v_32c9b7, v_0e5971] = v_5ab095(false);
     const [v_5605ec, v_ad5fd0] = v_5ab095(false);
     const [v_02e6ad, v_33ec67] = v_5ab095<string | null>(null);
@@ -320,6 +323,8 @@ export const v_10886b = () => {
             const v_8f00b9 = await v_9f42a4.post(v_09dafd, {});
             const v_479f05 = Array.isArray(v_8f00b9.data?.data?.list) ? v_8f00b9.data.data.list as any[] : [];
 
+            v_180395(typeof v_8f00b9.data?.data?.default_image === 'string' ? v_8f00b9.data.data.default_image : null);
+
             const v_ef8ab1 = v_479f05.map((v_206b88) => ({
                 id: v_206b88.goods_code,
                 name: v_206b88.goods_name,
@@ -447,8 +452,8 @@ export const v_10886b = () => {
     }, [v_bcfa24]);
 
     const v_f523cd = v_df9f57(
-        () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424)),
-        [v_50b846, v_ca7424],
+        () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424, v_2bb9f6)),
+        [v_50b846, v_ca7424, v_2bb9f6],
     );
 
     const v_cb1f8e = v_de06a3((v_ef8ab1): ProductData[] => {
