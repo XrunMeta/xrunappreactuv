@@ -18,6 +18,7 @@ export default {
   source_recommend: 'Đăng ký giới thiệu',
   source_attendance: 'Điểm danh',
   source_referral_share: 'Chia sẻ giới thiệu',
+  rewardAmount: 'Số tiền thưởng',
 };
 
 

@@ -18,6 +18,7 @@ export default {
   source_recommend: 'Referral signup',
   source_attendance: 'Attendance',
   source_referral_share: 'Referral share',
+  rewardAmount: 'Reward amount',
 };
 
 

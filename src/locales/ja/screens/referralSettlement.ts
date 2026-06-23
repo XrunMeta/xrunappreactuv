@@ -18,6 +18,7 @@ export default {
   source_recommend: '推薦登録',
   source_attendance: '出席チェック',
   source_referral_share: 'リファラル分配',
+  rewardAmount: '報酬金額',
 };
 
 

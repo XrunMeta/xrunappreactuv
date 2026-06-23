@@ -18,6 +18,7 @@ export default {
   source_recommend: 'สมัครแนะนำ',
   source_attendance: 'เช็คอิน',
   source_referral_share: 'แบ่งปันการแนะนำ',
+  rewardAmount: 'จำนวนรางวัล',
 };
 
 

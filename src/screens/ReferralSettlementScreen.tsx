@@ -353,7 +353,7 @@ export const ReferralSettlementScreen = () => {
         ) : null}
         <View style={styles.questDivider} />
         <View style={styles.questFooter}>
-          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>보상금액</Text>
+          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>{t('screens.referralSettlement.rewardAmount')}</Text>
           <Text style={[styles.questAmount, isPaid && styles.textPaid]}>{item.amount}</Text>
         </View>
       </View>
