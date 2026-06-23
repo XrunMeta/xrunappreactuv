@@ -281,12 +281,27 @@ export const v_10886b = () => {
 
     }, []);
 
+    const v_4bfa33 = 'shopGpsCountry';
+    const v_447733 = 30 * 60 * 1000; 
     const v_add9f8 = v_de06a3(async () => {
         if (v_01305e !== 'AUTO') {
             v_068f20(v_01305e);
             v_9982dc(false);
             return;
         }
+
+        try {
+            const v_e2a6a6 = await v_e84827.getItem(v_4bfa33);
+            if (v_e2a6a6) {
+                const v_8decf8 = JSON.parse(v_e2a6a6);
+                if (v_8decf8?.country && v_8decf8?.ts && (Date.now() - v_8decf8.ts) < v_447733) {
+                    v_068f20(v_8decf8.country === 'ID' ? 'ID' : 'KR');
+                    v_9982dc(false);
+                    console.log('[ShopScreen] GPS country cache hit:', v_8decf8.country, '(age', Math.round((Date.now() - v_8decf8.ts)/1000), 's)');
+                    return;
+                }
+            }
+        } catch {  }
         try {
             const v_d60769 = await v_8a44cb.getForegroundPermissionsAsync();
             let v_b6d66b = v_d60769.granted;
@@ -305,8 +320,13 @@ export const v_10886b = () => {
             if (!v_9e7a9d?.coords) { v_068f20('KR'); return; }
             const v_c53393 = await v_8a44cb.reverseGeocodeAsync({ latitude: v_9e7a9d.coords.latitude, longitude: v_9e7a9d.coords.longitude }).catch(() => []);
             const v_fb024c = (v_c53393?.[0]?.isoCountryCode ?? '').toUpperCase();
-            v_068f20(v_fb024c === 'ID' ? 'ID' : 'KR');
-            console.log('[ShopScreen] GPS country detected:', v_fb024c, '→', v_fb024c === 'ID' ? 'ID' : 'KR');
+            const v_36caa3 = v_fb024c === 'ID' ? 'ID' : 'KR';
+            v_068f20(v_36caa3);
+            console.log('[ShopScreen] GPS country detected:', v_fb024c, '→', v_36caa3);
+
+            try {
+                await v_e84827.setItem(v_4bfa33, JSON.stringify({ country: v_36caa3, ts: Date.now() }));
+            } catch {  }
         } catch (v_9e86fd) {
             console.warn('[ShopScreen] GPS detect failed, fallback KR:', v_9e86fd);
             v_9982dc(true);
@@ -393,10 +413,10 @@ export const v_10886b = () => {
     }, [v_9b57fc]);
 
     v_c4deb2(() => {
-        if (v_11083e === 'xrunStore' && v_b70da2 === null) {
+        if (v_11083e === 'xrunStore') {
             void v_add9f8();
         }
-    }, [v_11083e, v_b70da2, v_add9f8]);
+    }, [v_11083e, v_add9f8]);
 
     v_c4deb2(() => {
         if (v_11083e === 'xrunStore' && v_b70da2 !== null) {
