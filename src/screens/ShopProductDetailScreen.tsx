@@ -894,9 +894,9 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.cancelRefund')}</Text>
                             </View>
                             <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• 본 상품은 구매 즉시 발송되는 디지털 쿠폰(모바일 쿠폰/바코드)입니다.</Text>
-                                <Text style={styles.guideText}>• 쿠폰번호(PIN) 발행 후 사용 여부 확인이 불가능하므로 단순 변심에 의한 취소 및 환불은 불가능합니다.</Text>
-                                <Text style={styles.guideText}>• 상품 품절 등 교환 불가 사유 발생 시에만 100% 환불 처리됩니다.</Text>
+                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine1')}</Text>
+                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine2')}</Text>
+                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.cancelRefundLine3')}</Text>
                             </View>
                         </View>
 
@@ -908,8 +908,8 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.guideSubtitle')}</Text>
                             </View>
                             <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• 전국 교환처(해당 브랜드 매장)에서 결제 시 모바일 쿠폰을 제시해 주세요.</Text>
-                                <Text style={styles.guideText}>• 매장 재고에 따라 상품이 제공되지 않을 수 있으며, 이 경우 동일 가격 이상의 다른 상품으로 교환 가능합니다(차액 지불).</Text>
+                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.guideLine1')}</Text>
+                                <Text style={styles.guideText}>• {t('screens.shopProductDetail.guideLine2')}</Text>
                             </View>
                         </View>
                     </View>
