@@ -88,6 +88,19 @@ function v_02c692(item: v_20035e): ProductData {
 
 const v_4994d5 = 70;
 
+function v_e233cd(v_cd1446): string | null {
+    if (!v_cd1446) return null;
+    const v_fd5f43 = String(v_cd1446).trim();
+    if (!v_fd5f43) return null;
+    if (/^https?:\/\//i.test(v_fd5f43)) return v_fd5f43;
+    if (v_fd5f43.startsWith('/files/')) {
+
+        const v_389afb = v_fd5f43.slice('/files/'.length);
+        return `https://oth-path-f0013c.example.invalid/oth-path${v_389afb}`;
+    }
+    return v_fd5f43;
+}
+
 function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
     const v_56d99d = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
 
@@ -100,7 +113,8 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
         v_7be02f = Math.ceil(v_56d99d / v_b7ffba);
     }
 
-    const v_0158ad = v_b0e133 ? { uri: v_b0e133 } : null;
+    const v_364071 = v_e233cd(v_b0e133);
+    const v_0158ad = v_364071 ? { uri: v_364071 } : null;
     return {
         id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
 
@@ -109,7 +123,7 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
 
         description: (v_8c0b26 as any).description ?? undefined,
         price: v_7be02f,
-        image: v_8c0b26.imageUrl ? { uri: v_8c0b26.imageUrl } : (v_0158ad as any),
+        image: v_8c0b26.imageUrl ? { uri: v_e233cd(v_8c0b26.imageUrl) ?? v_8c0b26.imageUrl } : (v_0158ad as any),
         isXplayShop: true,
         isIak: (v_8c0b26 as any).source === 'iak',
         iakCategory: (v_8c0b26 as any).iakCategory ?? (v_8c0b26 as any).category ?? undefined,
