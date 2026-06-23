@@ -193,7 +193,8 @@ export const v_8c1d95 = () => {
                             type: 'iak' as const,
                             iakSn: v_8d41d7.iak_sn ?? undefined,
                             iakCustomerId: v_8d41d7.customer_id,
-                            sortKey: new Date(String(v_8d41d7.created_at)).getTime() || 0,
+
+                            sortKey: Number(String(v_8d41d7.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
                     })
                     : [];
