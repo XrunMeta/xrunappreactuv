@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: '复制完成。\n粘贴到您需要的位置。',
   alertVeryDangerTitle: '⚠️ 非常危险',
   alertVeryDangerMessage: '将以明文 (无加密) 保存私钥到 Google Drive。\n\n如有人获取此文件，可在无密码情况下转移钱包所有资产。\n\n确定继续吗?',
-  alertUnderstoodContinue: '我已理解，继续',
+  alertUnderstoodContinue: '继续',
   alertFinalConfirmTitle: '⚠️ 最终确认',
   alertFinalConfirmMessage: '明文 PK 将原样保存到 Drive。\n收到文件的人可立即转移资产。\n\n继续吗?',
   alertYesPlainSave: '是的，以明文保存',

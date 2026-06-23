@@ -714,7 +714,7 @@ export const WalletDetailScreen = () => {
     }
 
     if (!gopaxPrice) {
-      return `⏳ ${t('screens.walletDetail.priceUpdating')}`;
+      return t('screens.walletDetail.priceUpdating');
     }
 
     try {
@@ -730,7 +730,7 @@ export const WalletDetailScreen = () => {
       return `KRW ${formattedInteger}`;
     } catch (error) {
       console.error('[WalletDetail] KRW 금액 계산 오류:', error);
-      return `⏳ ${t('screens.walletDetail.priceUpdating')}`;
+      return t('screens.walletDetail.priceUpdating');
     }
   }, [selectedWalletAsset, gopaxPrice, t]);
 

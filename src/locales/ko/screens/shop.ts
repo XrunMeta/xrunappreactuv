@@ -14,6 +14,8 @@ export default {
   pendingShort: '대기중',
   completedShort: '구매 완료',
   shopBrand: '쇼핑',
+  giftBrand: '기프티콘',
+  iakBrand: '충전',
   thankYou: '구매 완료',
   noPurchasedCoupons: '구매한 쿠폰이 없습니다.',
   loadingGiftList: '기프티콘 목록 불러오는 중...',

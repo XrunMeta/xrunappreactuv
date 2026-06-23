@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'कॉपी पूर्ण।\nजहाँ आवश्यक हो वहाँ पेस्ट करें।',
   alertVeryDangerTitle: '⚠️ बहुत खतरनाक',
   alertVeryDangerMessage: 'यह आपकी निजी कुंजी को सादे रूप में (बिना एन्क्रिप्शन) Google Drive पर सहेजता है।\n\nयदि कोई इस फ़ाइल को प्राप्त करता है, तो वे बिना पासवर्ड के आपकी वॉलेट की सभी संपत्ति स्थानांतरित कर सकते हैं।\n\nक्या आप वास्तव में आगे बढ़ना चाहते हैं?',
-  alertUnderstoodContinue: 'मैं समझ गया, जारी रखें',
+  alertUnderstoodContinue: 'जारी रखें',
   alertFinalConfirmTitle: '⚠️ अंतिम पुष्टि',
   alertFinalConfirmMessage: 'सादा PK Drive पर वैसे ही सहेजा जाएगा।\nफ़ाइल प्राप्त करने वाला तुरंत संपत्ति स्थानांतरित कर सकता है।\n\nजारी रखें?',
   alertYesPlainSave: 'हाँ, सादे रूप में सहेजें',

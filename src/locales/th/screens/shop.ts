@@ -14,6 +14,8 @@ export default {
   pendingShort: 'รอดำเนินการ',
   completedShort: 'ซื้อสำเร็จ',
   shopBrand: 'ช้อปปิ้ง',
+  giftBrand: 'บัตรของขวัญ',
+  iakBrand: 'เติมเงิน',
   thankYou: 'ขอบคุณ',
   noPurchasedCoupons: 'ไม่มีคูปองที่ซื้อ',
   loadingGiftList: 'กำลังโหลดรายการบัตรของขวัญ...',

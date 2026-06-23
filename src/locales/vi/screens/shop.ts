@@ -14,6 +14,8 @@ export default {
   pendingShort: 'Đang chờ',
   completedShort: 'Hoàn tất',
   shopBrand: 'Mua sắm',
+  giftBrand: 'Gift card',
+  iakBrand: 'Nạp tiền',
   thankYou: 'Cảm ơn',
   noPurchasedCoupons: 'Chưa có phiếu mua hàng.',
   loadingGiftList: 'Đang tải danh sách thẻ quà tặng...',

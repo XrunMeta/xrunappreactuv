@@ -14,6 +14,8 @@ export default {
   pendingShort: '待发送',
   completedShort: '购买完成',
   shopBrand: '购物',
+  giftBrand: '礼品券',
+  iakBrand: '充值',
   thankYou: '谢谢',
   noPurchasedCoupons: '暂无购买的优惠券。',
   loadingGiftList: '正在加载礼品券列表...',

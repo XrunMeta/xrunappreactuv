@@ -102,7 +102,8 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
     const fallbackImage = defaultImageUri ? { uri: defaultImageUri } : sampleCU;
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
-        brand: (item as any).brandName ?? '기프티콘',
+
+        brand: (item as any).brandName ?? (item as any).brand ?? '',
         title: item.name ?? '-',
         price: xrunPrice,
         image: item.imageUrl ? { uri: item.imageUrl } : fallbackImage,
@@ -571,7 +572,7 @@ export const ShopScreen = () => {
                     )}
                 </View>
                 <View style={styles.productInfo}>
-                    <Text style={styles.productBrand}>{product.brand}</Text>
+                    <Text style={styles.productBrand}>{product.brand || (product.isIak ? t('screens.shop.iakBrand') : t('screens.shop.giftBrand'))}</Text>
                     <Text style={styles.productTitle} numberOfLines={2}>
                         {product.title}
                     </Text>

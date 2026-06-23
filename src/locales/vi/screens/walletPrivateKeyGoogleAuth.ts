@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'Sao chép hoàn tất.\nDán vào nơi bạn cần.',
   alertVeryDangerTitle: '⚠️ Rất Nguy hiểm',
   alertVeryDangerMessage: 'Điều này lưu khóa riêng của bạn dưới dạng văn bản thuần (không mã hóa) vào Google Drive.\n\nNếu có ai nhận được file này, họ có thể chuyển tất cả tài sản ví của bạn mà không cần mật khẩu.\n\nBạn thực sự muốn tiếp tục?',
-  alertUnderstoodContinue: 'Tôi hiểu, tiếp tục',
+  alertUnderstoodContinue: 'Tiếp tục',
   alertFinalConfirmTitle: '⚠️ Xác nhận Cuối cùng',
   alertFinalConfirmMessage: 'PK văn bản thuần sẽ được lưu nguyên trạng trên Drive.\nBất kỳ ai nhận được file có thể chuyển tài sản ngay lập tức.\n\nTiếp tục?',
   alertYesPlainSave: 'Có, lưu dưới dạng văn bản thuần',
