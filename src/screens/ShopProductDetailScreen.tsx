@@ -935,34 +935,22 @@ export const v_a59951 = () => {
                         )}
 
                         {}
-                        {v_32eda7 === 'guide' && (<>
-                        <View style={v_d81136.guideItem}>
-                            <View style={v_d81136.guideItemHeader}>
-                                <View style={v_d81136.guideNumber}>
-                                    <Text style={v_d81136.guideNumberText}>1</Text>
-                                </View>
-                                <Text style={v_d81136.guideSubtitle}>{v_8d41d7('screens.shopProductDetail.cancelRefund')}</Text>
-                            </View>
-                            <View style={v_d81136.guideTextContainer}>
-                                <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine1')}</Text>
-                                <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine2')}</Text>
-                                <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine3')}</Text>
-                            </View>
-                        </View>
+                        {v_32eda7 === 'guide' && (
+                            <View style={{ paddingTop: 16 }}>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {v_8d41d7('screens.shopProductDetail.cancelRefund')}
+                                </Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine1')}</Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine2')}</Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 16 }]}>• {v_8d41d7('screens.shopProductDetail.cancelRefundLine3')}</Text>
 
-                        <View style={v_d81136.guideItem}>
-                            <View style={v_d81136.guideItemHeader}>
-                                <View style={v_d81136.guideNumber}>
-                                    <Text style={v_d81136.guideNumberText}>2</Text>
-                                </View>
-                                <Text style={v_d81136.guideSubtitle}>{v_8d41d7('screens.shopProductDetail.guideSubtitle')}</Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {v_8d41d7('screens.shopProductDetail.guideSubtitle')}
+                                </Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {v_8d41d7('screens.shopProductDetail.guideLine1')}</Text>
+                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {v_8d41d7('screens.shopProductDetail.guideLine2')}</Text>
                             </View>
-                            <View style={v_d81136.guideTextContainer}>
-                                <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.guideLine1')}</Text>
-                                <Text style={v_d81136.guideText}>• {v_8d41d7('screens.shopProductDetail.guideLine2')}</Text>
-                            </View>
-                        </View>
-                        </>)}
+                        )}
                     </View>
                 </View>
             </SafeScrollView>
