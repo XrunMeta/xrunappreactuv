@@ -947,8 +947,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#f2f2f2',
     },
     productImage: {
-        width: '100%',
-        height: '100%',
+
+        width: '90%',
+        height: '90%',
+        alignSelf: 'center',
+        marginTop: '5%',
     },
     imageDescriptionOverlay: {
         position: 'absolute',
