@@ -25,7 +25,7 @@ export default {
   cancelRefundLine2: 'After PIN is issued, usage cannot be verified, so cancellation/refund due to change of mind is not possible.',
   cancelRefundLine3: '100% refund is processed only if exchange is not possible (e.g. out of stock).',
   guideSubtitle: 'How to Use',
-  guideLine1: 'Please present the mobile coupon at participating exchange stores (the brand''s stores) when paying.',
+  guideLine1: "Please present the mobile coupon at participating exchange stores (the brand's stores) when paying.",
   guideLine2: 'Depending on store stock, the product may not be available — in that case it can be exchanged for another product of equal or higher value (with difference paid).',
   purchaseButton: 'Purchase',
   processing: 'Processing...',
