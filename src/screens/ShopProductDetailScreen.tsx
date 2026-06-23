@@ -38,6 +38,17 @@ interface ProductDetailData {
     image: ImageSourcePropType;
     isXrun?: boolean;
     isIak?: boolean;  
+    iakCategory?: string | null;  
+}
+
+type IakInputKind = 'phone' | 'game_id' | 'meter' | 'generic';
+function getIakInputKind(category?: string | null): IakInputKind {
+    if (!category) return 'phone';
+    const c = String(category).toLowerCase();
+    if (c === 'game') return 'game_id';
+    if (c === 'pln') return 'meter';
+
+    return 'phone';
 }
 
 const defaultProductFallback: ProductDetailData = {
@@ -70,7 +81,9 @@ export const ShopProductDetailScreen = () => {
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
         isIak: (selectedShopItem as any).isIak || false,
+        iakCategory: (selectedShopItem as any).iakCategory ?? null,
     } : defaultProductFallback;
+    const iakInputKind: IakInputKind = product.isIak ? getIakInputKind(product.iakCategory) : 'phone';
 
     const isExchangeProduct = false;
 
@@ -612,11 +625,14 @@ export const ShopProductDetailScreen = () => {
         navigate(ROUTES.shopMyItems);
     };
 
+    const inputPrefix = iakInputKind === 'game_id' ? 'gameId' : iakInputKind === 'meter' ? 'meter' : 'phone';
+    const tkInput = useCallback((suffix: string) => `screens.shop.iak.${inputPrefix}${suffix}`, [inputPrefix]);
+    const customerLabel = t(tkInput('Label'));
     const handleIakPurchase = useCallback(async () => {
         if (!member || iakPurchaseLoading) return;
         const phone = iakPhone.trim();
         if (!phone) {
-            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.phoneRequired'), [{ text: t('screens.shop.iak.ok') }]);
+            showAlert(t('screens.shop.iak.notice'), t(tkInput('Required')), [{ text: t('screens.shop.iak.ok') }]);
             return;
         }
         if (xrunBalanceState === null || xrunBalanceLoading) {
@@ -629,7 +645,7 @@ export const ShopProductDetailScreen = () => {
         }
         showAlert(
             t('screens.shop.iak.purchaseConfirmTitle'),
-            t('screens.shop.iak.purchaseConfirmMessage', { title: product.title, price: product.price, phone }),
+            t('screens.shop.iak.purchaseConfirmMessage', { title: product.title, price: product.price, label: customerLabel, customer: phone, phone }),
             [
                 { text: t('screens.shop.iak.cancel') },
                 {
@@ -696,7 +712,7 @@ export const ShopProductDetailScreen = () => {
                     },
                 },
             ]);
-    }, [t, member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance]);
+    }, [t, member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance, tkInput, customerLabel]);
 
     const handleIakSuccessClose = () => {
         setIakSuccessVisible(false);
@@ -996,16 +1012,16 @@ export const ShopProductDetailScreen = () => {
                 >
                     <View style={[styles.paymentSuccessModal, { paddingTop: 24 }]}>
                         <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
-                            {t('screens.shop.iak.phoneModalTitle')}
+                            {t(tkInput('ModalTitle'))}
                         </Text>
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
-                            {t('screens.shop.iak.phoneModalDesc')}
+                            {t(tkInput('ModalDesc'))}
                         </Text>
                         <TextInput
                             value={iakPhone}
                             onChangeText={setIakPhone}
-                            placeholder={t('screens.shop.iak.phonePlaceholder')}
-                            keyboardType="phone-pad"
+                            placeholder={t(tkInput('Placeholder'))}
+                            keyboardType={iakInputKind === 'game_id' ? 'numeric' : 'phone-pad'}
                             autoFocus
                             style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
                         />
@@ -1125,7 +1141,7 @@ export const ShopProductDetailScreen = () => {
                             if (kind === 'iak') {
 
                                 const customerId = purchaseCtx.iakCustomerId ?? '';
-                                if (!customerId) throw new Error(t('screens.shop.iak.phoneRequired'));
+                                if (!customerId) throw new Error(t(tkInput('Required')));
                                 const prep = await purchaseIakPrepare(member!, String(product.id), navigate);
                                 if (prep?.status !== 'success' || !prep.data?.[0]) {
                                     throw new Error(prep?.message || 'IAK prepare 실패');

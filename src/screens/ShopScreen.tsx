@@ -36,6 +36,8 @@ interface ProductData {
     isXplayShop?: boolean;
 
     isIak?: boolean;
+
+    iakCategory?: string;
 }
 
 const sampleProducts: ProductData[] = [
@@ -105,6 +107,7 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number):
         image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
         isXplayShop: true,
         isIak: (item as any).source === 'iak',
+        iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
     };
 }
 
@@ -326,6 +329,8 @@ export const ShopScreen = () => {
                 imageUrl: g.goods_image,
 
                 source: shopCountry === 'ID' ? 'iak' : 'kr_giftishow',
+
+                iakCategory: shopCountry === 'ID' ? (g.category ?? null) : null,
             }));
             setXplayProductList(list as any);
             console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');
@@ -489,6 +494,7 @@ export const ShopScreen = () => {
             shopTab: product.isXplayShop ? ('xplayShop' as const) : undefined,
 
             isIak: product.isIak ?? false,
+            iakCategory: product.iakCategory ?? null,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopProductDetail);
