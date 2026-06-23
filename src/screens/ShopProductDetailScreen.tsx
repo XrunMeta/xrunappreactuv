@@ -783,10 +783,7 @@ export const v_a59951 = () => {
                             <Text style={[v_d81136.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{v_ba7f97}</Text>
                             {}
                             {!v_d0d89e && (
-                                <View style={v_d81136.detailPriceBox}>
-                                    <Image source={v_33c40c} style={v_d81136.coinIcon} resizeMode="contain" />
-                                    <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
-                                </View>
+                                <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
                             {v_d0206c ? (
@@ -1523,22 +1520,13 @@ const v_d81136 = v_472849.create({
         letterSpacing: -0.3,
     },
 
-    detailPriceBox: {
-        marginTop: 14,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        backgroundColor: '#F3F4F6',
-        borderRadius: 8,
-        alignSelf: 'flex-start',
-    },
     detailPriceText: {
-        fontSize: 16,
+        marginTop: 10,
+        fontSize: 22,
         fontWeight: '700',
-        color: '#1E3A5F',
+        color: '#111827',
         fontFamily: 'Roboto-Bold',
+        alignSelf: 'flex-start',
     },
     productDescription: {
         marginTop: 12,
