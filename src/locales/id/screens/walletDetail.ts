@@ -14,6 +14,18 @@ export default {
   shop: 'Toko',
   other: 'Lainnya',
   priceUpdating: 'Memperbarui info harga',
+  cat_gift_purchase: 'Pembelian gift card',
+  cat_refund: 'Pengembalian dana',
+  cat_attendance: 'Absensi',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'Penyelesaian AR',
+  cat_ar_settle_pocr: 'Penyelesaian AR 1',
+  cat_ar_settle_nas: 'Penyelesaian AR 2',
+  cat_referral_settle: 'Penyelesaian referral',
+  cat_recommender_reward: 'Hadiah referrer',
+  cat_signup_reward: 'Hadiah pendaftaran',
+  cat_afterlife: 'Afterlife',
 };
 
 

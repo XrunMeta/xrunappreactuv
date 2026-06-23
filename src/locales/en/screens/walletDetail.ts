@@ -14,6 +14,18 @@ export default {
   shop: 'Shop',
   other: 'Other',
   priceUpdating: 'Updating price info',
+  cat_gift_purchase: 'Gift purchase',
+  cat_refund: 'Refund',
+  cat_attendance: 'Attendance',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'AR Ad Settlement',
+  cat_ar_settle_pocr: 'AR Ad Settlement 1',
+  cat_ar_settle_nas: 'AR Ad Settlement 2',
+  cat_referral_settle: 'Referral Settlement',
+  cat_recommender_reward: 'Recommender Reward',
+  cat_signup_reward: 'Signup Reward',
+  cat_afterlife: 'Afterlife',
 };
 
 

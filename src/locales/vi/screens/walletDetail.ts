@@ -14,6 +14,18 @@ export default {
   shop: 'Shop',
   other: 'Other',
   priceUpdating: 'Đang cập nhật giá',
+  cat_gift_purchase: 'Mua phiếu quà',
+  cat_refund: 'Hoàn tiền',
+  cat_attendance: 'Điểm danh',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'Thanh toán AR',
+  cat_ar_settle_pocr: 'Thanh toán AR 1',
+  cat_ar_settle_nas: 'Thanh toán AR 2',
+  cat_referral_settle: 'Thanh toán giới thiệu',
+  cat_recommender_reward: 'Thưởng giới thiệu',
+  cat_signup_reward: 'Thưởng đăng ký',
+  cat_afterlife: 'Afterlife',
 };
 
 

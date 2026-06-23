@@ -14,6 +14,18 @@ export default {
   shop: '상점',
   other: '기타',
   priceUpdating: '가격 정보 갱신 중',
+  cat_gift_purchase: '기프티콘 구매',
+  cat_refund: '환불',
+  cat_attendance: '출석체크',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'AR광고 정산',
+  cat_ar_settle_pocr: 'AR광고 정산1',
+  cat_ar_settle_nas: 'AR광고 정산2',
+  cat_referral_settle: '레퍼럴 정산',
+  cat_recommender_reward: '추천인 보상',
+  cat_signup_reward: '신규가입 보상',
+  cat_afterlife: '애프터라이프',
 };
 
 

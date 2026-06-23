@@ -440,7 +440,13 @@ export const WalletDetailScreen = () => {
 
           const onchainCategory = (item as any).category as string | undefined;
           if (onchainCategory && onchainCategory.trim()) {
-            actionType = onchainCategory.trim();
+            const trimmed = onchainCategory.trim();
+            if (trimmed.startsWith('cat:')) {
+              const key = trimmed.slice(4);
+              actionType = t(`screens.walletDetail.cat_${key}`);
+            } else {
+              actionType = trimmed;
+            }
           }
 
           const amountInEth = weiToEth(item.value, item.tokenDecimal);
