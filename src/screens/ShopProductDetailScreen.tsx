@@ -1509,7 +1509,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         color: '#6B7280',
         lineHeight: 20,
-        textAlign: 'center',
+
+        textAlign: 'left',
     },
     detailLoadingWrap: {
         position: 'absolute',
