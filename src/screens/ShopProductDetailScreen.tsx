@@ -284,7 +284,7 @@ export const ShopProductDetailScreen = () => {
                 t('screens.shopProductDetail.alerts.notification'),
                 t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
                 [
-                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.map) },
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.xplayInfo) },
                     { text: t('screens.shopProductDetail.confirm') },
                 ],
             );
@@ -667,7 +667,7 @@ export const ShopProductDetailScreen = () => {
                 t('screens.shop.iak.notice'),
                 t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
                 [
-                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.map) },
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.xplayInfo) },
                     { text: t('screens.shop.iak.ok') },
                 ],
             );
