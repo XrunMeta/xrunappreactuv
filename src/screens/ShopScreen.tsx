@@ -1031,9 +1031,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontFamily: 'Roboto-Bold',
         color: '#101828',
-        marginBottom: 8,
+
+        marginBottom: 6,
         lineHeight: 20,
-        height: 60, 
     },
     productFooter: {
         flexDirection: 'row',
