@@ -105,6 +105,11 @@ export const v_a59951 = () => {
     const [v_32eda7, v_047920] = v_5ab095<'desc' | 'guide'>('desc');
 
     const [v_1de7ee, v_c488ef] = v_5ab095(false);
+    const [v_a27651, v_da5eb5] = v_5ab095<(() => void) | null>(null);
+    const v_e78315 = v_de06a3((v_e2be2d) => {
+        v_da5eb5(() => v_e2be2d);
+        v_c488ef(true);
+    }, []);
 
     v_c4deb2(() => {
         const v_1ae212 = v_1ed974.addEventListener('hardwareBackPress', () => {
@@ -848,31 +853,39 @@ export const v_a59951 = () => {
                         </TouchableOpacity>
                     )}
 
-                    {}
+                    {
+}
+                    {(() => {
+                        const v_4acbf9 = !!(v_d0206c || v_01bee9.description);
+
+                        const v_dbeca6 = v_4acbf9 ? v_32eda7 : 'guide';
+                        return (
                     <View style={v_d81136.guideCard}>
                         <View style={v_d81136.tabRow}>
-                            <TouchableOpacity
-                                onPress={() => v_047920('desc')}
-                                style={[v_d81136.tabButton, v_32eda7 === 'desc' && v_d81136.tabButtonActive]}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={[v_d81136.tabButtonText, v_32eda7 === 'desc' && v_d81136.tabButtonTextActive]}>
-                                    {v_8d41d7('screens.shopProductDetail.tabDescription')}
-                                </Text>
-                            </TouchableOpacity>
+                            {v_4acbf9 && (
+                                <TouchableOpacity
+                                    onPress={() => v_047920('desc')}
+                                    style={[v_d81136.tabButton, v_dbeca6 === 'desc' && v_d81136.tabButtonActive]}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[v_d81136.tabButtonText, v_dbeca6 === 'desc' && v_d81136.tabButtonTextActive]}>
+                                        {v_8d41d7('screens.shopProductDetail.tabDescription')}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
                             <TouchableOpacity
                                 onPress={() => v_047920('guide')}
-                                style={[v_d81136.tabButton, v_32eda7 === 'guide' && v_d81136.tabButtonActive]}
+                                style={[v_d81136.tabButton, v_dbeca6 === 'guide' && v_d81136.tabButtonActive]}
                                 activeOpacity={0.8}
                             >
-                                <Text style={[v_d81136.tabButtonText, v_32eda7 === 'guide' && v_d81136.tabButtonTextActive]}>
+                                <Text style={[v_d81136.tabButtonText, v_dbeca6 === 'guide' && v_d81136.tabButtonTextActive]}>
                                     {v_8d41d7('screens.shopProductDetail.tabGuide')}
                                 </Text>
                             </TouchableOpacity>
                         </View>
 
                         {}
-                        {v_32eda7 === 'desc' && (v_d0206c || v_01bee9.description) && (
+                        {v_dbeca6 === 'desc' && v_4acbf9 && (
                             <View style={{ paddingTop: 16 }}>
                                 {v_d0206c ? (
                                     <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
@@ -887,7 +900,7 @@ export const v_a59951 = () => {
                         )}
 
                         {}
-                        {v_32eda7 === 'guide' && (
+                        {v_dbeca6 === 'guide' && (
                             <View style={{ paddingTop: 16 }}>
                                 <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
                                     {v_8d41d7('screens.shopProductDetail.cancelRefund')}
@@ -904,6 +917,8 @@ export const v_a59951 = () => {
                             </View>
                         )}
                     </View>
+                        );
+                    })()}
                 </View>
             </SafeScrollView>
 
@@ -914,7 +929,7 @@ export const v_a59951 = () => {
 
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_673bf2 && v_d81136.purchaseButtonDisabled]}
-                        onPress={() => { v_23d029(''); v_37f2b0(true); }}
+                        onPress={() => v_e78315(() => { v_23d029(''); v_37f2b0(true); })}
                         disabled={v_673bf2 || v_660822 == null}
                         activeOpacity={0.8}
                     >
@@ -933,7 +948,7 @@ export const v_a59951 = () => {
                 ) : v_5db874 ? (
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
-                        onPress={v_b000c1}
+                        onPress={() => v_e78315(v_b000c1)}
                         disabled={v_18a900 || v_837630 || v_660822 == null}
                         activeOpacity={0.8}
                     >
@@ -1027,13 +1042,38 @@ export const v_a59951 = () => {
                                     : `${v_512b94.toLocaleString()} XRUN`}
                             </Text>
                         </View>
-                        <TouchableOpacity
-                            onPress={() => v_c488ef(false)}
-                            style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
-                        </TouchableOpacity>
+                        {}
+                        {v_a27651 ? (
+                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
+                                <TouchableOpacity
+                                    onPress={() => { v_da5eb5(null); v_c488ef(false); }}
+                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{ color: '#374151', fontWeight: '600' }}>{v_8d41d7('screens.shop.iak.cancel')}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const v_16dbdb = v_a27651;
+                                        v_da5eb5(null);
+                                        v_c488ef(false);
+                                        v_16dbdb();
+                                    }}
+                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shopProductDetail.purchaseButton')}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <TouchableOpacity
+                                onPress={() => v_c488ef(false)}
+                                style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
+                            </TouchableOpacity>
+                        )}
                     </TouchableOpacity>
                 </TouchableOpacity>
             </Modal>
