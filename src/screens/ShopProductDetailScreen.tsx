@@ -1475,6 +1475,8 @@ const v_d81136 = v_472849.create({
     productImage: {
         width: '100%',
         height: '100%',
+
+        borderRadius: 16,
     },
     productInfoContainer: {
         alignItems: 'center',
