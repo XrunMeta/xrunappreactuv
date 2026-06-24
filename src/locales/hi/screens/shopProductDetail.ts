@@ -15,6 +15,7 @@ export default {
   paymentAmount: 'भुगतान राशि',
   purchaseCompleteInfo: 'खरीद की जानकारी',
   purchaseDateLabel: 'खरीद की तारीख',
+  balanceShort: 'शेष',
   myXRUNBalance: 'मेरा XRUN बैलेंस',
   remainingXRUN: 'खरीद के बाद XRUN',
   myXrunBalance: 'मेरा XRUN बैलेंस',

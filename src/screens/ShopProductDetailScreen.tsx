@@ -793,16 +793,7 @@ export const ShopProductDetailScreen = () => {
                             <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
                             {}
                             {!isPurchasedView && (
-                                <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', marginTop: 10 }}>
-                                    <Text style={[styles.detailPriceText, { marginTop: 0 }]}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
-                                    <Text style={styles.detailPriceHolding}>
-                                        {`  ${t('screens.shopProductDetail.myXrunBalance')}: ${
-                                            isXplayShop
-                                                ? (xrunBalanceState == null ? '-' : xrunBalanceState.toLocaleString())
-                                                : xrunBalance.toLocaleString()
-                                        } XRUN`}
-                                    </Text>
-                                </View>
+                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
                             {descLines > 9999 && null}
@@ -847,7 +838,9 @@ export const ShopProductDetailScreen = () => {
                     {
 }
                     {(() => {
-                        const hasDesc = !!(hasDetailDescription || product.description);
+                        const descStr = String(product.description ?? '').trim();
+                        const isPlaceholder = descStr === '' || descStr === '-';
+                        const hasDesc = !!(hasDetailDescription || (product.description && !isPlaceholder));
 
                         const effectiveTab: 'desc' | 'guide' = hasDesc ? detailTab : 'guide';
                         return (
@@ -916,6 +909,14 @@ export const ShopProductDetailScreen = () => {
             {}
             {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
+                {}
+                <Text style={styles.bottomBalanceText}>
+                    {`${t('screens.shopProductDetail.balanceShort')}: ${
+                        isXplayShop
+                            ? (xrunBalanceState == null ? '-' : xrunBalanceState.toLocaleString())
+                            : xrunBalance.toLocaleString()
+                    } XRUN`}
+                </Text>
                 {product.isIak ? (
 
                     <TouchableOpacity
@@ -1499,10 +1500,11 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
 
-    detailPriceHolding: {
-        fontSize: 12,
+    bottomBalanceText: {
+        fontSize: 13,
         color: '#6B7280',
-        marginLeft: 6,
+        marginBottom: 10,
+        textAlign: 'right',
     },
 
     tabRow: {

@@ -15,6 +15,7 @@ export default {
   paymentAmount: 'Payment Amount',
   purchaseCompleteInfo: 'ข้อมูลการซื้อสำเร็จ',
   purchaseDateLabel: 'วันที่ซื้อ',
+  balanceShort: 'ยอดคงเหลือ',
   myXRUNBalance: 'My XRUN Balance',
   remainingXRUN: 'XRUN After Purchase',
   myXrunBalance: 'My XRUN Balance',
