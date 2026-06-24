@@ -793,16 +793,7 @@ export const v_a59951 = () => {
                             <Text style={[v_d81136.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{v_ba7f97}</Text>
                             {}
                             {!v_d0d89e && (
-                                <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', marginTop: 10 }}>
-                                    <Text style={[v_d81136.detailPriceText, { marginTop: 0 }]}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
-                                    <Text style={v_d81136.detailPriceHolding}>
-                                        {`  ${v_8d41d7('screens.shopProductDetail.myXrunBalance')}: ${
-                                            v_5db874
-                                                ? (v_a1c497 == null ? '-' : v_a1c497.toLocaleString())
-                                                : v_1d54f1.toLocaleString()
-                                        } XRUN`}
-                                    </Text>
-                                </View>
+                                <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
                             )}
                             {}
                             {v_25cfbb > 9999 && null}
@@ -847,7 +838,9 @@ export const v_a59951 = () => {
                     {
 }
                     {(() => {
-                        const v_4acbf9 = !!(v_d0206c || v_01bee9.description);
+                        const v_620603 = String(v_01bee9.description ?? '').trim();
+                        const v_87a4e3 = v_620603 === '' || v_620603 === '-';
+                        const v_4acbf9 = !!(v_d0206c || (v_01bee9.description && !v_87a4e3));
 
                         const v_dbeca6 = v_4acbf9 ? v_32eda7 : 'guide';
                         return (
@@ -916,6 +909,14 @@ export const v_a59951 = () => {
             {}
             {!v_d0d89e && (
             <View style={[v_d81136.buttonContainer, { paddingBottom: v_365f44 + 20 }]}>
+                {}
+                <Text style={v_d81136.bottomBalanceText}>
+                    {`${v_8d41d7('screens.shopProductDetail.balanceShort')}: ${
+                        v_5db874
+                            ? (v_a1c497 == null ? '-' : v_a1c497.toLocaleString())
+                            : v_1d54f1.toLocaleString()
+                    } XRUN`}
+                </Text>
                 {v_01bee9.isIak ? (
 
                     <TouchableOpacity
@@ -1499,10 +1500,11 @@ const v_d81136 = v_472849.create({
         letterSpacing: -0.3,
     },
 
-    detailPriceHolding: {
-        fontSize: 12,
+    bottomBalanceText: {
+        fontSize: 13,
         color: '#6B7280',
-        marginLeft: 6,
+        marginBottom: 10,
+        textAlign: 'right',
     },
 
     tabRow: {

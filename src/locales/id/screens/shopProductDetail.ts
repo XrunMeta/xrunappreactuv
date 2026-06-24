@@ -15,6 +15,7 @@ export default {
   paymentAmount: 'Jumlah Pembayaran',
   purchaseCompleteInfo: 'Info pembelian',
   purchaseDateLabel: 'Tanggal pembelian',
+  balanceShort: 'Saldo',
   myXRUNBalance: 'Saldo XRUN',
   remainingXRUN: 'XRUN Setelah Beli',
   myXrunBalance: 'Saldo XRUN',

@@ -15,6 +15,7 @@ export default {
   paymentAmount: '결제금액',
   purchaseCompleteInfo: '구매 완료 정보',
   purchaseDateLabel: '구매일',
+  balanceShort: '잔액',
   myXRUNBalance: '내 XRUN 잔액',
   remainingXRUN: '구매 후 잔여 XRUN',
   myXrunBalance: '내보유 XRUN',

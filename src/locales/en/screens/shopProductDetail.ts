@@ -15,6 +15,7 @@ export default {
   paymentAmount: 'Payment Amount',
   purchaseCompleteInfo: 'Purchase complete',
   purchaseDateLabel: 'Purchase date',
+  balanceShort: 'Balance',
   myXRUNBalance: 'My XRUN Balance',
   remainingXRUN: 'XRUN After Purchase',
   myXrunBalance: 'My XRUN Balance',
