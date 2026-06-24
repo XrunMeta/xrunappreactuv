@@ -991,13 +991,13 @@ const styles = StyleSheet.create({
     },
     productImageContainer: {
         width: '100%',
-        height: 128,
+
+        aspectRatio: 1,
         borderBottomWidth: 1.108,
         borderBottomColor: '#e2e2e2',
         backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
-
         borderTopLeftRadius: 8,
         borderTopRightRadius: 8,
     },
