@@ -284,7 +284,7 @@ export const v_a59951 = () => {
                 v_8d41d7('screens.shopProductDetail.alerts.notification'),
                 v_8d41d7('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage: v_ff3b79 }),
                 [
-                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.map) },
+                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.xplayInfo) },
                     { text: v_8d41d7('screens.shopProductDetail.confirm') },
                 ],
             );
@@ -667,7 +667,7 @@ export const v_a59951 = () => {
                 v_8d41d7('screens.shop.iak.notice'),
                 v_8d41d7('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage: v_ff3b79 }),
                 [
-                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.map) },
+                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.xplayInfo) },
                     { text: v_8d41d7('screens.shop.iak.ok') },
                 ],
             );
