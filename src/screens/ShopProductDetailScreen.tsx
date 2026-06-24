@@ -105,6 +105,11 @@ export const ShopProductDetailScreen = () => {
     const [detailTab, setDetailTab] = useState<'desc' | 'guide'>('desc');
 
     const [paymentInfoModalVisible, setPaymentInfoModalVisible] = useState(false);
+    const [paymentInfoOnConfirm, setPaymentInfoOnConfirm] = useState<(() => void) | null>(null);
+    const openPaymentInfoModal = useCallback((onConfirm: () => void) => {
+        setPaymentInfoOnConfirm(() => onConfirm);
+        setPaymentInfoModalVisible(true);
+    }, []);
 
     useEffect(() => {
         const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -848,31 +853,39 @@ export const ShopProductDetailScreen = () => {
                         </TouchableOpacity>
                     )}
 
-                    {}
+                    {
+}
+                    {(() => {
+                        const hasDesc = !!(hasDetailDescription || product.description);
+
+                        const effectiveTab: 'desc' | 'guide' = hasDesc ? detailTab : 'guide';
+                        return (
                     <View style={styles.guideCard}>
                         <View style={styles.tabRow}>
-                            <TouchableOpacity
-                                onPress={() => setDetailTab('desc')}
-                                style={[styles.tabButton, detailTab === 'desc' && styles.tabButtonActive]}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={[styles.tabButtonText, detailTab === 'desc' && styles.tabButtonTextActive]}>
-                                    {t('screens.shopProductDetail.tabDescription')}
-                                </Text>
-                            </TouchableOpacity>
+                            {hasDesc && (
+                                <TouchableOpacity
+                                    onPress={() => setDetailTab('desc')}
+                                    style={[styles.tabButton, effectiveTab === 'desc' && styles.tabButtonActive]}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[styles.tabButtonText, effectiveTab === 'desc' && styles.tabButtonTextActive]}>
+                                        {t('screens.shopProductDetail.tabDescription')}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
                             <TouchableOpacity
                                 onPress={() => setDetailTab('guide')}
-                                style={[styles.tabButton, detailTab === 'guide' && styles.tabButtonActive]}
+                                style={[styles.tabButton, effectiveTab === 'guide' && styles.tabButtonActive]}
                                 activeOpacity={0.8}
                             >
-                                <Text style={[styles.tabButtonText, detailTab === 'guide' && styles.tabButtonTextActive]}>
+                                <Text style={[styles.tabButtonText, effectiveTab === 'guide' && styles.tabButtonTextActive]}>
                                     {t('screens.shopProductDetail.tabGuide')}
                                 </Text>
                             </TouchableOpacity>
                         </View>
 
                         {}
-                        {detailTab === 'desc' && (hasDetailDescription || product.description) && (
+                        {effectiveTab === 'desc' && hasDesc && (
                             <View style={{ paddingTop: 16 }}>
                                 {hasDetailDescription ? (
                                     <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
@@ -887,7 +900,7 @@ export const ShopProductDetailScreen = () => {
                         )}
 
                         {}
-                        {detailTab === 'guide' && (
+                        {effectiveTab === 'guide' && (
                             <View style={{ paddingTop: 16 }}>
                                 <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
                                     {t('screens.shopProductDetail.cancelRefund')}
@@ -904,6 +917,8 @@ export const ShopProductDetailScreen = () => {
                             </View>
                         )}
                     </View>
+                        );
+                    })()}
                 </View>
             </SafeScrollView>
 
@@ -914,7 +929,7 @@ export const ShopProductDetailScreen = () => {
 
                     <TouchableOpacity
                         style={[styles.purchaseButton, iakPurchaseLoading && styles.purchaseButtonDisabled]}
-                        onPress={() => { setIakPhone(''); setIakPhoneModalVisible(true); }}
+                        onPress={() => openPaymentInfoModal(() => { setIakPhone(''); setIakPhoneModalVisible(true); })}
                         disabled={iakPurchaseLoading || member == null}
                         activeOpacity={0.8}
                     >
@@ -933,7 +948,7 @@ export const ShopProductDetailScreen = () => {
                 ) : isXplayShop ? (
                     <TouchableOpacity
                         style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
-                        onPress={handleXplayPurchase}
+                        onPress={() => openPaymentInfoModal(handleXplayPurchase)}
                         disabled={xplayPurchaseLoading || xplayBalanceLoading || member == null}
                         activeOpacity={0.8}
                     >
@@ -1027,13 +1042,38 @@ export const ShopProductDetailScreen = () => {
                                     : `${remainingBalance.toLocaleString()} XRUN`}
                             </Text>
                         </View>
-                        <TouchableOpacity
-                            onPress={() => setPaymentInfoModalVisible(false)}
-                            style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shopProductDetail.confirm')}</Text>
-                        </TouchableOpacity>
+                        {}
+                        {paymentInfoOnConfirm ? (
+                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
+                                <TouchableOpacity
+                                    onPress={() => { setPaymentInfoOnConfirm(null); setPaymentInfoModalVisible(false); }}
+                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{ color: '#374151', fontWeight: '600' }}>{t('screens.shop.iak.cancel')}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const cb = paymentInfoOnConfirm;
+                                        setPaymentInfoOnConfirm(null);
+                                        setPaymentInfoModalVisible(false);
+                                        cb();
+                                    }}
+                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shopProductDetail.purchaseButton')}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <TouchableOpacity
+                                onPress={() => setPaymentInfoModalVisible(false)}
+                                style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shopProductDetail.confirm')}</Text>
+                            </TouchableOpacity>
+                        )}
                     </TouchableOpacity>
                 </TouchableOpacity>
             </Modal>
