@@ -894,31 +894,48 @@ export const ShopProductDetailScreen = () => {
                                         ? (productDetail?.content || productDetail?.contentAddDesc || '').trim()
                                         : String(product.description).trim();
 
-                                    if (rawContent.includes('▶')) {
-                                        const sections = rawContent.split('▶').map((s) => s.trim()).filter(Boolean);
-                                        return sections.map((sec, idx) => {
-                                            const lines = sec.split('\n').map((l) => l.trim()).filter(Boolean);
-                                            const heading = lines[0] || '';
-                                            const body = lines.slice(1);
-                                            return (
-                                                <View key={idx} style={{ marginBottom: idx < sections.length - 1 ? 16 : 0 }}>
-                                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
-                                                        {heading}
-                                                    </Text>
-                                                    {body.map((line, i) => (
-                                                        <Text key={i} style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
-                                                            {line}
-                                                        </Text>
-                                                    ))}
-                                                </View>
-                                            );
-                                        });
+                                    const lines = rawContent.split('\n').map((l) => l.trim()).filter(Boolean);
+                                    const sections: { heading: string; body: string[] }[] = [];
+                                    let cur: { heading: string; body: string[] } | null = null;
+                                    const headingRe = /^(?:▶\s*(.+)|\[([^\]]+)\]\s*(.*))$/;
+                                    for (const line of lines) {
+                                        const m = line.match(headingRe);
+                                        if (m) {
+                                            if (cur) sections.push(cur);
+                                            const heading = (m[1] ?? m[2] ?? '').trim();
+                                            cur = { heading, body: [] };
+                                            const tail = (m[3] ?? '').trim();
+                                            if (tail) cur.body.push(tail);
+                                        } else if (cur) {
+                                            cur.body.push(line);
+                                        } else {
+
+                                            cur = { heading: '', body: [line] };
+                                        }
                                     }
-                                    return (
-                                        <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
-                                            {rawContent}
-                                        </Text>
-                                    );
+                                    if (cur) sections.push(cur);
+
+                                    if (sections.length === 1 && !sections[0].heading) {
+                                        return (
+                                            <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                                {sections[0].body.join('\n')}
+                                            </Text>
+                                        );
+                                    }
+                                    return sections.map((sec, idx) => (
+                                        <View key={idx} style={{ marginBottom: idx < sections.length - 1 ? 16 : 0 }}>
+                                            {sec.heading ? (
+                                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                                    {sec.heading}
+                                                </Text>
+                                            ) : null}
+                                            {sec.body.map((line, i) => (
+                                                <Text key={i} style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
+                                                    {line}
+                                                </Text>
+                                            ))}
+                                        </View>
+                                    ));
                                 })()}
                             </View>
                         )}
