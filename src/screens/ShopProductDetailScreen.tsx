@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView, BackHandler } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ImageBackground, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeView, SafeScrollView } from '../components';
@@ -789,19 +789,18 @@ export const ShopProductDetailScreen = () => {
                             </View>
                         )}
                         <View style={styles.productImageContainer}>
-                            <View style={styles.productImageWrapper}>
-                                {showPlaceholder ? (
-
-                                    <View style={styles.productImage} />
-                                ) : (
-                                    <Image
-                                        source={primarySource}
-                                        style={styles.productImage}
-                                        resizeMode="contain"
-                                        onError={() => setImageLoadFailed(true)}
-                                    />
-                                )}
-                            </View>
+                            {}
+                            {showPlaceholder ? (
+                                <View style={styles.productImageWrapper} />
+                            ) : (
+                                <ImageBackground
+                                    source={primarySource}
+                                    style={styles.productImageWrapper}
+                                    imageStyle={{ borderRadius: 16 }}
+                                    resizeMode="contain"
+                                    onError={() => setImageLoadFailed(true)}
+                                />
+                            )}
                         </View>
                         {}
                         <View style={[styles.productInfoContainer, { alignItems: 'flex-start' }]}>
