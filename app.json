@@ -10,9 +10,9 @@
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "splash": {
-      "image": "./assets/icon_xrun_round_logo.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#262B41"
+      "image": "./assets/splash_transparent.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": false,
