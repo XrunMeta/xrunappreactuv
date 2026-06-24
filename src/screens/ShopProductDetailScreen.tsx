@@ -790,14 +790,11 @@ export const ShopProductDetailScreen = () => {
                         )}
                         <View style={styles.productImageContainer}>
                             {}
-                            {showPlaceholder ? (
-                                <View style={styles.productImageWrapper} />
-                            ) : (
-                                <ImageBackground
+                            {!showPlaceholder && (
+                                <Image
                                     source={primarySource}
-                                    style={styles.productImageWrapper}
-                                    imageStyle={{ borderRadius: 16 }}
-                                    resizeMode="contain"
+                                    style={{ width: '100%', height: 200, borderRadius: 16 }}
+                                    resizeMode="cover"
                                     onError={() => setImageLoadFailed(true)}
                                 />
                             )}
