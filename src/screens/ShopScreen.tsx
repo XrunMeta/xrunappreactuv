@@ -578,7 +578,8 @@ export const ShopScreen = () => {
                     {hasImage ? (
                         <Image
                             source={displayImage as ImageSourcePropType}
-                            style={{ width: '100%', height: '100%', borderRadius: 8 }}
+
+                            style={{ width: '80%', height: '80%', borderRadius: 8, alignSelf: 'center', marginTop: '10%' }}
                             resizeMode="cover"
                             onError={() => {
                                 if (isRemote) {
