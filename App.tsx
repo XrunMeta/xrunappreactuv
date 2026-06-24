@@ -993,7 +993,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void initTracker({ enabled: false });
+    void initTracker({ enabled: true });
   }, []);
 
   useEffect(() => {
