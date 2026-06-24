@@ -1030,7 +1030,7 @@ const styles = StyleSheet.create({
     productTitle: {
 
         fontSize: 13,
-        fontFamily: 'Roboto-Regular',
+        fontFamily: 'Roboto-Medium',
         color: '#101828',
         marginBottom: 6,
         lineHeight: 18,
