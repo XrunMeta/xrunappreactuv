@@ -36,7 +36,7 @@ export default {
   cancel: 'キャンセル',
   iak: {
     gpsBanner: '位置情報を許可すると、地域に合った商品が表示されます。タップして許可',
-    buyButton: 'XRUN で購入',
+    buyButton: '購入',
     processing: '処理中…',
     processingPayment: '決済処理中...',
     phoneModalTitle: 'チャージ先の携帯番号',

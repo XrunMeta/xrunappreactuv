@@ -29,7 +29,7 @@ export default {
   cancel: 'ยกเลิก',
   iak: {
     gpsBanner: 'อนุญาตการเข้าถึงตำแหน่งเพื่อดูสินค้าในพื้นที่ของคุณ แตะเพื่ออนุญาต',
-    buyButton: 'ซื้อด้วย XRUN',
+    buyButton: 'ซื้อ',
     processing: 'กำลังประมวลผล…',
     processingPayment: 'กำลังดำเนินการชำระเงิน...',
     phoneModalTitle: 'หมายเลขโทรศัพท์รับเติมเงิน',
