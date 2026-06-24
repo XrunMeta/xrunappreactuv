@@ -29,7 +29,7 @@ export default {
   cancel: 'Cancel',
   iak: {
     gpsBanner: 'Allow location permission to see products available in your area. Tap to allow',
-    buyButton: 'Buy with XRUN',
+    buyButton: 'Purchase',
     processing: 'Processing…',
     processingPayment: 'Processing payment...',
     phoneModalTitle: 'Phone number to receive top-up',

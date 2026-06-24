@@ -29,7 +29,7 @@ export default {
   cancel: '取消',
   iak: {
     gpsBanner: '允许位置权限以查看您所在地区的商品。点击允许',
-    buyButton: '用 XRUN 购买',
+    buyButton: '购买',
     processing: '处理中…',
     processingPayment: '支付处理中...',
     phoneModalTitle: '接收充值的手机号',

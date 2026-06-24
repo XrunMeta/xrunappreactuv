@@ -30,7 +30,7 @@ export default {
 
   iak: {
     gpsBanner: '위치 권한을 허용하면 지역에 맞는 상품을 보여드려요. 탭해서 허용',
-    buyButton: 'XRUN 으로 구매하기',
+    buyButton: '구매',
     processing: '처리 중…',
     processingPayment: '결제 처리 중...',
     phoneModalTitle: '충전 받을 휴대폰 번호',

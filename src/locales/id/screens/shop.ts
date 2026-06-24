@@ -29,7 +29,7 @@ export default {
   cancel: 'Batal',
   iak: {
     gpsBanner: 'Izinkan lokasi untuk melihat produk yang tersedia di wilayah Anda. Ketuk untuk mengizinkan',
-    buyButton: 'Beli dengan XRUN',
+    buyButton: 'Beli',
     processing: 'Memproses…',
     processingPayment: 'Memproses pembayaran...',
     phoneModalTitle: 'Nomor HP penerima top-up',

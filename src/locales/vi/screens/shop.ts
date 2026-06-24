@@ -29,7 +29,7 @@ export default {
   cancel: 'Hủy',
   iak: {
     gpsBanner: 'Cho phép quyền vị trí để xem sản phẩm có sẵn ở khu vực của bạn. Nhấn để cho phép',
-    buyButton: 'Mua bằng XRUN',
+    buyButton: 'Mua',
     processing: 'Đang xử lý…',
     processingPayment: 'Đang xử lý thanh toán...',
     phoneModalTitle: 'Số điện thoại nhận nạp tiền',

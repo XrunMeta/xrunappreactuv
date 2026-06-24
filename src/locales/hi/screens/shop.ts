@@ -29,7 +29,7 @@ export default {
   cancel: 'रद्द करें',
   iak: {
     gpsBanner: 'अपने क्षेत्र में उपलब्ध उत्पाद देखने के लिए स्थान अनुमति दें। अनुमति देने के लिए टैप करें',
-    buyButton: 'XRUN से खरीदें',
+    buyButton: 'खरीदें',
     processing: 'प्रसंस्करण…',
     processingPayment: 'भुगतान संसाधित हो रहा है...',
     phoneModalTitle: 'टॉप-अप प्राप्त करने के लिए फोन नंबर',
