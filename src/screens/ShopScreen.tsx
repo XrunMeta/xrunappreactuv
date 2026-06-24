@@ -1028,12 +1028,12 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     productTitle: {
-        fontSize: 15,
-        fontFamily: 'Roboto-Bold',
-        color: '#101828',
 
+        fontSize: 13,
+        fontFamily: 'Roboto-Regular',
+        color: '#101828',
         marginBottom: 6,
-        lineHeight: 20,
+        lineHeight: 18,
     },
     productFooter: {
         flexDirection: 'row',
