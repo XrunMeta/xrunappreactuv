@@ -790,14 +790,11 @@ export const v_a59951 = () => {
                         )}
                         <View style={v_d81136.productImageContainer}>
                             {}
-                            {v_a12826 ? (
-                                <View style={v_d81136.productImageWrapper} />
-                            ) : (
-                                <ImageBackground
+                            {!v_a12826 && (
+                                <Image
                                     source={v_6ef3ee}
-                                    style={v_d81136.productImageWrapper}
-                                    imageStyle={{ borderRadius: 16 }}
-                                    resizeMode="contain"
+                                    style={{ width: '100%', height: 200, borderRadius: 16 }}
+                                    resizeMode="cover"
                                     onError={() => v_aad6d1(true)}
                                 />
                             )}
