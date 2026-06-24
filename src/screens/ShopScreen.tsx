@@ -578,8 +578,8 @@ export const ShopScreen = () => {
                     {hasImage ? (
                         <Image
                             source={displayImage as ImageSourcePropType}
-                            style={styles.productImage}
-                            resizeMode="contain"
+                            style={{ width: '100%', height: '100%', borderRadius: 8 }}
+                            resizeMode="cover"
                             onError={() => {
                                 if (isRemote) {
                                     setFailedImages(prev => new Set(prev).add(product.id));
