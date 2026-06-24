@@ -578,8 +578,8 @@ export const v_10886b = () => {
                     {v_01a739 ? (
                         <Image
                             source={v_fafc7f as v_07a341}
-                            style={v_d81136.productImage}
-                            resizeMode="contain"
+                            style={{ width: '100%', height: '100%', borderRadius: 8 }}
+                            resizeMode="cover"
                             onError={() => {
                                 if (v_419eb6) {
                                     v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
