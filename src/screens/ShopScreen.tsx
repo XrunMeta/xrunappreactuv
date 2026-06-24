@@ -578,7 +578,8 @@ export const v_10886b = () => {
                     {v_01a739 ? (
                         <Image
                             source={v_fafc7f as v_07a341}
-                            style={{ width: '100%', height: '100%', borderRadius: 8 }}
+
+                            style={{ width: '80%', height: '80%', borderRadius: 8, alignSelf: 'center', marginTop: '10%' }}
                             resizeMode="cover"
                             onError={() => {
                                 if (v_419eb6) {
