@@ -104,6 +104,8 @@ export const ShopProductDetailScreen = () => {
 
     const [detailTab, setDetailTab] = useState<'desc' | 'guide'>('desc');
 
+    const [paymentInfoModalVisible, setPaymentInfoModalVisible] = useState(false);
+
     useEffect(() => {
         const sub = BackHandler.addEventListener('hardwareBackPress', () => {
             navigate(ROUTES.shop);
@@ -833,63 +835,17 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
                             </View>
                         </View>
-                    ) : (
-                    <View style={styles.paymentCard}>
-                        <View style={styles.sectionHeader}>
-                            <Feather name="credit-card" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.paymentInfo')}</Text>
-                        </View>
-                        <View style={styles.divider} />
-                        {isXplayShop ? (
-                            <>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
-                                    <View style={styles.priceContainer}>
-                                        <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} XRUN</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXRUNBalance')}</Text>
-                                    {xrunBalanceLoading ? (
-                                        <ActivityIndicator size="small" color="#1E3A5F" />
-                                    ) : (
-                                        <Text style={styles.paymentBalance}>
-                                            {xrunBalanceState == null ? '-' : `${xrunBalanceState.toLocaleString()} XRUN`}
-                                        </Text>
-                                    )}
-                                </View>
-                                <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXRUN')}</Text>
-                                    <Text style={styles.paymentRemaining}>
-                                        {xrunBalanceState == null ? '-' : `${(xrunBalanceState - displayPrice).toLocaleString()} XRUN`}
-                                    </Text>
-                                </View>
-                            </>
-                        ) : (
-                            <>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
-                                    <View style={styles.priceContainer}>
-                                        <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{product.price.toLocaleString()} XRUN</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXrunBalance')}</Text>
-                                    {xrunBalanceLoading ? (
-                                        <ActivityIndicator size="small" color="#1E3A5F" />
-                                    ) : (
-                                        <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
-                                    )}
-                                </View>
-                                <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXrun')}</Text>
-                                    <Text style={styles.paymentRemaining}>{remainingBalance.toLocaleString()} XRUN</Text>
-                                </View>
-                            </>
-                        )}
-                    </View>
+                    ) : null}
+                    {}
+                    {!isPurchasedView && (
+                        <TouchableOpacity
+                            style={styles.paymentInfoLink}
+                            onPress={() => setPaymentInfoModalVisible(true)}
+                            activeOpacity={0.7}
+                        >
+                            <Feather name="info" size={14} color="#1E3A5F" />
+                            <Text style={styles.paymentInfoLinkText}>{t('screens.shopProductDetail.paymentInfo')}</Text>
+                        </TouchableOpacity>
                     )}
 
                     {}
@@ -1032,6 +988,54 @@ export const ShopProductDetailScreen = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
+            </Modal>
+
+            {}
+            <Modal
+                visible={paymentInfoModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setPaymentInfoModalVisible(false)}
+            >
+                <TouchableOpacity activeOpacity={1} style={styles.modalOverlay} onPress={() => setPaymentInfoModalVisible(false)}>
+                    <TouchableOpacity activeOpacity={1} style={[styles.paymentSuccessModal, { paddingTop: 24 }]} onPress={(e) => e.stopPropagation()}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                            <Feather name="credit-card" size={18} color="#1E3A5F" />
+                            <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>{t('screens.shopProductDetail.paymentInfo')}</Text>
+                        </View>
+                        <View style={styles.paymentInfoModalRow}>
+                            <Text style={styles.paymentInfoModalLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
+                            <Text style={styles.paymentInfoModalValue}>{(isXplayShop ? displayPrice : product.price).toLocaleString()} XRUN</Text>
+                        </View>
+                        <View style={styles.paymentInfoModalRow}>
+                            <Text style={styles.paymentInfoModalLabel}>{t('screens.shopProductDetail.myXrunBalance')}</Text>
+                            {xrunBalanceLoading ? (
+                                <ActivityIndicator size="small" color="#1E3A5F" />
+                            ) : (
+                                <Text style={styles.paymentInfoModalValue}>
+                                    {isXplayShop
+                                        ? (xrunBalanceState == null ? '-' : `${xrunBalanceState.toLocaleString()} XRUN`)
+                                        : `${xrunBalance.toLocaleString()} XRUN`}
+                                </Text>
+                            )}
+                        </View>
+                        <View style={[styles.paymentInfoModalRow, { borderBottomWidth: 0 }]}>
+                            <Text style={styles.paymentInfoModalLabel}>{t('screens.shopProductDetail.remainingXrun')}</Text>
+                            <Text style={styles.paymentInfoModalRemaining}>
+                                {isXplayShop
+                                    ? (xrunBalanceState == null ? '-' : `${(xrunBalanceState - displayPrice).toLocaleString()} XRUN`)
+                                    : `${remainingBalance.toLocaleString()} XRUN`}
+                            </Text>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => setPaymentInfoModalVisible(false)}
+                            style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shopProductDetail.confirm')}</Text>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </TouchableOpacity>
             </Modal>
 
             {}
@@ -1533,6 +1537,46 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         textAlign: 'center',
         letterSpacing: -0.3,
+    },
+
+    paymentInfoLink: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: -8,
+        marginBottom: 4,
+        paddingHorizontal: 4,
+        paddingVertical: 8,
+        alignSelf: 'flex-start',
+    },
+    paymentInfoLinkText: {
+        fontSize: 13,
+        color: '#1E3A5F',
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+    },
+
+    paymentInfoModalRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+    },
+    paymentInfoModalLabel: {
+        fontSize: 14,
+        color: '#6B7280',
+    },
+    paymentInfoModalValue: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#111827',
+    },
+    paymentInfoModalRemaining: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#16a34a',
     },
 
     tabRow: {
