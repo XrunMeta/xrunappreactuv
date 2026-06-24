@@ -278,7 +278,16 @@ export const ShopProductDetailScreen = () => {
         const balance = xrunBalanceState;
         console.log('[Xplay 구매] 잔액 비교', { balance, needPrice, ok: balance >= needPrice });
         if (balance < needPrice) {
-            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: t('screens.shopProductDetail.confirm') }]);
+
+            const shortage = (needPrice - balance).toFixed(4).replace(/\.?0+$/, '');
+            showAlert(
+                t('screens.shopProductDetail.alerts.notification'),
+                t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
+                [
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.map) },
+                    { text: t('screens.shopProductDetail.confirm') },
+                ],
+            );
             return;
         }
         showAlert(t('screens.shopProductDetail.alerts.purchaseConfirmTitle'), t('screens.shopProductDetail.alerts.purchaseConfirmMessageXplay', { title: product.title }), [
@@ -652,7 +661,16 @@ export const ShopProductDetailScreen = () => {
             return;
         }
         if (xrunBalanceState < product.price) {
-            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.insufficientBalance'), [{ text: t('screens.shop.iak.ok') }]);
+
+            const shortage = (product.price - xrunBalanceState).toFixed(4).replace(/\.?0+$/, '');
+            showAlert(
+                t('screens.shop.iak.notice'),
+                t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
+                [
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.map) },
+                    { text: t('screens.shop.iak.ok') },
+                ],
+            );
             return;
         }
         showAlert(

@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\nThanh toán đã hoàn tất. Mã giảm giá sẽ được gửi tự động hoặc thủ công sớm. ({{tx}}…)',
     phoneNotRegistered: 'Chưa đăng ký SĐT người nhận. Vui lòng đăng ký tại Trang cá nhân.',
     insufficientXRUN: 'Số dư XRUN không đủ.',
+    insufficientWithShortage: "Số dư XRUN không đủ.\nCần thêm {{shortage}} XRUN.",
+    collectXrun: "Kiếm XRUN",
     purchaseConfirmTitle: 'Mua',
     purchaseConfirmMessageXRUN: 'Mua {{title}} bằng XRUN?',
     cancel: 'Hủy',

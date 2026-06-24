@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\nभुगतान पूर्ण हो गया है। कूपन शीघ्र ही स्वचालित या मैन्युअल रूप से भेजा जाएगा। ({{tx}}…)',
     phoneNotRegistered: 'प्राप्तकर्ता फोन पंजीकृत नहीं। माई पेज में पंजीकृत करें।',
     insufficientXRUN: 'XRUN बैलेंस अपर्याप्त।',
+    insufficientWithShortage: "XRUN शेष अपर्याप्त है।\n{{shortage}} XRUN और चाहिए।",
+    collectXrun: "XRUN कमाएं",
     purchaseConfirmTitle: 'खरीदें',
     purchaseConfirmMessageXRUN: '{{title}} को XRUN से खरीदें?',
     cancel: 'रद्द',

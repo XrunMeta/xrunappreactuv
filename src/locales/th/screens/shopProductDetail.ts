@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\nชำระเงินเสร็จแล้ว คูปองจะถูกส่งแบบอัตโนมัติหรือด้วยตนเองในไม่ช้า ({{tx}}…)',
     phoneNotRegistered: 'Recipient phone number is not registered. Please register in My Page.',
     insufficientXRUN: 'Insufficient XRUN balance.',
+    insufficientWithShortage: "ยอด XRUN ไม่เพียงพอ\nต้องการเพิ่มอีก {{shortage}} XRUN",
+    collectXrun: "หา XRUN เพิ่ม",
     purchaseConfirmTitle: 'Purchase',
     purchaseConfirmMessageXRUN: 'ซื้อ {{title}} ด้วย XRUN?',
     cancel: 'Cancel',

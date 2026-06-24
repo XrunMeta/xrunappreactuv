@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\nPembayaran telah selesai. Kupon akan dikirim otomatis atau manual segera. ({{tx}}…)',
     phoneNotRegistered: 'Nomor penerima belum terdaftar. Daftar di Halaman Saya.',
     insufficientXRUN: 'Saldo XRUN tidak cukup.',
+    insufficientWithShortage: "Saldo XRUN tidak cukup.\nButuh {{shortage}} XRUN lagi.",
+    collectXrun: "Kumpulkan XRUN",
     purchaseConfirmTitle: 'Beli',
     purchaseConfirmMessageXRUN: 'Beli {{title}} dengan XRUN?',
     cancel: 'Batal',
