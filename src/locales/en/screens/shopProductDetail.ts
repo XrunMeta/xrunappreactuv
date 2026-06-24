@@ -45,6 +45,8 @@ export default {
     phoneNotRegistered: 'Recipient phone number is not registered. Please register in My Page.',
     insufficientXRUN: 'Insufficient XRUN balance.',
     insufficientXplay: 'Insufficient XRUN balance.',
+    insufficientWithShortage: "Insufficient XRUN balance.\n{{shortage}} more XRUN needed.",
+    collectXrun: "Earn XRUN",
     purchaseConfirmTitle: 'Purchase',
     purchaseConfirmMessageXRUN: 'Buy {{title}} with XRUN?',
     purchaseConfirmMessageXplay: 'Buy {{title}} with XRUN?',

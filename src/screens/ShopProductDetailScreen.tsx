@@ -278,7 +278,16 @@ export const v_a59951 = () => {
         const v_c88e9b = v_a1c497;
         console.log('[Xplay 구매] 잔액 비교', { balance: v_c88e9b, needPrice: v_c25eec, ok: v_c88e9b >= v_c25eec });
         if (v_c88e9b < v_c25eec) {
-            v_889fad(v_8d41d7('screens.shopProductDetail.alerts.notification'), v_8d41d7('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
+
+            const v_ff3b79 = (v_c25eec - v_c88e9b).toFixed(4).replace(/\.?0+$/, '');
+            v_889fad(
+                v_8d41d7('screens.shopProductDetail.alerts.notification'),
+                v_8d41d7('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage: v_ff3b79 }),
+                [
+                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.map) },
+                    { text: v_8d41d7('screens.shopProductDetail.confirm') },
+                ],
+            );
             return;
         }
         v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseConfirmTitle'), v_8d41d7('screens.shopProductDetail.alerts.purchaseConfirmMessageXplay', { title: v_01bee9.title }), [
@@ -652,7 +661,16 @@ export const v_a59951 = () => {
             return;
         }
         if (v_a1c497 < v_01bee9.price) {
-            v_889fad(v_8d41d7('screens.shop.iak.notice'), v_8d41d7('screens.shop.iak.insufficientBalance'), [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+
+            const v_ff3b79 = (v_01bee9.price - v_a1c497).toFixed(4).replace(/\.?0+$/, '');
+            v_889fad(
+                v_8d41d7('screens.shop.iak.notice'),
+                v_8d41d7('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage: v_ff3b79 }),
+                [
+                    { text: v_8d41d7('screens.shopProductDetail.alerts.collectXrun'), onPress: () => v_9b57fc(v_ce4741.map) },
+                    { text: v_8d41d7('screens.shop.iak.ok') },
+                ],
+            );
             return;
         }
         v_889fad(

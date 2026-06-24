@@ -45,6 +45,8 @@ export default {
     phoneNotRegistered: '수신자 휴대폰 번호가 등록되지 않았습니다. 마이페이지에서 휴대폰 번호를 등록해 주세요.',
     insufficientXRUN: 'XRUN 잔액이 부족합니다.',
     insufficientXplay: 'XRUN 잔액이 부족합니다.',
+    insufficientWithShortage: 'XRUN 잔액이 부족합니다.\n{{shortage}} XRUN 이 더 필요해요.',
+    collectXrun: 'XRUN 모으러 가기',
     purchaseConfirmTitle: '구매',
     purchaseConfirmMessageXRUN: '{{title}}을(를) XRUN으로 구매하시겠습니까?',
     purchaseConfirmMessageXplay: '{{title}}을(를) XRUN으로 구매하시겠습니까?',

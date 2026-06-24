@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\n決済は完了しました。クーポンは自動または手動でまもなく送信されます。({{tx}}…)',
     phoneNotRegistered: '受取人電話番号が登録されていません。マイページで登録してください。',
     insufficientXRUN: 'XRUN残高が不足しています。',
+    insufficientWithShortage: "XRUN 残高が不足しています。\n{{shortage}} XRUN が追加で必要です。",
+    collectXrun: "XRUN を集めに行く",
     purchaseConfirmTitle: '購入',
     purchaseConfirmMessageXRUN: '{{title}}をXRUNで購入しますか？',
     cancel: 'キャンセル',

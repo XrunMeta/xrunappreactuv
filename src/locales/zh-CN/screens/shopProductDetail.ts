@@ -44,6 +44,8 @@ export default {
     paymentCompletePendingCouponMessage: '{{reason}}\n\n支付已完成，优惠券将自动或手动发送。({{tx}}…)',
     phoneNotRegistered: '未登记收件人手机号，请在个人中心登记。',
     insufficientXRUN: 'XRUN余额不足。',
+    insufficientWithShortage: "XRUN 余额不足。\n还需要 {{shortage}} XRUN。",
+    collectXrun: "去赚 XRUN",
     purchaseConfirmTitle: '购买',
     purchaseConfirmMessageXRUN: '使用 XRUN 购买 {{title}}？',
     cancel: '取消',
