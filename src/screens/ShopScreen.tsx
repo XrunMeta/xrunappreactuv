@@ -1030,7 +1030,7 @@ const v_d81136 = v_472849.create({
     productTitle: {
 
         fontSize: 13,
-        fontFamily: 'Roboto-Regular',
+        fontFamily: 'Roboto-Medium',
         color: '#101828',
         marginBottom: 6,
         lineHeight: 18,
